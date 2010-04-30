@@ -208,7 +208,7 @@ cache_class_attribs(PARROT_INTERP,
         /* Insert into hash, along with index. */
         VTABLE_set_integer_keyed_str(interp, attrib_index, full_key, cur_index);
         VTABLE_set_integer_keyed_str(interp, class_cache, attrib_name, cur_index);
-        cur_index++;
+        ++cur_index;
     }
 
     return cur_index;
@@ -228,7 +228,7 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     int                  i;
 
     /* Go over the list of all parents to construct the attribute index. */
-    for (i = 0; i < num_classes; i++) {
+    for (i = 0; i < num_classes; ++i) {
        /* Get the class and check that it respects the standard class interface
         * (if not we don't know how it stores its attributes, so we'll have to
         * delegate the lookup). */
@@ -352,7 +352,7 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
         const int  parent_count = VTABLE_elements(interp, parent_list);
         int i;
 
-        for (i = 0; i < parent_count; i++)
+        for (i = 0; i < parent_count; ++i)
             VTABLE_add_parent(interp, self,
                 VTABLE_get_pmc_keyed_int(interp, parent_list, i));
     }
@@ -365,7 +365,7 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
         const int   role_count = VTABLE_elements(interp, role_list);
         int i;
 
-        for (i = 0; i < role_count; i++)
+        for (i = 0; i < role_count; ++i)
             VTABLE_add_role(interp, self,
                 VTABLE_get_pmc_keyed_int(interp, role_list, i));
     }
@@ -378,7 +378,7 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
         const int   attrib_count    = VTABLE_elements(interp, attrs_name_list);
         int i;
 
-        for (i = 0; i < attrib_count; i++) {
+        for (i = 0; i < attrib_count; ++i) {
             STRING * const attr_name = VTABLE_get_string_keyed_int(interp,
                 attrs_name_list, i);
             VTABLE_add_attribute(interp, self, attr_name, PMCNULL);
@@ -889,7 +889,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* iterate over all direct parents, check whether this class already has
          * the parent being added. */
-        for (index = 0; index < parent_count; index++) {
+        for (index = 0; index < parent_count; ++index) {
             /* get the next parent */
             PMC * const current_parent = VTABLE_get_pmc_keyed_int(INTERP,
                                       _class->parents, index);
@@ -907,7 +907,7 @@ Adds the supplied PMC to the list of parents for the class.
         /* Check that none of the parents is self */
         parent_count = VTABLE_elements(INTERP, PARROT_CLASS(parent)->all_parents);
 
-        for (index = 0; index < parent_count; index++) {
+        for (index = 0; index < parent_count; ++index) {
             /* get the next parent */
             PMC * const current_parent = VTABLE_get_pmc_keyed_int(INTERP,
                 PARROT_CLASS(parent)->all_parents, index);
@@ -955,7 +955,7 @@ if the class has been instantiated.
         parent_count = VTABLE_elements(INTERP, _class->parents);
 
         /* iterate over all direct parents, looking for the parent to remove */
-        for (index = 0; index < parent_count; index++) {
+        for (index = 0; index < parent_count; ++index) {
             /* get the next parent */
             PMC * const current_parent = VTABLE_get_pmc_keyed_int(INTERP,
                                       _class->parents, index);
@@ -1237,7 +1237,7 @@ Creates a new PMC object of the type of the class and calls init().
             /* don't use HLL mappings for internal-only data */
             Parrot_pcc_set_HLL(INTERP, CURRENT_CONTEXT(INTERP), 0);
 
-            for (i = 0; i < resolve_count; i++) {
+            for (i = 0; i < resolve_count; ++i) {
                 STRING * const check_meth =
                     VTABLE_get_string_keyed_int(INTERP, _class->resolve_method, i);
                 if (!VTABLE_exists_keyed_str(INTERP, _class->methods, check_meth))
@@ -1258,7 +1258,7 @@ Creates a new PMC object of the type of the class and calls init().
              * flag stating so. */
             mro_length = VTABLE_elements(INTERP, _class->all_parents);
 
-            for (i = 0; i < mro_length; i++) {
+            for (i = 0; i < mro_length; ++i) {
                 PMC * const class_check = VTABLE_get_pmc_keyed_int(INTERP,
                     _class->all_parents, i);
                 if (class_check->vtable->base_type != enum_class_Class) {
@@ -1368,7 +1368,7 @@ Returns whether the class is or inherits from C<*class>.
          * for 'isa' on the original comparison. */
         num_classes = VTABLE_elements(INTERP, _class->parents);
 
-        for (i = 0; i < num_classes; i++) {
+        for (i = 0; i < num_classes; ++i) {
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
                     _class->parents, i);
 
@@ -1426,7 +1426,7 @@ Returns whether the class does the role with the given C<*role_name>.
 
         count = VTABLE_elements(INTERP, role_list);
 
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < count; ++i) {
             PMC * const role = VTABLE_get_pmc_keyed_int(INTERP, role_list, i);
 
             if (VTABLE_does(INTERP, role, role_name))
@@ -1437,7 +1437,7 @@ Returns whether the class does the role with the given C<*role_name>.
          * for 'does' on the original comparison. */
         count = VTABLE_elements(INTERP, _class->parents);
 
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < count; ++i) {
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
                     _class->parents, i);
 
@@ -1467,7 +1467,7 @@ Returns whether the class does the given C<*role>.
 
         role_count = VTABLE_elements(INTERP, role_list);
 
-        for (i = 0; i < role_count; i++) {
+        for (i = 0; i < role_count; ++i) {
             PMC    * const test_role = VTABLE_get_pmc_keyed_int(INTERP, role_list, i);
             if (VTABLE_does_pmc(INTERP, test_role, role))
                 return 1;
@@ -1477,7 +1477,7 @@ Returns whether the class does the given C<*role>.
          * for 'does' on the original comparison. */
         count = VTABLE_elements(INTERP, _class->parents);
 
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < count; ++i) {
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
                     _class->parents, i);
 
@@ -1851,7 +1851,7 @@ Walks the MRO of the class and finds the method with the given name.
         /* Walk and search. One day, we'll use the cache first. */
         const int num_classes = VTABLE_elements(INTERP, _class->all_parents);
 
-        for (i = 0; i < num_classes; i++) {
+        for (i = 0; i < num_classes; ++i) {
             /* Get the class and see if it has the method. */
             PMC * const cur_class =
                 VTABLE_get_pmc_keyed_int(INTERP, _class->all_parents, i);
@@ -1941,7 +1941,7 @@ Composes a role into a class with the given exclusions and aliases.
             const int resolve_count = VTABLE_elements(INTERP, _class->resolve_method);
             int i;
 
-            for (i = 0; i < resolve_count; i++) {
+            for (i = 0; i < resolve_count; ++i) {
                 STRING * const meth_name = VTABLE_get_string_keyed_int(INTERP,
                     _class->resolve_method, i);
                 VTABLE_push_string(INTERP, exclude_method, meth_name);

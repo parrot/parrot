@@ -136,7 +136,7 @@ Initializes a PMCProxy PMC.
 
         /* Build MRO (skip ourself). */
         mro_length = VTABLE_elements(interp, interp->vtables[type_num]->mro);
-        for (i = 1; i < mro_length; i++) {
+        for (i = 1; i < mro_length; ++i) {
             PMC    *pclass = VTABLE_get_pmc_keyed_int(interp, interp->vtables[type_num]->mro, i);
             PMC    *cns    = pclass->vtable->_namespace;
             STRING *cname  = pclass->vtable->whoami;
@@ -260,7 +260,7 @@ Returns whether the class is or inherits from C<*classname>.
          * for 'isa' on the original comparison. */
         num_classes = VTABLE_elements(interp, _proxy->parents);
 
-        for (i = 0; i < num_classes; i++) {
+        for (i = 0; i < num_classes; ++i) {
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
                 _proxy->parents, i);
 

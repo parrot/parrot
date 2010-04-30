@@ -124,7 +124,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
         /* trace_op_dump(interp, self->pf->src, pc); */
         Parrot_io_printf(interp, " %04x:  ", (int)(pc - self->data));
 
-        for (i = 0; i < 6; i++)
+        for (i = 0; i < 6; ++i)
             if (i < n)
                 Parrot_io_printf(interp, "%08lx ", (unsigned long)pc[i]);
             else
@@ -210,7 +210,7 @@ null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)
     const PackFile_Directory * const dir = (const PackFile_Directory *)self;
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++)
+    for (i = 0; i < dir->num_segments; ++i)
         self->pf->PackFuncs[dir->segments[i]->type].dump(interp, dir->segments[i]);
 }
 
@@ -440,7 +440,7 @@ main(int argc, const char **argv)
     if (nums_only) {
         int i;
 
-        for (i = PF_DIR_SEG + 1; i < PF_MAX_SEG; i++)
+        for (i = PF_DIR_SEG + 1; i < PF_MAX_SEG; ++i)
             pf->PackFuncs[i].dump = null_dump;
 
         pf->PackFuncs[PF_DIR_SEG].dump   = null_dir_dump;

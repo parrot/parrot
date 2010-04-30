@@ -303,7 +303,7 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGMOD(PMC* info))
             packid_type = enum_PackID_seen;
         }
         else {
-            PARROT_IMAGEIO(info)->id++; /* next id to freeze */
+            ++PARROT_IMAGEIO(info)->id; /* next id to freeze */
             id = PARROT_IMAGEIO(info)->id;
             packid_type = enum_PackID_normal;
         }

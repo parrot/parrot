@@ -589,7 +589,7 @@ Parrot_print_backtrace(void)
             "Backtrace - Obtained %d stack frames (max trace depth is %d).\n",
             size, BACKTRACE_DEPTH);
 #  ifndef BACKTRACE_VERBOSE
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < size; ++i) {
         Dl_info   frameInfo;
         const int found  = dladdr(array[i], &frameInfo);
 
@@ -608,7 +608,7 @@ Parrot_print_backtrace(void)
     { /* Scope for strings */
         char ** strings = backtrace_symbols(array, size);
         if (strings) {
-            for (i = 0; i < size; i++)
+            for (i = 0; i < size; ++i)
                 fprintf(stderr, "%s\n", strings[i]);
             /* backtrace_symbols gets memory using malloc */
             free(strings);

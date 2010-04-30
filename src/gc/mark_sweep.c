@@ -268,12 +268,12 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
         b = (PObj *)cur_arena->start_objects;
 
         /* loop only while there are objects in the arena */
-        for (i = objects_end; i; i--) {
+        for (i = objects_end; i; --i) {
 
             /* if it's on free list, do nothing */
 
             if (PObj_live_TEST(b)) {
-                total_used++;
+                ++total_used;
                 PObj_live_CLEAR(b);
                 PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
             }
@@ -414,7 +414,7 @@ Parrot_gc_clear_live_bits(SHIM_INTERP, ARGIN(const Fixed_Size_Pool *pool))
         Buffer *b = (Buffer *)arena->start_objects;
         UINTVAL i;
 
-        for (i = 0; i < arena->used; i++) {
+        for (i = 0; i < arena->used; ++i) {
             PObj_live_CLEAR(b);
             b = (Buffer *)((char *)b + object_size);
         }
@@ -456,7 +456,7 @@ Parrot_add_to_free_list(SHIM_INTERP,
 #else
     /* Move all the new objects into the free list */
     arena->used          = num_objects;
-    for (i = 0; i < num_objects; i++) {
+    for (i = 0; i < num_objects; ++i) {
         pool->add_free_object(interp, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }

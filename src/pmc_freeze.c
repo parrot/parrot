@@ -206,7 +206,7 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
     PMC * const todo    = VTABLE_get_iter(interp, info);
 
     /* can't cache upper limit, visit may append items */
-    for (i = 0; i < VTABLE_elements(interp, todo); i++) {
+    for (i = 0; i < VTABLE_elements(interp, todo); ++i) {
         PMC * const current = VTABLE_get_pmc_keyed_int(interp, todo, i);
         if (!current)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,

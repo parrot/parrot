@@ -396,7 +396,7 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
             enum_class_FixedIntegerArray, param_count);
     INTVAL i;
 
-    for (i = 0; i < param_count; i++) {
+    for (i = 0; i < param_count; ++i) {
         STRING *type_name = VTABLE_get_string_keyed_int(interp, type_list, i);
         INTVAL  type;
 
@@ -646,7 +646,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
             if (type_sig == enum_class_Integer) { dist++; continue; }
             if (type_sig == enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
-                dist++;
+                ++dist;
                 type_call = enum_class_Integer;
             }
             break;
@@ -654,7 +654,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
             if (type_sig == enum_class_Float)   { dist++; continue; }
             if (type_sig == enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
-                dist++;
+                ++dist;
                 type_call = enum_class_Float;
             }
             break;
@@ -662,7 +662,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
             if (type_sig == enum_class_String)  { dist++; continue; }
             if (type_sig == enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
-                dist++;
+                ++dist;
                 type_call = enum_class_String;
             }
             break;
@@ -675,7 +675,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * which matches any PMC
          */
         if (type_call <= 0 && type_sig == enum_type_PMC) {
-            dist++;
+            ++dist;
             continue;
         }
 
@@ -1122,7 +1122,7 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     STRING *key;
     INTVAL  i;
 
-    for (i = 0; i < num_values; i++) {
+    for (i = 0; i < num_values; ++i) {
         const INTVAL id = VTABLE_type(interp, VTABLE_get_pmc_keyed_int(interp, values, i));
         if (id == 0) {
             mem_gc_free(interp, type_ids);
@@ -1223,7 +1223,7 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     STRING *key;
     INTVAL  i;
 
-    for (i = 0; i < num_types; i++) {
+    for (i = 0; i < num_types; ++i) {
         const INTVAL id = VTABLE_get_integer_keyed_int(interp, types, i);
 
         if (id == 0) {

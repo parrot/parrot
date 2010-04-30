@@ -277,7 +277,7 @@ get_max_buffer_address(ARGIN(const Memory_Pools *mem_pools))
     size_t         max        = 0;
     UINTVAL        i;
 
-    for (i = 0; i < mem_pools->num_sized; i++) {
+    for (i = 0; i < mem_pools->num_sized; ++i) {
         if (mem_pools->sized_header_pools[i]) {
             if (mem_pools->sized_header_pools[i]->end_arena_memory > max)
                 max = mem_pools->sized_header_pools[i]->end_arena_memory;
@@ -311,7 +311,7 @@ get_min_buffer_address(ARGIN(const Memory_Pools *mem_pools))
     size_t         min        = (size_t) -1;
     UINTVAL        i;
 
-    for (i = 0; i < mem_pools->num_sized; i++) {
+    for (i = 0; i < mem_pools->num_sized; ++i) {
         const Fixed_Size_Pool * const pool = mem_pools->sized_header_pools[i];
         if (pool && pool->start_arena_memory) {
             if (pool->start_arena_memory < min)
@@ -387,7 +387,7 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
     /* Shifting a value by its size (in bits) or larger is undefined behaviour.
        So need an explicit check to return 0 if there is no prefix, rather than
        attempting to rely on (say) 0xFFFFFFFF << 32 being 0.  */
-    for (i = 0; i < bound; i++) {
+    for (i = 0; i < bound; ++i) {
         if (val1 == val2)
             return ~(size_t)0 << i;
 
@@ -494,7 +494,7 @@ is_buffer_ptr(ARGIN(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
     ASSERT_ARGS(is_buffer_ptr)
     UINTVAL        i;
 
-    for (i = 0; i < mem_pools->num_sized; i++) {
+    for (i = 0; i < mem_pools->num_sized; ++i) {
         if (mem_pools->sized_header_pools[i]
             &&  contained_in_pool(mem_pools->sized_header_pools[i], ptr))
             return 1;

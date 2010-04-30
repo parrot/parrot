@@ -4913,7 +4913,7 @@ int mALLOPt(param_number, value) int param_number; int value;
           }
           / / save ptrs so they can be freed during cleanup
           our_os_pools[next_os_pool] = ptr;
-          next_os_pool++;
+          ++next_os_pool;
           ptr = (void *) ((((CHUNK_SIZE_T) ptr) + RM_PAGE_MASK) & ~RM_PAGE_MASK);
           sbrk_top = (char *) ptr + size;
           return ptr;

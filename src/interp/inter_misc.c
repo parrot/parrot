@@ -336,10 +336,10 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                 while (pos              >  0
                 &&     fullname_c[pos] != '/'
                 &&     fullname_c[pos] != '\\')
-                    pos--;
+                    --pos;
 
                 if (pos > 0)
-                    pos++;
+                    ++pos;
 
                 basename = Parrot_str_new(interp, fullname_c + pos, 0);
                 Parrot_str_free_cstring(fullname_c);

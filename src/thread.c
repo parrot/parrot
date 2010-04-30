@@ -1443,7 +1443,7 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
 
     new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
     INTERPRETER_LOCK_INIT(new_interp);
-    running_threads++;
+    ++running_threads;
     if (Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
         fprintf(stderr, "running threads %d\n", running_threads);
 

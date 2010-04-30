@@ -316,7 +316,7 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
         char * const buffer = result->strstart;
         UINTVAL offset;
 
-        for (offset = 0; offset < n; offset++) {
+        for (offset = 0; offset < n; ++offset) {
             buffer[offset] = (char)toupper((unsigned char)buffer[offset]);
         }
     }
@@ -346,7 +346,7 @@ downcase(PARROT_INTERP, ARGIN(const STRING *src))
         char * const buffer = result->strstart;
         UINTVAL offset;
 
-        for (offset = 0; offset < n; offset++) {
+        for (offset = 0; offset < n; ++offset) {
             buffer[offset] = (char)tolower((unsigned char)buffer[offset]);
         }
     }
@@ -379,7 +379,7 @@ titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         UINTVAL offset;
 
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
-        for (offset = 1; offset < n; offset++) {
+        for (offset = 1; offset < n; ++offset) {
             buffer[offset] = (char)tolower((unsigned char)buffer[offset]);
         }
     }

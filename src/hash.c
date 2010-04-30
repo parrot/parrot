@@ -645,7 +645,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
     ASSERT_ARGS(hash_freeze)
     size_t           i;
 
-    for (i = 0; i < hash->entries; i++) {
+    for (i = 0; i < hash->entries; ++i) {
         HashBucket * const b = hash->bs+i;
 
         switch (hash->key_type) {
@@ -1063,7 +1063,7 @@ parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
     ASSERT_ARGS(parrot_chash_destroy)
     UINTVAL i;
 
-    for (i = 0; i <= hash->mask; i++) {
+    for (i = 0; i <= hash->mask; ++i) {
         HashBucket *bucket = hash->bi[i];
         while (bucket) {
             mem_gc_free(interp, bucket->key);
@@ -1098,7 +1098,7 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
     ASSERT_ARGS(parrot_chash_destroy_values)
     UINTVAL i;
 
-    for (i = 0; i <= hash->mask; i++) {
+    for (i = 0; i <= hash->mask; ++i) {
         HashBucket *bucket = hash->bi[i];
         while (bucket) {
             mem_gc_free(interp, bucket->key);
@@ -1226,7 +1226,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
         const UINTVAL  entries = hash->entries;
         UINTVAL        i;
 
-        for (i = 0; i < entries; i++) {
+        for (i = 0; i < entries; ++i) {
             HashBucket * const bucket = hash->bs + i;
 
             /* the hash->compare cost is too high for this fast path */
@@ -1353,7 +1353,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
             bucket = hash->free_list;
         }
 
-        hash->entries++;
+        ++hash->entries;
         hash->free_list                = bucket->next;
         bucket->key                    = key;
         bucket->value                  = value;
@@ -1423,7 +1423,7 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
     UINTVAL entries = hash->entries;
     UINTVAL i;
 
-    for (i = 0; i < entries; i++) {
+    for (i = 0; i < entries; ++i) {
         void         *valtmp;
         HashBucket   *b   = hash->bs+i;
         void * const  key = b->key;

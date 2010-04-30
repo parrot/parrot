@@ -67,7 +67,7 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
     ASSERT_ARGS(PackFile_ConstTable_dump)
     opcode_t i;
 
-    for (i = 0; i < self->const_count; i++) {
+    for (i = 0; i < self->const_count; ++i) {
         Parrot_io_printf(interp, "    # %ld:\n", (long)i);
         PackFile_Constant_dump(interp, self, self->constants[i]);
     }
@@ -144,9 +144,9 @@ pobj_flag_dump(PARROT_INTERP, long flags)
             if (printed_flag_p)
                 Parrot_io_printf(interp, ",");
             Parrot_io_printf(interp, "%s", flag_bit_names[idx]);
-            printed_flag_p++;
+            ++printed_flag_p;
         }
-        idx++;
+        ++idx;
         flags >>= 1;
     }
     Parrot_io_printf(interp, ")\n");
@@ -181,7 +181,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         break;
 
       case PFC_KEY:
-        for (i = 0, key = self->u.key; key; i++) {
+        for (i = 0, key = self->u.key; key; ++i) {
             GETATTR_Key_next_key(interp, key, key);
         }
         /* number of key components */
@@ -376,7 +376,7 @@ PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
     ASSERT_ARGS(PackFile_Fixup_dump)
     opcode_t i;
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         Parrot_io_printf(interp, "\t#%d\n", (int) i);
         switch (ft->fixups[i].type) {
           case enum_fixup_label:

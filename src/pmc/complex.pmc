@@ -100,26 +100,26 @@ complex_parse_string(PARROT_INTERP,
 
     if (*t == '-') {
         /* first number is negative */
-        t++;
+        ++t;
         first_num_minus = 1;
 
         /* allow for an optional space */
         if (*t == ' ')
-            t++;
+            ++t;
         first_num_offset = t;
     }
 
     /* skip digits */
     while (*t >= '0' && *t <= '9')
-        t++;
+        ++t;
 
     if (*t == '.') {
         /* this number has a decimal point */
-        t++;
+        ++t;
 
         /* skip digits */
         while (*t >= '0' && *t <= '9')
-            t++;
+            ++t;
     }
 
     /* save the length of the real part */
@@ -145,32 +145,32 @@ complex_parse_string(PARROT_INTERP,
     else {
         /* skip an optional space */
         if (*t == ' ')
-            t++;
+            ++t;
 
         /* expect "+" or "-" and the imaginary part */
         if (*t == '+' || *t == '-') {
             /* save the sign */
             second_num_minus = (*t == '-');
-            t++;
+            ++t;
 
             /* skip another optional space */
             if (*t == ' ')
-                t++;
+                ++t;
 
             /* save the beginning of the imaginary part */
             second_num_offset = t;
 
             /* skip digits */
             while (*t >= '0' && *t <= '9')
-                t++;
+                ++t;
 
             if (*t == '.') {
                 /* this number has a decimal point */
-                t++;
+                ++t;
 
                 /* skip digits */
                 while (*t >= '0' && *t <= '9')
-                    t++;
+                    ++t;
             }
 
             /* save the length of the imaginary part */
@@ -178,7 +178,7 @@ complex_parse_string(PARROT_INTERP,
 
             /* allow for one more optional space */
             if (*t == ' ')
-                t++;
+                ++t;
 
             /* verify that the string ends properly */
             if ((*t != 'i' && *t != 'j') || (*(t+1) != 0)) {

@@ -327,7 +327,7 @@ register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
     else
         all_encodings->enc = mem_gc_realloc_n_typed_zeroed(interp,
                 all_encodings->enc, n + 1, n, One_encoding);
-    all_encodings->n_encodings++;
+    ++all_encodings->n_encodings;
     all_encodings->enc[n].encoding = encoding;
 
     return 1;
@@ -351,7 +351,7 @@ Parrot_str_internal_register_encoding_names(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_str_internal_register_encoding_names)
     int n;
-    for (n = 0; n < all_encodings->n_encodings; n++)
+    for (n = 0; n < all_encodings->n_encodings; ++n)
         all_encodings->enc[n].name =
             Parrot_str_new_constant(interp, all_encodings->enc[n].encoding->name);
 }

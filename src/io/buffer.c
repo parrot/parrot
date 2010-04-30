@@ -481,7 +481,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     buf_start = buffer_next;
 
     for (l = 0; buffer_next < buffer_end;) {
-        l++;
+        ++l;
         if (io_is_end_of_line((char *)buffer_next)) {
             Parrot_io_set_buffer_next(interp, filehandle, ++buffer_next);
             break;

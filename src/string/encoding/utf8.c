@@ -229,7 +229,7 @@ utf8_characters(PARROT_INTERP, ARGIN(const utf8_t *ptr), UINTVAL byte_len)
 
     while (u8ptr < u8end) {
         u8ptr += UTF8SKIP(u8ptr);
-        characters++;
+        ++characters;
     }
 
     if (u8ptr > u8end)
@@ -261,8 +261,8 @@ utf8_decode(PARROT_INTERP, ARGIN(const utf8_t *ptr))
         UINTVAL count;
 
         c &= UTF8_START_MASK(len);
-        for (count = 1; count < len; count++) {
-            u8ptr++;
+        for (count = 1; count < len; ++count) {
+            ++u8ptr;
 
             if (!UTF8_IS_CONTINUATION(*u8ptr))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
@@ -408,8 +408,8 @@ utf8_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 
         c &= UTF8_START_MASK(len);
         i->bytepos += len;
-        for (len--; len; len--) {
-            u8ptr++;
+        for (--len; len; --len) {
+            ++u8ptr;
 
             if (!UTF8_IS_CONTINUATION(*u8ptr))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
@@ -427,10 +427,10 @@ utf8_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
             "Malformed UTF-8 string\n");
     }
     else {
-        i->bytepos++;
+        ++i->bytepos;
     }
 
-    i->charpos++;
+    ++i->charpos;
     return c;
 }
 
@@ -457,7 +457,7 @@ utf8_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     i->bytepos += (new_pos - pos);
     /* XXX possible buffer overrun exception? */
     PARROT_ASSERT(i->bytepos <= Buffer_buflen(s));
-    i->charpos++;
+    ++i->charpos;
 }
 
 /*

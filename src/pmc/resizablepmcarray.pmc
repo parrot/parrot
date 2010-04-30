@@ -99,7 +99,7 @@ Resizes the array to C<size> elements.
             PMC_array(SELF) = mem_gc_realloc_n_typed_zeroed(INTERP,
                     PMC_array(SELF), cur, i, PMC *);
 
-            for (; i < cur; i++) {
+            for (; i < cur; ++i) {
                 (PMC_array(SELF))[i] = PMCNULL;
             }
 
@@ -703,7 +703,7 @@ everything via the VTABLE api.
         /* shrink the array */
         if (shift < 0) {
             /* start at offset so we don't overwrite values we'll need */
-            for (i = offset + count; i < length; i++)
+            for (i = offset + count; i < length; ++i)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
 
@@ -721,7 +721,7 @@ everything via the VTABLE api.
         }
 
         /* copy the new values */
-        for (i = 0; i < elems; i++)
+        for (i = 0; i < elems; ++i)
             VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
                 VTABLE_get_pmc_keyed_int(INTERP, value, i));
     }

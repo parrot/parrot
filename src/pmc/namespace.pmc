@@ -532,7 +532,7 @@ really a public API.
                     break;
                 }
                 ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
-                i++;
+                ++i;
             }
             return ns;
         }
@@ -818,7 +818,7 @@ Returns the name of the namespace as an array of strings.
             Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(ns);
             VTABLE_unshift_string(INTERP, ar, nsinfo->name);
             ns = nsinfo->parent;
-            elements++;
+            ++elements;
         }
 
         /* remove the NULL string of the namespace root */

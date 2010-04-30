@@ -567,7 +567,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
                 break;
 
             i = i * base + dig;
-            j++;
+            ++j;
         }
 
         if (j < len) {

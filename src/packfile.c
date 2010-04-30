@@ -818,7 +818,7 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
     PackFile_Constant ** const constants = find_constants(interp, ct);
     opcode_t i;
 
-    for (i = 0; i < ct->const_count; i++) {
+    for (i = 0; i < ct->const_count; ++i) {
         PMC    * pmc;
         STRING * string;
         switch (constants[i]->type) {
@@ -929,7 +929,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
 
     TRACE_PRINTF(("PackFile: do_sub_pragmas (action=%d)\n", action));
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         switch (ft->fixups[i].type) {
             case enum_fixup_sub:
             {
@@ -1176,7 +1176,7 @@ PackFile_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
     ASSERT_ARGS(PackFile_map_segments)
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         const INTVAL ret = callback(interp, dir->segments[i], user_data);
         if (ret)
             return ret;
@@ -1207,7 +1207,7 @@ PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
     dir->segments = mem_gc_realloc_n_typed_zeroed(interp, dir->segments,
             dir->num_segments + 1, dir->num_segments, PackFile_Segment *);
     dir->segments[dir->num_segments] = seg;
-    dir->num_segments++;
+    ++dir->num_segments;
     seg->dir = dir;
 
     return;
@@ -1238,7 +1238,7 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
     if (dir) {
         size_t i;
 
-        for (i = 0; i < dir->num_segments; i++) {
+        for (i = 0; i < dir->num_segments; ++i) {
             PackFile_Segment *seg = dir->segments[i];
 
             if (seg) {
@@ -1282,7 +1282,7 @@ PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
     ASSERT_ARGS(PackFile_remove_segment_by_name)
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment * const seg = dir->segments[i];
         if (Parrot_str_equal(interp, seg->name, name)) {
             dir->num_segments--;
@@ -1537,7 +1537,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
         int i;
         TRACE_PRINTF(("default_unpack: pre-fetch %d ops into data\n",
                       self->size));
-        for (i = 0; i < (int)self->size; i++) {
+        for (i = 0; i < (int)self->size; ++i) {
             self->data[i] = PF_fetch_opcode(self->pf, &cursor);
             TRACE_PRINTF(("default_unpack: transformed op[#%d]/%d %u\n",
                           i, self->size, self->data[i]));
@@ -1592,7 +1592,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
     for (; i < (self->data ? self->size :
-            self->file_offset + self->op_count); i++) {
+            self->file_offset + self->op_count); ++i) {
 
         if (i % 8 == 0)
             Parrot_io_printf(interp, "\n %04x:  ", (int) i);
@@ -2027,7 +2027,7 @@ directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "\n\t# %d segments\n", dir->num_segments);
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         const PackFile_Segment * const seg = dir->segments[i];
 
         Parrot_io_printf(interp,
@@ -2042,7 +2042,7 @@ directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "]\n");
 
-    for (i = 0; i < dir->num_segments; i++)
+    for (i = 0; i < dir->num_segments; ++i)
         PackFile_Segment_dump(interp, dir->segments[i]);
 }
 
@@ -2076,7 +2076,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     dir->segments = mem_gc_allocate_n_zeroed_typed(interp,
             dir->num_segments, PackFile_Segment *);
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment *seg;
         char             *buf;
         STRING           *name;
@@ -2155,7 +2155,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
                       offs, pf->src, cursor));
 
     /* and now unpack contents of dir */
-    for (i = 0; cursor && i < dir->num_segments; i++) {
+    for (i = 0; cursor && i < dir->num_segments; ++i) {
         const opcode_t * const csave = cursor;
 
         /* check len again */
@@ -2223,7 +2223,7 @@ directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     PackFile_Directory * const dir = (PackFile_Directory *)self;
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment *segment = dir->segments[i];
         /* Prevent repeated destruction */
         dir->segments[i] = NULL;
@@ -2260,7 +2260,7 @@ sort_segs(ARGMOD(PackFile_Directory *dir))
     if (seg->type != PF_BYTEC_SEG) {
         size_t i;
 
-        for (i = 1; i < num_segs; i++) {
+        for (i = 1; i < num_segs; ++i) {
             PackFile_Segment * const s2 = dir->segments[i];
             if (s2->type == PF_BYTEC_SEG) {
                 dir->segments[0] = s2;
@@ -2275,7 +2275,7 @@ sort_segs(ARGMOD(PackFile_Directory *dir))
     if (seg->type != PF_FIXUP_SEG) {
         size_t i;
 
-        for (i = 2; i < num_segs; i++) {
+        for (i = 2; i < num_segs; ++i) {
             PackFile_Segment * const s2 = dir->segments[i];
             if (s2->type == PF_FIXUP_SEG) {
                 dir->segments[1] = s2;
@@ -2295,7 +2295,7 @@ sort_segs(ARGMOD(PackFile_Directory *dir))
     if (seg->type != PF_CONST_SEG) {
         size_t i;
 
-        for (i = 3; i < num_segs; i++) {
+        for (i = 3; i < num_segs; ++i) {
             PackFile_Segment * const s2 = dir->segments[i];
             if (s2->type == PF_CONST_SEG) {
                 dir->segments[2] = s2;
@@ -2334,7 +2334,7 @@ directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     /* number of segments + default, we need it for the offsets */
     size = 1 + default_packed_size(self);
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         char *name = Parrot_str_to_cstring(interp, dir->segments[i]->name);
         /* type, offset, size */
         size += 3;
@@ -2346,7 +2346,7 @@ directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     if (align && size % align)
         size += (align - size % align);
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         size_t seg_size;
 
         dir->segments[i]->file_offset = size + self->file_offset;
@@ -2413,7 +2413,7 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
       cursor += align - (cursor - self->pf->src) % align;*/
 
     /* now pack all segments into new format */
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment * const seg = dir->segments[i];
 
         cursor = PackFile_Segment_pack(interp, seg, cursor);
@@ -2718,7 +2718,7 @@ pf_debug_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cu
     *cursor++ = n;
 
     /* Now store each mapping. */
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < n; ++i) {
         /* Bytecode offset and filename. */
         *cursor++ = debug->mappings[i].offset;
         *cursor++ = debug->mappings[i].filename;
@@ -2764,7 +2764,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
             debug->num_mappings, PackFile_DebugFilenameMapping);
 
     /* Read in each mapping. */
-    for (i = 0; i < debug->num_mappings; i++) {
+    for (i = 0; i < debug->num_mappings; ++i) {
         /* Get offset and filename type. */
         debug->mappings[i].offset   = PF_fetch_opcode(self->pf, &cursor);
         debug->mappings[i].filename = PF_fetch_opcode(self->pf, &cursor);
@@ -2809,7 +2809,7 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     default_dump_header(interp, self);
 
     Parrot_io_printf(interp, "\n  mappings => [\n");
-    for (i = 0; i < debug->num_mappings; i++) {
+    for (i = 0; i < debug->num_mappings; ++i) {
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
                    debug->mappings[i].offset);
@@ -2919,7 +2919,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         /* Find the right place and shift stuff that's after it. */
         int i;
 
-        for (i = 0; i < debug->num_mappings; i++) {
+        for (i = 0; i < debug->num_mappings; ++i) {
             if (debug->mappings[i].offset > offset) {
                 insert_pos = i;
                 memmove(debug->mappings + i + 1, debug->mappings + i,
@@ -2995,7 +2995,7 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
        bytecode offset. */
 
     int i;
-    for (i = 0; i < debug->num_mappings; i++) {
+    for (i = 0; i < debug->num_mappings; ++i) {
         /* If this is the last mapping or the current position is
            between this mapping and the next one, return a filename. */
        if (i + 1                          == debug->num_mappings
@@ -3032,14 +3032,14 @@ Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
     opcode_t n;
 
     /* TODO make an index of code segments for faster look up */
-    for (i = n = 0; i < num_segs; i++) {
+    for (i = n = 0; i < num_segs; ++i) {
         if (dir->segments[i]->type == PF_BYTEC_SEG) {
             if (n == seg) {
                 Parrot_switch_to_cs(interp, (PackFile_ByteCode *)
                         dir->segments[i], 1);
                 return;
             }
-            n++;
+            ++n;
         }
     }
 
@@ -3278,7 +3278,7 @@ PackFile_FixupTable_clear(PARROT_INTERP, ARGMOD(PackFile_FixupTable *self))
 
     if (self->fixup_count) {
         opcode_t i;
-        for (i = 0; i < self->fixup_count; i++) {
+        for (i = 0; i < self->fixup_count; ++i) {
             mem_gc_free(interp, self->fixups[i].name);
             self->fixups[i].name = NULL;
         }
@@ -3328,14 +3328,14 @@ fixup_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     size_t                      size = 1;
     opcode_t i;
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         /* fixup_entry type */
-        size++;
+        ++size;
         switch (ft->fixups[i].type) {
           case enum_fixup_label:
           case enum_fixup_sub:
             size += PF_size_cstring(ft->fixups[i].name);
-            size ++; /* offset */
+            ++size; /* offset */
             break;
           case enum_fixup_none:
             break;
@@ -3371,7 +3371,7 @@ fixup_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor
 
     *cursor++ = ft->fixup_count;
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         *cursor++ = (opcode_t) ft->fixups[i].type;
         switch (ft->fixups[i].type) {
           case enum_fixup_label:
@@ -3465,7 +3465,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
         }
     }
 
-    for (i = 0; i < self->fixup_count; i++) {
+    for (i = 0; i < self->fixup_count; ++i) {
         PackFile_FixupEntry * const entry = self->fixups + i;
 
         entry->type = PF_fetch_opcode(pf, &cursor);
@@ -3555,7 +3555,7 @@ find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name)
 {
     ASSERT_ARGS(find_fixup)
     opcode_t i;
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         if ((INTVAL)((enum_fixup_t)ft->fixups[i].type) == type
         &&  STREQ(ft->fixups[i].name, name)) {
             return ft->fixups + i;
@@ -3662,7 +3662,7 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
     ASSERT_ARGS(PackFile_ConstTable_clear)
     opcode_t i;
 
-    for (i = 0; i < self->const_count; i++) {
+    for (i = 0; i < self->const_count; ++i) {
         PackFile_Constant_destroy(interp, self->constants[i]);
         self->constants[i] = NULL;
     }
@@ -3726,7 +3726,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
         return NULL;
     }
 
-    for (i = 0; i < self->const_count; i++) {
+    for (i = 0; i < self->const_count; ++i) {
         TRACE_PRINTF(("PackFile_ConstTable_unpack(): Unpacking constant %ld/%ld\n",
             i, self->const_count));
         self->constants[i] = PackFile_Constant_new(interp);
@@ -4123,7 +4123,7 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 
     /* Free any keys. */
     if (self->keys) {
-        for (i = 0; i < self->num_keys; i++)
+        for (i = 0; i < self->num_keys; ++i)
             mem_gc_free(interp, self->keys[i]);
 
         mem_gc_free(interp, self->keys);
@@ -4131,14 +4131,14 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 
     /* Free any groups. */
     if (self->groups) {
-        for (i = 0; i < self->num_groups; i++)
+        for (i = 0; i < self->num_groups; ++i)
             mem_gc_free(interp, self->groups[i]);
         mem_gc_free(interp, self->groups);
     }
 
     /* Free any entries. */
     if (self->entries) {
-        for (i = 0; i < self->num_entries; i++)
+        for (i = 0; i < self->num_entries; ++i)
             mem_gc_free(interp, self->entries[i]);
         mem_gc_free(interp, self->entries);
     }
@@ -4194,7 +4194,7 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
     /* Write key count and any keys. */
     *cursor++ = self->num_keys;
 
-    for (i = 0; i < self->num_keys; i++) {
+    for (i = 0; i < self->num_keys; ++i) {
         const PackFile_Annotations_Key * const key = self->keys[i];
         *cursor++ = key->name;
         *cursor++ = key->type;
@@ -4203,7 +4203,7 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
     /* Write group count and any groups. */
     *cursor++ = self->num_groups;
 
-    for (i = 0; i < self->num_groups; i++) {
+    for (i = 0; i < self->num_groups; ++i) {
         const PackFile_Annotations_Group * const group = self->groups[i];
         *cursor++ = group->bytecode_offset;
         *cursor++ = group->entries_offset;
@@ -4212,7 +4212,7 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
     /* Write entry count and any entries. */
     *cursor++ = self->num_entries;
 
-    for (i = 0; i < self->num_entries; i++) {
+    for (i = 0; i < self->num_entries; ++i) {
         const PackFile_Annotations_Entry * const entry = self->entries[i];
         *cursor++ = entry->bytecode_offset;
         *cursor++ = entry->key;
@@ -4257,7 +4257,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->keys     = mem_gc_allocate_n_zeroed_typed(interp,
             self->num_keys, PackFile_Annotations_Key *);
 
-    for (i = 0; i < self->num_keys; i++) {
+    for (i = 0; i < self->num_keys; ++i) {
         PackFile_Annotations_Key * const key = self->keys[i] =
                 mem_gc_allocate_zeroed_typed(interp, PackFile_Annotations_Key);
         key->name = PF_fetch_opcode(seg->pf, &cursor);
@@ -4271,7 +4271,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->groups     = mem_gc_allocate_n_zeroed_typed(interp,
             self->num_groups, PackFile_Annotations_Group *);
 
-    for (i = 0; i < self->num_groups; i++) {
+    for (i = 0; i < self->num_groups; ++i) {
         PackFile_Annotations_Group * const group =
             self->groups[i] = mem_gc_allocate_zeroed_typed(interp,
                     PackFile_Annotations_Group);
@@ -4287,7 +4287,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->num_entries = PF_fetch_opcode(seg->pf, &cursor);
     self->entries     = mem_gc_allocate_n_zeroed_typed(interp,
             self->num_entries, PackFile_Annotations_Entry *);
-    for (i = 0; i < self->num_entries; i++) {
+    for (i = 0; i < self->num_entries; ++i) {
         PackFile_Annotations_Entry * const entry =
             self->entries[i]   = mem_gc_allocate_zeroed_typed(interp,
                     PackFile_Annotations_Entry);
@@ -4337,7 +4337,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
-    for (i = 0; i < self->num_keys; i++) {
+    for (i = 0; i < self->num_keys; ++i) {
         const PackFile_Annotations_Key * const key = self->keys[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
@@ -4354,7 +4354,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
     /* Dump groups. */
     Parrot_io_printf(interp, "\n  groups => [\n");
-    for (i = 0; i < self->num_groups; i++) {
+    for (i = 0; i < self->num_groups; ++i) {
         const PackFile_Annotations_Group * const group = self->groups[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
@@ -4369,7 +4369,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump entries. */
     Parrot_io_printf(interp, "\n  entries => [\n");
 
-    for (i = 0; i < self->num_entries; i++) {
+    for (i = 0; i < self->num_entries; ++i) {
         const PackFile_Annotations_Entry * const entry = self->entries[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
@@ -4420,7 +4420,7 @@ PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     group->entries_offset  = self->num_entries;
 
     /* Increment group count. */
-    self->num_groups++;
+    ++self->num_groups;
 }
 
 
@@ -4451,7 +4451,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     opcode_t key_id   = -1;
     INTVAL   i;
 
-    for (i = 0; i < self->num_keys; i++) {
+    for (i = 0; i < self->num_keys; ++i) {
         STRING * const test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
         if (Parrot_str_equal(interp, test_key, key_name)) {
             key_id = i;
@@ -4470,7 +4470,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
         key_id             = self->num_keys;
         self->keys[key_id] = mem_gc_allocate_typed(interp, PackFile_Annotations_Key);
-        self->num_keys++;
+        ++self->num_keys;
 
         /* Populate it. */
         self->keys[key_id]->name = key;
@@ -4499,7 +4499,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     self->entries[self->num_entries]->key             = key_id;
     self->entries[self->num_entries]->value           = value;
 
-    self->num_entries++;
+    ++self->num_entries;
 }
 
 
@@ -4572,7 +4572,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     opcode_t key_id = -1;
 
     if (!STRING_IS_NULL(key)) {
-        for (i = 0; i < self->num_keys; i++) {
+        for (i = 0; i < self->num_keys; ++i) {
             STRING * const test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
             if (Parrot_str_equal(interp, test_key, key)) {
                 key_id = i;
@@ -4585,7 +4585,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     }
 
     /* Use groups to find search start point. */
-    for (i = 0; i < self->num_groups; i++)
+    for (i = 0; i < self->num_groups; ++i)
         if (offset < self->groups[i]->bytecode_offset)
             break;
         else
@@ -4599,7 +4599,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         opcode_t *have_values   = mem_gc_allocate_n_zeroed_typed(interp,
                 self->num_keys, opcode_t);
 
-        for (i = start_entry; i < self->num_entries; i++) {
+        for (i = start_entry; i < self->num_entries; ++i) {
             if (self->entries[i]->bytecode_offset >= offset)
                 break;
 
@@ -4610,7 +4610,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         /* Create hash of values we have. */
         result = Parrot_pmc_new(interp, enum_class_Hash);
 
-        for (i = 0; i < self->num_keys; i++) {
+        for (i = 0; i < self->num_keys; ++i) {
             if (have_values[i]) {
                 STRING * const key_name = PF_CONST(self->code, self->keys[i]->name)->u.string;
                 VTABLE_set_pmc_keyed_str(interp, result, key_name,
@@ -4627,7 +4627,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         opcode_t latest_value = 0;
         opcode_t found_value  = 0;
 
-        for (i = start_entry; i < self->num_entries; i++) {
+        for (i = start_entry; i < self->num_entries; ++i) {
             if (self->entries[i]->bytecode_offset >= offset)
                 break;
 

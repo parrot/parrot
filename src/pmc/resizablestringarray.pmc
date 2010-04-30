@@ -225,7 +225,7 @@ Resizes the array to C<size> elements.
             GET_ATTR_size(interp, SELF, old_size);
             if (new_size > old_size) {
                 INTVAL i;
-                for (i = old_size; i < new_size; i++)
+                for (i = old_size; i < new_size; ++i)
                     str_array[i] = NULL;
             }
 
@@ -249,7 +249,7 @@ Resizes the array to C<size> elements.
                             cur, resize_threshold, STRING*));
             GET_ATTR_str_array(INTERP, SELF, str_array);
 
-            for (; i < cur; i++)
+            for (; i < cur; ++i)
                 str_array[i] = NULL;
 
             SET_ATTR_size(INTERP, SELF, new_size);
@@ -605,7 +605,7 @@ everything via the VTABLE api.
         /* shrink the array */
         if (shift < 0) {
             /* start at offset so we don't overwrite values we'll need */
-            for (i = offset+count; i < length; i++)
+            for (i = offset+count; i < length; ++i)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
 
@@ -623,7 +623,7 @@ everything via the VTABLE api.
         }
 
         /* copy the new values */
-        for (i = 0; i < elems; i++)
+        for (i = 0; i < elems; ++i)
             VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
                 VTABLE_get_pmc_keyed_int(INTERP, value, i));
     }

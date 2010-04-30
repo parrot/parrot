@@ -90,7 +90,7 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
         bucket = attrs->parrot_hash->bi[attrs->pos++];
     }
     attrs->bucket = bucket;
-    attrs->elements--;
+    --attrs->elements;
 
     return;
 }

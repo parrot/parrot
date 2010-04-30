@@ -112,7 +112,7 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     padding_size = 16 - (PACKFILE_HEADER_BYTES + self->header->uuid_size) % 16;
     if (padding_size < 16) {
         int i;
-        for (i = 0; i < padding_size; i++)
+        for (i = 0; i < padding_size; ++i)
             *byte_cursor++ = 0;
     }
     else {
@@ -162,7 +162,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     const PackFile_ConstTable* const self = (const PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
-    for (i = 0; i < self->const_count; i++)
+    for (i = 0; i < self->const_count; ++i)
         size += PackFile_Constant_pack_size(interp, self->constants[i]);
     return size;
 }
@@ -197,7 +197,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
     *cursor++ = self->const_count;
 
-    for (i = 0; i < self->const_count; i++)
+    for (i = 0; i < self->const_count; ++i)
         cursor = PackFile_Constant_pack(interp, self, self->constants[i], cursor);
 
     return cursor;
@@ -228,7 +228,7 @@ PackFile_find_in_const(PARROT_INTERP,
     GETATTR_Key_str_key(interp, key, key_str);
     GETATTR_Key_num_key(interp, key, key_num);
 
-    for (i = 0; i < ct->const_count; i++) {
+    for (i = 0; i < ct->const_count; ++i) {
         if (type == PFC_STRING && ct->constants[i]->u.string == key_str)
             return i;
         if (type == PFC_NUMBER && ct->constants[i]->u.number == key_num)
@@ -291,7 +291,7 @@ PackFile_Constant_pack(PARROT_INTERP,
         break;
 
       case PFC_KEY:
-        for (i = 0, key = self->u.key; key; i++){
+        for (i = 0, key = self->u.key; key; ++i){
             GETATTR_Key_next_key(interp, key, key);
         }
 

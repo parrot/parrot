@@ -259,7 +259,7 @@ calc_signature_needs(const char *sig, int *strings)
     while (*sig) {
         switch (*sig) {
           case 't':
-            (*strings)++;
+            ++(*strings);
             stack_size +=4;
             break;
           case 'd':
@@ -269,7 +269,7 @@ calc_signature_needs(const char *sig, int *strings)
             stack_size +=4;
             break;
         }
-        sig++;
+        ++sig;
     }
     return stack_size;
 
@@ -461,8 +461,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             return NULL;
         }
         args_offset +=4;
-        arg_count++;
-        sig++;
+        ++arg_count;
+        ++sig;
     }
 
     /* prepare to call VTABLE_get_pointer, set up args */
@@ -608,7 +608,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
 
     /* free temporary strings */
     strings_offset = st_offset + ST_SIZE_OF;
-    for (i=0; i<string_buffer_count; i++) {
+    for (i=0; i<string_buffer_count; ++i) {
         emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, strings_offset);
         emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
         emitm_call_cfunc(pc, Parrot_str_free_cstring);

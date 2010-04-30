@@ -347,7 +347,7 @@ mem_allocate(PARROT_INTERP,
              */
             alloc_new_block(mem_pools, size, pool, "compact failed");
 
-            mem_pools->mem_allocs_since_last_collect++;
+            ++mem_pools->mem_allocs_since_last_collect;
 
             if (pool->top_block->free < size) {
                 fprintf(stderr, "out of mem\n");
@@ -459,7 +459,7 @@ compact_pool(PARROT_INTERP,
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
-    mem_pools->gc_collect_runs++;
+    ++mem_pools->gc_collect_runs;
 
     /* Snag a block big enough for everything */
     total_size = pad_pool_size(pool);
@@ -920,7 +920,7 @@ check_memory_system(ARGIN(const Memory_Pools *mem_pools))
     check_fixed_size_obj_pool(mem_pools->string_header_pool);
     check_fixed_size_obj_pool(mem_pools->constant_string_header_pool);
 
-    for (i = 0; i < mem_pools->num_sized; i++) {
+    for (i = 0; i < mem_pools->num_sized; ++i) {
         const Fixed_Size_Pool * const pool = mem_pools->sized_header_pools[i];
         if (pool != NULL && pool != mem_pools->string_header_pool)
             check_fixed_size_obj_pool(pool);
@@ -1128,16 +1128,16 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
     header_pools_iterate_callback(interp, mem_pools, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
-    for (pass = start; pass <= 2; pass++) {
+    /* for (pass = start; pass <= 2; ++pass) { */ /* XXX it's unsed loop */
         header_pools_iterate_callback(interp, mem_pools, POOL_BUFFER | POOL_CONST,
-                (void *)pass, sweep_cb_buf);
-    }
+                (void *)start, sweep_cb_buf);
+    /* } */
 
     mem_internal_free(mem_pools->sized_header_pools);
 
     if (mem_pools->attrib_pools) {
         unsigned int i;
-        for (i = 0; i < mem_pools->num_attribs; i++) {
+        for (i = 0; i < mem_pools->num_attribs; ++i) {
             PMC_Attribute_Pool  *pool  = mem_pools->attrib_pools[i];
             PMC_Attribute_Arena *arena;
 
@@ -1431,7 +1431,7 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(const Fixed_Size_Pool *pool))
         PMC   *p = (PMC *)((char*)cur_arena->start_objects);
         size_t i;
 
-        for (i = 0; i < cur_arena->used; i++) {
+        for (i = 0; i < cur_arena->used; ++i) {
             if (!PObj_on_free_list_TEST(p) && PObj_is_PMC_TEST(p)) {
                 if (PObj_is_PMC_shared_TEST(p))
                     PMC_sync(p)->owner = dest_interp;

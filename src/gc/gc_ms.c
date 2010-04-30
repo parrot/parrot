@@ -557,7 +557,7 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     pt_gc_stop_mark(interp);
 
     /* Note it */
-    mem_pools->gc_mark_runs++;
+    ++mem_pools->gc_mark_runs;
     --mem_pools->gc_mark_block_level;
     mem_pools->header_allocs_since_last_collect = 0;
 
@@ -689,7 +689,7 @@ gc_ms_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
     pool->add_free_object(interp, interp->mem_pools, pool, (PObj *)pmc);
-    pool->num_free_objects++;
+    ++pool->num_free_objects;
 }
 
 /*
@@ -735,7 +735,7 @@ gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
         Fixed_Size_Pool * const pool = interp->mem_pools->string_header_pool;
         PObj_flags_SETTO((PObj *)s, PObj_on_free_list_FLAG);
         pool->add_free_object(interp, interp->mem_pools, pool, s);
-        pool->num_free_objects++;
+        ++pool->num_free_objects;
     }
 }
 
@@ -882,7 +882,7 @@ Parrot_gc_allocate_new_attributes_arena(ARGMOD(PMC_Attribute_Pool *pool))
     pool->newlast   = (PMC_Attribute_Free_List *)((char *)next + item_space);
 #else
     pool->free_list = next;
-    for (i = 0; i < num_items; i++) {
+    for (i = 0; i < num_items; ++i) {
         list        = next;
         list->next  = (PMC_Attribute_Free_List *)((char *)list + item_size);
         next        = list->next;
@@ -1049,7 +1049,7 @@ gc_ms_free_attributes_from_pool(ARGMOD(PMC_Attribute_Pool *pool), ARGMOD(void *d
     item->next      = pool->free_list;
     pool->free_list = item;
 
-    pool->num_free_objects++;
+    ++pool->num_free_objects;
 }
 
 /*
@@ -1595,7 +1595,7 @@ gc_ms_get_free_object(PARROT_INTERP,
         Fixed_Size_Arena * const arena = pool->last_Arena;
         ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
-        arena->used++;
+        ++arena->used;
 
         if (pool->newfree >= pool->newlast)
             pool->newfree = NULL;
@@ -1711,7 +1711,7 @@ static void
 gc_ms_block_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_block_GC_mark)
-    interp->mem_pools->gc_mark_block_level++;
+    ++interp->mem_pools->gc_mark_block_level;
     Parrot_shared_gc_block(interp);
 }
 
@@ -1729,7 +1729,7 @@ static void
 gc_ms_block_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_block_GC_sweep)
-    interp->mem_pools->gc_sweep_block_level++;
+    ++interp->mem_pools->gc_sweep_block_level;
 }
 
 static void
@@ -1818,7 +1818,7 @@ gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(gc_ms_active_sized_buffers)
     int j, ret = 0;
-    for (j = 0; j < (INTVAL)mem_pools->num_sized; j++) {
+    for (j = 0; j < (INTVAL)mem_pools->num_sized; ++j) {
         Fixed_Size_Pool * const header_pool =
             mem_pools->sized_header_pools[j];
         if (header_pool)
@@ -1843,7 +1843,7 @@ gc_ms_total_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(gc_ms_total_sized_buffers)
     int j, ret = 0;
-    for (j = 0; j < (INTVAL)mem_pools->num_sized; j++) {
+    for (j = 0; j < (INTVAL)mem_pools->num_sized; ++j) {
         Fixed_Size_Pool * const header_pool =
             mem_pools->sized_header_pools[j];
         if (header_pool)

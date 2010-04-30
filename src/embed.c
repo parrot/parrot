@@ -632,7 +632,7 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL)IGLOBALS_ARGV_LIST, userargv);
 
-    for (i = 0; i < argc; i++) {
+    for (i = 0; i < argc; ++i) {
         /* Run through argv, adding everything to @ARGS. */
         STRING * const arg =
             string_make(interp, argv[i], strlen(argv[i]), "unicode",
@@ -703,7 +703,7 @@ set_current_sub(PARROT_INTERP)
      * entry point with the address at our resume_offset.
      */
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         if (ft->fixups[i].type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i].offset;
             PMC    * const sub_pmc = ct->constants[ci]->u.key;
@@ -997,7 +997,7 @@ Parrot_disassemble(PARROT_INTERP, ARGIN(const char *outfile), Parrot_disassemble
                     interp->code->debugs->mappings[curr_mapping].filename;
                 Parrot_io_fprintf(interp, output, "# Current Source Filename '%Ss'\n",
                         interp->code->const_table->constants[filename_const_offset]->u.string);
-                curr_mapping++;
+                ++curr_mapping;
             }
         }
 
@@ -1022,7 +1022,7 @@ Parrot_disassemble(PARROT_INTERP, ARGIN(const char *outfile), Parrot_disassemble
 
         Parrot_io_fprintf(interp, output, "\n");
         line = line->next;
-        op_code_seq_num++;
+        ++op_code_seq_num;
     }
     if (outfile != NULL)
         Parrot_io_close(interp, output);

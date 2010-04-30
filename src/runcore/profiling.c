@@ -334,7 +334,7 @@ ARGIN(opcode_t *pc))
         preop_ctx->current_pc = pc;
         preop_pc              = pc;
 
-        runcore->level++;
+        ++runcore->level;
         Profiling_exit_check_CLEAR(runcore);
 
         runcore->op_start  = Parrot_hires_get_time();
@@ -375,7 +375,7 @@ ARGIN(opcode_t *pc))
                 ns_separator = Parrot_str_new(interp, ";", 1);
 
                 i = MAX_NS_DEPTH - 1;
-                for (;ns ; i--) {
+                for (;ns ; --i) {
                     if (i < 0) {
                         /* should probably warn about truncated namespace here */
                         break;
@@ -384,9 +384,8 @@ ARGIN(opcode_t *pc))
                     GETATTR_NameSpace_parent(interp, ns, ns);
                 }
 
-                i++;
-                i++; /* the root namespace has an empty name, so ignore it */
-                for (;i < MAX_NS_DEPTH; i++) {
+                i += 2; /* the root namespace has an empty name, so ignore it */
+                for (;i < MAX_NS_DEPTH; ++i) {
                     full_ns = Parrot_str_concat(interp, full_ns, ns_names[i]);
                     full_ns = Parrot_str_concat(interp, full_ns, ns_separator);
                 }
@@ -511,7 +510,7 @@ add_bogus_parent_runloop(ARGIN(Parrot_profiling_runcore_t * runcore))
     pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) "noop";
     runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
 
-    runcore->runloop_count++;
+    ++runcore->runloop_count;
 }
 
 /*

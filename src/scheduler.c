@@ -445,7 +445,7 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         LOCK(sched_struct->msg_lock);
         /* Search the task index for GC suspend tasks */
         num_tasks = VTABLE_elements(interp, sched_struct->messages);
-        for (index = 0; index < num_tasks; index++) {
+        for (index = 0; index < num_tasks; ++index) {
             PMC *message = VTABLE_get_pmc_keyed_int(interp, sched_struct->messages, index);
             if (!PMC_IS_NULL(message)
             &&   Parrot_str_equal(interp, VTABLE_get_string(interp, message),
@@ -612,11 +612,11 @@ Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
                 switch (htype) {
                   case Hexception:
                     if (VTABLE_isa(interp, handler, handler_name))
-                        count++;
+                        ++count;
                     break;
                   case Hevent:
                     if (handler->vtable->base_type == enum_class_EventHandler)
-                        count++;
+                        ++count;
                     break;
                   default:
                     break;
@@ -1069,7 +1069,7 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     /* Sweep the wait list for completed timers */
     num_tasks = VTABLE_elements(interp, sched_struct->wait_index);
-    for (index = 0; index < num_tasks; index++) {
+    for (index = 0; index < num_tasks; ++index) {
         INTVAL tid = VTABLE_get_integer_keyed_int(interp, sched_struct->wait_index, index);
         if (tid > 0) {
             PMC *task = VTABLE_get_pmc_keyed_int(interp, sched_struct->task_list, tid);

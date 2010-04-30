@@ -195,7 +195,7 @@ the first line is line number zero.
         jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
                                       str, 0, eos);
         while (jpos < eos) {
-            jpos++;
+            ++jpos;
             /* add the start of line position */
             VTABLE_push_integer(INTERP, linepos, jpos);
 
@@ -203,7 +203,7 @@ the first line is line number zero.
             if (jpos < eos
             && string_ord(INTERP, str, jpos - 1)     == 13
             && string_ord(INTERP, str, jpos)         == 10) {
-                jpos++;
+                ++jpos;
             }
             /* search for the next newline */
             jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
@@ -220,7 +220,7 @@ the first line is line number zero.
     count = VTABLE_elements(INTERP, linepos);
     while (line < count
           && VTABLE_get_integer_keyed_int(INTERP, linepos, line) <= pos)
-        line++;
+        ++line;
 
     RETURN(INTVAL line);
   }
@@ -245,7 +245,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     STRING * const counter_as_string = Parrot_str_from_int(INTERP, counter);
     UNUSED(SELF);
 
-    counter++;
+    ++counter;
 
     if (!has_fmt) {
         RETURN(STRING *counter_as_string);
@@ -347,7 +347,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
     STRING *       prefix        = NULL;
     STRING *       out           = open_bracket;
 
-    for (index = 0; index < elements; index++) {
+    for (index = 0; index < elements; ++index) {
         PMC * const P0 = VTABLE_get_pmc_keyed_int(INTERP, args, index);
 
         if (!PMC_IS_NULL(P0)) {
@@ -355,7 +355,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
                 const INTVAL elements2 = VTABLE_elements(INTERP, P0);
                 INTVAL index2;
 
-                for (index2 = 0; index2 < elements2; index2++) {
+                for (index2 = 0; index2 < elements2; ++index2) {
                     STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
                     (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
                     if (prefix)

@@ -1022,7 +1022,7 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
         UINTVAL i;
         char *             destpos = dest->strstart;
         const char * const srcpos  = s->strstart;
-        for (i = 0; i < num; i++) {
+        for (i = 0; i < num; ++i) {
             mem_sys_memcopy(destpos, srcpos, length);
             destpos += length;
         }
@@ -2014,7 +2014,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
                 d = d*10 + (c-'0');
                 if (d >= max_safe)
                     d_is_safe = 0;
-                d_length++;
+                ++d_length;
             }
             else if (c == 'e' || c == 'E')
                 state = parse_after_e;
@@ -2583,8 +2583,8 @@ Parrot_str_unescape(PARROT_INTERP,
         if (d == offs) {
             /* we did it in place - no action */
             ++d;
-            iter.bytepos++;
-            iter.charpos++;
+            ++(iter.bytepos);
+            ++(iter.charpos);
             continue;
         }
 
