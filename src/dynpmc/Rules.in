@@ -24,6 +24,7 @@ src/dynpmc/foo_group$(O): src/dynpmc/foo.c src/dynpmc/foo2.c $(DYNPMC_H_FILES)
 src/dynpmc/foo_group.c: $(DYNPMC_FOO_OBJS)
 	$(PMC2C) --library foo_group --c $(DYNPMC_FOO)
 	$(MV) foo_group.c src/dynpmc/foo_group.c
+	$(MV) foo_group.h src/dynpmc/foo_group.h
 
 src/dynpmc/foo$(O): src/dynpmc/foo.c $(DYNPMC_H_FILES)
 
