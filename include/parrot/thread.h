@@ -201,14 +201,6 @@ PMC* pt_thread_join(ARGIN(Parrot_Interp parent), UINTVAL tid)
 
 void pt_thread_kill(UINTVAL tid);
 void pt_thread_prepare_for_run(Parrot_Interp d, NULLOK(Parrot_Interp s));
-int pt_thread_run(PARROT_INTERP,
-    ARGOUT(PMC *dest_interp),
-    ARGIN(PMC *sub),
-    ARGIN_NULLOK(PMC *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dest_interp);
 
 void pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
         __attribute__nonnull__(1)
@@ -254,10 +246,6 @@ PMC * pt_transfer_sub(
        PARROT_ASSERT_ARG(parent))
 #define ASSERT_ARGS_pt_thread_kill __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pt_thread_prepare_for_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_pt_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest_interp) \
-    , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_pt_thread_wait_with __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mutex))
