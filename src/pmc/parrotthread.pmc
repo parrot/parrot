@@ -1,0 +1,206 @@
+/*
+Copyright (C) 2001-2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/parrotthread.pmc - Represents a Parrot Thread.
+
+=head1 DESCRIPTION
+
+This type represents a  parrot thread.
+
+It provides the following methods:
+    - join
+    - detach
+    - kill
+    - pid
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/embed.h"
+
+
+pmclass ParrotThread no_ro auto_attrs {
+    ATTR INTVAL tid; /* thread id */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static INTVAL do_thread_run(PARROT_INTERP,
+    ARGIN(PMC *thread),
+    INTVAL clone_flags,
+    ARGIN(PMC *sub),
+    ARGIN(PMC *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+static void stop_GC(ARGIN(Interp *parent), ARGIN(Interp *thread))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_do_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread) \
+    , PARROT_ASSERT_ARG(sub) \
+    , PARROT_ASSERT_ARG(args))
+#define ASSERT_ARGS_stop_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(parent) \
+    , PARROT_ASSERT_ARG(thread))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<void init()>
+
+Create a new, invalid handle to a running thread.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        VTABLE_set_integer_native(interp, SELF, -1);
+    }
+
+/*
+
+=item C<void init_pmc(PMC *notused)>
+
+Create a new, invalid handle to a running thread.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *notused) {
+        VTABLE_set_integer_native(interp, SELF, -1);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Return the thread ID of this thread.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL ttid;
+        GETATTR_ParrotThread_tid(interp, SELF, ttid);
+        return ttid;
+    }
+
+    VTABLE INTVAL set_integer_native(INTVAL ttid) {
+        SETATTR_ParrotThread_tid(interp, SELF, ttid);
+        return ttid;
+    }
+
+
+/*
+
+=item C<METHOD run(closure)>
+
+Join the thread, returning whatever its main method returns.
+
+=cut
+
+*/
+    METHOD run_clone(PMC *sub, PMC *args :slurpy) {
+        INTVAL ttid;
+        if (PMC_IS_NULL(sub)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Invalid thread sub");
+        }
+        
+        ttid = pt_thread_create_run(interp, enum_class_ThreadInterpreter, PARROT_CLONE_DEFAULT, sub, args);
+        VTABLE_set_integer_native(interp, SELF, ttid);
+    }
+
+    METHOD run(INTVAL clone_flags, PMC *sub, PMC *args :slurpy) {
+        INTVAL ttid;
+        if (PMC_IS_NULL(sub)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Invalid thread sub");
+        }
+
+        ttid = pt_thread_create_run(interp, enum_class_ThreadInterpreter, clone_flags, sub, args);
+        VTABLE_set_integer_native(interp, SELF, ttid);
+    }
+/*
+
+=item C<METHOD join()>
+
+Join the thread, returning whatever its main method returns.
+
+=cut
+
+*/
+    METHOD join() {
+        PMC *ret;
+        INTVAL ttid = VTABLE_get_integer(INTERP, SELF);
+
+        ret = pt_thread_join(INTERP, ttid);
+        /* invalidate self */
+        VTABLE_set_integer_native(interp, SELF, -1);
+
+        RETURN(PMC *ret);
+    }
+
+/*
+
+=item C<METHOD detach()>
+
+Detach the thread so it cannot be joined and will free its resources
+immediately when it exits.
+
+=cut
+
+*/
+
+    METHOD detach() {
+        pt_thread_detach((UINTVAL)VTABLE_get_integer(INTERP, SELF));
+    }
+
+/*
+
+=item C<METHOD kill()>
+
+Terminate a running thread.
+
+=cut
+
+*/
+
+    METHOD kill() {
+        pt_thread_kill((UINTVAL)VTABLE_get_integer(INTERP, SELF));
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

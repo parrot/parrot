@@ -1,0 +1,81 @@
+/*
+Copyright (C) 2001-2007, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/threadinterpreter.pmc - INTERNAL Interpreter for OS level worker thread(pthread).
+
+=head1 DESCRIPTION
+
+ThreadInterpreter extends ParrotInterpreter to provide a interpreter
+to be used internally in a OS level worker thread(pthread).
+which supports:
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/embed.h"
+
+#define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
+
+/*
+ * can't do multi-threaded GC yet
+ * XXX a quick hack to pass the few tests
+ */
+static void
+stop_GC(Interp *parent, Interp *thread)
+{
+    Parrot_block_GC_mark(parent);
+    Parrot_block_GC_mark(thread);
+    Parrot_block_GC_sweep(parent);
+    Parrot_block_GC_sweep(thread);
+}
+
+
+
+pmclass ThreadInterpreter extends ParrotInterpreter no_ro {
+
+/*
+
+=item C<void init()>
+
+Initializes the thread.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        /* protect interpreter creation and list handling */
+        LOCK(interpreter_array_mutex);
+
+        SUPER();
+        pt_add_to_interpreters(INTERP, PMC_interp(SELF));
+
+        UNLOCK(interpreter_array_mutex);
+
+        /* can't allow GC runs for now */
+        stop_GC(INTERP, PMC_interp(SELF));
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

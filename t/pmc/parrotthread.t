@@ -16,13 +16,14 @@ Tests the ParrotThread PMC.
 
 =cut
 
-.sub main :main
+.sub 'main' :main
     .include 'test_more.pir'
 
     plan(1)
 
     new $P0, ['ParrotThread']
     ok(1, 'Instantiated a ParrotThread PMC')
+
 .end
 
 # Local Variables:
