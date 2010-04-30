@@ -855,7 +855,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                             /* fake the old %P and %S commands */
                             if (info.type == SIZE_PMC
                              || info.type == SIZE_PSTR) {
-                                i--;
+                                --i;
                                 goto CASE_s;
                                 /* case 's' will see the SIZE_PMC or SIZE_PSTR
                                  * and assume it was %Ps (or %Ss).  Genius,

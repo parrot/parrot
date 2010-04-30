@@ -117,7 +117,7 @@ Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
     size_t  str_len;
     if (len == 0)
         return;
-    len--;
+    --len;
     if (len) {
         const STRING * const ret = Parrot_vsprintf_c(interp, pat, args);
         /* string_transcode(interp, ret, NULL, NULL, &ret); */

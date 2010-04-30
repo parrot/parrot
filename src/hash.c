@@ -1392,7 +1392,7 @@ parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
             else
                 hash->bi[hashval] = bucket->next;
 
-            hash->entries--;
+            --hash->entries;
             bucket->next    = hash->free_list;
             bucket->key     = NULL;
             hash->free_list = bucket;

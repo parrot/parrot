@@ -1161,7 +1161,7 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     #if 0
 
     /* Execute */
-    for (; n && pdb->cur_opcode; n--)
+    for (; n && pdb->cur_opcode; --n)
         DO_OP(pdb->cur_opcode, pdb->debugee);
 
     /* Set the stopped flag */
@@ -2115,7 +2115,7 @@ PDB_break(PARROT_INTERP)
         /* If we have to skip breakpoints, do so. */
         if (pdb->breakpoint_skip) {
             TRACEDEB_MSG("PDB_break skipping");
-            pdb->breakpoint_skip--;
+            --pdb->breakpoint_skip;
             return 0;
         }
 

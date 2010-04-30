@@ -1768,7 +1768,7 @@ do {                                                                          \
     case 4:           *mzp++ = 0;                                             \
     case 3:           *mzp++ = 0;                                             \
     case 2:           *mzp++ = 0;                                             \
-    case 1:           *mzp++ = 0; if (mcn <= 0) break; mcn--; }                \
+    case 1:           *mzp++ = 0; if (mcn <= 0) break; --mcn; }                \
   }                                                                           \
 } while (0)
 
@@ -1787,7 +1787,7 @@ do {                                                                          \
     case 4:           *mcdst++ = *mcsrc++;                                    \
     case 3:           *mcdst++ = *mcsrc++;                                    \
     case 2:           *mcdst++ = *mcsrc++;                                    \
-    case 1:           *mcdst++ = *mcsrc++; if (mcn <= 0) break; mcn--; }       \
+    case 1:           *mcdst++ = *mcsrc++; if (mcn <= 0) break; --mcn; }       \
   }                                                                           \
 } while (0)
 
@@ -3857,7 +3857,7 @@ void fREe(mem) Void_t* mem;
 #if HAVE_MMAP
             int ret;
             INTERNAL_SIZE_T offset = p->prev_size;
-            av->n_mmaps--;
+            --av->n_mmaps;
             av->mmapped_mem -= (size + offset);
             ret = munmap((char*)p - offset, size + offset);
             /* munmap returns non-zero on failure */

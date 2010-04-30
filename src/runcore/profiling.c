@@ -349,7 +349,7 @@ ARGIN(opcode_t *pc))
         else
             op_time = runcore->op_finish - runcore->op_start;
 
-        runcore->level--;
+        --runcore->level;
 
         /* if current context changed since the last printing of a CS line... */
         /* Occasionally the ctx stays the same while the sub changes, possible

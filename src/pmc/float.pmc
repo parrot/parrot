@@ -317,7 +317,7 @@ Decrements the number.
     VTABLE void decrement() {
         FLOATVAL fv;
         GET_ATTR_fv(INTERP, SELF, fv);
-        fv--;
+        --fv;
         SET_ATTR_fv(INTERP, SELF, fv);
     }
 /*

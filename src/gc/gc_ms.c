@@ -853,7 +853,7 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
     pool->free_list = item->next;
 #endif
 
-    pool->num_free_objects--;
+    --pool->num_free_objects;
     return (void *)item;
 }
 
@@ -1720,7 +1720,7 @@ gc_ms_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_unblock_GC_mark)
     if (interp->mem_pools->gc_mark_block_level) {
-        interp->mem_pools->gc_mark_block_level--;
+        --interp->mem_pools->gc_mark_block_level;
         Parrot_shared_gc_unblock(interp);
     }
 }
@@ -1737,7 +1737,7 @@ gc_ms_unblock_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_unblock_GC_sweep)
     if (interp->mem_pools->gc_sweep_block_level)
-        interp->mem_pools->gc_sweep_block_level--;
+        --interp->mem_pools->gc_sweep_block_level;
 }
 
 static unsigned int

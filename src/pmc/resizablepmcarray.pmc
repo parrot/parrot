@@ -292,7 +292,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         for (i = idx; i < n - 1; ++i)
             data[i] = data[i + 1];
 
-        PMC_size(SELF)--;
+        --PMC_size(SELF);
     }
 
 /*
@@ -715,7 +715,7 @@ everything via the VTABLE api.
 
             /* move the existing values */
             /* start at length-1 so we don't overwrite values we'll need */
-            for (i = length - 1; i >= offset; i--)
+            for (i = length - 1; i >= offset; --i)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
         }

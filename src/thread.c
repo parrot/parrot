@@ -1234,7 +1234,7 @@ pt_thread_join(ARGIN(Parrot_Interp parent), UINTVAL tid)
             retval = PMCNULL;
         }
         interpreter_array[tid] = NULL;
-        running_threads--;
+        --running_threads;
 
         DEBUG_ONLY(fprintf(stderr, "destroying an interpreter [join]\n"));
         if (Interp_debug_TEST(parent, PARROT_THREAD_DEBUG_FLAG))

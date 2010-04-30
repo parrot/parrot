@@ -365,9 +365,9 @@ utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
     const utf8_t *u8ptr = (const utf8_t *)ptr;
 
     while (n-- > 0) {
-        u8ptr--;
+        --u8ptr;
         while (UTF8_IS_CONTINUATION(*u8ptr))
-            u8ptr--;
+            --u8ptr;
     }
 
     return u8ptr;

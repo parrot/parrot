@@ -415,7 +415,7 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
     STRING * const name  = CONST_STRING(interp, "init");
 
     /* Loop through the parents in reverse MRO order. */
-    for (; parent_index >= 0; parent_index--) {
+    for (; parent_index >= 0; --parent_index) {
         PMC *meth;
         PMC * const parent = VTABLE_get_pmc_keyed_int(interp,
             all_parents, parent_index);
@@ -445,7 +445,7 @@ initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
     STRING * const name  = CONST_STRING(interp, "init_pmc");
 
     /* Loop through the parents in reverse MRO order. */
-    for (; parent_index >= 0; parent_index--) {
+    for (; parent_index >= 0; --parent_index) {
         PMC *meth;
         PMC * const parent = VTABLE_get_pmc_keyed_int(interp,
             all_parents, parent_index);

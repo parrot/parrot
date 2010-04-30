@@ -408,7 +408,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
           case 'J':   /* interpreter */
             emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
-            arg_count--;
+            --arg_count;
             break;
           case 'p':   /* push pmc->data */
             /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_p); */

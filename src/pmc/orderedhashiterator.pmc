@@ -214,8 +214,8 @@ the next one for reverse iterator.
                 ORDERED_HASH_ITEM_KEY);
         attrs->next_entry = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
                 ORDERED_HASH_ITEM_PREV);
-        attrs->pos--;
-        attrs->elements--;
+        --attrs->pos;
+        --attrs->elements;
 
         return ret;
     }

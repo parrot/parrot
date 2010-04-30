@@ -343,7 +343,7 @@ Returns a 1 | 2 | 4 (read, write, error) value.
 This is not equivalent to any specific POSIX or BSD socket call, but
 it is a useful, common primitive.
 
-Not at all usefule --leo.
+Not at all useful --leo.
 
 Also, a buffering layer above this may choose to reimplement by checking
 the read buffer.
