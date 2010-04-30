@@ -428,6 +428,18 @@ L<https://trac.parrot.org/parrot/ticket/852>
 
 =back
 
+=head1 Experimental
+
+=over 4
+
+=item Threads and Parallelism
+
+L<https://trac.parrot.org/parrot/ticket/1601>
+
+All threads and parallelism constructs are experimental
+
+=back
+
 =head1 Footnotes
 
 =over 4
