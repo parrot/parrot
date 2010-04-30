@@ -722,7 +722,8 @@ pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, ARGIN(PMC *sub), ARGIN_NULL
     ASSERT_ARGS(pt_thread_run)
     Interp *thread_interp = (Interp *)VTABLE_get_pointer(interp, thread_interp_pmc);
 
-    SETATTR_ParrotInterpreter_sub(interp, thread_interp_pmc, pt_transfer_sub(thread_interp, interp, sub));
+    SETATTR_ParrotInterpreter_sub(interp,
+                                  thread_interp_pmc, pt_transfer_sub(thread_interp, interp, sub));
     VTABLE_set_pmc(interp, thread_interp_pmc, make_local_args_copy(thread_interp, interp, arg));
     thread_interp->thread_data->state = THREAD_STATE_JOINABLE;
 
@@ -744,7 +745,8 @@ pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, ARGIN(PMC *sub), ARGIN_NULL
 }
 
 int
-pt_thread_create_run(PARROT_INTERP, INTVAL type, INTVAL clone_flags, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
+pt_thread_create_run(PARROT_INTERP,
+                     INTVAL type, INTVAL clone_flags, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
 {
   ASSERT_ARGS(pt_thread_create_run)
   PMC *thread_interp_pmc = pt_thread_create(interp, type, clone_flags);
