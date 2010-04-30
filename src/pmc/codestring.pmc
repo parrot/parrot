@@ -146,8 +146,7 @@ A newline is automatically added to the end of the fmt.
 
     GET_ATTR_str_val(INTERP, SELF, S1);
 
-    parts = Parrot_pmc_new_temporary(INTERP, enum_class_ResizableStringArray);
-    VTABLE_set_integer_native(INTERP, parts, 3);
+    parts = Parrot_pmc_new_init_int(INTERP, enum_class_FixedStringArray, 3);
     VTABLE_set_string_keyed_int(INTERP, parts, 0, S1);
     VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
 
@@ -157,7 +156,6 @@ A newline is automatically added to the end of the fmt.
 
     S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
     VTABLE_set_string_native(INTERP, SELF, S1);
-    Parrot_pmc_free_temporary(INTERP, parts);
 
     RETURN(PMC *SELF);
   }
