@@ -103,9 +103,8 @@ Return the thread ID of this thread.
         return ttid;
     }
 
-    VTABLE INTVAL set_integer_native(INTVAL ttid) {
+    VTABLE void set_integer_native(INTVAL ttid) {
         SETATTR_ParrotThread_tid(interp, SELF, ttid);
-        return ttid;
     }
 
 
