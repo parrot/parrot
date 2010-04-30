@@ -187,6 +187,38 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return ($S0, $S1)
 .end
 
+=item full_path
+
+=cut
+
+.sub 'full_path' :method
+    .local string prefix, name
+    $P0 = getattribute self, 'name'
+    name = $P0
+    $P0 = getattribute self, 'prefix'
+    prefix = $P0
+    unless prefix == '' goto L1
+    .return (name)
+  L1:
+    $S0 = prefix . '/'
+    $S0 .= name
+    .return ($S0)
+.end
+
+=item rename
+
+=cut
+
+.sub 'rename' :method
+    .param string path
+    .local string prefix, name
+    (prefix, name) = _prefix_and_file(path)
+    $P0 = box name
+    setattribute self, 'name', $P0
+    $P0 = box prefix
+    setattribute self, 'prefix', $P0
+.end
+
 =item _format_tar_entry
 
 =cut

@@ -21,7 +21,7 @@ Test the Archive/TAR library
 
     load_bytecode 'Archive/TAR.pir'
 
-    plan(11)
+    plan(12)
     test_new()
     test_tar()
 .end
@@ -39,12 +39,14 @@ Test the Archive/TAR library
     .local pmc archive, entry
     archive = new ['Archive';'TAR']
     $I0 = isa archive, ['Archive';'TAR']
-    ok($I0, "test_atf")
+    ok($I0, "test_tar")
     entry = archive.'add_data'('msg.txt', "some data")
     $I0 = isa entry, ['Archive';'TAR';'File']
     ok($I0, "entry is an ['Archive';'TAR';'File']")
     $S0 = entry.'data'()
     is($S0, "some data", "data")
+    $S0 = entry.'full_path'()
+    is($S0, 'msg.txt', "full_path")
     .local string header
     header = entry.'_format_tar_entry'()
     $I0 = length header
