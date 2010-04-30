@@ -444,11 +444,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        INTVAL tempInt;
-        PMC  * const tempPMC = Parrot_pmc_new_temporary(INTERP, enum_class_Integer);
-        VTABLE_set_string_native(INTERP, tempPMC, value);
-        tempInt        = VTABLE_get_integer(INTERP, tempPMC);
-        Parrot_pmc_free_temporary(interp, tempPMC);
+        const INTVAL tempInt = Parrot_str_to_int(INTERP, value);
         SELF.set_integer_keyed_int(key, tempInt);
     }
 
