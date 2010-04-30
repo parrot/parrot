@@ -266,27 +266,33 @@ interpreter.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 interpinfo_p(PARROT_INTERP, INTVAL what)
 {
     ASSERT_ARGS(interpinfo_p)
+
+    PMC *result;
     switch (what) {
       case CURRENT_SUB:
-        return Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+        result = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+        break;
       case CURRENT_CONT:
-        {
-            PMC * const cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-            return cont;
-        }
+        result = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        break;
       case CURRENT_OBJECT:
-        return Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
+        result = Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
+        break;
       case CURRENT_LEXPAD:
-        return Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
+        result = Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
+        break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
+
+    /* Don't send NULL values to P registers */
+    return result ? result : PMCNULL;
 }
 
 /*
