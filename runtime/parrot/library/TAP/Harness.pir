@@ -212,9 +212,8 @@ automatically aggregated and output to STDOUT.
     $I0 = exists $P0['PARROT_TEST_HARNESS_DUMP_TAP']
     unless $I0 goto L1
     .local string spool
-    spool = $P0['PARROT_TEST_HARNESS_DUMP_TAP']
-    spool .= '/'
-    spool .= test
+    $S0 = $P0['PARROT_TEST_HARNESS_DUMP_TAP']
+    spool = catfile($S0, test)
     $S0 = dirname(spool)
     mkpath($S0)
     $P0 = new 'FileHandle'

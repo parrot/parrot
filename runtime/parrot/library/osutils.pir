@@ -795,6 +795,55 @@ osutils - Parrot OS Utilities
     rethrow e
 .end
 
+=item catfile
+
+=cut
+
+.sub 'catfile'
+    .param pmc args             :slurpy
+    .param int native           :named('native') :optional
+    .param int has_native       :opt_flag
+    .local string slash
+    slash = '/'
+    unless has_native goto L1
+    unless native goto L1
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    slash = $P0['slash']
+  L1:
+    $S0 = join slash, args
+    .return ($S0)
+.end
+
+=item splitpath
+
+=cut
+
+.sub 'splitpath'
+    .param string path
+    .local string volume, directories, file
+    volume = ''
+    $I0 = index path, ':'
+    unless $I0 == 1 goto L1
+    volume = substr path, 0, 2
+    path = substr path, 2
+  L1:
+    $I0 = 0
+  L2:
+    $I1 = index path, '/', $I0
+    if $I1 < 0 goto L3
+    $I0 = $I1 + 1
+    goto L2
+  L3:
+    file = substr path, $I0
+    directories = ''
+    dec $I0
+    unless $I0 > 0 goto L4
+    directories = substr path, 0, $I0
+  L4:
+    .return (volume, directories, file)
+.end
+
 =back
 
 =head1 AUTHOR

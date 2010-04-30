@@ -24,7 +24,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 .namespace ['Archive';'TAR';'File']
 
 .sub '' :init :load :anon
-    load_bytecode 'osutils.pbc' # basename, dirname
+    load_bytecode 'osutils.pbc' # splitpath
     $P0 = newclass ['Archive';'TAR';'File']
     $P0.'add_attribute'('name')
     $P0.'add_attribute'('mode')
@@ -179,12 +179,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 .sub '_prefix_and_file' :anon
     .param string path
-    $S0 = dirname(path)
-    unless $S0 == '.' goto L1
-    $S0 = ''
-  L1:
-    $S1 = basename(path)
-    .return ($S0, $S1)
+    .local string volume, directories, file
+    (volume, directories, file) = splitpath(path)
+    .return (directories, file)
 .end
 
 =item full_path
@@ -200,8 +197,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     unless prefix == '' goto L1
     .return (name)
   L1:
-    $S0 = prefix . '/'
-    $S0 .= name
+    $S0 = catfile(prefix, name)
     .return ($S0)
 .end
 
