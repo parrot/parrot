@@ -8,7 +8,7 @@ t/library/archive_tar.t
 
 =head1 DESCRIPTION
 
-Test the Archive/TAR library
+Test the Archive/Tar library
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ Test the Archive/TAR library
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'Archive/TAR.pir'
+    load_bytecode 'Archive/Tar.pir'
 
     plan(12)
     test_new()
@@ -27,22 +27,22 @@ Test the Archive/TAR library
 .end
 
 .sub 'test_new'
-    $P0 = new ['Archive';'TAR']
-    $I0 = isa $P0, ['Archive';'TAR']
-    ok($I0, "new ['Archive';'TAR']")
-    $P0 = new ['Archive';'TAR';'File']
-    $I0 = isa $P0, ['Archive';'TAR';'File']
-    ok($I0, "new ['Archive';'TAR';'File']")
+    $P0 = new ['Archive';'Tar']
+    $I0 = isa $P0, ['Archive';'Tar']
+    ok($I0, "new ['Archive';'Tar']")
+    $P0 = new ['Archive';'Tar';'File']
+    $I0 = isa $P0, ['Archive';'Tar';'File']
+    ok($I0, "new ['Archive';'Tar';'File']")
 .end
 
 .sub 'test_tar'
     .local pmc archive, entry
-    archive = new ['Archive';'TAR']
-    $I0 = isa archive, ['Archive';'TAR']
+    archive = new ['Archive';'Tar']
+    $I0 = isa archive, ['Archive';'Tar']
     ok($I0, "test_tar")
     entry = archive.'add_data'('msg.txt', "some data")
-    $I0 = isa entry, ['Archive';'TAR';'File']
-    ok($I0, "entry is an ['Archive';'TAR';'File']")
+    $I0 = isa entry, ['Archive';'Tar';'File']
+    ok($I0, "entry is an ['Archive';'Tar';'File']")
     $S0 = entry.'data'()
     is($S0, "some data", "data")
     $S0 = entry.'full_path'()

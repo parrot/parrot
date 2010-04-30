@@ -3022,7 +3022,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
-    load_bytecode 'Archive/TAR.pbc'
+    load_bytecode 'Archive/Tar.pbc'
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
     $S0 = pop $P0
@@ -3031,7 +3031,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $I0 = newer(archive_file, $P0)
     if $I0 goto L1
     .local pmc archive
-    archive = new ['Archive';'TAR']
+    archive = new ['Archive';'Tar']
     $P1 = archive.'add_files'($P0 :flat)
     .local string dir
     dir = get_tarname('', kv :flat :named)

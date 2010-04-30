@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-Archive/TAR
+Archive/Tar
 
 =head2 DESCRIPTION
 
-Partial port of Archive::TAR (version 1.60)
+Partial port of Archive::Tar (version 1.60)
 
 See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
@@ -15,17 +15,17 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 .include 'stat.pasm'
 
-=head3 Class Archive;TAR;File
+=head3 Class Archive;Tar;File
 
 =over 4
 
 =cut
 
-.namespace ['Archive';'TAR';'File']
+.namespace ['Archive';'Tar';'File']
 
 .sub '' :init :load :anon
     load_bytecode 'osutils.pbc' # splitpath
-    $P0 = newclass ['Archive';'TAR';'File']
+    $P0 = newclass ['Archive';'Tar';'File']
     $P0.'add_attribute'('name')
     $P0.'add_attribute'('mode')
     $P0.'add_attribute'('uid')
@@ -107,7 +107,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .param int has_devmajor     :opt_flag
     .param int devminor         :named('devminor') :optional
     .param int has_devminor     :opt_flag
-    $P0 = new ['Archive';'TAR';'File']
+    $P0 = new ['Archive';'Tar';'File']
     .local string prefix, name
     (prefix, name) = _prefix_and_file(path)
     if has_mode goto L1
@@ -324,16 +324,16 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 =back
 
-=head3 Class Archive;TAR
+=head3 Class Archive;Tar
 
 =over 4
 
 =cut
 
-.namespace ['Archive';'TAR']
+.namespace ['Archive';'Tar']
 
 .sub '' :init :load :anon
-    $P0 = newclass ['Archive';'TAR']
+    $P0 = newclass ['Archive';'Tar']
     $P0.'add_attribute'('data')
 .end
 
@@ -361,7 +361,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     goto L1
   L3:
     .local pmc obj
-    $P1 = get_hll_global ['Archive';'TAR';'File'], 'new_from_file'
+    $P1 = get_hll_global ['Archive';'Tar';'File'], 'new_from_file'
     obj = $P1(filename)
     unless null obj goto L4
     self.'_error'("Unable to add file: '", filename, "'")
@@ -390,7 +390,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .param string data
     .param pmc opt :slurpy :named
     .local pmc obj
-    $P0 = get_hll_global ['Archive';'TAR';'File'], 'new_from_data'
+    $P0 = get_hll_global ['Archive';'Tar';'File'], 'new_from_data'
     obj = $P0(filename, data, opt :flat :named)
     $P0 = getattribute self, 'data'
     push $P0, obj
