@@ -703,6 +703,16 @@ pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub)
     return make_local_copy(d, s, sub);
 }
 
+/*
+
+=item C<PMC * pt_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)>
+
+create a pt_thread
+
+=cut
+
+*/
+
 PMC *
 pt_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
 {
@@ -715,6 +725,17 @@ pt_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
 
     return new_interp_pmc;
 }
+
+/*
+
+=item C<int pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, PMC *sub, PMC
+*arg)>
+
+run a pt_thread
+
+=cut
+
+*/
 
 int
 pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
@@ -743,6 +764,17 @@ pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, ARGIN(PMC *sub), ARGIN_NULL
 
     return thread_interp->thread_data->tid;
 }
+
+/*
+
+=item C<int pt_thread_create_run(PARROT_INTERP, INTVAL type, INTVAL clone_flags,
+PMC *sub, PMC *arg)>
+
+create a pt_thread run
+
+=cut
+
+*/
 
 int
 pt_thread_create_run(PARROT_INTERP,
