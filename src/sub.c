@@ -549,10 +549,11 @@ PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
     ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
-    PMC *key, *sub_pmc;
 
     /* Ensure we really do have a subclass of sub. */
     if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
+        PMC *key, *sub_pmc;
+
         /* If it's actually a PMC still, probably does the same structure
          * underneath. */
         if (!PObj_is_object_TEST(subclass)) {
