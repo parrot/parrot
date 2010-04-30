@@ -124,8 +124,9 @@ Join the thread, returning whatever its main method returns.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "Invalid thread sub");
         }
-        
-        ttid = pt_thread_create_run(interp, enum_class_ThreadInterpreter, PARROT_CLONE_DEFAULT, sub, args);
+
+        ttid = pt_thread_create_run(interp,
+                                    enum_class_ThreadInterpreter, PARROT_CLONE_DEFAULT, sub, args);
         VTABLE_set_integer_native(interp, SELF, ttid);
     }
 
