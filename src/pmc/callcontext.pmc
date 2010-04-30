@@ -30,7 +30,6 @@ typedef struct Pcc_cell
     INTVAL type;
 } Pcc_cell;
 
-/* mask off lower two bits (1 + 2 = 3) for pointer tags */
 #define NOCELL     0
 #define INTCELL    1
 #define FLOATCELL  2
