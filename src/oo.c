@@ -1045,13 +1045,12 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
     STRING * const class_str = CONST_STRING(interp, "class");
 
     for (i = 0; i < n; ++i) {
-        PMC *ns, *class_obj, *_class, *method_hash;
-        PMC *method = PMCNULL;
+        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class);
+        PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
+        PMC           *method = PMCNULL;
+        PMC * method_hash;
 
-        _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        ns     = VTABLE_get_namespace(interp, _class);
-
-        class_obj = VTABLE_inspect_str(interp, ns, class_str);
         if (PMC_IS_NULL(class_obj))
             method_hash = VTABLE_inspect_str(interp, ns, methods_str);
         else
