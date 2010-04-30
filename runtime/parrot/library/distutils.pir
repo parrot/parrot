@@ -3030,18 +3030,18 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     archive_file = get_tarname('.tar.gz', kv :flat :named)
     $I0 = newer(archive_file, $P0)
     if $I0 goto L1
-    .local string prefix
-    prefix = get_tarname('', kv :flat :named)
-    copy_sdist(prefix, $P0)
     .local pmc archive
     archive = new ['Archive';'TAR']
-    $P1 = iter $P0
+    $P1 = archive.'add_files'($P0 :flat)
+    .local string dir
+    dir = get_tarname('', kv :flat :named)
   L2:
     unless $P1 goto L3
-    $S1 = shift $P1
-    $S0 = prefix . '/'
-    $S0 .= $S1
-    archive.'add_files'($S0)
+    $P2 = shift $P1
+    $S0 = $P2.'full_path'()
+    $S0 = '/' . $S0
+    $S0 = dir . $S0
+    $P2.'rename'($S0)
     goto L2
   L3:
     $P0 = loadlib 'gziphandle'
@@ -3049,7 +3049,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $P0.'open'(archive_file, 'wb')
     archive.'write'($P0)
     $P0.'close'()
-    rmtree(prefix)
   L1:
 .end
 
@@ -3059,21 +3058,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.tar.gz', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('MANIFEST', 1 :named('verbose'))
-.end
-
-.sub 'copy_sdist' :anon
-    .param string dirname
-    .param pmc files
-    mkdir(dirname)
-    $S1 = dirname . "/"
-    $P0 = iter files
-  L1:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    $S2 = $S1 . $S0
-    install($S0, $S2)
-    goto L1
-  L2:
 .end
 
 .sub 'get_tarname' :anon
@@ -3124,6 +3108,21 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.zip', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('MANIFEST', 1 :named('verbose'))
+.end
+
+.sub 'copy_sdist' :anon
+    .param string dirname
+    .param pmc files
+    mkdir(dirname)
+    $S1 = dirname . "/"
+    $P0 = iter files
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S2 = $S1 . $S0
+    install($S0, $S2)
+    goto L1
+  L2:
 .end
 
 =head3 Step sdist_rpm
