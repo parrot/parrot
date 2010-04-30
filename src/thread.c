@@ -703,6 +703,55 @@ pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub)
     return make_local_copy(d, s, sub);
 }
 
+PMC *
+pt_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
+{
+    ASSERT_ARGS(pt_thread_create)
+    PMC *new_interp_pmc = pmc_new(interp, type);
+    Interp *new_interp  = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
+
+    clone_interpreter(new_interp, interp, clone_flags);
+    pt_thread_prepare_for_run(new_interp, interp);
+
+    return new_interp_pmc;
+}
+
+int
+pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
+{
+    ASSERT_ARGS(pt_thread_run)
+    Interp *thread_interp = (Interp *)VTABLE_get_pointer(interp, thread_interp_pmc);
+
+    SETATTR_ParrotInterpreter_sub(interp, thread_interp_pmc, pt_transfer_sub(thread_interp, interp, sub));
+    VTABLE_set_pmc(interp, thread_interp_pmc, make_local_args_copy(thread_interp, interp, arg));
+    thread_interp->thread_data->state = THREAD_STATE_JOINABLE;
+
+    THREAD_CREATE_JOINABLE(thread_interp->thread_data->thread, thread_func, thread_interp_pmc);
+
+    /* check for pending GC */
+    /*
+     * can't do multi-threaded GC yet
+     * XXX a quick hack to pass the few tests
+
+    LOCK(interpreter_array_mutex);
+    if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED)
+        pt_suspend_one_for_gc(new_interp);
+    UNLOCK(interpreter_array_mutex);
+
+    */
+
+    return thread_interp->thread_data->tid;
+}
+
+int
+pt_thread_create_run(PARROT_INTERP, INTVAL type, INTVAL clone_flags, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
+{
+  ASSERT_ARGS(pt_thread_create_run)
+  PMC *thread_interp_pmc = pt_thread_create(interp, type, clone_flags);
+  return pt_thread_run(interp, thread_interp_pmc, sub, arg);
+}
+
+
 /*
 
 =item C<void pt_thread_yield(void)>

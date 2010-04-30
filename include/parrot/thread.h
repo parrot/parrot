@@ -201,6 +201,28 @@ PMC* pt_thread_join(ARGIN(Parrot_Interp parent), UINTVAL tid)
 
 void pt_thread_kill(UINTVAL tid);
 void pt_thread_prepare_for_run(Parrot_Interp d, NULLOK(Parrot_Interp s));
+PMC* pt_thread_create(PARROT_INTERP,
+    INTVAL type,
+    INTVAL clone_flags)
+        __attribute__nonnull__(1);
+
+int pt_thread_create_run(PARROT_INTERP,
+    INTVAL type,
+    INTVAL clone_flags,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+int pt_thread_run(PARROT_INTERP,
+    ARGOUT(PMC *thread_interp_pmc),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*thread_interp_pmc);
 
 void pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
         __attribute__nonnull__(1)
@@ -246,6 +268,16 @@ PMC * pt_transfer_sub(
        PARROT_ASSERT_ARG(parent))
 #define ASSERT_ARGS_pt_thread_kill __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pt_thread_prepare_for_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_pt_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_pt_thread_create_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub) \
+    , PARROT_ASSERT_ARG(arg))
+#define ASSERT_ARGS_pt_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread_interp_pmc) \
+    , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_pt_thread_wait_with __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mutex))
