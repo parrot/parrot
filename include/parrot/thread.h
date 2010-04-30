@@ -210,36 +210,6 @@ int pt_thread_run(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest_interp);
 
-int pt_thread_run_1(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(* dest_interp);
-
-int pt_thread_run_2(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(* dest_interp);
-
-int pt_thread_run_3(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(* dest_interp);
-
 void pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -288,21 +258,6 @@ PMC * pt_transfer_sub(
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dest_interp) \
     , PARROT_ASSERT_ARG(sub))
-#define ASSERT_ARGS_pt_thread_run_1 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest_interp) \
-    , PARROT_ASSERT_ARG(sub) \
-    , PARROT_ASSERT_ARG(arg))
-#define ASSERT_ARGS_pt_thread_run_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest_interp) \
-    , PARROT_ASSERT_ARG(sub) \
-    , PARROT_ASSERT_ARG(arg))
-#define ASSERT_ARGS_pt_thread_run_3 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest_interp) \
-    , PARROT_ASSERT_ARG(sub) \
-    , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_pt_thread_wait_with __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mutex))

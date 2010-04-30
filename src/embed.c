@@ -122,9 +122,6 @@ Sets on any of the following flags, specified by C<flag>, in the interpreter:
 Flag                    Effect
 C<PARROT_BOUNDS_FLAG>   enable bounds checking
 C<PARROT_PROFILE_FLAG>  enable profiling,
-C<PARROT_THR_TYPE_1>    disable variable sharing and thread communication
-C<PARROT_THR_TYPE_2>    disable variable sharing but enable thread communication
-C<PARROT_THR_TYPE_3>    enable variable sharing.
 
 =cut
 

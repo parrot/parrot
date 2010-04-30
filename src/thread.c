@@ -793,66 +793,6 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
 
 /*
 
-=item C<int pt_thread_run_1(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC
-*arg)>
-
-Runs a thread that shares nothing and does not communicate with the other
-interpreter.
-
-=cut
-
-*/
-
-int
-pt_thread_run_1(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(PMC *arg))
-{
-    ASSERT_ARGS(pt_thread_run_1)
-    interp->flags |= PARROT_THR_TYPE_1;
-    return pt_thread_run(interp, dest_interp, sub, arg);
-}
-
-/*
-
-=item C<int pt_thread_run_2(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC
-*arg)>
-
-Runs an interpreter in a thread with no shared variables, but which
-communicates by sending messages.
-
-=cut
-
-*/
-
-int
-pt_thread_run_2(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(PMC *arg))
-{
-    ASSERT_ARGS(pt_thread_run_2)
-    interp->flags |= PARROT_THR_TYPE_2;
-    return pt_thread_run(interp, dest_interp, sub, arg);
-}
-
-/*
-
-=item C<int pt_thread_run_3(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC
-*arg)>
-
-Runs an interpreter in a thread, allowing shared variables and using a thread
-pool.
-
-=cut
-
-*/
-
-int
-pt_thread_run_3(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(PMC *arg))
-{
-    ASSERT_ARGS(pt_thread_run_3)
-    interp->flags |= PARROT_THR_TYPE_3;
-    return pt_thread_run(interp, dest_interp, sub, arg);
-}
-
-/*
-
 =item C<void pt_thread_yield(void)>
 
 Relinquishes hold on the processor.
