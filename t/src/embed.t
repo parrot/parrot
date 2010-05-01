@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 6;
+plan tests => 7;
 
 =head1 NAME
 
@@ -23,6 +23,43 @@ t/src/embed.t - Embedding parrot
 Embedding parrot in C
 
 =cut
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/embed.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, lang;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+    lang = Parrot_str_new_constant(interp, "PIR", 3);
+
+    func_pmc  = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
+    str = Parrot_str_to_cstring(interp, err);
+    puts(str);
+    Parrot_str_free_cstring(interp, str);
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
+OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
