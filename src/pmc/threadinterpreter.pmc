@@ -22,6 +22,15 @@ which supports:
 
 #include "parrot/embed.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void stop_GC(Interp *parent, Interp *thread);
+#define ASSERT_ARGS_stop_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
 /*
@@ -31,6 +40,7 @@ which supports:
 static void
 stop_GC(Interp *parent, Interp *thread)
 {
+    ASSERT_ARGS(stop_GC)
     Parrot_block_GC_mark(parent);
     Parrot_block_GC_mark(thread);
     Parrot_block_GC_sweep(parent);

@@ -32,31 +32,6 @@ pmclass ParrotThread no_ro auto_attrs {
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static INTVAL do_thread_run(PARROT_INTERP,
-    ARGIN(PMC *thread),
-    INTVAL clone_flags,
-    ARGIN(PMC *sub),
-    ARGIN(PMC *args))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-static void stop_GC(ARGIN(Interp *parent), ARGIN(Interp *thread))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_do_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(thread) \
-    , PARROT_ASSERT_ARG(sub) \
-    , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_stop_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(parent) \
-    , PARROT_ASSERT_ARG(thread))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
