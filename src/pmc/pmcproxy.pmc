@@ -115,8 +115,7 @@ Initializes a PMCProxy PMC.
         PObj_is_class_SET(SELF);
     }
 
-    VTABLE void init_pmc(PMC *init_data) {
-        const INTVAL type_num = VTABLE_get_integer(interp, init_data);
+    VTABLE void init_int(INTVAL type_num) {
         Parrot_Class_attributes *proxy_info;
         INTVAL mro_length, i;
 
@@ -183,6 +182,11 @@ Initializes a PMCProxy PMC.
                 ++attr;
             }
         }
+    }
+
+    VTABLE void init_pmc(PMC *init_data) {
+        const INTVAL type_num = VTABLE_get_integer(interp, init_data);
+        SELF.init_int(type_num);
     }
 
 /*

@@ -339,9 +339,7 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
 
         /* Create proxy if not found */
         if (PMC_IS_NULL(proxy)) {
-            PMC * const type_num = Parrot_pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, type_num, type);
-            proxy = Parrot_pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            proxy = Parrot_pmc_new_init_int(interp, enum_class_PMCProxy, type);
             Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
         }
         return proxy;

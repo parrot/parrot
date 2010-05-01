@@ -1043,10 +1043,7 @@ Returns SELF. A PMC is its own class.
 
         if (PMC_IS_NULL(_class)) {
             const INTVAL type      = VTABLE_type(interp, SELF);
-            PMC   * const type_num = Parrot_pmc_new(interp, enum_class_Integer);
-
-            VTABLE_set_integer_native(interp, type_num, type);
-            return Parrot_pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            return Parrot_pmc_new_init_int(interp, enum_class_PMCProxy, type);
         }
 
         return _class;
