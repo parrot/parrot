@@ -972,9 +972,9 @@ X<UTF-8 encoding>
 X<UTF-16 encoding>
 Parrot supports the character sets C<ascii>, C<binary>, C<iso-8859-1>
 (Latin 1), and C<unicode> and the encodings C<fixed_8>, C<ucs2>,
-C<utf8>, and C<utf18>.
+C<utf8>, and C<utf16>.
 
-The C<binary:> charset treats the string as a buffer of raw unformatted
+The C<binary> charset treats the string as a buffer of raw unformatted
 binary data. It isn't really a string per se, because binary data
 contains no readable characters. This exists to support libraries which
 manipulate binary data that doesn't easily fit into any other primitive
