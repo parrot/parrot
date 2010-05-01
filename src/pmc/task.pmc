@@ -210,8 +210,8 @@ Gets the value of an attribute for this task.
         PMC *value;
 
         if (Parrot_str_equal(interp, name, CONST_STRING(interp, "id"))) {
-            value = Parrot_pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, value, core_struct->id);
+            value = Parrot_pmc_new_init_int(interp, enum_class_Integer,
+                    core_struct->id);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "type"))) {
             value = Parrot_pmc_new(interp, enum_class_String);
@@ -222,8 +222,8 @@ Gets the value of an attribute for this task.
             VTABLE_set_string_native(interp, value, core_struct->subtype);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "priority"))) {
-            value = Parrot_pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, value, core_struct->priority);
+            value = Parrot_pmc_new_init_int(interp, enum_class_Integer,
+                    core_struct->priority);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "status"))) {
             value = Parrot_pmc_new(interp, enum_class_String);

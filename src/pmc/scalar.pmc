@@ -938,9 +938,7 @@ Sets this PMC as shared and read-only.
 */
     VTABLE PMC *share_ro() {
         PMC         *ret  = pt_shared_fixup(INTERP, SELF);
-        PMC * const _true = Parrot_pmc_new(INTERP, enum_class_Integer);
-
-        VTABLE_set_integer_native(INTERP, _true, 1);
+        PMC * const _true = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, 1);
 
         /* first set readonly */
         VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
