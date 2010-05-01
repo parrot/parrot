@@ -883,11 +883,10 @@ Used to mark a PMC as read-only shared.
         UNLOCK_INTERPRETER(master);
 
         ret = SELF;
-        _true = Parrot_pmc_new(INTERP, enum_class_Integer);
-
         /* Setting the '_ro' property switches to the read-only vtable */
-        VTABLE_set_integer_native(INTERP, _true, 1);
+        _true = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, 1);
         VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), _true);
+
         SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
         Parrot_gc_add_pmc_sync(INTERP, ret);
         PObj_is_PMC_shared_SET(ret);

@@ -907,8 +907,7 @@ The number of optional named arguments
                 EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
 
-        retval = Parrot_pmc_new(INTERP, enum_class_Integer);
-        VTABLE_set_integer_native(INTERP, retval, count_found);
+        retval = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, count_found);
         return retval;
     }
 

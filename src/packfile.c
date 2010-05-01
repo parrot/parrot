@@ -4525,8 +4525,7 @@ make_annotation_value_pmc(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
     switch (type) {
       case PF_ANNOTATION_KEY_TYPE_INT:
-        result = Parrot_pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, result, value);
+        result = Parrot_pmc_new_init_int(interp, enum_class_Integer, value);
         break;
       case PF_ANNOTATION_KEY_TYPE_NUM:
         result = Parrot_pmc_new(interp, enum_class_Float);

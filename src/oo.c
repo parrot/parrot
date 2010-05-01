@@ -648,11 +648,10 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
     }
     {
         if (!typeid_exists) {
-            PMC * const classname_hash = interp->class_hash;
-            PMC * const item           = Parrot_pmc_new(interp, enum_class_Integer);
             /* set entry in name->type hash */
-            VTABLE_set_integer_native(interp, item, type);
-
+            PMC * const classname_hash = interp->class_hash;
+            PMC * const item           = Parrot_pmc_new_init_int(interp,
+                    enum_class_Integer, type);
             VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
         }
     }

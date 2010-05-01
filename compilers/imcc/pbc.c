@@ -1082,10 +1082,9 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
                 sig_pmc = Parrot_pmc_new(interp, enum_class_String);
                 VTABLE_set_string_native(interp, sig_pmc, type_name);
             }
-            else {
-                sig_pmc = Parrot_pmc_new(interp, enum_class_Integer);
-                VTABLE_set_integer_native(interp, sig_pmc, type_num);
-            }
+            else
+                sig_pmc = Parrot_pmc_new_init_int(interp,
+                        enum_class_Integer, type_num);
         }
         else {
             PARROT_ASSERT(r->set == 'K');

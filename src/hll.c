@@ -97,8 +97,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
     else
         VTABLE_push_pmc(interp, hll_info, entry);
 
-    entry_id = Parrot_pmc_new_constant(interp, enum_class_Integer);
-    VTABLE_set_integer_native(interp, entry_id, id);
+    entry_id = Parrot_pmc_new_constant_init_int(interp, enum_class_Integer, id);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_id, entry_id);
 
     return entry;

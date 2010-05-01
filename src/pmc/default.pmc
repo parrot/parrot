@@ -242,8 +242,8 @@ propagate_std_props(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *prop_hash))
     ASSERT_ARGS(propagate_std_props)
 
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
-        PMC * const pmc_true  = Parrot_pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, pmc_true, 1);
+        PMC * const pmc_true  = Parrot_pmc_new_init_int(interp,
+                enum_class_Integer, 1);
         VTABLE_set_pmc_keyed_str(interp, prop_hash, CONST_STRING(interp, "_ro"), pmc_true);
     }
 }
@@ -290,8 +290,8 @@ check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *k
 
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
        && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
-        PMC * const ret_val  = Parrot_pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, ret_val, 1);
+        PMC * const ret_val = Parrot_pmc_new_init_int(interp,
+                enum_class_Integer, 1);
         return ret_val;
     }
     else
@@ -992,8 +992,7 @@ Provides introspection of a specific piece of information about the PMC.
 
     VTABLE PMC *inspect_str(STRING *name) {
         if (Parrot_str_equal(interp, name, CONST_STRING(interp, "flags"))) {
-            PMC *found = Parrot_pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, found,
+            PMC *found = Parrot_pmc_new_init_int(interp, enum_class_Integer,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }

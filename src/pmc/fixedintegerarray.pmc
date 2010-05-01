@@ -317,9 +317,8 @@ Returns the PMC value of the element at index C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC  * const ret = Parrot_pmc_new(INTERP, enum_class_Integer);
         const INTVAL val = SELF.get_integer_keyed_int(key);
-        VTABLE_set_integer_native(INTERP, ret, val);
+        PMC  * const ret = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, val);
         return ret;
     }
 

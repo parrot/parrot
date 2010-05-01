@@ -1048,8 +1048,7 @@ Array of Class PMCs representing the direct parents of this class.
             VTABLE_set_string_native(INTERP, found, _class->name);
         }
         else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "id"))) {
-            found = Parrot_pmc_new(INTERP, enum_class_Integer);
-            VTABLE_set_integer_native(INTERP, found, _class->id);
+            found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, _class->id);
         }
         else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "namespace"))) {
             /* Should not clone this. */
@@ -1071,8 +1070,7 @@ Array of Class PMCs representing the direct parents of this class.
             found = _class->roles;
         }
         else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "flags"))) {
-            found = Parrot_pmc_new(INTERP, enum_class_Integer);
-            VTABLE_set_integer_native(INTERP, found,
+            found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                 (INTVAL)PObj_get_FLAGS(SELF));
         }
         else

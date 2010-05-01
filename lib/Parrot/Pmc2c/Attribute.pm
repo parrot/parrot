@@ -208,8 +208,7 @@ EOA
     }
     elsif ($attrtype eq "INTVAL") {
         $decl .= <<"EOA";
-            PMC * const attr_value = Parrot_pmc_new(interp, enum_class_Integer); \\
-            VTABLE_set_integer_native(interp, attr_value, value); \\
+            PMC * const attr_value = Parrot_pmc_new_init_int(interp, enum_class_Integer, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
 EOA
