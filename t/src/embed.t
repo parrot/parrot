@@ -24,7 +24,15 @@ Embedding parrot in C
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
+sub linedirective
+{
+    # Provide a #line directive for the C code in the heredoc
+    # starting immediately after where this sub is called.
+    my $linenum = shift() + 1;
+    return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
+}
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/embed.h"
@@ -61,7 +69,7 @@ CODE
 The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +99,7 @@ CODE
 Done
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Hello world from main" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,7 +148,7 @@ Hello, parrot
 Hello, pir
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Hello world from a sub" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -206,7 +214,7 @@ CODE
 Hello, sub
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "External sub" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -262,7 +270,7 @@ CODE
 Hello from C
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
 
 #include <stdio.h>
 #include <stdlib.h>
