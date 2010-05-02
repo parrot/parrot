@@ -246,7 +246,8 @@ GEN_SOURCES = \
     src/parrot_config.c \
     src/null_config.c \
     src/install_config.c \
-    src/extend_vtable.c
+    src/extend_vtable.c \
+    src/extra_nci_thunks.c
 
 GEN_MODULES = \
     lib/Parrot/OpLib/core.pm
@@ -1819,6 +1820,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
+	$(RM_RF) runtime/parrot/languages/data_json
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PIRC_CLEANUPS) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
