@@ -41,8 +41,10 @@ pmclass OpLib singleton {
     }
 
     VTABLE void init() {
-        if (OPLIB_OPCODE_CACHE == NULL)
+        if (OPLIB_OPCODE_CACHE == NULL) {
             OPLIB_OPCODE_CACHE = Parrot_pmc_new(INTERP, enum_class_Hash);
+            Parrot_pmc_gc_register(INTERP, OPLIB_OPCODE_CACHE);
+        }
         PObj_custom_mark_SET(SELF);
     }
 
