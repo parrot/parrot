@@ -2,7 +2,7 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 #
-# perl script that writes modified POD files to the directory 
+# perl script that writes modified POD files to the directory
 # 'build/modified_pod'. Then this script generates a latex file from
 # this POD.
 #

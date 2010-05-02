@@ -51,7 +51,7 @@ html: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
 
 # The pdf target is to generate a parrot PDF document.
-# It will not work on Windows. It use the Unix syntax to specify the 
+# It will not work on Windows. It use the Unix syntax to specify the
 # path of files. May be that will be changed.
 pdf: ../tools/docs/filename_and_chapter.pl
 	$(MKPATH) build/modified_pod
