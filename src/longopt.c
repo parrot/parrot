@@ -145,13 +145,13 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
     const struct longopt_opt_decl* dptr;
 
     while (argv[dex][optlen] != '\0' && argv[dex][optlen] != '=') {
-        optlen++;
+        ++optlen;
     }
 
-    for (dptr = options; dptr->opt_id; dptr++) {
+    for (dptr = options; dptr->opt_id; ++dptr) {
         int sptr;
         /* For each listed long option... */
-        for (sptr = 0; dptr->opt_long[sptr]; sptr++) {
+        for (sptr = 0; dptr->opt_long[sptr]; ++sptr) {
             if (strncmp(dptr->opt_long[sptr], argv[dex], optlen) == 0
              && dptr->opt_long[sptr][optlen] == '\0') {
                 /* Found it */
@@ -246,7 +246,7 @@ longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
         info_buf->_shortopt_pos = &argv[dex][1];
     pos = info_buf->_shortopt_pos;
 
-    for (dptr = options; dptr->opt_id; dptr++) {
+    for (dptr = options; dptr->opt_id; ++dptr) {
         if (dptr->opt_short == *pos) {
             /* Found it */
             info_buf->opt_id = dptr->opt_id;

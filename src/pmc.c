@@ -649,7 +649,7 @@ Creates a new temporary PMC of type C<base_type>, then call C<init>. Cannot
 be used to create PMC Objects which have been defined from PIR.
 
 B<You> are responsible for freeing this PMC when it goes out of scope with
-C<free_temporary_pmc()>.  B<Do not> store this PMC in any other PMCs, or
+C<Parrot_pmc_free_temporary()>.  B<Do not> store this PMC in any other PMCs, or
 allow it to be stored.  B<Do not> store any regular PMC in this PMC, or
 allow the storage of any regular PMC in this PMC. Temporary PMCs do not
 participate in garbage collection, and mixing them with PMCs that are

@@ -263,21 +263,21 @@ clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
      * if the architecture has 0x := NULL and 0.0 we could memset too
      */
 
-    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; i++) {
+    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         ctx->bp_ps.regs_p[-1L - i] = PMCNULL;
     }
 
-    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
+    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         ctx->bp_ps.regs_s[i] = STRINGNULL;
     }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40, set int and num to identifiable garbage values */
-        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
+        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; ++i) {
             ctx->bp.regs_i[i] = -999;
         }
 
-        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
+        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; ++i) {
             ctx->bp.regs_n[-1L - i] = -99.9;
         }
     }

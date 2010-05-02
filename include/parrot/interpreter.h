@@ -26,11 +26,6 @@ typedef enum {
     PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */
     PARROT_THR_THREAD_POOL  = 0x4000, /* type3 threads */
 
-    PARROT_THR_TYPE_1       = PARROT_IS_THREAD,
-    PARROT_THR_TYPE_2       = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP,
-    PARROT_THR_TYPE_3       = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP |
-                              PARROT_THR_THREAD_POOL
-
 } Parrot_Interp_flag;
 /* &end_gen */
 
@@ -470,7 +465,7 @@ INTVAL interpinfo(PARROT_INTERP, INTVAL what)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC* interpinfo_p(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 

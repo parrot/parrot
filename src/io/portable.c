@@ -349,7 +349,7 @@ Flushes the underlying file descriptor of the given IO PMC.
 */
 
 INTVAL
-Parrot_io_flush_portable(SHIM_INTERP, SHIM(PMC *filehandle))
+Parrot_io_flush_portable(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_flush_portable)
     return fflush((FILE *)Parrot_io_get_os_handle(interp, filehandle));
@@ -369,7 +369,7 @@ of bytes read.
 */
 
 size_t
-Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
+Parrot_io_read_portable(PARROT_INTERP, ARGIN(PMC *filehandle),
               ARGIN(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_portable)
@@ -393,8 +393,8 @@ Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_write_portable(PARROT_INTERP, PMC *filehandle, STRING
-*s)>
+=item C<size_t Parrot_io_write_portable(PARROT_INTERP, PMC *filehandle, const
+STRING *s)>
 
 Writes the given STRING to the provided IO PMC.
 
@@ -403,10 +403,10 @@ Writes the given STRING to the provided IO PMC.
 */
 
 size_t
-Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
+Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_portable)
-    void * const buffer = s->strstart;
+    const void * const buffer = s->strstart;
     return fwrite(buffer, 1, s->bufused,
                   (FILE *)Parrot_io_get_os_handle(interp, filehandle));
 }
@@ -424,15 +424,15 @@ Seeks to the given offset and position within the provided IO PMC.
 */
 
 PIOOFF_T
-Parrot_io_seek_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              PIOOFF_T offset, INTVAL whence)
+Parrot_io_seek_portable(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_portable)
-    PIOOFF_T pos;
     errno = 0;
 
-    if ((pos = fseek((FILE *)Parrot_io_get_os_handle(interp, filehandle),
-                    (long)offset, whence)) >= 0)
+    const PIOOFF_T pos = fseek(
+            (FILE *)Parrot_io_get_os_handle(interp, filehandle), (long)offset, whence);
+
+    if (pos >= 0)
         Parrot_io_set_file_position(interp, filehandle, pos);
 
     /* Seek clears EOF */

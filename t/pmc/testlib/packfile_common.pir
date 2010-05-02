@@ -70,6 +70,17 @@
 .end
 
 
+# Report no ok for loading packfile failures
+.sub report_load_error
+    .param pmc except
+    .param string desc
+    .local string msg, aux
+    msg = concat desc, ' - error loading packfile: '
+    aux = except['message']
+    msg = concat msg, aux
+    ok(0, msg)
+.end
+
 
 # Local Variables:
 #   mode: pir

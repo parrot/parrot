@@ -141,7 +141,7 @@ Marks the array as live.
             UINTVAL size, i;
             GET_ATTR_size(INTERP, SELF, size);
 
-            for (i = 0; i < size; i++) {
+            for (i = 0; i < size; ++i) {
                 Parrot_gc_mark_STRING_alive(INTERP, str_array[i]);
             }
         }

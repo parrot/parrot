@@ -845,7 +845,7 @@ Parrot_register_move(PARROT_INTERP,
     c.temp_reg = temp_reg;
 
     /* compute max_reg, the max reg number + 1 */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         if (src_regs[i] > max_reg)
             max_reg = src_regs[i];
         if (dest_regs[i] > max_reg)
@@ -861,26 +861,26 @@ Parrot_register_move(PARROT_INTERP,
     c.reg_to_index = reg_to_index = mem_gc_allocate_n_zeroed_typed(interp, max_reg, int);
 
     /* init backup array */
-    for (i = 0; i < n_regs; i++)
+    for (i = 0; i < n_regs; ++i)
         backup[i] = -1;
 
     /* fill in the conversion array between a register number and its index */
-    for (i = 0; i < max_reg; i++)
+    for (i = 0; i < max_reg; ++i)
         reg_to_index[i] = -1;
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         const int index = dest_regs[i];
         if (index != src_regs[i]) /* get rid of self-assignment */
             reg_to_index[index] = i;
     }
 
     /* count the nb of successors for each reg index */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         const int index = reg_to_index[ src_regs[i] ];
         if (index >= 0) /* not interested in the wells that have no preds */
-            nb_succ[ index ]++;
+            ++nb_succ[index];
     }
     /* process each well if any */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         if (0 == nb_succ[i]) { /* a well */
             rec_climb_back_and_mark(i, &c);
         }
@@ -888,7 +888,7 @@ Parrot_register_move(PARROT_INTERP,
 
     /* process remaining dest registers not processed */
     /* remaining nodes are members of cycles without exits */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         if (0 < nb_succ[i] && 0 > backup[i]) { /* not a well nor visited*/
             process_cycle_without_exit(i, &c);
         }

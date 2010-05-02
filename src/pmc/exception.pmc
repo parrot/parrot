@@ -545,26 +545,22 @@ Retrieve an attribute value for the exception object.
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
                 INTVAL type;
                 GET_ATTR_type(interp, SELF, type);
-                value = Parrot_pmc_new(interp, enum_class_Integer);
-                VTABLE_set_integer_native(interp, value, type);
+                value = Parrot_pmc_new_init_int(interp, enum_class_Integer, type);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "severity"))) {
                 INTVAL severity;
                 GET_ATTR_severity(interp, SELF, severity);
-                value = Parrot_pmc_new(interp, enum_class_Integer);
-                VTABLE_set_integer_native(interp, value, severity);
+                value = Parrot_pmc_new_init_int(interp, enum_class_Integer, severity);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exit_code"))) {
                 INTVAL exit_code;
                 GET_ATTR_exit_code(interp, SELF, exit_code);
-                value = Parrot_pmc_new(interp, enum_class_Integer);
-                VTABLE_set_integer_native(interp, value, exit_code);
+                value = Parrot_pmc_new_init_int(interp, enum_class_Integer, exit_code);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handled"))) {
                 INTVAL handled;
                 GET_ATTR_handled(interp, SELF, handled);
-                value = Parrot_pmc_new(interp, enum_class_Integer);
-                VTABLE_set_integer_native(interp, value, handled);
+                value = Parrot_pmc_new_init_int(interp, enum_class_Integer, handled);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
                 STRING *message = SELF.get_string();

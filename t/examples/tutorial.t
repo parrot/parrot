@@ -97,8 +97,8 @@ END_EXPECTED
 bc
 bc
 abcde
-bc
 aXYZde
+abcde
 END_EXPECTED
 
     '24_string_ops_clone.pir' => << 'END_EXPECTED',

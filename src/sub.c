@@ -181,7 +181,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
 
         if (!debug)
             return 0;
-        for (i = n = 0; n < sub->seg->base.size; i++) {
+        for (i = n = 0; n < sub->seg->base.size; ++i) {
             op_info_t * const op_info = &interp->op_info_table[*pc];
             opcode_t var_args = 0;
 
@@ -233,7 +233,7 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     base_pc            = sub->seg->base.data;
     current_annotation = pc - base_pc;
 
-    for (i = op = 0; op < debug_size; i++) {
+    for (i = op = 0; op < debug_size; ++i) {
         op_info_t * const op_info  = &interp->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 
@@ -549,10 +549,11 @@ PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
     ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
-    PMC *key, *sub_pmc;
 
     /* Ensure we really do have a subclass of sub. */
     if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
+        PMC *key, *sub_pmc;
+
         /* If it's actually a PMC still, probably does the same structure
          * underneath. */
         if (!PObj_is_object_TEST(subclass)) {

@@ -450,7 +450,7 @@ getchr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGMOD(SPRINTF_OBJ *obj))
             ((PMC *)obj->data),
             (obj->index));
 
-    obj->index++;
+    ++obj->index;
     s = VTABLE_get_string(interp, tmp);
     /* XXX Parrot_str_copy like below? + adjusting bufused */
     return Parrot_str_substr(interp, s, 0, 1);
@@ -473,13 +473,12 @@ static HUGEINTVAL
 getint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(getint_pmc)
-    HUGEINTVAL ret;
+
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    ret = VTABLE_get_integer(interp, tmp);
+    HUGEINTVAL ret  = VTABLE_get_integer(interp, tmp);
 
     switch (size) {
       case SIZE_SHORT:
@@ -513,13 +512,12 @@ static UHUGEINTVAL
 getuint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(getuint_pmc)
-    UHUGEINTVAL ret;
+
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    ret = (UINTVAL)VTABLE_get_integer(interp, tmp);
+    UHUGEINTVAL ret = (UINTVAL)VTABLE_get_integer(interp, tmp);
 
     switch (size) {
       case SIZE_SHORT:
@@ -553,13 +551,11 @@ static HUGEFLOATVAL
 getfloat_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(getfloat_pmc)
-    HUGEFLOATVAL ret;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
+    PMC * const tmp  = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    ret = (HUGEFLOATVAL)(VTABLE_get_number(interp, tmp));
+    HUGEFLOATVAL ret = (HUGEFLOATVAL)(VTABLE_get_number(interp, tmp));
 
     switch (size) {
     case SIZE_SHORT:
@@ -591,14 +587,13 @@ static STRING *
 getstring_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(getstring_pmc)
-    STRING *s;
+
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    s = (STRING *)(VTABLE_get_string(interp, tmp));
-    return s;
+    STRING * const str = (STRING *)(VTABLE_get_string(interp, tmp));
+    return str;
 }
 
 /*
@@ -619,10 +614,8 @@ getptr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(getptr_pmc)
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
-            ((PMC *)obj->data), (obj->index));
+            ((PMC *)obj->data), (obj->index++));
     const INTVAL i  = VTABLE_get_integer(interp, tmp);
-
-    obj->index++;
 
     /* XXX correct? */
     return (void *)i;

@@ -45,7 +45,7 @@ automatically aggregated and output to STDOUT.
     set_global ['TAP';'Harness'], 'LEGAL_CALLBACK', $P0
 .end
 
-.sub 'init' :vtable :init
+.sub 'init' :vtable :method
     $P0 = get_global ['TAP';'Harness'], 'LEGAL_CALLBACK'
     setattribute self, 'ok_callbacks', $P0
 .end
@@ -212,9 +212,8 @@ automatically aggregated and output to STDOUT.
     $I0 = exists $P0['PARROT_TEST_HARNESS_DUMP_TAP']
     unless $I0 goto L1
     .local string spool
-    spool = $P0['PARROT_TEST_HARNESS_DUMP_TAP']
-    spool .= '/'
-    spool .= test
+    $S0 = $P0['PARROT_TEST_HARNESS_DUMP_TAP']
+    spool = catfile($S0, test)
     $S0 = dirname(spool)
     mkpath($S0)
     $P0 = new 'FileHandle'
@@ -248,7 +247,6 @@ files or streams into an archive file (C<.tar.gz>).
 .namespace ['TAP';'Harness';'Archive']
 
 .sub '' :init :load :anon
-    load_bytecode 'osutils.pbc'
     $P0 = subclass ['TAP';'Harness'], ['TAP';'Harness';'Archive']
     $P0.'add_attribute'('archive_file')
     $P0.'add_attribute'('archive_extra_files')
@@ -296,12 +294,13 @@ files or streams into an archive file (C<.tar.gz>).
 
 .sub 'runtests' :method
     .param pmc files
+    load_bytecode 'Archive/Tar.pbc'
     $P0 = getattribute self, 'archive_file'
     unless null $P0 goto L1
     die "You must provide the name of the archive to create!"
   L1:
-    .local string archive, dir
-    archive = $P0
+    .local string archive_file, dir
+    archive_file = $P0
     dir = tempdir()
     .local pmc env
     env = new 'Env'
@@ -312,35 +311,22 @@ files or streams into an archive file (C<.tar.gz>).
     .local string current_dir, cmd
     current_dir = cwd()
     chdir(dir)
-    $S0 = self.'_mk_meta'(aggregate)
-    spew('meta.yml', $S0)
+    .local pmc archive
+    archive = new ['Archive';'Tar']
+    archive.'add_files'(files :flat)
+    chdir(current_dir)
+    rmtree(dir)
     $P0 = getattribute self, 'archive_extra_files'
     if null $P0 goto L2
-    $P1 = iter $P0
-  L3:
-    unless $P1 goto L2
-    $S2 = shift $P1
-    $S1 = current_dir . '/'
-    $S1 .= $S2
-    cp($S1, $S2)
-    goto L3
+    archive.'add_files'($P0 :flat)
   L2:
-    $S0 = current_dir
-    $I0 = index $S0, ':'
-    unless $I0 == 1 goto L4
-    $S0 = substr $S0, 2         # remove Windows drive
-  L4:
-    cmd = "tar -cf " . $S0
-    cmd .= "/"
-    $I0 = length archive
-    $I0 -= 3
-    $S0 = substr archive, 0, $I0
-    cmd .= $S0
-    cmd .= " *"
-    system(cmd)
-    chdir(current_dir)
-    gzip($S0)
-    rmtree(dir)
+    $S0 = self.'_mk_meta'(aggregate)
+    archive.'add_data'('meta.yml', $S0)
+    $P0 = loadlib 'gziphandle'
+    $P0 = new 'GzipHandle'
+    $P0.'open'(archive_file, 'wb')
+    archive.'write'($P0)
+    $P0.'close'()
     .return (aggregate)
 .end
 

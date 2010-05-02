@@ -485,7 +485,7 @@ utf16_decode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i))
      *      iter versions
      */
     U16_NEXT_UNSAFE(s, pos, c);
-    i->charpos++;
+    ++i->charpos;
     i->bytepos = pos * sizeof (UChar);
     return c;
 }
@@ -509,7 +509,7 @@ utf16_encode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
     U16_APPEND_UNSAFE(s, pos, c);
-    i->charpos++;
+    ++i->charpos;
     i->bytepos = pos * sizeof (UChar);
 }
 

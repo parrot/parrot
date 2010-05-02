@@ -323,7 +323,7 @@ nul:
         dest[7] |= 0x80;
     /* long double frac 63 bits => 52 bits
        src[7] &= 0x7f; reset integer bit */
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < 6; ++i) {
         dest[i+1] |= (i==5 ? src[7]&0x7f : src[i+2]) >> 3;
         dest[i] |= (src[i+2] & 0x1f) << 5;
     }
@@ -552,7 +552,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
             dest[7] |= 0x80;
         /* long double frac 112 bits => 52 bits
            src[13] &= 0x7f; reset integer bit */
-        for (i = 0; i < 6; i++) {
+        for (i = 0; i < 6; ++i) {
             dest[i+1] |= (i==5 ? src[13]&0x7f : src[i+7]) >> 3;
             dest[i] |= (src[i+7] & 0x1f) << 5;
         }

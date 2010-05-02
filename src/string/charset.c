@@ -348,7 +348,7 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
         all_charsets->set = mem_gc_realloc_n_typed_zeroed(interp,
                 all_charsets->set, n + 1, n, One_charset);
 
-    all_charsets->n_charsets++;
+    ++all_charsets->n_charsets;
     all_charsets->set[n].charset      = charset;
     all_charsets->set[n].n_converters = 0;
 
@@ -372,7 +372,7 @@ Parrot_str_internal_register_charset_names(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_str_internal_register_charset_names)
     int n;
-    for (n = 0; n < all_charsets->n_charsets; n++)
+    for (n = 0; n < all_charsets->n_charsets; ++n)
         all_charsets->set[n].name =
             Parrot_str_new_constant(interp, all_charsets->set[n].charset->name);
 }

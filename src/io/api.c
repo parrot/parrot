@@ -460,14 +460,13 @@ INTVAL
 Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t length)
 {
     ASSERT_ARGS(Parrot_io_write)
-    DECL_CONST_CAST;
     INTVAL result;
     STRING *s;
 
     if (PMC_IS_NULL(pmc))
         return -1;
 
-    s = Parrot_str_new(interp, (char *) PARROT_const_cast(void *, buffer), length);
+    s = Parrot_str_new(interp, (const char *)buffer, length);
 
     result = Parrot_io_putps(interp, pmc, s);
     return result;

@@ -388,7 +388,7 @@ fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
 {
     ASSERT_ARGS(fixed8_get_next)
     const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
-    iter->bytepos++;
+    ++iter->bytepos;
     return c;
 }
 
@@ -409,7 +409,7 @@ fixed8_set_next(PARROT_INTERP, ARGMOD(String_iter *iter), UINTVAL c)
 {
     ASSERT_ARGS(fixed8_set_next)
     set_byte(interp, iter->str, iter->charpos++, c);
-    iter->bytepos++;
+    ++iter->bytepos;
 }
 
 /*

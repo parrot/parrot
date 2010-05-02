@@ -66,10 +66,12 @@ permissions.)
 Congratulate the new member publicly by sending an email to
 parrot-dev@lists.parrot.org, and copying the new committer.
 
-
 The steps for the "languages" repository and Trac instance are the same,
 except the URLs are L<https://trac.parrot.org/languages/...> and the
 committer group is "languages_committers".
+
+Note that commit messages from the new member will be automatically held
+pending list-admin approval.
 
 =head2 To manage the list of Metacommitters
 

@@ -423,7 +423,7 @@ ucs2_decode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i))
      *      iter versions
      */
     const UChar c = s[pos++];
-    i->charpos++;
+    ++i->charpos;
     i->bytepos = pos * sizeof (UChar);
     return c;
 #else
@@ -457,7 +457,7 @@ ucs2_encode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     UChar    *s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
     s[pos++]    = (UChar)c;
-    i->charpos++;
+    ++i->charpos;
     i->bytepos = pos * sizeof (UChar);
 #else
     /* This function must never be called if compiled without ICU.

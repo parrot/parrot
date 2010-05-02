@@ -420,8 +420,8 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
     STRING * const nul = string_chr(interp, '\0');
 
     path = Parrot_str_concat(interp, path, nul);
-    path->bufused--;
-    path->strlen--;
+    --path->bufused;
+    --path->strlen;
 
 #ifdef WIN32
     cnv_to_win32_filesep(path);

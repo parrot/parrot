@@ -181,7 +181,7 @@
     print "bef> "
     $P0 = getstdin
     $S0 = readline $P0
-    chopn $S0, 1
+    $S0 = chopn $S0, 1
     $I0 = length $S0
 
     if $I0 == 0 goto DEBUG__INTERACT__NEXT
@@ -205,7 +205,7 @@
     goto DEBUG__INTERACT__LOOP
 
   DEBUG__INTERACT__BREAK:
-    substr $S0, 0, 6, ""
+    $S0 = replace $S0, 0, 6, ""
     $P0 = get_global "breakpoints"
     $P0[$S0] = 1
     set_global "breakpoints", $P0
@@ -218,7 +218,7 @@
     goto DEBUG__INTERACT__END
 
   DEBUG__INTERACT__DELETE:
-    substr $S0, 0, 7, ""
+    $S0 = replace $S0, 0, 7, ""
     $P0 = get_global "breakpoints"
     delete $P0[$S0]
     set_global "breakpoints", $P0

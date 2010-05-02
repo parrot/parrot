@@ -351,7 +351,9 @@ Returns the thread id of the interpreter.
 
     VTABLE INTVAL get_integer() {
         const Parrot_Interp i = PMC_interp(SELF);
-        return (INTVAL)i->thread_data->tid;
+        if (i->thread_data)
+          return (INTVAL)i->thread_data->tid;
+        return 0;
     }
 
 /*
@@ -651,7 +653,7 @@ have the same thread id.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *val) {
+    MULTI INTVAL is_equal(ParrotInterpreter val) {
         Parrot_Interp self  = PMC_interp(SELF);
         Parrot_Interp other = PMC_interp(val);
 
@@ -663,6 +665,22 @@ have the same thread id.
             return 1;
 
         return 0;
+    }
+
+    MULTI INTVAL is_equal(ParrotThread value) {
+        Parrot_Interp self  = PMC_interp(SELF);
+
+        if (!self->thread_data)
+            return 0;
+
+        return self->thread_data->tid == (UINTVAL) VTABLE_get_integer(interp, value);
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "ParrotInterpreter: no multiple dispatch variant 'is_equal' for %Ss",
+                VTABLE_name(interp, value));
     }
 
 /*

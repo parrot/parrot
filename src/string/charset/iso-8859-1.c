@@ -331,7 +331,7 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
         return result;
 
     buffer = (unsigned char *)result->strstart;
-    for (offset = 0; offset < result->strlen; offset++) {
+    for (offset = 0; offset < result->strlen; ++offset) {
         unsigned int c = buffer[offset]; /* XXX use encoding ? */
         if (c >= 0xe0 && c != 0xf7)
             c &= ~0x20;
@@ -367,7 +367,7 @@ downcase(PARROT_INTERP, ARGIN(const STRING *src))
         return result;
 
     buffer = (unsigned char *)result->strstart;
-    for (offset = 0; offset < result->strlen; offset++) {
+    for (offset = 0; offset < result->strlen; ++offset) {
         unsigned int c = buffer[offset];
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
             c |= 0x20;
@@ -411,7 +411,7 @@ titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         c = toupper((unsigned char)c);
     buffer[0] = (unsigned char)c;
 
-    for (offset = 1; offset < result->strlen; offset++) {
+    for (offset = 1; offset < result->strlen; ++offset) {
         c = buffer[offset];
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
             c |= 0x20;

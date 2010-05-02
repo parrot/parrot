@@ -102,6 +102,13 @@ Initializes the integer with a default value of C<0>.
         attrs->iv      = VTABLE_get_integer(INTERP, init);
     }
 
+    VTABLE void init_int(INTVAL init) {
+        Parrot_Integer_attributes * const attrs =
+            (Parrot_Integer_attributes *)PMC_data(SELF);
+
+        attrs->iv = init;
+    }
+
 /*
 
 =item C<PMC *clone()>

@@ -317,9 +317,8 @@ Returns the PMC value of the element at index C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC  * const ret = Parrot_pmc_new(INTERP, enum_class_Integer);
         const INTVAL val = SELF.get_integer_keyed_int(key);
-        VTABLE_set_integer_native(INTERP, ret, val);
+        PMC  * const ret = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, val);
         return ret;
     }
 
@@ -444,11 +443,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        INTVAL tempInt;
-        PMC  * const tempPMC = Parrot_pmc_new_temporary(INTERP, enum_class_Integer);
-        VTABLE_set_string_native(INTERP, tempPMC, value);
-        tempInt        = VTABLE_get_integer(INTERP, tempPMC);
-        Parrot_pmc_free_temporary(interp, tempPMC);
+        const INTVAL tempInt = Parrot_str_to_int(INTERP, value);
         SELF.set_integer_keyed_int(key, tempInt);
     }
 

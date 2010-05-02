@@ -121,12 +121,6 @@ flags include:
 
 =item PARROT_THR_THREAD_POOL
 
-=item PARROT_THR_TYPE_1
-
-=item PARROT_THR_TYPE_2
-
-=item PARROT_THR_TYPE_3
-
 =back
 
 See F<interpreter.h> for the definition of these flags (TODO: document flag

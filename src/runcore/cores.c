@@ -73,7 +73,7 @@ As its name implies, the switch core uses a gigantic C C<switch / case>
 structure to execute opcodes. Here's a brief example of how this
 architecture works:
 
-  for( ; ; current_opcode++) {
+  for( ; ; ++current_opcode) {
       switch(*current_opcode) {
           case opcode_1:
               ...

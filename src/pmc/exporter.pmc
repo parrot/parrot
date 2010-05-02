@@ -256,7 +256,7 @@ Throws an exception if an unknown PMC type is passed.
                 if (n == 0)
                     temp_globals = PMCNULL;
 
-                for (i = 0; i < n; i++) {
+                for (i = 0; i < n; ++i) {
                     STRING * const item = VTABLE_get_string_keyed_int(interp, glb_array, i);
                     VTABLE_set_string_keyed_str(interp, temp_globals, item, s_empty);
                 }

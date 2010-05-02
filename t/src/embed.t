@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 6;
+plan tests => 7;
 
 =head1 NAME
 
@@ -24,7 +24,52 @@ Embedding parrot in C
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
+sub linedirective
+{
+    # Provide a #line directive for the C code in the heredoc
+    # starting immediately after where this sub is called.
+    my $linenum = shift() + 1;
+    return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
+}
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/embed.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, lang;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+    lang = Parrot_str_new_constant(interp, "PIR", 3);
+
+    func_pmc  = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
+    str = Parrot_str_to_cstring(interp, err);
+    puts(str);
+    Parrot_str_free_cstring(interp, str);
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +99,7 @@ CODE
 Done
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Hello world from main" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,7 +148,7 @@ Hello, parrot
 Hello, pir
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Hello world from a sub" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -169,7 +214,7 @@ CODE
 Hello, sub
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "External sub" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -225,7 +270,7 @@ CODE
 Hello from C
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -73,7 +73,7 @@ clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
     if (!ct)
         return;
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         PackFile_FixupEntry * const e = ft->fixups + i;
 
         if (e->type == enum_fixup_sub) {
@@ -112,7 +112,7 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
     if (!ct)
         return PMCNULL;
 
-    for (i = n = 0; i < ft->fixup_count; i++) {
+    for (i = n = 0; i < ft->fixup_count; ++i) {
         const PackFile_FixupEntry * const e = ft->fixups + i;
 
         if (e->type == enum_fixup_sub) {
@@ -151,7 +151,7 @@ mark_subs(PARROT_INTERP, ARGIN(PMC *self))
     if (!ct)
         return;
 
-    for (i = 0; i < ft->fixup_count; i++) {
+    for (i = 0; i < ft->fixup_count; ++i) {
         const PackFile_FixupEntry * const e = ft->fixups + i;
 
         if (e->type == enum_fixup_sub) {
@@ -426,11 +426,11 @@ Unarchives the code.
         if (!ft)
             return 0;
 
-        for (i = n = 0; i < ft->fixup_count; i++) {
+        for (i = n = 0; i < ft->fixup_count; ++i) {
             const PackFile_FixupEntry * const e = ft->fixups + i;
 
             if (e->type == enum_fixup_sub)
-                n++;
+                ++n;
         }
 
         return n;

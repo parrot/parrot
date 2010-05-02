@@ -185,7 +185,7 @@ Report whether the exception handler can handle a particular type of exception.
                 const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
 
-                for (i = 0; i < elems; i++) {
+                for (i = 0; i < elems; ++i) {
                     INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
                             handled_types, i);
                     if (handled_type == type)
@@ -199,7 +199,7 @@ Report whether the exception handler can handle a particular type of exception.
                 const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
 
-                for (i = 0; i < elems; i++) {
+                for (i = 0; i < elems; ++i) {
                     const INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
                             handled_types_except, i);
                     if (handled_type == type)

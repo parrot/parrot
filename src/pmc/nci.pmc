@@ -64,7 +64,7 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
     size_t  j            = 0;
     size_t  i;
 
-    for (i = 1; i < sig_length; i++) {
+    for (i = 1; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig, i);
 
         switch (c) {

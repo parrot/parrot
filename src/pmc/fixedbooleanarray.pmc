@@ -281,7 +281,7 @@ Returns the Parrot string representation of the array.
         zero = CONST_STRING(INTERP, "0");
         one  = CONST_STRING(INTERP, "1");
 
-        for (i = 0; i < elems; i++) {
+        for (i = 0; i < elems; ++i) {
             if (SELF.get_integer_keyed_int((INTVAL)i))
                 str = Parrot_str_concat(INTERP, str, one);
             else

@@ -48,8 +48,12 @@ sub _init {
             conditioned_lines => 1,
         },
 
-        'src/dynpmc/Makefile'        =>
-            { SOURCE => 'config/gen/makefiles/dynpmc.in' },
+        'src/dynpmc/Rules.mak' => {
+             SOURCE => 'src/dynpmc/Rules.in',
+        },
+        'src/dynpmc/Defines.mak' => {
+             SOURCE => 'src/dynpmc/Defines.in',
+        },
         'editor/Makefile'            =>
             { SOURCE => 'config/gen/makefiles/editor.in' },
 

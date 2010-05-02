@@ -49,7 +49,7 @@ Freeze using either method.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING*
 Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 {
@@ -99,7 +99,6 @@ Get the size of an image to be frozen without allocating a large buffer.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 UINTVAL
 Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
 {
@@ -184,7 +183,7 @@ nested containers, for which another approach could be a win.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 {
@@ -277,7 +276,7 @@ This is a lie. It does nothing different from Parrot_thaw at the moment.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING *image))
 {
@@ -326,7 +325,7 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
     PMC * const todo    = VTABLE_get_iter(interp, info);
 
     /* can't cache upper limit, visit may append items */
-    for (i = 0; i < VTABLE_elements(interp, todo); i++) {
+    for (i = 0; i < VTABLE_elements(interp, todo); ++i) {
         PMC * const current = VTABLE_get_pmc_keyed_int(interp, todo, i);
         if (!current)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,

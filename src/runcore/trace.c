@@ -316,7 +316,7 @@ trace_op_dump(PARROT_INTERP,
         INTVAL i;
         len += Parrot_io_eprintf(debugger, " ");
         /* pass 1 print arguments */
-        for (i = s; i < n; i++) {
+        for (i = s; i < n; ++i) {
             const opcode_t o = pc[i];
 
             if (i < info->op_count)
@@ -415,7 +415,7 @@ trace_op_dump(PARROT_INTERP,
             Parrot_io_eprintf(debugger, "\t");
 
         /* pass 2 print argument details if needed */
-        for (i = 1; i < n; i++) {
+        for (i = 1; i < n; ++i) {
             const opcode_t o = pc[i];
             if (i < info->op_count)
                 type = info->types[i - 1];

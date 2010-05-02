@@ -99,7 +99,7 @@ Resizes the array to C<size> elements.
             PMC_array(SELF) = mem_gc_realloc_n_typed_zeroed(INTERP,
                     PMC_array(SELF), cur, i, PMC *);
 
-            for (; i < cur; i++) {
+            for (; i < cur; ++i) {
                 (PMC_array(SELF))[i] = PMCNULL;
             }
 
@@ -292,7 +292,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         for (i = idx; i < n - 1; ++i)
             data[i] = data[i + 1];
 
-        PMC_size(SELF)--;
+        --PMC_size(SELF);
     }
 
 /*
@@ -382,9 +382,7 @@ the array.
     VTABLE void push_integer(INTVAL value) {
 
         const INTVAL size = PMC_size(SELF);
-        PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Integer);
-
-        VTABLE_set_integer_native(INTERP, val, value);
+        PMC   * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         SELF.set_pmc_keyed_int(size, val);
 
         return;
@@ -531,11 +529,10 @@ the array.
     VTABLE void unshift_integer(INTVAL value) {
 
         const INTVAL size = PMC_size(SELF);
-        PMC * const val   = Parrot_pmc_new(INTERP, enum_class_Integer);
+        PMC * const val   = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         PMC    **data;
         INTVAL   i;
 
-        VTABLE_set_integer_native(INTERP, val, value);
         SELF.set_integer_native(size + 1);
 
         data = PMC_array(SELF);
@@ -703,7 +700,7 @@ everything via the VTABLE api.
         /* shrink the array */
         if (shift < 0) {
             /* start at offset so we don't overwrite values we'll need */
-            for (i = offset + count; i < length; i++)
+            for (i = offset + count; i < length; ++i)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
 
@@ -715,13 +712,13 @@ everything via the VTABLE api.
 
             /* move the existing values */
             /* start at length-1 so we don't overwrite values we'll need */
-            for (i = length - 1; i >= offset; i--)
+            for (i = length - 1; i >= offset; --i)
                 VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
         }
 
         /* copy the new values */
-        for (i = 0; i < elems; i++)
+        for (i = 0; i < elems; ++i)
             VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
                 VTABLE_get_pmc_keyed_int(INTERP, value, i));
     }

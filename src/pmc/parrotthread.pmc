@@ -4,29 +4,17 @@ $Id$
 
 =head1 NAME
 
-src/pmc/parrotthread.pmc - Threaded Interpreter
+src/pmc/parrotthread.pmc - Represents a Parrot Thread.
 
 =head1 DESCRIPTION
 
-ParrotThread extends ParrotInterpreter to provide a threaded interpreter
-which supports:
+This type represents a  parrot thread.
 
-    new P2, "ParrotThread"        # create new threaded interp
-    find_method P0, P2, "thread3" # thread-run function
-    find_global P5, "_th1"        # locate thread function
-    invoke                        # run thread
-
-    set I0, P2                    # get thread id
-
-and these methods:
-
-    thread1
-    thread2
-    thread3                   # start thread of type 1..3
-    join
-    detach
-    yield
-    kill
+It provides the following methods:
+    - join
+    - detach
+    - kill
+    - pid
 
 =head2 Methods
 
@@ -38,155 +26,143 @@ and these methods:
 
 #include "parrot/embed.h"
 
-#define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
+
+pmclass ParrotThread no_ro auto_attrs {
+    ATTR INTVAL tid; /* thread id */
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static INTVAL do_thread_run(PARROT_INTERP,
-    ARGIN(PMC *thread),
-    INTVAL clone_flags,
-    ARGIN(PMC *sub),
-    ARGIN(PMC *args))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-static void stop_GC(ARGIN(Interp *parent), ARGIN(Interp *thread))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_do_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(thread) \
-    , PARROT_ASSERT_ARG(sub) \
-    , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_stop_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(parent) \
-    , PARROT_ASSERT_ARG(thread))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-/*
- * can't do multi-threaded GC yet
- * XXX a quick hack to pass the few tests
- */
-static void
-stop_GC(ARGIN(Interp *parent), ARGIN(Interp *thread))
-{
-    ASSERT_ARGS(stop_GC)
-    Parrot_block_GC_mark(parent);
-    Parrot_block_GC_mark(thread);
-    Parrot_block_GC_sweep(parent);
-    Parrot_block_GC_sweep(thread);
-}
-
-/* XXX FIXME probably not the best interface [see also list post of
-   coke's]
- */
-
-static INTVAL
-do_thread_run(PARROT_INTERP, ARGIN(PMC *thread),
-                            INTVAL clone_flags, ARGIN(PMC *sub), ARGIN(PMC *args))
-{
-    ASSERT_ARGS(do_thread_run)
-
-    const INTVAL tid = VTABLE_get_integer(interp, thread);
-
-    if (PMC_IS_NULL(sub)) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Invalid thread sub");
-    }
-
-    clone_interpreter(PMC_interp(thread), interp, clone_flags);
-
-    interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
-    pt_thread_run(interp, thread, sub, args);
-
-    Parrot_pmc_reuse(interp, thread, enum_class_ParrotRunningThread, 0);
-
-    PObj_custom_mark_CLEAR(thread);
-    VTABLE_set_integer_native(interp, thread, tid);
-
-    return tid;
-}
-
-pmclass ParrotThread extends ParrotInterpreter no_ro manual_attrs {
-
-/*
-
-=item C<thread_id = thread.'run'(CLONE_FLAGS, sub, args...)>
-
-Run the thread. This object is morphed into an appropriate
-ParrotRunningThread PMC.  The CLONE_FLAGS are or'd together values
-taken from C<cloneflags.pasm>.
-
-=item C<thread_id = thread.'run_clone'(sub, args...)>
-
-Equivalent to calling run with PARROT_CLONE_DEFAULT.
-
-=cut
-
-*/
-
-    METHOD run(INTVAL clone_flags, PMC *sub, PMC *args :slurpy) {
-        const INTVAL retval = do_thread_run(INTERP, SELF, clone_flags, sub, args);
-        RETURN(INTVAL retval);
-    }
-
-    METHOD run_clone(PMC *sub, PMC *args :slurpy) {
-        const INTVAL retval = do_thread_run(INTERP, SELF, PARROT_CLONE_DEFAULT, sub, args);
-        RETURN(INTVAL retval)
-    }
-
 
 /*
 
 =item C<void init()>
 
-Initializes the thread.
+Create a new, invalid handle to a running thread.
 
 =cut
 
 */
 
     VTABLE void init() {
-        /* protect interpreter creation and list handling */
-        LOCK(interpreter_array_mutex);
-
-        SUPER();
-        pt_add_to_interpreters(INTERP, PMC_interp(SELF));
-
-        UNLOCK(interpreter_array_mutex);
-
-        /* can't allow GC runs for now */
-        stop_GC(INTERP, PMC_interp(SELF));
+        VTABLE_set_integer_native(interp, SELF, -1);
     }
 
 /*
 
-=item C<void init_pmc(PMC *parent)>
+=item C<void init_pmc(PMC *notused)>
 
-Create a new thread by cloning the passed interpreter.
+Create a new, invalid handle to a running thread.
 
 =cut
 
 */
 
-    VTABLE void init_pmc(PMC *parent) {
-        LOCK(interpreter_array_mutex);
-        SUPER(parent);
-
-        pt_add_to_interpreters(PMC_interp(parent),
-                               PMC_interp(SELF));
-
-        UNLOCK(interpreter_array_mutex);
-
-        /* can't allow GC runs for now */
-        stop_GC(INTERP, PMC_interp(SELF));
+    VTABLE void init_pmc(PMC *notused) {
+        VTABLE_set_integer_native(interp, SELF, -1);
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Return the thread ID of this thread.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL ttid;
+        GETATTR_ParrotThread_tid(interp, SELF, ttid);
+        return ttid;
+    }
+
+    VTABLE void set_integer_native(INTVAL ttid) {
+        SETATTR_ParrotThread_tid(interp, SELF, ttid);
+    }
+
+
+/*
+
+=item C<METHOD run(closure)>
+
+Join the thread, returning whatever its main method returns.
+
+=cut
+
+*/
+    METHOD run_clone(PMC *sub, PMC *args :slurpy) {
+        INTVAL ttid;
+        if (PMC_IS_NULL(sub)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Invalid thread sub");
+        }
+
+        ttid = pt_thread_create_run(interp,
+                                    enum_class_ThreadInterpreter, PARROT_CLONE_DEFAULT, sub, args);
+        VTABLE_set_integer_native(interp, SELF, ttid);
+    }
+
+    METHOD run(INTVAL clone_flags, PMC *sub, PMC *args :slurpy) {
+        INTVAL ttid;
+        if (PMC_IS_NULL(sub)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Invalid thread sub");
+        }
+
+        ttid = pt_thread_create_run(interp, enum_class_ThreadInterpreter, clone_flags, sub, args);
+        VTABLE_set_integer_native(interp, SELF, ttid);
+    }
+/*
+
+=item C<METHOD join()>
+
+Join the thread, returning whatever its main method returns.
+
+=cut
+
+*/
+    METHOD join() {
+        PMC *ret;
+        INTVAL ttid = VTABLE_get_integer(INTERP, SELF);
+
+        ret = pt_thread_join(INTERP, ttid);
+        /* invalidate self */
+        VTABLE_set_integer_native(interp, SELF, -1);
+
+        RETURN(PMC *ret);
+    }
+
+/*
+
+=item C<METHOD detach()>
+
+Detach the thread so it cannot be joined and will free its resources
+immediately when it exits.
+
+=cut
+
+*/
+
+    METHOD detach() {
+        pt_thread_detach((UINTVAL)VTABLE_get_integer(INTERP, SELF));
+    }
+
+/*
+
+=item C<METHOD kill()>
+
+Terminate a running thread.
+
+=cut
+
+*/
+
+    METHOD kill() {
+        pt_thread_kill((UINTVAL)VTABLE_get_integer(INTERP, SELF));
+    }
+
 }
 
 /*

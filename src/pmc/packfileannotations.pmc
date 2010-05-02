@@ -229,6 +229,10 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
             /* Poke directly to annotation attributes. */
             annotation_attrs         = PARROT_PACKFILEANNOTATION(annotation);
             annotation_attrs->offset = entry->bytecode_offset;
+            if (! attrs->const_table)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_MALFORMED_PACKFILE, "No constant table");
+
             annotation_attrs->name   = VTABLE_get_string_keyed_int(interp,
                     attrs->const_table, key->name);
             switch (key->type) {

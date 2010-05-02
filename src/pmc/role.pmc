@@ -163,7 +163,7 @@ init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
         PMC    * const role_list = VTABLE_get_pmc_keyed_str(interp, info, roles_str);
         const int role_count     = VTABLE_elements(interp, role_list);
 
-        for (i = 0; i < role_count; i++) {
+        for (i = 0; i < role_count; ++i) {
             PMC * const cur_role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
             VTABLE_add_role(interp, self, cur_role);
         }
@@ -177,7 +177,7 @@ init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
 
         const int attrib_count = VTABLE_elements(interp, attrib_name_list);
 
-        for (i = 0; i < attrib_count; i++) {
+        for (i = 0; i < attrib_count; ++i) {
             STRING * const attrib_name = VTABLE_get_string_keyed_int(interp,
                 attrib_name_list, i);
             VTABLE_add_attribute(interp, self, attrib_name, PMCNULL);
@@ -536,7 +536,7 @@ Returns whether the class does the role with the given C<*rolename>.
             return 1;
 
         count = VTABLE_elements(interp, role->roles);
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < count; ++i) {
             PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, role->roles, i);
             if (VTABLE_does(interp, cur_role, role_name))
                 return 1;
@@ -563,7 +563,7 @@ Returns whether the class does the givne C<*role>.
             return 1;
 
         count = VTABLE_elements(interp, this_role->roles);
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < count; ++i) {
             PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, this_role->roles, i);
             if (VTABLE_does_pmc(interp, cur_role, role))
                 return 1;

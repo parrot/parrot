@@ -523,7 +523,7 @@ If no type argument is passed, counts all handlers.
                 &&   handler->vtable->base_type == enum_class_ExceptionHandler)
                 || (Parrot_str_equal(INTERP, type, event)
                 &&  handler->vtable->base_type == enum_class_EventHandler))
-                        count++;
+                        ++count;
             }
         }
 

@@ -35,9 +35,17 @@ Tests the PackfileFixupEntry PMC.
 .sub 'test_sanity'
     .local pmc pf, pftable
     .local string name
+    push_eh load_error
     pf      = _pbc()
+    pop_eh
     pftable = _get_fixup_table(pf)
     isa_ok(pftable, 'PackfileFixupTable')
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, 'PackfileFixupTable')
+    .return()
 .end
 
 
@@ -45,10 +53,18 @@ Tests the PackfileFixupEntry PMC.
 .sub 'test_sanity_entry'
     .local pmc pf, pftable, pfentry
     .local string name
+    push_eh load_error
     pf      = _pbc()
+    pop_eh
     pftable = _get_fixup_table(pf)
     pfentry = pftable[0]
     isa_ok(pfentry, 'PackfileFixupEntry')
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, 'PackfileFixupEntry')
+    .return()
 .end
 
 
@@ -57,7 +73,9 @@ Tests the PackfileFixupEntry PMC.
     .local pmc pf, pftable, pfentry
     .local int size, this, data
     .local string name, label
+    push_eh load_error
     pf      = _pbc()
+    pop_eh
     pftable = _get_fixup_table(pf)
     size    = elements pftable
     this    = 0
@@ -79,6 +97,12 @@ Tests the PackfileFixupEntry PMC.
     gt size, 0, done
   done:
     ok(1, "Got entries")
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "Got entries")
+    .return()
 .end
 
 # Local Variables:

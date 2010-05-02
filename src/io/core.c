@@ -124,7 +124,7 @@ Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
     /* this was i < PIO_NR_OPEN, but only standard handles 0..2 need
      * to be kept alive AFAIK -leo
      */
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         Parrot_gc_mark_PMC_alive(interp, table[i]);
     }
 }

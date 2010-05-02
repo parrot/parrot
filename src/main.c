@@ -206,7 +206,7 @@ static int
 is_all_hex_digits(ARGIN(const char *s))
 {
     ASSERT_ARGS(is_all_hex_digits)
-    for (; *s; s++)
+    for (; *s; ++s)
         if (!isxdigit(*s))
             return 0;
     return 1;
@@ -402,7 +402,7 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         else if (!strncmp(arg, "--hash-seed", 11)) {
 
             if ((arg = strrchr(arg, '=')))
-                arg++;
+                ++arg;
             else
                 arg = argv[++pos];
 

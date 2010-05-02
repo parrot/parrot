@@ -47,7 +47,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "interp identity" );
 ok1:
     print "ok 1\n"
     new P4, ['ParrotThread']
-    ne P4, P2, ok2
+    ne P2, P4, ok2
     print "not"
 ok2:
     print "ok 2\n"
@@ -182,7 +182,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 CODE
 ok 1
 hello from thread
-ParrotThread tid 1
+ThreadInterpreter tid 1
 from 10 interp
 OUTPUT
 
@@ -215,7 +215,7 @@ lp:
     branch lp
 .end
 CODE
-start 1
+start -1
 in thread
 done
 OUTPUT
