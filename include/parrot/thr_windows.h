@@ -125,7 +125,7 @@ struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#endif /* HAVE_STRUCT_TIMESPEC */
+#endif /* _TIMESPEC_DEFINED */
 
 #endif /* PARROT_THR_WINDOWS_H_GUARD */
 
