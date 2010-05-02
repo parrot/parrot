@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.12	2010.05.02	plobsing	store constant PMC strings as top level constant strings    
 6.11	2010.04.29	tewk	remove ParrotRunningThread
 6.10	2010.04.29	NotFound	packfiledebug.pmc
 6.9	2010.04.27	bacek	remove deprecated in-place string ops (bitwise, charset, case change)
