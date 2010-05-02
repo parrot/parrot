@@ -260,6 +260,7 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
         break;
       case enum_PackID_normal:
         {
+            PMC * const todo    = PARROT_IMAGEIO(info)->todo;
             const INTVAL type = VTABLE_shift_integer(interp, info);
 
             PARROT_ASSERT(id - 1 == VTABLE_elements(interp, PARROT_IMAGEIO(info)->todo));
@@ -274,10 +275,7 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
             pmc = Parrot_pmc_new_noinit(interp, type);
             VTABLE_thaw(interp, pmc, info);
 
-            {
-                PMC * const todo    = PARROT_IMAGEIO(info)->todo;
-                VTABLE_set_pmc_keyed_int(interp, todo, id - 1, pmc);
-            }
+            VTABLE_set_pmc_keyed_int(interp, todo, id - 1, pmc);
         }
         break;
       default:
@@ -549,15 +547,23 @@ Pushes the string C<*v> onto the end of the image.
                     &&  Parrot_encoding_number_of_str(interp, v)
                     ==  Parrot_encoding_number_of_str(interp, sc)
                     &&  Parrot_str_equal(interp, v, sc)) {
-                        SET_VISIT_CURSOR(SELF,
-                                (char *)PF_store_integer(GET_VISIT_CURSOR(SELF), i));
+                        STATICSELF.push_integer(i);
                         return;
                     }
                 }
             }
-            PANIC(INTERP, "string not previously in constant table when freezing to packfile");
+            /* XXX
+             * handle cases where the PMC has changed after Parrot_freeze_strings was called
+             * eg: :immediate subs
+             */
+            STATICSELF.push_integer(-1);
+            /* TODO
+             * should really be:
+             * PANIC(INTERP, "string not previously in constant table when freezing to packfile");
+             */
         }
-        else {
+
+        {
             const size_t len = PF_size_string(v) * sizeof (opcode_t);
             ensure_buffer_size(INTERP, SELF, len);
             SET_VISIT_CURSOR(SELF, (char *)PF_store_string(GET_VISIT_CURSOR(SELF), v));
@@ -633,14 +639,18 @@ Removes and returns a string from the start of the image.
     VTABLE STRING *shift_string() {
         if (PObj_flag_TEST(private1, SELF)) {
             PackFile_ConstTable *table = PARROT_IMAGEIO(SELF)->pf_ct;
-            opcode_t *pos              = GET_VISIT_CURSOR(SELF);
-            INTVAL i                   = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf,
-                                                (const opcode_t **)&pos);
-            SET_VISIT_CURSOR(SELF, (char *)pos);
-            BYTECODE_SHIFT_OK(SELF);
-            return table->constants[i]->u.string;
+            INTVAL i                   = STATICSELF.shift_integer();
+
+            if (i >= 0)
+                return table->constants[i]->u.string;
+
+            /* XXX
+             * only got here because constant table doesn't contain the string
+             * fallback on inline strings
+             */
         }
-        else {
+
+        {
             opcode_t *pos = GET_VISIT_CURSOR(SELF);
             STRING   *s   = PF_fetch_string(interp, PARROT_IMAGEIO(SELF)->pf,
                                                (const opcode_t **)&pos);

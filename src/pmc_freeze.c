@@ -115,7 +115,8 @@ Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc)>
+=item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc, const
+PackFile_ConstTable *pf)>
 
 Get the size of an image if it were created using C<Parrot_freeze_pbc>.
 
@@ -126,16 +127,19 @@ Get the size of an image if it were created using C<Parrot_freeze_pbc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 UINTVAL
-Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc))
+Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
 {
     ASSERT_ARGS(Parrot_freeze_pbc_size)
-    UINTVAL  int_result;
-    PMC     *pmc_result;
-    PMC     *visitor = Parrot_pmc_new_init(interp, enum_class_ImageIOSize, PMCNULL);
+    PMC     *pf_pmc, *visitor, *pmc_result;
+
+    pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    VTABLE_set_pointer(interp, pf_pmc, (void *)pf);
+
+    visitor = Parrot_pmc_new_init(interp, enum_class_ImageIOSize, pf_pmc);
     VTABLE_set_pmc(interp, visitor, pmc);
+
     pmc_result = VTABLE_get_pmc(interp, visitor);
-    int_result = VTABLE_get_integer(interp, pmc_result);
-    return int_result;
+    return VTABLE_get_integer(interp, pmc_result);
 }
 
 
@@ -144,8 +148,6 @@ Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc))
 =item C<PMC * Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)>
 
 Get the strings of a PMC to be frozen.
-
-Used in C<???>.
 
 =cut
 

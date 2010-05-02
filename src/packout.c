@@ -163,7 +163,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
-        size += PackFile_Constant_pack_size(interp, self->constants[i]);
+        size += PackFile_Constant_pack_size(interp, self->constants[i], self);
     return size;
 }
 
