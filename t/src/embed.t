@@ -32,43 +32,6 @@ sub linedirective
     return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
 }
 
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
-
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-void fail(const char *msg);
-
-void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-
-int main(int argc, const char **argv)
-{
-    Parrot_Interp interp;
-    Parrot_String err, lang;
-    Parrot_PMC func_pmc;
-    char *str;
-
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
-    lang = Parrot_str_new_constant(interp, "PIR");
-
-    func_pmc  = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
-    str = Parrot_str_to_cstring(interp, err);
-    puts(str);
-    Parrot_str_free_cstring(str);
-    Parrot_destroy(interp);
-    return 0;
-}
-CODE
-The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
-OUTPUT
-
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
@@ -97,6 +60,43 @@ int main(int argc, const char **argv)
 }
 CODE
 Done
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, lang;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+    lang = Parrot_new_string(interp, "PIR", 3, (const char*)NULL, 0);
+
+    func_pmc = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
+    Parrot_printf(interp, "%Ss\n", err);
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
 OUTPUT
 
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
