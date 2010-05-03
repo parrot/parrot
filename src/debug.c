@@ -1157,22 +1157,6 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     /* Erase the stopped flag */
     pdb->state &= ~PDB_STOPPED;
 
-    /* Testing use of the debugger runloop */
-    #if 0
-
-    /* Execute */
-    for (; n && pdb->cur_opcode; --n)
-        DO_OP(pdb->cur_opcode, pdb->debugee);
-
-    /* Set the stopped flag */
-    pdb->state |= PDB_STOPPED;
-
-    /* If program ended */
-
-    if (!pdb->cur_opcode)
-        (void)PDB_program_end(interp);
-    #endif
-
     debugee     = pdb->debugee;
 
     new_runloop_jump_point(debugee);
@@ -1684,27 +1668,6 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         PDB_skip_breakpoint(interp, ln);
     }
 
-    /* Run while no break point is reached */
-    /*
-    while (!PDB_break(interp))
-        DO_OP(pdb->cur_opcode, pdb->debugee);
-    */
-
-    #if 0
-    pdb->tracing           = 0;
-    Parrot_runcore_switch(pdb->debugee, CONST_STRING(interp, "debugger"));
-
-    new_internal_exception(pdb->debugee);
-    if (setjmp(pdb->debugee->exceptions->destination)) {
-        Parrot_io_eprintf(pdb->debugee, "Unhandled exception while debugging: %Ss\n",
-            pdb->debugee->exceptions->msg);
-        pdb->state |= PDB_STOPPED;
-        return;
-    }
-    runops_int(pdb->debugee, pdb->debugee->code->base.data - pdb->cur_opcode);
-    if (!pdb->cur_opcode)
-        (void)PDB_program_end(interp);
-    #endif
     pdb->state |= PDB_RUNNING;
     pdb->state &= ~PDB_BREAK;
     pdb->state &= ~PDB_STOPPED;
