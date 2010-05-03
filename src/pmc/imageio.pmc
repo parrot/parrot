@@ -542,11 +542,12 @@ Pushes the string C<*v> onto the end of the image.
                 PackFile_Constant *constant = table->constants[i];
                 if (constant->type == PFC_STRING) {
                     STRING * const sc = constant->u.string;
-                    if (Parrot_charset_number_of_str(interp, v)
+                    if (Parrot_str_equal(interp, v, sc)
+                    && Parrot_charset_number_of_str(interp, v)
                     ==  Parrot_charset_number_of_str(interp, sc)
                     &&  Parrot_encoding_number_of_str(interp, v)
                     ==  Parrot_encoding_number_of_str(interp, sc)
-                    &&  Parrot_str_equal(interp, v, sc)) {
+                    ) {
                         STATICSELF.push_integer(i);
                         return;
                     }
