@@ -241,11 +241,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* param count mismatch is an error by default */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_PARAM_COUNT_FLAG);
 
-#if 0
-    /* TODO not yet - too many test failures */
-    PARROT_ERRORS_on(interp, PARROT_ERRORS_RESULT_COUNT_FLAG);
-#endif
-
     create_initial_context(interp);
 
     /* clear context introspection vars */
