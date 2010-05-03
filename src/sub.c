@@ -435,18 +435,6 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
     if (PMC_IS_NULL(sub->outer_sub))
         return;
 
-#if 0
-    /* verify that the current sub is sub_pmc's :outer */
-    PMC_get_sub(interp, sub->outer_sub, outer_sub);
-    if (Parrot_str_not_equal(interp, current_sub->subid,
-                         outer_sub->subid)) {
-        Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION, "'%Ss' isn't the :outer of '%Ss'",
-            current_sub->name, sub->name);
-        return;
-    }
-#endif
-
     /* set the sub's outer context to the current context */
     sub->outer_ctx = ctx;
 }
