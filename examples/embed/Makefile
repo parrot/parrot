@@ -12,6 +12,7 @@
 
 CC = $(shell parrot_config cc)
 CCFLAGS = $(shell parrot_config ccflags)
+CCWARN = $(shell parrot_config ccwarn)
 LD = $(shell parrot_config ld)
 LD_OUT = $(shell parrot_config ld_out)
 LINKFLAGS = $(shell parrot_config inst_libparrot_linkflags) $(shell parrot_config rpath_lib)
@@ -28,7 +29,7 @@ all: cotorra$(EXE)
 #-----------------------------------------------------------------------
 
 cotorra$(O): cotorra.c
-	$(CC) $(CCFLAGS) -c -I $(INCLUDEDIR) cotorra.c
+	$(CC) $(CCFLAGS) $(CCWARN) -c -I $(INCLUDEDIR) cotorra.c
 
 cotorra$(EXE): cotorra$(O)
 	$(LD) $(LD_OUT)cotorra$(EXE) cotorra$(O) $(CONFIG)$(O) $(LINKFLAGS)
