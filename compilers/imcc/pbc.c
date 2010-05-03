@@ -994,8 +994,8 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
             &&  Parrot_charset_number_of_str(interp, s)
             ==  Parrot_charset_number_of_str(interp, sc)
             &&  Parrot_encoding_number_of_str(interp, s)
-            ==  Parrot_encoding_number_of_str(interp, sc)
-            ) {
+            ==  Parrot_encoding_number_of_str(interp, sc))
+            {
                 return i;
             }
         }

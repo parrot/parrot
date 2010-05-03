@@ -546,8 +546,8 @@ Pushes the string C<*v> onto the end of the image.
                     && Parrot_charset_number_of_str(interp, v)
                     ==  Parrot_charset_number_of_str(interp, sc)
                     &&  Parrot_encoding_number_of_str(interp, v)
-                    ==  Parrot_encoding_number_of_str(interp, sc)
-                    ) {
+                    ==  Parrot_encoding_number_of_str(interp, sc))
+                    {
                         STATICSELF.push_integer(i);
                         return;
                     }
