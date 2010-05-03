@@ -116,7 +116,8 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
     VTABLE void init_pmc(PMC *pf_ct) {
         PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
-        PARROT_IMAGEIOSIZE(SELF)->pf_ct = VTABLE_get_pointer(interp, pf_ct);
+        PARROT_IMAGEIOSIZE(SELF)->pf_ct =
+            (PackFile_ConstTable *)VTABLE_get_pointer(interp, pf_ct);
         PARROT_IMAGEIOSIZE(SELF)->size  = 0;
 
         PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
