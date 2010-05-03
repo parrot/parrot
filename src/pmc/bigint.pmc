@@ -1352,15 +1352,6 @@ Decrements the integer.
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_div_bigint(INTERP, SELF, value, dest);
-#if 0
-        /* to downgrade or not that's the question */
-        GETATTR_BigInt_bi(interp, dest, bi);
-        if (mpz_fits_slong_p(bi->b)) {
-            long iresult = mpz_get_si(bi->b);
-            VTABLE_morph(interp, dest, enum_class_Integer);
-            VTABLE_set_integer_native(interp, dest, iresult);
-        }
-#endif
         return dest;
     }
 
