@@ -2415,7 +2415,6 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
     /* now pack all segments into new format */
     for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment * const seg = dir->segments[i];
-
         cursor = PackFile_Segment_pack(interp, seg, cursor);
     }
 
@@ -3840,7 +3839,7 @@ PackFile_Constant_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile_Constant *self))
 /*
 
 =item C<size_t PackFile_Constant_pack_size(PARROT_INTERP, const
-PackFile_Constant *self)>
+PackFile_Constant *self, const PackFile_ConstTable *ct)>
 
 Determines the size of the buffer needed in order to pack the PackFile Constant
 into a contiguous region of memory.
@@ -3852,7 +3851,8 @@ into a contiguous region of memory.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
-PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
+PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self), ARGIN(const
+    PackFile_ConstTable *ct))
 {
     ASSERT_ARGS(PackFile_Constant_pack_size)
     PMC    *component;
@@ -3878,7 +3878,7 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
 
       case PFC_PMC:
         component = self->u.key; /* the pmc (Sub, ...) */
-        packed_size = PF_size_strlen(Parrot_freeze_size(interp, component));
+        packed_size = PF_size_strlen(Parrot_freeze_pbc_size(interp, component, ct));
         break;
 
       default:
@@ -3981,7 +3981,7 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     interp->code                      = pf->cur_cs;
     image                             = PF_fetch_string(interp, pf, &cursor);
 
-    pmc         = Parrot_thaw_constants(interp, image);
+    pmc         = Parrot_thaw_pbc(interp, image, constt);
 
     /* place item in const_table */
     self->type  = PFC_PMC;

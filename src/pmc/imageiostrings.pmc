@@ -1,0 +1,199 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/imageiosize.pmc - ImageIOStrings PMC
+
+=head1 DESCRIPTION
+
+Get a list of strings in an object graph. Used in packfile creation.
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass ImageIOStrings auto_attrs {
+    ATTR PMC *seen; /* seen hash */
+    ATTR PMC *todo; /* todo list */
+    ATTR PMC *list; /* list of strings seen */
+
+/*
+
+=head1 VTABLES
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC.
+
+=cut
+
+*/
+    VTABLE void init() {
+        PARROT_IMAGEIOSTRINGS(SELF)->todo = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+
+        PARROT_IMAGEIOSTRINGS(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->seen,
+            parrot_new_intval_hash(INTERP));
+
+        PARROT_IMAGEIOSTRINGS(SELF)->list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the PMC as alive.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->todo);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->seen);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->list);
+    }
+
+/*
+
+=item C<VTABLE PMC *get_pmc()>
+
+Gets the result PMC after a thaw.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        return PARROT_IMAGEIOSTRINGS(SELF)->list;
+    }
+
+/*
+
+=item C<VTABLE PMC *get_iter()>
+
+Get the C<todo> list for this freeze/thaw for iterating over.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return PARROT_IMAGEIOSTRINGS(SELF)->todo;
+    }
+
+/*
+
+=item C<VTABLE INTVAL get_integer()>
+
+Returns the flags describing the visit action
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return VISIT_FREEZE_NORMAL;
+    }
+
+
+/*
+
+=item C<VTABLE void push_integer(INTVAL v)>
+
+Do nothing.
+
+=cut
+
+*/
+
+    VTABLE void push_integer(INTVAL v) { }
+
+
+/*
+
+=item C<VTABLE void push_float(FLOATVAL v)>
+
+Do nothing.
+
+=cut
+
+*/
+
+    VTABLE void push_float(FLOATVAL v) { }
+
+
+/*
+
+=item C<VTABLE void push_string(STRING *v)>
+
+Adds the string to the list of strings.
+
+=cut
+
+*/
+
+    VTABLE void push_string(STRING *v)
+    {
+        VTABLE_push_string(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->list, v);
+    }
+
+/*
+
+=item C<VTABLE void push_pmc(PMC *v)>
+
+Checks new pmcs for strings.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *v) {
+        if (!PMC_IS_NULL(v)) {
+            Hash * const hash    = (Hash *)VTABLE_get_pointer(INTERP,
+                                                PARROT_IMAGEIOSTRINGS(SELF)->seen);
+            HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
+            if (!b) {
+                /* not yet seen */
+                parrot_hash_put(INTERP, hash, v, v);
+                VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->todo, v);
+                VTABLE_freeze(INTERP, v, SELF);
+            }
+        }
+    }
+
+    VTABLE void set_pmc(PMC *p)
+    {
+        STATICSELF.push_pmc(p);
+        Parrot_visit_loop_visit(INTERP, SELF);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -13,6 +13,8 @@
 #ifndef PARROT_PMC_FREEZE_H_GUARD
 #define PARROT_PMC_FREEZE_H_GUARD
 
+#include "parrot/packfile.h"
+
 typedef enum {
     VISIT_HOW_PMC_TO_VISITOR     = 0x00, /* push to visitor */
     VISIT_HOW_VISITOR_TO_PMC     = 0x01, /* shift from visitor */
@@ -120,9 +122,33 @@ STRING* Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_freeze_pbc(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(const PackFile_ConstTable *pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(const PackFile_ConstTable *pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 UINTVAL Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -138,6 +164,16 @@ PMC* Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING *image))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC* Parrot_thaw_pbc(PARROT_INTERP,
+    ARGIN(STRING *image),
+    ARGIN(PackFile_ConstTable *pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 void Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -152,15 +188,29 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
 #define ASSERT_ARGS_Parrot_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_freeze_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_Parrot_freeze_pbc_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_freeze_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_freeze_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(image))
 #define ASSERT_ARGS_Parrot_thaw_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(image))
+#define ASSERT_ARGS_Parrot_thaw_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(image) \
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_visit_loop_thawfinish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))

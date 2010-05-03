@@ -52,6 +52,11 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(PMC* info))
         Hash * const hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
 
         parrot_hash_put(interp, hash, pmc, pmc);
+
+        /* workaround to keep ParrotInterpreter PBC hack working */
+        if (pmc->vtable->base_type == enum_class_ParrotInterpreter)
+            PObj_flag_CLEAR(private1, info);
+
         VTABLE_push_integer(interp, info, pmc->vtable->base_type);
         VTABLE_push_pmc(interp, PARROT_IMAGEIOSIZE(info)->todo, pmc);
         VTABLE_freeze(interp, pmc, info);
@@ -59,10 +64,11 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(PMC* info))
 }
 
 pmclass ImageIOSize auto_attrs {
-    ATTR PMC             *seen;           /* seen hash */
-    ATTR PMC             *todo;           /* todo list */
-    ATTR struct PackFile *pf;
-    ATTR INTVAL           size;
+    ATTR PMC                        *seen; /* seen hash */
+    ATTR PMC                        *todo; /* todo list */
+    ATTR struct PackFile            *pf;
+    ATTR struct PackFile_ConstTable *pf_ct;
+    ATTR INTVAL                      size;
 
 /*
 
@@ -84,13 +90,40 @@ Initializes the PMC.
 
 */
     VTABLE void init() {
-        PARROT_IMAGEIOSIZE(SELF)->todo = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PARROT_IMAGEIOSIZE(SELF)->pf   = PackFile_new(INTERP, 0);
-        PARROT_IMAGEIOSIZE(SELF)->size = 0;
+        PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
+        PARROT_IMAGEIOSIZE(SELF)->pf_ct = NULL;
+        PARROT_IMAGEIOSIZE(SELF)->size  = 0;
 
         PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
             parrot_new_intval_hash(INTERP));
+
+        PObj_flag_CLEAR(private1, SELF);
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void init_pmc()>
+
+Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
+
+=cut
+
+*/
+    VTABLE void init_pmc(PMC *pf_ct) {
+        PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
+        PARROT_IMAGEIOSIZE(SELF)->pf_ct = VTABLE_get_pointer(interp, pf_ct);
+        PARROT_IMAGEIOSIZE(SELF)->size  = 0;
+
+        PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
+            parrot_new_intval_hash(INTERP));
+
+        PObj_flag_SET(private1, SELF);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -210,10 +243,40 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v)
-    {
-        const size_t len = PF_size_string(v) * sizeof (opcode_t);
-        PARROT_IMAGEIOSIZE(SELF)->size += len;
+    VTABLE void push_string(STRING *v) {
+        if (PObj_flag_TEST(private1, SELF)) {
+            /* look for a reference to constant table entry of string */
+            int i;
+            PackFile_ConstTable *table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
+            for (i = 0; i < table->const_count; i++) {
+                PackFile_Constant *constant = table->constants[i];
+                if (constant->type == PFC_STRING) {
+                    STRING * const sc = constant->u.string;
+                    if (Parrot_charset_number_of_str(interp, v)
+                    ==  Parrot_charset_number_of_str(interp, sc)
+                    &&  Parrot_encoding_number_of_str(interp, v)
+                    ==  Parrot_encoding_number_of_str(interp, sc)
+                    &&  Parrot_str_equal(interp, v, sc)) {
+                        STATICSELF.push_integer(i);
+                        return;
+                    }
+                }
+            }
+            /* XXX
+             * handle cases where the PMC has changed after Parrot_freeze_strings was called
+             * eg: :immediate subs
+             */
+            STATICSELF.push_integer(-1);
+            /* TODO
+             * should really be:
+             * PANIC(INTERP, "string not previously in constant table when freezing to packfile");
+             */
+        }
+
+        {
+            const size_t len = PF_size_string(v) * sizeof (opcode_t);
+            PARROT_IMAGEIOSIZE(SELF)->size += len;
+        }
     }
 
 /*

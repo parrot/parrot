@@ -163,7 +163,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; ++i)
-        size += PackFile_Constant_pack_size(interp, self->constants[i]);
+        size += PackFile_Constant_pack_size(interp, self->constants[i], self);
     return size;
 }
 
@@ -286,7 +286,7 @@ PackFile_Constant_pack(PARROT_INTERP,
 
       case PFC_PMC:
         key = self->u.key;      /* the (Sub) PMC */
-        image = Parrot_freeze(interp, key);
+        image = Parrot_freeze_pbc(interp, key, const_table);
         cursor = PF_store_string(cursor, image);
         break;
 
