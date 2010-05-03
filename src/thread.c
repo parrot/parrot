@@ -1060,32 +1060,6 @@ pt_suspend_all_for_gc(PARROT_INTERP)
         return;
     }
 
-#if 0
-    for (i = 0; i < n_interpreters; ++i) {
-        Parrot_Interp other_interp;
-        other_interp = interpreter_array[i];
-        if (!other_interp)
-            continue;
-
-        if (is_suspended_for_gc(other_interp) &&
-            other_interp != interp &&
-            (other_interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))
-        {
-            PMC *successp;
-            /* this means that someone else already got this far,
-             * so we have a suspend event in our queue to ignore
-             */
-            /* XXX still reachable? */
-            DEBUG_ONLY(fprintf(stderr, "apparently someone else is doing it [%p]\n", other_interp));
-            fprintf(stderr, "??? found later (%p)\n", other_interp);
-            successp = Parrot_cx_delete_suspend_for_gc(interp);
-            PARROT_ASSERT(successp);
-            UNLOCK(interpreter_array_mutex);
-            return;
-        }
-    }
-#endif
-
     /* now send all the non-suspended threads to suspend for GC */
     for (i = 0; i < n_interpreters; ++i) {
         Parrot_Interp other_interp = interpreter_array[i];
