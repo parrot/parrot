@@ -314,11 +314,6 @@ Parrot_run_callback(PARROT_INTERP,
       case 'v':
         pasm_sig[1] = 'v';
         break;
-#if 0
-      case '2':
-      case '3':
-      case '4':
-#endif
       case 'l':
         i_param = (INTVAL)(long) external_data;
         goto case_I;
@@ -334,14 +329,6 @@ case_I:
         pasm_sig[1] = 'I';
         param = (void*) i_param;
         break;
-#if 0
-      case 'f':
-      case 'd':
-        /* these types don't fit into a pointer, they will not
-         * work
-         */
-        break;
-#endif
       case 'p':
         /* created a UnManagedStruct */
         p_param = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
@@ -349,11 +336,6 @@ case_I:
         pasm_sig[1] = 'P';
         param = (void*) p_param;
         break;
-#if 0
-      case 'P':
-        pasm_sig[1] = 'P';
-        break;
-#endif
       case 't':
         pasm_sig[1] = 'S';
         param = Parrot_str_new(interp, external_data, 0);
