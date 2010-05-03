@@ -1343,17 +1343,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     }
 
     sub->subid = ct->constants[unit->subid->color]->u.string;
-
-#if 0
-    if (unit->subid) {
-        sub->subid = IMCC_string_from__STRINGC(interp, unit->subid);
-        UNIT_FREE_CHAR(unit->subid);
-        }
-    /* If the unit has no subid, set the subid to match the name. */
-    else
-        sub->subid = sub->name;
-#endif
-
     ns_pmc     = NULL;
 
     if (ns_const >= 0 && ns_const < ct->const_count) {
