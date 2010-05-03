@@ -159,20 +159,6 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
             len += Parrot_str_byte_length(interp, prefix);
         }
         /* XXX sharp + fill ??? */
-
-#if 0
-        /* precision - only for floats, which is handled elsewhere */
-        if (info->flags & FLAG_PREC) {
-            info->flags |= FLAG_WIDTH;
-            if (string_ord(interp, str, 0) == '-' ||
-                    string_ord(interp, str, 0) == '+') {
-                info->width = info->prec + 1;
-            }
-            else {
-                info->width = info->prec;
-            }
-        }
-#endif
     }
     else {
         /* string precision */
