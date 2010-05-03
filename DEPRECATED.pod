@@ -37,18 +37,23 @@ specifically by including this C<PIR> code:
 
 =over 4
 
-=item gziphandle [experimental]
+=item GzipHandle [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1580>
 
-=item packfiledebug [experimental]
+=item PackfileDebug [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
-=item moved to dynpmc [eligible in 1.1]
+=item File [eligible in 1.1]
 
-AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
-and Timer.
+Move from static PMC to dynamic PMC
+
+L<https://trac.parrot.org/parrot/ticket/448>
+
+=item OS [eligible in 1.1]
+
+Move from static PMC to dynamic PMC
 
 L<https://trac.parrot.org/parrot/ticket/448>
 
