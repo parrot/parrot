@@ -441,9 +441,6 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
          * const PMC is const too
          * see e.g. t/pmc/sarray_13.pir
          */
-#if 0
-        flags |= PObj_constant_FLAG;
-#endif
         --base_type;
         vtable = interp->vtables[base_type];
     }
