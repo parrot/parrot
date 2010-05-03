@@ -33,8 +33,8 @@ sub linedirective
 }
 
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "parrot/parrot.h"
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -56,12 +56,12 @@ int main(int argc, const char **argv)
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
-    lang = Parrot_str_new_constant(interp, "PIR", 3);
+    lang = Parrot_str_new_constant(interp, "PIR");
 
     func_pmc  = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
     str = Parrot_str_to_cstring(interp, err);
     puts(str);
-    Parrot_str_free_cstring(interp, str);
+    Parrot_str_free_cstring(str);
     Parrot_destroy(interp);
     return 0;
 }
