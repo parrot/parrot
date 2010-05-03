@@ -949,18 +949,6 @@ propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg *r), int i)
                  *
                  * TT #1244: emit warning in propagate_need()
                  */
-#if 0
-                if (pred->index == 0) {
-                    Instruction *ins = r->life_info[i]->first_ins;
-                    int bbi = ins->bbindex;
-                    for (; ins && ins->bbindex == bbi; ins = ins->next)
-                        if (instruction_reads(ins, r))
-                            break;
-                    IMCC_warning("propagate_need",
-                            "'%s' might be used uninitialized in %s:%d\n",
-                            r->name, function, ins->line);
-                }
-#endif
                 propagate_need(pred, r, i);
             }
         }
