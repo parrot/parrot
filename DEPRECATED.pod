@@ -281,12 +281,6 @@ this rather than relying on in-place modification of an existing pointer.
 
 L<https://trac.parrot.org/parrot/ticket/1584>
 
-=item STRING_is_null function [eligible in 2.4]
-
-renamed to Parrot_str_is_null
-
-L<https://trac.parrot.org/parrot/ticket/1585>
-
 =item Parrot_string_* [eligible in 2.4]
 
 rename Parrot_string_cstring to Parrot_str_cstring

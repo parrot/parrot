@@ -85,26 +85,6 @@ Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<INTVAL STRING_is_null(PARROT_INTERP, const STRING *s)>
-
-Tests if the given STRING is STRINGNULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_HOT
-PARROT_PURE_FUNCTION
-INTVAL
-STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
-{
-    ASSERT_ARGS(STRING_is_null)
-    return STRING_IS_NULL(s);
-}
-
-/*
-
 =back
 
 =head2 Basic String Functions
