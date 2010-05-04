@@ -201,20 +201,6 @@ find_lex will not throw exception for non-existing lexicals.
 
 L<https://trac.parrot.org/parrot/ticket/1207>
 
-=item substr_s_i_i_s [eligible in 2.4]
-
-This op will be replaced with replace_s_s_i_i_s op to clearly indicate
-semantic. Part of COW removal.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
-=item substr_s_s_i_i_s [eligible in 2.4]
-
-This op is deprecated. Use replace_s_s_i_i_s or substr_s_s_i_i (or both)
-instead. Part of COW removal.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
 =item inplace string updates. [eligible in 2.4]
 
 All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
