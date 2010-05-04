@@ -713,38 +713,6 @@ Translate ascii string C<src> with entries from C<trans_table>.
 
 /*
 
-=item C<void reverse(STRING *src)>
-
-Reverse the ascii STRING C<src> in place.
-
-=cut
-
-*/
-
-    METHOD reverse(STRING *src) {
-        INTVAL         i;
-        unsigned char *p;
-        INTVAL         len = Parrot_str_byte_length(interp, src);
-
-        if (!len)
-            RETURN(void);
-
-        if (src->charset != Parrot_ascii_charset_ptr)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
-                "Can't reverse non-ascii");
-
-        p = (unsigned char *)Buffer_bufstart(src);
-
-        for (i = 0, --len; i < len; ++i, --len) {
-            const unsigned char ch = p[len];
-
-            p[len] = p[i];
-            p[i]   = ch;
-        }
-    }
-
-/*
-
 =item C<INTEGER is_integer(STRING *src)>
 
 Checks if the ascii STRING C<str> is just an integer.

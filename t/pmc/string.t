@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(167)
+    plan(166)
 
     set_or_get_strings()
     setting_integers()
@@ -56,7 +56,6 @@ Tests the C<String> PMC.
     test_string_replace()
     set_i0__p0__string_to_int()
     test_string_trans()
-    reverse_p0__reverse_string()
     is_integer__check_integer()
     instantiate_str()
     get_string_returns_cow_string()
@@ -838,13 +837,6 @@ loop:
     inc i
     if i < len goto loop
     .return(tr_array)
-.end
-
-.sub reverse_p0__reverse_string
-    $S0 = 'torrap'
-    $P0 = new ['String']
-    $P0.'reverse'($S0)
-    is( $S0, "parrot", 'reverse string' )
 .end
 
 .sub is_integer__check_integer
