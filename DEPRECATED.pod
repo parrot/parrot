@@ -183,10 +183,6 @@ Ability to use non-default dynamic loading behaviour.
 
 L<https://trac.parrot.org/parrot/ticket/1583>
 
-=item pushaction, pushmark, popmark [eligible in 2.4]
-
-L<https://trac.parrot.org/parrot/ticket/876>
-
 =item new_callback_p_p_p_s [eligible in 2.4]
 
 To be replaced with new_callback_p_p_p_p_s.

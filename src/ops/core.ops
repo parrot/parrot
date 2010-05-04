@@ -710,21 +710,6 @@ Exit the interpreter with exit_status $1. If you want to communicate an
 extended exit status, create an exception with severity B<EXCEPT_exit>
 and throw it.
 
-=item B<pushmark>(in INT)
-
-Push a mark labeled $1 onto the dynamic environment.
-
-=item B<popmark>(in INT)
-
-Pop all items off the dynamic environment to the given mark.
-
-=item B<pushaction>(invar PMC)
-
-Push the given Sub PMC $1 onto the dynamic environment.  If the dynamic
-environment is unwound due to a C<popmark>, subroutine return, or an exception,
-the subroutine will be invoked with an integer argument: C<0> means a normal
-return; C<1> means an exception has been raised.
-
 =cut
 
 inline op push_eh(inconst LABEL) {
@@ -848,36 +833,6 @@ inline op exit(in INT) :flow {
         Parrot_str_new_constant(interp, "exit_code"), $1);
     dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
-}
-
-inline op pushmark(in INT) {
-    PMC * const newint = Parrot_pmc_new(interp, enum_class_Integer);
-    VTABLE_set_integer_native(interp, newint, $1);
-    VTABLE_push_pmc(interp, interp->dynamic_env, newint);
-}
-
-inline op popmark(in INT) {
-    opcode_t * dest;
-    opcode_t * const ret = expr NEXT();
-    int found = 0;
-    while (VTABLE_elements(interp, interp->dynamic_env)) {
-        PMC * const item = VTABLE_pop_pmc(interp, interp->dynamic_env);
-        if (item->vtable->base_type == enum_class_Integer
-         && VTABLE_get_integer(interp, item) == $1) {
-            found = 1;
-            break;
-        }
-
-        else if (item->vtable->base_type == enum_class_Sub
-              || item->vtable->base_type == enum_class_NCI)
-            Parrot_pcc_invoke_sub_from_c_args(interp, item, "I->", 0);
-    }
-    if (!found)
-        dest = Parrot_ex_throw_from_op_args(interp, ret, 1, "Mark %d not found", $1);
-}
-
-inline op pushaction(invar PMC) {
-    VTABLE_push_pmc(interp, interp->dynamic_env, $1);
 }
 
 =back

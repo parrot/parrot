@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 22;
 
 =head1 NAME
 
@@ -325,40 +325,6 @@ caught it
 OUTPUT
 1;
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "pushmark" );
-    pushmark 10
-    print "ok 1\n"
-    popmark 10
-    print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "pushmark nested" );
-    pushmark 10
-    pushmark 11
-    print "ok 1\n"
-    popmark 11
-    popmark 10
-    print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "pushmark - pop wrong one" );
-    pushmark 10
-    print "ok 1\n"
-    popmark 500
-    print "never\n"
-    end
-CODE
-/Mark 500 not found/
-OUTPUT
-
 # stringification is handled by a vtable, which runs in a second
 # runloop. when an error in the method tries to go to a Error_Handler defined
 # outside it, it winds up going to the inner runloop, giving strange results.
@@ -390,58 +356,6 @@ catch:
 .end
 CODE
 caught
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
-.sub main :main
-    print "main\n"
-    .const 'Sub' at_exit = "exit_handler"
-    pushaction at_exit
-    $P0 = new ['Exception']
-    throw $P0
-    .return()
-.end
-
-.sub exit_handler
-    .param int flag
-    print "at_exit, flag = "
-    say flag
-.end
-CODE
-/^main
-No exception handler/
-OUTPUT
-
-# exception handlers are still run in an inferior runloop, which messes up
-# nonlocal exit from within handlers.
-pir_output_like(
-    <<'CODE', <<'OUTPUT', "pushaction: error while handling error", todo => 'runloop shenanigans' );
-.sub main :main
-    push_eh h
-    print "main\n"
-    .const 'Sub' at_exit = "exit_handler"
-    pushaction at_exit
-    $P1 = new ['Exception']
-    throw $P1
-    print "never 1\n"
-h:
-    ## this is never actually reached, because exit_handler throws an unhandled
-    ## exception before the handler is entered.
-    print "in outer handler\n"
-.end
-
-.sub exit_handler :outer(main)
-    .param int flag
-    print "at_exit, flag = "
-    say flag
-    $P2 = new ['Exception']
-    throw $P2
-    print "never 2\n"
-.end
-CODE
-/^main
-at_exit, flag = 1
-No exception handler/
 OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
