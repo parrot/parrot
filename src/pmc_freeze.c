@@ -72,12 +72,14 @@ Freeze to a PackFile.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING *
-Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf)) {
+Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
+{
     ASSERT_ARGS(Parrot_freeze_pbc)
-    PMC *pf_pmc, *visitor;
+    PMC *visitor;
 
-    pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    PMC * const pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, pf_pmc, (void *)pf);
 
     visitor  = Parrot_pmc_new_init(interp, enum_class_ImageIO, pf_pmc);
@@ -156,10 +158,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)
+Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_freeze_strings)
-    PMC *visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
+    PMC * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
     VTABLE_set_pmc(interp, visitor, pmc);
     return VTABLE_get_pmc(interp, visitor);
 }

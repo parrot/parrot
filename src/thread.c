@@ -713,12 +713,15 @@ create a pt_thread
 
 */
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 pt_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
 {
     ASSERT_ARGS(pt_thread_create)
-    PMC *new_interp_pmc = pmc_new(interp, type);
-    Interp *new_interp  = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
+    PMC    * const new_interp_pmc = pmc_new(interp, type);
+    Interp * const new_interp     = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
 
     clone_interpreter(new_interp, interp, clone_flags);
     pt_thread_prepare_for_run(new_interp, interp);
@@ -738,10 +741,11 @@ run a pt_thread
 */
 
 int
-pt_thread_run(PARROT_INTERP, PMC *thread_interp_pmc, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
+pt_thread_run(PARROT_INTERP, ARGMOD(PMC *thread_interp_pmc), ARGIN(PMC *sub),
+        ARGIN_NULLOK(PMC *arg))
 {
     ASSERT_ARGS(pt_thread_run)
-    Interp *thread_interp = (Interp *)VTABLE_get_pointer(interp, thread_interp_pmc);
+    Interp * const thread_interp = (Interp *)VTABLE_get_pointer(interp, thread_interp_pmc);
 
     SETATTR_ParrotInterpreter_sub(interp,
                                   thread_interp_pmc, pt_transfer_sub(thread_interp, interp, sub));

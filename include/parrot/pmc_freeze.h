@@ -122,6 +122,7 @@ STRING* Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING * Parrot_freeze_pbc(PARROT_INTERP,
     ARGIN(PMC *pmc),
     ARGIN(const PackFile_ConstTable *pf))
@@ -147,8 +148,9 @@ UINTVAL Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)
-        __attribute__nonnull__(1);
+PMC * Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -200,7 +202,8 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_freeze_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(image))
