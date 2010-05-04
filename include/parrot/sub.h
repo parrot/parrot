@@ -31,9 +31,6 @@ typedef enum {
     SUB_FLAG_PF_IMMEDIATE = PObj_private6_FLAG,
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
-    /* [temporary expedient.  -- rgr, 13-Jul-08.] */
-    SUB_FLAG_NEWCLOSURE   = SUB_FLAG_PF_IMMEDIATE,
-
     SUB_FLAG_PF_MASK      = SUB_FLAG_PF_ANON
                           | SUB_FLAG_PF_MAIN
                           | SUB_FLAG_PF_LOAD
