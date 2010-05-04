@@ -484,9 +484,8 @@ reads entries from a directory.
         PMC   * array = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 #ifndef _MSC_VER
         char  * const cpath = Parrot_str_to_cstring(INTERP, path);
-        DIR           *dir  = opendir(cpath);
+        DIR   * const   dir = opendir(cpath);
         struct dirent *dirent;
-        STRING        *retval;
 
         Parrot_str_free_cstring(cpath);
 
@@ -497,8 +496,7 @@ reads entries from a directory.
         }
 
         while ((dirent = readdir(dir)) != NULL) {
-            retval = Parrot_str_new(INTERP, dirent->d_name, 0) ;
-            VTABLE_push_string(INTERP, array, retval);
+            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP, dirent->d_name, 0));
         }
 
         closedir(dir);

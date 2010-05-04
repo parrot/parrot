@@ -299,7 +299,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     const int ST_SIZE_OF           = 124;
     const int JIT_ALLOC_SIZE       = 1024;
 
-    char      *signature_str      = Parrot_str_to_cstring(interp, signature);
+    char    * const signature_str  = Parrot_str_to_cstring(interp, signature);
     /* skip over the result */
     char      *sig                = signature_str + 1;
     size_t     stack_space_needed = calc_signature_needs(sig,

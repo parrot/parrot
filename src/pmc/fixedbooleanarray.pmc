@@ -581,13 +581,11 @@ Used to unarchive the string.
         SUPER(info);
 
         {
-            unsigned char * bit_array;
-            UINTVAL         threshold;
             const INTVAL    size      = VTABLE_shift_integer(INTERP, info);
             STRING * const  s         = VTABLE_shift_string(INTERP, info);
 
-            bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
-            threshold = Parrot_str_byte_length(interp, s) * BITS_PER_CHAR;
+            unsigned char * const bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
+            const UINTVAL   threshold = Parrot_str_byte_length(interp, s) * BITS_PER_CHAR;
 
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, threshold);

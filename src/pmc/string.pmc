@@ -541,7 +541,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 
         /* TODO verify encoding */
         const STRING *me  = VTABLE_get_string(INTERP, SELF);
-        char         *str = Parrot_str_to_cstring(INTERP, me);
+        char  * const str = Parrot_str_to_cstring(INTERP, me);
         UINTVAL       i   = 0;
         size_t        j   = 0;
         size_t        len = strlen(str);

@@ -56,7 +56,7 @@ pmclass OpLib singleton {
     /* Look up an opnumber given the name of the op. First we look for the
        specific name, then the more general short name. */
     VTABLE INTVAL get_integer_keyed_str(STRING *name) {
-        char * cstr = Parrot_str_to_cstring(INTERP, name);
+        char * const cstr = Parrot_str_to_cstring(INTERP, name);
         INTVAL num = INTERP->op_lib->op_code(INTERP, cstr, 1);
         if (num == -1)
             num = INTERP->op_lib->op_code(INTERP, cstr, 0);
@@ -105,7 +105,7 @@ pmclass OpLib singleton {
 
     METHOD op_family(STRING *shortname)
     {
-        char *sname = Parrot_str_to_cstring(INTERP, shortname);
+        char * const sname = Parrot_str_to_cstring(INTERP, shortname);
         const op_lib_t * const op_lib = INTERP->op_lib;
         const op_info_t * const table = op_lib->op_info_table;
         PMC *result = PMCNULL;

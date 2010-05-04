@@ -2335,7 +2335,7 @@ directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     size = 1 + default_packed_size(self);
 
     for (i = 0; i < dir->num_segments; ++i) {
-        char *name = Parrot_str_to_cstring(interp, dir->segments[i]->name);
+        char * const name = Parrot_str_to_cstring(interp, dir->segments[i]->name);
         /* type, offset, size */
         size += 3;
         size += PF_size_cstring(name);

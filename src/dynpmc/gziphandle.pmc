@@ -76,11 +76,11 @@ invocant is modified and becomes an open filehandle.
 */
     METHOD open(STRING *filename, STRING *mode :optional,
                                INTVAL has_mode :opt_flag) {
-        char *path  = Parrot_str_to_cstring(INTERP, filename);
+        char * const path  = Parrot_str_to_cstring(INTERP, filename);
         gzFile file;
 
         if (has_mode) {
-            char *mod = Parrot_str_to_cstring(INTERP, mode);
+            char * const mod = Parrot_str_to_cstring(INTERP, mode);
             file      = gzopen(path, mod);
             Parrot_str_free_cstring(mod);
         }
@@ -161,8 +161,9 @@ Print the passed in integer, number, string, or PMC to the gziphandle.
     METHOD print(PMC *value) {
         gzFile file;
         STRING * const str = VTABLE_get_string(INTERP, value);
-        char *buf = Parrot_str_to_cstring(INTERP, str);
-        UINTVAL len =  Parrot_str_byte_length(INTERP, str);
+        char   * const buf = Parrot_str_to_cstring(INTERP, str);
+        const UINTVAL  len =  Parrot_str_byte_length(INTERP, str);
+
         GET_ATTR_file(INTERP, SELF, file);
         (void)gzwrite(file, buf, len);
         Parrot_str_free_cstring(buf);
@@ -181,8 +182,9 @@ Print the string to the gziphandle.
     METHOD puts(STRING *value) {
         INTVAL status;
         gzFile file;
-        char *buf = Parrot_str_to_cstring(INTERP, value);
-        UINTVAL len =  Parrot_str_byte_length(INTERP, value);
+        char * const  buf = Parrot_str_to_cstring(INTERP, value);
+        const UINTVAL len =  Parrot_str_byte_length(INTERP, value);
+
         GET_ATTR_file(INTERP, SELF, file);
         status =  gzwrite(file, buf, len);
         Parrot_str_free_cstring(buf);
@@ -248,7 +250,7 @@ Returns a string with the zlib version.
         char *buf;
         STRING *dst = NULL;
         UINTVAL srcLen, bufSize, dstLen;
-        char *src = Parrot_str_to_cstring(INTERP, str);
+        char * const src = Parrot_str_to_cstring(INTERP, str);
 
         if (!src)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,

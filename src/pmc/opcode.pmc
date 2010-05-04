@@ -45,7 +45,7 @@ pmclass Opcode auto_attrs {
     }
 
     VTABLE void set_string_native(STRING *name) {
-        char * cstr = Parrot_str_to_cstring(INTERP, name);
+        char * const cstr = Parrot_str_to_cstring(INTERP, name);
         const INTVAL num = INTERP->op_lib->op_code(INTERP, cstr, 1);
         Parrot_str_free_cstring(cstr);
         if (num == -1)

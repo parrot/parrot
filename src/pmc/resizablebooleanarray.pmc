@@ -454,12 +454,12 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
-        unsigned char   *bit_array;
+
         const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, info);
         const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, info);
         STRING * const   s        = VTABLE_shift_string(INTERP, info);
 
-        bit_array      = (unsigned char*)Parrot_str_to_cstring(INTERP, s);
+        unsigned char * const bit_array = (unsigned char*)Parrot_str_to_cstring(INTERP, s);
         SET_ATTR_size(INTERP, SELF, tail_pos);
         SET_ATTR_resize_threshold(INTERP, SELF, head_pos);
         SET_ATTR_bit_array(INTERP, SELF, bit_array);
