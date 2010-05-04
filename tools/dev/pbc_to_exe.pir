@@ -248,6 +248,10 @@ MAIN
     push codestring, "\n"
     goto code_loop
   code_done:
+    # Join current strings to avoid storing too much
+    $S0 = join '', codestring
+    codestring = 0
+    push codestring, $S0
     goto read_loop
 
   read_done:
@@ -343,6 +347,10 @@ END_OF_FUNCTION
     push codestring, '"'
     goto code_loop
   code_done:
+    # Join current strings to avoid storing too much
+    $S0 = join '', codestring
+    codestring = 0
+    push codestring, $S0
     goto read_loop
 
   read_done:
