@@ -1,3 +1,13 @@
+parrot (2.3.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/patches:
+    - Removed 01_fix_doc_install.patch, change included upstream.
+    - Removed 02_fix_man_whatis.patch, change included upstream.
+  * control.in
+    - Removed package dependency on libgdbm-dev, no longer used.
+
+ -- Allison Randal <allison@parrot.org>  Tue, 27 Apr 2010 18:03:12 +0100
+
 parrot (2.0.0-1) unstable; urgency=low
   * New upstream release
   * parrot-devel.install.in
