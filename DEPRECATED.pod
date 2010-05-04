@@ -102,8 +102,6 @@ L<https://trac.parrot.org/parrot/ticket/1554>
 
 =item Auto-vivification of nested aggregates [eligible in 2.4]
 
-Auto-vivifation of nested aggregated is deprecated.
-
 E.g.
 
   $P0 = new ['Hash']
