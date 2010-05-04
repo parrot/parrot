@@ -82,36 +82,42 @@ the Parrot Foundation copyright line if needed.
 
 =item 6.
 
+Make sure you have C<quilt> installed. Run:
+
+  $ aptitude install quilt
+
+=item 7.
+
 Regenerate the debian/control file. From the
 ~/deb/parrot/parrot-<version>/ directory, run:
 
   $ debian/rules debian-control-stamp
 
-=item 7.
+=item 8.
 
 Install all dependencies:
 
   $ sudo /usr/lib/pbuilder/pbuilder-satisfydepends
 
-=item 8.
+=item 9.
 
 Build the packages. From ~/deb/parrot/parrot_<version>/, run:
 
   $ export DEBSIGN_KEYID="<gpg key id>"
   $ debuild
 
-=item 9.
+=item 10.
 
 Check the package for errors. From ~/deb/parrot, run:
 
   $ lintian -i parrot_<version>.changes
 
-=item 10.
+=item 11.
 
 Commit all changes made to the files in the debian/ directory to the Parrot
 repository.
 
-=item 11.
+=item 12.
 
 Upload the packages to http://alioth.debian.org. (If you don't have admin
 privileges, ask someone who does.) From any of the project pages, click on the
