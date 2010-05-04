@@ -172,7 +172,7 @@ http://mentors.debian.net.
 =item 2.
 
 Set up a chroot environment for building packages. See
-<http://www.perlfoundation.org/parrot/index.cgi?debian_chroot_setup>.
+<http://trac.parrot.org/parrot/wiki/ChrootSetup>.
 
 =back
 
