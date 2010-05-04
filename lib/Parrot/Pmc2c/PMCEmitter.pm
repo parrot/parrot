@@ -742,7 +742,7 @@ sub update_vtable_func {
     my $flag_manual_attrs = $self->{flags}{manual_attrs};
     die 'manual_attrs and auto_attrs can not be used together'
         if ($flag_auto_attrs && $flag_manual_attrs);
-    warn 'PMC has attributes but no auto_attrs or manual_attrs'
+    die 'PMC has attributes but no auto_attrs or manual_attrs'
         if (@{$self->attributes} && ! ($flag_auto_attrs || $flag_manual_attrs));
 
     if ( @{$self->attributes} &&  $flag_auto_attrs) {

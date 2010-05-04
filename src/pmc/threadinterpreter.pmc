@@ -49,7 +49,7 @@ stop_GC(Interp *parent, Interp *thread)
 
 
 
-pmclass ThreadInterpreter extends ParrotInterpreter no_ro {
+pmclass ThreadInterpreter extends ParrotInterpreter no_ro manual_attrs {
 
 /*
 
