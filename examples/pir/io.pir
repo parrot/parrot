@@ -37,6 +37,7 @@ You should check where the file is going to be before you run this.
     print $S0
 
     # now clean up after ourselves.
+    $P0 = loadlib 'os'
     $P1 = new "OS"
     $P1."rm"(test_fn)
 

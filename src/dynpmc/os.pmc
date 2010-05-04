@@ -39,7 +39,7 @@ files and directories.
 /* HEADERIZER END: static */
 
 static PMC *OS_PMC;
-pmclass OS singleton {
+pmclass OS dynpmc singleton {
 
 /*
 

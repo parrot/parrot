@@ -660,6 +660,7 @@ END_OF_FUNCTION
   check_manifest:
     # Check if there is a MSVC app manifest
     .local pmc file
+    $P0 = loadlib 'file'
     file = new 'File'
     .local string manifest_file_name
     manifest_file_name  = clone exefile

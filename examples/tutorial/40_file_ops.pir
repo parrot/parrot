@@ -20,6 +20,7 @@ This example demonstrates basic file operations.
     close filein
 
     # Be nice and remove the temporary file we created.
+    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rm'('40_file_ops_data.txt')
 .end

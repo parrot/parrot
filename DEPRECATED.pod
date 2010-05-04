@@ -45,18 +45,6 @@ L<https://trac.parrot.org/parrot/ticket/1580>
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
-=item File [eligible in 1.1]
-
-Move from static PMC to dynamic PMC
-
-L<https://trac.parrot.org/parrot/ticket/448>
-
-=item OS [eligible in 1.1]
-
-Move from static PMC to dynamic PMC
-
-L<https://trac.parrot.org/parrot/ticket/448>
-
 =item multiple dispatch within core PMCs [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/452>

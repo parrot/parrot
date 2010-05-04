@@ -54,6 +54,7 @@ END
 
 .sub delete_library
     .local pmc os
+    $P0 = loadlib 'os'
     os = new 'OS'
     $S0 = "method_library.pir"
     os.'rm'($S0)

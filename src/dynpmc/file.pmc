@@ -29,7 +29,7 @@ C<File> is a singleton class which provides access to File functions.
 /* TT #1050 apparently, strerror_r is thread-safe and should be used instead.*/
 
 static PMC *File_PMC;
-pmclass File singleton {
+pmclass File dynpmc singleton {
 
 /*
 

@@ -92,6 +92,7 @@ method build_pir_profile() {
     my $pprof_fh  := pir::new__p_sc('FileHandle');
     self<profile> := $pprof_fh.readall($tmp_pprof);
 
+    pir::loadlib__ps('os');
     pir::new__p_sc('OS').rm($tmp_pir);
     pir::new__p_sc('OS').rm($tmp_pprof);
 }

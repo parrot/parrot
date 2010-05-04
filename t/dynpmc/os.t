@@ -42,6 +42,7 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
     $cwd = lc($cwd);
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
         $S2 = downcase $S1
@@ -56,6 +57,7 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
         print $S1
@@ -78,6 +80,7 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
 
     pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "src"
@@ -104,6 +107,7 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "src"
@@ -135,6 +139,7 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
 
     pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -163,6 +168,7 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -192,6 +198,7 @@ mkdir "xpto" unless -d "xpto";
 
 pir_output_is( <<'CODE', <<'OUT', 'Test rm call in a directory' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -227,6 +234,7 @@ if ( $MSWin32 ) {
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
@@ -246,6 +254,7 @@ else {
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
@@ -270,6 +279,7 @@ SKIP: {
     my $entries = join( ' ', @entries ) . "\n";
     pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
+    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('docs')
 
@@ -286,6 +296,7 @@ SKIP: {
     close $FILE;
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
+    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rename'('____some_test_file', '___some_other_file')
     $I0 = stat '___some_other_file', 0
@@ -314,6 +325,7 @@ SKIP: {
     $lstat = sprintf( "0x%08x\n" x 13, @s );
     pir_output_is( <<'CODE', $lstat, "Test OS.lstat" );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."lstat"($S1)
@@ -330,6 +342,7 @@ CODE
 # Test remove on a file
 pir_output_is( <<'CODE', <<"OUT", "Test rm call in a file" );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -352,6 +365,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -376,6 +390,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
+        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -403,6 +418,7 @@ SKIP: {
 .sub main :main
     .local pmc os
     .local string xpto, tools
+    \$P0 = loadlib 'os'
     os    = new ['OS']
     xpto  = "xpto"
     tools = "tools"

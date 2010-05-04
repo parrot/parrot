@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.13	2010.05.03	coke	move File/OS pmcs to src/dynpmc
 6.12	2010.05.02	plobsing	store constant PMC strings as top level constant strings    
 6.11	2010.04.29	tewk	remove ParrotRunningThread
 6.10	2010.04.29	NotFound	packfiledebug.pmc

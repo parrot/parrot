@@ -130,7 +130,9 @@ print the filename for each match
 	filecount = files
 	# define with-filename if there's more than one file
 	.If(filecount >= 2, { opts['with-filename'] = 1 })
+        $P0 = loadlib 'file'
 	File = new 'File'
+        $P0 = loadlib 'os'
 	OS = new 'OS'
 	# This must be here, or else it'll get filled with junk data we use stdin...
 	i = 0
