@@ -281,12 +281,6 @@ this rather than relying on in-place modification of an existing pointer.
 
 L<https://trac.parrot.org/parrot/ticket/1584>
 
-=item Parrot_string_* [eligible in 2.4]
-
-rename Parrot_string_cstring to Parrot_str_cstring
-
-L<https://trac.parrot.org/parrot/ticket/1586>
-
 =item STRING COW [eligible in 2.4]
 
 COW strings are to be removed. All "inplace" string modification

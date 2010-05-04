@@ -102,7 +102,7 @@ Create PackFile_FixupEntry* from self.
                 mem_gc_allocate_zeroed_typed(INTERP, PackFile_FixupEntry);
 
         entry->type     = attrs->type;
-        entry->name     = strdup(Parrot_string_cstring(interp, attrs->name));
+        entry->name     = strdup(Parrot_str_cstring(interp, attrs->name));
         entry->offset   = attrs->offset;
         return entry;
     }

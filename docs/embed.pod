@@ -1587,7 +1587,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_str_indexed>
 
-=item C<Parrot_string_cstring>
+=item C<Parrot_str_cstring>
 
 =item C<Parrot_str_init>
 

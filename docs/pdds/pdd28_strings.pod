@@ -614,10 +614,9 @@ that specially allows returning a NULL string.
 Old Perl 5-style behavior where "aa" goes to "bb". Only useful for ASCII
 strings, and not terribly useful even there.
 
-=head4 Parrot_string_cstring
+=head4 Parrot_str_cstring
 
 Unsafe, and behavior handled by Parrot_str_to_cstring.
-
 
 =head4 Parrot_str_split
 
