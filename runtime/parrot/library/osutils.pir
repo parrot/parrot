@@ -9,6 +9,12 @@ osutils - Parrot OS Utilities
 
 =over 4
 
+=cut
+
+.sub '' :init :load :anon
+    $P0 = loadlib 'os'
+.end
+
 =item system
 
 =cut
