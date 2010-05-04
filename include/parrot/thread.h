@@ -147,12 +147,6 @@ typedef struct _Shared_gc_info {
 /* TODO use thread pools instead */
 VAR_SCOPE Shared_gc_info *shared_gc_info;
 
-typedef struct _Sync {
-    Parrot_Interp owner;                /* that interpreter, that owns
-                                           the arena, where the PMC is in */
-    Parrot_mutex pmc_lock;              /* for wr access to PMCs content */
-} Sync;
-
 /* HEADERIZER BEGIN: src/thread.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

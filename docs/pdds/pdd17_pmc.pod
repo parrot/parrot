@@ -48,7 +48,6 @@ All PMCs have the form:
         VTABLE *vtable;
         DPOINTER *data;
         PMC *_metadata;
-        struct _Sync *_synchronize;    # [Note: may be deprecated, see STM]
     }
 
 C<flags> holds a set of flags associated with the PMC; these are documented

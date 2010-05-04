@@ -83,8 +83,6 @@ struct parrot_string_t {
     const struct _charset  *charset;
 };
 
-struct _Sync;   /* forward decl */
-
 /* note that cache and flags are isomorphic with Buffer and PObj */
 struct PMC {
     Parrot_UInt     flags;
