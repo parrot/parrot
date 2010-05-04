@@ -51,8 +51,10 @@ html: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
 
 # The pdf target is to generate a parrot PDF document.
-# It will not work on Windows. It use the Unix syntax to specify the
-# path of files. May be that will be changed.
+# If you are missing the command 'pdflatex' then you have first to install a
+# LaTeX distribution with it. For Windows and UNIX downloads are for example
+# available from: http://miktex.org, http://tug.org/texlive or
+# http://www.ctan.org
 pdf: ../tools/docs/filename_and_chapter.pl
 	$(MKPATH) build/modified_pod
 	$(PERL) ../tools/docs/filename_and_chapter.pl
