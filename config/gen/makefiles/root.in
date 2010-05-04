@@ -808,7 +808,7 @@ $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT)
+$(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc tools/dev/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 

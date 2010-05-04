@@ -438,6 +438,7 @@ END_OF_DEFINES
 
 
     .local int pbc_size
+    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'stat'(pbc_path)
     pbc_size = $P2[7]
