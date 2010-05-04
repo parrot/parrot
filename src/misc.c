@@ -113,7 +113,6 @@ Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
 {
     ASSERT_ARGS(Parrot_vsnprintf)
-    
 
     if (len == 0)
         return;
