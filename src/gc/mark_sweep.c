@@ -355,25 +355,6 @@ mark_special(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), ARGIN(PMC *obj))
 {
     ASSERT_ARGS(mark_special)
 
-    /*
-     * If the object is shared, we have to use the arena and gc
-     * pointers of the originating interpreter.
-     *
-     * We are possibly changing another interpreter's data here, so
-     * the mark phase of GC must run only on one interpreter of a pool
-     * at a time. However, freeing unused objects can occur in parallel.
-     * And: to be sure that a shared object is dead, we have to finish
-     * the mark phase of all interpreters in a pool that might reference
-     * the object.
-     */
-    if (PObj_is_PMC_shared_TEST(obj)) {
-        interp = PMC_sync(obj)->owner;
-        PARROT_ASSERT(interp);
-
-        if (!mem_pools->gc_mark_ptr)
-            mem_pools->gc_mark_ptr = obj;
-    }
-
     PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
 
     /* clearing the flag is much more expensive then testing */

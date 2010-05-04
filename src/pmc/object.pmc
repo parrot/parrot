@@ -888,7 +888,6 @@ Used to mark a PMC as read-only shared.
         VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), _true);
 
         SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
-        Parrot_gc_add_pmc_sync(INTERP, ret);
         PObj_is_PMC_shared_SET(ret);
 
         data = PARROT_CLASS(classobj)->parents;

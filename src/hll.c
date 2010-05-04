@@ -52,16 +52,6 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 /* for shared HLL data, do COW stuff */
 #define START_READ_HLL_INFO(interp, hll_info)
 #define END_READ_HLL_INFO(interp, hll_info)
-#define START_WRITE_HLL_INFO(interp, hll_info) \
-    do { \
-        if (PObj_is_PMC_shared_TEST(hll_info) && PMC_sync((interp)->HLL_info)) { \
-            (hll_info) = (interp)->HLL_info = \
-                Parrot_clone((interp), (interp)->HLL_info); \
-            if (PMC_sync((interp)->HLL_info)) \
-                mem_internal_free(PMC_sync((interp)->HLL_info)); \
-        } \
-    } while (0)
-#define END_WRITE_HLL_INFO(interp, hll_info)
 
 
 /*
@@ -160,8 +150,6 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
     hll_info = interp->HLL_info;
 
-    START_WRITE_HLL_INFO(interp, hll_info);
-
     idx      = VTABLE_elements(interp, hll_info);
     entry    = new_hll_entry(interp, hll_name);
 
@@ -190,9 +178,6 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     VTABLE_set_pointer(interp, type_hash, parrot_new_intval_hash(interp));
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
 
-    /* UNLOCK */
-    END_WRITE_HLL_INFO(interp, hll_info);
-
     return idx;
 }
 
@@ -216,8 +201,6 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
     ASSERT_ARGS(Parrot_register_HLL_lib)
     PMC   *hll_info = interp->HLL_info;
     INTVAL nelements, i;
-
-    START_WRITE_HLL_INFO(interp, hll_info);
 
     nelements = VTABLE_elements(interp, hll_info);
 
@@ -245,8 +228,6 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 
         VTABLE_set_string_native(interp, name, hll_lib);
         VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_lib, name);
-
-        END_WRITE_HLL_INFO(interp, hll_info);
 
         return 0;
     }
@@ -357,15 +338,6 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
             "no such HLL ID (%vd)", hll_id);
 
-    /* the type might already be registered in a non-conflicting way, in which
-     * ca se we can avoid copying */
-    if (PObj_is_PMC_shared_TEST(hll_info) && PMC_sync(hll_info)) {
-        if (hll_type == Parrot_get_HLL_type(interp, hll_id, core_type))
-            return;
-    }
-
-    START_WRITE_HLL_INFO(interp, hll_info);
-
     entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
     PARROT_ASSERT(!PMC_IS_NULL(entry));
 
@@ -373,8 +345,6 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
     PARROT_ASSERT(!PMC_IS_NULL(type_hash));
 
     VTABLE_set_integer_keyed_int(interp, type_hash, core_type, hll_type);
-
-    END_WRITE_HLL_INFO(interp, hll_info);
 }
 
 /*

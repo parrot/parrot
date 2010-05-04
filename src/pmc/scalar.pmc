@@ -944,7 +944,6 @@ Sets this PMC as shared and read-only.
         VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
 
         /* We're sharing this, so make sure it has a PMC_sync */
-        Parrot_gc_add_pmc_sync(INTERP, ret);
         PObj_is_PMC_shared_SET(ret);
 
         /* XXX FIXME workaround lack of metadata sharing*/

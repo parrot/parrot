@@ -339,8 +339,6 @@ pt_shared_fixup(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (is_ro)
         pmc->vtable = pmc->vtable->ro_variant_vtable;
 
-    Parrot_gc_add_pmc_sync(interp, pmc);
-
     PObj_is_PMC_shared_SET(pmc);
 
     /* make sure metadata doesn't go away unexpectedly */

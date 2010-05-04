@@ -1433,14 +1433,11 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(const Fixed_Size_Pool *pool))
 
         for (i = 0; i < cur_arena->used; ++i) {
             if (!PObj_on_free_list_TEST(p) && PObj_is_PMC_TEST(p)) {
-                if (PObj_is_PMC_shared_TEST(p))
-                    PMC_sync(p)->owner = dest_interp;
-                else
-                    Parrot_ex_throw_from_c_args(dest_interp, NULL,
-                        EXCEPTION_INTERP_ERROR,
-                        "Unshared PMC still alive after interpreter"
-                        "destruction. address=%p, base_type=%d\n",
-                        p, p->vtable->base_type);
+                Parrot_ex_throw_from_c_args(dest_interp, NULL,
+                    EXCEPTION_INTERP_ERROR,
+                    "Unshared PMC still alive after interpreter"
+                    "destruction. address=%p, base_type=%d\n",
+                    p, p->vtable->base_type);
             }
 
             p = (PMC *)((char *)p + object_size);
