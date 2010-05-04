@@ -401,11 +401,9 @@ L<https://trac.parrot.org/parrot/ticket/852>
 
 =over 4
 
-=item Threads and Parallelism
+=item Threads and Parallelism [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1601>
-
-All threads and parallelism constructs are experimental
 
 =back
 
