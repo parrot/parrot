@@ -991,7 +991,7 @@ return current Namespace
 
     VTABLE void unshift_pmc(PMC *value) {
         Pcc_cell *cells;
-        INTVAL    size = STATICSELF.elements();
+        INTVAL size = STATICSELF.elements();
         INTVAL    i;
 
         ensure_positionals_storage(INTERP, SELF, size + 1);
@@ -1008,7 +1008,7 @@ return current Namespace
     VTABLE PMC * shift_pmc() {
         Pcc_cell *cells;
         PMC      *retval;
-        INTVAL    size = STATICSELF.elements();
+        const INTVAL size = STATICSELF.elements();
         INTVAL    i;
 
         if (size < 1)
@@ -1029,7 +1029,7 @@ return current Namespace
     VTABLE STRING * shift_string() {
         Pcc_cell *cells;
         STRING   *retval;
-        INTVAL    size = STATICSELF.elements();
+        const INTVAL size = STATICSELF.elements();
         INTVAL    i;
 
         if (size < 1)
