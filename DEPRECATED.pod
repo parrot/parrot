@@ -22,16 +22,22 @@ C<[eligible in 1.5]>.  If the release listed is one that has already
 shipped, this feature may be removed in B<any> upcoming release, and
 you should no longer rely on it.
 
-Whenever deprecated items are removed, information
-regarding how to cope with the removal should be added to
-L<https://trac.parrot.org/parrot/wiki/Deprecation>.
+If you find a feature you once used was removed after a deprecation
+cycle, L<https://trac.parrot.org/parrot/wiki/Deprecation>. Otherwise
+please open a documentation ticket via Trac[1].
 
-When running parrot, you can receive warnings about deprecated opcodes.
+=head1 Are you using any Deprecated Features?
+
+When running parrot, you can receive warnings about deprecations.
 Either run parrot with the C<-w> option to enable all warnings, or
-specifically by including this C<PIR> code:
+deprecations specifically by including this snippet:
+
+=begin PIR_FRAGMENT
 
  .include 'warnings.pasm'
  warningson .PARROT_WARNINGS_DEPRECATED_FLAG
+
+=end PIR_FRAGMENT
 
 =head1 PMCS
 
