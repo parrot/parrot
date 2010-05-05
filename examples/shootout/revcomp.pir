@@ -67,11 +67,25 @@ done:
 .sub print_revcomp
 	.param string line
 	.local int i, linelen, ch
+	.local string revline
 	linelen = length line
 
         $P0 = new 'String'
-        $P0.'reverse'(line)
-
+#       $P0.'reverse'(line)
+#         reverse is no longer available so
+        i = linelen
+        revline = ''
+rev_loop:
+        i -= 1
+        $S0 = substr line, i, 1
+        revline .= $S0
+        if i > 0 goto rev_loop
+#
+        $P0 = revline
+#
+        # line was reversed in-place so we need
+        line = revline
+#
 	.const 'Sub' tr_00 = 'tr_00_init'
 	$P0.'trans'(line, tr_00)
 
