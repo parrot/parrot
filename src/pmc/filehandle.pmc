@@ -459,7 +459,6 @@ filehandle when finished.
 
             result = Parrot_io_reads(INTERP, filehandle, size);
             Parrot_io_close(INTERP, filehandle);
-            RETURN(STRING *result);
         }
         else {
             /* slurp open file */
@@ -467,19 +466,16 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall without a file name or open filehandle");
 
-            result = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
-
             /* Do line buffering on the filehandle */
             if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
                 Parrot_io_setlinebuf(INTERP, SELF);
 
+            result = STRINGNULL;
             do {
                 STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
-                result = Parrot_str_concat(INTERP, result, part);
-
-                if (Parrot_io_eof(INTERP, SELF))
-                    break;
-            } while (1);
+                result = STRING_IS_NULL(result) ? part :
+                        Parrot_str_concat(INTERP, result, part);
+            } while (!Parrot_io_eof(INTERP, SELF));
         }
 
         RETURN(STRING *result);
