@@ -433,11 +433,13 @@ void PbcFile::read_directory(ifstream &pbcfile)
     opcode size = read_opcode(pbcfile);
     cout << "Directory segment size: " << size << '\n';
 
-    pbcfile.ignore(16 - opcode_size);
-    // Not sure if the update of this check is correct,
-    // but lacked the time to verify with old parrots.
-    if ((pbc_major < 3 || (pbc_major == 3 && pbc_minor < 25)) && opcode_size == 8)
-        pbcfile.ignore(16);
+    // Must be zero:
+    opcode in_type = read_opcode(pbcfile);
+    opcode in_id   = read_opcode(pbcfile);
+    opcode op_size = read_opcode(pbcfile);
+    cout << "Internal type: " << in_type << '\n';
+    cout << "Internal id:   " << in_id   << '\n';
+    cout << "Op table size: " << op_size << '\n';
 
     opcode entries = read_opcode(pbcfile);
     cout << "Directory entries: " << entries << '\n';
