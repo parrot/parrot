@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 7;
+plan tests => 9;
 
 =head1 NAME
 
@@ -98,6 +98,87 @@ int main(int argc, const char **argv)
 CODE
 The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
 OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when given invalid language string');
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, lang;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+    lang = Parrot_new_string(interp, "Foo", 3, (const char*)NULL, 0);
+
+    func_pmc = Parrot_compile_string(interp, lang, "This doesn't matter", &err);
+    Parrot_printf(interp, "%Ss\n", err);
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+Invalid interpreter type
+OUTPUT
+
+SKIP: {
+
+    skip('TT #1610 : Parrot_compile_string does not properly catch IMCC syntax errors', 1);
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when there is an IMCC syntax error');
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, lang;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+    lang = Parrot_new_string(interp, "PIR", 3, (const char*)NULL, 0);
+
+    func_pmc = Parrot_compile_string(interp, lang, "The sleeper must awake", &err);
+    Parrot_printf(interp,"Caught exception\n");
+    Parrot_printf(interp, "%Ss\n", err);
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+Caught exception
+error:imcc:syntax error, unexpected IDENTIFIER ('The')
+OUTPUT
+}
 
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
 
