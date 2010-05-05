@@ -136,11 +136,8 @@ CODE
 Invalid interpreter type
 OUTPUT
 
-SKIP: {
 
-    skip('TT #1610 : Parrot_compile_string does not properly catch IMCC syntax errors', 1);
-
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when there is an IMCC syntax error');
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when there is an IMCC syntax error', 'todo' => 'TT #1610 : does not properly catch IMCC errors');
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -178,7 +175,7 @@ CODE
 Caught exception
 error:imcc:syntax error, unexpected IDENTIFIER ('The')
 OUTPUT
-}
+
 
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
 
