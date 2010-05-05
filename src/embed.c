@@ -27,6 +27,8 @@ This file implements the Parrot embedding interface.
 
 #include "../compilers/imcc/imc.h"
 
+#include "embed.str"
+
 /* HEADERIZER HFILE: none */ /* The visible types are different than what we use in here */
 
 /* HEADERIZER BEGIN: static */
@@ -1093,18 +1095,17 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
 
     if (!interp->initial_pf) {
         /* SIDE EFFECT: PackFile_new_dummy sets interp->initial_pf */
-        interp->initial_pf = PackFile_new_dummy(interp,
-            Parrot_str_new_constant(interp, "compile_string"));
+        interp->initial_pf = PackFile_new_dummy(interp, CONST_STRING(interp, "compile_string"));
         /* Assumption: there is no valid reason to fail to create it.
          * If the assumption changes, replace the assertion with a
          * runtime check */
         PARROT_ASSERT(interp->initial_pf);
     }
 
-    if (Parrot_str_compare(interp, Parrot_str_new(interp, "PIR", 3), type) == 0)
+    if (Parrot_str_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
         return IMCC_compile_pir_s(interp, code, error);
 
-    if (Parrot_str_compare(interp, Parrot_str_new(interp, "PASM", 4), type) == 0)
+    if (Parrot_str_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
         return IMCC_compile_pasm_s(interp, code, error);
 
     *error = Parrot_str_new(interp, "Invalid interpreter type", 0);

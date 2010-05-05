@@ -664,6 +664,7 @@ STR_FILES = \
     src/spf_vtable.str \
     src/string/api.str \
     src/sub.str \
+    src/embed.str \
     \
     $(CLASS_STR_FILES)
 
