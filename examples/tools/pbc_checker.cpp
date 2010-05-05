@@ -320,7 +320,8 @@ public:
     opcode read_opcode(ifstream &pbcfile);
 private:
     unsigned int opcode_size;
-    unsigned int pbc_version;
+    unsigned int pbc_major;
+    unsigned int pbc_minor;
 
     unsigned char byte_order;
     unsigned char fp_encoding;
@@ -387,7 +388,8 @@ void PbcFile::read_header(ifstream &pbcfile)
         cerr << "*** Warning: opcode size too big for this program ***\n";
 
     this->opcode_size = opcode_size;
-    this->pbc_version = ((unsigned int) pbc_major) * 8 + pbc_minor;
+    this->pbc_major = pbc_major;
+    this->pbc_minor = pbc_minor;
     this->byte_order = byte_order;
     this->fp_encoding = fp_encoding;
     if (byte_order != ByteOrderLE && byte_order != ByteOrderBE)
@@ -432,7 +434,9 @@ void PbcFile::read_directory(ifstream &pbcfile)
     cout << "Directory segment size: " << size << '\n';
 
     pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
+    // Not sure if the update of this check is correct,
+    // but lacked the time to verify with old parrots.
+    if ((pbc_major < 3 || (pbc_major == 3 && pbc_minor < 25)) && opcode_size == 8)
         pbcfile.ignore(16);
 
     opcode entries = read_opcode(pbcfile);
@@ -464,7 +468,9 @@ void PbcFile::dump_segment(const DirEntry &entry, ifstream &pbcfile)
         " (0x" << hex << type << dec << ")\n";
 
     // Set file read position to segment's start
-    pbcfile.seekg(entry.getOffset() * opcode_size);
+    size_t start = entry.getOffset() * opcode_size;
+    cout << "Start: 0x" << hex << setw(6) << start << dec << '\n';
+    pbcfile.seekg(start);
 
     switch(type)
     {
@@ -715,26 +721,50 @@ void PbcFile::dump_segment_dependencies(ifstream &/*pbcfile*/)
 
 void PbcFile::dump_constant_string(ifstream &pbcfile)
 {
-    opcode flags = read_opcode(pbcfile);
-    cout << "Flags: 0x" << hex << flags << dec;
-    opcode charset = read_opcode(pbcfile);
+    opcode flags;
+    opcode charset;
+    if (pbc_major > 5 && pbc_minor > 11) {
+        opcode flags_charset = read_opcode(pbcfile);
+        flags = flags_charset & 0xFF;
+        charset = flags_charset >> 8;
+    }
+    else {
+        flags = read_opcode(pbcfile);
+	charset = read_opcode(pbcfile);
+    }
+
+    cout << "Flags: 0x" << hex << setw(6) << flags << dec;
     cout << " Charset: " << charset;
 
+    // Encoding not saved, see TT #468
     //opcode encoding = read_opcode(pbcfile);
     //cout << " Encoding: "<< encoding;
 
     opcode length = read_opcode(pbcfile);
     cout << " Length: "<< length;
+
+    // Don't dump very long strings at full length.
+    opcode full = length;
+    length = std::min(length, (opcode)512);
+
     cout << " \'";
     for (opcode i= 0; i < length; ++i) {
         unsigned char c = pbcfile.get();
+        if (! pbcfile)
+            throw ReadError("string constant");
         if (c >= 32 && c < 128)
             cout << c;
         else
             cout << "\\x" << hex << setw(2) << setfill('0') <<
                 (unsigned int) c << dec;
     }
-    cout << "'\n";
+    cout << '\'';
+    if (full > length) {
+        cout << "(...)";
+        pbcfile.ignore(full - length);
+    }
+    cout << '\n';
+
     for (unsigned int i= length; i % opcode_size; ++i) {
         pbcfile.ignore(1);
     }
