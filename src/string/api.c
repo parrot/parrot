@@ -395,7 +395,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
 {
     ASSERT_ARGS(Parrot_str_concat)
     const CHARSET   *cs;
-    const ENCODING  *enc;
+    const ENCODING  *enc = NULL;
     STRING          *dest;
     UINTVAL          total_length;
 
@@ -417,6 +417,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
 
     if (!cs) {
         /* upgrade strings for concatenation */
+        cs = Parrot_unicode_charset_ptr;
         enc = (a->encoding == Parrot_utf16_encoding_ptr
            ||  b->encoding == Parrot_utf16_encoding_ptr
            ||  a->encoding == Parrot_ucs2_encoding_ptr
@@ -432,11 +433,12 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         if (b->encoding != enc)
             b = enc->to_encoding(interp, b);
     }
-
     /* calc usable and total bytes */
     total_length = a->bufused + b->bufused;
 
     dest = Parrot_str_new_noinit(interp, enum_stringrep_one, total_length);
+    PARROT_ASSERT(enc);
+    PARROT_ASSERT(cs);
     dest->encoding = enc;
     dest->charset  = cs;
 
