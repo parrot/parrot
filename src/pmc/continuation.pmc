@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -57,6 +57,7 @@ pmclass Continuation auto_attrs {
     ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
     ATTR int                runloop_id;      /* id of the creating runloop. */
     ATTR int                invoked;         /* flag when a handler has been invoked. */
+
 /*
 
 =item C<void init()>
@@ -80,7 +81,19 @@ Initializes the continuation.
         PObj_custom_mark_SET(SELF);
     }
 
-    /*if they pass in a PMC to initialize with*/
+
+/*
+
+=item C<void init_pmc(PMC *continuation)>
+
+Initializes the continuation with values from the provided continuation.
+
+=cut
+
+*/
+
+
+    /* if they pass in a PMC to initialize with */
     VTABLE void init_pmc(PMC *values) {
         PMC               *to_ctx;
         opcode_t          *address;
@@ -101,7 +114,6 @@ Initializes the continuation.
 
         PObj_custom_mark_SET(SELF);
     }
-
 
 
 /*
@@ -131,6 +143,7 @@ Marks the continuation as live.
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
     }
 
+
 /*
 
 =item C<PMC *clone()>
@@ -146,25 +159,27 @@ Creates and returns a clone of the continuation.
         return Parrot_pmc_new_init(INTERP, SELF->vtable->base_type, SELF);
     }
 
+
 /*
 
 =item C<PMC *set_pmc()>
 
-Assign context.
+Assigns context.
 
 =cut
 
 */
     VTABLE void set_pmc(PMC *src) {
-        STRUCT_COPY((Parrot_Continuation_attributes *)PMC_data(SELF),
-                (Parrot_Continuation_attributes *)PMC_data(src));
+        STRUCT_COPY(PMC_data_typed(SELF, Parrot_Continuation_attributes *),
+                    PMC_data_typed(src,  Parrot_Continuation_attributes *));
     }
+
 /*
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the return instruction.  Also captures the descriptor
-address for any returned values.
+Sets the pointer to the given return instruction and captures the runloop id
+for any returned values.
 
 =cut
 
@@ -174,6 +189,7 @@ address for any returned values.
         SET_ATTR_address(INTERP, SELF, (opcode_t *)value);
         SET_ATTR_runloop_id(INTERP, SELF, INTERP->current_runloop_id);
     }
+
 
 /*
 
@@ -189,9 +205,9 @@ Returns the pointer to the return instruction.
         opcode_t          *address;
 
         GET_ATTR_address(INTERP, SELF, address);
-
         return address;
     }
+
 
 /*
 
@@ -209,17 +225,17 @@ Returns whether the subroutine is defined.
         opcode_t          *address;
 
         GET_ATTR_address(INTERP, SELF, address);
-
         return address != NULL;
     }
+
 
     VTABLE INTVAL get_bool() {
         opcode_t          *address;
 
         GET_ATTR_address(INTERP, SELF, address);
-
         return address != NULL;
     }
+
 
 /*
 
@@ -247,9 +263,8 @@ destination to continue execution.
         Parrot_continuation_check(INTERP, SELF);
         Parrot_continuation_rewind_environment(INTERP, SELF);
 
-        if (!PMC_IS_NULL(from_obj)) {
+        if (!PMC_IS_NULL(from_obj))
             Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);
-        }
 
         /* switch segment */
         if (INTERP->code != seg)
@@ -258,11 +273,12 @@ destination to continue execution.
         return pc;
     }
 
+
 /*
 
 =item C<STRING *get_string()>
 
-Experimental: return caller info as a STRING.
+Experimental: returns caller info as a STRING.
 
 =cut
 
@@ -272,15 +288,15 @@ Experimental: return caller info as a STRING.
         PMC *to_ctx;
 
         GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
-
         return Parrot_Context_infostr(INTERP, to_ctx);
     }
+
 
 /*
 
 =item C<PMC *caller()>
 
-Experimental: return caller PMC or PMCNULL if none.
+Experimental: return callers PMC or PMCNULL if none.
 
 =cut
 
@@ -305,11 +321,13 @@ Experimental: return caller PMC or PMCNULL if none.
         RETURN(PMC *caller);
 
     }
+
+
 /*
 
 =item C<PMC *continuation()>
 
-Experimental: return continuation PMC of this Continuation or PMCNULL if none.
+Experimental: returns continuation PMC of this Continuation or PMCNULL if none.
 
 =cut
 
@@ -332,10 +350,6 @@ Experimental: return continuation PMC of this Continuation or PMCNULL if none.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial revision by sean 2002/08/04.
 
 =cut
 
