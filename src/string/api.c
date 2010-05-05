@@ -898,8 +898,6 @@ string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 
 Returns a single-character Parrot string.
 
-TODO - Allow this to take an array of characters?
-
 =cut
 
 */
