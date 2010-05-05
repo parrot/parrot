@@ -212,7 +212,7 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
     }
 
 #ifndef DISABLE_GC_DEBUG
-    Parrot_gc_compact_memory_pool(INTERP);
+    Parrot_gc_compact_memory_pool(interp);
 #endif
 
 }
@@ -500,7 +500,7 @@ Pushes the integer C<v> onto the end of the image.
 
     VTABLE void push_integer(INTVAL v) {
         const size_t len = PF_size_integer() * sizeof (opcode_t);
-        ensure_buffer_size(interp, SELF, len);
+        ensure_buffer_size(INTERP, SELF, len);
         SET_VISIT_CURSOR(SELF, (char *)PF_store_integer(GET_VISIT_CURSOR(SELF), v));
     }
 
@@ -518,7 +518,7 @@ Pushes the float C<v> onto the end of the image.
     VTABLE void push_float(FLOATVAL v)
     {
         size_t len = PF_size_number() * sizeof (opcode_t);
-        ensure_buffer_size(interp, SELF, len);
+        ensure_buffer_size(INTERP, SELF, len);
         SET_VISIT_CURSOR(SELF, (char *)PF_store_number(GET_VISIT_CURSOR(SELF), &v));
     }
 
@@ -542,11 +542,11 @@ Pushes the string C<*v> onto the end of the image.
                 PackFile_Constant *constant = table->constants[i];
                 if (constant->type == PFC_STRING) {
                     STRING * const sc = constant->u.string;
-                    if (Parrot_str_equal(interp, v, sc)
-                    && Parrot_charset_number_of_str(interp, v)
-                    ==  Parrot_charset_number_of_str(interp, sc)
-                    &&  Parrot_encoding_number_of_str(interp, v)
-                    ==  Parrot_encoding_number_of_str(interp, sc))
+                    if (Parrot_str_equal(INTERP, v, sc)
+                    && Parrot_charset_number_of_str(INTERP, v)
+                    ==  Parrot_charset_number_of_str(INTERP, sc)
+                    &&  Parrot_encoding_number_of_str(INTERP, v)
+                    ==  Parrot_encoding_number_of_str(INTERP, sc))
                     {
                         STATICSELF.push_integer(i);
                         return;
@@ -653,7 +653,7 @@ Removes and returns a string from the start of the image.
 
         {
             opcode_t *pos = GET_VISIT_CURSOR(SELF);
-            STRING   *s   = PF_fetch_string(interp, PARROT_IMAGEIO(SELF)->pf,
+            STRING   *s   = PF_fetch_string(INTERP, PARROT_IMAGEIO(SELF)->pf,
                                                (const opcode_t **)&pos);
             SET_VISIT_CURSOR(SELF, (char *)pos);
             BYTECODE_SHIFT_OK(SELF);
@@ -708,13 +708,13 @@ Removes and returns a reference to a pmc from the start of the image.
         PARROT_IMAGEIO(SELF)->input_length = image->strlen;
 
         PARROT_IMAGEIO(SELF)->pf->options |= PFOPT_PMC_FREEZE_ONLY;
-        unpacked_length = PackFile_unpack(interp, PARROT_IMAGEIO(SELF)->pf,
+        unpacked_length = PackFile_unpack(INTERP, PARROT_IMAGEIO(SELF)->pf,
             GET_VISIT_CURSOR(SELF), PARROT_IMAGEIO(SELF)->input_length);
 
         if (unpacked_length)
             INC_VISIT_CURSOR(SELF, header_length);
         else
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "PackFile header failed during unpack");
 

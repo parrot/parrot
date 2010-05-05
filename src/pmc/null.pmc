@@ -55,21 +55,21 @@ Overrides the default to do nothing.
 */
 
     VTABLE void init() {
-        UNUSED(interp)
+        UNUSED(INTERP)
     }
 
     VTABLE void *get_pointer() {
-        UNUSED(interp)
+        UNUSED(INTERP)
         return PMCNULL;
     }
 
     VTABLE void set_pointer(void *p) {
-        UNUSED(interp)
+        UNUSED(INTERP)
         PMCNULL = (PMC *)p;
     }
 
     VTABLE INTVAL does(STRING *what) {
-        UNUSED(interp)
+        UNUSED(INTERP)
         UNUSED(what)
         /* XXX maybe a hack to get TGE running again */
         return 0;
@@ -99,7 +99,7 @@ Gives a more informative message than the automaticaaly generated version.
 */
 
     VTABLE PMC *find_method(STRING *method_name) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_NULL_REG_ACCESS,
                 "Null PMC access in find_method('%Ss')",
                 method_name);
     }

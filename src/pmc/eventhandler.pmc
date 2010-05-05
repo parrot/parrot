@@ -217,7 +217,7 @@ handle the registered events.
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
         PMC *value = PMCNULL;
 
-        if (Parrot_str_equal(interp, name, CONST_STRING(interp, "code"))) {
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "code"))) {
             value = e->code;
         }
 
@@ -274,15 +274,15 @@ Report whether the event handler can handle a particular type of event.
     METHOD can_handle(PMC *event) {
 
         if (event->vtable->base_type == enum_class_Task) {
-            PMC    * const type     = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
-            STRING * const type_str = VTABLE_get_string(interp, type);
+            PMC    * const type     = VTABLE_get_attr_str(INTERP, event, CONST_STRING(INTERP, "type"));
+            STRING * const type_str = VTABLE_get_string(INTERP, type);
 
-            if (Parrot_str_equal(interp, type_str, CONST_STRING(interp, "event"))) {
+            if (Parrot_str_equal(INTERP, type_str, CONST_STRING(INTERP, "event"))) {
                 Parrot_EventHandler_attributes * const handler_struct = PARROT_EVENTHANDLER(SELF);
-                PMC    * const subtype     = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "subtype"));
-                STRING * const subtype_str = VTABLE_get_string(interp, subtype);
+                PMC    * const subtype     = VTABLE_get_attr_str(INTERP, event, CONST_STRING(INTERP, "subtype"));
+                STRING * const subtype_str = VTABLE_get_string(INTERP, subtype);
 
-                if (Parrot_str_equal(interp, subtype_str, handler_struct->type)) {
+                if (Parrot_str_equal(INTERP, subtype_str, handler_struct->type)) {
                     RETURN(INTVAL 1);
                 }
             }

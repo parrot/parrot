@@ -238,7 +238,7 @@ Appends C<*value> to the key.
 
     void push_pmc(PMC *value) {
         if (value->vtable->base_type != enum_class_Key)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
 
         key_append(INTERP, SELF, value);

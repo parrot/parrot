@@ -106,7 +106,7 @@ Create a copy of the filehandle.
     VTABLE PMC *clone() {
         Parrot_FileHandle_attributes * const old_struct
             = PARROT_FILEHANDLE(SELF);
-        PMC * const copy = Parrot_io_new_pmc(interp, old_struct->flags);
+        PMC * const copy = Parrot_io_new_pmc(INTERP, old_struct->flags);
         Parrot_FileHandle_attributes * const data_struct
             = PARROT_FILEHANDLE(copy);
 
@@ -130,9 +130,9 @@ Mark active filehandle data as live.
         Parrot_FileHandle_attributes * const data_struct
             = PARROT_FILEHANDLE(SELF);
 
-        Parrot_gc_mark_STRING_alive(interp, data_struct->mode);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->filename);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->encoding);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
     }
 
 
@@ -249,7 +249,7 @@ filehandle, rather than modifying the invocant).
         STRING *open_filename, *open_mode;
 
         if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                                 "Cannot reopen already open filehandle");
 
         if (got_mode && !STRING_IS_NULL(mode))
@@ -263,7 +263,7 @@ filehandle, rather than modifying the invocant).
         GET_ATTR_mode(INTERP, SELF, open_mode);
 
         if (STRING_IS_NULL(open_filename))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                             "Cannot open filehandle, no filename");
 
         if (STRING_IS_NULL(open_mode)) {
@@ -317,7 +317,7 @@ Test if the filehandle is closed.
 */
 
     METHOD is_closed() {
-        const INTVAL status = Parrot_io_is_closed(interp, SELF);
+        const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL status);
     }
 
@@ -447,7 +447,7 @@ filehandle when finished.
             GET_ATTR_encoding(INTERP, SELF, encoding);
 
             if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
             filehandle  = Parrot_io_open(INTERP, PMCNULL, name, NULL);
@@ -464,7 +464,7 @@ filehandle when finished.
         else {
             /* slurp open file */
             if (Parrot_io_is_closed_filehandle(INTERP, SELF))
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall without a file name or open filehandle");
 
             result = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
@@ -514,7 +514,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
-        Parrot_io_putps(interp, SELF, string_to_print);
+        Parrot_io_putps(INTERP, SELF, string_to_print);
     }
 
 

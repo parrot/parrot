@@ -42,7 +42,7 @@ Returns the floating-point value of the element at index C<key>.
         INTVAL    size;
 
         if (key < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: index out of bounds!");
 
         GET_ATTR_size(INTERP, SELF, size);
@@ -69,7 +69,7 @@ C<value>.
         INTVAL    size;
 
         if (key < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: index out of bounds!");
 
         GET_ATTR_size(INTERP, SELF, size);
@@ -102,7 +102,7 @@ equal to three quarters of the old size).
         INTVAL    resize_threshold;
 
         if (size < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: Can't resize to negative value!");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
@@ -192,7 +192,7 @@ Removes and returns the last element in the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: Can't pop from an empty array!");
 
         value = SELF.get_number_keyed_int(size-1);

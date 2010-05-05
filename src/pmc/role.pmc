@@ -248,11 +248,11 @@ C<init_data>.
         PObj_custom_mark_SET(SELF);
 
         /* Set up the object. */
-        role->name            = CONST_STRING(interp, "");
+        role->name            = CONST_STRING(INTERP, "");
         role->_namespace      = PMCNULL;
-        role->roles           = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        role->methods         = Parrot_pmc_new(interp, enum_class_Hash);
-        role->attrib_metadata = Parrot_pmc_new(interp, enum_class_Hash);
+        role->roles           = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        role->methods         = Parrot_pmc_new(INTERP, enum_class_Hash);
+        role->attrib_metadata = Parrot_pmc_new(INTERP, enum_class_Hash);
     }
 
     VTABLE void init_pmc(PMC *init_data) {
@@ -260,7 +260,7 @@ C<init_data>.
         SELF.init();
 
         /* Initialize the role with the supplied data. */
-        init_role_from_hash(interp, SELF, init_data);
+        init_role_from_hash(INTERP, SELF, init_data);
     }
 
 /*
@@ -276,11 +276,11 @@ Mark referenced strings and PMCs in the structure as live.
     VTABLE void mark() {
         Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
 
-        Parrot_gc_mark_STRING_alive(interp, role->name);
-        Parrot_gc_mark_PMC_alive(interp, role->_namespace);
-        Parrot_gc_mark_PMC_alive(interp, role->roles);
-        Parrot_gc_mark_PMC_alive(interp, role->methods);
-        Parrot_gc_mark_PMC_alive(interp, role->attrib_metadata);
+        Parrot_gc_mark_STRING_alive(INTERP, role->name);
+        Parrot_gc_mark_PMC_alive(INTERP, role->_namespace);
+        Parrot_gc_mark_PMC_alive(INTERP, role->roles);
+        Parrot_gc_mark_PMC_alive(INTERP, role->methods);
+        Parrot_gc_mark_PMC_alive(INTERP, role->attrib_metadata);
     }
 
 /*
@@ -296,16 +296,16 @@ Enters the attribute in the C<attributes> array.
 
     VTABLE void add_attribute(STRING *name, PMC *type) {
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
-        PMC           * const new_attribute  = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC           * const new_attribute  = Parrot_pmc_new(INTERP, enum_class_Hash);
 
         /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
+        VTABLE_set_string_keyed_str(INTERP, new_attribute, CONST_STRING(INTERP, "name"), name);
 
         if (!PMC_IS_NULL(type))
-            VTABLE_set_pmc_keyed_str(interp, new_attribute, CONST_STRING(interp, "type"), type);
+            VTABLE_set_pmc_keyed_str(INTERP, new_attribute, CONST_STRING(INTERP, "type"), type);
 
         /* Enter the attribute in the attributes array. */
-        VTABLE_set_pmc_keyed_str(interp, role->attrib_metadata,
+        VTABLE_set_pmc_keyed_str(INTERP, role->attrib_metadata,
             name, new_attribute);
     }
 
@@ -323,15 +323,15 @@ Adds the given sub PMC as a method with the given name.
         Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
 
         /* If we have already added a method with this name... */
-        if (VTABLE_exists_keyed_str(interp, role->methods, name)) {
+        if (VTABLE_exists_keyed_str(INTERP, role->methods, name)) {
             /* XXX Need to handle multi methods here. */
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Currently, adding multiple methods of the same name"
                 " is not supported.");
         }
         else {
             /* Enter it into the table. */
-            VTABLE_set_pmc_keyed_str(interp, role->methods, name, sub);
+            VTABLE_set_pmc_keyed_str(INTERP, role->methods, name, sub);
         }
     }
 
@@ -346,12 +346,12 @@ Removes the method with the given name.
 */
     VTABLE void remove_method(STRING *name) {
         Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
-        if (VTABLE_exists_keyed_str(interp, role->methods, name))
-            VTABLE_delete_keyed_str(interp, role->methods, name);
+        if (VTABLE_exists_keyed_str(INTERP, role->methods, name))
+            VTABLE_delete_keyed_str(INTERP, role->methods, name);
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "No method named '%S' to remove in role '%S'.",
-                name, VTABLE_get_string(interp, SELF));
+                name, VTABLE_get_string(INTERP, SELF));
     }
 
 /*
@@ -369,7 +369,7 @@ conflicts.
         Parrot_Role_attributes * const this_role = PARROT_ROLE(SELF);
 
         /* Do the composition. */
-        Parrot_ComposeRole(interp, role, PMCNULL, 0, PMCNULL, 0,
+        Parrot_ComposeRole(INTERP, role, PMCNULL, 0, PMCNULL, 0,
                this_role->methods, this_role->roles);
     }
 
@@ -407,25 +407,25 @@ composed into this role.
         /* What should we return? */
         PMC         *found;
 
-        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "name"))) {
-            found = Parrot_pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, found, role->name);
+        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "name"))) {
+            found = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, found, role->name);
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "namespace"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "namespace"))) {
             /* Don't clone the namespace, as it's not part of our state. */
             return role->_namespace;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "attributes"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "attributes"))) {
             found = role->attrib_metadata;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "methods"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
             found = role->methods;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "roles"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "roles"))) {
             found = role->roles;
         }
         else {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
         }
 
@@ -434,16 +434,16 @@ composed into this role.
         if (found->vtable->base_type == enum_class_Hash) {
             /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
-            PMC * const hash = Parrot_pmc_new(interp, enum_class_Hash);
-            PMC * const iter = VTABLE_get_iter(interp, found);
-            while (VTABLE_get_bool(interp, iter)) {
-                STRING * key = VTABLE_shift_string(interp, iter);
-                PMC * value  = VTABLE_get_pmc_keyed_str(interp, found, key);
-                VTABLE_set_pmc_keyed_str(interp, hash, key, value);
+            PMC * const hash = Parrot_pmc_new(INTERP, enum_class_Hash);
+            PMC * const iter = VTABLE_get_iter(INTERP, found);
+            while (VTABLE_get_bool(INTERP, iter)) {
+                STRING * key = VTABLE_shift_string(INTERP, iter);
+                PMC * value  = VTABLE_get_pmc_keyed_str(INTERP, found, key);
+                VTABLE_set_pmc_keyed_str(INTERP, hash, key, value);
             }
             return hash;
         }
-        return VTABLE_clone(interp, found);
+        return VTABLE_clone(INTERP, found);
     }
 
 
@@ -461,28 +461,28 @@ inspect_str.
     VTABLE PMC *inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC * const metadata = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC * const metadata = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-        STRING * const name       = CONST_STRING(interp, "name");
-        STRING * const _namespace = CONST_STRING(interp, "namespace");
-        STRING * const attributes = CONST_STRING(interp, "attributes");
-        STRING * const methods    = CONST_STRING(interp, "methods");
-        STRING * const roles      = CONST_STRING(interp, "roles");
+        STRING * const name       = CONST_STRING(INTERP, "name");
+        STRING * const _namespace = CONST_STRING(INTERP, "namespace");
+        STRING * const attributes = CONST_STRING(INTERP, "attributes");
+        STRING * const methods    = CONST_STRING(INTERP, "methods");
+        STRING * const roles      = CONST_STRING(INTERP, "roles");
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, name,
-            VTABLE_inspect_str(interp, SELF, name));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, name,
+            VTABLE_inspect_str(INTERP, SELF, name));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, _namespace,
-            VTABLE_inspect_str(interp, SELF, _namespace));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, _namespace,
+            VTABLE_inspect_str(INTERP, SELF, _namespace));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, attributes,
-            VTABLE_inspect_str(interp, SELF, attributes));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, attributes,
+            VTABLE_inspect_str(INTERP, SELF, attributes));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, methods,
-            VTABLE_inspect_str(interp, SELF, methods));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, methods,
+            VTABLE_inspect_str(INTERP, SELF, methods));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, roles,
-            VTABLE_inspect_str(interp, SELF, roles));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, roles,
+            VTABLE_inspect_str(INTERP, SELF, roles));
         return metadata;
     }
 
@@ -505,12 +505,12 @@ Return the name of the role (without the HLL namespace).
              * to retrieve a fully qualified list of names, then join the list
              * with a semicolon.
              */
-            PMC * const names = Parrot_ns_get_name(interp, _namespace);
+            PMC * const names = Parrot_ns_get_name(INTERP, _namespace);
 
             if (!PMC_IS_NULL(names)) {
                 /* remove the HLL namespace name */
                 VTABLE_shift_string(INTERP, names);
-                return Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
+                return Parrot_str_join(INTERP, CONST_STRING(INTERP, ";"), names);
             }
         }
 
@@ -532,13 +532,13 @@ Returns whether the class does the role with the given C<*rolename>.
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
 
-        if (Parrot_str_equal(interp, role->name, role_name))
+        if (Parrot_str_equal(INTERP, role->name, role_name))
             return 1;
 
-        count = VTABLE_elements(interp, role->roles);
+        count = VTABLE_elements(INTERP, role->roles);
         for (i = 0; i < count; ++i) {
-            PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, role->roles, i);
-            if (VTABLE_does(interp, cur_role, role_name))
+            PMC *cur_role = VTABLE_get_pmc_keyed_int(INTERP, role->roles, i);
+            if (VTABLE_does(INTERP, cur_role, role_name))
                 return 1;
         }
 
@@ -562,10 +562,10 @@ Returns whether the class does the givne C<*role>.
         if (role == SELF)
             return 1;
 
-        count = VTABLE_elements(interp, this_role->roles);
+        count = VTABLE_elements(INTERP, this_role->roles);
         for (i = 0; i < count; ++i) {
-            PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, this_role->roles, i);
-            if (VTABLE_does_pmc(interp, cur_role, role))
+            PMC *cur_role = VTABLE_get_pmc_keyed_int(INTERP, this_role->roles, i);
+            if (VTABLE_does_pmc(INTERP, cur_role, role))
                 return 1;
         }
 
@@ -603,9 +603,9 @@ Sets the name of the role, and updates the namespace accordingly.
         if (got_name) {
             /* We'll build a hash just containing the name, then give this to
              * init_role_from_hash - saves some code duplication. */
-            PMC *naming_hash = Parrot_pmc_new(interp, enum_class_Hash);
-            VTABLE_set_string_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
-            init_role_from_hash(interp, SELF, naming_hash);
+            PMC *naming_hash = Parrot_pmc_new(INTERP, enum_class_Hash);
+            VTABLE_set_string_keyed_str(INTERP, naming_hash, CONST_STRING(INTERP, "name"), name);
+            init_role_from_hash(INTERP, SELF, naming_hash);
         }
 
         ret_name = role->name;
@@ -643,7 +643,7 @@ providing a set of key/value pairs describing the attribute.
 
 */
     METHOD attributes() {
-        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
+        PMC *ret_attrib_metadata = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "attributes"));
         RETURN(PMC *ret_attrib_metadata);
     }
 
@@ -661,7 +661,7 @@ Add an attribute to the role. Requires a name and, optionally, a type.
 */
     METHOD add_attribute(STRING *attribute_name,
             PMC *attribute_type :optional, int got_type :opt_flag) {
-        VTABLE_add_attribute(interp, SELF, attribute_name,
+        VTABLE_add_attribute(INTERP, SELF, attribute_name,
             got_type ? attribute_type : PMCNULL);
     }
 
@@ -676,7 +676,7 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     METHOD methods() {
-        PMC *ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
+        PMC *ret_methods = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "methods"));
         RETURN(PMC *ret_methods);
     }
 
@@ -691,7 +691,7 @@ Adds the given sub PMC as a method with the given name.
 
 */
     METHOD add_method(STRING *name, PMC *sub) {
-        VTABLE_add_method(interp, SELF, name, sub);
+        VTABLE_add_method(INTERP, SELF, name, sub);
     }
 
 /*
@@ -705,7 +705,7 @@ Removes the method with the given name.
 */
     METHOD remove_method(STRING *name)
     {
-        VTABLE_remove_method(interp, SELF, name);
+        VTABLE_remove_method(INTERP, SELF, name);
     }
 
 
@@ -719,7 +719,7 @@ Return the roles array PMC.
 
 */
     METHOD roles() {
-        PMC *ret_roles = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "roles"));
+        PMC *ret_roles = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "roles"));
         RETURN(PMC *ret_roles);
     }
 
@@ -747,12 +747,12 @@ Compose the given role into this one, using the given exclusions and aliases.
         STRING *s_name   = NULL;
         STRING *r_name   = NULL;
 
-        (STRING *s_name) = PCCINVOKE(interp, SELF, "name");
-        (STRING *r_name) = PCCINVOKE(interp, role, "name");
+        (STRING *s_name) = PCCINVOKE(INTERP, SELF, "name");
+        (STRING *r_name) = PCCINVOKE(INTERP, role, "name");
         UNUSED(s_name);
         UNUSED(r_name);
 
-        Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
+        Parrot_ComposeRole(INTERP, role, exclude_method, got_exclude_method,
                            alias_method, got_alias_method,
                            role_info->methods, role_info->roles);
     }
@@ -772,9 +772,9 @@ parameter is supplied, a particular item of introspection data.
 
         /* Just delegate to the appropriate vtable. */
         if (got_what)
-            found = VTABLE_inspect_str(interp, SELF, what);
+            found = VTABLE_inspect_str(INTERP, SELF, what);
         else
-            found = VTABLE_inspect(interp, SELF);
+            found = VTABLE_inspect(INTERP, SELF);
 
         RETURN(PMC *found);
     }

@@ -34,12 +34,12 @@ pmclass Handle provides Handle manual_attrs {
     ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
 
     VTABLE void init() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
     VTABLE void init_pmc(PMC * init) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 }

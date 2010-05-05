@@ -319,13 +319,13 @@ Marks the namespace as live.
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
 
         if (nsinfo->hash)
-            parrot_mark_hash(interp, nsinfo->hash);
+            parrot_mark_hash(INTERP, nsinfo->hash);
 
-        Parrot_gc_mark_PMC_alive(interp, nsinfo->parent);
-        Parrot_gc_mark_PMC_alive(interp, nsinfo->_class);
-        Parrot_gc_mark_PMC_alive(interp, nsinfo->vtable);
-        Parrot_gc_mark_PMC_alive(interp, nsinfo->methods);
-        Parrot_gc_mark_STRING_alive(interp, nsinfo->name);
+        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->parent);
+        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->_class);
+        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->vtable);
+        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->methods);
+        Parrot_gc_mark_STRING_alive(INTERP, nsinfo->name);
     }
 
 /*
@@ -385,14 +385,14 @@ really a public API.
         PMC * const old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         /* If it's a sub... */
-        if (maybe_add_sub_to_namespace(interp, SELF, key, value))
+        if (maybe_add_sub_to_namespace(INTERP, SELF, key, value))
             return;
 
         /* If it's an NCI method */
-        add_nci_to_namespace(interp, SELF, key, value);
+        add_nci_to_namespace(INTERP, SELF, key, value);
 
         /* If it's a multi-sub and the first in this NS... */
-        add_multi_to_namespace(interp, SELF, key, value);
+        add_multi_to_namespace(INTERP, SELF, key, value);
 
         if (!old)
             SUPER(key, value);
@@ -465,10 +465,10 @@ really a public API.
         }
 
         if (key->vtable->base_type == enum_class_ResizableStringArray) {
-            const INTVAL elements = VTABLE_elements(interp, key);
+            const INTVAL elements = VTABLE_elements(INTERP, key);
             INTVAL i;
             for (i = 0; i < elements; ++i)  {
-                STRING * const part = VTABLE_get_string_keyed_int(interp, key, i);
+                STRING * const part = VTABLE_get_string_keyed_int(INTERP, key, i);
 
                 if ((i + 1) >= elements) { /* Last entry in the array */
                     Parrot_set_global(INTERP, ns, part, value);
@@ -554,7 +554,7 @@ really a public API.
         if (PMC_IS_NULL(vtable))
             return PMCNULL;
 
-        return VTABLE_get_pmc_keyed_int(interp, vtable, key);
+        return VTABLE_get_pmc_keyed_int(INTERP, vtable, key);
     }
 
 /*
@@ -612,10 +612,10 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                 }
             }
             case enum_class_ResizableStringArray: {
-                const INTVAL elements = VTABLE_elements(interp, key);
+                const INTVAL elements = VTABLE_elements(INTERP, key);
                 INTVAL i;
                 for (i = 0; i < elements; ++i)  {
-                    STRING * const part = VTABLE_get_string_keyed_int(interp, key, i);
+                    STRING * const part = VTABLE_get_string_keyed_int(INTERP, key, i);
 
                     /* Last entry in the array */
                     if ((i + 1) >= elements)
@@ -685,17 +685,17 @@ Includes vtable overrides composed in from roles.
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC *found;
 
-        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "methods"))) {
+        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
             found = nsinfo->methods;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "vtable_overrides"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
             found = nsinfo->vtable;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "class"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "class"))) {
             found = nsinfo->_class;
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
 
         /* return found value */
@@ -1015,75 +1015,75 @@ NOTE: exporting 'default' set of items is not yet implemented.
 */
 
     METHOD export_to(PMC *dest, PMC *what) {
-        STRING * const s_hash  = CONST_STRING(interp, "hash");
-        STRING * const s_array = CONST_STRING(interp, "array");
+        STRING * const s_hash  = CONST_STRING(INTERP, "hash");
+        STRING * const s_array = CONST_STRING(INTERP, "array");
 
         if (PMC_IS_NULL(dest))
-            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "destination namespace not specified");
 
-        if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what))
-            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+        if (PMC_IS_NULL(what) || !VTABLE_elements(INTERP, what))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "exporting default object set not yet implemented");
 
         /* if "what" does "hash", we extract string key/value pairs,
          * lookup the object with the name specified in the key,
          * and export it with the name specified as value. */
         if (VTABLE_does(INTERP, what, s_hash)) {
-            PMC * const  iter = VTABLE_get_iter(interp, what);
-            const INTVAL n    = VTABLE_elements(interp, what);
+            PMC * const  iter = VTABLE_get_iter(INTERP, what);
+            const INTVAL n    = VTABLE_elements(INTERP, what);
             INTVAL       i;
 
             for (i = 0; i < n; ++i) {
                 STRING *dest_name;
                 PMC    *object;
-                STRING * const src_name = VTABLE_shift_string(interp, iter);
+                STRING * const src_name = VTABLE_shift_string(INTERP, iter);
 
                 if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name))
-                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "source object name not specified");
 
-                if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(interp, what, src_name))) {
+                if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(INTERP, what, src_name))) {
                     dest_name = src_name;
                 }
                 else {
-                    dest_name = VTABLE_get_string_keyed_str(interp, what, src_name);
+                    dest_name = VTABLE_get_string_keyed_str(INTERP, what, src_name);
                     if (STRING_IS_NULL(dest_name) || STRING_IS_EMPTY(dest_name))
                         dest_name = src_name;
                 }
 
-                object = VTABLE_get_pmc_keyed_str(interp, SELF, src_name);
+                object = VTABLE_get_pmc_keyed_str(INTERP, SELF, src_name);
 
                 if (PMC_IS_NULL(object))
-                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "object '%Ss' not found in current namespace", src_name);
 
-                VTABLE_set_pmc_keyed_str(interp, dest, dest_name, object);
+                VTABLE_set_pmc_keyed_str(INTERP, dest, dest_name, object);
             }
         }
         else if (VTABLE_does(INTERP, what, s_array)) {
-            const INTVAL n = VTABLE_elements(interp, what);
+            const INTVAL n = VTABLE_elements(INTERP, what);
             INTVAL       i;
 
             for (i = 0; i < n; ++i) {
                 PMC    *object;
-                STRING * const name = VTABLE_get_string_keyed_int(interp, what, i);
+                STRING * const name = VTABLE_get_string_keyed_int(INTERP, what, i);
 
                 if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name))
-                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "object name not specified");
 
-                object = VTABLE_get_pmc_keyed_str(interp, SELF, name);
+                object = VTABLE_get_pmc_keyed_str(INTERP, SELF, name);
 
                 if (PMC_IS_NULL(object))
-                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "object '%Ss' not found in current namespace", name);
 
-                VTABLE_set_pmc_keyed_str(interp, dest, name, object);
+                VTABLE_set_pmc_keyed_str(INTERP, dest, name, object);
             }
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "can't handle argument of type %s", what->vtable->base_type);
     }
 

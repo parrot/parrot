@@ -45,7 +45,7 @@ Returns the integer value of the element at index C<key>.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key >= size)
             return 0;
@@ -151,17 +151,17 @@ of the array.
         INTVAL  nextix;
         INTVAL  resize_threshold;
 
-        GET_ATTR_size(interp, SELF, nextix);
-        GET_ATTR_resize_threshold(interp, SELF, resize_threshold);
+        GET_ATTR_size(INTERP, SELF, nextix);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
 
         /* can't always avoid the resize, but don't duplicate the code */
         if ((nextix && (nextix >= resize_threshold)) || !nextix)
             SELF.set_integer_native(nextix + 1);
         else
-            SET_ATTR_size(interp, SELF, nextix + 1);
+            SET_ATTR_size(INTERP, SELF, nextix + 1);
 
         /* fetch the array only after resize check; realloc may move it */
-        GET_ATTR_int_array(interp, SELF, int_array);
+        GET_ATTR_int_array(INTERP, SELF, int_array);
         int_array[nextix] = value;
     }
 

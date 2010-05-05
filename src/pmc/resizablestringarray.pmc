@@ -43,7 +43,7 @@ Returns the Parrot string value of the element at index C<key>.
 
         STRING **str_array;
         INTVAL size;
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0) {
             if (key < -size)
@@ -59,7 +59,7 @@ Returns the Parrot string value of the element at index C<key>.
         GET_ATTR_str_array(INTERP, SELF, str_array);
 
         if (!str_array[key])
-            str_array[key] = Parrot_str_new(interp, NULL, 0);
+            str_array[key] = Parrot_str_new(INTERP, NULL, 0);
 
         return str_array[key];
     }
@@ -78,7 +78,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
         STRING **str_array;
         INTVAL   size;
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0) {
             if (key < -size)
@@ -108,7 +108,7 @@ the array.
 
     VTABLE void push_string(STRING *value) {
         INTVAL next_idx;
-        GET_ATTR_size(interp, SELF, next_idx);
+        GET_ATTR_size(INTERP, SELF, next_idx);
         SELF.set_string_keyed_int(next_idx, value);
     }
 
@@ -125,7 +125,7 @@ Removes and returns the last element in the array.
     VTABLE STRING *pop_string() {
         STRING *value;
         INTVAL  size;
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -222,7 +222,7 @@ Resizes the array to C<size> elements.
             /* zero out anything that was previously allocated
              * if we're growing the array */
             INTVAL old_size;
-            GET_ATTR_size(interp, SELF, old_size);
+            GET_ATTR_size(INTERP, SELF, old_size);
             if (new_size > old_size) {
                 INTVAL i;
                 for (i = old_size; i < new_size; ++i)
@@ -270,7 +270,7 @@ Creates and returns a copy of the array.
     VTABLE PMC *clone() {
         PMC * const copy = SUPER();
         INTVAL size;
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
         /* copy trimmed extra space */
         SET_ATTR_resize_threshold(INTERP, copy, size);
         return copy;
@@ -289,7 +289,7 @@ Removes and returns an item from the start of the array.
     VTABLE STRING *shift_string() {
         STRING *value;
         INTVAL  size;
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,

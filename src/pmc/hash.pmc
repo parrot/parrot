@@ -179,21 +179,21 @@ NB: this method will destroy all old data!
                                     : enum_type_PMC;
 
         if (type == Hash_key_type_STRING)
-            new_hash = parrot_create_hash(interp,
+            new_hash = parrot_create_hash(INTERP,
                     entry_type,
                     Hash_key_type_STRING,
                     STRING_compare,
                     (hash_hash_key_fn)key_hash_STRING);
         else if (type == Hash_key_type_int)
             /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = parrot_create_hash(interp,
+            new_hash = parrot_create_hash(INTERP,
                     entry_type,
                     Hash_key_type_int,
                     int_compare,
                     key_hash_int);
         else if (type == Hash_key_type_PMC)
             /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = parrot_create_hash(interp,
+            new_hash = parrot_create_hash(INTERP,
                     entry_type,
                     Hash_key_type_PMC,
                     (hash_comp_fn)PMC_compare,
@@ -257,14 +257,14 @@ NB: this method will destroy all old data!
           case enum_type_INTVAL:
           case enum_type_STRING:
           case enum_type_PMC:
-            new_hash = parrot_create_hash(interp,
+            new_hash = parrot_create_hash(INTERP,
                         (PARROT_DATA_TYPE)type,
                         old_hash ? old_hash->key_type : Hash_key_type_STRING,
                         old_hash ? old_hash->compare : STRING_compare,
                         old_hash ? old_hash->hash_val : (hash_hash_key_fn)key_hash_STRING);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                         "Hash: unsupported entry_type %d", type);
         }
 
@@ -695,11 +695,11 @@ Returns the PMC value for the element at C<*key>.
         const Hash *hash;
         HashBucket *b = NULL;
 
-        GET_ATTR_hash(interp, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         /* special case the most key type, for speed */
         if (hash->key_type == Hash_key_type_STRING)
-            b = parrot_hash_get_bucket(interp, hash, key);
+            b = parrot_hash_get_bucket(INTERP, hash, key);
         else
             b = parrot_hash_get_bucket(INTERP, hash,
                 hash_key_from_string(INTERP, hash, key));
@@ -1169,7 +1169,7 @@ Used to unarchive the hash.
                     cmp_fn = (hash_comp_fn)PMC_compare;
                     break;
                   default:
-                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                             "unimplemented key type");
                     break;
                 }

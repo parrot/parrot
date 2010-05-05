@@ -34,22 +34,22 @@ pmclass SubProxy dynpmc extends Sub auto_attrs {
             Parrot_Sub_attributes  *rsub,     *my_sub;
 
             if (!key)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "SubProxy: no key");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no key");
 
-            file = VTABLE_get_string(interp, key);
+            file = VTABLE_get_string(INTERP, key);
             if (!file)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "SubProxy: no file");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no file");
 
-            sub_pmc = key_next(interp, key);
+            sub_pmc = key_next(INTERP, key);
             if (!sub_pmc)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "SubProxy: no sub");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no sub");
 
-            Parrot_load_bytecode(interp, file);
-            rsub_pmc = VTABLE_get_pmc_keyed(interp,
-                    interp->root_namespace, sub_pmc);
+            Parrot_load_bytecode(INTERP, file);
+            rsub_pmc = VTABLE_get_pmc_keyed(INTERP,
+                    INTERP->root_namespace, sub_pmc);
 
-            if (!VTABLE_defined(interp, rsub_pmc))
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            if (!VTABLE_defined(INTERP, rsub_pmc))
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "SubProxy: sub not found");
 
             PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;

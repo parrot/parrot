@@ -24,7 +24,7 @@ pmclass DynLexPad dynpmc provides lexpad auto_attrs {
     ATTR PMC  *init; /* the PMC used to initialize this DynLexPad */
 
     VTABLE void init() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "don't create me like this");
     }
 
@@ -44,8 +44,8 @@ lexinfo.
         Parrot_DynLexPad_attributes *attrs =
             (Parrot_DynLexPad_attributes *) PMC_data(SELF);
 
-        if (VTABLE_elements(interp, lexinfo)) {
-            attrs->init = Parrot_pmc_new_init(interp, enum_class_LexPad, lexinfo);
+        if (VTABLE_elements(INTERP, lexinfo)) {
+            attrs->init = Parrot_pmc_new_init(INTERP, enum_class_LexPad, lexinfo);
         }
         else
             attrs->init = NULL;
@@ -68,7 +68,7 @@ Initialize the LexPad PMC and remember the associate context.
     VTABLE void set_pointer(void* ctx) {
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
         if (std_pad)
-            VTABLE_set_pointer(interp, std_pad, ctx);
+            VTABLE_set_pointer(INTERP, std_pad, ctx);
     }
 
 /*
@@ -81,7 +81,7 @@ Returns the number of elements in the hash.
 
 */
     VTABLE INTVAL elements() {
-        return parrot_hash_size(interp, PARROT_DYNLEXPAD(SELF)->hash);
+        return parrot_hash_size(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
     }
 
 /*
@@ -97,17 +97,17 @@ Returns whether a lexical C<name> exists in the hash.
 */
 
     VTABLE INTVAL exists_keyed(PMC* name) {
-        STRING *s = VTABLE_get_string(interp, name);
+        STRING *s = VTABLE_get_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }
 
     VTABLE INTVAL exists_keyed_str(STRING* name) {
         PMC *std_pad;
-        if (parrot_hash_exists(interp, PARROT_DYNLEXPAD(SELF)->hash, name))
+        if (parrot_hash_exists(INTERP, PARROT_DYNLEXPAD(SELF)->hash, name))
             return 1;
         std_pad = PARROT_DYNLEXPAD(SELF)->init;
         if (std_pad)
-            return VTABLE_exists_keyed_str(interp, std_pad, name);
+            return VTABLE_exists_keyed_str(INTERP, std_pad, name);
         return 0;
     }
 
@@ -124,14 +124,14 @@ lexical doesn't exist.
 
 */
     VTABLE PMC* get_pmc_keyed_str(STRING* name) {
-        HashBucket *b = parrot_hash_get_bucket(interp,
+        HashBucket *b = parrot_hash_get_bucket(INTERP,
             PARROT_DYNLEXPAD(SELF)->hash, name);
 
         if (!b) {
             PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
 
             if (std_pad)
-                return VTABLE_get_pmc_keyed_str(interp, std_pad, name);
+                return VTABLE_get_pmc_keyed_str(INTERP, std_pad, name);
 
             return PMCNULL;
         }
@@ -140,7 +140,7 @@ lexical doesn't exist.
     }
 
     VTABLE PMC* get_pmc_keyed(PMC* name) {
-        STRING *s = VTABLE_get_string(interp, name);
+        STRING *s = VTABLE_get_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
@@ -159,17 +159,17 @@ doesn't exist, it is created.
 */
 
     VTABLE void set_pmc_keyed(PMC* name, PMC* value) {
-        STRING *s = VTABLE_get_string(interp, name);
+        STRING *s = VTABLE_get_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 
     VTABLE void set_pmc_keyed_str(STRING* name, PMC* value) {
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
 
-        if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name))
-            VTABLE_set_pmc_keyed_str(interp, std_pad, name, value);
+        if (std_pad && VTABLE_exists_keyed_str(INTERP, std_pad, name))
+            VTABLE_set_pmc_keyed_str(INTERP, std_pad, name, value);
 
-        parrot_hash_put(interp, PARROT_DYNLEXPAD(SELF)->hash, name, value);
+        parrot_hash_put(INTERP, PARROT_DYNLEXPAD(SELF)->hash, name, value);
     }
 
 /*
@@ -184,7 +184,7 @@ Destroy DynLexPad.
 
     VTABLE void destroy() {
         if (PARROT_DYNLEXPAD(SELF)->hash) {
-            parrot_hash_destroy(interp, PARROT_DYNLEXPAD(SELF)->hash);
+            parrot_hash_destroy(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
             PARROT_DYNLEXPAD(SELF)->hash = NULL;
         }
     }
@@ -202,7 +202,7 @@ Marks the lexpad hash as live.
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
         Parrot_gc_mark_PMC_alive(INTERP, std_pad);
         if (PARROT_DYNLEXPAD(SELF)->hash)
-            parrot_mark_hash(interp, PARROT_DYNLEXPAD(SELF)->hash);
+            parrot_mark_hash(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
     }
 
 

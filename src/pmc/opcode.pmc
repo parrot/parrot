@@ -26,7 +26,7 @@ pmclass Opcode auto_attrs {
     ATTR STRING *full_name_cache;
 
     VTABLE void init() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Opcode must be created from OpLib.");
     }
 
@@ -39,7 +39,7 @@ pmclass Opcode auto_attrs {
     VTABLE void set_pointer(void *i) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (attrs->info)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Opcode has already been initialized");
         attrs->info = (op_info_t *)i;
     }
@@ -65,7 +65,7 @@ pmclass Opcode auto_attrs {
         const INTVAL opcount = INTERP->op_lib->op_count;
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (attrs->info)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Opcode has already been initialized");
         if (value >= opcount || value < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,

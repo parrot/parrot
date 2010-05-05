@@ -900,7 +900,7 @@ Returns whether the two C<struct>s are equivalent.
 
     VTABLE INTVAL is_equal(PMC *value) {
         return (SELF->vtable   == value->vtable
-        &&      SELF.get_pointer() == VTABLE_get_pointer(interp, value));
+        &&      SELF.get_pointer() == VTABLE_get_pointer(INTERP, value));
     }
 
 /*

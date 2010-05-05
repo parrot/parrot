@@ -117,7 +117,7 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
         PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
         PARROT_IMAGEIOSIZE(SELF)->pf_ct =
-            (PackFile_ConstTable *)VTABLE_get_pointer(interp, pf_ct);
+            (PackFile_ConstTable *)VTABLE_get_pointer(INTERP, pf_ct);
         PARROT_IMAGEIOSIZE(SELF)->size  = 0;
 
         PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
@@ -253,11 +253,11 @@ Pushes the string C<*v> onto the end of the image.
                 PackFile_Constant *constant = table->constants[i];
                 if (constant->type == PFC_STRING) {
                     STRING * const sc = constant->u.string;
-                    if (Parrot_str_equal(interp, v, sc)
-                    &&  Parrot_charset_number_of_str(interp, v)
-                    ==  Parrot_charset_number_of_str(interp, sc)
-                    &&  Parrot_encoding_number_of_str(interp, v)
-                    ==  Parrot_encoding_number_of_str(interp, sc)) {
+                    if (Parrot_str_equal(INTERP, v, sc)
+                    &&  Parrot_charset_number_of_str(INTERP, v)
+                    ==  Parrot_charset_number_of_str(INTERP, sc)
+                    &&  Parrot_encoding_number_of_str(INTERP, v)
+                    ==  Parrot_encoding_number_of_str(INTERP, sc)) {
                         STATICSELF.push_integer(i);
                         return;
                     }

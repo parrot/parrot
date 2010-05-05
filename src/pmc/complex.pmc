@@ -309,31 +309,31 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE void init_pmc(PMC *initializer) {
-        const INTVAL arg_type = VTABLE_type(interp, initializer);
+        const INTVAL arg_type = VTABLE_type(INTERP, initializer);
         SELF.init();
         switch (arg_type) {
           case enum_class_String:
-            SELF.set_string_native(VTABLE_get_string(interp, initializer));
+            SELF.set_string_native(VTABLE_get_string(INTERP, initializer));
             break;
           case enum_class_FixedFloatArray:
           case enum_class_ResizableFloatArray:
           case enum_class_FixedIntegerArray:
           case enum_class_ResizableIntegerArray:
-            if (VTABLE_get_integer(interp, initializer) == 2) {
-                const FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
-                const FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
+            if (VTABLE_get_integer(INTERP, initializer) == 2) {
+                const FLOATVAL re = VTABLE_get_number_keyed_int(INTERP, initializer, 0);
+                const FLOATVAL im = VTABLE_get_number_keyed_int(INTERP, initializer, 1);
                 SET_ATTR_re(INTERP, SELF, re);
                 SET_ATTR_im(INTERP, SELF, im);
                 break;
             }
             /* else let it fall to default */
           default:
-            if (VTABLE_isa(interp, initializer, CONST_STRING(interp, "String"))) {
-                STRING * const s = VTABLE_get_string(interp, initializer);
+            if (VTABLE_isa(INTERP, initializer, CONST_STRING(INTERP, "String"))) {
+                STRING * const s = VTABLE_get_string(INTERP, initializer);
                 SELF.set_string_native(s);
             }
             else {
-                Parrot_ex_throw_from_c_args(interp, NULL,
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "Invalid Complex initializer");
             }
@@ -480,14 +480,14 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
             GET_ATTR_im(INTERP, SELF, value);
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
         return value;
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        if (VTABLE_isa(interp, key, CONST_STRING(interp, "Integer"))) {
-            const INTVAL i = VTABLE_get_integer(interp, key);
+        if (VTABLE_isa(INTERP, key, CONST_STRING(INTERP, "Integer"))) {
+            const INTVAL i = VTABLE_get_integer(INTERP, key);
             return SELF.get_pmc_keyed_int(i);
         }
         else {
@@ -547,7 +547,7 @@ Set real or imag depending on key
             GET_ATTR_im(INTERP, SELF, f);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
         return f;
@@ -562,7 +562,7 @@ Set real or imag depending on key
             SET_ATTR_im(INTERP, SELF, v);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
     }
@@ -648,8 +648,8 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        if (VTABLE_isa(interp, key, CONST_STRING(interp, "Integer"))) {
-            const INTVAL i = VTABLE_get_integer(interp, key);
+        if (VTABLE_isa(INTERP, key, CONST_STRING(INTERP, "Integer"))) {
+            const INTVAL i = VTABLE_get_integer(INTERP, key);
             SELF.set_number_keyed_int(i, value);
         }
         else {
@@ -666,7 +666,7 @@ to C<value>.
             SET_ATTR_im(INTERP, SELF, value);
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
     }
 
@@ -1861,12 +1861,12 @@ x ^ y = exp(y * ln x))
         PMC *log;
         PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
+        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "ln"),
                     "->P", &log);
 
         l = VTABLE_multiply(INTERP, log, value, l);
 
-        Parrot_pcc_invoke_method_from_c_args(interp, l, CONST_STRING(interp, "exp"),
+        Parrot_pcc_invoke_method_from_c_args(INTERP, l, CONST_STRING(INTERP, "exp"),
                     "->P", &dest);
         RETURN(PMC *dest);
     }

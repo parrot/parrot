@@ -59,7 +59,7 @@ Initializes the array.
 
     VTABLE void init_int(INTVAL size) {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedIntegerArray: Cannot set array size to a negative number (%d)"), size);
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_int_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, size, INTVAL));
@@ -191,7 +191,7 @@ Returns the integer value of the element at index C<key>.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0 || key >= size)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedIntegerArray: index out of bounds!");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -381,7 +381,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0 || key >= size)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedIntegerArray: index out of bounds!");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -503,7 +503,7 @@ Sets the string value of the element at index C<key> to C<value>.
 
         if (n > 1) {
             GET_ATTR_int_array(INTERP, SELF, int_array);
-            Parrot_quicksort(interp, (void**)int_array, n, cmp_func);
+            Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
         }
     }
 

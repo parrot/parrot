@@ -51,7 +51,7 @@ subroutine.
     void class_init() {
 
         /* there is no pmclass const_pmc flag yet */
-        interp->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
+        INTERP->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
 
     }
 
@@ -96,8 +96,8 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
 */
 
     VTABLE PMC *inspect_str(STRING *what) {
-        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "symbols"))) {
-            PMC * const result    = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "symbols"))) {
+            PMC * const result    = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
             const Hash *hash      = (Hash *)SELF.get_pointer();
             const UINTVAL entries = hash->entries;
 
@@ -108,12 +108,12 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
                 HashBucket *bucket = hash->bi[i];
                 while (bucket) {
                     if (++found > entries)
-                        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                             "Detected corruption at LexInfo hash %p entries %d",
                             hash, (int)entries);
 
                     PARROT_ASSERT(bucket->key);
-                    VTABLE_push_string(interp, result, (STRING *)bucket->key);
+                    VTABLE_push_string(INTERP, result, (STRING *)bucket->key);
 
                     bucket = bucket->next;
                 }
@@ -122,7 +122,7 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
             return result;
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
     }
 

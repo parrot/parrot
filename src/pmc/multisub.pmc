@@ -34,49 +34,49 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
     }
 
     VTABLE void push_pmc(PMC *value) {
-        STRING * const _sub = CONST_STRING(interp, "Sub");
-        STRING * const _nci = CONST_STRING(interp, "NCI");
+        STRING * const _sub = CONST_STRING(INTERP, "Sub");
+        STRING * const _nci = CONST_STRING(INTERP, "NCI");
 
-        if (!VTABLE_isa(interp, value, _sub)
-        &&  !VTABLE_isa(interp, value, _nci))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        if (!VTABLE_isa(INTERP, value, _sub)
+        &&  !VTABLE_isa(INTERP, value, _nci))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "attempt to push non Sub PMC");
 
         SUPER(value);
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        STRING * const _sub = CONST_STRING(interp, "Sub");
-        if (!VTABLE_isa(interp, value, _sub))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        STRING * const _sub = CONST_STRING(INTERP, "Sub");
+        if (!VTABLE_isa(INTERP, value, _sub))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "attempt to set non Sub PMC");
         SUPER(key, value);
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to set non Sub PMC");
     }
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to set non Sub PMC");
     }
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to set non Sub PMC");
     }
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const sig_obj = CONTEXT(interp)->current_sig;
-        PMC * const func    = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
+        PMC * const func    = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(func))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "No applicable candidates found to dispatch to for '%Ss'",
-                    VTABLE_get_string(interp, SELF));
+                    VTABLE_get_string(INTERP, SELF));
         return VTABLE_invoke(INTERP, func, next);
     }
 
@@ -86,26 +86,26 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
        ResizablePMCArray's VTABLEs of the same names. Hopefully we
        don't need anything beyond that. */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC * const sig_obj = CONTEXT(interp)->current_sig;
-        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "No applicable candidates found to dispatch to for '%Ss'",
-                    VTABLE_get_string(interp, SELF));
+                    VTABLE_get_string(INTERP, SELF));
         return SUPER(key);
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *s) {
-        PMC * const sig_obj = CONTEXT(interp)->current_sig;
-        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "No applicable candidates found to dispatch to for '%Ss'",
-                    VTABLE_get_string(interp, SELF));
+                    VTABLE_get_string(INTERP, SELF));
         return SUPER(s);
     }
 
@@ -115,8 +115,8 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
        to this input argument list and return an iterator over that list. */
 
     METHOD get_iter(PMC *args) {
-        STRING * const _array  = CONST_STRING(interp, "Array");
-        STRING * const _string = CONST_STRING(interp, "String");
+        STRING * const _array  = CONST_STRING(INTERP, "Array");
+        STRING * const _string = CONST_STRING(INTERP, "String");
 
         if (VTABLE_isa(INTERP, args, _array)){
             /* TODO: What goes here? */
@@ -126,7 +126,7 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
             /* TODO: What goes here? */
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "attempt to call get_iter method with invalid arg type.\n");
     }
 }

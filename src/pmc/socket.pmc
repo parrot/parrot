@@ -63,8 +63,8 @@ Create a copy of the socket handle.
         Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 
-        data_struct->local      = VTABLE_clone(interp, old_struct->local);
-        data_struct->remote     = VTABLE_clone(interp, old_struct->remote);
+        data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
+        data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
 
         return SELF;
     }
@@ -83,8 +83,8 @@ Mark active socket handle data as live.
         Parrot_Socket_attributes * const data = PARROT_SOCKET(SELF);
 
         if (data) {
-            Parrot_gc_mark_PMC_alive(interp, data->local);
-            Parrot_gc_mark_PMC_alive(interp, data->remote);
+            Parrot_gc_mark_PMC_alive(INTERP, data->local);
+            Parrot_gc_mark_PMC_alive(INTERP, data->remote);
         }
     }
 /*
@@ -101,7 +101,7 @@ Free structures.
             Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
 
             if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                Parrot_io_close_piohandle(interp, data_struct->os_handle);
+                Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
     }
@@ -136,7 +136,7 @@ Returns whether the Socket is currently open.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        if (Parrot_io_socket(interp, SELF, fam, type, proto) < 0)
+        if (Parrot_io_socket(INTERP, SELF, fam, type, proto) < 0)
             RETURN(PMC * PMCNULL);
         RETURN(PMC * SELF);
     }
@@ -171,7 +171,7 @@ from a port number (integer) and an address (string).
 */
 
     METHOD sockaddr(STRING * address, INTVAL port) {
-        PMC * res = Parrot_io_sockaddr_in(interp, address, port);
+        PMC * res = Parrot_io_sockaddr_in(INTERP, address, port);
         RETURN(PMC * res);
     }
 
@@ -213,7 +213,7 @@ Close a socket.
             Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
 
             if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                result = Parrot_io_close_piohandle(interp, data_struct->os_handle);
+                result = Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
         RETURN(INTVAL result);

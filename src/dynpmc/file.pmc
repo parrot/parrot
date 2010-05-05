@@ -67,7 +67,7 @@ Returns a true value (1) if the supplied file or directory exists.
 
     METHOD exists(STRING *path) {
         struct stat info;
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
 #ifdef WIN32
         const int error = stat(cpath, &info);
 #else
@@ -93,7 +93,7 @@ Returns a true value (1) if the supplied path is a directory.
 
     METHOD is_dir(STRING *path) {
         struct stat info;
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
 #ifdef WIN32
         const int error = stat(cpath, &info);
 #else
@@ -103,7 +103,7 @@ Returns a true value (1) if the supplied path is a directory.
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 
@@ -125,7 +125,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
     METHOD is_file(STRING *path) {
         struct stat info;
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
 #ifdef WIN32
         int error   = stat(cpath, &info);
 #else
@@ -135,7 +135,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 
@@ -162,14 +162,14 @@ Returns a true value (1) if the supplied path is a link.
 #else
         struct stat info;
 
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
         const int    error = lstat(cpath, &info);
 
         Parrot_str_free_cstring(cpath);
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 
@@ -199,13 +199,13 @@ free to change or give me hints on how to change it. -- ambs
     METHOD copy(STRING *from, STRING *to) {
 #define CHUNK_SIZE 1024
 
-        char * const cfrom  = Parrot_str_to_cstring(interp, from);
+        char * const cfrom  = Parrot_str_to_cstring(INTERP, from);
         FILE * const source = fopen(cfrom, "rb");
 
         Parrot_str_free_cstring(cfrom);
 
         if (source) {
-            char * const cto    = Parrot_str_to_cstring(interp, to);
+            char * const cto    = Parrot_str_to_cstring(INTERP, to);
             FILE * const target = fopen(cto, "w+b");
 
             Parrot_str_free_cstring(cto);
@@ -218,7 +218,7 @@ free to change or give me hints on how to change it. -- ambs
                     if (bytes_read) {
                         const size_t bytes_written = fwrite(buf, 1, bytes_read, target);
                         if (bytes_read != bytes_written) {
-                            Parrot_ex_throw_from_c_args(interp, NULL,
+                            Parrot_ex_throw_from_c_args(INTERP, NULL,
                                 EXCEPTION_EXTERNAL_ERROR, "Error writing file");
                             break;
                         }
@@ -228,14 +228,14 @@ free to change or give me hints on how to change it. -- ambs
             }
             else {
                 const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                     errmsg);
             }
             fclose(source);
         }
         else {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 #undef CHUNK_SIZE
@@ -252,8 +252,8 @@ Rename a file C<from> to the path C<to>.
 */
 
     METHOD rename(STRING *from, STRING *to) {
-        char * const cfrom = Parrot_str_to_cstring(interp, from);
-        char * const   cto = Parrot_str_to_cstring(interp, to);
+        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
+        char * const   cto = Parrot_str_to_cstring(INTERP, to);
         const int    error = rename(cfrom, cto);
 
         Parrot_str_free_cstring(cfrom);
@@ -261,7 +261,7 @@ Rename a file C<from> to the path C<to>.
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
     }

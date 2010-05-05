@@ -393,8 +393,8 @@ Invokes the subroutine.
         INTERP->current_cont = NULL;
 
         if (ccont == NEED_CONTINUATION) {
-            ccont = pmc_new(interp, enum_class_Continuation);
-            VTABLE_set_pointer(interp, ccont, next);
+            ccont = pmc_new(INTERP, enum_class_Continuation);
+            VTABLE_set_pointer(INTERP, ccont, next);
         }
 
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
@@ -410,9 +410,9 @@ Invokes the subroutine.
         Parrot_pcc_init_context(INTERP, context, caller_ctx);
         Parrot_pcc_set_object(INTERP, context, object);
 
-        Parrot_pcc_set_sub(interp, context, SELF);
-        Parrot_pcc_set_continuation(interp, context, ccont);
-        Parrot_pcc_set_constants(interp, context, sub->seg->const_table->constants);
+        Parrot_pcc_set_sub(INTERP, context, SELF);
+        Parrot_pcc_set_continuation(INTERP, context, ccont);
+        Parrot_pcc_set_constants(INTERP, context, sub->seg->const_table->constants);
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
@@ -433,26 +433,26 @@ Invokes the subroutine.
          *      and factor out common code with coroutine pmc
          */
         if (!PMC_IS_NULL(sub->lex_info)) {
-            Parrot_pcc_set_lex_pad(interp, context, Parrot_pmc_new_init(INTERP,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
+            Parrot_pcc_set_lex_pad(INTERP, context, Parrot_pmc_new_init(INTERP,
+                    Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad),
                     sub->lex_info));
-            VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(interp, context), context);
+            VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(INTERP, context), context);
         }
 
         /* set outer context */
         if (!PMC_IS_NULL(sub->outer_ctx))
-            Parrot_pcc_set_outer_ctx(interp, context, sub->outer_ctx);
+            Parrot_pcc_set_outer_ctx(INTERP, context, sub->outer_ctx);
         else {
             /* autoclose */
             PMC *c       = context;
-            PMC *outer_c = Parrot_pcc_get_outer_ctx(interp, c);
+            PMC *outer_c = Parrot_pcc_get_outer_ctx(INTERP, c);
 
             for (c = context; PMC_IS_NULL(outer_c); c = outer_c) {
 
                 PMC *outer_pmc;
                 Parrot_Sub_attributes *current_sub, *outer_sub;
 
-                PMC_get_sub(INTERP, Parrot_pcc_get_sub(interp, c), current_sub);
+                PMC_get_sub(INTERP, Parrot_pcc_get_sub(INTERP, c), current_sub);
                 outer_pmc   = current_sub->outer_sub;
 
                 if (PMC_IS_NULL(outer_pmc))
@@ -463,26 +463,26 @@ Invokes the subroutine.
                 if (PMC_IS_NULL(outer_sub->ctx)) {
                     PMC * const dummy = Parrot_alloc_context(INTERP,
                                                 outer_sub->n_regs_used, NULL);
-                    Parrot_pcc_set_sub(interp, dummy, outer_pmc);
+                    Parrot_pcc_set_sub(INTERP, dummy, outer_pmc);
 
                     if (!PMC_IS_NULL(outer_sub->lex_info)) {
-                        Parrot_pcc_set_lex_pad(interp, dummy,
+                        Parrot_pcc_set_lex_pad(INTERP, dummy,
                             Parrot_pmc_new_init(INTERP,
-                                Parrot_get_ctx_HLL_type(interp,
+                                Parrot_get_ctx_HLL_type(INTERP,
                                     enum_class_LexPad), outer_sub->lex_info));
 
                         VTABLE_set_pointer(INTERP,
-                            Parrot_pcc_get_lex_pad(interp, dummy), dummy);
+                            Parrot_pcc_get_lex_pad(INTERP, dummy), dummy);
                     }
 
                     if (!PMC_IS_NULL(outer_sub->outer_ctx))
-                        Parrot_pcc_set_outer_ctx(interp, dummy,
+                        Parrot_pcc_set_outer_ctx(INTERP, dummy,
                             outer_sub->outer_ctx);
 
                     outer_sub->ctx = dummy;
                 }
 
-                Parrot_pcc_set_outer_ctx(interp, c, outer_sub->ctx);
+                Parrot_pcc_set_outer_ctx(INTERP, c, outer_sub->ctx);
                 outer_c = outer_sub->ctx;
             }
         }
@@ -582,10 +582,10 @@ Marks the sub as live.
         Parrot_gc_mark_STRING_alive(INTERP, sub->method_name);
         Parrot_gc_mark_STRING_alive(INTERP, sub->ns_entry_name);
 
-        Parrot_gc_mark_PMC_alive(interp, sub->ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->ctx);
         Parrot_gc_mark_PMC_alive(INTERP, sub->eval_pmc);
         Parrot_gc_mark_PMC_alive(INTERP, sub->lex_info);
-        Parrot_gc_mark_PMC_alive(interp, sub->outer_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->outer_ctx);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_sub);
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_name);
         Parrot_gc_mark_PMC_alive(INTERP, sub->multi_signature);
@@ -760,31 +760,31 @@ Returns the full set of meta-data about the sub.
     {
         /* Create a hash, then use inspect_str to get all of its data */
 
-        PMC    * const metadata           = Parrot_pmc_new(interp, enum_class_Hash);
-        STRING * const pos_required_str   = CONST_STRING(interp, "pos_required");
-        STRING * const pos_optional_str   = CONST_STRING(interp, "pos_optional");
-        STRING * const named_required_str = CONST_STRING(interp, "named_required");
-        STRING * const named_optional_str = CONST_STRING(interp, "named_optional");
-        STRING * const pos_slurpy_str     = CONST_STRING(interp, "pos_slurpy");
-        STRING * const named_slurpy_str   = CONST_STRING(interp, "named_slurpy");
+        PMC    * const metadata           = Parrot_pmc_new(INTERP, enum_class_Hash);
+        STRING * const pos_required_str   = CONST_STRING(INTERP, "pos_required");
+        STRING * const pos_optional_str   = CONST_STRING(INTERP, "pos_optional");
+        STRING * const named_required_str = CONST_STRING(INTERP, "named_required");
+        STRING * const named_optional_str = CONST_STRING(INTERP, "named_optional");
+        STRING * const pos_slurpy_str     = CONST_STRING(INTERP, "pos_slurpy");
+        STRING * const named_slurpy_str   = CONST_STRING(INTERP, "named_slurpy");
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, pos_required_str,
-            VTABLE_inspect_str(interp, SELF, pos_required_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, pos_required_str,
+            VTABLE_inspect_str(INTERP, SELF, pos_required_str));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, pos_optional_str,
-            VTABLE_inspect_str(interp, SELF, pos_optional_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, pos_optional_str,
+            VTABLE_inspect_str(INTERP, SELF, pos_optional_str));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, named_required_str,
-            VTABLE_inspect_str(interp, SELF, named_required_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, named_required_str,
+            VTABLE_inspect_str(INTERP, SELF, named_required_str));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, named_optional_str,
-            VTABLE_inspect_str(interp, SELF, named_optional_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, named_optional_str,
+            VTABLE_inspect_str(INTERP, SELF, named_optional_str));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, pos_slurpy_str,
-            VTABLE_inspect_str(interp, SELF, pos_slurpy_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, pos_slurpy_str,
+            VTABLE_inspect_str(INTERP, SELF, pos_slurpy_str));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, named_slurpy_str,
-            VTABLE_inspect_str(interp, SELF, named_slurpy_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, named_slurpy_str,
+            VTABLE_inspect_str(INTERP, SELF, named_slurpy_str));
 
         return metadata;
     }
@@ -884,26 +884,26 @@ The number of optional named arguments
         }
 
         /* Return the requested argument information */
-        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_required"))) {
+        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_required"))) {
             count_found = (INTVAL)sub->arg_info->pos_required;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_optional"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_optional"))) {
             count_found = (INTVAL)sub->arg_info->pos_optional;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_slurpy"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->pos_slurpy;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_required"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_required"))) {
             count_found = (INTVAL)sub->arg_info->named_required;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_optional"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_optional"))) {
             count_found = (INTVAL)sub->arg_info->named_optional;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_slurpy"))) {
+        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->named_slurpy;
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
 
@@ -1039,7 +1039,7 @@ slurpy arguments).
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
 
-        subid = sub->subid ? sub->subid : CONST_STRING(interp, "");
+        subid = sub->subid ? sub->subid : CONST_STRING(INTERP, "");
 
         RETURN(STRING *subid);
     }
@@ -1069,21 +1069,21 @@ slurpy arguments).
 
         /* Ensure we have lex info. */
         if (PMC_IS_NULL(sub->lex_info)) {
-            const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(interp,
+            const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(INTERP,
                                            enum_class_LexInfo);
-            sub->lex_info = Parrot_pmc_new_init(interp, lex_info_id, SELF);
+            sub->lex_info = Parrot_pmc_new_init(INTERP, lex_info_id, SELF);
         }
 
         /* If we've got a context around for the outer sub, set it as the
          * outer context. */
-        outer_ctx = CURRENT_CONTEXT(interp);
+        outer_ctx = CURRENT_CONTEXT(INTERP);
 
         while (!PMC_IS_NULL(outer_ctx)) {
-            if (Parrot_pcc_get_sub(interp, outer_ctx) == outer) {
+            if (Parrot_pcc_get_sub(INTERP, outer_ctx) == outer) {
                 sub->outer_ctx = outer_ctx;
                 break;
             }
-            outer_ctx = Parrot_pcc_get_caller_ctx(interp, outer_ctx);
+            outer_ctx = Parrot_pcc_get_caller_ctx(INTERP, outer_ctx);
         }
     }
 
@@ -1100,8 +1100,8 @@ slurpy arguments).
 
 
     METHOD arity() {
-        PMC * const pos_required   = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "pos_required"));
-        PMC * const named_required = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "named_required"));
+        PMC * const pos_required   = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "pos_required"));
+        PMC * const named_required = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "named_required"));
 
         const INTVAL arity = VTABLE_get_integer(INTERP, pos_required)
                            + VTABLE_get_integer(INTERP, named_required);

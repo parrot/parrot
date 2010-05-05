@@ -72,8 +72,8 @@ Mark any active exception handler data as live.
     VTABLE void mark() {
         Parrot_ExceptionHandler_attributes * const attrs =
             PARROT_EXCEPTIONHANDLER(SELF);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_types);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_types_except);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types_except);
         SUPER();
     }
 
@@ -125,8 +125,8 @@ Set up the environment for the exception handler to be invoked.
     VTABLE opcode_t *invoke(void *next) {
         opcode_t    * const pc = PARROT_CONTINUATION(SELF)->address;
 
-        Parrot_continuation_check(interp, SELF);
-        Parrot_continuation_rewind_environment(interp, SELF);
+        Parrot_continuation_check(INTERP, SELF);
+        Parrot_continuation_rewind_environment(INTERP, SELF);
 
         /* switch code segment if needed */
         if (INTERP->code != PARROT_CONTINUATION(SELF)->seg)
@@ -159,10 +159,10 @@ Report whether the exception handler can handle a particular type of exception.
 */
 
     METHOD can_handle(PMC *exception) {
-        STRING * const sev    = CONST_STRING(interp, "severity");
-        STRING * const ex_str = CONST_STRING(interp, "Exception");
+        STRING * const sev    = CONST_STRING(INTERP, "severity");
+        STRING * const ex_str = CONST_STRING(INTERP, "Exception");
 
-        INTVAL severity = VTABLE_get_integer_keyed_str(interp, exception, sev);
+        INTVAL severity = VTABLE_get_integer_keyed_str(INTERP, exception, sev);
 
         if (exception->vtable->base_type == enum_class_Exception
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
@@ -181,12 +181,12 @@ Report whether the exception handler can handle a particular type of exception.
                 RETURN(INTVAL 0);
             }
             if (! PMC_IS_NULL(handled_types)) {
-                const INTVAL elems = VTABLE_elements(interp, handled_types);
-                const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
+                const INTVAL elems = VTABLE_elements(INTERP, handled_types);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; ++i) {
-                    INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
+                    INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
                             handled_types, i);
                     if (handled_type == type)
                         RETURN(INTVAL 1);
@@ -195,12 +195,12 @@ Report whether the exception handler can handle a particular type of exception.
                 RETURN(INTVAL 0);
             }
             if (handled_types_except != PMCNULL) {
-                const INTVAL elems = VTABLE_elements(interp, handled_types_except);
-                const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
+                const INTVAL elems = VTABLE_elements(INTERP, handled_types_except);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; ++i) {
-                    const INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
+                    const INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
                             handled_types_except, i);
                     if (handled_type == type)
                         RETURN(INTVAL 0);
@@ -276,7 +276,7 @@ Set the exception types that the ExceptionHandler will handle.
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
         attrs->handled_types =
-            VTABLE_elements(interp, types) > 0
+            VTABLE_elements(INTERP, types) > 0
                 ? types
                 : PMCNULL;
     }
@@ -295,7 +295,7 @@ Set the exception types that the ExceptionHandler will not handle.
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
         attrs->handled_types_except =
-            VTABLE_elements(interp, types) > 0
+            VTABLE_elements(INTERP, types) > 0
                 ? types
                 : PMCNULL;
     }

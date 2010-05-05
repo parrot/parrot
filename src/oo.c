@@ -433,10 +433,9 @@ Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
         ARGIN(PMC *classobj), ARGIN(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_find_vtable_override_for_class)
-    Parrot_Class_attributes *class_info;
+    const Parrot_Class_attributes * const class_info = PARROT_CLASS(classobj);;
     PARROT_ASSERT(PObj_is_class_TEST(classobj));
 
-    class_info = PARROT_CLASS(classobj);
     return VTABLE_get_pmc_keyed_str(interp, class_info->vtable_overrides, name);
 }
 
@@ -802,8 +801,8 @@ static void
 invalidate_all_caches(PARROT_INTERP)
 {
     ASSERT_ARGS(invalidate_all_caches)
-    UINTVAL i;
-    for (i = 1; i < (UINTVAL)interp->n_vtable_max; ++i)
+    int i;
+    for (i = 1; i < interp->n_vtable_max; ++i)
         invalidate_type_caches(interp, i);
 }
 

@@ -59,7 +59,7 @@ Initializes the array.
 
     VTABLE void init_int(INTVAL size) {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedStringArray: Cannot set array size to a negative number (%d)"), size);
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_str_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING *));
@@ -234,7 +234,7 @@ Returns the integer value of the element at index C<key>.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         STRING * const element = SELF.get_string_keyed_int(key);
-        return Parrot_str_to_int(interp, element);
+        return Parrot_str_to_int(INTERP, element);
     }
 
 /*
@@ -266,7 +266,7 @@ Returns the floating-point value of the element at index C<key>.
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         STRING * const element = SELF.get_string_keyed_int(key);
-        return Parrot_str_to_num(interp, element);
+        return Parrot_str_to_num(INTERP, element);
     }
 
 /*
@@ -395,7 +395,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        STRING *val = Parrot_str_from_int(interp, value);
+        STRING *val = Parrot_str_from_int(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
 
@@ -426,7 +426,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        STRING *val = Parrot_str_from_num(interp, value);
+        STRING *val = Parrot_str_from_num(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
 
@@ -582,7 +582,7 @@ The C<==> operation. Compares two array to hold equal elements.
             if (item1 == NULL ||  item2 == NULL)
                 return 0;
 
-            if (!Parrot_str_equal(interp, item1, item2))
+            if (!Parrot_str_equal(INTERP, item1, item2))
                 return 0;
         }
 

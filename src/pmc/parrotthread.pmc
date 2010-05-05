@@ -45,7 +45,7 @@ Create a new, invalid handle to a running thread.
 */
 
     VTABLE void init() {
-        VTABLE_set_integer_native(interp, SELF, -1);
+        VTABLE_set_integer_native(INTERP, SELF, -1);
     }
 
 /*
@@ -59,7 +59,7 @@ Create a new, invalid handle to a running thread.
 */
 
     VTABLE void init_pmc(PMC *notused) {
-        VTABLE_set_integer_native(interp, SELF, -1);
+        VTABLE_set_integer_native(INTERP, SELF, -1);
     }
 
 /*
@@ -74,12 +74,12 @@ Return the thread ID of this thread.
 
     VTABLE INTVAL get_integer() {
         INTVAL ttid;
-        GETATTR_ParrotThread_tid(interp, SELF, ttid);
+        GETATTR_ParrotThread_tid(INTERP, SELF, ttid);
         return ttid;
     }
 
     VTABLE void set_integer_native(INTVAL ttid) {
-        SETATTR_ParrotThread_tid(interp, SELF, ttid);
+        SETATTR_ParrotThread_tid(INTERP, SELF, ttid);
     }
 
 
@@ -95,24 +95,24 @@ Join the thread, returning whatever its main method returns.
     METHOD run_clone(PMC *sub, PMC *args :slurpy) {
         INTVAL ttid;
         if (PMC_IS_NULL(sub)) {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Invalid thread sub");
         }
 
-        ttid = pt_thread_create_run(interp,
+        ttid = pt_thread_create_run(INTERP,
                                     enum_class_ThreadInterpreter, PARROT_CLONE_DEFAULT, sub, args);
-        VTABLE_set_integer_native(interp, SELF, ttid);
+        VTABLE_set_integer_native(INTERP, SELF, ttid);
     }
 
     METHOD run(INTVAL clone_flags, PMC *sub, PMC *args :slurpy) {
         INTVAL ttid;
         if (PMC_IS_NULL(sub)) {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Invalid thread sub");
         }
 
-        ttid = pt_thread_create_run(interp, enum_class_ThreadInterpreter, clone_flags, sub, args);
-        VTABLE_set_integer_native(interp, SELF, ttid);
+        ttid = pt_thread_create_run(INTERP, enum_class_ThreadInterpreter, clone_flags, sub, args);
+        VTABLE_set_integer_native(INTERP, SELF, ttid);
     }
 /*
 
@@ -129,7 +129,7 @@ Join the thread, returning whatever its main method returns.
 
         ret = pt_thread_join(INTERP, ttid);
         /* invalidate self */
-        VTABLE_set_integer_native(interp, SELF, -1);
+        VTABLE_set_integer_native(INTERP, SELF, -1);
 
         RETURN(PMC *ret);
     }

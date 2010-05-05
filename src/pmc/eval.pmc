@@ -224,8 +224,8 @@ Invokes the first subroutine in the eval code.
         }
 
         /* XXX Quick and dirty fix for TT #995 */
-        if ((struct PackFile *)cur_cs == interp->initial_pf
-                || cur_cs == interp->code) {
+        if ((struct PackFile *)cur_cs == INTERP->initial_pf
+                || cur_cs == INTERP->code) {
             SUPER();
             return;
         }
@@ -404,7 +404,7 @@ Unarchives the code.
 
         /*
          * TT #1292 this isn't ok - it seems that the packfile
-         *     gets attached to interp->code and is
+         *     gets attached to INTERP->code and is
          *     destroyed again during interpreter destruction
          */
         /* PackFile_destroy(INTERP, pf); */
@@ -416,7 +416,7 @@ Unarchives the code.
         PackFile_ByteCode   *seg;
         PackFile_FixupTable *ft;
 
-        PMC_get_sub(interp, SELF, sub);
+        PMC_get_sub(INTERP, SELF, sub);
         seg = sub->seg;
 
         if (!seg)

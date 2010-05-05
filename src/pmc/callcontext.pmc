@@ -539,13 +539,13 @@ Mark any referenced strings and PMCs.
             PMC * const p = bp_ps.regs_p[-1L-(i)];
             /* Original code from CTX_REG_PMC */
             if (p)
-                Parrot_gc_mark_PMC_alive(interp, p);
+                Parrot_gc_mark_PMC_alive(INTERP, p);
         }
 
         for (i = 0; i < n_regs_used[REGNO_STR]; ++i) {
             STRING * const s = bp_ps.regs_s[i];
             if (s)
-                Parrot_gc_mark_STRING_alive(interp, s);
+                Parrot_gc_mark_STRING_alive(INTERP, s);
         }
     }
 
@@ -589,7 +589,7 @@ stored.)
             }
 
             parrot_hash_destroy(INTERP, hash);
-            SET_ATTR_hash(interp, SELF, NULL);
+            SET_ATTR_hash(INTERP, SELF, NULL);
         }
     }
 
@@ -736,7 +736,7 @@ CallContext.
             GET_ATTR_positionals(INTERP, SELF, c);
             GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
 
-            type_tuple = Parrot_pmc_new_init_int(interp,
+            type_tuple = Parrot_pmc_new_init_int(INTERP,
                 enum_class_FixedIntegerArray, num_positionals);
 
             for (i = 0; i < num_positionals; ++i) {
@@ -749,15 +749,15 @@ CallContext.
                     case PMCCELL:
                         type = PMC_IS_NULL(c[i].u.p)
                              ? (INTVAL) enum_type_PMC
-                             : VTABLE_type(interp, c[i].u.p);
+                             : VTABLE_type(INTERP, c[i].u.p);
                         break;
                     default:
-                        Parrot_ex_throw_from_c_args(interp, NULL,
+                        Parrot_ex_throw_from_c_args(INTERP, NULL,
                             EXCEPTION_INVALID_OPERATION,
                             "Multiple Dispatch: invalid argument type!");
                 }
 
-                VTABLE_set_integer_keyed_int(interp, type_tuple, i, type);
+                VTABLE_set_integer_keyed_int(INTERP, type_tuple, i, type);
             }
 
             SET_ATTR_type_tuple(INTERP, SELF, type_tuple);
@@ -931,7 +931,7 @@ return current Namespace
         INTVAL    num_pos, allocated_positionals;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        GET_ATTR_allocated_positionals(interp, SELF, allocated_positionals);
+        GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
 
         if (num_pos + 1 > allocated_positionals)
             ensure_positionals_storage(INTERP, SELF, num_pos + 1);
@@ -973,7 +973,7 @@ return current Namespace
         INTVAL    num_pos, allocated_positionals;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        GET_ATTR_allocated_positionals(interp, SELF, allocated_positionals);
+        GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
 
         if (num_pos + 1 > allocated_positionals)
             ensure_positionals_storage(INTERP, SELF, num_pos + 1);
@@ -991,7 +991,7 @@ return current Namespace
 
     VTABLE void unshift_pmc(PMC *value) {
         Pcc_cell *cells;
-        INTVAL size = STATICSELF.elements();
+        const INTVAL size = STATICSELF.elements();
         INTVAL    i;
 
         ensure_positionals_storage(INTERP, SELF, size + 1);
@@ -1012,7 +1012,7 @@ return current Namespace
         INTVAL    i;
 
         if (size < 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Cannot shift PMC from empty CallContext");
 
@@ -1033,7 +1033,7 @@ return current Namespace
         INTVAL    i;
 
         if (size < 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Cannot shift PMC from empty CallContext");
 
@@ -1460,48 +1460,48 @@ sub, or for the point of the call a level deeper for the rest.
 */
 
     METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) {
-        PMC *result  = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *result  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PMC *cur_ctx = SELF;
         Parrot_Continuation_attributes * const cont = has_resume ? PMC_cont(resume) : NULL;
 
         /* Get starting context, then loop over them. */
         while (cur_ctx) {
-            PMC        * const frame       = Parrot_pmc_new(interp, enum_class_Hash);
+            PMC        * const frame       = Parrot_pmc_new(INTERP, enum_class_Hash);
             PMC        *annotations = NULL;
             Parrot_Sub_attributes *sub;
 
             /* Get sub and put it in the hash. */
-            PMC *sub_pmc = Parrot_pcc_get_sub(interp, cur_ctx);
+            PMC *sub_pmc = Parrot_pcc_get_sub(INTERP, cur_ctx);
 
             if (!sub_pmc)
                 sub_pmc = PMCNULL;
 
-            VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "sub"), sub_pmc);
+            VTABLE_set_pmc_keyed_str(INTERP, frame, CONST_STRING(INTERP, "sub"), sub_pmc);
 
             /* Look up any annotations and put them in the hash. */
             if (!PMC_IS_NULL(sub_pmc)) {
-                PMC_get_sub(interp, sub_pmc, sub);
+                PMC_get_sub(INTERP, sub_pmc, sub);
 
                 if (sub->seg->annotations) {
                     PackFile_ByteCode *seg = sub->seg;
                     opcode_t          *pc  = cont && cur_ctx == cont->to_ctx
                                              ? cont->address
-                                             : Parrot_pcc_get_pc(interp, cur_ctx);
+                                             : Parrot_pcc_get_pc(INTERP, cur_ctx);
 
-                    annotations = PackFile_Annotations_lookup(interp,
+                    annotations = PackFile_Annotations_lookup(INTERP,
                         seg->annotations, pc - seg->base.data,
                         NULL);
                 }
             }
 
             if (!annotations)
-                annotations = Parrot_pmc_new(interp, enum_class_Hash);
+                annotations = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-            VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "annotations"), annotations);
+            VTABLE_set_pmc_keyed_str(INTERP, frame, CONST_STRING(INTERP, "annotations"), annotations);
 
             /* Push frame and go to next caller. */
-            VTABLE_push_pmc(interp, result, frame);
-            cur_ctx = Parrot_pcc_get_caller_ctx(interp, cur_ctx);
+            VTABLE_push_pmc(INTERP, result, frame);
+            cur_ctx = Parrot_pcc_get_caller_ctx(INTERP, cur_ctx);
         }
 
         RETURN(PMC *result);

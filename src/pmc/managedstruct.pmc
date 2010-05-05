@@ -148,9 +148,9 @@ of knowing how to make a deep copy of the pointer contents.
         PMC *dest;
         if (clone_func) {
             void *clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;
-            return clone_func(interp, SELF, clone_data);
+            return clone_func(INTERP, SELF, clone_data);
         }
-        dest = Parrot_pmc_new_init(interp, SELF->vtable->base_type,
+        dest = Parrot_pmc_new_init(INTERP, SELF->vtable->base_type,
             PARROT_MANAGEDSTRUCT(SELF)->init);
 
         if (PARROT_MANAGEDSTRUCT(SELF)->ptr)

@@ -42,7 +42,7 @@ Initialize PackfileFixupEntry.
         Parrot_PackfileFixupEntry_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileFixupEntry_attributes*);
 
-        attrs->name = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+        attrs->name = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
 
         PObj_custom_mark_SET(SELF);
     }
@@ -61,7 +61,7 @@ Marks the object as live.
         Parrot_PackfileFixupEntry_attributes * const attrs =
                 PARROT_PACKFILEFIXUPENTRY(SELF);
 
-        Parrot_gc_mark_STRING_alive(interp, attrs->name);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->name);
     }
 
 /*
@@ -80,7 +80,7 @@ Initialize from PackFile_FixupEntry pointer.
         PackFile_FixupEntry *entry = (PackFile_FixupEntry*)pointer;
 
         attrs->type     = entry->type;
-        attrs->name     = Parrot_str_new_init(interp, entry->name,
+        attrs->name     = Parrot_str_new_init(INTERP, entry->name,
                 strlen(entry->name), PARROT_FIXED_8_ENCODING,
                 PARROT_BINARY_CHARSET, 0);
         attrs->offset   = entry->offset;
@@ -102,7 +102,7 @@ Create PackFile_FixupEntry* from self.
                 mem_gc_allocate_zeroed_typed(INTERP, PackFile_FixupEntry);
 
         entry->type     = attrs->type;
-        entry->name     = strdup(Parrot_str_cstring(interp, attrs->name));
+        entry->name     = strdup(Parrot_str_cstring(INTERP, attrs->name));
         entry->offset   = attrs->offset;
         return entry;
     }

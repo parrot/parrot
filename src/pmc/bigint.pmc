@@ -1183,7 +1183,7 @@ Decrements the integer.
     MULTI PMC *add(Integer value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        bigint_add_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
+        bigint_add_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
         return dest;
     }
 
@@ -1192,7 +1192,7 @@ Decrements the integer.
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'add' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
@@ -1207,14 +1207,14 @@ Decrements the integer.
     }
 
     MULTI void i_add(Integer value) {
-        bigint_add_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+        bigint_add_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
 
     MULTI void i_add(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_add' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE void i_add_int(INTVAL value) {
@@ -1239,7 +1239,7 @@ Decrements the integer.
     MULTI PMC *subtract(Integer value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        bigint_sub_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
+        bigint_sub_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
         return dest;
     }
 
@@ -1248,7 +1248,7 @@ Decrements the integer.
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'subtract' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
@@ -1263,14 +1263,14 @@ Decrements the integer.
     }
 
     MULTI void i_subtract(Integer value) {
-        bigint_sub_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+        bigint_sub_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
 
     MULTI void i_subtract(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_subtract' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE void i_subtract_int(INTVAL value) {
@@ -1295,7 +1295,7 @@ Decrements the integer.
     MULTI PMC *multiply(Integer value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        bigint_mul_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
+        bigint_mul_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
         return dest;
     }
 
@@ -1304,7 +1304,7 @@ Decrements the integer.
          Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'multiply' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
@@ -1318,13 +1318,13 @@ Decrements the integer.
         bigint_mul_bigint(INTERP, SELF, value, SELF);
     }
     MULTI void i_multiply(Integer value) {
-        bigint_mul_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+        bigint_mul_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_multiply(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_multiply' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE void i_multiply_int(INTVAL value) {
@@ -1358,7 +1358,7 @@ Decrements the integer.
     MULTI PMC *divide(Integer value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        bigint_div_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
+        bigint_div_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
         return dest;
     }
 
@@ -1367,7 +1367,7 @@ Decrements the integer.
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'divide' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
@@ -1381,13 +1381,13 @@ Decrements the integer.
         bigint_div_bigint(INTERP, SELF, value, SELF);
     }
     MULTI void i_divide(Integer value) {
-        bigint_div_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+        bigint_div_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_divide(DEFAULT value) {
          Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_divide' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE void i_divide_int(INTVAL value) {
@@ -1404,7 +1404,7 @@ Decrements the integer.
     MULTI PMC *floor_divide(Integer value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        bigint_fdiv_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
+        bigint_fdiv_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
         return dest;
     }
 
@@ -1413,7 +1413,7 @@ Decrements the integer.
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'floor_divide' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
@@ -1428,14 +1428,14 @@ Decrements the integer.
     }
 
     MULTI void i_floor_divide(Integer value) {
-        bigint_fdiv_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+        bigint_fdiv_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
 
     MULTI void i_floor_divide(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_floor_divide' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     VTABLE void i_floor_divide_int(INTVAL value) {
@@ -1452,7 +1452,7 @@ Decrements the integer.
     MULTI PMC *modulus(Integer value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        bigint_mod_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
+        bigint_mod_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), dest);
         return dest;
     }
 
@@ -1461,20 +1461,20 @@ Decrements the integer.
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'modulus' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     MULTI void i_modulus(BigInt value) {
         bigint_mod_bigint(INTERP, SELF, value, SELF);
     }
     MULTI void i_modulus(Integer value) {
-        bigint_mod_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+        bigint_mod_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_modulus(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_modulus' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     MULTI INTVAL cmp(BigInt value) {
@@ -1482,14 +1482,14 @@ Decrements the integer.
     }
 
     MULTI INTVAL cmp(Integer value) {
-        return bigint_cmp_int(INTERP, SELF, VTABLE_get_integer(interp, value));
+        return bigint_cmp_int(INTERP, SELF, VTABLE_get_integer(INTERP, value));
     }
 
     MULTI INTVAL cmp(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'cmp' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
     MULTI INTVAL is_equal(BigInt value) {
@@ -1497,14 +1497,14 @@ Decrements the integer.
     }
 
     MULTI INTVAL is_equal(Integer value) {
-        return bigint_cmp_int(INTERP, SELF, VTABLE_get_integer(interp, value)) == 0;
+        return bigint_cmp_int(INTERP, SELF, VTABLE_get_integer(INTERP, value)) == 0;
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'is_equal' for %Ss",
-            VTABLE_name(interp, value));
+            VTABLE_name(INTERP, value));
     }
 
 /*

@@ -116,7 +116,7 @@ Retrieve the message ID.
     VTABLE INTVAL get_integer() {
         const Parrot_SchedulerMessage_attributes * const
             core_struct = PARROT_SCHEDULERMESSAGE(SELF);
-        UNUSED(interp);
+        UNUSED(INTERP);
 
         return core_struct->id;
     }
@@ -133,7 +133,7 @@ Set the message ID.
 
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_SchedulerMessage_attributes * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
-        UNUSED(interp);
+        UNUSED(INTERP);
         core_struct->id = value;
     }
 
@@ -151,7 +151,7 @@ Retrieve the message type.
     STRING *  get_string() {
         const Parrot_SchedulerMessage_attributes * const core_struct =
             PARROT_SCHEDULERMESSAGE(SELF);
-        UNUSED(interp);
+        UNUSED(INTERP);
         return core_struct->type;
     }
 
@@ -167,7 +167,7 @@ Set the message type.
 
     VTABLE void set_string_native(STRING *value) {
         Parrot_SchedulerMessage_attributes * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
-        UNUSED(interp);
+        UNUSED(INTERP);
         core_struct->type = value;
     }
 
@@ -210,8 +210,8 @@ Mark any referenced strings and PMCs.
             Parrot_SchedulerMessage_attributes * const core_struct =
                 PARROT_SCHEDULERMESSAGE(SELF);
 
-            Parrot_gc_mark_STRING_alive(interp, core_struct->type);
-            Parrot_gc_mark_PMC_alive(interp, core_struct->data);
+            Parrot_gc_mark_STRING_alive(INTERP, core_struct->type);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->data);
         }
     }
 

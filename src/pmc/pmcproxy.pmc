@@ -83,33 +83,33 @@ Initializes a PMCProxy PMC.
     VTABLE void init() {
         Parrot_Class_attributes * const _pmc =
                 (Parrot_Class_attributes *) PMC_data(SELF);
-        PMC          * const new_attribute   = Parrot_pmc_new(interp, enum_class_Hash);
-        STRING       * const name            = CONST_STRING(interp, "proxy");
+        PMC          * const new_attribute   = Parrot_pmc_new(INTERP, enum_class_Hash);
+        STRING       * const name            = CONST_STRING(INTERP, "proxy");
 
         /* Set flag for custom GC mark. */
         PObj_custom_mark_SET(SELF);
 
         /* Set up the object. */
         _pmc->id               = 0;
-        _pmc->name             = CONST_STRING(interp, "");
+        _pmc->name             = CONST_STRING(INTERP, "");
         _pmc->_namespace       = PMCNULL;
-        _pmc->parents          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->all_parents      = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->roles            = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->methods          = Parrot_pmc_new(interp, enum_class_Hash);
-        _pmc->vtable_overrides = Parrot_pmc_new(interp, enum_class_Hash);
-        _pmc->parent_overrides = Parrot_pmc_new(interp, enum_class_Hash);
-        _pmc->attrib_metadata  = Parrot_pmc_new(interp, enum_class_Hash);
+        _pmc->parents          = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        _pmc->all_parents      = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        _pmc->roles            = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        _pmc->methods          = Parrot_pmc_new(INTERP, enum_class_Hash);
+        _pmc->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
+        _pmc->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
+        _pmc->attrib_metadata  = Parrot_pmc_new(INTERP, enum_class_Hash);
         _pmc->attrib_index     = PMCNULL;
         _pmc->attrib_cache     = PMCNULL;
-        _pmc->resolve_method   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->resolve_method   = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
 
         /* Set up the attribute storage for the proxy instance */
-        VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
-        VTABLE_set_pmc_keyed_str(interp, _pmc->attrib_metadata, name, new_attribute);
+        VTABLE_set_string_keyed_str(INTERP, new_attribute, CONST_STRING(INTERP, "name"), name);
+        VTABLE_set_pmc_keyed_str(INTERP, _pmc->attrib_metadata, name, new_attribute);
 
         /* We put ourself on the all parents list. */
-        VTABLE_push_pmc(interp, _pmc->all_parents, SELF);
+        VTABLE_push_pmc(INTERP, _pmc->all_parents, SELF);
 
         /* We are a class. */
         PObj_is_class_SET(SELF);
@@ -120,8 +120,8 @@ Initializes a PMCProxy PMC.
         INTVAL mro_length, i;
 
         /* Ensure that it's a valid type number. */
-        if (type_num > interp->n_vtable_max || type_num <= 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        if (type_num > INTERP->n_vtable_max || type_num <= 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                 "Attempt to create PMC Proxy for invalid type number!");
 
         /* Set up the object. */
@@ -130,36 +130,36 @@ Initializes a PMCProxy PMC.
         /* Set up number, name and namespace. */
         proxy_info             = PARROT_CLASS(SELF);
         proxy_info->id         = type_num;
-        proxy_info->name       = interp->vtables[type_num]->whoami;
-        proxy_info->_namespace = interp->vtables[type_num]->_namespace;
+        proxy_info->name       = INTERP->vtables[type_num]->whoami;
+        proxy_info->_namespace = INTERP->vtables[type_num]->_namespace;
 
         /* Build MRO (skip ourself). */
-        mro_length = VTABLE_elements(interp, interp->vtables[type_num]->mro);
+        mro_length = VTABLE_elements(INTERP, INTERP->vtables[type_num]->mro);
         for (i = 1; i < mro_length; ++i) {
-            PMC    *pclass = VTABLE_get_pmc_keyed_int(interp, interp->vtables[type_num]->mro, i);
+            PMC    *pclass = VTABLE_get_pmc_keyed_int(INTERP, INTERP->vtables[type_num]->mro, i);
             PMC    *cns    = pclass->vtable->_namespace;
             STRING *cname  = pclass->vtable->whoami;
-            if (Parrot_str_not_equal(interp, cname, CONST_STRING(interp, "scalar"))) {
-                PMC *pproxy = Parrot_oo_get_class(interp, cns);
-                VTABLE_push_pmc(interp, proxy_info->all_parents, pproxy);
+            if (Parrot_str_not_equal(INTERP, cname, CONST_STRING(INTERP, "scalar"))) {
+                PMC *pproxy = Parrot_oo_get_class(INTERP, cns);
+                VTABLE_push_pmc(INTERP, proxy_info->all_parents, pproxy);
             }
         }
 
         /* PMCs just do single inheritance, so we'll assume that if we have a
          * second entry in our MRO, it goes in the parents list. */
-        if (VTABLE_elements(interp, proxy_info->all_parents) >= 2)
-            VTABLE_push_pmc(interp, proxy_info->parents,
-                    VTABLE_get_pmc_keyed_int(interp, proxy_info->all_parents, 1));
+        if (VTABLE_elements(INTERP, proxy_info->all_parents) >= 2)
+            VTABLE_push_pmc(INTERP, proxy_info->parents,
+                    VTABLE_get_pmc_keyed_int(INTERP, proxy_info->all_parents, 1));
 
         if (!PMC_IS_NULL(proxy_info->_namespace) &&
-            PMC_IS_NULL(VTABLE_get_class(interp, proxy_info->_namespace))) {
+            PMC_IS_NULL(VTABLE_get_class(INTERP, proxy_info->_namespace))) {
 
             /* Link the proxy and the namespace, caching the proxy object for
              * later retrieval on class lookup. */
-             Parrot_pcc_invoke_method_from_c_args(interp, proxy_info->_namespace, CONST_STRING(interp, "set_class"), "P->", SELF);
+             Parrot_pcc_invoke_method_from_c_args(INTERP, proxy_info->_namespace, CONST_STRING(INTERP, "set_class"), "P->", SELF);
 
             /* Extract any methods from the namespace */
-            Parrot_oo_extract_methods_from_namespace(interp, SELF,
+            Parrot_oo_extract_methods_from_namespace(INTERP, SELF,
                     proxy_info->_namespace);
         }
 
@@ -168,7 +168,7 @@ Initializes a PMCProxy PMC.
              * and terminated by an space,
              * the list is '\0' terminated
              */
-            const char * attr = interp->vtables[type_num]->attribute_defs;
+            const char * attr = INTERP->vtables[type_num]->attribute_defs;
             while (* attr) {
                 const char * const current = attr + 1;
                 size_t l;
@@ -176,7 +176,7 @@ Initializes a PMCProxy PMC.
                 while (* attr != ' ') ++attr;
                 l= attr - current;
                 if (attrtype != ':') {
-                    STRING *sattr = Parrot_str_new(interp, current, l);
+                    STRING *sattr = Parrot_str_new(INTERP, current, l);
                     SELF.add_attribute(sattr, NULL);
                 }
                 ++attr;
@@ -185,7 +185,7 @@ Initializes a PMCProxy PMC.
     }
 
     VTABLE void init_pmc(PMC *init_data) {
-        const INTVAL type_num = VTABLE_get_integer(interp, init_data);
+        const INTVAL type_num = VTABLE_get_integer(INTERP, init_data);
         SELF.init_int(type_num);
     }
 
@@ -202,9 +202,9 @@ Creates an instance of the PMC.
         Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
 
         if (!PMC_IS_NULL(init))
-            return Parrot_pmc_new_init(interp, _pmc->id, init);
+            return Parrot_pmc_new_init(INTERP, _pmc->id, init);
 
-        return Parrot_pmc_new(interp, _pmc->id);
+        return Parrot_pmc_new(INTERP, _pmc->id);
     }
 
 /*
@@ -229,46 +229,46 @@ Returns whether the class is or inherits from C<*classname>.
         if (SUPER(lookup))
             return 1;
 
-        classobj = Parrot_oo_get_class(interp, lookup);
+        classobj = Parrot_oo_get_class(INTERP, lookup);
 
         if (PMC_IS_NULL(classobj))
             return 0;
 
-        classname = VTABLE_get_string(interp, classobj);
+        classname = VTABLE_get_string(INTERP, classobj);
 
         /* Check if the passed name is the same as the stored short name. */
-        if (Parrot_str_equal(interp, classname, _proxy->name))
+        if (Parrot_str_equal(INTERP, classname, _proxy->name))
             return 1;
 
         /* Check if the class object is the same as self's class object */
-        if (VTABLE_is_same(interp, SELF, classobj))
+        if (VTABLE_is_same(INTERP, SELF, classobj))
             return 1;
 
         /* Check if the passed name is the same as the fully qualified name. */
-        if (Parrot_str_equal(interp, classname, VTABLE_get_string(interp, SELF)))
+        if (Parrot_str_equal(INTERP, classname, VTABLE_get_string(INTERP, SELF)))
             return 1;
 
         /* Look in the isa hash. */
-        if (interp->vtables[_proxy->id]) {
-            Hash *isa_hash = interp->vtables[_proxy->id]->isa_hash;
+        if (INTERP->vtables[_proxy->id]) {
+            Hash *isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
 
-            if (!isa_hash && Parrot_str_equal(interp,
-                     interp->vtables[_proxy->id]->whoami, classname))
+            if (!isa_hash && Parrot_str_equal(INTERP,
+                     INTERP->vtables[_proxy->id]->whoami, classname))
                 return 1;
 
-            if (isa_hash && parrot_hash_exists(interp, isa_hash, classname))
+            if (isa_hash && parrot_hash_exists(INTERP, isa_hash, classname))
                 return 1;
         }
 
         /* Iterate over all the parents and check if they respond true
          * for 'isa' on the original comparison. */
-        num_classes = VTABLE_elements(interp, _proxy->parents);
+        num_classes = VTABLE_elements(INTERP, _proxy->parents);
 
         for (i = 0; i < num_classes; ++i) {
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
                 _proxy->parents, i);
 
-            if (VTABLE_isa_pmc(interp, cur_class, lookup))
+            if (VTABLE_isa_pmc(INTERP, cur_class, lookup))
                 return 1;
         }
 
@@ -287,7 +287,7 @@ Returns whether the class is or inherits from C<*classname>.
 
     VTABLE INTVAL isa(STRING *classname) {
         Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
-        const STRING * const pmc_proxy = CONST_STRING(interp, "PMCProxy");
+        const STRING * const pmc_proxy = CONST_STRING(INTERP, "PMCProxy");
 
         if (Parrot_str_equal(INTERP, classname, pmc_proxy))
             return 1;
@@ -296,15 +296,15 @@ Returns whether the class is or inherits from C<*classname>.
             return 1;
 
         /* Look in the isa hash. */
-        if (interp->vtables[_proxy->id]) {
-            Hash *isa_hash = interp->vtables[_proxy->id]->isa_hash;
+        if (INTERP->vtables[_proxy->id]) {
+            Hash *isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
 
-            if (!isa_hash && Parrot_str_equal(interp,
-                     interp->vtables[_proxy->id]->whoami, classname)) {
+            if (!isa_hash && Parrot_str_equal(INTERP,
+                     INTERP->vtables[_proxy->id]->whoami, classname)) {
                 return 1;
             }
 
-            if (isa_hash && parrot_hash_exists(interp, isa_hash, classname))
+            if (isa_hash && parrot_hash_exists(INTERP, isa_hash, classname))
                 return 1;
         }
 
@@ -360,21 +360,21 @@ inspect_str.
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        STRING * const name_str    = CONST_STRING(interp, "name");
-        STRING * const ns_str      = CONST_STRING(interp, "namespace");
-        STRING * const meth_str    = CONST_STRING(interp, "methods");
-        STRING * const parents_str = CONST_STRING(interp, "parents");
+        STRING * const name_str    = CONST_STRING(INTERP, "name");
+        STRING * const ns_str      = CONST_STRING(INTERP, "namespace");
+        STRING * const meth_str    = CONST_STRING(INTERP, "methods");
+        STRING * const parents_str = CONST_STRING(INTERP, "parents");
 
-        PMC * const metadata = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC * const metadata = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, name_str,
-            VTABLE_inspect_str(interp, SELF, name_str));
-        VTABLE_set_pmc_keyed_str(interp, metadata, ns_str,
-            VTABLE_inspect_str(interp, SELF, ns_str));
-        VTABLE_set_pmc_keyed_str(interp, metadata, meth_str,
-            VTABLE_inspect_str(interp, SELF, meth_str));
-        VTABLE_set_pmc_keyed_str(interp, metadata, parents_str,
-            VTABLE_inspect_str(interp, SELF, parents_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, name_str,
+            VTABLE_inspect_str(INTERP, SELF, name_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, ns_str,
+            VTABLE_inspect_str(INTERP, SELF, ns_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, meth_str,
+            VTABLE_inspect_str(INTERP, SELF, meth_str));
+        VTABLE_set_pmc_keyed_str(INTERP, metadata, parents_str,
+            VTABLE_inspect_str(INTERP, SELF, parents_str));
 
         return metadata;
     }
@@ -422,7 +422,7 @@ Creates an instance of the PMC.
 */
 
     METHOD new(PMC *args :optional, int got_args :opt_flag) {
-        PMC * const obj = VTABLE_instantiate(interp, SELF, args);
+        PMC * const obj = VTABLE_instantiate(INTERP, SELF, args);
         UNUSED(got_args);
         RETURN(PMC *obj);
     }
@@ -438,7 +438,7 @@ Return a hash where the keys are method names and the values are methods.
 */
 
     METHOD methods() {
-        PMC * const ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
+        PMC * const ret_methods = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "methods"));
         RETURN(PMC *ret_methods);
     }
 
@@ -453,7 +453,7 @@ Return the parents array PMC.
 */
 
     METHOD parents() {
-        PMC * const ret_parents = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents"));
+        PMC * const ret_parents = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "parents"));
         RETURN(PMC *ret_parents);
     }
 
@@ -472,8 +472,8 @@ parameter is supplied, a particular item of introspection data.
         /* Just delegate to the appropriate vtable. */
         PMC * const found =
             got_what
-                ? VTABLE_inspect_str(interp, SELF, what)
-                : VTABLE_inspect(interp, SELF);
+                ? VTABLE_inspect_str(INTERP, SELF, what)
+                : VTABLE_inspect(INTERP, SELF);
 
         RETURN(PMC *found);
     }

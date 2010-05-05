@@ -132,10 +132,10 @@ Mark active stringhandle data as live.
 
     VTABLE void mark() {
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(SELF);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->stringhandle);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->mode);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->encoding);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->stringhandle);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
     }
 
 /*
@@ -346,7 +346,7 @@ Print the passed in integer, number, string, or PMC to the stringhandle.
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
-        Parrot_io_putps(interp, SELF, string_to_print);
+        Parrot_io_putps(INTERP, SELF, string_to_print);
     }
 
 /*
@@ -365,19 +365,19 @@ Print the string to the stringhandle.
 
         GET_ATTR_stringhandle(INTERP, SELF, old_string);
         if (STRING_IS_NULL(old_string))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot write to a closed filehandle");
 
         GET_ATTR_flags(INTERP, SELF, flags);
         if (!(flags & PIO_F_WRITE))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot write to a filehandle not opened for write");
 
-        new_string = Parrot_str_concat(interp, old_string, to_print);
+        new_string = Parrot_str_concat(INTERP, old_string, to_print);
 
         SET_ATTR_stringhandle(INTERP, SELF, new_string);
 
-        status = Parrot_str_byte_length(interp, new_string);
+        status = Parrot_str_byte_length(INTERP, new_string);
         RETURN(INTVAL status);
     }
 
@@ -442,7 +442,7 @@ Returns the current size of the stringhandle.
 
         if (STRING_IS_NULL(stringhandle))
             RETURN(INTVAL 0);
-        buffer_size = Parrot_str_byte_length(interp, stringhandle);
+        buffer_size = Parrot_str_byte_length(INTERP, stringhandle);
 
         RETURN(INTVAL buffer_size);
 
@@ -523,7 +523,7 @@ value.
 */
 
     METHOD get_fd() {
-        UNUSED(interp);
+        UNUSED(INTERP);
         RETURN(INTVAL -1);
     }
 

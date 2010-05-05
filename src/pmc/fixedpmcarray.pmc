@@ -51,11 +51,11 @@ Sort this array, optionally using the provided cmp_func
         if (n > 1) {
             /* XXX Workaround for TT #218 */
             if (PObj_is_object_TEST(SELF)) {
-                PMC *parent = SELF.get_attr_str(CONST_STRING(interp, "proxy"));
-                Parrot_pcc_invoke_method_from_c_args(interp, parent, CONST_STRING(interp, "sort"), "P->", cmp_func);
+                PMC *parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
+                Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
-                Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
+                Parrot_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
         }
         RETURN(PMC *SELF);
     }
@@ -308,7 +308,7 @@ Returns the Parrot string value of the element at index C<key>.
         PMC * const retval = SELF.get_pmc_keyed_int(key);
 
         if (PMC_IS_NULL(retval))
-            return CONST_STRING(interp, "");
+            return CONST_STRING(INTERP, "");
 
         return VTABLE_get_string(INTERP, retval);
     }
@@ -416,7 +416,7 @@ array.
         if (SELF == value)
             return;
 
-        if (!VTABLE_does(interp, value, CONST_STRING(interp, "array")))
+        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("Can't set self from this type"));
 
@@ -637,7 +637,7 @@ The C<==> operation. Compares two array to hold equal elements.
             ||  item2->vtable->base_type == enum_class_Null)
                 return 0;
 
-            if (!VTABLE_is_equal(interp, item1, item2))
+            if (!VTABLE_is_equal(INTERP, item1, item2))
                 return 0;
         }
 
@@ -791,7 +791,7 @@ Mark the array.
             return;
 
         for (i = PMC_size(SELF) - 1; i >= 0; --i)
-            Parrot_gc_mark_PMC_alive(interp, data[i]);
+            Parrot_gc_mark_PMC_alive(INTERP, data[i]);
     }
 
 

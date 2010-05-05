@@ -369,14 +369,14 @@ Runs the interpreter's byte code.
         Interp * const new_interp = PMC_interp(SELF);
 
         /* setup code */
-        pt_thread_prepare_for_run(new_interp, interp);
+        pt_thread_prepare_for_run(new_interp, INTERP);
 
         /* TODO pass arguments from parent (interp) to child (new_interp) by
          * possibly clone of share the arguments r/o args can be passed as is */
 
         /* calculate offset and run */
         runops(new_interp, (size_t)((opcode_t *)PMC_sub(SELF) -
-            (opcode_t *)interp->code->base.data));
+            (opcode_t *)INTERP->code->base.data));
 
         return (opcode_t *)next;
     }
@@ -459,120 +459,120 @@ Introspection interface. C<key> can be:
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         PMC    *nextkey;
         STRING *outer = NULL;
-        STRING *item  = key_string(interp, key);
-        STRING *name  = CONST_STRING(interp, "globals");
+        STRING *item  = key_string(INTERP, key);
+        STRING *name  = CONST_STRING(INTERP, "globals");
         int     level = 0;
 
         PMC *ctx;
 
-        if (Parrot_str_equal(interp, item, name))
-            return interp->root_namespace;
+        if (Parrot_str_equal(INTERP, item, name))
+            return INTERP->root_namespace;
 
-        name  = CONST_STRING(interp, "outer");
+        name  = CONST_STRING(INTERP, "outer");
 
-        if (Parrot_str_equal(interp, item, name)) {
+        if (Parrot_str_equal(INTERP, item, name)) {
             outer   = item;
             nextkey = key_next(INTERP, key);
 
             if (nextkey && (PObj_get_FLAGS(nextkey) & KEY_string_FLAG)) {
                 key  = nextkey;
-                item = VTABLE_get_string(interp, key);
+                item = VTABLE_get_string(INTERP, key);
             }
         }
 
         nextkey = key_next(INTERP, key);
 
         if (nextkey)
-            level = VTABLE_get_integer(interp, nextkey);
+            level = VTABLE_get_integer(INTERP, nextkey);
         else if (outer)
             level = 1;
 
         if (level < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, CONTROL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
                 "No such caller depth");
 
-        ctx = CURRENT_CONTEXT(interp);
+        ctx = CURRENT_CONTEXT(INTERP);
 
         if (outer) {
             for (; level; --level) {
-                ctx = Parrot_pcc_get_outer_ctx(interp, ctx);
+                ctx = Parrot_pcc_get_outer_ctx(INTERP, ctx);
                 if (PMC_IS_NULL(ctx))
-                    Parrot_ex_throw_from_c_args(interp, NULL,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL,
                         CONTROL_ERROR, "No such outer depth");
             }
         }
         else {
             for (; level; --level) {
-                PMC * const cont = Parrot_pcc_get_continuation(interp, ctx);
+                PMC * const cont = Parrot_pcc_get_continuation(INTERP, ctx);
 
                 if (PMC_IS_NULL(cont) || !PARROT_CONTINUATION(cont)->seg)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL,
                         CONTROL_ERROR, "No such caller depth");
 
                 ctx = PARROT_CONTINUATION(cont)->to_ctx;
 
-                if (PMC_IS_NULL(Parrot_pcc_get_sub(interp, ctx)))
-                    Parrot_ex_throw_from_c_args(interp, NULL,
+                if (PMC_IS_NULL(Parrot_pcc_get_sub(INTERP, ctx)))
+                    Parrot_ex_throw_from_c_args(INTERP, NULL,
                         CONTROL_ERROR, "No such caller depth");
             }
         }
 
         if (item == outer)
-            return Parrot_pcc_get_sub(interp, ctx);
+            return Parrot_pcc_get_sub(INTERP, ctx);
 
-        name = CONST_STRING(interp, "context");
+        name = CONST_STRING(INTERP, "context");
 
-        if (Parrot_str_equal(interp, item, name))
+        if (Parrot_str_equal(INTERP, item, name))
             return ctx;
 
-        name = CONST_STRING(interp, "sub");
+        name = CONST_STRING(INTERP, "sub");
 
-        if (Parrot_str_equal(interp, item, name))
-            return Parrot_pcc_get_sub(interp, ctx);
+        if (Parrot_str_equal(INTERP, item, name))
+            return Parrot_pcc_get_sub(INTERP, ctx);
 
-        name = CONST_STRING(interp, "lexpad");
+        name = CONST_STRING(INTERP, "lexpad");
 
-        if (Parrot_str_equal(interp, item, name))
-            return Parrot_pcc_get_lex_pad(interp, ctx);
+        if (Parrot_str_equal(INTERP, item, name))
+            return Parrot_pcc_get_lex_pad(INTERP, ctx);
 
-        name = CONST_STRING(interp, "namespace");
+        name = CONST_STRING(INTERP, "namespace");
 
-        if (Parrot_str_equal(interp, item, name))
-            return Parrot_pcc_get_namespace(interp, ctx);
+        if (Parrot_str_equal(INTERP, item, name))
+            return Parrot_pcc_get_namespace(INTERP, ctx);
 
-        name = CONST_STRING(interp, "continuation");
+        name = CONST_STRING(INTERP, "continuation");
 
-        if (Parrot_str_equal(interp, item, name))
-            return VTABLE_clone(interp, Parrot_pcc_get_continuation(interp, ctx));
+        if (Parrot_str_equal(INTERP, item, name))
+            return VTABLE_clone(INTERP, Parrot_pcc_get_continuation(INTERP, ctx));
 
-        name = CONST_STRING(interp, "annotations");
+        name = CONST_STRING(INTERP, "annotations");
 
-        if (Parrot_str_equal(interp, item, name)) {
-            PMC        *sub_pmc = Parrot_pcc_get_sub(interp, ctx);
-            if (ctx == CURRENT_CONTEXT(interp)) {
+        if (Parrot_str_equal(INTERP, item, name)) {
+            PMC        *sub_pmc = Parrot_pcc_get_sub(INTERP, ctx);
+            if (ctx == CURRENT_CONTEXT(INTERP)) {
                 /* We can't know the current program counter for the currently
                  * executing sub, so can't return annotations for that. */
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "Cannot get annotations at depth 0; use annotations op instead.");
             }
             if (!PMC_IS_NULL(sub_pmc)
             &&   sub_pmc->vtable->base_type == enum_class_Sub) {
                 Parrot_Sub_attributes *sub;
                 PackFile_ByteCode     *seg;
-                opcode_t              *pc  = Parrot_pcc_get_pc(interp, ctx);
+                opcode_t              *pc  = Parrot_pcc_get_pc(INTERP, ctx);
 
-                PMC_get_sub(interp, sub_pmc, sub);
+                PMC_get_sub(INTERP, sub_pmc, sub);
                 seg = sub->seg;
 
                 if (sub->seg->annotations)
-                    return PackFile_Annotations_lookup(interp, seg->annotations,
+                    return PackFile_Annotations_lookup(INTERP, seg->annotations,
                         pc - seg->base.data, NULL);
             }
 
-            return Parrot_pmc_new(interp, enum_class_Hash);
+            return Parrot_pmc_new(INTERP, enum_class_Hash);
         }
 
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such item %Ss", item);
     }
 
@@ -672,14 +672,14 @@ have the same thread id.
         if (!self->thread_data)
             return 0;
 
-        return self->thread_data->tid == (UINTVAL) VTABLE_get_integer(interp, value);
+        return self->thread_data->tid == (UINTVAL) VTABLE_get_integer(INTERP, value);
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "ParrotInterpreter: no multiple dispatch variant 'is_equal' for %Ss",
-                VTABLE_name(interp, value));
+                VTABLE_name(INTERP, value));
     }
 
 /*
@@ -735,10 +735,10 @@ Finish thawing.
         /*  HLL_info */
         if (VTABLE_get_integer(INTERP, info) == VISIT_THAW_NORMAL ||
             VTABLE_get_integer(INTERP, info) == VISIT_THAW_CONSTANTS) {
-            VISIT_PMC(interp, info, PMC_args(SELF));
+            VISIT_PMC(INTERP, info, PMC_args(SELF));
         }
         else
-            VISIT_PMC(interp, info, INTERP->HLL_info);
+            VISIT_PMC(INTERP, info, INTERP->HLL_info);
 
     }
 
@@ -822,7 +822,7 @@ Map core_type to hll_type.
     METHOD hll_map(PMC *core_type, PMC *hll_type) {
         const INTVAL core_type_id = VTABLE_type(INTERP, core_type);
         const INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
-        const INTVAL hll_id       = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
+        const INTVAL hll_id       = Parrot_pcc_get_HLL(INTERP, CURRENT_CONTEXT(INTERP));
         Parrot_register_HLL_type(INTERP, hll_id, core_type_id, hll_type_id);
     }
 
@@ -843,7 +843,7 @@ This method is experimental. See TT #264.
 */
 
     METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
-        PMC * const handle = Parrot_io_stdhandle(interp, fileno, newhandle);
+        PMC * const handle = Parrot_io_stdhandle(INTERP, fileno, newhandle);
         RETURN(PMC *handle);
     }
 

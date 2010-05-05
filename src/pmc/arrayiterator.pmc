@@ -90,7 +90,7 @@ Defaults iteration mode to iterate from start.
 
     VTABLE void init_pmc(PMC *array) {
 
-        SET_ATTR_array(interp, SELF, array);
+        SET_ATTR_array(INTERP, SELF, array);
 
         PObj_custom_mark_SET(SELF);
 
@@ -128,14 +128,14 @@ Marks the current idx/key and the aggregate as live.
         PMC   *array;
         PMC   *clone;
 
-        GET_ATTR_array(interp, SELF, array);
-        GET_ATTR_pos(interp, SELF, pos);
-        GET_ATTR_reverse(interp, SELF, reverse);
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_pos(INTERP, SELF, pos);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
 
         clone = Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, array);
 
-        SET_ATTR_pos(interp, clone, pos);
-        SET_ATTR_reverse(interp, clone, reverse);
+        SET_ATTR_pos(INTERP, clone, pos);
+        SET_ATTR_reverse(INTERP, clone, reverse);
 
         return clone;
     }
@@ -167,15 +167,15 @@ Returns the number of remaining elements in the array.
     VTABLE INTVAL elements() {
         INTVAL reverse, pos, length;
 
-        GET_ATTR_reverse(interp, SELF, reverse);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
 
         if (reverse) {
-            GET_ATTR_pos(interp, SELF, pos);
+            GET_ATTR_pos(INTERP, SELF, pos);
             return pos;
         }
         else {
-            GET_ATTR_length(interp, SELF, length);
-            GET_ATTR_pos(interp, SELF, pos);
+            GET_ATTR_length(INTERP, SELF, length);
+            GET_ATTR_pos(INTERP, SELF, pos);
             return length - pos;
         }
     }
@@ -201,18 +201,18 @@ Reset the Iterator. C<value> must be one of
         PMC *array;
 
         if (value == ITERATE_FROM_START) {
-            GET_ATTR_array(interp, SELF, array);
-            SET_ATTR_reverse(interp, SELF, 0);
-            SET_ATTR_pos(interp, SELF, 0);
-            SET_ATTR_length(interp, SELF, VTABLE_elements(INTERP, array));
+            GET_ATTR_array(INTERP, SELF, array);
+            SET_ATTR_reverse(INTERP, SELF, 0);
+            SET_ATTR_pos(INTERP, SELF, 0);
+            SET_ATTR_length(INTERP, SELF, VTABLE_elements(INTERP, array));
         }
         else if (value == ITERATE_FROM_END) {
             INTVAL element;
-            GET_ATTR_array(interp, SELF, array);
+            GET_ATTR_array(INTERP, SELF, array);
             element = VTABLE_elements(INTERP, array);
-            SET_ATTR_reverse(interp, SELF, 1);
-            SET_ATTR_length(interp, SELF, element);
-            SET_ATTR_pos(interp, SELF, element);
+            SET_ATTR_reverse(INTERP, SELF, 1);
+            SET_ATTR_length(INTERP, SELF, element);
+            SET_ATTR_pos(INTERP, SELF, element);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

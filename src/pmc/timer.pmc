@@ -86,8 +86,8 @@ Initializes the timer.
 
         /* Set up the core struct. */
         core_struct->id          = 0;
-        core_struct->type        = CONST_STRING(interp, "timer");
-        core_struct->subtype     = CONST_STRING(interp, "");
+        core_struct->type        = CONST_STRING(INTERP, "timer");
+        core_struct->subtype     = CONST_STRING(INTERP, "");
         core_struct->priority    = 0;
         core_struct->status      = CONST_STRING(interp, "created");
         core_struct->birthtime   = 0.0;
@@ -313,7 +313,7 @@ Sets the PMC associated with C<key> to C<*value>.
             Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
             core_struct->codeblock = value;
 */
-            SET_ATTR_codeblock(interp, SELF, value);
+            SET_ATTR_codeblock(INTERP, SELF, value);
         }
     }
 
