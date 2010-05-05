@@ -404,7 +404,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     /* If B isn't real, we just bail */
     const UINTVAL b_len = b ? Parrot_str_byte_length(interp, b) : 0;
     if (!b_len)
-        return Parrot_str_copy(interp, a);
+        return STRING_IS_NULL(a) ? STRINGNULL : Parrot_str_copy(interp, a);
 
     /* Is A real? */
     if (STRING_IS_NULL(a) || Buffer_bufstart(a) == NULL)
