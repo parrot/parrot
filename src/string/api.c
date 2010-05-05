@@ -380,8 +380,7 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 Concatenates two Parrot strings. If necessary, converts the second
 string's encoding and/or type to match those of the first string. If
 either string is C<NULL>, then a copy of the non-C<NULL> string is
-returned. If both strings are C<NULL>, then a new zero-length string is
-created and returned.
+returned. If both strings are C<NULL>, return C<STRINGNULL>.
 
 =cut
 
