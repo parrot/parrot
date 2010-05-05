@@ -4122,26 +4122,16 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     INTVAL                i;
 
     /* Free any keys. */
-    if (self->keys) {
-        for (i = 0; i < self->num_keys; ++i)
-            mem_gc_free(interp, self->keys[i]);
-
+    if (self->keys)
         mem_gc_free(interp, self->keys);
-    }
 
     /* Free any groups. */
-    if (self->groups) {
-        for (i = 0; i < self->num_groups; ++i)
-            mem_gc_free(interp, self->groups[i]);
+    if (self->groups)
         mem_gc_free(interp, self->groups);
-    }
 
     /* Free any entries. */
-    if (self->entries) {
-        for (i = 0; i < self->num_entries; ++i)
-            mem_gc_free(interp, self->entries[i]);
+    if (self->entries)
         mem_gc_free(interp, self->entries);
-    }
 }
 
 
@@ -4195,7 +4185,7 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
     *cursor++ = self->num_keys;
 
     for (i = 0; i < self->num_keys; ++i) {
-        const PackFile_Annotations_Key * const key = self->keys[i];
+        const PackFile_Annotations_Key * const key = self->keys + i;
         *cursor++ = key->name;
         *cursor++ = key->type;
     }
@@ -4204,7 +4194,7 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
     *cursor++ = self->num_groups;
 
     for (i = 0; i < self->num_groups; ++i) {
-        const PackFile_Annotations_Group * const group = self->groups[i];
+        const PackFile_Annotations_Group * const group = self->groups + i;
         *cursor++ = group->bytecode_offset;
         *cursor++ = group->entries_offset;
     }
@@ -4213,7 +4203,7 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
     *cursor++ = self->num_entries;
 
     for (i = 0; i < self->num_entries; ++i) {
-        const PackFile_Annotations_Entry * const entry = self->entries[i];
+        const PackFile_Annotations_Entry * const entry = self->entries + i;
         *cursor++ = entry->bytecode_offset;
         *cursor++ = entry->key;
         *cursor++ = entry->value;
@@ -4255,11 +4245,10 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
                   self->num_keys));
 
     self->keys     = mem_gc_allocate_n_zeroed_typed(interp,
-            self->num_keys, PackFile_Annotations_Key *);
+            self->num_keys, PackFile_Annotations_Key);
 
     for (i = 0; i < self->num_keys; ++i) {
-        PackFile_Annotations_Key * const key = self->keys[i] =
-                mem_gc_allocate_zeroed_typed(interp, PackFile_Annotations_Key);
+        PackFile_Annotations_Key * const key = self->keys + i;
         key->name = PF_fetch_opcode(seg->pf, &cursor);
         key->type = PF_fetch_opcode(seg->pf, &cursor);
         TRACE_PRINTF_VAL(("PackFile_Annotations_unpack: key[%d]/%d name=%s type=%d\n",
@@ -4269,12 +4258,10 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     /* Unpack groups. */
     self->num_groups = PF_fetch_opcode(seg->pf, &cursor);
     self->groups     = mem_gc_allocate_n_zeroed_typed(interp,
-            self->num_groups, PackFile_Annotations_Group *);
+            self->num_groups, PackFile_Annotations_Group);
 
     for (i = 0; i < self->num_groups; ++i) {
-        PackFile_Annotations_Group * const group =
-            self->groups[i] = mem_gc_allocate_zeroed_typed(interp,
-                    PackFile_Annotations_Group);
+        PackFile_Annotations_Group * const group = self->groups + i;
         group->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
         group->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
         TRACE_PRINTF_VAL((
@@ -4286,11 +4273,9 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     /* Unpack entries. */
     self->num_entries = PF_fetch_opcode(seg->pf, &cursor);
     self->entries     = mem_gc_allocate_n_zeroed_typed(interp,
-            self->num_entries, PackFile_Annotations_Entry *);
+            self->num_entries, PackFile_Annotations_Entry);
     for (i = 0; i < self->num_entries; ++i) {
-        PackFile_Annotations_Entry * const entry =
-            self->entries[i]   = mem_gc_allocate_zeroed_typed(interp,
-                    PackFile_Annotations_Entry);
+        PackFile_Annotations_Entry * const entry = self->entries + i;
         entry->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
         entry->key             = PF_fetch_opcode(seg->pf, &cursor);
         entry->value           = PF_fetch_opcode(seg->pf, &cursor);
@@ -4338,7 +4323,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
     for (i = 0; i < self->num_keys; ++i) {
-        const PackFile_Annotations_Key * const key = self->keys[i];
+        const PackFile_Annotations_Key * const key = self->keys + i;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
                 PF_CONST(self->code, key->name)->u.string);
@@ -4355,7 +4340,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump groups. */
     Parrot_io_printf(interp, "\n  groups => [\n");
     for (i = 0; i < self->num_groups; ++i) {
-        const PackFile_Annotations_Group * const group = self->groups[i];
+        const PackFile_Annotations_Group * const group = self->groups + i;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
                 group->bytecode_offset);
@@ -4370,7 +4355,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     Parrot_io_printf(interp, "\n  entries => [\n");
 
     for (i = 0; i < self->num_entries; ++i) {
-        const PackFile_Annotations_Entry * const entry = self->entries[i];
+        const PackFile_Annotations_Entry * const entry = self->entries + i;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
                 entry->bytecode_offset);
@@ -4408,14 +4393,13 @@ PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Allocate extra space for the group in the groups array. */
     if (self->groups)
         self->groups = mem_gc_realloc_n_typed_zeroed(interp, self->groups,
-            1 + self->num_groups, self->num_groups, PackFile_Annotations_Group *);
+            1 + self->num_groups, self->num_groups, PackFile_Annotations_Group);
     else
         self->groups = mem_gc_allocate_n_typed(interp,
-                1 + self->num_groups, PackFile_Annotations_Group *);
+                1 + self->num_groups, PackFile_Annotations_Group);
 
     /* Store details. */
-    group = self->groups[self->num_groups] =
-                mem_gc_allocate_zeroed_typed(interp, PackFile_Annotations_Group);
+    group = self->groups + self->num_groups;
     group->bytecode_offset = offset;
     group->entries_offset  = self->num_entries;
 
@@ -4452,7 +4436,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     INTVAL   i;
 
     for (i = 0; i < self->num_keys; ++i) {
-        STRING * const test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
+        STRING * const test_key = PF_CONST(self->code, self->keys[i].name)->u.string;
         if (Parrot_str_equal(interp, test_key, key_name)) {
             key_id = i;
             break;
@@ -4463,22 +4447,21 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
         /* We do have it. Add key entry. */
         if (self->keys)
             self->keys = mem_gc_realloc_n_typed_zeroed(interp, self->keys,
-                    1 + self->num_keys, self->num_keys, PackFile_Annotations_Key *);
+                    1 + self->num_keys, self->num_keys, PackFile_Annotations_Key);
         else
             self->keys = mem_gc_allocate_n_typed(interp,
-                    1 + self->num_keys, PackFile_Annotations_Key *);
+                    1 + self->num_keys, PackFile_Annotations_Key);
 
         key_id             = self->num_keys;
-        self->keys[key_id] = mem_gc_allocate_typed(interp, PackFile_Annotations_Key);
         ++self->num_keys;
 
         /* Populate it. */
-        self->keys[key_id]->name = key;
-        self->keys[key_id]->type = type;
+        self->keys[key_id].name = key;
+        self->keys[key_id].type = type;
     }
     else {
         /* Ensure key types are compatible. */
-        if (self->keys[key_id]->type != type)
+        if (self->keys[key_id].type != type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Annotations with different types of value used for key '%S'\n",
@@ -4488,16 +4471,14 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Add annotations entry. */
     if (self->entries)
             self->entries = mem_gc_realloc_n_typed(interp, self->entries,
-                    1 + self->num_entries, PackFile_Annotations_Entry *);
+                    1 + self->num_entries, PackFile_Annotations_Entry);
         else
             self->entries = mem_gc_allocate_n_typed(interp,
-                    1 + self->num_entries, PackFile_Annotations_Entry *);
+                    1 + self->num_entries, PackFile_Annotations_Entry);
 
-    self->entries[self->num_entries]                  =
-                        mem_gc_allocate_typed(interp, PackFile_Annotations_Entry);
-    self->entries[self->num_entries]->bytecode_offset = offset;
-    self->entries[self->num_entries]->key             = key_id;
-    self->entries[self->num_entries]->value           = value;
+    self->entries[self->num_entries].bytecode_offset = offset;
+    self->entries[self->num_entries].key             = key_id;
+    self->entries[self->num_entries].value           = value;
 
     ++self->num_entries;
 }
@@ -4572,7 +4553,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
     if (!STRING_IS_NULL(key)) {
         for (i = 0; i < self->num_keys; ++i) {
-            STRING * const test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
+            STRING * const test_key = PF_CONST(self->code, self->keys[i].name)->u.string;
             if (Parrot_str_equal(interp, test_key, key)) {
                 key_id = i;
                 break;
@@ -4585,10 +4566,10 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
     /* Use groups to find search start point. */
     for (i = 0; i < self->num_groups; ++i)
-        if (offset < self->groups[i]->bytecode_offset)
+        if (offset < self->groups[i].bytecode_offset)
             break;
         else
-            start_entry = self->groups[i]->entries_offset;
+            start_entry = self->groups[i].entries_offset;
 
     if (key_id == -1) {
         /* Look through entries, storing what we find by key and tracking those
@@ -4599,11 +4580,11 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
                 self->num_keys, opcode_t);
 
         for (i = start_entry; i < self->num_entries; ++i) {
-            if (self->entries[i]->bytecode_offset >= offset)
+            if (self->entries[i].bytecode_offset >= offset)
                 break;
 
-            latest_values[self->entries[i]->key] = self->entries[i]->value;
-            have_values[self->entries[i]->key]   = 1;
+            latest_values[self->entries[i].key] = self->entries[i].value;
+            have_values[self->entries[i].key]   = 1;
         }
 
         /* Create hash of values we have. */
@@ -4611,9 +4592,9 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
         for (i = 0; i < self->num_keys; ++i) {
             if (have_values[i]) {
-                STRING * const key_name = PF_CONST(self->code, self->keys[i]->name)->u.string;
+                STRING * const key_name = PF_CONST(self->code, self->keys[i].name)->u.string;
                 VTABLE_set_pmc_keyed_str(interp, result, key_name,
-                        make_annotation_value_pmc(interp, self, self->keys[i]->type,
+                        make_annotation_value_pmc(interp, self, self->keys[i].type,
                                 latest_values[i]));
             }
         }
@@ -4627,11 +4608,11 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         opcode_t found_value  = 0;
 
         for (i = start_entry; i < self->num_entries; ++i) {
-            if (self->entries[i]->bytecode_offset >= offset)
+            if (self->entries[i].bytecode_offset >= offset)
                 break;
 
-            if (self->entries[i]->key == key_id) {
-                latest_value = self->entries[i]->value;
+            if (self->entries[i].key == key_id) {
+                latest_value = self->entries[i].value;
                 found_value  = 1;
             }
         }
@@ -4641,7 +4622,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
             result = PMCNULL;
         else
             result = make_annotation_value_pmc(interp, self,
-                    self->keys[key_id]->type, latest_value);
+                    self->keys[key_id].type, latest_value);
     }
 
     return result;

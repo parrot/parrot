@@ -301,11 +301,11 @@ typedef struct PackFile_Annotations_Entry {
 typedef struct PackFile_Annotations {
     PackFile_Segment            base;
     opcode_t                    num_keys;
-    PackFile_Annotations_Key    **keys;
+    PackFile_Annotations_Key    *keys;
     opcode_t                    num_groups;
-    PackFile_Annotations_Group  **groups;
+    PackFile_Annotations_Group  *groups;
     opcode_t                    num_entries;
-    PackFile_Annotations_Entry  **entries;
+    PackFile_Annotations_Entry  *entries;
     PackFile_ByteCode           *code;
 } PackFile_Annotations;
 
