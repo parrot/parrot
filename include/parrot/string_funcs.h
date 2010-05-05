@@ -102,8 +102,8 @@ STRING * Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_concat(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *a),
-    ARGIN_NULLOK(STRING *b))
+    ARGIN_NULLOK(const STRING *a),
+    ARGIN_NULLOK(const STRING *b))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

@@ -374,7 +374,8 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 
 /*
 
-=item C<STRING * Parrot_str_concat(PARROT_INTERP, STRING *a, STRING *b)>
+=item C<STRING * Parrot_str_concat(PARROT_INTERP, const STRING *a, const STRING
+*b)>
 
 Concatenates two Parrot strings. If necessary, converts the second
 string's encoding and/or type to match those of the first string. If
@@ -389,8 +390,8 @@ created and returned.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
-            ARGIN_NULLOK(STRING *b))
+Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
+            ARGIN_NULLOK(const STRING *b))
 {
     ASSERT_ARGS(Parrot_str_concat)
     const CHARSET   *cs;
@@ -403,22 +404,18 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
     /* If B isn't real, we just bail */
     const UINTVAL b_len = b ? Parrot_str_byte_length(interp, b) : 0;
     if (!b_len)
-        return a;
+        return Parrot_str_copy(interp, a);
 
     /* Is A real? */
     if (STRING_IS_NULL(a) || Buffer_bufstart(a) == NULL)
-        return b;
+        return Parrot_str_copy(interp, b);
 
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
 
     cs = string_rep_compatible(interp, a, b, &enc);
 
-    if (cs) {
-        a->charset  = cs;
-        a->encoding = enc;
-    }
-    else {
+    if (!cs) {
         /* upgrade strings for concatenation */
         enc = (a->encoding == Parrot_utf16_encoding_ptr
            ||  b->encoding == Parrot_utf16_encoding_ptr
@@ -440,8 +437,8 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
     total_length = a->bufused + b->bufused;
 
     dest = Parrot_str_new_noinit(interp, enum_stringrep_one, total_length);
-    dest->encoding = a->encoding;
-    dest->charset  = a->charset;
+    dest->encoding = enc;
+    dest->charset  = cs;
 
     /* Copy A first */
     mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
