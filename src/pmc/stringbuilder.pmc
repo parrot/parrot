@@ -18,6 +18,8 @@ TODO: Add description here.
 
 */
 
+#include "parrot/string_funcs.h"
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -117,10 +119,32 @@ Append string to current buffer.
     VTABLE void push_string(STRING *s) {
         STRING          *buffer;
         size_t           total_size;
+        const CHARSET   *cs;
+        const ENCODING  *enc = NULL;
+
+        /* Early return on NULL strings */
+        if (STRING_IS_NULL(s))
+            return;
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
 
-        /* TODO If strings are incompatible - convert them */
+        /* If strings are incompatible - convert them */
+        /* TODO Ask chromatic why in Parrot_str_join he ignored charset */
+        cs = Parrot_str_rep_compatible(interp, buffer, s, &enc);
+        if (!cs) {
+            cs = Parrot_unicode_charset_ptr;
+            enc = (buffer->encoding == Parrot_utf16_encoding_ptr
+               ||  s->encoding == Parrot_utf16_encoding_ptr
+               ||  buffer->encoding == Parrot_ucs2_encoding_ptr
+               ||  s->encoding == Parrot_ucs2_encoding_ptr)
+                ? Parrot_utf16_encoding_ptr
+                : Parrot_utf8_encoding_ptr;
+
+            buffer = Parrot_unicode_charset_ptr->to_charset(interp, buffer);
+            s      = Parrot_unicode_charset_ptr->to_charset(interp, s);
+
+            SET_ATTR_buffer(INTERP, SELF, buffer);
+        }
 
         /* Calculate (possibly new) total size */
         total_size = calculate_capacity(INTERP, buffer->bufused, s->bufused);

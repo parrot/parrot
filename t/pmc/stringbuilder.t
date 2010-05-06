@@ -20,9 +20,10 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(12)
-    test_create()       # 2 tests
-    test_push_string()
+    plan(13)
+    test_create()               # 2 tests
+    test_push_string()          # 9 tests
+    test_push_string_unicode()  # 1 test
 
     # END_OF_TESTS
 .end
@@ -88,6 +89,18 @@ Tests the C<StringBuilder> PMC.
     $I0 = sb
     is( $I0, 16384, "... and capacity increased" )
 
+.end
+
+.sub 'test_push_string_unicode'
+    .local pmc sb
+    sb = new ["StringBuilder"]
+
+    push sb, "le"
+    push sb, unicode:"o "
+    push sb, iso-8859-1:"tötsch"
+
+    $S0 = sb
+    is( $S0, iso-8859-1:"leo tötsch", "Unicode strings appened")
 .end
 
 # Local Variables:
