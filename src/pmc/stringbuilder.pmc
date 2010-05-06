@@ -184,6 +184,19 @@ Append string. Synonym for push_string
         SELF.push_string(VTABLE_get_string(INTERP, p));
     }
 
+/*
+
+=item C<VTABLE set_string_native()>
+
+Set content of buffer to passed string
+
+=cut
+
+*/
+    VTABLE void set_string_native(STRING *s) {
+        SET_ATTR_buffer(INTERP, SELF, Parrot_str_clone(INTERP, s));
+    }
+
 
 /*
 

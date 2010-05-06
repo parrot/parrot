@@ -20,11 +20,12 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(14)
+    plan(17)
     test_create()               # 2 tests
     test_push_string()          # 9 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
+    test_set_string_native()    # 3 tests
 
     # END_OF_TESTS
 .end
@@ -118,6 +119,23 @@ Tests the C<StringBuilder> PMC.
 
     $S0 = sb
     is( $S0, "foobarbaz", "StringBuilder handles concat properly")
+
+.end
+
+.sub 'test_set_string_native'
+    .local pmc sb
+    sb = new ["StringBuilder"]
+
+    $S99 = "foo"
+    sb   = $S99
+
+    $S0  = sb
+    is( $S0, "foo", "Assignment works")
+
+    sb .= "bar"
+    $S0  = sb
+    is( $S0, "foobar", "... with appending string after")
+    is( $S99, "foo", "... without touching of original string")
 
 .end
 
