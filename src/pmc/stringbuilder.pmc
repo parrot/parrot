@@ -211,7 +211,8 @@ Calculate capacity for string. Usually StringBuilders used for "large"
 strings. So capacity rounded up by next algorithm:
   - By 128 bytes if total capacity less then 1KB
   - By 1KB if total less than 4KB
-  - By 4KB otherwise.
+  - By 4KB if total less than 1MB 
+  - By 1MB otherwise.
 
 This function is subject for tuning on real-world usage scenarios.
 
@@ -230,8 +231,10 @@ calculate_capacity(SHIM_INTERP, size_t current, size_t additional)
         total_size = (total_size / 128 + 1) * 128;
     else if (total_size < 4096)
         total_size = (total_size / 1024 + 1) * 1024;
-    else
+    else if (total_size < 1024*1024)
         total_size = (total_size / 4096 + 1) * 4096;
+    else
+        total_size = (total_size / 1024 / 1024 + 1) * 1024 * 1024;
 
     return total_size;
 }
