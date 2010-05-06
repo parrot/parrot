@@ -1251,6 +1251,21 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem += sizeof (void *);
 
+    /* Update Memory_Block usage */
+    if (PObj_is_movable_TESTALL(str)) {
+        INTVAL *buffer_flags = Buffer_bufrefcountptr(str);
+
+        /* Mask low 2 bits used for flags */
+        Memory_Block * block = Buffer_pool(str);
+
+        PARROT_ASSERT(block);
+
+        /* We can have shared buffers. Don't count them (yet) */
+        if (!(*buffer_flags & Buffer_shared_FLAG)) {
+            block->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(str));
+        }
+    }
+
     /* copy mem from strstart, *not* bufstart */
     oldmem             = str->strstart;
     Buffer_bufstart(str) = (void *)mem;
