@@ -166,6 +166,27 @@ Append string to current buffer.
 
 /*
 
+=item C<VTABLE i_concatenate_str()
+
+=item C<VTABLE i_concatenate()
+
+Append string. Synonym for push_string
+
+=cut
+
+*/
+
+    VTABLE void i_concatenate_str(STRING *s) {
+        SELF.push_string(s);
+    }
+
+    VTABLE void i_concatenate(PMC *p) {
+        SELF.push_string(VTABLE_get_string(INTERP, p));
+    }
+
+
+/*
+
 =item C<VTABLE get_integer()>
 
 Returns current capacity of allocated buffer.

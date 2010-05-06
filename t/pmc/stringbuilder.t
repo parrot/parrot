@@ -20,10 +20,11 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(13)
+    plan(14)
     test_create()               # 2 tests
     test_push_string()          # 9 tests
     test_push_string_unicode()  # 1 test
+    test_i_concatenate()        # 1 test
 
     # END_OF_TESTS
 .end
@@ -101,6 +102,23 @@ Tests the C<StringBuilder> PMC.
 
     $S0 = sb
     is( $S0, iso-8859-1:"leo tötsch", "Unicode strings appened")
+.end
+
+.sub 'test_i_concatenate'
+    .local pmc sb
+    sb = new ["StringBuilder"]
+
+    concat sb, "foo"
+
+    $P0 = new ["String"]
+    $P0 = "bar"
+    concat sb, $P0
+
+    sb .= "baz"
+
+    $S0 = sb
+    is( $S0, "foobarbaz", "StringBuilder handles concat properly")
+
 .end
 
 # Local Variables:
