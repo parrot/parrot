@@ -265,14 +265,16 @@ calculate_capacity(SHIM_INTERP, size_t current, size_t additional)
 {
     ASSERT_ARGS(calculate_capacity)
     size_t total_size = current + additional;
+    size_t chunk_size = 1024*1024;
+
     if (total_size < 1024)
-        total_size = (total_size / 128 + 1) * 128;
+        chunk_size = 128;
     else if (total_size < 4096)
-        total_size = (total_size / 1024 + 1) * 1024;
+        chunk_size = 1024;
     else if (total_size < 1024*1024)
-        total_size = (total_size / 4096 + 1) * 4096;
-    else
-        total_size = (total_size / 1024 / 1024 + 1) * 1024 * 1024;
+        chunk_size = 4096;
+
+    total_size = (total_size / chunk_size + 1) * chunk_size;
 
     return total_size;
 }
