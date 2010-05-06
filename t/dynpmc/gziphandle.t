@@ -22,7 +22,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .local pmc config_hash, interp
     .local int num_tests
 
-    num_tests = 3
+    num_tests = 5
     plan(num_tests)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
@@ -32,6 +32,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     $P0 = loadlib 'gziphandle'
     test_handle()
     test_version()
+    test_basic()
     .return()
 
   no_zlib:
@@ -56,6 +57,15 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     is($I0, 0, 'zlib version')
 .end
 
+.sub 'test_basic'
+    $P0 = new 'GzipHandle'
+    .const string data = "message"
+    $I0 = $P0.'crc32'(0, data)
+    ok($I0, "crc32")
+    $S0 = $P0.'compress'(data)
+    $I0 = length $S0
+    is($I0, 15, "compress")
+.end
 
 # Local Variables:
 #   mode: pir
