@@ -124,10 +124,6 @@ Math/Rand.pbc
 
 curl
 
-=item sdist_zip
-
-zip
-
 =item spec, sdist_rpm, bdist_rpm
 
 rpmbuild
@@ -3033,14 +3029,14 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .local pmc archive
     archive = new ['Archive';'Tar']
     $P1 = archive.'add_files'($P0 :flat)
-    .local string dir
-    dir = get_tarname('', kv :flat :named)
+    .local string dirname
+    $S0 = get_tarname('', kv :flat :named)
+    dirname = $S0 . '/'
   L2:
     unless $P1 goto L3
     $P2 = shift $P1
     $S0 = $P2.'full_path'()
-    $S0 = '/' . $S0
-    $S0 = dir . $S0
+    $S0 = dirname . $S0
     $P2.'rename'($S0)
     goto L2
   L3:
@@ -3082,23 +3078,28 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
+    load_bytecode 'Archive/Zip.pbc'
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
     $S0 = pop $P0
-    $S0 = get_tarname('.zip', kv :flat :named)
-    $I0 = newer($S0, $P0)
+    .local string archive_file
+    archive_file = get_tarname('.zip', kv :flat :named)
+    $I0 = newer(archive_file, $P0)
     if $I0 goto L1
-    .local string cmd
+    .local pmc archive
+    archive = new ['Archive';'Zip']
+    .local string dirname
     $S0 = get_tarname('', kv :flat :named)
-    copy_sdist($S0, $P0)
-
-    cmd = 'zip -9 -r '
-    cmd .= $S0
-    cmd .= '.zip '
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-
-    rmtree($S0)
+    dirname = $S0 . '/'
+    $P1 = iter $P0
+  L2:
+    unless $P1 goto L3
+    $S0 = shift $P1
+    $S1 = dirname . $S0
+    archive.'addFile'($S0, $S1)
+    goto L2
+  L3:
+    archive.'writeToFileNamed'(archive_file)
   L1:
 .end
 
@@ -3108,21 +3109,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.zip', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('MANIFEST', 1 :named('verbose'))
-.end
-
-.sub 'copy_sdist' :anon
-    .param string dirname
-    .param pmc files
-    mkdir(dirname)
-    $S1 = dirname . "/"
-    $P0 = iter files
-  L1:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    $S2 = $S1 . $S0
-    install($S0, $S2)
-    goto L1
-  L2:
 .end
 
 =head3 Step sdist_rpm
