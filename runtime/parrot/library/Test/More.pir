@@ -1335,14 +1335,16 @@ Bad input: "C<test that the return from Foo is correct type>"
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local pmc description
-    .local string diagnostic
+    .local pmc diagnostic
     description = new ['StringBuilder']
+    diagnostic  = new ['StringBuilder']
 
     description = "The object"
     unless got_name goto keep_default
     description = object_name
   keep_default:
-    diagnostic = description
+    $S0 = description
+    diagnostic = $S0
     description .= " isa "
     $S0 = class_name
     description .= $S0
