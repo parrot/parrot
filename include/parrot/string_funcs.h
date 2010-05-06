@@ -322,7 +322,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC* Parrot_str_split(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *delim),
+    ARGIN_NULLOK(const STRING *delim),
     ARGIN_NULLOK(STRING *str))
         __attribute__nonnull__(1);
 
