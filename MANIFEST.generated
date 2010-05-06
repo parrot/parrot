@@ -132,6 +132,7 @@ include/pmc/pmc_sockaddr.h                       [devel]include
 include/pmc/pmc_socket.h                         [devel]include
 include/pmc/pmc_string.h                         [devel]include
 include/pmc/pmc_string.h                         [devel]include
+include/pmc/pmc_stringbuilder.h                  [devel]include
 include/pmc/pmc_stringhandle.h                   [devel]include
 include/pmc/pmc_stringiterator.h                 [devel]include
 include/pmc/pmc_sub.h                            [devel]include
@@ -408,6 +409,7 @@ src/pmc/sockaddr.dump                            [devel]src
 src/pmc/socket.dump                              [devel]src
 src/pmc/string.dump                              [devel]src
 src/pmc/string.dump                              [devel]src
+src/pmc/stringbuilder.dump                       [devel]src
 src/pmc/stringhandle.dump                        [devel]src
 src/pmc/stringiterator.dump                      [devel]src
 src/pmc/sub.dump                                 [devel]src

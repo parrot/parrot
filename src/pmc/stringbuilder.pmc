@@ -1,0 +1,44 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/stringbuilder.pmc - StringBuilder PMC Class
+
+=head1 DESCRIPTION
+
+TODO: Add description here.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass StringBuilder provides string auto_attrs {
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
