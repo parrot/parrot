@@ -184,19 +184,11 @@ If $2 is NULL or zero length, zero is returned.
 =cut
 
 inline op length(out INT, in STR) :base_mem {
-    $1 = $2 ? Parrot_str_byte_length(interp, $2) : 0;
+    $1 = Parrot_str_length(interp, $2);
 }
 
 inline op bytelength(out INT, in STR) :base_mem {
-    UINTVAL n;
-    const STRING * const s = $2;
-    if (STRING_IS_NULL(s))
-        n = 0;
-    else {
-        n = s->bufused;
-        PARROT_ASSERT(n == ENCODING_BYTES(interp, $2));
-    }
-    $1 = n;
+    $1 = Parrot_str_byte_length(interp, $2);
 }
 
 

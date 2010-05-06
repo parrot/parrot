@@ -427,7 +427,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     /* XXX should this be a CHARSET method? */
 
     /* If B isn't real, we just bail */
-    const UINTVAL b_len = b ? Parrot_str_byte_length(interp, b) : 0;
+    const UINTVAL b_len = b ? Parrot_str_length(interp, b) : 0;
     if (!b_len)
         return STRING_IS_NULL(a) ? STRINGNULL : Parrot_str_copy(interp, a);
 
@@ -797,7 +797,7 @@ Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_byte_length)
 
-    return STRING_IS_NULL(s) ? 0 : s->strlen;
+    return STRING_IS_NULL(s) ? 0 : s->bufused;
 }
 
 
@@ -852,7 +852,7 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *s),
     if (start < 0)
         return -1;
 
-    len = Parrot_str_byte_length(interp, s);
+    len = Parrot_str_length(interp, s);
 
     if (!len)
         return -1;
@@ -860,7 +860,7 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *s),
     if (start >= (INTVAL)len)
         return -1;
 
-    if (!Parrot_str_byte_length(interp, s2))
+    if (!Parrot_str_length(interp, s2))
         return -1;
     else {
         DECL_CONST_CAST;
@@ -896,7 +896,7 @@ string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
             "Cannot get character of NULL string");
 
-    len = Parrot_str_byte_length(interp, s);
+    len = Parrot_str_length(interp, s);
     if (len == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
             "Cannot get character of empty string");
@@ -959,7 +959,7 @@ string_chr(PARROT_INTERP, UINTVAL character)
 
 =item C<INTVAL Parrot_str_length(PARROT_INTERP, const STRING *s)>
 
-Calculates and returns the number of characters in the specified Parrot string.
+Returns the number of characters in the specified Parrot string.
 
 =cut
 
@@ -968,11 +968,11 @@ Calculates and returns the number of characters in the specified Parrot string.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_length(SHIM_INTERP, ARGIN(const STRING *s))
+Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_length)
 
-    return s->strlen;
+    return STRING_IS_NULL(s) ? 0 : s->strlen;
 }
 
 
@@ -1068,7 +1068,7 @@ Parrot_str_substr(PARROT_INTERP,
     ASSERT_STRING_SANITY(src);
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-    if (offset == (INTVAL)Parrot_str_byte_length(interp, src) || length < 1)
+    if (offset == (INTVAL)Parrot_str_length(interp, src) || length < 1)
         return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
     if (offset < 0)
@@ -3096,12 +3096,12 @@ Parrot_str_split(PARROT_INTERP,
 
     res  = Parrot_pmc_new(interp,
             Parrot_get_ctx_HLL_type(interp, enum_class_ResizableStringArray));
-    slen = Parrot_str_byte_length(interp, str);
+    slen = Parrot_str_length(interp, str);
 
     if (!slen)
         return res;
 
-    dlen = Parrot_str_byte_length(interp, delim);
+    dlen = Parrot_str_length(interp, delim);
 
     if (dlen == 0) {
         int i;
@@ -3129,7 +3129,7 @@ Parrot_str_split(PARROT_INTERP,
         STRING * const tstr = Parrot_str_substr(interp, str, ps, pl);
 
         VTABLE_push_string(interp, res, tstr);
-        ps = pe + Parrot_str_byte_length(interp, delim);
+        ps = pe + Parrot_str_length(interp, delim);
 
         if (ps > slen)
             break;
