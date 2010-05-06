@@ -221,7 +221,7 @@ MAIN
     .local pmc codestring
     .local int size
 
-    codestring = new [ 'ResizableStringArray' ]
+    codestring = new [ 'StringBuilder' ]
     push codestring, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
@@ -248,10 +248,6 @@ MAIN
     push codestring, "\n"
     goto code_loop
   code_done:
-    # Join current strings to avoid storing too much
-    $S0 = join '', codestring
-    codestring = 0
-    push codestring, $S0
     goto read_loop
 
   read_done:
@@ -268,7 +264,7 @@ MAIN
         }
 END_OF_FUNCTION
 
-    $S0 = join '', codestring
+    $S0 = codestring
     .return ($S0)
 
   err_infile:
@@ -317,7 +313,7 @@ END_OF_FUNCTION
     .local pmc codestring
     .local int size
 
-    codestring = new ['ResizableStringArray']
+    codestring = new ['StringBuilder']
 
     push codestring, "const char * program_code =\n"
     push codestring, '"'
@@ -347,10 +343,6 @@ END_OF_FUNCTION
     push codestring, '"'
     goto code_loop
   code_done:
-    # Join current strings to avoid storing too much
-    $S0 = join '', codestring
-    codestring = 0
-    push codestring, $S0
     goto read_loop
 
   read_done:
@@ -370,7 +362,7 @@ END_OF_FUNCTION
         }
 END_OF_FUNCTION
 
-    $S0 = join '', codestring
+    $S0 = codestring
     .return ($S0)
 
   err_infile:
@@ -453,7 +445,7 @@ END_OF_DEFINES
 
 
     .local pmc codestring
-    codestring  = new [ 'ResizableStringArray' ]
+    codestring  = new [ 'StringBuilder' ]
     push codestring, "#include <windows.h>\n"
     push codestring, rc_constant_defines
     push codestring, "const unsigned int bytecode_size = "
@@ -505,7 +497,7 @@ END_OF_FUNCTION
     die "RC command failed"
 
   rc_ok:
-    $S0 = join '', codestring
+    $S0 = codestring
     .return ($S0)
 
   err_h_open:
