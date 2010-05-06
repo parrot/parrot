@@ -413,8 +413,8 @@ check:
     if type == 'f' goto flt
     $P0 = new 'Exception'
     $S0 = "Unknown specs option '"
-    $S0 .= type
-    $S0 .= "'"
+    $S0 = $S0 . type
+    $S0 = $S0 . "'"
     $P0 = $S0
     throw $P0
 
@@ -506,8 +506,8 @@ endfor:
     if $I0 goto finish
     $P0 = new 'Exception'
     $S0 = "Option '"
-    $S0 .= key
-    $S0 .= "' not in specs"
+    $S0 = $S0 . key
+    $S0 = $S0 . "' not in specs"
     $P0 = $S0
     throw $P0
 finish:
@@ -558,8 +558,8 @@ When a required argument is missing, throws an exception with the message
 
     $P0 = new 'Exception'
     $S0 = "Missing a required argument for option '"
-    $S0 .= arg
-    $S0 .= "'"
+    $S0 = $S0 . arg
+    $S0 = $S0 . "'"
     $P0 = $S0
     throw $P0
 .end
