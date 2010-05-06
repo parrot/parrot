@@ -172,6 +172,8 @@ For testing purpose only?
 
 =head2 Helper functions.
 
+=over 4
+
 =cut
 
 */
@@ -188,6 +190,8 @@ strings. So capacity rounded up by next algorithm:
   - By 4KB otherwise.
 
 This function is subject for tuning on real-world usage scenarios.
+
+=back
 
 =cut
 
