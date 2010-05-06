@@ -294,6 +294,32 @@ string_rep_compatible(SHIM_INTERP,
     return NULL;
 }
 
+/*
+
+=item C<const CHARSET * Parrot_str_rep_compatible(PARROT_INTERP, const STRING
+*a, const STRING *b, const ENCODING **e)>
+
+Find the "lowest" possible charset and encoding for the given string. E.g.
+
+  ascii <op> utf8 => utf8
+                  => ascii, B<if> C<STRING *b> has ascii chars only.
+
+Returns NULL, if no compatible string representation can be found.
+
+=cut
+
+*/
+
+PARROT_INLINE
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+const CHARSET *
+Parrot_str_rep_compatible(PARROT_INTERP,
+    ARGIN(const STRING *a), ARGIN(const STRING *b), ARGOUT(const ENCODING **e))
+{
+    ASSERT_ARGS(Parrot_str_rep_compatible)
+    return string_rep_compatible(interp, a, b, e);
+}
 
 /*
 
