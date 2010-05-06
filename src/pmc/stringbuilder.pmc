@@ -22,7 +22,79 @@ TODO: Add description here.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
+#define INITIAL_STRING_CAPACITY 128
+
 pmclass StringBuilder provides string auto_attrs {
+    ATTR STRING *buffer;    /* Mutable string to gather results */
+
+/*
+
+=item C<void init()>
+
+Initializes the StringBuilder.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        STATICSELF.init_int(INITIAL_STRING_CAPACITY);
+    }
+
+/*
+
+=item C<void init_int()>
+
+Initializes the StringBuilder with initial size of buffer.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL initial_size) {
+        STRING * const buffer = Parrot_str_new_init(INTERP, NULL, initial_size,
+                Parrot_default_encoding_ptr, Parrot_default_charset_ptr, 0);
+        SET_ATTR_buffer(INTERP, SELF, buffer);
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the StringBuilder as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        STRING *buffer;
+
+        if (!PMC_data(SELF))
+            return;
+
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        Parrot_gc_mark_STRING_alive(INTERP, buffer);
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Clones and returns current buffer. We need clone because outside of
+StringBuilder strings are immutable.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        STRING *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        return Parrot_str_clone(INTERP, buffer);
+    }
 
 
 /*
