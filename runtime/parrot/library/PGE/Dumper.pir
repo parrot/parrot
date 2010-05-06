@@ -112,8 +112,10 @@ An alternate dump output for a Match object and all of its subcaptures.
     if has_b1 goto start
     b1 = "["
   start:
-    .local string out
-    out = concat prefix, ':'
+    .local pmc out
+    out = new ['StringBuilder']
+    out = prefix
+    out .= ':'
     unless self goto subpats
     out .= ' <'
     $S0 = self
@@ -136,8 +138,8 @@ An alternate dump output for a Match object and all of its subcaptures.
     unless spi < spc goto subrules
     prefix1 = concat prefix, b1
     $S0 = spi
-    concat prefix1, $S0
-    concat prefix1, b2
+    prefix1 = concat prefix1, $S0
+    prefix1 = concat prefix1, b2
     $I0 = defined capt[spi]
     unless $I0 goto subpats_2
     $P0 = capt[spi]
@@ -154,8 +156,8 @@ An alternate dump output for a Match object and all of its subcaptures.
     unless it goto end
     $S0 = shift it
     prefix1 = concat prefix, '<'
-    concat prefix1, $S0
-    concat prefix1, ">"
+    prefix1 = concat prefix1, $S0
+    prefix1 = concat prefix1, ">"
     $I0 = defined capt[$S0]
     unless $I0 goto subrules_1
     $P0 = capt[$S0]
@@ -178,8 +180,8 @@ An alternate dump output for a Match object and all of its subcaptures.
     $P1 = $P0[$I0]
     prefix2 = concat prefix1, b1
     $S0 = $I0
-    concat prefix2, $S0
-    concat prefix2, b2
+    prefix2 = concat prefix2, $S0
+    prefix2 = concat prefix2, b2
     $S0 = $P1.'dump_str'(prefix2, b1, b2)
     out .= $S0
     inc $I0
@@ -195,7 +197,8 @@ An alternate dump output for a Match object and all of its subcaptures.
     local_return jmpstack
 
   end:
-    .return (out)
+    $S0 = out
+    .return ($S0)
 .end
 
 
