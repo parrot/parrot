@@ -84,6 +84,7 @@ include/pmc/pmc_namespace.h                      [devel]include
 include/pmc/pmc_nci.h                            [devel]include
 include/pmc/pmc_null.h                           [devel]include
 include/pmc/pmc_object.h                         [devel]include
+include/pmc/pmc_opcode.h                         [devel]include
 include/pmc/pmc_oplib.h                          [devel]include
 include/pmc/pmc_orderedhash.h                    [devel]include
 include/pmc/pmc_orderedhashiterator.h            [devel]include
