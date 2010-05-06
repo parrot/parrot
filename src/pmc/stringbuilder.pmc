@@ -20,6 +20,14 @@ TODO: Add description here.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static size_t calculate_capacity(SHIM_INTERP,
+    size_t current,
+    size_t additional);
+
+#define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define INITIAL_STRING_CAPACITY 128
@@ -96,6 +104,41 @@ StringBuilder strings are immutable.
         return Parrot_str_clone(INTERP, buffer);
     }
 
+/*
+
+=item C<STRING *push_string()>
+
+Append string to current buffer.
+
+=cut
+
+*/
+
+    VTABLE void push_string(STRING *s) {
+        STRING          *buffer;
+        size_t           total_size;
+
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+
+        /* TODO If strings are incompatible - convert them */
+
+        /* Calculate (possibly new) total size */
+        total_size = calculate_capacity(INTERP, Buffer_buflen(buffer),
+                s->bufused);
+
+        /* Reallocate if necessary */
+        if (total_size > Buffer_buflen(buffer))
+            Parrot_gc_reallocate_string_storage(INTERP, buffer, total_size);
+
+        /* Tack s on the end of buffer */
+        mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart + buffer->bufused),
+                s->strstart, s->bufused);
+
+        /* Update buffer */
+        buffer->bufused += s->bufused;
+        buffer->strlen  += Parrot_str_length(INTERP, s);
+    }
+
 
 /*
 
@@ -107,6 +150,46 @@ StringBuilder strings are immutable.
 
 }
 
+
+/*
+
+=head2 Helper functions.
+
+=cut
+
+*/
+
+/*
+
+=item C<static size_t calculate_capacity(PARROT_INTERP, size_t current, size_t
+additional)>
+
+Calculate capacity for string. Usually StringBuilders used for "large"
+strings. So capacity rounded up by next algorithm:
+  - By 128 bytes if total capacity less then 1KB
+  - By 1KB if total less than 4KB
+  - By 4KB otherwise.
+
+This function is subject for tuning on real-world usage scenarios.
+
+=cut
+
+*/
+
+static size_t
+calculate_capacity(SHIM_INTERP, size_t current, size_t additional)
+{
+    ASSERT_ARGS(calculate_capacity)
+    size_t total_size = current + additional;
+    if (total_size < 1024)
+        total_size = (total_size + 128) & ~128;
+    else if (total_size < 4096)
+        total_size = (total_size + 1024) & ~1024;
+    else
+        total_size = (total_size + 4096) & ~4096;
+
+    return total_size;
+}
 
 /*
  * Local variables:

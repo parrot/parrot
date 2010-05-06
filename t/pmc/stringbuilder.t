@@ -20,8 +20,9 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(2)
+    plan(5)
     test_create()       # 2 tests
+    test_push_string()
 
     # END_OF_TESTS
 .end
@@ -36,6 +37,24 @@ Tests the C<StringBuilder> PMC.
 
     $S0 = sb
     is( $S0, '', '... with empty content')
+
+.end
+
+.sub 'test_push_string'
+    .local pmc sb
+    sb = new ['StringBuilder']
+
+    push sb, 'foo'
+    $S0 = sb
+    is( $S0, 'foo', 'First string pushed')
+
+    push sb, 'bar'
+    $S1 = sb
+    is( $S1, 'foobar', 'Second string pushed')
+
+    is( $S0, 'foo', '... without clobbering first string')
+
+    # Push large string which will cause reallocate
 
 .end
 
