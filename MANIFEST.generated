@@ -223,6 +223,7 @@ src/pmc/fixedpmcarray.dump                        [devel]src
 src/pmc/float.dump                                [devel]src
 src/pmc/hash.dump                                 [devel]src
 src/pmc/integer.dump                              [devel]src
+src/pmc/managedstruct.dump                        [devel]src
 src/pmc/multisub.dump                             [devel]src
 src/pmc/object.dump                               [devel]src
 include/pmc/pmc_boolean.h                         [devel]include
@@ -236,6 +237,7 @@ include/pmc/pmc_fixedpmcarray.h                   [devel]include
 include/pmc/pmc_float.h                           [devel]include
 include/pmc/pmc_hash.h                            [devel]include
 include/pmc/pmc_integer.h                         [devel]include
+include/pmc/pmc_managedstruct.h                   [devel]include
 include/pmc/pmc_multisub.h                        [devel]include
 include/pmc/pmc_object.h                          [devel]include
 include/pmc/pmc_parrotlibrary.h                   [devel]include
@@ -245,12 +247,14 @@ include/pmc/pmc_scalar.h                          [devel]include
 include/pmc/pmc_string.h                          [devel]include
 include/pmc/pmc_sub.h                             [devel]include
 include/pmc/pmc_undef.h                           [devel]include
+include/pmc/pmc_unmanagedstruct.h                 [devel]include
 src/pmc/resizablepmcarray.dump                    [devel]src
 src/pmc/role.dump                                 [devel]src
 src/pmc/scalar.dump                               [devel]src
 src/pmc/string.dump                               [devel]src
 src/pmc/sub.dump                                  [devel]src
 src/pmc/undef.dump                                [devel]src
+src/pmc/unmanagedstruct.dump                      [devel]src
 src/string_private_cstring.h                      []
 tools/build/dynpmc.pl                             []
 vtable.dump                                       [devel]src
