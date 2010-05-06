@@ -493,7 +493,8 @@ also calls C<exit>.
     .local pmc output
     output   = self.'output'()
 
-    .local string bail_out
+    .local pmc bail_out
+    bail_out = new ['StringBuilder']
     bail_out = 'Bail out!'
 
     unless has_reason goto WRITE_REASON

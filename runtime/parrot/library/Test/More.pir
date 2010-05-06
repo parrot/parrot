@@ -560,7 +560,8 @@ This handles comparisons of array-like and hash-like structures.
     .param int have_desc   :opt_flag
 
     .local int    result
-    .local string diagnosis
+    .local pmc diagnosis
+    diagnosis = new ['StringBuilder']
 
     .local pmc position
     position = new 'ResizablePMCArray'
@@ -660,16 +661,21 @@ This handles comparisons of array-like and hash-like structures.
     r_count = r_array
     if l_count == r_count goto compare_contents
 
-    .local string l_count_string
-    .local string r_count_string
-    l_count_string  = l_count
+    .local pmc l_count_string
+    .local pmc r_count_string
+    l_count_string  = new ['StringBuilder']
+    r_count_string  = new ['StringBuilder']
+
+    $S0 = l_count
+    l_count_string  = $S0
     l_count_string .= ' element'
 
     if l_count == 1 goto pluralization_done
     l_count_string .= 's'
 
   pluralization_done:
-    r_count_string  = r_count
+    $S0 = r_count
+    r_count_string  = $S0
 
     push position, l_count_string
     push position, r_count_string
@@ -733,16 +739,21 @@ This handles comparisons of array-like and hash-like structures.
     r_count = r_hash
     if l_count == r_count goto compare_contents
 
-    .local string l_count_string
-    .local string r_count_string
-    l_count_string  = l_count
+    .local pmc l_count_string
+    .local pmc r_count_string
+    l_count_string  = new ['StringBuilder']
+    r_count_string  = new ['StringBuilder']
+
+    $S0 = l_count
+    l_count_string  = $S0
     l_count_string .= ' element'
 
     if l_count == 1 goto pluralization_done
     l_count_string .= 's'
 
   pluralization_done:
-    r_count_string  = r_count
+    $S0 = r_count
+    r_count_string  = $S0
 
     push position, l_count_string
     push position, r_count_string
@@ -1166,7 +1177,9 @@ optional test description in C<description>.
     .param string description :optional
 
     .local pmc test
-    .local string diagnostic
+    .local pmc diagnostic
+    diagnostic = new ['StringBuilder']
+
     get_hll_global test, [ 'Test'; 'More' ], '_test'
     $I0 = index target, text
     $I0 = isne $I0, -1
@@ -1206,7 +1219,8 @@ optional test description in C<description>.
     load_bytecode "PGE/Util.pbc"
     p6rule_compile = compreg "PGE::Perl6Regex"
 
-    .local string diagnostic
+    .local pmc diagnostic
+    diagnostic = new ['StringBuilder']
     .local int pass
     pass = 0
 
@@ -1320,7 +1334,10 @@ Bad input: "C<test that the return from Foo is correct type>"
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    .local string description, diagnostic
+    .local pmc description
+    .local string diagnostic
+    description = new ['StringBuilder']
+
     description = "The object"
     unless got_name goto keep_default
     description = object_name
@@ -1346,14 +1363,16 @@ Bad input: "C<test that the return from Foo is correct type>"
 .sub _make_diagnostic
     .param string received
     .param string expected
-    .local string diagnostic
+    .local pmc diagnostic
 
+    diagnostic  = new ['StringBuilder']
     diagnostic  = 'Have: '
     diagnostic .= received
     diagnostic .= "\nWant: "
     diagnostic .= expected
 
-    .return( diagnostic )
+    $S0 = diagnostic
+    .return( $S0 )
 .end
 
 =back

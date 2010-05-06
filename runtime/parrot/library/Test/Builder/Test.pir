@@ -231,7 +231,7 @@ Returns the TAP-compatible string representation of this test.
     concat report, 'ok '
     concat report, number_string
 
-    unless description goto REPORT
+    unless desc_string goto REPORT
 
     concat report, ' - '
     concat report, desc_string
