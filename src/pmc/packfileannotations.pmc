@@ -37,6 +37,9 @@ pmclass PackfileAnnotations auto_attrs extends PackfileSegment {
     /* ConstantTable used for names lookup */
     ATTR PMC *const_table;
 
+    /* Annotations group: two RIA for a now */
+    ATTR PMC *gr_byte;
+    ATTR PMC *gr_entries;
     /* RPA of Annotation */
     ATTR PMC *annotations;
 
@@ -219,6 +222,20 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
         PMC      *annotation;
         Parrot_PackfileAnnotation_attributes *annotation_attrs;
 
+        /* Copy annotations groups */
+        if (a->num_groups > 0) {
+            attrs->gr_byte  = Parrot_pmc_new_init_int(INTERP,
+                    enum_class_ResizableIntegerArray, a->num_groups);
+            attrs->gr_entries = Parrot_pmc_new_init_int(INTERP,
+                    enum_class_ResizableIntegerArray, a->num_groups);
+            for (i = 0; i < a->num_groups; ++i) {
+                VTABLE_set_integer_keyed_int(INTERP, attrs->gr_byte, i,
+                        a->groups[i].bytecode_offset);
+                VTABLE_set_integer_keyed_int(INTERP, attrs->gr_entries, i,
+                        a->groups[i].entries_offset);
+            }
+        }
+
         /* Copy annotations to own array */
         VTABLE_set_integer_native(INTERP, attrs->annotations, a->num_entries);
         for (i = 0; i < a->num_entries; ++i) {
@@ -279,6 +296,21 @@ Create PackFile_Annotations* from self.
         INTVAL                name_id;
 
         res->base.type = PF_ANNOTATIONS_SEG;
+
+        /* Create annotations groups */
+        num = PMC_IS_NULL(attrs->gr_byte) ?
+            (INTVAL)0 : VTABLE_elements(INTERP, attrs->gr_byte);
+        res->num_groups = num;
+        if (num > 0) {
+            res->groups = mem_gc_allocate_n_zeroed_typed(interp,
+                    num, PackFile_Annotations_Group);
+            for (i = 0; i < num; ++i) {
+                res->groups[i].bytecode_offset =
+                        VTABLE_get_integer_keyed_int(INTERP, attrs->gr_byte, i);
+                res->groups[i].entries_offset =
+                        VTABLE_get_integer_keyed_int(INTERP, attrs->gr_entries, i);
+            }
+        }
 
         /*
             Create keys. Hash will be created in next structure:
