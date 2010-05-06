@@ -123,8 +123,7 @@ Append string to current buffer.
         /* TODO If strings are incompatible - convert them */
 
         /* Calculate (possibly new) total size */
-        total_size = calculate_capacity(INTERP, Buffer_buflen(buffer),
-                s->bufused);
+        total_size = calculate_capacity(INTERP, buffer->bufused, s->bufused);
 
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer))
@@ -137,8 +136,26 @@ Append string to current buffer.
         /* Update buffer */
         buffer->bufused += s->bufused;
         buffer->strlen  += Parrot_str_length(INTERP, s);
+
+        PARROT_ASSERT(buffer->bufused <= Buffer_buflen(buffer));
     }
 
+/*
+
+=item C<VTABLE get_integer()>
+
+Returns current capacity of allocated buffer.
+
+For testing purpose only?
+
+=cut
+
+*/
+    INTVAL get_integer() {
+        STRING *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        return Buffer_buflen(buffer);
+    }
 
 /*
 
@@ -182,11 +199,11 @@ calculate_capacity(SHIM_INTERP, size_t current, size_t additional)
     ASSERT_ARGS(calculate_capacity)
     size_t total_size = current + additional;
     if (total_size < 1024)
-        total_size = (total_size + 128) & ~128;
+        total_size = (total_size / 128 + 1) * 128;
     else if (total_size < 4096)
-        total_size = (total_size + 1024) & ~1024;
+        total_size = (total_size / 1024 + 1) * 1024;
     else
-        total_size = (total_size + 4096) & ~4096;
+        total_size = (total_size / 4096 + 1) * 4096;
 
     return total_size;
 }

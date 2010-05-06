@@ -20,7 +20,7 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(5)
+    plan(12)
     test_create()       # 2 tests
     test_push_string()
 
@@ -42,19 +42,51 @@ Tests the C<StringBuilder> PMC.
 
 .sub 'test_push_string'
     .local pmc sb
-    sb = new ['StringBuilder']
+    sb = new ["StringBuilder"]
 
-    push sb, 'foo'
+    push sb, "foo"
     $S0 = sb
-    is( $S0, 'foo', 'First string pushed')
+    is( $S0, "foo", "First string pushed")
 
-    push sb, 'bar'
+    push sb, "bar"
     $S1 = sb
-    is( $S1, 'foobar', 'Second string pushed')
+    is( $S1, "foobar", "Second string pushed")
 
-    is( $S0, 'foo', '... without clobbering first string')
+    is( $S0, "foo", "... without clobbering first string")
+
+    $I0 = sb
+    is( $I0, 128, "... and capacity still 128" )
 
     # Push large string which will cause reallocate
+    $S99 = repeat "x", 128
+    push sb, $S99
+
+    $S0 = concat "foobar", $S99
+    $S1 = sb
+    is( $S0, $S1, "Push 128 chars string works")
+
+    $I0 = sb
+    is( $I0, 256, "... and capacity increased" )
+
+    $S99 = repeat "x", 1000
+    push sb, $S99
+
+    $S0 = concat $S0, $S99
+    $S1 = sb
+    is( $S0, $S1, "Push 1000 chars string works")
+
+    $I0 = sb
+    is( $I0, 2048, "... and capacity increased" )
+
+    $S99 = repeat "x", 12000
+    push sb, $S99
+
+    $S0 = concat $S0, $S99
+    $S1 = sb
+    is( $S0, $S1, "Push 10000 chars string works")
+
+    $I0 = sb
+    is( $I0, 16384, "... and capacity increased" )
 
 .end
 
