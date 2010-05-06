@@ -20,9 +20,10 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(17)
+    plan(21)
     test_create()               # 2 tests
     test_push_string()          # 9 tests
+    test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
     test_set_string_native()    # 3 tests
@@ -91,6 +92,26 @@ Tests the C<StringBuilder> PMC.
     $I0 = sb
     is( $I0, 16384, "... and capacity increased" )
 
+.end
+
+.sub 'test_push_pmc'
+    .local pmc sb
+    sb = new ["StringBuilder"]
+
+    box $P0, "foo"
+    push sb, $P0
+    $S0 = sb
+    is( $S0, "foo", "First string pushed")
+
+    box $P0, "bar"
+    push sb, $P0
+    $S1 = sb
+    is( $S1, "foobar", "Second string pushed")
+
+    is( $S0, "foo", "... without clobbering first string")
+
+    $I0 = sb
+    is( $I0, 128, "... and capacity still 128" )
 .end
 
 .sub 'test_push_string_unicode'

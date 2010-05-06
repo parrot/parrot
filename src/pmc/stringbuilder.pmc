@@ -184,6 +184,10 @@ Append string. Synonym for push_string
         SELF.push_string(VTABLE_get_string(INTERP, p));
     }
 
+    VTABLE void push_pmc(PMC *p) {
+        SELF.push_string(VTABLE_get_string(INTERP, p));
+    }
+
 /*
 
 =item C<VTABLE set_string_native()>
