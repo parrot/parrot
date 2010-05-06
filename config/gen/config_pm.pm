@@ -108,6 +108,7 @@ END
         if (/\@PCONFIG\@/) {
             for my $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
                 next if exists $p5_keys{$k};
+                next if $k ~~ /_provisional/;
 
                 my $v = $conf->data->get($k);
                 if ( defined $v ) {
