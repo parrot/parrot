@@ -455,7 +455,8 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     $I1 = $P1
     $I1 = $P0.'crc32'($I1, $S0)
     set $P1, $I1
-    .return ($S0, AZ_OK)
+    $S1 = $P0.'compress'($S0)
+    .return ($S1, AZ_OK)
 .end
 
 .sub 'rewindData' :method :nsentry
@@ -628,6 +629,9 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     $P1 = box $I0
     setattribute $P0, 'uncompressedSize', $P1
     $I1 = COMPRESSION_STORED
+    if $I0 == 0 goto L4
+    $I1 = COMPRESSION_DEFLATED
+  L4:
     $P1 = box $I1
     setattribute $P0, 'compressionMethod', $P1
     $P0.'unixFileAttributes'(0o666)
