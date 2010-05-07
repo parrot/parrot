@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(166)
+    plan(167)
 
     set_or_get_strings()
     setting_integers()
@@ -814,9 +814,10 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
     is( el, 256, 'elements' )
 
     $P0 = new ['String']
-    $P0.'trans'(s, tr_00)
+    t = $P0.'trans'(s, tr_00)
 
-    is( s, 'TAACGSTAACGS', 'trans' )
+    is( t, 'TAACGSTAACGS', 'trans' )
+    is( s, 'atugcsATUGCS', "trans doesn't touch source string")
 .end
 
 # create tr table at compile-time

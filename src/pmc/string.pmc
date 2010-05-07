@@ -689,17 +689,19 @@ Translate ascii string C<src> with entries from C<trans_table>.
         unsigned char *p;
         INTVAL        *tr_data;
         INTVAL         i;
+        STRING        *dest;
 
         const INTVAL len = Parrot_str_byte_length(INTERP, src);
 
         if (!len)
-            RETURN(void);
+            RETURN(STRING src);
 
         if (src->charset != Parrot_ascii_charset_ptr)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
-        p = (unsigned char *)(src->strstart);
+        dest = Parrot_str_clone(INTERP, src);
+        p = (unsigned char *)(dest->strstart);
         /* TODO verify trans table */
 
         GETATTR_FixedIntegerArray_int_array(INTERP, table, tr_data);
@@ -709,6 +711,9 @@ Translate ascii string C<src> with entries from C<trans_table>.
             if (ch)
                 *p = ch;
         }
+
+        dest->hashval = 0; /* hash is invalid */
+        RETURN(STRING dest);
     }
 
 /*
