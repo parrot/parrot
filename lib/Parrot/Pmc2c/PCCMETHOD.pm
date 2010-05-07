@@ -415,7 +415,7 @@ sub rewrite_pccmethod {
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _ccont       = Parrot_pcc_get_continuation(interp, _ctx);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
-    PMC * _ret_object        = PMCNULL;
+    PMC * _ret_object;
 
     { /* BEGIN PARMS SCOPE */
 END

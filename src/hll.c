@@ -200,9 +200,8 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 {
     ASSERT_ARGS(Parrot_register_HLL_lib)
     PMC   *hll_info = interp->HLL_info;
-    INTVAL nelements, i;
-
-    nelements = VTABLE_elements(interp, hll_info);
+    const INTVAL nelements = VTABLE_elements(interp, hll_info);
+    INTVAL i;
 
     for (i = 0; i < nelements; ++i) {
         PMC * const entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);

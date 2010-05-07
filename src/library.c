@@ -505,8 +505,7 @@ path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
     ASSERT_ARGS(path_concat)
     STRING* join;
 
-    join = l_path;
-    join = path_guarantee_trailing_separator(interp, join);
+    join = path_guarantee_trailing_separator(interp, l_path);
     join = Parrot_str_concat(interp, join, r_path);
 
     return join;
@@ -530,9 +529,7 @@ static STRING*
 try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 {
     ASSERT_ARGS(try_load_path)
-    STRING *final;
-
-    final = path_finalize(interp, path);
+    STRING * const final = path_finalize(interp, path);
 
     if (Parrot_stat_info_intval(interp, final, STAT_EXISTS)) {
         return final;
