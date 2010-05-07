@@ -218,24 +218,76 @@ constant is in constant table, so we have to search for it.
 PARROT_EXPORT
 int
 PackFile_find_in_const(PARROT_INTERP,
-        ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
+    ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
 {
     ASSERT_ARGS(PackFile_find_in_const)
+    int i = PackFile_ConstTable_rlookup(interp, ct, key, type);
+
+    if (i < 0) {
+        Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
+        Parrot_exit(interp, 1);
+    }
+
+    return i;
+}
+
+/*
+
+=item C<int PackFile_ConstTable_rlookup(PARROT_INTERP, const PackFile_ConstTable
+*ct, PMC *key, int type)>
+
+Reverse lookup a constant in the constant table.
+
+TODO: use a hash to make these O(1) for strings
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+PackFile_ConstTable_rlookup(PARROT_INTERP,
+    ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
+{
+    ASSERT_ARGS(PackFile_ConstTable_rlookup)
     int      i;
     FLOATVAL key_num;
     STRING  *key_str;
+
+    PARROT_ASSERT(type == PFC_STRING || type == PFC_NUMBER);
 
     GETATTR_Key_str_key(interp, key, key_str);
     GETATTR_Key_num_key(interp, key, key_num);
 
     for (i = 0; i < ct->const_count; ++i) {
-        if (type == PFC_STRING && ct->constants[i]->u.string == key_str)
-            return i;
-        if (type == PFC_NUMBER && ct->constants[i]->u.number == key_num)
-            return i;
+        PackFile_Constant *constant = ct->constants[i];
+
+        switch (type) {
+          case PFC_STRING:
+            if (constant->type == PFC_STRING) {
+                STRING * const sc = constant->u.string;
+                if (Parrot_str_equal(interp, key_str, sc)
+                &&  Parrot_charset_number_of_str(interp, key_str)
+                ==  Parrot_charset_number_of_str(interp, sc)
+                &&  Parrot_encoding_number_of_str(interp, key_str)
+                ==  Parrot_encoding_number_of_str(interp, sc))
+                    return i;
+            }
+            break;
+
+          case PFC_NUMBER:
+            if (constant->type == PFC_NUMBER)
+                if (constant->u.number == key_num)
+                    return i;
+            break;
+
+          default:
+            PANIC(interp, "Universe imploded. Did you divide by zero?");
+        }
     }
-    Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
-    Parrot_exit(interp, 1);
+
+    /* not found */
+    return -1;
 }
 
 /*

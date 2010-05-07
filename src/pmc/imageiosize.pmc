@@ -246,23 +246,16 @@ Pushes the string C<*v> onto the end of the image.
 
     VTABLE void push_string(STRING *v) {
         if (PObj_flag_TEST(private1, SELF)) {
-            /* look for a reference to constant table entry of string */
-            int i;
+            /* store a reference to constant table entry of string */
+            PMC *v_pmc = key_new_string(interp, v);
             PackFile_ConstTable *table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            for (i = 0; i < table->const_count; i++) {
-                PackFile_Constant *constant = table->constants[i];
-                if (constant->type == PFC_STRING) {
-                    STRING * const sc = constant->u.string;
-                    if (Parrot_str_equal(INTERP, v, sc)
-                    &&  Parrot_charset_number_of_str(INTERP, v)
-                    ==  Parrot_charset_number_of_str(INTERP, sc)
-                    &&  Parrot_encoding_number_of_str(INTERP, v)
-                    ==  Parrot_encoding_number_of_str(INTERP, sc)) {
-                        STATICSELF.push_integer(i);
-                        return;
-                    }
-                }
+            int idx = PackFile_ConstTable_rlookup(INTERP, table, v_pmc, PFC_STRING);
+
+            if (idx >= 0) {
+                STATICSELF.push_integer(idx);
+                return;
             }
+
             /* XXX
              * handle cases where the PMC has changed after Parrot_freeze_strings was called
              * eg: :immediate subs
