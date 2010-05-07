@@ -141,7 +141,7 @@ A newline is automatically added to the end of the fmt.
         }
 
         fmt    = Parrot_str_replace(INTERP, fmt, pos, 2, repl);
-        replen = Parrot_str_byte_length(INTERP, repl);
+        replen = Parrot_str_length(INTERP, repl);
     }
 
     GET_ATTR_str_val(INTERP, SELF, S1);
@@ -151,7 +151,7 @@ A newline is automatically added to the end of the fmt.
     VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
 
     /* Add a newline if necessary */
-    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_byte_length(INTERP, fmt) - 1))
+    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_length(INTERP, fmt) - 1))
         VTABLE_set_string_keyed_int(INTERP, parts, 2, newline);
 
     S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
