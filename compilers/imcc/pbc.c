@@ -983,23 +983,13 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(add_const_str)
 
+    PMC *s_pmc = key_new_string(interp, s);
     PackFile_ConstTable *table = interp->code->const_table;
-    int i;
+    int i = PackFile_ConstTable_rlookup(interp, table, s_pmc, PFC_STRING);
 
-    for (i = 0; i < table->const_count; ++i) {
-        PackFile_Constant * const constant = table->constants[i];
-        if (constant->type == PFC_STRING) {
-            STRING * const sc = constant->u.string;
-            if (Parrot_str_equal(interp, s, sc)
-            &&  Parrot_charset_number_of_str(interp, s)
-            ==  Parrot_charset_number_of_str(interp, sc)
-            &&  Parrot_encoding_number_of_str(interp, s)
-            ==  Parrot_encoding_number_of_str(interp, sc))
-            {
-                return i;
-            }
-        }
-    }
+    if (i >= 0)
+        return i;
+
 
     /* otherwise... */
     {
