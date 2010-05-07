@@ -251,6 +251,8 @@ typedef struct PackFile_ConstTable {
     opcode_t                   const_count;
     PackFile_Constant        **constants;
     PackFile_ByteCode         *code;  /* where this segment belongs to */
+
+    PMC                       *string_hash; /* Hash for lookup strings and numbers */
 } PackFile_ConstTable;
 
 struct PackFile_ByteCode {
