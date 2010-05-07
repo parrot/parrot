@@ -87,7 +87,7 @@ rev_loop:
         line = revline
 #
 	.const 'Sub' tr_00 = 'tr_00_init'
-	$P0.'trans'(line, tr_00)
+	line = $P0.'trans'(line, tr_00)
 
 	i = 0
 	$S0 = 'x'
