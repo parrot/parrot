@@ -101,9 +101,11 @@ StringBuilder strings are immutable.
 */
 
     VTABLE STRING *get_string() {
-        STRING *buffer;
+        STRING *buffer, *retv;
         GET_ATTR_buffer(INTERP, SELF, buffer);
-        return Parrot_str_clone(INTERP, buffer);
+        retv = Parrot_str_clone(INTERP, buffer);
+        retv->hashval = 0; /* hash is invalid */
+        return retv;
     }
 
 /*
