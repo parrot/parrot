@@ -5,9 +5,6 @@
  *  Overview:
  *     This is the Parrot embedding system--the only part of Parrot that
  *     the outside world should see.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
  *  References:
  *      embed.c, docs/embed.pod.
  */
@@ -28,48 +25,52 @@ typedef enum {
     enum_DIS_HEADER    = 2
 } Parrot_disassemble_options;
 
-PARROT_EXPORT Parrot_Interp Parrot_new(Parrot_Interp parent);
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+Parrot_Interp Parrot_new(ARGIN_NULLOK(Parrot_Interp parent));
 
-PARROT_EXPORT void Parrot_init_stacktop(Parrot_Interp, void *);
+PARROT_EXPORT void Parrot_init_stacktop(PARROT_INTERP, void *);
 
-PARROT_EXPORT void Parrot_set_flag(Parrot_Interp, Parrot_Int);
-PARROT_EXPORT void Parrot_clear_flag(Parrot_Interp, Parrot_Int);
-PARROT_EXPORT Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Int);
+PARROT_EXPORT void Parrot_set_flag(PARROT_INTERP, Parrot_Int);
+PARROT_EXPORT void Parrot_clear_flag(PARROT_INTERP, Parrot_Int);
+PARROT_EXPORT Parrot_Int Parrot_test_flag(PARROT_INTERP, Parrot_Int);
 
-PARROT_EXPORT void Parrot_set_trace(Parrot_Interp, Parrot_UInt);
-PARROT_EXPORT void Parrot_clear_trace(Parrot_Interp, Parrot_UInt);
-PARROT_EXPORT Parrot_UInt Parrot_test_trace(Parrot_Interp, Parrot_UInt);
+PARROT_EXPORT void Parrot_set_trace(PARROT_INTERP, Parrot_UInt);
+PARROT_EXPORT void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt);
+PARROT_EXPORT Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt);
 
-PARROT_EXPORT void Parrot_set_debug(Parrot_Interp, Parrot_UInt);
-PARROT_EXPORT void Parrot_clear_debug(Parrot_Interp, Parrot_UInt);
-PARROT_EXPORT Parrot_UInt Parrot_test_debug(Parrot_Interp, Parrot_UInt);
+PARROT_EXPORT void Parrot_set_debug(PARROT_INTERP, Parrot_UInt);
+PARROT_EXPORT void Parrot_clear_debug(PARROT_INTERP, Parrot_UInt);
+PARROT_EXPORT Parrot_UInt Parrot_test_debug(PARROT_INTERP, Parrot_UInt);
 
-PARROT_EXPORT void Parrot_set_executable_name(Parrot_Interp, Parrot_String);
+PARROT_EXPORT void Parrot_set_executable_name(PARROT_INTERP, Parrot_String);
 
-PARROT_EXPORT void Parrot_set_run_core(Parrot_Interp, Parrot_Run_core_t core);
+PARROT_EXPORT void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core);
 
-PARROT_EXPORT void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);
+PARROT_EXPORT void Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass);
 
-PARROT_EXPORT Parrot_PackFile Parrot_pbc_read(Parrot_Interp, const char *, const int);
+PARROT_EXPORT Parrot_PackFile Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *), int);
 
-PARROT_EXPORT void Parrot_pbc_load(Parrot_Interp, Parrot_PackFile);
+PARROT_EXPORT void Parrot_pbc_load(PARROT_INTERP, Parrot_PackFile);
 
-PARROT_EXPORT void Parrot_pbc_fixup_loaded(Parrot_Interp);
+PARROT_EXPORT void Parrot_pbc_fixup_loaded(PARROT_INTERP);
 
-PARROT_EXPORT void Parrot_runcode(Parrot_Interp, int argc, const char **argv);
+PARROT_EXPORT void Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv));
 
-PARROT_EXPORT Parrot_PMC Parrot_compile_string(Parrot_Interp,
-        Parrot_String type, const char *code, Parrot_String *error);
+PARROT_EXPORT Parrot_PMC Parrot_compile_string(PARROT_INTERP,
+        Parrot_String type, ARGIN(const char *code), ARGOUT(Parrot_String *error));
 
-PARROT_EXPORT void Parrot_destroy(Parrot_Interp);
+PARROT_EXPORT void Parrot_destroy(PARROT_INTERP);
 
-PARROT_EXPORT Parrot_Opcode * Parrot_debug(Parrot_Interp, Parrot_Interp, Parrot_Opcode *pc);
+PARROT_EXPORT Parrot_Opcode * Parrot_debug(PARROT_INTERP, ARGIN(Parrot_Interp debugger), ARGIN(Parrot_Opcode *pc));
 
-PARROT_EXPORT void Parrot_disassemble(Parrot_Interp, const char *outfile, Parrot_disassemble_options options);
+PARROT_EXPORT void Parrot_disassemble(PARROT_INTERP, ARGIN(const char *outfile),
+        Parrot_disassemble_options options);
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
-void Parrot_exit(Parrot_Interp, int status);
+void Parrot_exit(PARROT_INTERP, int status);
 
 PARROT_EXPORT void Parrot_run_native(PARROT_INTERP, native_func_t func);
 

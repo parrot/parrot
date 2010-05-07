@@ -83,14 +83,13 @@ Create the Parrot interpreter. Allocate memory and clear the registers.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp
 make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     ASSERT_ARGS(make_interpreter)
     int stacktop;
-    Interp *interp;
-
-    interp = allocate_interpreter(parent, flags);
+    Interp * const interp = allocate_interpreter(parent, flags);
     initialize_interpreter(interp, (void*)&stacktop);
     return interp;
 }
@@ -114,6 +113,7 @@ for overriding subsystems (e.g. GC) which require early initialization.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp
 allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {

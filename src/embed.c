@@ -80,6 +80,7 @@ to get destroyed.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp
 Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
 {
@@ -1087,8 +1088,8 @@ Compiles a code string.
 
 PARROT_EXPORT
 Parrot_PMC
-Parrot_compile_string(PARROT_INTERP, Parrot_String type,
-        const char *code, Parrot_String *error)
+Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
+        ARGOUT(Parrot_String *error))
 {
     /* For the benefit of embedders that do not load any pbc
      * before compiling a string */

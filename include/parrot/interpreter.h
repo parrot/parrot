@@ -364,6 +364,7 @@ typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp allocate_interpreter(
     ARGIN_NULLOK(Interp *parent),
     INTVAL flags);
@@ -376,6 +377,7 @@ Parrot_Interp initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
 
 PARROT_EXPORT
