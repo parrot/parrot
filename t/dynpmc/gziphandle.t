@@ -22,7 +22,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .local pmc config_hash, interp
     .local int num_tests
 
-    num_tests = 5
+    num_tests = 6
     plan(num_tests)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
@@ -65,6 +65,8 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     $S0 = $P0.'compress'(data)
     $I0 = length $S0
     is($I0, 15, "compress")
+    $S0 = $P0.'uncompress'($S0)
+    is($S0, data, "uncompress")
 .end
 
 # Local Variables:

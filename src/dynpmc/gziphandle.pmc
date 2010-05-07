@@ -248,7 +248,7 @@ Returns a string with the zlib version.
     METHOD compress(STRING *str) {
         int rc;
         char *buf;
-        STRING *dst = NULL;
+        STRING *dst = STRINGNULL;
         UINTVAL srcLen, dstLen;
         char * const src = Parrot_str_to_cstring(INTERP, str);
 
@@ -285,6 +285,62 @@ Returns a string with the zlib version.
             mem_sys_free(buf);
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "output buffer error");
+            break;
+
+          default:
+            /* these are the only three documented return values */
+            break;
+        }
+
+        RETURN(STRING *dst);
+    }
+
+    METHOD uncompress(STRING *str) {
+        int rc;
+        char *buf;
+        STRING *dst = STRINGNULL;
+        UINTVAL srcLen, dstLen;
+        char * const src = Parrot_str_to_cstring(INTERP, str);
+
+        if (!src)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "failed to allocate");
+
+        srcLen = Parrot_str_byte_length(INTERP, str);
+        dstLen = srcLen;
+    REDO:
+        buf = mem_allocate_n_zeroed_typed(dstLen, char);
+
+        if (!buf) {
+            Parrot_str_free_cstring(src);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "failed to allocate");
+        }
+
+        rc = uncompress((Bytef *)buf, &dstLen, (const Bytef *)src, srcLen);
+        Parrot_str_free_cstring(src);
+
+        switch (rc) {
+          case Z_OK:
+            dst = Parrot_str_new(INTERP, buf, dstLen);
+            mem_sys_free(buf);
+            break;
+
+          case Z_MEM_ERROR:
+            mem_sys_free(buf);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "not enough memory");
+            break;
+
+          case Z_BUF_ERROR:
+            mem_sys_free(buf);
+            dstLen *= 2;
+            goto REDO;
+
+          case Z_DATA_ERROR:
+            mem_sys_free(buf);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "input data corrupted");
             break;
 
           default:
