@@ -22,7 +22,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .local pmc config_hash, interp
     .local int num_tests
 
-    num_tests = 6
+    num_tests = 9
     plan(num_tests)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
@@ -31,6 +31,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
 
     $P0 = loadlib 'gziphandle'
     test_handle()
+    test_stream()
     test_version()
     test_basic()
     .return()
@@ -47,6 +48,32 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     is($S0, 'GzipHandle', 'GzipHandle typeof')
     $I0 = does $P0, 'Handle'
     ok($I0, 'does Handle')
+.end
+
+.include 'stat.pasm'
+
+.sub 'test_stream'
+    $P0 = new 'FileHandle'
+    $S0 = $P0.'readall'('t/dynpmc/gziphandle.t')
+    $I0 = length $S0
+    diag($I0)
+    .const string filename = 't/dynpmc/gziphandle.t.gz'
+    $P1 = new 'GzipHandle'
+    $P1.'open'(filename, 'wb')
+    $P1.'puts'($S0)
+    $P1.'close'()
+    $I1 = stat filename, .STAT_FILESIZE
+    diag($I1)
+    $I2 = $I1 < $I0
+    ok($I2, "compressed")
+    $P2 = new 'GzipHandle'
+    $P2.'open'(filename, 'rb')
+    $S1 = $P2.'read'($I0)
+    $P2.'close'()
+    is($S1, $S0, "gzip stream")
+    $P0 = loadlib 'os'
+    $P0 = new 'OS'
+    $P0.'rm'(filename)
 .end
 
 .sub 'test_version'
@@ -67,6 +94,15 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     is($I0, 15, "compress")
     $S0 = $P0.'uncompress'($S0)
     is($S0, data, "uncompress")
+
+    $S0 = repeat 'repeat', 100
+    $I0 = length $S0
+    $S1 = $P0.'compress'($S0)
+    $I1 = length $S1
+    $N0 = $I1 / $I0
+    diag($N0)
+    $S2 = $P0.'uncompress'($S1)
+    is($S2, $S0, "uncompress with many realloc")
 .end
 
 # Local Variables:
