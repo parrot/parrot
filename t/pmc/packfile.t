@@ -314,7 +314,7 @@ load_error:
 
     $I0 = cmp first, second
     $I0 = not $I0
-    todo($I0, 'pack produced same result twice')
+    todo($I0, 'pack produced same result twice: TT #1614')
     .return()
 load_error:
     .get_results($P0)
