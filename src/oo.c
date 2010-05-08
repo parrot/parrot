@@ -944,7 +944,8 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
     if (!e) {
         /* when here no or no correct entry was at [bits] */
-        e     = mem_gc_allocate_typed(interp, Meth_cache_entry);
+        /* Use zeroed allocation because find_method_direct can trigger GC */
+        e     = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
 
         mc->idx[type][bits] = e;
 
