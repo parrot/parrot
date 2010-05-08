@@ -26,8 +26,13 @@ Tests the default PMC.
 .end
 
 .sub test_default
-    #new $P0, ['default']
-    todo(0,'the default PMC does not exist')
+    $I0 = 1
+    push_eh bang
+    new $P0, ['default']
+    $I0 = 0
+  bang:
+    pop_eh
+    ok($I0, "Couldn't create default PMC directly")
 .end
 
 .sub test_inspect_vtable_function
