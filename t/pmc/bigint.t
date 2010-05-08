@@ -745,7 +745,7 @@ k24:
     ne $S0, $S6, k25
     inc $I1
 k25:
-    todo($I1, 'integer negation of MinInt converts MaxInt+1 to BigInt')
+    todo( $I1, 'integer negation of MinInt converts MaxInt+1 to BigInt', 'TT #1616')
 
     $I1 = 0
     $P0 = new ['Integer']
@@ -760,7 +760,7 @@ k26:
     ne $S0, $S6, k27
     inc $I1
 k27:
-    todo($I1, 'integer absolute-value of MinInt converts MaxInt+1 to BigInt')
+    todo( $I1, 'integer absolute-value of MinInt converts MaxInt+1 to BigInt', 'TT #1616')
 
     $P0 = new ['Integer']
     $P0 = $I3
