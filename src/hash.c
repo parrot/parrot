@@ -193,6 +193,35 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
 
 /*
 
+=item C<int STRING_compare_distinct_cs_enc(PARROT_INTERP, const void
+*search_key, const void *bucket_key)>
+
+Compare two strings. Returns 0 if they are identical. Considers differing
+charset or encoding to be distinct.
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+int
+STRING_compare_distinct_cs_enc(PARROT_INTERP, ARGIN(const void *search_key),
+                                                ARGIN(const void *bucket_key))
+{
+    ASSERT_ARGS(STRING_compare_distinct_cs_enc)
+    STRING const *s1 = (STRING const *)search_key;
+    STRING const *s2 = (STRING const *)bucket_key;
+
+    if (s1 && s2 && (
+            s1->charset != s2->charset ||
+            s1->encoding != s2->encoding)) {
+        return 1;
+    }
+
+    return STRING_compare(interp, search_key, bucket_key);
+}
+
+
+/*
+
 =item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
 
 Compares the two pointers, returning 0 if they are identical

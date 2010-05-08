@@ -260,43 +260,12 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
     GETATTR_Key_str_key(interp, key, key_str);
     GETATTR_Key_num_key(interp, key, key_num);
 
-    /*
-     * string_hash contains array of all possible charset/encoding
-     * combinations for given string.
-     *
-     * Because we don't have templateble PMC like tuple<charset, encoding, i>
-     * we store FIA [charset ^ encoding, i].
-     *
-     * So cache looks like this:
-     *   "foo" => [
-     *      [charset1 ^ encoding1, index1],
-     *      ...
-     *      [charsetN ^ encodingN, indexN]
-     *   ]
-     */
-
-    if (type == PFC_STRING) {
-        /* Auto-vivify cache */
-        if (PMC_IS_NULL(ct->string_hash)) {
-            DECL_CONST_CAST;
-            PackFile_ConstTable * c = PARROT_const_cast(PackFile_ConstTable*, ct);
-            c->string_hash = Parrot_pmc_new(interp, enum_class_Hash);
+    if (type == PFC_STRING && !PMC_IS_NULL(ct->string_hash)) {
+        if (VTABLE_exists_keyed_str(interp, ct->string_hash, key_str)) {
+            return VTABLE_get_integer_keyed_str(interp, ct->string_hash, key_str);
         }
-
-        /* Auto-vivify cache item */
-        string_list = VTABLE_get_pmc_keyed_str(interp, ct->string_hash, key_str);
-        if (PMC_IS_NULL(string_list)) {
-            string_list = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-            VTABLE_set_pmc_keyed_str(interp, ct->string_hash, key_str, string_list);
-        }
-
-        /* Iterate of cache and try to find exactly this string */
-        strings = VTABLE_elements(interp, string_list);
-        for (i = 0; i < strings; ++i) {
-            PMC    *item = VTABLE_get_pmc_keyed_int(interp, string_list, i);
-            INTVAL xored = VTABLE_get_integer_keyed_int(interp, item, 0);
-            if (((size_t)key_str->encoding ^ (size_t)key_str->charset) == (size_t)xored)
-                return VTABLE_get_integer_keyed_int(interp, item, 1);
+        else {
+            return -1;
         }
     }
 
@@ -312,14 +281,6 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
                 ==  Parrot_charset_number_of_str(interp, sc)
                 &&  Parrot_encoding_number_of_str(interp, key_str)
                 ==  Parrot_encoding_number_of_str(interp, sc)) {
-                    /* Cache found string */
-                    PMC *item = Parrot_pmc_new_init_int(interp,
-                                    enum_class_FixedIntegerArray, 2);
-                    VTABLE_set_integer_keyed_int(interp, item, 0,
-                            (size_t)sc->encoding ^ (size_t)sc->charset);
-                    VTABLE_set_integer_keyed_int(interp, item, 1,
-                            i);
-                    VTABLE_push_pmc(interp, string_list, item);
                     return i;
                 }
             }

@@ -356,13 +356,21 @@ add_const_table(PARROT_INTERP)
     PackFile_Constant *new_constant = PackFile_Constant_new(interp);
 
     /* Update the constant count and reallocate */
-    if (interp->code->const_table->constants)
+    if (interp->code->const_table->constants) {
         interp->code->const_table->constants =
             mem_gc_realloc_n_typed_zeroed(interp, interp->code->const_table->constants,
                 newcount, oldcount, PackFile_Constant *);
-    else
+    }
+    else {
+        /* initialize rlookup cache */
+        interp->code->const_table->string_hash =
+            Parrot_pmc_new_init_int(interp, enum_class_Hash, enum_type_INTVAL);
+        ((Hash *)VTABLE_get_pointer(interp, interp->code->const_table->string_hash))->compare =
+            (hash_comp_fn)STRING_compare_distinct_cs_enc;
+
         interp->code->const_table->constants =
             mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant *);
+    }
 
     interp->code->const_table->constants[oldcount] = new_constant;
     interp->code->const_table->const_count         = newcount;
@@ -997,6 +1005,8 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
         PackFile_Constant *constant = table->constants[k];
         constant->type              = PFC_STRING;
         constant->u.string          = s;
+
+        VTABLE_set_integer_keyed_str(interp, table->string_hash, s, k);
 
         return k;
     }
