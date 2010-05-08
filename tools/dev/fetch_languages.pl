@@ -265,8 +265,8 @@ my @hlls = (
 
     {
         name       => 'pynie',
-        scm        => 'SVN',
-        repository => 'http://pynie.googlecode.com/svn/trunk'
+        scm        => 'HG',
+        repository => 'http://bitbucket.org/allison/pynie'
     },
 
     {
