@@ -20,13 +20,14 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(21)
+    plan(23)
     test_create()               # 2 tests
     test_push_string()          # 9 tests
     test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
     test_set_string_native()    # 3 tests
+    test_set_string_native_with_hash()    # 2 tests
 
     # END_OF_TESTS
 .end
@@ -157,6 +158,29 @@ Tests the C<StringBuilder> PMC.
     $S0  = sb
     is( $S0, "foobar", "... with appending string after")
     is( $S99, "foo", "... without touching of original string")
+
+.end
+
+.sub 'test_set_string_native_with_hash'
+    .local pmc sb, hash
+    sb   = new ["StringBuilder"]
+    hash = new ['Hash']
+
+    $S0 = "foo"
+    hash[$S0] = "foo"
+    sb   = $S0
+    # Used later
+    $S0  = sb
+
+    sb .= "bar"
+    $S1  = sb
+    hash[$S1] = $S1
+
+    $S99 = hash[$S0]
+    is ( $S99, "foo", "First string stored in hash" )
+
+    $S99 = hash[$S1]
+    is ( $S99, "foobar", "Second string stored in hash" )
 
 .end
 

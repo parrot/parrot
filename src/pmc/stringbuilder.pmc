@@ -103,9 +103,7 @@ StringBuilder strings are immutable.
     VTABLE STRING *get_string() {
         STRING *buffer, *retv;
         GET_ATTR_buffer(INTERP, SELF, buffer);
-        retv = Parrot_str_clone(INTERP, buffer);
-        retv->hashval = 0; /* hash is invalid */
-        return retv;
+        return Parrot_str_clone(INTERP, buffer);
     }
 
 /*
@@ -200,7 +198,10 @@ Set content of buffer to passed string
 
 */
     VTABLE void set_string_native(STRING *s) {
-        SET_ATTR_buffer(INTERP, SELF, Parrot_str_clone(INTERP, s));
+        STRING * tmp = Parrot_str_clone(INTERP, s);
+        /* Unset hashval. We update this string all the time */
+        tmp->hashval = 0;
+        SET_ATTR_buffer(INTERP, SELF, tmp);
     }
 
 
