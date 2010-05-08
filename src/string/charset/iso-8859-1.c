@@ -525,9 +525,9 @@ static UINTVAL
 validate(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(validate)
-    UINTVAL offset;
+    INTVAL offset;
 
-    for (offset = 0; offset < Parrot_str_byte_length(interp, src); ++offset) {
+    for (offset = 0; offset < Parrot_str_length(interp, src); ++offset) {
         const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
         if (codepoint >= 0x100)
             return 0;

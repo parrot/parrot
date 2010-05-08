@@ -716,11 +716,11 @@ static UINTVAL
 validate(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(validate)
-    UINTVAL     offset;
+    INTVAL      offset;
     String_iter iter;
 
     ENCODING_ITER_INIT(interp, src, &iter);
-    for (offset = 0; offset < Parrot_str_byte_length(interp, src); ++offset) {
+    for (offset = 0; offset < Parrot_str_length(interp, src); ++offset) {
         const UINTVAL codepoint = iter.get_and_advance(interp, &iter);
         /* Check for Unicode non-characters */
         if (codepoint >= 0xfdd0
