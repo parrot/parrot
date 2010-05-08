@@ -20,19 +20,35 @@ Tests the default PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(3)
+    plan(5)
     test_default()
     test_inspect_vtable_function()
 .end
 
 .sub test_default
     $I0 = 1
-    push_eh bang
-    new $P0, ['default']
+    push_eh init
+    $P0 = new ['default']
     $I0 = 0
-  bang:
+  init:
     pop_eh
     ok($I0, "Couldn't create default PMC directly")
+
+    $I0 = 1
+    push_eh init_int
+    $P0 = new ['default'], 42
+    $I0 = 0
+  init_int:
+    pop_eh
+    ok($I0, "Couldn't create default PMC directly with int initializer")
+
+    $I0 = 1
+    push_eh init_pmc
+    $P0 = new ['default'], $P1
+    $I0 = 0
+  init_pmc:
+    pop_eh
+    ok($I0, "Couldn't create default PMC directly with PMC initializer")
 .end
 
 .sub test_inspect_vtable_function
