@@ -1742,7 +1742,7 @@ INTVAL
 Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_boolean)
-    const INTVAL len = !STRING_IS_NULL(s) ? Parrot_str_byte_length(interp, s) : 0;
+    const INTVAL len = !STRING_IS_NULL(s) ? Parrot_str_length(interp, s) : 0;
 
     if (len == 0)
         return 0;
@@ -2719,7 +2719,7 @@ string_increment(PARROT_INTERP, ARGIN(const STRING *s))
     ASSERT_ARGS(string_increment)
     UINTVAL o;
 
-    if (Parrot_str_byte_length(interp, s) != 1)
+    if (Parrot_str_length(interp, s) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "increment only for length = 1 done");
 
