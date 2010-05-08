@@ -51,7 +51,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'comments between .param(TT #1035)', todo => 'broken');
+pir_output_is( <<'CODE', <<'OUT', 'comments between .param(TT #1035)');
 .sub main :main
   comments(1,2)
 .end
@@ -79,7 +79,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(TT #1035)', todo => 'broken');
+pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(TT #1035)');
 .sub main :main
   comments(1,2)
 .end
