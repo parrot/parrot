@@ -1399,7 +1399,7 @@ sub:
 
 sub_params:
      /* empty */               { $$ = 0; } %prec LOW_PREC
-   | '\n'                               { $$ = 0; }
+   | sub_params '\n'                               { $$ = 0; }
    | sub_params sub_param '\n'
          {
            if (IMCC_INFO(interp)->adv_named_id) {
