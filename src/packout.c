@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -260,7 +260,7 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
     GETATTR_Key_str_key(interp, key, key_str);
     GETATTR_Key_num_key(interp, key, key_num);
 
-    /* 
+    /*
      * string_hash contains array of all possible charset/encoding
      * combinations for given string.
      *
