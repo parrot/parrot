@@ -85,7 +85,7 @@ FAIL:
     fail("no attribute")
 NEXT:
 
-    todo(0, "new opcode makes working objects", "not implemented")
+    todo(0, "new opcode makes working objects", "not implemented: TT #1619")
 #    $P0 = new "Dog"
 #    $I0 = defined $P0
 #    isa_ok($P0, "Dog", "new opcode makes working objects")
