@@ -759,11 +759,11 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     ASSERT_ARGS(fill_params)
     INTVAL *raw_params;
     PMC    *named_used_list = PMCNULL;
-    INTVAL  param_count     = 0;
     INTVAL  param_index     = 0;
     INTVAL  arg_index       = 0;
     INTVAL  named_count     = 0;
     INTVAL  err_check       = 0;
+    INTVAL  param_count;
     INTVAL  positional_args;
 
     GETATTR_FixedIntegerArray_size(interp, raw_sig, param_count);
