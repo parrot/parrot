@@ -442,7 +442,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     &&  sub->pcc_sub
     && !sub->pcc_sub->object
        /* s. src/inter_call.c:119 */
-    && (sub->pcc_sub->flags & isTAIL_CALL))
+    && sub->pcc_sub->tailcall)
         return;
 
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL)
@@ -780,7 +780,7 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         return;
     }
 
-    tail_call = (sub->pcc_sub->flags & isTAIL_CALL);
+    tail_call = sub->pcc_sub->tailcall;
 
     if (tail_call && IMCC_INFO(interp)->optimizer_level & OPT_SUB)
         if (recursive_tail_call(interp, unit, ins, sub))

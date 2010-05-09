@@ -843,9 +843,6 @@ IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
         IMCC_INFO(interp)->cur_obj = NULL;
     }
 
-    if (IMCC_INFO(interp)->cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
-        IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isNCI;
-
     if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
         IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
 }
@@ -1663,7 +1660,6 @@ pcc_call:
    | NCI_CALL var '\n'
          {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-           IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isNCI;
          }
    | METH_CALL target '\n'
          {
@@ -2003,7 +1999,7 @@ labeled_inst:
    | TAILCALL sub_call
          {
            $$ = NULL;
-           IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
+           IMCC_INFO(interp)->cur_call->pcc_sub->tailcall = 1;
            IMCC_INFO(interp)->cur_call = NULL;
          }
    | GOTO label_op

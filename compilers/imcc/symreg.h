@@ -438,11 +438,6 @@ typedef enum {
     P_NSENTRY        = SUB_COMP_FLAG_NSENTRY  /* 1<<11 0x800 - 11       */
 } pragma_enum_t;
 
-typedef enum {
-    isNCI  =        0x01,
-    isTAIL_CALL =   0x02
-} pcc_flags_t;
-
 typedef struct pcc_sub_t {
     SymReg *sub;
     SymReg *cc;
@@ -456,7 +451,7 @@ typedef struct pcc_sub_t {
     int     nret;
     int     nmulti;
     int     calls_a_sub;
-    int     flags;    /* isNCI, isTAIL_CALL */
+    int     tailcall;
     int     label;
     INTVAL  pragma;
 } pcc_sub_t;
