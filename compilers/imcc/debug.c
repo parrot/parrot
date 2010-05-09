@@ -502,46 +502,6 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 
 /*
 
-=item C<void dump_interference_graph(const IMC_Unit *unit)>
-
-Dumps the interference graph for the current IMC_Unit C<unit>
-
-=cut
-
-*/
-
-void
-dump_interference_graph(ARGIN(const IMC_Unit *unit))
-{
-    ASSERT_ARGS(dump_interference_graph)
-    int x;
-    SymReg** const reglist = unit->reglist;
-    const int n_symbols = unit->n_symbols;
-
-    fprintf(stderr, "\nDumping the Interf. graph:"
-            "\n-------------------------------\n");
-    for (x = 0; x < n_symbols; x++) {
-        if (reglist[x]->first_ins) {
-            int cnt = 0;
-            int y;
-
-            fprintf(stderr, "%s\t -> ", reglist[x]->name);
-            for (y = 0; y < n_symbols; y++) {
-                if (ig_test(x, y, n_symbols, unit->interference_graph)) {
-                    const SymReg * const r = unit->reglist[y];
-
-                    fprintf(stderr, "%s ", r->name);
-                    cnt++;
-                }
-            }
-            fprintf(stderr, "(%d)\n", cnt);
-        }
-    }
-    fprintf(stderr, "\n");
-}
-
-/*
-
 =item C<void dump_dominators(const IMC_Unit *unit)>
 
 Dumps the current list of dominators for the current IMC_Unit C<unit>.

@@ -91,9 +91,6 @@ void dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void dump_interference_graph(ARGIN(const IMC_Unit *unit))
-        __attribute__nonnull__(1);
-
 void dump_labels(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
@@ -142,8 +139,6 @@ void dump_symreg(ARGIN(const IMC_Unit *unit))
 #define ASSERT_ARGS_dump_instructions __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_dump_interference_graph __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_dump_labels __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_dump_liveness_status __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

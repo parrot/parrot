@@ -48,7 +48,6 @@ struct IMC_Unit {
     Edge             *edge_list;
 
     /* register allocation */
-    unsigned int     *interference_graph;
     SymReg          **reglist;
     unsigned int      n_symbols;
     int               max_color;

@@ -150,10 +150,6 @@ void graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
-unsigned int ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
-        __attribute__nonnull__(4);
-
 void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
@@ -162,8 +158,6 @@ void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 #define ASSERT_ARGS_graph_coloring_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_ig_test __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(graph))
 #define ASSERT_ARGS_imc_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
