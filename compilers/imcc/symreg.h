@@ -450,7 +450,7 @@ typedef struct pcc_sub_t {
     int     nargs;
     int     nret;
     int     nmulti;
-    int     calls_a_sub;
+    int     yield;
     int     tailcall;
     int     label;
     INTVAL  pragma;

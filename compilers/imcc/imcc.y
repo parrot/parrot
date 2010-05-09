@@ -842,9 +842,6 @@ IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
             IMCC_INFO(interp)->cur_obj;
         IMCC_INFO(interp)->cur_obj = NULL;
     }
-
-    if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
-        IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
 }
 
 
@@ -867,8 +864,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
     if (!ins || !ins->symregs[0] || !(ins->symregs[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "yield or return directive outside pcc subroutine\n");
-    if (yield)
-       ins->symregs[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
+    ins->symregs[0]->pcc_sub->yield = yield;
     snprintf(name, sizeof (name), yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, name, 0);
@@ -1599,8 +1595,6 @@ pcc_sub_call:
             * sub call; the sub is in r[0] of the first ins
             */
            r1 = IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
-           if (r1 && r1->pcc_sub)
-               r1->pcc_sub->calls_a_sub |= 1;
          }
      pcc_args
      opt_invocant

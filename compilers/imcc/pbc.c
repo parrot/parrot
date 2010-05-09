@@ -1270,7 +1270,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         IMCC_INFO(interp)->globals->cs->subs->unit;
 
     INTVAL               type         =
-        (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
+        (r->pcc_sub->yield) ?
             enum_class_Coroutine : enum_class_Sub;
 
     int                  i;

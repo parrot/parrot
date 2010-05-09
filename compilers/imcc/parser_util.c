@@ -474,13 +474,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Cannot yield from non-continuation\n");
 
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub
-                |= 1 | ITPCCYIELD;
-        }
-        else if ((strncmp(name, "invoke", 6) == 0) ||
-                 (strncmp(name, "callmethod", 10) == 0)) {
-            if (IMCC_INFO(interp)->cur_unit->type & IMC_PCCSUB)
-                IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->yield = 1;
         }
 
         /* set up branch flags
