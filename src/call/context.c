@@ -84,13 +84,6 @@ static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);
 
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-static Parrot_Context * get_context_struct_fast(PARROT_INTERP,
-    ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void init_context(PARROT_INTERP,
     ARGMOD(PMC *pmcctx),
     ARGIN_NULLOK(PMC *pmcold))
@@ -110,9 +103,6 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
 #define ASSERT_ARGS_calculate_registers_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(number_regs_used))
 #define ASSERT_ARGS_clear_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_get_context_struct_fast __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_init_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -146,7 +136,7 @@ PMC*
 Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_sub)
-    const Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    const Parrot_Context *c = CONTEXT_STRUCT(ctx);
     return c->current_sub;
 }
 
@@ -166,7 +156,7 @@ void
 Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 {
     ASSERT_ARGS(Parrot_pcc_set_sub)
-    Parrot_Context * const c = get_context_struct_fast(interp, ctx);
+    Parrot_Context * const c = CONTEXT_STRUCT(ctx);
     c->current_sub    = sub;
 
     if (sub && !PMC_IS_NULL(sub)) {
@@ -211,33 +201,6 @@ create_initial_context(PARROT_INTERP)
      * other extenders) assume the presence of these registers */
     ignored = Parrot_set_new_context(interp, num_regs);
     UNUSED(ignored);
-}
-
-/*
-
-=item C<static Parrot_Context * get_context_struct_fast(PARROT_INTERP, PMC
-*ctx)>
-
-Fetches Parrot_Context from Context PMC.  This is a static, inlineable function
-so it only works within this file.  It also only works if you *know* that ctx
-is a valid PMC, so be careful.  This is an encapsulation-breaking optimization
-that improves performance measurably.  Use responsibly.  Never export this
-function.
-
-=cut
-
-*/
-
-
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-static Parrot_Context *
-get_context_struct_fast(PARROT_INTERP, ARGIN(PMC *ctx))
-{
-    ASSERT_ARGS(get_context_struct_fast)
-
-    /* temporarily violate encapsulation; big speedup here */
-    return PMC_data_typed(ctx, Parrot_Context *);
 }
 
 /*
@@ -298,12 +261,12 @@ static void
 init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
-    Parrot_Context * const ctx    = get_context_struct_fast(interp, pmcctx);
+    Parrot_Context * const ctx    = CONTEXT_STRUCT(pmcctx);
 
     /* pmcold may be null */
     Parrot_Context *old    = PMC_IS_NULL(pmcold)
                            ? NULL
-                           : get_context_struct_fast(interp, pmcold);
+                           : CONTEXT_STRUCT(pmcold);
 
     PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
@@ -745,7 +708,7 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp.regs_i[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.regs_i[idx]);
 }
 
 /*
@@ -766,7 +729,7 @@ Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp.regs_n[-1L - idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.regs_n[-1L - idx]);
 }
 
 /*
@@ -787,7 +750,7 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp_ps.regs_s[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_s[idx]);
 }
 
 /*
@@ -807,7 +770,7 @@ Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp_ps.regs_p[-1L - idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
 }
 
 /*
@@ -824,7 +787,7 @@ UINTVAL
 Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type)
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_used)
-    return get_context_struct_fast(interp, ctx)->n_regs_used[type];
+    return CONTEXT_STRUCT(ctx)->n_regs_used[type];
 }
 
 /*
@@ -842,7 +805,7 @@ void
 Parrot_pcc_set_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type, INTVAL num)
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_used)
-    get_context_struct_fast(interp, ctx)->n_regs_used[type] = num;
+    CONTEXT_STRUCT(ctx)->n_regs_used[type] = num;
 }
 
 /*
@@ -860,7 +823,7 @@ Regs_ni*
 Parrot_pcc_get_regs_ni(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ni)
-    return &(get_context_struct_fast(interp, ctx)->bp);
+    return &(CONTEXT_STRUCT(ctx)->bp);
 }
 
 /*
@@ -878,7 +841,7 @@ void
 Parrot_pcc_set_regs_ni(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ni *bp))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ni)
-    get_context_struct_fast(interp, ctx)->bp = *bp;
+    CONTEXT_STRUCT(ctx)->bp = *bp;
 }
 
 /*
@@ -896,7 +859,7 @@ Regs_ps*
 Parrot_pcc_get_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ps)
-    return &(get_context_struct_fast(interp, ctx)->bp_ps);
+    return &(CONTEXT_STRUCT(ctx)->bp_ps);
 }
 
 /*
@@ -914,7 +877,7 @@ void
 Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ps)
-    get_context_struct_fast(interp, ctx)->bp_ps = *bp_ps;
+    CONTEXT_STRUCT(ctx)->bp_ps = *bp_ps;
 }
 
 
