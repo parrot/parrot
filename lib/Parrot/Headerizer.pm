@@ -91,7 +91,9 @@ Returns a list of all the valid PARROT_XXX macros.
 sub valid_macros {
     my $self = shift;
 
-    return sort keys %{$self->{valid_macros}};
+    my @macros = sort keys %{$self->{valid_macros}};
+
+    return @macros;
 }
 
 =item $headerizer->extract_function_declarations($text)
