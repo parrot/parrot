@@ -1688,7 +1688,15 @@ pcc_call:
 
 pcc_args:
      /* empty */               { $$ = 0; }
-   | pcc_args pcc_arg '\n'     { add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $2); }
+   | pcc_args pcc_arg '\n'     {
+                                 if (IMCC_INFO(interp)->adv_named_id) {
+                                     add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
+                                                    IMCC_INFO(interp)->adv_named_id, $2);
+                                     IMCC_INFO(interp)->adv_named_id = NULL;
+                                 }
+                                 else
+                                     add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $2);
+                               }
    ;
 
 pcc_arg:
