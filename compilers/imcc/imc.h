@@ -145,19 +145,11 @@ void free_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
-void graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*unit);
-
 void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_free_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_graph_coloring_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_imc_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

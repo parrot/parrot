@@ -95,10 +95,6 @@ static void print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-static void rebuild_reglist(ARGMOD(IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*unit);
-
 PARROT_WARN_UNUSED_RESULT
 static int reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
         __attribute__nonnull__(1)
@@ -140,8 +136,6 @@ static void vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 #define ASSERT_ARGS_print_stat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_rebuild_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_reg_sort_f __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
