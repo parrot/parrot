@@ -25,7 +25,10 @@ typedef union {
 } Regs_ni;
 
 #include "pmc/pmc_callcontext.h"
+
 typedef struct Parrot_CallContext_attributes Parrot_Context;
+
+#define CONTEXT_STRUCT(c) (PMC_data_typed((c), Parrot_Context *))
 
 /*
  * Macros to make accessing registers more convenient/readable.
@@ -47,12 +50,10 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 /* Manually inlined macros. Used in optimised builds */
 
-#  define __C(c) (PMC_data_typed((c), Parrot_Context*))
-
-#  define CTX_REG_NUM(p, x) (__C(p)->bp.regs_n[-1L - (x)])
-#  define CTX_REG_INT(p, x) (__C(p)->bp.regs_i[(x)])
-#  define CTX_REG_PMC(p, x) (__C(p)->bp_ps.regs_p[-1L - (x)])
-#  define CTX_REG_STR(p, x) (__C(p)->bp_ps.regs_s[(x)])
+#  define CTX_REG_NUM(p, x) (CONTEXT_STRUCT(p)->bp.regs_n[-1L - (x)])
+#  define CTX_REG_INT(p, x) (CONTEXT_STRUCT(p)->bp.regs_i[(x)])
+#  define CTX_REG_PMC(p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_p[-1L - (x)])
+#  define CTX_REG_STR(p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_s[(x)])
 
 #  define REG_NUM(interp, x) CTX_REG_NUM((interp)->ctx, (x))
 #  define REG_INT(interp, x) CTX_REG_INT((interp)->ctx, (x))
@@ -61,31 +62,10 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 #endif
 
-/*
- * and a set of macros to access a register by offset, used
- * in JIT emit prederef code
- * The offsets are relative to interp->ctx.bp.
- *
- * Reg order in imcc/reg_alloc.c is "INSP"   TODO make defines
- */
-
 #define REGNO_INT 0
 #define REGNO_NUM 1
 #define REGNO_STR 2
 #define REGNO_PMC 3
-
-#define __CTX Parrot_pcc_get_context_struct(interp, interp->ctx)
-#define _SIZEOF_INTS    (sizeof (INTVAL) * __CTX->n_regs_used[REGNO_INT])
-#define _SIZEOF_NUMS    (sizeof (FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
-#define _SIZEOF_PMCS    (sizeof (PMC*) * __CTX->n_regs_used[REGNO_PMC])
-#define _SIZEOF_STRS    (sizeof (STRING*) * __CTX->n_regs_used[REGNO_STR])
-
-#define REG_OFFS_NUM(x) (sizeof (FLOATVAL) * (-1L - (x)))
-#define REG_OFFS_INT(x) (sizeof (INTVAL) * (x))
-#define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof (PMC*) * \
-        (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
-#define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
-
 
 /* Context accessors functions */
 
@@ -499,61 +479,61 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 
 /* Map Context manipulating functions to functions or macros */
 #ifdef NDEBUG
-#  define Parrot_pcc_get_context_struct(i, c) (PMC_data_typed((c), Parrot_Context*))
+#  define Parrot_pcc_get_context_struct(i, c) CONTEXT_STRUCT(c)
 
-#  define Parrot_pcc_get_constants(i, c) (__C(c)->constants)
-#  define Parrot_pcc_set_constants(i, c, value) (__C(c)->constants = (value))
+#  define Parrot_pcc_get_constants(i, c) (CONTEXT_STRUCT(c)->constants)
+#  define Parrot_pcc_set_constants(i, c, value) (CONTEXT_STRUCT(c)->constants = (value))
 
-#  define Parrot_pcc_get_continuation(i, c) (__C(c)->current_cont)
-#  define Parrot_pcc_set_continuation(i, c, value) (__C(c)->current_cont = (value))
+#  define Parrot_pcc_get_continuation(i, c) (CONTEXT_STRUCT(c)->current_cont)
+#  define Parrot_pcc_set_continuation(i, c, value) (CONTEXT_STRUCT(c)->current_cont = (value))
 
-#  define Parrot_pcc_get_caller_ctx(i, c) (__C(c)->caller_ctx)
-#  define Parrot_pcc_set_caller_ctx(i, c, value) (__C(c)->caller_ctx = (value))
+#  define Parrot_pcc_get_caller_ctx(i, c) (CONTEXT_STRUCT(c)->caller_ctx)
+#  define Parrot_pcc_set_caller_ctx(i, c, value) (CONTEXT_STRUCT(c)->caller_ctx = (value))
 
-#  define Parrot_pcc_get_namespace(i, c) (__C(c)->current_namespace)
-#  define Parrot_pcc_set_namespace(i, c, value) (__C(c)->current_namespace = (value))
+#  define Parrot_pcc_get_namespace(i, c) (CONTEXT_STRUCT(c)->current_namespace)
+#  define Parrot_pcc_set_namespace(i, c, value) (CONTEXT_STRUCT(c)->current_namespace = (value))
 
-#  define Parrot_pcc_get_pc(i, c) (__C(c)->current_pc)
-#  define Parrot_pcc_set_pc(i, c, value) (__C(c)->current_pc = (value))
+#  define Parrot_pcc_get_pc(i, c) (CONTEXT_STRUCT(c)->current_pc)
+#  define Parrot_pcc_set_pc(i, c, value) (CONTEXT_STRUCT(c)->current_pc = (value))
 
-#  define Parrot_pcc_get_HLL(i, c) (__C(c)->current_HLL)
-#  define Parrot_pcc_set_HLL(i, c, value) (__C(c)->current_HLL = (value))
+#  define Parrot_pcc_get_HLL(i, c) (CONTEXT_STRUCT(c)->current_HLL)
+#  define Parrot_pcc_set_HLL(i, c, value) (CONTEXT_STRUCT(c)->current_HLL = (value))
 
-#  define Parrot_pcc_get_object(i, c) (__C(c)->current_object)
-#  define Parrot_pcc_set_object(i, c, value) (__C(c)->current_object = (value))
+#  define Parrot_pcc_get_object(i, c) (CONTEXT_STRUCT(c)->current_object)
+#  define Parrot_pcc_set_object(i, c, value) (CONTEXT_STRUCT(c)->current_object = (value))
 
-#  define Parrot_pcc_get_lex_pad(i, c) (__C(c)->lex_pad)
-#  define Parrot_pcc_set_lex_pad(i, c, value) (__C(c)->lex_pad = (value))
+#  define Parrot_pcc_get_lex_pad(i, c) (CONTEXT_STRUCT(c)->lex_pad)
+#  define Parrot_pcc_set_lex_pad(i, c, value) (CONTEXT_STRUCT(c)->lex_pad = (value))
 
-#  define Parrot_pcc_get_handlers(i, c) (__C(c)->handlers)
-#  define Parrot_pcc_set_handlers(i, c, value) (__C(c)->handlers = (value))
+#  define Parrot_pcc_get_handlers(i, c) (CONTEXT_STRUCT(c)->handlers)
+#  define Parrot_pcc_set_handlers(i, c, value) (CONTEXT_STRUCT(c)->handlers = (value))
 
-#  define Parrot_pcc_get_outer_ctx(i, c) (__C(c)->outer_ctx)
-#  define Parrot_pcc_set_outer_ctx(i, c, value) (__C(c)->outer_ctx = (value))
+#  define Parrot_pcc_get_outer_ctx(i, c) (CONTEXT_STRUCT(c)->outer_ctx)
+#  define Parrot_pcc_set_outer_ctx(i, c, value) (CONTEXT_STRUCT(c)->outer_ctx = (value))
 
-#  define Parrot_pcc_get_signature(i, c) (__C(c)->current_sig)
-#  define Parrot_pcc_set_signature(i, c, value) (__C(c)->current_sig = (value))
+#  define Parrot_pcc_get_signature(i, c) (CONTEXT_STRUCT(c)->current_sig)
+#  define Parrot_pcc_set_signature(i, c, value) (CONTEXT_STRUCT(c)->current_sig = (value))
 
-#  define Parrot_pcc_get_int_constant(i, c, idx) (__C(c)->constants[(idx)]->u.integer)
-#  define Parrot_pcc_get_num_constant(i, c, idx) (__C(c)->constants[(idx)]->u.number)
-#  define Parrot_pcc_get_string_constant(i, c, idx) (__C(c)->constants[(idx)]->u.string)
-#  define Parrot_pcc_get_pmc_constant(i, c, idx) (__C(c)->constants[(idx)]->u.key)
+#  define Parrot_pcc_get_int_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.integer)
+#  define Parrot_pcc_get_num_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.number)
+#  define Parrot_pcc_get_string_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.string)
+#  define Parrot_pcc_get_pmc_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.key)
 
-#  define Parrot_pcc_get_recursion_depth(i, c) (__C(c)->recursion_depth)
-#  define Parrot_pcc_dec_recursion_depth(i, c) (--__C(c)->recursion_depth)
-#  define Parrot_pcc_inc_recursion_depth(i, c) (__C(c)->recursion_depth++)
+#  define Parrot_pcc_get_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth)
+#  define Parrot_pcc_dec_recursion_depth(i, c) (--CONTEXT_STRUCT(c)->recursion_depth)
+#  define Parrot_pcc_inc_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth++)
 
-#  define Parrot_pcc_warnings_on(i, c, flags)   (__C(c)->warns |= (flags))
-#  define Parrot_pcc_warnings_off(i, c, flags)  (__C(c)->warns &= ~(flags))
-#  define Parrot_pcc_warnings_test(i, c, flags) (__C(c)->warns & (flags))
+#  define Parrot_pcc_warnings_on(i, c, flags)   (CONTEXT_STRUCT(c)->warns |= (flags))
+#  define Parrot_pcc_warnings_off(i, c, flags)  (CONTEXT_STRUCT(c)->warns &= ~(flags))
+#  define Parrot_pcc_warnings_test(i, c, flags) (CONTEXT_STRUCT(c)->warns & (flags))
 
-#  define Parrot_pcc_errors_on(i, c, flags)     (__C(c)->errors |= (flags))
-#  define Parrot_pcc_errors_off(i, c, flags)    (__C(c)->errors &= ~(flags))
-#  define Parrot_pcc_errors_test(i, c, flags)   (__C(c)->errors & (flags))
+#  define Parrot_pcc_errors_on(i, c, flags)     (CONTEXT_STRUCT(c)->errors |= (flags))
+#  define Parrot_pcc_errors_off(i, c, flags)    (CONTEXT_STRUCT(c)->errors &= ~(flags))
+#  define Parrot_pcc_errors_test(i, c, flags)   (CONTEXT_STRUCT(c)->errors & (flags))
 
-#  define Parrot_pcc_trace_flags_on(i, c, flags)     (__C(c)->trace_flags |= (flags))
-#  define Parrot_pcc_trace_flags_off(i, c, flags)    (__C(c)->trace_flags &= ~(flags))
-#  define Parrot_pcc_trace_flags_test(i, c, flags)   (__C(c)->trace_flags & (flags))
+#  define Parrot_pcc_trace_flags_on(i, c, flags)     (CONTEXT_STRUCT(c)->trace_flags |= (flags))
+#  define Parrot_pcc_trace_flags_off(i, c, flags)    (CONTEXT_STRUCT(c)->trace_flags &= ~(flags))
+#  define Parrot_pcc_trace_flags_test(i, c, flags)   (CONTEXT_STRUCT(c)->trace_flags & (flags))
 
 #else
 
@@ -614,7 +594,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_trace_flags_test(i, c, flags) Parrot_pcc_trace_flags_test_func((i), (c), (flags))
 
 #endif /* ifndef NDEBUG */
-
 
 #endif /* PARROT_CONTEXT_H_GUARD */
 
