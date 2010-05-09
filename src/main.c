@@ -107,7 +107,7 @@ main(int argc, const char *argv[])
     Interp     *interp;
     int         status;
 
-    Parrot_Run_core_t  core  = PARROT_FAST_CORE;
+    Parrot_Run_core_t  core  = PARROT_SLOW_CORE;
     Parrot_trace_flags trace = PARROT_NO_TRACE;
 
     /* internationalization setup */
