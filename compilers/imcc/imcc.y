@@ -1116,7 +1116,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit pmc_const pragma
-%type <s> classname relop any_string assign_op  bin_op  un_op
+%type <s> relop any_string assign_op  bin_op  un_op
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
@@ -2037,19 +2037,6 @@ type:
    | PMCV                      { $$ = 'P'; }
    ;
 
-classname:
-     IDENTIFIER
-         {
-           /* there'd normally be a mem_sys_strdup() here, but the lexer already
-            * copied the string, so it's safe to use directly */
-           if ((IMCC_INFO(interp)->cur_pmc_type = Parrot_pmc_get_type_str(interp,
-               Parrot_str_new(interp, $1, 0))) <= 0) {
-               IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                    "Unknown PMC type '%s'\n", $1);
-           }
-         }
-   ;
-
 assignment:
      target '=' var
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set", 2, $1, $3);  }
@@ -2061,11 +2048,6 @@ assignment:
             { $$ = iINDEXFETCH(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $5); }
    | target '[' keylist ']' '=' var
             { $$ = iINDEXSET(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $6); }
-     /* Removing this line causes test failures in t/compilers/tge/* for
-        some reason. Eventually it should be removed and the normal handling
-        of ops should be used for all forms of "new". */
-   | target '=' 'new' classname '[' keylist ']'
-            { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, $6, 1); }
      /* Subroutine call the short way */
    | target  '=' sub_call
          {

@@ -128,61 +128,7 @@ static INTVAL       eval_nr  = 0;
 
 =head2 Functions
 
-=over 4
-
-=item C<Instruction * iNEW(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, char
-*type, SymReg *init, int emit)>
-
- * P = new type, [init]
- * PASM like:
- *   new P, 'SomeThing'
- * is done in the lexer, this is a mess
- * best would be to have a flag in core.ops, where a PMC type is expected
-
-=cut
-
- */
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Instruction *
-iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
-        ARGMOD(char *type), ARGIN_NULLOK(SymReg *init), int emit)
-{
-    ASSERT_ARGS(iNEW)
-    char fmt[256];
-    SymReg *regs[3];
-    SymReg *pmc;
-    int nargs;
-    const int pmc_num = Parrot_pmc_get_type_str(interp,
-            Parrot_str_new(interp, *type == '.' ? type + 1 : type, 0));
-
-    snprintf(fmt, sizeof (fmt), "%d", pmc_num);
-    pmc = mk_const(interp, fmt, 'I');
-
-    if (pmc_num <= 0)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "Unknown PMC type '%s'\n", type);
-
-    snprintf(fmt, sizeof (fmt), "%%s, %d\t # .%s", pmc_num, type);
-
-    r0->usage |= U_NEW;
-    if (STREQ(type, "Hash"))
-        r0->usage |= U_KEYED;
-
-    regs[0] = r0;
-    regs[1] = pmc;
-
-    if (init) {
-        regs[2] = init;
-        nargs   = 3;
-    }
-    else
-        nargs = 2;
-
-    return INS(interp, unit, "new", fmt, regs, nargs, 0, emit);
-}
-
-/*
+=over
 
 =item C<void op_fullname(char *dest, const char *name, SymReg * const *args, int
 narg, int keyvec)>

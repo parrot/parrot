@@ -293,22 +293,6 @@ imcc_vfprintf(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*io);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Instruction * iNEW(PARROT_INTERP,
-    ARGMOD(IMC_Unit *unit),
-    ARGMOD(SymReg *r0),
-    ARGMOD(char *type),
-    ARGIN_NULLOK(SymReg *init),
-    int emit)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(*r0)
-        FUNC_MODIFIES(*type);
-
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction * INS(PARROT_INTERP,
@@ -406,11 +390,6 @@ int try_find_op(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io) \
     , PARROT_ASSERT_ARG(format))
-#define ASSERT_ARGS_iNEW __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit) \
-    , PARROT_ASSERT_ARG(r0) \
-    , PARROT_ASSERT_ARG(type))
 #define ASSERT_ARGS_INS __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
@@ -604,7 +583,6 @@ typedef struct _imc_info_t {
     int                   IMCC_DEBUG;
     int                   allocated;
     int                   cnr;
-    int                   cur_pmc_type;
     int                   debug;
     int                   dont_optimize;
     int                   emitter;

@@ -665,11 +665,6 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
     else
         mem_sys_free(fullname);
 
-    if (t == 'P') {
-        r->pmc_type                     = IMCC_INFO(interp)->cur_pmc_type;
-        IMCC_INFO(interp)->cur_pmc_type = 0;
-    }
-
     return r;
 }
 
