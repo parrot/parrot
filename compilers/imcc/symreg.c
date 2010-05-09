@@ -1631,10 +1631,6 @@ clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 
         for (p = hsh->data[i]; p;) {
             SymReg * const next = p->next;
-
-            if (unit && p->life_info)
-                free_life_info(unit, p);
-
             free_sym(p);
             p = next;
         }

@@ -215,9 +215,6 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 
         build_reglist(interp, unit);
 
-        if (IMCC_INFO(interp)->allocator == IMCC_GRAPH_ALLOCATOR)
-            life_analysis(interp, unit);
-
         allocate_uniq(interp, unit, 0);
     } while (!IMCC_INFO(interp)->dont_optimize && optimize(interp, unit));
 
@@ -254,11 +251,6 @@ free_reglist(ARGMOD(IMC_Unit *unit))
 #endif
 
     if (unit->reglist) {
-        unsigned int i;
-
-        for (i = 0; i < unit->n_symbols; i++)
-            free_life_info(unit, unit->reglist[i]);
-
         mem_sys_free(unit->reglist);
         unit->reglist   = NULL;
         unit->n_symbols = 0;

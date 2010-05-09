@@ -243,7 +243,6 @@ imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
         if (strchr(opt->opt_arg, 'c'))
             IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
 
-        IMCC_INFO(interp)->allocator = IMCC_GRAPH_ALLOCATOR;
         /* currently not ok due to different register allocation */
         if (strchr(opt->opt_arg, '1')) {
             IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
@@ -432,7 +431,6 @@ imcc_initialize(PARROT_INTERP)
     Parrot_block_GC_sweep(interp);
 
     IMCC_INFO(interp)->yyscanner = yyscanner;
-    IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!IMCC_INFO(interp)->optimizer_level) {

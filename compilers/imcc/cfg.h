@@ -89,22 +89,6 @@ void find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-void free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*r);
-
-void life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Life_range * make_life_range(PARROT_INTERP, ARGMOD(SymReg *r), int idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*r);
-
 PARROT_WARN_UNUSED_RESULT
 int natural_preheader(
     ARGIN(const IMC_Unit *unit),
@@ -141,15 +125,6 @@ void search_predecessors_not_in(
 #define ASSERT_ARGS_find_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_free_life_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit) \
-    , PARROT_ASSERT_ARG(r))
-#define ASSERT_ARGS_life_analysis __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_make_life_range __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_natural_preheader __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(loop_info))

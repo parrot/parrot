@@ -530,11 +530,6 @@ typedef enum _AsmState {
     AsmInYield
 } AsmState;
 
-typedef enum _imcc_reg_allocator_t {
-    IMCC_VANILLA_ALLOCATOR = 0,
-    IMCC_GRAPH_ALLOCATOR
-} imcc_reg_allocator;
-
 PARROT_EXPORT void IMCC_push_parser_state(PARROT_INTERP);
 PARROT_EXPORT void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
 
@@ -608,7 +603,6 @@ typedef struct _imc_info_t {
     jmp_buf               jump_buf;        /* The jump for error  handling */
     int                   IMCC_DEBUG;
     int                   allocated;
-    int                   allocator;
     int                   cnr;
     int                   cur_pmc_type;
     int                   debug;

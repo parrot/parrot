@@ -32,23 +32,6 @@ enum VARTYPE {              /* variable type can be */
 #define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM)
 #define REG_NEEDS_ALLOC(r) ((r)->type & VTREGISTER)
 
-enum LIFEFLAG {    /* The status of a var inside a basic block can be */
-    LF_use       = 1 << 0, /* block uses the the var before defining it */
-    LF_def       = 1 << 1, /* block defines the variable */
-    LF_lv_in     = 1 << 2, /* variable is alive at the beginning of the block */
-    LF_lv_out    = 1 << 3, /* variable is alive at the end of the block */
-    LF_lv_inside = 1 << 4, /* variable is alive at some moment in the block */
-    LF_lv_all    = 1 << 5  /* variable is alive throughout the block */
-};
-
-/* Liveness represents the usage of a var inside a basic block
-   This is represented by pairs of [definition, usage] in *intervals: */
-typedef struct _Life_range {
-    int                  flags;
-    struct _Instruction *first_ins;
-    struct _Instruction *last_ins;
-} Life_range;
-
 enum USAGE {
     U_KEYED         = 1 << 0,       /* array, hash, keyed */
     U_NEW           = 1 << 1,       /* PMC was inited */
@@ -61,7 +44,6 @@ enum USAGE {
 typedef struct _SymReg {
     char                *name;
     char                *subid;
-    Life_range         **life_info;     /* Each block has a Life_range status */
     struct _SymReg      *nextkey;       /* keys */
     struct _SymReg      *reg;           /* key->register for VTREGKEYs */
     struct pcc_sub_t    *pcc_sub;       /* PCC subroutine */
