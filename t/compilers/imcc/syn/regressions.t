@@ -254,7 +254,7 @@ OUT
 bar()
 .end
 CODE
-/:opt_flag parameter must be of type 'I', not '$invalid_type'/
+/:opt_flag parameter must be of type 'int', not '$invalid_type'/
 OUT
 
     }

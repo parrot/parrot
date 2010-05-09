@@ -1429,8 +1429,10 @@ sub_param_type_def:
                }
 
                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                   ":opt_flag parameter must be of type 'I', not '%s'", type);
+                   ":opt_flag parameter must be of type 'int', not '%s'", type);
            }
+           if ($3 & VT_NAMED && !($3 & VT_FLAT) && !IMCC_INFO(interp)->adv_named_id)
+               adv_named_set(interp, $2);
            $$ = mk_ident(interp, $2, $1);
            $$->type |= $3;
            mem_sys_free($2);
@@ -1726,8 +1728,8 @@ paramtype:
    | ADV_OPTIONAL               { $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG               { $$ = VT_OPT_FLAG; }
    | ADV_NAMED                  { $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; mem_sys_free($3); }
-   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; mem_sys_free($3); }
+   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = VT_NAMED; mem_sys_free($3); }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = VT_NAMED; mem_sys_free($3); }
    | UNIQUE_REG                 { $$ = 0; }
    | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;

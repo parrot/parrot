@@ -621,7 +621,7 @@ xyz:<\>
 xyz:<\>
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', ':named should default to param name', todo=>'TT #1152');
+pir_output_is( <<'CODE', <<'OUT', ':named should default to param name');
 .sub main
   $I0 = 'incr'('value'=>3)
   say $I0
