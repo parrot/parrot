@@ -759,7 +759,8 @@ void Parrot_destroy_constants(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
+void Parrot_load_bytecode(PARROT_INTERP,
+    ARGIN_NULLOK(Parrot_String file_str))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

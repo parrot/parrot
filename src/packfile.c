@@ -4801,7 +4801,7 @@ PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
 
 /*
 
-=item C<void Parrot_load_bytecode(PARROT_INTERP, STRING *file_str)>
+=item C<void Parrot_load_bytecode(PARROT_INTERP, Parrot_String file_str)>
 
 Load a bytecode, PIR, or PASM file into the interpreter.
 
@@ -4812,7 +4812,7 @@ Load a bytecode, PIR, or PASM file into the interpreter.
 /* intermediate hook during changes */
 PARROT_EXPORT
 void
-Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
+Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 {
     ASSERT_ARGS(Parrot_load_bytecode)
     STRING         *wo_ext, *ext, *pbc, *path;
