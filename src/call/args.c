@@ -40,7 +40,7 @@ typedef FLOATVAL  (*numval_func_t)(PARROT_INTERP, void *arg_info, INTVAL index);
 typedef STRING*   (*string_func_t)(PARROT_INTERP, void *arg_info, INTVAL index);
 typedef PMC*      (*pmc_func_t)   (PARROT_INTERP, void *arg_info, INTVAL index);
 
-typedef struct pcc_set_funcs {
+typedef struct pcc_funcs_ptr {
     intval_ptr_func_t   intval;
     numval_ptr_func_t   numval;
     string_ptr_func_t   string;
@@ -50,19 +50,7 @@ typedef struct pcc_set_funcs {
     numval_func_t   numval_constant;
     string_func_t   string_constant;
     pmc_func_t      pmc_constant;
-} pcc_set_funcs;
-
-typedef struct pcc_get_funcs {
-    intval_func_t   intval;
-    numval_func_t   numval;
-    string_func_t   string;
-    pmc_func_t      pmc;
-
-    intval_func_t   intval_constant;
-    numval_func_t   numval_constant;
-    string_func_t   string_constant;
-    pmc_func_t      pmc_constant;
-} pcc_get_funcs;
+} pcc_funcs_ptr;
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -71,7 +59,7 @@ static void assign_default_param_value(PARROT_INTERP,
     INTVAL param_index,
     INTVAL param_flags,
     ARGIN(void *arg_info),
-    ARGMOD(struct pcc_set_funcs *accessor))
+    ARGMOD(struct pcc_funcs_ptr *accessor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
@@ -108,7 +96,7 @@ static void fill_params(PARROT_INTERP,
     ARGMOD_NULLOK(PMC *call_object),
     ARGIN(PMC *raw_sig),
     ARGIN(void *arg_info),
-    ARGIN(struct pcc_set_funcs *accessor),
+    ARGIN(struct pcc_funcs_ptr *accessor),
     Errors_classes direction)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -739,7 +727,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 /*
 
 =item C<static void fill_params(PARROT_INTERP, PMC *call_object, PMC *raw_sig,
-void *arg_info, struct pcc_set_funcs *accessor, Errors_classes direction)>
+void *arg_info, struct pcc_funcs_ptr *accessor, Errors_classes direction)>
 
 Gets args for the current function call and puts them into position.
 First it gets the positional non-slurpy parameters, then the positional
@@ -753,7 +741,7 @@ slurpy parameters.
 static void
 fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(void *arg_info),
-        ARGIN(struct pcc_set_funcs *accessor),
+        ARGIN(struct pcc_funcs_ptr *accessor),
         Errors_classes direction)
 {
     ASSERT_ARGS(fill_params)
@@ -1185,7 +1173,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 /*
 
 =item C<static void assign_default_param_value(PARROT_INTERP, INTVAL
-param_index, INTVAL param_flags, void *arg_info, struct pcc_set_funcs
+param_index, INTVAL param_flags, void *arg_info, struct pcc_funcs_ptr
 *accessor)>
 
 Assign an appropriate default value to the parameter depending on its type
@@ -1196,7 +1184,7 @@ Assign an appropriate default value to the parameter depending on its type
 
 static void
 assign_default_param_value(PARROT_INTERP, INTVAL param_index, INTVAL param_flags,
-        ARGIN(void *arg_info), ARGMOD(struct pcc_set_funcs *accessor))
+        ARGIN(void *arg_info), ARGMOD(struct pcc_funcs_ptr *accessor))
 {
     ASSERT_ARGS(assign_default_param_value)
     switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
@@ -1243,7 +1231,7 @@ Parrot_pcc_fill_params_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_op)
 
-    static pcc_set_funcs function_pointers = {
+    static pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_op,
         (numval_ptr_func_t)numval_param_from_op,
         (string_ptr_func_t)string_param_from_op,
@@ -1317,7 +1305,7 @@ Parrot_pcc_fill_params_from_varargs(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_varargs)
     PMC    *raw_sig  = PMCNULL;
-    static pcc_set_funcs function_pointers = {
+    static pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_c_args,
         (numval_ptr_func_t)numval_param_from_c_args,
         (string_ptr_func_t)string_param_from_c_args,
