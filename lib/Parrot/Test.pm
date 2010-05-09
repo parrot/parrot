@@ -443,7 +443,7 @@ sub generate_languages_functions {
             # set a todo-item for Test::Builder to find
             my $call_pkg = $self->{builder}->exported_to() || '';
 
-            no strict 'refs';
+            no strict 'refs';  ## no critic Variables::ProhibitConditionalDeclarations
 
             local *{ $call_pkg . '::TODO' } = ## no critic Variables::ProhibitConditionalDeclarations
                 \$options{todo}
@@ -500,10 +500,20 @@ sub generate_languages_functions {
 
         my ($package) = caller();
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
+}
+
+sub create_sub {
+    my $package = shift;
+    my $func    = shift;
+    my $sub     = shift;
+
+    no strict 'refs';
+
+    *{ $package . '::' . $func } = $sub;
+
+    return;
 }
 
 =over
@@ -766,9 +776,7 @@ sub _generate_test_functions {
             return $pass;
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 2: PIR-to-PASM test map #####
@@ -860,9 +868,7 @@ sub _generate_test_functions {
             return $pass;
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 3: Language test map #####
@@ -926,9 +932,7 @@ sub _generate_test_functions {
             }
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 4:  Example test map #####
@@ -973,9 +977,7 @@ sub _generate_test_functions {
             }
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 5: C test map #####
@@ -1100,9 +1102,7 @@ sub _generate_test_functions {
             return $pass;
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     return;
