@@ -146,7 +146,7 @@ PMC*
 Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_sub)
-    Parrot_Context const *c = get_context_struct_fast(interp, ctx);
+    const Parrot_Context *c = get_context_struct_fast(interp, ctx);
     return c->current_sub;
 }
 
@@ -166,7 +166,7 @@ void
 Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 {
     ASSERT_ARGS(Parrot_pcc_set_sub)
-    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    Parrot_Context * const c = get_context_struct_fast(interp, ctx);
     c->current_sub    = sub;
 
     if (sub && !PMC_IS_NULL(sub)) {
@@ -298,7 +298,7 @@ static void
 init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
-    Parrot_Context *ctx    = get_context_struct_fast(interp, pmcctx);
+    Parrot_Context * const ctx    = get_context_struct_fast(interp, pmcctx);
 
     /* pmcold may be null */
     Parrot_Context *old    = PMC_IS_NULL(pmcold)
