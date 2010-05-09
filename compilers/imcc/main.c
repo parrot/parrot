@@ -298,13 +298,10 @@ do_pre_process(PARROT_INTERP)
             case GOTO:          printf("goto ");break;
             case IF:            printf("if ");break;
             case UNLESS:        printf("unless ");break;
-            case INC:           printf("inc ");break;
-            case DEC:           printf("dec ");break;
             case INTV:          printf("int ");break;
             case FLOATV:        printf("float ");break;
             case STRINGV:       printf("string ");break;
             case PMCV:          printf("pmc ");break;
-            case NEW:           printf("new ");break;
             case SHIFT_LEFT:    printf(" << ");break;
             case SHIFT_RIGHT:   printf(" >> ");break;
             case SHIFT_RIGHT_U: printf(" >>> ");break;
