@@ -676,29 +676,6 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 
 /*
 
-=item C<SymReg* mk_ident_ur(PARROT_INTERP, const char *name, int t)>
-
-Creates and returns a SymReg representing a unique (non-volatile) register.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_IGNORABLE_RESULT
-SymReg*
-mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
-{
-    ASSERT_ARGS(mk_ident_ur)
-    SymReg * const r = mk_ident(interp, name, t);
-    r->usage        |= U_NON_VOLATILE;
-
-    return r;
-}
-
-
-/*
-
 =item C<static SymReg * mk_pmc_const_2(PARROT_INTERP, IMC_Unit *unit, SymReg
 *left, SymReg *rhs)>
 

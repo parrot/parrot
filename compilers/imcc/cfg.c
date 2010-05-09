@@ -763,22 +763,6 @@ analyse_life_symbol(PARROT_INTERP,
         if (r->life_info[i]->flags & LF_use) {
             const Instruction * const ins = unit->bb_list[i]->start;
 
-            /* if the previous instruction (the last of the previous block) was
-             * a sub call, and the symbol is live/use here, it needs allocation
-             * in the non-volatile register range */
-            if (ins->prev) {
-                const Instruction * const prev = ins->prev;
-
-                if ((prev->type  & (ITPCCSUB|ITPCCYIELD))
-                &&   prev->opnum != PARROT_OP_tailcall_p)
-                    r->usage |= U_NON_VOLATILE;
-                else if (prev->opnum == PARROT_OP_invoke_p_p
-                     ||  prev->opnum == PARROT_OP_invokecc_p)
-                    r->usage |= U_NON_VOLATILE;
-                else if (ins->type & ITADDR)
-                    r->usage |= U_NON_VOLATILE;
-            }
-
             /* This block uses r, so it must be live at the beginning */
             r->life_info[i]->flags |= LF_lv_in;
 
@@ -843,10 +827,6 @@ analyse_life_block(PARROT_INTERP, ARGIN(const Basic_block* bb), ARGMOD(SymReg *r
 
     for (ins = bb->start; ins; ins = ins->next) {
         int is_alias;
-
-        /* if we have a setp_ind opcode, it may write all PMC registers */
-        if (ins->opnum == PARROT_OP_setp_ind_i_p && r->set == 'P')
-            r->usage |= U_NON_VOLATILE;
 
         /* restoreall and such */
         if (ins_writes2(ins, r->set))

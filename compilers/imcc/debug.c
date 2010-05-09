@@ -406,9 +406,8 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
             continue;
         if (!r->first_ins)
             continue;
-        fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%lx\n",
+        fprintf(stderr, "%s \t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%lx\n",
                 r->name,
-                r->usage & U_NON_VOLATILE ? 'P' : ' ',
                 r->first_ins->index, r->last_ins->index,
                 r->first_ins->bbindex, r->last_ins->bbindex,
                 r->set,

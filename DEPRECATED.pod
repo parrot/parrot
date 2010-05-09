@@ -252,6 +252,10 @@ L<https://trac.parrot.org/parrot/ticket/1091>
 
 L<https://trac.parrot.org/parrot/ticket/1103>
 
+=item :unique_reg flag [eligible in 3.1]
+
+L<https://trac.parrot.org/parrot/ticket/1622>
+
 =back
 
 =head1 Functions

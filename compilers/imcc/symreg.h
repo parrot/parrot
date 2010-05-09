@@ -24,8 +24,7 @@ enum VARTYPE {              /* variable type can be */
     VT_ENCODED      = VARTYPE_BIT(16),  /* unicode string constant */
     VT_OPT_FLAG     = VARTYPE_BIT(17),  /* var :opt_flag */
     VT_NAMED        = VARTYPE_BIT(18),  /* var :named(name) */
-    VT_UNIQUE_REG   = VARTYPE_BIT(19),
-    VT_CALL_SIG     = VARTYPE_BIT(20)
+    VT_CALL_SIG     = VARTYPE_BIT(19)
 };
 #undef VARTYPE_BIT
 
@@ -56,8 +55,7 @@ enum USAGE {
     U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
     U_LEXICAL       = 1 << 4,       /* symbol is lexical */
     U_FIXUP         = 1 << 5,       /* maybe not global, force fixup */
-    U_NON_VOLATILE  = 1 << 6,       /* needs preserving */
-    U_SUBID_LOOKUP  = 1 << 7        /* .const 'Sub' lookup is done by subid */
+    U_SUBID_LOOKUP  = 1 << 6        /* .const 'Sub' lookup is done by subid */
 };
 
 typedef struct _SymReg {

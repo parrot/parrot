@@ -44,11 +44,6 @@ static void allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-static void allocate_non_volatile(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*unit);
-
 static void allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -110,9 +105,6 @@ static void vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         FUNC_MODIFIES(*unit);
 
 #define ASSERT_ARGS_allocate_lexicals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_allocate_non_volatile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_allocate_uniq __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -226,7 +218,7 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         if (IMCC_INFO(interp)->allocator == IMCC_GRAPH_ALLOCATOR)
             life_analysis(interp, unit);
 
-        allocate_non_volatile(interp, unit);
+        allocate_uniq(interp, unit, 0);
     } while (!IMCC_INFO(interp)->dont_optimize && optimize(interp, unit));
 
     if (IMCC_INFO(interp)->debug & DEBUG_IMC)
@@ -783,22 +775,6 @@ allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     ASSERT_ARGS(allocate_lexicals)
     IMCC_debug(interp, DEBUG_IMC, "allocate lexicals\n");
     allocate_uniq(interp, unit, U_LEXICAL);
-}
-
-/*
-
-=item C<static void allocate_non_volatile(PARROT_INTERP, IMC_Unit *unit)>
-
-=cut
-
-*/
-
-static void
-allocate_non_volatile(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
-{
-    ASSERT_ARGS(allocate_non_volatile)
-    IMCC_debug(interp, DEBUG_IMC, "allocate non_volatile\n");
-    allocate_uniq(interp, unit, U_NON_VOLATILE);
 }
 
 /*

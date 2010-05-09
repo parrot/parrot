@@ -1419,9 +1419,7 @@ sub_param:
 sub_param_type_def:
      type IDENTIFIER paramtype_list
          {
-           if ($3 & VT_UNIQUE_REG)
-               $$ = mk_ident_ur(interp, $2, $1);
-           else if ($3 & VT_OPT_FLAG && $1 != 'I') {
+           if ($3 & VT_OPT_FLAG && $1 != 'I') {
                const char *type;
                switch ($1) {
                     case 'N': type = "num";     break;
@@ -1433,8 +1431,7 @@ sub_param_type_def:
                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                    ":opt_flag parameter must be of type 'I', not '%s'", type);
            }
-           else
-               $$ = mk_ident(interp, $2, $1);
+           $$ = mk_ident(interp, $2, $1);
            $$->type |= $3;
            mem_sys_free($2);
           }
@@ -1712,10 +1709,7 @@ pcc_result:
          {
            IdList * const l = $4;
            SymReg *ignored;
-           if (l->unique_reg)
-               ignored = mk_ident_ur(interp, l->id, $3);
-           else
-               ignored = mk_ident(interp, l->id, $3);
+           ignored = mk_ident(interp, l->id, $3);
            UNUSED(ignored);
            IMCC_INFO(interp)->is_def = 0;
            $$ = 0;
@@ -1734,7 +1728,7 @@ paramtype:
    | ADV_NAMED                  { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; mem_sys_free($3); }
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; mem_sys_free($3); }
-   | UNIQUE_REG                 { $$ = VT_UNIQUE_REG; }
+   | UNIQUE_REG                 { $$ = 0; }
    | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;
 
@@ -1926,14 +1920,13 @@ id_list_id :
          {
            IdList* const l = mem_gc_allocate_n_zeroed_typed(interp, 1, IdList);
            l->id           = $1;
-           l->unique_reg   = $2;
            $$ = l;
          }
    ;
 
 opt_unique_reg:
-     /* empty */               { $$ = 0; }
-   | UNIQUE_REG                { $$ = 1; }
+     /* empty */
+   | UNIQUE_REG
    ;
 
 
@@ -1945,10 +1938,7 @@ labeled_inst:
            IdList *l = $4;
            while (l) {
                IdList *l1;
-               if (l->unique_reg)
-                   mk_ident_ur(interp, l->id, $3);
-               else
-                   mk_ident(interp, l->id, $3);
+               mk_ident(interp, l->id, $3);
                l1 = l;
                l  = l->next;
                mem_sys_free(l1->id);
