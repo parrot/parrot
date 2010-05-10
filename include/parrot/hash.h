@@ -40,7 +40,6 @@ typedef UINTVAL BucketIndex;
                                      (n) * sizeof (HashBucket *))
 
 typedef int (*hash_comp_fn)(PARROT_INTERP, ARGIN(const void *), ARGIN(const void *));
-typedef void (*hash_mark_key_fn)(PARROT_INTERP, PObj *);
 typedef size_t (*hash_hash_key_fn)(PARROT_INTERP, ARGIN(const void *), size_t seed);
 
 /* &gen_from_enum(hash_key_type.pasm) */
