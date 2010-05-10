@@ -6,14 +6,19 @@ use strict;
 use warnings;
 use lib qw| lib |;
 
-use Parrot::Manifest;
+my ($mani, $gitignore);
+open $mani,      '<', 'MANIFEST.SKIP' or die "Can't open MANIFEST.SKIP for reading";
+open $gitignore, '>', '.gitignore' or die "Can't open .gitignore for writing";
 
-my $script = $0;
-
-my $mani = Parrot::Manifest->new( { script => $script, } );
-
-my $print_str     = $mani->prepare_gitignore();
-$mani->print_gitignore($print_str);
+while (<$mani>) {
+    next if /\/$/;  # skip redundant directories
+    # Convert MANIFEST.SKIP style regexes into git paths.
+    s/^\^//;
+    s/\.\*/*/g;
+    s/\\\././g;
+    s/\$$//;
+    print $gitignore $_;
+}
 
 __END__
 
@@ -27,12 +32,10 @@ tools/dev/mk_gitignore.pl - Create the file F<.gitignore>.
 
 =head1 DESCRIPTION
 
-This is a helper for users of git-svn. In an svn-checkout it creates
-a file called F<.gitignore> containing the files detailed in the subversion property
-C<svn:ignore>. This file can then be copied to a git-svn working directory.
+This is a helper for users of git-svn. It converts MANIFEST.SKIP into
+.gitgnore.
 
-So beware, this works only for a svn checkout and the result is only useful
-for a git-svn checkout.
+So beware, result is only useful for a git-svn checkout.
 
 =head1 SEE ALSO
 
