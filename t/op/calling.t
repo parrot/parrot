@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 98;
 
 =head1 NAME
 
@@ -2529,6 +2529,37 @@ $I1 = 2
 .end
 CODE
 2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "methodtailcall 1 TT#133" );
+
+.sub main
+    say "main"
+    $P0 = foo() ## fails :-(
+    $P0 = bar()
+    say "done"
+.end
+
+.sub foo
+    .local pmc p
+    say "foo"
+    p = new "Class"
+    .tailcall p."attributes"()
+.end
+
+.sub bar
+    .local pmc  p
+    say "bar"
+    p = new "Class"
+    $P0 = p."attributes"()
+    .return ($P0)
+.end
+
+CODE
+main
+foo
+bar
+done
 OUTPUT
 
 # Local Variables:
