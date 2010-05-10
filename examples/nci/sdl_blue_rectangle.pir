@@ -33,19 +33,9 @@
     SDL_FillRect   = global ['SDL'; 'SDL_FillRect']
     new_SDL_Rect   = global "new_SDL_Rect"
 
-    .begin_call
-        .set_arg 65535
-        .nci_call SDL_Init
-    .end_call
+    SDL_Init(65535)
 
-    .begin_call
-        .set_arg 640
-        .set_arg 480
-        .set_arg  0
-        .set_arg   0
-        .nci_call SetVideoMode
-        .result screen
-    .end_call
+    screen = SetVideoMode(640, 480, 0, 0)
 
     .local object blue_rect
     #.local object blue_color
@@ -67,30 +57,15 @@
     set blue_rect['x'], 270
     set blue_rect['y'], 190
 
-    .begin_call
-        .set_arg screen
-        .set_arg blue_rect
-        .set_arg blue
-        .nci_call SDL_FillRect
-        .local int ok
-        .result ok
-    .end_call
+    .local int ok
+    ok = SDL_FillRect(screen, blue_rect, blue)
 
     # update full screen (all 0 arguments)
-    .begin_call
-        .set_arg screen
-        .set_arg 0
-        .set_arg 0
-        .set_arg 0
-        .set_arg 0
-        .nci_call SDL_UpdateRect
-    .end_call
+    SDL_UpdateRect(screen, 0, 0, 0, 0)
 
     sleep 2
 
-    .begin_call
-        .nci_call SDL_Quit
-    .end_call
+    SDL_Quit()
 
     .begin_return
     .end_return
