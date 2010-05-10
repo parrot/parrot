@@ -121,6 +121,7 @@ static Instruction * var_arg_ins(PARROT_INTERP,
  * absolutely global to prevent the files from being overwritten.
  *
  */
+/* XXX non-reentrant */
 static Parrot_mutex eval_nr_lock;
 static INTVAL       eval_nr  = 0;
 
@@ -1158,7 +1159,7 @@ static const char *
 try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 {
     ASSERT_ARGS(try_rev_cmp)
-    static struct br_pairs {
+    static const struct br_pairs {
         PARROT_OBSERVER const char * const op;
         PARROT_OBSERVER const char * const nop;
         const int to_swap;

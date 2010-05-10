@@ -152,9 +152,6 @@ SymReg * get_branch_reg(ARGIN(const Instruction *ins))
 int get_branch_regno(ARGIN(const Instruction *ins))
         __attribute__nonnull__(1);
 
-void imcc_init_tables(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 ins_print(PARROT_INTERP,
@@ -163,9 +160,6 @@ ins_print(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-int ins_writes2(ARGIN(const Instruction *ins), int t)
-        __attribute__nonnull__(1);
 
 void insert_ins(
     ARGMOD(IMC_Unit *unit),
@@ -246,14 +240,10 @@ void subst_ins(
        PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_get_branch_regno __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ins))
-#define ASSERT_ARGS_imcc_init_tables __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_ins_print __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io) \
     , PARROT_ASSERT_ARG(ins))
-#define ASSERT_ARGS_ins_writes2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_insert_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(tmp))

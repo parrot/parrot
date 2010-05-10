@@ -167,7 +167,6 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
                 (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
         goto done;
 
-    imcc_init_tables(interp);
     IMCC_INFO(interp)->allocated = 0;
 
 #if IMC_TRACE

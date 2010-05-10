@@ -368,6 +368,7 @@ mk_temp_reg(PARROT_INTERP, int t)
 {
     ASSERT_ARGS(mk_temp_reg)
     char       buf[30];
+    /* XXX non-reentrant */
     static int temp;
 
     snprintf(buf, sizeof (buf), "__imcc_temp_%d", ++temp);

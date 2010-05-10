@@ -769,6 +769,7 @@ int yywrap(void* yyscanner) {
 
 static macro_frame_t *
 new_frame(PARROT_INTERP) {
+    /* XXX non-reentrant */
     static int label   = 0;
     macro_frame_t * const tmp = mem_gc_allocate_zeroed_typed(interp, macro_frame_t);
 
