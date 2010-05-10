@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(128)
+    plan(129)
 
     resize_tests()
     negative_array_size()
@@ -51,6 +51,7 @@ out-of-bounds test. Checks INT and PMC keys.
     addr_tests()
     equality_tests()
     sort_tailcall()
+    push_to_subclasses_array()
 .end
 
 
@@ -1020,6 +1021,22 @@ end:
     .param pmc b
     .tailcall 'cmp_func_tailcall'(a, b)
 .end
+
+# Regression test for TT#835
+.sub 'push_to_subclasses_array'
+    .local pmc cl, array_one
+    cl = subclass "ResizablePMCArray", "ExampleArray"
+    array_one = new "ExampleArray"
+
+    $I0 = 100000
+  loop:
+    array_one.'push'($I0)
+    dec $I0
+    if $I0 goto loop
+
+    ok(1, "Push to subclassed array works")
+.end
+
 # don't forget to change the test plan
 
 # Local Variables:
