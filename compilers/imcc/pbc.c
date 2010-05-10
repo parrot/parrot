@@ -2180,21 +2180,13 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         IMCC_INFO(interp)->pc  = (opcode_t *)interp->code->base.data + oldsize;
         IMCC_INFO(interp)->npc = 0;
 
-        /* add debug if necessary */
-        if (IMCC_INFO(interp)->optimizer_level == 0
-        ||  IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
-            const char * const sourcefile = unit->file;
+        /* FIXME length and multiple subs */
+        IMCC_INFO(interp)->debug_seg  = Parrot_new_debug_seg(interp,
+            interp->code,
+            (size_t)IMCC_INFO(interp)->ins_line + ins_size + 1);
 
-            /* FIXME length and multiple subs */
-            IMCC_INFO(interp)->debug_seg  = Parrot_new_debug_seg(interp,
-                interp->code,
-                (size_t)IMCC_INFO(interp)->ins_line + ins_size + 1);
-
-            Parrot_debug_add_mapping(interp, IMCC_INFO(interp)->debug_seg,
-                IMCC_INFO(interp)->ins_line, sourcefile);
-        }
-        else
-            IMCC_INFO(interp)->debug_seg = NULL;
+        Parrot_debug_add_mapping(interp, IMCC_INFO(interp)->debug_seg,
+            IMCC_INFO(interp)->ins_line, unit->file);
 
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
