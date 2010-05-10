@@ -77,10 +77,9 @@ Parrot_Opcode * Parrot_debug(PARROT_INTERP,
 
 PARROT_EXPORT
 void Parrot_disassemble(PARROT_INTERP,
-    ARGIN(const char *outfile),
+    ARGIN_NULLOK(const char *outfile),
     Parrot_disassemble_options options)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
@@ -168,8 +167,7 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
     , PARROT_ASSERT_ARG(debugger) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_Parrot_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(outfile))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(stack_top))
