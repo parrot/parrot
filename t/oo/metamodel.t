@@ -17,13 +17,7 @@ Tests the metamodel for the OO implementation.
 =cut
 
 .sub _main :main
-    load_bytecode 'Test/More.pbc'
-
-    .local pmc exports, curr_namespace, test_namespace
-    curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "plan ok is isa_ok skip todo"
-    test_namespace.'export_to'(curr_namespace, exports)
+    .include 'test_more.pir'
 
     plan( 12 )
 
@@ -85,10 +79,9 @@ FAIL:
     fail("no attribute")
 NEXT:
 
-    todo(0, "new opcode makes working objects", "not implemented: TT #1619")
-#    $P0 = new "Dog"
-#    $I0 = defined $P0
-#    isa_ok($P0, "Dog", "new opcode makes working objects")
+    $P0 = new "Dog"
+    $I0 = defined $P0
+    isa_ok($P0, "Dog", "new opcode makes working objects")
 
 .end
 
