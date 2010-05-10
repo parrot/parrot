@@ -111,7 +111,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Variable_Size_Pool * new_memory_pool(
     size_t min_block,
-    ARGIN_NULLOK(compact_f compact));
+    NULLOK(compact_f compact));
 
 PARROT_CANNOT_RETURN_NULL
 static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
@@ -809,7 +809,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Variable_Size_Pool *
-new_memory_pool(size_t min_block, ARGIN_NULLOK(compact_f compact))
+new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 {
     ASSERT_ARGS(new_memory_pool)
     Variable_Size_Pool * const pool = mem_internal_allocate_typed(Variable_Size_Pool);

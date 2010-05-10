@@ -376,8 +376,8 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
 
 /*
 
-=item C<PMC * Parrot_init_lib(PARROT_INTERP, PMC *(*load_func(PARROT_INTERP)),
-void (*init_func(PARROT_INTERP, PMC *)))>
+=item C<PMC * Parrot_init_lib(PARROT_INTERP, dynext_load_func load_func,
+dynext_init_func init_func)>
 
 Initializes a new library. First, calls C<load_func> to load the library
 (if C<load_func> is provided) and then calls C<init_func>. Returns a
@@ -391,8 +391,8 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-                ARGIN_NULLOK(PMC *(*load_func)(PARROT_INTERP)),
-                ARGIN_NULLOK(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
+        NOTNULL(dynext_load_func load_func),
+        NOTNULL(dynext_init_func init_func))
 {
     ASSERT_ARGS(Parrot_init_lib)
     PMC *lib_pmc = NULL;
