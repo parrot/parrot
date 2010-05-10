@@ -7,6 +7,9 @@ New in 2.4.0
   + Tools to distribute on CPAN were removed
 - Tests
   + Many tests for the extend/embed interface were added
+  + done_testing() is now implemented in Test::More
+- Miscellaneous
+  + Six Parrot-related projects accepted to GSoC
 
 New in 2.3.0
 - Core
