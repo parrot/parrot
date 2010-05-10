@@ -391,8 +391,8 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-        NOTNULL(dynext_load_func load_func),
-        NOTNULL(dynext_init_func init_func))
+        NULLOK(dynext_load_func load_func),
+        NULLOK(dynext_init_func init_func))
 {
     ASSERT_ARGS(Parrot_init_lib)
     PMC *lib_pmc = NULL;
