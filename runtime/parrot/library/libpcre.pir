@@ -130,37 +130,6 @@ NOMATCH:
     .return( match )
 .end
 
-=for todo
-    # or use convenience function
-    print "copy_substring\n"
-    i = 0
-    repeat match, " ", 500
-loop:
-    .begin_call
-    .set_arg s
-    .set_arg ovector
-    .set_arg ok
-    .set_arg i
-    .set_arg match
-    .set_arg 500
-    .nci_call COPY_SUBSTRING
-    .end_call
-    if i goto subp
-    print "all "
-    goto all
-subp:
-    print "("
-    print i
-    print ") "
-all:
-    print "matched: '"
-    print match
-    print "'\n"
-    inc i
-    if i < ok goto loop
-    end
-.end
-
 =head1 FILES
 
 pcre.pir, libpcre.pir
