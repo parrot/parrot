@@ -196,8 +196,8 @@ The only way creating a new language compiler could be easier is if these files
 created themselves. PCT includes a tool to do just that:
 C<mk_language_shell.pl>.  This program automatically creates a new directory in
 F<languages/> for your new language, the necessary three files, starter files
-for libraries, a F<Makefile> to automate the build process, and a basic test
-harness to demonstrate that your language works as expects.
+for libraries, a F<setup.pir> script to automate the build process, and a basic
+test harness to demonstrate that your language works as expects.
 
 These generated files are all stubs which will require extensive editing to
 implement a full language, but they are a well-understood and working starting
