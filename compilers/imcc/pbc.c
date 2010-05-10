@@ -1156,6 +1156,10 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
                             "add lexical '%s' to sub name '%Ss'\n",
                             n->name, sub->name);
 
+                    if (VTABLE_exists_keyed_str(interp, lex_info, lex_name))
+                        IMCC_fataly(interp, EXCEPTION_INVALID_OPERATION,
+                            "Multiple declarations of lexical '%S'\n", lex_name);
+
                     VTABLE_set_integer_keyed_str(interp, lex_info,
                             lex_name, r->color);
 

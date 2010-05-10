@@ -261,7 +261,7 @@ CODE
 ok
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'lexical redeclared in sub', todo => 'TT #1073' );
+pir_error_output_like( <<'CODE', <<'OUT', 'lexical redeclared in sub');
 .sub 'main' :main
     .lex 'foo', $P0
     $P1 = box 'ok 1'
@@ -282,7 +282,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'lexical redeclared in sub', todo => '
     store_lex 'foo', $P7
 .end
 CODE
-/Lexical 'foo' already declared/
+/Multiple declarations of lexical 'foo'/
 OUT
 
 # Local Variables:
