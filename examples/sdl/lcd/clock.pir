@@ -28,10 +28,10 @@ The main function.
 =cut
 
 .sub _main :main
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Event.pir"
-    load_bytecode "library/SDL/EventHandler.pir"
-    load_bytecode "library/SDL/LCD.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Event.pir"
+    load_bytecode "SDL/EventHandler.pir"
+    load_bytecode "SDL/LCD.pir"
 
     # create the SDL application object
     .local pmc app
