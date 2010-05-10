@@ -964,7 +964,8 @@ This is used by the Parrot disassembler.
 
 PARROT_EXPORT
 void
-Parrot_disassemble(PARROT_INTERP, ARGIN_NULLOK(const char *outfile), Parrot_disassemble_options options)
+Parrot_disassemble(PARROT_INTERP,
+                   ARGIN_NULLOK(const char *outfile), Parrot_disassemble_options options)
 {
     ASSERT_ARGS(Parrot_disassemble)
     PDB_line_t *line;
