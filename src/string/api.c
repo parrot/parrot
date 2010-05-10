@@ -2516,6 +2516,7 @@ PARROT_COLD
 static void
 throw_illegal_escape(PARROT_INTERP)
 {
+    ASSERT_ARGS(throw_illegal_escape)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "Illegal escape sequence");
 }
