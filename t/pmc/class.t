@@ -17,17 +17,10 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 73
-
-
 .sub 'main' :main
-     load_bytecode 'Test/More.pbc'
-     .local pmc exporter, test_ns
-     test_ns = get_namespace [ 'Test'; 'More' ]
-     exporter = new ['Exporter']
-     exporter.'import'( test_ns :named('source'), 'plan ok is isa_ok todo' :named('globals') )
+    .include 'test_more.pir'
 
-     plan(TESTS)
+     plan(73)
      'new op'()
      'class flag'()
      'name'()
