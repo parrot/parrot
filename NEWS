@@ -3,6 +3,7 @@
 New in 2.4.0
 - Core
   + Various long-standing bugs in IMCC were fixed
+  + STRINGs are now immutable.
 - Deprecations
   + Tools to distribute on CPAN were removed
 - Tests
