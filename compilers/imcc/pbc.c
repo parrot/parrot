@@ -1314,7 +1314,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     }
     else {
         /* use a possible type mapping for the Sub PMCs, and create it */
-        const INTVAL type = Parrot_get_ctx_HLL_type(interp, 
+        const INTVAL type = Parrot_get_ctx_HLL_type(interp,
                                 r->pcc_sub->yield ? enum_class_Coroutine : enum_class_Sub);
 
         /* TODO create constant - see also src/packfile.c */
