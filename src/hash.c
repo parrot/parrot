@@ -1004,7 +1004,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 Hash *
 parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
-        ARGIN(hash_comp_fn compare), ARGIN(hash_hash_key_fn keyhash))
+        NOTNULL(hash_comp_fn compare), NOTNULL(hash_hash_key_fn keyhash))
 {
     ASSERT_ARGS(parrot_create_hash)
     HashBucket  *bp;
@@ -1122,7 +1122,7 @@ The callback returns C<void> and takes a C<void *>.
 
 void
 parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
-    ARGIN(value_free func))
+    NOTNULL(value_free func))
 {
     ASSERT_ARGS(parrot_chash_destroy_values)
     UINTVAL i;
