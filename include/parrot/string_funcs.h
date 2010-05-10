@@ -373,6 +373,17 @@ STRING * Parrot_str_unescape(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_unescape_string(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGIN(const CHARSET *charset),
+    ARGIN(const ENCODING *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+PARROT_EXPORT
 void Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -593,6 +604,11 @@ const CHARSET * Parrot_str_rep_compatible(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_unescape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cstring))
+#define ASSERT_ARGS_Parrot_str_unescape_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(charset) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_str_unpin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))

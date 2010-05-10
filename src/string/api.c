@@ -55,10 +55,17 @@ static const CHARSET * string_rep_compatible(SHIM_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*e);
 
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+static void throw_illegal_escape(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b) \
     , PARROT_ASSERT_ARG(e))
+#define ASSERT_ARGS_throw_illegal_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -2494,6 +2501,174 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     return result;
 }
 
+/*
+
+=item C<static void throw_illegal_escape(PARROT_INTERP)>
+
+Helper function to avoid repeated throw calls.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+static void
+throw_illegal_escape(PARROT_INTERP)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Illegal escape sequence");
+}
+
+/*
+
+=item C<STRING * Parrot_str_unescape_string(PARROT_INTERP, const STRING *src,
+const CHARSET *charset, const ENCODING *encoding)>
+
+EXPERIMENTAL, see TT #1628
+
+Unescapes the src string returnning a new string with the charset
+and encoding specified.
+
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
+        ARGIN(const CHARSET *charset),
+        ARGIN(const ENCODING *encoding))
+{
+    ASSERT_ARGS(Parrot_str_unescape_string)
+
+    UINTVAL srclen = Parrot_str_byte_length(interp, src);
+    STRING *result = Parrot_gc_new_string_header(interp, 0);
+    String_iter itersrc;
+    String_iter iterdest;
+    UINTVAL reserved;
+    int digcount;
+    char digbuf[9];
+    int pending;
+
+    result->charset = charset;
+    result->encoding = encoding;
+    reserved = string_max_bytes(interp, result, srclen);
+    Parrot_gc_allocate_string_storage(interp, result, reserved);
+    result->bufused = reserved;
+
+    src->encoding->iter_init(interp, src, &itersrc);
+    encoding->iter_init(interp, result, &iterdest);
+    while (itersrc.bytepos < srclen) {
+        INTVAL c = itersrc.get_and_advance(interp, &itersrc);
+        INTVAL next;
+
+        do {
+            pending = 0;
+            next = c;
+            if (c == '\\') {
+                c = itersrc.get_and_advance(interp, &itersrc);
+                switch (c) {
+                /* Common one char sequences */
+                case 'a': next = '\a'; break;
+                case 'b': next = '\b'; break;
+                case 't': next = '\t'; break;
+                case 'n': next = '\n'; break;
+                case 'v': next = '\v'; break;
+                case 'f': next = '\f'; break;
+                case 'r': next = '\r'; break;
+                case 'e': next = '\e'; break;
+                /* Escape character */
+                case 'c':
+                    c = itersrc.get_and_advance(interp, &itersrc);
+                    /* This assumes ascii-alike encoding */
+                    if (c < 'A' || c > 'Z')
+                        throw_illegal_escape(interp);
+                    next = c - 'A' + 1;
+                    break;
+                case 'x':
+                    digcount = 0;
+                    c = itersrc.get_and_advance(interp, &itersrc);
+                    if (c == '{') {
+                        /* \x{h..h} 1..8 hex digits */
+                        while (itersrc.bytepos < srclen) {
+                            c = itersrc.get_and_advance(interp, &itersrc);
+                            if (c == '}')
+                                break;
+                            if (!isxdigit(c))
+                                throw_illegal_escape(interp);
+                            if (digcount == 8)
+                                break;
+                            digbuf[digcount++] = c;
+                        }
+                        if (c != '}')
+                            throw_illegal_escape(interp);
+                    }
+                    else {
+                        /* \xhh 1..2 hex digits */
+                        for (digcount = 0; digcount < 2; ++digcount) {
+                            if (!isxdigit(c))
+                                break;
+                            digbuf[digcount] = c;
+                            c = itersrc.get_and_advance(interp, &itersrc);
+                        }
+                        pending = 1;
+                    }
+                    if (digcount == 0)
+                        throw_illegal_escape(interp);
+                    digbuf[digcount] = '\0';
+                    next = strtol(digbuf, NULL, 16);
+                    break;
+                case 'u':
+                    /* \uhhhh 4 hex digits */
+                    for (digcount = 0; digcount < 4; ++digcount) {
+                        c = itersrc.get_and_advance(interp, &itersrc);
+                        if (!isxdigit(c))
+                            throw_illegal_escape(interp);
+                        digbuf[digcount] = c;
+                    }
+                    digbuf[digcount] = '\0';
+                    next = strtol(digbuf, NULL, 16);
+                    break;
+                case 'U':
+                    /* \Uhhhhhhhh 8 hex digits */
+                    for (digcount = 0; digcount < 8; ++digcount) {
+                        c = itersrc.get_and_advance(interp, &itersrc);
+                        if (!isxdigit(c))
+                            throw_illegal_escape(interp);
+                        digbuf[digcount] = c;
+                    }
+                    digbuf[digcount] = '\0';
+                    next = strtol(digbuf, NULL, 16);
+                    break;
+                case '0': case '1': case '2': case '3':
+                case '4': case '5': case '6': case '7':
+                    /* \ooo 1..3 oct digits */
+                    digbuf[0] = c;
+                    for (digcount = 1; digcount < 3; ++digcount) {
+                        c = itersrc.get_and_advance(interp, &itersrc);
+                        if (c < '0' || c > '7')
+                            break;
+                        digbuf[digcount] = c;
+                    }
+                    digbuf[digcount] = '\0';
+                    next = strtol(digbuf, NULL, 8);
+                    if (digcount < 3)
+                        pending = 1;
+                    break;
+                default:
+                    next = c;
+                }
+            }
+            iterdest.set_and_advance(interp, &iterdest, next);
+        } while (pending);
+    }
+    result->bufused = iterdest.bytepos;
+    result->strlen = iterdest.charpos;
+    return result;
+}
 
 /*
 
