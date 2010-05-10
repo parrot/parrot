@@ -395,7 +395,7 @@ CODE
 written
 OUTPUT
 
-pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
+pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw", todo => 'TT #1142' );
 .sub main :main
     .local pmc io, e
     .local string file
@@ -407,6 +407,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
     \$S0 = read io, size
     close io
     e = thaw \$S0
+    sweep 1 # ensure all of the object survives GC
     e()
     e = get_global "foo_1"
     e()
