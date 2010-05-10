@@ -312,6 +312,38 @@ declared a plan or if you pass an invalid argument.
     .return()
 .end
 
+=item done_testing
+
+=cut
+
+.sub 'done_testing' :method
+    .param string tests     :optional
+    .param int    has_tests :opt_flag
+
+    .local pmc testplan
+    testplan = self.'testplan'()
+
+    unless has_tests goto write_footer
+
+    .local int num_tests
+    num_tests = tests
+    unless num_tests goto write_footer
+
+    testplan.'set_tests'( num_tests )
+
+  write_footer:
+    .local pmc output
+    output = self.'output'()
+
+    $S0 = testplan.'header'()
+    output.'write'( $S0 )
+
+    $I0 = self.'results'()
+    $S0 = testplan.'footer'( $I0 )
+    output.'write'( $S0 )
+
+.end
+
 =item C<diag( diagnostic_message, ... )>
 
 Records a diagnostic message for output.

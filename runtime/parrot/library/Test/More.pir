@@ -92,6 +92,29 @@ already declared a plan or if you pass an invalid argument.
     test.'plan'( tests )
 .end
 
+=item C<done_testing( number_of_tests? )>
+
+If you don't know how many tests you're going to run, you can issue
+the plan when you're done running tests.
+
+C<number_of_tests> is the same as plan(), it's the number of tests
+you expected to run.  You can omit this, in which case the number
+of tests you ran doesn't matter, just the fact that your tests ran
+to conclusion.
+
+This is safer than and replaces the "no_plan" plan.
+
+=cut
+
+.sub done_testing
+    .param string tests     :optional
+    .param int    has_tests :opt_flag
+
+    .local pmc test
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+    test.'done_testing'( tests )
+.end
+
 =item C<ok( passed, description )>
 
 Records a test as pass or fail depending on the truth of the PMC C<passed>,
