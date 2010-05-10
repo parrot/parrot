@@ -262,6 +262,12 @@ As of the latest PCC changes, there is nothing special about calling an NCI sub.
 
 L<https://trac.parrot.org/parrot/ticket/1623>
 
+=item .meth_call [eligible in 3.1]
+
+As of the latest PCC changes, this does nothing different from '.call'.
+
+L<https://trac.parrot.org/parrot/ticket/1624>
+
 =back
 
 =head1 Functions
