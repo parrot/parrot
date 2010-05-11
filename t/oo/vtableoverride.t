@@ -18,13 +18,14 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(14)
+    plan(15)
 
     newclass_tests()
     subclass_tests()
     vtable_implies_self_tests()
     anon_vtable_tests()
     invalid_vtable()
+    get_pmc_keyed_int_Null()
 .end
 
 .sub invalid_vtable
@@ -114,6 +115,13 @@ CODE
     pop_eh
 .end
 
+.sub 'get_pmc_keyed_int_Null'
+    $P0 = newclass [ 'NoReturn_get_pmc_keyed_int' ]
+    $P1 = new $P0
+    $P2 = $P1[0]
+    $I0 = isnull $P2
+    ok($I0, "Override get_pmc_keyed_int without .return")
+.end
 
 .namespace [ 'MyObject' ]
 
@@ -205,6 +213,13 @@ yes:
     .return("foo")
 .end
 
+
+.namespace [ 'NoReturn_get_pmc_keyed_int' ]
+
+.sub 'get_pmc_keyed_int' :vtable
+    .param int i
+    # No .return
+.end
 
 # Local Variables:
 #   mode: pir

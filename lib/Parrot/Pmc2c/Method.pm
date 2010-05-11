@@ -192,6 +192,7 @@ sub pcc_signature {
     }
     else {
         $result_decl = "$return_type result;";
+        $result_decl = "$return_type result = PMCNULL;" if $return_type_char eq 'P';
         $args .= ', &result';
         $sig .= $return_type_char;
         $return_stmt = "return ($return_type) result;";
