@@ -515,7 +515,6 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
                 return result;
 
             }
-            /* method name is get_integer */
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                 /* Get the PMC instance and call the vtable function on that. */
                 STRING * const proxy      = CONST_STRING(INTERP, "proxy");

@@ -1,6 +1,6 @@
 package Parrot::Pmc2c::PMC::Object;
 
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 use base 'Parrot::Pmc2c::PMC';
@@ -55,31 +55,35 @@ sub pre_method_gen {
     Parrot_Object_attributes * const obj       = PARROT_OBJECT(_self);
     Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
     STRING        * const meth_name = CONST_STRING_GEN(interp, "$vt_method_name");
-
-    /* Walk and search for the vtable. */
+EOC
+        # Walk and search for the vtable.
+        $method_body_text .= <<"EOC";
     const int num_classes = VTABLE_elements(interp, _class->all_parents);
     int i;
     for (i = 0; i < num_classes; i++) {
-        /* Get the class. */
+EOC
+        # Get the class.
+        $method_body_text .= <<"EOC";
         PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-
         PMC * const meth = Parrot_oo_find_vtable_override_for_class(interp, cur_class, meth_name);
         if (!PMC_IS_NULL(meth)) {
-            $pcc_result_decl
+EOC
+        $method_body_text .= "            $pcc_result_decl\n" if $pcc_result_decl ne '';
+        $method_body_text .= <<"EOC";
             Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi$pcc_sig", _self$pcc_args);
             $pcc_return_stmt
         }
-        /* method name is $vt_method_name */
 EOC
 
         # Multiply dispatched math opcodes shouldn't be invoked on a proxy object.
         unless ($self->vtable_method_does_multi($vt_method_name)) {
             $method_body_text .= <<"EOC";
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
-            /* Get the PMC instance and call the vtable on that. */
+EOC
+            # Get the PMC instance and call the vtable on that.
+            $method_body_text .= <<"EOC";
             STRING * const proxy      = CONST_STRING_GEN(interp, "proxy");
             PMC    * const del_object = VTABLE_get_attr_str(interp, SELF, proxy);
-
             if (!PMC_IS_NULL(del_object)) {
                 ${return}VTABLE_$vt_method_name(interp, del_object$args);
                 $void_return
