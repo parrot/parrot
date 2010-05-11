@@ -218,6 +218,7 @@ No Configure step, no Makefile generated.
     .local pmc config
     config = get_config()
     $I0 = config['revision']
+    unless $I0 goto L1
     unless reqsvn > $I0 goto L1
     $S1 = "Parrot revision r"
     $S0 = reqsvn
