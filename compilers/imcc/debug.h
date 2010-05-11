@@ -60,15 +60,6 @@ void IMCC_fataly(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-void IMCC_fataly_standalone(PARROT_INTERP,
-    int code,
-    ARGIN(const char *fmt),
-    ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 void IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -110,9 +101,6 @@ void dump_symreg(ARGIN(const IMC_Unit *unit))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_fataly __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fmt))
-#define ASSERT_ARGS_IMCC_fataly_standalone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

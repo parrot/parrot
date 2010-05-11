@@ -183,9 +183,6 @@ void create_symhash(PARROT_INTERP, ARGOUT(SymHash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
-void debug_dump_sym_hash(ARGIN(const SymHash *hsh))
-        __attribute__nonnull__(1);
-
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 SymReg * dup_sym(PARROT_INTERP, ARGIN(const SymReg *r))
@@ -359,8 +356,6 @@ char * symreg_to_str(ARGIN(const SymReg *s))
 #define ASSERT_ARGS_create_symhash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_debug_dump_sym_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(hsh))
 #define ASSERT_ARGS_dup_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(r))

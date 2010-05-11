@@ -105,35 +105,6 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fataly_standalone(PARROT_INTERP, int code, const char *fmt,
-...)>
-
-Prints an error message and exits Parrot. This is not a recoverable
-error.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
-{
-    ASSERT_ARGS(IMCC_fataly_standalone)
-
-    va_list ap;
-
-    va_start(ap, fmt);
-    fprintf(stderr, "error:imcc:");
-    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
-    va_end(ap);
-    IMCC_print_inc(interp);
-    Parrot_exit(interp, code);
-}
-
-/*
-
 =item C<void IMCC_warning(PARROT_INTERP, const char *fmt, ...)>
 
 Prints a warning message, but does not throw an exception and does not

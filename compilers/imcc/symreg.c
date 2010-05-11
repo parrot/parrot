@@ -1581,32 +1581,6 @@ clear_sym_hash(ARGMOD(SymHash *hsh))
 
 /*
 
-=item C<void debug_dump_sym_hash(const SymHash *hsh)>
-
-Prints all identifiers in the specified hash table to stderr.
-
-=cut
-
-*/
-
-void
-debug_dump_sym_hash(ARGIN(const SymHash *hsh))
-{
-    ASSERT_ARGS(debug_dump_sym_hash)
-    unsigned int i;
-
-    for (i = 0; i < hsh->size; i++) {
-        const SymReg *p = hsh->data[i];
-        while (p) {
-            fprintf(stderr, "%s ", p->name);
-            p = p->next;
-        }
-    }
-}
-
-
-/*
-
 =item C<void clear_locals(IMC_Unit *unit)>
 
 Deletes all local symbols and clears life info from the given IMC_Unit.
