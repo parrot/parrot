@@ -1445,7 +1445,7 @@ src/runcore/cores$(O) : src/runcore/cores.str \
         $(PARROT_H_HEADERS)
 
 src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
-        src/embed.c \
+        src/embed.c src/embed.str \
         $(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_api.h \
         compilers/imcc/imc.h \
         compilers/imcc/cfg.h \
