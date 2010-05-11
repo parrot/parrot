@@ -1124,8 +1124,8 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <i> func_assign get_results
 %type <i> opt_invocant
 %type <i> annotate_directive
-%type <sr> target targetlist reg const var result pcc_set_yield
-%type <sr> keylist keylist_force _keylist key maybe_ns
+%type <sr> target targetlist reg const stringc var result pcc_set_yield
+%type <sr> keylist keylist_force _keylist key maybe_ns nslist _nslist
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
@@ -1362,11 +1362,29 @@ class_namespace:
    ;
 
 maybe_ns:
-     '[' keylist ']'
-        {
-            $$ = $2;
-        }
-   | '[' ']'                   { $$ = NULL; }
+     '[' nslist ']' { $$ = $2; }
+   | '[' ']'        { $$ = NULL; }
+   ;
+
+nslist:
+         {
+           IMCC_INFO(interp)->nkeys    = 0;
+         }
+     _nslist
+         {
+           $$ = link_keys(interp,
+                          IMCC_INFO(interp)->nkeys,
+                          IMCC_INFO(interp)->keys, 0);
+         }
+   ;
+
+_nslist:
+     stringc { IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $1; }
+   | _nslist ';' stringc
+         {
+           IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $3;
+           $$ = IMCC_INFO(interp)->keys[0];
+         }
    ;
 
 sub:
@@ -2445,11 +2463,15 @@ reg:
    | REG                       { $$ = mk_pasm_reg(interp, $1); mem_sys_free($1); }
    ;
 
+stringc:
+     STRINGC                   { $$ = mk_const(interp, $1, 'S'); mem_sys_free($1); }
+   | USTRINGC                  { $$ = mk_const(interp, $1, 'U'); mem_sys_free($1); }
+   ;
+
 const:
      INTC                      { $$ = mk_const(interp, $1, 'I'); mem_sys_free($1); }
    | FLOATC                    { $$ = mk_const(interp, $1, 'N'); mem_sys_free($1); }
-   | STRINGC                   { $$ = mk_const(interp, $1, 'S'); mem_sys_free($1); }
-   | USTRINGC                  { $$ = mk_const(interp, $1, 'U'); mem_sys_free($1); }
+   | stringc                   { $$ = $1; }
    ;
 
 
