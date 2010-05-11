@@ -649,9 +649,10 @@ validate(PARROT_INTERP, ARGIN(const STRING *src))
     ASSERT_ARGS(validate)
     INTVAL      offset;
     String_iter iter;
+    const INTVAL length = Parrot_str_length(interp, src);
 
     ENCODING_ITER_INIT(interp, src, &iter);
-    for (offset = 0; offset < Parrot_str_length(interp, src); ++offset) {
+    for (offset = 0; offset < length; ++offset) {
         const UINTVAL codepoint = iter.get_and_advance(interp, &iter);
         if (codepoint >= 0x80)
             return 0;
