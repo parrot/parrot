@@ -26,12 +26,6 @@ An implementation of sets -- used for tracking register usage.
 
 /* HEADERIZER HFILE: compilers/imcc/sets.h */
 
-/* XXX */
-#define fatal(e, s1, s2) do { \
-    fprintf(stderr, "%s: %s", (s1), (s2)); \
-    exit(e); \
-} while (0)
-
 #define NUM_BYTES(length)    (((length) / 8) + 1)
 #define BYTE_IN_SET(element) ((element) >> 3)
 #define BIT_IN_BYTE(element) (1 << ((element) & 7))
@@ -156,8 +150,6 @@ set_copy(PARROT_INTERP, ARGIN(const Set *s))
 Compares two sets for equality; sets are equal if they contain the same
 elements.
 
-Raises a fatal error if the two Sets have different lengths.
-
 =cut
 
 */
@@ -169,8 +161,7 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
     int          mask;
     const size_t bytes = s1->length / 8;
 
-    if (s1->length != s2->length)
-        fatal(1, "set_equal", "Sets don't have the same length\n");
+    PARROT_ASSERT(s1->length == s2->length);
 
     if (bytes)
         if (memcmp(s1->bmp, s2->bmp, bytes) != 0)
@@ -290,8 +281,6 @@ set_contains(ARGIN(const Set *s), unsigned int element)
 
 Computes the union of the two Set arguments, returning it as a new Set.
 
-Raises a fatal error if the two Sets have different lengths.
-
 =cut
 
 */
@@ -305,8 +294,7 @@ set_union(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
     unsigned int i;
     Set * const s = set_make(interp, s1->length);
 
-    if (s1->length != s2->length)
-        fatal(1, "set_union", "Sets don't have the same length\n");
+    PARROT_ASSERT(s1->length == s2->length);
 
     for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] | s2->bmp[i];
@@ -323,8 +311,6 @@ set_union(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
 Creates a new Set object that is the intersection of the Set arguments (defined
 through the binary C<and> operator.)
 
-Raises a fatal error if the two Sets have different lengths.
-
 =cut
 
 */
@@ -338,8 +324,7 @@ set_intersec(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
     unsigned int i;
     Set * const  s = set_make(interp, s1->length);
 
-    if (s1->length != s2->length)
-        fatal(1, "set_intersec", "Sets don't have the same length\n");
+    PARROT_ASSERT(s1->length == s2->length);
 
     for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] & s2->bmp[i];
@@ -366,8 +351,7 @@ set_intersec_inplace(ARGMOD(Set *s1), ARGIN(const Set *s2))
     ASSERT_ARGS(set_intersec_inplace)
     unsigned int i;
 
-    if (s1->length != s2->length)
-        fatal(1, "set_intersec_inplace", "Sets don't have the same length\n");
+    PARROT_ASSERT(s1->length == s2->length);
 
     for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s1->bmp[i] &= s2->bmp[i];
