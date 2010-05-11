@@ -49,7 +49,7 @@ our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # For now, skip any files that have generated dependencies
-    next if $file =~ m{src/(ops|dynoplibs|pmc)/};
+    next if $file =~ m{src/(ops|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
 
     open my $fh, '<', $file;

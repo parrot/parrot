@@ -42,7 +42,6 @@ Returns the C C<#define> macros for register access etc.
 sub defines {
     my $type = __PACKAGE__;
     return <<END;
-#include "pmc/pmc_callcontext.h"
 
 /* defines - $0 -> $type */
 #undef CONST
