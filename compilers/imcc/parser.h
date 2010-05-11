@@ -21,6 +21,8 @@ typedef struct _IdList {
 typedef void* yyscan_t;
 #endif
 
+typedef struct yyguts_t yyguts_t;
+
 void set_filename(PARROT_INTERP, char * const filename);
 
 SymReg * macro(PARROT_INTERP, char *name);
@@ -42,6 +44,7 @@ void yyset_extra(YY_EXTRA_TYPE user_defined, yyscan_t yyscanner);
 
 extern void compile_file(PARROT_INTERP, FILE *file, void *);
 extern void compile_string(PARROT_INTERP, const char *, void *);
+extern void imcc_run_compilation(PARROT_INTERP, void *);
 
 int at_eof(yyscan_t yyscanner);
 

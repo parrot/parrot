@@ -611,7 +611,7 @@ compile_to_bytecode(PARROT_INTERP,
     ASSERT_ARGS(compile_to_bytecode)
     PackFile *pf;
     yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
-    const int per_pbc   = (STATE_WRITE_PBC(interp) | STATE_RUN_PBC(interp)) !=0;
+    const int per_pbc   = STATE_WRITE_PBC(interp) || STATE_RUN_PBC(interp);
     const int opt_level = IMCC_INFO(interp)->optimizer_level;
 
     /* Shouldn't be more than five, but five extra is cheap */
@@ -634,14 +634,8 @@ compile_to_bytecode(PARROT_INTERP,
 
     IMCC_INFO(interp)->state->pasm_file = STATE_PASM_FILE(interp) ? 1 : 0;
 
-    IMCC_TRY(IMCC_INFO(interp)->jump_buf,
-             IMCC_INFO(interp)->error_code) {
-        if (yyparse(yyscanner, interp))
-            exit(EXIT_FAILURE);
-
-        imc_compile_all_units(interp);
-    }
-    IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+    imcc_run_compilation(interp, yyscanner);
+    if (IMCC_INFO(interp)->error_code) {
         char * const error_str = Parrot_str_to_cstring(interp,
                                                    IMCC_INFO(interp)->error_message);
 
@@ -651,17 +645,6 @@ compile_to_bytecode(PARROT_INTERP,
         Parrot_str_free_cstring(error_str);
         Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
     }
-    IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-        char * const error_str = Parrot_str_to_cstring(interp,
-                                                   IMCC_INFO(interp)->error_message);
-
-        IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
-        fprintf(stderr, "error:imcc:%s", error_str);
-        IMCC_print_inc(interp);
-        Parrot_str_free_cstring(error_str);
-        Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
-    }
-    IMCC_END_TRY;
 
     imc_cleanup(interp, yyscanner);
 

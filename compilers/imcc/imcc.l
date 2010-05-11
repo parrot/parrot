@@ -41,7 +41,7 @@
 #include "imc.h"
 #include "parser.h"
 
-typedef struct yyguts_t       yyguts_t;
+// typedef struct yyguts_t       yyguts_t;
 typedef struct parser_state_t parser_state_t;
 
 /* parser state structure
@@ -1332,20 +1332,7 @@ compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
 
     emit_open(interp, 1, NULL);
 
-    IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
-        yyparse(yyscanner, interp);
-        imc_compile_all_units(interp);
-    }
-
-    IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
-        IMCC_INFO(interp)->error_code = IMCC_FATAL_EXCEPTION;
-    }
-
-    IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-        IMCC_INFO(interp)->error_code = IMCC_FATALY_EXCEPTION;
-    }
-
-    IMCC_END_TRY;
+    imcc_run_compilation(interp, yyscanner);
 
     if (buffer)
         yy_switch_to_buffer(buffer, yyscanner);
@@ -1361,10 +1348,24 @@ compile_string(PARROT_INTERP, const char *s, void *yyscanner)
     buffer                            = YY_CURRENT_BUFFER;
 
     yy_scan_string(s, yyscanner);
+
     emit_open(interp, 1, NULL);
 
+    imcc_run_compilation(interp, yyscanner);
+
+    if (buffer)
+        yy_switch_to_buffer(buffer, yyscanner);
+}
+
+void
+imcc_run_compilation(PARROT_INTERP, void *yyscanner) {
     IMCC_TRY(IMCC_INFO(interp)->jump_buf, IMCC_INFO(interp)->error_code) {
-        yyparse(yyscanner, interp);
+        if (yyparse(yyscanner, interp)) {
+            IMCC_INFO(interp)->error_code    = IMCC_PARSEFAIL_EXCEPTION;
+            IMCC_INFO(interp)->error_message = string_from_literal(interp, "syntax error ... somewhere");
+            return;
+        }
+
         imc_compile_all_units(interp);
     }
 
@@ -1377,9 +1378,6 @@ compile_string(PARROT_INTERP, const char *s, void *yyscanner)
     }
 
     IMCC_END_TRY;
-
-    if (buffer)
-        yy_switch_to_buffer(buffer, yyscanner);
 }
 
 void
