@@ -817,13 +817,19 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 /*
 
+=item C<void freeze(PMC *info)>
+
 =item C<void thaw(PMC *info)>
 
-Used to unarchive the object.
+Realias magically generated methods so they don't wreak havoc.
 
 =cut
 
 */
+
+    VTABLE void freeze(PMC *info) {
+        return;
+    }
 
     VTABLE void thaw(PMC *info) {
         return;
