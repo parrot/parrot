@@ -1532,11 +1532,14 @@ src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic/gcc_x86.h \
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
-    include/pmc/pmc_callcontext.h \
+    $(PARROT_H_HEADERS) \
+    include/parrot/dynext.h \
+    include/parrot/embed.h \
+    include/parrot/oplib/core_ops.h \
+    include/parrot/runcore_api.h \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_parrotlibrary.h \
-    src/io/io_private.h $(INC_DIR)/dynext.h $(INC_DIR)/embed.h \
-    $(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h
+    src/io/io_private.h
 
 # .h files are built along with .c
 $(INC_DIR)/oplib/core_ops.h: src/ops/core_ops.c
