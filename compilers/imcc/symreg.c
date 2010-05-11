@@ -1390,9 +1390,6 @@ _store_symreg(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
 {
     ASSERT_ARGS(_store_symreg)
     const int i = hash_str(r->name) % hsh->size;
-#if IMC_TRACE_HIGH
-    printf("    store [%s]\n", r->name);
-#endif
     r->next      = hsh->data[i];
     hsh->data[i] = r;
 
@@ -1441,9 +1438,6 @@ _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
     const unsigned int i = hash_str(name) % hsh->size;
 
     for (p = hsh->data[i]; p; p = p->next) {
-#if IMC_TRACE_HIGH
-        printf("   [%s]\n", p->name);
-#endif
         if (STREQ(name, p->name))
             return p;
     }

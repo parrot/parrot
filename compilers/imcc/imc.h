@@ -621,9 +621,6 @@ typedef struct macro_t {
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
 
-#define IMC_TRACE      0
-#define IMC_TRACE_HIGH 0
-
 /* main.c */
 #define PBC_LOAD        (1 << 0)
 #define PBC_RUN         (1 << 1)

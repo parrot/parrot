@@ -602,10 +602,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
     int i;
     int len;
 
-#if IMC_TRACE
-    Parrot_io_eprintf(NULL, "ins_print\n");
-#endif
-
     /* comments, labels and such */
     if (!ins->symregs[0] || !strchr(ins->format, '%'))
         return Parrot_io_fprintf(interp, io, "%s", ins->format);
@@ -775,9 +771,7 @@ e_file_emit(PARROT_INTERP,
         ARGIN(const Instruction *ins))
 {
     ASSERT_ARGS(e_file_emit)
-#if IMC_TRACE
-    Parrot_io_eprintf(NULL, "e_file_emit\n");
-#endif
+
     if ((ins->type & ITLABEL) || ! *ins->opname)
         ins_print(interp, Parrot_io_STDOUT(interp), ins);
     else {

@@ -2150,10 +2150,6 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     int        ok = 0;
     int        op, i;
 
-#if IMC_TRACE_HIGH
-    Parrot_io_eprintf(NULL, "e_pbc_emit\n");
-#endif
-
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
         size_t       ins_size;
@@ -2190,12 +2186,6 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
-
-#if IMC_TRACE
-            Parrot_io_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n",
-                        ins->symregs[0]->name);
-#endif
-
             add_const_pmc_sub(interp, ins->symregs[0], oldsize,
                               oldsize + code_size);
         }
@@ -2261,10 +2251,6 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         SymReg  *addr, *r;
         op_info_t *op_info;
         opcode_t last_label = 1;
-
-#if IMC_TRACE_HIGH
-        Parrot_io_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->opname);
-#endif
 
         if ((ins->type & ITBRANCH)
         && ((addr = get_branch_reg(ins)) != NULL)

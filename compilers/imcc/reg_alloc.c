@@ -169,14 +169,6 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 
     IMCC_INFO(interp)->allocated = 0;
 
-#if IMC_TRACE
-    fprintf(stderr, "reg_alloc.c: imc_reg_alloc\n");
-    if (unit->instructions->r[1] && unit->instructions->r[1]->pcc_sub) {
-        fprintf(stderr, "img_reg_alloc: pcc_sub (nargs = %d)\n",
-            unit->instructions->r[1]->pcc_sub->nargs);
-    }
-#endif
-
     if (unit->instructions->symreg_count)
       function = unit->instructions->symregs[0]->name;
     else
@@ -245,9 +237,6 @@ void
 free_reglist(ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(free_reglist)
-#if IMC_TRACE
-    fprintf(stderr, "reg_alloc.c: free_reglist\n");
-#endif
 
     if (unit->reglist) {
         mem_sys_free(unit->reglist);

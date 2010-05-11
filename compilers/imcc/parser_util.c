@@ -142,10 +142,6 @@ Lookup the full opcode given the short name
 Obviously the registers must be examined before returning the correct
 opcode.
 
-NOTE: All this nasty IMC_TRACE is for tracking down equally nasty bugs, so
-if you don't like the looks of it, stay out, but please don't remove it. :)
--Mel
-
 =cut
 
  */
@@ -157,29 +153,18 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
     int i;
     const size_t namelen = strlen(name);
 
-#if IMC_TRACE_HIGH
-    const char * const full = dest;
-    Parrot_io_eprintf(NULL, "op %s", name);
-#endif
-
     memcpy(dest, name, namelen+1);
     dest += namelen;
 
     for (i = 0; i < narg && args[i]; i++) {
         *dest++ = '_';
         if (args[i]->type == VTADDRESS) {
-#if IMC_TRACE_HIGH
-            Parrot_io_eprintf(NULL, " (address)%s", args[i]->name);
-#endif
             *dest++ = 'i';
             *dest++ = 'c';
             continue;
         }
         /* if one ever wants num keys, they go with 'S' */
         if (keyvec & KEY_BIT(i)) {
-#if IMC_TRACE_HIGH
-            Parrot_io_eprintf(NULL, " (key)%s", args[i]->name);
-#endif
             *dest++ = 'k';
             if (args[i]->set=='S' || args[i]->set=='N' || args[i]->set=='K') {
                 *dest++ = 'c';
@@ -195,22 +180,10 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
             *dest++ = (char)tolower((unsigned char)args[i]->set);
 
         if (args[i]->type & (VTCONST|VT_CONSTP)) {
-#if IMC_TRACE_HIGH
-            Parrot_io_eprintf(NULL, " (%cc)%s",
-                    tolower((unsigned char)args[i]->set), args[i]->name);
-#endif
             *dest++ = 'c';
         }
-#if IMC_TRACE_HIGH
-        else
-            Parrot_io_eprintf(NULL, " (%c)%s",
-                    tolower((unsigned char)args[i]->set), args[i]->name);
-#endif
     }
     *dest = '\0';
-#if IMC_TRACE_HIGH
-    Parrot_io_eprintf(NULL, " -> %s\n", full);
-#endif
 }
 
 /*
@@ -867,10 +840,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     if (!fp)
         IMCC_fatal(interp, EXCEPTION_EXTERNAL_ERROR,
                 "imcc_compile_file: couldn't open '%s'\n", fullname);
-
-#if IMC_TRACE
-    fprintf(stderr, "parser_util.c: imcc_compile_file '%s'\n", fullname);
-#endif
 
     IMCC_INFO(interp)->cur_namespace = NULL;
     interp->code                     = NULL;

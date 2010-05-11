@@ -257,10 +257,6 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     ASSERT_ARGS(imc_free_unit)
     imc_info_t * const imc = IMCC_INFO(interp);
 
-#if IMC_TRACE_HIGH
-    fprintf(stderr, "imc_free_unit()\n");
-#endif
-
     free_reglist(unit);
 
     /* and cfg ... */
