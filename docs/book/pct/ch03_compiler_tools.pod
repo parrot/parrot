@@ -218,8 +218,8 @@ An entirely new language has no such constraints.
 
 From the Parrot directory, invoke C<mk_language_shell.pl> like:
 
-  $ B<cd languages/>
-  $ B<perl ../tools/dev/mk_language_shell.pl <project name>>
+  $ cd languages/
+  $ perl ../tools/dev/mk_language_shell.pl <project name>
 
 =head3 Parsing Fundamentals
 
