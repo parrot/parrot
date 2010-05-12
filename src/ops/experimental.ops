@@ -361,7 +361,8 @@ op find_codepoint(out INT, in STR) {
     Parrot_str_free_cstring(cstr);
     $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    Parrot_ex_throw_from_op_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
+    opcode_t * const dest = expr NEXT();
+    Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
 }
