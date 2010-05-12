@@ -3,6 +3,14 @@
 ** experimental.ops
 */
 
+BEGIN_OPS_PREAMBLE
+
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
+
+END_OPS_PREAMBLE
+
 =head1 NAME
 
 experimental.ops - Experimental Opcodes
@@ -304,8 +312,6 @@ op new(out PMC, in PMC, in INT) {
 
 =item B<root_new>(out PMC, in PMC, in INT)
 
-=back
-
 =cut
 
 op root_new(out PMC, in PMC, in INT) {
@@ -339,6 +345,28 @@ op root_new(out PMC, in PMC, in INT) {
         goto ADDRESS(dest);
     }
 }
+
+=item B<find_codepoint>(out INT, in STR)
+
+Set $1 to the codepoint with the name given in $2, or -1 if there is none.
+Requires ICU lib, otherwise exception is thrown.
+
+=cut
+
+op find_codepoint(out INT, in STR) {
+#if PARROT_HAS_ICU
+    UErrorCode   err       = U_ZERO_ERROR;
+    char * const cstr      = Parrot_str_to_cstring(interp, $2);
+    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    Parrot_str_free_cstring(cstr);
+    $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
+#else
+    Parrot_ex_throw_from_op_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
+#endif
+}
+
+=back
 
 =head1 COPYRIGHT
 

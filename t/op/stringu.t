@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Parrot::Config;
 
 =head1 NAME
@@ -574,6 +574,17 @@ equal
 equal
 OUT
 
+SKIP: {
+    skip( 'no ICU lib', 1 ) unless $PConfig{has_icu};
+pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode (experimental)');
+.sub 'main'
+    $I1 = find_codepoint 'THISISNOTTHENAMEOFNOTHING'
+    say $I1
+.end
+CODE
+-1
+OUT
+}
 
 # Local Variables:
 #   mode: cperl
