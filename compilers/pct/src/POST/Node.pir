@@ -116,13 +116,14 @@ newly created node.
 
 =item escape(str)
 
-Return C<str> as a PIR constant string.
+Return C<str> as a PIR constant string.  (Deprecated in favor of
+C<POST::Compiler.escape>.)
 
 =cut
 
 .sub 'escape' :method
     .param string str
-    $P0 = new 'CodeString'
+    $P0 = get_hll_global ['PAST'], 'Compiler'
     str = $P0.'escape'(str)
     .return (str)
 .end
