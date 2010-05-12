@@ -220,9 +220,19 @@ Return C<str> as a PIR constant string.
 
 .sub 'escape' :method
     .param string str
-    $P0 = get_global '%!codestring'
-    str = $P0.'escape'(str)
-    .return (str)
+    .local string estr
+    estr = escape str
+    $I0 = index estr, "\\x"
+    if $I0 >= 0 goto unicode_prefix
+    $I0 = index estr, "\\u"
+    if $I0 >= 0 goto unicode_prefix
+    estr = concat '"', estr
+    goto done
+  unicode_prefix:
+    estr = concat 'unicode:"', estr
+  done:
+    estr = concat estr, '"'
+    .return (estr)
 .end
 
 =item unique([STR fmt])
