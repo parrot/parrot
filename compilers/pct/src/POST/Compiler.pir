@@ -33,6 +33,22 @@ PIR or an Eval PMC (bytecode).
 .end
 
 
+=item C<escape(string str)>
+
+Returns an escaped value of C<str> suitable for including in PIR.
+If the string contains any non-ASCII characters, then it's
+prefixed with 'unicode:'.  (This method just delegates to
+PAST::Compiler.escape, which does the same thing.)
+
+=cut
+
+.sub 'escape' :method
+    .param pmc str
+    $P0 = get_hll_global ['PAST'], 'Compiler'
+    .tailcall $P0.'escape'(str)
+.end
+
+
 .sub 'to_pir' :method
     .param pmc post
     .param pmc adverbs         :slurpy :named
@@ -248,7 +264,7 @@ the sub.
     if null outerpost goto pirflags_done
     unless outerpost goto pirflags_done
     outername = outerpost.'subid'()
-    $S0 = subpir.'escape'(outername)
+    $S0 = self.'escape'(outername)
     pirflags = concat pirflags, ' :outer('
     concat pirflags, $S0
     concat pirflags, ')'
@@ -291,11 +307,11 @@ the sub.
 
   subpir_post:
     unless hll goto subpir_ns
-    $P0 = subpir.'escape'(hll)
+    $P0 = self.'escape'(hll)
     subpir.'emit'("\n.HLL %0", $P0)
   subpir_ns:
     subpir.'emit'("\n.namespace %0", nskey)
-    $S0 = subpir.'escape'(name)
+    $S0 = self.'escape'(name)
     subpir.'emit'(".sub %0 %1", $S0, pirflags)
     .local pmc paramlist
     paramlist = node['paramlist']
