@@ -70,11 +70,11 @@ which will print:
 Next, try out one of Parrot's high-level languages. Create a test file
 called F<more_news.nqp>:
 
-  say "No parrots were involved in an accident on the M1 today..."
+  say( "No parrots were involved in an accident on the M1 today..." );
 
 Then run it as:
 
-  $ nqp more_news.nqp
+  $ parrot-nqp more_news.nqp
 
 which will print:
 
