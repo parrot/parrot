@@ -62,11 +62,18 @@ Initializes the StringBuilder with initial size of buffer.
 */
 
     VTABLE void init_int(INTVAL initial_size) {
-        STRING * const buffer = Parrot_str_new_init(INTERP, NULL, initial_size,
-                Parrot_default_encoding_ptr, Parrot_default_charset_ptr, 0);
+        STRING * const buffer = mem_gc_allocate_zeroed_typed(INTERP, STRING);
+        buffer->encoding  = Parrot_default_encoding_ptr;
+        buffer->charset   = Parrot_default_charset_ptr;
+        /* We need all string flags here because we use this buffer in substr_str */
+        buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
+        buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
+                initial_size, char);
+        buffer->_buflen   = initial_size;
+
         SET_ATTR_buffer(INTERP, SELF, buffer);
 
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -80,29 +87,35 @@ Marks the StringBuilder as live.
 */
 
     VTABLE void mark() {
+    }
+
+    VTABLE void destroy() {
         STRING *buffer;
 
         if (!PMC_data(SELF))
             return;
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
-        Parrot_gc_mark_STRING_alive(INTERP, buffer);
+        if (buffer->_bufstart)
+            mem_gc_free(INTERP, buffer->_bufstart);
+        mem_gc_free(INTERP, buffer);
     }
 
 /*
 
 =item C<STRING *get_string()>
 
-Clones and returns current buffer. We need clone because outside of
-StringBuilder strings are immutable.
+Returns created string.
 
 =cut
 
 */
 
     VTABLE STRING *get_string() {
-        STRING *buffer, *retv;
+        STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
+        /* We need to clone buffer because outside of StringBuilder strings */
+        /* are immutable */
         return Parrot_str_clone(INTERP, buffer);
     }
 
@@ -150,8 +163,11 @@ Append string to current buffer.
         total_size = calculate_capacity(INTERP, buffer->bufused, s->bufused);
 
         /* Reallocate if necessary */
-        if (total_size > Buffer_buflen(buffer))
-            Parrot_gc_reallocate_string_storage(INTERP, buffer, total_size);
+        if (total_size > Buffer_buflen(buffer)) {
+            buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
+                    buffer->_bufstart, total_size, char);
+            buffer->_buflen   = total_size;
+        }
 
         /* Tack s on the end of buffer */
         mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart + buffer->bufused),
@@ -160,6 +176,7 @@ Append string to current buffer.
         /* Update buffer */
         buffer->bufused += s->bufused;
         buffer->strlen  += Parrot_str_length(INTERP, s);
+        buffer->hashval = 0; /* hash is invalid */
 
         PARROT_ASSERT(buffer->bufused <= Buffer_buflen(buffer));
     }
@@ -177,31 +194,56 @@ Append string. Synonym for push_string
 */
 
     VTABLE void i_concatenate_str(STRING *s) {
-        SELF.push_string(s);
+        STATICSELF.push_string(s);
     }
 
     VTABLE void i_concatenate(PMC *p) {
-        SELF.push_string(VTABLE_get_string(INTERP, p));
+        STATICSELF.push_string(VTABLE_get_string(INTERP, p));
     }
 
     VTABLE void push_pmc(PMC *p) {
-        SELF.push_string(VTABLE_get_string(INTERP, p));
+        STATICSELF.push_string(VTABLE_get_string(INTERP, p));
     }
 
 /*
 
-=item C<VTABLE set_string_native()>
+=item C<VTABLE set_string_native(STRING)>
 
-Set content of buffer to passed string
+=item C<VTABLE set_pmc(PMC)>
+
+Set content of buffer to passed string or PMC
 
 =cut
 
 */
     VTABLE void set_string_native(STRING *s) {
-        STRING * tmp = Parrot_str_clone(INTERP, s);
-        /* Unset hashval. We update this string all the time */
-        tmp->hashval = 0;
-        SET_ATTR_buffer(INTERP, SELF, tmp);
+        STRING * buffer;
+
+        /* Calculate (possibly new) total size */
+        size_t total_size = calculate_capacity(INTERP, 0, s->bufused);
+
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+
+        /* Reallocate if necessary */
+        if (total_size > Buffer_buflen(buffer)) {
+            buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
+                    buffer->_bufstart, total_size, char);
+            buffer->_buflen   = total_size;
+        }
+
+        /* Tack s on the buffer */
+        mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart),
+                s->strstart, s->bufused);
+
+        /* Update buffer */
+        buffer->bufused  = s->bufused;
+        buffer->strlen   = Parrot_str_length(INTERP, s);
+        buffer->encoding = s->encoding;
+        buffer->charset  = s->charset;
+    }
+
+    VTABLE void set_pmc(PMC *s) {
+        STATICSELF.set_string_native(VTABLE_get_string(INTERP, s));
     }
 
 
@@ -216,11 +258,128 @@ For testing purpose only?
 =cut
 
 */
+
     INTVAL get_integer() {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         return Buffer_buflen(buffer);
     }
+
+/*
+
+=item C<VTABLE substr_str()>
+
+=cut
+
+*/
+
+    VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
+        STRING *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        /* We must clone here becase we can reallocate buffer behind the scene... */
+        /* TODO Optimize it to avoid creation of redundant STRING */
+        return Parrot_str_clone(INTERP,
+                Parrot_str_substr(INTERP, buffer, offset, length));
+    }
+
+/*
+
+=item C<append_format(string fmt [, pmc args ] [, pmc hash ])>
+
+Add a line to a C<StringBuilder> object according to C<fmt>.
+The C<fmt> string can contain any number of "%-replacements"
+which are replaced by the corresponding values from C<args>
+or C<hash> prior to being appended to the string.  (Here
+C<args> is a slurpy array, and C<hash> is a slurpy hash.)
+
+The currently defined replacements include:
+
+    %0 %1 ... %9     the value from the args array at index 0..9
+    %,               the values of the args array separated by commas
+    %%               a percent sign
+
+A percent-sign followed by any other character that is a hash
+key receives the value of the hash element.
+
+=cut
+
+*/
+
+    METHOD append_format(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
+        STRING * const percent     = CONST_STRING(INTERP, "%");
+        STRING * const comma       = CONST_STRING(INTERP, ",");
+        STRING * const comma_space = CONST_STRING(INTERP, ", ");
+        STRING * const newline     = CONST_STRING(INTERP, "\n");
+        STRING *key;
+        PMC    *stringbuilder = SELF;
+        INTVAL percentPos;
+        INTVAL pos = 0;
+
+        /* Loop over the format string, splitting it into chunks
+         * for the string builder. */
+        while (pos >= 0) {
+            /* Find the next % */
+            percentPos = Parrot_str_find_index(INTERP, fmt, percent, pos);
+
+            if (percentPos < 0) {
+                if (pos == 0) {
+                    VTABLE_push_string(INTERP, stringbuilder, fmt);
+                }
+                else {
+                    /* remaining string can be added as is. */
+                    VTABLE_push_string(INTERP, stringbuilder,
+                        Parrot_str_substr(INTERP, fmt, pos,
+                            Parrot_str_length(INTERP, fmt) -pos));
+                    }
+                break;
+            }
+            else {
+                /* slurp up to just before the % sign... */
+                VTABLE_push_string(INTERP, stringbuilder,
+                    Parrot_str_substr(INTERP, fmt, pos, percentPos - pos));
+                /* skip the % sign */
+                pos = percentPos + 1 ;
+            }
+
+            /* key is always a single character */
+            key = Parrot_str_substr(INTERP, fmt, pos++, 1);
+
+            if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
+                VTABLE_push_string(INTERP, stringbuilder,
+                        VTABLE_get_string_keyed_str(INTERP, hash, key));
+            }
+            else if (Parrot_str_is_cclass(INTERP, enum_cclass_numeric, key, 0)) {
+                VTABLE_push_string(INTERP, stringbuilder,
+                    VTABLE_get_string_keyed_int(INTERP, args,
+                        Parrot_str_to_int(INTERP, key)));
+            }
+            else if (Parrot_str_equal(INTERP, key, comma)) {
+                INTVAL num_args = VTABLE_elements(INTERP, args);
+                INTVAL pos_args = 1;
+
+                VTABLE_push_string(INTERP, stringbuilder,
+                    VTABLE_get_string_keyed_int(INTERP, args, 0));
+
+                while (pos_args < num_args) {
+                    VTABLE_push_string(INTERP, stringbuilder, comma_space);
+                    VTABLE_push_string(INTERP, stringbuilder,
+                        VTABLE_get_string_keyed_int(INTERP, args, pos_args));
+                    pos_args++;
+                }
+            }
+            else if (Parrot_str_equal(INTERP, key, percent)) {
+                VTABLE_push_string(INTERP, stringbuilder, percent);
+            }
+            else {
+                /* %foo has no special meaning, pass it through unchanged */
+                VTABLE_push_string(INTERP, stringbuilder,
+                    Parrot_str_substr(INTERP, fmt, pos-2, 2));
+            }
+        }
+
+        RETURN(PMC *SELF);
+    }
+
 
 /*
 

@@ -20,7 +20,6 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(23)
     test_create()               # 2 tests
     test_push_string()          # 9 tests
     test_push_pmc()             # 4 tests
@@ -28,6 +27,13 @@ Tests the C<StringBuilder> PMC.
     test_i_concatenate()        # 1 test
     test_set_string_native()    # 3 tests
     test_set_string_native_with_hash()    # 2 tests
+
+    emit_with_pos_args()
+    emit_with_percent_args()
+    emit_with_named_args()
+    emit_with_pos_and_named_args()
+
+    done_testing()
 
     # END_OF_TESTS
 .end
@@ -183,6 +189,61 @@ Tests the C<StringBuilder> PMC.
     is ( $S99, "foobar", "Second string stored in hash" )
 
 .end
+
+.sub emit_with_pos_args
+    .local pmc code
+    code = new ["StringBuilder"]
+    code."append_format"("label_%0:\n",          1234)
+    code."append_format"("    say '%0, %1'\n",   "Hello", "World")
+    code."append_format"("    %0 = %2\n", "$I0", 24, 48)
+    is(code, <<'CODE', "code string with positional args looks fine")
+label_1234:
+    say 'Hello, World'
+    $I0 = 48
+CODE
+.end
+
+.sub emit_with_percent_args
+    .local pmc code
+    code = new ['StringBuilder']
+    code."append_format"("label_%0:\n",    1234)
+    code."append_format"("    say '%,'\n", "Hello")
+    code."append_format"("    say '%,'\n", "Hello", "World", "of", "Parrot")
+    code."append_format"("    say '%%0'\n")
+    is(code, <<'CODE', "code string with % args looks fine")
+label_1234:
+    say 'Hello'
+    say 'Hello, World, of, Parrot'
+    say '%0'
+CODE
+.end
+
+.sub emit_with_named_args
+    .local pmc code
+    code = new ['StringBuilder']
+    code."append_format"("label_%a:\n",         "a"=>1234)
+    code."append_format"("    say '%b, %c'\n",  "b"=>"Hello", "c"=>"World")
+    code."append_format"("    say '%d'\n",      "b"=>"Hello", "c"=>"World")
+    is(code, <<'CODE', "emit with named args looks fine")
+label_1234:
+    say 'Hello, World'
+    say '%d'
+CODE
+.end
+
+.sub emit_with_pos_and_named_args
+    .local pmc code
+    code = new ['StringBuilder']
+    code."append_format"("label_%a:\n", "a"=>1234)
+    code."append_format"("    %0 '%b, %c'\n", "say", "print", "b"=>"H", "c"=>"W")
+    code."append_format"("    say '%,, %c'\n", "alpha", "beta", "b"=>"H", "c"=>"W")
+    is(code, <<'CODE', "emit with pos + named args")
+label_1234:
+    say 'H, W'
+    say 'alpha, beta, W'
+CODE
+.end
+
 
 # Local Variables:
 #   mode: pir
