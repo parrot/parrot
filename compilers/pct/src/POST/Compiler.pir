@@ -195,10 +195,11 @@ Return pir for an operation node.
     subline = find_caller_lex '$SUBLINE'
     line    = find_caller_lex '$LINE'
     if subline == line goto done_line
-    subpir.'emit'('.annotate "line", %0', line)
+    subpir.'append_format'(".annotate 'line', %0\n", line)
     assign subline, line
   done_line:
-    subpir.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
+    subpir.'append_format'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
+    concat subpir, "\n"
 .end
 
 
@@ -213,7 +214,7 @@ Generate a label.
     .local pmc subpir, value
     value = node.'result'()
     subpir = find_caller_lex '$SUBPIR'
-    subpir.'emit'('  %0:', value)
+    subpir.'append_format'("  %0:\n", value)
 .end
 
 
@@ -229,7 +230,7 @@ the sub.
     .param pmc node
 
     .local pmc subpir, subline, innerpir
-    subpir = new 'CodeString'
+    subpir = new 'StringBuilder'
     .lex '$SUBPIR', subpir
     subline = box -1
     .lex '$SUBLINE', subline
@@ -286,7 +287,8 @@ the sub.
     ns = $P0
   have_ns:
     set_global '$?NAMESPACE', ns
-    nskey = subpir.'key'(ns)
+    $P0 = new ['CodeString']
+    nskey = $P0.'key'(ns)
 
   subpir_start:
     $P0 = node['loadinit']
@@ -308,11 +310,11 @@ the sub.
   subpir_post:
     unless hll goto subpir_ns
     $P0 = self.'escape'(hll)
-    subpir.'emit'("\n.HLL %0", $P0)
+    subpir.'append_format'("\n.HLL %0\n", $P0)
   subpir_ns:
-    subpir.'emit'("\n.namespace %0", nskey)
+    subpir.'append_format'("\n.namespace %0\n", nskey)
     $S0 = self.'escape'(name)
-    subpir.'emit'(".sub %0 %1", $S0, pirflags)
+    subpir.'append_format'(".sub %0 %1\n", $S0, pirflags)
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
@@ -327,7 +329,7 @@ the sub.
   paramlist_done:
 
     self.'pir_children'(node)
-    subpir.'emit'(".end\n\n")
+    subpir.'append_format'(".end\n\n")
 
   subpir_done:
     .local pmc outerpir
