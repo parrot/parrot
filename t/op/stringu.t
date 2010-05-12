@@ -580,9 +580,27 @@ pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode (experimental)');
 .sub 'main'
     $I1 = find_codepoint 'THISISNOTTHENAMEOFNOTHING'
     say $I1
+
+    .const string cpf = "0x%04x"
+    $P0 = new 'FixedIntegerArray', 1
+    $I0 = find_codepoint 'LATIN CAPITAL LETTER C'
+    $P0[0] = $I0
+    $S0 = sprintf cpf, $P0
+    say $S0
+    $I0 = find_codepoint 'MUSIC FLAT SIGN'
+    $P0[0] = $I0
+    $S0 = sprintf cpf, $P0
+    say $S0
+    $I0 = find_codepoint 'RECYCLING SYMBOL FOR TYPE-1 PLASTICS'
+    $P0[0] = $I0
+    $S0 = sprintf cpf, $P0
+    say $S0
 .end
 CODE
 -1
+0x0043
+0x266d
+0x2673
 OUT
 }
 
