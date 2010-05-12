@@ -321,7 +321,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             PMC * const exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE);
             if (PMC_IS_NULL(exe_name))
-                return string_from_literal(interp, "");
+                return CONST_STRING(interp, "");
             return VTABLE_get_string(interp, exe_name);
         }
         case EXECUTABLE_BASENAME: {
@@ -329,7 +329,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                                 interp->iglobals, IGLOBALS_EXECUTABLE);
 
             if (PMC_IS_NULL(exe_name))
-                return string_from_literal(interp, "");
+                return CONST_STRING(interp, "");
 
             else {
                 /* Need to strip back to what follows the final / or \. */
@@ -460,7 +460,7 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
       default:
         break;
     }
-    return string_from_literal(interp, "");
+    return CONST_STRING(interp, "");
 }
 
 /*

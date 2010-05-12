@@ -276,7 +276,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
     if (lib == NULL) {
         *handle = Parrot_dlopen((char *)NULL, flags);
         if (*handle) {
-            return string_from_literal(interp, "");
+            return CONST_STRING(interp, "");
         }
         err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
@@ -660,7 +660,7 @@ Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *para
         lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);
     }
     else {
-        wo_ext   = string_from_literal(interp, "");
+        wo_ext   = CONST_STRING(interp, "");
         lib_name = NULL;
         ext      = NULL;
     }
