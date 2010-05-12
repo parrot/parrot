@@ -222,7 +222,7 @@ L<https://trac.parrot.org/parrot/ticket/1540>
 
 Intended to replace the CodeString charname_to_ord method.
 
-(Trac ticket coming soon).
+L<https://trac.parrot.org/parrot/ticket/1629>
 
 =back
 
