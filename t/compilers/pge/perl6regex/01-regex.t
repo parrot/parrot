@@ -409,7 +409,7 @@ Description of the test.
 .end
 
 
-# given a single digit hex value, return it's int value.
+# given a single digit hex value, return its int value.
 .sub hex_val
   .param string digit
 

@@ -188,7 +188,7 @@ position mappings that are in the header.
 
 A source to bytecode position mapping simply states that the bytecode that
 starts from the specified offset up until the offset in the next mapping, or
-if there is none up until the end of the bytecode, has it's source in
+if there is none up until the end of the bytecode, has its source in
 location X.
 
 A mapping always starts with the offset in the bytecode, followed by the

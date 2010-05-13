@@ -252,7 +252,7 @@ Frees the scheduler's underlying struct.
     VTABLE void destroy() {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         /* TT #946: this line is causing an order-of-destruction error
-           because the scheduler is being freed before it's tasks.
+           because the scheduler is being freed before its tasks.
            Commenting this out till we get a real fix (although it's a hack) */
         /* MUTEX_DESTROY(core_struct->msg_lock); */
     }

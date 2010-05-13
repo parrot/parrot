@@ -153,7 +153,7 @@ endif_0:
 endif_1:
 
     # ok now, we know we've got an arg to process, maybe long
-    # maybe short, maybe with it's own argument.
+    # maybe short, maybe with its own argument.
     $S0 = substr arg, 0, 2
     unless $S0 == '--' goto shortarg
 

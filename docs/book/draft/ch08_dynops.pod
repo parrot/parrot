@@ -156,11 +156,11 @@ The parameter is an output
 =item * inout
 
 The parameter is an input and an output. It should be initialized before
-calling the op, and it's value will change after the op executes.
+calling the op, and its value will change after the op executes.
 
 =item * invar
 
-The parameter is a reference type like a String or PMC, and it's internals
+The parameter is a reference type like a String or PMC, and its internals
 might change in the call.
 
 =back

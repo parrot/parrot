@@ -29,7 +29,7 @@ languages.
 The Parrot Virtual Machine was originally conceived of as the engine for
 executing the new Perl 6 language, when specifications for that were first
 starting to be drafted. However, as time went on it was decided that Parrot
-would benefit from having a clean abstraction layer between it's internals
+would benefit from having a clean abstraction layer between its internals
 and the Perl 6 language syntax. This clean abstraction layer brought with it
 the side effect that Parrot could be used to host a wide variety of dynamic
 languages, not just Perl 6. And beyond just hosting them, it could
@@ -81,7 +81,7 @@ supports this and more.
 Parrot has a robust system for interfacing with external native code
 libraries, such as those commonly written in C, C++, Fortran and other
 compiled languages. Where previously every interpreter would need to
-maintain it's own bindings and interfaces to libraries, Parrot enables
+maintain its own bindings and interfaces to libraries, Parrot enables
 developers to write library bindings once and use them seamlessly from
 any language executing on Parrot. Want to use Tcl's Tk libraries, along with
 Python's image manipulation libraries in a program you are writing in Perl?

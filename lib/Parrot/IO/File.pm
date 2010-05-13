@@ -229,7 +229,7 @@ sub svn_version {
 
 =item C<is_hidden()>
 
-Returns whether the file is "hidden", i.e. it's name starts with a dot.
+Returns whether the file is "hidden", i.e. its name starts with a dot.
 
 =cut
 

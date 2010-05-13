@@ -890,7 +890,7 @@ Parrot_gc_impatient_pmcs(PARROT_INTERP)
 
 =item C<void Parrot_block_GC_mark(PARROT_INTERP)>
 
-Blocks the GC from performing it's mark phase.
+Blocks the GC from performing its mark phase.
 
 =item C<void Parrot_unblock_GC_mark(PARROT_INTERP)>
 
@@ -898,7 +898,7 @@ Unblocks the GC mark.
 
 =item C<void Parrot_block_GC_sweep(PARROT_INTERP)>
 
-Blocks the GC from performing it's sweep phase.
+Blocks the GC from performing its sweep phase.
 
 =item C<void Parrot_unblock_GC_sweep(PARROT_INTERP)>
 

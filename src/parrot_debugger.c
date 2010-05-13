@@ -331,7 +331,7 @@ F<src/debug.c>, F<include/parrot/debug.h>.
 
 =item * Start of rewrite - leo 2005.02.16
 
-The debugger now uses it's own interpreter. User code is run in
+The debugger now uses its own interpreter. User code is run in
 Interp* debugee. We have:
 
   debug_interp->pdb->debugee->debugger

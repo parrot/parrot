@@ -139,7 +139,7 @@ with error messages about mismatched argument/parameter numbers.
 
 X<match object>
 X<$/>
-The match object C<$/> it's a data structure that's all business: it's both a
+The match object C<$/> is a data structure that's all business: it's both a
 hash and an array. Because it's a special variable used pervasively in PCT, it
 has a special shortcut syntax:
 

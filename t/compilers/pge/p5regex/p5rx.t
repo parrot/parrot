@@ -789,7 +789,7 @@ Column 6, if present, contains a description of what is being tested.
 .end
 
 
-# given a single digit hex value, return it's int value.
+# given a single digit hex value, return its int value.
 .sub hex_val
     .param string digit
 

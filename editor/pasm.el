@@ -12,7 +12,7 @@
 ;;;;
 ;;;; 1) highlighting for labels, comments and ops which modify program
 ;;;; flow (if, bsr, jsr, etc.). I have intentionally kept the
-;;;; highlighting to a minimum (highlighitng loses it's point when you
+;;;; highlighting to a minimum (highlighitng loses its point when you
 ;;;; highlight _everything_), however if someone wants i'll add in
 ;;;; different highlighting levels ala cperl-mode.
 ;;;;
