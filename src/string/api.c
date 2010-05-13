@@ -867,6 +867,10 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *s),
     if (start >= (INTVAL)len)
         return -1;
 
+    /* Short circuit when s is the same as s2 */
+    if (s == s2)
+        return start == 0 ? 0 : -1;
+
     if (!Parrot_str_length(interp, s2))
         return -1;
     else {
