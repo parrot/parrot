@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, Parrot Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -43,6 +43,7 @@ use Parrot::Docs::Section::Compilers;
 #use Parrot::Docs::Section::Config;
 #use Parrot::Docs::Section::Tests;
 use Parrot::Docs::Section::PDDs;
+use Parrot::Docs::Section::PCT_Tutorial;
 
 =item C<new()>
 
@@ -81,6 +82,7 @@ sub new {
             'Implementing Languages on Parrot',
             '',
             $self->new_item( 'Parrot Compiler Tools', 'docs/book/pct/ch03_compiler_tools.pod'),
+            Parrot::Docs::Section::PCT_Tutorial->new,
             $self->new_item( 'Parrot Grammar Engine', 'docs/book/pct/ch04_pge.pod'),
             $self->new_item( 'Not Quite Perl', 'docs/book/pct/ch05_nqp.pod'),
             $self->new_item( 'Compiler FAQ', 'docs/compiler_faq.pod'),
