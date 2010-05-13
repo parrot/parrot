@@ -841,9 +841,9 @@ Return the POST representation of a C<PAST::Block>.
     concat blockref, $S0
     goto have_blockref
   block_ns:
-    $P0 = get_global '%!codestring'
+    $P0 = get_hll_global ['POST'], 'Compiler'
     blockref = concat 'get_hll_global ', blockreg
-    $S0 = $P0.'key'(ns)
+    $S0 = $P0.'key_pir'(ns)
     concat blockref, ', '
     concat blockref, $S0
     $S0 = self.'escape'(name)
@@ -2178,8 +2178,8 @@ attribute.
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
 
   package_ns:
-    $P1 = new 'CodeString'
-    ns = $P1.'key'(ns)
+    $P1 = get_hll_global ['POST'], 'Compiler'
+    ns = $P1.'key_pir'(ns)
     if bindpost goto package_ns_bind
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
