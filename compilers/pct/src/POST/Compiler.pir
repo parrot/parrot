@@ -188,36 +188,37 @@ Return pir for an operation node.
     if pirop == 'inline' goto pirop_inline
 
   pirop_opcode:
-    fmt = "    %n %,"
+    fmt = "    %n %,\n"
     name = pirop
     goto pirop_emit
 
   pirop_call:
-    fmt = "    %r%n(%,)"
+    fmt = "    %r%n(%,)\n"
     name = shift arglist
     goto pirop_emit
 
   pirop_callmethod:
-    fmt = "    %r%i.%n(%,)"
+    fmt = "    %r%i.%n(%,)\n"
     name = shift arglist
     invocant = shift arglist
     goto pirop_emit
 
   pirop_return:
-    fmt = "    .return (%,)"
+    fmt = "    .return (%,)\n"
     goto pirop_emit
 
   pirop_yield:
-    fmt = "    .yield (%,)"
+    fmt = "    .yield (%,)\n"
     goto pirop_emit
 
   pirop_tailcall:
     name = shift arglist
-    fmt = '    .tailcall %n(%,)'
+    fmt = "    .tailcall %n(%,)\n"
     goto pirop_emit
 
   pirop_inline:
     fmt = node.'inline'()
+    concat fmt, "\n"
     result = node.'result'()
     goto pirop_emit
 
@@ -231,7 +232,6 @@ Return pir for an operation node.
     assign subline, line
   done_line:
     subpir.'append_format'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
-    concat subpir, "\n"
 .end
 
 
