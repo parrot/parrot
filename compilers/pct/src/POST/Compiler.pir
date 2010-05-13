@@ -89,7 +89,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
     newself = new ['POST';'Compiler']
 
     .local pmc innerpir, line
-    innerpir = new 'CodeString'
+    innerpir = new 'StringBuilder'
     .lex '$CODE', innerpir
     line = box 0
     .lex '$LINE', line
@@ -266,7 +266,7 @@ the sub.
     .lex '$SUBPIR', subpir
     subline = box -1
     .lex '$SUBLINE', subline
-    innerpir = new 'CodeString'
+    innerpir = new 'StringBuilder'
     .lex '$CODE', innerpir
 
     .local string name, pirflags
