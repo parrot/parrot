@@ -25,13 +25,13 @@ for compiling programs in Parrot.
     p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
     $P0 = new 'ResizableStringArray'
-    $P0[0] = "    .param pmc %0"
-    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag"
-    $P0[2] = "    .param pmc %0 :slurpy"
-    $P0[4] = "    .param pmc %0 :named(%1)"
-    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag"
-    $P0[6] = "    .param pmc %0 :slurpy :named"
-    $P0[8] = "    .param pmc %0 :call_sig"
+    $P0[0] = "    .param pmc %0\n"
+    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
+    $P0[2] = "    .param pmc %0 :slurpy\n"
+    $P0[4] = "    .param pmc %0 :named(%1)\n"
+    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
+    $P0[6] = "    .param pmc %0 :slurpy :named\n"
+    $P0[8] = "    .param pmc %0 :call_sig\n"
     set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()
 .end
@@ -272,15 +272,15 @@ Get/set the opcode type for this node.
     .local pmc code
     code = paramlist[paramseq]
     unless null code goto have_code
-    code = new 'CodeString'
+    code = new 'StringBuilder'
     paramlist[paramseq] = code
   have_code:
 
     .local pmc paramfmt
     paramfmt = get_hll_global ['POST';'Sub'], '%!paramfmt'
     $S0 = paramfmt[paramseq]
-    named = code.'escape'(named)
-    code.'emit'($S0, pname, named)
+    named = self.'escape'(named)
+    code.'append_format'($S0, pname, named)
 
     .return ()
 .end
