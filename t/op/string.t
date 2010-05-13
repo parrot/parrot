@@ -19,7 +19,7 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(370)
+    plan(374)
 
     set_s_s_sc()
     test_clone()
@@ -919,6 +919,14 @@ WHILE:
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, 3-arg form' )
 
+    # Ascii - Non-ascii, same content
+    set $S0, "hello"
+    set $S1, unicode:"hello"
+    index $I1, $S0, $S1
+    is( $I1, "0", 'index, 3-arg form' )
+    index $I1, $S1, $S0
+    is( $I1, "0", 'index, 3-arg form' )
+
     # Non-ascii, source shorter than searched
     set $S0, unicode:"-o"
     set $S1, unicode:"@INC"
@@ -938,6 +946,14 @@ WHILE:
     set $S1, "qwx"
     index $I1, $S0, $S1, 0
     is( $I1, "-1", 'index, 4-arg form' )
+
+    # Ascii - Non-ascii, same content
+    set $S0, "hello"
+    set $S1, unicode:"hello"
+    index $I1, $S0, $S1, 0
+    is( $I1, "0", 'index, 4-arg form' )
+    index $I1, $S1, $S0, 0
+    is( $I1, "0", 'index, 4-arg form' )
 .end
 
 .sub index_four_arg_form_bug_twenty_two_thousand_seven_hundred_and_eighteen

@@ -532,7 +532,7 @@ mixed_cs_index(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *sear
 {
     ASSERT_ARGS(mixed_cs_index)
 
-    if (search->strlen < src->strlen) {
+    if (search->strlen <= src->strlen) {
         String_iter src_iter, search_iter;
         const UINTVAL maxpos = src->strlen - search->strlen + 1;
         const UINTVAL cfirst = Parrot_str_indexed(interp, search, 0);
