@@ -554,6 +554,9 @@ void PbcFile::dump_segment_fixup(ifstream &pbcfile)
                 cout << " Sub: " << sub;
                 }
                 break;
+            case 0x00:
+                cout << " None";
+                break;
             default:
                 throw runtime_error("Invalid fixup");
         }
@@ -617,10 +620,10 @@ void PbcFile::dump_segment_bytecode(ifstream &pbcfile)
 
     for (opcode n= 0; n < size; ++n) {
         opcode code = read_opcode(pbcfile);
-	if ((n % 8) == 0)
-	    cout << '\n' << setfill('0') << setw (7) << n << ':';
-	else
-	    cout << ' ';
+        if ((n % 8) == 0)
+            cout << '\n' << setfill('0') << setw (7) << n << ':';
+        else
+            cout << ' ';
         cout << setfill('0') << setw(opcode_size * 2) << code;
     }
     cout << dec << '\n';
@@ -732,7 +735,7 @@ void PbcFile::dump_constant_string(ifstream &pbcfile)
     }
     else {
         flags = read_opcode(pbcfile);
-	charset = read_opcode(pbcfile);
+        charset = read_opcode(pbcfile);
     }
 
     cout << "Flags: 0x" << hex << setw(6) << flags << dec;
@@ -767,7 +770,7 @@ void PbcFile::dump_constant_string(ifstream &pbcfile)
     }
     cout << '\n';
 
-    for (unsigned int i= length; i % opcode_size; ++i) {
+    for (unsigned int i= full; i % opcode_size; ++i) {
         pbcfile.ignore(1);
     }
 }
