@@ -531,43 +531,34 @@ mixed_cs_index(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *sear
     UINTVAL offs)
 {
     ASSERT_ARGS(mixed_cs_index)
-    String_iter src_iter, search_iter;
-    UINTVAL len, next_pos;
-    INTVAL found_at;
 
-    ENCODING_ITER_INIT(interp, src, &src_iter);
-    src_iter.set_position(interp, &src_iter, offs);
-    ENCODING_ITER_INIT(interp, search, &search_iter);
-    len = search->strlen;
+    if (search->strlen < src->strlen) {
+        String_iter src_iter, search_iter;
+        const UINTVAL maxpos = src->strlen - search->strlen + 1;
+        const UINTVAL cfirst = Parrot_str_indexed(interp, search, 0);
 
-    found_at = -1;
-    next_pos = offs;
+        ENCODING_ITER_INIT(interp, src, &src_iter);
+        src_iter.set_position(interp, &src_iter, offs);
+        ENCODING_ITER_INIT(interp, search, &search_iter);
 
-    for (; len && offs < src->strlen ;) {
-        const UINTVAL c1 = src_iter.get_and_advance(interp, &src_iter);
-        const UINTVAL c2 = search_iter.get_and_advance(interp, &search_iter);
-
-        if (c1 == c2) {
-            --len;
-            if (found_at == -1)
-                found_at = offs;
-            ++offs;
-        }
-        else {
-            len = search->strlen;
-            ++offs;
-            ++next_pos;
-            if (offs != next_pos) {
-                src_iter.set_position(interp, &src_iter, next_pos);
-                offs = next_pos;
+        while (src_iter.charpos < maxpos) {
+            if (cfirst == src_iter.get_and_advance(interp, &src_iter)) {
+                const INTVAL next_pos = src_iter.charpos;
+                const INTVAL next_byte = src_iter.bytepos;
+                UINTVAL len;
+                search_iter.set_position(interp, &search_iter, 1);
+                for (len = search->strlen - 1; len; --len) {
+                    if ((src_iter.get_and_advance(interp, &src_iter)) !=
+                            (search_iter.get_and_advance(interp, &search_iter)))
+                        break;
+                }
+                if (len == 0)
+                    return next_pos - 1;
+                src_iter.charpos = next_pos;
+                src_iter.bytepos = next_byte;
             }
-
-            found_at = -1;
-            search_iter.set_position(interp, &search_iter, 0);
         }
     }
-    if (len == 0)
-        return found_at;
     return -1;
 }
 
