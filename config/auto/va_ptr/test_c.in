@@ -43,6 +43,15 @@ test1(va_list ap)
     test2(&a);
 }
 
+/*
+ * Visual C++ dies with an Internal Compiler Error when compiling the
+ * following function using -O2.  Don't know why, but maybe because of this:
+ * https://connect.microsoft.com/VisualStudio/feedback/details/457892/internal-compiler-error
+ * Disable optimizations for this function using a pragma.
+ */
+#if defined _MSC_VER
+#  pragma optimize("t", off)
+#endif
 static void
 test0(int n, ...)
 {
@@ -51,6 +60,9 @@ test0(int n, ...)
     test1(ap);
     va_end(ap);
 }
+#if defined _MSC_VER
+#  pragma optimize("", on)
+#endif
 
 int
 main(int argc, char *argv[])
