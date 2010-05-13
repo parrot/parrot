@@ -189,8 +189,23 @@ endif_2:
     unless type == 'Boolean' goto endif_4
     val = 1
     goto beginstore_1
+
 endif_4:
+    # just a --foo type, do the optarg check here
+    $I0 = spec."optarg"()
     if $I0 goto beginstore_1
+    $I0 = index arg, '='
+    if $I0 != -1 goto else_4
+    delete argv[i]
+    argc = argv
+    unless i < argc goto error_1
+#    # XXX/TODO doesn't yet check the value of argv[i]
+#    #          to see if it's a possible argument
+#    # argv[i] gets deleted before going to the next arg
+    val = argv[i]
+    goto beginstore
+
+else_4:
     if_null val, error_0
     goto beginstore_1
 error_0:

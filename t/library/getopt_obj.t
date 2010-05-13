@@ -20,7 +20,7 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
 .sub main :main
     .include 'test_more.pir'
     load_bytecode "Getopt/Obj.pbc"
-    plan(48)
+    plan(49)
 
     test_basic_long_options()
     test_basic_short_options()
@@ -47,6 +47,8 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
         push argv, '--bar=3.14'
         push argv, '--bax=3'
         push argv, '--baz'
+        push argv, '--quux'
+        push argv, 'frobz'
 
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
@@ -66,6 +68,11 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
         $P0 = getopts."add"()
         $P0."long"("baz")
 
+        $P0 = getopts."add"()
+        $P0."long"("quux")
+        $P0."type"("String")
+        $P0.'optarg'(0)
+
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
@@ -79,6 +86,9 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
 
         $S0 = $P1["baz"]
         is($S0, 1, 'basic long options')
+
+        $S0 = $P1["quux"]
+        is($S0, 'frobz', 'basic long options')
 .end
 
 # 2
