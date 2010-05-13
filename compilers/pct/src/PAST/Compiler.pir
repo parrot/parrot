@@ -174,9 +174,6 @@ any value type.
     controltypes['REDO'] = $P0
     set_global '%!controltypes', controltypes
 
-    $P0 = new 'CodeString'
-    set_global '%!codestring', $P0
-
     $P0 = box 11
     set_global '$!serno', $P0
 
