@@ -43,9 +43,11 @@ C<@> arrays, and C<%> for hashes.  A scalar is any single value which can
 interchangeably contain given a string value, an integer value, or an object
 reference. Simple NQP assignments are:
 
- $scalar := "This is a string"
- $x      := 123
- $pi     := 3.1415      # rounding
+  my $scalar;  my $x;  my $pi;
+  # assignments are:
+  $scalar := "This is a string";
+  $x      := 123;
+  $pi     := 3.1415;      # rounding
 
 X<bind operator>
 X<operators; binding>
@@ -75,7 +77,7 @@ There is also a nice shorthand way to index hashes, using angle brackets:
 
 It's also possible to assign a list in I<scalar context>:
 
- $array_but_a_scalar := (1, 2, 3, 4)
+  $array_but_a_scalar := (1, 2, 3, 4);
 
 Or you could write a new function in PIR to create a new array from a variadic
 argument list:
