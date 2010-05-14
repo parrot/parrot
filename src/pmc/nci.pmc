@@ -56,16 +56,17 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
 {
     ASSERT_ARGS(pcc_params)
 
-    char    param_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    const int do_alloc = (sig_length > 7);
-    char   *param_sig    = !do_alloc
-                         ? param_buf
-                         : mem_gc_allocate_n_typed(interp, sig_length, char);
+    /* NCI and PCC have a 1 to 1 mapping except an
+       extra char in PCC for invocant and slurpy */
+    size_t  buf_length = sig_length + 2 + 1;
+    char    sig_buf[buf_length];
     size_t  j            = 0;
     size_t  i;
 
-    for (i = 1; i < sig_length; ++i) {
+    for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig, i);
+
+        PARROT_ASSERT(j < buf_length - 1);
 
         switch (c) {
           case (INTVAL)'0':    /* null ptr or such - doesn't consume a reg */
@@ -73,44 +74,47 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
           case (INTVAL)'f':
           case (INTVAL)'N':
           case (INTVAL)'d':
-            param_sig[j++] = 'N';
+            sig_buf[j++] = 'N';
             break;
           case (INTVAL)'I':   /* INTVAL */
           case (INTVAL)'l':   /* long */
           case (INTVAL)'i':   /* int */
           case (INTVAL)'s':   /* short */
           case (INTVAL)'c':   /* char */
-            param_sig[j++] = 'I';
+            sig_buf[j++] = 'I';
             break;
           case (INTVAL)'S':
           case (INTVAL)'t':   /* string, pass a cstring */
-            param_sig[j++] = 'S';
+            sig_buf[j++] = 'S';
             break;
           case (INTVAL)'J':   /* interpreter */
             break;
           case (INTVAL)'p':   /* push pmc->data */
-          case (INTVAL)'O':   /* push PMC * object in P2 */
           case (INTVAL)'P':   /* push PMC * */
           case (INTVAL)'V':   /* push PMC * */
-            param_sig[j++] = 'P';
-          case (INTVAL)'v':
-            break;
-            /* I have no idea how to handle these */
           case (INTVAL)'2':
           case (INTVAL)'3':
           case (INTVAL)'4':
-            param_sig[j++] = 'I';
+            sig_buf[j++] = 'P';
             break;
-          case (INTVAL)'@':
-            param_sig[j++] = '@';
+          case (INTVAL)'v':
+            /* null return */
+            if (j == 0)
+                sig_buf[j++] = '\0';
+            break;
+          case (INTVAL)'O':   /* push PMC * invocant */
+            sig_buf[j++] = 'P';
+            sig_buf[j++] = 'i';
+            break;
+          case (INTVAL)'@':   /* push PMC * slurpy */
+            sig_buf[j++] = 'P';
+            sig_buf[j++] = 's';
             break;
           case (INTVAL)'b': /* buffer (void*) pass Buffer_bufstart(SReg) */
           case (INTVAL)'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
-            param_sig[j++] = 'S';
+            sig_buf[j++] = 'S';
             break;
           default:
-            if (do_alloc)
-                mem_gc_free(interp, param_sig);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_JIT_ERROR,
                     "Unknown param Signature %c\n", (char)c);
@@ -118,18 +122,16 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
         }
     }
 
-    PARROT_ASSERT(j <= sig_length);
+    PARROT_ASSERT(j < buf_length);
+    sig_buf[j++] = '\0';
 
-    /* use only the signature-significant part of the string buffer */
-    if (j) {
-        nci_info->pcc_params_signature = string_make(interp, param_sig, j,
-            NULL, PObj_constant_FLAG);
-    }
-    else
-        nci_info->pcc_params_signature = CONST_STRING(interp, "");
 
-    if (sig_length > 7)
-        mem_gc_free(interp, param_sig);
+    nci_info->pcc_return_signature =
+        Parrot_str_new(interp, sig_buf, 1);
+
+    nci_info->pcc_params_signature = j ?
+        Parrot_str_new(interp, sig_buf + 1, j - 1) :
+        CONST_STRING(interp, "");
 }
 
 /* actually build the NCI thunk */
@@ -157,15 +159,20 @@ build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci_info))
 
 
 pmclass NCI auto_attrs {
+    /* NCI thunk handling attributes */
     ATTR STRING    *signature;              /* The signature. */
     ATTR void      *func;                   /* Function pointer to call. */
     ATTR PMC       *fb_info;                /* Frame-builder info */
     ATTR void      *orig_func;              /* Function pointer
                                              * used to create func */
-    ATTR STRING    *pcc_params_signature;   /* The signature. */
+    /* Parrot Sub-ish attributes */
+    ATTR STRING    *pcc_params_signature;
+    ATTR STRING    *pcc_return_signature;
+    ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
+
+    /* MMD fields */
     ATTR STRING    *long_signature;         /* The full signature. */
     ATTR PMC       *multi_sig;              /* type tuple array (?) */
-    ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
 
 /*
 
@@ -268,6 +275,7 @@ Mark any referenced strings and PMCs.
             Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
             Parrot_gc_mark_STRING_alive(interp, nci_info->signature);
             Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
             Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
             Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
         }
@@ -300,6 +308,7 @@ Creates and returns a clone of the NCI.
         nci_info_ret->orig_func             = nci_info_self->orig_func;
         nci_info_ret->signature             = nci_info_self->signature;
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
+        nci_info_ret->pcc_return_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
         PObj_get_FLAGS(ret)                |= (PObj_get_FLAGS(SELF) & 0x7);
 
