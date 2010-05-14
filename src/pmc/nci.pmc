@@ -58,10 +58,16 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
 
     /* NCI and PCC have a 1 to 1 mapping except an
        extra char in PCC for invocant and slurpy */
-    size_t  buf_length = sig_length + 2 + 1;
-    char    sig_buf[buf_length];
-    size_t  j            = 0;
-    size_t  i;
+    size_t       buf_length = sig_length + 2 + 1;
+
+    /* avoid malloc churn on common signatures */
+    char         static_buf[16];
+    char * const sig_buf = sig_length <= sizeof static_buf ?
+                            static_buf :
+                            mem_sys_allocate(buf_length);
+
+    size_t j = 0;
+    size_t i;
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig, i);
@@ -132,6 +138,9 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
     nci_info->pcc_params_signature = j ?
         Parrot_str_new(interp, sig_buf + 1, j - 1) :
         CONST_STRING(interp, "");
+
+    if (sig_buf != static_buf)
+        mem_sys_free(sig_buf);
 }
 
 /* actually build the NCI thunk */
