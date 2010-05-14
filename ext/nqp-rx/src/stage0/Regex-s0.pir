@@ -1921,7 +1921,7 @@ An alternate dump output for a Match object and all of its subcaptures.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 ### .include 'src/PAST/Regex.pir'
-# $Id$
+# $Id: Regex.pir 41578 2009-09-30 14:45:23Z pmichaud $
 
 =head1 NAME
 
