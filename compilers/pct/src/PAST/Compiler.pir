@@ -997,7 +997,16 @@ Return the POST representation of a C<PAST::Block>.
     bpost = $P0.'new'( bpost, 'node'=>node, 'result'=>blockreg)
     bpost.'push_pirop'( blockref, 'result'=>blockreg )
     unless islexical goto block_done
+    $I0 = node.'closure'()
+    if $I0 goto block_closure
     bpost.'push_pirop'('capture_lex', blockreg)
+    goto block_done
+
+  block_closure:
+    ##  return a reference to a clone of the block with captured outer context
+    result = self.'uniquereg'('P')
+    bpost.'push_pirop'('newclosure', result, blockreg)
+    bpost.'result'(result)
     goto block_done
 
   block_immediate:

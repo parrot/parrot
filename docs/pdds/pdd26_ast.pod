@@ -481,12 +481,19 @@ the C<symbol> method below.
 =item blocktype([type])
 
 Get/set the type of the block to C<type>.  The currently
-understood values are 'declaration' and 'immediate'.  'Declaration'
-indicates that a block is simply being defined at this point, the
-result of the node is a reference to the block.  A C<blocktype>
-of 'immediate' indicates a block that is to be immediately
+understood values are 'declaration', 'immediate',  and 'method'.  
+'Declaration' indicates that a block is simply being defined at 
+this point, the result of the node is a reference to the block.  
+A C<blocktype> of 'immediate' indicates a block that is to be immediately
 executed when it is evaluated in the AST, and the result of the
 last operation is used as the return value for the block.
+
+=item closure([value])
+
+Get/set the closure flag for the block to C<value>.  If the closure
+flag on a (non-immediate) block is true, then the node returns a 
+reference to a clone of the block that has captured the current
+lexical context.
 
 =item namespace([value])
 

@@ -498,6 +498,21 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 .end
 
 
+=item closure([value])
+
+Get/set the closure flag for the block to C<value>.  If set,
+any block reference returned by the node is to a clone of the
+block that has captured the current lexical context.
+
+=cut
+
+.sub 'closure' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('closure', value, has_value)
+.end
+
+
 =item control([value])
 
 Get/set the control exception handler for this block to C<value>.
