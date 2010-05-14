@@ -640,7 +640,7 @@ Removes and returns a string from the start of the image.
                             EXCEPTION_MALFORMED_PACKFILE,
                             "Reference to constant not yet unpacked %d", i);
                 return table->constants[i]->u.string;
-	    }
+        }
 
             /* XXX
              * only got here because constant table doesn't contain the string
