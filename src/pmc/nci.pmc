@@ -64,7 +64,7 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
     char         static_buf[16];
     char * const sig_buf = sig_length <= sizeof static_buf ?
                             static_buf :
-                            mem_sys_allocate(buf_length);
+                            (char *)mem_sys_allocate(buf_length);
 
     size_t j = 0;
     size_t i;
