@@ -8,7 +8,7 @@ URI- Uniform Resource Identifiers
 =head2 DESCRIPTION
 
 Simplified port of URI (version 1.54)
-see http://search.cpan.org/~gaas/URI/
+see L<http://search.cpan.org/~gaas/URI/>
 
 =head3 Class URI
 
@@ -234,6 +234,36 @@ see http://search.cpan.org/~gaas/URI/
     $I3 = $I2 - $I1
     $S1 = substr $S0, $I1, $I3
     .return ($S1)
+.end
+
+=back
+
+=head3 Class URI,file
+
+=over 4
+
+=cut
+
+.namespace ['URI';'file']
+
+.sub '' :init :load :anon
+    $P0 = subclass ['URI';'_generic'], ['URI';'file']
+.end
+
+=item path
+
+=cut
+
+.sub 'path' :method
+    .tailcall self.'path_query'()
+.end
+
+=item host
+
+=cut
+
+.sub 'host' :method
+    .tailcall self.'authority'()
 .end
 
 =back

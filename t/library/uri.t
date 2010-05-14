@@ -21,9 +21,10 @@ Test the URI library
 
     load_bytecode 'URI.pir'
 
-    plan(40)
+    plan(47)
     test_new()
     test_uri()
+    test_file()
     test_http()
 .end
 
@@ -33,6 +34,12 @@ Test the URI library
     ok($I0, "new ['URI';'_generic']")
     $I0 = isa $P0, ['URI']
     ok($I0, "isa ['URI']")
+
+    $P0 = new ['URI';'file']
+    $I0 = isa $P0, ['URI';'file']
+    ok($I0, "new ['URI';'file']")
+    $I0 = isa $P0, ['URI';'_generic']
+    ok($I0, "isa ['URI';'_generic']")
 
     $P0 = new ['URI';'_server']
     $I0 = isa $P0, ['URI';'_server']
@@ -101,6 +108,22 @@ Test the URI library
     is($S0, 'path', "path")
     $S0 = $P0.'path_query'()
     is($S0, 'path?query', "path_query")
+.end
+
+.sub 'test_file'
+    .local pmc factory
+    factory = get_hll_global ['URI'], 'new_from_string'
+
+    $P0 = factory('file:/foo/bar')
+    ok($P0, "file:/foo/bar")
+    $I0 = isa $P0, ['URI';'file']
+    ok($I0, "isa ['URI';'file']")
+    $S0 = $P0.'scheme'()
+    is($S0, 'file', "scheme")
+    $S0 = $P0.'host'()
+    is($S0, '', 'no host')
+    $S0 = $P0.'path'()
+    is($S0, '/foo/bar', 'path')
 .end
 
 .sub 'test_http'
