@@ -1074,6 +1074,9 @@ slurpy arguments).
             sub->lex_info = Parrot_pmc_new_init(INTERP, lex_info_id, SELF);
         }
 
+        /* Clear any existing outer context */
+        sub->outer_ctx = PMCNULL;
+
         /* If we've got a context around for the outer sub, set it as the
          * outer context. */
         outer_ctx = CURRENT_CONTEXT(INTERP);
