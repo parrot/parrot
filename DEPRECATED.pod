@@ -420,6 +420,10 @@ to language that doesn't support it.
 
 L<https://trac.parrot.org/parrot/ticket/1598>
 
+=item URI [experimental]
+
+L<http://trac.parrot.org/parrot/ticket/1637>
+
 =item JSON and Config;JSON [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/508>
