@@ -15,7 +15,7 @@
 
 #include "parrot/parrot.h"
 
-typedef PMC *(*nci_fb_func_t)(PMC *user_data, STRING *signature);
+typedef PMC *(*nci_fb_func_t)(PARROT_INTERP, PMC *user_data, STRING *signature);
 typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
 
 void Parrot_nci_load_core_thunks(PARROT_INTERP);

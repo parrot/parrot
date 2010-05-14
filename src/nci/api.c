@@ -68,14 +68,13 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
             nci_fb_func_t cb = (nci_fb_func_t)D2FPTR(cb_ptr);
             if (cb_ptr) {
                 PMC *nci_fb_ud = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD);
-                thunk = cb(nci_fb_ud, signature);
+                thunk = cb(interp, nci_fb_ud, signature);
             }
         }
     }
 
     if (!PMC_IS_NULL(thunk)) {
         PARROT_ASSERT(thunk->vtable);
-        PARROT_ASSERT(thunk->vtable->base_type == enum_class_UnManagedStruct);
         return thunk;
     }
 
