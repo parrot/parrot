@@ -416,11 +416,11 @@ L<https://trac.parrot.org/parrot/ticket/1429>
 A way to provide an equivalent of -L and -I parrot command line options
 to language that doesn't support it.
 
-=item Archive::Tar [experimental]
+=item Archive::Tar & Archive::Zip [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1598>
 
-=item URI [experimental]
+=item LWP, HTTP::Message & URI [experimental]
 
 L<http://trac.parrot.org/parrot/ticket/1637>
 
