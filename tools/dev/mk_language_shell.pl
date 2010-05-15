@@ -615,7 +615,7 @@ pmclass @lang@
     extends ResizablePMCArray
     provides array
     group   @lclang@_group
-
+    auto_attrs
     dynpmc
     {
 /*
