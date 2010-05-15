@@ -149,10 +149,10 @@ Regex methods and functions
 =begin item match
 Match C<$text> against C<$regex>.  If the C<$global> flag is
 given, then return an array of all non-overlapping matches.
-=end
+=end item
 
 sub match ($text, $regex, :$global?) {
-    my $match := $text ~~ regex;
+    my $match := $text ~~ $regex;
     if $global {
         my @matches;
         while $match {
@@ -171,7 +171,7 @@ sub match ($text, $regex, :$global?) {
 Substitute an match of C<$regex> in C<$text> with C<$replacement>,
 returning the substituted string.  If C<$global> is given, then
 perform the replacement on all matches of C<$text>.
-=end
+=end item
 
 sub subst ($text, $regex, $repl, :$global?) {
     my @matches := $global ?? match($text, $regex, :global)
@@ -184,7 +184,7 @@ sub subst ($text, $regex, $repl, :$global?) {
         my $repl_string := $is_code ?? $repl($match) !! $repl;
         @pieces.push( pir::substr($text, $offset, $match.from - $offset))
             if $match.from > $offset;
-        @pieces.push($replace_string);
+        @pieces.push($repl_string);
         $offset := $match.to;
     }
 
