@@ -625,6 +625,7 @@ configuration file.
     auto::signal
     auto::socklen_t
     auto::env
+    auto::extra_nci_thunks
     auto::gmp
     auto::readline
     auto::pcre

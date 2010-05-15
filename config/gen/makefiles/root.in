@@ -477,7 +477,7 @@ INTERP_O_FILES = \
     src/frame_builder$(O) \
     src/nci/api$(O) \
     src/nci/core_thunks$(O) \
-    src/nci/extra_thunks$(O) \
+#IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile$(O) \
     src/packout$(O) \
@@ -655,7 +655,7 @@ STR_FILES = \
     src/frame_builder.str \
     src/nci/api.str \
     src/nci/core_thunks.str \
-    src/nci/extra_thunks.str \
+#IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/packfile.str \
     src/pmc.str \
     src/pmc_freeze.str \
@@ -1754,6 +1754,14 @@ testj : test_prep
 # normal core, write and run Parrot Byte Code
 testr : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
+
+# normal core, write and run PASM
+testp : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
+
+# normal core, optimization level 1
+testO1 : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O1 $(RUNCORE_TEST_FILES)
 
 # test the EXEC stuff
 testexec: test_prep

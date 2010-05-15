@@ -194,7 +194,9 @@ init_world(PARROT_INTERP)
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS, pmc);
     Parrot_nci_load_core_thunks(interp);
+#if PARROT_HAS_EXTRA_NCI_THUNKS
     Parrot_nci_load_extra_thunks(interp);
+#endif
 }
 
 /*

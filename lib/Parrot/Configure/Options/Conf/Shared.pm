@@ -72,6 +72,7 @@ our @shared_valid_options = qw{
     verbose-step
     version
     without-crypto
+    without-extra-nci-thunks
     without-gdbm
     without-gettext
     without-gmp
