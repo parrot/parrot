@@ -1,6 +1,7 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
+# auto/extra_nci_thunks-01.t
 
 =head1 NAME
 
