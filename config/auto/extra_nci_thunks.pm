@@ -5,7 +5,7 @@
 
 config/auto/extra_nci_thunks - Static NCI Frame Building
 
-=head1 DESCRIPTIONo
+=head1 DESCRIPTION
 
 If C<--without-extra-nci-thunks> is specified, builds parrot without NCI thunks
 not required by core.
