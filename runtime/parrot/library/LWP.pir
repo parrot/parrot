@@ -25,11 +25,21 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0.'add_attribute'('progress_start')
     $P0.'add_attribute'('progress_lastp')
     $P0.'add_attribute'('progress_ani')
+    $P0.'add_attribute'('max_redirect')
     .globalconst int RC_OK = 200
+    .globalconst int RC_MOVED_PERMANENTLY = 301
+    .globalconst int RC_FOUND = 302
+    .globalconst int RC_SEE_OTHER = 303
+    .globalconst int RC_TEMPORARY_REDIRECT = 307
     .globalconst int RC_BAD_REQUEST = 400
     .globalconst int RC_NOT_FOUND = 404
     .globalconst int RC_INTERNAL_SERVER_ERROR = 500
     .globalconst int RC_NOT_IMPLEMENTED = 501
+.end
+
+.sub 'init' :vtable :method
+    $P0 = box 7
+    setattribute self, 'max_redirect', $P0
 .end
 
 .sub 'send_request' :method
@@ -73,13 +83,61 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .sub 'request' :method
     .param pmc request
+    .param pmc previous         :optional
+    .param int has_previous     :opt_flag
+
     .local pmc response
     response = self.'simple_request'(request)
+    unless has_previous goto L1
+    response.'previous'(previous)
+  L1:
 
-    # work in progress
+    .local int redirect
+    $P0 = response.'redirect'()
+    redirect = elements $P0
+    .local int max_redirect
+    $P0 = getattribute self, 'max_redirect'
+    max_redirect = $P0
+    unless redirect >= max_redirect goto L2
+    $S0 = 'Redirect loop detected (max_redirect = '
+    $S1 = max_redirect
+    $S0 .= $S1
+    $S0 .= ')'
+    response.'push_header'('Client-Warning', $S0)
+    .return (response)
+  L2:
 
     .local int code
     code = response.'code'()
+
+    if code == RC_MOVED_PERMANENTLY goto L3
+    if code == RC_FOUND goto L3
+    if code == RC_SEE_OTHER goto L3
+    if code == RC_TEMPORARY_REDIRECT goto L3
+    goto L4
+  L3:
+    .local pmc referral
+    referral = clone request
+    # These headers should never be forwarded
+    referral.'remove_header'('Host')
+    referral.'remove_header'('Cookie')
+
+    # work in progress
+
+    .local string referral_uri
+    referral_uri = response.'get_header'('Location')
+    $P0 = get_hll_global ['URI'], 'new_from_string'
+    $P1 = $P0(referral_uri)
+    setattribute referral, 'uri', $P1
+
+    # work in progress
+
+    $I0 = self.'redirect_ok'(referral, response)
+    if $I0 goto L5
+    .return (response)
+  L5:
+    .tailcall self.'request'(referral, response)
+  L4:
 
     # work in progress
 
@@ -178,6 +236,22 @@ see http://search.cpan.org/~gaas/libwww-perl/
     # work in progress
 
   L1:
+.end
+
+.sub 'redirect_ok' :method
+    .param pmc new_request
+    .param pmc response
+    # work in progress
+    .return (1)
+.end
+
+=item max_redirect
+
+=cut
+
+.sub 'max_redirect' :method
+    .param pmc val
+    setattribute self, 'max_redirect', val
 .end
 
 =item show_progress

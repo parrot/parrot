@@ -114,6 +114,16 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return ($S0)
 .end
 
+=item remove_header
+
+=cut
+
+.sub 'remove_header' :method
+    .param string key
+    $P0 = getattribute self, 'headers'
+    delete $P0[key]
+.end
+
 =item content
 
 =cut
@@ -261,6 +271,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Response']
     $P0.'add_attribute'('code')
     $P0.'add_attribute'('message')
+    $P0.'add_attribute'('previous')
     $P0.'add_attribute'('request')
 .end
 
@@ -280,6 +291,15 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub 'message' :method
     $P0 = getattribute self, 'message'
     .return ($P0)
+.end
+
+=item previous
+
+=cut
+
+.sub 'previous' :method
+    .param pmc prev
+    setattribute self, 'previous', prev
 .end
 
 =item request
@@ -305,6 +325,23 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 .= $S1
   L1:
     .return ($S0)
+.end
+
+=item redirects
+
+=cut
+
+.sub 'redirect' :method
+    $P0 = new 'ResizablePMCArray'
+    $P1 = self
+  L1:
+    $P2 = getattribute $P1, 'previous'
+    if null $P2 goto L2
+    unshift $P0, $P2
+    $P1 = $P2
+    goto L1
+  L2:
+    .return ($P0)
 .end
 
 =item is_info
@@ -375,7 +412,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 =head1 AUTHOR
 
-Franc§ois Perrad
+Francois Perrad
 
 =cut
 
