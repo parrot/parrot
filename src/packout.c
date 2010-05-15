@@ -159,11 +159,18 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack_size)
     opcode_t i;
-    const PackFile_ConstTable* const self = (const PackFile_ConstTable *) seg;
+    PackFile_ConstTable* const self = (PackFile_ConstTable *) seg;
+    const opcode_t n_constants = self->const_count;
     size_t size = 1;    /* const_count */
 
-    for (i = 0; i < self->const_count; ++i)
+    for (i = 0; i < n_constants; ++i) {
+        /* only constants up to the current one will be valid on unpack */
+        self->const_count = i;
         size += PackFile_Constant_pack_size(interp, self->constants[i], self);
+    }
+
+    self->const_count = i;
+
     return size;
 }
 
@@ -192,13 +199,19 @@ PackFile_ConstTable_pack(PARROT_INTERP,
         ARGIN(PackFile_Segment *seg), ARGMOD(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack)
-    const PackFile_ConstTable * const self = (const PackFile_ConstTable *)seg;
+    PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
+    const opcode_t n_constants = self->const_count;
     opcode_t i;
 
     *cursor++ = self->const_count;
 
-    for (i = 0; i < self->const_count; ++i)
+    for (i = 0; i < n_constants; ++i) {
+        /* only constants up to the current one will be valid on unpack */
+        self->const_count = i;
         cursor = PackFile_Constant_pack(interp, self, self->constants[i], cursor);
+    }
+
+    self->const_count = n_constants;
 
     return cursor;
 }
@@ -262,11 +275,11 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
 
     if (type == PFC_STRING && !PMC_IS_NULL(ct->string_hash)) {
         if (VTABLE_exists_keyed_str(interp, ct->string_hash, key_str)) {
-            return VTABLE_get_integer_keyed_str(interp, ct->string_hash, key_str);
+            i = VTABLE_get_integer_keyed_str(interp, ct->string_hash, key_str);
+            if (i < ct->const_count) /* only consider constants that have already occured */
+                return i;
         }
-        else {
-            return -1;
-        }
+        return -1;
     }
 
     for (i = 0; i < ct->const_count; ++i) {
