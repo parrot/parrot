@@ -1662,13 +1662,11 @@ LIBRARY_TEST_FILES = @library_tests@
 PMC2CUTILS_DIR = t/tools/pmc2cutils
 OPS2PMUTILS_DIR = t/tools/ops2pm
 OPS2CUTILS_DIR = t/tools/ops2cutils
-REVISIONUTILS_DIR = t/tools/revision
 HARNESS_DIR = t/pharness
 BUILDTOOLS_TEST_FILES = \
     $(PMC2CUTILS_DIR)/*.t \
     $(OPS2PMUTILS_DIR)/*.t \
     $(OPS2CUTILS_DIR)/*.t \
-    $(REVISIONUTILS_DIR)/*.t \
     $(HARNESS_DIR)/*.t
 MANIFEST_DIR = t/manifest
 INSTALL_TOOLS_DIR = t/tools/install
