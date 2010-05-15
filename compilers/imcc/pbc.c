@@ -1277,6 +1277,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     int                  ns_const = -1;
 
     if (unit->_namespace) {
+        SymReg     * const ns = unit->_namespace->reg;
+
         /* strip namespace off from front */
 
         static const char ns_sep[] = "@@@";
@@ -1290,8 +1292,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             }
             real_name += 3;
         }
-
-        SymReg     * const ns = unit->_namespace->reg;
 
         IMCC_debug(interp, DEBUG_PBC_CONST,
                 "name space const = %d ns name '%s'\n", ns->color, ns->name);
