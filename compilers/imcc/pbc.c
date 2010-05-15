@@ -1278,7 +1278,19 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     if (unit->_namespace) {
         /* strip namespace off from front */
-        const char *real_name = strrchr(r->name, '@');
+
+        static const char ns_sep[] = "@@@";
+        char *real_name = strstr(r->name, ns_sep);
+        if (real_name) {
+            /* Unfortunately, there is no strrstr, then iterate until last */
+            char *aux = strstr(real_name + 3, ns_sep);
+            while (aux) {
+                 real_name = aux;
+                aux = strstr(real_name + 3, ns_sep);
+            }
+            real_name += 3;
+        }
+
         SymReg     * const ns = unit->_namespace->reg;
 
         IMCC_debug(interp, DEBUG_PBC_CONST,
@@ -1287,7 +1299,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         ns_const  = ns->color;
 
         if (real_name) {
-            char * const p = mem_sys_strdup(real_name + 1);
+            char * const p = mem_sys_strdup(real_name);
             mem_sys_free(r->name);
             r->name = p;
         }
