@@ -75,8 +75,14 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc request
     .local pmc response
     response = self.'simple_request'(request)
+
+    # work in progress
+
     .local int code
     code = response.'code'()
+
+    # work in progress
+
     .return (response)
 .end
 
@@ -205,24 +211,25 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc request
     .param pmc code
     .param pmc message
-    $P0 = new ['HTTP';'Response']
-    setattribute $P0, 'code', code
-    setattribute $P0, 'message', message
-    setattribute $P0, 'request', request
+    .local pmc response
+    response = new ['HTTP';'Response']
+    setattribute response, 'code', code
+    setattribute response, 'message', message
+    setattribute response, 'request', request
     $P0 = get_hll_global ['HTTP';'Date'], 'time2str'
     $I0 = time
     $S0 = $P0($I0)
-    $P0.'push_header'('Client-Date', $S0)
-    $P0.'push_header'('Client-Warning', "Internal response")
-    $P0.'push_header'('Content-Type', 'text/plain')
+    response.'push_header'('Client-Date', $S0)
+    response.'push_header'('Client-Warning', "Internal response")
+    response.'push_header'('Content-Type', 'text/plain')
     $S0 = code
     $S0 .= ' '
     $S1 = message
     $S0 .= $S1
     $S0 .= "\n"
     $P0 = box $S0
-    setattribute $P0, 'content', $P0
-    .return ($P0)
+    setattribute response, 'content', $P0
+    .return (response)
 .end
 
 =back
