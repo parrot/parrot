@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-Tapir
+Prove
 
 =head1 DESCRIPTION
 
-Tapir is a PIR-based TAP (Test Anything Protocol) Harness
+Prove is a PIR-based TAP (Test Anything Protocol) Harness
 
 It eats test output (i.e. is a TAP consumer) and tells humans if the
 test suite passed, and if not, which kind of pretty colors of smoke
@@ -15,7 +15,7 @@ came out. It is mostly equivalent to 'prove' from Perl 5.
 
 =head1 SYNOPSIS
 
-  ./tapir t/*.t
+  ./parrot-prove t/*.t
 
 =head2 OPTIONS
 
@@ -73,13 +73,13 @@ Usage:
 .end
 
 .sub 'version' :anon
-    say "Tapir 0.1.0"
+    say "Prove 0.1.0"
 .end
 
 .sub 'help' :anon
     say <<"HELP"
 
- tapir [options] [files]
+ parrot-prove [options] [files]
 
 Boolean options:
 

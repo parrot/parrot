@@ -9,6 +9,8 @@ New in 2.4.0
 - Tests
   + Many tests for the extend/embed interface were added
   + done_testing() is now implemented in Test::More
+- Tools
+  + the fakexecutable tapir is renamed parrot-prove
 - Miscellaneous
   + Six Parrot-related projects accepted to GSoC
 
@@ -155,7 +157,7 @@ New in 1.8.0
   + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
   + Many small speed improvements.
 - New deprecations
-  + MT19937, the Mersenne twisted pseudorandom number generator, is now hosted on github and 
+  + MT19937, the Mersenne twisted pseudorandom number generator, is now hosted on github and
     will be removed from the Parrot core. (eligible in 2.1)
   + The 'Parrot_call_*' functions for invoking a sub/method object from C are
     deprecated. They are replaced by 'Parrot_ext_call'. (eligible in 2.1)
