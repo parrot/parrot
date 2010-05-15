@@ -14,6 +14,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 =over 4
 
+=item time2str
+
 =cut
 
 .namespace ['HTTP';'Date']
@@ -48,9 +50,9 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return ($S0)
 .end
 
-=head3 Class HTTP;Headers
+=back
 
-=over 4
+=head3 Class HTTP;Headers
 
 =cut
 
@@ -60,13 +62,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = subclass 'Hash', ['HTTP';'Headers']
 .end
 
-=back
-
 =head3 Class HTTP;Message
 
 =over 4
 
 =cut
+
 .namespace ['HTTP';'Message']
 
 .sub '' :init :load :anon
@@ -374,7 +375,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 =head1 AUTHOR
 
-Francois Perrad
+Franc§ois Perrad
 
 =cut
 
