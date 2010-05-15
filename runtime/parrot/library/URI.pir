@@ -334,6 +334,20 @@ see L<http://search.cpan.org/~gaas/URI/>
     .return ('80')
 .end
 
+=head3 Class URI;https
+
+=cut
+
+.namespace ['URI';'https']
+
+.sub '' :init :load :anon
+    $P0 = subclass ['URI';'http'], ['URI';'https']
+.end
+
+.sub 'default_port' :method
+    .return ('443')
+.end
+
 =head1 AUTHOR
 
 Francois Perrad

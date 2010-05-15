@@ -21,11 +21,12 @@ Test the URI library
 
     load_bytecode 'URI.pir'
 
-    plan(47)
+    plan(53)
     test_new()
     test_uri()
     test_file()
     test_http()
+    test_https()
 .end
 
 .sub 'test_new'
@@ -52,6 +53,12 @@ Test the URI library
     ok($I0, "new ['URI';'http']")
     $I0 = isa $P0, ['URI';'_server']
     ok($I0, "isa ['URI';'_server']")
+
+    $P0 = new ['URI';'https']
+    $I0 = isa $P0, ['URI';'https']
+    ok($I0, "new ['URI';'https']")
+    $I0 = isa $P0, ['URI';'http']
+    ok($I0, "isa ['URI';'http']")
 .end
 
 .sub 'test_uri'
@@ -151,6 +158,20 @@ Test the URI library
     is($S0, '127.0.0.1', 'host')
     $S0 = $P0.'port'()
     is($S0, '8080', 'port')
+.end
+
+.sub 'test_https'
+    .local pmc factory
+    factory = get_hll_global ['URI'], 'new_from_string'
+
+    $P0 = factory('https://www.parrot.org')
+    ok($P0, "https://www.parrot.org")
+    $I0 = isa $P0, ['URI';'https']
+    ok($I0, "isa ['URI';'https']")
+    $S0 = $P0.'scheme'()
+    is($S0, 'https', "scheme")
+    $S0 = $P0.'port'()
+    is($S0, '443', 'port')
 .end
 
 # Local Variables:
