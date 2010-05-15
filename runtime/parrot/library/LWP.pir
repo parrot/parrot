@@ -267,11 +267,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
     unless null $P0 goto L1
     .return ($P0)
   L1:
-    $P0 = new $P0
-    $P1 = box scheme
-    setattribute $P0, 'scheme', $P1
-    setattribute $P0, 'ua', ua
-    .return ($P0)
+    .local pmc protocol
+    protocol = new $P0
+    $P0 = box scheme
+    setattribute protocol, 'scheme', $P0
+    setattribute protocol, 'ua', ua
+    .return (protocol)
 .end
 
 .sub 'request' :method
@@ -290,12 +291,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .include 'stat.pasm'
 
 .sub '' :init :load :anon
-    load_bytecode 'osutils.pbc'
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'file']
 .end
 
 .sub 'request' :method
     .param pmc request
+    load_bytecode 'osutils.pbc'
     .local string method
     method = request.'method'()
     $P0 = get_hll_global ['LWP';'Protocol';'file'], method

@@ -20,6 +20,7 @@ Test the LWP library
     .include 'test_more.pir'
 
     load_bytecode 'LWP.pir'
+    load_bytecode 'osutils.pbc'
 
     plan(30)
     test_new()
