@@ -41,8 +41,8 @@ use_ok('config::init::defaults');
 use_ok('config::auto::extra_nci_thunks');
 
 my ($args, $step_list_ref) = process_options( {
-	    argv => [ q{--without-extra-nci-thunks} ],
-	    mode => 'configure',
+    argv => [ q{--without-extra-nci-thunks} ],
+    mode => 'configure',
 } );
 
 my $conf = Parrot::Configure->new;
@@ -65,8 +65,8 @@ is( $conf->data->get( 'HAS_EXTRA_NCI_THUNKS' ), 0,
 $conf->replenish($serialized);
 
 ($args, $step_list_ref) = process_options( {
-	    argv => [ ],
-	    mode => 'configure',
+    argv => [ ],
+    mode => 'configure',
 } );
 rerun_defaults_for_testing($conf, $args);
 $conf->add_steps($pkg);
