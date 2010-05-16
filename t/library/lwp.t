@@ -22,8 +22,9 @@ Test the LWP library
     load_bytecode 'LWP.pir'
     load_bytecode 'osutils.pbc'
 
-    plan(30)
+    plan(34)
     test_new()
+    test_unknown_protocol()
     test_file_not_found()
     test_file()
     test_file_post_delete()
@@ -56,6 +57,20 @@ Test the LWP library
     ok($I0, "new ['HTTP';'Response']")
     $I0 = isa $P0, ['HTTP';'Message']
     ok($I0, "isa ['HTTP';'Message']")
+.end
+
+.sub 'test_unknown_protocol'
+    .local pmc ua, response
+    ua = new ['LWP';'UserAgent']
+    response = ua.'get'('unk:foo/bar')
+    $I0 = isa response, ['HTTP';'Response']
+    ok($I0, "GET unk:foo/bar")
+    $I0 = response.'code'()
+    is($I0, 501, "code")
+    $S0 = response.'message'()
+    is($S0, "Not Implemented", "message")
+    $I0 = response.'is_error'()
+    ok($I0, "is error")
 .end
 
 .sub 'test_file_not_found'
