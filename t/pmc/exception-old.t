@@ -328,7 +328,7 @@ OUTPUT
 # stringification is handled by a vtable, which runs in a second
 # runloop. when an error in the method tries to go to a Error_Handler defined
 # outside it, it winds up going to the inner runloop, giving strange results.
-pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)', todo => 'runloop shenanigans' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)' );
 .sub main :main
         $P0 = get_hll_global ['Foo'], 'load'
         $P0()
@@ -340,7 +340,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)', todo => 'runlo
         .return()
 
 catch:
+        .get_results($P1)
         say "caught"
+	unroll $P1
         .return()
 .end
 
