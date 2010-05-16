@@ -44,10 +44,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute self, 'def_headers', $P0
     $P0 = box 7
     setattribute self, 'max_redirect', $P0
-    $P0 = box ''
-    setattribute self, 'progress_lastp', $P0
-    $P0 = box 0
-    setattribute self, 'progress_lastp', $P0
 .end
 
 .sub 'send_request' :method
