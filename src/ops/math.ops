@@ -52,17 +52,11 @@ inline op abs(inout NUM) :base_core {
 }
 
 inline op abs(out INT, in INT) :base_core {
-    if ($2 < 0)
-        $1 = - (INTVAL)$2;
-    else
-        $1 = (INTVAL)$2;
+    $1 = abs($2);
 }
 
 inline op abs(out NUM, in NUM) :base_core {
-    if ($2 < 0)
-        $1 = - (FLOATVAL)$2;
-    else
-        $1 = (FLOATVAL)$2;
+    $1 = fabs($2);
 }
 
 inline op abs(invar PMC) :base_core {
