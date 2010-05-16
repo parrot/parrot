@@ -808,7 +808,7 @@ Generic method for compilers invoked from a shell command line.
     ## from Perl's Test::Harness.  (Test::Harness versions 2.64
     ## and earlier have a hardwired commandline option that is
     ## always passed to an initial run of the interpreter binary,
-    ## whether you want it or not.)  We expect to remove this 
+    ## whether you want it or not.)  We expect to remove this
     ## check eventually (or make it a lot smarter than it is here).
     $S0 = args[2]
     $I0 = index $S0, '@INC'
