@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -232,6 +232,7 @@ Free runloops until the one with the provided id gets current.
 static void
 free_runloops_until(PARROT_INTERP, int id)
 {
+    ASSERT_ARGS(free_runloops_until)
     while (interp->current_runloop && interp->current_runloop_id != id)
         free_runloop_jump_point(interp);
 }
