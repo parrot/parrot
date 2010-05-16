@@ -44,6 +44,10 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute self, 'def_headers', $P0
     $P0 = box 7
     setattribute self, 'max_redirect', $P0
+    $P0 = box ''
+    setattribute self, 'progress_lastp', $P0
+    $P0 = box 0
+    setattribute self, 'progress_lastp', $P0
 .end
 
 .sub 'send_request' :method
@@ -270,14 +274,27 @@ see http://search.cpan.org/~gaas/libwww-perl/
     goto L1
   L3:
     unless status == 'tick' goto L5
-
-    # work in progress
-
+    $P0 = getattribute self, 'progress_ani'
+    inc $P0
+    $P0 %= 4
+    $P1 = split '', '-\|/'
+    $S0 = $P1[$P0]
+    printerr $S0
+    printerr "\b"
     goto L1
   L5:
-
-    # work in progress
-
+    $N0 = status
+    $N0 *= 100
+    $P0 = new 'FixedFloatArray'
+    set $P0, 1
+    $P0[0] = $N0
+    $S1 = sprintf '%3.0f%%', $P0
+    $P0 = getattribute self, 'progress_lastp'
+    $S0 = $P0
+    if $S0 == $S1 goto L1
+    set $P0, $S1
+    printerr $S1
+    printerr "\b\b\b\b"
   L1:
 .end
 
@@ -400,6 +417,24 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute protocol, 'scheme', $P0
     setattribute protocol, 'ua', ua
     .return (protocol)
+.end
+
+=item scheme
+
+=cut
+
+.sub 'scheme' :method
+    $P0 = getattribute self, 'scheme'
+    .return ($P0)
+.end
+
+=item ua
+
+=cut
+
+.sub 'ua' :method
+    $P0 = getattribute self, 'ua'
+    .return ($P0)
 .end
 
 .sub 'request' :method
@@ -668,8 +703,13 @@ see http://search.cpan.org/~gaas/libwww-perl/
     content = request.'content'()
 
     $S0 = _format_request(method, url, request_headers, content)
+
+    .local pmc ua
+    ua = self.'ua'()
+    ua.'progress'(0.01, request)
     sock.'send'($S0)
     $S1 = sock.'recv'()
+    ua.'progress'(0.99, request)
     sock.'close'()
 
     .local pmc response
