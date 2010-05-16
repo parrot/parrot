@@ -121,7 +121,7 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method lower on String [eligible in 3.1]
+=item Method lower on String [eligible in 2.7]
 
 Use the downcase opcode or subclass with a method name consistent with your
 HLL.
@@ -261,17 +261,17 @@ L<https://trac.parrot.org/parrot/ticket/1091>
 
 L<https://trac.parrot.org/parrot/ticket/1103>
 
-=item :unique_reg flag [eligible in 3.1]
+=item :unique_reg flag [eligible in 2.7]
 
 L<https://trac.parrot.org/parrot/ticket/1622>
 
-=item .nci_call [eligible in 3.1]
+=item .nci_call [eligible in 2.7]
 
 As of the latest PCC changes, there is nothing special about calling an NCI sub.
 
 L<https://trac.parrot.org/parrot/ticket/1623>
 
-=item .meth_call [eligible in 3.1]
+=item .meth_call [eligible in 2.7]
 
 As of the latest PCC changes, this does nothing different from '.call'.
 
