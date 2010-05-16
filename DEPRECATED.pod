@@ -156,13 +156,6 @@ address of the PMC. Uses of get_addr and set_addr that would set label values
 for Sub, Exception, and related PMC types will instead be handled by
 get_label and set_label.
 
-=item sizeof [eligible in 2.4]
-
-This opcode uses the old integer ID for a PMC type; this opcode should be changed
-to use the current methods to lookup a PMC or removed entirely.
-
-L<https://trac.parrot.org/parrot/ticket/633>
-
 =item All bitwise ops [eligible in 2.1]
 
 All bitwise ops (all ops containing C<bitwise> in their names) will be provided

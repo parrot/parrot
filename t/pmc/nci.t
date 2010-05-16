@@ -1330,16 +1330,6 @@ OUTPUT
   push P2, 0    # 1 elem array
   push P2, 0
   new P5, ['ManagedStruct'], P2
-  set I6, 0
-  sizeof I7, .DATATYPE_DOUBLE
-  add I6, I7
-  sizeof I7, .DATATYPE_FLOAT
-  add I6, I7
-  sizeof I7, .DATATYPE_INT
-  add I6, I7
-  sizeof I7, .DATATYPE_CSTR
-  add I6, I7
-  set P5, I6
   set P5[0], 10.0
   set P5[1], 4.0
   set P5[2], 17

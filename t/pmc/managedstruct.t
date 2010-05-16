@@ -104,10 +104,6 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     ok($I0, "short val retrieved correctly")
 .end
 
-#pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
-#
-#.include "datatypes.pasm"
-#
 .sub named_element_access_int16
     new $P1, ['OrderedHash']
     set  $P1['x'], .DATATYPE_INT16
@@ -120,14 +116,6 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
     # need a ManagedStruct to allocate data memory
     new $P2, ['ManagedStruct'], $P1
-
-    # calc allocation size
-    set $I0, 0
-    sizeof $I1, .DATATYPE_INT16
-    add $I0, $I1
-    add $I0, $I1
-    # set size
-    set $P2, $I0
 
     # set struct values by name
     set $I0, 2
