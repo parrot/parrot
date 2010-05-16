@@ -761,6 +761,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     if $S0 == '' goto L22
     push buf, $S0
     header_length = self.'_parse_response_headers'(response, buf)
+    $I0 = response.'is_success'()
+    unless $I0 goto L22
     $S0 = response.'get_header'('Content-Length')
     if $S0 == '' goto L21
     content_length = $S0

@@ -245,7 +245,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     unless $P0 goto L2
     $S0 = shift $P0
     $S1 = headers[$S0]
-    req.'push_headers'($S0, $S1)
+    req.'push_header'($S0, $S1)
     goto L1
   L2:
     $P0 = iter contents
