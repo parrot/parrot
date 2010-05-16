@@ -22,9 +22,10 @@ Test the LWP library
     load_bytecode 'LWP.pir'
     load_bytecode 'osutils.pbc'
 
-    plan(34)
+    plan(38)
     test_new()
     test_unknown_protocol()
+    test_bad_request()
     test_file_not_found()
     test_file()
     test_file_post_delete()
@@ -69,6 +70,20 @@ Test the LWP library
     is($I0, 501, "code")
     $S0 = response.'message'()
     is($S0, "Not Implemented", "message")
+    $I0 = response.'is_error'()
+    ok($I0, "is error")
+.end
+
+.sub 'test_bad_request'
+    .local pmc ua, response
+    ua = new ['LWP';'UserAgent']
+    response = ua.'post'('file:foo/bar')
+    $I0 = isa response, ['HTTP';'Response']
+    ok($I0, "GET unk:foo/bar")
+    $I0 = response.'code'()
+    is($I0, 400, "code bad request")
+    $S0 = response.'message'()
+    is($S0, "Library does not allow method POST for 'file:' URLs", "message")
     $I0 = response.'is_error'()
     ok($I0, "is error")
 .end
@@ -121,7 +136,7 @@ Test the LWP library
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
 
-    response = ua.'post'(url, data)
+    response = ua.'put'(url, data)
     $I0 = isa response, ['HTTP';'Response']
     ok($I0, "POST file:t/library/file.txt")
     $I0 = response.'code'()

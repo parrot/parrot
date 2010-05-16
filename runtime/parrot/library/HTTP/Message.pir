@@ -74,6 +74,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = newclass ['HTTP';'Message']
     $P0.'add_attribute'('headers')
     $P0.'add_attribute'('content')
+    $P0.'add_attribute'('protocol')
 .end
 
 .sub 'init' :vtable :method
@@ -81,6 +82,15 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute self, 'headers', $P0
     $P0 = box ''
     setattribute self, 'content', $P0
+.end
+
+=item protocol
+
+=cut
+
+.sub 'protocol' :method
+    $P0 = getattribute self, 'protocol'
+    .return ($P0)
 .end
 
 =item headers
@@ -273,6 +283,40 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0.'add_attribute'('message')
     $P0.'add_attribute'('previous')
     $P0.'add_attribute'('request')
+.end
+
+.sub 'parse' :method
+    .param string str
+    $P0 = split "\r\n\r\n", str
+    $S0 = shift $P0
+    $P1 = split "\r\n", $S0
+    .local string status_line
+    status_line = shift $P1
+    $P2 = split " ", status_line
+    $S0 = shift $P2
+    $P3 = box $S0
+    setattribute self, 'protocol', $P3
+    $S0 = shift $P2
+    $P3 = box $S0
+    setattribute self, 'code', $P3
+    $S0 = join " ", $P2
+    $P3 = box $S0
+    setattribute self, 'message', $P3
+    $P3 = new ['HTTP';'Headers']
+  L1:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $P2 = split ": ", $S0
+    $S1 = shift $P2
+    $S2 = shift $P2
+    $P3[$S1] = $S2
+    goto L1
+  L2:
+    setattribute self, 'headers', $P3
+    .local string content
+    content = shift $P0
+    $P3 = box content
+    setattribute self, 'content', $P3
 .end
 
 =item code
