@@ -26,9 +26,9 @@ a new empty string instead.
 
 inline op clone(out STR, in STR) :base_mem {
     /* cloning a NULL STRING produces an empty STRING; TT #964 */
-    $1 = $2
-       ? $2
-       : Parrot_str_new(interp, NULL, 0);
+    $1 = STRING_IS_NULL($2)
+       ? Parrot_str_new(interp, NULL, 0)
+       : $2;
 }
 
 
