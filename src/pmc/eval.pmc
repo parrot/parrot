@@ -163,7 +163,7 @@ mark_subs(PARROT_INTERP, ARGIN(PMC *self))
     }
 }
 
-pmclass Eval extends Sub auto_attrs {
+pmclass Eval extends Sub provides invokable auto_attrs {
 
     VTABLE void init() {
         Parrot_Sub_attributes *sub_data;

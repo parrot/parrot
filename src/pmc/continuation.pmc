@@ -47,7 +47,7 @@ more information.
  * Additionally ct->current_cont has the continuation of the caller.
  */
 
-pmclass Continuation auto_attrs {
+pmclass Continuation auto_attrs provides invokable {
     /* continuation destination */
     ATTR PackFile_ByteCode *seg;             /* bytecode segment */
     ATTR opcode_t          *address;         /* start of bytecode, addr to continue */

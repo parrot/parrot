@@ -73,7 +73,7 @@ print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     print_pbc_location(interp);
 }
 
-pmclass Coroutine extends Sub auto_attrs {
+pmclass Coroutine extends Sub provides invokable auto_attrs {
     ATTR INTVAL             yield;      /* yield in process */
     ATTR opcode_t          *address;    /* next address to run - toggled each time */
     ATTR PackFile_ByteCode *caller_seg; /* bytecode segment */

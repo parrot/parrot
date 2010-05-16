@@ -61,7 +61,7 @@ initializer.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass Timer extends Task provides event auto_attrs {
+pmclass Timer extends Task provides event provides invokable auto_attrs {
     ATTR FLOATVAL duration;  /* The duration of the timer pause */
     ATTR FLOATVAL interval;  /* How often to repeat */
     ATTR INTVAL   repeat;    /* Whether to repeat:

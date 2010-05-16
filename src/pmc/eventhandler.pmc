@@ -24,7 +24,7 @@ Event.
 /* HEADERIZER END: static */
 
 
-pmclass EventHandler extends Sub auto_attrs {
+pmclass EventHandler extends Sub provides invokable auto_attrs {
 
     ATTR STRING *type;          /* the type of the event to handle */
     ATTR PMC    *code;          /* the code object to execute */

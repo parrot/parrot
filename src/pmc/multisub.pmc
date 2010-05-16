@@ -25,7 +25,7 @@ Sub PMCs with the same short name, but different long names.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
+pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides invokable {
 
     VTABLE STRING * get_string() {
         PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);

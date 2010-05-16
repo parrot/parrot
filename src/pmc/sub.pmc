@@ -48,7 +48,7 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
     print_pbc_location(interp);
 }
 
-pmclass Sub auto_attrs {
+pmclass Sub auto_attrs provides invokable {
     ATTR PackFile_ByteCode *seg;        /* bytecode segment */
     ATTR size_t             start_offs; /* sub entry in ops from seg->base.data */
     ATTR size_t             end_offs;

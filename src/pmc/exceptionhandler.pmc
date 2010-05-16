@@ -26,7 +26,7 @@ exception object's C<_P5> attribute.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass ExceptionHandler extends Continuation auto_attrs {
+pmclass ExceptionHandler extends Continuation provides invokable auto_attrs {
 
     ATTR PMC    *handled_types;
     ATTR PMC    *handled_types_except;

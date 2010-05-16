@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 69;
+use Parrot::Test tests => 70;
 use Parrot::Config;
 
 =head1 NAME
@@ -837,15 +837,7 @@ the_sub
 main
 OUTPUT
 
-@todo = (
-    defined $ENV{TEST_PROG_ARGS}
-        and
-    $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/
-)
-    ? ( todo => 'broken with JIT (TT #983)' )
-    : ();
-
-pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp", @todo );
+pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
 .sub main :main
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -1734,6 +1726,24 @@ named_required 3
 named_optional 5
 named_slurpy 8
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUT', 'interface' );
+.sub 'main' :main
+    .const 'Sub' $P0 = "main"
+
+    $I0 = does $P0, 'scalar'
+    say $I0 # Sub does not scalar
+    $I0 = does $P0, 'invokable'
+    say $I0 # Sub does invokable
+    $I0 = does $P0, 'no_interface'
+    say $I0 # Sub does not no_interface
+.end
+CODE
+0
+1
+0
+OUT
+
 
 # Local Variables:
 #   mode: cperl
