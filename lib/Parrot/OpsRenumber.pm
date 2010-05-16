@@ -124,7 +124,7 @@ sub renum_op_map_file {
         s/^\s*//;
         next unless $_;
         ( $name, $number ) = split( /\s+/, $_ );
-        $seen{$name}  = $number;
+        $seen{$name}  = 1;
         $fixed{$name} = $number if $fix;
     }
     close $OP;
