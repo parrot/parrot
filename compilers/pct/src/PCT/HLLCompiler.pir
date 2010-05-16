@@ -805,9 +805,11 @@ Generic method for compilers invoked from a shell command line.
 
     ## this bizarre piece of code causes the compiler to
     ## immediately abort if it looks like it's being run
-    ## from Perl's Test::Harness.  We expect to remove this
-    ## check eventually (or make it a lot smarter than it
-    ## is here).
+    ## from Perl's Test::Harness.  (Test::Harness versions 2.64
+    ## and earlier have a hardwired commandline option that is
+    ## always passed to an initial run of the interpreter binary,
+    ## whether you want it or not.)  We expect to remove this 
+    ## check eventually (or make it a lot smarter than it is here).
     $S0 = args[2]
     $I0 = index $S0, '@INC'
     if $I0 < 0 goto not_harness
