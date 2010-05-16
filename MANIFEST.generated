@@ -128,6 +128,8 @@ install_config.fpmc                              [main]lib
 installable_parrot                               [main]bin
 installable_parrot-nqp                           [main]bin
 installable_parrot-nqp.exe                       [main]bin
+installable_parrot-prove                         [main]bin
+installable_parrot-prove.exe                     [main]bin
 installable_parrot.exe                           [main]bin
 installable_parrot_config                        [main]bin
 installable_parrot_config.exe                    [main]bin
@@ -142,8 +144,6 @@ installable_pbc_merge                            [main]bin
 installable_pbc_merge.exe                        [main]bin
 installable_pbc_to_exe                           [main]bin
 installable_pbc_to_exe.exe                       [main]bin
-installable_parrot-prove                         [main]bin
-installable_parrot-prove.exe                     [main]bin
 lib/Parrot/Config/Generated.pm                   [devel]lib
 lib/Parrot/OpLib/core.pm                         [devel]lib
 lib/Parrot/PMC.pm                                [devel]lib
