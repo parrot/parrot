@@ -294,6 +294,22 @@ Experimental: returns caller info as a STRING.
 
 /*
 
+=item C<INTVAL rid()>
+
+Experimental: return the runloop_id value.
+
+=cut
+
+*/
+
+    METHOD rid() {
+        INTVAL runloop_id;
+        GET_ATTR_runloop_id(INTERP, SELF, runloop_id);
+        RETURN(INTVAL runloop_id);
+    }
+
+/*
+
 =item C<PMC *caller()>
 
 Experimental: return callers PMC or PMCNULL if none.

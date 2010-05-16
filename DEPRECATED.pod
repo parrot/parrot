@@ -221,6 +221,12 @@ Intended to replace the CodeString charname_to_ord method.
 
 L<https://trac.parrot.org/parrot/ticket/1629>
 
+=item unroll [experimental]
+
+Unroll inner runloops from exception handlers.
+
+L<https://trac.parrot.org/parrot/ticket/1635>
+
 =back
 
 =head1 Bytecode

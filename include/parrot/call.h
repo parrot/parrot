@@ -28,6 +28,7 @@ typedef struct parrot_runloop_t {
     struct parrot_runloop_t *prev;          /* interpreter's runloop
                                              * jump buffer stack */
     opcode_t                *handler_start; /* Used in exception handling */
+    int                      id;            /* runloop id */
 
     /* let the biggest element cross the cacheline boundary */
     Parrot_jump_buff         resume;        /* jmp_buf */

@@ -35,10 +35,15 @@ runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void free_runloops_until(PARROT_INTERP, int id)
+        __attribute__nonnull__(1);
+
 static void really_destroy_runloop_jump_points(PARROT_INTERP,
     ARGFREE(Parrot_runloop *jump_point))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_free_runloops_until __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_really_destroy_runloop_jump_points \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -61,8 +66,8 @@ runops(PARROT_INTERP, size_t offs)
     ASSERT_ARGS(runops)
     volatile size_t offset            = offs;
     const    int    old_runloop_id    = interp->current_runloop_id;
-    const    int    our_runloop_level = ++interp->current_runloop_level;
-    const    int    our_runloop_id    = ++runloop_id_counter;
+    int             our_runloop_level = interp->current_runloop_level;
+    int             our_runloop_id    = old_runloop_id;
 
     /* It is OK if the runloop ID overflows; we only ever test it for equality,
        so the chance of collision is slight. */
@@ -82,6 +87,8 @@ runops(PARROT_INTERP, size_t offs)
 #endif
     {
         new_runloop_jump_point(interp);
+        our_runloop_id = interp->current_runloop_id;
+        our_runloop_level = interp->current_runloop_level;
   reenter:
         interp->current_runloop->handler_start = NULL;
         switch (setjmp(interp->current_runloop->resume)) {
@@ -101,9 +108,16 @@ runops(PARROT_INTERP, size_t offs)
           case 2:
             /* Reenter the runloop from a exception thrown from C
              * with a pir handler */
+            free_runloops_until(interp, our_runloop_id);
             PARROT_ASSERT(interp->current_runloop->handler_start);
             offset = interp->current_runloop->handler_start - interp->code->base.data;
             /* Prevent incorrect reuse */
+            goto reenter;
+          case 3:
+            /* Reenter the runloop when finished the handling of a
+             * exception */
+            free_runloops_until(interp, our_runloop_id);
+            offset = interp->current_runloop->handler_start - interp->code->base.data;
             goto reenter;
           default:
             break;
@@ -121,9 +135,6 @@ runops(PARROT_INTERP, size_t offs)
     fprintf(stderr, "[exiting loop %d, level %d]\n",
             our_runloop_id, our_runloop_level);
 #endif
-
-    interp->current_runloop_level = our_runloop_level - 1;
-    interp->current_runloop_id    = old_runloop_id;
 }
 
 
@@ -158,8 +169,11 @@ new_runloop_jump_point(PARROT_INTERP)
     else
         jump_point = mem_gc_allocate_zeroed_typed(interp, Parrot_runloop);
 
-    jump_point->prev        = interp->current_runloop;
-    interp->current_runloop = jump_point;
+    jump_point->prev           = interp->current_runloop;
+    jump_point->id             = ++runloop_id_counter;
+    interp->current_runloop    = jump_point;
+    interp->current_runloop_id = jump_point->id;
+    ++interp->current_runloop_level;
 }
 
 /*
@@ -178,9 +192,12 @@ free_runloop_jump_point(PARROT_INTERP)
 {
     ASSERT_ARGS(free_runloop_jump_point)
     Parrot_runloop * const jump_point = interp->current_runloop;
-    interp->current_runloop           = jump_point->prev;
+    Parrot_runloop * const current    = jump_point->prev;
+    interp->current_runloop           = current;
     jump_point->prev                  = interp->runloop_jmp_free_list;
     interp->runloop_jmp_free_list     = jump_point;
+    interp->current_runloop_id        = current ? current->id : 0;
+    --interp->current_runloop_level;
 }
 
 /*
@@ -200,6 +217,23 @@ destroy_runloop_jump_points(PARROT_INTERP)
     ASSERT_ARGS(destroy_runloop_jump_points)
     really_destroy_runloop_jump_points(interp, interp->current_runloop);
     really_destroy_runloop_jump_points(interp, interp->runloop_jmp_free_list);
+}
+
+/*
+
+=item C<static void free_runloops_until(PARROT_INTERP, int id)>
+
+Free runloops until the one with the provided id gets current.
+
+=cut
+
+*/
+
+static void
+free_runloops_until(PARROT_INTERP, int id)
+{
+    while (interp->current_runloop && interp->current_runloop_id != id)
+        free_runloop_jump_point(interp);
 }
 
 /*
