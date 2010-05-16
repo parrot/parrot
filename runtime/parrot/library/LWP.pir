@@ -675,6 +675,48 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return ($P0)
 .end
 
+.sub '_parse_response_headers' :method
+    .param pmc response
+    .param string str
+    $P0 = split "\r\n\r\n", str
+    $S0 = shift $P0
+    $I0 = length $S0
+    $P1 = split "\r\n", $S0
+    .local string status_line
+    status_line = shift $P1
+    $P2 = split " ", status_line
+    $S0 = shift $P2
+    $P3 = box $S0
+    setattribute response, 'protocol', $P3
+    $S0 = shift $P2
+    $P3 = box $S0
+    setattribute response, 'code', $P3
+    $S0 = join " ", $P2
+    $P3 = box $S0
+    setattribute response, 'message', $P3
+    $P3 = new ['HTTP';'Headers']
+  L1:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $P2 = split ": ", $S0
+    $S1 = shift $P2
+    $S2 = shift $P2
+    $P3[$S1] = $S2
+    goto L1
+  L2:
+    setattribute response, 'headers', $P3
+    .return ($I0)
+.end
+
+.sub '_parse_response_content' :method
+    .param pmc response
+    .param string str
+    $P0 = split "\r\n\r\n", str
+    $S0 = $P0[1]
+    $P0 = box $S0
+    setattribute response, 'content', $P0
+.end
+
 .sub 'request' :method
     .param pmc request
 
@@ -706,15 +748,36 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     .local pmc ua
     ua = self.'ua'()
-    ua.'progress'(0.01, request)
     sock.'send'($S0)
-    $S1 = sock.'recv'()
-    ua.'progress'(0.99, request)
-    sock.'close'()
 
     .local pmc response
     response = new ['HTTP';'Response']
-    response.'parse'($S1)
+    .local pmc buf
+    buf = new 'StringBuilder'
+    .local int header_length, content_length
+    content_length = 0
+  L21:
+    $S0 = sock.'recv'()
+    if $S0 == '' goto L22
+    push buf, $S0
+    header_length = self.'_parse_response_headers'(response, buf)
+    $S0 = response.'get_header'('Content-Length')
+    if $S0 == '' goto L21
+    content_length = $S0
+  L23:
+    $I0 = buf
+    $I0 -= header_length
+    $N0 = $I0 / content_length
+    ua.'progress'($N0, request)
+    $S0 = sock.'recv'()
+    if $S0 == '' goto L22
+    push buf, $S0
+    goto L23
+  L22:
+    sock.'close'()
+    unless content_length goto L24
+    self.'_parse_response_content'(response, buf)
+  L24:
     .return (response)
 .end
 
