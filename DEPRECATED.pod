@@ -221,6 +221,18 @@ Intended to replace the CodeString charname_to_ord method.
 
 L<https://trac.parrot.org/parrot/ticket/1629>
 
+=item All opcodes that modify non-argument registers. [eligible in 2.7]
+
+E.g. "cleari", etc.
+
+L<https://trac.parrot.org/parrot/ticket/1642>
+
+=item exchange [eligible in 2.7]
+
+This op is too low level for Parrot in its current form.
+
+L<https://trac.parrot.org/parrot/ticket/1643>
+
 =item unroll [experimental]
 
 Unroll inner runloops from exception handlers.
