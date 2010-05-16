@@ -146,6 +146,18 @@ my @permitted_duplicate_copyright_files = (
         file    => 'examples/pir/quine_ord.pir',
         reason  => 'quine',
     },
+    {
+        file    => 'tools/dev/nci_thunk_gen.pir',
+        reason  => 'heredoc text for generated file',
+    },
+    {
+        file    => 'src/main.c',
+        reason  => 'Parrot_version() prints copyright notice ',
+    },
+    {
+        file    => 't/examples/streams.t',
+        reason  => 'heredoc-like text in test',
+    },
 );
 my $cwd = cwd();
 my %permitted_duplicate_copyright_files =

@@ -2,8 +2,6 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
-# Copyright (C) 2007-2009, Parrot Foundation.
-
 =head1 NAME
 
 t/compilers/pge/04-compile.t - Test our ability to compile regexes into various names
