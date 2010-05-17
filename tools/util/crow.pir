@@ -21,7 +21,7 @@ module, L<runtime/parrot/library/Crow.pir>.
 
 
 .sub 'main' :main
-    .param pmc    args
+    .param pmc args
 
     load_bytecode 'Crow.pbc'
 
@@ -43,8 +43,10 @@ module, L<runtime/parrot/library/Crow.pir>.
 
     .local string template, type
     type = opts['type']
-    'infix://='(type, 'text')
+    if type != '' goto got_type
+    type = 'text'
 
+got_type:
     template = 'get_template'(templates, type)
 
     .local pmc data
@@ -95,25 +97,6 @@ module, L<runtime/parrot/library/Crow.pir>.
     $S0 = concat type, '.text'
     $S1 = templates[$S0]
     .return ($S1)
-.end
-
-
-.sub 'infix://='
-    .param pmc    a
-    .param pmc    b
-
-    if null a goto agg_undefined
-    $I0 = defined a
-    if $I0 goto return
-    assign a, b
-
-  return:
-    .return ()
-
-  agg_undefined:
-    $P0 = new 'Exception'
-    $P0 = "cannot assign to Null PMC!"
-    throw $P0
 .end
 
 
