@@ -400,8 +400,10 @@ op unroll(in PMC) {
         while (rl && rl->id != rid)
             rl = rl->prev;
         if (rl) {
-            rl->handler_start = dest;
-            longjmp(rl->resume, 3);
+            if (rl != interp->current_runloop) {
+                rl->handler_start = dest;
+                longjmp(rl->resume, 3);
+            }
         }
         else
             Parrot_ex_throw_from_c_args(interp, NULL,
