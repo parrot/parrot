@@ -239,7 +239,12 @@ GzipHandles are never tty's, returns false.
 
 Returns a string with the zlib version.
 
+=back
+
+=cut
+
 */
+
     METHOD version() {
         STRING *version = Parrot_str_new_constant(INTERP, zlibVersion());
         RETURN(STRING *version);
@@ -354,10 +359,7 @@ Returns a string with the zlib version.
     }
 
     METHOD crc32(INTVAL crc, STRING *str) {
-        int rc;
-        char *buf;
-        STRING *dst = NULL;
-        UINTVAL srcLen, bufSize, dstLen;
+        UINTVAL srcLen;
         char * const src = Parrot_str_to_cstring(INTERP, str);
 
         if (!src)
@@ -369,15 +371,6 @@ Returns a string with the zlib version.
         crc = crc32(crc, (const Bytef *)src, srcLen);
         RETURN(INTVAL crc);
     }
-
-/*
-
-=back
-
-=cut
-
-*/
-
 }
 
 /*
