@@ -674,43 +674,61 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub '_parse_response_headers' :method
     .param pmc response
     .param string str
-    $P0 = split "\r\n\r\n", str
-    $S0 = shift $P0
-    $I0 = length $S0
-    $P1 = split "\r\n", $S0
-    .local string status_line
-    status_line = shift $P1
-    $P2 = split " ", status_line
-    $S0 = shift $P2
-    $P3 = box $S0
-    setattribute response, 'protocol', $P3
-    $S0 = shift $P2
-    $P3 = box $S0
-    setattribute response, 'code', $P3
-    $S0 = join " ", $P2
-    $P3 = box $S0
-    setattribute response, 'message', $P3
-    $P3 = new ['HTTP';'Headers']
+    $I0 = index str, "\r\n\r\n"
+    if $I0 < 0 goto L1
+    str = substr str, 0, $I0
   L1:
-    unless $P1 goto L2
-    $S0 = shift $P1
-    $P2 = split ": ", $S0
-    $S1 = shift $P2
-    $S2 = shift $P2
+
+    $P0 = split "\r\n", str
+    .local string status_line
+    status_line = shift $P0
+    $I0 = index status_line, " "
+    if $I0 < 0 goto L2
+    $S0 = substr status_line, 0, $I0
+    $P1 = box $S0
+    setattribute response, 'protocol', $P1
+    $I1 = $I0 + 1
+    $I0 = index status_line, " ", $I1
+    if $I0 < 0 goto L2
+    $I2 = $I0 - $I1
+    $S0 = substr status_line, $I1, $I2
+    $P1 = box $S0
+    setattribute response, 'code', $P1
+    inc $I0
+    $S0 = substr status_line, $I0
+    $P1 = box $S0
+    setattribute response, 'message', $P1
+
+    $P3 = new ['HTTP';'Headers']
+  L3:
+    unless $P0 goto L4
+    $S0 = shift $P0
+    $I0 = index $S0, ": "
+    if $I0 < 0 goto L3
+    $S1 = substr $S0, 0, $I0
+    $I0 += 2
+    $S2 = substr $S0, $I0
     $P3[$S1] = $S2
-    goto L1
-  L2:
+    goto L3
+  L4:
     setattribute response, 'headers', $P3
+
+    $I0 = length str
     .return ($I0)
+  L2:
+    .return (0)
 .end
 
 .sub '_parse_response_content' :method
     .param pmc response
     .param string str
-    $P0 = split "\r\n\r\n", str
-    $S0 = $P0[1]
+    $I0 = index str, "\r\n\r\n"
+    if $I0 < 0 goto L1
+    $I0 += 4
+    $S0 = substr str, $I0
     $P0 = box $S0
     setattribute response, 'content', $P0
+  L1:
 .end
 
 .sub 'request' :method
