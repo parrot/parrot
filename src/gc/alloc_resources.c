@@ -1115,7 +1115,6 @@ void
 Parrot_gc_destroy_header_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(Parrot_gc_destroy_header_pools)
-    INTVAL pass;
 
     /* const/non const COW strings life in different pools
      * so in first pass
@@ -1128,10 +1127,8 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
     header_pools_iterate_callback(interp, mem_pools, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
-    /* for (pass = start; pass <= 2; ++pass) { */ /* XXX it's unsed loop */
-        header_pools_iterate_callback(interp, mem_pools, POOL_BUFFER | POOL_CONST,
-                (void *)start, sweep_cb_buf);
-    /* } */
+    header_pools_iterate_callback(interp, mem_pools, POOL_BUFFER | POOL_CONST,
+            (void *)start, sweep_cb_buf);
 
     mem_internal_free(mem_pools->sized_header_pools);
 
@@ -1385,12 +1382,10 @@ Parrot_gc_merge_buffer_pools(PARROT_INTERP,
     cur_arena = source->last_Arena;
 
     while (cur_arena) {
-        size_t                     total_objects;
         Fixed_Size_Arena * const next_arena = cur_arena->prev;
+        const size_t total_objects          = cur_arena->total_objects;
 
         cur_arena->next = cur_arena->prev = NULL;
-
-        total_objects   = cur_arena->total_objects;
 
         Parrot_append_arena_in_pool(interp, mem_pools, dest, cur_arena,
             cur_arena->total_objects);
