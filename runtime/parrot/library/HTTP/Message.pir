@@ -62,6 +62,23 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = subclass 'Hash', ['HTTP';'Headers']
 .end
 
+.sub 'get_string' :vtable :method
+    $P0 = iter self
+    $P1 = new 'StringBuilder'
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    push $P1, $S0
+    push $P1, ": "
+    $S0 = self[$S0]
+    push $P1, $S0
+    push $P1, "\r\n"
+    goto L1
+  L2:
+    $S0 = $P1
+    .return ($S0)
+.end
+
 =head3 Class HTTP;Message
 
 =over 4
@@ -330,8 +347,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     unless $P0 goto L2
     .local pmc v
     v = shift $P0
-    $I0 = does v, 'string'
-    unless $I0 goto L3
+    $I0 = does v, 'array'
+    if $I0 goto L3
     $P1 = new 'StringBuilder'
     push $P1, 'Content-Disposition: form-data; name="'
     push $P1, k
@@ -343,9 +360,61 @@ see http://search.cpan.org/~gaas/libwww-perl/
     push parts, $S0
     goto L1
   L3:
-
-    # work in progress
-
+    $P1 = iter v
+    .local string file
+    file = shift $P1
+    .local string usename
+    usename = file
+    unless $P1 goto L4
+    $S0 = shift $P1
+    if $S0 == '' goto L4
+    usename = $S0
+  L4:
+    .local string disp
+    $P2 = new 'StringBuilder'
+    push $P2, 'form-data; name="'
+    push $P2, k
+    push $P2, '"'
+    if usename == '' goto L5
+    push $P2, '; filename="'
+    push $P2, usename
+    push $P2, '"'
+  L5:
+    disp = $P2
+    .local pmc h
+    h = new ['HTTP';'Headers']
+  L6:
+    unless $P1 goto L7
+    $S1 = shift $P1
+    unless $P1 goto L7
+    $S2 = shift $P1
+    h[$S1] = $S2
+    goto L6
+  L7:
+    .local string content
+    content = ''
+    if file == '' goto L8
+    content = slurp(file)
+  L8:
+    $I0 = exists h['Content-Disposition']
+    unless $I0 goto L9
+    disp = h['Content-Disposition']
+    delete h['Content-Disposition']
+  L9:
+    $I0 = exists h['Content']
+    unless $I0 goto L10
+    content = h['Content']
+    delete h['Content']
+  L10:
+    $P1 = new 'StringBuilder'
+    push $P1, 'Content-Disposition: '
+    push $P1, disp
+    push $P1, CRLF
+    push $P1, h
+    push $P1, CRLF
+    push $P1, content
+    $S0 = $P1
+    push parts, $S0
     goto L1
   L2:
 
@@ -353,16 +422,16 @@ see http://search.cpan.org/~gaas/libwww-perl/
     _boundary = boundary(10)
     $P0 = iter parts
     $P1 = new 'StringBuilder'
-  L11:
-    unless $P0 goto L12
+  L21:
+    unless $P0 goto L22
     $S0 = shift $P0
     push $P1, '--'
     push $P1, _boundary
     push $P1, CRLF
     push $P1, $S0
     push $P1, CRLF
-    goto L11
-  L12:
+    goto L21
+  L22:
     push $P1, '--'
     push $P1, _boundary
     push $P1, CRLF
