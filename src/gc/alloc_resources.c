@@ -705,7 +705,6 @@ free_old_mem_blocks(
     ASSERT_ARGS(free_old_mem_blocks)
     Memory_Block *prev_block = new_block;
     Memory_Block *cur_block  = new_block->prev;
-    size_t i;
 
     PARROT_ASSERT(new_block == pool->top_block);
 
