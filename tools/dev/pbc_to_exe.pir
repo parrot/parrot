@@ -53,13 +53,13 @@ HEADER
     if code_type == 'msvc' goto code_for_msvc
     goto code_for_default
   code_for_gcc:
-    codestring = 'generate_code_gcc'(infile)
+    codestring = 'generate_code_gcc'(infile, outfh)
     goto code_end
   code_for_msvc:
-    codestring = 'generate_code_msvc'(infile)
+    codestring = 'generate_code_msvc'(infile, outfh)
     goto code_end
   code_for_default:
-    codestring = 'generate_code'(infile)
+    codestring = 'generate_code'(infile, outfh)
   code_end:
 
 
@@ -214,6 +214,7 @@ MAIN
 
 .sub 'generate_code'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
     ifh = open infile, 'r'
     unless ifh goto err_infile
@@ -303,6 +304,7 @@ END_OF_FUNCTION
 
 .sub 'generate_code_gcc'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
     ifh = open infile, 'r'
     unless ifh goto err_infile
@@ -407,6 +409,7 @@ END_OF_FUNCTION
 # this sub creates supplemental .rc and .RES files.
 .sub 'generate_code_msvc'
     .param string pbc_path
+    .param pmc    outfh
 
     .local string rc_path
     .local string res_path
