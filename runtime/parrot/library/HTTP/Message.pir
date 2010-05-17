@@ -394,6 +394,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local string content
     content = ''
     if file == '' goto L8
+    load_bytecode 'osutils.pbc'
     content = slurp(file)
   L8:
     $I0 = exists h['Content-Disposition']
@@ -434,6 +435,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
   L22:
     push $P1, '--'
     push $P1, _boundary
+    push $P1, '--'
     push $P1, CRLF
     $S0 = $P1
     .return ($S0, _boundary)
