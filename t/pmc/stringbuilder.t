@@ -68,6 +68,9 @@ Tests the C<StringBuilder> PMC.
     $I0 = sb
     is( $I0, 128, "... and capacity still 128" )
 
+    $I0 = sb.'get_string_length'()
+    is( $I0, 6,   "... and string length is correct")
+
     # Push large string which will cause reallocate
     $S99 = repeat "x", 128
     push sb, $S99

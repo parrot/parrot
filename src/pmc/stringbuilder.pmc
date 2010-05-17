@@ -380,6 +380,22 @@ key receives the value of the hash element.
         RETURN(PMC *SELF);
     }
 
+/*
+=item C<INTVAL get_string_length()>
+
+Returns length of currently built string.
+
+=cut
+*/
+
+    METHOD get_string_length() {
+        STRING *buffer;
+        INTVAL  length;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        length = Parrot_str_length(INTERP, buffer);
+        RETURN(INTVAL length);
+    }
+
 
 /*
 
