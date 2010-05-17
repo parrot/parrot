@@ -223,7 +223,7 @@ MAIN
     .local int size
 
     codestring = new [ 'StringBuilder' ]
-    push codestring, "const Parrot_UInt1 program_code[] = {"
+    print outfh, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
   read_loop:
@@ -240,13 +240,13 @@ MAIN
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = $I0
-    push codestring, $S0
-    push codestring, ','
+    print outfh, $S0
+    print outfh, ','
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    push codestring, "\n"
+    print outfh, "\n"
     goto code_loop
   code_done:
     goto read_loop
@@ -254,11 +254,11 @@ MAIN
   read_done:
     close ifh
 
-    push codestring, "\n};\n\nconst int bytecode_size = "
+    print outfh, "\n};\n\nconst int bytecode_size = "
     $S0 = size
-    push codestring, $S0
-    push codestring, ";\n"
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, $S0
+    print outfh, ";\n"
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
@@ -266,7 +266,7 @@ MAIN
 END_OF_FUNCTION
 
     $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -317,8 +317,8 @@ END_OF_FUNCTION
 
     codestring = new ['StringBuilder']
 
-    push codestring, "const char * program_code =\n"
-    push codestring, '"'
+    print outfh, "const char * program_code =\n"
+    print outfh, '"'
     size = 0
 
   read_loop:
@@ -335,14 +335,14 @@ END_OF_FUNCTION
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = encoding_table[$I0]
-    push codestring, $S0
+    print outfh, $S0
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    push codestring, '"'
-    push codestring, "\n"
-    push codestring, '"'
+    print outfh, '"'
+    print outfh, "\n"
+    print outfh, '"'
     goto code_loop
   code_done:
     goto read_loop
@@ -350,14 +350,14 @@ END_OF_FUNCTION
   read_done:
     close ifh
 
-    push codestring, '"'
-    push codestring, "\n;\n\n"
-    push codestring, "const int bytecode_size = "
+    print outfh, '"'
+    print outfh, "\n;\n\n"
+    print outfh, "const int bytecode_size = "
     $S0 = size
-    push codestring, $S0
-    push codestring, ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
@@ -365,7 +365,7 @@ END_OF_FUNCTION
 END_OF_FUNCTION
 
     $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -449,14 +449,14 @@ END_OF_DEFINES
 
     .local pmc codestring
     codestring  = new [ 'StringBuilder' ]
-    push codestring, "#include <windows.h>\n"
-    push codestring, rc_constant_defines
-    push codestring, "const unsigned int bytecode_size = "
+    print outfh, "#include <windows.h>\n"
+    print outfh, rc_constant_defines
+    print outfh, "const unsigned int bytecode_size = "
     $S0 = pbc_size
-    push codestring, $S0
-    push codestring, ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             HRSRC   hResource;
@@ -501,7 +501,7 @@ END_OF_FUNCTION
 
   rc_ok:
     $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_h_open:
     die "cannot open .h file"
