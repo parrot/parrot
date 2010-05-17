@@ -35,6 +35,16 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     (infile :optional, cfile :optional, objfile :optional, exefile :optional) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
+  open_outfile:
+    .local pmc outfh
+    outfh = open cfile, 'w'
+    unless outfh goto err_outfh
+    print outfh, <<'HEADER'
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+const void * get_program_code(void);
+HEADER
+
     .local string code_type
     code_type = 'determine_code_type'()
 
@@ -52,16 +62,6 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     codestring = 'generate_code'(infile)
   code_end:
 
-
-  open_outfile:
-    .local pmc outfh
-    outfh = open cfile, 'w'
-    unless outfh goto err_outfh
-    print outfh, <<'HEADER'
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-const void * get_program_code(void);
-HEADER
 
     print outfh, codestring
 
