@@ -7,6 +7,7 @@ VIM_FT_DIR  = $(VIM_DIR)/plugin
 VIM_IN_DIR  = $(VIM_DIR)/indent
 VIM_SYN_DIR = $(VIM_DIR)/syntax
 
+PARROT = ../parrot@exe@
 PERL   = @perl@
 CP     = @cp@
 MKPATH = @mkpath@
@@ -14,7 +15,7 @@ RM_F   = @rm_f@
 
 default: all
 
-all: pir.vim imc.kate
+all: pir.vim imc.kate skeleton.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help :
@@ -36,7 +37,10 @@ pir.vim: pir_vim.in ../src/ops/*.ops ops2vim.pl
 	$(CP) pir_vim.in pir.vim
 	$(PERL) ops2vim.pl ../src/ops/*.ops >> pir.vim
 
-vim-install: pir.vim
+skeleton.pir: mk_skeleton.pir
+	$(PARROT) mk_skeleton.pir > skeleton.pir
+
+vim-install: pir.vim skeleton.pir
 	$(MKPATH) "$(VIM_DIR)"
 	$(CP) skeleton.pir "$(VIM_DIR)"
 	$(MKPATH) "$(VIM_SYN_DIR)"
