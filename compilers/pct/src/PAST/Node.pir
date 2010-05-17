@@ -570,19 +570,6 @@ can be either a string or an array of strings.
     .tailcall self.'attr'('namespace', value, has_value)
 .end
 
-=item multi([multi])
-
-Get/set the multi signature for this block.  The C<multi> argument
-can be either a string or an array of strings.
-
-=cut
-
-.sub 'multi' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('multi', value, has_value)
-.end
-
 
 =item hll([hll])
 
