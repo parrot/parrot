@@ -317,7 +317,7 @@ Returns NULL, if no compatible string representation can be found.
 
 */
 
-PARROT_INLINE
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 const CHARSET *
