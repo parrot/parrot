@@ -771,6 +771,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local int header_length, content_length
     content_length = 0
   L21:
+    ua.'progress'('tick', request)
     $S0 = sock.'recv'()
     if $S0 == '' goto L22
     push buf, $S0
@@ -791,9 +792,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     goto L23
   L22:
     sock.'close'()
-    unless content_length goto L24
     self.'_parse_response_content'(response, buf)
-  L24:
     .return (response)
 .end
 
