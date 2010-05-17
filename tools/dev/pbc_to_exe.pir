@@ -48,22 +48,19 @@ HEADER
     .local string code_type
     code_type = 'determine_code_type'()
 
-    .local string codestring
     if code_type == 'gcc'  goto code_for_gcc
     if code_type == 'msvc' goto code_for_msvc
     goto code_for_default
   code_for_gcc:
-    codestring = 'generate_code_gcc'(infile, outfh)
+    'generate_code_gcc'(infile, outfh)
     goto code_end
   code_for_msvc:
-    codestring = 'generate_code_msvc'(infile, outfh)
+    'generate_code_msvc'(infile, outfh)
     goto code_end
   code_for_default:
-    codestring = 'generate_code'(infile, outfh)
+    'generate_code'(infile, outfh)
   code_end:
 
-
-    print outfh, codestring
 
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
@@ -219,10 +216,8 @@ MAIN
     ifh = open infile, 'r'
     unless ifh goto err_infile
 
-    .local pmc codestring
     .local int size
 
-    codestring = new [ 'StringBuilder' ]
     print outfh, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
@@ -265,7 +260,6 @@ MAIN
         }
 END_OF_FUNCTION
 
-    $S0 = codestring
     .return ()
 
   err_infile:
@@ -312,10 +306,7 @@ END_OF_FUNCTION
     .local pmc encoding_table
     encoding_table = 'generate_encoding_table'()
 
-    .local pmc codestring
     .local int size
-
-    codestring = new ['StringBuilder']
 
     print outfh, "const char * program_code =\n"
     print outfh, '"'
@@ -364,7 +355,6 @@ END_OF_FUNCTION
         }
 END_OF_FUNCTION
 
-    $S0 = codestring
     .return ()
 
   err_infile:
@@ -447,8 +437,6 @@ END_OF_DEFINES
     pbc_size = $P2[7]
 
 
-    .local pmc codestring
-    codestring  = new [ 'StringBuilder' ]
     print outfh, "#include <windows.h>\n"
     print outfh, rc_constant_defines
     print outfh, "const unsigned int bytecode_size = "
@@ -500,7 +488,7 @@ END_OF_FUNCTION
     die "RC command failed"
 
   rc_ok:
-    $S0 = codestring
+
     .return ()
 
   err_h_open:
