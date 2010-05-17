@@ -782,7 +782,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     if $S0 == '' goto L21
     content_length = $S0
   L23:
-    $I0 = buf
+    $I0 = buf.'get_string_length'()
     $I0 -= header_length
     $N0 = $I0 / content_length
     ua.'progress'($N0, request)
