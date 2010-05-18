@@ -27,20 +27,19 @@
     push contents, "EXPERIMENTAL LWP.pir"
     push contents, 'report_file'
     $P0 = new 'FixedStringArray'
-    set $P0, 6
-    $P0[0] = 'parrot_test_run.tar.gz' # filename
-    $P0[1] = 'parrot_test_run.tar.gz' # usename
-    $P0[2] = 'Content-Type'
-    $P0[3] = 'application/x-tar'
-    $P0[4] = 'Content-Encoding'
-    $P0[5] = 'gzip'
+    set $P0, 1
+    $P0[0] = 'parrot_test_run.tar.gz'
     push contents, $P0
     load_bytecode 'LWP.pir'
     .const string url = 'http://smolder.plusthree.com/app/projects/process_add_report/8'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
     ua.'show_progress'(1)
-    response = ua.'post'(url, contents :flat, 'form-data' :named('Content-Type'), 'TE, close' :named('Connection'), 'deflate,gzip;q=0.3' :named('TE'))
+    response = ua.'post'(url, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
+    $I0 = response.'code'()
+    unless $I0 == 302 goto L1
+    say "report uploaded"
+  L1:
 .end
 
 # Local Variables:

@@ -297,6 +297,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub 'redirect_ok' :method
     .param pmc new_request
     .param pmc response
+    $P0 = response.'request'()
+    $S0 = $P0.'method'()
+    if $S0 == 'GET' goto L1
+    if $S0 == 'HEAD' goto L1
+    .return (0)
+  L1:
     # work in progress
     .return (1)
 .end
