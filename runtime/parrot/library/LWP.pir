@@ -755,7 +755,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     .local pmc ua
     ua = self.'ua'()
-    $S0 = _format_request(method, url, request_headers)
+    $S0 = _format_request(method, fullpath, request_headers)
     sock.'send'($S0)
 
     .local string content
