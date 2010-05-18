@@ -158,14 +158,26 @@ see http://search.cpan.org/~gaas/libwww-perl/
     referral_uri = response.'get_header'('Location')
     $P0 = get_hll_global ['URI'], 'new_from_string'
     $P1 = $P0(referral_uri)
+    $S0 = $P1.'scheme'()
+    unless $S0 == '' goto L5
+    $P2 = new 'StringBuilder'
+    $P3 = request.'uri'()
+    $S0 = $P3.'scheme'()
+    push $P2, $S0
+    push $P2, '://'
+    $S0 = request.'get_header'('Host')
+    push $P2, $S0
+    push $P2, referral_uri
+    $P1 = $P0($P2)
+  L5:
     setattribute referral, 'uri', $P1
 
     # work in progress
 
     $I0 = self.'redirect_ok'(referral, response)
-    if $I0 goto L5
+    if $I0 goto L6
     .return (response)
-  L5:
+  L6:
     .tailcall self.'request'(referral, response)
   L4:
 
