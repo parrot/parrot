@@ -394,7 +394,6 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - May 18, 2010 - 2.4  - whiteknight
  - Jun 15, 2010 - 2.5  - gerd
  - Jul 20, 2010 - 2.6* - coke
  - Aug 17, 2010 - 2.7  - ??

@@ -108,4 +108,6 @@ Starred release numbers indicate supported releases.
  cotto       2.2.0          2010-Mar-16     "Like Clockwork"
 
  Gerd        2.3.0 *        2010-Apr-20     "Samoan Lory"
+ Whiteknight 2.4.0          2010-May-18     "Sulfer Crest"
+
 =cut
