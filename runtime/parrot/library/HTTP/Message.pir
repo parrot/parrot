@@ -396,6 +396,9 @@ see http://search.cpan.org/~gaas/libwww-perl/
     if file == '' goto L8
     load_bytecode 'osutils.pbc'
     content = slurp(file)
+    $I0 = exists h['Content-Type']
+    if $I0 goto L8
+    h['Content-Type'] = 'application/octet-stream'
   L8:
     $I0 = exists h['Content-Disposition']
     unless $I0 goto L9
