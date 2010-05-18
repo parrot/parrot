@@ -776,8 +776,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $I1 = sock.'send'($S0)
     $I0 += $I1
     $N0 = $I0 / content_length
-    ua.'progress'($N0, request)
-    sleep 1
     goto L12
   L11:
 
