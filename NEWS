@@ -7,7 +7,7 @@ New in 2.4.0
   + use STRINGNULL instead of NULL when working with strings
   + Fixed storage of methods in the NameSpace PMC
   + Added :nsentry flag to force method to be stored in the NameSpace
-  + Added StringBuilder PMC
+  + Added StringBuilder and PackfileDebug PMCs
   + Added experimental opcodes find_codepoint and unroll
 - Compilers
   + Fixed reporting of line numbers in IMCC
