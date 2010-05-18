@@ -120,10 +120,6 @@ Math/Rand.pbc
 
 =over 4
 
-=item smoke
-
-curl
-
 =item spec, sdist_rpm, bdist_rpm
 
 rpmbuild
@@ -2021,7 +2017,7 @@ The following Version Control System are handled :
 
 =item prove_exec / test_exec
 
-option --exec of prove / tapir
+option --exec of prove
 
 =item prove_files / test_files
 
@@ -2102,7 +2098,7 @@ the default value is "t/*.t"
 
 =item prove_archive / smolder_archive
 
-option --archive of prove / tapir
+option --archive of prove
 
 the default value is report.tar.gz
 
@@ -2186,35 +2182,40 @@ a hash
     unless $I0 goto L1
     .local pmc config
     config = get_config()
-    cmd = "curl -F architecture="
+    .local pmc contents
+    contents = new 'ResizablePMCArray' # by couple
+    push contents, 'architecture'
     $S0 = config['cpuarch']
-    cmd .= $S0
-    cmd .= " -F platform="
+    push contents, $S0
+    push contents, 'platform'
     $S0 = config['osname']
-    cmd .= $S0
-    cmd .= " -F revision="
+    push contents, $S0
+    push contents, 'revision'
     $S0 = config['revision']
-    cmd .= $S0
+    push contents, $S0
     $I0 = exists kv['smolder_tags']
     unless $I0 goto L2
-    cmd .= " -F tags=\""
+    push contents, 'tags'
     $S0 = kv['smolder_tags']
-    cmd .= $S0
-    cmd .= "\""
+    push contents, $S0
   L2:
     $I0 = exists kv['smolder_comments']
     unless $I0 goto L3
-    cmd .= " -F comments=\""
+    push contents, 'comments'
     $S0 = kv['smolder_comments']
-    cmd .= $S0
-    cmd .= "\""
+    push contents, $S0
   L3:
-    cmd .= " -F report_file=@"
-    cmd .= archive
-    cmd .= " "
+    push contents, 'report_file'
+    $P0 = new 'FixedStringArray'
+    set $P0, 1
+    $P0[0] = archive
+    push contents, $P0
+    load_bytecode 'LWP.pir'
+    .local pmc ua, response
+    ua = new ['LWP';'UserAgent']
+    ua.'show_progress'(1)
     $S0 = kv['smolder_url']
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
+    response = ua.'post'($S0, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
   L1:
 .end
 
