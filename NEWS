@@ -4,15 +4,29 @@ New in 2.4.0
 - Core
   + Various long-standing bugs in IMCC were fixed
   + STRINGs are now immutable.
+  + use STRINGNULL instead of NULL when working with strings
+  + Fixed storage of methods in the NameSpace PMC
+  + Added :nsentry flag to force method to be stored in the NameSpace
+  + Added StringBuilder PMC
+- Compilers
+  + Fixed reporting of line numbers in IMCC
+  + Removed deprecated NQP compiler, replaced with new NQP-RX
+  + Removed NCIGen compiler
 - Deprecations
   + Tools to distribute on CPAN were removed
+  + Deprecated dynpmcs have been removed to external repositories
+  + Removed RetContinuation PMC
+  + Removed CGoto, CGP, and Switch runcores
 - Tests
   + Many tests for the extend/embed interface were added
   + done_testing() is now implemented in Test::More
 - Tools
-  + the fakexecutable tapir is renamed parrot-prove
+  + The fakexecutable tapir is renamed parrot-prove
+  + Performance fixes to the pbc_to_exe tool
+  + Fix data_json to work outside of trunk
 - Miscellaneous
   + Six Parrot-related projects accepted to GSoC
+  + Improve use of const and other compiler hints
 
 New in 2.3.0
 - Core
