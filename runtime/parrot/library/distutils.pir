@@ -2216,10 +2216,6 @@ a hash
     ua.'show_progress'(1)
     $S0 = kv['smolder_url']
     response = ua.'post'($S0, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
-    $I0 = response.'code'()
-    unless $I0 == 302 goto L1
-    $S0 = response.'content'()
-    say $S0
   L1:
 .end
 

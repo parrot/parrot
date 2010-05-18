@@ -333,45 +333,38 @@ TEST
 
 .sub 'send_archive_to_smolder' :anon
     .param pmc env_data
+    load_bytecode 'osutils.pbc'
+    .const string archive = 'parrot_test_run.tar.gz'
+    .const string smolder_url = 'http://smolder.plusthree.com/app/projects/process_add_report/8'
+    .const string username = 'parrot-autobot'
+    .const string password = 'squ@wk'
     .local pmc config
     $P0 = getinterp
     config = $P0[.IGLOBALS_CONFIG_HASH]
-    .local pmc contents
-    contents = new 'ResizablePMCArray' # by couple
-    push contents, 'architecture'
+    .local string cmd
+    cmd = "curl -F architecture="
     $S0 = config['cpuarch']
-    push contents, $S0
-    push contents, 'platform'
+    cmd .= $S0
+    cmd .= " -F platform="
     $S0 = config['osname']
-    push contents, $S0
-    push contents, 'revision'
+    cmd .= $S0
+    cmd .= " -F revision="
     $S0 = config['revision']
-    push contents, $S0
-    push contents, 'tags'
+    cmd .= $S0
+    cmd .= " -F tags=\""
     $S0 = _get_tags(env_data)
-    push contents, $S0
-    push contents, 'username'
-    push contents, 'parrot-autobot'
-    push contents, 'password'
-    push contents, 'squ@wk'
-    push contents, 'comments'
-    push contents, "EXPERIMENTAL t/harness.pir with LWP.pir"
-    push contents, 'report_file'
-    $P0 = new 'FixedStringArray'
-    set $P0, 1
-    $P0[0] = 'parrot_test_run.tar.gz'
-    push contents, $P0
-    load_bytecode 'LWP.pir'
-    .const string url = 'http://smolder.plusthree.com/app/projects/process_add_report/8'
-    .local pmc ua, response
-    ua = new ['LWP';'UserAgent']
-    ua.'show_progress'(1)
-    response = ua.'post'(url, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
-    $I0 = response.'code'()
-    unless $I0 == 302 goto L1
-    $S0 = response.'content'()
-    say $S0
-  L1:
+    cmd .= $S0
+    cmd .= "\""
+    cmd .= " -F username="
+    cmd .= username
+    cmd .= " -F password="
+    cmd .= password
+    cmd .= " -F comments=\"EXPERIMENTAL t/harness.pir\""
+    cmd .= " -F report_file=@"
+    cmd .= archive
+    cmd .= " "
+    cmd .= smolder_url
+    .tailcall system(cmd, 1 :named('verbose'))
 .end
 
 .sub '_get_tags' :anon
