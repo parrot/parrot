@@ -678,12 +678,19 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub '_parse_response_headers' :method
     .param pmc response
     .param string str
-    $I0 = index str, "\r\n\r\n"
+    .local string sep
+    sep = "\r\n"
+    $I0 = index str, "\r"
+    unless $I0 < 0 goto L0
+    sep = "\n"
+  L0:
+    $S0 = sep . sep
+    $I0 = index str, $S0
     if $I0 < 0 goto L1
     str = substr str, 0, $I0
   L1:
 
-    $P0 = split "\r\n", str
+    $P0 = split sep, str
     .local string status_line
     status_line = shift $P0
     $I0 = index status_line, " "
@@ -732,7 +739,15 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = substr str, $I0
     $P0 = box $S0
     setattribute response, 'content', $P0
+    goto L2
   L1:
+    $I0 = index str, "\n\n"
+    if $I0 < 0 goto L1
+    $I0 += 2
+    $S0 = substr str, $I0
+    $P0 = box $S0
+    setattribute response, 'content', $P0
+  L2:
 .end
 
 .sub 'request' :method

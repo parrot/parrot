@@ -367,6 +367,11 @@ TEST
     ua = new ['LWP';'UserAgent']
     ua.'show_progress'(1)
     response = ua.'post'(url, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
+    $I0 = response.'code'()
+    unless $I0 == 302 goto L1
+    $S0 = response.'content'()
+    say $S0
+  L1:
 .end
 
 .sub '_get_tags' :anon
