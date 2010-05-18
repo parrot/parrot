@@ -24,6 +24,10 @@ New in 2.4.0
   + The fakexecutable tapir is renamed parrot-prove
   + Performance fixes to the pbc_to_exe tool
   + Fix data_json to work outside of trunk
+  + The dynpmc GzipHandle (zlib wrapper) was added
+  + The library Archive/Tar.pir was added.
+  + The library Archive/Zip.pir was added.
+  + The libraries LWP.pir, HTTP/Message.pir & URI.pir were added.
 - Miscellaneous
   + Six Parrot-related projects accepted to GSoC
   + Improve use of const and other compiler hints
