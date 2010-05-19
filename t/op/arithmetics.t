@@ -21,7 +21,7 @@ number types.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
 
-    plan(130)
+    plan(121)
 
     take_the_negative_of_a_native_integer()
     take_the_absolute_of_a_native_integer()
@@ -42,8 +42,6 @@ number types.
     subtract_native_number_from_native_number()
     multiply_native_number_with_native_number()
     divide_native_number_by_native_number()
-    lcm_test()
-    gcd_test()
     integer_overflow_with_pow()
     bnot_p_p_creates_destination()
     # END_OF_TESTS
@@ -470,53 +468,6 @@ End_test4:
     div $N0, $N0, $N2
     is( $N0, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
-.end
-
-.sub lcm_test
-    set $I0, 10
-    set $I1, 10
-    lcm $I2, $I1, $I0
-    is( $I2, 10, 'lcm_test' )
-
-    set $I1, 17
-    lcm $I2, $I1, $I0
-    is( $I2, 170, 'lcm_test' )
-
-    set $I0, 17
-    set $I1, 10
-    lcm $I2, $I1, $I0
-    is( $I2, 170, 'lcm_test' )
-
-    set $I0, 10
-    set $I1, 0
-    lcm $I2, $I1, $I0
-    is( $I2, 0, 'lcm_test' )
-
-    set $I0, 0
-    set $I1, 10
-    lcm $I2, $I1, $I0
-    is( $I2, 0, 'lcm_test' )
-.end
-
-.sub gcd_test
-    set $I0, 70
-    set $I1, 42
-    gcd $I2, $I1, $I0
-    is( $I2, 14, 'gcd_test' )
-
-    set $I0, 66
-    gcd $I2, $I1, $I0
-    is( $I2, 6, 'gcd_test' )
-
-    set $I0, 70
-    set $I1, 1
-    gcd $I2, $I1, $I0
-    is( $I2, 1, 'gcd_test' )
-
-    set $I0, 70
-    set $I1, 3
-    gcd $I2, $I1, $I0
-    is( $I2, 1, 'gcd_test' )
 .end
 
 .sub integer_overflow_with_pow

@@ -94,6 +94,109 @@ inline op vers(out NUM, in NUM) :advanced_math {
     $1 = 1.0 - cos($2);
 }
 
+########################################
+
+=item B<gcd>(out INT, in INT, in INT)
+
+Greatest Common divisor of $2 and $3.
+
+=cut
+
+inline op gcd(out INT, in INT, in INT) :advanced_math {
+    INTVAL p = 0;
+    INTVAL a = $2 < 0 ? -$2 : $2;
+    INTVAL b = $3 < 0 ? -$3 : $3;
+
+    if (a==0) { $1=b; goto NEXT(); }
+    if (b==0) { $1=a; goto NEXT(); }
+
+    while (!((a | b) & 1)) {
+        a>>=1;
+        b>>=1;
+        p++;
+    }
+
+    while (a>0) {
+        if (!(a & 1)) a>>=1;
+        else if (!(b & 1)) b>>=1;
+        else if (a<b)      b = (b-a)>>1;
+        else               a = (a-b)>>1;
+    }
+
+    $1 = b<<p;
+}
+
+
+########################################
+
+=item B<lcm>(out INT, in INT, in INT)
+
+Least Common Multiple of $2 and $3
+
+=cut
+
+inline op lcm(out INT, in INT, in INT) :advanced_math {
+    INTVAL gcd = 0;
+    INTVAL p = 0;
+    INTVAL a = $2 < 0 ? -$2 : $2;
+    INTVAL b = $3 < 0 ? -$3 : $3;
+    INTVAL saved_var1 = a, saved_var2 = b;
+
+    if (a==0 || b==0) { $1=0; goto NEXT(); }
+
+    while (!((a | b) & 1)) {
+        a>>=1;
+        b>>=1;
+        p++;
+    }
+
+    while (a>0) {
+        if (!(a & 1)) a>>=1;
+        else if (!(b & 1)) b>>=1;
+        else if (a<b)      b = (b-a)>>1;
+        else               a = (a-b)>>1;
+    }
+
+    gcd = b<<p;
+    saved_var1 /= gcd;
+    $1 = saved_var1*saved_var2;
+}
+
+########################################
+
+=item B<fact>(out INT, in INT)
+
+=item B<fact>(out NUM, in INT)
+
+Factorial, n!. Calculates the product of 1 to N.
+
+=cut
+
+inline op fact(out INT, in INT) :advanced_math {
+    /* Coercing a negative to a UINT can get pretty ugly
+     * in this situation. */
+    INTVAL i = $2;
+    UINTVAL q = 1;
+    while (i>0) {
+        q = q*i;
+        i--;
+    }
+    $1 = q;
+}
+
+inline op fact(out NUM, in INT) :advanced_math {
+    /* Coercing a negative to a UINT can get pretty ugly
+     * in this situation. */
+    INTVAL i = $2;
+    FLOATVAL q = 1;
+    while (i>0) {
+        q = q*i;
+        i--;
+    }
+    $1 = q;
+}
+
+
 
 =back
 

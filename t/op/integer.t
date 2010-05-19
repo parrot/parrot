@@ -16,7 +16,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 202
+.const int TESTS = 194
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -49,7 +49,6 @@ Tests the use of Parrot integer registers.
     test_set_n()
     test_cleari()
     test_neg()
-    test_fact()
     test_mul_i_i()
     test_exchange()
     test_null()
@@ -835,38 +834,6 @@ Tests the use of Parrot integer registers.
     mul $I0, $I1
 
     is($I0, 12, 'mul_i_i')
-.end
-
-.sub 'test_fact'
-    $I0 = 3
-    $I1 = 11
-    $I2 = 0
-    $I3 = -563
-
-    $I5 = fact $I0
-    is($I5, 6, 'fact_i_i - first')
-
-    $I6 = fact $I1
-    is($I6, 39916800, 'fact_i_i - second')
-
-    $I7 = fact $I2
-    is($I7, 1, 'fact_i_i on zero')
-
-    $I8 = fact $I3
-    is($I8, 1, 'fact_i_i on a negative integer')
-
-    # Now run the same tests, with constants instead
-    $I5 = fact 3
-    is($I5, 6, 'fact_i_ic - first')
-
-    $I6 = fact 11
-    is($I6, 39916800, 'fact_i_ic - second')
-
-    $I7 = fact 0
-    is($I7, 1, 'fact_i_ic on zero')
-
-    $I8 = fact -563
-    is($I8, 1, 'fact_i_ic on a negative integer')
 .end
 
 .sub 'test_exchange'

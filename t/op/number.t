@@ -19,7 +19,7 @@ Tests the use of Parrot floating-point number registers.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(173)
+    plan(165)
     test_set_n_nc()
     test_set_n()
     test_add_n_n_n()
@@ -51,8 +51,6 @@ Tests the use of Parrot floating-point number registers.
     test_neg_n()
     test_neg_0_dot_0()
     test_mul_n_n()
-    test_fact_n_i()
-    test_fact_n_ic()
     test_exchange()
     test_op_n_nc_nc()
     test_lt_nc_nc_ic()
@@ -704,32 +702,6 @@ Tests the use of Parrot floating-point number registers.
     set $N1,4.0
     mul $N0,$N1
     is( $N0, "12", 'mul_n_n' )
-.end
-
-.sub test_fact_n_i
-    set $I0, 3
-    set $I1, 11
-    set $I2, 0
-    set $I3, -563
-    fact $N5, $I0
-    is( $N5, "6", 'fact_n_i' )
-    fact $N6, $I1
-    is( $N6, "39916800", 'fact_n_i' )
-    fact $N7, $I2
-    is( $N7, "1", 'fact_n_i' )
-    fact $N8, $I3
-    is( $N8, "1", 'fact_n_i' )
-.end
-
-.sub test_fact_n_ic
-    fact $N5, 3
-    is( $N5, "6", 'fact_n_ic' )
-    fact $N6, 11
-    is( $N6, "39916800", 'fact_n_ic' )
-    fact $N7, 0
-    is( $N7, "1", 'fact_n_ic' )
-    fact $N8, -563
-    is( $N8, "1", 'fact_n_ic' )
 .end
 
 .sub test_exchange
