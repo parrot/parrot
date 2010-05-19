@@ -59,7 +59,6 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(PMC* info))
 
         VTABLE_push_integer(interp, info, pmc->vtable->base_type);
         VTABLE_push_pmc(interp, PARROT_IMAGEIOSIZE(info)->todo, pmc);
-        VTABLE_freeze(interp, pmc, info);
     }
 }
 

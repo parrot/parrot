@@ -324,6 +324,7 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
     ASSERT_ARGS(Parrot_visit_loop_visit)
 
     INTVAL      i;
+    const INTVAL action = VTABLE_get_integer(interp, info);
     PMC * const todo    = VTABLE_get_iter(interp, info);
 
     /* can't cache upper limit, visit may append items */
@@ -334,6 +335,11 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
                     "NULL current PMC in visit_loop_todo_list");
 
         PARROT_ASSERT(current->vtable);
+
+        if (action == VISIT_FREEZE_NORMAL)
+            VTABLE_freeze(interp, current, info);
+        else
+            VTABLE_thaw(interp, current, info);
 
         VTABLE_visit(interp, current, info);
 

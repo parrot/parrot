@@ -170,7 +170,6 @@ Checks new pmcs for strings.
                 /* not yet seen */
                 parrot_hash_put(INTERP, hash, v, v);
                 VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->todo, v);
-                VTABLE_freeze(INTERP, v, SELF);
             }
         }
     }
