@@ -428,7 +428,17 @@ EOT
 # Display everything collected.
 sub dump_report { 
     print "==> Dumping message...\n";
-    print format_message();
+    my $report = format_message();
+
+    if ( defined($ENV{PAGER}) ) {
+        open(my $ofh, '|-', $ENV{PAGER});
+        print {$ofh} $report;
+        close $ofh;
+    }
+    else {
+        print $report;
+    }
+
 }
 
 
