@@ -2546,7 +2546,7 @@ STRING *
 Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
         ARGIN(const CHARSET *charset),
         ARGIN(const ENCODING *encoding),
-	UINTVAL flags)
+        UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_str_unescape_string)
 
@@ -2614,13 +2614,18 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     }
                     else {
                         /* \xhh 1..2 hex digits */
-                        for (digcount = 0; digcount < 2; ++digcount) {
+                        pending = 1;
+                        for (digcount = 0; digcount < 2; ) {
                             if (!isxdigit(c))
                                 break;
                             digbuf[digcount] = c;
+                            ++digcount;
+                            if (itersrc.bytepos >= srclen) {
+                                pending = 0;
+                                break;
+                            }
                             c = itersrc.get_and_advance(interp, &itersrc);
                         }
-                        pending = digcount < 2;
                     }
                     if (digcount == 0)
                         throw_illegal_escape(interp);
