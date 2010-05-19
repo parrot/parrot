@@ -76,7 +76,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     uid = stat path, .STAT_UID
     gid = stat path, .STAT_GID
     mtime = stat path, .STAT_MODIFYTIME
-    .tailcall new_from_data(path, data, uid :named('uid'), gid :named('gid'), mtime :named('mtime'))
+    .tailcall new_from_data(path, data, mode :named('mode'), uid :named('uid'), gid :named('gid'), mtime :named('mtime'))
   _handler:
     null $P0
     .return ($P0)
