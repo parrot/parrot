@@ -103,12 +103,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -164,12 +164,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -259,12 +259,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -320,12 +320,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -341,12 +341,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -436,12 +436,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -497,12 +497,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -575,12 +575,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -669,12 +669,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -730,12 +730,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1

@@ -2,19 +2,24 @@
 # Each opslib must be compiled with several variants.
 #
 
+DYNOP_O_DEPS = \
+    include/pmc/pmc_parrotlibrary.h \
+    $(PARROT_H_HEADERS) \
+    include/parrot/runcore_api.h
+
 $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT): src/dynoplibs/obscure_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/obscure_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
-src/dynoplibs/obscure_ops$(O): include/pmc/pmc_parrotlibrary.h \
-    src/dynoplibs/obscure_ops.c $(PARROT_H_HEADERS) \
-    include/parrot/runcore_api.h src/dynoplibs/obscure_ops.h
+src/dynoplibs/obscure_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/obscure_ops.c include/parrot/runcore_api.h
 
 src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
 
 src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(BUILD_TOOLS_DIR)/ops2c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/obscure.ops
+
 
 $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/math_ops$(O) $(LINKARGS)
@@ -24,9 +29,21 @@ $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 src/dynoplibs/math_ops.c: src/dynoplibs/math.ops $(BUILD_TOOLS_DIR)/ops2c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/math.ops
 
-src/dynoplibs/math_ops$(O): include/pmc/pmc_parrotlibrary.h \
-    src/dynoplibs/math_ops.c $(PARROT_H_HEADERS) \
-    include/parrot/runcore_api.h src/dynoplibs/math_ops.h
+src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/math_ops.c src/dynoplibs/math_ops.h
 
 src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
 
+
+$(DYNEXT_DIR)/deprecated_ops$(LOAD_EXT): src/dynoplibs/deprecated_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/deprecated_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/deprecated_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/deprecated_ops.c src/dynoplibs/deprecated_ops.h
+
+src/dynoplibs/deprecated_ops.h: src/dynoplibs/deprecated_ops.c
+
+src/dynoplibs/deprecated_ops.c: src/dynoplibs/deprecated.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/deprecated.ops

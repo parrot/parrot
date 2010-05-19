@@ -31,17 +31,6 @@ operator:
 
 =end PIR_FRAGMENT
 
-X<exchange opcode>
-The C<exchange> opcode swaps the contents of two variables of the same type.
-This example sets C<$I0> to the value of C<$I1> and sets C<$I1> to the value
-of C<$I0>.
-
-=begin PIR_FRAGMENT
-
-  exchange $I0, $I1
-
-=end PIR_FRAGMENT
-
 X<null opcode>
 The C<null> opcode sets an integer or number variable to a zero value,
 and undefines a string or object.
@@ -99,12 +88,12 @@ Unary opcodes have a single argument.  They either return a result or
 modify the argument in place. Some of the most common unary numeric
 opcodes are C<inc> (increment)X<inc opcode>, C<dec> (decrement)X<dec
 opcode>, C<abs> (absolute value)X<abs opcode>, C<neg> (negate)X<neg
-opcode>, and C<fact> (factorial)X<fact opcode>:
+opcode>:
 
 =begin PIR_FRAGMENT
 
   $N0 = abs -5.0  # the absolute value of -5.0 is 5.0
-  $I1 = fact  5   # the factorial of 5 is 120
+  $I0 = 120
   inc $I1         # 120 incremented by 1 is 121
 
 =end PIR_FRAGMENT

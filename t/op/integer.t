@@ -16,7 +16,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 194
+.const int TESTS = 159
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -47,10 +47,8 @@ Tests the use of Parrot integer registers.
     test_dec()
     test_sub_i_i()
     test_set_n()
-    test_cleari()
     test_neg()
     test_mul_i_i()
-    test_exchange()
     test_null()
     test_div_i_i_by_zero()
     test_div_i_ic_by_zero()
@@ -750,76 +748,6 @@ Tests the use of Parrot integer registers.
     is($N2, -2147483648.0, 'set_n_i - negative integer')
 .end
 
-.sub 'test_cleari'
-    $I0 = 0xdeadbee
-    $I1 = 0xdeadbee
-    $I2 = 0xdeadbee
-    $I3 = 0xdeadbee
-    $I4 = 0xdeadbee
-    $I5 = 0xdeadbee
-    $I6 = 0xdeadbee
-    $I7 = 0xdeadbee
-    $I8 = 0xdeadbee
-    $I9 = 0xdeadbee
-    $I10 = 0xdeadbee
-    $I11 = 0xdeadbee
-    $I12 = 0xdeadbee
-    $I13 = 0xdeadbee
-    $I14 = 0xdeadbee
-    $I15 = 0xdeadbee
-    $I16 = 0xdeadbee
-    $I17 = 0xdeadbee
-    $I18 = 0xdeadbee
-    $I19 = 0xdeadbee
-    $I20 = 0xdeadbee
-    $I21 = 0xdeadbee
-    $I22 = 0xdeadbee
-    $I23 = 0xdeadbee
-    $I24 = 0xdeadbee
-    $I25 = 0xdeadbee
-    $I26 = 0xdeadbee
-    $I27 = 0xdeadbee
-    $I28 = 0xdeadbee
-    $I29 = 0xdeadbee
-    $I30 = 0xdeadbee
-    $I31 = 0xdeadbee
-
-    cleari
-
-    is($I0, 0, 'cleari - $I0 cleared')
-    is($I1, 0, 'cleari - $I1 cleared')
-    is($I2, 0, 'cleari - $I2 cleared')
-    is($I3, 0, 'cleari - $I3 cleared')
-    is($I4, 0, 'cleari - $I4 cleared')
-    is($I5, 0, 'cleari - $I5 cleared')
-    is($I6, 0, 'cleari - $I6 cleared')
-    is($I7, 0, 'cleari - $I7 cleared')
-    is($I8, 0, 'cleari - $I8 cleared')
-    is($I9, 0, 'cleari - $I9 cleared')
-    is($I10, 0, 'cleari - $I10 cleared')
-    is($I11, 0, 'cleari - $I11 cleared')
-    is($I12, 0, 'cleari - $I12 cleared')
-    is($I13, 0, 'cleari - $I13 cleared')
-    is($I14, 0, 'cleari - $I14 cleared')
-    is($I15, 0, 'cleari - $I15 cleared')
-    is($I16, 0, 'cleari - $I16 cleared')
-    is($I17, 0, 'cleari - $I17 cleared')
-    is($I18, 0, 'cleari - $I18 cleared')
-    is($I19, 0, 'cleari - $I19 cleared')
-    is($I20, 0, 'cleari - $I20 cleared')
-    is($I21, 0, 'cleari - $I21 cleared')
-    is($I22, 0, 'cleari - $I22 cleared')
-    is($I23, 0, 'cleari - $I23 cleared')
-    is($I24, 0, 'cleari - $I24 cleared')
-    is($I25, 0, 'cleari - $I25 cleared')
-    is($I26, 0, 'cleari - $I26 cleared')
-    is($I27, 0, 'cleari - $I27 cleared')
-    is($I28, 0, 'cleari - $I28 cleared')
-    is($I29, 0, 'cleari - $I29 cleared')
-    is($I30, 0, 'cleari - $I30 cleared')
-    is($I31, 0, 'cleari - $I31 cleared')
-.end
-
 .sub 'test_neg'
     $I0 = neg 3
     $I0 = neg $I0
@@ -834,18 +762,6 @@ Tests the use of Parrot integer registers.
     mul $I0, $I1
 
     is($I0, 12, 'mul_i_i')
-.end
-
-.sub 'test_exchange'
-    $I10 = 10
-    $I20 = 20
-    exchange $I10, $I20
-    is($I10, 20, 'exchange - first operand ok')
-    is($I20, 10, 'exchange - second operand ok')
-
-    $I30 = 30
-    exchange $I30, $I30
-    is($I30, 30, 'exchange - reflexive')
 .end
 
 .sub 'test_null'

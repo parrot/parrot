@@ -31,46 +31,6 @@ inline op clone(out STR, in STR) :base_mem {
        : $2;
 }
 
-
-
-########################################
-
-=item B<exchange>(inout INT, inout INT)
-
-=item B<exchange>(inout NUM, inout NUM)
-
-=item B<exchange>(inout PMC, inout PMC)
-
-=item B<exchange>(inout STR, inout STR)
-
-Exchange the contents of registers $1 and $2
-
-=cut
-
-op exchange(inout INT, inout INT) :base_core {
-    const INTVAL temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
-op exchange(inout PMC, inout PMC) :base_core {
-    PMC * const temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
-op exchange(inout NUM, inout NUM) :base_core {
-    FLOATVAL temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
-op exchange(inout STR, inout STR) :base_core {
-    STRING * const temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
 ########################################
 
 =item B<set>(out INT, in INT)
@@ -255,68 +215,6 @@ inline op setref(invar PMC, invar PMC) :base_core {
 
 inline op deref(out PMC, invar PMC) :base_ref {
     $1 = VTABLE_get_pmc(interp, $2);
-}
-
-=back
-
-=head2 Indirect PMC register set
-
-=over 4
-
-=item B<setp_ind>(in INT, invar PMC)
-
-Set the PMC in register $1 to $2.
-Please note, that the register allocator doesn't track the usage of the
-affected register - handle with care.
-
-=cut
-
-inline op setp_ind(in INT, invar PMC) :base_ref {
-    if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC(interp, "Out of bound register access");
-    REG_PMC(interp, $1) = $2;
-}
-
-=item B<setn_ind>(in INT, in NUM)
-
-Set the number in register $1 to $2.
-Please note, that the register allocator doesn't track the usage of the
-affected register - handle with care.
-
-=cut
-
-inline op setn_ind(in INT, in NUM) :base_ref {
-    if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC(interp, "Out of bound register access");
-    REG_NUM(interp, $1) = $2;
-}
-
-=item B<sets_ind>(in INT, in STR)
-
-Set the string in register $1 to $2.
-Please note, that the register allocator doesn't track the usage of the
-affected register - handle with care.
-
-=cut
-
-inline op sets_ind(in INT, in STR) :base_ref {
-    if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC(interp, "Out of bound register access");
-    REG_STR(interp, $1) = $2;
-}
-
-=item B<seti_ind>(in INT, in INT)
-
-Set the int in register $1 to $2.
-Please note, that the register allocator doesn't track the usage of the
-affected register - handle with care.
-
-=cut
-
-inline op seti_ind(in INT, in INT) :base_ref {
-    if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC(interp, "Out of bound register access");
-    REG_INT(interp, $1) = $2;
 }
 
 =back
@@ -571,40 +469,6 @@ inline op null(out PMC) :base_core {
 
 inline op null(out NUM) :base_core {
     $1 = 0;
-}
-
-########################################
-
-=item B<cleari>()
-
-=item B<clearn>()
-
-=item B<clearp>()
-
-=item B<clears>()
-
-Clear all the registers of the type indicated in the name of the operation.
-
-INTVAL ('i') and FLOATVAL ('n') registers clear to zero.
-
-PMC ('p') and STRING ('s') registers clear to NULL.
-
-=cut
-
-inline op cleari() :base_core {
-    Parrot_clear_i(interp);
-}
-
-inline op clearn() :base_core {
-    Parrot_clear_n(interp);
-}
-
-inline op clears() :base_core {
-    Parrot_clear_s(interp);
-}
-
-inline op clearp() :base_core {
-    Parrot_clear_p(interp);
 }
 
 =back

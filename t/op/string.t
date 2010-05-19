@@ -19,7 +19,7 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(374)
+    plan(339)
 
     set_s_s_sc()
     test_clone()
@@ -65,7 +65,6 @@ Tests Parrot string registers and operations.
     test_concat_s_s_sc()
     concat_s_s_sc_s_sc()
     concat_ensure_copy_is_made()
-    test_clears()
 
     same_constant_twice_bug()
     exception_two_param_ord_empty_string()
@@ -120,7 +119,6 @@ Tests Parrot string registers and operations.
     other_form_of_sprintf_op()
     sprintf_left_justify()
     correct_precision_for_sprintf_x()
-    test_exchange()
     test_find_encoding()
     test_assign()
     assign_and_globber()
@@ -605,74 +603,6 @@ WHILE:
     is( $S2, "JAPH", '' )
 .end
 
-.sub test_clears
-    set $S0, "BOO 0"
-    set $S1, "BOO 1"
-    set $S2, "BOO 2"
-    set $S3, "BOO 3"
-    set $S4, "BOO 4"
-    set $S5, "BOO 5"
-    set $S6, "BOO 6"
-    set $S7, "BOO 7"
-    set $S8, "BOO 8"
-    set $S9, "BOO 9"
-    set $S10, "BOO 10"
-    set $S11, "BOO 11"
-    set $S12, "BOO 12"
-    set $S13, "BOO 13"
-    set $S14, "BOO 14"
-    set $S15, "BOO 15"
-    set $S16, "BOO 16"
-    set $S17, "BOO 17"
-    set $S18, "BOO 18"
-    set $S19, "BOO 19"
-    set $S20, "BOO 20"
-    set $S21, "BOO 21"
-    set $S22, "BOO 22"
-    set $S23, "BOO 23"
-    set $S24, "BOO 24"
-    set $S25, "BOO 25"
-    set $S26, "BOO 26"
-    set $S27, "BOO 27"
-    set $S28, "BOO 28"
-    set $S29, "BOO 29"
-    set $S30, "BOO 30"
-    set $S31, "BOO 31"
-    clears
-    is( $S0, "", '' )
-    is( $S1, "", '' )
-    is( $S2, "", '' )
-    is( $S3, "", '' )
-    is( $S4, "", '' )
-    is( $S5, "", '' )
-    is( $S6, "", '' )
-    is( $S7, "", '' )
-    is( $S8, "", '' )
-    is( $S9, "", '' )
-    is( $S10, "", '' )
-    is( $S11, "", '' )
-    is( $S12, "", '' )
-    is( $S13, "", '' )
-    is( $S14, "", '' )
-    is( $S15, "", '' )
-    is( $S16, "", '' )
-    is( $S17, "", '' )
-    is( $S18, "", '' )
-    is( $S19, "", '' )
-    is( $S20, "", '' )
-    is( $S21, "", '' )
-    is( $S22, "", '' )
-    is( $S23, "", '' )
-    is( $S24, "", '' )
-    is( $S25, "", '' )
-    is( $S26, "", '' )
-    is( $S27, "", '' )
-    is( $S28, "", '' )
-    is( $S29, "", '' )
-    is( $S30, "", '' )
-    is( $S31, "", '' )
-.end
-
 .sub same_constant_twice_bug
    set     $S0, ""
    set     $S1, ""
@@ -844,7 +774,6 @@ WHILE:
     ok( $S0, 'string " " is true' )
 
     # An empty register should be false...
-    clears
     nok( $S1, 'empty register is false' )
 .end
 
@@ -1435,18 +1364,6 @@ WHILE:
     $P0[0] = -1
     $S1 = sprintf "%-20x", $P0
     is( $S1, $S0, 'Correct precision for %x' )
-.end
-
-.sub test_exchange
-    set $S0, "String #0"
-    set $S1, "String #1"
-    exchange $S0, $S1
-    is( $S0, "String #1", 'exchange' )
-    is( $S1, "String #0", 'exchange' )
-
-    set $S2, "String #2"
-    exchange $S2, $S2
-    is( $S2, "String #2", 'exchange' )
 .end
 
 .sub test_find_encoding
