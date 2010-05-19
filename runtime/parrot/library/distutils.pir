@@ -2161,7 +2161,13 @@ a hash
     $I0 = response.'code'()
     unless $I0 == 302 goto L1
     $S0 = response.'content'()
-    say $S0
+    $I0 = index $S0, 'Report'
+    unless $I0 == 0 goto L4
+    $I0 = index $S0, "\n"
+    if $I0 < 0 goto L4
+    $S0 = substr $S0, 0, $I0
+  L4:
+    print $S0
   L1:
 .end
 
