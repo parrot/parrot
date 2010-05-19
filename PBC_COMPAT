@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.16	2010.05.18	plobsing	move freeze/thaw adjacent to visit
 6.15	2010.05.06	bacek	add StringBuilder PMC
 6.14	2010.05.03	coke	remove popaction, pushmark, pushaction ops.
 6.13	2010.05.03	coke	move File/OS pmcs to src/dynpmc
