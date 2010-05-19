@@ -682,6 +682,7 @@ developers
 
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
+PARROT_EXPORT
 void
 do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
          ARGIN_NULLOK(const char *file), unsigned int line)
