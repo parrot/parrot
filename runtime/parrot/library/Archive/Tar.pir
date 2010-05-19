@@ -70,7 +70,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .local string data
     data = $P0.'readall'(path)
     pop_eh
-    .local int uid, gid, mtime
+    .local int mode, uid, gid, mtime
+    mode = stat path, .STAT_PLATFORM_MODE
+    mode &= 0o777
     uid = stat path, .STAT_UID
     gid = stat path, .STAT_GID
     mtime = stat path, .STAT_MODIFYTIME
