@@ -2619,7 +2619,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                             digbuf[digcount] = c;
                             c = itersrc.get_and_advance(interp, &itersrc);
                         }
-                        pending = 1;
+                        pending = digcount < 2;
                     }
                     if (digcount == 0)
                         throw_illegal_escape(interp);
