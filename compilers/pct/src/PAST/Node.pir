@@ -286,6 +286,18 @@ attribute.
     .tailcall self.'attr'('vivibase', value, has_value)
 .end
 
+=item multitype([type])
+
+Get/set MMD type of Var when used as parameter of Block.
+
+=cut
+
+.sub 'multitype' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('multitype', value, has_value)
+.end
+
 
 =back
 
@@ -568,6 +580,19 @@ can be either a string or an array of strings.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('namespace', value, has_value)
+.end
+
+=item multi([multi])
+
+Get/set the multi signature for this block.  The C<multi> argument
+can be either a string or an array of strings.
+
+=cut
+
+.sub 'multi' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('multi', value, has_value)
 .end
 
 

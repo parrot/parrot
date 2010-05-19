@@ -321,6 +321,30 @@ the sub.
     set_global '$?NAMESPACE', ns
     nskey = self.'key_pir'(ns)
 
+    .local pmc multi
+    multi = node.'multi'()
+    unless multi goto no_multi
+
+    .local pmc parts, m_iter
+    parts  = new ['ResizableStringArray']
+    m_iter = iter multi
+  multi_iter:
+    unless m_iter goto multi_iter_done
+    $P0 = shift m_iter
+    $S0 = $P0
+    if $S0 == "_" goto push_part
+    $S0 = self.'key_pir'($P0)
+  push_part:
+    push parts, $S0
+    goto multi_iter
+
+  multi_iter_done:
+    pirflags = concat pirflags, ' :multi('
+    $S0 = join ',', parts
+    pirflags = concat pirflags, $S0
+    pirflags = concat pirflags, ')'
+  no_multi:
+
   subpir_start:
     $P0 = node['loadinit']
     if null $P0 goto loadinit_done

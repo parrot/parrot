@@ -791,7 +791,7 @@ Return the POST representation of a C<PAST::Block>.
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
-    .local pmc nsentry, subid, ns, hll
+    .local pmc nsentry, subid, ns, hll, multi
     name = node.'name'()
     pirflags = node.'pirflags'()
     blocktype = node.'blocktype'()
@@ -799,6 +799,7 @@ Return the POST representation of a C<PAST::Block>.
     subid = node.'subid'()
     ns = node.'namespace'()
     hll = node.'hll'()
+    multi = node.'multi'()
 
     ##  handle nsentry attribute
     $I0 = defined nsentry
@@ -824,7 +825,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  create a POST::Sub node for this block
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi)
     unless pirflags goto pirflags_done
     bpost.'pirflags'(pirflags)
   pirflags_done:
