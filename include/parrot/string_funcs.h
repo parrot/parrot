@@ -390,7 +390,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_unescape_string(PARROT_INTERP,
     ARGIN(const STRING *src),
     ARGIN(const CHARSET *charset),
-    ARGIN(const ENCODING *encoding))
+    ARGIN(const ENCODING *encoding),
+    UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
