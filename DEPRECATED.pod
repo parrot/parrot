@@ -335,16 +335,6 @@ functions and all "inplace" string ops are deprecated.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
 
-=item Parrot_VTABLE, Parrot_get_vtable, Parrot_PMC_set_vtable [eligible in 2.4]
-
-These do not expose any functionality that should be available to code outside
-of parrot core.
-
-These might get revived in some form to allow for creating new types and adding
-vtable-overrides, if that functionality becomes desired.
-
-L<https://trac.parrot.org/parrot/ticket/1588>
-
 =item Parrot_str_unescape_string [experimental]
 
 This function is an experimental addition to enhance and maybe replace

@@ -574,44 +574,6 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 
 /*
 
-=item C<void Parrot_PMC_set_vtable(PARROT_INTERP, Parrot_PMC pmc, Parrot_VTABLE
-vtable)>
-
-Replaces the vtable of the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_vtable(SHIM_INTERP, Parrot_PMC pmc, Parrot_VTABLE vtable)
-{
-    ASSERT_ARGS(Parrot_PMC_set_vtable)
-    pmc->vtable = vtable;
-}
-
-/*
-
-=item C<Parrot_VTABLE Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)>
-
-Returns the vtable corresponding to the given PMC ID.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-Parrot_VTABLE
-Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
-{
-    ASSERT_ARGS(Parrot_get_vtable)
-    return interp->vtables[id];
-}
-
-/*
-
 =item C<Parrot_PMC Parrot_sub_new_from_c_func(PARROT_INTERP, void (*func(void)),
 const char * signature)>
 

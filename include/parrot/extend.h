@@ -52,7 +52,6 @@ typedef void * Parrot_Encoding;
 typedef void * Parrot_CharType;
 typedef const void * Parrot_Const_Encoding;
 typedef const void * Parrot_Const_CharType;
-typedef const void * Parrot_VTABLE;
 
 #endif
 
@@ -111,11 +110,6 @@ Parrot_String Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_PURE_FUNCTION
-Parrot_VTABLE Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String Parrot_new_string(PARROT_INTERP,
@@ -135,11 +129,6 @@ Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
 
 PARROT_EXPORT
 Parrot_PMC Parrot_PMC_null(void);
-
-PARROT_EXPORT
-void Parrot_PMC_set_vtable(SHIM_INTERP,
-    Parrot_PMC pmc,
-    Parrot_VTABLE vtable);
 
 PARROT_EXPORT
 Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
@@ -215,8 +204,6 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_get_strreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_new_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -224,7 +211,6 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_PMC_newclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_PMC_set_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_PMC_typenum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
