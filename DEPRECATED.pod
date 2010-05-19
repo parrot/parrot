@@ -335,18 +335,6 @@ functions and all "inplace" string ops are deprecated.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
 
-=item Parrot_PMC_* in src/extend.c [eligible in 2.4]
-
-These are duplicates of functions in src/extend_vtable.c. Exceptions:
-
-  Parrot_PMC_new
-  Parrot_PMC_typenum
-  Parrot_PMC_null
-  Parrot_PMC_set_vtable
-  Parrot_PMC_newclass
-
-L<https://trac.parrot.org/parrot/ticket/1587>
-
 =item Parrot_VTABLE, Parrot_get_vtable, Parrot_PMC_set_vtable [eligible in 2.4]
 
 These do not expose any functionality that should be available to code outside

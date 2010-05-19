@@ -12,7 +12,7 @@ use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test;
 use Parrot::Config;
 
-plan tests => 20;
+plan tests => 18;
 
 =head1 NAME
 
@@ -148,7 +148,7 @@ CODE
 Test
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_intval' );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -169,8 +169,8 @@ main(int argc, const char *argv[])
     type    = Parrot_PMC_typenum(interp, "Integer");
     testpmc = Parrot_PMC_new(interp, type);
 
-    Parrot_PMC_set_intval(interp, testpmc, value);
-    new_value = Parrot_PMC_get_intval(interp, testpmc);
+    Parrot_PMC_set_integer_native(interp, testpmc, value);
+    new_value = Parrot_PMC_get_integer(interp, testpmc);
 
     printf("%ld\n", (long)new_value);
 
@@ -181,7 +181,7 @@ CODE
 101010
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_intval_intkey' );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -197,9 +197,9 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_Int key   = 10;
     Parrot_Int new_value;
 
-    Parrot_PMC_set_intval_intkey(interp, array, key, value);
+    Parrot_PMC_set_integer_keyed_int(interp, array, key, value);
 
-    new_value = Parrot_PMC_get_intval_intkey(interp, array, key);
+    new_value = Parrot_PMC_get_integer_keyed_int(interp, array, key);
 
     printf("%ld\n", (long)new_value);
     return NULL;
@@ -244,13 +244,13 @@ main(int argc, const char *argv[])
     type    = Parrot_PMC_typenum(interp, "Integer");
     testpmc = Parrot_PMC_new(interp, type);
 
-    Parrot_PMC_set_intval(interp, testpmc, value);
+    Parrot_PMC_set_integer_native(interp, testpmc, value);
 
     parrot_reg = 31;
     Parrot_set_pmcreg(interp, parrot_reg, testpmc);
 
     newpmc    = Parrot_get_pmcreg(interp, parrot_reg);
-    new_value = Parrot_PMC_get_intval(interp, newpmc);
+    new_value = Parrot_PMC_get_integer(interp, newpmc);
 
     printf("%d\n", (int)new_value);
 
@@ -261,7 +261,7 @@ CODE
 -123
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_numval' );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_number' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -283,8 +283,8 @@ main(int argc, const char *argv[])
     type    = Parrot_PMC_typenum(interp, "Float");
     testpmc = Parrot_PMC_new(interp, type);
 
-    Parrot_PMC_set_numval(interp, testpmc, value);
-    new_value = Parrot_PMC_get_numval(interp, testpmc);
+    Parrot_PMC_set_number_native(interp, testpmc, value);
+    new_value = Parrot_PMC_get_number(interp, testpmc);
 
     printf("%.7f\n", (double)new_value);
 
@@ -317,7 +317,7 @@ main(int argc, const char *argv[])
     testpmc = Parrot_PMC_new(interp, type);
 
     value     = Parrot_new_string(interp, "Pumpking", 8, "iso-8859-1", 0);
-    Parrot_PMC_set_string(interp, testpmc, value);
+    Parrot_PMC_set_string_native(interp, testpmc, value);
     new_value = Parrot_PMC_get_string(interp, testpmc);
 
     Parrot_eprintf(interp, "%S\n", new_value);
@@ -327,80 +327,6 @@ main(int argc, const char *argv[])
 }
 CODE
 Pumpking
-OUTPUT
-
-c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_cstring' );
-
-#include <stdio.h>
-#include "parrot/embed.h"
-#include "parrot/extend.h"
-
-int
-main(int argc, const char *argv[])
-{
-    Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_Int    type;
-    Parrot_PMC    testpmc;
-    char         *new_value;
-
-    /* Interpreter set-up */
-    if (!interp)
-        return 1;
-
-    type    = Parrot_PMC_typenum(interp, "String");
-    testpmc = Parrot_PMC_new(interp, type);
-
-    Parrot_PMC_set_cstring(interp, testpmc, "Wibble");
-    new_value = Parrot_PMC_get_cstring(interp, testpmc);
-
-    printf("%s\n", new_value);
-
-    Parrot_free_cstring(new_value);
-
-    Parrot_exit(interp, 0);
-    return 0;
-}
-CODE
-Wibble
-OUTPUT
-
-c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_cstringn' );
-
-#include <stdio.h>
-#include "parrot/embed.h"
-#include "parrot/extend.h"
-
-int
-main(int argc, const char *argv[])
-{
-    Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_Int    length = 6;
-    Parrot_Int    type;
-    Parrot_Int    new_len;
-    Parrot_PMC    testpmc;
-    char         *new_value;
-
-    /* Interpreter set-up */
-    if (!interp)
-        return 1;
-
-    type    = Parrot_PMC_typenum(interp, "String");
-    testpmc = Parrot_PMC_new(interp, type);
-
-    Parrot_PMC_set_cstringn(interp, testpmc, "Wibble", length);
-    new_value = Parrot_PMC_get_cstringn(interp, testpmc, &new_len);
-
-    printf("%s\n", new_value);
-    printf("%d\n", (int)(new_len));
-
-    Parrot_free_cstring(new_value);
-
-    Parrot_exit(interp, 0);
-    return 0;
-}
-CODE
-Wibble
-6
 OUTPUT
 
 my ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
