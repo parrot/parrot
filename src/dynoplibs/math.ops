@@ -25,7 +25,13 @@ To use this library of ops, add this directive to your PIR:
 
 =cut
 
-=over
+###############################################################################
+
+=head2 Pseudorandom number operations
+
+These operations perform various pseudorandom number operations.
+
+=over 4
 
 =item B<rand>(out NUM)
 
@@ -108,6 +114,8 @@ inline op rand(out INT, in INT, in INT) {
 }
 
 =back
+
+=cut
 
 =head1 COPYRIGHT
 

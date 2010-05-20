@@ -16,12 +16,14 @@ Tests various transcendental operations
 
 =cut
 
+.loadlib 'trans_ops'
+
 .sub main :main
     .include 'test_more.pir'
     .local num epsilon
     epsilon = _epsilon()
 
-    plan(28)
+    plan(68)
 
     test_sin_n(epsilon)
     test_sin_i(epsilon)
@@ -41,6 +43,7 @@ Tests various transcendental operations
     test_asec_i(epsilon)
     test_cosh_n(epsilon)
     test_cosh_i(epsilon)
+    integer_overflow_with_pow()
 .end
 
 .sub _pi
@@ -235,6 +238,51 @@ Tests various transcendental operations
     $N1 = cosh $I1
     is($N1, 1.543081, "cosh(1)", epsilon)
 .end
+
+.sub integer_overflow_with_pow
+    .include "iglobals.pasm"
+
+    # Check that we aren't 32-bit INTVALs without GMP
+    .local pmc interp     # a handle to our interpreter object.
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int intvalsize
+    intvalsize = config['intvalsize']
+    .local int gmp
+    gmp = config['gmp']
+
+    if intvalsize != 4 goto can_test
+    if gmp goto can_test
+        skip(40,'No integer overflow for 32-bit INTVALs without GMP installed')
+        goto end
+
+  can_test:
+
+    .local pmc i1, i2, r
+    i1 = new 'Integer'
+    i2 = new 'Integer'
+    i1 = 2
+    i2 = 1
+    $I1 = 1
+  next:
+    null r
+    r = pow i1, i2
+    $S0 = r
+
+    $I1 = $I1 * 2
+    is( $S0, $I1, 'integer_overflow_with_pow' )
+
+    inc i2
+# XXX: this must be extended to at least 64 bit range
+# when sure that the result is not floating point.
+# In the meantime, make sure it overflows nicely
+# on 32 bit.
+    unless i2 > 40 goto next
+
+  end:
+.end
+
 
 # Local Variables:
 #   mode: pir

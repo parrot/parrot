@@ -16,6 +16,8 @@ Tests the Complex PMC.
 
 =cut
 
+.loadlib 'trans_ops'
+
 .sub main :main
     .include 'test_more.pir'
     .include 'fp_equality.pasm'

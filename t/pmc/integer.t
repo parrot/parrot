@@ -19,7 +19,7 @@ Tests the Integer PMC.
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(62)
+    plan(61)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -321,8 +321,6 @@ fin:
     is($P2,3)
     mod $P2, $P0, $P1
     is($P2,0)
-    pow $P2, $P0, $P1
-    is($P2,36)
 .end
 
 

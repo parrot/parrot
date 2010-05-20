@@ -16,6 +16,8 @@ Test handling C<dest> arg in 3-args arithmetic.
 
 =cut
 
+.loadlib 'trans_ops' # for pow
+
 .sub main :main
     .include 'test_more.pir'
     .include "iglobals.pasm"

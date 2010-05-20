@@ -47,3 +47,16 @@ src/dynoplibs/deprecated_ops.h: src/dynoplibs/deprecated_ops.c
 
 src/dynoplibs/deprecated_ops.c: src/dynoplibs/deprecated.ops $(BUILD_TOOLS_DIR)/ops2c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/deprecated.ops
+
+$(DYNEXT_DIR)/trans_ops$(LOAD_EXT): src/dynoplibs/trans_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/trans_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/trans_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/trans_ops.c src/dynoplibs/trans_ops.h
+
+src/dynoplibs/trans_ops.h: src/dynoplibs/trans_ops.c
+
+src/dynoplibs/trans_ops.c: src/dynoplibs/trans.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/trans.ops
