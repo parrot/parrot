@@ -198,8 +198,8 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                            Parrot_ucs4_encoding_ptr, Parrot_unicode_charset_ptr, 0);
         UChar32 *buf = (UChar32 *) res->strstart;
         UINTVAL offs;
-        for ( offs = 0; offs < len, offs++ ){
-            buf[offs] = src->encoding->get_codepoints(interp, src, offs);
+        for ( offs = 0; offs < len; offs++ ){
+            buf[offs] = src->encoding->get_codepoint(interp, src, offs);
         };
 
         return res;
@@ -437,8 +437,8 @@ ucs4_encode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(ucs4_encode_and_advance)
 #if PARROT_HAS_ICU
-    const UChar32 * const s = (const UChar32 *) i->str->strstart;
-    size_t pos              = i->bytepos / sizeof (UChar32);
+    UChar32 *s   = (UChar32 *) i->str->strstart;
+    size_t   pos = i->bytepos / sizeof (UChar32);
     s[pos++] = (UChar32) c;
     ++i->charpos;
     i->bytepos = pos * sizeof (UChar32);
