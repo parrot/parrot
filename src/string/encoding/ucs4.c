@@ -256,6 +256,8 @@ static UINTVAL
 find_cclass(PARROT_INTERP, ARGIN(const STRING *s), ARGIN(const INTVAL *typetable),
 INTVAL flags, UINTVAL pos, UINTVAL end)
 {
+    ASSERT_ARGS(find_cclass)
+
     UNUSED(s);
     UNUSED(typetable);
     UNUSED(flags);
@@ -325,6 +327,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_codepoints)
     return Parrot_str_new_init(interp, (char*)src->strstart + offset * sizeof (UChar32),
                                count * sizeof (UChar32), src->encoding, src->charset, 0);
 }
@@ -546,6 +549,7 @@ Initializes the UCS-4 encoding.
 void
 Parrot_encoding_ucs4_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_encoding_ucs4_init)
     ENCODING * const return_encoding = Parrot_new_encoding(interp);
 
     static const ENCODING base_encoding = {
