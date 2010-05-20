@@ -198,7 +198,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                            Parrot_ucs4_encoding_ptr, Parrot_unicode_charset_ptr, 0);
         UChar32 *buf = (UChar32 *) res->strstart;
         UINTVAL offs;
-        for ( offs = 0; offs < len; offs++ ){
+        for (offs = 0; offs < len; offs++){
             buf[offs] = src->encoding->get_codepoint(interp, src, offs);
         };
         res->strlen  = len;
@@ -471,7 +471,7 @@ ucs4_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
     const UChar32 *pos = (const UChar32*) s->strstart;
     UINTVAL len = s->strlen;
     UNUSED(interp);
- 
+
     while (len--) {
         hashval += hashval << 5;
         hashval += *(pos++);
