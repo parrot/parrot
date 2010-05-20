@@ -198,7 +198,7 @@ sub identify_files_for_POD_testing {
             @files = @{ $self->{argv} };
         }
         else {
-            print STDERR "\nFinding files with POD, this may take a minute.\n";
+            print STDERR "\n# Finding files with POD, this may take a minute.\n";
             @files = (
                 keys(%{ $self->{manifest} }),
                 keys(%{ $self->{manifest_gen} })
