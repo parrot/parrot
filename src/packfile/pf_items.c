@@ -1218,8 +1218,8 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     UINTVAL   flags;
     UINTVAL   encoding_nr;
     UINTVAL   charset_nr;
-    ENCODING *encoding;
-    CHARSET  *charset;
+    const ENCODING *encoding;
+    const CHARSET  *charset;
     size_t    size;
     const int wordsize          = pf ? pf->header->wordsize : sizeof (opcode_t);
     opcode_t  flag_charset_word = PF_fetch_opcode(pf, cursor);
