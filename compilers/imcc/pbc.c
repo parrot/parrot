@@ -932,7 +932,7 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         buf     = p + 1;
         if (strcmp(charset_name, "unicode") == 0 && strcmp(encoding_name, "utf8") == 0) {
             /* Special case needed for backward compatibility with utf8 literals
-	     * using \xHH\xHH byte sequences */
+             * using \xHH\xHH byte sequences */
             s = Parrot_str_unescape(interp, buf, '"', "utf8:unicode");
         }
         else {
