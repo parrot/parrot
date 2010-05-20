@@ -2615,7 +2615,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     else {
                         /* \xhh 1..2 hex digits */
                         pending = 1;
-                        for (digcount = 0; digcount < 2; ) {
+                        for (digcount = 0; digcount < 2;) {
                             if (!isxdigit(c))
                                 break;
                             digbuf[digcount] = c;
