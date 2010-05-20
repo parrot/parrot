@@ -18,7 +18,7 @@ Tests for mathematical operations with Inf and Nan.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(38)
+    plan(37)
 
     test_basic_arith()
     test_sqrt()
@@ -30,7 +30,6 @@ Tests for mathematical operations with Inf and Nan.
     test_fdiv_integer_pmc_nan()
     test_fdiv_float_pmc_nan()
     test_fdiv_float_integer_pmc_nan()
-    test_cmod_float_integer_pmc_nan()
     test_mod_float_integer_pmc_nan()
 
 .end
@@ -156,7 +155,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN', 'fdiv with Integer PMCs and NaN')
-    todo(0, 'fdiv with Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    todo(0, 'fdiv with Integer PMCs and NaN', 'fdiv/mod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_fdiv_float_pmc_nan
@@ -166,7 +165,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN','fdiv with Float PMCs and NaN')
-    todo(0,'fdiv with Float PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    todo(0,'fdiv with Float PMCs and NaN', 'fdiv/mod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_fdiv_float_integer_pmc_nan
@@ -176,17 +175,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN', 'fdiv with Float and Integer PMCs and NaN')
-    todo(0, 'fdiv with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
-.end
-
-.sub test_cmod_float_integer_pmc_nan
-    $P1 = new 'Float'
-    $P2 = new 'Integer'
-    $P2 = 1
-    $N0 = 'NaN'
-    cmod $P1, $P2, $N0
-    #is($P1, 'NaN', 'cmod with Float and Integer PMCs and NaN')
-    todo(0, 'cmod with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    todo(0, 'fdiv with Float and Integer PMCs and NaN', 'fdiv/mod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_mod_float_integer_pmc_nan
@@ -196,7 +185,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     mod $P1, $P2, $N0
     #is($P1, 'NaN', 'mod with Float and Integer PMCs and NaN')
-    todo(0, 'mod with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    todo(0, 'mod with Float and Integer PMCs and NaN', 'fdiv/mod do not play nicely with PMCs and NaN')
 .end
 
 # Local Variables:
