@@ -377,7 +377,7 @@ codepoints(PARROT_INTERP, ARGIN(const STRING *src))
 #else
     UNUSED(src);
     no_ICU_lib(interp);
-#endif  
+#endif
 }
 
 /*

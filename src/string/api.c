@@ -450,12 +450,16 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     if (!cs) {
         /* upgrade strings for concatenation */
         cs = Parrot_unicode_charset_ptr;
-        enc = (a->encoding == Parrot_utf16_encoding_ptr
-           ||  b->encoding == Parrot_utf16_encoding_ptr
-           ||  a->encoding == Parrot_ucs2_encoding_ptr
-           ||  b->encoding == Parrot_ucs2_encoding_ptr)
-            ? Parrot_utf16_encoding_ptr
-            : Parrot_utf8_encoding_ptr;
+        if (a->encoding == Parrot_ucs4_encoding_ptr
+            || b->encoding == Parrot_ucs4_encoding_ptr)
+            enc = Parrot_ucs4_encoding_ptr;
+        else if (a->encoding == Parrot_utf16_encoding_ptr
+            ||  b->encoding == Parrot_utf16_encoding_ptr
+            ||  a->encoding == Parrot_ucs2_encoding_ptr
+            ||  b->encoding == Parrot_ucs2_encoding_ptr)
+            enc = Parrot_utf16_encoding_ptr;
+        else
+            enc = Parrot_utf8_encoding_ptr;
 
         a = Parrot_unicode_charset_ptr->to_charset(interp, a);
         b = Parrot_unicode_charset_ptr->to_charset(interp, b);
