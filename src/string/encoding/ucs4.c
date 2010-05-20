@@ -201,6 +201,8 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         for ( offs = 0; offs < len; offs++ ){
             buf[offs] = src->encoding->get_codepoint(interp, src, offs);
         };
+        res->strlen  = len;
+        res->bufused = len * sizeof (UChar32);
 
         return res;
     }
