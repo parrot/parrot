@@ -170,7 +170,7 @@ Test the URI library
     $S0 = $P0.'userinfo'()
     is($S0, 'user:passwd', 'userinfo')
     $S0 = $P0.'host'()
-    is($S0, 'user:passwd@proxy.net', 'host')
+    is($S0, 'proxy.net', 'host')
     $S0 = $P0.'port'()
     is($S0, '8000', 'port')
 .end

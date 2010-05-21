@@ -300,20 +300,25 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .sub 'host' :method
     $S0 = self.'authority'()
+    $I0 = index $S0, '@'
+    if $I0 < 0 goto L1
+    inc $I0
+    $S0 = substr $S0, $I0
+  L1:
     .local int pos, lastpos
     lastpos = length $S0
     pos = 0
-  L1:
+  L2:
     pos = index $S0, ':', pos
-    if pos < 0 goto L2
+    if pos < 0 goto L3
     $I1 = pos
     inc pos
     $I0 = is_cclass .CCLASS_NUMERIC, $S0, pos
-    unless $I0 goto L1
+    unless $I0 goto L2
     $I0 = find_not_cclass .CCLASS_NUMERIC, $S0, pos, lastpos
-    unless $I0 == lastpos goto L1
+    unless $I0 == lastpos goto L2
     $S0 = substr $S0, 0, $I1
-  L2:
+  L3:
     .return ($S0)
 .end
 
