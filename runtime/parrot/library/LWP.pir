@@ -35,7 +35,9 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .globalconst int RC_SEE_OTHER = 303
     .globalconst int RC_TEMPORARY_REDIRECT = 307
     .globalconst int RC_BAD_REQUEST = 400
+    .globalconst int RC_UNAUTHORIZED = 401
     .globalconst int RC_NOT_FOUND = 404
+    .globalconst int RC_PROXY_AUTHENTICATION_REQUIRED = 407
     .globalconst int RC_INTERNAL_SERVER_ERROR = 500
     .globalconst int RC_NOT_IMPLEMENTED = 501
 .end
@@ -191,10 +193,30 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return (response)
   L6:
     .tailcall self.'request'(referral, response)
+
   L4:
+    .local int proxy
+    proxy = 0
+    .local string ch_header
+    ch_header = 'WWW-Authenticate'
+    if code == RC_UNAUTHORIZED goto L11
+    proxy = 1
+    ch_header = 'Proxy-Authenticate'
+    if code == RC_PROXY_AUTHENTICATION_REQUIRED goto L11
+    goto L12
+  L11:
+    .local string challenge
+    challenge = response.'get_header'(ch_header)
+    unless challenge == '' goto L13
+    response.'push_header'('Client-Warning', 'Missing Authenticate header')
+    .return (response)
+  L13:
 
     # work in progress
+    print "# "
+    say challenge
 
+  L12:
     .return (response)
 .end
 
@@ -807,7 +829,30 @@ see http://search.cpan.org/~gaas/libwww-perl/
     # Extract 'Host' header
     .local string host
     host = url.'authority'()
+    $I0 = index host, '@'
+    if $I0 < 0 goto L1
+    .local string userinfo
+    userinfo = substr host, 0, $I0
+    inc $I0
+    host = substr host, $I1
+    $S0 = headers['Authorization']
+    unless $S0 == '' goto L1
+    load_bytecode 'MIME/Base64.pbc'
+    $P0 = get_hll_global ['MIME';'Base64'], 'encode_base64'
+    $S0 = $P0(userinfo)
+    $S0 = 'Basic ' . $S0
+    headers['Authorization'] = $S0
+  L1:
     headers['Host'] = host
+    if null proxy goto L2
+    userinfo = proxy.'userinfo'()
+    if userinfo == '' goto L2
+    load_bytecode 'MIME/Base64.pbc'
+    $P0 = get_hll_global ['MIME';'Base64'], 'encode_base64'
+    $S0 = $P0(userinfo)
+    $S0 = 'Basic ' . $S0
+    headers['Proxy-Authorization'] = $S0
+  L2:
 .end
 
 .sub '_format_request'
@@ -924,13 +969,27 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local pmc url
     url = request.'uri'()
     .local string host, port, fullpath
+    if null proxy goto L1
+    # proxy is an URL to an HTTP server which will proxy this request
+    host = proxy.'host'()
+    port = proxy.'port'()
+    unless method == 'CONNECT' goto L3
+    fullpath = url.'host'()
+    fullpath .= ':'
+    $S0 = url.'port'()
+    fullpath .= $S0
+    goto L2
+  L3:
+    fullpath = url
+    goto L2
+  L1:
     host = url.'host'()
     port = url.'port'()
     fullpath = url.'path_query'()
     $I0 = index fullpath, '/'
-    if $I0 == 0 goto L1
+    if $I0 == 0 goto L2
     fullpath = '/' . fullpath
-  L1:
+  L2:
 
     # connect to remote site
     .local pmc sock
