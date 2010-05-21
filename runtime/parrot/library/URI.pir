@@ -280,16 +280,40 @@ see L<http://search.cpan.org/~gaas/URI/>
     $P0 = subclass ['URI';'_generic'], ['URI';'_server']
 .end
 
+=item userinfo
+
+=cut
+
+.sub 'userinfo' :method
+    $S0 = self.'authority'()
+    $I0 = index $S0, '@'
+    if $I0 < 0 goto L1
+    $S0 = substr $S0, 0, $I0
+    .return ($S0)
+  L1:
+    .return ('')
+.end
+
 =item host
 
 =cut
 
 .sub 'host' :method
     $S0 = self.'authority'()
-    $I0 = index $S0, ':'
-    if $I0 < 0 goto L1
-    $S0 = substr $S0, 0, $I0
+    .local int pos, lastpos
+    lastpos = length $S0
+    pos = 0
   L1:
+    pos = index $S0, ':', pos
+    if pos < 0 goto L2
+    $I1 = pos
+    inc pos
+    $I0 = is_cclass .CCLASS_NUMERIC, $S0, pos
+    unless $I0 goto L1
+    $I0 = find_not_cclass .CCLASS_NUMERIC, $S0, pos, lastpos
+    unless $I0 == lastpos goto L1
+    $S0 = substr $S0, 0, $I1
+  L2:
     .return ($S0)
 .end
 
@@ -301,8 +325,10 @@ see L<http://search.cpan.org/~gaas/URI/>
     $S0 = self.'authority'()
     .local int pos, lastpos
     lastpos = length $S0
-    pos = index $S0, ':'
-    if pos < 0 goto L1
+    pos = 0
+  L1:
+    pos = index $S0, ':', pos
+    if pos < 0 goto L2
     inc pos
     $I0 = is_cclass .CCLASS_NUMERIC, $S0, pos
     unless $I0 goto L1
@@ -310,7 +336,7 @@ see L<http://search.cpan.org/~gaas/URI/>
     unless $I0 == lastpos goto L1
     $S1 = substr $S0, pos
     .return ($S1)
-  L1:
+  L2:
     .tailcall self.'default_port'()
 .end
 
