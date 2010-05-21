@@ -12,7 +12,7 @@ A tool for traversing and modifying Parrot Abstract Syntax Trees.
 =cut
 
 .sub 'onload' :anon :init :load
-	$P0 = newclass ['PAST'; 'Walker']
+    $P0 = newclass ['PAST'; 'Walker']
 .end
 
 .namespace ['PAST'; 'Walker']
@@ -34,9 +34,9 @@ Subclasses should override this for specific PAST::Node subclasses in order to p
 =cut
 
 .sub 'walk' :multi(['PAST';'Walker'], ['PAST';'Node'])
-	.param pmc walker
-	.param pmc node
-	.tailcall 'walkChildren'(walker, node)
+    .param pmc walker
+    .param pmc node
+    .tailcall 'walkChildren'(walker, node)
 .end
 
 =item walkChildren(walker, node)
@@ -46,19 +46,19 @@ Iterates through the children of node, calling 'walk' with the walker and each c
 =cut
 
 .sub 'walkChildren' :multi(_, ['PAST';'Node'])
-	.param pmc walker
-	.param pmc node
-	.local int max, curr
-	.local pmc child
-	max = elements node
-	curr = 0
+    .param pmc walker
+    .param pmc node
+    .local int max, curr
+    .local pmc child
+    max = elements node
+    curr = 0
 
 loop:
-	ge curr, max, end
-	child = node[curr]
-	'walk'(walker, child)
-	inc curr
-	branch loop
+    ge curr, max, end
+    child = node[curr]
+    'walk'(walker, child)
+    inc curr
+    branch loop
 end:
 .end
 
@@ -77,8 +77,8 @@ walker->walk(node) is equivalent to PAST::Walker::walk(walker, node).
 =cut
 
 .sub 'walk' :method
-	.param pmc node
-	.tailcall 'walk'(self, node)
+    .param pmc node
+    .tailcall 'walk'(self, node)
 .end
 
 =item walkChildren(node)
@@ -88,8 +88,8 @@ walker->walkChildren(node) is equivalent to PAST::Walker::walkChildren(walker, n
 =cut
 
 .sub 'walkChildren' :method
-	.param pmc node
-	.tailcall 'walkChildren'(self, node)
+    .param pmc node
+    .tailcall 'walkChildren'(self, node)
 .end
 
 =back
