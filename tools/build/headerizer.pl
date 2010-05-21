@@ -89,8 +89,9 @@ sub extract_function_declarations_and_update_source {
 
         my $heading = $headerizer->generate_documentation_signature($decl);
 
-        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or
-            warn "$cfile_name: $name has no POD\n";
+        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or do {
+            warn "$cfile_name: $name has no POD\n" unless $name =~ /^yy/; # lexer funcs don't have to have POD
+        }
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
     print {$fhout} $text;
@@ -126,7 +127,9 @@ sub attrs_from_args {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?)|ARGFREE(_NOTNULL)?)\b/ ) ) {
-            $headerizer->squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
+            if ( $name !~ /^yy/ ) { # Don't complain about the lexer auto-generated funcs
+                $headerizer->squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
+            }
         }
         if ( ($arg =~ /\bconst\b/) && ($arg =~ /\*/) && ($arg !~ /\*\*/) && ($arg =~ /\b(ARG(MOD|OUT))\b/) ) {
             $headerizer->squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );

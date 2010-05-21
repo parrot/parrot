@@ -352,7 +352,7 @@ header_pools_iterate_callback(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     int flag,
     ARGIN_NULLOK(void *arg),
-    ARGIN(pool_iter_fn func))
+    NOTNULL(pool_iter_fn func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5)
