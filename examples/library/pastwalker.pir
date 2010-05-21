@@ -7,12 +7,16 @@
 	load_bytecode 'PCT.pbc'
 	load_bytecode 'PAST/Walker.pbc'
 	$P0 = subclass ['PAST'; 'Walker'], ['PAST'; 'Walker'; 'Dumper']
+	$P0 = subclass ['PAST'; 'Walker'], ['PAST'; 'Walker'; 'Changer']
 .end
 
 .sub 'walk' :multi(['PAST';'Walker';'Dumper'], ['PAST'; 'Val'])
 	.param pmc walker
 	.param pmc node
 	say "Val {"
+	$P0 = node.'value'()
+	print "  value => "
+	say $P0
 	'walkChildren'(walker, node)
 	say "} laV"
 .end
@@ -25,19 +29,34 @@
 	say "} raV"
 .end
 
+.sub 'walk' :multi(['PAST';'Walker';'Changer'], ['PAST';'Val'])
+	.param pmc walker
+	.param pmc node
+	node.'value'(5)
+.end
+
 .namespace []
 
 .sub 'main' :main
-	.local pmc past, walker
+	.local pmc past, dumper, changer, walk
 	past = new ['PAST';'Var']
 	$P0 = new ['PAST';'Val']
+	$P0.'value'(0)
 	push past, $P0
 	$P0 = new ['PAST';'Var']
 	push past, $P0
 
-	walker = new ['PAST';'Walker';'Dumper']
-	$P1 = get_hll_global ['PAST';'Walker'], 'walk'
-	$P1(walker, past)
+	walk = get_hll_global ['PAST';'Walker'], 'walk'
+
+	dumper = new ['PAST';'Walker';'Dumper']
+	walk(dumper, past)
+
+	say "\n\nChanging:\n"
+	
+	changer = new ['PAST';'Walker';'Changer']
+	walk(changer, past)
+
+	walk(dumper, past)
 .end
 
 # Local Variables:
