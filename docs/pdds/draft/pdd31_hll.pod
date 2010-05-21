@@ -77,11 +77,11 @@ a dynamic compilation at runtime.
 
 =item C<eval>
 
-    $P0 = compiler.'eval'(source [, options :named :slurpy])
+    $P0 = compiler.'eval'(source [, args :slurpy] [, options :named :slurpy])
 
 Compile and evaluate (execute) the code given by C<source>
-according to C<options>.  The available options are generally
-the same as for the C<compile> method above; in particular,
+with C<args> and according to C<options>.  The available options 
+are generally the same as for the C<compile> method above; in particular,
 the C<outer_ctx> option can be used to specify the outer lexical
 context for the evaluated source.
 
