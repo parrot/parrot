@@ -27,6 +27,7 @@ The HTTP redirection is supported (for example http://fperrad.googlepages.com/ho
     url = shift args
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
+    ua.'env_proxy'()
     ua.'show_progress'(1)
     response = ua.'get'(url, 'close' :named('Connection'))
     $S0 = response.'content'()

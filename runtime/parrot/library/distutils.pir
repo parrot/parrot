@@ -2155,6 +2155,7 @@ a hash
     load_bytecode 'LWP.pir'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
+    ua.'env_proxy'()
     ua.'show_progress'(1)
     $S0 = kv['smolder_url']
     response = ua.'post'($S0, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
