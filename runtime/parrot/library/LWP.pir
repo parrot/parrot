@@ -27,6 +27,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0.'add_attribute'('progress_lastp')
     $P0.'add_attribute'('progress_ani')
     $P0.'add_attribute'('max_redirect')
+    $P0.'add_attribute'('proxy')
+    $P0.'add_attribute'('no_proxy')
     .globalconst int RC_OK = 200
     .globalconst int RC_MOVED_PERMANENTLY = 301
     .globalconst int RC_FOUND = 302
@@ -44,6 +46,10 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute self, 'def_headers', $P0
     $P0 = box 7
     setattribute self, 'max_redirect', $P0
+    $P0 = new 'Hash'
+    setattribute self, 'proxy', $P0
+    $P0 = new 'ResizableStringArray'
+    setattribute self, 'no_proxy', $P0
 .end
 
 .sub 'send_request' :method
@@ -55,20 +61,25 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local string scheme
     scheme = url.'scheme'()
     self.'progress'('begin', request)
+    .local pmc proxy
+    proxy = request.'proxy'()
+    if null proxy goto L1
+    scheme = proxy.'scheme'()
+  L1:
     .local pmc protocol, response
     $P0 =get_hll_global ['LWP';'Protocol'], 'create'
     protocol = $P0(scheme, self)
-    unless null protocol goto L1
+    unless null protocol goto L2
     response = _new_response(request, RC_NOT_IMPLEMENTED, 'Not Implemented')
-    goto L2
-  L1:
-    response = protocol.'request'(request)
+    goto L3
+  L2:
+    response = protocol.'request'(request, proxy)
     setattribute response, 'request', request
     $P0 = get_hll_global ['HTTP';'Date'], 'time2str'
     $I0 = time
     $S0 = $P0($I0)
     response.'push_header'('Client-Date', $S0)
-  L2:
+  L3:
     self.'progress'('end', response)
     .return (response)
 .end
@@ -87,6 +98,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     unless $S0 == '' goto L3
     die "URL must be absolute"
   L3:
+    self.'_need_proxy'(request)
     $P0 = getattribute self, 'def_headers'
     $P1 = iter $P0
   L4:
@@ -195,6 +207,19 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc kv :slurpy :named
     .local pmc request
     $P0 = get_hll_global ['HTTP';'Request'], 'GET'
+    request = $P0(args :flat, kv :flat :named)
+    .tailcall self.'request'(request)
+.end
+
+=item head
+
+=cut
+
+.sub 'head' :method
+    .param pmc args :slurpy
+    .param pmc kv :slurpy :named
+    .local pmc request
+    $P0 = get_hll_global ['HTTP';'Request'], 'HEAD'
     request = $P0(args :flat, kv :flat :named)
     .tailcall self.'request'(request)
 .end
@@ -347,6 +372,35 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0['User-Agent'] = val
 .end
 
+.sub '_need_proxy' :method
+    .param pmc req
+    $P0 = req.'proxy'()
+    unless null $P0 goto L1
+    .local pmc uri
+    uri = req.'uri'()
+    .local string scheme
+    scheme = uri.'scheme'()
+    $P0 = getattribute self, 'proxy'
+    .local string proxy
+    proxy = $P0[scheme]
+    unless proxy goto L1
+    .local string host
+    host = uri.'host'()
+    $P0 = getattribute self, 'no_proxy'
+    $P1 = iter $P0
+  L2:
+    unless $P1 goto L3
+    $S0 = shift $P1
+    $I0 = index host, $S0
+    if $I0 < 0 goto L2
+    goto L1
+  L3:
+    $P0 = get_hll_global ['URI'], 'new_from_string'
+    $P0 = $P0(proxy)
+    req.'proxy'($P0)
+  L1:
+.end
+
 =item env_provy
 
 =cut
@@ -358,10 +412,84 @@ see http://search.cpan.org/~gaas/libwww-perl/
     unless $P1 goto L2
     $S0 = shift $P1
     $S1 = downcase $S0
-
-    # work in progress
-
+    $I0 = index $S1, '_proxy'
+    if $I0 < 0 goto L1
+    $S2 = $P0[$S0]
+    unless $S1 == 'no_proxy' goto L3
+    $P2 = split ',', $S2
+    $P3 = iter $P2
+  L4:
+    unless $P3 goto L1
+    $S0 = shift $P3
+    $S0 = trim($S0)
+    self.'no_proxy'($S0)
+    goto L4
+  L3:
+    $S3 = substr $S1, 0, $I0
+    # Ignore xxx_proxy variables if xxx isn't a supported protocol
+    $P11 = new 'Key'
+    set $P11, 'LWP'
+    $P12 = new 'Key'
+    set $P12, 'Protocol'
+    push $P11, $P12
+    $P13 = new 'Key'
+    set $P13, $S3
+    push $P11, $P13
+    $P10 = get_class $P11
+    if null $P10 goto L1
+    self.'proxy'($S3, $S2)
     goto L1
+  L2:
+.end
+
+.include 'cclass.pasm'
+
+.sub 'trim' :anon
+    .param string str
+    $I0 = length str
+    $I0 = find_not_cclass .CCLASS_WHITESPACE, str, 0, $I0
+    str = substr str, $I0
+    $I0 = length str
+  L1:
+    dec $I0
+    unless $I0 > 0 goto L2
+    $I1 = is_cclass .CCLASS_WHITESPACE, str, $I0
+    if $I1 != 0 goto L1
+  L2:
+    inc $I0
+    str = substr str, 0, $I0
+    .return (str)
+.end
+
+=item proxy
+
+=cut
+
+.sub 'proxy' :method
+    .param string scheme
+    .param string url
+    $P0 = getattribute self, 'proxy'
+    $P0[scheme] = url
+.end
+
+=item no_proxy
+
+=cut
+
+.sub 'no_proxy' :method
+    .param pmc args :slurpy
+    $I0 = elements args
+    if $I0 goto L1
+    $P0 = new 'ResizableStringArray'
+    setattribute self, 'no_proxy', $P0
+    goto L2
+  L1:
+    $P0 = getattribute self, 'no_proxy'
+  L3:
+    unless args goto L2
+    $S0 = shift args
+    push $P0, $S0
+    goto L3
   L2:
 .end
 
@@ -460,6 +588,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 =head3 Class LWP;Protocol;file
 
+=over 4
+
 =cut
 
 .namespace ['LWP';'Protocol';'file']
@@ -470,13 +600,26 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'file']
 .end
 
+=item request
+
+=cut
+
 .sub 'request' :method
     .param pmc request
+    .param pmc proxy
+    if null proxy goto L1
+    $P0 = new ['HTTP';'Response']
+    $P1 = box RC_BAD_REQUEST
+    setattribute $P0, 'code', $P1
+    $P1 = box 'You can not proxy through the filesystem'
+    setattribute $P0, 'message', $P1
+    .return ($P0)
+  L1:
     load_bytecode 'osutils.pbc'
     .local string method
     method = request.'method'()
     $P0 = get_hll_global ['LWP';'Protocol';'file'], method
-    unless null $P0 goto L1
+    unless null $P0 goto L2
     $P0 = new ['HTTP';'Response']
     $P1 = box RC_BAD_REQUEST
     setattribute $P0, 'code', $P1
@@ -485,12 +628,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P1 = box $S0
     setattribute $P0, 'message', $P1
     .return ($P0)
-  L1:
+  L2:
     .local pmc url
     url = request.'uri'()
     .local string scheme
     scheme = url.'scheme'()
-    if scheme == 'file' goto L2
+    if scheme == 'file' goto L3
     $P0 = new ['HTTP';'Response']
     $P1 = box RC_INTERNAL_SERVER_ERROR
     setattribute $P0, 'code', $P1
@@ -499,7 +642,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P1 = box $S0
     setattribute $P0, 'message', $P1
     .return ($P0)
-  L2:
+  L3:
     .tailcall $P0(self, request)
 .end
 
@@ -630,7 +773,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return (response)
 .end
 
+=back
+
 =head3 Class LWP;Protocol;http
+
+=over 4
 
 =cut
 
@@ -656,6 +803,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub '_fixup_header' :method
     .param pmc headers
     .param pmc url
+    .param pmc proxy
+    # Extract 'Host' header
     .local string host
     host = url.'authority'()
     headers['Host'] = host
@@ -762,8 +911,13 @@ see http://search.cpan.org/~gaas/libwww-perl/
   L2:
 .end
 
+=item request
+
+=cut
+
 .sub 'request' :method
     .param pmc request
+    .param pmc proxy
 
     .local string method
     method = request.'method'()
@@ -784,7 +938,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     .local pmc request_headers
     request_headers = request.'headers'()
-    self.'_fixup_header'(request_headers, url)
+    self.'_fixup_header'(request_headers, url, proxy)
 
     .local pmc ua
     ua = self.'ua'()
@@ -837,6 +991,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     self.'_parse_response_content'(response, buf)
     .return (response)
 .end
+
+=back
 
 =head1 AUTHOR
 
