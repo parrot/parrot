@@ -199,11 +199,6 @@ int check_op(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*fullname);
 
-int do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* yyscanner);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile(PARROT_INTERP,
@@ -345,9 +340,6 @@ int try_find_op(PARROT_INTERP,
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
-#define ASSERT_ARGS_do_yylex_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s) \

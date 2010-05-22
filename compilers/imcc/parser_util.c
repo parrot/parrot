@@ -494,27 +494,6 @@ extern void* yy_scan_string(const char *);
 
 /*
 
-=item C<int do_yylex_init(PARROT_INTERP, yyscan_t* yyscanner)>
-
-=cut
-
-*/
-
-int
-do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
-{
-    ASSERT_ARGS(do_yylex_init)
-    const int retval = yylex_init(yyscanner);
-
-    /* This way we can get the interpreter via yyscanner */
-    if (!retval)
-        yyset_extra(interp, *yyscanner);
-
-    return retval;
-}
-
-/*
-
 =item C<PMC * imcc_compile(PARROT_INTERP, const char *s, int pasm_file, STRING
 **error_message)>
 
@@ -546,7 +525,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     UINTVAL regs_used[4] = {3, 3, 3, 3};
     INTVAL eval_number;
 
-    do_yylex_init(interp, &yyscanner);
+    yylex_init_extra(interp, &yyscanner);
 
     /* we create not yet anchored PMCs - e.g. Subs: turn off GC */
     Parrot_block_GC_mark(interp);
@@ -864,7 +843,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
     if (ext && STREQ(ext, ".pasm")) {
         void *yyscanner;
-        do_yylex_init(interp, &yyscanner);
+        yylex_init_extra(interp, &yyscanner);
 
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
@@ -874,7 +853,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     }
     else {
         void *yyscanner;
-        do_yylex_init(interp, &yyscanner);
+        yylex_init_extra(interp, &yyscanner);
 
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp, yyscanner);

@@ -422,7 +422,7 @@ imcc_initialize(PARROT_INTERP)
 {
     yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
-    do_yylex_init(interp, &yyscanner);
+    yylex_init_extra(interp, &yyscanner);
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
