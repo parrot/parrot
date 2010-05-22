@@ -215,8 +215,6 @@ SP              [ ]
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
 
-            /* not sure we need this decrement; more testing needed */
-            IMCC_INFO(interp)->line--;
             return STRINGC;
         }
         else {
