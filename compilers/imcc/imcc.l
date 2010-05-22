@@ -125,7 +125,6 @@ OCT             0[oO][0-7]+
 BIN             0[bB][01]+
 DOT             [.]
 SIGN            [-+]
-BIGINT          {SIGN}?{DIGITS}"L"
 FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT([a-zA-Z0-9_@])
@@ -541,16 +540,6 @@ SP              [ ]
 <*>{HEX}              DUP_AND_RET(valp, INTC);
 <*>{BIN}              DUP_AND_RET(valp, INTC);
 <*>{OCT}              DUP_AND_RET(valp, INTC);
-
-<*>{BIGINT} {
-        valp->s = mem_sys_strdup(yytext);
-
-        /* trailing 'L' */
-        valp->s[strlen(valp->s) - 1] = '\0';
-
-        /* no BIGINT native format yet */
-        return STRINGC;
-    }
 
 <*>{STRINGCONSTANT} {
         valp->s = mem_sys_strdup(yytext);
