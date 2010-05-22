@@ -41,7 +41,6 @@
 #include "imc.h"
 #include "parser.h"
 
-// typedef struct yyguts_t       yyguts_t;
 typedef struct parser_state_t parser_state_t;
 
 /* parser state structure
