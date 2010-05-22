@@ -500,7 +500,6 @@ extern void* yy_scan_string(const char *);
 
 */
 
-PARROT_EXPORT
 int
 do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
 {
@@ -1191,7 +1190,6 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(PMC *io), ARGIN(const char *format), va_list
 
 */
 
-PARROT_EXPORT
 void
 imcc_init(PARROT_INTERP)
 {
@@ -1240,7 +1238,6 @@ imcc_destroy_macro_values(ARGMOD(void *value))
 
 */
 
-PARROT_EXPORT
 void
 imcc_destroy(PARROT_INTERP)
 {
