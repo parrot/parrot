@@ -140,8 +140,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "../compilers/imcc/imc.h"
-#include "../compilers/imcc/parser.h"
+#include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
@@ -206,34 +205,13 @@ main(int argc, const char *argv[])
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
         }
         else {
-            void            *yyscanner;
-            Parrot_PackFile  pf        = PackFile_new(interp, 0);
-            int              pasm_file = 0;
-
-            do_yylex_init(interp, &yyscanner);
+            STRING          *errmsg = NULL;
+            Parrot_PackFile  pf     = PackFile_new(interp, 0);
 
             Parrot_pbc_load(interp, pf);
-
-            IMCC_push_parser_state(interp);
-            IMCC_INFO(interp)->state->file = mem_sys_strdup(filename);
-
-            if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
-                IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,
-                        "Error reading source file %s.\n",
-                        filename);
-            }
-
-            if (ext && STREQ(ext, ".pasm"))
-                pasm_file = 1;
-
-            emit_open(interp, 1, NULL);
-            IMCC_INFO(interp)->state->pasm_file = pasm_file;
-            yyparse(yyscanner, interp);
-            imc_compile_all_units(interp);
-
-            imc_cleanup(interp, yyscanner);
-
-            fclose(imc_yyin_get(yyscanner));
+            Parrot_compile_file(interp, filename, &errmsg);
+            if (errmsg)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1, "%S", errmsg);
             PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
 
             /* load the source for debugger list */
