@@ -32,6 +32,7 @@ int yylex(YYSTYPE *, yyscan_t, PARROT_INTERP);
 int yylex_destroy(yyscan_t);
 
 int yylex_init(yyscan_t*);
+int yylex_init_extra(PARROT_INTERP, yyscan_t*);
 int yyget_column(yyscan_t);
 void yyset_column(int column_no , yyscan_t);
 int yyerror(yyscan_t, Interp*, const char *);

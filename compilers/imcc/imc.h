@@ -531,7 +531,6 @@ typedef struct _imcc_globals_t {
 } imcc_globals;
 
 typedef struct _imc_info_t {
-    void                  *yyscanner;
     struct _imc_info_t    *prev;
     IMC_Unit              *imc_units;
     IMC_Unit              *last_unit;
@@ -644,7 +643,6 @@ typedef struct macro_t {
 /* imclexer.c */
 FILE * imc_yyin_set(FILE *new_yyin, void *yyscanner);
 FILE * imc_yyin_get(void *yyscanner);
-
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 

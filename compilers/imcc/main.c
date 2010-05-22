@@ -47,14 +47,18 @@ extern int yydebug;
 
 static void compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
-    ARGIN_NULLOK(const char * const output_file))
+    ARGIN_NULLOK(const char * const output_file),
+    ARGIN(yyscan_t yyscanner))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 static void determine_input_file_type(PARROT_INTERP,
-    ARGIN(const char * const sourcefile))
+    ARGIN(const char * const sourcefile),
+    ARGIN(yyscan_t yyscanner))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void determine_output_file_type(PARROT_INTERP,
     ARGMOD(int *obj_file),
@@ -64,7 +68,7 @@ static void determine_output_file_type(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*obj_file);
 
-static void do_pre_process(PARROT_INTERP)
+static void do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
         __attribute__nonnull__(1);
 
 static void imcc_get_optimization_description(
@@ -93,10 +97,12 @@ static int is_all_hex_digits(ARGIN(const char *s))
 
 #define ASSERT_ARGS_compile_to_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sourcefile))
+    , PARROT_ASSERT_ARG(sourcefile) \
+    , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sourcefile))
+    , PARROT_ASSERT_ARG(sourcefile) \
+    , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_determine_output_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj_file) \
@@ -261,7 +267,7 @@ imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
 
 /*
 
-=item C<static void do_pre_process(PARROT_INTERP)>
+=item C<static void do_pre_process(PARROT_INTERP, yyscan_t yyscanner)>
 
 Pre-processor step.  Turn parser's output codes into Parrot instructions.
 
@@ -270,13 +276,11 @@ Pre-processor step.  Turn parser's output codes into Parrot instructions.
 */
 
 static void
-do_pre_process(PARROT_INTERP)
+do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
 {
     ASSERT_ARGS(do_pre_process)
     int       c;
     YYSTYPE   val;
-
-    const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     IMCC_push_parser_state(interp);
     c = yylex(&val, yyscanner, interp); /* is reset at end of while loop */
@@ -420,14 +424,12 @@ Initialise interpreter and set optimisation level.
 void
 imcc_initialize(PARROT_INTERP)
 {
-    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
+    yyscan_t yyscanner;
 
     yylex_init_extra(interp, &yyscanner);
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
-
-    IMCC_INFO(interp)->yyscanner = yyscanner;
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!IMCC_INFO(interp)->optimizer_level) {
@@ -522,7 +524,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
 /*
 
 =item C<static void determine_input_file_type(PARROT_INTERP, const char * const
-sourcefile)>
+sourcefile, yyscan_t yyscanner)>
 
 Read in the source and determine whether it's Parrot bytecode or PASM
 
@@ -531,10 +533,10 @@ Read in the source and determine whether it's Parrot bytecode or PASM
 */
 
 static void
-determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
+determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile),
+                            ARGIN(yyscan_t yyscanner))
 {
     ASSERT_ARGS(determine_input_file_type)
-    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     /* Read in the source and check the file extension for the input type;
        a file extension .pbc means it's parrot bytecode;
@@ -595,7 +597,7 @@ determine_output_file_type(PARROT_INTERP,
 /*
 
 =item C<static void compile_to_bytecode(PARROT_INTERP, const char * const
-sourcefile, const char * const output_file)>
+sourcefile, const char * const output_file, yyscan_t yyscanner)>
 
 Compile source code into bytecode (or die trying).
 
@@ -606,11 +608,11 @@ Compile source code into bytecode (or die trying).
 static void
 compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),
-                    ARGIN_NULLOK(const char * const output_file))
+                    ARGIN_NULLOK(const char * const output_file),
+                    ARGIN(yyscan_t yyscanner))
 {
     ASSERT_ARGS(compile_to_bytecode)
     PackFile *pf;
-    yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
     const int per_pbc   = STATE_WRITE_PBC(interp) || STATE_RUN_PBC(interp);
     const int opt_level = IMCC_INFO(interp)->optimizer_level;
 
@@ -673,20 +675,21 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv))
 {
     int                obj_file;
-    yyscan_t           yyscanner   = IMCC_INFO(interp)->yyscanner;
+    yyscan_t           yyscanner;
     const char * const output_file = interp->output_file;
+
+    yylex_init_extra(interp, &yyscanner);
 
     /* Figure out what kind of source file we have -- if we have one */
     if (!sourcefile || !*sourcefile)
         IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
     else
-        determine_input_file_type(interp, sourcefile);
+        determine_input_file_type(interp, sourcefile, yyscanner);
 
     if (STATE_PRE_PROCESS(interp)) {
-        do_pre_process(interp);
+        do_pre_process(interp, yyscanner);
         Parrot_destroy(interp);
         yylex_destroy(yyscanner);
-        IMCC_INFO(interp)->yyscanner = NULL;
 
         return 0;
     }
@@ -718,7 +721,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         Parrot_pbc_load(interp, pf);
     }
     else
-        compile_to_bytecode(interp, sourcefile, output_file);
+        compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
 
     /* Produce a PBC output file, if one was requested */
     if (STATE_WRITE_PBC(interp)) {
@@ -746,7 +749,6 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         imcc_run_pbc(interp, obj_file, output_file, argc, argv);
 
     yylex_destroy(yyscanner);
-    IMCC_INFO(interp)->yyscanner = NULL;
     return 0;
 }
 
