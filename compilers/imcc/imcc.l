@@ -136,7 +136,6 @@ ENC             {LETTER}{ENCCHARS}":"
 UNICODE         {ENC}{ENC}?{DQ_STRING}
 STRINGCONSTANT  {SQ_STRING}|{DQ_STRING}
 SQ_STRING       \'[^'\n]*\'
-RANKSPEC        \[[,]*\]
 EOL             \r?\n
 WS              [\t\f\r\x1a ]
 SP              [ ]
