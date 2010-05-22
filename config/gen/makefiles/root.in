@@ -285,6 +285,7 @@ GEN_LIBRARY = \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
     $(LIBRARY_DIR)/osutils.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
+    $(LIBRARY_DIR)/PAST/Transformer.pbc \
     $(LIBRARY_DIR)/PAST/Walker.pbc \
     $(LIBRARY_DIR)/ProfTest.pbc \
     $(LIBRARY_DIR)/ProfTest/PIRProfile.pir \

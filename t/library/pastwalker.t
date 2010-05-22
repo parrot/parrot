@@ -15,16 +15,16 @@ Test PAST::Walker.
     % prove t/library/configure.t
 
 =cut
-    
+
 .sub 'main' :main
     .include 'test_more.pir'
 
     load_bytecode 'PCT.pbc'
     load_bytecode 'PAST/Walker.pbc'
     register_classes()
-    
+
     plan(5)
-    test_count_node_types()    
+    test_count_node_types()
 .end
 
 =head1 Tests
@@ -46,23 +46,23 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     setattribute walker, 'counts', $P0
 
     past = 'build_count_node_types_past'()
-    
+
     walker.'walk'(past)
-    
+
     $P2 = getattribute walker, 'counts'
-    
+
     $P3 = $P2['blocks']
     is($P3, 2, "PAST::Block")
-    
+
     $P3 = $P2['ops']
     is($P3, 3, "PAST::Op")
-    
+
     $P3 = $P2['vars']
     is($P3, 2, "PAST::Var")
-    
+
     $P3 = $P2['vals']
     is($P3, 1, "PAST::Val")
-    
+
     $P3 = $P2['stmts']
     is($P3, 2, "PAST::Stmts")
 .end
@@ -70,7 +70,7 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
 .sub 'build_count_node_types_past'
     .local pmc past
     past = new ['PAST';'Block']
-    
+
     $P0 = new ['PAST'; 'Var']
     push past, $P0
     $P0 = new ['PAST'; 'Op']
@@ -135,7 +135,7 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     $P0['stmts'] = $I0
     'walkChildren'(walker, node)
 .end
-    
+
 .sub 'walk' :multi(['PAST';'Walker';'NodeCounter'], ['PAST';'Val'])
     .param pmc walker
     .param pmc node
