@@ -33,11 +33,16 @@
 .sub 'walk' :multi(['PAST';'Transformer';'Changer'], ['PAST';'Val'])
     .param pmc walker
     .param pmc node
+    $I0 = node.'value'()
+    if $I0 == 1 goto is_one
     .local pmc result
     result = clone node
     result.'value'(5)
     $P0 = result.'value'()
     .return (result)
+is_one:
+    $P0 = null
+    .return ($P0)
 .end
 
 .namespace []
@@ -47,6 +52,9 @@
     past = new ['PAST';'Var']
     $P0 = new ['PAST';'Val']
     $P0.'value'(0)
+    push past, $P0
+    $P0 = new ['PAST';'Val']
+    $P0.'value'(1)
     push past, $P0
     $P0 = new ['PAST';'Var']
     push past, $P0

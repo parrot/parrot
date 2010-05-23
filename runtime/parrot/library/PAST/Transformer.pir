@@ -40,17 +40,19 @@ end:
 .sub 'replaceChildren'
     .param pmc node
     .param pmc newChildren
-    .local int index, max
-    max = elements node
-    index = 0
-    ge index, max, end
+    .local int childIndex, resultIndex, max
+    max = elements newChildren
+    childIndex = 0
+    resultIndex = 0
+    ge childIndex, max, end
 loop:
-    $P0 = newChildren[index]
+    $P0 = newChildren[childIndex]
     if null $P0 goto reloop
-    node[index] = $P0
+    node[resultIndex] = $P0
+    inc resultIndex
 reloop:
-    inc index
-    lt index, max, loop
+    inc childIndex
+    lt childIndex, max, loop
 end:
     .return ()
 .end
