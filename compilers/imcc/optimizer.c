@@ -824,18 +824,19 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
           case PARROT_ARG_S:
             eval[i + 1] = i;        /* regs used are I0, I1, I2 */
             if (ops <= 2 || i) { /* fill source regs */
+                SymReg *r_ = r[i]->type & VT_CONSTP ? r[i]->reg : r[i];
                 switch (r[i]->set) {
                   case 'I':
-                    REG_INT(interp, i) = IMCC_int_from_reg(interp, r[i]);
+                    REG_INT(interp, i) = IMCC_int_from_reg(interp, r_);
                     break;
                   case 'N':
                     {
-                        STRING * const s = Parrot_str_new(interp, r[i]->name, 0);
+                        STRING * const s = Parrot_str_new(interp, r_->name, 0);
                         REG_NUM(interp, i) = Parrot_str_to_num(interp, s);
                     }
                     break;
                   case 'S':
-                    REG_STR(interp, i) = IMCC_string_from_reg(interp, r[i]);
+                    REG_STR(interp, i) = IMCC_string_from_reg(interp, r_);
                     break;
                   default:
                     break;
