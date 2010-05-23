@@ -231,15 +231,18 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
             break;
           case KEY_string_FLAG|KEY_register_FLAG:
             {
-            const STRING * const s = REG_STR(interp,
-                 VTABLE_get_integer(interp, key));
-            STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
-            if (escaped)
-                len += Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"",
-                    VTABLE_get_integer(interp, key), escaped);
+            const INTVAL keynum = VTABLE_get_integer(interp, key);
+            if (keynum < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR)) {
+                const STRING * const s = REG_STR(interp, keynum);
+                STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
+                if (escaped)
+                    len += Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"",
+                            keynum, escaped);
+                else
+                    len += Parrot_io_eprintf(debugger, "S%vd=\"(null)\"", keynum);
+            }
             else
-                len += Parrot_io_eprintf(debugger, "S%vd=\"(null)\"",
-                        VTABLE_get_integer(interp, key));
+                len += Parrot_io_eprintf(debugger, "**WRONG KEY STRING REG %d**", keynum);
             }
             break;
           case KEY_pmc_FLAG|KEY_register_FLAG:
