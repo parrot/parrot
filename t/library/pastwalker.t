@@ -12,7 +12,7 @@ Test PAST::Walker.
 
 =head1 SYNOPSIS
 
-    % prove t/library/configure.t
+    % prove t/library/pastwalker.t
 
 =cut
 
@@ -29,8 +29,6 @@ Test PAST::Walker.
 
 =head1 Tests
 
-=cut
-
 =over 4
 
 =item test_count_node_types()
@@ -41,9 +39,8 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
 
 .sub 'test_count_node_types'
     .local pmc walker, past
-    $P0 = new 'Hash'
     walker = new ['PAST';'Walker';'NodeCounter']
-    setattribute walker, 'counts', $P0
+    walker.'reset'()
 
     past = 'build_count_node_types_past'()
 
@@ -156,7 +153,12 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     'walkChildren'(walker, node)
 .end
 
+.namespace ['PAST'; 'Walker'; 'NodeCounter']
 
+.sub 'reset' :method
+    $P0 = new 'Hash'
+    setattribute self, 'counts', $P0
+.end
 
 # Local Variables:
 #   mode: pir
