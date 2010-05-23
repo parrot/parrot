@@ -19,7 +19,7 @@ Test the LWP library
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'LWP.pir'
+    load_bytecode 'LWP/UserAgent.pir'
     load_bytecode 'osutils.pbc'
 
     plan(48)

@@ -361,7 +361,7 @@ TEST
     set $P0, 1
     $P0[0] = 'parrot_test_run.tar.gz'
     push contents, $P0
-    load_bytecode 'LWP.pir'
+    load_bytecode 'LWP/UserAgent.pir'
     .const string url = 'http://smolder.plusthree.com/app/projects/process_add_report/8'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']

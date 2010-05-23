@@ -274,7 +274,8 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/HTTP/Message.pbc \
     $(LIBRARY_DIR)/Iter.pbc \
     $(LIBRARY_DIR)/JSON.pbc \
-    $(LIBRARY_DIR)/LWP.pbc \
+    $(LIBRARY_DIR)/LWP/Protocol.pbc \
+    $(LIBRARY_DIR)/LWP/UserAgent.pbc \
     $(LIBRARY_DIR)/Math/Rand.pbc \
     $(LIBRARY_DIR)/MIME/Base64.pbc \
     $(LIBRARY_DIR)/NCI/Utils.pbc \

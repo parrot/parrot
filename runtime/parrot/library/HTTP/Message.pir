@@ -171,7 +171,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .include 'cclass.pasm'
 
 .sub '' :init :load :anon
-    load_bytecode 'URI.pir'
+    load_bytecode 'URI.pbc'
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Request']
     $P0.'add_attribute'('method')
     $P0.'add_attribute'('uri')

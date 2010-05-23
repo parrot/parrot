@@ -21,7 +21,7 @@ The HTTP redirection is supported (for example http://fperrad.googlepages.com/ho
 
 .sub 'main' :main
     .param pmc args
-    load_bytecode 'LWP.pir'
+    load_bytecode 'LWP/UserAgent.pir'
     $S0 = shift args
     .local string url
     url = shift args

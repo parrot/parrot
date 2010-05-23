@@ -2152,7 +2152,7 @@ a hash
     set $P0, 1
     $P0[0] = archive
     push contents, $P0
-    load_bytecode 'LWP.pir'
+    load_bytecode 'LWP/UserAgent.pir'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
     ua.'env_proxy'()
