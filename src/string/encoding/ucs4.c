@@ -328,8 +328,15 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
+#if PARROT_HAS_ICU
     return Parrot_str_new_init(interp, (char*)src->strstart + offset * sizeof (UChar32),
                                count * sizeof (UChar32), src->encoding, src->charset, 0);
+#else
+    UNUSED(src);
+    UNUSED(offset);
+    UNUSED(count);
+    no_ICU_lib(interp);
+#endif
 }
 
 /*
@@ -409,7 +416,7 @@ Moves the string iterator C<i> to the next UCS-4 codepoint.
 */
 
 static UINTVAL
-ucs4_decode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i))
+ucs4_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(ucs4_decode_and_advance)
 #if PARROT_HAS_ICU
@@ -438,7 +445,7 @@ next position in the string.
 */
 
 static void
-ucs4_encode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL c)
+ucs4_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(ucs4_encode_and_advance)
 #if PARROT_HAS_ICU
@@ -492,7 +499,7 @@ Moves the string iterator C<i> to the position C<n> in the string.
 */
 
 static void
-ucs4_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
+ucs4_set_position(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
     ASSERT_ARGS(ucs4_set_position)
 #if PARROT_HAS_ICU
