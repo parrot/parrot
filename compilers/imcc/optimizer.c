@@ -1416,7 +1416,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
             const SymReg * const lab = ins->symregs[0];
-            used = IMCC_INFO(interp)->has_compile ? 1 : 0;
+            used = 0;
 
             if (!lab->first_ins)
                 continue;

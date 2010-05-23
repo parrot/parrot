@@ -479,8 +479,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
                 ins->type |= ITALIAS;
         }
-        else if (STREQ(name, "compile"))
-            ++IMCC_INFO(interp)->has_compile;
 
       found_ins:
         if (emit)

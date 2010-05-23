@@ -799,7 +799,6 @@ emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
 {
     ASSERT_ARGS(emit_open)
     IMCC_INFO(interp)->emitter       = type;
-    IMCC_INFO(interp)->has_compile   = 0;
     IMCC_INFO(interp)->dont_optimize = 0;
 
     return (emitters[IMCC_INFO(interp)->emitter]).open(interp, param);

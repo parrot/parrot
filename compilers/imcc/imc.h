@@ -577,7 +577,6 @@ typedef struct _imc_info_t {
     int                   error_code;      /* The Error code. */
     int                   expect_pasm;
     int                   gc_off;
-    int                   has_compile;
     int                   imcc_warn;
     int                   in_pod;
     int                   ins_line;
