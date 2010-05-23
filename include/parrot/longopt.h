@@ -44,6 +44,16 @@ struct longopt_opt_info {
 
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
+#define OPT_GC_DEBUG       128
+#define OPT_DESTROY_FLAG   129
+#define OPT_HELP_DEBUG     130
+#define OPT_PBC_OUTPUT     131
+#define OPT_RUNTIME_PREFIX 132
+#define OPT_HASH_SEED      133
+
+PARROT_EXPORT
+const struct longopt_opt_decl Parrot_cmd_options[];
+
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

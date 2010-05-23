@@ -61,12 +61,9 @@ static void determine_input_file_type(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void determine_output_file_type(PARROT_INTERP,
-    ARGMOD(int *obj_file),
     ARGIN(const char *output_file))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*obj_file);
+        __attribute__nonnull__(2);
 
 static void do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
         __attribute__nonnull__(1);
@@ -78,13 +75,11 @@ static void imcc_get_optimization_description(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*opt_desc);
 
-static void imcc_run_pbc(PARROT_INTERP,
-    int obj_file,
-    ARGIN_NULLOK(const char *output_file),
+static void imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN(const char **argv))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(3);
 
 static void imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
         __attribute__nonnull__(1)
@@ -105,14 +100,13 @@ static int is_all_hex_digits(ARGIN(const char *s))
     , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_determine_output_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj_file) \
     , PARROT_ASSERT_ARG(output_file))
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_get_optimization_description \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(opt_desc))
-#define ASSERT_ARGS_imcc_run_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_imcc_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -153,116 +147,89 @@ is_all_hex_digits(ARGIN(const char *s))
     return 1;
 }
 
-/*
-
-=item C<void imcc_start_handling_flags(PARROT_INTERP)>
-
-Initialize handling of IMCC related command line flags.
-
-=cut
-
-*/
-void
-imcc_start_handling_flags(PARROT_INTERP)
+static void
+imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
+    ASSERT_ARGS(imcc_parseflags)
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+
+    /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
-}
 
-/*
+    while (longopt_get(interp, argc, argv, Parrot_cmd_options, &opt) > 0) {
+        switch (opt.opt_id) {
+          case 'd':
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
+                IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, NULL, 16);
+            }
+            else {
+                IMCC_INFO(interp)->debug++;
+            }
+            break;
+          case 'w':
+            /* FIXME It's not best way to set warnings... */
+            Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
+            IMCC_INFO(interp)->imcc_warn = 1;
+            break;
+          case 'G':
+            IMCC_INFO(interp)->gc_off = 1;
+            break;
+          case 'a':
+            SET_STATE_PASM_FILE(interp);
+            break;
+          case 'r':
+            if (STATE_RUN_PBC(interp))
+                SET_STATE_RUN_FROM_FILE(interp);
+            SET_STATE_RUN_PBC(interp);
+            break;
+          case 'c':
+            SET_STATE_LOAD_PBC(interp);
+            break;
+          case 'v':
+            IMCC_INFO(interp)->verbose++;
+            break;
+          case 'y':
+            yydebug = 1;
+            break;
+          case 'E':
+            SET_STATE_PRE_PROCESS(interp);
+            break;
+          case 'o':
+            UNSET_STATE_RUN_PBC(interp);
+            interp->output_file = opt.opt_arg;
+            break;
 
-=item C<int imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
-Parrot_Run_core_t *core)>
+          case OPT_PBC_OUTPUT:
+            UNSET_STATE_RUN_PBC(interp);
+            SET_STATE_WRITE_PBC(interp);
+            if (!interp->output_file)
+                interp->output_file = "-";
+            break;
 
-Handle Parrot's command line for IMCC related option and set appropriate flags.
+          case 'O':
+            if (!opt.opt_arg) {
+                IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
+                break;
+            }
+            if (strchr(opt.opt_arg, 'p'))
+                IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
+            if (strchr(opt.opt_arg, 'c'))
+                IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
 
-Return 1 if flag handled, 0 if not.
+            /* currently not ok due to different register allocation */
+            if (strchr(opt.opt_arg, '1')) {
+                IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
+            }
+            if (strchr(opt.opt_arg, '2')) {
+                IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
+            }
+            break;
 
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-int
-imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
-    Parrot_Run_core_t *core)
-{
-    PARROT_ASSERT(opt);
-    PARROT_ASSERT(core);
-
-    switch (opt->opt_id) {
-      case 'd':
-        if (opt->opt_arg && is_all_hex_digits(opt->opt_arg)) {
-            IMCC_INFO(interp)->debug = strtoul(opt->opt_arg, NULL, 16);
-        }
-        else {
-            IMCC_INFO(interp)->debug++;
-        }
-        break;
-      case 'w':
-        /* FIXME It's not best way to set warnings... */
-        Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
-        IMCC_INFO(interp)->imcc_warn = 1;
-        break;
-      case 'G':
-        IMCC_INFO(interp)->gc_off = 1;
-        break;
-      case 'a':
-        SET_STATE_PASM_FILE(interp);
-        break;
-      case 'r':
-        if (STATE_RUN_PBC(interp))
-            SET_STATE_RUN_FROM_FILE(interp);
-        SET_STATE_RUN_PBC(interp);
-        break;
-      case 'c':
-        SET_STATE_LOAD_PBC(interp);
-        break;
-      case 'v':
-        IMCC_INFO(interp)->verbose++;
-        break;
-      case 'y':
-        yydebug = 1;
-        break;
-      case 'E':
-        SET_STATE_PRE_PROCESS(interp);
-        break;
-      case 'o':
-        UNSET_STATE_RUN_PBC(interp);
-        interp->output_file = opt->opt_arg;
-        break;
-
-      case OPT_PBC_OUTPUT:
-        UNSET_STATE_RUN_PBC(interp);
-        SET_STATE_WRITE_PBC(interp);
-        if (!interp->output_file)
-            interp->output_file = "-";
-        break;
-
-      case 'O':
-        if (!opt->opt_arg) {
-            IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
+          default:
+            /* skip already processed arguments */
             break;
         }
-        if (strchr(opt->opt_arg, 'p'))
-            IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
-        if (strchr(opt->opt_arg, 'c'))
-            IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
-
-        /* currently not ok due to different register allocation */
-        if (strchr(opt->opt_arg, '1')) {
-            IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
-        }
-        if (strchr(opt->opt_arg, '2')) {
-            IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
-        }
-        break;
-
-      default:
-        return 0;
     }
-
-    return 1;
 }
 
 /*
@@ -413,8 +380,8 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
 
 /*
 
-=item C<static void imcc_run_pbc(PARROT_INTERP, int obj_file, const char
-*output_file, int argc, const char **argv)>
+=item C<void imcc_run_pbc(PARROT_INTERP, const char *output_file, int argc,
+const char **argv)>
 
 Write out or run Parrot bytecode.
 
@@ -422,25 +389,13 @@ Write out or run Parrot bytecode.
 
 */
 
-static void
-imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
+void
+imcc_run_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *output_file),
         int argc, ARGIN(const char **argv))
 {
-    ASSERT_ARGS(imcc_run_pbc)
-    if (IMCC_INFO(interp)->imcc_warn)
-        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
-    else
-        PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
+    /* ASSERT_ARGS(imcc_run_pbc) */
 
-    if (!IMCC_INFO(interp)->gc_off) {
-        Parrot_unblock_GC_mark(interp);
-        Parrot_unblock_GC_sweep(interp);
-    }
-
-    if (obj_file)
-        IMCC_info(interp, 1, "Writing %s\n", output_file);
-    else
-        IMCC_info(interp, 1, "Running...\n");
+    IMCC_info(interp, 1, "Running...\n");
 
     /* runs :init functions */
     PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
@@ -536,8 +491,8 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile),
 
 /*
 
-=item C<static void determine_output_file_type(PARROT_INTERP, int *obj_file,
-const char *output_file)>
+=item C<static void determine_output_file_type(PARROT_INTERP, const char
+*output_file)>
 
 Decide what kind of file we are to output.
 
@@ -546,8 +501,7 @@ Decide what kind of file we are to output.
 */
 
 static void
-determine_output_file_type(PARROT_INTERP,
-    ARGMOD(int *obj_file), ARGIN(const char *output_file))
+determine_output_file_type(PARROT_INTERP, ARGIN(const char *output_file))
 {
     ASSERT_ARGS(determine_output_file_type)
     const char * const ext = strrchr(output_file, '.');
@@ -555,10 +509,6 @@ determine_output_file_type(PARROT_INTERP,
     if (ext) {
         if (STREQ(ext, ".pbc"))
             SET_STATE_WRITE_PBC(interp);
-        else if (STREQ(ext, PARROT_OBJ_EXT)) {
-            UNUSED(obj_file);
-            IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
-        }
     }
 }
 
@@ -642,9 +592,10 @@ int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv))
 {
-    int                obj_file;
     yyscan_t           yyscanner;
     const char * const output_file = interp->output_file;
+
+    imcc_parseflags(interp, argc, argv);
 
     /* PMCs in IMCC_INFO won't get marked */
     Parrot_block_GC_mark(interp);
@@ -667,9 +618,8 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     }
 
     /* Do we need to produce an output file? If so, what type? */
-    obj_file = 0;
     if (output_file) {
-        determine_output_file_type(interp, &obj_file, output_file);
+        determine_output_file_type(interp, output_file);
 
         if (STREQ(sourcefile, output_file) && !STREQ(sourcefile, "-"))
             IMCC_fatal_standalone(interp, 1, "main: outputfile is sourcefile\n");
@@ -716,12 +666,24 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         }
     }
 
-    /* Run the bytecode */
-    if (STATE_RUN_PBC(interp))
-        imcc_run_pbc(interp, obj_file, output_file, argc, argv);
+    /* tear down the compilation context */
+    if (IMCC_INFO(interp)->imcc_warn)
+        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
+    else
+        PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
+
+    if (!IMCC_INFO(interp)->gc_off) {
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
+    }
 
     yylex_destroy(yyscanner);
-    return 0;
+
+    /* should the bytecode be run */
+    if (STATE_RUN_PBC(interp))
+        return 1;
+    else
+        return 0;
 }
 
 /*
