@@ -496,7 +496,7 @@ inline op find_sub_not_null(out PMC, in STR) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 

@@ -297,7 +297,7 @@ TEST
     $I1 = index $S0, '/branches/'
     unless $I1 >= 0 goto L2
     $I1 += 10
-    $I2 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
+    $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
     $I3 = $I2 - $I1
     $S1 = substr $S0, $I1, $I3
   L2:
