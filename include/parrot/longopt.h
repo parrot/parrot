@@ -52,7 +52,7 @@ struct longopt_opt_info {
 #define OPT_HASH_SEED      133
 
 PARROT_DATA
-const struct longopt_opt_decl Parrot_cmd_options[];
+const struct longopt_opt_decl *Parrot_cmd_options;
 
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
