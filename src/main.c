@@ -129,7 +129,6 @@ main(int argc, const char *argv[])
 
     /* Now initialize interpreter */
     initialize_interpreter(interp, (void*)&stacktop);
-    imcc_initialize(interp);
 
     /* Parse flags */
     sourcefile = parseflags(interp, &argc, &argv, &core, &trace);

@@ -413,38 +413,6 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
 
 /*
 
-=item C<void imcc_initialize(PARROT_INTERP)>
-
-Initialise interpreter and set optimisation level.
-
-=cut
-
-*/
-
-void
-imcc_initialize(PARROT_INTERP)
-{
-    yyscan_t yyscanner;
-
-    yylex_init_extra(interp, &yyscanner);
-
-    Parrot_block_GC_mark(interp);
-    Parrot_block_GC_sweep(interp);
-
-    /* Default optimization level is zero; see optimizer.c, imc.h */
-    if (!IMCC_INFO(interp)->optimizer_level) {
-#if 1
-        IMCC_INFO(interp)->optimizer_level = 0;
-#else
-        /* won't even make with this: something with Data::Dumper and
-         * set_i_p_i*/
-        IMCC_INFO(interp)->optimizer_level = OPT_PRE;
-#endif
-    }
-}
-
-/*
-
 =item C<static void imcc_run_pbc(PARROT_INTERP, int obj_file, const char
 *output_file, int argc, const char **argv)>
 
@@ -677,6 +645,10 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     int                obj_file;
     yyscan_t           yyscanner;
     const char * const output_file = interp->output_file;
+
+    /* PMCs in IMCC_INFO won't get marked */
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
 
     yylex_init_extra(interp, &yyscanner);
 
