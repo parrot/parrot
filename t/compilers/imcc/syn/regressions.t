@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUT', 'fold symbolic constants (TT #1652)');
     say $I0
 
     .const num DAYS_PER_YEAR = 365.24e0
-    $N0 = DAYS_PER_YEAR * 2.96460137564761618e-03 
+    $N0 = DAYS_PER_YEAR * 2.96460137564761618e-03
     'printf'("%f\n", $N0)
 
     .const string HI = "Hello "
