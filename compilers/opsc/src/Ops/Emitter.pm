@@ -23,7 +23,9 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
 
     if !%flags<core> {
         $base := subst( $file, /.ops$$/, '');
-        $base := subst( $base, /.*\//, '');
+        # Workarond for nqp-setting subst bug.
+        $base := subst( $base, /.*[\/\\]/, '') if $base ~~ /[\/\\]/;
+        #pir::say('# ' ~ $base);
     }
 
     my $base_ops_stub := $base ~ '_ops' ~ $suffix;
