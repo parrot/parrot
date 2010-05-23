@@ -62,7 +62,7 @@ static int longopt_get_shortopt(PARROT_INTERP,
 
 static char longopt_error_buffer[512];
 
-PARROT_EXPORT
+PARROT_DATA
 const struct longopt_opt_decl Parrot_cmd_options[] = {
     { '.', '.', (OPTION_flags)0, { "--wait" } },
     { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },

@@ -51,7 +51,7 @@ struct longopt_opt_info {
 #define OPT_RUNTIME_PREFIX 132
 #define OPT_HASH_SEED      133
 
-PARROT_EXPORT
+PARROT_DATA
 const struct longopt_opt_decl Parrot_cmd_options[];
 
 /* HEADERIZER BEGIN: src/longopt.c */
