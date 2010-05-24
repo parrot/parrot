@@ -1,0 +1,699 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/instrument.pmc - Interface to hook into a child interpreter.
+
+=head1 DESCRIPTION
+
+C<Instrument> is a PMC class that allows dynamic execution introspection
+to be done on a child interpreter.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/imcc.h"
+#include "parrot/runcore_api.h"
+#include "parrot/embed.h"
+
+/*
+ * Extend the runcore_t struct to include a reference
+ *  to the supervisor interpreter.
+ */
+typedef struct Instrument_runcore_t {
+    STRING                  *name;
+    int                      id;
+    oplib_init_f             opinit;
+    runcore_runops_fn_type   runops;
+    runcore_destroy_fn_type  destroy;
+    runcore_prepare_fn_type  prepare_run;
+    INTVAL                   flags;
+    
+    /* End of common members */
+    PMC                     *supervisor;
+} Instrument_runcore_t;
+
+/* Define the enumeration for op lookups */
+typedef enum {
+    OP_LOOKUP   = 0,
+    OP_INFO     = 1,
+    OP_FULLNAME = 2,
+    OP_NAME     = 3,
+    OP_ARGS     = 4,
+    OP_COUNT    = 5
+} Instrument_op_query_t;
+
+/* Runcore Function Prototypes */
+static void Instrument_runcore_init (PARROT_INTERP, PMC *supervisor);
+static opcode_t * Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc);
+
+/* Helper Function Prototypes */
+static void gather_params(PARROT_INTERP, opcode_t *pc, PMC *supervisor, PMC *params);
+
+pmclass Instrument auto_attrs dynpmc {
+    ATTR Parrot_Interp  supervisor;  /* The interpreter that created this instance */
+    ATTR Parrot_Interp  supervised;  /* The interpreter running the code */
+    ATTR PMC           *op_hooks;    /* A ResizablePMCArray for holding references to op hooks */
+    ATTR PMC           *op_catchall; /* These callbacks are to be called on each op */
+    ATTR PMC           *probes;      /* A list of probes registered. */
+
+/*
+
+=item C<void init()>
+
+Initializes the pmc and creates a child interpreter.
+
+=cut
+
+*/
+
+    VTABLE void init () {
+        struct parrot_interp_t *in;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        /* Create the child interpreter PMC */
+        attr->supervisor  = INTERP;
+        attr->supervised  = Parrot_new(attr->supervisor);
+        attr->op_hooks    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        attr->op_catchall = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        attr->probes      = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        
+        /* Initialize the runcore for the child interpreter */  
+        Instrument_runcore_init(attr->supervised, SELF);
+        
+        /* Set self to destroy manually */
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Cleans up after the PMC.
+
+=cut
+
+*/
+
+    VTABLE void destroy () {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        /* Delete the supervised interpreter */
+        Parrot_destroy(attr->supervised);
+        
+        /* Set the references to null */
+        /* TODO: Is there a better way to delete them? */
+        attr->supervisor  = NULL;
+        attr->supervised  = NULL;
+        attr->op_hooks    = NULL;
+        attr->op_catchall = NULL;
+        attr->probes      = NULL;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks internal data structures as live to the gc.
+
+=cut
+
+*/
+
+    VTABLE void mark () {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+    
+        /* Mark attributes as alive */
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->op_hooks);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->op_catchall);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->probes);
+    }
+
+/*
+
+=item C<void * get_pointer()>
+
+Returns a reference to the supervising interpreter,
+meaning the interpreter that runs the instruments.
+
+=cut
+
+*/
+
+    VTABLE void * get_pointer () {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        return attr->supervisor;
+    }
+
+/*
+
+=item C<void set_pointer(void *pc_pointer)>
+
+With the pc_pointer passed in, execute the current op at
+the given address after firing all hooks that apply.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer (void *pc_pointer) {
+        opcode_t *pc = (opcode_t *) pc_pointer;
+        INTVAL hook_count, cur_hook, catchall_count, cur_catchall;
+        PMC *hooks;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        STRING *full_name;
+        
+        /* Set the full name of the op. */
+        full_name = CONST_STRING(INTERP, attr->supervised->op_info_table[*pc].full_name);
+        
+        /* Fire the catchall hooks first */
+        catchall_count = VTABLE_get_integer(INTERP, attr->op_catchall);
+        for(cur_catchall = 0; cur_catchall < catchall_count; cur_catchall++) {
+            PMC *cur_catchall_sub;
+            
+            cur_catchall_sub = VTABLE_get_pmc_keyed_int(INTERP, attr->op_catchall,
+                                                    cur_catchall);
+            if(!PMC_IS_NULL(cur_catchall_sub)) 
+                Parrot_ext_call(INTERP, cur_catchall_sub, "S->", full_name);
+        }
+        
+        /* Fire the specific probes */
+        hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, *pc);
+        if(!PMC_IS_NULL(hooks)) {
+        
+            hook_count = VTABLE_get_integer(INTERP, hooks);
+            for(cur_hook = 0; cur_hook < hook_count; cur_hook++) {
+                PMC *cur_hook_sub;
+                
+                cur_hook_sub = VTABLE_get_pmc_keyed_int(INTERP, hooks, cur_hook);
+                if(!PMC_IS_NULL(cur_hook_sub)) 
+                    Parrot_ext_call(INTERP, cur_hook_sub, "S->", full_name);
+            }
+        }
+        
+        /* Done firing hooks */
+        return;
+    }
+
+/*
+
+=item C<void run(STRING file, PMC *args)>
+
+Loads the given file and run it with the args given.
+
+=cut
+
+*/
+
+    METHOD run (STRING file, PMC *args) {
+        PMC *entry_point;
+        int argc = 0, status;
+        char * default_argv[] = {NULL};
+        char ** argv = default_argv;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        PMC *probe_iter;
+            
+        /* If args is not null, is of type ResizableStringArray and has at
+           least 1 element, process it so we can pass it to the child interpreter.
+         */
+        if(!Parrot_pmc_is_null(INTERP, args)
+           && VTABLE_type(INTERP, args) == enum_class_ResizableStringArray
+           && VTABLE_get_integer(INTERP, args) > 0) {
+            /* There are some arguments to be passed to
+               the child interpreter. We need to convert
+               them from Parrot strings to c-strings so
+               that we can pass it to imcc.
+            */
+            
+            /* Get the number of argument values */
+            int count = VTABLE_get_integer(INTERP, args);
+            
+            /* Allocate enough memory for the argv pointer array */
+            argv = (char **) mem_gc_allocate_n_zeroed_typed(INTERP, count, char *);
+            
+            /* Populate the argv array, updating argc in the process */
+            for(argc = 0; argc < count; argc++) {
+                STRING *cur;
+                
+                cur = VTABLE_get_string_keyed_int(INTERP, args, argc);
+                argv[argc] = Parrot_str_to_cstring(INTERP, cur);
+            }
+        }
+        
+        /* Begin Execution */
+        status = imcc_run(attr->supervised,
+                    Parrot_str_cstring(attr->supervised, file),
+                    argc, (const char **) argv);
+        if (status)
+            imcc_run_pbc(attr->supervised,
+                         attr->supervised->output_file,
+                         argc,(const char **) argv);
+        
+        /* Finalize the instruments */
+        probe_iter = VTABLE_get_iter(INTERP, attr->probes);
+        while(VTABLE_get_bool(INTERP, probe_iter)) {
+            PMC *cur_probe, *finalize_sub;
+            
+            /* For the current probe, get the finalize attribute. */
+            cur_probe = VTABLE_shift_pmc(INTERP, probe_iter);
+            finalize_sub = VTABLE_get_attr_str(INTERP, cur_probe,
+                                               CONST_STRING(INTERP, "finalize"));
+            
+            /* If it is set, call that sub. */
+            if(!PMC_IS_NULL(finalize_sub)) {
+                Parrot_ext_call(INTERP, finalize_sub, "->");
+            }
+        }
+        
+        /* We should free the cstrings allocated above if needed */
+        if(argc > 0) {
+            for(; argc > 0; argc--) {
+                Parrot_str_free_cstring(argv[argc - 1]);
+                argv[argc - 1] = NULL;
+            }
+            
+            /* Free the memory allocated to hold the string pointers */
+            mem_gc_free(INTERP, argv);
+            argv = NULL;
+        }
+    }
+
+/*
+
+=item C<void attach(PMC *obj)>
+
+With the passed in object, assume it is a class with the method 'enable'
+and attribute 'instr_obj'. Set the 'instr_obj' to SELF and call the
+'enable' method of the object for the object to commence attaching the hooks.
+
+=cut
+
+*/
+
+    METHOD attach (PMC *obj) {
+        PMC *enable_method;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+    
+        /* We do not care what type of object it is,
+           as long as the object has the attribute instr_obj and
+           the method enable. */
+        
+        /* Set the instrument reference attribute of the object,
+           and call its enable method. */
+        VTABLE_set_attr_str(
+            INTERP, obj,
+            CONST_STRING(INTERP, "instr_obj"),
+            SELF
+        );
+        
+        /* Find the enable method */
+        enable_method = VTABLE_find_method(INTERP, obj, CONST_STRING(INTERP, "enable"));
+        if(PMC_IS_NULL(enable_method)) {
+            /* Error! Could not find the enable method. */
+            Parrot_ex_throw_from_c_args(
+                INTERP, NULL, 1,
+                "Could not locate the method 'enable'."
+            );
+        }
+        
+        /* Call the method.
+           The first parameter to a method is the object itself.
+           The enable method will be calling insert_hooks(HASH) to register the hooks. */
+        Parrot_ext_call(INTERP, enable_method, "P->", obj);
+        
+        /* Register the probe. */
+        VTABLE_push_pmc(INTERP, attr->probes, obj);
+    }
+
+/*
+
+=item C<void *op_query(INTVAL query_type, PMC *key :optional)>
+
+Performs a op query, based on the query_type.
+0: Lookup the op number given the ops' name. Returns an array of all the indexes with that name.
+1: Returns a hash with the key and data as in the op's op_info_t entry.
+2: Returns the op's full name.
+3: Returns the op's short name.
+4: Returns an array with the type of arguments the op expects.
+5: Returns the total number of ops in the op_lib.
+
+TODO: Create a .pasm file for the constants.
+
+=cut
+
+*/
+
+    METHOD op_query (INTVAL query_type, PMC *key :optional) {
+        PMC *res;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        /* Perform the required lookup */
+        switch (query_type) {
+          case OP_LOOKUP:
+            {
+                /* Given the name of the op, return its number.
+                   Name given can be either short or long name.
+                   Return value is in the form of a ResizableIntegerArray */
+                int index;
+                op_info_t *head    = attr->supervised->op_info_table;
+                STRING *name       = VTABLE_get_string(INTERP, key);
+                char const *c_name = Parrot_str_cstring(INTERP, name);
+                res                = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+
+                
+                
+                /* Find the first index of the op. */
+                index = attr->supervised->op_lib->op_code(attr->supervised, c_name, 0);
+                if(index < 0) {
+                    index = attr->supervised->op_lib->op_code(attr->supervised, c_name, 1);
+                }
+                
+                /* Check if long or short name lookups fail. */
+                if(index < 0) {
+                    break;
+                }
+                
+                /* Iterate onwards until the name does not match. */
+                do {
+                
+                    VTABLE_push_integer(INTERP, res, index);
+                    index++;
+                    
+                } while (STREQ(c_name, head[index].name)
+                         || STREQ(c_name, head[index].full_name));
+            
+                break; 
+            }
+                
+          case OP_INFO:
+            /* Returns a Hash with the op info as shown in
+               the op_info_table */
+            /* TODO */
+            res = Parrot_pmc_new(INTERP, enum_class_Undef);
+            
+            break;
+                
+          case OP_FULLNAME:
+            {
+                /* Given the op number, return the full name of the op */
+                size_t index;
+                STRING *name;
+                char const *c_name;
+                index = VTABLE_get_integer(INTERP, key);
+                
+                if(index > attr->supervised->op_lib->op_count) {
+                    /* Error! Index given is out of range. */
+                    Parrot_ex_throw_from_c_args(
+                        INTERP, NULL, 1,
+                        "Op index out of range."
+                    );
+                }
+                
+                c_name = attr->supervised->op_info_table[index].full_name;
+                name = Parrot_str_new(INTERP, c_name, strlen(c_name));
+                res  = Parrot_pmc_new(INTERP, enum_class_String);
+                
+                VTABLE_set_string_native(INTERP, res, name);
+                
+                break;
+            }
+               
+          case OP_NAME:
+            {
+                /* Given the op number, return the short name of the op */
+                size_t index;
+                STRING *name;
+                char const *c_name;
+                index = VTABLE_get_integer(INTERP, key);
+                
+                if(index > attr->supervised->op_lib->op_count) {
+                    /* Error! Index given is out of range. */
+                    Parrot_ex_throw_from_c_args(
+                        INTERP, NULL, 1,
+                        "Op index out of range."
+                    );
+                }
+                
+                c_name = attr->supervised->op_info_table[index].name;
+                name = Parrot_str_new(INTERP, c_name, strlen(c_name));
+                res  = Parrot_pmc_new(INTERP, enum_class_String);
+                
+                VTABLE_set_string_native(INTERP, res, name);
+                
+                break;
+            }
+            
+          case OP_ARGS:
+            /* Return a ResizablePMCArray with the types of arguments
+               in order of how the op expects it. */
+            /* TODO */
+            res = Parrot_pmc_new(INTERP, enum_class_Undef);
+            
+            break;
+            
+          case OP_COUNT:
+            {
+                /* Return the total number of ops in the supervised
+                   ops table */
+                INTVAL count;
+                res = Parrot_pmc_new(INTERP, enum_class_Integer);
+                count = attr->supervised->op_count;
+                VTABLE_set_integer_native(INTERP, res, count);
+                
+                break;
+            }
+        default:
+            res = Parrot_pmc_new(INTERP, enum_class_Undef);
+        }
+        
+        RETURN(PMC* res);
+    }
+
+/*
+
+=item C<void *insert_op_hooks(PMC *hook_hash)>
+
+Insert hooks based on what is given in hook_hash.
+Keys are op numbers and values are sub pmcs.
+
+=cut
+
+*/
+
+    METHOD insert_op_hooks (PMC *hook_hash) {
+        PMC *iter;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        /* Iterate through hook_hash. For each
+           key (op_num), push the callback to the
+           appropriate entry in op_hooks. */
+        iter = VTABLE_get_iter(INTERP, hook_hash);
+        while(VTABLE_get_bool(INTERP, iter)) {
+            INTVAL op_num;
+            PMC *iter_key, *cur, *callback, *op_num_hooks;
+            
+            iter_key = VTABLE_shift_pmc(INTERP, iter);
+            cur      = VTABLE_get_pmc(INTERP, iter_key);
+            op_num   = VTABLE_get_integer(INTERP, cur);
+            callback = VTABLE_get_pmc_keyed(INTERP, hook_hash, cur);
+            
+            op_num_hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, op_num);
+            if(PMC_IS_NULL(op_num_hooks)) {
+                op_num_hooks = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+                VTABLE_set_pmc_keyed_int(INTERP, attr->op_hooks, op_num, op_num_hooks);
+            }
+            
+            VTABLE_push_pmc(INTERP, op_num_hooks, callback);
+        }
+    }
+
+/*
+=item C<void *insert_op_catchall(PMC *callback)>
+
+Register a catchall op callback
+
+=cut
+*/
+
+    METHOD insert_op_catchall (PMC *callback) {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        VTABLE_push_pmc(INTERP, attr->op_catchall, callback);
+    }
+}
+
+/*
+ * Runcore Function Implementations
+ */
+
+/*
+ * This is the simplified custom runops function.
+ * This is based on the PARROT_FAST_RUNCORE.
+ */
+static
+opcode_t *
+Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc)
+{	
+    Instrument_runcore_t *core = (Instrument_runcore_t *) runcore;
+    
+    PMC *pmc = core->supervisor;
+    Parrot_Interp supervisor = (Parrot_Interp) VTABLE_get_pointer(interp, pmc);
+
+    while (pc) {
+		Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
+		
+		/* Fire the hooks */
+		VTABLE_set_pointer(supervisor, pmc, pc);
+
+        DO_OP(pc, interp);
+    }
+	
+    return pc;
+	
+}
+
+/*
+ * This is the initializer for the runcore.
+ * Sets up runcore_t.
+ */
+static
+void
+Instrument_runcore_init (PARROT_INTERP, PMC *supervisor) {
+	Instrument_runcore_t * const coredata =
+	    mem_gc_allocate_zeroed_typed(interp, Instrument_runcore_t);
+	
+	/* Ensure the current loaded runcore is the slow core */
+	Parrot_set_run_core(interp, PARROT_SLOW_CORE);
+	
+	/* Copy the runcore entry for the PARROT_SLOW_CORE,
+	   and then make modifications to it.
+	   Copy so that we get the opinit function pointer.
+	*/
+	mem_copy_n_typed(coredata, interp->run_core, 1, Parrot_runcore_t);
+	
+	coredata->name			= string_from_literal(interp, "instrument");
+	coredata->runops		= Instrument_runcore_runops;
+	coredata->prepare_run	= NULL;
+	coredata->destroy		= NULL;
+	coredata->flags			= 0;
+	coredata->supervisor   = supervisor;
+	
+	PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *)coredata);
+	
+	Parrot_runcore_register(interp, (Parrot_runcore_t *) coredata);
+	
+	//Switch to this runcore.
+	Parrot_runcore_switch(interp, coredata->name);
+}
+
+/*
+ * Helper function to gather the parameters of an op
+ * and put it into the passed in ResizablePMCArray.
+ * TODO: This is incomplete and currently unused.
+ */
+static
+void
+gather_params(Parrot_Interp interp, opcode_t *pc, PMC *supervisor, PMC *params) {
+    INTVAL no_params, cur_param;
+    PMC *cc; /* Current context */
+    Parrot_Interp instr_in = (Parrot_Interp) VTABLE_get_pointer(interp, supervisor);
+    
+    /* Retrieve the current context.
+       Current context refers to the registers + some other stuff */
+    cc = CURRENT_CONTEXT(interp); /* defined in parrot/interpreter.h */
+    
+    /* Figure out how many parameters the op takes,
+        referring to op_info_table
+        We want the op_count field of the current op's
+        op_info_t, which also includes the op as a parameter. */
+    no_params = interp->op_info_table[*pc].op_count - 1;
+     
+    /* Begin gathering the parameters.
+       Each parameter is of a certain type, and based on this
+       type, we can access the current_context and get the
+       parameter.
+       
+       The types are listed in parrot/op.h.
+    */
+    for(cur_param = 0; cur_param < no_params; cur_param++) {
+        arg_type_t type; /* parrot/op.h */
+        
+        /* Get the type of the current param */
+        type = interp->op_info_table[*pc].types[cur_param];
+        
+        /* For keyed types, remove the keyed flag,
+           instead treating it as a normal ARG type. */
+        if((type & PARROT_ARG_KEYED) == PARROT_ARG_KEYED) {
+            type &= ~PARROT_ARG_KEYED;
+        }
+        
+        /* Gather the params and put it into the
+           ResizablePMCArray pointed to by params.
+         */
+        switch(type) {
+          case PARROT_ARG_IC:            
+            /* Integer constants are stored as part of the opcode
+               in the packfile */
+            VTABLE_push_integer(instr_in, params, pc[cur_param + 1]);
+            
+            break;
+          case PARROT_ARG_I:
+            VTABLE_push_integer(instr_in, params,
+                                *Parrot_pcc_get_INTVAL_reg(interp, cc, pc[cur_param + 1]));
+            break;
+          case PARROT_ARG_NC:
+            VTABLE_push_float(instr_in, params,
+                              Parrot_pcc_get_num_constant_func(interp, cc, pc[cur_param + 1]));
+            
+            break;
+          case PARROT_ARG_N:
+            VTABLE_push_float(instr_in, params,
+                              *Parrot_pcc_get_FLOATVAL_reg(interp, cc, pc[cur_param + 1]));
+            break;
+          case PARROT_ARG_PC:
+            VTABLE_push_pmc(instr_in, params,
+                              Parrot_pcc_get_pmc_constant_func(interp, cc, pc[cur_param + 1]));
+            
+            break;
+          case PARROT_ARG_P:
+            VTABLE_push_pmc(instr_in, params,
+                              *Parrot_pcc_get_PMC_reg(interp, cc, pc[cur_param + 1]));
+            break;
+          case PARROT_ARG_SC:
+            VTABLE_push_string(instr_in, params,
+                              Parrot_pcc_get_string_constant_func(interp, cc, pc[cur_param + 1]));
+            
+            break;
+          case PARROT_ARG_S:
+            VTABLE_push_string(instr_in, params,
+                              *Parrot_pcc_get_STRING_reg(interp, cc, pc[cur_param + 1]));
+            break;
+          default:
+            /* printf("\tUnhandled arg type: %d\n", type); */
+            break;
+        };
+     }
+}
+
+/*
+=back
+
+=head1 SEE ALS0
+
+=cut
+*/
+
+/*
+ * Local Variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

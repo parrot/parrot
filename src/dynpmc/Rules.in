@@ -176,3 +176,22 @@ src/dynpmc/subproxy.c: src/dynpmc/subproxy.dump
 
 src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/subproxy.pmc
+	
+
+$(DYNEXT_DIR)/instrument$(LOAD_EXT): src/dynpmc/instrument$(O)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/instrument$(LOAD_EXT) src/dynpmc/instrument$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):   $(CHMOD) 0775 $@
+
+src/dynpmc/pmc_instrument.h : src/dynpmc/instrument.c
+
+src/dynpmc/instrument$(O): src/dynpmc/instrument.c $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_instrument.h
+
+src/dynpmc/instrument.c: src/dynpmc/instrument.dump
+	$(PMC2CC) src/dynpmc/instrument.pmc
+
+src/dynpmc/instrument.dump: src/dynpmc/instrument.pmc vtable.dump $(CLASS_O_FILES)
+	$(PMC2CD) src/dynpmc/instrument.pmc
+
+

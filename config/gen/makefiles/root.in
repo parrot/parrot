@@ -326,7 +326,9 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/YAML/Dumper.pbc \
     $(LIBRARY_DIR)/STM.pbc \
     $(LIBRARY_DIR)/libpcre.pbc \
-    $(LIBRARY_DIR)/postgres.pbc
+    $(LIBRARY_DIR)/postgres.pbc \
+    $(LIBRARY_DIR)/Instrument/Instrument.pbc \
+    $(LIBRARY_DIR)/Instrument/Probe.pbc 
 
 FLUID_FILES_1 = \
     $(GEN_HEADERS) \
