@@ -34,12 +34,18 @@ src/test_main.c
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+static Interp * debugger_or_interp(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_debugger_or_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_trace_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -48,15 +54,17 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 /*
 
-=item C<Interp * debugger_or_interp(PARROT_INTERP)>
+=item C<static Interp * debugger_or_interp(PARROT_INTERP)>
 
 Get debugger if available
 
 =cut
 */
+
 PARROT_CANNOT_RETURN_NULL
-Interp *
-debugger_or_interp(PARROT_INTERP) {
+static Interp *
+debugger_or_interp(PARROT_INTERP)
+{
     ASSERT_ARGS(debugger_or_interp)
 
     return interp->pdb && interp->pdb->debugger
