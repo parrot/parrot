@@ -93,9 +93,24 @@ token body_word {
     [
     || <.ws> <macro_param> <.ws>
     || <.ws> <op_macro> <.ws>
-    || $<word>=[ [<alnum>+|<punct>]? <ws> ]
+    || <word>
     ]
 }
+
+token word {
+    || <quote>
+    || <ident>
+    || <raw_word> <ws>
+    || <ws>
+}
+
+token raw_word {
+    <alnum>|<punct>
+}
+
+proto token quote { <...> }
+token quote:sym<apos> { <?[']> <quote_EXPR: ':q'>  }
+token quote:sym<dblq> { <?["]> <quote_EXPR: ':q'> }
 
 token macro_param {
     '$' $<num>=<[1..9]> # Up to nine params.
