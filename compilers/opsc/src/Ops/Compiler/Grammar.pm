@@ -8,7 +8,7 @@ grammar Ops::Compiler::Grammar is HLL::Grammar;
 
 rule TOP {
     <body>
-    [ $ || <panic: 'Syntax error'> ]
+    [ $ || <.panic: 'Syntax error'> ]
 }
 
 rule body {
@@ -35,9 +35,9 @@ token end_preamble {
 
 rule op {
     <op_type>? 'op' <op_name=identifier>
-    [ '(' <signature> ')' || <panic: "Fail to parse signature"> ]
+    [ '(' <signature> ')' || <.panic: "Fail to parse signature"> ]
     <op_flag>*
-    [ <op_body> || <panic: "Fail to parse op body"> ]
+    [ <op_body> || <.panic: "Fail to parse op body"> ]
     {*}
 }
 
@@ -89,11 +89,11 @@ regex op_body {
 #Process op body by breaking it into "words" consisting entirely of whitespace,
 #alnums or a single punctuation, then checking for interesting macros (e.g $1
 #or goto NEXT() ) in the midst of the words.
-regex body_word {
+token body_word {
     [
-    || <macro_param>
-    || <op_macro>
-    || $<word>=[<alnum>+|<punct>|<space>+]
+    || <.ws> <macro_param> <.ws>
+    || <.ws> <op_macro> <.ws>
+    || $<word>=[ [<alnum>+|<punct>]? <ws> ]
     ]
 }
 
