@@ -59,7 +59,6 @@
     $I1 = isa $P3, 'Integer'
     foldable = and $I0, $I1
     unless foldable goto end
-    say "Foo"
     result = new ['PAST'; 'Val']
     $I0 = $P2
     $I1 = $P3
