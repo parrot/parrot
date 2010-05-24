@@ -72,8 +72,20 @@ our %second_analysis_subs = (
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
                         | examples/config/file/configwithfatalstep
+                        | compilers/opsc
                     }x
                 ) {
+                    delete $files_needing_analysis->{ $file };
+                    next SECOND_FILE;
+                }
+
+                # read first line. If it contains "nqp" remove file from test.
+                my $fh;
+                open $fh, '<', $full_file or croak "Can't opend file $full_file $!";
+                my $line = <$fh>;
+                close $fh;
+
+                if ($line =~ m/ nqp | use \s v6 /x) {
                     delete $files_needing_analysis->{ $file };
                     next SECOND_FILE;
                 }
@@ -198,7 +210,7 @@ sub identify_files_for_POD_testing {
             @files = @{ $self->{argv} };
         }
         else {
-            print STDERR "\nFinding files with POD, this may take a minute.\n";
+            print STDERR "\n# Finding files with POD, this may take a minute.\n";
             @files = (
                 keys(%{ $self->{manifest} }),
                 keys(%{ $self->{manifest_gen} })

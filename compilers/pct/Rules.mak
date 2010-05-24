@@ -4,7 +4,7 @@ $(LIBRARY_DIR)/PCT.pbc : $(PARROT) compilers/pct/PCT.pir \
     $(LIBRARY_DIR)/PCT/Grammar.pbc $(LIBRARY_DIR)/PCT/PAST.pbc
 	$(PARROT) -o $@ compilers/pct/PCT.pir
 
-$(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) \
+$(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) $(PBC_MERGE) \
     $(LIBRARY_DIR)/PCT/HLLCompiler.pbc \
     compilers/pct/src/PCT/Node.pbc \
     compilers/pct/src/PAST/Node.pbc \

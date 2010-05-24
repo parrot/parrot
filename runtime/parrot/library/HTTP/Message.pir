@@ -171,10 +171,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .include 'cclass.pasm'
 
 .sub '' :init :load :anon
-    load_bytecode 'URI.pir'
+    load_bytecode 'URI.pbc'
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Request']
     $P0.'add_attribute'('method')
     $P0.'add_attribute'('uri')
+    $P0.'add_attribute'('proxy')
 .end
 
 =item method
@@ -192,6 +193,17 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .sub 'uri' :method
     $P0 = getattribute self, 'uri'
+    .return ($P0)
+.end
+
+.sub 'proxy' :method
+    .param pmc val              :optional
+    .param int has_val          :opt_flag
+    unless has_val goto L1
+    setattribute self, 'proxy', val
+    .return ()
+  L1:
+    $P0 = getattribute self, 'proxy'
     .return ($P0)
 .end
 
@@ -467,7 +479,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
   L2:
     $S0 = $P0
     .local pmc encode
-    encode = get_hll_global  ['MIME';'Base64'], 'encode_base64'
+    encode = get_hll_global ['MIME';'Base64'], 'encode_base64'
     $S0 = encode($S0)
     $I1 = length $S0
     $I0 = 0

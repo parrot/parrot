@@ -820,7 +820,7 @@ EXPERIMENTAL, for testing only. See TT #1628
             Parrot_encoding_number(INTERP, encodingname));
         STRING * const src = VTABLE_get_string(INTERP, SELF);
         STRING * const dest = Parrot_str_unescape_string(INTERP, src,
-                charset, encoding);
+                charset, encoding, 0);
         RETURN(STRING *dest);
     }
 

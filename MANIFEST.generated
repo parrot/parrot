@@ -125,6 +125,8 @@ include/pmc/pmc_timer.h                          [devel]include
 include/pmc/pmc_undef.h                          [devel]include
 include/pmc/pmc_unmanagedstruct.h                [devel]include
 install_config.fpmc                              [main]lib
+installable_ops2c                                [main]bin
+installable_ops2c.exe                            [main]bin
 installable_parrot                               [main]bin
 installable_parrot-nqp                           [main]bin
 installable_parrot-nqp.exe                       [main]bin
@@ -145,7 +147,6 @@ installable_pbc_merge.exe                        [main]bin
 installable_pbc_to_exe                           [main]bin
 installable_pbc_to_exe.exe                       [main]bin
 lib/Parrot/Config/Generated.pm                   [devel]lib
-lib/Parrot/OpLib/core.pm                         [devel]lib
 lib/Parrot/PMC.pm                                [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
 libparrot.dll                                    [main]bin
@@ -232,7 +233,8 @@ runtime/parrot/library/HTTP/Daemon.pbc           [main]
 runtime/parrot/library/HTTP/Message.pbc          [main]
 runtime/parrot/library/Iter.pbc                  [main]
 runtime/parrot/library/JSON.pbc                  [main]
-runtime/parrot/library/LWP.pbc                   [main]
+runtime/parrot/library/LWP/Protocol.pbc          [main]
+runtime/parrot/library/LWP/UserAgent.pbc         [main]
 runtime/parrot/library/MIME/Base64.pbc           [main]
 runtime/parrot/library/Math/Rand.pbc             [main]
 runtime/parrot/library/NCI/call_toolkit_init.pbc [main]
@@ -271,7 +273,7 @@ runtime/parrot/library/Stream/Writer.pbc         [main]
 runtime/parrot/library/TAP/Formatter.pbc         [main]
 runtime/parrot/library/TAP/Harness.pbc           [main]
 runtime/parrot/library/TAP/Parser.pbc            [main]
-runtime/parrot/library/TGE.pbc                   [tge]
+runtime/parrot/library/TGE.pbc			 [main]
 runtime/parrot/library/Tcl/Glob.pbc              [main]
 runtime/parrot/library/TclLibrary.pbc            [main]
 runtime/parrot/library/Test/Builder.pbc          [main]
@@ -293,6 +295,7 @@ runtime/parrot/library/libpcre.pbc               [main]
 runtime/parrot/library/ncurses.pbc               [main]
 runtime/parrot/library/nqp-rx.pbc                [nqp]
 runtime/parrot/library/nqp-setting.pbc           [nqp]
+runtime/parrot/library/opsc.pbc                  [main]
 runtime/parrot/library/osutils.pbc               [main]
 runtime/parrot/library/parrotlib.pbc             [main]
 runtime/parrot/library/pcore.pbc                 [main]

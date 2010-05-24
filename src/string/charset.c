@@ -149,6 +149,7 @@ Returns the charset if it is found, NULL otherwise.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const CHARSET *
@@ -227,6 +228,7 @@ Return the number of the charset of the given string or -1 if not found.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
@@ -254,6 +256,7 @@ C<number_of_charset>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
@@ -277,6 +280,7 @@ Returns the charset given by the INTVAL index C<number_of_charset>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const CHARSET *
@@ -301,6 +305,7 @@ INTVAL index C<number_of_charset>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const char *
@@ -539,6 +544,7 @@ Returns the default charset.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const CHARSET *
@@ -560,6 +566,7 @@ Finds a converter from charset C<lhs> to charset C<rhs>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 charset_converter_t
@@ -572,7 +579,7 @@ Parrot_find_charset_converter(SHIM_INTERP,
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
-            One_charset * const left = all_charsets->set + i;
+            const One_charset * const left = all_charsets->set + i;
             const int nc = left->n_converters;
             int j;
 

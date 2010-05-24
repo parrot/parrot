@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -25,6 +25,7 @@ This is used by C<parrot>.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 static int longopt_get_longopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -36,6 +37,7 @@ static int longopt_get_longopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+PARROT_WARN_UNUSED_RESULT
 static int longopt_get_shortopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -64,6 +66,57 @@ static char longopt_error_buffer[512];
 
 /*
 
+=item C<const struct longopt_opt_decl * Parrot_cmd_options(void)>
+
+Set up the const struct declaration for cmd_options
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_CONST_FUNCTION
+const struct longopt_opt_decl *
+Parrot_cmd_options(void)
+{
+    ASSERT_ARGS(Parrot_cmd_options)
+    static const struct longopt_opt_decl cmd_options[] = {
+        { '.', '.', (OPTION_flags)0, { "--wait" } },
+        { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
+        { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
+        { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
+        { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
+        { 'I', 'I', OPTION_required_FLAG, { "--include" } },
+        { 'L', 'L', OPTION_required_FLAG, { "--library" } },
+        { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
+        { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
+        { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { 'V', 'V', (OPTION_flags)0, { "--version" } },
+        { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
+        { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
+                                     { "--leak-test", "--destroy-at-end" } },
+        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
+        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
+        { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
+        { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
+        { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
+        { 'h', 'h', (OPTION_flags)0, { "--help" } },
+        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
+        { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
+        { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
+        { 't', 't', OPTION_optional_FLAG, { "--trace" } },
+        { 'v', 'v', (OPTION_flags)0, { "--verbose" } },
+        { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
+        { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
+        { 0, 0, (OPTION_flags)0, { NULL } }
+    };
+    return cmd_options;
+}
+
+/*
+
 =item C<int longopt_get(PARROT_INTERP, int argc, const char* argv[], const
 struct longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
@@ -83,6 +136,7 @@ Any other value is a valid option identifier.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int
 longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
@@ -134,6 +188,7 @@ characters and start with C<-->.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
@@ -231,6 +286,7 @@ characters long and start with a dash.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                      ARGIN(const struct longopt_opt_decl options[]),

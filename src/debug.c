@@ -2481,8 +2481,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                                      " :unused040",
                                      " :optional",
                                      " :opt_flag",
-                                     " :named",
-                                     NULL
+                                     " :named"
         };
 
 
@@ -2503,7 +2502,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
 
             /* Add flags, if we have any. */
             {
-                int flag_idx = 0;
+                unsigned int flag_idx = 0;
                 int flags = sig_value;
 
                 /* End when we run out of flags, off the end of flag_names, or
@@ -2511,10 +2510,12 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                  * 100 is just an estimate of all buf lengths added together.
                  */
                 while (flags && idx < sizeof (buf) - 100) {
-                    const char * const flag_string
-                                    = (specialop == 2  && STREQ(flag_names[flag_idx], " :flat"))
+                    const char * const flag_string =
+                            flag_idx < (sizeof flag_names / sizeof (char *))
+                                ? (specialop == 2  && STREQ(flag_names[flag_idx], " :flat"))
                                     ? " :slurpy"
-                                    : flag_names[flag_idx];
+                                    : flag_names[flag_idx]
+                                : (const char *) NULL;
 
                     if (! flag_string)
                         break;

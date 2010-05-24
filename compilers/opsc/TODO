@@ -1,0 +1,14 @@
+Simple todo.
+
+Required for initial self-hosting:
+ 
+  * NONE! We are selfhosted now!
+
+Required for full implementation:
+  * Handling #line directives.
+  * A LOT OF DOCUMENTATION.
+  * Add tests for Trans::C independent from 06-emitter.t
+  * Add tests for dynamic mode of Emitter.
+
+Nice to have:
+  * Profiling and performance tuning of ops parsing (we need pmichaud).

@@ -375,7 +375,7 @@ Returns a hashed value for an integer key (passed as a void pointer, sadly).
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
 size_t
 key_hash_int(SHIM_INTERP, ARGIN_NULLOK(const void *value), size_t seed)
 {
@@ -396,7 +396,7 @@ to store the integers, sadly.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
 int
 int_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
@@ -1121,8 +1121,7 @@ The callback returns C<void> and takes a C<void *>.
 */
 
 void
-parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
-    NOTNULL(value_free func))
+parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_free func))
 {
     ASSERT_ARGS(parrot_chash_destroy_values)
     UINTVAL i;

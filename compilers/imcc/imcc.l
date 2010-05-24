@@ -41,7 +41,6 @@
 #include "imc.h"
 #include "parser.h"
 
-// typedef struct yyguts_t       yyguts_t;
 typedef struct parser_state_t parser_state_t;
 
 /* parser state structure
@@ -125,7 +124,6 @@ OCT             0[oO][0-7]+
 BIN             0[bB][01]+
 DOT             [.]
 SIGN            [-+]
-BIGINT          {SIGN}?{DIGITS}"L"
 FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT([a-zA-Z0-9_@])
@@ -137,7 +135,6 @@ ENC             {LETTER}{ENCCHARS}":"
 UNICODE         {ENC}{ENC}?{DQ_STRING}
 STRINGCONSTANT  {SQ_STRING}|{DQ_STRING}
 SQ_STRING       \'[^'\n]*\'
-RANKSPEC        \[[,]*\]
 EOL             \r?\n
 WS              [\t\f\r\x1a ]
 SP              [ ]
@@ -217,8 +214,6 @@ SP              [ ]
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
 
-            /* not sure we need this decrement; more testing needed */
-            IMCC_INFO(interp)->line--;
             return STRINGC;
         }
         else {
@@ -541,16 +536,6 @@ SP              [ ]
 <*>{HEX}              DUP_AND_RET(valp, INTC);
 <*>{BIN}              DUP_AND_RET(valp, INTC);
 <*>{OCT}              DUP_AND_RET(valp, INTC);
-
-<*>{BIGINT} {
-        valp->s = mem_sys_strdup(yytext);
-
-        /* trailing 'L' */
-        valp->s[strlen(valp->s) - 1] = '\0';
-
-        /* no BIGINT native format yet */
-        return STRINGC;
-    }
 
 <*>{STRINGCONSTANT} {
         valp->s = mem_sys_strdup(yytext);

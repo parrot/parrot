@@ -141,14 +141,17 @@ void Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_UInt Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Int Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
