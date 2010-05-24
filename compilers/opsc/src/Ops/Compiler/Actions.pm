@@ -63,10 +63,7 @@ method op($/) {
         %flags{~$_<identifier>} := 1;
     }
 
-    my @args := list();
-    if ($<op_params>) {
-        @args := @($<op_params>[0].ast);
-    }
+    my @args := @($<signature>.ast);
 
     my @norm_args := normalize_args(@args);
     # We have to clone @norm_args. Otherwise it will be destroyed...
@@ -224,7 +221,7 @@ sub expand_args(@args) {
 }
 
 
-method op_params($/) {
+method signature($/) {
     my $past := PAST::Stmts.new(
         :node($/)
     );

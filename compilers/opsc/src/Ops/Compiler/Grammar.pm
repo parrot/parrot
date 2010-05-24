@@ -34,9 +34,9 @@ token end_preamble {
 }
 
 rule op {
-    <op_type>? 'op' <op_name=identifier> '('
-        [ <op_params>? || <panic: "Fail to parse params"> ]
-    ')' <op_flag>*
+    <op_type>? 'op' <op_name=identifier>
+    [ '(' <signature> ')' || <panic: "Fail to parse signature"> ]
+    <op_flag>*
     [ <op_body> || <panic: "Fail to parse op body"> ]
     {*}
 }
@@ -45,9 +45,7 @@ token op_type {
     [ 'inline' | 'function' ]
 }
 
-rule op_params {
-    <op_param> [ ',' <op_param> ]*
-}
+rule signature { [ [<.ws><op_param><.ws>] ** ',' ]? }
 
 rule op_param {
     <op_param_direction> <op_param_type>
@@ -93,18 +91,18 @@ regex op_body {
 #or goto NEXT() ) in the midst of the words.
 regex body_word {
     [
-    | <macro_param>
-    | <op_macro>
-    | $<word>=[<alnum>+|<punct>|<space>+]
+    || <macro_param>
+    || <op_macro>
+    || $<word>=[<alnum>+|<punct>|<space>+]
     ]
 }
 
 token macro_param {
-    '$' $<num>=[<digit>+]
+    '$' $<num>=<[1..9]> # Up to nine params.
 }
 
-regex op_macro {
-    <macro_type> <space>* <macro_destination> <space>* '(' <space>* <body_word>*? ')'
+rule op_macro {
+    <macro_type> <macro_destination> '(' <body_word>*? ')'
 }
 
 token macro_type {
