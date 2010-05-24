@@ -110,7 +110,7 @@ token quote:sym<apos> { <?[']> <quote_EXPR: ':q'>  }
 token quote:sym<dblq> { <?["]> <quote_EXPR: ':q'> }
 
 token macro_param {
-    '$' $<num>=<[1..9]> # Up to nine params.
+    '$' $<num>=<integer> # Up to nine params.
 }
 
 rule op_macro {
