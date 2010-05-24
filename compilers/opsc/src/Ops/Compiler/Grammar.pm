@@ -100,12 +100,9 @@ token body_word {
 token word {
     || <quote>
     || <ident>
-    || <raw_word> <ws>
+    || <alnum>
+    || <punct>
     || <ws>
-}
-
-token raw_word {
-    <alnum>|<punct>
 }
 
 proto token quote { <...> }
