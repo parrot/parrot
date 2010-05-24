@@ -243,12 +243,12 @@ Reads in the specified .ops file, gathering information about the ops.
 method read_ops($file, $nolines) {
     $Ops::Compiler::Actions::OPLIB := self<oplib>;
 
-    say("# Parsing $file...");
+    #say("# Parsing $file...");
     my $start_time := pir::time__N();
     my $buffer     := slurp($file);
     self.compile_ops($buffer, :experimental( $file ~~ /experimental\.ops/));
-    pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
-    say("# Parsed $file in $time seconds.");
+    #pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
+    #say("# Parsed $file in $time seconds.");
 }
 
 method compile_ops($str, :$experimental? = 0) {

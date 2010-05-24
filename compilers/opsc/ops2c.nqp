@@ -93,7 +93,7 @@ else {
     $f := Ops::File.new(|@files, :core(0));
 }
 
-pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
+#pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
 #say("# Ops parsed in $time seconds.");
 
 my $emitter := Ops::Emitter.new(
