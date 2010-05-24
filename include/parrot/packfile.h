@@ -1096,7 +1096,8 @@ PARROT_PURE_FUNCTION
 size_t PF_size_string(ARGIN(const STRING *s))
         __attribute__nonnull__(1);
 
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 size_t PF_size_strlen(const UINTVAL len);
 
 PARROT_WARN_UNUSED_RESULT

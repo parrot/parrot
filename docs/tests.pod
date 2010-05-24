@@ -190,10 +190,9 @@ using the methodology above.
 
 The files in F<t/postconfigure> are tests for build system. The build tools
 tests are intended to be run after someone has made changes in modules such as
-F<lib/Parrot/Pmc2cUtils/>, F<Ops2cUtils/> and F<Ops2pmutils/>.  They're set up
-to be run after F<Configure.pl> has completed but before make has been invoked.
-(In fact, they will generate errors if make has completed.)  You can run them
-with any of the following:
+F<lib/Parrot/Pmc2cUtils/>.  They're set up to be run after F<Configure.pl> has
+completed but before make has been invoked.  (In fact, they will generate
+errors if make has completed.)  You can run them with any of the following:
  
      perl Configure.pl --test
      perl Configure.pl --test=build

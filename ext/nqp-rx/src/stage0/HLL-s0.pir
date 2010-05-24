@@ -854,7 +854,7 @@ An operator precedence parser.
 ### .include 'gen/hllgrammar-grammar.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1274022878.64768")
+.sub "_block11"  :anon :subid("10_1274564773.54721")
 .annotate 'line', 0
     get_hll_global $P14, ["HLL";"Grammar"], "_block13" 
     capture_lex $P14
@@ -864,15 +864,15 @@ An operator precedence parser.
     $P343 = $P14()
 .annotate 'line', 1
     .return ($P343)
-    .const 'Sub' $P345 = "104_1274022878.64768" 
+    .const 'Sub' $P345 = "104_1274564773.54721" 
     .return ($P345)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post105") :outer("10_1274022878.64768")
+.sub "" :load :init :subid("post105") :outer("10_1274564773.54721")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1274022878.64768" 
+    .const 'Sub' $P12 = "10_1274564773.54721" 
     .local pmc block
     set block, $P12
     $P348 = get_root_global ["parrot"], "P6metaclass"
@@ -881,94 +881,94 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block13"  :subid("11_1274022878.64768") :outer("10_1274022878.64768")
+.sub "_block13"  :subid("11_1274564773.54721") :outer("10_1274564773.54721")
 .annotate 'line', 5
-    .const 'Sub' $P329 = "101_1274022878.64768" 
+    .const 'Sub' $P329 = "101_1274564773.54721" 
     capture_lex $P329
-    .const 'Sub' $P322 = "99_1274022878.64768" 
+    .const 'Sub' $P322 = "99_1274564773.54721" 
     capture_lex $P322
-    .const 'Sub' $P309 = "96_1274022878.64768" 
+    .const 'Sub' $P309 = "96_1274564773.54721" 
     capture_lex $P309
-    .const 'Sub' $P277 = "91_1274022878.64768" 
+    .const 'Sub' $P277 = "91_1274564773.54721" 
     capture_lex $P277
-    .const 'Sub' $P271 = "89_1274022878.64768" 
+    .const 'Sub' $P271 = "89_1274564773.54721" 
     capture_lex $P271
-    .const 'Sub' $P266 = "87_1274022878.64768" 
+    .const 'Sub' $P266 = "87_1274564773.54721" 
     capture_lex $P266
-    .const 'Sub' $P260 = "85_1274022878.64768" 
+    .const 'Sub' $P260 = "85_1274564773.54721" 
     capture_lex $P260
-    .const 'Sub' $P254 = "83_1274022878.64768" 
+    .const 'Sub' $P254 = "83_1274564773.54721" 
     capture_lex $P254
-    .const 'Sub' $P249 = "81_1274022878.64768" 
+    .const 'Sub' $P249 = "81_1274564773.54721" 
     capture_lex $P249
-    .const 'Sub' $P244 = "79_1274022878.64768" 
+    .const 'Sub' $P244 = "79_1274564773.54721" 
     capture_lex $P244
-    .const 'Sub' $P239 = "77_1274022878.64768" 
+    .const 'Sub' $P239 = "77_1274564773.54721" 
     capture_lex $P239
-    .const 'Sub' $P234 = "75_1274022878.64768" 
+    .const 'Sub' $P234 = "75_1274564773.54721" 
     capture_lex $P234
-    .const 'Sub' $P229 = "73_1274022878.64768" 
+    .const 'Sub' $P229 = "73_1274564773.54721" 
     capture_lex $P229
-    .const 'Sub' $P224 = "71_1274022878.64768" 
+    .const 'Sub' $P224 = "71_1274564773.54721" 
     capture_lex $P224
-    .const 'Sub' $P219 = "69_1274022878.64768" 
+    .const 'Sub' $P219 = "69_1274564773.54721" 
     capture_lex $P219
-    .const 'Sub' $P208 = "65_1274022878.64768" 
+    .const 'Sub' $P208 = "65_1274564773.54721" 
     capture_lex $P208
-    .const 'Sub' $P195 = "63_1274022878.64768" 
+    .const 'Sub' $P195 = "63_1274564773.54721" 
     capture_lex $P195
-    .const 'Sub' $P183 = "61_1274022878.64768" 
+    .const 'Sub' $P183 = "61_1274564773.54721" 
     capture_lex $P183
-    .const 'Sub' $P176 = "59_1274022878.64768" 
+    .const 'Sub' $P176 = "59_1274564773.54721" 
     capture_lex $P176
-    .const 'Sub' $P167 = "57_1274022878.64768" 
+    .const 'Sub' $P167 = "57_1274564773.54721" 
     capture_lex $P167
-    .const 'Sub' $P160 = "55_1274022878.64768" 
+    .const 'Sub' $P160 = "55_1274564773.54721" 
     capture_lex $P160
-    .const 'Sub' $P151 = "53_1274022878.64768" 
+    .const 'Sub' $P151 = "53_1274564773.54721" 
     capture_lex $P151
-    .const 'Sub' $P144 = "51_1274022878.64768" 
+    .const 'Sub' $P144 = "51_1274564773.54721" 
     capture_lex $P144
-    .const 'Sub' $P135 = "49_1274022878.64768" 
+    .const 'Sub' $P135 = "49_1274564773.54721" 
     capture_lex $P135
-    .const 'Sub' $P128 = "47_1274022878.64768" 
+    .const 'Sub' $P128 = "47_1274564773.54721" 
     capture_lex $P128
-    .const 'Sub' $P121 = "45_1274022878.64768" 
+    .const 'Sub' $P121 = "45_1274564773.54721" 
     capture_lex $P121
-    .const 'Sub' $P111 = "43_1274022878.64768" 
+    .const 'Sub' $P111 = "43_1274564773.54721" 
     capture_lex $P111
-    .const 'Sub' $P103 = "41_1274022878.64768" 
+    .const 'Sub' $P103 = "41_1274564773.54721" 
     capture_lex $P103
-    .const 'Sub' $P93 = "40_1274022878.64768" 
+    .const 'Sub' $P93 = "40_1274564773.54721" 
     capture_lex $P93
-    .const 'Sub' $P87 = "38_1274022878.64768" 
+    .const 'Sub' $P87 = "38_1274564773.54721" 
     capture_lex $P87
-    .const 'Sub' $P82 = "36_1274022878.64768" 
+    .const 'Sub' $P82 = "36_1274564773.54721" 
     capture_lex $P82
-    .const 'Sub' $P74 = "34_1274022878.64768" 
+    .const 'Sub' $P74 = "34_1274564773.54721" 
     capture_lex $P74
-    .const 'Sub' $P68 = "32_1274022878.64768" 
+    .const 'Sub' $P68 = "32_1274564773.54721" 
     capture_lex $P68
-    .const 'Sub' $P62 = "30_1274022878.64768" 
+    .const 'Sub' $P62 = "30_1274564773.54721" 
     capture_lex $P62
-    .const 'Sub' $P56 = "28_1274022878.64768" 
+    .const 'Sub' $P56 = "28_1274564773.54721" 
     capture_lex $P56
-    .const 'Sub' $P23 = "14_1274022878.64768" 
+    .const 'Sub' $P23 = "14_1274564773.54721" 
     capture_lex $P23
-    .const 'Sub' $P15 = "12_1274022878.64768" 
+    .const 'Sub' $P15 = "12_1274564773.54721" 
     capture_lex $P15
 .annotate 'line', 33
-    .const 'Sub' $P329 = "101_1274022878.64768" 
+    .const 'Sub' $P329 = "101_1274564773.54721" 
     capture_lex $P329
 .annotate 'line', 5
     .return ($P329)
-    .const 'Sub' $P340 = "103_1274022878.64768" 
+    .const 'Sub' $P340 = "103_1274564773.54721" 
     .return ($P340)
 .end
 
 
 .namespace ["HLL";"Grammar"]
-.sub "ws"  :subid("12_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "ws"  :subid("12_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx16_tgt
     .local int rx16_pos
@@ -1052,7 +1052,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__ws"  :subid("13_1274022878.64768") :method
+.sub "!PREFIX__ws"  :subid("13_1274564773.54721") :method
 .annotate 'line', 5
     new $P18, "ResizablePMCArray"
     push $P18, ""
@@ -1061,7 +1061,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "termish"  :subid("14_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "termish"  :subid("14_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx24_tgt
     .local int rx24_pos
@@ -1153,7 +1153,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__termish"  :subid("15_1274022878.64768") :method
+.sub "!PREFIX__termish"  :subid("15_1274564773.54721") :method
 .annotate 'line', 5
     new $P26, "ResizablePMCArray"
     push $P26, ""
@@ -1162,7 +1162,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "term"  :subid("16_1274022878.64768") :method
+.sub "term"  :subid("16_1274564773.54721") :method
 .annotate 'line', 13
     $P33 = self."!protoregex"("term")
     .return ($P33)
@@ -1170,7 +1170,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__term"  :subid("17_1274022878.64768") :method
+.sub "!PREFIX__term"  :subid("17_1274564773.54721") :method
 .annotate 'line', 13
     $P35 = self."!PREFIX__!protoregex"("term")
     .return ($P35)
@@ -1178,7 +1178,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "infix"  :subid("18_1274022878.64768") :method
+.sub "infix"  :subid("18_1274564773.54721") :method
 .annotate 'line', 14
     $P37 = self."!protoregex"("infix")
     .return ($P37)
@@ -1186,7 +1186,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__infix"  :subid("19_1274022878.64768") :method
+.sub "!PREFIX__infix"  :subid("19_1274564773.54721") :method
 .annotate 'line', 14
     $P39 = self."!PREFIX__!protoregex"("infix")
     .return ($P39)
@@ -1194,7 +1194,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "prefix"  :subid("20_1274022878.64768") :method
+.sub "prefix"  :subid("20_1274564773.54721") :method
 .annotate 'line', 15
     $P41 = self."!protoregex"("prefix")
     .return ($P41)
@@ -1202,7 +1202,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__prefix"  :subid("21_1274022878.64768") :method
+.sub "!PREFIX__prefix"  :subid("21_1274564773.54721") :method
 .annotate 'line', 15
     $P43 = self."!PREFIX__!protoregex"("prefix")
     .return ($P43)
@@ -1210,7 +1210,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "postfix"  :subid("22_1274022878.64768") :method
+.sub "postfix"  :subid("22_1274564773.54721") :method
 .annotate 'line', 16
     $P45 = self."!protoregex"("postfix")
     .return ($P45)
@@ -1218,7 +1218,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__postfix"  :subid("23_1274022878.64768") :method
+.sub "!PREFIX__postfix"  :subid("23_1274564773.54721") :method
 .annotate 'line', 16
     $P47 = self."!PREFIX__!protoregex"("postfix")
     .return ($P47)
@@ -1226,7 +1226,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "circumfix"  :subid("24_1274022878.64768") :method
+.sub "circumfix"  :subid("24_1274564773.54721") :method
 .annotate 'line', 17
     $P49 = self."!protoregex"("circumfix")
     .return ($P49)
@@ -1234,7 +1234,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__circumfix"  :subid("25_1274022878.64768") :method
+.sub "!PREFIX__circumfix"  :subid("25_1274564773.54721") :method
 .annotate 'line', 17
     $P51 = self."!PREFIX__!protoregex"("circumfix")
     .return ($P51)
@@ -1242,7 +1242,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "postcircumfix"  :subid("26_1274022878.64768") :method
+.sub "postcircumfix"  :subid("26_1274564773.54721") :method
 .annotate 'line', 18
     $P53 = self."!protoregex"("postcircumfix")
     .return ($P53)
@@ -1250,7 +1250,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__postcircumfix"  :subid("27_1274022878.64768") :method
+.sub "!PREFIX__postcircumfix"  :subid("27_1274564773.54721") :method
 .annotate 'line', 18
     $P55 = self."!PREFIX__!protoregex"("postcircumfix")
     .return ($P55)
@@ -1258,7 +1258,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "term:sym<circumfix>"  :subid("28_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "term:sym<circumfix>"  :subid("28_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx57_tgt
     .local int rx57_pos
@@ -1316,7 +1316,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__term:sym<circumfix>"  :subid("29_1274022878.64768") :method
+.sub "!PREFIX__term:sym<circumfix>"  :subid("29_1274564773.54721") :method
 .annotate 'line', 5
     $P59 = self."!PREFIX__!subrule"("circumfix", "")
     new $P60, "ResizablePMCArray"
@@ -1326,7 +1326,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "infixish"  :subid("30_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "infixish"  :subid("30_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx63_tgt
     .local int rx63_pos
@@ -1384,7 +1384,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__infixish"  :subid("31_1274022878.64768") :method
+.sub "!PREFIX__infixish"  :subid("31_1274564773.54721") :method
 .annotate 'line', 5
     $P65 = self."!PREFIX__!subrule"("OPER=infix", "")
     new $P66, "ResizablePMCArray"
@@ -1394,7 +1394,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "prefixish"  :subid("32_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "prefixish"  :subid("32_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx69_tgt
     .local int rx69_pos
@@ -1457,7 +1457,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__prefixish"  :subid("33_1274022878.64768") :method
+.sub "!PREFIX__prefixish"  :subid("33_1274564773.54721") :method
 .annotate 'line', 5
     $P71 = self."!PREFIX__!subrule"("OPER=prefix", "")
     new $P72, "ResizablePMCArray"
@@ -1467,7 +1467,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "postfixish"  :subid("34_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "postfixish"  :subid("34_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx75_tgt
     .local int rx75_pos
@@ -1541,7 +1541,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__postfixish"  :subid("35_1274022878.64768") :method
+.sub "!PREFIX__postfixish"  :subid("35_1274564773.54721") :method
 .annotate 'line', 5
     $P77 = self."!PREFIX__!subrule"("OPER=postcircumfix", "")
     $P78 = self."!PREFIX__!subrule"("OPER=postfix", "")
@@ -1553,7 +1553,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "nullterm"  :subid("36_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "nullterm"  :subid("36_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx83_tgt
     .local int rx83_pos
@@ -1604,7 +1604,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__nullterm"  :subid("37_1274022878.64768") :method
+.sub "!PREFIX__nullterm"  :subid("37_1274564773.54721") :method
 .annotate 'line', 5
     new $P85, "ResizablePMCArray"
     push $P85, ""
@@ -1613,7 +1613,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "nullterm_alt"  :subid("38_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "nullterm_alt"  :subid("38_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 5
     .local string rx88_tgt
     .local int rx88_pos
@@ -1671,7 +1671,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__nullterm_alt"  :subid("39_1274022878.64768") :method
+.sub "!PREFIX__nullterm_alt"  :subid("39_1274564773.54721") :method
 .annotate 'line', 5
     $P90 = self."!PREFIX__!subrule"("term", "")
     new $P91, "ResizablePMCArray"
@@ -1681,7 +1681,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "nulltermish"  :subid("40_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "nulltermish"  :subid("40_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     new $P95, 'ExceptionHandler'
     set_addr $P95, control_94
@@ -1708,7 +1708,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_delimited"  :subid("41_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_delimited"  :subid("41_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx104_tgt
     .local int rx104_pos
@@ -1790,7 +1790,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_delimited"  :subid("42_1274022878.64768") :method
+.sub "!PREFIX__quote_delimited"  :subid("42_1274564773.54721") :method
 .annotate 'line', 33
     $P106 = self."!PREFIX__!subrule"("starter", "")
     new $P107, "ResizablePMCArray"
@@ -1800,7 +1800,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_atom"  :subid("43_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_atom"  :subid("43_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx112_tgt
     .local int rx112_pos
@@ -1891,7 +1891,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_atom"  :subid("44_1274022878.64768") :method
+.sub "!PREFIX__quote_atom"  :subid("44_1274564773.54721") :method
 .annotate 'line', 33
     new $P114, "ResizablePMCArray"
     push $P114, ""
@@ -1900,7 +1900,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "decint"  :subid("45_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "decint"  :subid("45_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx122_tgt
     .local int rx122_pos
@@ -1972,7 +1972,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__decint"  :subid("46_1274022878.64768") :method
+.sub "!PREFIX__decint"  :subid("46_1274564773.54721") :method
 .annotate 'line', 33
     new $P124, "ResizablePMCArray"
     push $P124, ""
@@ -1981,7 +1981,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "decints"  :subid("47_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "decints"  :subid("47_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx129_tgt
     .local int rx129_pos
@@ -2065,7 +2065,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__decints"  :subid("48_1274022878.64768") :method
+.sub "!PREFIX__decints"  :subid("48_1274564773.54721") :method
 .annotate 'line', 33
     new $P131, "ResizablePMCArray"
     push $P131, ""
@@ -2074,7 +2074,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "hexint"  :subid("49_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "hexint"  :subid("49_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx136_tgt
     .local int rx136_pos
@@ -2155,7 +2155,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__hexint"  :subid("50_1274022878.64768") :method
+.sub "!PREFIX__hexint"  :subid("50_1274564773.54721") :method
 .annotate 'line', 33
     new $P138, "ResizablePMCArray"
     push $P138, ""
@@ -2164,7 +2164,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "hexints"  :subid("51_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "hexints"  :subid("51_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx145_tgt
     .local int rx145_pos
@@ -2248,7 +2248,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__hexints"  :subid("52_1274022878.64768") :method
+.sub "!PREFIX__hexints"  :subid("52_1274564773.54721") :method
 .annotate 'line', 33
     new $P147, "ResizablePMCArray"
     push $P147, ""
@@ -2257,7 +2257,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "octint"  :subid("53_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "octint"  :subid("53_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx152_tgt
     .local int rx152_pos
@@ -2338,7 +2338,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__octint"  :subid("54_1274022878.64768") :method
+.sub "!PREFIX__octint"  :subid("54_1274564773.54721") :method
 .annotate 'line', 33
     new $P154, "ResizablePMCArray"
     push $P154, ""
@@ -2347,7 +2347,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "octints"  :subid("55_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "octints"  :subid("55_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx161_tgt
     .local int rx161_pos
@@ -2431,7 +2431,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__octints"  :subid("56_1274022878.64768") :method
+.sub "!PREFIX__octints"  :subid("56_1274564773.54721") :method
 .annotate 'line', 33
     new $P163, "ResizablePMCArray"
     push $P163, ""
@@ -2440,7 +2440,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "binint"  :subid("57_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "binint"  :subid("57_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx168_tgt
     .local int rx168_pos
@@ -2521,7 +2521,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__binint"  :subid("58_1274022878.64768") :method
+.sub "!PREFIX__binint"  :subid("58_1274564773.54721") :method
 .annotate 'line', 33
     new $P170, "ResizablePMCArray"
     push $P170, ""
@@ -2530,7 +2530,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "binints"  :subid("59_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "binints"  :subid("59_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx177_tgt
     .local int rx177_pos
@@ -2614,7 +2614,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__binints"  :subid("60_1274022878.64768") :method
+.sub "!PREFIX__binints"  :subid("60_1274564773.54721") :method
 .annotate 'line', 33
     new $P179, "ResizablePMCArray"
     push $P179, ""
@@ -2623,7 +2623,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "integer"  :subid("61_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "integer"  :subid("61_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx184_tgt
     .local int rx184_pos
@@ -2771,7 +2771,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__integer"  :subid("62_1274022878.64768") :method
+.sub "!PREFIX__integer"  :subid("62_1274564773.54721") :method
 .annotate 'line', 33
     $P186 = self."!PREFIX__!subrule"("VALUE=decint", "")
     $P187 = self."!PREFIX__!subrule"("VALUE=decint", "0d")
@@ -2789,7 +2789,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "dec_number"  :subid("63_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "dec_number"  :subid("63_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx196_tgt
     .local int rx196_pos
@@ -2968,7 +2968,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__dec_number"  :subid("64_1274022878.64768") :method
+.sub "!PREFIX__dec_number"  :subid("64_1274564773.54721") :method
 .annotate 'line', 33
     new $P198, "ResizablePMCArray"
     push $P198, ""
@@ -2979,7 +2979,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "escale"  :subid("65_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "escale"  :subid("65_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx209_tgt
     .local int rx209_pos
@@ -3056,7 +3056,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__escale"  :subid("66_1274022878.64768") :method
+.sub "!PREFIX__escale"  :subid("66_1274564773.54721") :method
 .annotate 'line', 33
     new $P211, "ResizablePMCArray"
     push $P211, "e"
@@ -3066,7 +3066,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape"  :subid("67_1274022878.64768") :method
+.sub "quote_escape"  :subid("67_1274564773.54721") :method
 .annotate 'line', 79
     $P216 = self."!protoregex"("quote_escape")
     .return ($P216)
@@ -3074,7 +3074,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape"  :subid("68_1274022878.64768") :method
+.sub "!PREFIX__quote_escape"  :subid("68_1274564773.54721") :method
 .annotate 'line', 79
     $P218 = self."!PREFIX__!protoregex"("quote_escape")
     .return ($P218)
@@ -3082,7 +3082,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<backslash>"  :subid("69_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<backslash>"  :subid("69_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx220_tgt
     .local int rx220_pos
@@ -3144,7 +3144,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<backslash>"  :subid("70_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<backslash>"  :subid("70_1274564773.54721") :method
 .annotate 'line', 33
     new $P222, "ResizablePMCArray"
     push $P222, "\\\\"
@@ -3153,7 +3153,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<stopper>"  :subid("71_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<stopper>"  :subid("71_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx225_tgt
     .local int rx225_pos
@@ -3222,7 +3222,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<stopper>"  :subid("72_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<stopper>"  :subid("72_1274564773.54721") :method
 .annotate 'line', 33
     new $P227, "ResizablePMCArray"
     push $P227, "\\"
@@ -3231,7 +3231,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<bs>"  :subid("73_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<bs>"  :subid("73_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx230_tgt
     .local int rx230_pos
@@ -3293,7 +3293,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<bs>"  :subid("74_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<bs>"  :subid("74_1274564773.54721") :method
 .annotate 'line', 33
     new $P232, "ResizablePMCArray"
     push $P232, "\\b"
@@ -3302,7 +3302,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<nl>"  :subid("75_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<nl>"  :subid("75_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx235_tgt
     .local int rx235_pos
@@ -3364,7 +3364,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<nl>"  :subid("76_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<nl>"  :subid("76_1274564773.54721") :method
 .annotate 'line', 33
     new $P237, "ResizablePMCArray"
     push $P237, "\\n"
@@ -3373,7 +3373,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<cr>"  :subid("77_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<cr>"  :subid("77_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx240_tgt
     .local int rx240_pos
@@ -3435,7 +3435,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<cr>"  :subid("78_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<cr>"  :subid("78_1274564773.54721") :method
 .annotate 'line', 33
     new $P242, "ResizablePMCArray"
     push $P242, "\\r"
@@ -3444,7 +3444,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<tab>"  :subid("79_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<tab>"  :subid("79_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx245_tgt
     .local int rx245_pos
@@ -3506,7 +3506,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<tab>"  :subid("80_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<tab>"  :subid("80_1274564773.54721") :method
 .annotate 'line', 33
     new $P247, "ResizablePMCArray"
     push $P247, "\\t"
@@ -3515,7 +3515,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<ff>"  :subid("81_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<ff>"  :subid("81_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx250_tgt
     .local int rx250_pos
@@ -3577,7 +3577,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<ff>"  :subid("82_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<ff>"  :subid("82_1274564773.54721") :method
 .annotate 'line', 33
     new $P252, "ResizablePMCArray"
     push $P252, "\\f"
@@ -3586,7 +3586,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<hex>"  :subid("83_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<hex>"  :subid("83_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx255_tgt
     .local int rx255_pos
@@ -3684,7 +3684,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<hex>"  :subid("84_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<hex>"  :subid("84_1274564773.54721") :method
 .annotate 'line', 33
     new $P257, "ResizablePMCArray"
     push $P257, unicode:"\\x"
@@ -3693,7 +3693,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<oct>"  :subid("85_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<oct>"  :subid("85_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx261_tgt
     .local int rx261_pos
@@ -3791,7 +3791,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<oct>"  :subid("86_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<oct>"  :subid("86_1274564773.54721") :method
 .annotate 'line', 33
     new $P263, "ResizablePMCArray"
     push $P263, "\\o"
@@ -3800,7 +3800,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<chr>"  :subid("87_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<chr>"  :subid("87_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx267_tgt
     .local int rx267_pos
@@ -3869,7 +3869,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<chr>"  :subid("88_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<chr>"  :subid("88_1274564773.54721") :method
 .annotate 'line', 33
     new $P269, "ResizablePMCArray"
     push $P269, "\\c"
@@ -3878,7 +3878,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<0>"  :subid("89_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<0>"  :subid("89_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx272_tgt
     .local int rx272_pos
@@ -3961,7 +3961,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<0>"  :subid("90_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<0>"  :subid("90_1274564773.54721") :method
 .annotate 'line', 33
     new $P274, "ResizablePMCArray"
     push $P274, "\\0"
@@ -3970,13 +3970,13 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "quote_escape:sym<misc>"  :subid("91_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "quote_escape:sym<misc>"  :subid("91_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
-    .const 'Sub' $P297 = "95_1274022878.64768" 
+    .const 'Sub' $P297 = "95_1274564773.54721" 
     capture_lex $P297
-    .const 'Sub' $P290 = "94_1274022878.64768" 
+    .const 'Sub' $P290 = "94_1274564773.54721" 
     capture_lex $P290
-    .const 'Sub' $P285 = "93_1274022878.64768" 
+    .const 'Sub' $P285 = "93_1274564773.54721" 
     capture_lex $P285
     .local string rx278_tgt
     .local int rx278_pos
@@ -4007,13 +4007,13 @@ An operator precedence parser.
     set_addr $I10, rxscan281_loop
     rx278_cur."!mark_push"(0, rx278_pos, $I10)
   rxscan281_done:
-.annotate 'line', 98
+.annotate 'line', 99
+  # rx pastnode subtype= negate=
     rx278_cur."!cursor_pos"(rx278_pos)
     find_lex $P282, unicode:"$\x{a2}"
     $P283 = $P282."MATCH"()
     store_lex "$/", $P283
-.annotate 'line', 99
-    .const 'Sub' $P285 = "93_1274022878.64768" 
+    .const 'Sub' $P285 = "93_1274564773.54721" 
     capture_lex $P285
     $P286 = $P285()
   # rx literal  "\\"
@@ -4039,7 +4039,7 @@ An operator precedence parser.
 .annotate 'line', 103
   # rx subrule $P290 subtype=capture negate=
     rx278_cur."!cursor_pos"(rx278_pos)
-    .const 'Sub' $P290 = "94_1274022878.64768" 
+    .const 'Sub' $P290 = "94_1274564773.54721" 
     capture_lex $P290
     $P10 = rx278_cur.$P290()
     unless $P10, rx278_fail
@@ -4069,11 +4069,12 @@ An operator precedence parser.
   rxcap_293_fail:
     goto rx278_fail
   rxcap_293_done:
+  # rx pastnode subtype= negate=
     rx278_cur."!cursor_pos"(rx278_pos)
     find_lex $P294, unicode:"$\x{a2}"
     $P295 = $P294."MATCH"()
     store_lex "$/", $P295
-    .const 'Sub' $P297 = "95_1274022878.64768" 
+    .const 'Sub' $P297 = "95_1274564773.54721" 
     capture_lex $P297
     $P307 = $P297()
   alt288_end:
@@ -4119,7 +4120,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<misc>"  :subid("92_1274022878.64768") :method
+.sub "!PREFIX__quote_escape:sym<misc>"  :subid("92_1274564773.54721") :method
 .annotate 'line', 33
     new $P280, "ResizablePMCArray"
     push $P280, ""
@@ -4128,14 +4129,14 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block284"  :anon :subid("93_1274022878.64768") :outer("91_1274022878.64768")
+.sub "_block284"  :anon :subid("93_1274564773.54721") :outer("91_1274564773.54721")
 .annotate 'line', 99
     .return ()
 .end
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block289"  :anon :subid("94_1274022878.64768") :method :outer("91_1274022878.64768")
+.sub "_block289"  :anon :subid("94_1274564773.54721") :method :outer("91_1274564773.54721")
 .annotate 'line', 103
     .local string rx291_tgt
     .local int rx291_pos
@@ -4190,7 +4191,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block296"  :anon :subid("95_1274022878.64768") :outer("91_1274022878.64768")
+.sub "_block296"  :anon :subid("95_1274564773.54721") :outer("91_1274564773.54721")
 .annotate 'line', 104
     find_lex $P298, "$/"
     $P299 = $P298."CURSOR"()
@@ -4213,9 +4214,9 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "charname"  :subid("96_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "charname"  :subid("96_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
-    .const 'Sub' $P319 = "98_1274022878.64768" 
+    .const 'Sub' $P319 = "98_1274564773.54721" 
     capture_lex $P319
     .local string rx310_tgt
     .local int rx310_pos
@@ -4293,7 +4294,7 @@ An operator precedence parser.
 .annotate 'line', 113
   # rx subrule "before" subtype=zerowidth negate=
     rx310_cur."!cursor_pos"(rx310_pos)
-    .const 'Sub' $P319 = "98_1274022878.64768" 
+    .const 'Sub' $P319 = "98_1274564773.54721" 
     capture_lex $P319
     $P10 = rx310_cur."before"($P319)
     unless $P10, rx310_fail
@@ -4318,7 +4319,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__charname"  :subid("97_1274022878.64768") :method
+.sub "!PREFIX__charname"  :subid("97_1274564773.54721") :method
 .annotate 'line', 33
     $P312 = self."!PREFIX__!subrule"("integer", "")
     new $P313, "ResizablePMCArray"
@@ -4380,7 +4381,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block318"  :anon :subid("98_1274022878.64768") :method :outer("96_1274022878.64768")
+.sub "_block318"  :anon :subid("98_1274564773.54721") :method :outer("96_1274564773.54721")
 .annotate 'line', 113
     .local string rx320_tgt
     .local int rx320_pos
@@ -4440,7 +4441,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "charnames"  :subid("99_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "charnames"  :subid("99_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx323_tgt
     .local int rx323_pos
@@ -4524,7 +4525,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__charnames"  :subid("100_1274022878.64768") :method
+.sub "!PREFIX__charnames"  :subid("100_1274564773.54721") :method
 .annotate 'line', 33
     new $P325, "ResizablePMCArray"
     push $P325, ""
@@ -4533,7 +4534,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "charspec"  :subid("101_1274022878.64768") :method :outer("11_1274022878.64768")
+.sub "charspec"  :subid("101_1274564773.54721") :method :outer("11_1274564773.54721")
 .annotate 'line', 33
     .local string rx330_tgt
     .local int rx330_pos
@@ -4663,7 +4664,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "!PREFIX__charspec"  :subid("102_1274022878.64768") :method
+.sub "!PREFIX__charspec"  :subid("102_1274564773.54721") :method
 .annotate 'line', 33
     $P332 = self."!PREFIX__!subrule"("", "")
     $P333 = self."!PREFIX__!subrule"("charnames", "[")
@@ -4704,18 +4705,18 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block339" :load :anon :subid("103_1274022878.64768")
+.sub "_block339" :load :anon :subid("103_1274564773.54721")
 .annotate 'line', 5
-    .const 'Sub' $P341 = "11_1274022878.64768" 
+    .const 'Sub' $P341 = "11_1274564773.54721" 
     $P342 = $P341()
     .return ($P342)
 .end
 
 
 .namespace []
-.sub "_block344" :load :anon :subid("104_1274022878.64768")
+.sub "_block344" :load :anon :subid("104_1274564773.54721")
 .annotate 'line', 1
-    .const 'Sub' $P346 = "10_1274022878.64768" 
+    .const 'Sub' $P346 = "10_1274564773.54721" 
     $P347 = $P346()
     .return ($P347)
 .end
@@ -4723,7 +4724,7 @@ An operator precedence parser.
 ### .include 'gen/hllgrammar-actions.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1274022880.65586")
+.sub "_block11"  :anon :subid("10_1274564775.02458")
 .annotate 'line', 0
     get_hll_global $P14, ["HLL";"Actions"], "_block13" 
     capture_lex $P14
@@ -4733,15 +4734,15 @@ An operator precedence parser.
     $P575 = $P14()
 .annotate 'line', 1
     .return ($P575)
-    .const 'Sub' $P577 = "50_1274022880.65586" 
+    .const 'Sub' $P577 = "50_1274564775.02458" 
     .return ($P577)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post51") :outer("10_1274022880.65586")
+.sub "" :load :init :subid("post51") :outer("10_1274564775.02458")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1274022880.65586" 
+    .const 'Sub' $P12 = "10_1274564775.02458" 
     .local pmc block
     set block, $P12
     $P580 = get_root_global ["parrot"], "P6metaclass"
@@ -4750,82 +4751,82 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block13"  :subid("11_1274022880.65586") :outer("10_1274022880.65586")
+.sub "_block13"  :subid("11_1274564775.02458") :outer("10_1274564775.02458")
 .annotate 'line', 3
-    .const 'Sub' $P553 = "48_1274022880.65586" 
+    .const 'Sub' $P553 = "48_1274564775.02458" 
     capture_lex $P553
-    .const 'Sub' $P528 = "46_1274022880.65586" 
+    .const 'Sub' $P528 = "46_1274564775.02458" 
     capture_lex $P528
-    .const 'Sub' $P498 = "45_1274022880.65586" 
+    .const 'Sub' $P498 = "45_1274564775.02458" 
     capture_lex $P498
-    .const 'Sub' $P479 = "44_1274022880.65586" 
+    .const 'Sub' $P479 = "44_1274564775.02458" 
     capture_lex $P479
-    .const 'Sub' $P472 = "43_1274022880.65586" 
+    .const 'Sub' $P472 = "43_1274564775.02458" 
     capture_lex $P472
-    .const 'Sub' $P462 = "42_1274022880.65586" 
+    .const 'Sub' $P462 = "42_1274564775.02458" 
     capture_lex $P462
-    .const 'Sub' $P445 = "41_1274022880.65586" 
+    .const 'Sub' $P445 = "41_1274564775.02458" 
     capture_lex $P445
-    .const 'Sub' $P428 = "40_1274022880.65586" 
+    .const 'Sub' $P428 = "40_1274564775.02458" 
     capture_lex $P428
-    .const 'Sub' $P421 = "39_1274022880.65586" 
+    .const 'Sub' $P421 = "39_1274564775.02458" 
     capture_lex $P421
-    .const 'Sub' $P414 = "38_1274022880.65586" 
+    .const 'Sub' $P414 = "38_1274564775.02458" 
     capture_lex $P414
-    .const 'Sub' $P407 = "37_1274022880.65586" 
+    .const 'Sub' $P407 = "37_1274564775.02458" 
     capture_lex $P407
-    .const 'Sub' $P400 = "36_1274022880.65586" 
+    .const 'Sub' $P400 = "36_1274564775.02458" 
     capture_lex $P400
-    .const 'Sub' $P393 = "35_1274022880.65586" 
+    .const 'Sub' $P393 = "35_1274564775.02458" 
     capture_lex $P393
-    .const 'Sub' $P383 = "34_1274022880.65586" 
+    .const 'Sub' $P383 = "34_1274564775.02458" 
     capture_lex $P383
-    .const 'Sub' $P376 = "33_1274022880.65586" 
+    .const 'Sub' $P376 = "33_1274564775.02458" 
     capture_lex $P376
-    .const 'Sub' $P360 = "32_1274022880.65586" 
+    .const 'Sub' $P360 = "32_1274564775.02458" 
     capture_lex $P360
-    .const 'Sub' $P285 = "30_1274022880.65586" 
+    .const 'Sub' $P285 = "30_1274564775.02458" 
     capture_lex $P285
-    .const 'Sub' $P222 = "27_1274022880.65586" 
+    .const 'Sub' $P222 = "27_1274564775.02458" 
     capture_lex $P222
-    .const 'Sub' $P213 = "26_1274022880.65586" 
+    .const 'Sub' $P213 = "26_1274564775.02458" 
     capture_lex $P213
-    .const 'Sub' $P204 = "25_1274022880.65586" 
+    .const 'Sub' $P204 = "25_1274564775.02458" 
     capture_lex $P204
-    .const 'Sub' $P195 = "24_1274022880.65586" 
+    .const 'Sub' $P195 = "24_1274564775.02458" 
     capture_lex $P195
-    .const 'Sub' $P186 = "23_1274022880.65586" 
+    .const 'Sub' $P186 = "23_1274564775.02458" 
     capture_lex $P186
-    .const 'Sub' $P177 = "22_1274022880.65586" 
+    .const 'Sub' $P177 = "22_1274564775.02458" 
     capture_lex $P177
-    .const 'Sub' $P167 = "21_1274022880.65586" 
+    .const 'Sub' $P167 = "21_1274564775.02458" 
     capture_lex $P167
-    .const 'Sub' $P157 = "20_1274022880.65586" 
+    .const 'Sub' $P157 = "20_1274564775.02458" 
     capture_lex $P157
-    .const 'Sub' $P149 = "19_1274022880.65586" 
+    .const 'Sub' $P149 = "19_1274564775.02458" 
     capture_lex $P149
-    .const 'Sub' $P139 = "18_1274022880.65586" 
+    .const 'Sub' $P139 = "18_1274564775.02458" 
     capture_lex $P139
-    .const 'Sub' $P129 = "17_1274022880.65586" 
+    .const 'Sub' $P129 = "17_1274564775.02458" 
     capture_lex $P129
-    .const 'Sub' $P28 = "14_1274022880.65586" 
+    .const 'Sub' $P28 = "14_1274564775.02458" 
     capture_lex $P28
-    .const 'Sub' $P22 = "13_1274022880.65586" 
+    .const 'Sub' $P22 = "13_1274564775.02458" 
     capture_lex $P22
-    .const 'Sub' $P15 = "12_1274022880.65586" 
+    .const 'Sub' $P15 = "12_1274564775.02458" 
     capture_lex $P15
 .annotate 'line', 197
-    .const 'Sub' $P553 = "48_1274022880.65586" 
+    .const 'Sub' $P553 = "48_1274564775.02458" 
     newclosure $P570, $P553
 .annotate 'line', 3
     .return ($P570)
-    .const 'Sub' $P572 = "49_1274022880.65586" 
+    .const 'Sub' $P572 = "49_1274564775.02458" 
     .return ($P572)
 .end
 
 
 .namespace ["HLL";"Actions"]
-.sub "string_to_int"  :subid("12_1274022880.65586") :outer("11_1274022880.65586")
+.sub "string_to_int"  :subid("12_1274564775.02458") :outer("11_1274564775.02458")
     .param pmc param_18
     .param pmc param_19
 .annotate 'line', 3
@@ -4878,7 +4879,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "ints_to_string"  :subid("13_1274022880.65586") :outer("11_1274022880.65586")
+.sub "ints_to_string"  :subid("13_1274564775.02458") :outer("11_1274564775.02458")
     .param pmc param_25
 .annotate 'line', 37
     new $P24, 'ExceptionHandler'
@@ -4919,14 +4920,14 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "EXPR"  :subid("14_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "EXPR"  :subid("14_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_31
     .param pmc param_32 :optional
     .param int has_param_32 :opt_flag
 .annotate 'line', 62
-    .const 'Sub' $P111 = "16_1274022880.65586" 
+    .const 'Sub' $P111 = "16_1274564775.02458" 
     capture_lex $P111
-    .const 'Sub' $P78 = "15_1274022880.65586" 
+    .const 'Sub' $P78 = "15_1274564775.02458" 
     capture_lex $P78
     new $P30, 'ExceptionHandler'
     set_addr $P30, control_29
@@ -5061,7 +5062,7 @@ An operator precedence parser.
     find_lex $P75, "$past"
     $P76 = $P75."name"()
     if $P76, unless_74_end
-    .const 'Sub' $P78 = "15_1274022880.65586" 
+    .const 'Sub' $P78 = "15_1274564775.02458" 
     capture_lex $P78
     $P78()
   unless_74_end:
@@ -5085,7 +5086,7 @@ An operator precedence parser.
     unless $P105, loop122_done
     shift $P109, $P105
   loop122_redo:
-    .const 'Sub' $P111 = "16_1274022880.65586" 
+    .const 'Sub' $P111 = "16_1274564775.02458" 
     capture_lex $P111
     $P111($P109)
   loop122_next:
@@ -5130,7 +5131,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block77"  :anon :subid("15_1274022880.65586") :outer("14_1274022880.65586")
+.sub "_block77"  :anon :subid("15_1274564775.02458") :outer("14_1274564775.02458")
 .annotate 'line', 71
     new $P79, "Undef"
     .lex "$name", $P79
@@ -5180,7 +5181,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block110"  :anon :subid("16_1274022880.65586") :outer("14_1274022880.65586")
+.sub "_block110"  :anon :subid("16_1274564775.02458") :outer("14_1274564775.02458")
     .param pmc param_112
 .annotate 'line', 82
     .lex "$_", param_112
@@ -5203,7 +5204,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "term:sym<circumfix>"  :subid("17_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "term:sym<circumfix>"  :subid("17_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_132
 .annotate 'line', 87
     new $P131, 'ExceptionHandler'
@@ -5233,7 +5234,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "termish"  :subid("18_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "termish"  :subid("18_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_142
 .annotate 'line', 89
     new $P141, 'ExceptionHandler'
@@ -5263,7 +5264,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "nullterm"  :subid("19_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "nullterm"  :subid("19_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_152
 .annotate 'line', 90
     new $P151, 'ExceptionHandler'
@@ -5285,7 +5286,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "nullterm_alt"  :subid("20_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "nullterm_alt"  :subid("20_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_160
 .annotate 'line', 91
     new $P159, 'ExceptionHandler'
@@ -5315,7 +5316,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "integer"  :subid("21_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "integer"  :subid("21_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_170
 .annotate 'line', 93
     new $P169, 'ExceptionHandler'
@@ -5345,7 +5346,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "dec_number"  :subid("22_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "dec_number"  :subid("22_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_180
 .annotate 'line', 95
     new $P179, 'ExceptionHandler'
@@ -5368,7 +5369,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "decint"  :subid("23_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "decint"  :subid("23_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_189
 .annotate 'line', 97
     new $P188, 'ExceptionHandler'
@@ -5391,7 +5392,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "hexint"  :subid("24_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "hexint"  :subid("24_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_198
 .annotate 'line', 98
     new $P197, 'ExceptionHandler'
@@ -5414,7 +5415,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "octint"  :subid("25_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "octint"  :subid("25_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_207
 .annotate 'line', 99
     new $P206, 'ExceptionHandler'
@@ -5437,7 +5438,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "binint"  :subid("26_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "binint"  :subid("26_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_216
 .annotate 'line', 100
     new $P215, 'ExceptionHandler'
@@ -5460,10 +5461,10 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_EXPR"  :subid("27_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_EXPR"  :subid("27_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_225
 .annotate 'line', 102
-    .const 'Sub' $P241 = "28_1274022880.65586" 
+    .const 'Sub' $P241 = "28_1274564775.02458" 
     capture_lex $P241
     new $P224, 'ExceptionHandler'
     set_addr $P224, control_223
@@ -5495,7 +5496,7 @@ An operator precedence parser.
     $P237 = $P235."ACCEPTS"($P236)
     if $P237, if_234
 .annotate 'line', 108
-    .const 'Sub' $P241 = "28_1274022880.65586" 
+    .const 'Sub' $P241 = "28_1274564775.02458" 
     capture_lex $P241
     $P241()
     goto if_234_end
@@ -5534,9 +5535,9 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block240"  :anon :subid("28_1274022880.65586") :outer("27_1274022880.65586")
+.sub "_block240"  :anon :subid("28_1274564775.02458") :outer("27_1274564775.02458")
 .annotate 'line', 108
-    .const 'Sub' $P260 = "29_1274022880.65586" 
+    .const 'Sub' $P260 = "29_1274564775.02458" 
     capture_lex $P260
 .annotate 'line', 109
     $P242 = root_new ['parrot';'ResizablePMCArray']
@@ -5587,7 +5588,7 @@ An operator precedence parser.
     unless $P255, loop265_done
     shift $P258, $P255
   loop265_redo:
-    .const 'Sub' $P260 = "29_1274022880.65586" 
+    .const 'Sub' $P260 = "29_1274564775.02458" 
     capture_lex $P260
     $P260($P258)
   loop265_next:
@@ -5610,7 +5611,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block259"  :anon :subid("29_1274022880.65586") :outer("28_1274022880.65586")
+.sub "_block259"  :anon :subid("29_1274564775.02458") :outer("28_1274564775.02458")
     .param pmc param_261
 .annotate 'line', 112
     .lex "$_", param_261
@@ -5622,10 +5623,10 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_delimited"  :subid("30_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_delimited"  :subid("30_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_288
 .annotate 'line', 125
-    .const 'Sub' $P300 = "31_1274022880.65586" 
+    .const 'Sub' $P300 = "31_1274564775.02458" 
     capture_lex $P300
     new $P287, 'ExceptionHandler'
     set_addr $P287, control_286
@@ -5668,7 +5669,7 @@ An operator precedence parser.
     unless $P294, loop332_done
     shift $P298, $P294
   loop332_redo:
-    .const 'Sub' $P300 = "31_1274022880.65586" 
+    .const 'Sub' $P300 = "31_1274564775.02458" 
     capture_lex $P300
     $P300($P298)
   loop332_next:
@@ -5746,7 +5747,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block299"  :anon :subid("31_1274022880.65586") :outer("30_1274022880.65586")
+.sub "_block299"  :anon :subid("31_1274564775.02458") :outer("30_1274564775.02458")
     .param pmc param_302
 .annotate 'line', 129
     new $P301, "Undef"
@@ -5815,7 +5816,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_atom"  :subid("32_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_atom"  :subid("32_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_363
 .annotate 'line', 150
     new $P362, 'ExceptionHandler'
@@ -5864,7 +5865,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<backslash>"  :subid("33_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<backslash>"  :subid("33_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_379
 .annotate 'line', 154
     new $P378, 'ExceptionHandler'
@@ -5885,7 +5886,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<stopper>"  :subid("34_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<stopper>"  :subid("34_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_386
 .annotate 'line', 155
     new $P385, 'ExceptionHandler'
@@ -5915,7 +5916,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<bs>"  :subid("35_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<bs>"  :subid("35_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_396
 .annotate 'line', 157
     new $P395, 'ExceptionHandler'
@@ -5936,7 +5937,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<nl>"  :subid("36_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<nl>"  :subid("36_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_403
 .annotate 'line', 158
     new $P402, 'ExceptionHandler'
@@ -5957,7 +5958,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<cr>"  :subid("37_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<cr>"  :subid("37_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_410
 .annotate 'line', 159
     new $P409, 'ExceptionHandler'
@@ -5978,7 +5979,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<tab>"  :subid("38_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<tab>"  :subid("38_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_417
 .annotate 'line', 160
     new $P416, 'ExceptionHandler'
@@ -5999,7 +6000,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<ff>"  :subid("39_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<ff>"  :subid("39_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_424
 .annotate 'line', 161
     new $P423, 'ExceptionHandler'
@@ -6020,7 +6021,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<hex>"  :subid("40_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<hex>"  :subid("40_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_431
 .annotate 'line', 163
     new $P430, 'ExceptionHandler'
@@ -6078,7 +6079,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<oct>"  :subid("41_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<oct>"  :subid("41_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_448
 .annotate 'line', 167
     new $P447, 'ExceptionHandler'
@@ -6136,7 +6137,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<chr>"  :subid("42_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<chr>"  :subid("42_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_465
 .annotate 'line', 171
     new $P464, 'ExceptionHandler'
@@ -6168,7 +6169,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<0>"  :subid("43_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<0>"  :subid("43_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_475
 .annotate 'line', 175
     new $P474, 'ExceptionHandler'
@@ -6191,7 +6192,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "quote_escape:sym<misc>"  :subid("44_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "quote_escape:sym<misc>"  :subid("44_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_482
 .annotate 'line', 179
     new $P481, 'ExceptionHandler'
@@ -6249,7 +6250,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "charname"  :subid("45_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "charname"  :subid("45_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_501
 .annotate 'line', 183
     new $P500, 'ExceptionHandler'
@@ -6322,10 +6323,10 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "charnames"  :subid("46_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "charnames"  :subid("46_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_531
 .annotate 'line', 191
-    .const 'Sub' $P540 = "47_1274022880.65586" 
+    .const 'Sub' $P540 = "47_1274564775.02458" 
     capture_lex $P540
     new $P530, 'ExceptionHandler'
     set_addr $P530, control_529
@@ -6359,7 +6360,7 @@ An operator precedence parser.
     unless $P534, loop546_done
     shift $P538, $P534
   loop546_redo:
-    .const 'Sub' $P540 = "47_1274022880.65586" 
+    .const 'Sub' $P540 = "47_1274564775.02458" 
     capture_lex $P540
     $P540($P538)
   loop546_next:
@@ -6388,7 +6389,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block539"  :anon :subid("47_1274022880.65586") :outer("46_1274022880.65586")
+.sub "_block539"  :anon :subid("47_1274564775.02458") :outer("46_1274564775.02458")
     .param pmc param_541
 .annotate 'line', 193
     .lex "$_", param_541
@@ -6402,7 +6403,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "charspec"  :subid("48_1274022880.65586") :method :outer("11_1274022880.65586")
+.sub "charspec"  :subid("48_1274564775.02458") :method :outer("11_1274564775.02458")
     .param pmc param_556
 .annotate 'line', 197
     new $P555, 'ExceptionHandler'
@@ -6452,18 +6453,18 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block571" :load :anon :subid("49_1274022880.65586")
+.sub "_block571" :load :anon :subid("49_1274564775.02458")
 .annotate 'line', 3
-    .const 'Sub' $P573 = "11_1274022880.65586" 
+    .const 'Sub' $P573 = "11_1274564775.02458" 
     $P574 = $P573()
     .return ($P574)
 .end
 
 
 .namespace []
-.sub "_block576" :load :anon :subid("50_1274022880.65586")
+.sub "_block576" :load :anon :subid("50_1274564775.02458")
 .annotate 'line', 1
-    .const 'Sub' $P578 = "10_1274022880.65586" 
+    .const 'Sub' $P578 = "10_1274564775.02458" 
     $P579 = $P578()
     .return ($P579)
 .end
@@ -6471,80 +6472,86 @@ An operator precedence parser.
 ### .include 'gen/hllcompiler.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1274022881.57388")
+.sub "_block11"  :anon :subid("10_1274564776.02218")
 .annotate 'line', 0
     get_hll_global $P14, ["HLL";"Compiler"], "_block13" 
     capture_lex $P14
 .annotate 'line', 6
     get_hll_global $P14, ["HLL";"Compiler"], "_block13" 
     capture_lex $P14
-    $P285 = $P14()
+    $P454 = $P14()
 .annotate 'line', 1
-    .return ($P285)
-    .const 'Sub' $P287 = "25_1274022881.57388" 
-    .return ($P287)
+    .return ($P454)
+    .const 'Sub' $P456 = "33_1274564776.02218" 
+    .return ($P456)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post26") :outer("10_1274022881.57388")
+.sub "" :load :init :subid("post34") :outer("10_1274564776.02218")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1274022881.57388" 
+    .const 'Sub' $P12 = "10_1274564776.02218" 
     .local pmc block
     set block, $P12
 .annotate 'line', 2
     load_bytecode "PCT/HLLCompiler.pbc"
 .annotate 'line', 1
-    $P290 = get_root_global ["parrot"], "P6metaclass"
-    new $P291, "ResizablePMCArray"
-    push $P291, "$!language"
-    $P290."new_class"("HLL::Compiler", "PCT::HLLCompiler" :named("parent"), $P291 :named("attr"))
+    $P459 = get_root_global ["parrot"], "P6metaclass"
+    new $P460, "ResizablePMCArray"
+    push $P460, "$!language"
+    $P459."new_class"("HLL::Compiler", "PCT::HLLCompiler" :named("parent"), $P460 :named("attr"))
 .end
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block13"  :subid("11_1274022881.57388") :outer("10_1274022881.57388")
+.sub "_block13"  :subid("11_1274564776.02218") :outer("10_1274564776.02218")
 .annotate 'line', 6
-    .const 'Sub' $P188 = "20_1274022881.57388" 
+    .const 'Sub' $P409 = "31_1274564776.02218" 
+    capture_lex $P409
+    .const 'Sub' $P298 = "26_1274564776.02218" 
+    capture_lex $P298
+    .const 'Sub' $P283 = "25_1274564776.02218" 
+    capture_lex $P283
+    .const 'Sub' $P188 = "20_1274564776.02218" 
     capture_lex $P188
-    .const 'Sub' $P153 = "18_1274022881.57388" 
+    .const 'Sub' $P153 = "18_1274564776.02218" 
     capture_lex $P153
-    .const 'Sub' $P138 = "17_1274022881.57388" 
+    .const 'Sub' $P138 = "17_1274564776.02218" 
     capture_lex $P138
-    .const 'Sub' $P122 = "16_1274022881.57388" 
+    .const 'Sub' $P122 = "16_1274564776.02218" 
     capture_lex $P122
-    .const 'Sub' $P33 = "13_1274022881.57388" 
+    .const 'Sub' $P33 = "13_1274564776.02218" 
     capture_lex $P33
-    .const 'Sub' $P15 = "12_1274022881.57388" 
+    .const 'Sub' $P15 = "12_1274564776.02218" 
     capture_lex $P15
 .annotate 'line', 14
-    .const 'Sub' $P15 = "12_1274022881.57388" 
+    .const 'Sub' $P15 = "12_1274564776.02218" 
     newclosure $P31, $P15
     .lex "value_type", $P31
 .annotate 'line', 10
     find_lex $P32, "value_type"
-.annotate 'line', 69
-    .const 'Sub' $P188 = "20_1274022881.57388" 
-    newclosure $P283, $P188
+.annotate 'line', 135
+    .const 'Sub' $P409 = "31_1274564776.02218" 
+    newclosure $P452, $P409
 .annotate 'line', 6
-    .return ($P283)
+    .return ($P452)
 .end
 
 
 .namespace ["HLL";"Compiler"]
-.sub "" :load :init :subid("post27") :outer("11_1274022881.57388")
+.sub "" :load :init :subid("post35") :outer("11_1274564776.02218")
 .annotate 'line', 6
     get_hll_global $P14, ["HLL";"Compiler"], "_block13" 
     .local pmc block
     set block, $P14
 .annotate 'line', 11
-    get_hll_global $P284, ["HLL"], "Compiler"
-    $P284."language"("parrot")
+    get_hll_global $P453, ["HLL"], "Compiler"
+    $P453."language"("parrot")
 .end
 
 
 .namespace ["HLL";"Compiler"]
-.sub "value_type"  :subid("12_1274022881.57388") :outer("11_1274022881.57388")
+.sub "value_type"  :subid("12_1274564776.02218") :outer("11_1274564776.02218")
     .param pmc param_18
 .annotate 'line', 14
     new $P17, 'ExceptionHandler'
@@ -6588,15 +6595,15 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "get_exports"  :subid("13_1274022881.57388") :method :outer("11_1274022881.57388")
+.sub "get_exports"  :subid("13_1274564776.02218") :method :outer("11_1274564776.02218")
     .param pmc param_36
     .param pmc param_39 :slurpy
     .param pmc param_37 :optional :named("tagset")
     .param int has_param_37 :opt_flag
 .annotate 'line', 20
-    .const 'Sub' $P105 = "15_1274022881.57388" 
+    .const 'Sub' $P105 = "15_1274564776.02218" 
     capture_lex $P105
-    .const 'Sub' $P84 = "14_1274022881.57388" 
+    .const 'Sub' $P84 = "14_1274564776.02218" 
     capture_lex $P84
     new $P35, 'ExceptionHandler'
     set_addr $P35, control_34
@@ -6604,10 +6611,10 @@ An operator precedence parser.
     push_eh $P35
     .lex "self", self
     .lex "$module", param_36
-    if has_param_37, optparam_28
+    if has_param_37, optparam_36
     new $P38, "Undef"
     set param_37, $P38
-  optparam_28:
+  optparam_36:
     .lex "$tagset", param_37
     .lex "@symbols", param_39
 .annotate 'line', 27
@@ -6653,17 +6660,17 @@ An operator precedence parser.
     find_lex $P60, "$tagset"
     set $S61, $P60
     find_lex $P62, "$module"
-    unless_null $P62, vivify_29
+    unless_null $P62, vivify_37
     $P62 = root_new ['parrot';'Hash']
-  vivify_29:
+  vivify_37:
     set $P63, $P62["EXPORT"]
-    unless_null $P63, vivify_30
+    unless_null $P63, vivify_38
     $P63 = root_new ['parrot';'Hash']
-  vivify_30:
+  vivify_38:
     set $P64, $P63[$S61]
-    unless_null $P64, vivify_31
+    unless_null $P64, vivify_39
     new $P64, "Undef"
-  vivify_31:
+  vivify_39:
     store_lex "%source", $P64
 .annotate 'line', 29
     find_lex $P66, "%source"
@@ -6692,7 +6699,7 @@ An operator precedence parser.
 .annotate 'line', 39
     find_lex $P101, "%source"
     defined $I102, $P101
-    unless $I102, for_undef_32
+    unless $I102, for_undef_40
     iter $P100, $P101
     new $P118, 'ExceptionHandler'
     set_addr $P118, loop117_handler
@@ -6702,7 +6709,7 @@ An operator precedence parser.
     unless $P100, loop117_done
     shift $P103, $P100
   loop117_redo:
-    .const 'Sub' $P105 = "15_1274022881.57388" 
+    .const 'Sub' $P105 = "15_1274564776.02218" 
     capture_lex $P105
     $P105($P103)
   loop117_next:
@@ -6715,14 +6722,14 @@ An operator precedence parser.
     eq $P119, 66, loop117_redo
   loop117_done:
     pop_eh 
-  for_undef_32:
+  for_undef_40:
 .annotate 'line', 38
     goto if_77_end
   if_77:
 .annotate 'line', 33
     find_lex $P80, "@symbols"
     defined $I81, $P80
-    unless $I81, for_undef_35
+    unless $I81, for_undef_43
     iter $P79, $P80
     new $P98, 'ExceptionHandler'
     set_addr $P98, loop97_handler
@@ -6732,7 +6739,7 @@ An operator precedence parser.
     unless $P79, loop97_done
     shift $P82, $P79
   loop97_redo:
-    .const 'Sub' $P84 = "14_1274022881.57388" 
+    .const 'Sub' $P84 = "14_1274564776.02218" 
     capture_lex $P84
     $P84($P82)
   loop97_next:
@@ -6745,7 +6752,7 @@ An operator precedence parser.
     eq $P99, 66, loop97_redo
   loop97_done:
     pop_eh 
-  for_undef_35:
+  for_undef_43:
   if_77_end:
 .annotate 'line', 32
     find_lex $P120, "%exports"
@@ -6760,7 +6767,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block104"  :anon :subid("15_1274022881.57388") :outer("13_1274022881.57388")
+.sub "_block104"  :anon :subid("15_1274564776.02218") :outer("13_1274564776.02218")
     .param pmc param_107
 .annotate 'line', 40
     new $P106, "Undef"
@@ -6776,15 +6783,15 @@ An operator precedence parser.
     find_lex $P113, "$value"
     $P114 = "value_type"($P113)
     find_lex $P115, "%exports"
-    unless_null $P115, vivify_33
+    unless_null $P115, vivify_41
     $P115 = root_new ['parrot';'Hash']
     store_lex "%exports", $P115
-  vivify_33:
+  vivify_41:
     set $P116, $P115[$P114]
-    unless_null $P116, vivify_34
+    unless_null $P116, vivify_42
     $P116 = root_new ['parrot';'Hash']
     set $P115[$P114], $P116
-  vivify_34:
+  vivify_42:
     set $P116[$P112], $P110
 .annotate 'line', 39
     .return ($P110)
@@ -6792,7 +6799,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block83"  :anon :subid("14_1274022881.57388") :outer("13_1274022881.57388")
+.sub "_block83"  :anon :subid("14_1274564776.02218") :outer("13_1274564776.02218")
     .param pmc param_86
 .annotate 'line', 34
     new $P85, "Undef"
@@ -6801,13 +6808,13 @@ An operator precedence parser.
     find_lex $P87, "$_"
     set $S88, $P87
     find_lex $P89, "%source"
-    unless_null $P89, vivify_36
+    unless_null $P89, vivify_44
     $P89 = root_new ['parrot';'Hash']
-  vivify_36:
+  vivify_44:
     set $P90, $P89[$S88]
-    unless_null $P90, vivify_37
+    unless_null $P90, vivify_45
     new $P90, "Undef"
-  vivify_37:
+  vivify_45:
     store_lex "$value", $P90
 .annotate 'line', 35
     find_lex $P91, "$value"
@@ -6815,15 +6822,15 @@ An operator precedence parser.
     find_lex $P93, "$value"
     $P94 = "value_type"($P93)
     find_lex $P95, "%exports"
-    unless_null $P95, vivify_38
+    unless_null $P95, vivify_46
     $P95 = root_new ['parrot';'Hash']
     store_lex "%exports", $P95
-  vivify_38:
+  vivify_46:
     set $P96, $P95[$P94]
-    unless_null $P96, vivify_39
+    unless_null $P96, vivify_47
     $P96 = root_new ['parrot';'Hash']
     set $P95[$P94], $P96
-  vivify_39:
+  vivify_47:
     set $P96[$P92], $P91
 .annotate 'line', 33
     .return ($P91)
@@ -6831,7 +6838,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "get_module"  :subid("16_1274022881.57388") :method :outer("11_1274022881.57388")
+.sub "get_module"  :subid("16_1274564776.02218") :method :outer("11_1274564776.02218")
     .param pmc param_125
 .annotate 'line', 47
     new $P124, 'ExceptionHandler'
@@ -6851,9 +6858,9 @@ An operator precedence parser.
     find_lex $P130, "@name"
     find_lex $P131, "self"
     getattribute $P132, $P131, "$!language"
-    unless_null $P132, vivify_40
+    unless_null $P132, vivify_48
     new $P132, "Undef"
-  vivify_40:
+  vivify_48:
     set $S133, $P132
     downcase $S134, $S133
     $P130."unshift"($S134)
@@ -6871,7 +6878,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "language"  :subid("17_1274022881.57388") :method :outer("11_1274022881.57388")
+.sub "language"  :subid("17_1274564776.02218") :method :outer("11_1274564776.02218")
     .param pmc param_141 :optional
     .param int has_param_141 :opt_flag
 .annotate 'line', 53
@@ -6880,10 +6887,10 @@ An operator precedence parser.
     $P140."handle_types"(57)
     push_eh $P140
     .lex "self", self
-    if has_param_141, optparam_41
+    if has_param_141, optparam_49
     new $P142, "Undef"
     set param_141, $P142
-  optparam_41:
+  optparam_49:
     .lex "$name", param_141
 .annotate 'line', 54
     find_lex $P144, "$name"
@@ -6901,9 +6908,9 @@ An operator precedence parser.
 .annotate 'line', 54
     find_lex $P150, "self"
     getattribute $P151, $P150, "$!language"
-    unless_null $P151, vivify_42
+    unless_null $P151, vivify_50
     new $P151, "Undef"
-  vivify_42:
+  vivify_50:
 .annotate 'line', 53
     .return ($P151)
   control_139:
@@ -6915,10 +6922,10 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "load_module"  :subid("18_1274022881.57388") :method :outer("11_1274022881.57388")
+.sub "load_module"  :subid("18_1274564776.02218") :method :outer("11_1274564776.02218")
     .param pmc param_156
 .annotate 'line', 61
-    .const 'Sub' $P166 = "19_1274022881.57388" 
+    .const 'Sub' $P166 = "19_1274564776.02218" 
     capture_lex $P166
     new $P155, 'ExceptionHandler'
     set_addr $P155, control_154
@@ -6945,7 +6952,7 @@ An operator precedence parser.
     assign $P164, 0
     store_lex "$loaded", $P164
 .annotate 'line', 64
-    .const 'Sub' $P166 = "19_1274022881.57388" 
+    .const 'Sub' $P166 = "19_1274564776.02218" 
     capture_lex $P166
     $P166()
 .annotate 'line', 65
@@ -6974,7 +6981,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block165"  :anon :subid("19_1274022881.57388") :outer("18_1274022881.57388")
+.sub "_block165"  :anon :subid("19_1274564776.02218") :outer("18_1274564776.02218")
 .annotate 'line', 64
     new $P173, 'ExceptionHandler'
     set_addr $P173, control_172
@@ -7007,11 +7014,11 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "import"  :subid("20_1274022881.57388") :method :outer("11_1274022881.57388")
+.sub "import"  :subid("20_1274564776.02218") :method :outer("11_1274564776.02218")
     .param pmc param_191
     .param pmc param_192
 .annotate 'line', 69
-    .const 'Sub' $P198 = "21_1274022881.57388" 
+    .const 'Sub' $P198 = "21_1274564776.02218" 
     capture_lex $P198
     new $P190, 'ExceptionHandler'
     set_addr $P190, control_189
@@ -7023,7 +7030,7 @@ An operator precedence parser.
 .annotate 'line', 70
     find_lex $P194, "%exports"
     defined $I195, $P194
-    unless $I195, for_undef_43
+    unless $I195, for_undef_51
     iter $P193, $P194
     new $P280, 'ExceptionHandler'
     set_addr $P280, loop279_handler
@@ -7033,7 +7040,7 @@ An operator precedence parser.
     unless $P193, loop279_done
     shift $P196, $P193
   loop279_redo:
-    .const 'Sub' $P198 = "21_1274022881.57388" 
+    .const 'Sub' $P198 = "21_1274564776.02218" 
     capture_lex $P198
     $P198($P196)
   loop279_next:
@@ -7046,7 +7053,7 @@ An operator precedence parser.
     eq $P281, 66, loop279_redo
   loop279_done:
     pop_eh 
-  for_undef_43:
+  for_undef_51:
 .annotate 'line', 69
     .return ($P193)
   control_189:
@@ -7058,14 +7065,14 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block197"  :anon :subid("21_1274022881.57388") :outer("20_1274022881.57388")
+.sub "_block197"  :anon :subid("21_1274564776.02218") :outer("20_1274564776.02218")
     .param pmc param_201
 .annotate 'line', 70
-    .const 'Sub' $P268 = "24_1274022881.57388" 
+    .const 'Sub' $P268 = "24_1274564776.02218" 
     capture_lex $P268
-    .const 'Sub' $P248 = "23_1274022881.57388" 
+    .const 'Sub' $P248 = "23_1274564776.02218" 
     capture_lex $P248
-    .const 'Sub' $P219 = "22_1274022881.57388" 
+    .const 'Sub' $P219 = "22_1274564776.02218" 
     capture_lex $P219
 .annotate 'line', 71
     new $P199, "Undef"
@@ -7103,7 +7110,7 @@ An operator precedence parser.
 .annotate 'line', 80
     find_lex $P264, "%items"
     defined $I265, $P264
-    unless $I265, for_undef_44
+    unless $I265, for_undef_52
     iter $P263, $P264
     new $P277, 'ExceptionHandler'
     set_addr $P277, loop276_handler
@@ -7113,7 +7120,7 @@ An operator precedence parser.
     unless $P263, loop276_done
     shift $P266, $P263
   loop276_redo:
-    .const 'Sub' $P268 = "24_1274022881.57388" 
+    .const 'Sub' $P268 = "24_1274564776.02218" 
     capture_lex $P268
     $P268($P266)
   loop276_next:
@@ -7126,7 +7133,7 @@ An operator precedence parser.
     eq $P278, 66, loop276_redo
   loop276_done:
     pop_eh 
-  for_undef_44:
+  for_undef_52:
 .annotate 'line', 79
     set $P235, $P263
 .annotate 'line', 76
@@ -7135,7 +7142,7 @@ An operator precedence parser.
 .annotate 'line', 77
     find_lex $P244, "%items"
     defined $I245, $P244
-    unless $I245, for_undef_46
+    unless $I245, for_undef_54
     iter $P243, $P244
     new $P261, 'ExceptionHandler'
     set_addr $P261, loop260_handler
@@ -7145,7 +7152,7 @@ An operator precedence parser.
     unless $P243, loop260_done
     shift $P246, $P243
   loop260_redo:
-    .const 'Sub' $P248 = "23_1274022881.57388" 
+    .const 'Sub' $P248 = "23_1274564776.02218" 
     capture_lex $P248
     $P248($P246)
   loop260_next:
@@ -7158,7 +7165,7 @@ An operator precedence parser.
     eq $P262, 66, loop260_redo
   loop260_done:
     pop_eh 
-  for_undef_46:
+  for_undef_54:
 .annotate 'line', 76
     set $P235, $P243
   if_236_end:
@@ -7169,7 +7176,7 @@ An operator precedence parser.
 .annotate 'line', 74
     find_lex $P215, "%items"
     defined $I216, $P215
-    unless $I216, for_undef_47
+    unless $I216, for_undef_55
     iter $P214, $P215
     new $P233, 'ExceptionHandler'
     set_addr $P233, loop232_handler
@@ -7179,7 +7186,7 @@ An operator precedence parser.
     unless $P214, loop232_done
     shift $P217, $P214
   loop232_redo:
-    .const 'Sub' $P219 = "22_1274022881.57388" 
+    .const 'Sub' $P219 = "22_1274564776.02218" 
     capture_lex $P219
     $P219($P217)
   loop232_next:
@@ -7192,7 +7199,7 @@ An operator precedence parser.
     eq $P234, 66, loop232_redo
   loop232_done:
     pop_eh 
-  for_undef_47:
+  for_undef_55:
 .annotate 'line', 73
     set $P206, $P214
   if_207_end:
@@ -7202,7 +7209,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block267"  :anon :subid("24_1274022881.57388") :outer("21_1274022881.57388")
+.sub "_block267"  :anon :subid("24_1274564776.02218") :outer("21_1274564776.02218")
     .param pmc param_269
 .annotate 'line', 80
     .lex "$_", param_269
@@ -7212,17 +7219,17 @@ An operator precedence parser.
     $P273 = $P272."key"()
     set $S274, $P273
     find_lex $P275, "$target"
-    unless_null $P275, vivify_45
+    unless_null $P275, vivify_53
     $P275 = root_new ['parrot';'Hash']
     store_lex "$target", $P275
-  vivify_45:
+  vivify_53:
     set $P275[$S274], $P271
     .return ($P271)
 .end
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block247"  :anon :subid("23_1274022881.57388") :outer("21_1274022881.57388")
+.sub "_block247"  :anon :subid("23_1274564776.02218") :outer("21_1274564776.02218")
     .param pmc param_249
 .annotate 'line', 77
     .lex "$_", param_249
@@ -7242,7 +7249,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "_block218"  :anon :subid("22_1274022881.57388") :outer("21_1274022881.57388")
+.sub "_block218"  :anon :subid("22_1274564776.02218") :outer("21_1274564776.02218")
     .param pmc param_220
 .annotate 'line', 74
     .lex "$_", param_220
@@ -7262,12 +7269,488 @@ An operator precedence parser.
 .end
 
 
+.namespace ["HLL";"Compiler"]
+.sub "autoprint"  :subid("25_1274564776.02218") :method :outer("11_1274564776.02218")
+    .param pmc param_286
+.annotate 'line', 85
+    new $P285, 'ExceptionHandler'
+    set_addr $P285, control_284
+    $P285."handle_types"(57)
+    push_eh $P285
+    .lex "self", self
+    .lex "$value", param_286
+.annotate 'line', 87
+    getstdout $P289
+    tell $I290, $P289
+    set $N291, $I290
+    find_dynamic_lex $P292, "$*AUTOPRINTPOS"
+    unless_null $P292, vivify_56
+    get_hll_global $P292, "$AUTOPRINTPOS"
+    unless_null $P292, vivify_57
+    die "Contextual $*AUTOPRINTPOS not found"
+  vivify_57:
+  vivify_56:
+    set $N293, $P292
+    isgt $I294, $N291, $N293
+    unless $I294, unless_288
+    new $P287, 'Integer'
+    set $P287, $I294
+    goto unless_288_end
+  unless_288:
+.annotate 'line', 86
+    find_lex $P295, "$value"
+    set $S296, $P295
+    say $S296
+  unless_288_end:
+.annotate 'line', 85
+    .return ($P287)
+  control_284:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P297, exception, "payload"
+    .return ($P297)
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "interactive"  :subid("26_1274564776.02218") :method :outer("11_1274564776.02218")
+    .param pmc param_301 :slurpy :named
+.annotate 'line', 90
+    .const 'Sub' $P328 = "27_1274564776.02218" 
+    capture_lex $P328
+    new $P300, 'ExceptionHandler'
+    set_addr $P300, control_299
+    $P300."handle_types"(57)
+    push_eh $P300
+    .lex "self", self
+    .lex "%adverbs", param_301
+.annotate 'line', 91
+    new $P302, "Undef"
+    .lex "$target", $P302
+.annotate 'line', 95
+    new $P303, "Undef"
+    .lex "$stdin", $P303
+.annotate 'line', 96
+    new $P304, "Undef"
+    .lex "$encoding", $P304
+.annotate 'line', 91
+    find_lex $P305, "%adverbs"
+    unless_null $P305, vivify_58
+    $P305 = root_new ['parrot';'Hash']
+  vivify_58:
+    set $P306, $P305["target"]
+    unless_null $P306, vivify_59
+    new $P306, "Undef"
+  vivify_59:
+    set $S307, $P306
+    downcase $S308, $S307
+    new $P309, 'String'
+    set $P309, $S308
+    store_lex "$target", $P309
+.annotate 'line', 93
+    find_lex $P310, "self"
+    $S311 = $P310."commandline_banner"()
+    printerr $S311
+.annotate 'line', 95
+    getstdin $P312
+    store_lex "$stdin", $P312
+.annotate 'line', 96
+    find_lex $P313, "%adverbs"
+    unless_null $P313, vivify_60
+    $P313 = root_new ['parrot';'Hash']
+  vivify_60:
+    set $P314, $P313["encoding"]
+    unless_null $P314, vivify_61
+    new $P314, "Undef"
+  vivify_61:
+    set $S315, $P314
+    new $P316, 'String'
+    set $P316, $S315
+    store_lex "$encoding", $P316
+.annotate 'line', 97
+    find_lex $P320, "$encoding"
+    if $P320, if_319
+    set $P318, $P320
+    goto if_319_end
+  if_319:
+    find_lex $P321, "$encoding"
+    set $S322, $P321
+    isne $I323, $S322, "fixed_8"
+    new $P318, 'Integer'
+    set $P318, $I323
+  if_319_end:
+    unless $P318, if_317_end
+.annotate 'line', 98
+    find_lex $P324, "$stdin"
+    find_lex $P325, "$encoding"
+    $P324."encoding"($P325)
+  if_317_end:
+.annotate 'line', 101
+    new $P406, 'ExceptionHandler'
+    set_addr $P406, loop405_handler
+    $P406."handle_types"(64, 66, 65)
+    push_eh $P406
+  loop405_test:
+    new $P326, "Integer"
+    assign $P326, 1
+    unless $P326, loop405_done
+  loop405_redo:
+    .const 'Sub' $P328 = "27_1274564776.02218" 
+    capture_lex $P328
+    $P328()
+  loop405_next:
+    goto loop405_test
+  loop405_handler:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P407, exception, 'type'
+    eq $P407, 64, loop405_next
+    eq $P407, 66, loop405_redo
+  loop405_done:
+    pop_eh 
+.annotate 'line', 90
+    .return ($P326)
+  control_299:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P408, exception, "payload"
+    .return ($P408)
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "_block327"  :anon :subid("27_1274564776.02218") :outer("26_1274564776.02218")
+.annotate 'line', 101
+    .const 'Sub' $P356 = "28_1274564776.02218" 
+    capture_lex $P356
+.annotate 'line', 104
+    new $P329, "Undef"
+    .lex "$prompt", $P329
+.annotate 'line', 105
+    new $P330, "Undef"
+    .lex "$code", $P330
+.annotate 'line', 110
+    new $P331, "Undef"
+    .lex "$*AUTOPRINTPOS", $P331
+.annotate 'line', 102
+    find_lex $P333, "$stdin"
+    if $P333, unless_332_end
+.include "except_types.pasm"
+    $P334 = new "Exception"
+    $P334["type"] = .CONTROL_LOOP_LAST
+    throw $P334
+  unless_332_end:
+.annotate 'line', 104
+    find_lex $P336, "self"
+    $P337 = $P336."commandline_prompt"()
+    set $P335, $P337
+    defined $I339, $P335
+    if $I339, default_338
+    new $P340, "String"
+    assign $P340, "> "
+    set $P335, $P340
+  default_338:
+    store_lex "$prompt", $P335
+.annotate 'line', 105
+    find_lex $P341, "$stdin"
+    find_lex $P342, "$prompt"
+    set $S343, $P342
+    $P344 = $P341."readline_interactive"($S343)
+    store_lex "$code", $P344
+.annotate 'line', 107
+    find_lex $P346, "$code"
+    isnull $I347, $P346
+    unless $I347, if_345_end
+.include "except_types.pasm"
+    $P348 = new "Exception"
+    $P348["type"] = .CONTROL_LOOP_LAST
+    throw $P348
+  if_345_end:
+.annotate 'line', 110
+    getstdout $P349
+    tell $I350, $P349
+    new $P351, 'Integer'
+    set $P351, $I350
+    store_lex "$*AUTOPRINTPOS", $P351
+.annotate 'line', 112
+    find_lex $P354, "$code"
+    if $P354, if_353
+    set $P352, $P354
+    goto if_353_end
+  if_353:
+    .const 'Sub' $P356 = "28_1274564776.02218" 
+    capture_lex $P356
+    $P404 = $P356()
+    set $P352, $P404
+  if_353_end:
+.annotate 'line', 101
+    .return ($P352)
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "_block355"  :anon :subid("28_1274564776.02218") :outer("27_1274564776.02218")
+.annotate 'line', 112
+    .const 'Sub' $P362 = "29_1274564776.02218" 
+    capture_lex $P362
+.annotate 'line', 114
+    new $P357, "Undef"
+    .lex "$output", $P357
+.annotate 'line', 113
+    find_lex $P358, "$code"
+    concat $P359, $P358, "\n"
+    store_lex "$code", $P359
+    find_lex $P360, "$output"
+.annotate 'line', 115
+    .const 'Sub' $P362 = "29_1274564776.02218" 
+    capture_lex $P362
+    $P362()
+.annotate 'line', 122
+    find_lex $P383, "$output"
+    isnull $I384, $P383
+    unless $I384, if_382_end
+.include "except_types.pasm"
+    $P385 = new "Exception"
+    $P385["type"] = .CONTROL_LOOP_NEXT
+    throw $P385
+  if_382_end:
+.annotate 'line', 124
+    find_lex $P388, "$target"
+    isfalse $I389, $P388
+    if $I389, if_387
+.annotate 'line', 126
+    find_lex $P395, "$target"
+    set $S396, $P395
+    iseq $I397, $S396, "pir"
+    if $I397, if_394
+.annotate 'line', 129
+    find_lex $P399, "self"
+    find_lex $P400, "$output"
+    find_lex $P401, "$target"
+    find_lex $P402, "%adverbs"
+    $P403 = $P399."dumper"($P400, $P401, $P402 :flat)
+.annotate 'line', 128
+    set $P393, $P403
+.annotate 'line', 126
+    goto if_394_end
+  if_394:
+.annotate 'line', 127
+    find_lex $P398, "$output"
+    say $P398
+  if_394_end:
+.annotate 'line', 126
+    set $P386, $P393
+.annotate 'line', 124
+    goto if_387_end
+  if_387:
+.annotate 'line', 125
+    find_lex $P390, "self"
+    find_lex $P391, "$output"
+    $P392 = $P390."autoprint"($P391)
+.annotate 'line', 124
+    set $P386, $P392
+  if_387_end:
+.annotate 'line', 112
+    .return ($P386)
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "_block361"  :anon :subid("29_1274564776.02218") :outer("28_1274564776.02218")
+.annotate 'line', 115
+    .const 'Sub' $P373 = "30_1274564776.02218" 
+    capture_lex $P373
+    new $P369, 'ExceptionHandler'
+    set_addr $P369, control_368
+    $P369."handle_types_except"(57, 58, 59, 60, 62, 63, 64, 65, 66)
+    push_eh $P369
+.annotate 'line', 116
+    find_lex $P363, "self"
+    find_lex $P364, "$code"
+    find_lex $P365, "%adverbs"
+    $P366 = $P363."eval"($P364, $P365 :flat)
+    store_lex "$output", $P366
+.annotate 'line', 115
+    pop_eh 
+    goto skip_handler_367
+  control_368:
+.annotate 'line', 117
+    .local pmc exception 
+    .get_results (exception) 
+    .const 'Sub' $P373 = "30_1274564776.02218" 
+    newclosure $P379, $P373
+    $P379(exception)
+    new $P380, 'Integer'
+    set $P380, 1
+    set exception["handled"], $P380
+    set $I381, exception["handled"]
+    ne $I381, 1, nothandled_371
+  handled_370:
+    .return (exception)
+  nothandled_371:
+    rethrow exception
+  skip_handler_367:
+.annotate 'line', 115
+    .return ()
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "_block372"  :anon :subid("30_1274564776.02218") :outer("29_1274564776.02218")
+    .param pmc param_374
+.annotate 'line', 117
+    .lex "$_", param_374
+    find_lex $P375, "$_"
+    .lex "$!", $P375
+.annotate 'line', 118
+    find_lex $P376, "$!"
+    concat $P377, $P376, "\n"
+    print $P377
+.annotate 'line', 119
+.include "except_types.pasm"
+    $P378 = new "Exception"
+    $P378["type"] = .CONTROL_LOOP_NEXT
+    throw $P378
+.annotate 'line', 117
+    .return ($P378)
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "eval"  :subid("31_1274564776.02218") :method :outer("11_1274564776.02218")
+    .param pmc param_412
+    .param pmc param_413 :slurpy
+    .param pmc param_414 :slurpy :named
+.annotate 'line', 135
+    .const 'Sub' $P433 = "32_1274564776.02218" 
+    capture_lex $P433
+    new $P411, 'ExceptionHandler'
+    set_addr $P411, control_410
+    $P411."handle_types"(57)
+    push_eh $P411
+    .lex "self", self
+    .lex "$code", param_412
+    .lex "@args", param_413
+    .lex "%adverbs", param_414
+.annotate 'line', 136
+    new $P415, "Undef"
+    .lex "$output", $P415
+.annotate 'line', 135
+    find_lex $P416, "$output"
+.annotate 'line', 137
+    find_lex $P417, "self"
+    find_lex $P418, "$code"
+    find_lex $P419, "%adverbs"
+    $P420 = $P417."compile"($P418, $P419 :flat)
+    store_lex "$output", $P420
+.annotate 'line', 139
+    find_lex $P424, "$output"
+    isa $I425, $P424, "String"
+    new $P426, 'Integer'
+    set $P426, $I425
+    isfalse $I427, $P426
+    if $I427, if_423
+    new $P422, 'Integer'
+    set $P422, $I427
+    goto if_423_end
+  if_423:
+.annotate 'line', 140
+    find_lex $P428, "%adverbs"
+    unless_null $P428, vivify_62
+    $P428 = root_new ['parrot';'Hash']
+  vivify_62:
+    set $P429, $P428["target"]
+    unless_null $P429, vivify_63
+    new $P429, "Undef"
+  vivify_63:
+    set $S430, $P429
+    iseq $I431, $S430, ""
+    new $P422, 'Integer'
+    set $P422, $I431
+  if_423_end:
+    unless $P422, if_421_end
+    .const 'Sub' $P433 = "32_1274564776.02218" 
+    capture_lex $P433
+    $P433()
+  if_421_end:
+.annotate 'line', 139
+    find_lex $P450, "$output"
+.annotate 'line', 135
+    .return ($P450)
+  control_410:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P451, exception, "payload"
+    .return ($P451)
+.end
+
+
+.namespace ["HLL";"Compiler"]
+.sub "_block432"  :anon :subid("32_1274564776.02218") :outer("31_1274564776.02218")
+.annotate 'line', 141
+    new $P434, "Undef"
+    .lex "$outer_ctx", $P434
+    find_lex $P435, "%adverbs"
+    unless_null $P435, vivify_64
+    $P435 = root_new ['parrot';'Hash']
+  vivify_64:
+    set $P436, $P435["outer_ctx"]
+    unless_null $P436, vivify_65
+    new $P436, "Undef"
+  vivify_65:
+    store_lex "$outer_ctx", $P436
+.annotate 'line', 142
+    find_lex $P438, "$outer_ctx"
+    defined $I439, $P438
+    unless $I439, if_437_end
+.annotate 'line', 143
+    find_lex $P440, "$output"
+    unless_null $P440, vivify_66
+    $P440 = root_new ['parrot';'ResizablePMCArray']
+  vivify_66:
+    set $P441, $P440[0]
+    unless_null $P441, vivify_67
+    new $P441, "Undef"
+  vivify_67:
+    find_lex $P442, "$outer_ctx"
+    unless_null $P442, vivify_68
+    $P442 = root_new ['parrot';'Hash']
+  vivify_68:
+    set $P443, $P442["current_sub"]
+    unless_null $P443, vivify_69
+    new $P443, "Undef"
+  vivify_69:
+    $P441."set_outer"($P443)
+  if_437_end:
+.annotate 'line', 146
+    find_lex $P444, "%adverbs"
+    unless_null $P444, vivify_70
+    $P444 = root_new ['parrot';'Hash']
+  vivify_70:
+    set $P445, $P444["trace"]
+    unless_null $P445, vivify_71
+    new $P445, "Undef"
+  vivify_71:
+    set $I446, $P445
+    trace $I446
+.annotate 'line', 147
+    find_lex $P447, "$output"
+    find_lex $P448, "@args"
+    $P449 = $P447($P448 :flat)
+    store_lex "$output", $P449
+.annotate 'line', 148
+    trace 0
+.annotate 'line', 140
+    .return ()
+.end
+
+
 .namespace []
-.sub "_block286" :load :anon :subid("25_1274022881.57388")
+.sub "_block455" :load :anon :subid("33_1274564776.02218")
 .annotate 'line', 1
-    .const 'Sub' $P288 = "10_1274022881.57388" 
-    $P289 = $P288()
-    .return ($P289)
+    .const 'Sub' $P457 = "10_1274564776.02218" 
+    $P458 = $P457()
+    .return ($P458)
 .end
 
 

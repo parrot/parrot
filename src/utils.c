@@ -62,12 +62,12 @@ static INTVAL COMPARE(PARROT_INTERP,
 static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
     int node_index,
-    ARGIN(parrot_prm_context* c))
+    ARGIN(const parrot_prm_context *c))
         __attribute__nonnull__(2);
 
 static void rec_climb_back_and_mark(
     int node_index,
-    ARGIN(parrot_prm_context* c))
+    ARGIN(const parrot_prm_context *c))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS__drand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -664,8 +664,8 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<static void rec_climb_back_and_mark(int node_index, parrot_prm_context*
-c)>
+=item C<static void rec_climb_back_and_mark(int node_index, const
+parrot_prm_context *c)>
 
 Recursive function, used by Parrot_register_move to
 climb back the graph of register moves operations.
@@ -689,7 +689,7 @@ case marks it, and set node_index as its backup.
 */
 
 static void
-rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
+rec_climb_back_and_mark(int node_index, ARGIN(const parrot_prm_context *c))
 {
     ASSERT_ARGS(rec_climb_back_and_mark)
     const int node = c->dest_regs[node_index];
@@ -715,8 +715,8 @@ rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
 
 /*
 
-=item C<static void process_cycle_without_exit(int node_index,
-parrot_prm_context* c)>
+=item C<static void process_cycle_without_exit(int node_index, const
+parrot_prm_context *c)>
 
 Recursive function, used by Parrot_register_move to handle the case
 of cycles without exits, that are cycles of move ops between registers
@@ -732,7 +732,7 @@ For instance: 1-->2, 2-->3, 3-->1
 */
 
 static void
-process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
+process_cycle_without_exit(int node_index, ARGIN(const parrot_prm_context *c))
 {
     ASSERT_ARGS(process_cycle_without_exit)
     const int pred = c->src_regs[node_index];
@@ -915,6 +915,7 @@ returns 1 if C<a> is bigger, and returns -1 if C<b> is bigger.
 /* TODO: Macroize COMPARE */
 /* This is an awfully expensive function to call, what with all the */
 /* comparisons that never change. We ought to precompute everything. */
+/* XXX We should be able to guarantee that *a and *b never change via const parameters. */
 static INTVAL
 COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 {

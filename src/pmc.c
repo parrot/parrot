@@ -80,6 +80,7 @@ Tests if the given pmc is null.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_HOT
 INTVAL
@@ -187,8 +188,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-Parrot_pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
-    SHIM(UINTVAL flags))
+Parrot_pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(Parrot_pmc_reuse)
     pmc = Parrot_pmc_reuse_noinit(interp, pmc, new_type);
@@ -292,8 +292,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
-    UINTVAL flags)
+Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pmc_reuse_by_class)
     const INTVAL   new_type   = PARROT_CLASS(class_)->id;
@@ -495,6 +494,7 @@ Creates a new constant PMC of type C<base_type>.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
 {

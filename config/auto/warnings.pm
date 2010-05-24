@@ -182,6 +182,8 @@ sub _init {
         -Wdeprecated-declarations
         -Wno-format-extra-args
         -Wno-import
+        -Wsuggest-attribute=pure
+        -Wsuggest-attribute=const
         -Wunreachable-code
         -Wunused
         -Wunused-function

@@ -840,7 +840,7 @@ int
 header_pools_iterate_callback(PARROT_INTERP,
         ARGMOD(Memory_Pools *mem_pools),
         int flag, ARGIN_NULLOK(void *arg),
-        ARGIN(pool_iter_fn func))
+        NOTNULL(pool_iter_fn func))
 {
     ASSERT_ARGS(header_pools_iterate_callback)
 

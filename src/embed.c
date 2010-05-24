@@ -281,6 +281,7 @@ Test the interpreter flags specified in C<flag>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Int
 Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)
 {
@@ -300,6 +301,7 @@ Test the interpreter flags specified in C<flag>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_UInt
 Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)
 {
@@ -319,6 +321,7 @@ Test the interpreter flags specified in C<flag>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_UInt
 Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
 {

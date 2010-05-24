@@ -977,6 +977,7 @@ Returns the number of characters in the specified Parrot string.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))

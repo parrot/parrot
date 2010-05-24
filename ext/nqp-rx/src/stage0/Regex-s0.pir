@@ -719,6 +719,82 @@ Match the backreference given by C<name>.
     .return (cur)
 .end
 
+=item !process_pastnode_results_for_interpolation
+
+Used by the pastnode PAST::Regex type to prepare the results of the evaluation for interpolation.
+
+Takes two arguments:
+
+=over 4
+
+=item The node results
+
+=item The subtype of the PAST::Regex node, which is one of:
+
+=over 4
+
+=item interp_regex
+
+String values should be compiled into regexes and then interpolated.
+
+=item interp_literal
+
+String values should be treated as literals.
+
+=item interp_literal_i
+
+String values should be treated as literals and matched case-insensitively.
+
+=back
+
+=back
+
+Returns a RPA containing the elements to be interpolated
+
+=cut
+
+.sub '!process_pastnode_results_for_interpolation' :method
+    .param pmc node
+    .param string subtype
+
+    .local pmc it, result, compiler, context
+    .local string codestr
+
+    result = new ['ResizablePMCArray']
+    $S0 = typeof node
+    if $S0 == 'ResizablePMCArray' goto array
+    $P1 = node
+    it = box 0
+    goto not_array
+  array:
+    it = iter node
+  loop:
+    unless it, loop_done
+    $P1 = shift it
+  not_array:
+    if subtype != 'interp_regex' goto literal 
+    # Don't need to compile it if it's already a Sub
+    $I0 = isa $P1, ['Sub']
+    if $I0 goto literal
+    codestr = $P1
+    $P1 = split '/', codestr
+    codestr = join '\\/', $P1
+    codestr = concat '/', codestr
+    codestr = concat codestr, '/'
+    compiler = compreg 'NQP-rx'
+    $P2 = getinterp
+    context = $P2['context';0]
+    $P2 = compiler.'compile'(codestr, 'outer_ctx'=>context)
+    $P1 = $P2[0]
+    $P2 = getattribute context, 'current_sub'
+    $P1.'set_outer'($P2)
+    $P1 = $P1()
+  literal:
+    push result, $P1
+    goto loop
+  loop_done:
+    .return (result)
+.end
 
 =back
 
@@ -1921,7 +1997,7 @@ An alternate dump output for a Match object and all of its subcaptures.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 ### .include 'src/PAST/Regex.pir'
-# $Id: Regex.pir 41578 2009-09-30 14:45:23Z pmichaud $
+# $Id$
 
 =head1 NAME
 
@@ -2972,31 +3048,126 @@ second child of this node.
 
 =item 'pastnode'(PAST::Regex node)
 
+Evaluates the supplied PAST node and does various things with the result, based on subtype.
+
+Subtype can be any of:
+
+=over 4
+
+=item zerowidth
+
+Only test for truthiness and fail or not.  No interpolation.
+
+=item interp_regex
+
+String values should be compiled into regexes and then interpolated.
+
+=item interp_literal
+
+String values should be treated as literals.
+
+=item interp_literal_i
+
+String values should be treated as literals and matched case-insensitively.
+
+=item <nothing>
+
+Don't interpolate anything, just execute the PAST code
+
+=back
+
 =cut
 
-.sub 'pastnode' :method :multi(_, ['PAST';'Regex'])
+.sub 'pastnode' :method :multi(_, ['PAST'; 'Regex'])
     .param pmc node
-    .local pmc cur, pos, fail, ops
-    (cur, pos, fail) = self.'!rxregs'('cur pos fail')
+    .local pmc cur, pos, fail, ops, eos, off, tgt
+    (cur, pos, eos, off, tgt, fail) = self.'!rxregs'('cur pos eos off tgt fail')
     ops = self.'post_new'('Ops', 'node'=>node, 'result'=>cur)
+ 
+    .local pmc zerowidth, negate, testop, subtype
+    subtype = node.'subtype'()
 
+    ops.'push_pirop'('inline', subtype, negate, 'inline'=>'  # rx pastnode subtype=%1 negate=%2')
     .local pmc cpast, cpost
     cpast = node[0]
     cpost = self.'as_post'(cpast, 'rtype'=>'P')
-
+ 
     self.'!cursorop'(ops, '!cursor_pos', 0, pos)
     ops.'push'(cpost)
 
-    .local pmc subtype, negate, testop
-    subtype = node.'subtype'()
-    if subtype != 'zerowidth' goto done
+    # If this is just a zerowidth assertion, we don't actually interpolate anything.  Just evaluate
+    # and fail or not. 
+    if subtype == 'zerowidth' goto zerowidth_test
+
+    # Retain backwards compatibility with old pastnode semantics
+    unless subtype goto done
+
+    .local string prefix
+    prefix = self.'unique'('pastnode_')
+    .local pmc precompiled_label, done_label, loop_label, iterator_reg, label_reg
+    $S0 =  concat prefix, '_precompiled'
+    precompiled_label = self.'post_new'('Label', 'result'=>$S0)
+    $S0 =  concat prefix, '_done'
+    done_label = self.'post_new'('Label', 'result'=>$S0)
+    $S0 =  concat prefix, '_loop'
+    loop_label = self.'post_new'('Label', 'result'=>$S0)
+    iterator_reg = self.'uniquereg'("P")
+    label_reg = self.'uniquereg'("I")
+
+    $S10 = subtype
+    $S10 = concat '"', $S10
+    $S10 = concat $S10, '"'
+    self.'!cursorop'(ops, '!process_pastnode_results_for_interpolation', 1, '$P10', cpost, $S10)
+
+    ops.'push_pirop'('iter', iterator_reg, '$P10')
+    ops.'push_pirop'('set_addr', label_reg, loop_label)
+    ops.'push'(loop_label)
+    ops.'push_pirop'('unless', iterator_reg, fail)
+    ops.'push_pirop'('shift', '$P10', iterator_reg)
+    self.'!cursorop'(ops, '!mark_push', 0, 0, pos, label_reg)
+
+    # Check if it's already a compiled Regex, and call it as a method if so
+    ops.'push_pirop'('isa', '$I10', '$P10', "['Sub']")
+    ops.'push_pirop'('if', '$I10', precompiled_label)
+
+    # XXX This is rakudo's Regex class.  I'm not sure why the above test doesn't catch it, but
+    # need to figure it out so NQP doesn't have rakudo knowledge :(
+    ops.'push_pirop'('isa', '$I10', '$P10', "['Regex']")
+    ops.'push_pirop'('if', '$I10', precompiled_label)
+
+    # Otherwise, treat it as a literal
+    ops.'push_pirop'('set', '$S10', '$P10')
+    ops.'push_pirop'('length', '$I10', '$S10')
+    ops.'push_pirop'('add', '$I11', pos, '$I10')
+    ops.'push_pirop'('gt', '$I11', eos, fail)
+    ops.'push_pirop'('sub', '$I11', pos, off)
+    ops.'push_pirop'('substr', '$S11', tgt, '$I11', '$I10')
+    ne subtype, 'interp_literal_i', dont_downcase
+    ops.'push_pirop'('downcase', '$S10', '$S10')
+    ops.'push_pirop'('downcase', '$S11', '$S11')
+  dont_downcase:
+    ops.'push_pirop'('ne', '$S11', '$S10', fail)
+    ops.'push_pirop'('add', pos, '$I10')
+    ops.'push_pirop'('goto', done_label)
+
+    ops.'push'(precompiled_label)
+    ops.'push_pirop'('callmethod', '$P10', cur, 'result'=>'$P10')
+    ops.'push_pirop'('unless', '$P10', fail)
+    self.'!cursorop'(ops, '!mark_push', 0, 0, CURSOR_FAIL, 0, '$P10')
+    ops.'push_pirop'('callmethod', '"pos"', '$P10', 'result'=>pos)
+    
+    ops.'push'(done_label)
+
+    goto done
+
+  zerowidth_test:
     negate = node.'negate'()
     testop = self.'??!!'(negate, 'if', 'unless')
     ops.'push_pirop'(testop, cpost, fail)
   done:
     .return (ops)
-.end
 
+.end
 
 =item pass(PAST::Regex node)
 

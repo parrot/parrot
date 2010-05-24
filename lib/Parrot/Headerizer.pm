@@ -247,8 +247,10 @@ sub function_components_from_declaration {
     }
     if ( $return_type =~ /\*/ ) {
         if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            $self->squawk( $file, $name,
-                'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
+            if ( $name !~ /^yy/ ) { # Don't complain about lexer-created functions
+                $self->squawk( $file, $name,
+                    'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
+            }
         }
         elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
             $self->squawk( $file, $name,

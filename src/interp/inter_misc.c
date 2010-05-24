@@ -385,6 +385,7 @@ In unknown info is requested then -1 is returned.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 INTVAL
 sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 {

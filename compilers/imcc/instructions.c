@@ -794,13 +794,11 @@ the C<param> to the open function.
 
 */
 
-PARROT_EXPORT
 int
 emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
 {
     ASSERT_ARGS(emit_open)
     IMCC_INFO(interp)->emitter       = type;
-    IMCC_INFO(interp)->has_compile   = 0;
     IMCC_INFO(interp)->dont_optimize = 0;
 
     return (emitters[IMCC_INFO(interp)->emitter]).open(interp, param);
@@ -817,7 +815,6 @@ IMC_Unit C<unit>.
 
 */
 
-PARROT_EXPORT
 int
 emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
@@ -849,7 +846,6 @@ Closes the given emitter.
 
 */
 
-PARROT_EXPORT
 int
 emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 {

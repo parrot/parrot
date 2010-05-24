@@ -1,13 +1,9 @@
 /* longopt.h
- *  Copyright (C) 2001-2003, Parrot Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_LONGOPT_H_GUARD
@@ -44,10 +40,18 @@ struct longopt_opt_info {
 
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
+#define OPT_GC_DEBUG       128
+#define OPT_DESTROY_FLAG   129
+#define OPT_HELP_DEBUG     130
+#define OPT_PBC_OUTPUT     131
+#define OPT_RUNTIME_PREFIX 132
+#define OPT_HASH_SEED      133
+
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int longopt_get(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -59,11 +63,17 @@ int longopt_get(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_CONST_FUNCTION
+const struct longopt_opt_decl * Parrot_cmd_options(void);
+
 #define ASSERT_ARGS_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(options) \
     , PARROT_ASSERT_ARG(info_buf))
+#define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/longopt.c */
 
