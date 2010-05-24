@@ -17,8 +17,8 @@ src/dynoplibs/obscure_ops$(O): $(DYNOP_O_DEPS) \
 
 src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
 
-src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(BUILD_TOOLS_DIR)/ops2c.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/obscure.ops
+src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/obscure.ops
 
 
 $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
@@ -26,8 +26,8 @@ $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
-src/dynoplibs/math_ops.c: src/dynoplibs/math.ops $(BUILD_TOOLS_DIR)/ops2c.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/math.ops
+src/dynoplibs/math_ops.c: src/dynoplibs/math.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/math.ops
 
 src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/math_ops.c src/dynoplibs/math_ops.h
@@ -45,5 +45,5 @@ src/dynoplibs/deprecated_ops$(O): $(DYNOP_O_DEPS) \
 
 src/dynoplibs/deprecated_ops.h: src/dynoplibs/deprecated_ops.c
 
-src/dynoplibs/deprecated_ops.c: src/dynoplibs/deprecated.ops $(BUILD_TOOLS_DIR)/ops2c.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/deprecated.ops
+src/dynoplibs/deprecated_ops.c: src/dynoplibs/deprecated.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/deprecated.ops

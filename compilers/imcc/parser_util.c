@@ -479,8 +479,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
                 ins->type |= ITALIAS;
         }
-        else if (STREQ(name, "compile"))
-            ++IMCC_INFO(interp)->has_compile;
 
       found_ins:
         if (emit)
@@ -491,28 +489,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 }
 
 extern void* yy_scan_string(const char *);
-
-/*
-
-=item C<int do_yylex_init(PARROT_INTERP, yyscan_t* yyscanner)>
-
-=cut
-
-*/
-
-PARROT_EXPORT
-int
-do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
-{
-    ASSERT_ARGS(do_yylex_init)
-    const int retval = yylex_init(yyscanner);
-
-    /* This way we can get the interpreter via yyscanner */
-    if (!retval)
-        yyset_extra(interp, *yyscanner);
-
-    return retval;
-}
 
 /*
 
@@ -547,7 +523,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     UINTVAL regs_used[4] = {3, 3, 3, 3};
     INTVAL eval_number;
 
-    do_yylex_init(interp, &yyscanner);
+    yylex_init_extra(interp, &yyscanner);
 
     /* we create not yet anchored PMCs - e.g. Subs: turn off GC */
     Parrot_block_GC_mark(interp);
@@ -865,7 +841,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
     if (ext && STREQ(ext, ".pasm")) {
         void *yyscanner;
-        do_yylex_init(interp, &yyscanner);
+        yylex_init_extra(interp, &yyscanner);
 
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
@@ -875,7 +851,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     }
     else {
         void *yyscanner;
-        do_yylex_init(interp, &yyscanner);
+        yylex_init_extra(interp, &yyscanner);
 
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp, yyscanner);
@@ -1191,7 +1167,6 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(PMC *io), ARGIN(const char *format), va_list
 
 */
 
-PARROT_EXPORT
 void
 imcc_init(PARROT_INTERP)
 {
@@ -1240,7 +1215,6 @@ imcc_destroy_macro_values(ARGMOD(void *value))
 
 */
 
-PARROT_EXPORT
 void
 imcc_destroy(PARROT_INTERP)
 {

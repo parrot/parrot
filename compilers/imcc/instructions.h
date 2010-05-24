@@ -91,21 +91,6 @@ enum Emitter_type { EMIT_FILE, EMIT_PBC };
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_EXPORT
-int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-int emit_flush(PARROT_INTERP,
-    ARGIN_NULLOK(void *param),
-    ARGIN(IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction * _delete_ins(ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
@@ -132,6 +117,18 @@ Instruction * delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*ins);
+
+int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
+        __attribute__nonnull__(1);
+
+int emit_flush(PARROT_INTERP,
+    ARGIN_NULLOK(void *param),
+    ARGIN(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
+        __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
@@ -215,13 +212,6 @@ void subst_ins(
         FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*tmp);
 
-#define ASSERT_ARGS_emit_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS__delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
@@ -232,6 +222,13 @@ void subst_ins(
 #define ASSERT_ARGS_delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
+#define ASSERT_ARGS_emit_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_emitb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_free_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

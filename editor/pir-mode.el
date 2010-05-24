@@ -66,7 +66,7 @@ newline or semicolon after an end keyword."
   :type 'boolean
   :group 'pir)
 
-(defcustom pir-basic-indent 8
+(defcustom pir-basic-indent 4
   "*Extra indentation applied to statements in PIR block structures."
   :type 'integer
   :group 'pir)

@@ -21,7 +21,7 @@ Test the URI library
 
     load_bytecode 'URI.pir'
 
-    plan(53)
+    plan(60)
     test_new()
     test_uri()
     test_file()
@@ -158,6 +158,21 @@ Test the URI library
     is($S0, '127.0.0.1', 'host')
     $S0 = $P0.'port'()
     is($S0, '8080', 'port')
+
+    $P0 = factory('http://user:passwd@proxy.net:8000/path')
+    ok($P0, "http://user:passwd@proxy.net:8000/path")
+    $I0 = isa $P0, ['URI';'http']
+    ok($I0, "isa ['URI';'http']")
+    $S0 = $P0.'scheme'()
+    is($S0, 'http', "scheme")
+    $S0 = $P0.'authority'()
+    is($S0, 'user:passwd@proxy.net:8000', 'authority')
+    $S0 = $P0.'userinfo'()
+    is($S0, 'user:passwd', 'userinfo')
+    $S0 = $P0.'host'()
+    is($S0, 'proxy.net', 'host')
+    $S0 = $P0.'port'()
+    is($S0, '8000', 'port')
 .end
 
 .sub 'test_https'

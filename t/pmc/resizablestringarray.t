@@ -23,7 +23,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'test_more.pir'
 
     # set a test plan
-    plan(261)
+    plan(263)
 
     'size/resize'()
     'clone'()
@@ -1343,6 +1343,7 @@ err_2:
     .SpliceMadeEasy({ splice $P1, $P2, 0, 2 }, "ABCDE345", "splice, replace at beginning")
     .SpliceMadeEasy({ splice $P1, $P2, 2, 2 }, "12ABCDE5", "splice, replace in middle")
     .SpliceMadeEasy({ splice $P1, $P2, 3, 2 }, "123ABCDE", "splice, replace at end")
+    .SpliceMadeEasy({ splice $P1, $P2, -3, 2 }, "12ABCDE5", "splice, replace in middle start from end")
     .SpliceMadeEasy({
         $P2 = new ['ResizableStringArray']
         splice $P1, $P2, 2, 2
@@ -1352,6 +1353,20 @@ err_2:
         $P2[0] = "A"
         splice $P1, $P2, 2, 1
     }, "12A45", "splice, equal size replacement")
+
+    $P1 = new ['ResizableStringArray']
+    $P1[0] = "1"
+    $P2 = new ['ResizableStringArray']
+    $P2[0] = 'A'
+    $I0 = 0
+    push_eh handle_negtoobig
+    splice $P1, $P2, -10, 1
+    goto after_negtoobig
+handle_negtoobig:
+    inc $I0
+after_negtoobig:
+    pop_eh
+    is($I0, 1, 'splice, negative offset too long throws')
 
     $P1 = new ['ResizableStringArray']
     $P1[0] = "1"
