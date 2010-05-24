@@ -91,8 +91,8 @@ regex op_body {
 #or goto NEXT() ) in the midst of the words.
 token body_word {
     [
-    || <.ws> <macro_param> <.ws>
-    || <.ws> <op_macro> <.ws>
+    || <macro_param>
+    || <op_macro>
     || <word>
     ]
 }
