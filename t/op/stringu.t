@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Config;
 
 =head1 NAME
@@ -574,8 +574,23 @@ equal
 equal
 OUT
 
+pir_output_is( <<'CODE', <<'OUT', 'join mixed encodings' );
+.sub 'main'
+    new $P0, 'ResizablePMCArray'
+    push $P0, ascii:"a"
+    push $P0, unicode:"\x{e1}" # a acute
+    push $P0, iso-8859-1:"\x{e1}" # a acute
+    join $S0, "", $P0
+    $I0 = length $S0
+    say $I0
+.end
+CODE
+3
+OUT
+
 SKIP: {
     skip( 'no ICU lib', 1 ) unless $PConfig{has_icu};
+
 pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode (experimental)');
 .sub 'main'
     $I1 = find_codepoint 'THISISNOTTHENAMEOFNOTHING'
