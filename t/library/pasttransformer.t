@@ -7,7 +7,7 @@ t/library/pasttransformer.t
 
 =head1 DESCRIPTION
 
-Test PAST::Transformer.
+Test PAST::Transformer. The tests are currently far from exhaustive.
 
 =head1 SYNOPSIS
 
@@ -127,6 +127,63 @@ Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracti
     .return (past)
 .end
 
+=item test_delete_nodes()
+
+Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children. It tests that deletion works. PAST::Walker::CountBlocks is used to count the PAST::Blocks.
+
+=cut
+
+.sub test_delete_nodes
+    .local pmc past, transformer, counter, result
+    past = build_test_delete_nodes_past()
+    transformer = new ['PAST'; 'Transformer'; 'DeleteVals']
+    counter = new ['PAST'; 'Walker'; 'CountVals']
+
+    counter.'reset'()
+    counter.'walk'(past)
+    $P0 = getattribute counter, 'blocks'
+    is($P0, 4, "The initial block count was correct.")
+    $P0 = getattribute counter, 'nodes'
+    is($P0, 8, "The initial node count was correct.")
+
+    result = transformer.'walk'(past)
+    
+    counter.'reset'()
+    counter.'walk'(past)
+    $P0 = getattribute counter, 'blocks'
+    is($P0, 2, "The block count changed correctly.")
+    $P0 = getattribute counter, 'nodes'
+    is($P0, 3, "The node count changed correctly.")
+.end
+
+.sub build_test_delete_nodes_past
+    .local pmc past
+    past = new ['PAST';'Block']
+    $P0 = new ['PAST'; 'Stmts']
+    $P1 = new ['PAST'; 'Var']
+    push $P0, $P1
+    $P1 = new ['PAST'; 'Block']
+    $P2 = new ['PAST'; 'Val']
+    push $P1, $P2
+    push $P0, $P1
+    $P1 = new ['PAST'; 'Block']
+    $P2 = new ['PAST'; 'Op']
+    push $P1, $P2
+    $P2 = new ['PAST'; 'VarList']
+    push $P1, $P2
+    push $P0, $P1
+    $P1 = new ['PAST'; 'Block']
+    $P2 = new ['PAST'; 'Val']
+    push $P1, $P2
+    $P2 = clone $P2
+    push $P1, $P2
+    $P2 = clone $P2
+    push $P1, $P2
+    push $P0, $P1
+    push past, $P0
+    .return (past)
+.end
+
 =back
 
 =head1 Helper classes
@@ -137,6 +194,7 @@ Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracti
     $P1 = get_class ['PAST'; 'Transformer']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Increment']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Negate']
+    $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Trim']
     
     $P1 = get_class ['PAST'; 'Walker']
     $P0 = subclass $P1, ['PAST'; 'Walker'; 'SumVals']
@@ -144,6 +202,9 @@ Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracti
     addattribute $P0, 'sum'
     $P0 = subclass $P1, ['PAST'; 'Walker'; 'CountOps']
     addattribute $P0, 'count'
+    $P0 = subclass $P1, ['PAST'; 'Walker'; 'CountBlocks']
+    addattribute $P0, 'blocks'
+    addattribute $P0, 'nodes'
 .end
 
 .namespace ['PAST'; 'Walker']
@@ -198,6 +259,35 @@ negative:
     .tailcall 'walkChildren'(walker, node)
 .end
 
+.sub 'walk' :multi(['PAST'; 'Transformer'; 'Delete'], ['PAST'; 'Block'])
+    .param pmc walker
+    .param pmc node
+    .local pmc result
+    $I0 = elements node
+    if $I0 > 1 goto multiple
+    result = clone node
+    .return (result)
+multiple:
+    result = null
+    .return (result)
+.end
+
+.sub 'walk' :multi(['PAST'; 'Walker'; 'CountBlocks'], ['PAST'; 'Block'])
+    .param pmc walker
+    .param pmc node
+    $P0 = getattribute walker, 'blocks'
+    inc $P0
+    setattribute walker, 'blocks', $P0
+.end
+
+.sub 'walk' :multi(['PAST'; 'Walker'; 'CountBlocks'], ['PAST'; 'Node'])
+    .param pmc walker
+    .param pmc node
+    $P0 = getattribute walker, 'nodes'
+    inc $P0
+    setattribute walker, 'nodes', $P0
+.end
+
 .namespace ['PAST'; 'Walker'; 'SumVals']
 
 .sub 'reset' :method
@@ -215,6 +305,15 @@ negative:
     setattribute self, 'count', $P0
 .end
 
+.namespace ['PAST'; 'Walker'; 'CountBlocks']
+
+.sub 'reset' :method
+    $P0 = new 'Integer'
+    $P0 = 0
+    setattribute self, 'blocks', $P0
+    setattribute self, 'nodes', $P0
+.end
+    
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
