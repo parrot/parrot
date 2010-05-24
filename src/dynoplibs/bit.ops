@@ -38,6 +38,135 @@ The variant with an appended B<s> like B<bands> work on strings.
 
 ########################################
 
+=item B<band>(invar PMC, in INT)
+
+=item B<band>(invar PMC, invar PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $1 and $2.
+
+=item B<band>(invar PMC, invar PMC, in INT)
+
+=item B<band>(invar PMC, invar PMC, invar PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $2 and $3.
+
+=cut
+
+inline op band(invar PMC, in INT) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $1);
+    const INTVAL b = a & $2;
+    VTABLE_set_integer_native(interp, $1, b);
+}
+
+inline op band(invar PMC, invar PMC) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $1);
+    const INTVAL b = VTABLE_get_integer(interp, $2);
+    VTABLE_set_integer_native(interp, $1, a & b);
+}
+
+inline op band(invar PMC, invar PMC, in INT) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $2);
+    VTABLE_set_integer_native(interp, $1, a & $3);
+}
+
+inline op band(invar PMC, invar PMC, invar PMC) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $2);
+    const INTVAL b = VTABLE_get_integer(interp, $3);
+    VTABLE_set_integer_native(interp, $1, a & b);
+}
+
+=item B<bands>(invar PMC, in STR)
+
+=item B<bands>(invar PMC, invar PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $1 and $2.
+
+=item B<bands>(out STR, in STR, in STR)
+
+=item B<bands>(invar PMC, invar PMC, in STR)
+
+=item B<bands>(invar PMC, invar PMC, invar PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits
+from $2 and $3.
+
+=cut
+
+inline op bands(invar PMC, in STR) :base_core {
+    STRING * const a = VTABLE_get_string(interp, $1);
+    STRING * const b = Parrot_str_bitwise_and(interp, a, $2);
+    VTABLE_set_string_native(interp, $1, b);
+}
+
+inline op bands(invar PMC, invar PMC) :base_core {
+    STRING * a = VTABLE_get_string(interp, $1);
+    STRING * const b = VTABLE_get_string(interp, $2);
+    a = Parrot_str_bitwise_and(interp, a, b);
+    VTABLE_set_string_native(interp, $1, a);
+}
+
+inline op bands(out STR, in STR, in STR) :base_core {
+    $1 = Parrot_str_bitwise_and(interp, $2, $3);
+}
+
+inline op bands(invar PMC, invar PMC, in STR) :base_core {
+    STRING * const a = VTABLE_get_string(interp, $2);
+    STRING * const b = Parrot_str_bitwise_and(interp, a, $3);
+    VTABLE_set_string_native(interp, $1, b);
+}
+
+inline op bands(invar PMC, invar PMC, invar PMC) :base_core {
+    STRING * const a = VTABLE_get_string(interp, $2);
+    STRING * const b = VTABLE_get_string(interp, $3);
+    STRING * const c = Parrot_str_bitwise_and(interp, a, b);
+    VTABLE_set_string_native(interp, $1, c);
+}
+
+########################################
+
+=item B<bor>(invar PMC, in INT)
+
+=item B<bor>(invar PMC, invar PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits
+from $1 and $2.
+
+=item B<bor>(invar PMC, invar PMC, in INT)
+
+=item B<bor>(invar PMC, invar PMC, invar PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits
+from $2 and $3.
+
+=cut
+
+inline op bor(invar PMC, in INT) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $1);
+    VTABLE_set_integer_native(interp, $1, a | $2);
+}
+
+inline op bor(invar PMC, invar PMC) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $1);
+    const INTVAL b = VTABLE_get_integer(interp, $2);
+    VTABLE_set_integer_native(interp, $1, a | b);
+}
+
+inline op bor(invar PMC, invar PMC, in INT) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $2);
+    VTABLE_set_integer_native(interp, $1, a | $3);
+}
+
+inline op bor(invar PMC, invar PMC, invar PMC) :base_core {
+    const INTVAL a = VTABLE_get_integer(interp, $2);
+    const INTVAL b = VTABLE_get_integer(interp, $3);
+    VTABLE_set_integer_native(interp, $1, a | b);
+}
+
+########################################
+
 =item B<bors>(invar PMC, in STR)
 
 =item B<bors>(invar PMC, invar PMC)
