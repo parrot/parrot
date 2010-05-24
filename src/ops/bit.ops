@@ -541,54 +541,6 @@ inline op bxor(invar PMC, invar PMC, invar PMC) :base_core {
     VTABLE_set_integer_native(interp, $1, (INTVAL)c);
 }
 
-=item B<bxors>(invar PMC, in STR)
-
-=item B<bxors>(invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<xor> of the corresponding bits
-from $1 and $2.
-
-=item B<bxors>(out STR, in STR, in STR)
-
-=item B<bxors>(invar PMC, invar PMC, in STR)
-
-=item B<bxors>(invar PMC, invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<xor> of the corresponding bits
-from $2 and $3.
-
-=cut
-
-inline op bxors(invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_xor(interp, a, $2);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bxors(invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_xor(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
-}
-
-inline op bxors(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_xor(interp, $2, $3);
-}
-
-inline op bxors(invar PMC, invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_xor(interp, a, $3);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bxors(invar PMC, invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_xor(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
-}
-
 =back
 
 =cut
