@@ -1,13 +1,9 @@
 /* longopt.h
- *  Copyright (C) 2001-2003, Parrot Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_LONGOPT_H_GUARD
@@ -55,6 +51,7 @@ struct longopt_opt_info {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int longopt_get(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),

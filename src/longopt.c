@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -25,6 +25,7 @@ This is used by C<parrot>.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 static int longopt_get_longopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -36,6 +37,7 @@ static int longopt_get_longopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+PARROT_WARN_UNUSED_RESULT
 static int longopt_get_shortopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -134,6 +136,7 @@ Any other value is a valid option identifier.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int
 longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
@@ -185,6 +188,7 @@ characters and start with C<-->.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
@@ -282,6 +286,7 @@ characters long and start with a dash.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                      ARGIN(const struct longopt_opt_decl options[]),
