@@ -7,6 +7,8 @@ DYNOP_O_DEPS = \
     $(PARROT_H_HEADERS) \
     include/parrot/runcore_api.h
 
+#########################
+
 $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT): src/dynoplibs/obscure_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/obscure_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
@@ -20,6 +22,7 @@ src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
 src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/obscure.ops
 
+#########################
 
 $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/math_ops$(O) $(LINKARGS)
@@ -34,6 +37,7 @@ src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
 
 src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
 
+#########################
 
 $(DYNEXT_DIR)/deprecated_ops$(LOAD_EXT): src/dynoplibs/deprecated_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/deprecated_ops$(O) $(LINKARGS)
@@ -48,6 +52,8 @@ src/dynoplibs/deprecated_ops.h: src/dynoplibs/deprecated_ops.c
 src/dynoplibs/deprecated_ops.c: src/dynoplibs/deprecated.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/deprecated.ops
 
+#########################
+
 $(DYNEXT_DIR)/trans_ops$(LOAD_EXT): src/dynoplibs/trans_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/trans_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
@@ -61,6 +67,8 @@ src/dynoplibs/trans_ops.h: src/dynoplibs/trans_ops.c
 src/dynoplibs/trans_ops.c: src/dynoplibs/trans.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/trans.ops
 
+#########################
+
 $(DYNEXT_DIR)/bit_ops$(LOAD_EXT): src/dynoplibs/bit_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/bit_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
@@ -73,3 +81,18 @@ src/dynoplibs/bit_ops.h: src/dynoplibs/bit_ops.c
 
 src/dynoplibs/bit_ops.c: src/dynoplibs/bit.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/bit.ops
+
+#########################
+
+$(DYNEXT_DIR)/debug_ops$(LOAD_EXT): src/dynoplibs/debug_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/debug_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/debug_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/debug_ops.c src/dynoplibs/debug_ops.h
+
+src/dynoplibs/debug_ops.h: src/dynoplibs/debug_ops.c
+
+src/dynoplibs/debug_ops.c: src/dynoplibs/debug.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/debug.ops

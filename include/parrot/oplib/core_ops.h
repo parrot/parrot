@@ -365,13 +365,6 @@
  opcode_t * Parrot_xor_i_ic_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_xor_i_i_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_xor_p_p_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_debug_init(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_debug_load_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_debug_break(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_debug_print(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_backtrace(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_getline_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_getfile_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_close_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_fdopen_p_i_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_fdopen_p_ic_s(opcode_t *, PARROT_INTERP);
