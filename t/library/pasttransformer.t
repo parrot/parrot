@@ -23,8 +23,9 @@ Test PAST::Transformer.
     load_bytecode 'PAST/Walker.pbc'
     register_classes()
 
-    plan(4)
+    plan(6)
     test_change_node_attributes()
+    test_change_node_types()
 .end
 
 =head1 Tests
@@ -82,6 +83,50 @@ Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests th
     .return (result)
 .end
 
+=item test_change_node_types()
+
+Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracting the positive number from 0. It tests that PAST::Transformers can replace a node with a node of a different type. PAST::Walker::CountOps is used to ensure that the number of PAST::Ops changes correctly.
+
+=cut
+
+.sub test_change_node_types
+    .local pmc past, result, counter, transformer
+    past = build_test_change_node_types_past()
+    counter = new ['PAST'; 'Walker'; 'CountOps']
+    transformer = new ['PAST'; 'Transformer'; 'Negate']
+
+    counter.'reset'()
+    counter.'walk'(past)
+    $P0 = getattribute counter, 'count'
+    is($P0, 0, "The initial tree has no PAST::Op nodes.")
+    
+    result = transformer.'walk'(past)
+
+    counter.'reset'()
+    counter.'walk'(result)
+    $P0 = getattribute counter, 'count'
+    is($P0, 2, "The appropriate nodes were transformed to Ops.")
+.end
+
+.sub build_test_change_node_types_past
+    .local pmc past
+    past = new ['PAST'; 'Block']
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(0)
+    push past, $P0
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(-7)
+    push past, $P0
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(5)
+    push past, $P0
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(-32)
+    push past, $P0
+
+    .return (past)
+.end
+
 =back
 
 =head1 Helper classes
@@ -91,10 +136,14 @@ Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests th
 .sub register_classes
     $P1 = get_class ['PAST'; 'Transformer']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Increment']
+    $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Negate']
+    
     $P1 = get_class ['PAST'; 'Walker']
     $P0 = subclass $P1, ['PAST'; 'Walker'; 'SumVals']
     addattribute $P0, 'count'
     addattribute $P0, 'sum'
+    $P0 = subclass $P1, ['PAST'; 'Walker'; 'CountOps']
+    addattribute $P0, 'count'
 .end
 
 .namespace ['PAST'; 'Walker']
@@ -122,6 +171,33 @@ Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests th
     setattribute walker, 'count', $P0
 .end
 
+.sub 'walk' :multi(['PAST'; 'Transformer'; 'Negate'], ['PAST'; 'Val'])
+    .param pmc walker
+    .param pmc node
+    .local pmc result
+    $I0 = node.'value'()
+    if $I0 < 0 goto negative
+    result = clone node
+    .return (result)
+negative:
+    $I1 = neg $I0
+    result = new ['PAST'; 'Op']
+    result.'pirop'("neg")
+    $P0 = clone node
+    $P0.'value'($I1)
+    push result, $P0
+    .return (result)
+.end
+
+.sub 'walk' :multi(['PAST'; 'Walker'; 'CountOps'], ['PAST'; 'Op'])
+    .param pmc walker
+    .param pmc node
+    $P0 = getattribute walker, 'count'
+    inc $P0
+    setattribute walker, 'count', $P0
+    .tailcall 'walkChildren'(walker, node)
+.end
+
 .namespace ['PAST'; 'Walker'; 'SumVals']
 
 .sub 'reset' :method
@@ -129,6 +205,14 @@ Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests th
     $P0 = 0
     setattribute self, 'count', $P0
     setattribute self, 'sum', $P0
+.end
+
+.namespace ['PAST'; 'Walker'; 'CountOps']
+
+.sub 'reset' :method
+    $P0 = new 'Integer'
+    $P0 = 0
+    setattribute self, 'count', $P0
 .end
 
 # Local Variables:
