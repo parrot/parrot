@@ -147,6 +147,16 @@ is_all_hex_digits(ARGIN(const char *s))
     return 1;
 }
 
+/*
+
+=item C<static void imcc_parseflags(PARROT_INTERP, int argc, const char **argv)>
+
+Parse flags ans set approptiate state(s)
+
+=cut
+
+*/
+
 static void
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
