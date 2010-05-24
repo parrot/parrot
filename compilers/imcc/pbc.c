@@ -913,13 +913,25 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
             charset_name[p- p2 - 2] = '\0';
             /*fprintf(stderr, "%s:%s\n", charset_name, encoding_name);*/
             s_charset = Parrot_find_charset(interp, charset_name);
+            if (s_charset == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "Unknown charset '%s'", charset_name);
             s_encoding = Parrot_find_encoding(interp, encoding_name);
+            if (s_encoding == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "Unknown encoding '%s'", encoding_name);
         }
         else {
             strncpy(charset_name, buf, p - buf - 1);
             charset_name[p - buf - 1] = '\0';
             /*fprintf(stderr, "%s\n", charset_name);*/
             s_charset = Parrot_find_charset(interp, charset_name);
+            if (s_charset == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "Unknown charset '%s'", charset_name);
         }
         if (strcmp(charset_name, "unicode") == 0)
             src_encoding = Parrot_utf8_encoding_ptr;
