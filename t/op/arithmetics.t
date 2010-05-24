@@ -21,7 +21,7 @@ number types.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
 
-    plan(81)
+    plan(80)
 
     take_the_negative_of_a_native_integer()
     take_the_absolute_of_a_native_integer()
@@ -42,7 +42,6 @@ number types.
     subtract_native_number_from_native_number()
     multiply_native_number_with_native_number()
     divide_native_number_by_native_number()
-    bnot_p_p_creates_destination()
     # END_OF_TESTS
 
 .end
@@ -467,12 +466,6 @@ End_test4:
     div $N0, $N0, $N2
     is( $N0, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
-.end
-
-.sub 'bnot_p_p_creates_destination'
-    $P0 = box 3
-    $P1 = bnot $P0
-    is( $P1, -4, 'bnot_p_p_creates_destination')
 .end
 
 # Local Variables:

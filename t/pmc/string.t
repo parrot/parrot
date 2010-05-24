@@ -16,6 +16,7 @@ Tests the C<String> PMC.
 
 =cut
 
+.loadlib 'bit_ops'
 
 .sub main :main
     .include 'test_more.pir'
