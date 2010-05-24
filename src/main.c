@@ -417,7 +417,7 @@ parseflags(PARROT_INTERP,
         exit(EXIT_SUCCESS);
     }
 
-    while ((status = longopt_get(interp, argc, argv, Parrot_cmd_options, &opt)) > 0) {
+    while ((status = longopt_get(interp, argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
           case 'R':
             if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))

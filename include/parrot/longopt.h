@@ -51,9 +51,6 @@ struct longopt_opt_info {
 #define OPT_RUNTIME_PREFIX 132
 #define OPT_HASH_SEED      133
 
-PARROT_DATA
-const struct longopt_opt_decl * const Parrot_cmd_options;
-
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -69,11 +66,17 @@ int longopt_get(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_CONST_FUNCTION
+const struct longopt_opt_decl * Parrot_cmd_options(void);
+
 #define ASSERT_ARGS_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(options) \
     , PARROT_ASSERT_ARG(info_buf))
+#define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/longopt.c */
 

@@ -166,7 +166,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
 
-    while (longopt_get(interp, argc, argv, Parrot_cmd_options, &opt) > 0) {
+    while (longopt_get(interp, argc, argv, Parrot_cmd_options(), &opt) > 0) {
         switch (opt.opt_id) {
           case 'd':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
