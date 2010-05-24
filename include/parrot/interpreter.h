@@ -523,6 +523,7 @@ void register_raw_nci_method_in_ns(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 INTVAL sysinfo_i(SHIM_INTERP, INTVAL info_wanted);
 
 PARROT_CANNOT_RETURN_NULL
