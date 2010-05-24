@@ -9,17 +9,16 @@ grammar Ops::Compiler::Grammar is HLL::Grammar;
 rule TOP {
     <body>
     [ $ || <panic: 'Syntax error'> ]
-    {*}
 }
 
 rule body {
-    [  <preamble> |  <op> ]* {*}
+    [ <preamble> | <op> ]*
 }
 
 token preamble {
     <begin_preamble>
     <preamble_guts>
-    <end_preamble>  {*}
+    <end_preamble>
 }
 
 regex preamble_guts {
@@ -48,16 +47,14 @@ token op_type {
 
 rule op_params {
     <op_param> [ ',' <op_param> ]*
-    {*}
 }
 
 rule op_param {
     <op_param_direction> <op_param_type>
-    {*}
 }
 
 token op_param_direction {
-    # Order is crucial. PGE doesn't support LTM yet.
+    # Order is crucial. NQP doesn't support LTM yet.
     [
     | 'inout'
     | 'inconst'
@@ -68,7 +65,7 @@ token op_param_direction {
 }
 
 token op_param_type {
-    # Order is crucial. PGE doesn't support LTM yet.
+    # Order is crucial. NQP doesn't support LTM yet.
     [
     | 'INTKEY'
     | 'INT'
@@ -100,17 +97,14 @@ regex body_word {
     | <op_macro>
     | $<word>=[<alnum>+|<punct>|<space>+]
     ]
-    {*}
 }
 
 token macro_param {
     '$' $<num>=[<digit>+]
-    {*}
 }
 
 regex op_macro {
     <macro_type> <space>* <macro_destination> <space>* '(' <space>* <body_word>*? ')'
-    {*}
 }
 
 token macro_type {
