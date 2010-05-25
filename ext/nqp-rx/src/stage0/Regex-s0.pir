@@ -730,7 +730,7 @@ and the longest match is returned.
     .param pmc var
 
     .local pmc cur
-    .local int pos
+    .local int pos, eos
     .local string tgt
 
     $I0 = does var, 'array'
@@ -742,8 +742,11 @@ and the longest match is returned.
 
   var_string:
     (cur, pos, tgt) = self.'!cursor_start'()
+    eos = length tgt
     $S0 = var
     $I0 = length $S0
+    $I1 = pos + $I0
+    if $I1 > eos goto string_fail
     $S1 = substr tgt, pos, $I0
     if $S0 != $S1 goto string_fail
     pos += $I0
@@ -758,6 +761,7 @@ and the longest match is returned.
 
   var_array:
     (cur, pos, tgt) = self.'!cursor_start'()
+    eos = length tgt
     .local pmc var_it, elem
     .local int maxlen
     var_it = iter var
@@ -771,6 +775,8 @@ and the longest match is returned.
     $S0 = elem
     $I0 = length $S0
     if $I0 <= maxlen goto array_loop
+    $I1 = pos + $I0
+    if $I1 > eos goto array_loop
     $S1 = substr tgt, pos, $I0
     if $S0 != $S1 goto array_loop
     maxlen = $I0
