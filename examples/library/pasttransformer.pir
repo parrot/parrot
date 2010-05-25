@@ -18,12 +18,12 @@
     dumper = new ['Data'; 'Dumper']
     past = 'build_past'(nqp)
     folder = new ['PAST'; 'Transformer'; 'FoldConstants']
-    
+
     dumper.'dumper'(past)
     $P0 = nqp.'post'(past)
     $P0 = nqp.'pir'($P0)
     say $P0
-    
+
     say "\nFolding:\n"
     result = folder.'walk'(past)
     dumper.'dumper'(result)

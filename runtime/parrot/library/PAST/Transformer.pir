@@ -12,7 +12,7 @@
     .param pmc walker
     .param pmc node
     .local pmc newChildren, result
-    result = clone node
+    result = node
     newChildren = 'walkChildren'(walker, node)
     'replaceChildren'(result, newChildren)
     .return (result)

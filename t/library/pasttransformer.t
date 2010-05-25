@@ -99,7 +99,7 @@ Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracti
     counter.'walk'(past)
     $P0 = getattribute counter, 'count'
     is($P0, 0, "The initial tree has no PAST::Op nodes.")
-    
+
     result = transformer.'walk'(past)
 
     counter.'reset'()
@@ -147,7 +147,7 @@ Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children
     is($P0, 8, "The initial node count was correct.")
 
     result = transformer.'walk'(past)
-    
+
     counter.'reset'()
     counter.'walk'(past)
     $P0 = getattribute counter, 'blocks'
@@ -195,7 +195,7 @@ Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Increment']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Negate']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Trim']
-    
+
     $P1 = get_class ['PAST'; 'Walker']
     $P0 = subclass $P1, ['PAST'; 'Walker'; 'SumVals']
     addattribute $P0, 'count'
@@ -313,7 +313,7 @@ multiple:
     setattribute self, 'blocks', $P0
     setattribute self, 'nodes', $P0
 .end
-    
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
