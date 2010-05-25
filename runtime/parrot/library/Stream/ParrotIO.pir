@@ -56,7 +56,8 @@ Uses the open op to create a ParrotIO which is used as the source.
     .param string mode
     .local pmc pio
 
-    open pio, name, mode
+    pio = new ['FileHandle']
+    pio.'open'(name, mode)
     assign self, pio
 .end
 

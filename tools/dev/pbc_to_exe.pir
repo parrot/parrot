@@ -55,7 +55,8 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
   open_outfile:
     .local pmc outfh
-    outfh = open cfile, 'w'
+    outfh = new ['FileHandle']
+    outfh.'open'(cfile, 'w')
     unless outfh goto err_outfh
     print outfh, <<'HEADER'
 #include "parrot/parrot.h"
@@ -215,7 +216,8 @@ MAIN
 .sub 'generate_code'
     .param string infile
     .local pmc ifh
-    ifh = open infile, 'r'
+    ifh = new ['FileHandle']
+    ifh.'open'(infile, 'r')
     unless ifh goto err_infile
 
     .local pmc codestring
@@ -304,7 +306,8 @@ END_OF_FUNCTION
 .sub 'generate_code_gcc'
     .param string infile
     .local pmc ifh
-    ifh = open infile, 'r'
+    ifh = new ['FileHandle']
+    ifh.'open'(infile, 'r')
     unless ifh goto err_infile
 
     .local pmc encoding_table
@@ -430,7 +433,8 @@ END_OF_DEFINES
     rc_contents .= "\"\n"
 
     .local pmc rc_fh
-    rc_fh = open rc_path, 'w'
+    rc_fh = new ['FileHandle']
+    rc_fh.'open'(rc_path, 'w')
     unless rc_fh goto err_rc_open
     print rc_fh, rc_contents
     $I0 = rc_fh.'close'()

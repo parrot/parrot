@@ -70,14 +70,16 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
   OUTPUT_FILE:
     outfile = opts['output']
-    outfh = open outfile, 'w'
+    outfh = new ['FileHandle']
+    outfh.'open'(outfile, 'w')
     unless outfh goto ERR_NO_OUTFILE
 
   OUTPUT_DONE:
 
     # Read grammar file and compile here
     .local pmc infh
-    infh = open infile, 'r'
+    infh = new ['FileHandle']
+    infh.'open'(infile, 'r')
     unless infh goto ERR_NO_INFILE
 
     .local string source

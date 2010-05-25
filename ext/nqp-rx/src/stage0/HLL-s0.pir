@@ -7282,7 +7282,7 @@ An operator precedence parser.
 .annotate 'line', 87
     $P0 = getinterp
     $P289 = $P0.'stdhandle'(1)
-    tell $I290, $P289
+    $I290 = $P289.'tell'()
     set $N291, $I290
     find_dynamic_lex $P292, "$*AUTOPRINTPOS"
     unless_null $P292, vivify_56
@@ -7471,7 +7471,7 @@ An operator precedence parser.
 .annotate 'line', 110
     $P0 = getinterp
     $P349 = $P0.'stdhandle'(1)
-    tell $I350, $P349
+    $I350 = $P349.'tell'()
     new $P351, 'Integer'
     set $P351, $I350
     store_lex "$*AUTOPRINTPOS", $P351

@@ -882,7 +882,8 @@ Generic method for compilers invoked from a shell command line.
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
-    ofh = open output, 'w'
+    ofh = new ['FileHandle']
+    ofh.'open'(output, 'w')
     unless ofh goto err_output
   save_output_1:
     print ofh, result

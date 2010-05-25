@@ -45,8 +45,10 @@ F<docs/pdds/pdd16_native_call.pod>.
     sigs = 'read_sigs'()
 
     $S0 = 'read_from_opts'('output')
-    $P0 = open $S0, 'w'
-    setstdout $P0
+    $P0 = new ['FileHandle']
+    $P0.'open'($S0, 'w')
+    $P1 = getinterp
+    $P1.'stdhandle'(1, $P0)
 
     if targ == 'head'          goto get_targ
     if targ == 'thunks'        goto get_targ

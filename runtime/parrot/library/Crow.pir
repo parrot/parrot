@@ -65,7 +65,8 @@ END_HELP
     .local pmc newsfile
     .local string buf, news, start
 
-    newsfile = open 'NEWS', 'r'
+    newsfile = new ['FileHandle']
+    newsfile.'open'('NEWS', 'r')
 
     ## find the start of the news item for this version
     start    = concat 'New in ', version

@@ -211,7 +211,8 @@ Returns the contents of C<$filename> as a single string.
 =end
 
 our sub slurp ($filename) {
-    my $handle := pir::open__Pss($file, 'r');
+    my $handle := FileHandle.new;
+    $handle.open($file, 'r');
     my $contents := $handle.readall;
     $handle.close();
     $contents;
@@ -223,7 +224,8 @@ Write the string value of C<$contents> to C<$filename>.
 =end item
 
 our sub spew($filename, $contents) {
-    my $handle := pir::open__Pss($filename, 'w');
+    my $handle := FileHandle.new();
+    $handle.open($filename, 'w');
     $handle.print($contents);
     $handle.close();
 }

@@ -915,7 +915,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     $S0 = _get_exec($S0)
     .tailcall self.'exec'($S0, filename)
   L1:
-    seek $P0, 0, 0
+    $P0.'seek'(0, 0)
     setattribute self, 'stream', $P0
     .return ()
   _handler:

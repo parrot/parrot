@@ -389,11 +389,11 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .sub '_refreshLocalFileHeader' :method
     .param pmc fh
     .local int here
-    here = tell fh
+    here = fh.'tell'()
     $P0 = getattribute self, 'writeLocalHeaderRelativeOffset'
     $I0 = $P0
     $I0 += SIGNATURE_LENGTH
-    seek fh, $I0, 0
+    fh.'seek'($I0, 0)
     .local string header, fileName, localExtraField
     .const string VERSION = 20
     header = self.'pack_v'(VERSION)
@@ -429,7 +429,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     if $I0 goto L2
     .tailcall self.'_ioError'('re-writing local header')
   L2:
-    seek fh, here, 0
+    fh.'seek'(here, 0)
     .return (AZ_OK)
 .end
 
@@ -648,7 +648,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ($I0)
   L1:
     $P0 = self.'fh'()
-    seek $P0, 0, 0
+    $P0.'seek'(0, 0)
     .return (AZ_OK)
 .end
 
