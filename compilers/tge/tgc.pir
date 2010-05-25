@@ -64,7 +64,8 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
     if ck_output goto OUTPUT_FILE
 
   OUTPUT_STDOUT:
-    outfh = getstdout
+    $P0 = getinterp
+    outfh = $P0.'stdhandle'(1)
     goto OUTPUT_DONE
 
   OUTPUT_FILE:
@@ -81,7 +82,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
     .local string source
     source = read infh, 65535
-    close infh
+    infh.'close'()
 
     .local pmc grammar
     grammar = new ['TGE';'Compiler']

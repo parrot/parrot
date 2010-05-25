@@ -911,7 +911,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     $S0 = readline $P0
     $I0 = index $S0, '#!'
     unless $I0 == 0 goto L1
-    close $P0
+    $P0.'close'()
     $S0 = _get_exec($S0)
     .tailcall self.'exec'($S0, filename)
   L1:
@@ -1034,7 +1034,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     .yield (token)
     goto L2
   L3:
-    close stream
+    stream.'close'()
     $I0 = can stream, 'exit_status'
     unless $I0 goto L7
     $I0 = stream.'exit_status'()

@@ -365,14 +365,6 @@
  opcode_t * Parrot_xor_i_ic_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_xor_i_i_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_xor_p_p_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_close_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_fdopen_p_i_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_fdopen_p_ic_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_fdopen_p_i_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_fdopen_p_ic_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_getstdin_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_getstdout_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_getstderr_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_setstdin_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_setstdout_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_setstderr_p(opcode_t *, PARROT_INTERP);

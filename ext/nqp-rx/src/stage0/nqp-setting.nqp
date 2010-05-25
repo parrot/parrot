@@ -213,7 +213,7 @@ Returns the contents of C<$filename> as a single string.
 our sub slurp ($filename) {
     my $handle := pir::open__Pss($file, 'r');
     my $contents := $handle.readall;
-    pir::close($handle);
+    $handle.close();
     $contents;
 }
 
@@ -225,7 +225,7 @@ Write the string value of C<$contents> to C<$filename>.
 our sub spew($filename, $contents) {
     my $handle := pir::open__Pss($filename, 'w');
     $handle.print($contents);
-    pir::close($handle);
+    $handle.close();
 }
 
 # vim: ft=perl6

@@ -251,7 +251,7 @@ MAIN
     goto read_loop
 
   read_done:
-    close ifh
+    ifh.'close'()
 
     push codestring, "\n};\n\nconst int bytecode_size = "
     $S0 = size
@@ -346,7 +346,7 @@ END_OF_FUNCTION
     goto read_loop
 
   read_done:
-    close ifh
+    ifh.'close'()
 
     push codestring, '"'
     push codestring, "\n;\n\n"

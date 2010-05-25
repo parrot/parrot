@@ -78,7 +78,7 @@ the rendered JSON will not be formatted. The default is false.
     $P1 = open filename, 'w'
     print $P1, output
     print $P1, "\n"
-    close $P1
+    $P1.'close'()
 
 .end
 

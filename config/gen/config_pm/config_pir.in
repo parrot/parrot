@@ -41,6 +41,8 @@ undefined values) is undefined, and may be rather funky.
 
 .include "interpinfo.pasm"
 .include "stat.pasm"
+.loadlib 'sys_ops'
+.loadlib 'io_ops'
 
 .sub _config
     .local string prefix, conf_file

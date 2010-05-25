@@ -708,7 +708,8 @@ TEMPLATE
 
 .sub 'read_sigs'
     .local pmc stdin, seen, sigs
-    stdin = getstdin
+    $P0 = getinterp
+    stdin = $P0.'stdhandle'(0)
     seen  = new ['Hash']
     sigs  = new ['ResizablePMCArray']
 

@@ -59,12 +59,14 @@ STDERR by default.
 
 	output = args['output']
 	unless null output goto CHECK_ERROR_OUTPUT
-	getstdout output
+        $P0 = getinterp
+        output = $P0.'stdhandle'(1)
 
   CHECK_ERROR_OUTPUT:
 	diag_output = args['diag_output']
 	unless null diag_output goto SET_OUTPUT
-	getstderr diag_output
+        $P0 = getinterp
+        diag_output = $P0.'stdhandle'(1)
 
   SET_OUTPUT:
 	setattribute self, "output", output

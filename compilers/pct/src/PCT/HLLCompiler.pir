@@ -615,7 +615,8 @@ specifies the encoding to use for the input (e.g., "utf8").
 
     .local pmc stdin
     .local int has_readline
-    stdin = getstdin
+    $P0 = getinterp
+    stdin = $P0.'stdhandle'(0)
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -746,7 +747,7 @@ options are passed to the evaluator.
   iter_loop_1:
     $S0 = ifh.'readall'(iname)
     code .= $S0
-    close ifh
+    ifh.'close'()
     goto iter_loop
   iter_end:
     $S0 = join ' ', files
@@ -876,7 +877,8 @@ Generic method for compilers invoked from a shell command line.
     if target != 'pir' goto end
     .local string output
     .local pmc ofh
-    ofh = getstdout
+    $P0 = getinterp
+    ofh = $P0.'stdhandle'(1)
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
@@ -884,7 +886,7 @@ Generic method for compilers invoked from a shell command line.
     unless ofh goto err_output
   save_output_1:
     print ofh, result
-    close ofh
+    ofh.'close'()
   end:
     .return ()
 

@@ -95,7 +95,7 @@ Variour helper builtins.
     .local pmc pio
     pio  = open file
     $S0  = pio.'readall'()
-    close pio
+    pio.'close'()
     .return ($S0)
 .end
 

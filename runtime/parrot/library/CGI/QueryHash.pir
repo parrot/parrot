@@ -69,9 +69,10 @@ Get parameters for POST method.
         .local int len
         content_length  = my_env['CONTENT_LENGTH']
         len             = content_length
-        in              = getstdin
+        $P0             = getinterp
+        in              = $P0.'stdhandle'(0)
         query           = read in, len
-        close in
+        in.'close'()
         #_dumper( query, 'queryPOST:' )
         query_hash = parse( query )
 
