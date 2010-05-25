@@ -231,7 +231,7 @@ MAIN
     .local string pbcstring
     .local int pbclength
 
-    pbcstring = read ifh, 16384
+    pbcstring = ifh.'read'(16384)
     pbclength = length pbcstring
     unless pbclength > 0 goto read_done
 
@@ -326,7 +326,7 @@ END_OF_FUNCTION
     .local string pbcstring
     .local int pbclength
 
-    pbcstring = read ifh, 16384
+    pbcstring = ifh.'read'(16384)
     pbclength = length pbcstring
     unless pbclength > 0 goto read_done
 

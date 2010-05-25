@@ -71,7 +71,7 @@ Get parameters for POST method.
         len             = content_length
         $P0             = getinterp
         in              = $P0.'stdhandle'(0)
-        query           = read in, len
+        query           = in.'read'(len)
         in.'close'()
         #_dumper( query, 'queryPOST:' )
         query_hash = parse( query )

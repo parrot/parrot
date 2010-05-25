@@ -286,17 +286,21 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub 'progress' :method
     .param string status
     .param pmc msg
+
+    .local pmc interp, stderr
     $P0 = getattribute self, 'show_progress'
     if null $P0 goto L1
     unless $P0 goto L1
     unless status == 'begin' goto L2
-    printerr "** "
+    interp = getinterp
+    stderr = interp.'stdhandle'(2)
+    stderr.'print'("** ")
     $P0 = getattribute msg, 'method'
-    printerr $P0
-    printerr " "
+    stderr.'print'($P0)
+    stderr.'print'(" ")
     $P0 = getattribute msg, 'uri'
-    printerr $P0
-    printerr " ==> "
+    stderr.'print'($P0)
+    stderr.'print'(" ==> ")
     $N1 = time
     $P0 = box $N1
     setattribute self, 'progress_start', $P0
@@ -315,15 +319,15 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute self, 'progress_lastp', $P0
     setattribute self, 'progress_ani', $P0
     $S0 = msg.'status_line'()
-    printerr $S0
+    stderr.'print'($S0)
     $N0 =$N2 - $N1
     $I0 = $N0
     unless $I0 goto L4
-    printerr " ("
-    printerr $I0
-    printerr "s)"
+    stderr.'print'(" (")
+    stderr.'print'($I0)
+    stderr.'print'("s)")
   L4:
-    printerr "\n"
+    stderr.'print'("\n")
     goto L1
   L3:
     unless status == 'tick' goto L5
@@ -332,8 +336,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 %= 4
     $P1 = split '', '-\|/'
     $S0 = $P1[$P0]
-    printerr $S0
-    printerr "\b"
+    stderr.'print'($S0)
+    stderr.'print'("\b")
     goto L1
   L5:
     $N0 = status
@@ -346,8 +350,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = $P0
     if $S0 == $S1 goto L1
     set $P0, $S1
-    printerr $S1
-    printerr "\b\b\b\b"
+    stderr.'print'($S1)
+    stderr.'print'("\b\b\b\b")
   L1:
 .end
 

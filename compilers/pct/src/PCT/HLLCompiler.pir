@@ -329,11 +329,13 @@ when the stage corresponding to target has been reached.
     result = self.stagename(result, adverbs :flat :named)
     $N1 = time
     $N2 = $N1 - $N0
-    printerr "Stage '"
-    printerr stagename
-    printerr "': "
-    printerr $N2
-    printerr " sec\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Stage '")
+    $P1.'print'(stagename)
+    $P1.'print'("': ")
+    $P1.'print'($N2)
+    $P1.'print'(" sec\n")
     if target == stagename goto have_result
     goto stagestats_loop
 
@@ -611,7 +613,9 @@ specifies the encoding to use for the input (e.g., "utf8").
 
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
-    printerr $P0
+    $P1 = getinterp
+    $P2 = $P1.'stdhandle'(2)
+    $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline

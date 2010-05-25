@@ -101,7 +101,7 @@ RET:
 
     bs = self."blockSize"()
     pio = self."source"()
-    read str, pio, bs
+    str = pio.'read'(bs)
     length $I0, str
     if $I0 > 0 goto OK
     self."close"()

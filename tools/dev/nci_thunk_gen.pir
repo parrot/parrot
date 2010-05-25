@@ -738,7 +738,9 @@ TEMPLATE
                 $S0 = 'sprintf'(<<'ERROR', full_sig, lineno, $I0)
 Ignored signature '%s' on line %d (previously seen on line %d)
 ERROR
-                printerr $S0
+                $P0 = getinterp
+                $P1 = $P0.'stdhandle'(2)
+                $P1.'print'($S0)
             end_dup_warn:
             goto read_loop
         unseen:
@@ -761,7 +763,7 @@ ERROR
     .param pmc fh
 
     .local string line
-    line = readline fh
+    line = fh.'readline'()
 
     # handle comments
     $I0 = index line, '#'

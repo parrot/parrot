@@ -133,41 +133,6 @@ op say(invar PMC) :base_io {
 
 ##########################################
 
-=item B<printerr>(in INT)
-
-=item B<printerr>(in NUM)
-
-=item B<printerr>(in STR)
-
-=item B<printerr>(invar PMC)
-
-Print $1 to standard error.
-
-=cut
-
-op printerr(in INT) :base_io {
-    Parrot_io_eprintf(interp, INTVAL_FMT, $1);
-}
-
-op printerr(in NUM) :base_io {
-    Parrot_io_eprintf(interp, FLOATVAL_FMT, $1);
-}
-
-op printerr(in STR) :base_io {
-    STRING * const s = $1;
-    if (s && Parrot_str_byte_length(interp, s))
-        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
-}
-
-op printerr(invar PMC) :base_io {
-    PMC * const p = $1;
-    STRING * const s = (VTABLE_get_string(interp, p));
-    if (s)
-        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
-}
-
-##########################################
-
 =item B<print>(invar PMC, in INT)
 
 =item B<print>(invar PMC, in NUM)
@@ -205,37 +170,6 @@ op print(invar PMC, invar PMC) :base_io {
         STRING * const s = VTABLE_get_string(interp, $2);
         Parrot_io_putps(interp, $1, s);
     }
-}
-
-##########################################
-
-=item B<read>(out STR, in INT)
-
-Read up to N bytes from standard input stream
-
-=item B<read>(out STR, invar PMC, in INT)
-
-Read up to N bytes from IO PMC stream.
-
-=cut
-
-op read(out STR, in INT) :base_io {
-    $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
-}
-
-op read(out STR, invar PMC, in INT) :base_io {
-    $1 = Parrot_io_reads(interp, $2, (size_t)$3);
-}
-
-=item B<readline>(out STR, invar PMC)
-
-Read a line up to EOL from filehandle $2.
-This switches the filehandle to linebuffer-mode.
-
-=cut
-
-inline op readline(out STR, invar PMC) :base_io {
-    $1 = Parrot_io_readline(interp, $2);
 }
 
 ##########################################

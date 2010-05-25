@@ -908,7 +908,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     push_eh _handler
     $P0.'open'(filename, 'r')
     pop_eh
-    $S0 = readline $P0
+    $S0 = $P0.'readline'()
     $I0 = index $S0, '#!'
     unless $I0 == 0 goto L1
     $P0.'close'()
@@ -1010,7 +1010,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     st = box 'INIT'
     .lex 'state', st
   L2:
-    $S0 = readline stream
+    $S0 = stream.'readline'()
     if $S0 == '' goto L3
     $S0 = chomp($S0)
     .local pmc token
@@ -1085,9 +1085,11 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     set st, $S0
     goto L5
   L2:
-    printerr "Unhandled token type: "
-    printerr type
-    printerr "\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Unhandled token type: ")
+    $P1.'print'(type)
+    $P1.'print'("\n")
   L5:
 .end
 

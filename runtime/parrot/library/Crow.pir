@@ -74,12 +74,12 @@ END_HELP
   before:
     $I0 = newsfile.'eof'()
     if $I0 goto err_news
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, start
     if  $I0 != 0 goto before
 
   blank:
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, "\n"
     if  $I0 == 0 goto blank
     $I0      = index buf, "\r"
@@ -87,7 +87,7 @@ END_HELP
     news    .= buf
 
   item:
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, "\n"
     if  $I0 == 0 goto done
     $I0      = index buf, "\r"

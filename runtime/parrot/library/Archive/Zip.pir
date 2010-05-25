@@ -44,8 +44,10 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .sub '_printError'
     .param pmc args :slurpy
     $S0 = join '', args
-    printerr $S0
-    printerr "\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'($S0)
+    $P1.'print'("\n")
 .end
 
 .sub '_ioError' :method
@@ -598,7 +600,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ('', AZ_OK)
   L1:
     $P0 = self.'fh'()
-    $S0 = read $P0, chunkSize
+    $S0 = $P0.'read'(chunkSize)
     unless $S0 == '' goto L2
     $I0 = self.'_ioError'("reading data")
     .return ($S0, $I0)

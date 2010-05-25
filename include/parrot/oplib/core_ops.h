@@ -379,13 +379,6 @@
  opcode_t * Parrot_say_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_say_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_say_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_n(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_nc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_printerr_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_n(opcode_t *, PARROT_INTERP);
@@ -393,11 +386,6 @@
  opcode_t * Parrot_print_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_read_s_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_read_s_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_read_s_p_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_read_s_p_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_readline_s_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_stat_i_s_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_stat_i_sc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_stat_i_s_ic(opcode_t *, PARROT_INTERP);

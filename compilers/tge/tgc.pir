@@ -83,7 +83,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
     unless infh goto ERR_NO_INFILE
 
     .local string source
-    source = read infh, 65535
+    source = infh.'read'(65535)
     infh.'close'()
 
     .local pmc grammar
@@ -102,10 +102,12 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
   goto END
 
   USAGE:
-    printerr "Usage: "
-    printerr prog
-    printerr " [OPTIONS] FILE\n"
-    printerr <<"OPTIONS"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Usage: ")
+    $P1.'print'(prog)
+    $P1.'print'(" [OPTIONS] FILE\n")
+    $P1.'print'(<<"OPTIONS")
  Options:
   --output=OUTFILE  -- redirect output to OUTFILE
   --help            -- print this message
@@ -113,19 +115,25 @@ OPTIONS
     exit 1
 
   ERR_TOO_FEW_ARGS:
-    printerr "Error: too few arguments\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Error: too few arguments\n\n")
     goto USAGE
 
   ERR_NO_INFILE:
-    printerr "Error: file not found: "
-    printerr infile
-    printerr "\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Error: file not found: ")
+    $P1.'print'(infile)
+    $P1.'print'("\n\n")
     goto USAGE
 
   ERR_NO_OUTFILE:
-    printerr "Error: file not found: "
-    printerr outfile
-    printerr "\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Error: file not found: ")
+    $P1.'print'(outfile)
+    $P1.'print'("\n\n")
     goto USAGE
 
   END:

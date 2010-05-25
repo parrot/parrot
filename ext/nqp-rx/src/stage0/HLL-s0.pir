@@ -7351,7 +7351,9 @@ An operator precedence parser.
 .annotate 'line', 93
     find_lex $P310, "self"
     $S311 = $P310."commandline_banner"()
-    printerr $S311
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'($S311)
 .annotate 'line', 95
     $P0 = getinterp
     $P312 = $P0.'stdhandle'(0)
