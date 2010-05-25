@@ -5,6 +5,7 @@ DYNOPLIBS_TARGETS = \
     $(DYNEXT_DIR)/trans_ops$(LOAD_EXT) \
     $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
     $(DYNEXT_DIR)/debug_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) \
 
 DYNOPLIBS_CLEANUPS = \
     src/dynoplibs/*.c \

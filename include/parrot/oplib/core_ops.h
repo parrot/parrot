@@ -1024,18 +1024,6 @@
  opcode_t * Parrot_err_s_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_time_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_time_n(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_gmtime_s_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_gmtime_s_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_localtime_s_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_localtime_s_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_decodetime_p_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_decodetime_p_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_decodelocaltime_p_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_decodelocaltime_p_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_sysinfo_s_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_sysinfo_s_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_sysinfo_i_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_sysinfo_i_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sleep_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sleep_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sleep_n(opcode_t *, PARROT_INTERP);

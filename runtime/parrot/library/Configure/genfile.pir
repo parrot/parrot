@@ -38,6 +38,7 @@ Pure PIR, without any dependencies.
 
 =cut
 
+.loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 
 .sub 'genfile'

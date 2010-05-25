@@ -73,6 +73,7 @@ Tests various io opcodes.
     ok(1, 'open with null mode')
 .end
 
+.loadlib 'sys_ops'
 .sub 'tt661_todo_test' :anon
     # As of r41963, these tests need to be todo'ed at least on Win32. Add new
     # platforms known to fail.

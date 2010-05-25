@@ -59,6 +59,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .const int TESTS = 308
 
+.loadlib 'sys_ops'
+
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
     .include "iglobals.pasm"

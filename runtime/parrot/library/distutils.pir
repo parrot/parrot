@@ -172,6 +172,8 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
 
 =cut
 
+.loadlib 'sys_ops'
+
 .sub '__onload' :load :init :anon
     load_bytecode 'osutils.pbc'
     $P0 = new 'Hash'

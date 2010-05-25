@@ -29,6 +29,7 @@ $year += 1900;
 # don't run this test 1 tick before the year changes #'
 
 pasm_output_is( <<'CODE', $year, "decodelocaltime" );
+.loadlib 'sys_ops'
     time I0
     decodelocaltime P0, I0
     .include "tm.pasm"
