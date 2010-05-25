@@ -159,7 +159,7 @@ Initializes the exception with supplied values.
         /* Set up the values for the exception object. */
 
         SET_ATTR_severity(INTERP, SELF, severity_val);
-	if (! STRING_IS_NULL(message_val))
+        if (! STRING_IS_NULL(message_val))
             SET_ATTR_message(INTERP, SELF, message_val);
 
     }
