@@ -42,14 +42,16 @@ undefined values) is undefined, and may be rather funky.
 .include "interpinfo.pasm"
 .include "stat.pasm"
 .loadlib 'sys_ops'
-.loadlib 'io_ops'
+.loadlib 'os'
 
 .sub _config
     .local string prefix, conf_file
     prefix = interpinfo .INTERPINFO_RUNTIME_PREFIX
 
     $S0 = concat prefix, "/runtime"
-    $I0 = stat $S0, .STAT_EXISTS
+    $P0 = new ['OS']
+    $P1 = $P0.'stat'($S0)
+    $I0 = $P1[.STAT_EXISTS]
     if $I0 goto L1
     conf_file = "@libdir@@versiondir@/include/config.fpmc"
     goto L2

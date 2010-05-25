@@ -14,6 +14,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 =cut
 
 .include 'stat.pasm'
+.loadlib 'io_ops'
 
 =head3 Class Archive;Tar;File
 

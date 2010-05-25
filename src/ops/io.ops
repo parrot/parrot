@@ -172,38 +172,6 @@ op print(invar PMC, invar PMC) :base_io {
     }
 }
 
-##########################################
-
-=item B<stat>(out INT, in STR, in INT)
-
-=item B<stat>(out INT, in INT, in INT)
-
-Stat the file. Return stat element $3 for file $2 into $1. The queryable
-items currently are:
-
- EXISTS     0
- FILESIZE   1
- ISDIR      2
- ISDEV      3
- CREATETIME 4 (Time file was created)
- ACCESSTIME 5 (Time file was last accessed)
- MODIFYTIME 6 (Time file data was changed)
- CHANGETIME 7 (Time file metadata was changed)
- BACKUPTIME 8 (Time of last backup)
- UID        9
- GID        10
-
-
-=cut
-
-op stat(out INT, in STR, in INT) {
-    $1 = Parrot_stat_info_intval(interp, $2, $3);
-}
-
-op stat(out INT, in INT, in INT) {
-    $1 = Parrot_fstat_info_intval(interp, $2, $3);
-}
-
 ###############################################################################
 
 /*

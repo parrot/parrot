@@ -14,6 +14,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 =cut
 
 .loadlib 'sys_ops'
+.loadlib 'io_ops'
 .include 'stat.pasm'
 .include 'tm.pasm'
 

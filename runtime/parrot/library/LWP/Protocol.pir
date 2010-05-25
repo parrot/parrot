@@ -86,6 +86,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .namespace ['LWP';'Protocol';'file']
 
 .include 'stat.pasm'
+.loadlib 'io_ops'
 
 .sub '' :init :load :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'file']

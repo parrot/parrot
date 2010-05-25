@@ -630,7 +630,7 @@ $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
 
 $(LIBRARY_DIR)/Digest/MD5.pbc: $(DYNEXT_DIR)/bit_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/Archive/Zip.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/Archive/Zip.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/Configure/genfile.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
@@ -639,6 +639,14 @@ $(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 $(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/LWP/Protocol.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/Test/More.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/Archive/Tar.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 # constant string support
 .c.str : # suffix rule (limited support)

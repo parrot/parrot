@@ -19,6 +19,8 @@ parrotlib's interface functions.
 
 =cut
 
+.loadlib 'os'
+
 .sub __onload :load
     .local pmc paths
     .local pmc includes
@@ -130,20 +132,24 @@ Returns the location of a dynamic extension.
     .local string name
 
     name = request
-    stat $I0, name, 0
+    $P0 = new ['OS']
+    $I0 = $P0.'stat'(name, 0)
     if $I0 goto END
 
     name = concat request, ext
-    stat $I0, name, 0
+    $P0 = new ['OS']
+    $I0 = $P0.'stat'(name, 0)
     if $I0 goto END
 
     name = concat "runtime/parrot/dynext/", request
-    stat $I0, name, 0
+    $P0 = new ['OS']
+    $I0 = $P0.'stat'(name, 0)
     if $I0 goto END
 
     name = concat "runtime/parrot/dynext/", request
     name = concat name, ext
-    stat $I0, name, 0
+    $P0 = new ['OS']
+    $I0 = $P0.'stat'(name, 0)
     if $I0 goto END
 
     # file not found, give the OS a chance to locate it
@@ -187,7 +193,8 @@ END:
     path = $P0
 
     $S0 = concat path, name
-    stat $I0, $S0, 0
+    $P0 = new ['OS']
+    $I0 = $P0.'stat'($S0, 0)
     if $I0 goto OK
     null $S0
 OK:
