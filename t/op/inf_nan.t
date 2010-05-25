@@ -240,53 +240,53 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'Inf'
     #$N1 = cot $N0
     #is($N1, 'NaN', 'cot: cot Inf')
-    todo(0, 'cot Inf', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = '-Inf'
     #$N1 = cot $N0
     #is($N1, 'NaN', '... cot -Inf')
-    todo(0, 'cot -Inf', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = 'NaN'
     #$N1 = cot $N0
     #is($N1, 'NaN', '... cot NaN')
-    todo(0, 'cot NaN', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
 .end
 
 .sub test_coth
     $N0 = 'Inf'
     #$N1 = coth $N0
     #is($N1, 1, 'coth: coth Inf')
-    todo(0, 'coth Inf', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = '-Inf'
     #$N1 = coth $N0
     #is($N1, -1, '... coth -Inf')
-    todo(0, 'coth -Inf', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = 'NaN'
     #$N1 = coth $N0
     #is($N1, 'NaN', '... coth NaN')
-    todo(0, 'coth NaN', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
 .end
 
 .sub test_acot
     $N0 = 'Inf'
     #$N1 = acot $N0
     #is($N1, 'NaN', 'acot: acot Inf')
-    todo(0, 'acot Inf', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = '-Inf'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot -Inf')
-    todo(0, 'acot -Inf', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = 'NaN'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot NaN')
-    todo(0, 'acot NaN', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = '-2'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot -2')
-    todo(0, 'acot -2', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
     $N0 = '2'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot 2')
-    todo(0, 'acot 2', 'cot/coth/acot not implemented for real numbers')
+    skip(1, 'cot/coth/acot not implemented for real numbers')
 .end
 
 .sub test_sec
@@ -425,19 +425,19 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'Inf'
     $I0 = floor $N0
     #is($I0, 'Inf', 'floor Inf')
-    todo(0, 'floor Inf', 'rounding nan/inf gives something like -2147483648')
+    skip(1, 'rounding nan/inf gives something like -2147483648')
     $N0 = 'NaN'
     $I0 = floor $N0
     #is($I0, 'NaN', 'floor Inf')
-    todo(0, 'floor NaN', 'rounding nan/inf gives something like -2147483648')
+    skip(1, 'rounding nan/inf gives something like -2147483648')
     $N0 = 'Inf'
     $I0 = ceil $N0
     #is($I0, 'Inf', 'floor Inf')
-    todo(0, 'ceil Inf', 'rounding nan/inf gives something like -2147483648')
+    skip(1, 'rounding nan/inf gives something like -2147483648')
     $N0 = 'NaN'
     $I0 = ceil $N0
     #is($I0, 'NaN', 'floor Inf')
-    todo(0, 'ceil NaN', 'rounding nan/inf gives something like -2147483648')
+    skip(1, 'rounding nan/inf gives something like -2147483648')
 .end
 
 .sub test_nan_complex
@@ -446,7 +446,7 @@ Tests for mathematical operations with Inf and Nan.
     set $P1, "1 + i"
     $P1 += $N0
     #is($P1, 'NaN', '1+i + NaN')
-    todo(0, '1+i + NaN should be NaN')
+    skip(1, '1+i + NaN should be NaN')
 .end
 
 .sub test_fdiv_integer_pmc_nan
@@ -456,7 +456,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN', 'fdiv with Integer PMCs and NaN')
-    todo(0, 'fdiv with Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    skip(1, 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_fdiv_float_pmc_nan
@@ -466,7 +466,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN','fdiv with Float PMCs and NaN')
-    todo(0,'fdiv with Float PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    skip(1, 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_fdiv_float_integer_pmc_nan
@@ -476,7 +476,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN', 'fdiv with Float and Integer PMCs and NaN')
-    todo(0, 'fdiv with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    skip(1, 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_cmod_float_integer_pmc_nan
@@ -486,7 +486,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     cmod $P1, $P2, $N0
     #is($P1, 'NaN', 'cmod with Float and Integer PMCs and NaN')
-    todo(0, 'cmod with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    skip(1, 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_mod_float_integer_pmc_nan
@@ -496,7 +496,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     mod $P1, $P2, $N0
     #is($P1, 'NaN', 'mod with Float and Integer PMCs and NaN')
-    todo(0, 'mod with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
+    skip(1, 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
 
 # Local Variables:

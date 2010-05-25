@@ -182,7 +182,7 @@ ops file.
 
 =end
 
-method new(*@files, :$oplib, :$core!, :$nolines) {
+method new(*@files, :$oplib, :$core!, :$nolines, :$quiet? = 0) {
     self<files>   := @files;
     self<core>    := $core;
     self<ops>     := list(); # Ops
@@ -190,6 +190,7 @@ method new(*@files, :$oplib, :$core!, :$nolines) {
     self<compiler>:= pir::compreg__Ps('Ops');
     self<op_order>:= 0;
     self<renum>   := Ops::Renumberer.new( :ops_file(self) );
+    self<quiet>   := $quiet;
 
     if $core {
         self<oplib> := $oplib;
@@ -243,12 +244,12 @@ Reads in the specified .ops file, gathering information about the ops.
 method read_ops($file, $nolines) {
     $Ops::Compiler::Actions::OPLIB := self<oplib>;
 
-    #say("# Parsing $file...");
+    self<quiet> || say("# Parsing $file...");
     my $start_time := pir::time__N();
     my $buffer     := slurp($file);
     self.compile_ops($buffer, :experimental( $file ~~ /experimental\.ops/));
-    #pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
-    #say("# Parsed $file in $time seconds.");
+    pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
+    self<quiet> || say("# Parsed $file in $time seconds.");
 }
 
 method compile_ops($str, :$experimental? = 0) {
@@ -301,7 +302,7 @@ method _calculate_op_codes() {
             #ops not explicitly listed but not skipped are experimental
             else {
                 $op<code> := $code++;
-                say("# Experimental op " ~ $op.full_name ~ " is not in ops.num.");
+                self<quiet> || say("# Experimental op " ~ $op.full_name ~ " is not in ops.num.");
             }
         }
         #if there's no oplib, we're compiling dynops and ops aren't experimental

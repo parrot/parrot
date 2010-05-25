@@ -16,6 +16,7 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
     self<script>    := $script;
     self<file>      := $file;
     self<flags>     := %flags;
+    self<quiet>     := %flags<quiet> // 0;
 
     # Preparing various bits.
     my $suffix := $trans.suffix();
@@ -195,6 +196,7 @@ method _prepare_ops_num() {
     my $found_dynamic      := 0;
     self<max_fixed_op_num> := 0;
     self<ops_num_start>    := list();
+    self<max_op_num>       := 0;
 
     #record which ones have fixed numbers and which just need to be somewhere in ops.num
     for self.ops_file.oplib.num_file_lines -> $line {
@@ -207,13 +209,14 @@ method _prepare_ops_num() {
         if $line<op> {
             if $found_dynamic {
                 self<numbered_ops>{ $line<op><name> } := 1;
-                #say("# added '"~$line<op><name> ~" to numered ops");
+                self<quiet> || say("# added '"~$line<op><name> ~" to numered ops");
             }
             else {
                 #don't need to keep track of fixed ops
                 self<max_fixed_op_num> := +$line<op><number>;
-                #say("# added '"~$line<op><name> ~" to fixed ops");
+                self<quiet> || say("# added '"~$line<op><name> ~" to fixed ops");
             }
+            self<max_op_num>++;
         }
         elsif $line<dynamic> {
             $found_dynamic := 1;
