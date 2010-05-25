@@ -23,9 +23,10 @@ Test PAST::Transformer. The tests are currently far from exhaustive.
     load_bytecode 'PAST/Walker.pbc'
     register_classes()
 
-    plan(6)
+    plan(3)
     test_change_node_attributes()
     test_change_node_types()
+    test_delete_nodes()
 .end
 
 =head1 Tests
@@ -34,31 +35,20 @@ Test PAST::Transformer. The tests are currently far from exhaustive.
 
 =item test_change_node_attributes()
 
-Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests that modifying attributes with a PAST::Transformer works. PAST::Walker::SumVals is used to verify that the transformation has occured correctly.
+Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests that modifying attributes with a PAST::Transformer works.
 
 =cut
 
 .sub test_change_node_attributes
-    .local pmc past, result, summer, transformer
+    .local pmc past, result, target, transformer
     past = build_test_change_node_attributes_past()
-    summer = new ['PAST'; 'Walker'; 'SumVals']
     transformer = new ['PAST'; 'Transformer'; 'Increment']
-
-    summer.'reset'()
-    summer.'walk'(past)
-    $P0 = getattribute summer, 'sum'
-    is($P0, 78, "Initial sum worked correctly.")
-    $P1 = getattribute summer, 'count'
-    is($P1, 4, "Initial count worked correctly.")
 
     result = transformer.'walk'(past)
 
-    summer.'reset'()
-    summer.'walk'(result)
-    $P0 = getattribute summer, 'sum'
-    is($P0, 82, "The sum changed correctly.")
-    $P1 = getattribute summer, 'count'
-    is($P1, 4, "The count stayed the same correctly.")
+    target = build_test_change_node_attrs_target()
+    $S0 = "Node attributes can be changed by PAST::Transformers."
+    is (result, target, $S0)
 .end
 
 .sub build_test_change_node_attributes_past
@@ -83,6 +73,28 @@ Uses PAST::Transformer::Increment to add 1 to each PAST::Value node. It tests th
     .return (result)
 .end
 
+.sub build_test_change_node_attrs_target
+    .local pmc result
+    result = new ['PAST'; 'Block']
+    $P0 = new ['PAST'; 'Var']
+    $P1 = new ['PAST'; 'Val']
+    $P1.'value'(38)
+    push $P0, $P1
+    push result, $P0
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(25)
+    push result, $P0
+    $P0 = new ['PAST'; 'Block']
+    $P1 = new ['PAST'; 'Val']
+    $P1.'value'(6)
+    push $P0, $P1
+    $P1 = new ['PAST'; 'Val']
+    $P1.'value'(13)
+    push $P0, $P1
+    push result, $P0
+    .return (result)
+.end
+
 =item test_change_node_types()
 
 Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracting the positive number from 0. It tests that PAST::Transformers can replace a node with a node of a different type. PAST::Walker::CountOps is used to ensure that the number of PAST::Ops changes correctly.
@@ -90,22 +102,14 @@ Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracti
 =cut
 
 .sub test_change_node_types
-    .local pmc past, result, counter, transformer
+    .local pmc past, result, target, transformer
     past = build_test_change_node_types_past()
-    counter = new ['PAST'; 'Walker'; 'CountOps']
     transformer = new ['PAST'; 'Transformer'; 'Negate']
-
-    counter.'reset'()
-    counter.'walk'(past)
-    $P0 = getattribute counter, 'count'
-    is($P0, 0, "The initial tree has no PAST::Op nodes.")
 
     result = transformer.'walk'(past)
 
-    counter.'reset'()
-    counter.'walk'(result)
-    $P0 = getattribute counter, 'count'
-    is($P0, 2, "The appropriate nodes were transformed to Ops.")
+    target = build_test_change_node_types_target()
+    is(result, target, "Node types can be changed by PAST::Transformers.")
 .end
 
 .sub build_test_change_node_types_past
@@ -127,33 +131,46 @@ Use PAST::Transformer::Negate to replace negative number Vals with Ops subtracti
     .return (past)
 .end
 
+.sub build_test_change_node_types_target
+    .local pmc past
+    past = new ['PAST'; 'Block']
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(0)
+    push past, $P0
+    $P0 = new ['PAST'; 'Op']
+    $P0.'pirop'('neg')
+    $P1 = new ['PAST'; 'Val']
+    $P1.'value'(7)
+    push $P0, $P1
+    push past, $P0
+    $P0 = new ['PAST'; 'Val']
+    $P0.'value'(5)
+    push past, $P0
+    $P0 = new ['PAST'; 'Op']
+    $P0.'pirop'('neg')
+    $P1 = new ['PAST'; 'Val']
+    $P1.'value'(32)
+    push $P0, $P1
+    push past, $P0
+
+    .return (past)
+.end
+
 =item test_delete_nodes()
 
-Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children. It tests that deletion works. PAST::Walker::CountBlocks is used to count the PAST::Blocks.
+Uses PAST::Transformer::Trim to delete PAST::Blocks with multiple children. It tests that deletion works. PAST::Walker::CountBlocks is used to count the PAST::Blocks.
 
 =cut
 
 .sub test_delete_nodes
-    .local pmc past, transformer, counter, result
+    .local pmc past, result, target, transformer
     past = build_test_delete_nodes_past()
-    transformer = new ['PAST'; 'Transformer'; 'DeleteVals']
-    counter = new ['PAST'; 'Walker'; 'CountVals']
-
-    counter.'reset'()
-    counter.'walk'(past)
-    $P0 = getattribute counter, 'blocks'
-    is($P0, 4, "The initial block count was correct.")
-    $P0 = getattribute counter, 'nodes'
-    is($P0, 8, "The initial node count was correct.")
+    transformer = new ['PAST'; 'Transformer'; 'Trim']
 
     result = transformer.'walk'(past)
 
-    counter.'reset'()
-    counter.'walk'(past)
-    $P0 = getattribute counter, 'blocks'
-    is($P0, 2, "The block count changed correctly.")
-    $P0 = getattribute counter, 'nodes'
-    is($P0, 3, "The node count changed correctly.")
+    target = build_test_delete_nodes_target()
+    is(result, target, "Nodes can be deleted by PAST::Transformers.")
 .end
 
 .sub build_test_delete_nodes_past
@@ -184,6 +201,20 @@ Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children
     .return (past)
 .end
 
+.sub build_test_delete_nodes_target
+    .local pmc past
+    past = new ['PAST';'Block']
+    $P0 = new ['PAST'; 'Stmts']
+    $P1 = new ['PAST'; 'Var']
+    push $P0, $P1
+    $P1 = new ['PAST'; 'Block']
+    $P2 = new ['PAST'; 'Val']
+    push $P1, $P2
+    push $P0, $P1
+    push past, $P0
+    .return (past)
+.end
+
 =back
 
 =head1 Helper classes
@@ -195,16 +226,6 @@ Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Increment']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Negate']
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Trim']
-
-    $P1 = get_class ['PAST'; 'Walker']
-    $P0 = subclass $P1, ['PAST'; 'Walker'; 'SumVals']
-    addattribute $P0, 'count'
-    addattribute $P0, 'sum'
-    $P0 = subclass $P1, ['PAST'; 'Walker'; 'CountOps']
-    addattribute $P0, 'count'
-    $P0 = subclass $P1, ['PAST'; 'Walker'; 'CountBlocks']
-    addattribute $P0, 'blocks'
-    addattribute $P0, 'nodes'
 .end
 
 .namespace ['PAST'; 'Walker']
@@ -218,18 +239,6 @@ Uses PAST::Transformer::DeleteVals to delete PAST::Blocks with multiple children
     inc $P0
     result.'value'($P0)
     .return (result)
-.end
-
-.sub 'walk' :multi(['PAST'; 'Walker'; 'SumVals'], ['PAST'; 'Val'])
-    .param pmc walker
-    .param pmc node
-    $P0 = getattribute walker, 'sum'
-    $P1 = node.'value'()
-    $P0 = $P0 + $P1
-    setattribute walker, 'sum', $P0
-    $P0 = getattribute walker, 'count'
-    inc $P0
-    setattribute walker, 'count', $P0
 .end
 
 .sub 'walk' :multi(['PAST'; 'Transformer'; 'Negate'], ['PAST'; 'Val'])
@@ -250,69 +259,22 @@ negative:
     .return (result)
 .end
 
-.sub 'walk' :multi(['PAST'; 'Walker'; 'CountOps'], ['PAST'; 'Op'])
-    .param pmc walker
-    .param pmc node
-    $P0 = getattribute walker, 'count'
-    inc $P0
-    setattribute walker, 'count', $P0
-    .tailcall 'walkChildren'(walker, node)
-.end
-
-.sub 'walk' :multi(['PAST'; 'Transformer'; 'Delete'], ['PAST'; 'Block'])
+.sub 'walk' :multi(['PAST'; 'Transformer'; 'Trim'], ['PAST'; 'Block'])
     .param pmc walker
     .param pmc node
     .local pmc result
     $I0 = elements node
     if $I0 > 1 goto multiple
-    result = clone node
+    result = node
+    $P0 = 'walkChildren'(walker, node)
+    'replaceChildren'(result, $P0)
     .return (result)
 multiple:
     result = null
     .return (result)
 .end
 
-.sub 'walk' :multi(['PAST'; 'Walker'; 'CountBlocks'], ['PAST'; 'Block'])
-    .param pmc walker
-    .param pmc node
-    $P0 = getattribute walker, 'blocks'
-    inc $P0
-    setattribute walker, 'blocks', $P0
-.end
-
-.sub 'walk' :multi(['PAST'; 'Walker'; 'CountBlocks'], ['PAST'; 'Node'])
-    .param pmc walker
-    .param pmc node
-    $P0 = getattribute walker, 'nodes'
-    inc $P0
-    setattribute walker, 'nodes', $P0
-.end
-
-.namespace ['PAST'; 'Walker'; 'SumVals']
-
-.sub 'reset' :method
-    $P0 = new 'Integer'
-    $P0 = 0
-    setattribute self, 'count', $P0
-    setattribute self, 'sum', $P0
-.end
-
-.namespace ['PAST'; 'Walker'; 'CountOps']
-
-.sub 'reset' :method
-    $P0 = new 'Integer'
-    $P0 = 0
-    setattribute self, 'count', $P0
-.end
-
-.namespace ['PAST'; 'Walker'; 'CountBlocks']
-
-.sub 'reset' :method
-    $P0 = new 'Integer'
-    $P0 = 0
-    setattribute self, 'blocks', $P0
-    setattribute self, 'nodes', $P0
-.end
+.include 't/library/pastcompare.pir'
 
 # Local Variables:
 #   mode: pir
