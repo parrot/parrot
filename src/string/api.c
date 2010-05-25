@@ -3242,7 +3242,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         mem_sys_memcopy(pos, next->strstart, next->bufused);
         pos += next->bufused;
 
-        PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res));
+        /* We can consume all buffer and pos will be next-after-end of buffer */
+        PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);
     }
 
     res->bufused  = pos - res->strstart;
