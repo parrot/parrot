@@ -18,10 +18,10 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 =cut
 
-.loadlib 'sys_ops'
 .namespace ['HTTP';'Date']
 
 .include 'tm.pasm'
+.loadlib 'sys_ops'
 
 .sub 'time2str'
     .param int time

@@ -194,7 +194,8 @@ END:
 
     $S0 = concat path, name
     $P0 = new ['OS']
-    $I0 = $P0.'stat'($S0, 0)
+    $P1 = $P0.'stat'($S0)
+    $I0 = $P1[0]
     if $I0 goto OK
     null $S0
 OK:
