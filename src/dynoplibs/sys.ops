@@ -25,37 +25,6 @@ END_OPS_PREAMBLE
 
 ########################################
 
-=item B<err>(out INT)
-
-Store the system error code in $1.
-
-=item B<err>(out STR)
-
-Store the system error message in $1.
-
-=item B<err>(out STR, in INT)
-
-Get the system error message for the system error code $2
-and store it in $1.
-
-=cut
-
-inline op err(out INT) {
-    $1 = errno;
-}
-
-op err(out STR) {
-    const char * const tmp = strerror(errno);
-    $1 = string_make(interp, tmp, strlen(tmp), "ascii", 0);
-}
-
-op err(out STR, in INT) {
-    const char * const tmp = strerror($2);
-    $1 = string_make(interp, tmp, strlen(tmp), "ascii", 0);
-}
-
-########################################
-
 =item B<gmtime>(out STR, in INT)
 
 Take the integer, which represents GMT epoch-seconds, and turn it into a
