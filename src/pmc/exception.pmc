@@ -54,7 +54,7 @@ These arguments can be retrieved with the C<get_results> opcode.
 
 typedef enum {
     attr_id,
-    attr_birthime,
+    attr_birthtime,
     attr_message,
     attr_payload,
     attr_resume,
@@ -115,16 +115,18 @@ Initializes the exception with default values.
 */
 
     VTABLE void init() {
-        /* Set flags for custom GC mark and destroy. */
+        /* Use custom mark */
         PObj_custom_mark_SET(SELF);
 
-        SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
-        SET_ATTR_handled(INTERP, SELF, 0);
-        SET_ATTR_message(INTERP, SELF, NULL);
+        /* Set default values */
+        SET_ATTR_message(INTERP, SELF, STRINGNULL);
         SET_ATTR_payload(INTERP, SELF, PMCNULL);
         SET_ATTR_resume(INTERP, SELF, PMCNULL);
+        SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
         SET_ATTR_backtrace(INTERP, SELF, PMCNULL);
         SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
+        SET_ATTR_handler_ctx(INTERP, SELF, PMCNULL);
+        SET_ATTR_thrower(INTERP, SELF, PMCNULL);
     }
 
 /*
@@ -138,10 +140,12 @@ Initializes the exception with supplied values.
 */
 
     VTABLE void init_pmc(PMC *values) {
-        INTVAL severity_val;
-        STRING *message_val;
+        INTVAL severity_val = EXCEPT_error;
+        STRING *message_val = NULL;
 
         const INTVAL ishash = VTABLE_isa(INTERP, values, CONST_STRING(INTERP, 'Hash'));
+
+        STATICSELF.init();
 
         if (ishash) {
             STRING * const severity = CONST_STRING(INTERP, "severity");
@@ -149,23 +153,14 @@ Initializes the exception with supplied values.
             severity_val = VTABLE_get_integer_keyed_str(INTERP, values, severity);
             message_val = VTABLE_get_string_keyed_str(INTERP, values, message);
         }
-        else {
-            severity_val = EXCEPT_error;
+        else
             message_val  = VTABLE_get_string(INTERP, values);
-        }
 
-        /* Set flags for custom GC mark. */
-        PObj_custom_mark_SET(SELF);
-
-        /* Set up the core struct and default values for the exception object. */
+        /* Set up the values for the exception object. */
 
         SET_ATTR_severity(INTERP, SELF, severity_val);
-        SET_ATTR_handled(INTERP, SELF, 0);
-        SET_ATTR_message(INTERP, SELF, message_val);
-        SET_ATTR_payload(INTERP, SELF, PMCNULL);
-        SET_ATTR_resume(INTERP, SELF, PMCNULL);
-        SET_ATTR_backtrace(INTERP, SELF, PMCNULL);
-        SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
+	if (! STRING_IS_NULL(message_val))
+            SET_ATTR_message(INTERP, SELF, message_val);
 
     }
 
@@ -607,6 +602,14 @@ Retrieve an attribute value for the exception object.
             VTABLE_set_string_native(INTERP, value, message);
             }
             break;
+          case attr_birthtime:
+            {
+            FLOATVAL birthtime;
+            GET_ATTR_birthtime(INTERP, SELF, birthtime);
+            value = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, value, birthtime);
+            }
+            break;
           case attr_payload:
             GET_ATTR_payload(INTERP, SELF, value);
             break;
@@ -838,8 +841,8 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
     ASSERT_ARGS(getAttrEnum)
 
     AttrEnum r;
-    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "birthime")))
-        r = attr_birthime;
+    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "birthtime")))
+        r = attr_birthtime;
     else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "message")))
         r = attr_message;
     else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "payload")))
