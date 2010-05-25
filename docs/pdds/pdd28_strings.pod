@@ -1,3 +1,28 @@
+NFG has been specified as a feature parrot wants for a long time, it's been in the Parrot Design Document for strings since before I had a commit bit, or any involvement in the project come to that.  Something that has gone that long unimplemented can't be <em>that</em> important, right? I mean, we clearly have survived without it.  Turns out it is important, but it takes some background to realize why.
+
+<!--break-->
+
+If you look at the parrot_string_t struct in the parrot source there is something that might jump out at you.  There's two pointers there, one for the string's encoding and the other for the charset.  It's a bit more heavyweight than you might initially expect, and it's been suggested in the past that one pointer would do just fine, but the charset/encoding separation provides for a rather neat separation of concerns and some code reuse.
+
+The charsets handle all of the <em>character</em> level information: Case, composition, character classes and comparisons.  The way this characters are stored is a matter for the encoding to handle. The size of characters, iterators, and all "bytes vs chars" issues are for the encoding to handle.  Of course, some encodings are more versatile than others.  The UTF-8 encoding is only used by the UTF-8 charset, true, but the Fixed_8 encoding is shared by ASCII, ISO 8859-1, and the 'binary' not-encoding.
+
+Now, let's say you have a long-ish string that, through no fault of your own, came in some form of Unicode.  Okay, that's no problem, parrot can handle that.  Except, of course, that depending on what the encoding is there won't be any O(1) random access for you.  That's simply the nature of things when you have a consistent size for your characters.
+
+This is hardly news, it first came up with UTF-8 right when it was invented.  The solution adopted by the people who invented UTF-8, on the operating system they invented it for, was to avoid the thing as much as possible.  Any program that was expected to run faster than molasses was adapted to use 'Runes', trading memory inefficiency for O(1) random access.  A fine compromise if you ask me.
+
+Of course, once you've solved that, you have to face the next problem.  Even once you bite the bullet and allow
+
+
+
+
+
+
+
+
+
+
+
+
 # Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
@@ -67,6 +92,58 @@ just I<grapheme>) as one or more characters forming a visible whole when
 displayed, in other words, a bundle of a character and all of its combining
 characters.  Because graphemes are the highest-level abstract idea of a
 "character", they're useful for converting between character sets.
+
+
+
+
+
+
+
+
+
+NFG has been specified as a feature parrot wants for a long time, it's been in the Parrot Design Document for strings since before I had a commit bit, or any involvement in the project come to that.  Something that has gone that long unimplemented can't be <em>that</em> important, right? I mean, we clearly have survived without it.  Turns out it is important, but it takes some background to realize why.
+
+<!--break-->
+
+If you look at the parrot_string_t struct in the parrot source there is something that might jump out at you.  There's two pointers there, one for the string's encoding and the other for the charset.  It's a bit more heavyweight than you might initially expect, and it's been suggested in the past that one pointer would do just fine, but the charset/encoding separation provides for a rather neat separation of concerns and some code reuse.
+
+The charsets handle all of the <em>character</em> level information: Case, composition, character classes and comparisons.  The way this characters are stored is a matter for the encoding to handle. The size of characters, iterators, and all "bytes vs chars" issues are for the encoding to handle.  Of course, some encodings are more versatile than others.  The UTF-8 encoding is only used by the UTF-8 charset, true, but the Fixed_8 encoding is shared by ASCII, ISO 8859-1, and the 'binary' not-encoding.
+
+Now, let's say you have a long-ish string that, through no fault of your own, came in some form of Unicode.  Okay, that's no problem, parrot can handle that.  Except, of course, that depending on what the encoding is there won't be any O(1) random access for you.  That's simply the nature of things when you have a consistent size for your characters.
+
+This is hardly news, it first came up with UTF-8 right when it was invented.  The solution adopted by the people who invented UTF-8, on the operating system they invented it for, was to avoid the thing as much as possible.  Any program that was expected to run faster than molasses was adapted to use 'Runes', trading memory inefficiency for O(1) random access.  A fine compromise if you ask me.
+
+Of course, once you've solved that, you have to face the next problem.  Even if you bite the bullet and pay the storage space for O(1) access you still get bitten by the fact that encoding "all the scripts in the word" is an ugly business with more edge cases than you thought were even possible.
+
+Your next problem are 'composing characters', and boy is it <em>fun<em>.  Let's say you want to do something really easy, something that could not possibly go wrong. Like compare two strings for equality. Yes, that's easy, and efficient, so long as your system's memcmp() knows that the sequence "{A, tilde, acute, dot_below}" mus compare equal to "{A, tilde, dot_below, acute}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 =head3 Normalization Form
 

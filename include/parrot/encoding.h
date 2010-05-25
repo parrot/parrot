@@ -56,6 +56,7 @@ PARROT_DATA ENCODING *Parrot_fixed_8_encoding_ptr;
 PARROT_DATA ENCODING *Parrot_utf8_encoding_ptr;
 PARROT_DATA ENCODING *Parrot_utf16_encoding_ptr;
 PARROT_DATA ENCODING *Parrot_ucs2_encoding_ptr;
+PARROT_DATA ENCODING *Parrot_ucs4_encoding_ptr;
 PARROT_DATA ENCODING *Parrot_default_encoding_ptr;
 #endif
 
