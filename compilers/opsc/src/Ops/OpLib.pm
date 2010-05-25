@@ -93,9 +93,10 @@ Build OpLib.
 
 =end METHODS
 
-method new(:$num_file, :$skip_file) {
+method new(:$num_file, :$skip_file, :$quiet? = 0) {
     self<num_file>   := $num_file  // './src/ops/ops.num';
     self<skip_file>  := $skip_file // './src/ops/ops.skip';
+    self<quiet>      := $quiet;
 
     # Initialize self.
     self<max_op_num>    := 0;
@@ -155,11 +156,11 @@ my method _load_num_file() {
             if (+$number) eq $number {
                 if ($prev + 1 != $number) {
                     self<regen_ops_num> := 1;
-                    say("# hole in ops.num before #$number: will regenerate ops.num");
+                    self<quiet> || say("# hole in ops.num before #$number: will regenerate ops.num");
                 }
                 if self<op_num_table>.exists($name) {
                     self<regen_ops_num> := 1;
-                    say("# duplicate opcode $name and $number: will regenerate ops.num");
+                    self<quiet> || say("# duplicate opcode $name and $number: will regenerate ops.num");
                 }
 
                 $prev := $number;
