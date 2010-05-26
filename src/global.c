@@ -571,7 +571,7 @@ Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 
 /*
 
-=item C<void Parrot_store_global_n(PARROT_INTERP, PMC *ns, STRING *globalname,
+=item C<void Parrot_ns_store_global(PARROT_INTERP, PMC *ns, STRING *globalname,
 PMC *val)>
 
 Store the PMC C<val> into the namespace PMC C<ns> with name C<globalname>.
@@ -582,10 +582,10 @@ Store the PMC C<val> into the namespace PMC C<ns> with name C<globalname>.
 
 PARROT_EXPORT
 void
-Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
+Parrot_ns_store_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
-    ASSERT_ARGS(Parrot_store_global_n)
+    ASSERT_ARGS(Parrot_ns_store_global)
 #if DEBUG_GLOBAL
     if (globalname)
         Parrot_io_printf(interp, "store_global name '%Ss'\n", globalname);
@@ -619,7 +619,7 @@ Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
                                          Parrot_get_ctx_HLL_namespace(interp),
                                          str_key);
 
-    Parrot_store_global_n(interp, ns, globalname, val);
+    Parrot_ns_store_global(interp, ns, globalname, val);
 
     /* TT #1225 - method cache invalidation should be a namespace function */
     Parrot_invalidate_method_cache(interp, str_key);
@@ -818,7 +818,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         STRING * const ns_entry_name = sub->ns_entry_name;
         PMC    * const nsname        = sub->namespace_name;
 
-        Parrot_store_global_n(interp, ns, ns_entry_name, sub_pmc);
+        Parrot_ns_store_global(interp, ns, ns_entry_name, sub_pmc);
 
         /* TT #1224:
            TEMPORARY HACK - cache invalidation should be a namespace function */

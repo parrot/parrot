@@ -303,7 +303,7 @@ Return the object, or NULL if not found.
 Find and return a global called C<name> in the namespace C<namespace>.  Returns
 C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_n(PARROT_INTERP, PMC namespace, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_ns_store_global(PARROT_INTERP, PMC namespace, Parrot_String name, Parrot_PMC val)>
 
 Store the PMC C<val> into the namespace PMC C<namespace> with name C<globalname>.
 
@@ -1533,7 +1533,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_srand>
 
-=item C<Parrot_store_global_n>
+=item C<Parrot_ns_store_global>
 
 =item C<Parrot_store_global_s>
 
