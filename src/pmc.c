@@ -781,7 +781,6 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         if (!PMC_IS_NULL(item)) {
             /* nested namespace with same name */
             if (PMC_IS_TYPE(item, NameSpace))
-            //if (item->vtable->base_type == enum_class_NameSpace)
                 return enum_type_undef;
             else
                 return VTABLE_get_integer(interp, item);
