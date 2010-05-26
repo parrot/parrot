@@ -288,12 +288,12 @@ or risk memory leaks.
 
 =over 4
 
-=item C<Parrot_PMC Parrot_find_global_cur(PARROT_INTERP, Parrot_String name)>
+=item C<Parrot_PMC Parrot_ns_find_current_namespace_global(PARROT_INTERP, Parrot_String name)>
 
 Find and return a global called C<name> in the current namespace.  Returns
 C<PMCNULL> if not found.
 
-=item C<Parrot_PMC Parrot_find_global_n(PARROT_INTERP, PMC namespace, Parrot_String name)>
+=item C<Parrot_PMC Parrot_ns_find_namespace_global(PARROT_INTERP, PMC namespace, Parrot_String name)>
 
 Search the namespace PMC C<namespace> for an object with name C<globalname>.
 Return the object, or NULL if not found.
@@ -467,7 +467,7 @@ future.
 
         /* find the subroutine named "foo" in the global namespace */
         pstr = string_from_literal(interp, "foo");
-        sub = Parrot_find_global_cur(interp, pstr);
+        sub = Parrot_ns_find_current_namespace_global(interp, pstr);
 
         /* run foo(), which returns nothing */
 	Parrot_ext_call(interp, sub, "->");
@@ -709,11 +709,11 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_find_encoding_converter>
 
-=item C<Parrot_find_global_cur>
+=item C<Parrot_ns_find_current_namespace_global>
 
 =item C<Parrot_find_global_k>
 
-=item C<Parrot_find_global_n>
+=item C<Parrot_ns_find_namespace_global>
 
 =item C<Parrot_find_global_op>
 

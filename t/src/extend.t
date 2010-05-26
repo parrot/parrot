@@ -382,7 +382,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     PMC           *sub, *arg;
 
     Parrot_pbc_load(interp, pf);
-    sub = Parrot_find_global_cur(interp, name);
+    sub = Parrot_ns_find_current_namespace_global(interp, name);
     Parrot_ext_call(interp, sub, "->");
     Parrot_eprintf(interp, "back\\n");
 
@@ -390,7 +390,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
     name = Parrot_str_new_constant(interp, "_sub2");
-    sub  = Parrot_find_global_cur(interp, name);
+    sub  = Parrot_ns_find_current_namespace_global(interp, name);
     arg  = Parrot_pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
@@ -440,7 +440,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     PMC           *sub, *arg;
 
     Parrot_pbc_load(interp, pf);
-    sub = Parrot_find_global_cur(interp, name);
+    sub = Parrot_ns_find_current_namespace_global(interp, name);
     Parrot_ext_call(interp, sub, "->");
     Parrot_eprintf(interp, "back\\n");
 
@@ -448,7 +448,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
     name = Parrot_str_new_constant(interp, "_sub2");
-    sub  = Parrot_find_global_cur(interp, name);
+    sub  = Parrot_ns_find_current_namespace_global(interp, name);
     arg  = Parrot_pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
@@ -517,7 +517,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_Int     result;
 
     Parrot_pbc_load(interp, pf);
-    sub  = Parrot_find_global_cur(interp, name);
+    sub  = Parrot_ns_find_current_namespace_global(interp, name);
     arg  = Parrot_pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
@@ -584,7 +584,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_runloop jump_point;
 
     Parrot_pbc_load(interp, pf);
-    sub = Parrot_find_global_cur(interp, name);
+    sub = Parrot_ns_find_current_namespace_global(interp, name);
 
     if (setjmp(jump_point.resume)) {
         Parrot_eprintf(interp, "caught\\n");
@@ -714,7 +714,7 @@ main(int argc, const char *argv[])
     }
 
     foo_name = Parrot_str_new_constant( interp, "foo" );
-    sub      = Parrot_find_global_cur( interp, foo_name );
+    sub      = Parrot_ns_find_current_namespace_global( interp, foo_name );
 
     Parrot_ext_call(interp, sub, "->");
 
@@ -746,7 +746,7 @@ main(int argc, const char *argv[])
     pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
     Parrot_pbc_load( interp, pf );
 
-    sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
+    sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
     Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
     printf( "Result is %d.\\n", result );
 
@@ -778,7 +778,7 @@ main(int argc, const char *argv[])
     pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
     Parrot_pbc_load( interp, pf );
 
-    sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
+    sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
     Parrot_ext_call( interp, sub, "II->I", 100, 200, &result );
     printf( "Result is %d.\\n", result );
 

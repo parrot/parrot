@@ -19,14 +19,14 @@
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_global_cur(PARROT_INTERP,
+PMC * Parrot_ns_find_current_namespace_global(PARROT_INTERP,
     ARGIN_NULLOK(STRING *globalname))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_global_n(PARROT_INTERP,
+PMC * Parrot_ns_find_namespace_global(PARROT_INTERP,
     ARGIN_NULLOK(PMC *ns),
     ARGIN_NULLOK(STRING *globalname))
         __attribute__nonnull__(1);
@@ -144,9 +144,9 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_find_global_cur __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_ns_find_current_namespace_global __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_find_global_n __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_ns_find_namespace_global __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_find_global_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

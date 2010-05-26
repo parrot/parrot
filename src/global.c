@@ -475,7 +475,7 @@ Parrot_ns_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
 /*
 
-=item C<PMC * Parrot_find_global_n(PARROT_INTERP, PMC *ns, STRING *globalname)>
+=item C<PMC * Parrot_ns_find_namespace_global(PARROT_INTERP, PMC *ns, STRING *globalname)>
 
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
@@ -491,9 +491,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
+Parrot_ns_find_namespace_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
 {
-    ASSERT_ARGS(Parrot_find_global_n)
+    ASSERT_ARGS(Parrot_ns_find_namespace_global)
     PMC *res;
 
 #if DEBUG_GLOBAL
@@ -519,7 +519,7 @@ Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *
 
 /*
 
-=item C<PMC * Parrot_find_global_cur(PARROT_INTERP, STRING *globalname)>
+=item C<PMC * Parrot_ns_find_current_namespace_global(PARROT_INTERP, STRING *globalname)>
 
 Finds and returns the data time named C<globalname> in the current namespace.
 
@@ -531,11 +531,11 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
+Parrot_ns_find_current_namespace_global(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 {
-    ASSERT_ARGS(Parrot_find_global_cur)
+    ASSERT_ARGS(Parrot_ns_find_current_namespace_global)
     PMC * const ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    return Parrot_find_global_n(interp, ns, globalname);
+    return Parrot_ns_find_namespace_global(interp, ns, globalname);
 }
 
 /*
@@ -566,7 +566,7 @@ Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
         Parrot_ns_get_namespace_keyed_str(interp,
                                        Parrot_get_ctx_HLL_namespace(interp),
                                        str_key);
-    return Parrot_find_global_n(interp, ns, globalname);
+    return Parrot_ns_find_namespace_global(interp, ns, globalname);
 }
 
 /*
@@ -652,7 +652,7 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
         Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_GLOBAL_NOT_FOUND,
             "Tried to get null global");
 
-    res = Parrot_find_global_n(interp, ns, globalname);
+    res = Parrot_ns_find_namespace_global(interp, ns, globalname);
     if (!res)
         res = PMCNULL;
 
@@ -693,10 +693,10 @@ Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
     /* TT #1223 - walk up the scopes!  duh!! */
 
     if (PMC_IS_NULL(g))
-        g = Parrot_find_global_cur(interp, name);
+        g = Parrot_ns_find_current_namespace_global(interp, name);
 
     if (PMC_IS_NULL(g))
-        g = Parrot_find_global_n(interp, Parrot_get_ctx_HLL_namespace(interp), name);
+        g = Parrot_ns_find_namespace_global(interp, Parrot_get_ctx_HLL_namespace(interp), name);
 
     if (PMC_IS_NULL(g))
         return PMCNULL;
