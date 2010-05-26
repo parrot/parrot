@@ -1,6 +1,6 @@
 #!./parrot
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
+# $Id: io.t 46982 2010-05-25 03:05:26Z plobsing $
 
 =head1 NAME
 
@@ -17,6 +17,8 @@ Tests various io opcodes.
 =cut
 
 .const int TESTS = 5
+
+.loadlib 'io_ops'
 
 .sub 'main' :main
     .include 'test_more.pir'
@@ -162,6 +164,25 @@ Tests various io opcodes.
   open_pipe_for_writing_todoed:
     todo(0, 'Unimplemented in this platform, TT #661')
 
+.end
+
+# TT #1178
+.sub main :main
+    getstdout $P0
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, 'w'
+    $I0 = defined $P1
+    ok($I0, 'get_fd()/fdopen')
+    close $P1
+.end
+
+# TT # 1178
+.sub main :main
+    getstdout $P0
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, 'w'
+    $I0 = defined $P1
+    ok($I0, 'fdopen - no close')
 .end
 
 .namespace ["Testing"]
