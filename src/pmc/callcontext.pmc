@@ -167,7 +167,8 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 }
 
 static void
-ensure_positionals_storage_ap(PARROT_INTERP, ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals)
+ensure_positionals_storage_ap(PARROT_INTERP,
+                              ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals)
 {
     ASSERT_ARGS(ensure_positionals_storage_ap)
     INTVAL num_positionals;
