@@ -263,7 +263,7 @@ internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int 
 
 /*
 
-=item C<PMC * Parrot_get_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC
+=item C<PMC * Parrot_ns_get_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC
 *pmc_key)>
 
 Find the namespace relative to the namespace C<base_ns> with the key
@@ -278,15 +278,15 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key))
+Parrot_ns_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key))
 {
-    ASSERT_ARGS(Parrot_get_namespace_keyed)
+    ASSERT_ARGS(Parrot_ns_get_namespace_keyed)
     return internal_ns_keyed(interp, base_ns, pmc_key, 0);
 }
 
 /*
 
-=item C<PMC * Parrot_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING
+=item C<PMC * Parrot_ns_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING
 *str_key)>
 
 Find the namespace relative to the namespace C<base_ns> with the string key
@@ -300,10 +300,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
+Parrot_ns_get_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
         ARGIN_NULLOK(STRING *str_key))
 {
-    ASSERT_ARGS(Parrot_get_namespace_keyed_str)
+    ASSERT_ARGS(Parrot_ns_get_namespace_keyed_str)
     return internal_ns_keyed_str(interp, base_ns, str_key, 0);
 }
 
@@ -563,7 +563,7 @@ Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 {
     ASSERT_ARGS(Parrot_find_global_s)
     PMC *const ns =
-        Parrot_get_namespace_keyed_str(interp,
+        Parrot_ns_get_namespace_keyed_str(interp,
                                        Parrot_get_ctx_HLL_namespace(interp),
                                        str_key);
     return Parrot_find_global_n(interp, ns, globalname);

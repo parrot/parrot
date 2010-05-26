@@ -868,7 +868,7 @@ mmd_search_global(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *cl))
 {
     ASSERT_ARGS(mmd_search_global)
     STRING * const multi_str = CONST_STRING(interp, "MULTI");
-    PMC    * const ns        = Parrot_get_namespace_keyed_str(interp,
+    PMC    * const ns        = Parrot_ns_get_namespace_keyed_str(interp,
                                     interp->root_namespace, multi_str);
     PMC           *multi_sub = Parrot_get_global(interp, ns, name);
 

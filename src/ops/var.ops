@@ -189,7 +189,7 @@ op get_namespace(out PMC) {
 
 op get_namespace(out PMC, in PMC) {
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+    PMC * const ns     = Parrot_ns_get_namespace_keyed(interp, cur_ns, $2);
 
     $1 = PMC_IS_NULL(ns) ? PMCNULL : ns;
 }
@@ -216,7 +216,7 @@ op get_hll_namespace(out PMC, in PMC) {
     if (PMC_IS_NULL(hll_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, $2);
         $1 = ns;
     }
 }
@@ -242,7 +242,7 @@ op get_root_namespace(out PMC, in PMC) {
     if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, $2);
         $1 = ns;
     }
 }
@@ -281,7 +281,7 @@ op get_global(out PMC, in PMC, in STR) {
         $1 = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
@@ -313,7 +313,7 @@ op get_hll_global(out PMC, in PMC, in STR) {
         $1 = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
@@ -344,7 +344,7 @@ op get_root_global(out PMC, in PMC, in STR) {
     if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else

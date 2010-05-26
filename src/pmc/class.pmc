@@ -1589,7 +1589,7 @@ Used to unarchive the class.
         STRING * const semicolon_str = CONST_STRING(INTERP, ";");
         PMC    * const namespace_array =
             Parrot_str_split(INTERP, semicolon_str, serial_namespace);
-        PMC *ns = Parrot_get_namespace_keyed(INTERP,
+        PMC *ns = Parrot_ns_get_namespace_keyed(INTERP,
                 INTERP->root_namespace, namespace_array);
 
         /* If the namespace doesn't exist, we create it, and initialize
