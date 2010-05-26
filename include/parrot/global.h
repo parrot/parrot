@@ -88,7 +88,7 @@ PMC * Parrot_ns_get_namespace_keyed_str(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
+PMC * Parrot_ns_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -166,7 +166,7 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(base_ns))
-#define ASSERT_ARGS_Parrot_make_namespace_autobase \
+#define ASSERT_ARGS_Parrot_ns_make_namespace_autobase \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_ns_make_namespace_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

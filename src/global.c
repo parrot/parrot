@@ -358,7 +358,7 @@ Parrot_ns_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
 
 /*
 
-=item C<PMC * Parrot_make_namespace_autobase(PARROT_INTERP, PMC *key)>
+=item C<PMC * Parrot_ns_make_namespace_autobase(PARROT_INTERP, PMC *key)>
 
 Find, or create if necessary, a namespace with the key C<key>, which may be a
 String, a Key, or an array of strings. If it is a String, then the lookup is
@@ -373,9 +373,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
+Parrot_ns_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
-    ASSERT_ARGS(Parrot_make_namespace_autobase)
+    ASSERT_ARGS(Parrot_ns_make_namespace_autobase)
     PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
         base_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
