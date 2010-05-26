@@ -156,6 +156,9 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
 
 Lookup a class object from a namespace, string, or key PMC.
 
+TODO: This function is terribly inefficient. It needs to be refactored in a
+major way
+
 =cut
 
 */
@@ -169,51 +172,52 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(Parrot_oo_get_class)
     PMC *classobj = PMCNULL;
 
-    if (!PMC_IS_NULL(key)) {
-        if (PObj_is_class_TEST(key))
-            classobj = key;
-        else {
-            /* Fast select of behavior based on type of the lookup key */
-            switch (key->vtable->base_type) {
-              case enum_class_NameSpace:
-                classobj = VTABLE_get_class(interp, key);
-                break;
-              case enum_class_String:
-              case enum_class_Key:
-              case enum_class_ResizableStringArray:
-                {
-                    PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
-                                            interp->HLL_namespace,
-                                            Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-                    PMC * const ns     = Parrot_get_namespace_keyed(interp,
-                                            hll_ns, key);
+    if (PMC_IS_NULL(key))
+        return PMCNULL;
 
-                    if (!PMC_IS_NULL(ns))
-                        classobj = VTABLE_get_class(interp, ns);
-                }
-              default:
-                break;
+    if (PObj_is_class_TEST(key))
+        classobj = key;
+    else {
+        /* Fast select of behavior based on type of the lookup key */
+        switch (key->vtable->base_type) {
+          case enum_class_NameSpace:
+            classobj = VTABLE_get_class(interp, key);
+            break;
+          case enum_class_String:
+          case enum_class_Key:
+          case enum_class_ResizableStringArray:
+            {
+                PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
+                                        interp->HLL_namespace,
+                                        Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
+                PMC * const ns     = Parrot_get_namespace_keyed(interp,
+                                        hll_ns, key);
+
+                if (!PMC_IS_NULL(ns))
+                    classobj = VTABLE_get_class(interp, ns);
             }
+          default:
+            break;
         }
+    }
 
-        /* If the PMCProxy doesn't exist yet for the given key, we look up the
-           type ID here and create a new one */
-        if (PMC_IS_NULL(classobj)) {
-            INTVAL type;
-            const INTVAL base_type = key->vtable->base_type;
+    /* If the PMCProxy doesn't exist yet for the given key, we look up the
+       type ID here and create a new one */
+    if (PMC_IS_NULL(classobj)) {
+        INTVAL type;
+        const INTVAL base_type = key->vtable->base_type;
 
-            /* This is a hack! All PMCs should be able to be handled through
-               a single codepath, and all of them should be able to avoid
-               stringification because it's so imprecise. */
-            if (base_type == enum_class_Key
-             || base_type == enum_class_ResizableStringArray
-             || base_type == enum_class_String)
-                type = Parrot_pmc_get_type(interp, key);
-            else
-                type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key));
+        /* This is a hack! All PMCs should be able to be handled through
+           a single codepath, and all of them should be able to avoid
+           stringification because it's so imprecise. */
+        if (base_type == enum_class_Key
+         || base_type == enum_class_ResizableStringArray
+         || base_type == enum_class_String)
+            type = Parrot_pmc_get_type(interp, key);
+        else
+            type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key));
 
-            classobj = get_pmc_proxy(interp, type);
-        }
+        classobj = get_pmc_proxy(interp, type);
     }
 
     return classobj;
