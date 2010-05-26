@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.18	2010.05.25	cotto	removed ops.num
 6.17	2010.05.20	NotFound	store encoding of string constants
 6.16	2010.05.18	plobsing	move freeze/thaw adjacent to visit
 6.15	2010.05.06	bacek	add StringBuilder PMC
