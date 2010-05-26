@@ -104,13 +104,16 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL ucs4_decode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i))
+static UINTVAL ucs4_decode_and_advance(PARROT_INTERP,
+    ARGMOD(String_iter *i))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
-static void ucs4_encode_and_advance(SHIM_INTERP,
+static void ucs4_encode_and_advance(PARROT_INTERP,
     ARGMOD(String_iter *i),
     UINTVAL c)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
@@ -120,9 +123,10 @@ static size_t ucs4_hash(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void ucs4_set_position(SHIM_INTERP,
+static void ucs4_set_position(PARROT_INTERP,
     ARGMOD(String_iter *i),
     UINTVAL n)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
@@ -155,14 +159,17 @@ static void ucs4_set_position(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_decode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(i))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs4_encode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(i))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs4_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_ucs4_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(i))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(i))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
