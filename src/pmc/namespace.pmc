@@ -456,7 +456,7 @@ really a public API.
                 key                 = VTABLE_shift_pmc(INTERP, key);
 
                 if (!key) {
-                    Parrot_set_global(INTERP, ns, part, value);
+                    Parrot_ns_set_global(INTERP, ns, part, value);
                     return;
                 }
 
@@ -471,7 +471,7 @@ really a public API.
                 STRING * const part = VTABLE_get_string_keyed_int(INTERP, key, i);
 
                 if ((i + 1) >= elements) { /* Last entry in the array */
-                    Parrot_set_global(INTERP, ns, part, value);
+                    Parrot_ns_set_global(INTERP, ns, part, value);
                     return;
                 }
 

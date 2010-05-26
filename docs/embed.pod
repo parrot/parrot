@@ -761,7 +761,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_encoding>
 
-=item C<Parrot_get_global>
+=item C<Parrot_ns_get_global>
 
 =item C<Parrot_get_HLL_id>
 
@@ -1503,7 +1503,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_set_flag>
 
-=item C<Parrot_set_global>
+=item C<Parrot_ns_set_global>
 
 =item C<Parrot_set_intreg>
 

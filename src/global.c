@@ -409,9 +409,9 @@ Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
 
 /*
 
-=item C<PMC * Parrot_get_global(PARROT_INTERP, PMC *ns, STRING *globalname)>
+=item C<PMC * Parrot_ns_get_global(PARROT_INTERP, PMC *ns, STRING *globalname)>
 
-Parrot_get_global allows a null namespace without throwing an exception; it
+Parrot_ns_get_global allows a null namespace without throwing an exception; it
 simply returns PMCNULL in that case.
 
 NOTE: At present the use of the {get, set}_global functions is mandatory due to the
@@ -431,7 +431,7 @@ KLUDGE ALERT: Currently prefers non-namespaces in case of collision.
 /*
  * {get, set}_global.
  *
- * Parrot_get_global allows a null namespace without throwing an exception; it
+ * Parrot_ns_get_global allows a null namespace without throwing an exception; it
  * simply returns PMCNULL in that case.
  *
  * NOTE: At present the use of the {get, set}_global functions is mandatory due to the
@@ -443,9 +443,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
+Parrot_ns_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
 {
-    ASSERT_ARGS(Parrot_get_global)
+    ASSERT_ARGS(Parrot_ns_get_global)
     if (PMC_IS_NULL(ns))
         return PMCNULL;
 
@@ -454,7 +454,7 @@ Parrot_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *glo
 
 /*
 
-=item C<void Parrot_set_global(PARROT_INTERP, PMC *ns, STRING *globalname, PMC
+=item C<void Parrot_ns_set_global(PARROT_INTERP, PMC *ns, STRING *globalname, PMC
 *val)>
 
 Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
@@ -465,10 +465,10 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 PARROT_EXPORT
 void
-Parrot_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
+Parrot_ns_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
-    ASSERT_ARGS(Parrot_set_global)
+    ASSERT_ARGS(Parrot_ns_set_global)
     VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
 

@@ -61,7 +61,7 @@ PMC * Parrot_find_name_op(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_get_global(PARROT_INTERP,
+PMC * Parrot_ns_get_global(PARROT_INTERP,
     ARGIN_NULLOK(PMC *ns),
     ARGIN_NULLOK(STRING *globalname))
         __attribute__nonnull__(1);
@@ -119,7 +119,7 @@ PMC * Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_set_global(PARROT_INTERP,
+void Parrot_ns_set_global(PARROT_INTERP,
     ARGIN_NULLOK(PMC *ns),
     ARGIN_NULLOK(STRING *globalname),
     ARGIN_NULLOK(PMC *val))
@@ -156,7 +156,7 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #define ASSERT_ARGS_Parrot_find_name_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_Parrot_get_global __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_ns_get_global __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_ns_get_namespace_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -181,7 +181,7 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #define ASSERT_ARGS_Parrot_ns_get_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(_namespace))
-#define ASSERT_ARGS_Parrot_set_global __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_ns_set_global __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_store_global_n __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
