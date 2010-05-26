@@ -354,7 +354,8 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
 
 =item C<PMC * Parrot_oo_get_class_str(PARROT_INTERP, STRING *name)>
 
-Lookup a class object from a builtin string.
+Lookup a class object from the string C<name>. If the metaobject is found,
+return it. Otherwise, create a new PMCProxy for the type ID number.
 
 =cut
 
@@ -392,7 +393,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
 =item C<PMC * Parrot_oo_newclass_from_str(PARROT_INTERP, STRING *name)>
 
-Create a new class object from a string name.
+Create a new Class PMC for a new type of the given C<name>.
 
 =cut
 
@@ -423,7 +424,8 @@ Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 =item C<PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP, PMC
 *classobj, STRING *name)>
 
-Lookup a vtable override in a specific class object.
+Find the vtable override with the specified C<name> in the given C<classobj>
+metaobject.
 
 =cut
 
