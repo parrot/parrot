@@ -245,6 +245,9 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 #define pmc_type                Parrot_pmc_get_type_str
 #define pmc_type_p              Parrot_pmc_get_type
 
+#define PMC_IS_TYPE(p, t) ((p)->vtable->base_type == enum_class_ ## t)
+#define PMC_IS_TYPE_ENUM(p, e) ((p)->vtable->base_type == (e))
+
 #endif /* PARROT_PMC_H_GUARD */
 
 /*
