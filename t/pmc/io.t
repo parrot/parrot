@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 45;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -606,7 +606,20 @@ ok 1
 Hello Parrot!
 OUTPUT
 
-pasm_error_output_like( <<"CODE", <<'OUTPUT', '32bit seek: exception' );
+pir_error_output_like( sprintf(<<'CODE', $temp_file), <<'OUTPUT', '32bit seek: exception' );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    $P0.'seek'(-1, 0)
+    say "error!"
+.end
+CODE
+/seek failed/
+OUTPUT
+
+pasm_error_output_like( <<"CODE", <<'OUTPUT', '32bit seek: exception (ops)' );
+.loadlib 'io_ops'
    open P0, "$temp_file", 'w'
    seek P0, -1, 0
    say "error!"
@@ -615,7 +628,20 @@ CODE
 /seek failed \(32bit\)/
 OUTPUT
 
-pasm_error_output_like( <<"CODE", <<'OUTPUT', '64bit seek: exception' );
+pir_error_output_like( sprintf(<<'CODE', $temp_file), <<'OUTPUT', '64bit seek: exception' );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    $P0.'seek'(-1, -1, 0)
+    say "error!"
+.end
+CODE
+/seek failed/
+OUTPUT
+
+pasm_error_output_like( <<"CODE", <<'OUTPUT', '64bit seek: exception (ops)' );
+.loadlib 'io_ops'
    open P0, "$temp_file", 'w'
    seek P0, -1, -1, 0
    say "error!"
@@ -624,7 +650,33 @@ CODE
 /seek failed \(64bit\)/
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "peek" );
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "peek" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    print $P0, "a line\n"
+    $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'peek'()
+    print $S0
+    $S1 = $P0.'peek'()
+    print $S1
+    print "\n"
+    $S2 = $P0.'read'(2)
+    $S3 = $P0.'peek'()
+    print $S3
+    print "\n"
+.end
+CODE
+aa
+l
+OUTPUT
+
+pasm_output_is( <<"CODE", <<'OUTPUT', "peek (ops)" );
+.loadlib 'io_ops'
     open P0, "$temp_file", 'w'
     print P0, "a line\\n"
     close P0
@@ -644,7 +696,27 @@ aa
 l
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "peek on an empty file" );
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "peek on an empty file" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'peek'()
+    eq $S0, "", OK1
+    print "not "
+OK1:
+    say "ok 1"
+.end
+CODE
+ok 1
+OUTPUT
+
+pasm_output_is( <<"CODE", <<'OUTPUT', "peek on an empty file (ops)" );
+.loadlib 'io_ops'
     open P0, "$temp_file", 'w'
     close P0
     open P0, "$temp_file", 'r'
@@ -662,15 +734,17 @@ pir_output_is( <<"CODE", <<'OUTPUT', "substr after reading from file" );
 .sub _main
     # Write something into a file
     .local pmc out
-    out = open "$temp_file", 'w'
+    out = new ['FileHandle']
+    out.'open'("$temp_file", 'w')
     print out, "0123456789\\n"
-    close out
+    out.'close'()
 
     # read file contents back in
     .local pmc in
-    in = open "$temp_file", 'r'
+    in = new ['FileHandle']
+    in.'open'("$temp_file", 'r')
     .local string from_file
-    from_file = read in, 20
+    from_file = in.'read'(20)
 
     # Extract part of the read in file
     .local string head_from_file
@@ -688,15 +762,17 @@ pir_output_is( <<"CODE", <<'OUTPUT', "multiple substr after reading from file" )
 .sub _main
     # Write something into a file
     .local pmc out
-    out = open "$temp_file", 'w'
+    out = new ['FileHandle']
+    out.'open'("$temp_file", 'w')
     print out, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\n"
-    close out
+    out.'close'()
 
     .local pmc in
     .local string line
-    in = open '$temp_file', 'r'
-    line = read in, 50000
-    close in
+    in = new ['FileHandle']
+    in.'open'('$temp_file', 'r')
+    line = in.'read'(50000)
+    in.'close'()
 
     .local string sub_1
     sub_1 = ''
@@ -722,6 +798,7 @@ sub_2: 345
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'read on null PMC throws exception');
+.loadlib 'io_ops'
 .sub main :main
     null $P1
     $S0 = read $P1, 1
@@ -737,6 +814,7 @@ print $FOO "T\xc3\xb6tsch\n";
 close $FOO;
 
 pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled" );
+.loadlib 'io_ops'
 .sub main :main
     .local pmc pio
     .local int len
@@ -771,10 +849,11 @@ pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled - readline" );
     .local pmc pio
     .local string f
     f = '$temp_file'
-    pio = open f, 'r'
+    pio = new ['FileHandle']
+    pio.'open'(f, 'r')
     pio.'encoding'("utf8")
-    \$S0 = readline pio
-    close pio
+    \$S0 = pio.'readline'()
+    pio.'close'()
     \$I1 = charset \$S0
     \$S2 = charsetname \$I1
     say \$S2
@@ -794,6 +873,7 @@ T\xf6tsch
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
+.loadlib 'io_ops'
 .sub main :main
     .local pmc pio
     .local int len
@@ -801,13 +881,14 @@ pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
     .local string f
     f = '$temp_file'
     len = stat f, .STAT_FILESIZE
-    pio = open f, 'r'
+    pio = new ['FileHandle']
+    pio.'open'(f, 'r')
     pio.'encoding'("utf8")
-    \$S0 = read pio, 2
+    \$S0 = pio.'read'(2)
     len -= 2
-    \$S1 = read pio, len
+    \$S1 = pio.'read'(len)
     \$S0 .= \$S1
-    close pio
+    pio.'close'()
     \$I1 = charset \$S0
     \$S2 = charsetname \$I1
     say \$S2
@@ -834,9 +915,10 @@ line 2
 line 3
 EOS
     .local pmc pio, cl
-    pio = open    "$temp_file", 'w'
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", 'w')
     print pio, \$S0
-    close pio
+    pio.'close'()
     cl = new ['FileHandle']
     \$S1 = cl.'readall'('$temp_file')
     if \$S0 == \$S1 goto ok
@@ -856,10 +938,13 @@ line 2
 line 3
 EOS
     .local pmc pio, pio2
-    pio = open    "$temp_file", 'w'
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", 'w')
     print pio, \$S0
-    close pio
-    pio2 = open    "$temp_file", 'r'
+    pio.'close'()
+
+    pio2 = new ['FileHandle']
+    pio2.'open'("$temp_file", 'r')
     \$S1 = pio2.'readall'()
     if \$S0 == \$S1 goto ok
     print "not "
@@ -871,6 +956,7 @@ ok
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<"OUTPUT", "stat failed" );
+.loadlib 'io_ops'
 .sub main :main
     .local pmc pio
     .local int len
