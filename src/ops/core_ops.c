@@ -27412,7 +27412,7 @@ opcode_t *
 Parrot_set_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, PREG(1));
 
     Parrot_set_global(interp, ns, SREG(2), PREG(3));
 
@@ -27422,7 +27422,7 @@ opcode_t *
 Parrot_set_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
 
     Parrot_set_global(interp, ns, SREG(2), PREG(3));
 
@@ -27432,7 +27432,7 @@ opcode_t *
 Parrot_set_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, PREG(1));
 
     Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
@@ -27442,7 +27442,7 @@ opcode_t *
 Parrot_set_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
 
     Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
@@ -27468,7 +27468,7 @@ opcode_t *
 Parrot_set_hll_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PREG(1));
 
     Parrot_set_global(interp, ns, SREG(2), PREG(3));
 
@@ -27478,7 +27478,7 @@ opcode_t *
 Parrot_set_hll_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
 
     Parrot_set_global(interp, ns, SREG(2), PREG(3));
 
@@ -27488,7 +27488,7 @@ opcode_t *
 Parrot_set_hll_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PREG(1));
 
     Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
@@ -27498,7 +27498,7 @@ opcode_t *
 Parrot_set_hll_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
 
     Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
@@ -27524,7 +27524,7 @@ opcode_t *
 Parrot_set_root_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, PREG(1));
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, PREG(1));
 
     Parrot_set_global(interp, ns, SREG(2), PREG(3));
 
@@ -27534,7 +27534,7 @@ opcode_t *
 Parrot_set_root_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
 
     Parrot_set_global(interp, ns, SREG(2), PREG(3));
 
@@ -27544,7 +27544,7 @@ opcode_t *
 Parrot_set_root_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, PREG(1));
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, PREG(1));
 
     Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
@@ -27554,7 +27554,7 @@ opcode_t *
 Parrot_set_root_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
 
     Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 

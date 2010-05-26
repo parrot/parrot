@@ -951,9 +951,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_make_namespace_autobase>
 
-=item C<Parrot_make_namespace_keyed>
+=item C<Parrot_ns_make_namespace_keyed>
 
-=item C<Parrot_make_namespace_keyed_str>
+=item C<Parrot_ns_make_namespace_keyed_str>
 
 =item C<Parrot_mmd_cache_create>
 

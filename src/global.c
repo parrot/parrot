@@ -309,7 +309,7 @@ Parrot_ns_get_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
 
 /*
 
-=item C<PMC * Parrot_make_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC
+=item C<PMC * Parrot_ns_make_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC
 *pmc_key)>
 
 Find, or create if necessary, the namespace relative to the namespace
@@ -324,16 +324,16 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns),
+Parrot_ns_make_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns),
         ARGIN(PMC *pmc_key))
 {
-    ASSERT_ARGS(Parrot_make_namespace_keyed)
+    ASSERT_ARGS(Parrot_ns_make_namespace_keyed)
     return internal_ns_keyed(interp, base_ns, pmc_key, INTERN_NS_CREAT);
 }
 
 /*
 
-=item C<PMC * Parrot_make_namespace_keyed_str(PARROT_INTERP, PMC *base_ns,
+=item C<PMC * Parrot_ns_make_namespace_keyed_str(PARROT_INTERP, PMC *base_ns,
 STRING *str_key)>
 
 Find, or create if necessary, the namespace relative to the namespace
@@ -348,10 +348,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
+Parrot_ns_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
         ARGIN(STRING *str_key))
 {
-    ASSERT_ARGS(Parrot_make_namespace_keyed_str)
+    ASSERT_ARGS(Parrot_ns_make_namespace_keyed_str)
     return internal_ns_keyed_str(interp, base_ns, str_key, INTERN_NS_CREAT);
 }
 
@@ -382,7 +382,7 @@ Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     else
         base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
             Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-    return Parrot_make_namespace_keyed(interp, base_ns, key);
+    return Parrot_ns_make_namespace_keyed(interp, base_ns, key);
 }
 
 /*
@@ -615,7 +615,7 @@ Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
     ASSERT_ARGS(Parrot_store_global_s)
-    PMC * const ns = Parrot_make_namespace_keyed_str(interp,
+    PMC * const ns = Parrot_ns_make_namespace_keyed_str(interp,
                                          Parrot_get_ctx_HLL_namespace(interp),
                                          str_key);
 
@@ -733,11 +733,11 @@ get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         return nsroot;
     /* If we have a String, do a string lookup */
     else if (nsname->vtable->base_type == enum_class_String)
-        return Parrot_make_namespace_keyed_str(interp, nsroot,
+        return Parrot_ns_make_namespace_keyed_str(interp, nsroot,
                 VTABLE_get_string(interp, nsname));
     /* Otherwise, do a PMC lookup */
     else
-        return Parrot_make_namespace_keyed(interp, nsroot, nsname);
+        return Parrot_ns_make_namespace_keyed(interp, nsroot, nsname);
 }
 
 /*

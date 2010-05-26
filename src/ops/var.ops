@@ -381,7 +381,7 @@ op set_global(in STR, invar PMC) {
 
 op set_global(in PMC, in STR, invar PMC) {
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, $1);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);
 }
@@ -405,7 +405,7 @@ op set_hll_global(in STR, invar PMC) {
 
 op set_hll_global(in PMC, in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, $1);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);
 }
@@ -429,7 +429,7 @@ op set_root_global(in STR, invar PMC) {
 
 op set_root_global(in PMC, in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, $1);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);
 }

@@ -121,7 +121,7 @@ init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
 
         /* Namespace is nested in the current namespace and with the name of
          * the role. */
-        role->_namespace = Parrot_make_namespace_keyed_str(interp,
+        role->_namespace = Parrot_ns_make_namespace_keyed_str(interp,
             Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp)), role->name);
     }
 

@@ -460,7 +460,7 @@ really a public API.
                     return;
                 }
 
-                ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
+                ns = Parrot_ns_make_namespace_keyed_str(INTERP, ns, part);
             }
         }
 
@@ -475,7 +475,7 @@ really a public API.
                     return;
                 }
 
-                ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
+                ns = Parrot_ns_make_namespace_keyed_str(INTERP, ns, part);
             }
         }
 
@@ -731,7 +731,7 @@ already exists, only retrieve it.
     METHOD make_namespace(PMC *key) {
         PMC *ns = Parrot_ns_get_namespace_keyed(INTERP, SELF, key);
         if (PMC_IS_NULL(ns)) {
-            ns = Parrot_make_namespace_keyed(INTERP, SELF, key);
+            ns = Parrot_ns_make_namespace_keyed(INTERP, SELF, key);
         }
         RETURN(PMC *ns);
     }
