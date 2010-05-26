@@ -31,7 +31,7 @@ and associated libraries.
     #  each op.
     probe = new ['Instrument';'Probe';'Catchall']
     probe.'set_callback'('catchall_callback')
-    #probe.'set_finalize'('catchall_finalize')
+    probe.'set_finalize'('catchall_finalize')
     
     # Create a probe that will be called whenever the
     #  specified ops are encountered.

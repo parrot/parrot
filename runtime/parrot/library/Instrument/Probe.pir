@@ -22,7 +22,7 @@ runtime/parrot/library/Instrument/Probe.pir - A class to automate the task of cr
     probe2.'set_finalize'('specific_finalize')
 
 =head2 TODO
-1. Refactor, too much copy and paste for now.
+1. Rewrite in NQP
 
 =cut
 
@@ -279,7 +279,7 @@ SET:
 
 .sub 'enable' :method
     .local pmc instr_attr, ops_u_attr, ops_p_attr, en_attr, cb_attr
-    .local pmc it, key
+    .local pmc it, key, op_lib, op_eh
     .local string msg, type, op_name
     .local int op_num
 
@@ -288,6 +288,8 @@ SET:
     ops_p_attr = getattribute self, 'ops_processed'
     en_attr    = getattribute self, 'enabled'
     cb_attr    = getattribute self, 'callback'
+    
+    op_lib     = new ['OpLib']
     
     # Check to see if we are already enabled.
     if en_attr == 1 goto ENABLE_DONE
@@ -298,6 +300,11 @@ SET:
     type = typeof instr_attr
     
     if type != 'Instrument' goto EXCEP
+    
+    # Create a new exception handler for op lookups
+    op_eh = new ['ExceptionHandler']
+    set_addr op_eh, NON_EXISTENT_OP
+    push_eh op_eh
     
     # Process the unprocessed ops in ops_u_attr.
     
@@ -347,6 +354,9 @@ ENABLE_DONE:
     en_attr = 1
     setattribute self, 'enabled', en_attr
     
+    # Pop the op lookup exception handler
+    pop_eh
+    
     .return()
     
 
@@ -362,9 +372,18 @@ OPS_LOOKUP:
     # Lookup the op number from op_name
     # This will return an array, so for each element
     #  in the array, insert it into ops_p_attr.
-    .local pmc query_ret, op_lu_it, op_lu_cur
+    .local pmc query_ret, op_lu_it, op_lu_cur, op_obj
 
-    query_ret = instr_attr.'op_query'(0, op_name)
+    query_ret = op_lib.'op_family'(op_name)
+    $I0 = defined query_ret
+    if $I0 goto OPS_LOOKUP_ITER
+    
+    # Not short name.
+    op_obj = op_lib[op_name]
+    query_ret = new ['ResizablePMCArray']
+    push query_ret, op_obj
+    
+OPS_LOOKUP_ITER:
     op_lu_it = iter query_ret
 
 OPS_LOOKUP_BEG:
@@ -380,6 +399,13 @@ OPS_LOOKUP_BEG:
 OPS_LOOKUP_END:
 
     goto UNPROC_LOOKUPED
+    
+NON_EXISTENT_OP:
+    print 'Warning: Non-existant op "'
+    print op_name
+    say '".'
+    
+    goto OPS_LOOKUP_END
     
 .end
 
