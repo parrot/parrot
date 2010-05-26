@@ -111,7 +111,6 @@ Clones the coroutine.
 */
 
     VTABLE PMC *clone() {
-        STRING     *name;
         PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         PObj_custom_mark_destroy_SETALL(ret);
