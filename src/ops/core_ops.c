@@ -1333,8 +1333,8 @@ static op_func_t core_op_func_table[1269] = {  Parrot_end,                      
   Parrot_root_new_p_pc_ic,                           /*   1263 */
   Parrot_find_codepoint_i_s,                         /*   1264 */
   Parrot_find_codepoint_i_sc,                        /*   1265 */
-  Parrot_unroll_p,                                   /*   1266 */
-  Parrot_unroll_pc,                                  /*   1267 */
+  Parrot_finalize_p,                                 /*   1266 */
+  Parrot_finalize_pc,                                /*   1267 */
 
   NULL /* NULL function pointer */
 };
@@ -16540,9 +16540,9 @@ static op_info_t core_op_info_table[1269] = {
   },
   { /* 1266 */
     /* type PARROT_FUNCTION_OP, */
-    "unroll",
-    "unroll_p",
-    "Parrot_unroll_p",
+    "finalize",
+    "finalize_p",
+    "Parrot_finalize_p",
     /* "",  body */
     0,
     2,
@@ -16552,9 +16552,9 @@ static op_info_t core_op_info_table[1269] = {
   },
   { /* 1267 */
     /* type PARROT_FUNCTION_OP, */
-    "unroll",
-    "unroll_pc",
-    "Parrot_unroll_pc",
+    "finalize",
+    "finalize_pc",
+    "Parrot_finalize_pc",
     /* "",  body */
     0,
     2,
@@ -29172,7 +29172,7 @@ Parrot_find_codepoint_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
-Parrot_unroll_p(opcode_t *cur_opcode, PARROT_INTERP)  {
+Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     /* Go to the next op after loop unrolling */
     opcode_t * const dest =cur_opcode + 2;
@@ -29211,7 +29211,7 @@ Parrot_unroll_p(opcode_t *cur_opcode, PARROT_INTERP)  {
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
-Parrot_unroll_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
+Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     /* Go to the next op after loop unrolling */
     opcode_t * const dest =cur_opcode + 2;

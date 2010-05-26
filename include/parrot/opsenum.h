@@ -1281,8 +1281,8 @@ enum OPS_ENUM {
     enum_ops_root_new_p_pc_ic              = 1263,
     enum_ops_find_codepoint_i_s            = 1264,
     enum_ops_find_codepoint_i_sc           = 1265,
-    enum_ops_unroll_p                      = 1266,
-    enum_ops_unroll_pc                     = 1267,
+    enum_ops_finalize_p                    = 1266,
+    enum_ops_finalize_pc                   = 1267,
 };
 
 

@@ -1282,8 +1282,8 @@ typedef enum {
     PARROT_OP_root_new_p_pc_ic,                /* 1263 */
     PARROT_OP_find_codepoint_i_s,              /* 1264 */
     PARROT_OP_find_codepoint_i_sc,             /* 1265 */
-    PARROT_OP_unroll_p,                        /* 1266 */
-    PARROT_OP_unroll_pc                        /* 1267 */
+    PARROT_OP_finalize_p,                      /* 1266 */
+    PARROT_OP_finalize_pc                      /* 1267 */
 
 } parrot_opcode_enums;
 
