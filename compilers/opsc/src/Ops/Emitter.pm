@@ -118,46 +118,14 @@ method emit_c_op_enum_header($fh) {
 
 method print_ops_num_files() {
 
-    my $file := ~self<dir> ~ ~self<ops_file>.oplib.num_file;
+    my $file := ~self<dir> ~ "include/parrot/opsenum.h";
     my $fh := pir::open__pss($file, 'w')
-        || die("Can't open $file for writing: " ~ ~pir::err__s());
-    self.emit_ops_num_file($fh);
-    $fh.close();
-
-    $file := ~self<dir> ~ "include/parrot/opsenum.h";
-    $fh := pir::open__pss($file, 'w')
         || die("Can't open $file for writing: " ~ ~pir::err__s());
     self.emit_c_opsenum_header($fh, $file);
     $fh.close();
 }
 
-method emit_ops_num_file($fh) {
-
-    if !self.exists('max_fixed_op_num') {
-        self._prepare_ops_num();
-    }
-
-    $fh.print( join('', |self<ops_num_start>) );
-    my $max_op_num := self<max_fixed_op_num> + 0; #+ 0 to force cloning
-
-    for self.ops_file.ops -> $op {
-        if self<numbered_ops>.exists( $op.full_name ) {
-
-            $max_op_num++;
-
-            my $space := pir::repeat__SsI(' ',
-                35 - pir::length__Is($op.full_name) - pir::length__Is(~$max_op_num));
-            $fh.print($op.full_name ~ $space ~ $max_op_num ~ "\n");
-        }
-    }
-
-}
-
 method emit_c_opsenum_header($fh, $file) {
-
-    if !self.exists('max_fixed_op_num') {
-        self._prepare_ops_num();
-    }
 
     self._emit_guard_prefix($fh, $file);
 
@@ -174,54 +142,18 @@ method emit_opsenum_h_body($fh) {
 
     $fh.print("enum OPS_ENUM \{\n");
 
-    my $max_op_num := self<max_fixed_op_num> + 0;
+    my $max_op_num := 0;
     for self.ops_file.ops -> $op {
-        if self<numbered_ops>.exists( $op.full_name ) {
-            $max_op_num++;
-
+        if !self.ops_file<core> || !self.ops_file.oplib.op_skip_table.exists( $op.full_name ) {
             my $space := pir::repeat__SsI(' ', 30 - pir::length__Is($op.full_name));
             $fh.print("    enum_ops_" ~ $op.full_name ~ $space ~ "=");
             $space := pir::repeat__SsI(' ', 5 - pir::length__Is(~$max_op_num));
             $fh.print($space ~ $max_op_num ~ ",\n");
+            $max_op_num++;
         }
     }
 
     $fh.print("};\n");
-}
-
-method _prepare_ops_num() {
-
-    #grab all ops in ops.num
-    self<numbered_ops>     := hash();
-    my $found_dynamic      := 0;
-    self<max_fixed_op_num> := 0;
-    self<ops_num_start>    := list();
-    self<max_op_num>       := 0;
-
-    #record which ones have fixed numbers and which just need to be somewhere in ops.num
-    for self.ops_file.oplib.num_file_lines -> $line {
-
-        #copy all lines through ###DYNAMIC### into the new ops.num verbatim
-        unless $found_dynamic {
-            self<ops_num_start>.push(~$line);
-        }
-
-        if $line<op> {
-            if $found_dynamic {
-                self<numbered_ops>{ $line<op><name> } := 1;
-                self<quiet> || say("# added '"~$line<op><name> ~" to numered ops");
-            }
-            else {
-                #don't need to keep track of fixed ops
-                self<max_fixed_op_num> := +$line<op><number>;
-                self<quiet> || say("# added '"~$line<op><name> ~" to fixed ops");
-            }
-            self<max_op_num>++;
-        }
-        elsif $line<dynamic> {
-            $found_dynamic := 1;
-        }
-    }
 }
 
 method print_c_source_file() {

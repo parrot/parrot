@@ -97,7 +97,6 @@ my $renum;
 
 if $core {
     my $lib := Ops::OpLib.new(
-        :num_file('src/ops/ops.num'),
         :skip_file('src/ops/ops.skip'),
         :quiet($quiet)
     );
@@ -117,7 +116,7 @@ my $emitter := Ops::Emitter.new(
 );
 
 unless $debug {
-    if $force_regen || $f<renum>.need_regeneration {
+    if $core {
         $emitter.print_ops_num_files();
     }
     $emitter.print_c_header_files();

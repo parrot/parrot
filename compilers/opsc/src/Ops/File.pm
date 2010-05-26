@@ -189,7 +189,6 @@ method new(*@files, :$oplib, :$core!, :$nolines, :$quiet? = 0) {
     self<preamble>:= '';
     self<compiler>:= pir::compreg__Ps('Ops');
     self<op_order>:= 0;
-    self<renum>   := Ops::Renumberer.new( :ops_file(self) );
     self<quiet>   := $quiet;
 
     if $core {
@@ -285,30 +284,10 @@ method version_patch() { self<version_patch> }
 
 method _calculate_op_codes() {
 
-    my $code := self<oplib> ??
-        self<oplib>.max_op_num + 1 !!
-        0;
+    my $code := 0;
 
     for self<ops> -> $op {
-        #ops listed in ops.num are non-experimental
-        if self<oplib> {
-            my $full_name := $op.full_name;
-            if self<oplib>.op_num_table.exists($full_name) {
-                $op<code> := self<oplib>.op_num_table{$full_name};
-            }
-            elsif !$op<experimental> && !self<oplib>.op_skip_table.exists($full_name) {
-                die("Non-experimental op " ~ $op.full_name ~ " is not in ops.num.");
-            }
-            #ops not explicitly listed but not skipped are experimental
-            else {
-                $op<code> := $code++;
-                self<quiet> || say("# Experimental op " ~ $op.full_name ~ " is not in ops.num.");
-            }
-        }
-        #if there's no oplib, we're compiling dynops and ops aren't experimental
-        else {
-            $op<code> := $code++;
-        }
+        $op<code> := $code++;
     }
 }
 
