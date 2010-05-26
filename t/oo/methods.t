@@ -38,7 +38,8 @@ Tests features related to the creation, addition, and execution of OO methods.
     .local string filename
 
     filename = "method_library.pir"
-    file = open filename, 'w'
+    file = new ['FileHandle']
+    file.'open'(filename, 'w')
 
     $S0 = <<'END'
     .namespace['Foo']
@@ -48,7 +49,7 @@ Tests features related to the creation, addition, and execution of OO methods.
 END
 
     print file, $S0
-    close file
+    file.'close'()
 
 .end
 

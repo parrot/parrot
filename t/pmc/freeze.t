@@ -353,6 +353,7 @@ ok same
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
+.loadlib 'io_ops'
     newclass P10, "Foo"
     set S10, P10
     print S10
@@ -371,6 +372,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
+.loadlib 'io_ops'
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE
@@ -414,6 +416,7 @@ Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
+.loadlib 'io_ops'
     newclass P10, "Foo"
     addattribute P10, ".aa"
     set S10, P10
@@ -433,6 +436,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
+.loadlib 'io_ops'
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE
@@ -471,6 +475,7 @@ ok 5
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
+.loadlib 'io_ops'
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
@@ -519,6 +524,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter" );
+.loadlib 'io_ops'
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
@@ -560,6 +566,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" );
+.loadlib 'io_ops'
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE

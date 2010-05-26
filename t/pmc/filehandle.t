@@ -263,7 +263,7 @@ pir_output_is( <<"CODE", <<'OUT', 'readline 10,000 lines' );
     \$I0 = filehandle.'eof'()
     if \$I0 goto end_read_loop
 
-    test_line = readline filehandle
+    test_line = filehandle.'readline'()
     if test_line == "" goto end_read_loop
     test_line = chomp( test_line )
     \$I1 = test_line
@@ -586,7 +586,6 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .sub 'main'
     .local pmc pipe, conf, interp
     .local string cmd
-    pipe = new ['FileHandle']
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
@@ -601,7 +600,8 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     aux = conf['exe']
     cmd .= aux
 
-    pipe = open cmd, "rp"
+    pipe = new ['FileHandle']
+    pipe.'open'(cmd, "rp")
     pipe.'readall'()
     pipe.'close'()
     print "expect 0 exit status: "
@@ -609,7 +609,8 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     say $I0
 
     cmd .= ' --this_is_not_a_valid_option'
-    pipe = open cmd, "rp"
+    pipe = new ['FileHandle']
+    pipe.'open'(cmd, "rp")
     pipe.'readall'()
     pipe.'close'()
     print "expect 1 exit status: "

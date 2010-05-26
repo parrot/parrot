@@ -295,6 +295,7 @@ SKIP: {
     open my $FILE, ">", "____some_test_file";
     close $FILE;
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
+.loadlib 'io_ops'
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']

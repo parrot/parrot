@@ -28,6 +28,8 @@ L<http://swiss.csail.mit.edu/classes/symbolic/spring06/psets/ps6/samefringe.scm>
 
 .const int N_TESTS = 6
 
+.loadlib 'io_ops'
+
 ## Build an N-ary tree (where N is passed as node_width) of the specified depth,
 ## with the leaves being consecutive integer PMCs from start but less than N.
 ## The tree will be complete iff end-start+1 == node_width^depth.

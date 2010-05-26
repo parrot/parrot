@@ -608,24 +608,26 @@ dlfunced
 ok 1
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
-  loadlib P1, "libnci_test"
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
+.loadlib 'io_ops'
+.sub 'main' :main
+  loadlib $P1, "libnci_test"
   printerr "loaded\n"
-  dlfunc P0, P1, "nci_it", "it"
+  dlfunc $P0, $P1, "nci_it", "it"
   printerr "dlfunced\n"
-  set S5, "ko\n"
-  set_args "0", S5
-  invokecc P0
-  get_results "0", I5
-  ne I5, 2, nok_1
+  set $S5, "ko\n"
+  set_args "0", $S5
+  invokecc $P0
+  get_results "0", $I5
+  ne $I5, 2, nok_1
   printerr "ok 2\n"
   end
 nok_1: printerr "nok 1\n"
-  printerr I5
+  printerr $I5
   printerr "\n"
   end
 nok_2: printerr "nok 2\n"
-  end
+.end
 CODE
 loaded
 dlfunced
@@ -636,6 +638,7 @@ OUTPUT
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
 
 .include "datatypes.pasm"
+.loadlib 'io_ops'
 
 .sub test :main
   loadlib $P1, "libnci_test"

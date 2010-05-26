@@ -43,6 +43,7 @@ ending
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works with printing' );
+.loadlib 'io_ops'
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
@@ -70,6 +71,7 @@ OUTPUT
 # the test fail.
 pasm_output_like(
     <<'CODE', <<'OUTPUT', "restart trace" );
+    .loadlib 'io_ops'
     printerr "ok 1\n"
     sweepoff
     set I0, 1
@@ -89,6 +91,7 @@ OUTPUT
 pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
     new P0, 'Undef'
     set I0, P0
+    .loadlib 'io_ops'
     printerr "nada:"
     warningson 1
     new P1, 'Undef'
