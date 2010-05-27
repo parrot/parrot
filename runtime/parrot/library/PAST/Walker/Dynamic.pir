@@ -11,6 +11,58 @@
     addattribute $P0, 'var'
 .end
 
+.namespace ['PAST'; 'Walker'; 'Dynamic']
+
+.sub 'block' :method
+    .param pmc value :optional
+    .param int has_value :opt_flag
+    if has_value goto setter
+    $P0 = getattribute self, 'block'
+    .return ($P0)
+setter:
+    setattribute self, 'block', value
+.end
+
+.sub 'op' :method
+    .param pmc value :optional
+    .param int has_value :opt_flag
+    if has_value goto setter
+    $P0 = getattribute self, 'op'
+    .return ($P0)
+setter:
+    setattribute self, 'op', value
+.end
+
+.sub 'stmts' :method
+    .param pmc value :optional
+    .param int has_value :opt_flag
+    if has_value goto setter
+    $P0 = getattribute self, 'stmts'
+    .return ($P0)
+setter:
+    setattribute self, 'stmts', value
+.end
+
+.sub 'val' :method
+    .param pmc value :optional
+    .param int has_value :opt_flag
+    if has_value goto setter
+    $P0 = getattribute self, 'val'
+    .return ($P0)
+setter:
+    setattribute self, 'val', value
+.end
+
+.sub 'var' :method
+    .param pmc value :optional
+    .param int has_value :opt_flag
+    if has_value goto setter
+    $P0 = getattribute self, 'var'
+    .return ($P0)
+setter:
+    setattribute self, 'var', value
+.end
+    
 .namespace ['PAST'; 'Walker']
 
 .sub 'walk' :multi(['PAST'; 'Walker'; 'Dynamic'], ['PAST'; 'Block'])
