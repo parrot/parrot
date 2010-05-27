@@ -50,7 +50,7 @@ sub zeroCounts () {
 }
 
 sub test_count_node_types() {
-    my $walker := Q:PIR { %r = new ['PAST'; 'Walker'; 'Dynamic']};
+    my $walker := PAST::Walker::Dynamic.new();
     
     $walker.block(walkBlock);
     $walker.op(walkOp);

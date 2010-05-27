@@ -4,10 +4,14 @@
 .sub 'onload' :anon :init :load
     load_bytecode 'PAST/Transformer.pbc'
     load_bytecode 'PAST/Walker/Dynamic.pbc'
-    $P1 = get_class ['PAST'; 'Walker'; 'Dynamic']
-    $P2 = get_class ['PAST'; 'Transformer']
-    $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Dynamic']
-    addparent $P0, $P2
+    load_bytecode 'P6object.pbc'
+    .local pmc p6meta, walkdyn, trans
+    p6meta = new 'P6metaclass'
+    walkdyn = get_class ['PAST'; 'Walker'; 'Dynamic']
+    trans = get_class ['PAST'; 'Transformer']
+    $S0 = 'PAST::Transformer::Dynamic'
+    $P0 = p6meta.'new_class'($S0, 'parent'=> walkdyn)
+    p6meta.'addparrent'($P0, trans)
 .end
 
 .namespace ['PAST'; 'Walker']

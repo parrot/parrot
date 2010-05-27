@@ -12,7 +12,10 @@ A tool for traversing and modifying Parrot Abstract Syntax Trees.
 =cut
 
 .sub 'onload' :anon :init :load
-    $P0 = newclass ['PAST'; 'Walker']
+    load_bytecode 'P6object.pbc'
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PAST::Walker')
 .end
 
 .namespace ['PAST'; 'Walker']

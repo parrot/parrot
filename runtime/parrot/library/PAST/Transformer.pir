@@ -3,7 +3,11 @@
 
 .sub 'onload' :anon :init :load
     load_bytecode 'PAST/Walker.pbc'
-    $P0 = subclass ['PAST';'Walker'], ['PAST'; 'Transformer']
+    load_bytecode 'P6object.pbc'
+    .local pmc p6meta, base
+    p6meta = new 'P6metaclass'
+    base = get_class ['PAST'; 'Walker']
+    p6meta.'new_class'('PAST::Transformer', 'parent'=> base)
 .end
 
 .namespace ['PAST'; 'Walker']

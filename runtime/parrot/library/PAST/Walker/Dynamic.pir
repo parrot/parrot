@@ -3,12 +3,14 @@
 
 .sub 'onload' :anon :init :load
     load_bytecode 'PAST/Walker.pbc'
-    $P0 = subclass ['PAST'; 'Walker'], ['PAST'; 'Walker'; 'Dynamic']
-    addattribute $P0, 'block'
-    addattribute $P0, 'op'
-    addattribute $P0, 'stmts'
-    addattribute $P0, 'val'
-    addattribute $P0, 'var'
+    load_bytecode 'P6object.pbc'
+    .local pmc p6meta, base
+    .local string name, attrs
+    p6meta = new 'P6metaclass'
+    base = get_class ['PAST'; 'Walker']
+    name = 'PAST::Walker::Dynamic'
+    attrs = 'block op stmts val var'
+    p6meta.'new_class'(name, 'parent'=>base, 'attr'=>attrs)
 .end
 
 .namespace ['PAST'; 'Walker'; 'Dynamic']
