@@ -11,7 +11,7 @@
 
 .sub '_filename'
     .local string filename
-    filename = 't/native_pbc/number_1.pbc'
+    filename = 't/native_pbc/number.pbc'
     .return (filename)
 .end
 
