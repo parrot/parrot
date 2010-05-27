@@ -106,8 +106,6 @@ static void store_sub_in_multi(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#define DEBUG_GLOBAL 0
-
 /* flags for internal_ns_keyed */
 #define INTERN_NS_CREAT 1       /* I'm a fan of the classics */
 
@@ -496,11 +494,6 @@ Parrot_ns_find_namespace_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULL
     ASSERT_ARGS(Parrot_ns_find_namespace_global)
     PMC *res;
 
-#if DEBUG_GLOBAL
-    if (globalname)
-        Parrot_io_printf(interp, "find_global name '%Ss'\n", globalname);
-#endif
-
     if (PMC_IS_NULL(ns))
         res = PMCNULL;
     else {
@@ -586,10 +579,6 @@ Parrot_ns_store_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
     ASSERT_ARGS(Parrot_ns_store_global)
-#if DEBUG_GLOBAL
-    if (globalname)
-        Parrot_io_printf(interp, "store_global name '%Ss'\n", globalname);
-#endif
 
     if (PMC_IS_NULL(ns))
         return;
