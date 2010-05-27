@@ -648,6 +648,8 @@ $(LIBRARY_DIR)/Archive/Tar.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
+$(LIBRARY_DIR)/Config/JSON.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
 # constant string support
 .c.str : # suffix rule (limited support)
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< > $@

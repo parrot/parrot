@@ -20,8 +20,9 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .namespace ['HTTP';'Date']
 
-.include 'tm.pasm'
+.loadlib 'io_ops'  # XXX avoids segfaults for some reason
 .loadlib 'sys_ops'
+.include 'tm.pasm'
 
 .sub 'time2str'
     .param int time

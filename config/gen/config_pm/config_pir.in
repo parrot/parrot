@@ -40,8 +40,6 @@ undefined values) is undefined, and may be rather funky.
 =cut
 
 .include "interpinfo.pasm"
-.include "stat.pasm"
-.loadlib 'sys_ops'
 .loadlib 'os'
 
 .sub _config
@@ -49,10 +47,14 @@ undefined values) is undefined, and may be rather funky.
     prefix = interpinfo .INTERPINFO_RUNTIME_PREFIX
 
     $S0 = concat prefix, "/runtime"
+
     $P0 = new ['OS']
-    $P1 = $P0.'stat'($S0)
-    $I0 = $P1[.STAT_EXISTS]
-    if $I0 goto L1
+    push_eh file_not_found
+        # OS.stat throws on file not found
+        $P0.'stat'($S0)
+        goto L1
+    pop_eh
+  file_not_found:
     conf_file = "@libdir@@versiondir@/include/config.fpmc"
     goto L2
   L1:

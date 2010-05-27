@@ -86,7 +86,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .namespace ['LWP';'Protocol';'file']
 
 .include 'stat.pasm'
-.loadlib 'io_ops'
 
 .sub '' :init :load :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'file']
@@ -158,8 +157,13 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local string path
     path = url.'path'()
 
-    $I0 = stat path, .STAT_EXISTS
-    if $I0 goto L1
+    $P0 = new ['OS']
+    push_eh FILE_NOT_FOUND
+        $P1 = $P0.'stat'(path) # OS.stat throws on file not found
+    pop_eh
+    goto L1
+
+  FILE_NOT_FOUND:
     $P0 = box RC_NOT_FOUND
     setattribute response, 'code', $P0
     $S0 = "File `" . path
@@ -170,12 +174,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
   L1:
 
     .local int mtime
-    mtime = stat path, .STAT_MODIFYTIME
+    mtime = $P1[.STAT_MODIFYTIME]
     $P0 = get_hll_global ['HTTP';'Date'], 'time2str'
     $S0 = $P0(mtime)
     response.'push_header'('Last-Modified', $S0)
     .local int filesize
-    filesize = stat path, .STAT_FILESIZE
+    filesize = $P1[.STAT_FILESIZE]
     response.'push_header'('Content-Length', filesize)
 
     if method == 'HEAD' goto L2
@@ -239,8 +243,13 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local string path
     path = url.'path'()
 
-    $I0 = stat path, .STAT_EXISTS
-    if $I0 goto L1
+    $P0 = new ['OS']
+    push_eh FILE_NOT_FOUND
+        $P0.'stat'(path) # OS.stat throws on file not found
+    pop_eh
+    goto L1
+
+  FILE_NOT_FOUND:
     $P0 = box RC_NOT_FOUND
     setattribute response, 'code', $P0
     $S0 = "File `" . path
