@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/global.c
+src/namespace.c
 
 =head1 DESCRIPTION
 
-Access to global PMCs
+Common routines for storing and finding elements in namespaces
 
 =head1 FUNCTIONS
 
@@ -19,11 +19,11 @@ Access to global PMCs
 */
 
 #include "parrot/parrot.h"
-#include "global.str"
+#include "namespace.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
-/* HEADERIZER HFILE: include/parrot/global.h */
+/* HEADERIZER HFILE: include/parrot/namespace.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -839,7 +839,7 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 =head1 SEE ALSO
 
-F<include/parrot/global.h>
+F<include/parrot/namespace.h>
 
 =cut
 

@@ -1,5 +1,5 @@
-/* global.h
- *  Copyright (C) 2004, Parrot Foundation.
+/* namespace.h
+ *  Copyright (C) 2004-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -13,7 +13,7 @@
 #ifndef PARROT_GLOBAL_H_GUARD
 #define PARROT_GLOBAL_H_GUARD
 
-/* HEADERIZER BEGIN: src/global.c */
+/* HEADERIZER BEGIN: src/namespace.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -191,7 +191,7 @@ void Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/global.c */
+/* HEADERIZER END: src/namespace.c */
 
 #endif /* PARROT_GLOBAL_H_GUARD */
 

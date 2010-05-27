@@ -960,7 +960,6 @@ include/parrot/exceptions.h                                 [main]include
 include/parrot/exit.h                                       [main]include
 include/parrot/extend.h                                     [main]include
 include/parrot/gc_api.h                                     [main]include
-include/parrot/global.h                                     [main]include
 include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
 include/parrot/hll.h                                        [main]include
@@ -976,6 +975,7 @@ include/parrot/longopt.h                                    [main]include
 include/parrot/memory.h                                     [main]include
 include/parrot/misc.h                                       [main]include
 include/parrot/multidispatch.h                              [main]include
+include/parrot/namespace.h                                  [main]include
 include/parrot/nci.h                                        [main]include
 include/parrot/oo.h                                         [main]include
 include/parrot/oo_private.h                                 [main]include
@@ -1287,7 +1287,6 @@ src/gc/malloc.c                                             []
 src/gc/malloc_trace.c                                       []
 src/gc/mark_sweep.c                                         []
 src/gc/system.c                                             []
-src/global.c                                                []
 src/global_setup.c                                          []
 src/hash.c                                                  []
 src/hll.c                                                   []
@@ -1313,6 +1312,7 @@ src/longopt.c                                               []
 src/main.c                                                  []
 src/misc.c                                                  []
 src/multidispatch.c                                         []
+src/namespace.c                                             []
 src/nci/api.c                                               []
 src/nci/core_thunks.c                                       []
 src/nci/core_thunks.nci                                     []
