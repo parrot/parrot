@@ -410,22 +410,26 @@ PIR). There is a C<read> opcode to read from standard input.  Just
 pass it a string register or variable where you wish the characters
 read to be placed and the number of characters you wish to read:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   read $S1, 100
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 This line will read 100 characters (or until the end of the line) and
 put the read string into C<$S1>. In case you need a number, just
 assign the string to the correct register type:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
   read $S1, 100
+  ...
   $I1 = $S1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 With the PIR syntax shown in this article you should be able to start
 writing simple programs. Next article we will look into available
