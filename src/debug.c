@@ -3071,6 +3071,7 @@ Print interp registers.
 
 */
 
+PARROT_EXPORT
 void
 PDB_print(PARROT_INTERP, ARGIN(const char *command))
 {
@@ -3183,6 +3184,7 @@ Prints a backtrace of the interp's call chain.
 
 */
 
+PARROT_EXPORT
 void
 PDB_backtrace(PARROT_INTERP)
 {
