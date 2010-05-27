@@ -33,8 +33,6 @@ include/parrot/exec_dep.h                        [main]include
 include/parrot/extend_vtable.h                   [main]include
 include/parrot/feature.h                         [main]include
 include/parrot/has_header.h                      [main]include
-include/parrot/oplib/core_ops.h                  [main]include
-include/parrot/oplib/ops.h                       [main]include
 include/parrot/pbcversion.h                      [devel]include
 include/parrot/platform.h                        [main]include
 include/parrot/platform_limits.h                 [devel]include
