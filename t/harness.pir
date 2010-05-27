@@ -305,7 +305,7 @@ TEST
     $P0.'open'('svn status', 'pr')
     $P1 = new 'ResizableStringArray'
   L3:
-    $S0 = readline $P0
+    $S0 = $P0.'readline'()
     if $S0 == '' goto L4
     $I0 = index $S0, 'M'
     unless $I0 == 0 goto L3
