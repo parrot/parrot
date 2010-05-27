@@ -111,7 +111,7 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
 
         Parrot_run_native(interp, the_test);
         printf("done\n");
-    fflush(stdout);
+        fflush(stdout);
         return 0;
     }
 
