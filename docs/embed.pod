@@ -1537,7 +1537,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_store_global_s>
 
-=item C<Parrot_store_sub_in_namespace>
+=item C<Parrot_ns_store_sub>
 
 =item C<Parrot_str_boolean>
 

@@ -777,7 +777,7 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 
 /*
 
-=item C<void Parrot_store_sub_in_namespace(PARROT_INTERP, PMC *sub_pmc)>
+=item C<void Parrot_ns_store_sub(PARROT_INTERP, PMC *sub_pmc)>
 
 Adds the PMC C<sub> into the current namespace. Adds the sub to a multi of the
 same name if it's defined as a multi.
@@ -788,9 +788,9 @@ same name if it's defined as a multi.
 
 PARROT_EXPORT
 void
-Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
+Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
-    ASSERT_ARGS(Parrot_store_sub_in_namespace)
+    ASSERT_ARGS(Parrot_ns_store_sub)
     const INTVAL cur_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
 
     PMC        *ns;
