@@ -313,7 +313,7 @@ functions will be kept in the ticket at:
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
-=item C<Parrot_find_global_s>
+=item C<Parrot_find_global_s> and C<Parrot_store_global_s>
 
 This function is not used or tested anywhere.
 
