@@ -1,6 +1,6 @@
 #!./parrot
 # Copyright (C) 2008, Parrot Foundation.
-# $Id: io.t 46982 2010-05-25 03:05:26Z plobsing $
+# $Id$
 
 =head1 NAME
 

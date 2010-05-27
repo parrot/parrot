@@ -194,10 +194,6 @@ op tell(out INT, out INT, invar PMC) :base_io {
     }
 }
 
-=back
-
-=cut
-
 ##########################################
 
 =item B<peek>(out STR)

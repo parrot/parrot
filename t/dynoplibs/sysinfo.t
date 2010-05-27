@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id: sysinfo.t 44427 2010-02-24 00:30:09Z mikehh $
+# $Id$
 
 # initial work by Brad Gilbert b2gills <at> gmail <dot> com
 
