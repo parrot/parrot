@@ -27148,7 +27148,7 @@ opcode_t *
 Parrot_get_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PREG(1) = Parrot_find_global_op(interp, cur_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -27156,7 +27156,7 @@ opcode_t *
 Parrot_get_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PREG(1) = Parrot_find_global_op(interp, cur_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -27172,7 +27172,7 @@ Parrot_get_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27189,7 +27189,7 @@ Parrot_get_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27206,7 +27206,7 @@ Parrot_get_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27223,7 +27223,7 @@ Parrot_get_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27232,7 +27232,7 @@ opcode_t *
 Parrot_get_hll_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PREG(1) = Parrot_find_global_op(interp, hll_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -27240,7 +27240,7 @@ opcode_t *
 Parrot_get_hll_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PREG(1) = Parrot_find_global_op(interp, hll_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -27256,7 +27256,7 @@ Parrot_get_hll_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27273,7 +27273,7 @@ Parrot_get_hll_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27290,7 +27290,7 @@ Parrot_get_hll_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27307,7 +27307,7 @@ Parrot_get_hll_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27316,7 +27316,7 @@ opcode_t *
 Parrot_get_root_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PREG(1) = Parrot_find_global_op(interp, root_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -27324,7 +27324,7 @@ opcode_t *
 Parrot_get_root_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PREG(1) = Parrot_find_global_op(interp, root_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -27339,7 +27339,7 @@ Parrot_get_root_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27355,7 +27355,7 @@ Parrot_get_root_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27371,7 +27371,7 @@ Parrot_get_root_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -27387,7 +27387,7 @@ Parrot_get_root_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}

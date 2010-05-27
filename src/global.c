@@ -628,7 +628,7 @@ Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 
 /*
 
-=item C<PMC * Parrot_find_global_op(PARROT_INTERP, PMC *ns, STRING *globalname,
+=item C<PMC * Parrot_ns_find_global_from_op(PARROT_INTERP, PMC *ns, STRING *globalname,
 void *next)>
 
 If the global exists in the given namespace PMC, return it.  If not, return
@@ -642,10 +642,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
+Parrot_ns_find_global_from_op(PARROT_INTERP, ARGIN(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(void *next))
 {
-    ASSERT_ARGS(Parrot_find_global_op)
+    ASSERT_ARGS(Parrot_ns_find_global_from_op)
     PMC *res;
 
     if (STRING_IS_NULL(globalname))

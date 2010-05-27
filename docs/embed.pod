@@ -715,7 +715,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_find_namespace_global>
 
-=item C<Parrot_find_global_op>
+=item C<Parrot_ns_find_global_from_op>
 
 =item C<Parrot_find_global_s>
 
