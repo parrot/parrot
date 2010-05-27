@@ -29,14 +29,8 @@ Tests the transcendental mathematical operations.
 # which will conditionally branch
 # to LABEL if abs(n,n) < epsilon
 
-my $runcore = $ENV{TEST_PROG_ARGS} || '';
-my @bsdtodo = (
-    $runcore =~ /--runcore=jit/ &&  $^O =~ m/bsd/i
-        ? ( todo => 'broken under JIT TT #501' )
-        : ()
-);
-
-pasm_output_is( <<"CODE", <<OUTPUT, "sinh", @bsdtodo );
+pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 1.0
         sinh N2, N1
@@ -56,7 +50,8 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "tanh", @bsdtodo );
+pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 1.0
         tanh N2, N1
@@ -77,6 +72,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sech" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 1.0
         sech N2, N1
@@ -96,12 +92,8 @@ ok 1
 ok 2
 OUTPUT
 
-my @jittodo = (
-    $runcore =~ /--runcore=jit/
-        ? ( todo => 'broken under JIT TT #530' )
-        : ()
-);
-pasm_output_is( <<"CODE", <<OUTPUT, 'atan2', @jittodo );
+pasm_output_is( <<"CODE", <<OUTPUT, 'atan2' );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N0, 0.0
         set I0, 0
@@ -212,6 +204,7 @@ ok 16
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         atan N4, -0.0, -0.0
         .fp_eq_pasm   (N4, -3.1415926, EQ1)
@@ -223,6 +216,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 10.0
         log2 N2, N1
@@ -243,6 +237,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "log10" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 15.0
         log10 N2, N1
@@ -263,6 +258,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "ln" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 10.0
         ln N2, N1
@@ -282,6 +278,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "exp" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 10.0
         exp N2, N1
@@ -300,7 +297,8 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "pow", @bsdtodo );
+pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
+        .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 3.0
         set I1, 3
@@ -432,6 +430,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_ic" );
+    .loadlib 'trans_ops'
     set N0, 2.0
     pow N1, N0, 0
     print N1
@@ -487,6 +486,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
+    .loadlib 'trans_ops'
     set N0, 2.0
     set I0, 0
     pow N1, N0, I0

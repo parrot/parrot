@@ -94,6 +94,7 @@ Parrot_usleep(unsigned int microseconds)
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_gmtime_r(const time_t *t, struct tm *tm)
 {
@@ -108,6 +109,7 @@ Parrot_gmtime_r(const time_t *t, struct tm *tm)
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_localtime_r(const time_t *t, struct tm *tm)
 {
@@ -122,6 +124,7 @@ Parrot_localtime_r(const time_t *t, struct tm *tm)
 
 */
 
+PARROT_EXPORT
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {

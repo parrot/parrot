@@ -38,6 +38,7 @@ Pure PIR, without any dependencies.
 
 =cut
 
+.loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 
 .sub 'genfile'
@@ -356,13 +357,15 @@ Pure PIR, without any dependencies.
     .param string str
     .param int pos
     .param string msg
-    printerr "in '"
-    printerr str
-    printerr "' at "
-    printerr pos
-    printerr " : "
-    printerr msg
-    printerr "\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("in '")
+    $P1.'print'(str)
+    $P1.'print'("' at ")
+    $P1.'print'(pos)
+    $P1.'print'(" : ")
+    $P1.'print'(msg)
+    $P1.'print'("\n")
 .end
 
 .sub 'interpolate_var'
@@ -401,9 +404,11 @@ Pure PIR, without any dependencies.
     $I1 = $I3
     goto L8
   L7:
-    printerr "\tunknown config: "
-    printerr $S1
-    printerr "\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("\tunknown config: ")
+    $P1.'print'($S1)
+    $P1.'print'("\n")
   L6:
     $I0 = $I3 + 1
     goto L3

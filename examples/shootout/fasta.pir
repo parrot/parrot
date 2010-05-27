@@ -160,10 +160,11 @@ endfor:
 
 .sub main :main
 	.param pmc argv
-	.local pmc stdout
+	.local pmc interp, stdout
 	.local int n
 	# stdout is linebuffered per default - make it block buffered
-	stdout = getstdout
+        interp = getinterp
+	stdout = interp.'stdhandle'(1)
 	stdout.'buffer_size'(40960)
 	$I0 = argv
 	if $I0 > 1 goto argsok

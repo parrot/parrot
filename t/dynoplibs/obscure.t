@@ -17,6 +17,8 @@ Tests obscure.ops
 =cut
 
 .loadlib 'obscure_ops'
+.loadlib 'trans_ops'    # needed for atan
+
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'

@@ -55,7 +55,6 @@ if $opts<core> {
         src/ops/core.ops
         src/ops/bit.ops
         src/ops/cmp.ops
-        src/ops/debug.ops
         src/ops/io.ops
         src/ops/math.ops
         src/ops/object.ops

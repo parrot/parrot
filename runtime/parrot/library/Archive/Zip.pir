@@ -13,6 +13,8 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 
 =cut
 
+.loadlib 'sys_ops'
+.loadlib 'io_ops'
 .include 'stat.pasm'
 .include 'tm.pasm'
 
@@ -43,8 +45,10 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .sub '_printError'
     .param pmc args :slurpy
     $S0 = join '', args
-    printerr $S0
-    printerr "\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'($S0)
+    $P1.'print'("\n")
 .end
 
 .sub '_ioError' :method
@@ -388,11 +392,11 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .sub '_refreshLocalFileHeader' :method
     .param pmc fh
     .local int here
-    here = tell fh
+    here = fh.'tell'()
     $P0 = getattribute self, 'writeLocalHeaderRelativeOffset'
     $I0 = $P0
     $I0 += SIGNATURE_LENGTH
-    seek fh, $I0, 0
+    fh.'seek'($I0, 0)
     .local string header, fileName, localExtraField
     .const string VERSION = 20
     header = self.'pack_v'(VERSION)
@@ -428,7 +432,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     if $I0 goto L2
     .tailcall self.'_ioError'('re-writing local header')
   L2:
-    seek fh, here, 0
+    fh.'seek'(here, 0)
     .return (AZ_OK)
 .end
 
@@ -597,7 +601,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ('', AZ_OK)
   L1:
     $P0 = self.'fh'()
-    $S0 = read $P0, chunkSize
+    $S0 = $P0.'read'(chunkSize)
     unless $S0 == '' goto L2
     $I0 = self.'_ioError'("reading data")
     .return ($S0, $I0)
@@ -647,7 +651,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ($I0)
   L1:
     $P0 = self.'fh'()
-    seek $P0, 0, 0
+    $P0.'seek'(0, 0)
     .return (AZ_OK)
 .end
 

@@ -7,6 +7,8 @@
 # By Joshua Isom
 # changed default value to N=25000 (shootout test default) Karl Forner
 
+.loadlib 'trans_ops'
+
 .sub main :main
 	.param pmc argv
 	.local int k, n

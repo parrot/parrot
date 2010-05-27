@@ -329,11 +329,13 @@ when the stage corresponding to target has been reached.
     result = self.stagename(result, adverbs :flat :named)
     $N1 = time
     $N2 = $N1 - $N0
-    printerr "Stage '"
-    printerr stagename
-    printerr "': "
-    printerr $N2
-    printerr " sec\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'("Stage '")
+    $P1.'print'(stagename)
+    $P1.'print'("': ")
+    $P1.'print'($N2)
+    $P1.'print'(" sec\n")
     if target == stagename goto have_result
     goto stagestats_loop
 
@@ -611,11 +613,14 @@ specifies the encoding to use for the input (e.g., "utf8").
 
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
-    printerr $P0
+    $P1 = getinterp
+    $P2 = $P1.'stdhandle'(2)
+    $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
-    stdin = getstdin
+    $P0 = getinterp
+    stdin = $P0.'stdhandle'(0)
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -746,7 +751,7 @@ options are passed to the evaluator.
   iter_loop_1:
     $S0 = ifh.'readall'(iname)
     code .= $S0
-    close ifh
+    ifh.'close'()
     goto iter_loop
   iter_end:
     $S0 = join ' ', files
@@ -876,15 +881,17 @@ Generic method for compilers invoked from a shell command line.
     if target != 'pir' goto end
     .local string output
     .local pmc ofh
-    ofh = getstdout
+    $P0 = getinterp
+    ofh = $P0.'stdhandle'(1)
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
-    ofh = open output, 'w'
+    ofh = new ['FileHandle']
+    ofh.'open'(output, 'w')
     unless ofh goto err_output
   save_output_1:
     print ofh, result
-    close ofh
+    ofh.'close'()
   end:
     .return ()
 

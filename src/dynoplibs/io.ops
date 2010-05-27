@@ -1,0 +1,371 @@
+/*
+ * $Id$
+ * Copyright (C) 2010, Parrot Foundation.
+** io.ops
+*/
+
+=head1 NAME
+
+io.ops - Extended I/O Dynops
+
+=head1 DESCRIPTION
+
+A richer I/O API than that available in core Parrot.
+
+=over 4
+
+=cut
+
+BEGIN_OPS_PREAMBLE
+#include "../io/io_private.h"
+END_OPS_PREAMBLE
+
+##########################################
+
+=item B<stat>(out INT, in STR, in INT)
+
+=item B<stat>(out INT, in INT, in INT)
+
+Stat the file. Return stat element $3 for file $2 into $1. The queryable
+items currently are:
+
+ EXISTS     0
+ FILESIZE   1
+ ISDIR      2
+ ISDEV      3
+ CREATETIME 4 (Time file was created)
+ ACCESSTIME 5 (Time file was last accessed)
+ MODIFYTIME 6 (Time file data was changed)
+ CHANGETIME 7 (Time file metadata was changed)
+ BACKUPTIME 8 (Time of last backup)
+ UID        9
+ GID        10
+
+
+=cut
+
+op stat(out INT, in STR, in INT) {
+    $1 = Parrot_stat_info_intval(interp, $2, $3);
+}
+
+op stat(out INT, in INT, in INT) {
+    $1 = Parrot_fstat_info_intval(interp, $2, $3);
+}
+
+##########################################
+
+=item B<read>(out STR, in INT)
+
+Read up to N bytes from standard input stream
+
+=item B<read>(out STR, invar PMC, in INT)
+
+Read up to N bytes from IO PMC stream.
+
+=cut
+
+op read(out STR, in INT) :base_io {
+    $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
+}
+
+op read(out STR, invar PMC, in INT) :base_io {
+    $1 = Parrot_io_reads(interp, $2, (size_t)$3);
+}
+
+=item B<readline>(out STR, invar PMC)
+
+Read a line up to EOL from filehandle $2.
+This switches the filehandle to linebuffer-mode.
+
+=cut
+
+inline op readline(out STR, invar PMC) :base_io {
+    $1 = Parrot_io_readline(interp, $2);
+}
+
+##########################################
+
+=item B<printerr>(in INT)
+
+=item B<printerr>(in NUM)
+
+=item B<printerr>(in STR)
+
+=item B<printerr>(invar PMC)
+
+Print $1 to standard error.
+
+=cut
+
+op printerr(in INT) :base_io {
+    Parrot_io_eprintf(interp, INTVAL_FMT, $1);
+}
+
+op printerr(in NUM) :base_io {
+    Parrot_io_eprintf(interp, FLOATVAL_FMT, $1);
+}
+
+op printerr(in STR) :base_io {
+    STRING * const s = $1;
+    if (s && Parrot_str_byte_length(interp, s))
+        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+}
+
+op printerr(invar PMC) :base_io {
+    PMC * const p = $1;
+    STRING * const s = (VTABLE_get_string(interp, p));
+    if (s)
+        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+}
+
+##########################################
+
+=item B<seek>(invar PMC, in INT, in INT)
+
+seek:
+Set file position to offset $2 on IO stream $1. 'whence' is
+indicated by the value in $3. The valid values for 'whence' are:
+
+ Value      Meaning
+ 0          Seek from the beginning of the file
+ 1          Seek from the current position
+ 2          Seek from the end of the file
+
+[ Note: the above values for 'whence' is just an educated guess
+at this point ]
+
+=item B<seek>(invar PMC, in INT, in INT, in INT)
+
+64bit seek:
+Set file position to offset ($2 << 32 | $3) on IO stream $1. 'whence' is
+indicated by the value in $4. This allows 64-bit seeks with only 32-bit
+INTVALS.
+
+=cut
+
+op seek(invar PMC, in INT, in INT) :base_io {
+    if ($1) {
+        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
+            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_PIO_ERROR,
+                "seek failed (32bit)");
+            goto ADDRESS(handler);
+        }
+    }
+}
+
+op seek(invar PMC, in INT, in INT, in INT) :base_io {
+    if ($1) {
+        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
+            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_PIO_ERROR,
+                "seek failed (64bit)");
+            goto ADDRESS(handler);
+        }
+    }
+}
+
+=item B<tell>(out INT, invar PMC)
+
+tell:
+Get the current file position of stream $2 and store it in $1.
+On systems where INTVAL is 32bit the result will be truncated if the
+position is beyond 2 GiB
+
+=item B<tell>(out INT, out INT, invar PMC)
+
+64bit tell:
+Get the current file positon of stream $3 in two parts of 32-bit each
+($1 = pos >> 32, $2 = pos & 0xffffffff).
+
+=cut
+
+op tell(out INT, invar PMC) :base_io {
+    if ($2)
+        $1 = (INTVAL)Parrot_io_tell(interp, $2);
+}
+
+op tell(out INT, out INT, invar PMC) :base_io {
+    if ($3) {
+        PIOOFF_T pos;
+        pos = Parrot_io_tell(interp, $3);
+        $1 = (INTVAL)(pos >> 31);
+        $2 = (INTVAL)(pos & 0xffffffff);
+    }
+}
+
+##########################################
+
+=item B<peek>(out STR)
+
+Returns the next byte from standard input, but does not
+remove it from the stream.
+
+=item B<peek>(out STR, invar PMC)
+
+Reads the next byte from an IO PMC, but does not
+remove it from the stream.
+
+=cut
+
+op peek(out STR) :base_io {
+    STRING ** const s = &$1;
+
+    *s = NULL;
+    if (Parrot_io_peek(interp, _PIO_STDIN(interp), s) < 0) {
+        $1 = STRINGNULL;
+    }
+}
+
+op peek(out STR, invar PMC) :base_io {
+    STRING ** const s = &$1;
+
+    *s = NULL;
+    if (Parrot_io_peek(interp, $2, s) < 0) {
+        $1 = STRINGNULL;
+    }
+}
+
+#########################################
+
+=item B<open>(out PMC, in STR, in STR)
+
+Open URL (file, address, database, in core image) named $2 with
+a mode string in $3 and create an IO object in $1.
+
+The mode consists of a string of characters specified in any order:
+
+ r : read
+ w : write
+ a : append (Note: you must specify "wa", not just "a")
+ p : pipe
+
+=item B<open>(out PMC, in STR)
+
+Open URL (file, address, database, in core image) named $2 with
+read mode and create an IO object in $1.
+
+=cut
+
+inline op open(out PMC, in STR, in STR) :filesys_open {
+    if (STRING_IS_NULL($2) || STRING_IS_NULL($3)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_UNEXPECTED_NULL, "Invalid open");
+        goto ADDRESS(handler);
+    }
+    else {
+        $1 = Parrot_io_open(interp, PMCNULL, $2, $3);
+        PARROT_ASSERT(! PMC_IS_NULL($1));
+    }
+}
+
+inline op open(out PMC, in STR) :filesys_open {
+    if (STRING_IS_NULL($2)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_UNEXPECTED_NULL, "Invalid open");
+        goto ADDRESS(handler);
+    }
+    else {
+        $1 = Parrot_io_open(interp, PMCNULL, $2, NULL);
+        PARROT_ASSERT(! PMC_IS_NULL($1));
+    }
+}
+
+########################################
+
+=item B<close>(invar PMC)
+
+Close IO object $1
+
+=cut
+
+inline op close(invar PMC) :base_io {
+    Parrot_io_close(interp, $1);
+}
+
+########################################
+
+=item B<fdopen>(out PMC, in INT, in STR)
+
+Create ParrotIO object in $1 as a copy of file descriptor $2.
+
+=cut
+
+inline op fdopen(out PMC, in INT, in STR) :filesys_open {
+    $1 = Parrot_io_fdopen(interp, PMCNULL, (PIOHANDLE)$2, $3);
+    if (!$1)
+        $1 = Parrot_pmc_new(interp, enum_class_Undef);
+}
+
+=item B<getstdin>(out PMC)
+
+Create a new ParrotIO object for the stdin file descriptor and
+store it in $1
+
+=item B<getstdout>(out PMC)
+
+Create a new ParrotIO object for the stdout file descriptor and
+store it in $1
+
+=item B<getstderr>(out PMC)
+
+Create a new ParrotIO object for the stderr file descriptor and
+store it in $1
+
+=cut
+
+inline op getstdin(out PMC) :base_io {
+    $1 = _PIO_STDIN(interp);
+}
+
+inline op getstdout(out PMC) :base_io {
+    $1 = _PIO_STDOUT(interp);
+}
+
+inline op getstderr(out PMC) :base_io {
+    $1 = _PIO_STDERR(interp);
+}
+
+#########################################
+
+=item B<setstdin>(invar PMC)
+
+Sets the standard input for a bare C<read> op to go to the supplied PMC.
+Call C<getstdin> first if you care about retaining the previous PMC.
+
+=item B<setstdout>(invar PMC)
+
+Sets the standard output for a bare C<print> op to go to the supplied PMC.
+Call C<getstdout> first if you care about retaining the previous PMC.
+
+=item B<setstderr>(invar PMC)
+
+Sets the standard error for a bare C<printerr> op to go to the supplied PMC.
+Call C<getstderr> first if you care about retaining the previous PMC.
+
+=cut
+
+inline op setstdin(invar PMC) :base_io {
+    _PIO_STDIN(interp) = $1;
+}
+
+inline op setstdout(invar PMC) :base_io {
+    _PIO_STDOUT(interp) = $1;
+}
+
+inline op setstderr(invar PMC) :base_io {
+    _PIO_STDERR(interp) = $1;
+}
+
+########################################
+
+=back
+
+=cut
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

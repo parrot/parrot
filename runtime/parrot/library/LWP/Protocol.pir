@@ -17,6 +17,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
 =cut
 
 .namespace ['LWP';'Protocol']
+.loadlib 'sys_ops'
+.loadlib 'io_ops'
 
 .sub '' :init :load :anon
     load_bytecode 'HTTP/Message.pbc'

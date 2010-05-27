@@ -45,6 +45,7 @@ and is additionally stored as global 'PCRE', 'lib'.
 
 =cut
 
+.loadlib 'sys_ops'
 .include "sysinfo.pasm"
 
 .sub init

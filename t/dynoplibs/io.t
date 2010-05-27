@@ -18,6 +18,8 @@ Tests various io opcodes.
 
 .const int TESTS = 5
 
+.loadlib 'io_ops'
+
 .sub 'main' :main
     .include 'test_more.pir'
 
@@ -27,7 +29,8 @@ Tests various io opcodes.
     open_null_filename()
     open_null_mode()
     open_pipe_for_reading()
-    open_pipe_for_writing()
+    getfd_fdopen()
+    open_pipe_for_writing() # must be last (doesn't use test_more)
 .end
 
 .sub open_delegates_to_filehandle_pmc
@@ -73,6 +76,7 @@ Tests various io opcodes.
     ok(1, 'open with null mode')
 .end
 
+.loadlib 'sys_ops'
 .sub 'tt661_todo_test' :anon
     # As of r41963, these tests need to be todo'ed at least on Win32. Add new
     # platforms known to fail.
@@ -161,6 +165,22 @@ Tests various io opcodes.
   open_pipe_for_writing_todoed:
     todo(0, 'Unimplemented in this platform, TT #661')
 
+.end
+
+# TT #1178
+.sub 'getfd_fdopen'
+    getstdout $P0
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, 'w'
+    $I0 = defined $P1
+    ok($I0, 'get_fd()/fdopen')
+    close $P1
+
+    getstdout $P0
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, 'w'
+    $I0 = defined $P1
+    ok($I0, 'fdopen - no close')
 .end
 
 .namespace ["Testing"]

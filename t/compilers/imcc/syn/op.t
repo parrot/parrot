@@ -4,7 +4,7 @@
 
 .sub test :main
     .include 'test_more.pir'
-    plan(59)
+    plan(58)
 
     test_plus_equal()
     test_minus_equal()
@@ -21,7 +21,6 @@
     test_x_defined()
     test_x_clone()
     test_x_length()
-    test_x_sin()
     test_x_can()
     test_x_isa()
     test_x_add()
@@ -172,11 +171,6 @@
     s = ""
     $I0 = length s
     is($I0, 0, 'x = length')
-.end
-
-.sub test_x_sin
-    $N0 = sin 0
-    is($N0, 0, 'x = sin')
 .end
 
 .sub test_x_can

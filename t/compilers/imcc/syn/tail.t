@@ -15,6 +15,8 @@ use Parrot::Test tests => 6;
 $ENV{TEST_PROG_ARGS} = '-Oc';
 
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
+.loadlib 'io_ops'
+
 .sub _main :main
     $P1 = new 'Integer'
     $P1 = 20
@@ -97,6 +99,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position" );
 
+.loadlib 'io_ops'
+
 .sub _main :main
     $P1 = new 'Integer'
     $P1 = 20
@@ -170,6 +174,8 @@ _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return" );
+
+.loadlib 'io_ops'
 
 .sub _main :main
 
@@ -249,6 +255,8 @@ _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', ":flatten in .return" );
+
+.loadlib 'io_ops'
 
 .sub _main :main
 

@@ -540,7 +540,7 @@ typedef enum {
 
 /*
 
-=item C<PMC* tm_to_array(PARROT_INTERP, const struct tm *tm)>
+=item C<PMC* Parrot_tm_to_array(PARROT_INTERP, const struct tm *tm)>
 
 Helper to convert a B<struct tm *> to an Array
 
@@ -548,12 +548,13 @@ Helper to convert a B<struct tm *> to an Array
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+Parrot_tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
-    ASSERT_ARGS(tm_to_array)
+    ASSERT_ARGS(Parrot_tm_to_array)
 
     PMC * const Array = Parrot_pmc_new(interp,
         Parrot_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
