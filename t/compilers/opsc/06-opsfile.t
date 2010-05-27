@@ -20,9 +20,9 @@ my @ops := $f.ops;
 # 116 math
 # We can generate more than 1 Ops::Op per op due args expansion.
 say( "# Parsed " ~ +@ops);
-# There is more than 300 ops in this 2 files.
+# There is more than 200 ops in this 2 files.
 # Feel free to update number if you change them.
-ok(+@ops == 306, "Ops parsed correctly");
+ok(+@ops == 264, "Ops parsed correctly");
 say('# ' ~ +@ops);
 
 my $op := @ops[0];
@@ -32,7 +32,7 @@ ok($op.name eq 'end',   "First op is end");
 ok($op<code> == 0,      "... with code 0");
 
 $op := @ops[(+@ops)-1];
-ok($op.name eq 'tanh',  "Last op is tanh");
+ok($op.name eq 'sqrt',  "Last op is tanh");
 say('# ' ~ $op.name);
 ok($op<code> > 84 + 116,    "... with non zero code");
 

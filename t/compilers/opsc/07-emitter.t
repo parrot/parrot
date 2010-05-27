@@ -42,12 +42,13 @@ $emitter.emit_c_op_func_header($fh);
 
 $fh.close();
 my $header := $fh.readall();
+#say($header);
 
 ok($header ~~ /define \s PARROT_OPLIB_CORE_OPS_H_GUARD/, 'Guard generated');
 ok($header ~~ /endif/, 'Close guard generated');
 ok($header ~~ /DO \s NOT \s EDIT \s THIS \s FILE/, 'Preamble generated');
 ok($header ~~ /Parrot_DynOp_core_ \d+ _ \d+ _ \d+/, '... and contains init_func');
-ok($header ~~ /Parrot_sysinfo_s_i/, 'We have proper names of ops functions');
+ok($header ~~ /Parrot_err_s_ic/, 'We have proper names of ops functions');
 
 # Testing C emitting.
 #$emitter.print_c_source_file();
