@@ -274,7 +274,7 @@ multiple:
     .return (result)
 .end
 
-.include 't/library/pastcompare.pir'
+.include 'pastcompare.pir'
 
 # Local Variables:
 #   mode: pir
