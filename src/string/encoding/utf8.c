@@ -528,6 +528,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     result->charset  = Parrot_unicode_charset_ptr;
     result->encoding = Parrot_utf8_encoding_ptr;
     result->strlen   = src_len;
+    result->extra    = NULL;
 
     if (!src->strlen)
         return result;

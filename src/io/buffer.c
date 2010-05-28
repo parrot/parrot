@@ -467,6 +467,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     }
     s = *buf;
     s->strlen = 0;
+    s->extra  = NULL;
 
     /* fill empty buffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {

@@ -220,6 +220,7 @@ Parrot_str_new_noinit(PARROT_INTERP,
 
     s->charset  = PARROT_DEFAULT_CHARSET;
     s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);
+    s->extra    = NULL;
 
     Parrot_gc_allocate_string_storage(interp, s,
         (size_t)string_max_bytes(interp, s, capacity));
@@ -550,6 +551,7 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL 
     result->strlen          = len;
     result->encoding        = Parrot_fixed_8_encoding_ptr;
     result->charset         = Parrot_binary_charset_ptr;
+    result->extra           = NULL;
 
     Buffer_buflen(buffer)   = 0;
     Buffer_bufstart(buffer) = NULL;
@@ -746,6 +748,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     STRING * const s = Parrot_gc_new_string_header(interp, flags);
     s->encoding      = encoding;
     s->charset       = charset;
+    s->extra         = NULL;
 
     if (flags & PObj_external_FLAG) {
         /*
@@ -1201,6 +1204,10 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     /* Set encoding and charset to compatible */
     dest->encoding = enc;
     dest->charset  = cs;
+
+    /* TODO: We should merge the grapheme tables here and translate the
+       dynamic graphemes in the second string if needed. */
+    dest->extra    = NULL;
 
     /* Clear COW flag. We own buffer */
     PObj_get_FLAGS(dest) = PObj_is_string_FLAG
@@ -2569,6 +2576,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     reserved = string_max_bytes(interp, result, srclen);
     Parrot_gc_allocate_string_storage(interp, result, reserved);
     result->bufused = reserved;
+    result->extra = NULL; // TODO: Check wether we'll need a grapheme table here and create one if we will.
 
     src->encoding->iter_init(interp, src, &itersrc);
     encoding->iter_init(interp, result, &iterdest);
@@ -3223,6 +3231,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
     res->charset  = j->charset;
     res->encoding = j->encoding;
+    res->extra    = NULL;
 
     /* Iterate over chunks and append it to res */
     pos = res->strstart;
@@ -3232,6 +3241,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     if (!STRING_IS_NULL(s)) {
         mem_sys_memcopy(pos, s->strstart, s->bufused);
         pos += s->bufused;
+        res->extra = s->extra;
     }
 
     for (i = 1; i < ar_len; ++i) {
@@ -3245,6 +3255,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
         mem_sys_memcopy(pos, next->strstart, next->bufused);
         pos += next->bufused;
+
+        // TODO: Merge grapheme tables as we go. If it's needed.
 
         /* We can consume all buffer and pos will be next-after-end of buffer */
         PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);

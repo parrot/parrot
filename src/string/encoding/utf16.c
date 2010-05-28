@@ -196,6 +196,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 
     result = Parrot_gc_new_string_header(interp, 0);
 
+    result->extra = NULL;
     /*
      * TODO adapt string creation functions
      */
