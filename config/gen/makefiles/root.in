@@ -1090,19 +1090,14 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
 
-
-$(LIBRARY_DIR)/Instrument/Probe.pbc: $(LIBRARY_DIR)/Instrument/Probe.pir
-	$(PARROT) -o $@ $(LIBRARY_DIR)/Instrument/Probe.pir
-
-$(LIBRARY_DIR)/Instrument/Probe.pir: $(LIBRARY_DIR)/Instrument/Probe.nqp $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Probe.nqp > $@
-
 ###############################################################################
 #
 # Other Dependencies and Build Rules:
 #
 ###############################################################################
 
+$(LIBRARY_DIR)/Instrument/Probe.pir: $(LIBRARY_DIR)/Instrument/Probe.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Probe.nqp > $@
 
 runtime/parrot/include/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
