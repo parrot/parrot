@@ -29,7 +29,8 @@ and associated libraries.
     
     # Create a catchall probe which will be called for
     #  each op.
-    probe = new ['Instrument';'Probe';'Catchall']
+    probe = new ['Instrument';'Probe']
+    probe.'make_catchall'()
     probe.'set_callback'('catchall_callback')
     probe.'set_finalize'('catchall_finalize')
     

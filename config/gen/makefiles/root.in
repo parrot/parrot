@@ -328,7 +328,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/libpcre.pbc \
     $(LIBRARY_DIR)/postgres.pbc \
     $(LIBRARY_DIR)/Instrument/Instrument.pbc \
-    $(LIBRARY_DIR)/Instrument/Probe.pbc 
+	$(LIBRARY_DIR)/Instrument/Probe.pbc
 
 FLUID_FILES_1 = \
     $(GEN_HEADERS) \
@@ -1091,6 +1091,11 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_R
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
 
 
+$(LIBRARY_DIR)/Instrument/Probe.pbc: $(LIBRARY_DIR)/Instrument/Probe.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/Instrument/Probe.pir
+
+$(LIBRARY_DIR)/Instrument/Probe.pir: $(LIBRARY_DIR)/Instrument/Probe.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Probe.nqp > $@
 
 ###############################################################################
 #

@@ -14,7 +14,8 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
 
 .sub '__instrument_lib_init' :init :load :anon
     .local pmc lib
-
+    load_bytecode 'P6object.pbc'
+    
     lib = loadlib 'instrument'
     $I0 = defined lib
     if $I0 goto END
@@ -23,6 +24,11 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
 
 END:
     .return()
+.end
+
+.sub 'say'
+    .param pmc msg
+    say msg
 .end
 
 # Local Variables:

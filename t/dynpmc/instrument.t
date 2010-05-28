@@ -48,26 +48,32 @@ Tests the low level interface provided by instrument.pmc.
 .end
 
 .sub 'test_attach'    
-    .local pmc mock_probe, instr
+    .local pmc mock_probe, mock_id, instr
     .local pmc class, enable_method, ins, it, type
-
-    class = newclass ['MockProbe']
-    addattribute class, 'instr_obj'
     
-    mock_probe = new class
+    mock_id    = box 'MockProbe-0'
+    mock_probe = new ['MockProbe']
+    setattribute mock_probe, '$!identifier', mock_id
+    
     instr      = new ['Instrument']
-    
     instr.'attach'(mock_probe)
     
 .end
 
 .namespace ['MockProbe']
+.sub '' :anon :init :load
+    .local pmc class
+    class = newclass ['MockProbe']
+    addattribute class, '$!instr_obj'
+    addattribute class, '$!identifier'
+.end
+
 .sub 'enable' :method
     ok(1, 'Enable is called')
     
     .local pmc instr_obj
     .local string instr_obj_type
-    instr_obj = getattribute self, 'instr_obj'
+    instr_obj = getattribute self, '$!instr_obj'
     $I0 = defined instr_obj
     ok($I0, 'Attribute instr_obj is defined')
     

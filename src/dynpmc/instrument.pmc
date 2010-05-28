@@ -83,8 +83,8 @@ Initializes the pmc and creates a child interpreter.
         attr->supervisor  = INTERP;
         attr->supervised  = Parrot_new(attr->supervisor);
         attr->op_hooks    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        attr->op_catchall = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        attr->probes      = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        attr->op_catchall = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->probes      = Parrot_pmc_new(INTERP, enum_class_Hash);
         
         /* Initialize the runcore for the child interpreter */  
         Instrument_runcore_init(attr->supervised, SELF);
@@ -166,8 +166,7 @@ the given address after firing all hooks that apply.
 
     VTABLE void set_pointer (void *pc_pointer) {
         opcode_t *pc = (opcode_t *) pc_pointer;
-        INTVAL hook_count, cur_hook, catchall_count, cur_catchall;
-        PMC *hooks;
+        PMC *hooks, *hook_iter, *catchall_iter;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         STRING *full_name;
         
@@ -175,27 +174,29 @@ the given address after firing all hooks that apply.
         full_name = CONST_STRING(INTERP, attr->supervised->op_info_table[*pc].full_name);
         
         /* Fire the catchall hooks first */
-        catchall_count = VTABLE_get_integer(INTERP, attr->op_catchall);
-        for(cur_catchall = 0; cur_catchall < catchall_count; cur_catchall++) {
-            PMC *cur_catchall_sub;
+        catchall_iter = VTABLE_get_iter(INTERP, attr->op_catchall);
+        while(VTABLE_get_bool(INTERP, catchall_iter)) {
+            PMC *val, *key;
             
-            cur_catchall_sub = VTABLE_get_pmc_keyed_int(INTERP, attr->op_catchall,
-                                                    cur_catchall);
-            if(!PMC_IS_NULL(cur_catchall_sub)) 
-                Parrot_ext_call(INTERP, cur_catchall_sub, "S->", full_name);
+            key = VTABLE_shift_pmc(INTERP, catchall_iter);
+            val = VTABLE_get_pmc_keyed(INTERP, attr->op_catchall, key);
+            
+            if(!PMC_IS_NULL(val)) 
+                Parrot_ext_call(INTERP, val, "S->", full_name);
         }
         
         /* Fire the specific probes */
-        hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, *pc);
+        hooks     = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, *pc);
         if(!PMC_IS_NULL(hooks)) {
-        
-            hook_count = VTABLE_get_integer(INTERP, hooks);
-            for(cur_hook = 0; cur_hook < hook_count; cur_hook++) {
-                PMC *cur_hook_sub;
+            hook_iter = VTABLE_get_iter(INTERP, hooks);
+            while(VTABLE_get_bool(INTERP, hook_iter)) {
+                PMC *val, *key;
                 
-                cur_hook_sub = VTABLE_get_pmc_keyed_int(INTERP, hooks, cur_hook);
-                if(!PMC_IS_NULL(cur_hook_sub)) 
-                    Parrot_ext_call(INTERP, cur_hook_sub, "S->", full_name);
+                key = VTABLE_shift_pmc(INTERP, hook_iter);
+                val = VTABLE_get_pmc_keyed(INTERP, hooks, key);
+                
+                if(!PMC_IS_NULL(val)) 
+                    Parrot_ext_call(INTERP, val, "S->", full_name);
             }
         }
         
@@ -220,6 +221,7 @@ Loads the given file and run it with the args given.
         char ** argv = default_argv;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         PMC *probe_iter;
+        int counter = 0;
             
         /* If args is not null, is of type ResizableStringArray and has at
            least 1 element, process it so we can pass it to the child interpreter.
@@ -260,12 +262,13 @@ Loads the given file and run it with the args given.
         /* Finalize the instruments */
         probe_iter = VTABLE_get_iter(INTERP, attr->probes);
         while(VTABLE_get_bool(INTERP, probe_iter)) {
-            PMC *cur_probe, *finalize_sub;
+            PMC *key, *probe, *finalize_sub;
             
             /* For the current probe, get the finalize attribute. */
-            cur_probe = VTABLE_shift_pmc(INTERP, probe_iter);
-            finalize_sub = VTABLE_get_attr_str(INTERP, cur_probe,
-                                               CONST_STRING(INTERP, "finalize"));
+            key          = VTABLE_shift_pmc(INTERP, probe_iter);
+            probe        = VTABLE_get_pmc_keyed(INTERP, attr->probes, key);
+            finalize_sub = VTABLE_get_attr_str(INTERP, probe,
+                                               CONST_STRING(INTERP, "$!finalize"));
             
             /* If it is set, call that sub. */
             if(!PMC_IS_NULL(finalize_sub)) {
@@ -299,18 +302,18 @@ and attribute 'instr_obj'. Set the 'instr_obj' to SELF and call the
 */
 
     METHOD attach (PMC *obj) {
-        PMC *enable_method;
+        PMC *enable_method, *id;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
     
         /* We do not care what type of object it is,
-           as long as the object has the attribute instr_obj and
-           the method enable. */
+           as long as the object has the attributes $!instr_obj and $!identifier
+           and the method enable. */
         
         /* Set the instrument reference attribute of the object,
            and call its enable method. */
         VTABLE_set_attr_str(
             INTERP, obj,
-            CONST_STRING(INTERP, "instr_obj"),
+            CONST_STRING(INTERP, "$!instr_obj"),
             SELF
         );
         
@@ -330,60 +333,81 @@ and attribute 'instr_obj'. Set the 'instr_obj' to SELF and call the
         Parrot_ext_call(INTERP, enable_method, "P->", obj);
         
         /* Register the probe. */
-        VTABLE_push_pmc(INTERP, attr->probes, obj);
+        id = VTABLE_get_attr_str(INTERP, obj, CONST_STRING(INTERP, "$!identifier"));
+        VTABLE_set_pmc_keyed(INTERP, attr->probes, id, obj);
     }
 
 /*
 
-=item C<void *insert_op_hooks(PMC *hook_hash)>
+=item C<void *insert_op_hooks(PMC *id, INTVAL op_num, PMC *hook)>
 
-Insert hooks based on what is given in hook_hash.
-Keys are op numbers and values are sub pmcs.
+Insert a hook for the given op number.
 
 =cut
 
 */
-
-    METHOD insert_op_hooks (PMC *hook_hash) {
-        PMC *iter;
+    
+    METHOD insert_op_hook (PMC *id, INTVAL op_num, PMC *hook) {
+        PMC *op_num_hooks;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         
-        /* Iterate through hook_hash. For each
-           key (op_num), push the callback to the
-           appropriate entry in op_hooks. */
-        iter = VTABLE_get_iter(INTERP, hook_hash);
-        while(VTABLE_get_bool(INTERP, iter)) {
-            INTVAL op_num;
-            PMC *iter_key, *cur, *callback, *op_num_hooks;
-            
-            iter_key = VTABLE_shift_pmc(INTERP, iter);
-            cur      = VTABLE_get_pmc(INTERP, iter_key);
-            op_num   = VTABLE_get_integer(INTERP, cur);
-            callback = VTABLE_get_pmc_keyed(INTERP, hook_hash, cur);
-            
-            op_num_hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, op_num);
-            if(PMC_IS_NULL(op_num_hooks)) {
-                op_num_hooks = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-                VTABLE_set_pmc_keyed_int(INTERP, attr->op_hooks, op_num, op_num_hooks);
-            }
-            
-            VTABLE_push_pmc(INTERP, op_num_hooks, callback);
+        op_num_hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, op_num);
+        if(PMC_IS_NULL(op_num_hooks)) {
+            op_num_hooks = Parrot_pmc_new(INTERP, enum_class_Hash);
+            VTABLE_set_pmc_keyed_int(INTERP, attr->op_hooks, op_num, op_num_hooks);
+        }
+        
+        VTABLE_set_pmc_keyed(INTERP, op_num_hooks, id, hook);
+    }
+
+/*
+
+=item C<void *remove_op_hooks(PMC *id, INTVAL op_num)>
+
+Removes a hook for the given op number.
+
+=cut
+
+*/
+    
+    METHOD remove_op_hook (PMC *id, INTVAL op_num) {
+        PMC *op_num_hooks;
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        op_num_hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, op_num);
+        if(!PMC_IS_NULL(op_num_hooks)) {
+            VTABLE_delete_keyed(INTERP, op_num_hooks, id);
         }
     }
 
 /*
-=item C<void *insert_op_catchall(PMC *callback)>
+=item C<void *insert_op_catchall(PMC *id, PMC *callback)>
 
 Register a catchall op callback
 
 =cut
 */
 
-    METHOD insert_op_catchall (PMC *callback) {
+    METHOD insert_op_catchall (PMC *id, PMC *callback) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         
-        VTABLE_push_pmc(INTERP, attr->op_catchall, callback);
+        VTABLE_set_pmc_keyed(INTERP, attr->op_catchall, id, callback);
     }
+
+/*
+=item C<void *remove_op_catchall(PMC *id)>
+
+Deregister a catchall op callback
+
+=cut
+*/
+
+    METHOD remove_op_catchall (PMC *id) {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        
+        VTABLE_delete_keyed(INTERP, attr->op_catchall, id);
+    }
+
 }
 
 /*
