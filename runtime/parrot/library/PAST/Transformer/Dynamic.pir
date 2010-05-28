@@ -11,7 +11,7 @@
     trans = get_class ['PAST'; 'Transformer']
     $S0 = 'PAST::Transformer::Dynamic'
     $P0 = p6meta.'new_class'($S0, 'parent'=> walkdyn)
-    p6meta.'addparrent'($P0, trans)
+    p6meta.'add_parent'($P0, trans)
 .end
 
 .namespace ['PAST'; 'Walker']

@@ -64,7 +64,7 @@ setter:
 setter:
     setattribute self, 'var', value
 .end
-    
+
 .namespace ['PAST'; 'Walker']
 
 .sub 'walk' :multi(['PAST'; 'Walker'; 'Dynamic'], ['PAST'; 'Block'])
