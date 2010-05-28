@@ -3681,7 +3681,7 @@ TEMPLATE
 .end
 
 .sub 'get_timestamp' :anon
-    $P0 = new ['FileHandle']
+    $P0 = new 'FileHandle'
     $P0.'open'('date --rfc-2822', 'rp')
     $S0 = $P0.'readline'()
     $P0.'close'()
@@ -4484,7 +4484,7 @@ Return the whole config
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
     unlink(srcname, verbose :named('verbose'))
 
-    $P0 = new ['FileHandle']
+    $P0 = new 'FileHandle'
     $P0.'open'(exename, 'rp')
     $S0 = $P0.'readall'()
     $P0.'close'()
