@@ -24,6 +24,7 @@ These are Parrot's generic charset handling functions
 #include "encoding/utf16.h"
 #include "encoding/ucs2.h"
 #include "encoding/ucs4.h"
+#include "encoding/nfg.h"
 
 #include "charset/ascii.h"
 #include "charset/binary.h"
@@ -499,6 +500,7 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
     Parrot_encoding_ucs2_init(interp);
     Parrot_encoding_utf16_init(interp);
     Parrot_encoding_ucs4_init(interp);
+    Parrot_encoding_nfg_init(interp);
 
     Parrot_charset_ascii_init(interp);
     Parrot_charset_iso_8859_1_init(interp);

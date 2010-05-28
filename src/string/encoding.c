@@ -44,6 +44,7 @@ ENCODING *Parrot_utf8_encoding_ptr    = NULL;
 ENCODING *Parrot_ucs2_encoding_ptr    = NULL;
 ENCODING *Parrot_utf16_encoding_ptr   = NULL;
 ENCODING *Parrot_ucs4_encoding_ptr    = NULL;
+ENCODING *Parrot_nfg_encoding_ptr     = NULL;
 
 typedef struct One_encoding {
     NOTNULL(ENCODING *encoding);
@@ -363,7 +364,7 @@ Parrot_str_internal_register_encoding_names(PARROT_INTERP)
 ENCODING *encoding)>
 
 Registers a character encoding C<encoding> with name C<encodingname>.
-Only allows one of 5 possibilities: fixed_8, utf8, utf16, ucs2 and ucs4.
+Allows one of 6 possibilities: fixed_8, utf8, utf16, ucs2, ucs4 and nfg.
 
 =cut
 
@@ -402,6 +403,10 @@ Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
     }
     if (STREQ("ucs4", encodingname)) {
         Parrot_ucs4_encoding_ptr = encoding;
+        return register_encoding(interp, encodingname, encoding);
+    }
+    if (STREQ("nfg", encodingname)) {
+        Parrot_nfg_encoding_ptr = encoding;
         return register_encoding(interp, encodingname, encoding);
     }
     return 0;

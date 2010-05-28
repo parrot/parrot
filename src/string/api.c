@@ -454,6 +454,9 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         if (a->encoding == Parrot_ucs4_encoding_ptr
             || b->encoding == Parrot_ucs4_encoding_ptr)
             enc = Parrot_ucs4_encoding_ptr;
+        else if (a->encoding == Parrot_nfg_encoding_ptr
+            || b->encoding == Parrot_nfg_encoding_ptr)
+            enc = Parrot_ucs4_encoding_ptr;
         else if (a->encoding == Parrot_utf16_encoding_ptr
             ||  b->encoding == Parrot_utf16_encoding_ptr
             ||  a->encoding == Parrot_ucs2_encoding_ptr

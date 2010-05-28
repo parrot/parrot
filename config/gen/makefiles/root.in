@@ -1505,6 +1505,7 @@ src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
 	src/string/encoding/utf16.h \
 	src/string/encoding/ucs2.h \
 	src/string/encoding/ucs4.h \
+	src/string/encoding/nfg.h \
 	src/string/charset/ascii.h \
 	src/string/charset/binary.h \
 	src/string/charset/iso-8859-1.h \
