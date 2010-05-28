@@ -51,10 +51,6 @@ osutils - Parrot OS Utilities
 .sub 'file_exists'
     .param string filename
     $I0 = stat filename, .STAT_EXISTS
-    print "file_exists "
-    print filename
-    print " "
-    say $I0
     .return ($I0)
 .end
 
@@ -70,14 +66,12 @@ osutils - Parrot OS Utilities
     $S0 = depends
     .tailcall newer(target, $S0)
   L1:
-#    print "newer "
     $I0 = stat target, .STAT_EXISTS
     unless $I0 goto L2
     $I0 = stat target, .STAT_FILESIZE
     unless $I0 goto L2
     goto L3
   L2:
-#    say 0
     .return (0)
   L3:
     $I0 = stat target, .STAT_MODIFYTIME
@@ -88,34 +82,25 @@ osutils - Parrot OS Utilities
     if $S0 == '' goto L4
     $I1 = stat $S0, .STAT_MODIFYTIME
     if $I1 < $I0 goto L4
-#    say 0
     .return (0)
   L5:
-#    say 1
     .return (1)
 .end
 
 .sub 'newer' :multi(string, string)
     .param string target
     .param string depend
-#    print "newer "
-#    print target
-#    print " "
-#    print depend
-#    print " "
     $I0 = stat target, .STAT_EXISTS
     unless $I0 goto L1
     $I0 = stat target, .STAT_FILESIZE
     unless $I0 goto L1
     goto L2
   L1:
-#    say 0
     .return (0)
   L2:
     $I1 = stat target, .STAT_MODIFYTIME
     $I2 = stat depend, .STAT_MODIFYTIME
     $I0 = $I1 > $I2
-#    say $I0
     .return ($I0)
 .end
 
