@@ -100,7 +100,6 @@ compilers/pirc/src/pircapi.c
 config/gen/platform/ansi/dl.c
 config/gen/platform/ansi/exec.c
 config/gen/platform/ansi/time.c
-config/gen/platform/darwin/dl.c
 config/gen/platform/darwin/memalign.c
 config/gen/platform/generic/dl.c
 config/gen/platform/generic/exec.c
