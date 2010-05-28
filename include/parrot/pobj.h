@@ -81,6 +81,7 @@ struct parrot_string_t {
     /*    parrot_string_representation_t representation;*/
     const struct _encoding *encoding;
     const struct _charset  *charset;
+    void                   *extra;
 };
 
 /* note that cache and flags are isomorphic with Buffer and PObj */
