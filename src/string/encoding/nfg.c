@@ -34,6 +34,142 @@ static void no_ICU_lib(PARROT_INTERP) /* HEADERIZER SKIP */
 /* HEADERIZER HFILE: src/string/encoding/nfg.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL bytes(SHIM_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL codepoints(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL find_cclass(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    ARGIN(const INTVAL *typetable),
+    INTVAL flags,
+    UINTVAL pos,
+    UINTVAL end)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static UINTVAL get_byte(PARROT_INTERP,
+    SHIM(const STRING *src),
+    SHIM(UINTVAL offset))
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING * get_bytes(PARROT_INTERP,
+    SHIM(const STRING *src),
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count))
+        __attribute__nonnull__(1);
+
+static UINTVAL get_codepoint(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    UINTVAL offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING * get_codepoints(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    UINTVAL offset,
+    UINTVAL count)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void iter_init(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGOUT(String_iter *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*iter);
+
+static UINTVAL nfg_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*i);
+
+static void nfg_encode_and_advance(PARROT_INTERP,
+    ARGMOD(String_iter *i),
+    UINTVAL c)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*i);
+
+static size_t nfg_hash(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    size_t hashval)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void nfg_set_position(PARROT_INTERP,
+    ARGMOD(String_iter *i),
+    UINTVAL n)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*i);
+
+static void set_byte(PARROT_INTERP,
+    SHIM(const STRING *src),
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL byte))
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s) \
+    , PARROT_ASSERT_ARG(typetable))
+#define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(iter))
+#define ASSERT_ARGS_nfg_decode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_nfg_encode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_nfg_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_nfg_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_set_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #include "nfg.h"
