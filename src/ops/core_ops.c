@@ -14338,9 +14338,11 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC      * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
-    interp->current_cont   = NEED_CONTINUATION;
+    interp->current_cont   = NEED_CONTINUATION;    
     dest                   = VTABLE_invoke(interp, p, dest);return (opcode_t *)dest;
 }
 
@@ -14351,6 +14353,8 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC * const p          = PREG(1);
     PMC * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
+
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
