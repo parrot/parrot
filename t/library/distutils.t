@@ -29,8 +29,9 @@ Test the distutils library
     .const 'Sub' build_hll = 'build_hll'
     $P1['hll_hook'] = build_hll
 
-    say "1..3"
+    say "1..4"
     setup($P0 :flat, $P1 :flat :named)
+    say "ok 4 - end"
 .end
 
 .sub 'prebuild' :anon
@@ -38,14 +39,14 @@ Test the distutils library
     say "ok 1 - prebuild"
 .end
 
-.sub 'postbuild' :anon
-    .param pmc kv :slurpy :named
-    say "ok 3 - postbuild"
-.end
-
 .sub 'build_hll' :anon
     .param pmc kv :slurpy :named
     say "ok 2 - build_hll"
+.end
+
+.sub 'postbuild' :anon
+    .param pmc kv :slurpy :named
+    say "ok 3 - postbuild"
 .end
 
 # Local Variables:

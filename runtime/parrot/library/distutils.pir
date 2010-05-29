@@ -342,7 +342,7 @@ Entry point.
     run_step('usage', kv :flat :named)
   L12:
     pop_eh
-    end
+    .return ()
   _handler:
     .local pmc ex
     .get_results (ex)
