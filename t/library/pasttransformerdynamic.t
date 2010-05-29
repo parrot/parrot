@@ -35,6 +35,42 @@ sub test_change_node_attributes () {
        "Node attributes can be changed by PAST::Transformers.");
 }
 
+sub negate ($walker, $node) {
+    my $v := $node.'value'();
+    my $result;
+    if ($v < 0) {
+	$result := PAST::Op.new(PAST::Val.new(:value(-$v)),
+				:pirop<neg>);
+    }
+    else {
+	$result := $node;
+    }
+    $result;
+}
+
+sub test_change_node_types () {
+    my $past :=
+        PAST::Block.new(PAST::Val.new(:value(0)),
+			PAST::Val.new(:value(-7)),
+			PAST::Val.new(:value(5)),
+			PAST::Val.new(:value(-32)));
+    my $transformer := PAST::Transformer::Dynamic.new(:val(negate));
+
+    my $result := $transformer.'walk'($past);
+
+    my $target :=
+      PAST::Block.new(PAST::Val.new(:value(0)),
+		      PAST::Op.new(PAST::Val.new(:value(7)),
+				   :pirop<neg>),
+		      PAST::Val.new(:value(5)),
+		      PAST::Op.new(PAST::Val.new(:value(32)),
+				   :pirop<neg>));
+
+    ok(pir::iseq__i_p_p($result, $target),
+       "Node types can be changed by PAST::Transformers.")
+}
+
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
