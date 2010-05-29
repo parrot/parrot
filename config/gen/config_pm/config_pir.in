@@ -40,7 +40,6 @@ undefined values) is undefined, and may be rather funky.
 =cut
 
 .include "interpinfo.pasm"
-.loadlib 'os'
 
 .sub _config
     .local string prefix, conf_file
@@ -48,6 +47,7 @@ undefined values) is undefined, and may be rather funky.
 
     $S0 = concat prefix, "/runtime"
 
+    $P0 = loadlib 'os'
     $P0 = new ['OS']
     push_eh file_not_found
         # OS.stat throws on file not found
