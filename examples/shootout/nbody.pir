@@ -9,6 +9,8 @@
 # speed up  from 1m25 to 6s by Leopold Toetsch
 # changed default value to 1000 to match shootout default (karl)
 
+.loadlib 'trans_ops'
+
 .const int x = 0
 .const int y = 1
 .const int z = 2

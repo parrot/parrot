@@ -55,7 +55,8 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
   open_outfile:
     .local pmc outfh
-    outfh = open cfile, 'w'
+    outfh = new ['FileHandle']
+    outfh.'open'(cfile, 'w')
     unless outfh goto err_outfh
     print outfh, <<'HEADER'
 #include "parrot/parrot.h"
@@ -215,7 +216,8 @@ MAIN
 .sub 'generate_code'
     .param string infile
     .local pmc ifh
-    ifh = open infile, 'r'
+    ifh = new ['FileHandle']
+    ifh.'open'(infile, 'r')
     unless ifh goto err_infile
 
     .local pmc codestring
@@ -229,7 +231,7 @@ MAIN
     .local string pbcstring
     .local int pbclength
 
-    pbcstring = read ifh, 16384
+    pbcstring = ifh.'read'(16384)
     pbclength = length pbcstring
     unless pbclength > 0 goto read_done
 
@@ -251,7 +253,7 @@ MAIN
     goto read_loop
 
   read_done:
-    close ifh
+    ifh.'close'()
 
     push codestring, "\n};\n\nconst int bytecode_size = "
     $S0 = size
@@ -304,7 +306,8 @@ END_OF_FUNCTION
 .sub 'generate_code_gcc'
     .param string infile
     .local pmc ifh
-    ifh = open infile, 'r'
+    ifh = new ['FileHandle']
+    ifh.'open'(infile, 'r')
     unless ifh goto err_infile
 
     .local pmc encoding_table
@@ -323,7 +326,7 @@ END_OF_FUNCTION
     .local string pbcstring
     .local int pbclength
 
-    pbcstring = read ifh, 16384
+    pbcstring = ifh.'read'(16384)
     pbclength = length pbcstring
     unless pbclength > 0 goto read_done
 
@@ -346,7 +349,7 @@ END_OF_FUNCTION
     goto read_loop
 
   read_done:
-    close ifh
+    ifh.'close'()
 
     push codestring, '"'
     push codestring, "\n;\n\n"
@@ -430,7 +433,8 @@ END_OF_DEFINES
     rc_contents .= "\"\n"
 
     .local pmc rc_fh
-    rc_fh = open rc_path, 'w'
+    rc_fh = new ['FileHandle']
+    rc_fh.'open'(rc_path, 'w')
     unless rc_fh goto err_rc_open
     print rc_fh, rc_contents
     $I0 = rc_fh.'close'()

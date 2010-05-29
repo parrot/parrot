@@ -991,6 +991,7 @@ OUTPUT
 unlink( $l1_pbc, $l2_pbc );
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
+.loadlib 'trans_ops' # for atan
 .sub make_pi :immediate :anon
     $N0 = atan 1.0, 1.0
     $N0 *= 4

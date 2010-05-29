@@ -49,6 +49,8 @@ consumption which should be resolved soon.
 
 =cut
 
+.loadlib 'bit_ops'
+
 ###########################################################################
 # Export function entries to globals
 

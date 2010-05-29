@@ -41,6 +41,8 @@ Converted to PIR by Bernhard Schmalhofer.
 
 =cut
 
+.loadlib 'io_ops' # convenient I/O dynamic opcodes
+
 .sub "uniq" :main
   .param pmc argv
 

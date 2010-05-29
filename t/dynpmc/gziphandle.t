@@ -16,6 +16,8 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
 
 =cut
 
+.loadlib 'io_ops'
+
 .sub 'main' :main
     .include 'test_more.pir'
     .include 'iglobals.pasm'

@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(129)
+    plan(137)
 
     resize_tests()
     negative_array_size()
@@ -39,6 +39,8 @@ out-of-bounds test. Checks INT and PMC keys.
     get_mro_tests()
     push_and_pop()
     unshift_and_shift()
+    shift_empty()
+    pop_empty()
     multikey_access()
     exists_and_defined()
     append_tests()
@@ -577,6 +579,74 @@ loop:
     is(f_elem, 123.123000, "shifted num has correct value")
     elements = pmc_arr
     is(elements, 0, "expectedly empty RPA has 0 elements")
+.end
+
+.sub shift_empty
+    .local pmc pmc_arr
+    pmc_arr = new ['ResizablePMCArray']
+    $I1 = 0
+    push_eh handle_i
+    $I0 = shift pmc_arr
+    inc $I1
+handle_i:
+    pop_eh
+    is($I1, 0, 'shift int from empty RPA throws')
+
+    push_eh handle_n
+    $N0 = shift pmc_arr
+    inc $I1
+handle_n:
+    pop_eh
+    is($I1, 0, 'shift num from empty RPA throws')
+
+    push_eh handle_s
+    $S0 = shift pmc_arr
+    inc $I1
+handle_s:
+    pop_eh
+    is($I1, 0, 'shift string from empty RPA throws')
+
+    push_eh handle_p
+    $P0 = shift pmc_arr
+    inc $I1
+handle_p:
+    pop_eh
+    is($I1, 0, 'shift pmc from empty RPA throws')
+
+.end
+
+.sub pop_empty
+    .local pmc pmc_arr
+    pmc_arr = new ['ResizablePMCArray']
+    $I1 = 0
+    push_eh handle_i
+    $I0 = pop pmc_arr
+    inc $I1
+handle_i:
+    pop_eh
+    is($I1, 0, 'pop int from empty RPA throws')
+
+    push_eh handle_n
+    $N0 = pop pmc_arr
+    inc $I1
+handle_n:
+    pop_eh
+    is($I1, 0, 'pop num from empty RPA throws')
+
+    push_eh handle_s
+    $S0 = pop pmc_arr
+    inc $I1
+handle_s:
+    pop_eh
+    is($I1, 0, 'pop string from empty RPA throws')
+
+    push_eh handle_p
+    $P0 = pop pmc_arr
+    inc $I1
+handle_p:
+    pop_eh
+    is($I1, 0, 'pop pmc from empty RPA throws')
+
 .end
 
 ## an Integer Matrix, as used by befunge as a playing field

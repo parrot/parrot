@@ -14,6 +14,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 =cut
 
 .include 'stat.pasm'
+.loadlib 'io_ops'
 
 =head3 Class Archive;Tar;File
 
@@ -438,8 +439,10 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 .sub '_error' :method
     .param pmc args :slurpy
     $S0 = join '', args
-    printerr $S0
-    printerr "\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'($S0)
+    $P1.'print'("\n")
 .end
 
 =back

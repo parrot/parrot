@@ -61,8 +61,10 @@
 	############################################
 	# Read in the file
 beginwhile:
-	chunk = read 65535
-	chunklen = length chunk
+        $P0      = getinterp
+        $P1      = $P0.'stdhandle'(0) # stdin
+        chunk    = $P1.'read'(65535)
+        chunklen = length chunk
 	unless chunklen goto endwhile
 	# They don't say you have to match case insenitive...
 	chunk = downcase chunk

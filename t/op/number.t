@@ -19,7 +19,7 @@ Tests the use of Parrot floating-point number registers.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(130)
+    plan(126)
     test_set_n_nc()
     test_set_n()
     test_add_n_n_n()
@@ -30,7 +30,6 @@ Tests the use of Parrot floating-point number registers.
     test_mul_i()
     test_div_i()
     test_mod_n()
-    test_cmod_n()
     test_eq_n_ic()
     test_eq_nc_ic()
     test_ne_n_ic()
@@ -66,9 +65,6 @@ Tests the use of Parrot floating-point number registers.
     test_exception_fdiv_n_n_n_by_zero()
     test_exception_fdiv_n_nc_n_by_zero()
     test_exception_fdiv_n_n_nc_by_zero()
-    test_exception_cmod_n_n_n_by_zero()
-    test_exception_cmod_n_nc_n_by_zero()
-    test_exception_cmod_n_n_nc_by_zero()
     test_mod_n_n_n_by_zero()
     test_mod_n_nc_n_by_zero()
     test_mod_n_n_nc_by_zero()
@@ -257,13 +253,6 @@ Tests the use of Parrot floating-point number registers.
     set     $N1, -3.0
     mod     $N2, $N0, $N1
     is( $N2, "-2", 'mod_n' )
-.end
-
-.sub test_cmod_n
-    set     $N0, 5.000
-    set     $N1, 3.000
-    cmod    $N2, $N0, $N1
-    is( $N2, "2", 'cmod_n' )
 .end
 
 .sub test_eq_n_ic
@@ -776,31 +765,6 @@ Tests the use of Parrot floating-point number registers.
     push_eh handler
     set $N1, 10
     fdiv $N2, $N1, 0
-  handler:
-    .exception_is( 'Divide by zero' )
-.end
-
-.sub test_exception_cmod_n_n_n_by_zero
-    push_eh handler
-    set $N0, 0
-    set $N1, 10
-    cmod $N2, $N1, $N0
-  handler:
-    .exception_is( 'Divide by zero' )
-.end
-
-.sub test_exception_cmod_n_nc_n_by_zero
-    push_eh handler
-    set $N0, 0
-    cmod $N2, 10, $N0
-  handler:
-    .exception_is( 'Divide by zero' )
-.end
-
-.sub test_exception_cmod_n_n_nc_by_zero
-    push_eh handler
-    set $N1, 10
-    cmod $N2, $N1, 0
   handler:
     .exception_is( 'Divide by zero' )
 .end

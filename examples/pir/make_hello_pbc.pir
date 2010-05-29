@@ -84,9 +84,10 @@
 
     # Now pack Packfile and save it
     $S0 = pf
-    $P1 = open "generated_hello.pbc", "w"
+    $P1 = new ['FileHandle']
+    $P1.'open'("generated_hello.pbc", "w")
     $P1.'puts'($S0)
-    close $P1
+    $P1.'close'()
 
     # And check it!
     load_bytecode 'generated_hello.pbc'

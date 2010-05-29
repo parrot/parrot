@@ -59,6 +59,9 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .const int TESTS = 308
 
+.loadlib 'sys_ops'
+.loadlib 'io_ops'
+
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
     .include "iglobals.pasm"
@@ -154,7 +157,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
     data_hash = new 'Hash'
     data_hash["''"] = ''
     data_hash['2**32-1'] = 0xffffffff
-    $N0 = pow 2, 38
+    $N0 = data_hash['2**32-1']
+    inc $N0
     data_hash['2**38'] = $N0
     data_hash["'string'"] = 'string'
 

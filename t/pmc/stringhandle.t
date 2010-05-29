@@ -133,6 +133,7 @@ OUT
 
 pir_output_is(
     <<'CODE', <<'OUT', 'read opcode' );
+.loadlib 'io_ops'
 .sub 'test' :main
     $P0 = new ['StringHandle']
     $P0.'open'('README', 'w')
@@ -273,7 +274,7 @@ pir_output_is( <<'CODE', <<'OUT', 'readline 10,000 lines' );
     $I0 = stringhandle.'eof'()
     if $I0 goto end_read_loop
 
-    test_line = readline stringhandle
+    test_line = stringhandle.'readline'()
     if test_line == "" goto end_read_loop
     test_line = chomp( test_line )
     $I1 = test_line

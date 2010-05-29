@@ -30,6 +30,7 @@ REDO:   # I3 counts from 2 up to I4 (I1/2)
 	set     I3, 2
 	div     I4, I1, 2
 LOOP:   # Check if I3 is a factor of I1
+.loadlib 'math_ops' # cmod is a dynop
 	cmod    I5, I1, I3
 	if      I5, OK
 	# We've found a factor, so it can't be a prime and

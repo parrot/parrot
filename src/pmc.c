@@ -771,7 +771,7 @@ INTVAL
 Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 {
     ASSERT_ARGS(Parrot_pmc_get_type_str)
-    if (!name)
+    if (STRING_IS_NULL(name))
         return enum_type_undef;
     else {
         PMC * const classname_hash = interp->class_hash;
@@ -780,7 +780,7 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
         if (!PMC_IS_NULL(item)) {
             /* nested namespace with same name */
-            if (item->vtable->base_type == enum_class_NameSpace)
+            if (PMC_IS_TYPE(item, NameSpace))
                 return enum_type_undef;
             else
                 return VTABLE_get_integer(interp, item);

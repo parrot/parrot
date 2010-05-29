@@ -53,7 +53,7 @@ ERR:
     print "Socket error\n"
     end
 END:
-    close sock
+    sock.'close'()
     end
 .end
 

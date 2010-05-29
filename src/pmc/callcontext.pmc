@@ -79,6 +79,13 @@ static void ensure_positionals_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void ensure_positionals_storage_ap(PARROT_INTERP,
+    ARGIN(PMC *self),
+    INTVAL size,
+    INTVAL allocated_positionals)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static Pcc_cell* get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
         __attribute__nonnull__(1)
@@ -121,6 +128,9 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 #define ASSERT_ARGS_ensure_positionals_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_ensure_positionals_storage_ap __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_get_cell_at __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -146,13 +156,23 @@ static void
 ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 {
     ASSERT_ARGS(ensure_positionals_storage)
-    INTVAL num_positionals, allocated_positionals;
-    Pcc_cell *array, *new_array;
+    INTVAL allocated_positionals;
 
     GETATTR_CallContext_allocated_positionals(interp, self, allocated_positionals);
 
     if (size <= allocated_positionals)
         return;
+
+    ensure_positionals_storage_ap(interp, self, size, allocated_positionals);
+}
+
+static void
+ensure_positionals_storage_ap(PARROT_INTERP,
+                              ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals)
+{
+    ASSERT_ARGS(ensure_positionals_storage_ap)
+    INTVAL num_positionals;
+    Pcc_cell *array, *new_array;
 
     if (size < 8)
         size = 8;
@@ -934,7 +954,7 @@ return current Namespace
         GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
 
         if (num_pos + 1 > allocated_positionals)
-            ensure_positionals_storage(INTERP, SELF, num_pos + 1);
+            ensure_positionals_storage_ap(INTERP, SELF, num_pos + 1, allocated_positionals);
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         cells[num_pos].u.i      = value;
@@ -976,7 +996,7 @@ return current Namespace
         GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
 
         if (num_pos + 1 > allocated_positionals)
-            ensure_positionals_storage(INTERP, SELF, num_pos + 1);
+            ensure_positionals_storage_ap(INTERP, SELF, num_pos + 1, allocated_positionals);
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         cells[num_pos].u.p      = value;

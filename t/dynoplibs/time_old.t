@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# $Id: time_old.t 47051 2010-05-27 08:45:23Z plobsing $
 
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ $year += 1900;
 # don't run this test 1 tick before the year changes #'
 
 pasm_output_is( <<'CODE', $year, "decodelocaltime" );
+.loadlib 'sys_ops'
     time I0
     decodelocaltime P0, I0
     .include "tm.pasm"

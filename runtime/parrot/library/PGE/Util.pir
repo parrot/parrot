@@ -132,7 +132,9 @@ Emits the list of messages to stderr.
     message .= $S0
     message .= "\n"
   emit_message:
-    printerr message
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'(message)
 
     mob.'to'(pos)
     .return (mob)

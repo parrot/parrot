@@ -20,7 +20,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     .include 'test_more.pir'
     .include "iglobals.pasm"
 
-    plan(44)
+    plan(40)
 
     # Don't check BigInt or BigNum without gmp
     .local pmc interp     # a handle to our interpreter object.
@@ -55,7 +55,6 @@ Test handling C<dest> arg in 3-args arithmetic.
     test_logical_xor(type)
     test_logical_or(type)
     test_modulus(type)
-    test_pow(type)
     test_subtract(type)
 .end
 
@@ -318,36 +317,6 @@ Test handling C<dest> arg in 3-args arithmetic.
     # ignore exceptions
     push_eh done
     mod $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-
-    is( $I0, 0, $S0 )
-    goto end
-
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_pow
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in pow for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    pow $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
 

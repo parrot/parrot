@@ -21,7 +21,7 @@ number types.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
 
-    plan(121)
+    plan(80)
 
     take_the_negative_of_a_native_integer()
     take_the_absolute_of_a_native_integer()
@@ -42,8 +42,6 @@ number types.
     subtract_native_number_from_native_number()
     multiply_native_number_with_native_number()
     divide_native_number_by_native_number()
-    integer_overflow_with_pow()
-    bnot_p_p_creates_destination()
     # END_OF_TESTS
 
 .end
@@ -468,56 +466,6 @@ End_test4:
     div $N0, $N0, $N2
     is( $N0, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
-.end
-
-.sub integer_overflow_with_pow
-    .include "iglobals.pasm"
-
-    # Check that we aren't 32-bit INTVALs without GMP
-    .local pmc interp     # a handle to our interpreter object.
-    interp = getinterp
-    .local pmc config
-    config = interp[.IGLOBALS_CONFIG_HASH]
-    .local int intvalsize
-    intvalsize = config['intvalsize']
-    .local int gmp
-    gmp = config['gmp']
-
-    if intvalsize != 4 goto can_test
-    if gmp goto can_test
-        skip(40,'No integer overflow for 32-bit INTVALs without GMP installed')
-        goto end
-
-  can_test:
-
-    .local pmc i1, i2, r
-    i1 = new 'Integer'
-    i2 = new 'Integer'
-    i1 = 2
-    i2 = 1
-    $I1 = 1
-  next:
-    null r
-    r = pow i1, i2
-    $S0 = r
-
-    $I1 = $I1 * 2
-    is( $S0, $I1, 'integer_overflow_with_pow' )
-
-    inc i2
-# XXX: this must be extended to at least 64 bit range
-# when sure that the result is not floating point.
-# In the meantime, make sure it overflows nicely
-# on 32 bit.
-    unless i2 > 40 goto next
-
-  end:
-.end
-
-.sub 'bnot_p_p_creates_destination'
-    $P0 = box 3
-    $P1 = bnot $P0
-    is( $P1, -4, 'bnot_p_p_creates_destination')
 .end
 
 # Local Variables:

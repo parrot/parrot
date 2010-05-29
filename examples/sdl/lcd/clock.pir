@@ -20,6 +20,8 @@ This example demonstrates the SDL::LCD object. It shows a simple clock.
 
 .include "tm.pasm"
 .include "timer.pasm"
+.loadlib 'sys_ops'
+.loadlib 'math_ops'
 
 =item _main
 

@@ -7,17 +7,18 @@
 # N.B. it is called the sum-file benchmark on the computer shootout (KF)
 
 .sub main :main
-	.local pmc stdin
+	.local pmc interp, stdin
 	.local string line
 	.local int count, tmp, linelen
-	count = 0
-	stdin = getstdin
+	count  = 0
+	interp = getinterp
+	stdin  = interp.'stdhandle'(0)
 beginwhile:
-	line = readline stdin
+	line    = stdin.'readline'()
 	linelen = length line
 	unless linelen goto endwhile
-	tmp	= line
-	count += tmp
+	tmp     = line
+	count  += tmp
 	goto beginwhile
 endwhile:
 	print count

@@ -35,15 +35,16 @@ loop:
 .sub main :main
 	.local pmc stdin, stdout
 	.local string line, seq
-	stdin = getstdin
-	stdout = getstdout
+        $P0    = getinterp
+        stdin  = $P0.'stdhandle'(0)
+        stdout = $P0.'stdhandle'(1)
 	# stdout is linebuffered per default - make it block buffered
 	stdout.'buffer_size'(8192)
 
 	seq = ''
 
 beginwhile:
-	line = readline stdin
+	line = stdin.'readline'()
 	unless line goto endwhile
 	$I0 = ord line
 	unless $I0 == 62 goto else   # '>'

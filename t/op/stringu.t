@@ -25,11 +25,12 @@ Tests Parrot unicode string system.
 
 pir_output_is( <<'CODE', <<OUTPUT, "angstrom" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     chr $S0, 0x212B
-    print $P0, $S0
-    print $P0, "\n"
+    print $S0
+    print "\n"
     end
 .end
 CODE
@@ -38,8 +39,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"\x{212b}"
     print $S0
     print "\n"
@@ -51,8 +53,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{212b}"
     print $S0
     print "\n"
@@ -64,8 +67,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{212b}-aaaaaa"
     print $S0
     print "\n"
@@ -77,8 +81,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\u212b-aaaaaa"
     print $S0
     print "\n"
@@ -90,8 +95,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
     print $S0
     print "\n"
@@ -103,8 +109,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U' );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\U0001d400-aaaaaa"
     print $S0
     print "\n"
@@ -116,8 +123,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "two upscales" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
     print $S0
     print "\n"
@@ -133,8 +141,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale" );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
     print $S0
     print "\n"
@@ -150,8 +159,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo' );
 .sub main :main
-    getstdout $P0
-    $P0.'encoding'("utf8")
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(1)
+    $P1.'encoding'("utf8")
     set $S0, "ok 1\cJ"
     print $S0
     set $S0, "ok 2\012"

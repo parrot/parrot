@@ -19,6 +19,8 @@ parrotlib's interface functions.
 
 =cut
 
+.loadlib 'os'
+
 .sub __onload :load
     .local pmc paths
     .local pmc includes
@@ -127,32 +129,45 @@ Returns the location of a dynamic extension.
 .sub dynext_location
     .param string request
     .param string ext
+
+    .local pmc    os
     .local string name
 
+    os = new ['OS']
+
     name = request
-    stat $I0, name, 0
-    if $I0 goto END
+    push_eh FILE_NOT_FOUND_1
+    # OS.stat throws on file not found
+    os.'stat'(name)
+    goto END
 
+FILE_NOT_FOUND_1:
     name = concat request, ext
-    stat $I0, name, 0
-    if $I0 goto END
+    push_eh FILE_NOT_FOUND_2
+    os.'stat'(name)
+    goto END
 
+FILE_NOT_FOUND_2:
     name = concat "runtime/parrot/dynext/", request
-    stat $I0, name, 0
-    if $I0 goto END
+    push_eh FILE_NOT_FOUND_3
+    os.'stat'(name)
+    goto END
 
+FILE_NOT_FOUND_3:
     name = concat "runtime/parrot/dynext/", request
     name = concat name, ext
-    stat $I0, name, 0
-    if $I0 goto END
+    push_eh FILE_NOT_FOUND_4
+    os.'stat'(name)
+    goto END
 
+FILE_NOT_FOUND_4:
     # file not found, give the OS a chance to locate it
     name = concat request, ext
+    .return (name)
 
 END:
-    .begin_return
-    .set_return name
-    .end_return
+    pop_eh
+    .return (name)
 .end
 
 
@@ -187,10 +202,17 @@ END:
     path = $P0
 
     $S0 = concat path, name
-    stat $I0, $S0, 0
-    if $I0 goto OK
+    $P0 = new ['OS']
+    push_eh FILE_NOT_FOUND
+        # OS.stat throws on file not found
+        $P0.'stat'($S0)
+    pop_eh
+    goto END
+
+FILE_NOT_FOUND:
     null $S0
-OK:
+
+END:
     .begin_return
     .set_return $S0
     .end_return

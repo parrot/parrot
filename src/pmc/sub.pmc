@@ -954,6 +954,10 @@ Gets the sub that is the outer of this one, if any, or a Null PMC.
 
 Sets the sub that is the outer of this one.
 
+=item C<void set_outer_ctx(PMC *outer_ctx)>
+
+Set the outer context to be used on the next invocation of this sub.
+
 =item C<INTVAL arity()>
 
 Returns the arity of the Sub (the number of arguments, excluding optional and
@@ -1088,6 +1092,13 @@ slurpy arguments).
             }
             outer_ctx = Parrot_pcc_get_caller_ctx(INTERP, outer_ctx);
         }
+    }
+
+
+    METHOD set_outer_ctx(PMC *outer_ctx) {
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
+        sub->outer_ctx = outer_ctx;
     }
 
 

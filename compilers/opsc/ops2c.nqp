@@ -11,30 +11,42 @@ my $emit_lines := 1;
 my $getopts := Q:PIR{ %r = new ['Getopt';'Obj'] };
 
 $getopts.notOptStop();
+
+# build core ops
 my $arg := $getopts.add();
 $arg.long('core');
 $arg.short('c');
 
+# build the dynops in one .ops file
 $arg := $getopts.add();
 $arg.long('dynamic');
 $arg.short('d');
 $arg.type('String');
 
+# don't write to any files
 $arg := $getopts.add();
 $arg.long('debug');
 $arg.short('g');
 
+# don't add line numbers to generated files (not implemented)
 $arg := $getopts.add();
 $arg.long('no-lines');
 $arg.short('n');
 
+# print anemic usage information and exit
 $arg := $getopts.add();
 $arg.long('help');
 $arg.short('h');
 
+# regenerate ops.num et. al. even if it's not necessary
 $arg := $getopts.add();
 $arg.long('force-regen');
 $arg.short('f');
+
+# suppress timing and debug output on stdout
+$arg := $getopts.add();
+$arg.long('quiet');
+$arg.short('q');
 
 my $opts := $getopts.get_options(pir::getinterp__p()[2]);
 
@@ -43,7 +55,6 @@ if $opts<core> {
         src/ops/core.ops
         src/ops/bit.ops
         src/ops/cmp.ops
-        src/ops/debug.ops
         src/ops/io.ops
         src/ops/math.ops
         src/ops/object.ops
@@ -78,32 +89,33 @@ if ($opts<no-lines>) {
 
 my $trans := Ops::Trans::C.new();
 my $start_time := pir::time__N();
-my $debug :=  ?$opts<debug>;
+my $debug := ?$opts<debug>;
+my $quiet := ?$opts<quiet>;
 my $f;
 my $renum;
 
 if $core {
     my $lib := Ops::OpLib.new(
-        :num_file('src/ops/ops.num'),
         :skip_file('src/ops/ops.skip'),
+        :quiet($quiet)
     );
-    $f := Ops::File.new(|@files, :oplib($lib), :core(1));
+    $f := Ops::File.new(|@files, :oplib($lib), :core(1), :quiet($quiet));
 }
 else {
-    $f := Ops::File.new(|@files, :core(0));
+    $f := Ops::File.new(|@files, :core(0), :quiet($quiet));
 }
 
 pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
-#say("# Ops parsed in $time seconds.");
+$quiet || say("# Ops parsed in $time seconds.");
 
 my $emitter := Ops::Emitter.new(
     :ops_file($f), :trans($trans),
     :script('ops2c.nqp'), :file(@files[0]),
-    :flags( hash( core => $core ) ),
+    :flags( hash( core => $core, quiet => $quiet ) ),
 );
 
 unless $debug {
-    if $force_regen || $f<renum>.need_regeneration {
+    if $core {
         $emitter.print_ops_num_files();
     }
     $emitter.print_c_header_files();

@@ -85,6 +85,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .namespace ['LWP';'Protocol';'file']
 
+.loadlib 'io_ops'
 .include 'stat.pasm'
 
 .sub '' :init :load :anon
@@ -415,18 +416,16 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $I0 = index str, "\r\n\r\n"
     if $I0 < 0 goto L1
     $I0 += 4
-    $S0 = substr str, $I0
-    $P0 = box $S0
-    setattribute response, 'content', $P0
     goto L2
   L1:
     $I0 = index str, "\n\n"
-    if $I0 < 0 goto L1
+    if $I0 < 0 goto L3
     $I0 += 2
+  L2:
     $S0 = substr str, $I0
     $P0 = box $S0
     setattribute response, 'content', $P0
-  L2:
+  L3:
 .end
 
 =item request

@@ -45,6 +45,7 @@ osutils - Parrot OS Utilities
     .return ($I0)
 .end
 
+.loadlib 'io_ops'
 .include 'stat.pasm'
 
 .sub 'file_exists'

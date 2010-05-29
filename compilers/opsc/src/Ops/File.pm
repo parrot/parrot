@@ -182,14 +182,14 @@ ops file.
 
 =end
 
-method new(*@files, :$oplib, :$core!, :$nolines) {
+method new(*@files, :$oplib, :$core!, :$nolines, :$quiet? = 0) {
     self<files>   := @files;
     self<core>    := $core;
     self<ops>     := list(); # Ops
     self<preamble>:= '';
     self<compiler>:= pir::compreg__Ps('Ops');
     self<op_order>:= 0;
-    self<renum>   := Ops::Renumberer.new( :ops_file(self) );
+    self<quiet>   := $quiet;
 
     if $core {
         self<oplib> := $oplib;
@@ -243,12 +243,15 @@ Reads in the specified .ops file, gathering information about the ops.
 method read_ops($file, $nolines) {
     $Ops::Compiler::Actions::OPLIB := self<oplib>;
 
-    say("# Parsing $file...");
+    self<quiet> || say("# Parsing $file...");
     my $start_time := pir::time__N();
     my $buffer     := slurp($file);
+    my $start_ops  := +self<ops>;
     self.compile_ops($buffer, :experimental( $file ~~ /experimental\.ops/));
+    my $end_ops  := +self<ops>;
     pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
-    say("# Parsed $file in $time seconds.");
+    self<quiet> || say("# Parsed $file in $time seconds; found "~
+                       ($end_ops - $start_ops) ~" ops.");
 }
 
 method compile_ops($str, :$experimental? = 0) {
@@ -284,30 +287,10 @@ method version_patch() { self<version_patch> }
 
 method _calculate_op_codes() {
 
-    my $code := self<oplib> ??
-        self<oplib>.max_op_num + 1 !!
-        0;
+    my $code := 0;
 
     for self<ops> -> $op {
-        #ops listed in ops.num are non-experimental
-        if self<oplib> {
-            my $full_name := $op.full_name;
-            if self<oplib>.op_num_table.exists($full_name) {
-                $op<code> := self<oplib>.op_num_table{$full_name};
-            }
-            elsif !$op<experimental> && !self<oplib>.op_skip_table.exists($full_name) {
-                die("Non-experimental op " ~ $op.full_name ~ " is not in ops.num.");
-            }
-            #ops not explicitly listed but not skipped are experimental
-            else {
-                $op<code> := $code++;
-                say("# Experimental op " ~ $op.full_name ~ " is not in ops.num.");
-            }
-        }
-        #if there's no oplib, we're compiling dynops and ops aren't experimental
-        else {
-            $op<code> := $code++;
-        }
+        $op<code> := $code++;
     }
 }
 

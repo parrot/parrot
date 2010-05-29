@@ -18,6 +18,18 @@
 .include 'compilers/opsc/gen/Ops/File.pir'
 .include 'compilers/opsc/gen/Ops/Renumberer.pir'
 
+
+.namespace []
+.sub 'main' :main
+    .param pmc args
+
+    $P0 = compreg 'Ops'
+    $P0.'command_line'(args)
+    exit 0
+.end
+
+
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

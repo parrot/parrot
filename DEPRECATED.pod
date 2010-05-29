@@ -233,9 +233,9 @@ This op is too low level for Parrot in its current form.
 
 L<https://trac.parrot.org/parrot/ticket/1643>
 
-=item unroll [experimental]
+=item finalize [experimental]
 
-Unroll inner runloops from exception handlers.
+Finalize exception handler, unrolling inner runloops if needed.
 
 L<https://trac.parrot.org/parrot/ticket/1635>
 

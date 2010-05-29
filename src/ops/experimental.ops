@@ -367,15 +367,16 @@ op find_codepoint(out INT, in STR) {
 #endif
 }
 
-=item B<unroll>(in PMC)
+=item B<finalize>(in PMC)
 
-Exception handling done, unroll possible inner runloops left. $1 is the
-Exception handled or the ExceptionHandler that is handling it.
+Finalize exception handling, freeing any information needed to resume
+the handled exception, like inner runloops.
+$1 is the Exception handled or the ExceptionHandler that is handling it.
 EXPERIMENTAL. Handle with care.
 
 =cut
 
-op unroll(in PMC) {
+op finalize(in PMC) {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = expr NEXT();
     PMC *eh = PMCNULL;

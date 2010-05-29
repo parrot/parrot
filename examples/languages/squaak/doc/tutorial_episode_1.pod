@@ -9,7 +9,7 @@ This is the first episode in a tutorial series on building a compiler with the
 Parrot Compiler Tools. If you're interested in virtual machines, you've
 probably heard of the Parrot virtual machine. Parrot is a generic virtual
 machine designed for dynamic languages. This is in contrast with the Java
-virtual machine (JVM) and Microsoft's Common Language Runtime (CLR), both of
+virtual machine (JVM) and Microsoft's B<C>ommon B<L>anguage B<R>untime (CLR), both of
 which were designed to run static languages. Both the JVM and Microsoft
 (through the Dynamic Language Runtime -- DLR) are adding support for dynamic
 languages, but their primary focus is still static languages.
@@ -17,7 +17,7 @@ languages, but their primary focus is still static languages.
 =head2 High Level Languages
 
 The main purpose of a virtual machine is to run programs. These programs are
-typically written in some High Level Language (HLL). Some well-known dynamic
+typically written in some B<H>igh B<L>evel B<L>anguage (HLL). Some well-known dynamic
 languages (sometimes referred to as scripting languages) are Lua, Perl, PHP,
 Python, Ruby, and Tcl. Parrot is designed to be able to run all these languages.
 Each language that Parrot hosts, needs a compiler to parse the syntax of the
@@ -34,7 +34,7 @@ is rather difficult.
 
 =head2 The Parrot Compiler Toolkit
 
-Enter the Parrot Compiler Toolkit (PCT). In order to make Parrot an interesting
+Enter the B<P>arrot B<C>ompiler B<T>oolkit (PCT). In order to make Parrot an interesting
 target for language developers, the process of constructing a compiler should be
 supported by the right tools. Just as any construction task becomes much easier
 if you have the right tools (you wouldn't build a house using only your bare
@@ -99,13 +99,13 @@ parts:
 
 =over 4
 
-=item Parrot Grammar Engine (PGE).
+=item B<P>arrot B<G>rammar B<E>ngine (PGE).
 
 The PGE is an advanced engine for regular expressions. Besides regexes as found
 in Perl 5, it can also be used to define language grammars, using Perl 6 syntax.
 (Check the references for the specification.)
 
-=item Parrot Abstract Syntax Tree (PAST).
+=item B<P>arrot B<A>bstract B<S>yntax B<T>ree (PAST).
 
 The PAST nodes are a set of classes defining generic abstract syntax tree nodes
 that represent common language constructs.
@@ -114,7 +114,7 @@ that represent common language constructs.
 
 This class is the compiler driver for any PCT-based compiler.
 
-=item Not Quite Perl (6) (NQP).
+=item B<N>ot B<Q>uite B<P>erl (6) (NQP).
 
 NQP is a lightweight language inspired by Perl 6 and can be used to write the
 methods that must be executed during the parsing phase, just as you can write
@@ -140,18 +140,18 @@ type (assuming you're in Parrot's root directory):
  $ perl tools/dev/mk_language_shell.pl Squaak languages/squaak
 
 (Note: if you're on Windows, you should use backslashes.) This will generate the
-files in a directory languages/squaak, and use the name Squaak as the language's
-name. The last config step is to create the Makefile for your new language:
+files in a directory F<languages/squaak>, and use the name Squaak as the language's
+name.
 
- $  perl Configure.pl --languages=squaak
+After this, go to the directory F<languages/squaak> and type:
 
-After this, go to the directory languages/squaak and type:
-
- $ make test
+ $ parrot setup.pir test
 
 This will compile the generated files and run the test suite. If you want more
 information on what files are being generated, please check out the references
-at the end of this episode.
+at the end of this episode or read the documentation included in the file
+F<mk_language_shell.pl>. For that you can use an installed parrot executable
+from your distribution or one you have just compiled.
 
 Note that we didn't write a single line of code, and already we have the basic
 infrastructure in place to get us started. Of course, the generated compiler
@@ -163,7 +163,7 @@ your favorite editor, and put in this statement:
 
  say "Squaak!";
 
-Save the file (for instance as test.sq) and type:
+Save it the as file F<test.sq> and type:
 
  $ ../../parrot squaak.pbc test.sq
 

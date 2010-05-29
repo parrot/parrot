@@ -16,7 +16,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 159
+.const int TESTS = 150
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -32,7 +32,6 @@ Tests the use of Parrot integer registers.
     test_div()
     test_mod()
     mod_negative_zero_rest()
-    test_cmod()
     test_eq()
     test_ne()
     test_lt()
@@ -60,9 +59,6 @@ Tests the use of Parrot integer registers.
     test_fdiv_i_i_i_by_zero()
     test_fdiv_i_ic_i_by_zero()
     test_fdiv_i_i_ic_by_zero()
-    test_cmod_i_i_i_by_zero()
-    test_cmod_i_ic_i_by_zero()
-    test_cmod_i_i_ic_by_zero()
     test_mod_i_i_i_by_zero()
     test_mod_i_ic_i_by_zero()
     test_mod_i_i_ic_by_zero()
@@ -335,26 +331,6 @@ Tests the use of Parrot integer registers.
 
     $I1 = mod -3, -3
     is($I1, 0, 'mod - negative, zero rest (#36003), -3 mod -3 = 0')
-.end
-
-.sub 'test_cmod'
-    $I0 = 5
-    $I1 = 3
-    $I2 = cmod $I0, $I1
-    is($I2, 2, 'cmod_i_i_i')
-    is($I0, 5, 'cmod_i_i_i - dividend unchanged')
-    is($I1, 3, 'cmod_i_i_i - divisor unchanged')
-
-    $I0 = 12
-
-    $I1 = cmod $I0, 10
-    is($I1, 2, 'cmod_i_i_ic')
-
-    $I1 = cmod 14, $I0
-    is($I1, 2, 'cmod_i_ic_i')
-
-    $I1 = cmod 13, 11
-    is($I1, 2, 'cmod_i_ic_ic')
 .end
 
 .sub 'test_eq'
@@ -923,52 +899,6 @@ Tests the use of Parrot integer registers.
 
   test_fdiv_i_i_ic_by_zero_end:
     ok($I3, 'fdiv_i_i_ic by zero')
-.end
-
-.sub 'test_cmod_i_i_i_by_zero'
-    $I0 = 0
-    $I1 = 10
-    push_eh test_cmod_i_i_i_by_zero_catch
-    $I2 = cmod $I1, $I0
-    pop_eh
-    $I3 = 0
-    goto test_cmod_i_i_i_by_zero_end
-
-  test_cmod_i_i_i_by_zero_catch:
-    $I3 = 1
-
-  test_cmod_i_i_i_by_zero_end:
-    ok($I3, 'cmod_i_i_i by zero')
-.end
-
-.sub 'test_cmod_i_ic_i_by_zero'
-    $I0 = 0
-    push_eh test_cmod_i_ic_i_by_zero_catch
-    $I2 = cmod 10, $I0
-    pop_eh
-    $I3 = 0
-    goto test_cmod_i_ic_i_by_zero_end
-
-  test_cmod_i_ic_i_by_zero_catch:
-    $I3 = 1
-
-  test_cmod_i_ic_i_by_zero_end:
-    ok($I3, 'cmod_i_ic_i by zero')
-.end
-
-.sub 'test_cmod_i_i_ic_by_zero'
-    $I1 = 10
-    push_eh test_cmod_i_i_ic_by_zero_catch
-    $I2 = cmod $I1, 0
-    pop_eh
-    $I3 = 0
-    goto test_cmod_i_i_ic_by_zero_end
-
-  test_cmod_i_i_ic_by_zero_catch:
-    $I3 = 1
-
-  test_cmod_i_i_ic_by_zero_end:
-    ok($I3, 'cmod_i_i_ic by zero')
 .end
 
 .sub 'test_mod_i_i_i_by_zero'

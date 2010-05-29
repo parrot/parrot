@@ -7,9 +7,11 @@
 # Currently parrot doesn't support system independent PBCs. So, cross your
 # fingers and try different filename for binary-dependent tests...
 
+.loadlib 'io_ops'
+
 .sub '_filename'
     .local string filename
-    filename = 't/native_pbc/number_1.pbc'
+    filename = 't/native_pbc/number.pbc'
     .return (filename)
 .end
 

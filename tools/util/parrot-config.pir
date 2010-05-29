@@ -88,8 +88,10 @@ iter_end:
     end
 usage:
     $S0 = argv[0]
-    printerr $S0
-    printerr " [ <config-key> | --dump | --help ]\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    $P1.'print'($S0)
+    $P1.'print'(" [ <config-key> | --dump | --help ]\n")
     exit 1
 .end
 

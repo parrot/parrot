@@ -83,6 +83,13 @@ void Parrot_srand(INTVAL seed);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_uint_rand(INTVAL how_random);
 
 PARROT_CONST_FUNCTION
@@ -102,12 +109,6 @@ void Parrot_quicksort(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*data);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_Parrot_byte_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(base) \
     , PARROT_ASSERT_ARG(search))
@@ -123,6 +124,9 @@ PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
     , PARROT_ASSERT_ARG(src_regs) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_Parrot_srand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_tm_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(tm))
 #define ASSERT_ARGS_Parrot_uint_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_floatval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_intval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -130,9 +134,6 @@ PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(data) \
     , PARROT_ASSERT_ARG(cmp))
-#define ASSERT_ARGS_tm_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(tm))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/utils.c */
 

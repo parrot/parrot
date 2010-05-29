@@ -33,6 +33,8 @@ Tests the C<StringBuilder> PMC.
     emit_with_named_args()
     emit_with_pos_and_named_args()
 
+    test_unicode_conversion_tt1665()
+
     done_testing()
 
     # END_OF_TESTS
@@ -247,6 +249,29 @@ label_1234:
 CODE
 .end
 
+.sub "test_unicode_conversion_tt1665"
+    .local pmc list
+    list = new 'ResizablePMCArray'
+    push list, 195
+    push list, 182
+
+    .local pmc iterator
+    iterator = iter list
+    .local pmc sb
+    sb = new 'StringBuilder'
+    sb = unicode:""
+    loop:
+      unless iterator goto done
+      $P1 = shift iterator
+      $I1 = $P1
+      $S1 = chr $I1
+      sb .= $S1
+      goto loop
+    done:
+      $S0 = sb
+
+    ok( $S0, "Pushing unicode strings doesn't kill StringBuilder")
+.end
 
 # Local Variables:
 #   mode: pir

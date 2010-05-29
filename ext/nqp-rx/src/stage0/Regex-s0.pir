@@ -149,16 +149,12 @@ for the Cursor if one hasn't been created yet.
     unless cstack_it goto cstack_done
     .local pmc subcur, submatch, names
     subcur = shift cstack_it
+    $I0 = isa subcur, ['Regex';'Cursor']
+    unless $I0 goto cstack_loop
     # If the subcursor isn't bound with a name, skip it
     names = getattribute subcur, '$!names'
     if null names goto cstack_loop
-    $I0 = isa subcur, ['Regex';'Cursor']
-    unless $I0 goto cstack_1
     submatch = subcur.'MATCH'()
-    goto cstack_2
-  cstack_1:
-    submatch = subcur
-  cstack_2:
     # See if we have multiple binds
     .local pmc names_it
     subname = names
@@ -433,13 +429,15 @@ Log a debug message.
     orig = getattribute self, '$!target'
     line = orig.'lineof'(from)
     inc line
-    printerr from
-    printerr '/'
-    printerr line
-    printerr ': '
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    print $P1, from
+    print $P1, '/'
+    print $P1, line
+    print $P1, ': '
     $S0 = join '', args
-    printerr $S0
-    printerr "\n"
+    print $P1, $S0
+    print $P1, "\n"
   done:
     .return (self)
 .end
@@ -719,82 +717,128 @@ Match the backreference given by C<name>.
     .return (cur)
 .end
 
-=item !process_pastnode_results_for_interpolation
 
-Used by the pastnode PAST::Regex type to prepare the results of the evaluation for interpolation.
+=item !INTERPOLATE(var [, convert])
 
-Takes two arguments:
-
-=over 4
-
-=item The node results
-
-=item The subtype of the PAST::Regex node, which is one of:
-
-=over 4
-
-=item interp_regex
-
-String values should be compiled into regexes and then interpolated.
-
-=item interp_literal
-
-String values should be treated as literals.
-
-=item interp_literal_i
-
-String values should be treated as literals and matched case-insensitively.
-
-=back
-
-=back
-
-Returns a RPA containing the elements to be interpolated
+Perform regex interpolation on C<var>.  If C<var> is a
+regex (sub), it is used directly, otherwise it is used
+for a string literal match.  If C<var> is an array,
+then all of the elements of C<var> are considered,
+and the longest match is returned.
 
 =cut
 
-.sub '!process_pastnode_results_for_interpolation' :method
-    .param pmc node
-    .param string subtype
+.sub '!INTERPOLATE' :method
+    .param pmc var
 
-    .local pmc it, result, compiler, context
-    .local string codestr
+    .local pmc cur
+    .local int pos, eos
+    .local string tgt
 
-    result = new ['ResizablePMCArray']
-    $S0 = typeof node
-    if $S0 == 'ResizablePMCArray' goto array
-    $P1 = node
-    it = box 0
-    goto not_array
-  array:
-    it = iter node
-  loop:
-    unless it, loop_done
-    $P1 = shift it
-  not_array:
-    if subtype != 'interp_regex' goto literal 
-    # Don't need to compile it if it's already a Sub
-    $I0 = isa $P1, ['Sub']
-    if $I0 goto literal
-    codestr = $P1
-    $P1 = split '/', codestr
-    codestr = join '\\/', $P1
-    codestr = concat '/', codestr
-    codestr = concat codestr, '/'
-    compiler = compreg 'NQP-rx'
-    $P2 = getinterp
-    context = $P2['context';0]
-    $P2 = compiler.'compile'(codestr, 'outer_ctx'=>context)
-    $P1 = $P2[0]
-    $P2 = getattribute context, 'current_sub'
-    $P1.'set_outer'($P2)
-    $P1 = $P1()
-  literal:
-    push result, $P1
-    goto loop
-  loop_done:
-    .return (result)
+    $I0 = does var, 'array'
+    if $I0 goto var_array
+
+  var_scalar:
+    $I0 = does var, 'invokable'
+    if $I0 goto var_sub
+
+  var_string:
+    (cur, pos, tgt) = self.'!cursor_start'()
+    eos = length tgt
+    $S0 = var
+    $I0 = length $S0
+    $I1 = pos + $I0
+    if $I1 > eos goto string_fail
+    $S1 = substr tgt, pos, $I0
+    if $S0 != $S1 goto string_fail
+    pos += $I0
+  string_pass:
+    cur.'!cursor_pass'(pos, '')
+  string_fail:
+    .return (cur)
+
+  var_sub:
+    cur = var(self)
+    .return (cur)
+
+  var_array:
+    (cur, pos, tgt) = self.'!cursor_start'()
+    eos = length tgt
+    .local pmc var_it, elem
+    .local int maxlen
+    var_it = iter var
+    maxlen = -1
+  array_loop:
+    unless var_it goto array_done
+    elem = shift var_it
+    $I0 = does elem, 'invokable'
+    if $I0 goto array_sub
+  array_string:
+    $S0 = elem
+    $I0 = length $S0
+    if $I0 <= maxlen goto array_loop
+    $I1 = pos + $I0
+    if $I1 > eos goto array_loop
+    $S1 = substr tgt, pos, $I0
+    if $S0 != $S1 goto array_loop
+    maxlen = $I0
+    goto array_loop
+  array_sub:
+    $P0 = elem(self)
+    unless $P0 goto array_loop
+    $I0 = $P0.'pos'()
+    $I0 -= pos
+    if $I0 <= maxlen goto array_loop
+    maxlen = $I0
+    goto array_loop
+  array_done:
+    if maxlen < 0 goto array_fail
+    $I0 = pos + maxlen
+    cur.'!cursor_pass'($I0, '')
+  array_fail:
+    .return (cur)
 .end
+
+
+=item !INTERPOLATE_REGEX(var)
+
+Same as C<!INTERPOLATE> above, except that any non-regex values
+are first compiled to regexes prior to being matched.  
+
+=cut
+
+.sub '!INTERPOLATE_REGEX' :method
+    .param pmc var
+
+    $I0 = does var, 'invokable'
+    if $I0 goto done
+
+    .local pmc p6regex
+    p6regex = compreg 'Regex::P6Regex'
+
+    $I0 = does var, 'array'
+    if $I0 goto var_array
+    var = p6regex.'compile'(var)
+    goto done
+
+  var_array:
+    .local pmc var_it, elem
+    var_it = iter var
+    var = new ['ResizablePMCArray']
+  var_loop:
+    unless var_it goto done
+    elem = shift var_it
+    $I0 = does elem, 'invokable'
+    if $I0 goto var_next
+    elem = p6regex.'compile'(elem)
+  var_next:
+    push var, elem
+    goto var_loop
+
+  done:
+    .tailcall self.'!INTERPOLATE'(var)
+.end
+    
 
 =back
 
@@ -3048,126 +3092,31 @@ second child of this node.
 
 =item 'pastnode'(PAST::Regex node)
 
-Evaluates the supplied PAST node and does various things with the result, based on subtype.
-
-Subtype can be any of:
-
-=over 4
-
-=item zerowidth
-
-Only test for truthiness and fail or not.  No interpolation.
-
-=item interp_regex
-
-String values should be compiled into regexes and then interpolated.
-
-=item interp_literal
-
-String values should be treated as literals.
-
-=item interp_literal_i
-
-String values should be treated as literals and matched case-insensitively.
-
-=item <nothing>
-
-Don't interpolate anything, just execute the PAST code
-
-=back
-
 =cut
 
-.sub 'pastnode' :method :multi(_, ['PAST'; 'Regex'])
+.sub 'pastnode' :method :multi(_, ['PAST';'Regex'])
     .param pmc node
-    .local pmc cur, pos, fail, ops, eos, off, tgt
-    (cur, pos, eos, off, tgt, fail) = self.'!rxregs'('cur pos eos off tgt fail')
+    .local pmc cur, pos, fail, ops
+    (cur, pos, fail) = self.'!rxregs'('cur pos fail')
     ops = self.'post_new'('Ops', 'node'=>node, 'result'=>cur)
- 
-    .local pmc zerowidth, negate, testop, subtype
-    subtype = node.'subtype'()
 
-    ops.'push_pirop'('inline', subtype, negate, 'inline'=>'  # rx pastnode subtype=%1 negate=%2')
     .local pmc cpast, cpost
     cpast = node[0]
     cpost = self.'as_post'(cpast, 'rtype'=>'P')
- 
+
     self.'!cursorop'(ops, '!cursor_pos', 0, pos)
     ops.'push'(cpost)
 
-    # If this is just a zerowidth assertion, we don't actually interpolate anything.  Just evaluate
-    # and fail or not. 
-    if subtype == 'zerowidth' goto zerowidth_test
-
-    # Retain backwards compatibility with old pastnode semantics
-    unless subtype goto done
-
-    .local string prefix
-    prefix = self.'unique'('pastnode_')
-    .local pmc precompiled_label, done_label, loop_label, iterator_reg, label_reg
-    $S0 =  concat prefix, '_precompiled'
-    precompiled_label = self.'post_new'('Label', 'result'=>$S0)
-    $S0 =  concat prefix, '_done'
-    done_label = self.'post_new'('Label', 'result'=>$S0)
-    $S0 =  concat prefix, '_loop'
-    loop_label = self.'post_new'('Label', 'result'=>$S0)
-    iterator_reg = self.'uniquereg'("P")
-    label_reg = self.'uniquereg'("I")
-
-    $S10 = subtype
-    $S10 = concat '"', $S10
-    $S10 = concat $S10, '"'
-    self.'!cursorop'(ops, '!process_pastnode_results_for_interpolation', 1, '$P10', cpost, $S10)
-
-    ops.'push_pirop'('iter', iterator_reg, '$P10')
-    ops.'push_pirop'('set_addr', label_reg, loop_label)
-    ops.'push'(loop_label)
-    ops.'push_pirop'('unless', iterator_reg, fail)
-    ops.'push_pirop'('shift', '$P10', iterator_reg)
-    self.'!cursorop'(ops, '!mark_push', 0, 0, pos, label_reg)
-
-    # Check if it's already a compiled Regex, and call it as a method if so
-    ops.'push_pirop'('isa', '$I10', '$P10', "['Sub']")
-    ops.'push_pirop'('if', '$I10', precompiled_label)
-
-    # XXX This is rakudo's Regex class.  I'm not sure why the above test doesn't catch it, but
-    # need to figure it out so NQP doesn't have rakudo knowledge :(
-    ops.'push_pirop'('isa', '$I10', '$P10', "['Regex']")
-    ops.'push_pirop'('if', '$I10', precompiled_label)
-
-    # Otherwise, treat it as a literal
-    ops.'push_pirop'('set', '$S10', '$P10')
-    ops.'push_pirop'('length', '$I10', '$S10')
-    ops.'push_pirop'('add', '$I11', pos, '$I10')
-    ops.'push_pirop'('gt', '$I11', eos, fail)
-    ops.'push_pirop'('sub', '$I11', pos, off)
-    ops.'push_pirop'('substr', '$S11', tgt, '$I11', '$I10')
-    ne subtype, 'interp_literal_i', dont_downcase
-    ops.'push_pirop'('downcase', '$S10', '$S10')
-    ops.'push_pirop'('downcase', '$S11', '$S11')
-  dont_downcase:
-    ops.'push_pirop'('ne', '$S11', '$S10', fail)
-    ops.'push_pirop'('add', pos, '$I10')
-    ops.'push_pirop'('goto', done_label)
-
-    ops.'push'(precompiled_label)
-    ops.'push_pirop'('callmethod', '$P10', cur, 'result'=>'$P10')
-    ops.'push_pirop'('unless', '$P10', fail)
-    self.'!cursorop'(ops, '!mark_push', 0, 0, CURSOR_FAIL, 0, '$P10')
-    ops.'push_pirop'('callmethod', '"pos"', '$P10', 'result'=>pos)
-    
-    ops.'push'(done_label)
-
-    goto done
-
-  zerowidth_test:
+    .local pmc subtype, negate, testop
+    subtype = node.'subtype'()
+    if subtype != 'zerowidth' goto done
     negate = node.'negate'()
     testop = self.'??!!'(negate, 'if', 'unless')
     ops.'push_pirop'(testop, cpost, fail)
   done:
     .return (ops)
-
 .end
+
 
 =item pass(PAST::Regex node)
 

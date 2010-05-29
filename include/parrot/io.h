@@ -222,6 +222,10 @@ PIOOFF_T Parrot_io_make_offset(INTVAL offset);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PIOOFF_T Parrot_io_make_offset32(INTVAL hi, INTVAL lo);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)
         __attribute__nonnull__(1);
@@ -342,9 +346,6 @@ INTVAL Parrot_io_write(PARROT_INTERP,
         FUNC_MODIFIES(*pmc);
 
 PARROT_WARN_UNUSED_RESULT
-PIOOFF_T Parrot_io_make_offset32(INTVAL hi, INTVAL lo);
-
-PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -378,6 +379,7 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_make_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_io_make_offset32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_new_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -420,7 +422,6 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(buffer))
-#define ASSERT_ARGS_Parrot_io_make_offset32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_make_offset_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))

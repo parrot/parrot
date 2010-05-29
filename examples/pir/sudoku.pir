@@ -151,6 +151,9 @@ Same as parrot.
 
 .const string VERSION="0.2.3"
 
+.loadlib 'bit_ops'
+.loadlib 'io_ops'
+
 .sub _main :main
     .param pmc argv
     .local int argc
