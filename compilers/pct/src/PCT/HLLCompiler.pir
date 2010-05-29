@@ -849,11 +849,15 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
+    .local int can_backtrace
+    can_backtrace = can self, 'backtrace'
+    unless can_backtrace goto no_push_eh
+    push_eh uncaught_exception
+  no_push_eh:
 
     $S0 = adverbs['e']
     $I0 = exists adverbs['e']
     if $I0 goto eval_line
-
     .local pmc result
     result = box ''
     unless args goto interactive
@@ -872,6 +876,9 @@ Generic method for compilers invoked from a shell command line.
     result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
 
   save_output:
+    unless can_backtrace goto no_pop_eh
+    pop_eh
+  no_pop_eh:
     if null result goto end
     $I0 = defined result
     unless $I0 goto end
@@ -903,6 +910,16 @@ Generic method for compilers invoked from a shell command line.
   version:
     self.'version'()
     goto end
+
+    # If we get an uncaught exception in the program and the HLL provides
+    # a backtrace method, we end up here. We pass it the exception object
+    # so it can render a backtrace.
+  uncaught_exception:
+    .get_results ($P0)
+    pop_eh
+    $S0 = self.'backtrace'($P0)
+    print $S0
+    exit 1
 .end
 
 
