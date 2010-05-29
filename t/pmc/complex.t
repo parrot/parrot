@@ -16,14 +16,12 @@ Tests the Complex PMC.
 
 =cut
 
-.loadlib 'trans_ops'
-
 .sub main :main
     .include 'test_more.pir'
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(459)
+    plan(458)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -56,7 +54,6 @@ Tests the Complex PMC.
     test_sub()
     test_i_sub()
     sprintf_with_a_complex()
-    e_raised_pi_time_i__plus_1_equal_0()
     ln_of_complex_numbers()
     exp_of_complex_numbers()
     sqrt_of_complex_numbers()
@@ -649,21 +646,6 @@ handler:
     .sprintf_is( "%d%+di", "1.35+35.1i", "1+35i" )
     .sprintf_is( "%.3f%+.3fi", "0+3.141592653589793i", "0.000+3.142i" )
     .sprintf_is( "%.3f%+.3fi", "0+i", "0.000+1.000i" )
-.end
-
-.sub e_raised_pi_time_i__plus_1_equal_0
-    .local pmc c, c2, c3
-    c  = new ['Complex']
-    c2 = new ['Complex']
-    c3 = new ['Complex']
-    # e^(pi * i) + 1 = 0
-    $N0 = atan 1
-    $N0 *= 4
-    c[0] = 0.0
-    c[1] = $N0
-    c2 = c.'exp'()
-    c2 += 1.0
-    .sprintf_is( "%.3f%+.3fi", c2, "0.000+0.000i" )
 .end
 
 # # The inverse hyperbolic functions are broken wrt -0.0
