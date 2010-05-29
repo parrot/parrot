@@ -20,6 +20,7 @@ NFG encoding with the help of the ICU library.
 
 #include "parrot/parrot.h"
 #include "../unicode.h"
+#include "../grapheme.h"
 
 #if !PARROT_HAS_ICU
 PARROT_DOES_NOT_RETURN

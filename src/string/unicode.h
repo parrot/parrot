@@ -17,19 +17,6 @@ typedef unsigned char utf8_t;
 typedef unsigned short utf16_t;
 typedef unsigned long utf32_t;
 
-#if PARROT_HAS_ICU
-#  include <unicode/uchar.h>
-
-struct grapheme_t {
-    UINTVAL  len;        /* Grapheme length in codepoints. */
-    UChar32 *codepoints; /* UCS-4 codepoints that make up the grapheme */
-    UINTVAL  hash;
-};
-
-typedef struct grapheme_t grapheme;
-
-#endif /* PARROT_HAS_ICU */
-
 #define UNICODE_SURROGATE_FIRST         0xD800u
 #define UNICODE_SURROGATE_LAST          0xDFFFu
 #define UNICODE_HIGH_SURROGATE_FIRST    0xD800u
