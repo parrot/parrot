@@ -172,6 +172,7 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
 
 =cut
 
+.loadlib 'io_ops' # workaround TT #1663
 .loadlib 'sys_ops'
 
 .sub '__onload' :load :init :anon
