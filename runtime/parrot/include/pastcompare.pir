@@ -104,6 +104,9 @@ no:
 
 .sub 'is_equal' :vtable :method
     .param pmc value
+    $P0 = class self
+    $I0 = isa value, $P0
+    if $I0 == 0 goto no
     $P0 = self.'pasttype'()
     $P1 = value.'pasttype'()
     unless $P0 == $P1 goto no
@@ -123,6 +126,9 @@ no:
 
 .sub 'is_equal' :vtable :method
     .param pmc value
+    $P0 = class self
+    $I0 = isa value, $P0
+    if $I0 == 0 goto no
     $P0 = self.'blocktype'()
     $P1 = value.'blocktype'()
     unless $P0 == $P1 goto no
