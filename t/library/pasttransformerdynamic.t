@@ -6,8 +6,9 @@ pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Transformer/Dynamic.pbc');
 pir::load_bytecode('runtime/parrot/include/pastcompare.pbc');
 
-plan(1);
+plan(2);
 test_change_node_attributes();
+test_change_node_types();
 
 sub incVals ($walker, $node) {
     my $v := $node.'value'();
@@ -54,8 +55,8 @@ sub test_change_node_types () {
 			PAST::Val.new(:value(-7)),
 			PAST::Val.new(:value(5)),
 			PAST::Val.new(:value(-32)));
-    my $transformer := PAST::Transformer::Dynamic.new(:val(negate));
-
+    my $transformer := PAST::Transformer::Dynamic.new();
+    $transformer.'val'(negate);
     my $result := $transformer.'walk'($past);
 
     my $target :=
