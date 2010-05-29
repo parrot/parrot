@@ -200,24 +200,30 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         return Parrot_str_clone(interp, src);
     }
     else {
-        UINTVAL len = Parrot_str_length(interp, src);
-        STRING *res = Parrot_str_new_init(interp, NULL, len * sizeof (UChar32),
+        /* Make sure we have NFC Unicode string. */
+        STRING  *from = Parrot_unicode_charset_ptr->compose(interp, 
+                            Parrot_unicode_charset_ptr->to_charset(interp, src));
+        UINTVAL  len  = Parrot_str_length(interp, from);
+        STRING  *to   = Parrot_str_new_init(interp, NULL, len * sizeof (UChar32),
                            Parrot_nfg_encoding_ptr, Parrot_unicode_charset_ptr, 0);
-        UChar32 *buf = (UChar32 *) res->strstart;
-        UINTVAL offs;
-        for (offs = 0; offs < len; offs++){
-            buf[offs] = src->encoding->get_codepoint(interp, src, offs);
-        };
-        res->strlen  = len;
-        res->bufused = len * sizeof (UChar32);
+        UChar32 *buf  = (UChar32 *) to->strstart;
 
-        return res;
+        UINTVAL  offs = 0;
+        while (offs < len){
+            buf[offs] = src->encoding->get_codepoint(interp, src, offs);
+            offs++;
+            //TODO
+        };
+
+        to->strlen  = offs;
+        to->bufused = offs * sizeof (UChar32);
+
+        return to;
     }
 #else
     UNUSED(src);
     no_ICU_lib(interp);
 #endif
-
 }
 
 /*
