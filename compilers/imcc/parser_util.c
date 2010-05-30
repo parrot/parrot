@@ -47,7 +47,7 @@ ParserUtil - Parser support functions.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static int change_op(PARROT_INTERP,
+static int change_op_arg_to_num(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGMOD(SymReg **r),
     int num,
@@ -94,7 +94,7 @@ static Instruction * var_arg_ins(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
-#define ASSERT_ARGS_change_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_change_op_arg_to_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(r))
@@ -948,8 +948,11 @@ register_compilers(PARROT_INTERP)
 
 /*
 
-=item C<static int change_op(PARROT_INTERP, IMC_Unit *unit, SymReg **r, int num,
-int emit)>
+=item C<static int change_op_arg_to_num(PARROT_INTERP, IMC_Unit *unit, SymReg
+**r, int num, int emit)>
+
+Change one argument of an op to be numeric in stead of integral. Used when
+integer argument op variants don't exist.
 
 =cut
 
@@ -957,9 +960,9 @@ int emit)>
 
 PARROT_WARN_UNUSED_RESULT
 static int
-change_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, int emit)
+change_op_arg_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, int emit)
 {
-    ASSERT_ARGS(change_op)
+    ASSERT_ARGS(change_op_arg_to_num)
     int changed = 0;
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
@@ -1021,44 +1024,11 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ASSERT_ARGS(try_find_op)
     char fullname[64];
     int changed = 0;
-    /*
-     * eq_str, eq_num => eq
-     * ...
-     */
-    if (n == 3 && r[2]->type == VTADDRESS) {
-        if (STREQ(name, "eq_str") || STREQ(name, "eq_num")) {
-            name    = "eq";
-            changed = 1;
-        }
-        else if (STREQ(name, "ne_str") || STREQ(name, "ne_num")) {
-            name    = "ne";
-            changed = 1;
-        }
-        else if (STREQ(name, "le_str") || STREQ(name, "le_num")) {
-            name    = "le";
-            changed = 1;
-        }
-        else if (STREQ(name, "lt_str") || STREQ(name, "lt_num")) {
-            name    = "lt";
-            changed = 1;
-        }
-        else if (STREQ(name, "ge_str") || STREQ(name, "ge_num")) {
-            name    = "ge";
-            changed = 1;
-        }
-        else if (STREQ(name, "gt_str") || STREQ(name, "gt_num")) {
-            name    = "gt";
-            changed = 1;
-        }
-    }
-    else if (n == 3 && (STREQ(name, "cmp_str") || STREQ(name, "cmp_num"))) {
-        name     = "cmp";
-        changed = 1;
-    }
+
     if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I') {
             const SymReg * const r1 = r[1];
-            changed |= change_op(interp, unit, r, 1, emit);
+            changed |= change_op_arg_to_num(interp, unit, r, 1, emit);
 
             /* op Nx, Iy, Iy: reuse generated temp Nz */
             if (r[2]->set == 'I' && r[2]->type != VTADDRESS && r[2] == r1)
@@ -1066,20 +1036,20 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         }
 
         if (r[2]->set == 'I' && r[2]->type != VTADDRESS)
-            changed |= change_op(interp, unit, r, 2, emit);
+            changed |= change_op_arg_to_num(interp, unit, r, 2, emit);
     }
 
     /* handle eq_i_n_ic */
     else if (n == 3 && r[1]->set == 'N' && r[0]->set == 'I' &&
             r[2]->type == VTADDRESS) {
-        changed |= change_op(interp, unit, r, 0, emit);
+        changed |= change_op_arg_to_num(interp, unit, r, 0, emit);
     }
     else if (n == 2 && r[0]->set == 'N' && r[1]->set == 'I') {
         /*
          * transcendentals  e.g. acos N, I
          */
         if (!STREQ(name, "fact"))
-            changed = change_op(interp, unit, r, 1, emit);
+            changed = change_op_arg_to_num(interp, unit, r, 1, emit);
     }
 
     if (changed) {

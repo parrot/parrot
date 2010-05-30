@@ -358,7 +358,7 @@ done:
 .sub compare_reverse
     .param string a
     .param string b
-    $I0 = cmp_str b, a
+    $I0 = cmp b, a
     .return($I0)
 .end
 

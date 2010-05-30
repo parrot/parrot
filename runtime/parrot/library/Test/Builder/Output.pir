@@ -146,7 +146,7 @@ unescaped newlines.
     if i == 0 goto LINE_OK
   	line       = lines[i]
   	first_char = substr line, 0, 1
-	eq_str first_char, '#', LINE_OK
+	if first_char == '#' goto LINE_OK
 
 	.local string new_line
 	new_line = '# '
@@ -186,7 +186,7 @@ unescaped newlines.
 
 	.local string first_char
 	first_char = substr message, 0, 1
-	eq_str first_char, '#', WRITE_MESSAGE
+	if first_char == '#' goto WRITE_MESSAGE
 
 	first_char = '# '
 	concat first_char, message
