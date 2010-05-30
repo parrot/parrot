@@ -795,10 +795,13 @@ sub, or for the point of the call a level deeper for the rest.
             Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, CONST_STRING(INTERP, "backtrace"), "P->P", resume, &result);
         }
         else {
+            /* Hopefully we have a thrower set - our most epic fail fallback is
+             * to just assume the thrower is the current context. */
             PMC *cur_ctx;
-            /* No return continuation. Assuming we're being called  */
             GET_ATTR_thrower(INTERP, SELF, cur_ctx);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, CURRENT_CONTEXT(INTERP), CONST_STRING(INTERP, "backtrace"), "->P", &result);
+            if (PMC_IS_NULL(cur_ctx))
+                cur_ctx = CURRENT_CONTEXT(INTERP);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cur_ctx, CONST_STRING(INTERP, "backtrace"), "->P", &result);
         }
 
         RETURN(PMC *result);
