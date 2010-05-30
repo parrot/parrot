@@ -210,7 +210,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 
     /* Note the thrower. */
     VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
-    
+
     /* Locate the handler, if there is one. */
     handler = Parrot_cx_find_handler_local(interp, exception);
     if (PMC_IS_NULL(handler)) {
