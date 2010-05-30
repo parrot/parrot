@@ -67,7 +67,8 @@ INTVAL core_numops = 1081;
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1081] = {  Parrot_end,                                        /*      0 */
+static op_func_t core_op_func_table[1081] = {
+  Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
   Parrot_check_events__,                             /*      3 */
