@@ -354,10 +354,8 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     /* Note the thrower.
-     * XXX TT #596 - pass in current context instead when we have context PMCs. */
-    /* Don't split line. It will break CONST_STRING handling */
-    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp)));
-
+     * Don't split line. It will break CONST_STRING handling. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
 
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
