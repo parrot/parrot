@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.20	2010.05.29	plobsing	eliminate unused fixup type 'label'
 6.19	2010.05.27	plobsing	removed numerous core ops (TT #449)
 6.18	2010.05.25	cotto	removed ops.num
 6.17	2010.05.20	NotFound	store encoding of string constants
