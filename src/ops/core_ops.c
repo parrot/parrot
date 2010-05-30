@@ -14343,7 +14343,7 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
-    interp->current_cont   = NEED_CONTINUATION;    
+    interp->current_cont   = NEED_CONTINUATION;
     dest                   = VTABLE_invoke(interp, p, dest);return (opcode_t *)dest;
 }
 
@@ -23292,7 +23292,9 @@ Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC *sub = Parrot_find_name_op(interp, SREG(2), dest);
 
     if (PMC_IS_NULL(sub)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
+        opcode_t *handler;
+        Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+        handler = Parrot_ex_throw_from_op_args(interp, dest,
                        EXCEPTION_GLOBAL_NOT_FOUND,
                        "Could not find sub %Ss", SREG(2));return (opcode_t *)handler;
     }
@@ -23308,7 +23310,9 @@ Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC *sub = Parrot_find_name_op(interp, CONST(2)->u.string, dest);
 
     if (PMC_IS_NULL(sub)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
+        opcode_t *handler;
+        Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+        handler = Parrot_ex_throw_from_op_args(interp, dest,
                        EXCEPTION_GLOBAL_NOT_FOUND,
                        "Could not find sub %Ss", CONST(2)->u.string);return (opcode_t *)handler;
     }
