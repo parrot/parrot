@@ -36,7 +36,7 @@ Test handling 3-arg C<pow> on PMCs.
     test_pow('Float')
 
     if gmp goto do_big_ones
-        skip( 22, "will not test BigInt or BigNum without gmp" )
+        skip( 2, "will not test BigInt or BigNum without gmp" )
         goto end
 
   do_big_ones:
