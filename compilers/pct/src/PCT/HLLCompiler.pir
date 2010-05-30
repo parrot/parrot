@@ -804,6 +804,9 @@ Generic method for compilers invoked from a shell command line.
 
 =cut
 
+# for printerr
+.loadlib 'io_ops'
+
 .sub 'command_line' :method
     .param pmc args
     .param pmc adverbs         :slurpy :named
@@ -918,7 +921,7 @@ Generic method for compilers invoked from a shell command line.
     .get_results ($P0)
     pop_eh
     $S0 = self.'backtrace'($P0)
-    print $S0
+    printerr $S0
     exit 1
 .end
 
