@@ -76,3 +76,9 @@ Test handling 3-arg C<pow> on PMCs.
   end:
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

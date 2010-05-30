@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id: time_old.t 47051 2010-05-27 08:45:23Z plobsing $
+# $Id$
 
 use strict;
 use warnings;

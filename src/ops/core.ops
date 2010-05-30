@@ -383,7 +383,7 @@ inline op invokecc(invar PMC) :flow {
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
-    interp->current_cont   = NEED_CONTINUATION;    
+    interp->current_cont   = NEED_CONTINUATION;
     dest                   = VTABLE_invoke(interp, p, dest);
 
     goto ADDRESS(dest);
