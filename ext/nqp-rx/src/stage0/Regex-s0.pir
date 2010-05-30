@@ -1615,6 +1615,9 @@ Returns C<.to() - .from()>
     $I0 = self.'to'()
     $I1 = self.'from'()
     $I2 = $I0 - $I1
+    if $I2 >= 0 goto done
+    .return (0)
+  done:
     .return ($I2)
 .end
 
