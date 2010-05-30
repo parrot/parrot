@@ -134,6 +134,13 @@ This is a helper method for testing of Parrot_str_unescape_string.
 
 L<https://trac.parrot.org/parrot/ticket/1628>
 
+=item logical_* vtables [eligiblie in 2.7]
+
+These can be replaced by C<get_bool> and intval ops unless you're using them for
+things that aren't really logical ops (don't do that!).
+
+L<https://trac.parrot.org/parrot/ticket/1655>
+
 =back
 
 =head1 Opcodes
@@ -238,6 +245,12 @@ L<https://trac.parrot.org/parrot/ticket/1643>
 Finalize exception handler, unrolling inner runloops if needed.
 
 L<https://trac.parrot.org/parrot/ticket/1635>
+
+=item logical PMC ops [eligible in 2.7]
+
+These fall out from the logical vtables deprecation.
+
+L<https://trac.parrot.org/parrot/ticket/1655>
 
 =back
 
