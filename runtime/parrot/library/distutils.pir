@@ -4523,6 +4523,36 @@ SOURCE_C
     .return ($I0)
 .end
 
+=item runtests
+
+=cut
+
+.sub 'runtests' :multi()
+    .param pmc files :slurpy
+    .param pmc opts :slurpy :named
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc harness
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    .local pmc aggregate
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L1
+    $I0 = exists opts['ignore_error']
+    unless $I0 goto L2
+    $I0 = opts['ignore_error']
+    if $I0 goto L1
+  L2:
+    die "test fails"
+  L1:
+.end
+
+.sub 'runtests' :multi(ResizableStringArray,Hash)
+    .param pmc array
+    .param pmc hash
+    .tailcall runtests(array :flat, hash :flat :named)
+.end
+
 =back
 
 =head1 AUTHOR
