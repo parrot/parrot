@@ -206,7 +206,13 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 {
     ASSERT_ARGS(Parrot_ex_throw_from_op)
     opcode_t   *address;
-    PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
+    PMC        *handler;
+
+    /* Note the thrower. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
+    
+    /* Locate the handler, if there is one. */
+    handler = Parrot_cx_find_handler_local(interp, exception);
     if (PMC_IS_NULL(handler)) {
         STRING * const message     = VTABLE_get_string(interp, exception);
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
