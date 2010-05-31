@@ -1239,15 +1239,15 @@ the callback function.
 
 =cut
 
-inline op loadlib(out PMC, in STR) {
+inline op loadlib(out PMC, invar STR) {
     $1 = Parrot_load_lib(interp, $2, NULL);
 }
 
-inline op loadlib(out PMC, in STR, in PMC) {
+inline op loadlib(out PMC, invar STR, invar PMC) {
     $1 = Parrot_load_lib(interp, $2, $3);
 }
 
-op dlfunc(out PMC, invar PMC, in STR, in STR) {
+op dlfunc(out PMC, invar PMC, invar STR, invar STR) {
     char * const  name      = Parrot_str_to_cstring(interp, ($3));
     void         *dl_handle = NULL;
     void         *ptr       = NULL;
@@ -1275,7 +1275,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     Parrot_str_free_cstring(name);
 }
 
-op dlvar(out PMC, invar PMC, in STR) {
+op dlvar(out PMC, invar PMC, invar STR) {
     char * const  name      = Parrot_str_to_cstring(interp, ($3));
     void *        dl_handle = NULL;
     void *        p         = NULL;
