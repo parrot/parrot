@@ -1186,9 +1186,9 @@ Opcodes for interfacing with C functions in shared libraries.
 
 ########################################
 
-=item B<loadlib>(out PMC, in STR)
+=item B<loadlib>(out PMC, invar STR)
 
-=item B<loadlib>(out PMC, in STR, in PMC)
+=item B<loadlib>(out PMC, invar STR, invar PMC)
 
 Load a dynamic link library named $2 and store it in $1. $3, if
 provided, controls library loading and initialization; currently,
@@ -1204,13 +1204,13 @@ Make any symbols in the library accessible to other libraries loaded.
 
 =back
 
-=item B<dlfunc>(out PMC, invar PMC, in STR, in STR)
+=item B<dlfunc>(out PMC, invar PMC, invar STR, invar STR)
 
 Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
 
-=item B<dlvar>(out PMC, invar PMC, in STR)
+=item B<dlvar>(out PMC, invar PMC, invar STR)
 
 Look up symbol $3 in library $2. We assume that this is actually a
 variable address rather than a function address, and build an
