@@ -65,7 +65,6 @@ our @EXPORT_OK = qw(
     t/pmc/*.t
     t/oo/*.t
     t/native_pbc/*.t
-    t/dynpmc/*.t
 );
 
 # core tests are run unless --runcore-tests is present.  Typically
