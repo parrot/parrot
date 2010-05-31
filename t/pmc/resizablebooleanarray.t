@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
     .include 'test_more.pir'
 
-    plan(65)
+    plan(67)
 
     setting_array_size()
     setting_first_element()
@@ -70,6 +70,16 @@ out-of-bounds test. Checks INT and PMC keys.
 
     $P0 = 7
     is($P0, 7, "shrinking via int assignment to RBA works")
+
+    new $P1, ['ExceptionHandler']
+    set_addr $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+    $P0 = -1
+    ok(0, "no exception caught for setting negative size")
+    .return()
+caught:
+    ok(1, "caught exception on setting negative size")
 .end
 
 
@@ -138,6 +148,17 @@ end:
 
     set $I0, $P0[-1]
     is($I0, 0, "negative index retrieval is 0")
+
+    new $P1, ['ExceptionHandler']
+    set_addr $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+    set $I0, $P0[-2]
+    ok(0, "no exception caught for negative index out of range access")
+    .return()
+caught:
+    pop_eh
+    ok(1, "caught exception on negative index out of range access")
 .end
 
 
