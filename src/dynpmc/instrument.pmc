@@ -55,12 +55,10 @@ typedef enum {
 static void Instrument_runcore_init (PARROT_INTERP, PMC *supervisor);
 static opcode_t * Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc);
 
-/* Helper Function Prototypes */
-static void gather_params(PARROT_INTERP, opcode_t *pc, PMC *supervisor, PMC *params);
-
-pmclass Instrument auto_attrs dynpmc {
+pmclass Instrument auto_attrs dynpmc provides hash {
     ATTR Parrot_Interp  supervisor;  /* The interpreter that created this instance */
     ATTR Parrot_Interp  supervised;  /* The interpreter running the code */
+    ATTR opcode_t      *cur_pc;
     ATTR PMC           *op_hooks;    /* A ResizablePMCArray for holding references to op hooks */
     ATTR PMC           *op_catchall; /* These callbacks are to be called on each op */
     ATTR PMC           *probes;      /* A list of probes registered. */
@@ -166,12 +164,23 @@ the given address after firing all hooks that apply.
 
     VTABLE void set_pointer (void *pc_pointer) {
         opcode_t *pc = (opcode_t *) pc_pointer;
-        PMC *hooks, *hook_iter, *catchall_iter;
+        PMC *hooks, *hook_iter, *catchall_iter, *op_data;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-        STRING *full_name;
+        INTVAL pc_relative, cur_op_param, op_params;
         
-        /* Set the full name of the op. */
-        full_name = CONST_STRING(INTERP, attr->supervised->op_info_table[*pc].full_name);
+        attr->cur_pc = pc;
+        
+        /* Calculate the relative position of the pc. */
+        pc_relative = pc - attr->supervised->code->base.data;
+        
+        /* Grab the opcode params */
+        op_params = attr->supervised->op_info_table[*pc].op_count;
+        op_data   = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        cur_op_param = 0;
+        while(cur_op_param <= op_params) {
+            VTABLE_push_integer(INTERP, op_data, pc[cur_op_param]);
+            cur_op_param++;
+        }
         
         /* Fire the catchall hooks first */
         catchall_iter = VTABLE_get_iter(INTERP, attr->op_catchall);
@@ -181,8 +190,9 @@ the given address after firing all hooks that apply.
             key = VTABLE_shift_pmc(INTERP, catchall_iter);
             val = VTABLE_get_pmc_keyed(INTERP, attr->op_catchall, key);
             
-            if(!PMC_IS_NULL(val)) 
-                Parrot_ext_call(INTERP, val, "S->", full_name);
+            if(!PMC_IS_NULL(val)) {
+                Parrot_ext_call(INTERP, val, "IPP->", pc_relative, op_data, SELF);
+			}
         }
         
         /* Fire the specific probes */
@@ -195,13 +205,48 @@ the given address after firing all hooks that apply.
                 key = VTABLE_shift_pmc(INTERP, hook_iter);
                 val = VTABLE_get_pmc_keyed(INTERP, hooks, key);
                 
-                if(!PMC_IS_NULL(val)) 
-                    Parrot_ext_call(INTERP, val, "S->", full_name);
+                if(!PMC_IS_NULL(val)) {
+                    Parrot_ext_call(INTERP, val, "IPP->", pc_relative, op_data, SELF);
+                }
             }
         }
         
         /* Done firing hooks */
         return;
+    }
+
+/*
+
+=item C<void get_pmc_keyed(PMC *key)>
+
+Get the property with the key.
+
+Keys:
+probes: returns the hash of probes currently registered.
+
+Unknown keys are sent to the supervised interpreter.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        PMC *nextkey, *supervised_pmc;
+        STRING *item = key_string(INTERP, key);
+        STRING *name;
+
+        /* probes: return the hash of probes */
+        name = CONST_STRING(INTERP, "probes");
+        if(Parrot_str_equal(INTERP, name, item)) {
+            return attr->probes;
+        }
+        
+        /* push to the supervised interpreter. */
+        supervised_pmc = VTABLE_get_pmc_keyed_int(attr->supervised,
+                                                  attr->supervised->iglobals,
+                                                  (INTVAL) IGLOBALS_INTERPRETER);
+        return VTABLE_get_pmc_keyed(INTERP, supervised_pmc, key);
     }
 
 /*
@@ -408,6 +453,103 @@ Deregister a catchall op callback
         VTABLE_delete_keyed(INTERP, attr->op_catchall, id);
     }
 
+/*
+=item C<PMC *get_op_arg(INTVAL arg, INTVAL arg_type)>
+
+Interprets arg according to arg_type and returns the value as a PMC.
+Eg, get_op_arg(0, PARROT_ARG_I) => Returns the value in register I0.
+
+arg_type is as defined in parrot/op.h
+
+=cut
+*/
+
+    METHOD get_op_arg (INTVAL arg, INTVAL arg_type) {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        PMC *ret, *cc, *key;
+        arg_type_t type = (arg_type_t) arg_type;
+        
+        cc = CURRENT_CONTEXT(attr->supervised);
+        
+        switch(type) {
+          case PARROT_ARG_IC:            
+            /* Integer constants are stored as part of the opcode
+               in the packfile */
+            ret = Parrot_pmc_new(INTERP, enum_class_Integer);
+            VTABLE_set_integer_native(INTERP, ret, arg);
+            
+            break;
+          case PARROT_ARG_I:
+            ret = Parrot_pmc_new(INTERP, enum_class_Integer);
+            VTABLE_set_integer_native(INTERP, ret, *Parrot_pcc_get_INTVAL_reg(INTERP, cc, arg));
+
+            break;
+          case PARROT_ARG_NC:
+            ret = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, ret, Parrot_pcc_get_num_constant_func(INTERP, cc, arg));
+            
+            break;
+          case PARROT_ARG_N:
+            ret = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, ret, *Parrot_pcc_get_FLOATVAL_reg(INTERP, cc, arg));
+
+            break;
+          case PARROT_ARG_PC:
+            ret = Parrot_pcc_get_pmc_constant_func(INTERP, cc, arg);
+            
+            break;
+          case PARROT_ARG_P:
+            ret = *Parrot_pcc_get_PMC_reg(INTERP, cc, arg);
+            
+            break;
+          case PARROT_ARG_SC:
+            ret = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, ret, Parrot_pcc_get_string_constant_func(INTERP, cc, arg));
+            
+            break;
+          case PARROT_ARG_S:
+            ret = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, ret, *Parrot_pcc_get_STRING_reg(INTERP, cc, arg));
+
+            break;
+          case PARROT_ARG_K:
+            /* Key is PMC */
+            ret = *Parrot_pcc_get_PMC_reg(INTERP, cc, arg);
+            
+            break;
+          case PARROT_ARG_KC:
+            /* Key is String reg or String const */
+            ret = (Parrot_pcc_get_constants(INTERP, cc)[arg])->u.key;
+
+            break;
+          case PARROT_ARG_KI:
+            /* Key is integer reg */
+            ret = Parrot_pmc_new(INTERP, enum_class_Integer);
+            VTABLE_set_integer_native(INTERP, ret, *Parrot_pcc_get_INTVAL_reg(INTERP, cc, arg));
+            
+            break;
+          case PARROT_ARG_KIC:
+            /* Key is integer constant */
+            ret = Parrot_pmc_new(INTERP, enum_class_Integer);
+            VTABLE_set_integer_native(INTERP, ret, arg);
+          
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(
+                INTERP, NULL, 1,
+                "Currently unhandled op arg type %d.", type
+            );
+        };
+        
+        RETURN(PMC *ret);
+    }
+
+    METHOD get_key_value (PMC *key) {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        STRING *key_str = key_string(attr->supervised, key);
+        RETURN(STRING *key_str);
+    }
+
 }
 
 /*
@@ -472,95 +614,6 @@ Instrument_runcore_init (PARROT_INTERP, PMC *supervisor) {
 	
 	//Switch to this runcore.
 	Parrot_runcore_switch(interp, coredata->name);
-}
-
-/*
- * Helper function to gather the parameters of an op
- * and put it into the passed in ResizablePMCArray.
- * TODO: This is incomplete and currently unused.
- */
-static
-void
-gather_params(Parrot_Interp interp, opcode_t *pc, PMC *supervisor, PMC *params) {
-    INTVAL no_params, cur_param;
-    PMC *cc; /* Current context */
-    Parrot_Interp instr_in = (Parrot_Interp) VTABLE_get_pointer(interp, supervisor);
-    
-    /* Retrieve the current context.
-       Current context refers to the registers + some other stuff */
-    cc = CURRENT_CONTEXT(interp); /* defined in parrot/interpreter.h */
-    
-    /* Figure out how many parameters the op takes,
-        referring to op_info_table
-        We want the op_count field of the current op's
-        op_info_t, which also includes the op as a parameter. */
-    no_params = interp->op_info_table[*pc].op_count - 1;
-     
-    /* Begin gathering the parameters.
-       Each parameter is of a certain type, and based on this
-       type, we can access the current_context and get the
-       parameter.
-       
-       The types are listed in parrot/op.h.
-    */
-    for(cur_param = 0; cur_param < no_params; cur_param++) {
-        arg_type_t type; /* parrot/op.h */
-        
-        /* Get the type of the current param */
-        type = interp->op_info_table[*pc].types[cur_param];
-        
-        /* For keyed types, remove the keyed flag,
-           instead treating it as a normal ARG type. */
-        if((type & PARROT_ARG_KEYED) == PARROT_ARG_KEYED) {
-            type &= ~PARROT_ARG_KEYED;
-        }
-        
-        /* Gather the params and put it into the
-           ResizablePMCArray pointed to by params.
-         */
-        switch(type) {
-          case PARROT_ARG_IC:            
-            /* Integer constants are stored as part of the opcode
-               in the packfile */
-            VTABLE_push_integer(instr_in, params, pc[cur_param + 1]);
-            
-            break;
-          case PARROT_ARG_I:
-            VTABLE_push_integer(instr_in, params,
-                                *Parrot_pcc_get_INTVAL_reg(interp, cc, pc[cur_param + 1]));
-            break;
-          case PARROT_ARG_NC:
-            VTABLE_push_float(instr_in, params,
-                              Parrot_pcc_get_num_constant_func(interp, cc, pc[cur_param + 1]));
-            
-            break;
-          case PARROT_ARG_N:
-            VTABLE_push_float(instr_in, params,
-                              *Parrot_pcc_get_FLOATVAL_reg(interp, cc, pc[cur_param + 1]));
-            break;
-          case PARROT_ARG_PC:
-            VTABLE_push_pmc(instr_in, params,
-                              Parrot_pcc_get_pmc_constant_func(interp, cc, pc[cur_param + 1]));
-            
-            break;
-          case PARROT_ARG_P:
-            VTABLE_push_pmc(instr_in, params,
-                              *Parrot_pcc_get_PMC_reg(interp, cc, pc[cur_param + 1]));
-            break;
-          case PARROT_ARG_SC:
-            VTABLE_push_string(instr_in, params,
-                              Parrot_pcc_get_string_constant_func(interp, cc, pc[cur_param + 1]));
-            
-            break;
-          case PARROT_ARG_S:
-            VTABLE_push_string(instr_in, params,
-                              *Parrot_pcc_get_STRING_reg(interp, cc, pc[cur_param + 1]));
-            break;
-          default:
-            /* printf("\tUnhandled arg type: %d\n", type); */
-            break;
-        };
-     }
 }
 
 /*

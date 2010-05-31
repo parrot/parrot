@@ -431,6 +431,7 @@ a key.  Returns a string value corresponding to the key.
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *

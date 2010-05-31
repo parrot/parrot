@@ -12,15 +12,19 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
    
 =cut
 
+.include 'call_bits.pasm'
+.loadlib 'bit_ops'
+.loadlib 'instrument'
+
 .sub '__instrument_lib_init' :init :load :anon
     .local pmc lib
     load_bytecode 'P6object.pbc'
     
-    lib = loadlib 'instrument'
-    $I0 = defined lib
-    if $I0 goto END
+    #lib = loadlib 'instrument'
+    #$I0 = defined lib
+    #if $I0 goto END
     
-    die 'Could not load the instrument dynpmc'
+    #die 'Could not load the instrument dynpmc'
 
 END:
     .return()
