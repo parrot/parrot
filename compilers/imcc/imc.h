@@ -321,7 +321,22 @@ void register_compilers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-int try_find_op(PARROT_INTERP,
+int try_weaken_const_to_temp(PARROT_INTERP,
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const char *name),
+    ARGMOD(SymReg **r),
+    int n,
+    int keyvec,
+    int emit)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+PARROT_WARN_UNUSED_RESULT
+int try_weaken_int_to_num(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
     ARGMOD(SymReg **r),
@@ -393,7 +408,12 @@ int try_find_op(PARROT_INTERP,
     , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_register_compilers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_try_find_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_try_weaken_const_to_temp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_try_weaken_int_to_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(name) \

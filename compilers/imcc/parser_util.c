@@ -341,9 +341,13 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             }
         }
 
-        /* still wrong, try to find an existing op */
+        /* still wrong, try using temporaries in stead of constants */
         if (op < 0)
-            op = try_find_op(interp, unit, name, r, n, keyvec, emit);
+            op = try_weaken_const_to_temp(interp, unit, name, r, n, keyvec, emit);
+
+        /* still wrong, try using C<NUMVAL>s in stead of C<INTVAL>s */
+        if (op < 0)
+            op = try_weaken_int_to_num(interp, unit, name, r, n, keyvec, emit);
 
         if (op < 0) {
             int ok = 0;
@@ -1001,16 +1005,11 @@ change_op_arg_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), 
 
 /*
 
-=item C<int try_find_op(PARROT_INTERP, IMC_Unit *unit, const char *name, SymReg
-**r, int n, int keyvec, int emit)>
+=item C<int try_weaken_const_to_temp(PARROT_INTERP, IMC_Unit *unit, const char
+*name, SymReg **r, int n, int keyvec, int emit)>
 
-Try to find valid op doing the same operation e.g.
-
-   add_n_i_n  => add_n_n_i
-   div_n_ic_n => div_n_nc_n
-   div_n_i_n  => set_n_i ; div_n_n_n
-   ge_n_ic_ic => ge_n_nc_ic
-   acos_n_i   => acos_n_n
+Try to find a valid op doing the same operation by storing const values in
+temporaries used by the actual op.
 
 =cut
 
@@ -1018,10 +1017,85 @@ Try to find valid op doing the same operation e.g.
 
 PARROT_WARN_UNUSED_RESULT
 int
-try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+try_weaken_const_to_temp(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
+ARGIN(const char *name), ARGMOD(SymReg **r), int n, int keyvec, int emit)
+{
+    ASSERT_ARGS(try_weaken_const_to_temp)
+    char fullname[64];
+    SymReg **r_save = (SymReg **)mem_sys_allocate_zeroed(sizeof (SymReg *) * n);
+
+    int op = -1;
+    int i;
+
+    for (i = 0; i < n; i++) {
+        if (r[i]->type == VTCONST ||
+            r[i]->type == VT_CONSTP) {
+            r_save[i] = r[i];
+            r[i]      = mk_temp_reg(interp, r[i]->set);
+            op_fullname(fullname, name, r, n, keyvec);
+            op = interp->op_lib->op_code(interp, fullname, 1);
+            if (op >= 0)
+                break;
+        }
+    }
+
+    if (op >= 0) {
+        n = i + 1;
+        for (i = 0; i < n; i++) {
+            if (r_save[i]) {
+                SymReg *rr[2];
+                rr[0] = r[i];
+                rr[1] = r_save[i];
+                INS(interp, unit, "set", NULL, rr, 2, 0, 1);
+                /* XXX leak memory ?
+                free_sym(r_save[i]);
+                */
+            }
+        }
+
+        /* need to allocate the temp - run reg_alloc ??? */
+        IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
+    }
+    else {
+        for (i = 0; i < n; i++) {
+            if (r_save[i]) {
+                /* XXX leak memory ?
+                free_sym(r[i]);
+                */
+                r[i] = r_save[i];
+            }
+        }
+    }
+
+    mem_sys_free(r_save);
+
+    return op;
+}
+
+/*
+
+=item C<int try_weaken_int_to_num(PARROT_INTERP, IMC_Unit *unit, const char
+*name, SymReg **r, int n, int keyvec, int emit)>
+
+Try to find valid op doing the same operation by changing C<INTVAL> registers
+to C<NUMVAL> registers. eg:
+
+   add_n_i_n  => set_n_i ; add_n_n_n
+   div_n_ic_n => div_n_nc_n
+   div_n_i_n  => set_n_i ; div_n_n_n
+   ge_n_ic_ic => ge_n_nc_ic
+   acos_n_i   => set_n_i ; acos_n_n
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+int
+try_weaken_int_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, int keyvec, int emit)
 {
-    ASSERT_ARGS(try_find_op)
+    ASSERT_ARGS(try_weaken_int_to_num)
     char fullname[64];
     int changed = 0;
 
