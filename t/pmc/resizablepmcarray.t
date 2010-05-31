@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(137)
+    plan(139)
 
     resize_tests()
     negative_array_size()
@@ -901,6 +901,24 @@ loop_end:
     $S0 = get_array_string($P1)
     is($S0, "12A45", "splice with empty replacement")
 
+    $P1 = clone ar1
+    $P2 = clone ar2
+    splice $P1, $P2, -3, 2
+    $S0 = get_array_string($P1)
+    is($S0, "12ABCDE5", "splice with negative offset")
+
+    $P1 = clone ar1
+    $P2 = clone ar2
+    $I0 = 1
+    push_eh too_low
+    splice $P1, $P2, -10, 2
+    dec $I0
+    goto too_low_end
+too_low:
+    .get_results($P9)
+    finalize $P9
+too_low_end:
+    ok($I0, "splice with negative offset too low")
 .end
 
 
