@@ -248,6 +248,8 @@ end:
 OUT
 
 ##############################
+SKIP: {
+    skip( "constant folding replaced by unfolding", 2 );
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant add" );
 .sub _main
    add $I0, 10, 15
@@ -278,8 +280,11 @@ _main:
    set N0, -5
    end
 OUT
+}
 
 ##############################
+SKIP: {
+    skip( "constant folding replaced by unfolding", 1 );
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant mul" );
 .sub _main
    mul $I0, 10, 15
@@ -294,6 +299,7 @@ _main:
    set N0, 150
    end
 OUT
+}
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant div" );
@@ -312,6 +318,8 @@ _main:
 OUT
 
 ##############################
+SKIP: {
+    skip( "constant folding replaced by unfolding", 23 );
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant mod" );
 .sub _main
    mod $I0, 33, 10
@@ -618,7 +626,7 @@ _main:
 OUT
 
 ##############################
-pir_2_pasm_is( <<'CODE', <<'OUT', "constant mix add" );
+    pir_2_pasm_is( <<'CODE', <<'OUT', "constant mix add" );
 .sub _main
    add $N0, 10.0, 15
    end
@@ -632,7 +640,7 @@ _main:
 OUT
 
 ##############################
-pir_2_pasm_is( <<'CODE', <<'OUT', "constant unary abs" );
+    pir_2_pasm_is( <<'CODE', <<'OUT', "constant unary abs" );
 .sub _main
    abs $I0, -10
    end
@@ -644,6 +652,7 @@ _main:
    set I0, 10
    end
 OUT
+}
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant set" );
@@ -1151,12 +1160,15 @@ _main:
    end$/
 ';
 
-pir_2_pasm_like( <<'CODE', $output, "constant add big nums" );
+SKIP: {
+    skip( "constant folding replaced by constant unfolding", 1 );
+    pir_2_pasm_like( <<'CODE', $output, "constant add big nums" );
 .sub _main
    add $N0, 10.0e20, 15.0e21
    end
 .end
 CODE
+}
 
 ##############################
 SKIP: {
