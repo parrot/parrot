@@ -147,13 +147,6 @@ L<https://trac.parrot.org/parrot/ticket/1655>
 
 =over 4
 
-=item moved to dynop [eligible in 1.1]
-
-Parts or all of: bit.ops, debug.ops, io.ops, math.ops, set.ops
-(the obscure and rarely used parts), sys.ops.
-
-L<https://trac.parrot.org/parrot/ticket/449>
-
 =item get_addr and set_addr [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/218>
