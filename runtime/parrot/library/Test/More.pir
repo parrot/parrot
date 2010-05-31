@@ -67,8 +67,6 @@ This class defines the following functions:
 
 .namespace [ 'Test'; 'More' ]
 
-.loadlib 'io_ops'
-
 .sub _initialize :load
     load_bytecode 'Test/Builder.pbc'
 

@@ -623,8 +623,7 @@ corevm : \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
-    $(LIBRARY_DIR)/Test/More.pbc \
-    $(DYNPMC_TARGETS)
+    $(LIBRARY_DIR)/Test/More.pbc
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
 
@@ -642,7 +641,7 @@ $(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/LWP/Protocol.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/Test/More.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/Test/More.pbc:
 
 $(LIBRARY_DIR)/Archive/Tar.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
