@@ -19,9 +19,10 @@ Tests the LexPad PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(4)
+    plan(8)
 
     new_test()
+    test_keyed()
     test_iter()
 .end
 
@@ -36,7 +37,31 @@ eh:
 end:
 .end
 
+.sub test_keyed
+    .local pmc p1
+    .lex 'p1', p1
 
+    $P0 = getinterp
+    $P0 = $P0['lexpad']
+    $I0 = elements $P0
+    is($I0, 1, "get LexPad elements")
+
+    $I0 = exists $P0['p1']
+    is($I0, 1, ".lex exists_keyed true")
+
+    $I0 = exists $P0['nosuchlex']
+    is($I0, 0, ".lex exists_keyed false")
+
+    $P1 = new 'Integer'
+    push_eh eh
+    $P0['nosuchlex'] = $P1
+    ok(0, "setting a non existent .lex should throw")
+    goto end
+eh:
+    pop_eh
+    ok(1, "setting a non existent .lex throws")
+end:
+.end
 
 .sub 'test_iter'
 
