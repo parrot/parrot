@@ -17,6 +17,21 @@ struct grapheme_t {
 
 typedef struct grapheme_t grapheme;
 
+#define MIN_TABLE_LENGTH 1
+
+struct grapheme_table_t {
+    UINTVAL size; /* Total table size, in graphemes. */
+    UINTVAL used; /* Number of slots used from the table. */
+    grapheme graphemes[MIN_TABLE_LENGTH];
+    /*
+     * Not really a static array. When we need a bigger table, we just allocate
+     * a bigger structure and keep going after the 'end' of the array.
+     */
+};
+
+typedef struct grapheme_table_t grapheme_table;
+
+
 #endif /* PARROT_HAS_ICU */
 #endif /* PARROT_GRAPHEME_H_GUARD */
 
