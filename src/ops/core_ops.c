@@ -25960,6 +25960,9 @@ Parrot_stringinfo_i_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
           case STRINGINFO_STRLEN:
             IREG(1) = SREG(2)->strlen;
             break;
+          case STRINGINFO_EXTRA:
+            IREG(1) = SREG(2)->extra;
+            break;
           default:
             {
                 opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -25995,6 +25998,9 @@ Parrot_stringinfo_i_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
             break;
           case STRINGINFO_STRLEN:
             IREG(1) = CONST(2)->u.string->strlen;
+            break;
+          case STRINGINFO_EXTRA:
+            IREG(1) = CONST(2)->u.string->extra;
             break;
           default:
             {
@@ -26032,6 +26038,9 @@ Parrot_stringinfo_i_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
           case STRINGINFO_STRLEN:
             IREG(1) = SREG(2)->strlen;
             break;
+          case STRINGINFO_EXTRA:
+            IREG(1) = SREG(2)->extra;
+            break;
           default:
             {
                 opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -26067,6 +26076,9 @@ Parrot_stringinfo_i_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
             break;
           case STRINGINFO_STRLEN:
             IREG(1) = CONST(2)->u.string->strlen;
+            break;
+          case STRINGINFO_EXTRA:
+            IREG(1) = CONST(2)->u.string->extra;
             break;
           default:
             {
