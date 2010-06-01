@@ -614,6 +614,7 @@ all : \
     $(DATA_JSON_LIB_PBCS) \
     $(NQP_LIB_PBCS) \
     $(GEN_LIBRARY) \
+    $(DYNPMC_TARGETS) \
     $(DYNOPLIBS_TARGETS) \
     $(LIBNCI_TEST_SO)
 
