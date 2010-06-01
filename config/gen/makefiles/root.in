@@ -414,7 +414,7 @@ CHARSET_O_FILES   = @TEMP_charset_o@
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
 CLASS_O_FILES     = @TEMP_pmc_classes_o@
 CLASS_STR_FILES   = @TEMP_pmc_classes_str@
-ENCODING_O_FILES  = @TEMP_encoding_o@
+ENCODING_O_FILES  = @TEMP_encoding_o@ src/string/grapheme$(O)
 
 IO_O_FILES = \
     src/io/core$(O) \
@@ -1499,6 +1499,8 @@ src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
 src/string/encoding$(O) : $(PARROT_H_HEADERS) src/string/encoding.c
 
+src/string/encoding/nfg$(O) : $(PARROT_H_HEADERS) src/string/grapheme.h src/string/grapheme.c
+
 src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
 	src/string/encoding/fixed_8.h \
 	src/string/encoding/utf8.h \
@@ -1506,6 +1508,7 @@ src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
 	src/string/encoding/ucs2.h \
 	src/string/encoding/ucs4.h \
 	src/string/encoding/nfg.h \
+	src/string/grapheme.h \
 	src/string/charset/ascii.h \
 	src/string/charset/binary.h \
 	src/string/charset/iso-8859-1.h \
