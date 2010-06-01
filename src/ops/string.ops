@@ -552,7 +552,7 @@ inline op is_cclass(out INT, in INT, in STR, in INT) {
 }
 
 
-=item B<find_cclass>(out INT, invar INT, invar STR, invar INT, invar INT)
+=item B<find_cclass>(out INT, in INT, invar STR, invar INT, invar INT)
 
 Set $1 to the offset of the first codepoint matching
 the character class(es) given by $2 in string $3, starting
@@ -561,12 +561,12 @@ character is found, set $1 to (offset + count).
 
 =cut
 
-inline op find_cclass(out INT, invar INT, invar STR, invar INT, invar INT) {
+inline op find_cclass(out INT, in INT, invar STR, invar INT, invar INT) {
     $1 = Parrot_str_find_cclass(interp, $2, $3, $4, $5);
 }
 
 
-=item B<find_not_cclass>(out INT, invar INT, invar STR, invar INT, invar INT)
+=item B<find_not_cclass>(out INT, in INT, invar STR, invar INT, invar INT)
 
 Set $1 to the offset of the first codepoint not matching
 the character class(es) given by $2 in string $3, starting
@@ -575,7 +575,7 @@ consists entirely of matching characters, set $1 to (offset + count).
 
 =cut
 
-inline op find_not_cclass(out INT, invar INT, invar STR, invar INT, invar INT) {
+inline op find_not_cclass(out INT, in INT, invar STR, invar INT, invar INT) {
     $1 = Parrot_str_find_not_cclass(interp, $2, $3, $4, $5);
 }
 
