@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
     .include 'test_more.pir'
 
-    plan(67)
+    plan(68)
 
     setting_array_size()
     setting_first_element()
@@ -46,6 +46,7 @@ out-of-bounds test. Checks INT and PMC keys.
     sparse_access()
     check_for_zeroedness()
     pop_into_sparse()
+    clone_empty()
     clone_tests()
     alternate_clone_tests()
     get_iter_test()
@@ -748,6 +749,15 @@ err:
     print $I4
     print " "
     print $I5
+.end
+
+.sub clone_empty
+    .local pmc rba1, rba2
+    .local int i
+    rba1 = new ['ResizableBooleanArray']
+    rba2 = clone rba1
+    i = elements rba2
+    is(i, 0, "clone empty passed")
 .end
 
 .sub clone_tests
