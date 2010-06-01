@@ -31,6 +31,8 @@ struct grapheme_table_t {
 
 typedef struct grapheme_table_t grapheme_table;
 
+/* HEADERIZER BEGIN: src/string/grapheme.c */
+/* HEADERIZER END: src/string/grapheme.c */
 
 #endif /* PARROT_HAS_ICU */
 #endif /* PARROT_GRAPHEME_H_GUARD */
