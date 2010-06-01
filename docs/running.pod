@@ -169,6 +169,11 @@ Turn on warnings. See C<parrot --help-debug> for available flag bits.
 Turn on interpreter debug flag. See C<parrot --help-debug> for available flag
 bits.
 
+=item --hash-seed <hexnum>
+
+Sets the hash seed to the provided value. Only useful for debugging
+intermittent failures, and harmful in production.
+
 =item --gc-debug
 
 Turn on GC (Garbage Collection) debugging. This imposes some stress on the GC
