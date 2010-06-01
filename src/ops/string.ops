@@ -379,6 +379,9 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
           case STRINGINFO_STRLEN:
             $1 = $2->strlen;
             break;
+          case STRINGINFO_EXTRA:
+            $1 = $2->extra;
+            break;
           default:
             {
                 opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,

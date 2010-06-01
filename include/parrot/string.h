@@ -51,6 +51,7 @@ typedef struct string_iterator_t {
 #define STRINGINFO_FLAGS    4
 #define STRINGINFO_BUFUSED  5
 #define STRINGINFO_STRLEN   6
+#define STRINGINFO_EXTRA    7
 
 /* &end_gen */
 
