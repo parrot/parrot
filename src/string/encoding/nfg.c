@@ -32,6 +32,42 @@ static void no_ICU_lib(PARROT_INTERP) /* HEADERIZER SKIP */
 }
 #endif
 
+#if PARROT_HAS_ICU
+static void
+nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
+           UINTVAL offs, UINTVAL len, UINTVAL graphemes)
+{
+    UChar32 *buf  = (UChar32 *) (dest->strstart);
+    UINTVAL  hash = 0xffff; // TODO: put a real seed here.
+    UINTVAL  aux;
+
+    while (offs < len) {
+        buf[index] = src->encoding->get_codepoint(interp, src, offs);
+        aux = offs;
+
+        while (ISCOMBINING(buf[index]) && offs < len) {
+            hash += hash << 5;
+            hash += buf[index];
+            buf[index] = src->encoding->get_codepoint(interp, src, ++offs);
+        }
+
+        if (hash != 0xffff) {
+            nfg_encode(interp, dest, index, src, offs, len, graphemes + 1);
+            buf[index] = add_grapheme_from_substr(dest->extra, src, aux, offs-aux, hash);
+            return;
+        }
+        offs++;
+        index++;
+    }
+
+    dest->extra   = create_grapheme_table(interp, graphemes);
+    dest->strlen  = index;
+    dest->bufused = index * sizeof (UChar32);
+
+}
+
+#endif
+
 /* HEADERIZER HFILE: src/string/encoding/nfg.h */
 
 /* HEADERIZER BEGIN: static */
@@ -98,6 +134,15 @@ static UINTVAL nfg_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
+static void nfg_encode(PARROT_INTERP,
+    STRING *dest,
+    UINTVAL index,
+    STRING *src,
+    UINTVAL offs,
+    UINTVAL len,
+    UINTVAL graphemes)
+        __attribute__nonnull__(1);
+
 static void nfg_encode_and_advance(PARROT_INTERP,
     ARGMOD(String_iter *i),
     UINTVAL c)
@@ -156,6 +201,8 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_nfg_decode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_nfg_encode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_nfg_encode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(i))
@@ -178,6 +225,7 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #if PARROT_HAS_ICU
 #  include <unicode/ustring.h>
 #endif
+
 
 /*
 
@@ -208,15 +256,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                            Parrot_nfg_encoding_ptr, Parrot_unicode_charset_ptr, 0);
         UChar32 *buf  = (UChar32 *) to->strstart;
 
-        UINTVAL  offs = 0;
-        while (offs < len){
-            buf[offs] = src->encoding->get_codepoint(interp, src, offs);
-            offs++;
-            //TODO
-        };
-
-        to->strlen  = offs;
-        to->bufused = offs * sizeof (UChar32);
+        nfg_encode(interp, to, 0, src, 0, len - 1, 0);
 
         return to;
     }
