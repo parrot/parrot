@@ -1055,9 +1055,12 @@ static void
 do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 {
     ASSERT_ARGS(do_loadlib)
-    STRING * const s = Parrot_str_unescape(interp, lib + 1, '"', NULL);
-    PMC    *ignored  = Parrot_load_lib(interp, s, NULL);
-    UNUSED(ignored);
+    STRING * const s       = Parrot_str_unescape(interp, lib + 1, '"', NULL);
+    PMC    * const lib_pmc = Parrot_load_lib(interp, s, NULL);
+    if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(interp, lib_pmc)) {
+        IMCC_fataly(interp, EXCEPTION_LIBRARY_ERROR,
+            "loadlib directive could not find library `%S'", s);
+    }
     Parrot_register_HLL_lib(interp, s);
 }
 
