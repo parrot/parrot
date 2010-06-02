@@ -1055,6 +1055,11 @@ $(INSTALLABLEPBC_MERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+$(LIBRARY_DIR)/PAST/Pattern.pbc: $(LIBRARY_DIR)/PAST/Pattern.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Pattern.pir
+
+$(LIBRARY_DIR)/PAST/Pattern.pir: $(LIBRARY_DIR)/PAST/Pattern.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern.nqp > $@
 #
 # Profiling runcore test supporting code
 #
