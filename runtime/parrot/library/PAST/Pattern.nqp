@@ -16,8 +16,44 @@ class PAST::Pattern is Capture {
     has $flat;
     has $lvalue;
 
+    method new (*@children, *%attrs) {
+        my $result := Q:PIR {
+            $P0 = self.'HOW'()
+            $P0 = getattribute $P0, 'parrotclass'
+            %r = new $P0
+        };
+
+        for %attrs {
+            $result{$_} := %attrs{$_};
+        }
+        for @children {
+            pir::push($result, $_);
+        }
+        $result;
+    }
+
+    sub check_attribute ($pattern, $node, $attribute) {
+        my $pVal := $pattern{$attribute};
+        my $nVal := $node{$attribute};
+        my $result;
+        if $pVal {
+            if pir::iseq__i_p_p($pVal, $nVal) {
+                $result := ?1;
+            } else {
+                $result := ?0;
+            }
+        } else {
+            $result := ?1;
+        }
+        $result;
+    }
+
+    sub check_node_attributes ($pattern, $node) {
+        check_attribute($pattern, $node, "name");
+    }
+
     method ACCEPTS ($node) {
-        0;
+        ?0;
     }
 }
 
@@ -38,35 +74,40 @@ class PAST::Pattern::Block is PAST::Pattern {
     has $pirflags;
 
     method ACCEPTS ($node) {
-        $node ~~ PAST::Block;
+        (($node ~~ PAST::Block)
+         && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
 
-class PAST::Pattern::Op {
+
+class PAST::Pattern::Op is PAST::Pattern {
     has $pasttype;
     has $pirop;
     has $inline;
 
     method ACCEPTS ($node) {
-        $node ~~ PAST::Op;
+        ($node ~~ PAST::Op
+         && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
 
-class PAST::Pattern::Stmts {
+class PAST::Pattern::Stmts is PAST::Pattern {
     method ACCEPTS ($node) {
-        $node ~~ PAST::Stmts;
+        ($node ~~ PAST::Stmts
+         && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
 
-class PAST::Pattern::Val {
+class PAST::Pattern::Val is PAST::Pattern {
     has $value;
 
     method ACCEPTS ($node) {
-        $node ~~ PAST::Val;
+        ($node ~~ PAST::Val
+         && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
 
-class PAST::Pattern::Var {
+class PAST::Pattern::Var is PAST::Pattern {
     has $scope;
     has $isdecl;
     has $namespace;
@@ -77,13 +118,15 @@ class PAST::Pattern::Var {
     has $multitype;
 
     method ACCEPTS ($node) {
-        $node ~~ PAST::Var;
+        ($node ~~ PAST::Var
+         && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
 
-class PAST::Pattern::VarList {
+class PAST::Pattern::VarList is PAST::Pattern {
     method ACCEPTS ($node) {
-        $node ~~ PAST::VarList;
+        ($node ~~ PAST::VarList
+         && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
 

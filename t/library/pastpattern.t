@@ -104,6 +104,7 @@ sub test_attribute_exact_matching_on_node_attrs() {
            "Non-matching PAST::Pattern::Block.name " ~ ($iota++) );
     }
 
+    $right := PAST::Op.new(:name("foo"));
     $pattern := PAST::Pattern::Op.new(:name("foo"));
     ok($right ~~ $pattern, "Matching PAST::Pattern::Op.name.");
 
@@ -122,6 +123,7 @@ sub test_attribute_exact_matching_on_node_attrs() {
            "Non-matching PAST::Pattern::Op.name " ~ ($iota++) );
     }
 
+    $right := PAST::Stmts.new(:name("foo"));
     $pattern := PAST::Pattern::Stmts.new(:name("foo"));
     ok($right ~~ $pattern, "Matching PAST::Pattern::Stmts.name.");
 
@@ -139,6 +141,7 @@ sub test_attribute_exact_matching_on_node_attrs() {
            "Non-matching PAST::Pattern::Stmts.name " ~ ($iota++) );
     }
 
+    $right := PAST::Val.new(:name("foo"));
     $pattern := PAST::Pattern::Val.new(:name("foo"));
     ok($right ~~ $pattern, "Matching PAST::Pattern::Val.name.");
 
@@ -157,6 +160,7 @@ sub test_attribute_exact_matching_on_node_attrs() {
            "Non-matching PAST::Pattern::Val.name " ~ ($iota++) );
     }
 
+    $right := PAST::Var.new(:name("foo"));
     $pattern := PAST::Pattern::Var.new(:name("foo"));
     ok($right ~~ $pattern, "Matching PAST::Pattern::Var.name.");
 
@@ -175,6 +179,7 @@ sub test_attribute_exact_matching_on_node_attrs() {
            "Non-matching PAST::Pattern::Var.name " ~ ($iota++) );
     }
 
+    $right := PAST::VarList.new(:name("foo"));
     $pattern := PAST::Pattern::VarList.new(:name("foo"));
     ok($right ~~ $pattern, "Matching PAST::Pattern::VarList.name.");
 
