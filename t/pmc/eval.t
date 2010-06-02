@@ -404,11 +404,9 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw", todo => 'TT #1142' );
     .local string file
     .local int size
     file = "$temp_file"
-    .include "stat.pasm"
-    size = stat file, .STAT_FILESIZE
     io = new ['FileHandle']
-    io.'open'(file, 'r')
-    \$S0 = read io, size
+    io.'open'(file, 'rb')
+    \$S0 = io.'readall'()
     io.'close'()
     e = thaw \$S0
     sweep 1 # ensure all of the object survives GC
@@ -428,7 +426,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
   io = new ['FileHandle']
-  io.'open'("$temp_file", 'w')
+  io.'open'("$temp_file", 'wb')
   print io, \$S0
   io.'close'()
   say "written"
@@ -464,10 +462,9 @@ MORE
     .local string file
     .local int size
     file = "$temp_file"
-    .include "stat.pasm"
-    size = stat file, .STAT_FILESIZE
-    io.'open'(file, 'r')
-    \$S0 = read io, size
+    io = new ['FileHandle']
+    io.'open'(file, 'rb')
+    \$S0 = io.'readall'()
     io.'close'()
     e = thaw \$S0
     e()
