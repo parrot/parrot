@@ -999,6 +999,10 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     (cur, pos, tgt) = self.'!cursor_start'()
     $I0 = is_cclass .CCLASS_ALPHABETIC, tgt, pos
     if $I0 goto pass
+
+    $I0 = length tgt
+    if pos >= $I0 goto fail
+
     $S0 = substr tgt, pos, 1
     if $S0 != '_' goto fail
   pass:
