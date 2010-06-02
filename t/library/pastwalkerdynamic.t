@@ -85,7 +85,7 @@ sub build_count_node_types_past() {
 }
 
 # Local Variables:
-#   mode: cperl-mode
+#   mode: cperl
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
