@@ -53,7 +53,7 @@ nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
 
         if (hash != 0xffff) {
             nfg_encode(interp, dest, index, src, offs, len, graphemes + 1);
-            buf[index] = add_grapheme_from_substr(dest->extra, src, aux, offs-aux, hash);
+            buf[index] = add_grapheme_from_substr(interp, dest->extra, src, aux, offs-aux, hash);
             return;
         }
         offs++;

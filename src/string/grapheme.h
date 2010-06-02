@@ -37,6 +37,24 @@ typedef struct grapheme_table_t grapheme_table;
                       || (0xfe1f < (c) &&  (c) < 0xfe30))
 
 /* HEADERIZER BEGIN: src/string/grapheme.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+UChar32 * add_grapheme_from_substr(PARROT_INTERP,
+    grapheme_table *table,
+    STRING *src,
+    UINTVAL start,
+    UINTVAL len,
+    UINTVAL hash)
+        __attribute__nonnull__(1);
+
+grapheme_table * create_grapheme_table(PARROT_INTERP, UINTVAL n)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_add_grapheme_from_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_create_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/grapheme.c */
 
 #endif /* PARROT_HAS_ICU */
