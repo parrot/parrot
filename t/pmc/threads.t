@@ -833,7 +833,6 @@ pir_output_is(
 .include 'interpinfo.pasm'
 
 .loadlib 'foo_group'
-.loadlib 'myops_ops'
 
 .sub test
     .param pmc passed_value
