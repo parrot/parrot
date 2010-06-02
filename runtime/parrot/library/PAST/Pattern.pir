@@ -74,17 +74,61 @@ setattr:
 .accessor('subid')
 .accessor('pirflags')
 
+.sub 'ACCEPTS' :method
+    .param pmc node
+    $P0 = get_class ['PAST'; 'Block']
+    $I0 = isa node, $P0
+    unless $I0 goto no
+yes:
+    .return (1)
+no:
+    .return (0)
+.end
+
 .namespace ['PAST'; 'Pattern'; 'Op']
 
 .accessor('pasttype')
 .accessor('pirop')
 .accessor('inline')
 
+.sub 'ACCEPTS' :method
+    .param pmc node
+    $P0 = get_class ['PAST'; 'Op']
+    $I0 = isa node, $P0
+    unless $I0 goto no
+yes:
+    .return (1)
+no:
+    .return (0)
+.end
+
 .namespace ['PAST'; 'Pattern'; 'Stmts']
+
+.sub 'ACCEPTS' :method
+    .param pmc node
+    $P0 = get_class ['PAST'; 'Stmts']
+    $I0 = isa node, $P0
+    unless $I0 goto no
+yes:
+    .return (1)
+no:
+    .return (0)
+.end
 
 .namespace ['PAST'; 'Pattern'; 'Val']
 
 .accessor('value')
+
+.sub 'ACCEPTS' :method
+    .param pmc node
+    $P0 = get_class ['PAST'; 'Val']
+    $I0 = isa node, $P0
+    unless $I0 goto no
+yes:
+    .return (1)
+no:
+    .return (0)
+.end
 
 .namespace ['PAST'; 'Pattern'; 'Var']
 
@@ -97,7 +141,29 @@ setattr:
 .accessor('vivibase')
 .accessor('multitype')
 
+.sub 'ACCEPTS' :method
+    .param pmc node
+    $P0 = get_class ['PAST'; 'Var']
+    $I0 = isa node, $P0
+    unless $I0 goto no
+yes:
+    .return (1)
+no:
+    .return (0)
+.end
+
 .namespace ['PAST'; 'Pattern'; 'VarList']
+
+.sub 'ACCEPTS' :method
+    .param pmc node
+    $P0 = get_class ['PAST'; 'VarList']
+    $I0 = isa node, $P0
+    unless $I0 goto no
+yes:
+    .return (1)
+no:
+    .return (0)
+.end
 
 # Local Variables:
 #   mode: pir
