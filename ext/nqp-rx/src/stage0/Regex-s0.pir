@@ -2481,6 +2481,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     ops.'push_pirop'('.local pmc', 'match')
     ops.'push_pirop'('.lex', '"$/"', 'match')
     ops.'push_pirop'('length', eos, tgt, 'result'=>eos)
+    ops.'push_pirop'('gt', pos, eos, donelabel)
 
     # On Parrot, indexing into variable-width encoded strings
     # (such as utf8) becomes much more expensive as we move
