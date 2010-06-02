@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(94);
+plan(96);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -80,123 +80,60 @@ sub test_type_matching() {
 }
 
 sub test_attribute_exact_matching () {
-    test_attribute_exact_matching_on_node_attrs();
+    test_attribute_exact_matching_on_node_attr("name");
 }
 
-sub test_attribute_exact_matching_on_node_attrs() {
-    my $pattern := PAST::Pattern::Block.new(:name("foo"));
-
-    my $right := PAST::Block.new(:name("foo"));
-    ok($right ~~ $pattern, "Matching PAST::Pattern::Block.name.");
-
-    my @wrong := (PAST::Block.new(:name("bar")),
-                  PAST::Block.new(:blocktype("foo")),
-                  PAST::Block.new("foo"),
-                  PAST::Block.new(),
-                  PAST::Op.new(:name("foo")),
-                  PAST::Stmts.new(:name("foo")),
-                  PAST::Val.new(:name("foo")),
-                  PAST::Var.new(:name("foo")),
-                  PAST::VarList.new(:name("foo")));                           
-    my $iota := 0;
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           "Non-matching PAST::Pattern::Block.name " ~ ($iota++) );
+sub node_with_attr_set ($class, $attr, $val) {
+    my $node := $class.new();
+    if ($attr eq "source" || $attr eq "pos") {
+        pir::setattribute_p_s_p($node, $attr, $val);
     }
-
-    $right := PAST::Op.new(:name("foo"));
-    $pattern := PAST::Pattern::Op.new(:name("foo"));
-    ok($right ~~ $pattern, "Matching PAST::Pattern::Op.name.");
-
-    @wrong := (PAST::Op.new(:name("bar")),
-               PAST::Op.new(:pasttype("foo")),
-               PAST::Op.new("foo"),
-               PAST::Op.new(),
-               PAST::Block.new(:name("foo")),
-               PAST::Stmts.new(:name("foo")),
-               PAST::Val.new(:name("foo")),
-               PAST::Var.new(:name("foo")),
-               PAST::VarList.new(:name("foo")));                           
-    $iota := 0;
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           "Non-matching PAST::Pattern::Op.name " ~ ($iota++) );
+    else {
+        $node.attr($attr, $val, 1);
     }
+    $node;
+}
 
-    $right := PAST::Stmts.new(:name("foo"));
-    $pattern := PAST::Pattern::Stmts.new(:name("foo"));
-    ok($right ~~ $pattern, "Matching PAST::Pattern::Stmts.name.");
+sub test_attribute_exact_matching_on_node_attr($attr) {
+    my @classes := [ [PAST::Pattern::Block, PAST::Block],
+                     [PAST::Pattern::Op, PAST::Op],
+                     [PAST::Pattern::Stmts, PAST::Stmts],
+                     [PAST::Pattern::Val, PAST::Val],
+                     [PAST::Pattern::Var, PAST::Var],
+                     [PAST::Pattern::VarList, PAST::VarList] ];
 
-    @wrong := (PAST::Stmts.new(:name("bar")),
-               PAST::Stmts.new("foo"),
-               PAST::Stmts.new(),
-               PAST::Block.new(:name("foo")),
-               PAST::Op.new(:name("foo")),
-               PAST::Val.new(:name("foo")),
-               PAST::Var.new(:name("foo")),
-               PAST::VarList.new(:name("foo")));                           
-    $iota := 0;
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           "Non-matching PAST::Pattern::Stmts.name " ~ ($iota++) );
+    for @classes {
+        my $class := $_[1];
+        my $patClass := $_[0];
+        my $pattern := node_with_attr_set($patClass, $attr, "foo");
+
+        my $right := node_with_attr_set($class, $attr, "foo");
+        ok($right ~~ $pattern, "Matching $class.$attr.");
+
+        my @wrong := [ node_with_attr_set($class, $attr, "bar"),
+                       node_with_attr_set($class,
+                                          ($attr eq "name" ??
+                                           "returns" !! "name"),
+                                          "foo"),
+                       $class.new("foo"),
+                       $class.new()
+                     ];
+
+        for @classes {
+            my $otherClass := $_[1];
+            unless (pir::issame__i_p_p($class, $otherClass)) {
+                pir::push_p_p(@wrong, node_with_attr_set($otherClass,
+                                                         $attr,
+                                                         "foo"));
+            }
+        }
+
+        my $iota := 0;
+        for @wrong {
+            ok(!($_ ~~ $pattern),
+               "Non-matching $class.$attr " ~ ($iota++) );
+        }
     }
-
-    $right := PAST::Val.new(:name("foo"));
-    $pattern := PAST::Pattern::Val.new(:name("foo"));
-    ok($right ~~ $pattern, "Matching PAST::Pattern::Val.name.");
-
-    @wrong := (PAST::Val.new(:name("bar")),
-               PAST::Val.new(:value("foo")),
-               PAST::Val.new("foo"),
-               PAST::Val.new(),
-               PAST::Block.new(:name("foo")),
-               PAST::Op.new(:name("foo")),
-               PAST::Stmts.new(:name("foo")),
-               PAST::Var.new(:name("foo")),
-               PAST::VarList.new(:name("foo")));                           
-    $iota := 0;
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           "Non-matching PAST::Pattern::Val.name " ~ ($iota++) );
-    }
-
-    $right := PAST::Var.new(:name("foo"));
-    $pattern := PAST::Pattern::Var.new(:name("foo"));
-    ok($right ~~ $pattern, "Matching PAST::Pattern::Var.name.");
-
-    @wrong := (PAST::Var.new(:name("bar")),
-               PAST::Var.new(:scope("foo")),
-               PAST::Var.new("foo"),
-               PAST::Var.new(),
-               PAST::Block.new(:name("foo")),
-               PAST::Op.new(:name("foo")),
-               PAST::Stmts.new(:name("foo")),
-               PAST::Val.new(:name("foo")),
-               PAST::VarList.new(:name("foo")));                           
-    $iota := 0;
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           "Non-matching PAST::Pattern::Var.name " ~ ($iota++) );
-    }
-
-    $right := PAST::VarList.new(:name("foo"));
-    $pattern := PAST::Pattern::VarList.new(:name("foo"));
-    ok($right ~~ $pattern, "Matching PAST::Pattern::VarList.name.");
-
-    @wrong := (PAST::VarList.new(:name("bar")),
-               PAST::VarList.new("foo"),
-               PAST::VarList.new(),
-               PAST::Block.new(:name("foo")),
-               PAST::Op.new(:name("foo")),
-               PAST::Stmts.new(:name("foo")),
-               PAST::Val.new(:name("foo")),
-               PAST::Var.new(:name("foo")));                           
-    $iota := 0;
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           "Non-matching PAST::Pattern::VarList.name " ~ ($iota++) );
-    }
-
 }
 
 # Local Variables:
