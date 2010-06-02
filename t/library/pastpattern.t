@@ -86,7 +86,7 @@ sub test_attribute_exact_matching () {
 sub node_with_attr_set ($class, $attr, $val) {
     my $node := $class.new();
     if ($attr eq "source" || $attr eq "pos") {
-        pir::setattribute_p_s_p($node, $attr, $val);
+        $node{$attr} := $val;
     }
     else {
         $node.attr($attr, $val, 1);
