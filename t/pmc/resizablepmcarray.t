@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(139)
+    plan(142)
 
     resize_tests()
     negative_array_size()
@@ -43,6 +43,8 @@ out-of-bounds test. Checks INT and PMC keys.
     pop_empty()
     multikey_access()
     exists_and_defined()
+    delete_keyed()
+    get_rep()
     append_tests()
     splice_tests()
     splice_replace1()
@@ -688,6 +690,9 @@ handle_p:
     is(ex, 1, "element at idx 0 exists")
     def = defined array[0]
     is(def, 1, "element at idx 0 is defined")
+    $P0 = new 'Integer', 0
+    ex = exists array[$P0]
+    is(ex, 1, "element at PMC idx 0 exists")
 
     ## bounds checking: upper (7)
     ex = exists array[7]
@@ -732,6 +737,26 @@ handle_p:
     is(def, 0, "element at idx 5 is not defined")
 .end
 
+.sub delete_keyed
+    .local pmc array
+    array = new ['ResizablePMCArray']
+    push array, 'a'
+    push array, 'b'
+    push array, 'c'
+    $P0 = new 'Integer', 1
+    delete array[$P0]
+    $S0 = array[1]
+    is($S0, 'c', 'delete_keyed with PMC key')
+.end
+
+.sub get_rep
+    .local pmc array
+    array = new ['ResizablePMCArray']
+    push array, 'a'
+    push array, 'b'
+    $S0 = get_repr array
+    like($S0, '[.*a.*\,.*b.*]', 'get_repr')
+.end
 
 .sub append_tests
 
