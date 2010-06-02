@@ -3,20 +3,26 @@
 # $Id$
 
 .macro accessor(attrname)
-.sub .attrname :method
-    .param pmc value
-    .param int has_value
-    if has_value goto setattr
-    value = self[.attrname]
-    unless null value goto value_done
+    .sub .attrname :method
+	.param pmc value
+	.param int has_value
+	if has_value goto setattr
+	value = self[.attrname]
+	unless null value goto value_done
 value_undef:
-    value = new 'Undef'
+	value = new 'Undef'
 value_done:
-    .return (value)
+	.return (value)
 setattr:
-    self[.attrname] = value
-    .return (value)
-.end
+	self[.attrname] = value
+	.return (value)
+    .end
+.endm
+
+.macro check_class(obj, class)
+    $P0 = get_class .class
+    $I0 = isa .obj, $P0
+    unless $I0 goto no
 .endm
 
 .sub 'onload' :anon :init :load
@@ -76,9 +82,7 @@ setattr:
 
 .sub 'ACCEPTS' :method
     .param pmc node
-    $P0 = get_class ['PAST'; 'Block']
-    $I0 = isa node, $P0
-    unless $I0 goto no
+    .check_class(node, ['PAST'; 'Block'])
 yes:
     .return (1)
 no:
@@ -93,9 +97,7 @@ no:
 
 .sub 'ACCEPTS' :method
     .param pmc node
-    $P0 = get_class ['PAST'; 'Op']
-    $I0 = isa node, $P0
-    unless $I0 goto no
+    .check_class(node, ['PAST'; 'Op'])
 yes:
     .return (1)
 no:
@@ -106,9 +108,7 @@ no:
 
 .sub 'ACCEPTS' :method
     .param pmc node
-    $P0 = get_class ['PAST'; 'Stmts']
-    $I0 = isa node, $P0
-    unless $I0 goto no
+    .check_class(node, ['PAST'; 'Stmts'])
 yes:
     .return (1)
 no:
@@ -121,9 +121,7 @@ no:
 
 .sub 'ACCEPTS' :method
     .param pmc node
-    $P0 = get_class ['PAST'; 'Val']
-    $I0 = isa node, $P0
-    unless $I0 goto no
+    .check_class(node, ['PAST'; 'Val'])
 yes:
     .return (1)
 no:
@@ -143,9 +141,7 @@ no:
 
 .sub 'ACCEPTS' :method
     .param pmc node
-    $P0 = get_class ['PAST'; 'Var']
-    $I0 = isa node, $P0
-    unless $I0 goto no
+    .check_class(node, ['PAST'; 'Var'])
 yes:
     .return (1)
 no:
@@ -156,9 +152,7 @@ no:
 
 .sub 'ACCEPTS' :method
     .param pmc node
-    $P0 = get_class ['PAST'; 'VarList']
-    $I0 = isa node, $P0
-    unless $I0 goto no
+    .check_class(node, ['PAST'; 'VarList'])
 yes:
     .return (1)
 no:
