@@ -19,6 +19,14 @@ my $item_list_ref = [ ['intro.pod', 'Introduction to Parrot'],
                       ['running.pod', 'Parrot\'s command line options'],
                     ];
 
+my $PIR_chap_list_ref = [ 'ch01_introduction.pod', 'ch02_getting_started.pod',
+#                         'ch03_basic_syntax.pod', 'ch04_variables.pod',
+                          'ch03_basic_syntax.pod',
+                          'ch05_control_structures.pod', 'ch06_subroutines.pod',
+                          'ch07_objects.pod', 'ch08_io.pod',
+                          'ch09_exceptions.pod',
+                        ];
+
 my $lang = @$item_list_ref - 1;
 my $MOD_BUILD_PATH='build/modified_pod/';
 
@@ -55,6 +63,18 @@ for my $i ( 0..$lang ) {
     my $parser = Pod::PseudoPod::LaTeX->new();
     $parser->output_fh( $TEX_FH );
     $parser->parse_file( "${MOD_BUILD_PATH}$item_list_ref->[$i][0]" );
+}
+
+print $TEX_FH <<'PIR_TITEL';
+\chapter{Parrot Intermediate Representation (PIR)}
+
+PIR_TITEL
+
+$lang = @$PIR_chap_list_ref - 1;
+for my $i ( 0..$lang ) {
+    my $parser = Pod::PseudoPod::LaTeX->new();
+    $parser->output_fh( $TEX_FH );
+    $parser->parse_file( 'book/pir/' . $PIR_chap_list_ref->[$i] );
 }
 
 print $TEX_FH <<'FOOTER';
