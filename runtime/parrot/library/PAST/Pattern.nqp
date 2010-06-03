@@ -154,9 +154,14 @@ class PAST::Pattern::Block is PAST::Pattern {
         self.attr("pirflags", $val, !pir::isnull__i_p($val));
     }
 
+    sub check_block_attributes($pattern, $node) {
+        PAST::Pattern::check_attribute($pattern, $node, "blocktype");
+    }
+
     method ACCEPTS ($node) {
         (($node ~~ PAST::Block)
-         && PAST::Pattern::check_node_attributes(self, $node));
+         && PAST::Pattern::check_node_attributes(self, $node)
+         && check_block_attributes(self, $node));
     }
 }
 

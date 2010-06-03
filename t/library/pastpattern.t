@@ -5,10 +5,21 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(501);
+plan(509);
 
 test_type_matching();
 test_attribute_exact_matching();
+
+sub node_with_attr_set ($class, $attr, $val) {
+    my $node := $class.new();
+    if ($attr eq "source" || $attr eq "pos") {
+        $node{$attr} := $val;
+    }
+    else {
+        $node.attr($attr, $val, 1);
+    }
+    $node;
+}
 
 sub test_type_matching() {
     my $blockPat := PAST::Pattern::Block.new();
@@ -80,6 +91,11 @@ sub test_type_matching() {
 }
 
 sub test_attribute_exact_matching () {
+    test_attribute_exact_matching_node_attributes();
+    test_attribute_exact_matching_block_attributes();
+}
+
+sub test_attribute_exact_matching_node_attributes () {
     test_attribute_exact_matching_on_node_attr("name");
     test_attribute_exact_matching_on_node_attr("source");
     test_attribute_exact_matching_on_node_attr("pos");
@@ -88,17 +104,6 @@ sub test_attribute_exact_matching () {
     test_attribute_exact_matching_on_node_attr("named");
     test_attribute_exact_matching_on_node_attr("flat");
     test_attribute_exact_matching_on_node_attr("lvalue");
-}
-
-sub node_with_attr_set ($class, $attr, $val) {
-    my $node := $class.new();
-    if ($attr eq "source" || $attr eq "pos") {
-        $node{$attr} := $val;
-    }
-    else {
-        $node.attr($attr, $val, 1);
-    }
-    $node;
 }
 
 sub test_attribute_exact_matching_on_node_attr($attr) {
@@ -148,6 +153,63 @@ sub test_attribute_exact_matching_on_node_attr($attr) {
             ok(!($_ ~~ $pattern),
                "Non-matching $class.$attr " ~ ($iota++) );
         }
+    }
+}
+
+sub test_attribute_exact_matching_block_attributes () {
+    test_attribute_exact_matching_on_block_attr("blocktype");
+}
+
+sub test_attribute_exact_matching_on_block_attr($attr) {
+    my $pattern := node_with_attr_set(PAST::Pattern::Block, 
+                                      $attr, "foo");
+    my $rightBegin := "Matching PAST::Pattern::Block.$attr:";
+    my $wrongBegin := "Non-matching PAST::Pattern::Block.$attr:";
+
+    my @right := [ node_with_attr_set(PAST::Block,
+                                      $attr, "foo") ];
+    my @rightMessages := 
+      [ "$rightBegin simple case." ];
+    my $node := node_with_attr_set(PAST::Block, $attr, "foo");
+    $node.name("bar");
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with different :name.");
+
+    $node := PAST::Block.new(:name("bar"));
+    $node.attr($attr, "foo", 1);
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with different name first.");
+
+    $node := node_with_attr_set(PAST::Block, $attr, "foo");
+    $node.name("foo");
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with same name.");
+    
+    $node := PAST::Block.new(:name("foo"));
+    $node.attr($attr, "foo", 1);
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with same name first.");
+
+    for @right {
+        ok($_ ~~ $pattern, pir::shift__s_p(@rightMessages));
+    }
+
+    my @wrong := [ PAST::Block.new(),
+                   PAST::Block.new("foo"),
+                   node_with_attr_set(PAST::Block, $attr, "bar")
+                 ];
+    my @wrongMessages := [ "$wrongBegin plain Block.",
+                           "$wrongBegin with child.",
+                           "$wrongBegin with wrong value."
+                         ];
+
+    for @wrong {
+        ok(!($_ ~~ $pattern),
+           pir::shift__p_p(@wrongMessages));
     }
 }
 
