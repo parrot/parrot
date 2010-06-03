@@ -26,8 +26,6 @@ object.
 
 .namespace [ 'Squaak';'Compiler' ]
 
-.loadlib 'io_ops'
-
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
