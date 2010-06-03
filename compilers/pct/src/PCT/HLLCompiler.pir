@@ -25,6 +25,7 @@ running compilers from a command line.
 .namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
+.include 'stdio.pasm'
 
 .sub 'init' :vtable :method
     load_bytecode 'config.pir'
@@ -330,7 +331,7 @@ when the stage corresponding to target has been reached.
     $N1 = time
     $N2 = $N1 - $N0
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'("Stage '")
     $P1.'print'(stagename)
     $P1.'print'("': ")
@@ -614,13 +615,13 @@ specifies the encoding to use for the input (e.g., "utf8").
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
     $P1 = getinterp
-    $P2 = $P1.'stdhandle'(2)
+    $P2 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
     $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
     $P0 = getinterp
-    stdin = $P0.'stdhandle'(0)
+    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -889,7 +890,7 @@ Generic method for compilers invoked from a shell command line.
     .local string output
     .local pmc ofh
     $P0 = getinterp
-    ofh = $P0.'stdhandle'(1)
+    ofh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
@@ -919,7 +920,7 @@ Generic method for compilers invoked from a shell command line.
     pop_eh
     $S0 = self.'backtrace'($P0)
     $P0 = getinterp
-    $P0 = $P0.'stdhandle'(2)
+    $P0 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     print $P0, $S0
     exit 1
 .end
