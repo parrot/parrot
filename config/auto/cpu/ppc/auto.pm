@@ -19,17 +19,15 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
     my @files = qw( test_gcc_cmpset_c.in );
     for my $f (@files) {
-        print " $f " if $verbose;
+        $conf->debug(" $f ");
         my ($suffix) = $f =~ /test_(\w+)/;
         $f = "config/auto/cpu/ppc/$f";
         $conf->cc_gen($f);
         eval { $conf->cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
-            print " $@ " if $verbose;
+            $conf->debug(" $@ ");
         }
         else {
             if ( $conf->cc_run() =~ /ok/ ) {
@@ -37,7 +35,7 @@ sub runstep {
                     "ppc_has_$suffix" => '1',
                     "HAS_PPC_$suffix" => '1',
                 );
-                print " (\U$suffix) " if ($verbose);
+                $conf->debug(" (\U$suffix) ");
                 $conf->data->add( ' ', TEMP_generated => $f );
             }
         }

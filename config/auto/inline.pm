@@ -79,13 +79,12 @@ sub _second_probe_for_inline {
 
 sub _evaluate_inline {
     my ($self, $conf, $test) = @_;
-    my $verbose = $conf->options->get(qw(verbose));
     if ($test) {
-        print " ($test) " if $verbose;
+        $conf->debug(" ($test) ");
         $self->set_result('yes');
     }
     else {
-        print " no " if $verbose;
+        $conf->debug(" no ");
         $self->set_result('no');
         $test = '';
     }

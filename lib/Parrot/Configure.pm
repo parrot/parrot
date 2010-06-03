@@ -21,6 +21,7 @@ Parrot::Configure - Conducts the execution of Configuration Steps
 
     $conf->add_steps(@steps);
     $conf->runsteps;
+    $conf->debug(@messages);
 
 =head1 DESCRIPTION
 
@@ -552,6 +553,22 @@ sub replenish {
     }
 
     return;
+}
+
+=item * C<debug()>
+
+When C<--verbose> is requested, or when a particular configuration step is
+specified in C<--verbose-step>, this method prints its arguments as a string
+on STDOUT.
+
+=cut
+
+sub debug {
+    my ($conf, @messages) = @_;
+    if ($conf->options->get('verbose')) {
+        print join('' => @messages);
+    }
+    return 1;
 }
 
 =back

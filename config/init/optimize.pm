@@ -27,16 +27,12 @@ sub _init {
     };
 }
 
-our $verbose;
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get( 'verbose' );
-    print "\n" if $verbose;
+    $conf->debug("\n");
 
-    print "(optimization options: init::optimize)\n"
-        if $verbose;
+    $conf->debug("(optimization options: init::optimize)\n");
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
     # is given, however, use that instead.
@@ -44,7 +40,7 @@ sub runstep {
 
     if (! defined $optimize) {
         $self->set_result('no');
-        print "(none requested) " if $conf->options->get('verbose');
+        $conf->debug("(none requested) ");
         return 1;
     }
 
@@ -68,7 +64,7 @@ sub runstep {
 
     # save the options, however we got them.
     $conf->data->set( optimize => $options );
-    print "optimize options: ", $options, "\n" if $verbose;
+    $conf->debug("optimize options: ", $options, "\n");
 
     # disable debug flags.
     $conf->data->set( cc_debug => '' );

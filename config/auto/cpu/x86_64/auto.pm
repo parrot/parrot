@@ -20,8 +20,6 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     # x86_64 is recently new and has cmpxchg
-
-    my $verbose = $conf->options->get('verbose');
     my $gcc     = $conf->data->get('gccversion');
 
     # when running on gcc, we just define the config item
