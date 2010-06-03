@@ -219,7 +219,8 @@ class PAST::Pattern::Val is PAST::Pattern {
 
     method ACCEPTS ($node) {
         ($node ~~ PAST::Val
-         && PAST::Pattern::check_node_attributes(self, $node));
+         && PAST::Pattern::check_node_attributes(self, $node)
+         && PAST::Pattern::check_attribute(self, $node, "value"));
     }
 }
 

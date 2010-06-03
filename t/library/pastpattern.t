@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(629);
+plan(637);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -94,6 +94,7 @@ sub test_attribute_exact_matching () {
     test_attribute_exact_matching_node_attributes();
     test_attribute_exact_matching_block_attributes();
     test_attribute_exact_matching_op_attributes();
+    test_attribute_exact_matching_val_attributes();
 }
 
 sub test_attribute_exact_matching_node_attributes () {
@@ -243,6 +244,12 @@ sub test_attribute_exact_matching_on_op_attr ($attr) {
     test_attribute_exact_matching_on_subtype_attr(PAST::Op,
                                                   PAST::Pattern::Op,
                                                   $attr);
+}
+
+sub test_attribute_exact_matching_val_attributes () {
+    test_attribute_exact_matching_on_subtype_attr(PAST::Val,
+                                                  PAST::Pattern::Val,
+                                                  "value");
 }
 
 # Local Variables:
