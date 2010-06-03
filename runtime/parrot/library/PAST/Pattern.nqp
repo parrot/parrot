@@ -192,9 +192,16 @@ class PAST::Pattern::Op is PAST::Pattern {
         self.attr("inline", $val, !pir::isnull__i_p($val));
     }
 
+    sub check_op_attributes ($pattern, $node) {
+        (PAST::Pattern::check_attribute($pattern, $node, "pasttype")
+         && PAST::Pattern::check_attribute($pattern, $node, "pirop")
+         && PAST::Pattern::check_attribute($pattern, $node, "inline"));          
+    }
+
     method ACCEPTS ($node) {
-        ($node ~~ PAST::Op
-         && PAST::Pattern::check_node_attributes(self, $node));
+        (($node ~~ PAST::Op)
+         && PAST::Pattern::check_node_attributes(self, $node)
+         && check_op_attributes(self, $node));
     }
 }
 

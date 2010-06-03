@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(605);
+plan(629);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -93,6 +93,7 @@ sub test_type_matching() {
 sub test_attribute_exact_matching () {
     test_attribute_exact_matching_node_attributes();
     test_attribute_exact_matching_block_attributes();
+    test_attribute_exact_matching_op_attributes();
 }
 
 sub test_attribute_exact_matching_node_attributes () {
@@ -156,6 +157,60 @@ sub test_attribute_exact_matching_on_node_attr($attr) {
     }
 }
 
+sub test_attribute_exact_matching_on_subtype_attr ($class,
+                                                   $pattClass,
+                                                   $attr) {
+    my $pattern := node_with_attr_set($pattClass, $attr, "foo");
+    my $rightBegin := "Matching $pattClass.$attr:";
+    my $wrongBegin := "Non-matching $pattClass.$attr:";
+
+    my @right := [ node_with_attr_set($class, $attr, "foo") ];
+    my @rightMessages := 
+      [ "$rightBegin simple case." ];
+    my $node := node_with_attr_set($class, $attr, "foo");
+    $node.name("bar");
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with different :name.");
+
+    $node := $class.new(:name("bar"));
+    $node.attr($attr, "foo", 1);
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with different name first.");
+
+    $node := node_with_attr_set($class, $attr, "foo");
+    $node.name("foo");
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with same name.");
+    
+    $node := $class.new(:name("foo"));
+    $node.attr($attr, "foo", 1);
+    pir::push(@right, $node);
+    pir::push(@rightMessages,
+              "$rightBegin with same name first.");
+
+    for @right {
+        ok($_ ~~ $pattern, pir::shift__s_p(@rightMessages));
+    }
+
+    my @wrong := [ $class.new(),
+                   $class.new("foo"),
+                   node_with_attr_set($class, $attr, "bar")
+                 ];
+    my @wrongMessages := [ "$wrongBegin plain $class.",
+                           "$wrongBegin with child.",
+                           "$wrongBegin with wrong value."
+                         ];
+
+    for @wrong {
+        ok(!($_ ~~ $pattern),
+           pir::shift__p_p(@wrongMessages));
+    }
+}
+
+
 sub test_attribute_exact_matching_block_attributes () {
     test_attribute_exact_matching_on_block_attr("blocktype");
     test_attribute_exact_matching_on_block_attr("closure");
@@ -172,57 +227,22 @@ sub test_attribute_exact_matching_block_attributes () {
     test_attribute_exact_matching_on_block_attr("pirflags");
 }
 
-sub test_attribute_exact_matching_on_block_attr($attr) {
-    my $pattern := node_with_attr_set(PAST::Pattern::Block, 
-                                      $attr, "foo");
-    my $rightBegin := "Matching PAST::Pattern::Block.$attr:";
-    my $wrongBegin := "Non-matching PAST::Pattern::Block.$attr:";
+sub test_attribute_exact_matching_on_block_attr ($attr) {
+    test_attribute_exact_matching_on_subtype_attr(PAST::Block,
+                                                  PAST::Pattern::Block,
+                                                  $attr);
+}
 
-    my @right := [ node_with_attr_set(PAST::Block,
-                                      $attr, "foo") ];
-    my @rightMessages := 
-      [ "$rightBegin simple case." ];
-    my $node := node_with_attr_set(PAST::Block, $attr, "foo");
-    $node.name("bar");
-    pir::push(@right, $node);
-    pir::push(@rightMessages,
-              "$rightBegin with different :name.");
+sub test_attribute_exact_matching_op_attributes () {
+    test_attribute_exact_matching_on_op_attr("pasttype");
+    test_attribute_exact_matching_on_op_attr("pirop");
+    test_attribute_exact_matching_on_op_attr("inline");
+}
 
-    $node := PAST::Block.new(:name("bar"));
-    $node.attr($attr, "foo", 1);
-    pir::push(@right, $node);
-    pir::push(@rightMessages,
-              "$rightBegin with different name first.");
-
-    $node := node_with_attr_set(PAST::Block, $attr, "foo");
-    $node.name("foo");
-    pir::push(@right, $node);
-    pir::push(@rightMessages,
-              "$rightBegin with same name.");
-    
-    $node := PAST::Block.new(:name("foo"));
-    $node.attr($attr, "foo", 1);
-    pir::push(@right, $node);
-    pir::push(@rightMessages,
-              "$rightBegin with same name first.");
-
-    for @right {
-        ok($_ ~~ $pattern, pir::shift__s_p(@rightMessages));
-    }
-
-    my @wrong := [ PAST::Block.new(),
-                   PAST::Block.new("foo"),
-                   node_with_attr_set(PAST::Block, $attr, "bar")
-                 ];
-    my @wrongMessages := [ "$wrongBegin plain Block.",
-                           "$wrongBegin with child.",
-                           "$wrongBegin with wrong value."
-                         ];
-
-    for @wrong {
-        ok(!($_ ~~ $pattern),
-           pir::shift__p_p(@wrongMessages));
-    }
+sub test_attribute_exact_matching_on_op_attr ($attr) {
+    test_attribute_exact_matching_on_subtype_attr(PAST::Op,
+                                                  PAST::Pattern::Op,
+                                                  $attr);
 }
 
 # Local Variables:
