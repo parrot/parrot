@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(509);
+plan(605);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -158,6 +158,18 @@ sub test_attribute_exact_matching_on_node_attr($attr) {
 
 sub test_attribute_exact_matching_block_attributes () {
     test_attribute_exact_matching_on_block_attr("blocktype");
+    test_attribute_exact_matching_on_block_attr("closure");
+    test_attribute_exact_matching_on_block_attr("control");
+    test_attribute_exact_matching_on_block_attr("loadinit");
+    test_attribute_exact_matching_on_block_attr("namespace");
+    test_attribute_exact_matching_on_block_attr("multi");
+    test_attribute_exact_matching_on_block_attr("hll");
+    test_attribute_exact_matching_on_block_attr("nsentry");
+    test_attribute_exact_matching_on_block_attr("lexical");
+    test_attribute_exact_matching_on_block_attr("compiler");
+    test_attribute_exact_matching_on_block_attr("compiler_args");
+    test_attribute_exact_matching_on_block_attr("subid");
+    test_attribute_exact_matching_on_block_attr("pirflags");
 }
 
 sub test_attribute_exact_matching_on_block_attr($attr) {

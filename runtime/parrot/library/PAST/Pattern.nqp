@@ -155,7 +155,20 @@ class PAST::Pattern::Block is PAST::Pattern {
     }
 
     sub check_block_attributes($pattern, $node) {
-        PAST::Pattern::check_attribute($pattern, $node, "blocktype");
+        (PAST::Pattern::check_attribute($pattern, $node, "blocktype")
+         && PAST::Pattern::check_attribute($pattern, $node, "closure")
+         && PAST::Pattern::check_attribute($pattern, $node, "control")
+         && PAST::Pattern::check_attribute($pattern, $node, "loadinit")
+         && PAST::Pattern::check_attribute($pattern, $node, "namespace")
+         && PAST::Pattern::check_attribute($pattern, $node, "multi")
+         && PAST::Pattern::check_attribute($pattern, $node, "hll")
+         && PAST::Pattern::check_attribute($pattern, $node, "nsentry")
+         && PAST::Pattern::check_attribute($pattern, $node, "lexical")
+         && PAST::Pattern::check_attribute($pattern, $node, "compiler")
+         && PAST::Pattern::check_attribute($pattern, $node, 
+                                           "compiler_args")
+         && PAST::Pattern::check_attribute($pattern, $node, "subid")
+         && PAST::Pattern::check_attribute($pattern, $node, "pirflags"));
     }
 
     method ACCEPTS ($node) {
