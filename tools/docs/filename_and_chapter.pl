@@ -20,8 +20,7 @@ my $item_list_ref = [ ['intro.pod', 'Introduction to Parrot'],
                     ];
 
 my $PIR_chap_list_ref = [ 'ch01_introduction.pod', 'ch02_getting_started.pod',
-#                         'ch03_basic_syntax.pod', 'ch04_variables.pod',
-                          'ch03_basic_syntax.pod',
+                          'ch03_basic_syntax.pod', 'ch04_variables.pod',
                           'ch05_control_structures.pod', 'ch06_subroutines.pod',
                           'ch07_objects.pod', 'ch08_io.pod',
                           'ch09_exceptions.pod',
@@ -54,6 +53,9 @@ print $TEX_FH <<'HEADER';
 \documentclass[11pt,a4paper,oneside]{report}
 \usepackage{graphics,graphicx}
 \usepackage{colortbl}
+%
+%\setcounter{secnumdepth}{2}
+%\setcounter{tocdepth}{2}
 
 \begin{document}
 \tableofcontents
@@ -66,16 +68,26 @@ for my $i ( 0..$lang ) {
 }
 
 print $TEX_FH <<'PIR_TITEL';
-\chapter{Parrot Intermediate Representation (PIR)}
+\chapter{PIR Guide}
 
 PIR_TITEL
 
+open my $PIR_TEX_FH, '>', 'build/pir_guide_tex.in';
 $lang = @$PIR_chap_list_ref - 1;
 for my $i ( 0..$lang ) {
     my $parser = Pod::PseudoPod::LaTeX->new();
-    $parser->output_fh( $TEX_FH );
+    $parser->output_fh( $PIR_TEX_FH );
     $parser->parse_file( 'book/pir/' . $PIR_chap_list_ref->[$i] );
 }
+close( $PIR_TEX_FH );
+
+open $PIR_TEX_FH, '<', 'build/pir_guide_tex.in';
+while( <$PIR_TEX_FH> ) {
+    s/^\\section\*/\\section/;
+    s/subsubsub/subsub/;
+    print $TEX_FH $_;
+}
+close( $PIR_TEX_FH );
 
 print $TEX_FH <<'FOOTER';
 \end{document}
