@@ -132,6 +132,31 @@ Inno Setup
 
 =head2 EXAMPLES
 
+    $ cat hello.pir
+    .sub 'main' :main
+        say 'hello world!'
+    .end
+
+    $ cat setup.pir
+    .sub 'main' :main
+        .param pmc args
+        $S0 = shift args
+        load_bytecode 'distutils.pbc'
+
+        $P0 = new 'Hash'
+        $P1 = new 'Hash'
+        $P1['hello.pbc'] = 'hello.pir'
+        $P0['pbc_pir'] = $P1
+        $P2 = new 'Hash'
+        $P2['parrot-hello'] = 'hello.pbc'
+        $P0['installable_pbc'] = $P2
+        .tailcall setup(args :flat, $P0 :flat :named)
+    .end
+
+    $ parrot setup.pir
+    $ parrot setup.pir install
+    $ parrot setup clean
+
 L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
 
 L<http://github.com/fperrad/markdown/blob/master/setup.pir>
