@@ -259,7 +259,15 @@ class PAST::Pattern::Var is PAST::Pattern {
 
     method ACCEPTS ($node) {
         ($node ~~ PAST::Var
-         && PAST::Pattern::check_node_attributes(self, $node));
+         && PAST::Pattern::check_node_attributes(self, $node)
+         && PAST::Pattern::check_attribute(self, $node, "scope")
+         && PAST::Pattern::check_attribute(self, $node, "isdecl")
+         && PAST::Pattern::check_attribute(self, $node, "namespace")
+         && PAST::Pattern::check_attribute(self, $node, "slurpy")
+         && PAST::Pattern::check_attribute(self, $node, "call_sig")
+         && PAST::Pattern::check_attribute(self, $node, "viviself")
+         && PAST::Pattern::check_attribute(self, $node, "vivibase")
+         && PAST::Pattern::check_attribute(self, $node, "multitype"));
     }
 }
 
