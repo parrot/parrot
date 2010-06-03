@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(96);
+plan(501);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -81,6 +81,13 @@ sub test_type_matching() {
 
 sub test_attribute_exact_matching () {
     test_attribute_exact_matching_on_node_attr("name");
+    test_attribute_exact_matching_on_node_attr("source");
+    test_attribute_exact_matching_on_node_attr("pos");
+    test_attribute_exact_matching_on_node_attr("returns");
+    test_attribute_exact_matching_on_node_attr("arity");
+    test_attribute_exact_matching_on_node_attr("named");
+    test_attribute_exact_matching_on_node_attr("flat");
+    test_attribute_exact_matching_on_node_attr("lvalue");
 }
 
 sub node_with_attr_set ($class, $attr, $val) {
@@ -95,12 +102,20 @@ sub node_with_attr_set ($class, $attr, $val) {
 }
 
 sub test_attribute_exact_matching_on_node_attr($attr) {
-    my @classes := [ [PAST::Pattern::Block, PAST::Block],
-                     [PAST::Pattern::Op, PAST::Op],
-                     [PAST::Pattern::Stmts, PAST::Stmts],
-                     [PAST::Pattern::Val, PAST::Val],
-                     [PAST::Pattern::Var, PAST::Var],
-                     [PAST::Pattern::VarList, PAST::VarList] ];
+    my @classes :=
+      $attr eq "lvalue" ??
+        [ [PAST::Pattern::Block, PAST::Block],
+          [PAST::Pattern::Op, PAST::Op],
+          [PAST::Pattern::Stmts, PAST::Stmts],
+          [PAST::Pattern::Var, PAST::Var],
+          [PAST::Pattern::VarList, PAST::VarList] ]
+        !!
+          [ [PAST::Pattern::Block, PAST::Block],
+            [PAST::Pattern::Op, PAST::Op],
+            [PAST::Pattern::Stmts, PAST::Stmts],
+            [PAST::Pattern::Val, PAST::Val],
+            [PAST::Pattern::Var, PAST::Var],
+            [PAST::Pattern::VarList, PAST::VarList] ];
 
     for @classes {
         my $class := $_[1];

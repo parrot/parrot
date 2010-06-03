@@ -82,7 +82,14 @@ class PAST::Pattern is Capture {
     }
 
     sub check_node_attributes ($pattern, $node) {
-        check_attribute($pattern, $node, "name");
+        (check_attribute($pattern, $node, "name")
+         && check_attribute($pattern, $node, "source")
+         && check_attribute($pattern, $node, "pos")
+         && check_attribute($pattern, $node, "returns")
+         && check_attribute($pattern, $node, "arity")
+         && check_attribute($pattern, $node, "named")
+         && check_attribute($pattern, $node, "flat")
+         && check_attribute($pattern, $node, "lvalue"));
     }
 
     method ACCEPTS ($node) {
