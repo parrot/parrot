@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -35,12 +35,8 @@ Initialises SELF value according to the boolean value of the passed PMC.
 
 */
     VTABLE void init_pmc(PMC *value) {
-        if (!PMC_IS_NULL(value)) {
-            SELF.set_bool(VTABLE_get_bool(INTERP, value));
-        }
-        else {
-            SELF.set_bool(0);
-        }
+        INTVAL v = PMC_IS_NULL(value) ? (INTVAL) 0 : VTABLE_get_bool(INTERP, value);
+        SELF.set_bool(v);
     }
 /*
 
