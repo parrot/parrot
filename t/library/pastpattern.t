@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(803);
+plan(875);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -341,16 +341,45 @@ sub test_child_smart_matching () {
         right($class.new(PAST::Val.new()), $pattern,
               "Single PAST::Pattern child");
         wrong($class.new(), $pattern,
-              "Single PAST::Pattern, no corresponding child.");
+              "Single PAST::Pattern, no corresponding child");
         wrong($class.new(PAST::Block.new()), $pattern,
-              "Single PAST::Pattern, wrong node type.");
+              "Single PAST::Pattern, wrong node type");
         wrong($class.new(PAST::Val.new(), PAST::Val.new()), $pattern,
-              "Single PAST::Pattern, extra child of right type.");
+              "Single PAST::Pattern, extra child of right type");
         wrong($class.new(PAST::Val.new(), PAST::Block.new()), $pattern,
-              "Single PAST::Pattern, extra child of wrong type.");
+              "Single PAST::Pattern, extra child of wrong type");
         wrong($class.new(PAST::Block.new(), PAST::Val.new()), $pattern,
-              "Single PAST::Pattern, extra child of wrong type first.");
+              "Single PAST::Pattern, extra child of wrong type first");
+
+        $pattern := $patternClass.new(/foo/);
+
+        right($class.new("foo"), $pattern,
+              "Single regex");
+        wrong($class.new(), $pattern,
+              "Single regex, no corresponding child");
+        wrong($class.new("fop"), $pattern,
+              "Single regex, wrong string");
+        wrong($class.new("foo", "foo"), $pattern,
+              "Single regex, extra child of right string");
+        wrong($class.new("foo", "bar"), $pattern,
+              "Single regex, extra child of wrong string");
+        wrong($class.new("bar", "foo"), $pattern,
+              "Single regex, extra child of wrong string first.");
         
+        $pattern := $patternClass.new(sub ($_) { +$_ % 2; });
+
+        right($class.new(3), $pattern,
+              "Single closure child");
+        wrong($class.new(), $pattern,
+              "Single closure, no corresponding child");
+        wrong($class.new(2), $pattern,
+              "Single closure, false result");
+        wrong($class.new(3, 5), $pattern,
+              "Single closure, extra child of right result");
+        wrong($class.new(3, 6), $pattern,
+              "Single closure, extra child of wrong result");
+        wrong($class.new(6, 3), $pattern,
+              "Single closure, extra child of wrong result first");
     }
 }
 

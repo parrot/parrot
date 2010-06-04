@@ -69,7 +69,10 @@ class PAST::Pattern is Capture {
         my $result := 0;
         if (pir::can__IPs($patt, "ACCEPTS")) {
             $result := $val ~~ $patt;
-        } else {
+        } elsif (pir::does($patt, "invokable")) {
+            $result := ?$patt($val);
+        }
+        else {
             $result := pir::iseq__IPP($patt, $val);
             CATCH {
                 $result := 0;
