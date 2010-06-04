@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(33)
+    plan(35)
 
     test_set_size()
     test_reset_size()
@@ -31,6 +31,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_interface_done()
     test_get_iter()
     test_equality()
+    test_repr()
     test_new_style_init()
     test_invalid_init_tt1509()
 .end
@@ -227,7 +228,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub 'test_equality'
-    .local pmc a1, a2
+    .local pmc a1, a2, a3
     a1 = new ['FixedIntegerArray']
     a2 = new ['FixedIntegerArray']
 
@@ -247,6 +248,20 @@ out-of-bounds test. Checks INT and PMC keys.
 
     a2[1] = 84
     is(a1, a2, "Equal when second element same")
+
+    a3 = new ['Complex']
+    isnt(a1, a3, "Different PMC type is not equal")
+.end
+
+.sub 'test_repr'
+    .local pmc a1
+    .local string r
+    a1 = new ['FixedIntegerArray']
+    a1 = 2
+    a1[0] = 7
+    a1[1] = 1
+    r = get_repr a1
+    like(r, '[\s*7\s*\,\s*1\s*]', 'get_repr')
 .end
 
 .sub 'test_new_style_init'
