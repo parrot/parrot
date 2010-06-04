@@ -201,11 +201,11 @@ You can dynamically attach and remove hooks dynamically.
         if $!is_enabled {
             if $!is_catchall {
                 # Attach a catchall hook.
-                $!instr_obj.remove_op_catchall($!identifier);
+                $!instr_obj.remove_op_catchall($!identifier, $!callback);
             } else {
                 # Attach a hook to each op in @!oplist.
                 for $!oplist {
-                    $!instr_obj.remove_op_hook($!identifier, $_);
+                    $!instr_obj.remove_op_hook($!identifier, $_, $!callback);
                 }
             }
             

@@ -59,12 +59,9 @@ sub tracer ($pc, $op, $instr_obj) {
                 # Constant keys are int constants or strings.
                 if pir::band__III($arg_type, 2) == 2 {
                     # String constant key.
-                    #my $arg := $instr_obj.get_op_arg($op[$cur_arg + 1], $arg_type);
-                    # TODO: For pir code below, the above blows up. Figure out why.
-                    #       current workaround is to just print out the PMC constant value.
-                    #     $S0 = "test"
-                    #     $P1[$S0] = "sth"
-                    $arg_str := '[' ~ 'PC' ~ $op[$cur_arg + 1] ~ ']';
+                    my $arg := $instr_obj.get_op_arg($op[$cur_arg + 1], $arg_type);
+                    $arg_str := '["' ~ $arg ~ '"]';
+                    
                 } else {
                     # Integer constant key.
                     $arg_str := '[' ~ $op[$cur_arg + 1] ~ ']';
@@ -90,6 +87,7 @@ sub tracer ($pc, $op, $instr_obj) {
             
             if pir::band__III($arg_type, 1) == 1 {
                 $arg_str := '"' ~ $arg ~ '"';
+                
             } else {
                 $arg_str := $arg;
             }

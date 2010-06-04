@@ -25,9 +25,23 @@ to be done on a child interpreter.
 #include "parrot/embed.h"
 
 /*
+ * Structures for the linked list data type.
+ */
+
+typedef struct probe_node_t {
+    struct probe_node_t *next, *prev;
+    PMC                 *list_obj;
+} probe_node_t;
+
+typedef struct probe_list_t {
+    probe_node_t *head, *tail;
+} probe_list_t;
+
+/*
  * Extend the runcore_t struct to include a reference
  *  to the supervisor interpreter.
  */
+ 
 typedef struct Instrument_runcore_t {
     STRING                  *name;
     int                      id;
@@ -38,29 +52,31 @@ typedef struct Instrument_runcore_t {
     INTVAL                   flags;
     
     /* End of common members */
-    PMC                     *supervisor;
+    Parrot_Interp             supervisor_interp;
+    PMC                      *supervisor_pmc;
+    probe_list_t            **op_hooks;
+    probe_list_t             *op_catchall;
 } Instrument_runcore_t;
 
-/* Define the enumeration for op lookups */
-typedef enum {
-    OP_LOOKUP   = 0,
-    OP_INFO     = 1,
-    OP_FULLNAME = 2,
-    OP_NAME     = 3,
-    OP_ARGS     = 4,
-    OP_COUNT    = 5
-} Instrument_op_query_t;
-
 /* Runcore Function Prototypes */
-static void Instrument_runcore_init (PARROT_INTERP, PMC *supervisor);
-static opcode_t * Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc);
+static void      Instrument_runcore_init (PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument);
+static opcode_t *Instrument_runcore_runops (PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc);
+static void      Instrument_init_probes (Parrot_Interp supervisor, Parrot_Interp supervised);
+
+/* Helper prototype */
+static opcode_t *Instrument_fire_hooks (opcode_t *pc, PARROT_INTERP);
+
+/* Linked List operations */
+static probe_list_t *probe_list_create_list (PARROT_INTERP);
+static probe_node_t *probe_list_create_node (PARROT_INTERP);
+static void          probe_list_delete_node (PARROT_INTERP, probe_node_t *node);
+static void          probe_list_push (PARROT_INTERP, probe_list_t *list, PMC *item);
+static PMC          *probe_list_pop (PARROT_INTERP, probe_list_t *list);
+static PMC          *probe_list_remove (PARROT_INTERP, probe_list_t *list, probe_node_t *node);
+static probe_node_t *probe_list_find (PARROT_INTERP, probe_list_t *list, PMC *val);
 
 pmclass Instrument auto_attrs dynpmc provides hash {
-    ATTR Parrot_Interp  supervisor;  /* The interpreter that created this instance */
     ATTR Parrot_Interp  supervised;  /* The interpreter running the code */
-    ATTR opcode_t      *cur_pc;
-    ATTR PMC           *op_hooks;    /* A ResizablePMCArray for holding references to op hooks */
-    ATTR PMC           *op_catchall; /* These callbacks are to be called on each op */
     ATTR PMC           *probes;      /* A list of probes registered. */
 
 /*
@@ -74,18 +90,21 @@ Initializes the pmc and creates a child interpreter.
 */
 
     VTABLE void init () {
-        struct parrot_interp_t *in;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         
         /* Create the child interpreter PMC */
-        attr->supervisor  = INTERP;
-        attr->supervised  = Parrot_new(attr->supervisor);
-        attr->op_hooks    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        attr->op_catchall = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->supervised  = Parrot_new(INTERP);
         attr->probes      = Parrot_pmc_new(INTERP, enum_class_Hash);
         
         /* Initialize the runcore for the child interpreter */  
-        Instrument_runcore_init(attr->supervised, SELF);
+        Instrument_runcore_init(attr->supervised, INTERP, SELF);
+        
+        /* Initialize the scheduler for the child interpreter */
+        attr->supervised->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
+        attr->supervised->scheduler = VTABLE_share_ro(interp, attr->supervised->scheduler);
+        
+        /* Prepare the child interpreter's op table for instrumentation */
+        Instrument_init_probes(INTERP, attr->supervised);
         
         /* Set self to destroy manually */
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -104,16 +123,10 @@ Cleans up after the PMC.
     VTABLE void destroy () {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         
+        /* TODO: Delete the linked list entries. */
+        
         /* Delete the supervised interpreter */
         Parrot_destroy(attr->supervised);
-        
-        /* Set the references to null */
-        /* TODO: Is there a better way to delete them? */
-        attr->supervisor  = NULL;
-        attr->supervised  = NULL;
-        attr->op_hooks    = NULL;
-        attr->op_catchall = NULL;
-        attr->probes      = NULL;
     }
 
 /*
@@ -128,91 +141,9 @@ Marks internal data structures as live to the gc.
 
     VTABLE void mark () {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-    
+        
         /* Mark attributes as alive */
-        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->op_hooks);
-        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->op_catchall);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->probes);
-    }
-
-/*
-
-=item C<void * get_pointer()>
-
-Returns a reference to the supervising interpreter,
-meaning the interpreter that runs the instruments.
-
-=cut
-
-*/
-
-    VTABLE void * get_pointer () {
-        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-        return attr->supervisor;
-    }
-
-/*
-
-=item C<void set_pointer(void *pc_pointer)>
-
-With the pc_pointer passed in, execute the current op at
-the given address after firing all hooks that apply.
-
-=cut
-
-*/
-
-    VTABLE void set_pointer (void *pc_pointer) {
-        opcode_t *pc = (opcode_t *) pc_pointer;
-        PMC *hooks, *hook_iter, *catchall_iter, *op_data;
-        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-        INTVAL pc_relative, cur_op_param, op_params;
-        
-        attr->cur_pc = pc;
-        
-        /* Calculate the relative position of the pc. */
-        pc_relative = pc - attr->supervised->code->base.data;
-        
-        /* Grab the opcode params */
-        op_params = attr->supervised->op_info_table[*pc].op_count;
-        op_data   = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
-        cur_op_param = 0;
-        while(cur_op_param <= op_params) {
-            VTABLE_push_integer(INTERP, op_data, pc[cur_op_param]);
-            cur_op_param++;
-        }
-        
-        /* Fire the catchall hooks first */
-        catchall_iter = VTABLE_get_iter(INTERP, attr->op_catchall);
-        while(VTABLE_get_bool(INTERP, catchall_iter)) {
-            PMC *val, *key;
-            
-            key = VTABLE_shift_pmc(INTERP, catchall_iter);
-            val = VTABLE_get_pmc_keyed(INTERP, attr->op_catchall, key);
-            
-            if(!PMC_IS_NULL(val)) {
-                Parrot_ext_call(INTERP, val, "IPP->", pc_relative, op_data, SELF);
-			}
-        }
-        
-        /* Fire the specific probes */
-        hooks     = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, *pc);
-        if(!PMC_IS_NULL(hooks)) {
-            hook_iter = VTABLE_get_iter(INTERP, hooks);
-            while(VTABLE_get_bool(INTERP, hook_iter)) {
-                PMC *val, *key;
-                
-                key = VTABLE_shift_pmc(INTERP, hook_iter);
-                val = VTABLE_get_pmc_keyed(INTERP, hooks, key);
-                
-                if(!PMC_IS_NULL(val)) {
-                    Parrot_ext_call(INTERP, val, "IPP->", pc_relative, op_data, SELF);
-                }
-            }
-        }
-        
-        /* Done firing hooks */
-        return;
     }
 
 /*
@@ -274,12 +205,7 @@ Loads the given file and run it with the args given.
         if(!Parrot_pmc_is_null(INTERP, args)
            && VTABLE_type(INTERP, args) == enum_class_ResizableStringArray
            && VTABLE_get_integer(INTERP, args) > 0) {
-            /* There are some arguments to be passed to
-               the child interpreter. We need to convert
-               them from Parrot strings to c-strings so
-               that we can pass it to imcc.
-            */
-            
+           
             /* Get the number of argument values */
             int count = VTABLE_get_integer(INTERP, args);
             
@@ -299,10 +225,11 @@ Loads the given file and run it with the args given.
         status = imcc_run(attr->supervised,
                     Parrot_str_cstring(attr->supervised, file),
                     argc, (const char **) argv);
-        if (status)
+        if (status) {
             imcc_run_pbc(attr->supervised,
                          attr->supervised->output_file,
                          argc,(const char **) argv);
+        }
         
         /* Finalize the instruments */
         probe_iter = VTABLE_get_iter(INTERP, attr->probes);
@@ -374,7 +301,7 @@ and attribute 'instr_obj'. Set the 'instr_obj' to SELF and call the
         
         /* Call the method.
            The first parameter to a method is the object itself.
-           The enable method will be calling insert_hooks(HASH) to register the hooks. */
+           The enable method will be calling insert_op_hook to register the hooks. */
         Parrot_ext_call(INTERP, enable_method, "P->", obj);
         
         /* Register the probe. */
@@ -393,16 +320,15 @@ Insert a hook for the given op number.
 */
     
     METHOD insert_op_hook (PMC *id, INTVAL op_num, PMC *hook) {
-        PMC *op_num_hooks;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
+        probe_list_t **list = core->op_hooks;
         
-        op_num_hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, op_num);
-        if(PMC_IS_NULL(op_num_hooks)) {
-            op_num_hooks = Parrot_pmc_new(INTERP, enum_class_Hash);
-            VTABLE_set_pmc_keyed_int(INTERP, attr->op_hooks, op_num, op_num_hooks);
+        if(list[op_num] == NULL) {
+            list[op_num] = probe_list_create_list(INTERP);
         }
         
-        VTABLE_set_pmc_keyed(INTERP, op_num_hooks, id, hook);
+        probe_list_push(INTERP, list[op_num], hook);
     }
 
 /*
@@ -415,13 +341,18 @@ Removes a hook for the given op number.
 
 */
     
-    METHOD remove_op_hook (PMC *id, INTVAL op_num) {
-        PMC *op_num_hooks;
+    METHOD remove_op_hook (PMC *id, INTVAL op_num, PMC *callback) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
+        probe_list_t **list = core->op_hooks;
+        probe_node_t  *node = NULL;
         
-        op_num_hooks = VTABLE_get_pmc_keyed_int(INTERP, attr->op_hooks, op_num);
-        if(!PMC_IS_NULL(op_num_hooks)) {
-            VTABLE_delete_keyed(INTERP, op_num_hooks, id);
+        if(list[op_num] != NULL) {
+            node = probe_list_find(INTERP, list[op_num], callback);
+            
+            if(node != NULL) {
+                probe_list_remove(INTERP, list[op_num], node);
+            }
         }
     }
 
@@ -435,8 +366,10 @@ Register a catchall op callback
 
     METHOD insert_op_catchall (PMC *id, PMC *callback) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
+        probe_list_t  *list = core->op_catchall;
         
-        VTABLE_set_pmc_keyed(INTERP, attr->op_catchall, id, callback);
+        probe_list_push(INTERP, list, callback);
     }
 
 /*
@@ -447,10 +380,15 @@ Deregister a catchall op callback
 =cut
 */
 
-    METHOD remove_op_catchall (PMC *id) {
+    METHOD remove_op_catchall (PMC *id, PMC *callback) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
+        probe_list_t  *list = core->op_catchall;
+        probe_node_t  *node = NULL;
         
-        VTABLE_delete_keyed(INTERP, attr->op_catchall, id);
+        node = probe_list_find(INTERP, list, callback);
+        
+        probe_list_remove(INTERP, list, node);
     }
 
 /*
@@ -468,7 +406,7 @@ arg_type is as defined in parrot/op.h
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         PMC *ret, *cc, *key;
         arg_type_t type = (arg_type_t) arg_type;
-        
+
         cc = CURRENT_CONTEXT(attr->supervised);
         
         switch(type) {
@@ -544,12 +482,6 @@ arg_type is as defined in parrot/op.h
         RETURN(PMC *ret);
     }
 
-    METHOD get_key_value (PMC *key) {
-        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-        STRING *key_str = key_string(attr->supervised, key);
-        RETURN(STRING *key_str);
-    }
-
 }
 
 /*
@@ -560,60 +492,279 @@ arg_type is as defined in parrot/op.h
  * This is the simplified custom runops function.
  * This is based on the PARROT_FAST_RUNCORE.
  */
+ 
 static
 opcode_t *
 Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc)
-{	
+{    
     Instrument_runcore_t *core = (Instrument_runcore_t *) runcore;
-    
-    PMC *pmc = core->supervisor;
-    Parrot_Interp supervisor = (Parrot_Interp) VTABLE_get_pointer(interp, pmc);
+    Parrot_Interp supervisor = core->supervisor_interp;
 
     while (pc) {
-		Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
-		
-		/* Fire the hooks */
-		VTABLE_set_pointer(supervisor, pmc, pc);
-
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
+        
+        /* TODO: This is a hack to get around dynops for now.
+                 Since dynops are loaded by the child interpreter
+                 and there is no easy way to get notification of that,
+                 this will do for now.
+        */
+        if(supervisor->op_func_table != interp->op_func_table) {
+            Instrument_init_probes(supervisor, interp);
+            
+            supervisor->op_lib        = interp->op_lib;
+            supervisor->op_count      = interp->op_count;
+            supervisor->op_func_table = interp->op_func_table;
+            supervisor->op_info_table = interp->op_info_table;
+        }
+        
+        Instrument_fire_hooks(pc, interp);
         DO_OP(pc, interp);
+        
+        /* Force events */
+        Parrot_cx_handle_tasks(interp, interp->scheduler);
     }
-	
+    
     return pc;
-	
+    
 }
 
 /*
  * This is the initializer for the runcore.
  * Sets up runcore_t.
  */
+
 static
 void
-Instrument_runcore_init (PARROT_INTERP, PMC *supervisor) {
-	Instrument_runcore_t * const coredata =
-	    mem_gc_allocate_zeroed_typed(interp, Instrument_runcore_t);
-	
-	/* Ensure the current loaded runcore is the slow core */
-	Parrot_set_run_core(interp, PARROT_SLOW_CORE);
-	
-	/* Copy the runcore entry for the PARROT_SLOW_CORE,
-	   and then make modifications to it.
-	   Copy so that we get the opinit function pointer.
-	*/
-	mem_copy_n_typed(coredata, interp->run_core, 1, Parrot_runcore_t);
-	
-	coredata->name			= string_from_literal(interp, "instrument");
-	coredata->runops		= Instrument_runcore_runops;
-	coredata->prepare_run	= NULL;
-	coredata->destroy		= NULL;
-	coredata->flags			= 0;
-	coredata->supervisor   = supervisor;
-	
-	PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *)coredata);
-	
-	Parrot_runcore_register(interp, (Parrot_runcore_t *) coredata);
-	
-	//Switch to this runcore.
-	Parrot_runcore_switch(interp, coredata->name);
+Instrument_runcore_init (PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument) {
+    Instrument_runcore_t * const coredata =
+        mem_gc_allocate_zeroed_typed(interp, Instrument_runcore_t);
+    
+    /* Ensure the current loaded runcore is the slow core */
+    Parrot_set_run_core(interp, PARROT_SLOW_CORE);
+    
+    /* Copy the runcore entry for the PARROT_SLOW_CORE,
+       and then make modifications to it.
+       Copy so that we get the opinit function pointer.
+    */
+    mem_copy_n_typed(coredata, interp->run_core, 1, Parrot_runcore_t);
+    
+    coredata->name                 = string_from_literal(interp, "instrument");
+    coredata->runops             = Instrument_runcore_runops;
+    coredata->prepare_run         = NULL;
+    coredata->destroy             = NULL;
+    coredata->flags                 = 0;
+    coredata->supervisor_interp  = supervisor;
+    coredata->supervisor_pmc     = instrument;
+    coredata->op_hooks           = NULL;
+    coredata->op_catchall        = NULL;
+    
+    PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *)coredata);
+    
+    Parrot_runcore_register(interp, (Parrot_runcore_t *) coredata);
+    
+    //Switch to this runcore.
+    Parrot_runcore_switch(interp, coredata->name);
+}
+
+/*
+ * This is the initializer for the probe tables.
+ * Probes are stored in the extended runcore_t.
+ */
+ 
+static void Instrument_init_probes (Parrot_Interp supervisor, Parrot_Interp supervised) {
+    Instrument_runcore_t    *core;
+    INTVAL op_count;
+    
+    core     = (Instrument_runcore_t *) supervised->run_core;
+    op_count = supervised->op_count;
+    
+    /* Create the probe list table */
+    if(!core->op_hooks) {
+        /* First time allocating. */
+        core->op_hooks    = mem_gc_allocate_n_zeroed_typed(supervisor, op_count, probe_list_t *);
+        core->op_catchall = probe_list_create_list(supervisor);
+        
+    } else {
+        /* Reallocate. */
+        INTVAL old_count  = supervisor->op_count;
+        core->op_hooks    = mem_gc_realloc_n_typed_zeroed(supervisor, core->op_hooks,
+                                                          op_count, old_count, probe_list_t *);
+    }
+}
+
+/*
+ * This will fire the probes.
+ */
+
+static opcode_t *Instrument_fire_hooks (opcode_t *pc, PARROT_INTERP) {
+    /* If this stub is called, this op is instrumented. */
+    probe_list_t *to_recall, *op_probes, *op_catchalls;
+    probe_node_t *cur_probe;
+    Instrument_runcore_t    *core;
+    Parrot_Interp            supervisor;
+    PMC                     *instrument, *op_data;
+    INTVAL                   op_params, cur_op_param, pc_relative, done_catchalls;
+    
+    core         = (Instrument_runcore_t *) interp->run_core;
+    to_recall    = NULL; /* TODO: Implement probe recalls */
+    op_probes    = core->op_hooks[*pc];
+    op_catchalls = core->op_catchall;
+    supervisor   = core->supervisor_interp;
+    instrument   = core->supervisor_pmc;
+    
+    /* Calculate the relative position of the pc. */
+    pc_relative = pc - interp->code->base.data;
+    
+    /* Grab the opcode params */
+    /* TODO: Apparently some ops like set_args_pc have extra args.
+             see src/runcore/trace.c line 312.
+    */
+    op_params = interp->op_info_table[*pc].op_count;
+    op_data   = Parrot_pmc_new(supervisor, enum_class_ResizableIntegerArray);
+    cur_op_param = 0;
+    while(cur_op_param <= op_params) {
+        VTABLE_push_integer(supervisor, op_data, pc[cur_op_param]);
+        cur_op_param++;
+    }
+    
+    /* Execute any probes. */
+    done_catchalls = 0;
+    cur_probe = (op_catchalls != NULL) ? op_catchalls->head : NULL;
+    while(cur_probe != NULL || !done_catchalls) {
+        PMC *callback;
+    
+        /* Switch to the specific probes if we are done with catchalls. */
+        if(cur_probe == NULL && !done_catchalls) {
+            cur_probe = (op_probes != NULL) ? op_probes->head : NULL;
+            done_catchalls = 1;
+            continue;
+        }
+        
+        /* Fire the probe. */
+        callback = cur_probe->list_obj;
+        
+        if(!PMC_IS_NULL(callback)) {
+            Parrot_ext_call(supervisor, callback, "IPP->", pc_relative, op_data, instrument);
+        }
+        
+        cur_probe = cur_probe->next;
+    }
+    
+    /* Done */
+    return pc;
+}
+
+/*
+ * Functions implementing the linked list for the probes.
+ */
+
+/*
+ * Creates a new list.
+ */
+static probe_list_t *probe_list_create_list (PARROT_INTERP) {
+    probe_list_t *list;
+    
+    list = mem_gc_allocate_zeroed_typed(interp, probe_list_t);
+    
+    list->head = list->tail = NULL;
+    
+    return list;
+}
+
+/*
+ * Creates a new list node.
+ */
+static probe_node_t *probe_list_create_node (PARROT_INTERP) {
+    probe_node_t *node;
+    
+    node = mem_gc_allocate_zeroed_typed(interp, probe_node_t);
+    
+    node->next     = NULL;
+    node->prev     = NULL;
+    node->list_obj = NULL;
+    
+    return node;
+}
+
+/*
+ * Deletes the node.
+ */
+static void probe_list_delete_node (PARROT_INTERP, probe_node_t *node) {
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    
+    node->next = node->prev = NULL;
+
+    mem_gc_free(interp, node);
+}
+
+/*
+ * Pushes item to the end of the list.
+ */
+static void probe_list_push (PARROT_INTERP, probe_list_t *list, PMC *item) {
+    probe_node_t *node = probe_list_create_node(interp);
+    node->list_obj     = item;
+
+    if(list->head == NULL) {
+        list->head = list->tail = node;
+    } else {
+        node->prev       = list->tail;
+        node->next       = NULL;
+        list->tail->next = node;
+        list->tail       = node;
+    }
+}
+
+/*
+ * Removes item at the end of the list.
+ */
+static PMC * probe_list_pop (PARROT_INTERP, probe_list_t *list) {
+    PMC *item = PMCNULL;
+    probe_node_t *node = list->tail;
+    
+    if(node != NULL) {
+        if(node == list->head) {
+            list->head = list->tail = NULL;
+        } else {
+            list->tail       = node->prev;
+            list->tail->next = NULL;
+        }
+        
+        item = node->list_obj;
+        
+        probe_list_delete_node(interp, node);
+    }
+    
+    return item;
+}
+
+/*
+ * Removes the given node. Used with probe_list_find.
+ * Returns the item in that node.
+ */
+static PMC * probe_list_remove (PARROT_INTERP, probe_list_t *list, probe_node_t *node) {
+    PMC *item;
+    
+    item = node->list_obj;
+    
+    probe_list_delete_node(interp, node);
+    
+    return item;
+}
+
+/*
+ * Locates item within the list and returns the node.
+ */
+static probe_node_t *probe_list_find (PARROT_INTERP, probe_list_t *list, PMC *val) {
+    probe_node_t *cur_node = list->head;
+    
+    while(cur_node != NULL) {
+        if(cur_node->list_obj == val) { return cur_node; }
+        
+        cur_node = cur_node->next;
+    }
+    
+    return NULL;
 }
 
 /*
