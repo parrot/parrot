@@ -64,19 +64,44 @@ class PAST::Pattern is Capture {
         }
         $result;
     }
+    
+    sub check ($patt, $val) {
+        pir::iseq__i_p_p($patt, $val);
+    }
+
 
     sub check_attribute ($pattern, $node, $attribute) {
         my $pVal := $pattern.attr($attribute, null, 0);
         my $nVal := $node.attr($attribute, null, 0);
         my $result;
         if $pVal {
-            if pir::iseq__i_p_p($pVal, $nVal) {
+            if check($pVal, $nVal) {
                 $result := 1;
             } else {
                 $result := 0;
             }
         } else {
             $result := 1;
+        }
+        $result;
+    }
+
+    sub check_children ($pattern, $node) {
+        my $pLen := pir::elements($pattern);
+        my $nLen := pir::elements($node);
+        my $result;
+        my $index;
+        if ($pLen == $nLen) {
+            $index := 0;
+            while ($index < $pLen) {
+                unless (check($pattern[$index], $node[$index])) {
+                    return 0;
+                }
+                $index++;
+            }
+            $result := 1;
+        } else {
+            $result := 0;
         }
         $result;
     }
@@ -173,6 +198,7 @@ class PAST::Pattern::Block is PAST::Pattern {
 
     method ACCEPTS ($node) {
         (($node ~~ PAST::Block)
+         && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
          && check_block_attributes(self, $node));
     }
@@ -200,6 +226,7 @@ class PAST::Pattern::Op is PAST::Pattern {
 
     method ACCEPTS ($node) {
         (($node ~~ PAST::Op)
+         && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
          && check_op_attributes(self, $node));
     }
@@ -208,6 +235,7 @@ class PAST::Pattern::Op is PAST::Pattern {
 class PAST::Pattern::Stmts is PAST::Pattern {
     method ACCEPTS ($node) {
         ($node ~~ PAST::Stmts
+         && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node));
     }
 }
@@ -219,6 +247,7 @@ class PAST::Pattern::Val is PAST::Pattern {
 
     method ACCEPTS ($node) {
         ($node ~~ PAST::Val
+         && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
          && PAST::Pattern::check_attribute(self, $node, "value"));
     }
@@ -259,6 +288,7 @@ class PAST::Pattern::Var is PAST::Pattern {
 
     method ACCEPTS ($node) {
         ($node ~~ PAST::Var
+         && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
          && PAST::Pattern::check_attribute(self, $node, "scope")
          && PAST::Pattern::check_attribute(self, $node, "isdecl")
@@ -274,6 +304,7 @@ class PAST::Pattern::Var is PAST::Pattern {
 class PAST::Pattern::VarList is PAST::Pattern {
     method ACCEPTS ($node) {
         ($node ~~ PAST::VarList
+         && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node));
     }
 }

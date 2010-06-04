@@ -5,10 +5,11 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(701);
+plan(767);
 
 test_type_matching();
 test_attribute_exact_matching();
+test_child_exact_matching();
 
 sub node_with_attr_set ($class, $attr, $val) {
     my $node := $class.new();
@@ -268,6 +269,48 @@ sub test_attribute_exact_matching_on_var_attr ($attr) {
     test_attribute_exact_matching_on_subtype_attr(PAST::Var,
                                                   PAST::Pattern::Var,
                                                   $attr);
+}
+
+sub test_child_exact_matching () {
+    my @classes := [ [ PAST::Block, PAST::Pattern::Block ],
+                     [ PAST::Op, PAST::Pattern::Op ],
+                     [ PAST::Stmts, PAST::Pattern::Stmts ],
+                     [ PAST::Val, PAST::Pattern::Val ],
+                     [ PAST::Var, PAST::Pattern::Var ],
+                     [ PAST::VarList, PAST::Pattern::VarList]
+                   ];
+
+    for @classes {
+        my $nodeClass := $_[0];
+        my $patternClass := $_[1];
+        
+
+        sub right ($node, $pattern, $msg) {
+            ok($node ~~ $pattern, "Matching $patternClass: $msg.");
+        }
+
+        sub wrong ($node, $pattern, $msg) {
+            ok(!($node ~~ $pattern),
+               "Matching $patternClass: $msg.");
+        }
+
+        my $pattern := $patternClass.new(1);
+
+        right($nodeClass.new(1), $pattern, "(1) ~~ (1)");
+        wrong($nodeClass.new(), $pattern, "() !~~ (1)");
+        wrong($nodeClass.new(0), $pattern, "(0) !~~ (1)");
+        wrong($nodeClass.new(1, 2), $pattern, "(1, 2) !~~ (1)");
+        wrong($nodeClass.new(2, 1), $pattern, "(2, 1) !~~ (1)");
+
+        $pattern := $patternClass.new(1, 2);
+
+        right($nodeClass.new(1, 2), $pattern, "(1, 2) == (1, 2)");
+        wrong($nodeClass.new(), $pattern, "() !~~ (1, 2)");
+        wrong($nodeClass.new(1), $pattern, "(1) !~~ (1, 2)");
+        wrong($nodeClass.new(0, 2), $pattern, "(0, 2) !~~ (1, 2)");
+        wrong($nodeClass.new(1, 3), $pattern, "(1, 3) !~~ (1, 2)");
+        wrong($nodeClass.new(1, 2, 3), $pattern, "(1, 2, 3) !~~ (1, 2)");        
+    }
 }
 
 # Local Variables:
