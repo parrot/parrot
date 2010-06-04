@@ -38,7 +38,7 @@ NOT_NILL:
     # write the new version to the version_file
     $P0.'open'( version_file_name, 'w' )
     $P0.'print'( $S0 )
-    $P0.'close'() 
+    $P0.'close'()
 .end
 
 # Local Variables:
