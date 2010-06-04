@@ -45,7 +45,7 @@ sub test_type_matching() {
         }
         else {
             ok(!($_ ~~ $blockPat), 
-               ~pir::class__p_p($_) ~ " !~~ PAST::Pattern::Block.");
+               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Block.");
         }
 
         if $_ ~~ PAST::Op {
@@ -53,7 +53,7 @@ sub test_type_matching() {
         }
         else {
             ok(!($_ ~~ $opPat),
-               ~pir::class__p_p($_) ~ " !~~ PAST::Pattern::Op.");
+               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Op.");
         }
 
         if $_ ~~ PAST::Stmts {
@@ -61,7 +61,7 @@ sub test_type_matching() {
         } 
         else {
             ok(!($_ ~~ $stmtsPat),
-               ~pir::class__p_p($_) ~ " !~~ PAST::Pattern::Stmts.");
+               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Stmts.");
         }
 
         if $_ ~~ PAST::Val {
@@ -69,7 +69,7 @@ sub test_type_matching() {
         }
         else {
             ok(!($_ ~~ $valPat),
-               ~pir::class__p_p($_) ~ " !~~ PAST::Pattern::Val.");
+               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Val.");
         }
 
         if $_ ~~ PAST::Var {
@@ -77,7 +77,7 @@ sub test_type_matching() {
         }
         else {
             ok(!($_ ~~ $varPat),
-               ~pir::class__p_p($_) ~ " !~~ PAST::Pattern::Var.");
+               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Var.");
         }
 
         if $_ ~~ PAST::VarList {
@@ -86,7 +86,7 @@ sub test_type_matching() {
         }
         else {
             ok(!($_ ~~ $varListPat),
-               ~pir::class__p_p($_) ~ " !~~ PAST::Pattern::VarList.");
+               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::VarList.");
 	}
     }
 }
@@ -145,8 +145,8 @@ sub test_attribute_exact_matching_on_node_attr($attr) {
 
         for @classes {
             my $otherClass := $_[1];
-            unless (pir::issame__i_p_p($class, $otherClass)) {
-                pir::push_p_p(@wrong, node_with_attr_set($otherClass,
+            unless (pir::issame__IPP($class, $otherClass)) {
+                pir::push(@wrong, node_with_attr_set($otherClass,
                                                          $attr,
                                                          "foo"));
             }
@@ -195,7 +195,7 @@ sub test_attribute_exact_matching_on_subtype_attr ($class,
               "$rightBegin with same name first.");
 
     for @right {
-        ok($_ ~~ $pattern, pir::shift__s_p(@rightMessages));
+        ok($_ ~~ $pattern, pir::shift__SP(@rightMessages));
     }
 
     my @wrong := [ $class.new(),
@@ -209,7 +209,7 @@ sub test_attribute_exact_matching_on_subtype_attr ($class,
 
     for @wrong {
         ok(!($_ ~~ $pattern),
-           pir::shift__p_p(@wrongMessages));
+           pir::shift__PP(@wrongMessages));
     }
 }
 

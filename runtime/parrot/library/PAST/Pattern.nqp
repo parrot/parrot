@@ -18,35 +18,35 @@ class PAST::Pattern is Capture {
     }
 
     method name ($val?) {
-        self.attr("name", $val, !pir::isnull__i_p($val));
+        self.attr("name", $val, !pir::isnull__iP($val));
     }
 
     method source ($val?) {
-        self.attr("source", $val, !pir::isnull__i_p($val));
+        self.attr("source", $val, !pir::isnull__iP($val));
     }
 
     method pos ($val?) {
-        self.attr("pos", $val, !pir::isnull__i_p($val));
+        self.attr("pos", $val, !pir::isnull__iP($val));
     }
 
     method returns ($val?) {
-        self.attr("returns", $val, !pir::isnull__i_p($val));
+        self.attr("returns", $val, !pir::isnull__iP($val));
     }
 
     method arity ($val?) {
-        self.attr("arity", $val, !pir::isnull__i_p($val));
+        self.attr("arity", $val, !pir::isnull__iP($val));
     }
 
     method named ($val?) {
-        self.attr("named", $val, !pir::isnull__i_p($val));
+        self.attr("named", $val, !pir::isnull__iP($val));
     }
 
     method flat ($val?) {
-        self.attr("flat", $val, !pir::isnull__i_p($val));
+        self.attr("flat", $val, !pir::isnull__iP($val));
     }
 
     method lvalue ($val?) {
-        self.attr("lvalue", $val, !pir::isnull__i_p($val));
+        self.attr("lvalue", $val, !pir::isnull__iP($val));
     }    
 
     method new (*@children, *%attrs) {
@@ -66,7 +66,13 @@ class PAST::Pattern is Capture {
     }
     
     sub check ($patt, $val) {
-        pir::iseq__i_p_p($patt, $val);
+        my $result := 0;
+        if (pir::does__IPs($val, "ACCEPTS")) {
+            $result := $val ~~ $patt;
+        } else {
+            $result := pir::iseq__IPP($patt, $val);
+        }
+        $result;
     }
 
 
@@ -124,59 +130,59 @@ class PAST::Pattern is Capture {
 
 class PAST::Pattern::Block is PAST::Pattern {
     method blocktype ($val?) {
-        self.attr("blocktype", $val, !pir::isnull__i_p($val));
+        self.attr("blocktype", $val, !pir::isnull__iP($val));
     }
 
     method closure ($val?) {
-        self.attr("closure", $val, !pir::isnull__i_p($val));
+        self.attr("closure", $val, !pir::isnull__iP($val));
     }
 
     method control ($val?) {
-        self.attr("control", $val, !pir::isnull__i_p($val));
+        self.attr("control", $val, !pir::isnull__iP($val));
     }
 
     method loadinit ($val?) {
-        self.attr("loadinit", $val, !pir::isnull__i_p($val));
+        self.attr("loadinit", $val, !pir::isnull__iP($val));
     }
 
     method namespace ($val?) {
-        self.attr("namespace", $val, !pir::isnull__i_p($val));
+        self.attr("namespace", $val, !pir::isnull__iP($val));
     }
 
     method multi ($val?) {
-        self.attr("multi", $val, !pir::isnull__i_p($val));
+        self.attr("multi", $val, !pir::isnull__iP($val));
     }
 
     method hll ($val?) {
-        self.attr("hll", $val, !pir::isnull__i_p($val));
+        self.attr("hll", $val, !pir::isnull__iP($val));
     }
 
     method nsentry ($val?) {
-        self.attr("nsentry", $val, !pir::isnull__i_p($val));
+        self.attr("nsentry", $val, !pir::isnull__iP($val));
     }
 
     method symtable ($val?) {
-        self.attr("symtable", $val, !pir::isnull__i_p($val));
+        self.attr("symtable", $val, !pir::isnull__iP($val));
     }
 
     method lexical ($val?) {
-        self.attr("lexical", $val, !pir::isnull__i_p($val));
+        self.attr("lexical", $val, !pir::isnull__iP($val));
     }
 
     method compiler ($val?) {
-        self.attr("compiler", $val, !pir::isnull__i_p($val));
+        self.attr("compiler", $val, !pir::isnull__iP($val));
     }
 
     method compiler_args ($val?) {
-        self.attr("compiler_args", $val, !pir::isnull__i_p($val));
+        self.attr("compiler_args", $val, !pir::isnull__iP($val));
     }
 
     method subid ($val?) {
-        self.attr("subid", $val, !pir::isnull__i_p($val));
+        self.attr("subid", $val, !pir::isnull__iP($val));
     }
 
     method pirflags ($val?) {
-        self.attr("pirflags", $val, !pir::isnull__i_p($val));
+        self.attr("pirflags", $val, !pir::isnull__iP($val));
     }
 
     sub check_block_attributes($pattern, $node) {
@@ -207,15 +213,15 @@ class PAST::Pattern::Block is PAST::Pattern {
 
 class PAST::Pattern::Op is PAST::Pattern {
     method pasttype ($val?) {
-        self.attr("pasttype", $val, !pir::isnull__i_p($val));
+        self.attr("pasttype", $val, !pir::isnull__iP($val));
     }
 
     method pirop ($val?) {
-        self.attr("pirop", $val, !pir::isnull__i_p($val));
+        self.attr("pirop", $val, !pir::isnull__iP($val));
     }
 
     method inline ($val?) {
-        self.attr("inline", $val, !pir::isnull__i_p($val));
+        self.attr("inline", $val, !pir::isnull__iP($val));
     }
 
     sub check_op_attributes ($pattern, $node) {
@@ -242,7 +248,7 @@ class PAST::Pattern::Stmts is PAST::Pattern {
 
 class PAST::Pattern::Val is PAST::Pattern {
     method value ($val?) {
-        self.attr("value", $val, !pir::isnull__i_p($val));
+        self.attr("value", $val, !pir::isnull__iP($val));
     }
 
     method ACCEPTS ($node) {
@@ -255,35 +261,35 @@ class PAST::Pattern::Val is PAST::Pattern {
 
 class PAST::Pattern::Var is PAST::Pattern {
     method scope ($val?) {
-        self.attr("scope", $val, !pir::isnull__i_p($val));
+        self.attr("scope", $val, !pir::isnull__iP($val));
     }
 
     method isdecl ($val?) {
-        self.attr("isdecl", $val, !pir::isnull__i_p($val));
+        self.attr("isdecl", $val, !pir::isnull__iP($val));
     }
 
     method namespace ($val?) {
-        self.attr("namespace", $val, !pir::isnull__i_p($val));
+        self.attr("namespace", $val, !pir::isnull__iP($val));
     }
 
     method slurpy ($val?) {
-        self.attr("slurpy", $val, !pir::isnull__i_p($val));
+        self.attr("slurpy", $val, !pir::isnull__iP($val));
     }
 
     method call_sig ($val?) {
-        self.attr("call_sig", $val, !pir::isnull__i_p($val));
+        self.attr("call_sig", $val, !pir::isnull__iP($val));
     }
 
     method viviself ($val?) {
-        self.attr("viviself", $val, !pir::isnull__i_p($val));
+        self.attr("viviself", $val, !pir::isnull__iP($val));
     }
 
     method vivibase ($val?) {
-        self.attr("vivibase", $val, !pir::isnull__i_p($val));
+        self.attr("vivibase", $val, !pir::isnull__iP($val));
     }
 
     method multitype ($val?) {
-        self.attr("multitype", $val, !pir::isnull__i_p($val));
+        self.attr("multitype", $val, !pir::isnull__iP($val));
     }
 
     method ACCEPTS ($node) {

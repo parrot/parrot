@@ -33,7 +33,7 @@ sub test_change_node_attributes () {
 		      PAST::Val.new(:value(25)),
 		      PAST::Block.new(PAST::Val.new(:value(6)),
 				      PAST::Val.new(:value(13))));
-    ok(pir::iseq__i_p_p($result, $target),
+    ok(pir::iseq__IPP($result, $target),
        "Node attributes can be changed by PAST::Transformers.");
 }
 
@@ -67,13 +67,13 @@ sub test_change_node_types () {
 		      PAST::Val.new(:value(5)),
 		      PAST::Op.new(PAST::Val.new(:value(32)),
 				   :pirop<neg>));
-    ok(pir::iseq__i_p_p($result, $target),
+    ok(pir::iseq__IPP($result, $target),
        "Node types can be changed by PAST::Transformers.")
 }
 
 sub trim ($walker, $node) {
     my $result;
-    my $length := pir::elements__i_p($node);
+    my $length := pir::elements__IP($node);
     if ($length <= 1) {
 	$result := $node;
 	my $children := PAST::Walker::walkChildren($walker, $node);
@@ -101,7 +101,7 @@ sub test_delete_nodes () {
       PAST::Block.new(PAST::Stmts.new(PAST::Var.new(),
 				      PAST::Block.new(PAST::Val.new())));
     
-    ok(pir::iseq__i_p_p($result, $target),
+    ok(pir::iseq__IPP($result, $target),
        "Nodes can be deleted by PAST::Transformers.");
 }
 
