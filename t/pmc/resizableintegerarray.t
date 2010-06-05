@@ -43,7 +43,7 @@ Coverage plan:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(45)
+    plan(46)
 
     test_does_interfaces()
 
@@ -73,6 +73,7 @@ Coverage plan:
     test_unshift()
     test_cant_shift_empty()
     test_iterator()
+    test_clone()
 .end
 
 .sub test_does_interfaces
@@ -585,6 +586,14 @@ k1:
 k0:
     pop_eh
     is( $I0, 4, 'get_iter: iterator returns all values in correct sequence' )
+.end
+
+.sub test_clone
+    $P0 = new ['ResizableIntegerArray']
+    push $P0, 1
+    $P1 = clone $P0
+    $I0 = iseq $P0, $P1
+    is( $I0, 1, 'cloned is equal to original')
 .end
 
 # Local Variables:
