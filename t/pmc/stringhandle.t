@@ -133,7 +133,6 @@ OUT
 
 pir_output_is(
     <<'CODE', <<'OUT', 'read opcode' );
-.loadlib 'io_ops'
 .sub 'test' :main
     $P0 = new ['StringHandle']
     $P0.'open'('README', 'w')
