@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 41;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -40,20 +40,6 @@ sub file_content_is {
 }
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
-
-pir_output_is( <<"CODE", <<'OUTPUT', "open/close" );
-.sub main :main
-    \$P0 = new ['FileHandle']
-    \$P0.'open'("$temp_file", 'w')
-    print \$P0, "a line\\n"
-    \$P0.'close'()
-    \$P0.'open'("$temp_file", 'r')
-    \$S0 = \$P0.'read'(20)
-    print \$S0
-.end
-CODE
-a line
-OUTPUT
 
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (ops)");
 .loadlib 'io_ops'
