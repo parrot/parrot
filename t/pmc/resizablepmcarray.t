@@ -755,7 +755,7 @@ handle_p:
     push array, 'a'
     push array, 'b'
     $S0 = get_repr array
-    like($S0, '[.*a.*\,.*b.*]', 'get_repr')
+    is($S0, '[ a, b ]', 'get_repr')
 .end
 
 .sub append_tests
