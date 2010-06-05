@@ -331,9 +331,6 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
   print io, \$S0
   io.'close'()
   load_bytecode "$temp_pbc"
-  \$P0 = loadlib 'os'
-  os = new ['OS']
-  os.'rm'("$temp_pbc")
   f2 = compi("foo_2", "hello from foo_2")
   io.'open'("$temp_pbc", 'w')
   print io, f2
