@@ -65,7 +65,7 @@ src/dynoplibs/trans_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/trans_ops.h: src/dynoplibs/trans_ops.c
 
 src/dynoplibs/trans_ops.c: src/dynoplibs/trans.ops $(OPS2C)
-	$(OPS2C) --dynamic src/dynoplibs/trans.ops
+	$(OPS2C) --dynamic src/dynoplibs/trans.ops --quiet
 
 #########################
 
@@ -80,7 +80,7 @@ src/dynoplibs/bit_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/bit_ops.h: src/dynoplibs/bit_ops.c
 
 src/dynoplibs/bit_ops.c: src/dynoplibs/bit.ops $(OPS2C)
-	$(OPS2C) --dynamic src/dynoplibs/bit.ops
+	$(OPS2C) --dynamic src/dynoplibs/bit.ops --quiet
 
 #########################
 
@@ -95,7 +95,7 @@ src/dynoplibs/debug_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/debug_ops.h: src/dynoplibs/debug_ops.c
 
 src/dynoplibs/debug_ops.c: src/dynoplibs/debug.ops $(OPS2C)
-	$(OPS2C) --dynamic src/dynoplibs/debug.ops
+	$(OPS2C) --dynamic src/dynoplibs/debug.ops --quiet
 
 #########################
 
@@ -110,7 +110,7 @@ src/dynoplibs/sys_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/sys_ops.h: src/dynoplibs/sys_ops.c
 
 src/dynoplibs/sys_ops.c: src/dynoplibs/sys.ops $(OPS2C)
-	$(OPS2C) --dynamic src/dynoplibs/sys.ops
+	$(OPS2C) --dynamic src/dynoplibs/sys.ops --quiet
 
 #########################
 
@@ -125,5 +125,5 @@ src/dynoplibs/io_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
 
 src/dynoplibs/io_ops.c: src/dynoplibs/io.ops $(OPS2C)
-	$(OPS2C) --dynamic src/dynoplibs/io.ops
+	$(OPS2C) --dynamic src/dynoplibs/io.ops --quiet
 
