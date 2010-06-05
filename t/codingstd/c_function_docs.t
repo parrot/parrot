@@ -91,7 +91,6 @@ foreach my $path (@files) {
 }
 
 __DATA__
-compilers/imcc/pbc.c
 compilers/imcc/pcc.c
 compilers/imcc/reg_alloc.c
 compilers/pirc/src/pircapi.c
