@@ -614,16 +614,17 @@ all : \
     $(DATA_JSON_LIB_PBCS) \
     $(NQP_LIB_PBCS) \
     $(GEN_LIBRARY) \
-    $(DYNPMC_TARGETS) \
     $(DYNOPLIBS_TARGETS) \
     $(LIBNCI_TEST_SO)
 
+# We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
     $(GEN_PM_INCLUDES) \
     PARROT_LIBS \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
+    $(DYNPMC_TARGETS) \
     $(LIBRARY_DIR)/Test/More.pbc
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
