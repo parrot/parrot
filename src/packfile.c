@@ -4668,7 +4668,7 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
     else {
         STRING *err;
         PackFile_ByteCode * const cs =
-            (PackFile_ByteCode *)IMCC_compile_file_s(interp,
+            (PackFile_ByteCode *)Parrot_compile_file(interp,
                 filename, &err);
         Parrot_str_free_cstring(filename);
 

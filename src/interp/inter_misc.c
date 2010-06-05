@@ -165,7 +165,7 @@ void *
 Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
-    return IMCC_compile_file_s(interp, fullname, error);
+    return imcc_compile_file(interp, fullname, error);
 }
 
 /*

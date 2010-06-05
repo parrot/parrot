@@ -58,15 +58,6 @@ static int change_op_arg_to_num(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
-PARROT_CANNOT_RETURN_NULL
-static void * imcc_compile_file(PARROT_INTERP,
-    ARGIN(const char *fullname),
-    ARGOUT(STRING **error_message))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*error_message);
-
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
@@ -98,10 +89,6 @@ static Instruction * var_arg_ins(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(r))
-#define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname) \
-    , PARROT_ASSERT_ARG(error_message))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_try_rev_cmp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -231,6 +218,9 @@ is_op(PARROT_INTERP, ARGIN(const char *name))
 
 =item C<static Instruction * var_arg_ins(PARROT_INTERP, IMC_Unit *unit, const
 char *name, SymReg **r, int n, int emit)>
+
+Create an C<Instruction> object for an instruction that takes a variable
+number of arguments.
 
 =cut
 
@@ -686,6 +676,8 @@ imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
 =item C<PMC * IMCC_compile_pir_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
 
+Compile PIR code from a C string. Returns errors in the <STRING> provided.
+
 =cut
 
 */
@@ -705,6 +697,8 @@ IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
 =item C<PMC * IMCC_compile_pasm_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
 
+Compile PASM code from a C string. Returns errors in the <STRING> provided.
+
 =cut
 
 */
@@ -722,6 +716,8 @@ IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
 /*
 
 =item C<PMC * imcc_compile_pasm_ex(PARROT_INTERP, const char *s)>
+
+Compile PASM code from a C string. Throws an exception upon errors.
 
 =cut
 
@@ -748,6 +744,8 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
 
 =item C<PMC * imcc_compile_pir_ex(PARROT_INTERP, const char *s)>
 
+Compile PIR code from a C string. Throws an exception upon errors.
+
 =cut
 
 */
@@ -771,8 +769,8 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<static void * imcc_compile_file(PARROT_INTERP, const char *fullname,
-STRING **error_message)>
+=item C<void * imcc_compile_file(PARROT_INTERP, const char *fullname, STRING
+**error_message)>
 
 Compile a file by filename (can be either PASM or IMCC code)
 
@@ -780,8 +778,9 @@ Compile a file by filename (can be either PASM or IMCC code)
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-static void *
+void *
 imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         ARGOUT(STRING **error_message))
 {
@@ -882,44 +881,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     }
 
     return cs;
-}
-
-/*
-
-=item C<void * IMCC_compile_file(PARROT_INTERP, const char *s)>
-
-Note: This function is provided for backward compatibility. This
-function can go away in future.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-void *
-IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
-{
-    ASSERT_ARGS(IMCC_compile_file)
-    STRING *error_message;
-    return imcc_compile_file(interp, s, &error_message);
-}
-
-/*
-
-=item C<void * IMCC_compile_file_s(PARROT_INTERP, const char *s, STRING
-**error_message)>
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-void *
-IMCC_compile_file_s(PARROT_INTERP, ARGIN(const char *s),
-        ARGOUT(STRING **error_message))
-{
-    ASSERT_ARGS(IMCC_compile_file_s)
-    return imcc_compile_file(interp, s, error_message);
 }
 
 /*
@@ -1064,6 +1025,8 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 =item C<static const char * try_rev_cmp(const char *name, SymReg **r)>
 
+Try to find a valid op doing the same thing by reversing comparisons.
+
 =cut
 
 */
@@ -1133,6 +1096,8 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(PMC *io), ARGIN(const char *format), va_list
 
 =item C<void imcc_init(PARROT_INTERP)>
 
+Initialize IMCC with Parrot by registering it as a PIR and PASM compiler.
+
 =cut
 
 */
@@ -1180,6 +1145,8 @@ imcc_destroy_macro_values(ARGMOD(void *value))
 /*
 
 =item C<void imcc_destroy(PARROT_INTERP)>
+
+Deallocate memory associated with IMCC.
 
 =cut
 
