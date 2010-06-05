@@ -805,6 +805,7 @@ Generic method for compilers invoked from a shell command line.
 
 =cut
 
+.include 'except_severity.pasm'
 .sub 'command_line' :method
     .param pmc args
     .param pmc adverbs         :slurpy :named
@@ -914,15 +915,26 @@ Generic method for compilers invoked from a shell command line.
 
     # If we get an uncaught exception in the program and the HLL provides
     # a backtrace method, we end up here. We pass it the exception object
-    # so it can render a backtrace.
+    # so it can render a backtrace, unless the severity is exit or warning
+    # in which case it needs special handling.
   uncaught_exception:
     .get_results ($P0)
     pop_eh
+    $P1 = getinterp
+    $P1 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $I0 = $P0['severity']
+    if $I0 == .EXCEPT_EXIT goto do_exit
     $S0 = self.'backtrace'($P0)
-    $P0 = getinterp
-    $P0 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
-    print $P0, $S0
+    print $P1, $S0
+    if $I0 <= .EXCEPT_WARNING goto do_warning
     exit 1
+  do_exit:
+    $I0 = $P0['exit_code']
+    exit $I0
+  do_warning:
+    $P0 = $P0["resume"]
+    push_eh uncaught_exception # Otherwise we get errors about no handler to delete
+    $P0()
 .end
 
 
