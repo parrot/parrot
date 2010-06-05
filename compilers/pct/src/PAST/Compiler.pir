@@ -207,8 +207,8 @@ Compile the abstract syntax tree given by C<past> into POST.
     set_global '@?BLOCK', blockpast
   have_blockpast:
     .lex '@*BLOCKPAST', blockpast
-    null $P0
-    set_global '$?SUB', $P0
+    null $P99
+    .lex '$*SUB', $P99
     $P1 = self.'as_post'(past, 'rtype'=>'v')
     .return ($P1)
 .end
@@ -855,8 +855,8 @@ Return the POST representation of a C<PAST::Block>.
 
     ##  determine the outer POST::Sub for the new one
     .local pmc outerpost
-    outerpost = get_global '$?SUB'
-    set_global '$?SUB', bpost
+    outerpost = find_dynamic_lex '$*SUB'
+    .lex '$*SUB', bpost
 
     .local int islexical
     islexical = node.'lexical'()
@@ -987,7 +987,6 @@ Return the POST representation of a C<PAST::Block>.
   loadinit_done:
 
     ##  restore previous outer scope and symtable
-    set_global '$?SUB', outerpost
     setattribute self, '%!symtable', outersym
 
     ##  return block or block result
@@ -2110,7 +2109,7 @@ attribute.
 
     ##  get the current sub
     .local pmc subpost
-    subpost = get_global '$?SUB'
+    subpost = find_dynamic_lex '$*SUB'
 
     ##  determine lexical, register, and parameter names
     .local string named, pname, has_pname
