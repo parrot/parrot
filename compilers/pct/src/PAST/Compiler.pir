@@ -206,9 +206,11 @@ Compile the abstract syntax tree given by C<past> into POST.
     blockpast = new 'ResizablePMCArray'
     set_global '@?BLOCK', blockpast
   have_blockpast:
+    .lex '@*BLOCKPAST', blockpast
     null $P0
     set_global '$?SUB', $P0
-    .tailcall self.'as_post'(past, 'rtype'=>'v')
+    $P1 = self.'as_post'(past, 'rtype'=>'v')
+    .return ($P1)
 .end
 
 =item escape(str)
@@ -785,9 +787,9 @@ Return the POST representation of a C<PAST::Block>.
     .param pmc node
     .param pmc options         :slurpy :named
 
-    ##  add current block node to @?BLOCK
+    ##  add current block node to @*BLOCKPAST
     .local pmc blockpast
-    blockpast = get_global '@?BLOCK'
+    blockpast = find_dynamic_lex '@*BLOCKPAST'
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
@@ -1026,7 +1028,7 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push_pirop'('call', blockreg, arglist :flat, 'result'=>result)
 
   block_done:
-    ##  remove current block from @?BLOCK
+    ##  remove current block from @*BLOCKPAST
     $P99 = shift blockpast
     .return (bpost)
 .end
@@ -2038,7 +2040,7 @@ attribute.
     .local string blockname
     blockname = ''
     .local pmc it
-    $P0 = get_global '@?BLOCK'
+    $P0 = find_dynamic_lex '@*BLOCKPAST'
     it = iter $P0
   scope_error_block_loop:
     unless it goto scope_error_2
@@ -2248,7 +2250,7 @@ attribute.
     # treat it as that type.
     .local string name
     name = node.'name'()
-    $P0 = get_global '@?BLOCK'
+    $P0 = find_dynamic_lex '@*BLOCKPAST'
     $P0 = $P0[0]
     $P0 = $P0.'symtable'()
     unless $P0 goto contextual
