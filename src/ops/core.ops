@@ -1107,7 +1107,7 @@ Trigger a GC run unconditionally.
 
 op sweep(inconst INT) {
     if ($1)
-        Parrot_gc_mark_and_sweep(interp, 0);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_normal_FLAG);
     else
         if (Parrot_gc_impatient_pmcs(interp))
             Parrot_gc_mark_and_sweep(interp, GC_lazy_FLAG);

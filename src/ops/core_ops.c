@@ -14989,7 +14989,7 @@ opcode_t *
 Parrot_sweep_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     if (cur_opcode[1])
-        Parrot_gc_mark_and_sweep(interp, 0);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_normal_FLAG);
     else
         if (Parrot_gc_impatient_pmcs(interp))
             Parrot_gc_mark_and_sweep(interp, GC_lazy_FLAG);
