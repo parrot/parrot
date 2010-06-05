@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 43;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -813,65 +813,6 @@ OUT
 
 print $FOO "T\xc3\xb6tsch\n";
 close $FOO;
-
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled" );
-.loadlib 'io_ops'
-.sub main :main
-    .local pmc pio
-    .local int len
-    .include "stat.pasm"
-    .local string f
-    f = '$temp_file'
-    len = stat f, .STAT_FILESIZE
-    pio = open f, 'r'
-    pio.'encoding'("utf8")
-    \$S0 = read pio, len
-    close pio
-    \$I1 = charset \$S0
-    \$S2 = charsetname \$I1
-    say \$S2
-
-    \$I1 = encoding \$S0
-    \$S2 = encodingname \$I1
-    say \$S2
-
-    \$I1 = find_charset 'iso-8859-1'
-    trans_charset \$S1, \$S0, \$I1
-    print \$S1
-.end
-CODE
-unicode
-utf8
-T\xf6tsch
-OUTPUT
-
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled - readline" );
-.sub main :main
-    .local pmc pio
-    .local string f
-    f = '$temp_file'
-    pio = new ['FileHandle']
-    pio.'open'(f, 'r')
-    pio.'encoding'("utf8")
-    \$S0 = pio.'readline'()
-    pio.'close'()
-    \$I1 = charset \$S0
-    \$S2 = charsetname \$I1
-    say \$S2
-
-    \$I1 = encoding \$S0
-    \$S2 = encodingname \$I1
-    say \$S2
-
-    \$I1 = find_charset 'iso-8859-1'
-    trans_charset \$S1, \$S0, \$I1
-    print \$S1
-.end
-CODE
-unicode
-utf8
-T\xf6tsch
-OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
 .loadlib 'io_ops'

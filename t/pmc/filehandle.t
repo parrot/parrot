@@ -453,26 +453,46 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 
     \$P1.'open'('$temp_file')
 
-    \$S1 = \$P1.'readline'()
-    if \$S1 == "1234567890\\n" goto ok_1
-print \$S1
+    .local string line
+    line = \$P1.'readline'()
+    if line == "1234567890\\n" goto ok_1
+print line
     print 'not '
   ok_1:
     say 'ok 1 - \$S1 = \$P1.readline() # read with utf8 encoding on'
 
-    \$S2 = \$P1.'readline'()
-    if \$S2 == \$S0 goto ok_2
-print \$S2
+    line = \$P1.'readline'()
+    if line == \$S0 goto ok_2
+print line
     print 'not '
   ok_2:
     say 'ok 2 - \$S2 = \$P1.readline() # read iso-8859-1 string'
 
     \$P1.'close'()
 
+    \$I1 = charset line
+    \$S2 = charsetname \$I1
+    if \$S2 == 'unicode' goto ok_3
+    print \$S2
+    print 'not '
+  ok_3:
+    say 'ok 3 # unicode charset'
+
+
+    \$I1 = encoding line
+    \$S2 = encodingname \$I1
+    if \$S2 == 'utf8' goto ok_4
+    print \$S2
+    print 'not '
+  ok_4:
+    say 'ok 4 # utf8 encoding'
+
 .end
 CODE
 ok 1 - $S1 = $P1.readline() # read with utf8 encoding on
 ok 2 - $S2 = $P1.readline() # read iso-8859-1 string
+ok 3 # unicode charset
+ok 4 # utf8 encoding
 OUT
 
 
