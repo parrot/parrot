@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 40;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -57,65 +57,6 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (o
 .end
 CODE
 a line
-OUTPUT
-
-my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
-
-pir_output_is( sprintf( <<'CODE', $no_such_file, $temp_file ), <<'OUTPUT', "get_bool" );
-.const string no_such_file = '%s'
-.const string temp_file    = '%s'
-
-.sub main :main
-    push_eh read_non_existent_file
-    $P0 = new ['FileHandle']
-    $P0.'open'(no_such_file, 'r')
-
-    print "Huh: '"
-    print no_such_file
-    print "' exists? - not "
-ok1:
-    say "ok 1"
-
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'w')
-    $P0.'print'("a line\n")
-    $P0.'print'("a line\n")
-    $P0.'close'()
-
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'r')
-    if $P0, ok2
-    print "not "
-ok2:    say "ok 2"
-    $S0 = $P0.'read'(1024)
-    $S0 = $P0.'read'(1024)
-    unless $P0, ok3
-    print "not "
-ok3:    say "ok 3"
-    defined $I0, $P0
-    if $I0, ok4
-    print "not "
-ok4:    say "ok 4"
-    $P0.'close'()
-    defined $I0, $P0        # closed file is still defined
-    if $I0, ok5
-    print "not "
-ok5:    say "ok 5"
-    unless $P0, ok6        # but false
-    print "not "
-ok6:    say "ok 6"
-    .return ()
-read_non_existent_file:
-    pop_eh
-    branch ok1
-.end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception (ops)" );
