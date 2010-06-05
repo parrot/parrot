@@ -66,36 +66,36 @@ class PAST::Pattern is Capture {
     }
     
     sub check ($patt, $val) {
-        my $result := 0;
-        if (pir::can__IPs($patt, "ACCEPTS")) {
-            $result := $val ~~ $patt;
-        } elsif (pir::does($patt, "invokable")) {
-            $result := ?$patt($val);
-        }
-        else {
-            $result := pir::iseq__IPP($patt, $val);
-            CATCH {
+        pir::load_bytecode('Data/Dumper.pbc');
+        my $dumper := pir::new__PP(Data::Dumper);
+        my $result := 1;
+        if (pir::defined__IP($patt)) {
+            if (!pir::defined__IP($val)) {
+                say("bar");
                 $result := 0;
             }
+            elsif (pir::can__IPs($patt, "ACCEPTS")) {
+                $result := ?($val ~~ $patt);
+            } elsif (pir::does($patt, "invokable")) {
+                $result := ?$patt($val);
+            }
+            else {
+                $result := pir::iseq__IPP($patt, $val);
+                CATCH {
+                    $result := 0;
+                }
+            }
         }
+        $dumper.dumper($patt);
+        $dumper.dumper($val);
+        say($result);
         $result;
     }
 
 
     sub check_attribute ($pattern, $node, $attribute) {
-        my $pVal := $pattern.attr($attribute, null, 0);
-        my $nVal := $node.attr($attribute, null, 0);
-        my $result;
-        if $pVal {
-            if check($pVal, $nVal) {
-                $result := 1;
-            } else {
-                $result := 0;
-            }
-        } else {
-            $result := 1;
-        }
-        $result;
+        check($pattern.attr($attribute, null, 0),
+              $node.attr($attribute, null, 0));
     }
 
     sub check_children ($pattern, $node) {
@@ -200,6 +200,7 @@ class PAST::Pattern::Block is PAST::Pattern {
          && PAST::Pattern::check_attribute($pattern, $node, "multi")
          && PAST::Pattern::check_attribute($pattern, $node, "hll")
          && PAST::Pattern::check_attribute($pattern, $node, "nsentry")
+         && PAST::Pattern::check_attribute($pattern, $node, "symtable")
          && PAST::Pattern::check_attribute($pattern, $node, "lexical")
          && PAST::Pattern::check_attribute($pattern, $node, "compiler")
          && PAST::Pattern::check_attribute($pattern, $node, 
@@ -315,9 +316,10 @@ class PAST::Pattern::Var is PAST::Pattern {
 
 class PAST::Pattern::VarList is PAST::Pattern {
     method ACCEPTS ($node) {
-        ($node ~~ PAST::VarList
+        my $result := ($node ~~ PAST::VarList
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node));
+        $result;
     }
 }
 

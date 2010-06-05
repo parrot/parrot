@@ -5,11 +5,12 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(875);
+plan(1970);
 
 test_type_matching();
 test_attribute_exact_matching();
 test_child_exact_matching();
+test_attribute_smart_matching();
 test_child_smart_matching();
 
 sub node_with_attr_set ($class, $attr, $val) {
@@ -311,6 +312,129 @@ sub test_child_exact_matching () {
         wrong($nodeClass.new(0, 2), $pattern, "(0, 2) !~~ (1, 2)");
         wrong($nodeClass.new(1, 3), $pattern, "(1, 3) !~~ (1, 2)");
         wrong($nodeClass.new(1, 2, 3), $pattern, "(1, 2, 3) !~~ (1, 2)");        
+    }
+}
+
+sub test_attribute_smart_matching () {
+    my $nodeattrs := "name source pos returns arity named flat ";
+    my @classes := 
+      [ [ PAST::Block, PAST::Pattern::Block,
+          pir::split(" ", $nodeattrs ~
+                     "lvalue blocktype closure control loadinit " ~
+                     "namespace multi hll nsentry symtable " ~
+                     "lexical compiler compiler_args subid pirflags")
+        ],
+        [ PAST::Op, PAST::Pattern::Op,
+          pir::split(" ", $nodeattrs ~ "lvalue pirop pasttype inline")
+        ],
+        [ PAST::Stmts, PAST::Pattern::Stmts,
+          pir::split(" ", $nodeattrs ~ "lvalue")
+        ],
+        [ PAST::Val, PAST::Pattern::Val,
+          pir::split(" ", $nodeattrs ~ "value")
+        ],
+        [ PAST::Var, PAST::Pattern::Var,
+          pir::split(" ", $nodeattrs ~ "lvalue scope isdecl " ~
+                     "namespace slurpy call_sig viviself vivibase " ~
+                     "multitype")
+        ],
+        [ PAST::VarList, PAST::Pattern::VarList,
+          pir::split(" ", $nodeattrs ~ "lvalue")
+        ]
+      ];
+
+    for @classes {
+        my $class := $_[0];
+        my $patternClass := $_[1];
+        my @attrs := $_[2];
+
+        sub right ($node, $pattern, $msg) {
+            ok($node ~~ $pattern,
+               "Smart-matching attrs of $patternClass: $msg.");
+        }
+        sub wrong ($node, $pattern, $msg) {
+            ok(!($node ~~ $pattern),
+               "Non-smart-matching attrs of $patternClass: $msg.");
+        }
+
+        for @attrs {
+            my $attr := $_;
+
+            my $pattern := 
+              node_with_attr_set($patternClass, 
+                                 $attr,
+                                 PAST::Pattern::Val.new());
+
+            right(node_with_attr_set($class,
+                                     $attr,
+                                     PAST::Val.new()),
+                  $pattern,
+                  "PAST::Pattern $attr");
+            wrong($class.new(), $pattern,
+                  "PAST::Pattern $attr, no corresponding attr");
+            wrong(node_with_attr_set($class,
+                                     $attr,
+                                     PAST::Block.new()),
+                  $pattern,
+                  "PAST::Pattern $attr, wrong node type");
+            wrong(node_with_attr_set($class,
+                                     $attr eq "name"
+                                     ?? "pos"
+                                     !! "name",
+                                     PAST::Val.new()),
+                  $pattern,
+                  "PAST::Pattern $attr, wrong attribute");
+            wrong($class.new(PAST::Val.new()),
+                  $pattern,
+                  "PAST::Pattern $attr, in child instead");
+
+            $pattern := node_with_attr_set($patternClass,
+                                           $attr,
+                                           /foo/);
+
+            right(node_with_attr_set($class, $attr, "foo"),
+                  $pattern,
+                  "Regex $attr");
+            wrong($class.new(), $pattern,
+                  "Regex $attr, no corresponding attr");
+            wrong(node_with_attr_set($class, $attr, "fop"),
+                  $pattern,
+                  "Regex $attr, wrong string");
+            wrong(node_with_attr_set($class,
+                                     $attr eq "name"
+                                     ?? "pos"
+                                     !! "name",
+                                     "foo"),
+                  $pattern,
+                  "Regex $attr, wrong attribute");
+            wrong($class.new("foo"),
+                  $pattern,
+                  "Regex $attr, in child instead");
+        
+            $pattern := node_with_attr_set($patternClass,
+                                           $attr,
+                                           sub ($_) { +$_ % 2; });
+
+            right(node_with_attr_set($class, $attr, 1),
+                  $pattern,
+                  "Closure $attr");
+            wrong($class.new(), $pattern,
+                  "Closure $attr, no corresponding attr");
+            wrong(node_with_attr_set($class, $attr, 2),
+                  $pattern,
+                  "Closure $attr, wrong result");
+            wrong(node_with_attr_set($class,
+                                     $attr eq "name"
+                                     ?? "pos"
+                                     !! "name",
+                                     "foo"),
+                  $pattern,
+                  "Closure $attr, wrong attribute");
+            wrong($class.new(1),
+                  $pattern,
+                  "Closure $attr, in child instead");
+
+        }
     }
 }
 
