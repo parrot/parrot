@@ -376,22 +376,23 @@ file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
 Parrot overwrites
 OUTPUT
 
-pasm_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
-.loadlib 'io_ops'
-   set I0, 0
-   set I1, 10000
+pir_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
+.sub "main"
+   set \$I0, 0
+   set \$I1, 10000
 
-   open P0, "$temp_file", 'w'
+   new \$P0, ['FileHandle']
+   \$P0.'open'("$temp_file", 'w')
 
 PRINT:
-   ge I0, I1, END
-   print P0, "words\\n"
-   inc I0
+   ge \$I0, \$I1, END
+   print \$P0, "words\\n"
+   inc \$I0
    branch PRINT
 
 END:
-   close P0
-   end
+   \$P0.'close'()
+.end
 CODE
 
 file_content_is( $temp_file, <<'OUTPUT' x 10000, 'buffered file contents' );
