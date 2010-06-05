@@ -386,6 +386,9 @@
  opcode_t * Parrot_print_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getstdin_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getstdout_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getstderr_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_abs_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_abs_n(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_abs_i_i(opcode_t *, PARROT_INTERP);
