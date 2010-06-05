@@ -261,7 +261,7 @@ out-of-bounds test. Checks INT and PMC keys.
     a1[0] = 7
     a1[1] = 1
     r = get_repr a1
-    like(r, '[\s*7\s*\,\s*1\s*]', 'get_repr')
+    is(r, '[ 7, 1 ]', 'get_repr')
 .end
 
 .sub 'test_new_style_init'
