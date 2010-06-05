@@ -16,8 +16,10 @@ test_child_smart_matching();
 test_deep_matching_in_children();
 
 sub node_with_attr_set ($class, $attr, $val) {
+    say("Node of type $class with $attr set to $val made.");
     my $node := $class.new();
-    if ($attr eq "source" || $attr eq "pos") {
+    if (($attr eq "source" || $attr eq "pos")
+        && pir::isa__IPP($class, PAST::Node)) {
         $node{$attr} := $val;
     }
     else {
