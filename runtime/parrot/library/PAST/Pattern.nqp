@@ -66,12 +66,9 @@ class PAST::Pattern is Capture {
     }
     
     sub check ($patt, $val) {
-        pir::load_bytecode('Data/Dumper.pbc');
-        my $dumper := pir::new__PP(Data::Dumper);
         my $result := 1;
         if (pir::defined__IP($patt)) {
             if (!pir::defined__IP($val)) {
-                say("bar");
                 $result := 0;
             }
             elsif (pir::can__IPs($patt, "ACCEPTS")) {
@@ -86,9 +83,6 @@ class PAST::Pattern is Capture {
                 }
             }
         }
-        $dumper.dumper($patt);
-        $dumper.dumper($val);
-        say($result);
         $result;
     }
 
