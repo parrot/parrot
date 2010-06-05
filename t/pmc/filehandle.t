@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -642,6 +642,25 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 CODE
 expect 0 exit status: 0
 expect 1 exit status: 1
+OUTPUT
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction", todo => 'TT #1659' );
+.const string temp_file = '%s'
+.sub main :main
+    interpinfo $I0, 2    # GC mark runs
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+        needs_destroy $P0
+    print $P0, "a line\n"
+    null $P0            # kill it
+    sweep 0            # a lazy GC has to close the PIO
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'read'(20)
+    print $S0
+.end
+CODE
+a line
 OUTPUT
 
 # TT #1178
