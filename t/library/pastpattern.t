@@ -5,13 +5,15 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(1970);
+plan(1994);
 
 test_type_matching();
 test_attribute_exact_matching();
 test_child_exact_matching();
 test_attribute_smart_matching();
 test_child_smart_matching();
+
+test_deep_matching_in_children();
 
 sub node_with_attr_set ($class, $attr, $val) {
     my $node := $class.new();
@@ -505,6 +507,37 @@ sub test_child_smart_matching () {
         wrong($class.new(6, 3), $pattern,
               "Single closure, extra child of wrong result first");
     }
+}
+
+sub test_deep_matching_in_children () {
+    my @classes := [ PAST::Block, PAST::Op, PAST::Stmts,
+                     PAST::Val, PAST::Var, PAST::VarList ];
+
+    my $pattern := PAST::Pattern::Val.new(:returns('Integer'));
+    my $node, my $class;
+    my $childNode := PAST::Val.new(:returns('Integer'));
+
+    for @classes {
+        $class := $_;
+
+        $node := $class.new($childNode);
+        ok($node ~~ $pattern, 
+           "Deep matching $class: Matching subtree as first child.");
+
+        $node := $class.new(PAST::Block.new(),
+                            $childNode);
+        ok($node ~~ $pattern,
+           "Deep matching $class: Matching subtree as second child.");
+
+        $node := $class.new();
+        ok(!($node ~~ $pattern),
+           "Deep matching $class: no children.");
+
+        $node := $class.new(PAST::Var.new());
+        ok(!($node ~~ $pattern),
+           "Deep matching $class: wrong type of child.");
+    }
+
 }
 
 # Local Variables:

@@ -124,7 +124,16 @@ class PAST::Pattern is Capture {
     }
 
     method ACCEPTS ($node) {
-        ?0;
+        my $result := self.ACCEPTSEXACTLY($node);
+        if (!$result && $node ~~ PAST::Node) {
+            my $index := 0;
+            my $max := pir::elements__IP($node);
+            until ($result || $index == $max) {
+                $result := $node[$index] ~~ self;
+                $index++;
+            }
+        }
+        $result;
     }
 }
 
@@ -202,9 +211,9 @@ class PAST::Pattern::Block is PAST::Pattern {
          && PAST::Pattern::check_attribute($pattern, $node, "subid")
          && PAST::Pattern::check_attribute($pattern, $node, "pirflags"));
     }
-
-    method ACCEPTS ($node) {
-        (($node ~~ PAST::Block)
+    
+    method ACCEPTSEXACTLY ($node) {
+        ($node ~~ PAST::Block
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
          && check_block_attributes(self, $node));
@@ -231,7 +240,7 @@ class PAST::Pattern::Op is PAST::Pattern {
          && PAST::Pattern::check_attribute($pattern, $node, "inline"));          
     }
 
-    method ACCEPTS ($node) {
+    method ACCEPTSEXACTLY ($node) {
         (($node ~~ PAST::Op)
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
@@ -240,7 +249,7 @@ class PAST::Pattern::Op is PAST::Pattern {
 }
 
 class PAST::Pattern::Stmts is PAST::Pattern {
-    method ACCEPTS ($node) {
+    method ACCEPTSEXACTLY ($node) {
         ($node ~~ PAST::Stmts
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node));
@@ -252,7 +261,7 @@ class PAST::Pattern::Val is PAST::Pattern {
         self.attr("value", $val, !pir::isnull__iP($val));
     }
 
-    method ACCEPTS ($node) {
+    method ACCEPTSEXACTLY ($node) {
         ($node ~~ PAST::Val
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
@@ -293,7 +302,7 @@ class PAST::Pattern::Var is PAST::Pattern {
         self.attr("multitype", $val, !pir::isnull__iP($val));
     }
 
-    method ACCEPTS ($node) {
+    method ACCEPTSEXACTLY ($node) {
         ($node ~~ PAST::Var
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node)
@@ -309,7 +318,7 @@ class PAST::Pattern::Var is PAST::Pattern {
 }
 
 class PAST::Pattern::VarList is PAST::Pattern {
-    method ACCEPTS ($node) {
+    method ACCEPTSEXACTLY ($node) {
         my $result := ($node ~~ PAST::VarList
          && PAST::Pattern::check_children(self, $node)
          && PAST::Pattern::check_node_attributes(self, $node));
