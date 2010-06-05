@@ -59,8 +59,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .const int TESTS = 308
 
-.loadlib 'sys_ops'
-.loadlib 'io_ops'
+#.loadlib 'sys_ops'
+#.loadlib 'io_ops'
 
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
@@ -124,7 +124,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     # Open the test file
     .local pmc file_handle   # currently open file
-               file_handle = open test_file, 'r'
+               file_handle = new ['FileHandle']
+               file_handle.'open'(test_file, 'r')
 
     unless file_handle goto bad_file
 
@@ -135,7 +136,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $I0 = file_handle.'eof'()
     if $I0 goto end_loop
 
-    test_line = readline file_handle
+    test_line = file_handle.'readline'()
 
     # skip lines without tabs, and comment lines
     $I0 = index test_line, "\t"
@@ -232,7 +233,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     goto loop
   end_loop:
-    close file_handle
+    file_handle.'close'()
     goto outer_loop
   end_outer_loop:
 
@@ -485,8 +486,10 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local pmc it
     it = iter skip_os
 
+    load_bytecode 'config.pbc'
+    $P1 = _config()
     .local string osname
-    osname = sysinfo .SYSINFO_PARROT_OS
+    osname = $P1['osname']
 
   iter_loop:
     unless it goto iter_end
