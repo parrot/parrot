@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2024);
+plan(2033);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -546,6 +546,8 @@ sub test_deep_matching_in_children () {
 sub test_match_result () {
     test_match_result_from_top_node();
 #    test_match_result_from_sub_node();
+    test_match_result_from_closure();
+    test_match_result_from_constant();
 }
 
 sub test_match_result_from_top_node () {
@@ -567,18 +569,60 @@ sub test_match_result_from_top_node () {
         my $node := $class.new();
         my $/ := $node ~~ $pattern;
         ok($/ ~~ PAST::Pattern::Match,
-           "$begin $patternClass 1, returns a PAST::Pattern::Match");
-        ok(?$/, "$begin $patternClass 1, Bool conversion");
+           "$begin 1, returns a PAST::Pattern::Match");
+        ok(?$/, "$begin 1, Bool conversion");
         ok($/.from() =:= $node,
-           "$begin $patternClass 1, .from");
+           "$begin 1, .from");
 
         $node := ($class =:= PAST::Block
                   ?? PAST::Op !! PAST::Block).new();
         $/ := $node ~~ $pattern;
         ok($/ ~~ PAST::Pattern::Match,
-           "$begin $patternClass 0, returns PAST::Pattern::Match");
-        ok(!?$/, "$begin $patternClass 0, Bool conversion.");
+           "$begin 0, returns PAST::Pattern::Match");
+        ok(!?$/, "$begin 0, Bool conversion.");
     }
+}
+
+sub test_match_result_from_closure () {
+    my $pattern := 
+      PAST::Pattern::Closure.new(sub ($_) { 
+                                     $_ ~~ PAST::Val
+                                       && $_.returns() eq 'Integer';
+                                 });
+    my $node := PAST::Val.new(:returns('Integer'));
+    my $/ := $node ~~ $pattern;
+    
+    ok($/ ~~ PAST::Pattern::Match, 
+       "Match result from Closure 1 is a PAST::Pattern::Match.");
+    ok(?$/,
+       "Match result from Closure 1 converts to boolean truth.");
+    ok($/.from =:= $node,
+       "Match result from Closure 1 has correct .from.");
+
+    $node := PAST::Val.new(:returns('String'));
+    $/ := $node ~~ $pattern;
+    ok($/ ~~ PAST::Pattern::Match,
+       "Match result from Closure 0 is a PAST::Pattern::Match.");
+    ok(!?$/,
+       "Match result from Closure 0 converts to boolean falsehood.");
+}
+
+sub test_match_result_from_constant () {
+    my $pattern := PAST::Pattern::Constant.new(5);
+    my $node := 5;
+    my $/ := $node ~~ $pattern;
+    
+    ok($/ ~~ PAST::Pattern::Match, 
+       "Match result from Constant 1 is a PAST::Pattern::Match.");
+    ok(?$/,
+       "Match result from Constant 1 converts to boolean truth.");
+
+    $node := 6;
+    $/ := $node ~~ $pattern;
+    ok($/ ~~ PAST::Pattern::Match,
+       "Match result from Constant 0 is a PAST::Pattern::Match.");
+    ok(!?$/,
+       "Match result from Constant 0 converts to boolean falsehood.");
 }
 
 # Local Variables:
