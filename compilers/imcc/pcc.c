@@ -526,6 +526,9 @@ typedef struct move_info_t {
 =item C<static int pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
 void *vinfo)>
 
+Callback for C<Parrot_register_move>. Inserts move instructions in stead of
+actually moving the registers.
+
 =cut
 
 */
@@ -597,6 +600,8 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 
 =item C<static Instruction * move_regs(PARROT_INTERP, IMC_Unit *unit,
 Instruction *ins, size_t n, SymReg **dest, SymReg **src)>
+
+Insert instructions for moving C<n> registers from C<src> to C<dest>.
 
 =cut
 
@@ -719,6 +724,9 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 
 =item C<static void insert_tail_call(PARROT_INTERP, IMC_Unit *unit, Instruction
 *ins, SymReg *sub, SymReg *meth)>
+
+Creates and inserts an appropriate tailcall instruction for either a sub call
+or a method call.
 
 =cut
 
