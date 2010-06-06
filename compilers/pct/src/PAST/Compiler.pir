@@ -126,15 +126,12 @@ any value type.
     valflags['String']   = 's~*:e'
     valflags['Integer']  = 'i+*:'
     valflags['Float']    = 'n+*:'
-    valflags['!cconst']          = 'i+*:c'
-    valflags['!exception_types'] = 'i+*:c'
+    valflags['!cconst']             = 'i+*:c'
+    valflags['!exception_severity'] = 'i+*:c'
+    valflags['!exception_types']    = 'i+*:c'
+    valflags['!iterator']           = 'i+*:c'
+    valflags['!socket']             = 'i+*:c'
     set_global '%valflags', valflags
-
-    .local pmc valconst
-    valconst = new ['Hash']
-    valconst['!cconst']          = '.include "cclass.pasm"'
-    valconst['!exception_types'] = '.include "exception_types.pasm"'
-    set_global '%valconst', valconst
 
     ##  %!controltypes holds the list of exception types for each
     ##  type of exception handler we support
@@ -2477,21 +2474,21 @@ to have a PMC generated containing the constant value.
     $P0 = get_global '%valflags'
     valflags = $P0[returns]
   
-    .local string valconst 
-    $P0 = get_global '%valconst'
-    valconst = $P0[returns]
-    unless valconst > '' goto valconst_done
-    $P0 = find_dynamic_lex '$*SUB'
-    $P0.'add_directive'(valconst)
-  valconst_done:
-
     $I0 = index valflags, 'e'
     if $I0 < 0 goto escape_done
     value = self.'escape'(value)
   escape_done:
 
+    # See if this is a pasm constant type
     $I0 = index valflags, 'c'
     if $I0 < 0 goto const_done
+    # Add the directive for the appropriate .include statement.
+    $S0 = returns
+    $S0 = replace $S0, 0, 1, '.include "'
+    $S0 = concat $S0, '.pasm"'
+    $P0 = find_dynamic_lex '$*SUB'
+    $P0.'add_directive'($S0)
+    # Add a leading dot to the value if one isn't already there.
     $S0 = substr value, 0, 1
     if $S0 == '.' goto const_done
     $P0 = box '.'
