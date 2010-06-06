@@ -807,6 +807,7 @@ help :
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the Emacs editor."
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
+        @echo "  bootstrap-ops:     Update bootstrap ops."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
