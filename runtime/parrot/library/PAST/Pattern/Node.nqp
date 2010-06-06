@@ -2,6 +2,10 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
+INIT {
+    pir::load_bytecode('PCT.pbc');
+}
+
 class PAST::Pattern::Node is PAST::Pattern {
     method attr ($name, $value, $has_value) {
         my $result;
@@ -113,13 +117,20 @@ class PAST::Pattern::Node is PAST::Pattern {
 
     method ACCEPTS ($node) {
         my $result := self.ACCEPTSEXACTLY($node);
-        if (!$result && $node ~~ PAST::Node) {
+        if ($result) {
+            $result := PAST::Pattern::Match.new(1, $node);
+        }
+        elsif ($node ~~ PAST::Node) {
             my $index := 0;
             my $max := pir::elements__IP($node);
-            until ($result || $index == $max) {
+            until ($index == $max) {
                 $result := $node[$index] ~~ self;
+                return $result if $result;
                 $index++;
             }
+            $result := PAST::Pattern::Match.new(0);
+        } else {
+            $result := PAST::Pattern::Match.new(0);
         }
         $result;
     }
@@ -183,21 +194,34 @@ class PAST::Pattern::Block is PAST::Pattern::Node {
     }
 
     sub check_block_attributes($pattern, $node) {
-        (PAST::Pattern::Node::check_attribute($pattern, $node, "blocktype")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "closure")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "control")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "loadinit")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "namespace")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "multi")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "hll")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "nsentry")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "symtable")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "lexical")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "compiler")
+        (PAST::Pattern::Node::check_attribute($pattern, $node,
+                                              "blocktype")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "closure")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "control")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "loadinit")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "namespace")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "multi")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "hll")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "nsentry")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "symtable")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "lexical")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "compiler")
          && PAST::Pattern::Node::check_attribute($pattern, $node, 
-                                           "compiler_args")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "subid")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "pirflags"));
+                                                 "compiler_args")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "subid")
+         && PAST::Pattern::Node::check_attribute($pattern, $node,
+                                                 "pirflags"));
     }
     
     method ACCEPTSEXACTLY ($node) {

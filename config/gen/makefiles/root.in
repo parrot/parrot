@@ -288,6 +288,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PAST/Pattern.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Closure.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Constant.pbc \
+    $(LIBRARY_DIR)/PAST/Pattern/Match.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Node.pbc \
     $(LIBRARY_DIR)/PAST/Transformer.pbc \
     $(LIBRARY_DIR)/PAST/Transformer/Dynamic.pbc \
@@ -1080,6 +1081,15 @@ $(LIBRARY_DIR)/PAST/Pattern/Closure.pbc: \
 $(LIBRARY_DIR)/PAST/Pattern/Closure.pir: \
 	$(LIBRARY_DIR)/PAST/Pattern/Closure.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern/Closure.nqp\
+	> $@
+
+$(LIBRARY_DIR)/PAST/Pattern/Match.pbc: \
+	$(LIBRARY_DIR)/PAST/Pattern/Match.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Pattern/Match.pir
+
+$(LIBRARY_DIR)/PAST/Pattern/Match.pir: \
+	$(LIBRARY_DIR)/PAST/Pattern/Match.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern/Match.nqp \
 	> $@
 
 $(LIBRARY_DIR)/PAST/Pattern/Node.pbc: \

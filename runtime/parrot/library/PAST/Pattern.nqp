@@ -2,10 +2,6 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-INIT {
-    pir::load_bytecode("PCT.pbc");
-}
-
 class PAST::Pattern is Capture {
     sub patternize ($value) {
         unless (pir::can__IPS($value, 'ACCEPTS')) {
@@ -30,6 +26,8 @@ class PAST::Pattern is Capture {
 }
 
 INIT {
+    pir::load_bytecode('PAST/Pattern/Match.pbc');
+
     pir::load_bytecode('PAST/Pattern/Closure.pbc');
     pir::load_bytecode('PAST/Pattern/Constant.pbc');
     pir::load_bytecode('PAST/Pattern/Node.pbc');

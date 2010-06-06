@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(1994);
+plan(2024);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -15,8 +15,9 @@ test_child_smart_matching();
 
 test_deep_matching_in_children();
 
+test_match_result();
+
 sub node_with_attr_set ($class, $attr, $val) {
-    say("Node of type $class with $attr set to $val made.");
     my $node := $class.new();
     if (($attr eq "source" || $attr eq "pos")
         && pir::isa__IPP($class, PAST::Node)) {
@@ -540,6 +541,44 @@ sub test_deep_matching_in_children () {
            "Deep matching $class: wrong type of child.");
     }
 
+}
+
+sub test_match_result () {
+    test_match_result_from_top_node();
+#    test_match_result_from_sub_node();
+}
+
+sub test_match_result_from_top_node () {
+    my @classes := [ [ PAST::Block, PAST::Pattern::Block ],
+                     [ PAST::Op, PAST::Pattern::Op ],
+                     [ PAST::Stmts, PAST::Pattern::Stmts ],
+                     [ PAST::Val, PAST::Pattern::Val ],
+                     [ PAST::Var, PAST::Pattern::Var ],
+                     [ PAST::VarList, PAST::Pattern::VarList ]
+                   ];
+
+    for @classes {
+        my $class := $_[0];
+        my $patternClass := $_[1];
+
+        my $begin := "Match result from $patternClass:";
+
+        my $pattern := $patternClass.new();
+        my $node := $class.new();
+        my $/ := $node ~~ $pattern;
+        ok($/ ~~ PAST::Pattern::Match,
+           "$begin $patternClass 1, returns a PAST::Pattern::Match");
+        ok(?$/, "$begin $patternClass 1, Bool conversion");
+        ok($/.from() =:= $node,
+           "$begin $patternClass 1, .from");
+
+        $node := ($class =:= PAST::Block
+                  ?? PAST::Op !! PAST::Block).new();
+        $/ := $node ~~ $pattern;
+        ok($/ ~~ PAST::Pattern::Match,
+           "$begin $patternClass 0, returns PAST::Pattern::Match");
+        ok(!?$/, "$begin $patternClass 0, Bool conversion.");
+    }
 }
 
 # Local Variables:
