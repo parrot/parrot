@@ -59,17 +59,8 @@ undefined values) is undefined, and may be rather funky.
         $P0.'stat'($S0)
         goto L1
   file_not_found:
-    pop_eh
     # Treat it as installed parrot.
-    # XXX Check why 2.4.0-devel is hardcoded here!
-    # XXX Check why it's different paths when we use default /usr/local vs specified prefix
-    push_eh file_not_found_2
-    conf_file = prefix . "/lib/2.4.0-devel/include/config.fpmc"
-    $P0.'stat'(conf_file)
-    goto L2
-  file_not_found_2:
-    conf_file = prefix . "/lib/parrot/2.4.0-devel/include/config.fpmc"
-    goto L2
+    conf_file = "@libdir@@versiondir@/include/config.fpmc"
   L1:
     conf_file = prefix . "/runtime/parrot/include/config.fpmc"
   L2:
