@@ -126,59 +126,28 @@ any value type.
     valflags['String']   = 's~*:e'
     valflags['Integer']  = 'i+*:'
     valflags['Float']    = 'n+*:'
-    valflags['!cconst']             = 'i+*:c'
-    valflags['!exception_severity'] = 'i+*:c'
-    valflags['!exception_types']    = 'i+*:c'
-    valflags['!iterator']           = 'i+*:c'
-    valflags['!socket']             = 'i+*:c'
+    valflags['!cconst']          = 'i+*:c'
+    valflags['!except_severity'] = 'i+*:c'
+    valflags['!except_types']    = 'i+*:c'
+    valflags['!iterator']        = 'i+*:c'
+    valflags['!socket']          = 'i+*:c'
     set_global '%valflags', valflags
 
     ##  %!controltypes holds the list of exception types for each
     ##  type of exception handler we support
     .local pmc controltypes
     controltypes = new 'Hash'
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_RETURN)
-    $P0.'push'(.CONTROL_OK)
-    $P0.'push'(.CONTROL_BREAK)
-    $P0.'push'(.CONTROL_CONTINUE)
-    #$P0.'push'(.CONTROL_ERROR)
-    $P0.'push'(.CONTROL_TAKE)
-    $P0.'push'(.CONTROL_LEAVE)
-    $P0.'push'(.CONTROL_LOOP_NEXT)
-    $P0.'push'(.CONTROL_LOOP_LAST)
-    $P0.'push'(.CONTROL_LOOP_REDO)
-    controltypes['CONTROL']   = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_RETURN)
-    controltypes['RETURN']   = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_OK)
-    controltypes['OK'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_BREAK)
-    controltypes['BREAK'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_CONTINUE)
-    controltypes['CONTINUE'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_ERROR)
-    controltypes['ERROR'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_TAKE)
-    controltypes['GATHER']   = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LEAVE)
-    controltypes['LEAVE'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LOOP_NEXT)
-    controltypes['NEXT'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LOOP_LAST)
-    controltypes['LAST'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LOOP_REDO)
-    controltypes['REDO'] = $P0
+    controltypes['CONTROL']  = '.CONTROL_RETURN, .CONTROL_OK, .CONTROL_BREAK, .CONTROL_CONTINUE, .CONTROL_TAKE, .CONTROL_LEAVE, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_LAST, .CONTROL_LOOP_REDO'
+    controltypes['RETURN']   = '.CONTROL_RETURN'
+    controltypes['OK']       = '.CONTROL_OK'
+    controltypes['BREAK']    = '.CONTROL_BREAK'
+    controltypes['CONTINUE'] = '.CONTROL_CONTINUE'
+    controltypes['ERROR']    = '.CONTROL_ERROR'
+    controltypes['GATHER']   = '.CONTROL_TAKE'
+    controltypes['LEAVE']    = '.CONTROL_LEAVE'
+    controltypes['NEXT']     = '.CONTROL_NEXT'
+    controltypes['LAST']     = '.CONTROL_LAST'
+    controltypes['REDO']     = '.CONTROL_REDO'
     set_global '%!controltypes', controltypes
 
     $P0 = box 11
@@ -656,7 +625,7 @@ nodes of type C<PAST::Stmts>.
     .local pmc eh
     eh = node.'handlers'()
     unless eh, no_eh
-    ops = self.'wrap_handlers'(ops,eh,'rtype'=>rtype)
+    ops = self.'wrap_handlers'(ops, eh, 'rtype'=>rtype)
   no_eh:
     .return (ops)
 .end
@@ -730,28 +699,34 @@ Return the POST representation of a C<PAST::Control>.
     unless it, handler_loop_done
     node = shift it
 
-    .local pmc ehpir, types, label
+    .local pmc ehpir, label, controltypes, subpost
     .local string ehreg, type
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     label = $P0.'new'('result'=>$S0)
 
+    subpost = find_dynamic_lex '$*SUB'
+
     ehreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
     ops.'push_pirop'('set_addr', ehreg, label)
-    $P0 = get_global '%!controltypes'
+    controltypes = get_global '%!controltypes'
     type = node.'handle_types'()
-    unless type, no_handle_types
-    types = $P0[type]
-    unless type, no_handle_types
-    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, types :flat)
-  no_handle_types:
+    unless type, handle_types_done
+    type = controltypes[type]
+    unless type, handle_types_done
+    $P0 = split ',', type
+    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
+    subpost.'add_directive'('.include "except_types.pasm"')
+  handle_types_done:
     type = node.'handle_types_except'()
-    unless type, no_handle_types_except
-    types = $P0[type]
-    unless type, no_handle_types_except
-    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, types :flat)
-  no_handle_types_except:
+    unless type, handle_types_except_done
+    type = controltypes[type]
+    unless type, handle_types_except_done
+    $P0 = split ',', type
+    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
+    subpost.'add_directive'('.include "except_types.pasm"')
+  handle_types_except_done:
     ops.'push_pirop'('push_eh', ehreg)
 
     # Add one pop_eh for every handler we push_eh
@@ -937,7 +912,7 @@ Return the POST representation of a C<PAST::Block>.
     unless eh, no_eh
     $S0 = options['rtype']
     retval = ops[-1]
-    ops = self.'wrap_handlers'(ops,eh,'rtype'=>$S0)
+    ops = self.'wrap_handlers'(ops, eh, 'rtype'=>$S0)
     goto had_eh
   no_eh:
     ##  result of last child is return from block
