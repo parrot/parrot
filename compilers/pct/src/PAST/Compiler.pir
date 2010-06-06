@@ -894,8 +894,9 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'uniquereg'('P')
     bpost.'push_pirop'('new', $S0, "'ExceptionHandler'")
     bpost.'push_pirop'('set_addr', $S0, ctrllabel)
-    bpost.'push_pirop'('callmethod', '"handle_types"', $S0, .CONTROL_RETURN)
+    bpost.'push_pirop'('callmethod', '"handle_types"', $S0, '.CONTROL_RETURN')
     bpost.'push_pirop'('push_eh', $S0)
+    bpost.'add_directive'('.include "except_types.pasm"')
 
   children_past:
     ##  all children but last are void context, last returns anything
@@ -1353,11 +1354,14 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'()
 
+    $P0 = find_dynamic_lex '$*SUB'
+    $P0.'add_directive'('.include "except_types.pasm"')
+
     .local string handreg
     handreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
     ops.'push_pirop'('set_addr', handreg, handlabel)
-    ops.'push_pirop'('callmethod', '"handle_types"', handreg, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_REDO, .CONTROL_LOOP_LAST)
+    ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
     ops.'push_pirop'('push_eh', handreg)
 
     unless bodyfirst goto bodyfirst_done
@@ -1385,8 +1389,8 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push_pirop'('.get_results (exception)')
     $S0 = self.'uniquereg'('P')
     ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
-    ops.'push_pirop'('eq', $S0, .CONTROL_LOOP_NEXT, nextlabel)
-    ops.'push_pirop'('eq', $S0, .CONTROL_LOOP_REDO, redolabel)
+    ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_NEXT', nextlabel)
+    ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_REDO', redolabel)
     ops.'push'(donelabel)
     ops.'push_pirop'('pop_eh')
     .return (ops)
@@ -1624,7 +1628,9 @@ a return value.
     exreg = self.'uniquereg'('P')
     extype = concat exreg, "['type']"
     ops.'push_pirop'('new', exreg, '"Exception"')
-    ops.'push_pirop'('set', extype, .CONTROL_RETURN)
+    ops.'push_pirop'('set', extype, '.CONTROL_RETURN')
+    $P0 = find_dynamic_lex '$*SUB'
+    $P0.'add_directive'('.include "except_types.pasm"')
 
     .local pmc cpast, cpost
     cpast = node[0]
