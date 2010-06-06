@@ -304,7 +304,7 @@ Get/set the opcode type for this node.
   done:
     .return ()
 .end
-    
+
 
 =back
 

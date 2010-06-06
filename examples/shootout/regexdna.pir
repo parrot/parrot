@@ -62,7 +62,8 @@
 	# Read in the file
 beginwhile:
         $P0      = getinterp
-        $P1      = $P0.'stdhandle'(0) # stdin
+        .include 'stdio.pasm'
+        $P1      = $P0.'stdhandle'(.PIO_STDIN_FILENO)
         chunk    = $P1.'read'(65535)
         chunklen = length chunk
 	unless chunklen goto endwhile

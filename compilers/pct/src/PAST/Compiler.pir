@@ -2454,7 +2454,7 @@ to have a PMC generated containing the constant value.
     .local string valflags
     $P0 = get_global '%valflags'
     valflags = $P0[returns]
-  
+
     $I0 = index valflags, 'e'
     if $I0 < 0 goto escape_done
     value = self.'escape'(value)

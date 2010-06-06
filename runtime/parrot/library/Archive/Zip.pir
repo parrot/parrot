@@ -46,7 +46,8 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .param pmc args :slurpy
     $S0 = join '', args
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    .include 'stdio.pasm'
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'($S0)
     $P1.'print'("\n")
 .end

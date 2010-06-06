@@ -399,20 +399,21 @@ OUTPUT
 
 # TT #1178
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
+.include 'stdio.pasm'
 .sub main :main
     $P99 = getinterp
-    $P0  = $P99.'stdhandle'(0)
+    $P0  = $P99.'stdhandle'(.PIO_STDIN_FILENO)
     $I0  = $P0.'get_fd'()
     # I0 is 0 on Unix and non-Null on stdio and win32
     print "ok 1\n"
 
-    $P1 = $P99.'stdhandle'(1)
+    $P1 = $P99.'stdhandle'(.PIO_STDOUT_FILENO)
     $I1 = $P1.'get_fd'()
     if $I1, OK_2
     print "not "
 OK_2:
     say "ok 2"
-    $P2 = $P99.'stdhandle'(2)
+    $P2 = $P99.'stdhandle'(.PIO_STDERR_FILENO)
     $I2 = $P2.'get_fd'()
     if $I2, OK_3
     print "not "
@@ -445,9 +446,10 @@ This is a test
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
+.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P2 = $P0.'stdhandle'(1)
+    $P2 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     can $I0, $P2, "puts"
     if $I0, ok1
     print "not "
@@ -461,13 +463,13 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method - PIR' );
-
+.include 'stdio.pasm'
 .sub main :main
    .local string s
    s = "ok 2\n"
    .local pmc io
    $P0 = getinterp
-   io = $P0.'stdhandle'(1)
+   io = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
    $I0 = can io, "puts"
    if $I0 goto ok1
    print "not "
