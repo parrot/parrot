@@ -61,6 +61,7 @@ undefined values) is undefined, and may be rather funky.
   file_not_found:
     # Treat it as installed parrot.
     conf_file = "@libdir@@versiondir@/include/config.fpmc"
+    goto L2
   L1:
     conf_file = prefix . "/runtime/parrot/include/config.fpmc"
   L2:
