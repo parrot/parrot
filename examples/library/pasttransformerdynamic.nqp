@@ -1,3 +1,7 @@
+#!./parrot-nqp
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Transformer/Dynamic.pbc');
 pir::load_bytecode('Data/Dumper.pbc');
@@ -30,3 +34,10 @@ $walker.op(foldOp);
 
 $walker.walk($past);
 $dumper.dumper($past);
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
