@@ -823,7 +823,8 @@ inline op exit(in INT) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
-    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, $1, NULL);
+    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, 
+                                                           CONTROL_EXIT, NULL);
 
     VTABLE_set_pointer(interp, resume, ret);
 

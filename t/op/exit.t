@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -64,6 +64,20 @@ TODO: {
     my $pbc = File::Spec->catfile(qw/ t native_pbc integer_1.pbc /);
     pbc_exit_code_is($pbc, 0, 'pbc exits with 0 by default');
 }
+
+pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
+.sub main
+    $P0 = new ['ExceptionHandler']
+    set_addr $P0, catcher
+    $P0.'handle_types'(2)
+    push_eh $P0
+    exit 2
+  catcher:
+    # we shouldn't arrive here
+    pop_eh
+    exit 10
+.end
+CODE
 
 # Local Variables:
 #   mode: cperl

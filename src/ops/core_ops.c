@@ -14796,7 +14796,8 @@ Parrot_exit_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t        *dest;
     opcode_t * const ret       =cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
-    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, IREG(1), NULL);
+    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, 
+                                                           CONTROL_EXIT, NULL);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -14813,7 +14814,8 @@ Parrot_exit_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t        *dest;
     opcode_t * const ret       =cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
-    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, cur_opcode[1], NULL);
+    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, 
+                                                           CONTROL_EXIT, NULL);
 
     VTABLE_set_pointer(interp, resume, ret);
 
