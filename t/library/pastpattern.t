@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2033);
+plan(2036);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -545,7 +545,7 @@ sub test_deep_matching_in_children () {
 
 sub test_match_result () {
     test_match_result_from_top_node();
-#    test_match_result_from_sub_node();
+    test_match_result_from_sub_node();
     test_match_result_from_closure();
     test_match_result_from_constant();
 }
@@ -581,6 +581,21 @@ sub test_match_result_from_top_node () {
            "$begin 0, returns PAST::Pattern::Match");
         ok(!?$/, "$begin 0, Bool conversion.");
     }
+}
+
+sub test_match_result_from_sub_node () {
+    my $pattern := PAST::Pattern::Val.new(:returns('Integer'));
+    my $node := PAST::Op.new(:pirop<abs>, 
+                             PAST::Val.new(:value(5),
+                                           :returns<Integer>));
+    my $/ := $node ~~ $pattern;
+
+    ok($/ ~~ PAST::Pattern::Match,
+       "Deep match result on Node 1 is a PAST::Pattern::Match.");
+    ok(?$/,
+       "Deep match result on Node 1 converts to boolean truth.");
+    ok($/.from() =:= $node[0],
+       "Deep match result on Node 1 has correct .from.");
 }
 
 sub test_match_result_from_closure () {
