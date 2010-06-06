@@ -143,7 +143,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PAST::Val constant nodes' );
 
     .local pmc node
     $P0 = get_hll_global ['PAST'], 'Val'
-    node = $P0.'new'('value'=> 'CONTROL_NEXT', 'returns'=>'!exception_types')
+    node = $P0.'new'('value'=> 'CONTROL_NEXT', 'returns'=>'!except_types')
     block.'push'(node)
 
     .local pmc compiler
@@ -154,7 +154,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PAST::Val constant nodes' );
 CODE
 
 .namespace []
-.include "exception_types.pasm"
+.include "except_types.pasm"
 .sub "xyz"  :subid("xyz")
 .annotate 'line', 0
     .return (.CONTROL_NEXT)
