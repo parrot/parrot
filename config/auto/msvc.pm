@@ -33,8 +33,7 @@ sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
     if ($conf->data->get('gccversion')) {
-        my $verbose = $conf->options->get('verbose');
-        print " (skipped) " if $verbose;
+        $conf->debug(" (skipped) ");
         $self->set_result('skipped');
         $conf->data->set( msvcversion => undef );
         return 1;
@@ -57,7 +56,6 @@ sub _probe_for_msvc {
 
 sub _evaluate_msvc {
     my ($self, $conf, $msvcref) = @_;
-    my $verbose = $conf->options->get('verbose');
     # Set msvcversion to undef.  This will also trigger any hints-file
     # callbacks that depend on knowing whether or not we're using Visual C++.
 
@@ -73,10 +71,10 @@ sub _evaluate_msvc {
 
     my $major = int( $msvcref->{_MSC_VER} / 100 );
     my $minor = $msvcref->{_MSC_VER} % 100;
-    my $status = $self->_handle_not_msvc($conf, $major, $minor, $verbose);
+    my $status = $self->_handle_not_msvc($conf, $major, $minor);
     return 1 if $status;
 
-    my $msvcversion = $self->_compose_msvcversion($major, $minor, $verbose);
+    my $msvcversion = $self->_compose_msvcversion($major, $minor);
 
     $conf->data->set( msvcversion => $msvcversion );
 
@@ -96,10 +94,10 @@ sub _evaluate_msvc {
 
 sub _handle_not_msvc {
     my $self = shift;
-    my ($conf, $major, $minor, $verbose) = @_;
+    my ($conf, $major, $minor) = @_;
     my $status;
     unless ( defined $major && defined $minor ) {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
         $conf->data->set( msvcversion => undef );
         $status++;
@@ -109,7 +107,7 @@ sub _handle_not_msvc {
 
 sub _compose_msvcversion {
     my $self = shift;
-    my ($major, $minor, $verbose) = @_;
+    my ($major, $minor) = @_;
     my $msvcversion = "$major.$minor";
     $self->set_result("yes, $msvcversion");
     return $msvcversion;

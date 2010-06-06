@@ -736,6 +736,8 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
 =item C<static subs_t * find_sub_by_subid(PARROT_INTERP, const char *lookup,
 const subs_t *sym, int *pc)>
 
+Find the first sub in the current code segment with a given subid.
+
 =cut
 
 */
@@ -984,6 +986,9 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 /*
 
 =item C<STRING * IMCC_string_from__STRINGC(PARROT_INTERP, char *buf)>
+
+Creates a Parrot C<STRING> from a string constant found in PIR or PASM. This
+includes cases where charset and/or encoding are specified.
 
 =cut
 

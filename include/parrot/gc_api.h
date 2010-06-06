@@ -93,10 +93,10 @@ typedef enum {
 
 /* &end_gen */
 
-#define GC_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areas and stack */
-#define GC_trace_normal        (UINTVAL)(1 << 0)   /* the same */
-#define GC_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
-#define GC_finish_FLAG         (UINTVAL)(1 << 2)   /* on Parrot exit: mark (almost) all PMCs dead and */
+#define GC_trace_stack_FLAG    (UINTVAL)(1 << 1)   /* trace system areas and stack */
+#define GC_trace_normal_FLAG   (UINTVAL)(1 << 1)   /* the same */
+#define GC_lazy_FLAG           (UINTVAL)(1 << 2)   /* timely destruction run */
+#define GC_finish_FLAG         (UINTVAL)(1 << 3)   /* on Parrot exit: mark (almost) all PMCs dead and */
                                                    /* garbage collect. */
 
 /* HEADERIZER BEGIN: src/gc/api.c */

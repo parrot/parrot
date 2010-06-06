@@ -19,8 +19,6 @@ parrotlib's interface functions.
 
 =cut
 
-.loadlib 'os'
-
 .sub __onload :load
     .local pmc paths
     .local pmc includes
@@ -133,6 +131,7 @@ Returns the location of a dynamic extension.
     .local pmc    os
     .local string name
 
+    $P0 = loadlib 'os'
     os = new ['OS']
 
     name = request
@@ -202,6 +201,7 @@ END:
     path = $P0
 
     $S0 = concat path, name
+    $P0 = loadlib 'os'
     $P0 = new ['OS']
     push_eh FILE_NOT_FOUND
         # OS.stat throws on file not found

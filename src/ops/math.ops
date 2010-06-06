@@ -14,6 +14,9 @@ math.ops - Mathematical Opcodes
 Operations that perform basic mathematics. See F<src/dynoplibs/> for more
 advanced operations.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =head2 Arithmetic operations
 
 These operations store the results of arithmetic on other registers and

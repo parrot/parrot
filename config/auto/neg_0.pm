@@ -33,7 +33,6 @@ sub _init {
 
 sub runstep {
     my ( $self, $conf ) = @_;
-    my ( $verbose ) = $conf->options->get('verbose');
     $conf->cc_gen('config/auto/neg_0/test_c.in');
     eval { $conf->cc_build( q{} ); };
     my $has_neg_0 = 0;
@@ -43,7 +42,6 @@ sub runstep {
             $conf,
             $test,
             $has_neg_0,
-            $verbose,
         );
     }
     $conf->cc_clean();
@@ -54,10 +52,11 @@ sub runstep {
 
 sub _evaluate_cc_run {
     my $self = shift;
-    my ($conf, $test, $has_neg_0, $verbose) = @_;
+    my ($conf, $test, $has_neg_0) = @_;
     $has_neg_0 = ($test =~ m/^-0/ ? 1 : 0);
     $self->set_result( $has_neg_0 ? 'yes' : 'no' );
-    print $has_neg_0 ? ' (yes) ' : ' (no) ' if $verbose;
+    my $output = $has_neg_0 ? ' (yes) ' : ' (no) ';
+    $conf->debug($output);
     return $has_neg_0;
 }
 

@@ -2,6 +2,7 @@
 # $Id$
 
 .include "errors.pasm"
+.include 'stdio.pasm'
 .sub _main
     .local string x
     .local string pattern
@@ -35,7 +36,7 @@
     print "\ninput \"regex <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
     print "target string, \"pir\", \"exp\", \"trace\", \"next\"\n"
     $P0 = getinterp
-    stdin = $P0.'stdhandle'(0)
+    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
     x = stdin.'readline'()
     length $I0, x
     if $I0 < 1 goto end_demo

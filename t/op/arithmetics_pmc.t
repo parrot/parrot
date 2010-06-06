@@ -34,7 +34,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     run_tests_for('Float')
 
     if gmp goto do_big_ones
-        skip( 22, "will not test BigInt or BigNum without gmp" )
+        skip( 20, "will not test BigInt or BigNum without gmp" )
         goto end
 
   do_big_ones:

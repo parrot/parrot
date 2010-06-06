@@ -158,12 +158,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-opengl
-        |
-    );
+    my $without = $conf->options->get( qw| without-opengl | );
 
     return $self->_handle_no_opengl($conf) if $without;
 
@@ -192,15 +187,15 @@ sub runstep {
     }
     else {
         my $test = $conf->cc_run();
-        return _handle_glut($conf, $extra_libs, $self->_evaluate_cc_run($test, $verbose));
+        return _handle_glut($conf, $extra_libs, $self->_evaluate_cc_run($conf, $test));
     }
 }
 
 sub _evaluate_cc_run {
-    my ($self, $test, $verbose) = @_;
+    my ($self, $conf, $test) = @_;
     my ($glut_api_version, $glut_brand) = split ' ', $test;
 
-    print " (yes, $glut_brand API version $glut_api_version) " if $verbose;
+    $conf->debug(" (yes, $glut_brand API version $glut_api_version) ");
     $self->set_result("yes, $glut_brand $glut_api_version");
 
     return ($glut_api_version, $glut_brand);

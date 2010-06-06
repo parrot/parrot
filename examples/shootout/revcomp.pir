@@ -36,8 +36,9 @@ loop:
 	.local pmc stdin, stdout
 	.local string line, seq
         $P0    = getinterp
-        stdin  = $P0.'stdhandle'(0)
-        stdout = $P0.'stdhandle'(1)
+        .include 'stdio.pasm'
+        stdin  = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+        stdout = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
 	# stdout is linebuffered per default - make it block buffered
 	stdout.'buffer_size'(8192)
 

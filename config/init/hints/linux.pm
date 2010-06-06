@@ -15,10 +15,8 @@ sub runstep {
     my $linkflags = $conf->option_or_data('linkflags');
     my $share_ext = $conf->option_or_data('share_ext');
     my $version   = $conf->option_or_data('VERSION');
-    my $verbose;
 
-    $verbose = $conf->options->get('verbose');
-    print "\n" if $verbose;
+    $conf->debug("\n");
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
@@ -39,7 +37,7 @@ sub runstep {
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
 
-        $ccflags = _handle_icc_ccflags($ccflags, $verbose);
+        $ccflags = _handle_icc_ccflags($conf, $ccflags);
 
     }
     elsif ( $cc =~ /suncc/ ) {
@@ -96,7 +94,7 @@ sub runstep {
 }
 
 sub _handle_icc_ccflags {
-    my ($ccflags, $verbose) = @_;
+    my ($conf, $ccflags) = @_;
 
     # enable correct floating point behavior
     # which is *not* the default behavior. ahem.
@@ -106,7 +104,7 @@ sub _handle_icc_ccflags {
     # for negative zero without this.
     $ccflags .= ' -fp-model source';
 
-    $verbose and print " ccflags: $ccflags\n";
+    $conf->debug(" ccflags: $ccflags\n");
     return $ccflags;
 }
 

@@ -25,6 +25,7 @@ running compilers from a command line.
 .namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
+.include 'stdio.pasm'
 
 .sub 'init' :vtable :method
     load_bytecode 'config.pir'
@@ -330,7 +331,7 @@ when the stage corresponding to target has been reached.
     $N1 = time
     $N2 = $N1 - $N0
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'("Stage '")
     $P1.'print'(stagename)
     $P1.'print'("': ")
@@ -614,13 +615,13 @@ specifies the encoding to use for the input (e.g., "utf8").
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
     $P1 = getinterp
-    $P2 = $P1.'stdhandle'(2)
+    $P2 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
     $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
     $P0 = getinterp
-    stdin = $P0.'stdhandle'(0)
+    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -804,6 +805,7 @@ Generic method for compilers invoked from a shell command line.
 
 =cut
 
+.include 'except_severity.pasm'
 .sub 'command_line' :method
     .param pmc args
     .param pmc adverbs         :slurpy :named
@@ -849,11 +851,15 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
+    .local int can_backtrace
+    can_backtrace = can self, 'backtrace'
+    unless can_backtrace goto no_push_eh
+    push_eh uncaught_exception
+  no_push_eh:
 
     $S0 = adverbs['e']
     $I0 = exists adverbs['e']
     if $I0 goto eval_line
-
     .local pmc result
     result = box ''
     unless args goto interactive
@@ -872,6 +878,9 @@ Generic method for compilers invoked from a shell command line.
     result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
 
   save_output:
+    unless can_backtrace goto no_pop_eh
+    pop_eh
+  no_pop_eh:
     if null result goto end
     $I0 = defined result
     unless $I0 goto end
@@ -882,7 +891,7 @@ Generic method for compilers invoked from a shell command line.
     .local string output
     .local pmc ofh
     $P0 = getinterp
-    ofh = $P0.'stdhandle'(1)
+    ofh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
@@ -903,6 +912,29 @@ Generic method for compilers invoked from a shell command line.
   version:
     self.'version'()
     goto end
+
+    # If we get an uncaught exception in the program and the HLL provides
+    # a backtrace method, we end up here. We pass it the exception object
+    # so it can render a backtrace, unless the severity is exit or warning
+    # in which case it needs special handling.
+  uncaught_exception:
+    .get_results ($P0)
+    pop_eh
+    $P1 = getinterp
+    $P1 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $I0 = $P0['severity']
+    if $I0 == .EXCEPT_EXIT goto do_exit
+    $S0 = self.'backtrace'($P0)
+    print $P1, $S0
+    if $I0 <= .EXCEPT_WARNING goto do_warning
+    exit 1
+  do_exit:
+    $I0 = $P0['exit_code']
+    exit $I0
+  do_warning:
+    $P0 = $P0["resume"]
+    push_eh uncaught_exception # Otherwise we get errors about no handler to delete
+    $P0()
 .end
 
 

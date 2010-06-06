@@ -37,12 +37,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-gettext
-        |
-    );
+    my $without = $conf->options->get( qw| without-gettext | );
 
     if ($without) {
         $conf->data->set( has_gettext => 0 );
@@ -66,10 +61,10 @@ sub runstep {
     my $has_gettext = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_gettext = $self->_evaluate_cc_run($test, $verbose);
+        $has_gettext = $self->_evaluate_cc_run($conf, $test);
     }
     if ($has_gettext) {
-        _handle_gettext($conf, $verbose, $extra_libs);
+        _handle_gettext($conf, $extra_libs);
     }
     $conf->data->set( HAS_GETTEXT => $has_gettext );
 
@@ -77,22 +72,21 @@ sub runstep {
 }
 
 sub _evaluate_cc_run {
-    my $self = shift;
-    my ($test, $verbose) = @_;
+    my ($self, $conf, $test) = @_;
     my $has_gettext = 0;
     if ( $test eq "Hello, world!\n" ) {
         $has_gettext = 1;
-        print " (yes) " if $verbose;
+        $conf->debug(" (yes) ");
         $self->set_result('yes');
     }
     return $has_gettext;
 }
 
 sub _handle_gettext {
-    my ($conf, $verbose, $libs) = @_;
+    my ($conf, $libs) = @_;
     $conf->data->add( ' ', ccflags => "-DHAS_GETTEXT" );
     $conf->data->add( ' ', libs => $libs );
-    $verbose and print "\n  ccflags: ", $conf->data->get("ccflags"), "\n";
+    $conf->debug("\n  ccflags: ", $conf->data->get("ccflags"), "\n");
     return 1;
 }
 

@@ -11,6 +11,9 @@ set.ops - Assignment Opcodes
 
 These operations all set registers to various values.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =over 4
 
 =cut

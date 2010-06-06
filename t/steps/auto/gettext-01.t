@@ -112,12 +112,12 @@ is($step->_select_lib( {
 
 ########## _evaluate_cc_run() ##########
 
-my ($test, $verbose);
+my $test;
 my $has_gettext;
 
 $test = "Hello, world!\n";
-$verbose = undef;
-$has_gettext = $step->_evaluate_cc_run($test, $verbose);
+$conf->options->set(verbose => undef);
+$has_gettext = $step->_evaluate_cc_run($conf, $test);
 is($has_gettext, 1, "Got expected value for has_gettext");
 is($step->result(), 'yes', "Expected result was set");
 # Prepare for next test
@@ -126,10 +126,10 @@ $step->set_result(undef);
 {
     my $stdout;
     $test = "Hello, world!\n";
-    $verbose = 1;
+    $conf->options->set(verbose => 1);
     capture(
         sub {
-            $has_gettext = $step->_evaluate_cc_run($test, $verbose);
+            $has_gettext = $step->_evaluate_cc_run($conf, $test);
         },
         \$stdout,
     );
@@ -141,8 +141,8 @@ $step->set_result(undef);
 }
 
 $test = "Foobar\n";
-$verbose = undef;
-$has_gettext = $step->_evaluate_cc_run($test, $verbose);
+$conf->options->set(verbose => undef);
+$has_gettext = $step->_evaluate_cc_run($conf, $test);
 is($has_gettext, 0, "Got expected value for has_gettext");
 ok(! defined $step->result(), "As expected, result is not yet defined");
 
@@ -157,11 +157,11 @@ $conf->replenish($serialized);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 
-$verbose = undef;
+$conf->options->set(verbose => undef);
 $conf->data->set( ccflags => q{} );
 $conf->data->set( libs    => q{} );
 my $libs = q{foo bar baz};
-ok(auto::gettext::_handle_gettext($conf, $verbose, $libs),
+ok(auto::gettext::_handle_gettext($conf, $libs),
     "_handle_gettext() returned true value");
 like($conf->data->get( 'ccflags' ), qr/-DHAS_GETTEXT/,
     "HAS_GETTEXT was added to 'ccflags'");
@@ -172,9 +172,9 @@ $conf->data->set( ccflags => q{} );
 $conf->data->set( libs    => q{} );
 {
     my ($stdout, $rv);
-    $verbose = 1;
+    $conf->options->set(verbose => 1);
     capture(
-        sub { $rv = auto::gettext::_handle_gettext($conf, $verbose, $libs); },
+        sub { $rv = auto::gettext::_handle_gettext($conf, $libs); },
         \$stdout,
     );
     ok($rv, "_handle_gettext() returned true value");
@@ -186,6 +186,7 @@ $conf->data->set( libs    => q{} );
         qr/ccflags:\s.*-DHAS_GETTEXT/,
         "Got expected verbose output"
     );
+    $conf->options->set(verbose => undef);
 }
 
 pass("Completed all tests in $0");

@@ -16,6 +16,8 @@ Tests features related to the creation, addition, and execution of OO methods.
 
 =cut
 
+.const string library_file = "method_library.pir"
+
 .sub main :main
     .include 'test_more.pir'
 
@@ -29,17 +31,15 @@ Tests features related to the creation, addition, and execution of OO methods.
 
     overridden_core_pmc()
 
-    delete_library()
+    try_delete_library()
 
 .end
 
 .sub create_library
     .local pmc file
-    .local string filename
 
-    filename = "method_library.pir"
     file = new ['FileHandle']
-    file.'open'(filename, 'w')
+    file.'open'(library_file, 'w')
 
     $S0 = <<'END'
     .namespace['Foo']
@@ -53,12 +53,18 @@ END
 
 .end
 
-.sub delete_library
+.sub try_delete_library
     .local pmc os
     $P0 = loadlib 'os'
+    unless $P0 goto no_os
     os = new 'OS'
-    $S0 = "method_library.pir"
-    os.'rm'($S0)
+    os.'rm'(library_file)
+    .return ()
+
+  no_os:
+    $S1 = concat "WARNING: could not delete test file `", library_file
+    $S1 = concat $S1, "' because the OS PMC is unavailable"
+    diag($S1)
 .end
 
 .sub loading_methods_from_file
@@ -67,7 +73,7 @@ END
     $I0 = $P1.'foo_method'()
     ok ($I0, 'calling foo_method')
 
-    load_bytecode 'method_library.pir'
+    load_bytecode library_file
     $P1 = new 'Foo'
     $I0 = $P1.'bar_method'()
     ok ($I0, 'calling bar_method')

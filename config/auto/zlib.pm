@@ -32,12 +32,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-zlib
-        |
-    );
+    my $without = $conf->options->get( qw| without-zlib | );
 
     if ($without) {
         $conf->data->set( has_zlib => 0 );
@@ -60,7 +55,7 @@ sub runstep {
     my $has_zlib = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_zlib = $self->_evaluate_cc_run($conf, $test, $has_zlib, $verbose);
+        $has_zlib = $self->_evaluate_cc_run($conf, $test, $has_zlib);
     }
     $conf->data->set( has_zlib => $has_zlib );
     $self->set_result($has_zlib ? 'yes' : 'no');
@@ -70,11 +65,11 @@ sub runstep {
 
 sub _evaluate_cc_run {
     my $self = shift;
-    my ($conf, $test, $has_zlib, $verbose) = @_;
+    my ($conf, $test, $has_zlib) = @_;
     if ( $test =~ m/^(\d\.\d\.\d)/ ) {
         my $version = $1;
         $has_zlib = 1;
-        print " (yes) " if $verbose;
+        $conf->debug(" (yes) ");
         $self->set_result("yes, $version");
     }
     return $has_zlib;

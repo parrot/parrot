@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 74;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::inter::libparrot');
@@ -257,6 +257,101 @@ is($step->result(), 'no', "Expected result was set");
 $step->set_result(q{});
 $conf->data->set('has_dynamic_linking' => $has_dynamic_linking_orig);
 @prompts = ();
+
+##### get_libs() #####
+
+my %seen;
+{
+    local $^O = 'foobar';
+    %seen = map { $_ => 1 } inter::libparrot::get_libs();
+    is( scalar keys %seen, 1, "Got expected number of libs: generic" );
+    ok( $seen{'libparrot.so'}, "Got expected lib" );
+}
+
+{
+    local $^O = 'MSWin32';
+    %seen = map { $_ => 1 } inter::libparrot::get_libs();
+    is( scalar keys %seen, 3, "Got expected number of libs: Win32" );
+    is_deeply(
+        \%seen,
+        {
+            'libparrot.dll' => 1,
+            'libparrot.lib' => 1,
+            'libparrot.dll.a' => 1,
+        },
+        "Got expected libs"
+    );
+}
+
+{
+    local $^O = 'cygwin';
+    %seen = map { $_ => 1 } inter::libparrot::get_libs();
+    is( scalar keys %seen, 1, "Got expected number of libs: cygwin" );
+    is_deeply(
+        \%seen,
+        {
+            'libparrot.dll.a' => 1,
+        },
+        "Got expected libs"
+    );
+}
+
+{
+    local $^O = 'darwin';
+    %seen = map { $_ => 1 } inter::libparrot::get_libs();
+    is( scalar keys %seen, 2, "Got expected number of libs: darwin" );
+    is_deeply(
+        \%seen,
+        {
+            'libparrot.dylib' => 1,
+            'libparrot.a' => 1,
+        },
+        "Got expected libs"
+    );
+}
+
+##### get_libpaths() #####
+
+%seen = map { $_ => 1 } inter::libparrot::get_libpaths($conf);
+ok( $seen{'/usr/local/lib'}, "Got expected lib: generic" );
+ok( $seen{'/usr/lib'}, "Got expected lib: generic" );
+
+{
+    local $^O  = 'MSWin32';
+    local $ENV{PATH} = 'alpha;beta';
+    %seen = map { $_ => 1 } inter::libparrot::get_libpaths($conf);
+    ok( $seen{'/usr/local/lib'}, "Got expected lib: MSWin32" );
+    ok( $seen{'/usr/lib'}, "Got expected lib: MSWin32" );
+    ok( $seen{'alpha'}, "Got expected lib: MSWin32" );
+    ok( $seen{'beta'}, "Got expected lib: MSWin32" );
+}
+
+{
+    local $ENV{LD_LIBRARY_PATH} = 'alpha:beta';
+    %seen = map { $_ => 1 } inter::libparrot::get_libpaths($conf);
+    ok( $seen{'/usr/local/lib'}, "Got expected lib: LD_LIBRARY_PATH" );
+    ok( $seen{'/usr/lib'}, "Got expected lib: LD_LIBRARY_PATH" );
+    ok( $seen{'alpha'}, "Got expected lib: LD_LIBRARY_PATH" );
+    ok( $seen{'beta'}, "Got expected lib: LD_LIBRARY_PATH" );
+}
+
+{
+    local $ENV{LD_RUN_PATH} = 'alpha:beta';
+    %seen = map { $_ => 1 } inter::libparrot::get_libpaths($conf);
+    ok( $seen{'/usr/local/lib'}, "Got expected lib: LD_RUN_PATH" );
+    ok( $seen{'/usr/lib'}, "Got expected lib: LD_RUN_PATH" );
+    ok( $seen{'alpha'}, "Got expected lib: LD_RUN_PATH" );
+    ok( $seen{'beta'}, "Got expected lib: LD_RUN_PATH" );
+}
+
+{
+    local $ENV{DYLD_LIBRARY_PATH} = 'alpha:beta';
+    %seen = map { $_ => 1 } inter::libparrot::get_libpaths($conf);
+    ok( $seen{'/usr/local/lib'}, "Got expected lib: DYLD_LIBRARY_PATH" );
+    ok( $seen{'/usr/lib'}, "Got expected lib: DYLD_LIBRARY_PATH" );
+    ok( $seen{'alpha'}, "Got expected lib: DYLD_LIBRARY_PATH" );
+    ok( $seen{'beta'}, "Got expected lib: DYLD_LIBRARY_PATH" );
+}
 
 pass("Completed all tests in $0");
 

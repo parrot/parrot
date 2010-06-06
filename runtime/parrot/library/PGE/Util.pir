@@ -133,7 +133,8 @@ Emits the list of messages to stderr.
     message .= "\n"
   emit_message:
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    .include 'stdio.pasm'
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'(message)
 
     mob.'to'(pos)

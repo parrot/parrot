@@ -19,10 +19,24 @@ Tests the AddrRegistry PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(3)
 
     $P0 = new ['AddrRegistry']
     ok(1, 'Instantiated .AddrRegistry')
+
+    $I0 = 0
+    if $P0 goto isnotempty
+    inc $I0
+isnotempty:
+    ok($I0, 'vtable get_bool gives false when empty')
+
+    $P1 = new [ 'Integer' ]
+    $P0[0] = $P1
+    $I0 = 0
+    unless $P0 goto isempty
+    inc $I0
+isempty:
+    ok($I0, 'vtable get_bool gives true when non empty')
 .end
 
 # Local Variables:

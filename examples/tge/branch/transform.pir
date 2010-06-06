@@ -106,7 +106,8 @@ specified type.
     if $I0 == 2 goto fromfile
 
     $P0 = getinterp
-    filehandle = $P0.'stdhandle'(0)
+    .include 'stdio.pasm'
+    filehandle = $P0.'stdhandle'(.PIO_STDIN_FILENO)
     goto grabline
 
   fromfile:

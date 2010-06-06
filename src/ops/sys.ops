@@ -11,6 +11,9 @@ sys.ops - System Interaction Opcodes
 
 Operations that allow the user to interact with the system.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =over 4
 
 =cut

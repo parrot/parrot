@@ -11,7 +11,8 @@
  * This file is generated automatically from 'src/ops/core.ops' (and possibly other
  * .ops files). by ops2c.nqp.
  *
- * Any changes made here will be lost!
+ * Any changes made here will be lost!  To regenerate this file after making
+ * changes to any ops, use the bootstap-ops makefile target.
  *
  */
 
@@ -386,6 +387,9 @@
  opcode_t * Parrot_print_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_print_p_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getstdin_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getstdout_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getstderr_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_abs_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_abs_n(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_abs_i_i(opcode_t *, PARROT_INTERP);

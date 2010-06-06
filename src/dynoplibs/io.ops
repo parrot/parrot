@@ -297,35 +297,6 @@ inline op fdopen(out PMC, in INT, in STR) :filesys_open {
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
 }
 
-=item B<getstdin>(out PMC)
-
-Create a new ParrotIO object for the stdin file descriptor and
-store it in $1
-
-=item B<getstdout>(out PMC)
-
-Create a new ParrotIO object for the stdout file descriptor and
-store it in $1
-
-=item B<getstderr>(out PMC)
-
-Create a new ParrotIO object for the stderr file descriptor and
-store it in $1
-
-=cut
-
-inline op getstdin(out PMC) :base_io {
-    $1 = _PIO_STDIN(interp);
-}
-
-inline op getstdout(out PMC) :base_io {
-    $1 = _PIO_STDOUT(interp);
-}
-
-inline op getstderr(out PMC) :base_io {
-    $1 = _PIO_STDERR(interp);
-}
-
 #########################################
 
 =item B<setstdin>(invar PMC)

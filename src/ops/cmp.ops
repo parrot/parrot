@@ -15,6 +15,9 @@ Operations that compare two registers against each other.
 Some of these operations affect control flow directly; others
 do not.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =cut
 
 ###############################################################################

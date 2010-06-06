@@ -7,8 +7,6 @@
 # Currently parrot doesn't support system independent PBCs. So, cross your
 # fingers and try different filename for binary-dependent tests...
 
-.loadlib 'io_ops'
-
 .sub '_filename'
     .local string filename
     filename = 't/native_pbc/number.pbc'
@@ -22,9 +20,10 @@
     .local pmc pf, pio
     pf   = new ['Packfile']
     $S0  = '_filename'()
-    pio  = open $S0, 'r'
+    pio  = new ['FileHandle']
+    pio.'open'($S0, 'r')
     $S0  = pio.'readall'()
-    close pio
+    pio.'close'()
     pf   = $S0
     .return(pf)
 .end

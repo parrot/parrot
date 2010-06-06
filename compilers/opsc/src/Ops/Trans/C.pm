@@ -143,7 +143,7 @@ INTVAL {$emitter.bs}numops{self.suffix} = {self<num_entries>};
 ** Op Function Table:
 */
 
-static op_func{self.suffix}_t {self.op_func($emitter)}[{self<num_entries>}] = | ~ '{'
+static op_func{self.suffix}_t {self.op_func($emitter)}[{self<num_entries>}] = | ~ '{' ~ "\n"
 );
 
         for self<op_func_table> {

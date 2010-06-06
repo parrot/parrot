@@ -411,7 +411,6 @@ OUTPUT
 SKIP: {
     skip( 'no ICU lib', 17 ) unless $PConfig{has_icu};
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
-.loadlib 'io_ops'
 .sub main :main
     set $S0, iso-8859-1:"TÖTSCH"
     find_charset $I0, "unicode"
@@ -623,7 +622,6 @@ CODE
 OUTPUT
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase" );
-.loadlib 'io_ops'
 .sub main :main
     set $S0, iso-8859-1:"tötsch"
     find_charset $I0, "unicode"
@@ -640,7 +638,6 @@ T\x{c3}\x{96}TSCH
 OUTPUT
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char" );
-.loadlib 'io_ops'
 .sub main :main
     set $S1, unicode:"hacek j \u01f0"
     upcase $S1, $S1
@@ -671,7 +668,6 @@ OUTPUT
     # 0x844fb60:      0x005f  0x005f  0x005f  0x004a  0x030c  0x0031  0x0032  0x0000
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?" );
-.loadlib 'io_ops'
 .sub main :main
     set $S1, unicode:"___\u01f0123"
     upcase $S1, $S1
@@ -686,7 +682,6 @@ ___J\xcc\x8c123
 OUTPUT
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase" );
-.loadlib 'io_ops'
 .sub main :main
     set $S0, iso-8859-1:"tötsch leo"
     find_charset $I0, "unicode"
@@ -703,7 +698,6 @@ T\x{c3}\x{b6}tsch Leo
 OUTPUT
 
     pir_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
-.loadlib 'io_ops'
 .sub main :main
     set $S1, unicode:"___\u01f0___"
     length $I0, $S1

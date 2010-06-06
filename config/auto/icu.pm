@@ -46,9 +46,8 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $icushared_opt, $icuheaders_opt,
+    my ( $icushared_opt, $icuheaders_opt,
         $icuconfig_opt, $without_opt ) = $conf->options->get( qw|
-            verbose
             icushared
             icuheaders
             icu-config
@@ -101,21 +100,21 @@ sub runstep {
                         ( ! defined($icuheaders) );
 
     my $without = 0;
-    ($icuconfig, $autodetect, $without) =
-        $self->_handle_autodetect( {
+    ($icuconfig, $autodetect, $without) = $self->_handle_autodetect(
+        $conf,
+        {
             icuconfig   => $icuconfig,
             autodetect  => $autodetect,
             without     => $without,
-            verbose     => $verbose,
-    } );
+        }
+    );
     # Inside _handle_autodetect(), $without can be set to 1 by
     # _handle_search_for_icu_config().  In that case, we're abandoning our
     # attempt to configure with ICU and so may return here.
     # 2nd possible return point
     if ( $without ) {
         $self->_set_no_configure_with_icu($conf, q{no icu-config});
-        print "Could not locate an icu-config program\n"
-            if $verbose;
+        $conf->debug("Could not locate an icu-config program\n");
         return 1;
     }
 
@@ -126,7 +125,6 @@ sub runstep {
                 without         => $without,
                 autodetect      => $autodetect,
                 icuconfig       => $icuconfig,
-                verbose         => $verbose,
                 icushared       => $icushared,
                 icuheaders      => $icuheaders,
             },
@@ -137,7 +135,7 @@ sub runstep {
         return 1;
     }
 
-    _verbose_report($verbose, $icuconfig, $icushared, $icuheaders);
+    _verbose_report($conf, $icuconfig, $icushared, $icuheaders);
 
     $icuheaders = $self->_handle_icuconfig_errors( {
         icushared   => $icushared,
@@ -169,7 +167,6 @@ sub runstep {
         $conf,
         {
             ccflags_status  => $ccflags_status,
-            verbose         => $verbose,
             icuheaders      => $icuheaders,
         },
     );
@@ -222,8 +219,7 @@ HELP
 }
 
 sub _handle_search_for_icu_config {
-    my $self = shift;
-    my $arg = shift;
+    my ($self, $conf, $arg) = @_;
     if ( $arg->{ret} ) {
         undef $arg->{icuconfig};
         $arg->{autodetect} = 0;
@@ -231,40 +227,38 @@ sub _handle_search_for_icu_config {
     }
     else {
         $arg->{icuconfig} = $self->{icuconfig_default};
-        if ($arg->{verbose}) {
-            print "icu-config found... good!\n";
-        }
+        $conf->debug("icu-config found... good!\n");
     }
     return ( $arg->{icuconfig}, $arg->{autodetect}, $arg->{without} );
 }
 
 sub _handle_autodetect {
-    my $self = shift;
-    my $arg = shift;
+    my ($self, $conf, $arg) = @_;
     if ( $arg->{autodetect} ) {
         if ( ! $arg->{icuconfig} ) {
 
             my ( undef, undef, $ret ) =
                 capture_output( $self->{icuconfig_default}, "--exists" );
 
-            print "Discovered $self->{icuconfig_default} --exists returns $ret\n"
-                if $arg->{verbose};
+            $conf->debug("Discovered $self->{icuconfig_default} --exists returns $ret\n");
 
             ($arg->{icuconfig}, $arg->{autodetect}, $arg->{without}) =
-                $self->_handle_search_for_icu_config( {
-                    icuconfig   => $arg->{icuconfig},
-                    autodetect  => $arg->{autodetect},
-                    without     => $arg->{without},
-                    verbose     => $arg->{verbose},
-                    ret         => $ret,
-            } );
+                $self->_handle_search_for_icu_config(
+                    $conf,
+                    {
+                        icuconfig   => $arg->{icuconfig},
+                        autodetect  => $arg->{autodetect},
+                        without     => $arg->{without},
+                        ret         => $ret,
+                    }
+                );
         }
     } # end $autodetect true
     else {
-        if ($arg->{verbose}) {
-            print "Specified an ICU config parameter,\n";
-            print "ICU autodetection disabled.\n";
-        }
+        $conf->debug(
+            "Specified an ICU config parameter,\n",
+            "ICU autodetection disabled.\n",
+        );
     } # end $autodetect false
     return ( $arg->{icuconfig}, $arg->{autodetect}, $arg->{without} );
 }
@@ -285,28 +279,22 @@ sub _try_icuconfig {
         $arg->{icuconfig}
     ) {
         # ldflags
-        print "Trying $arg->{icuconfig} with '--ldflags'\n"
-            if $arg->{verbose};
+        $conf->debug("Trying $arg->{icuconfig} with '--ldflags'\n");
         $icushared = capture_output("$arg->{icuconfig} --ldflags");
         chomp $icushared;
-        print "icushared:  captured $icushared\n"
-            if $arg->{verbose};
+        $conf->debug("icushared:  captured $icushared\n");
         ($icushared, $arg->{without}) =
             $self->_handle_icushared($icushared, $arg->{without});
-        print "For icushared, found $icushared and $arg->{without}\n"
-            if $arg->{verbose};
+        $conf->debug("For icushared, found $icushared and $arg->{without}\n");
 
         # location of header files
-        print "Trying $arg->{icuconfig} with '--prefix'\n"
-            if $arg->{verbose};
+        $conf->debug("Trying $arg->{icuconfig} with '--prefix'\n");
         $icuheaders = capture_output("$arg->{icuconfig} --prefix");
         chomp($icuheaders);
-        print "icuheaders:  captured $icuheaders\n"
-            if $arg->{verbose};
+        $conf->debug("icuheaders:  captured $icuheaders\n");
         ($icuheaders, $arg->{without}) =
             $self->_handle_icuheaders($conf, $icuheaders, $arg->{without});
-        print "For icuheaders, found $icuheaders and $arg->{without}\n"
-            if $arg->{verbose};
+        $conf->debug("For icuheaders, found $icuheaders and $arg->{without}\n");
     }
 
     return ($arg->{without}, $icushared, $icuheaders);
@@ -348,8 +336,8 @@ sub _handle_icuheaders {
 }
 
 sub _verbose_report {
-    my ($verbose, $icuconfig, $icushared, $icuheaders) = @_;
-    if ($verbose) {
+    my ($conf, $icuconfig, $icushared, $icuheaders) = @_;
+    if ($conf->options->get('verbose')) {
         print "icuconfig: $icuconfig\n"  if defined $icuconfig;
         print "icushared='$icushared'\n" if defined $icushared;
         print "headers='$icuheaders'\n"  if defined $icuheaders;
@@ -395,9 +383,7 @@ sub _handle_ccflags_status {
     my $arg = shift;
     if ($arg->{ccflags_status}) {
         # Ok, we don't need anything more.
-        if ($arg->{verbose}) {
-            print "Your compiler found the icu headers... good!\n";
-        }
+        $conf->debug("Your compiler found the icu headers... good!\n");
     }
     else {
         my $icuheaders = $arg->{icuheaders};
@@ -410,9 +396,7 @@ sub _handle_ccflags_status {
             $icuflags = "-I $arg->{icuheaders}";
         }
 
-        if ($arg->{verbose}) {
-            print "Adding $icuflags to ccflags for icu headers.\n";
-        }
+        $conf->debug( "Adding $icuflags to ccflags for icu headers.\n");
         $conf->data->add( ' ', ccflags => $icuflags );
     }
 }

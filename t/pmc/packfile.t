@@ -298,7 +298,8 @@ load_error:
     .local string filename, first
     push_eh load_error
     $S0 = '_filename'()
-    $P0 = open $S0, 'r'
+    $P0 = new ['FileHandle']
+    $P0.'open'($S0, 'r')
 
     first = $P0.'readall'()
 

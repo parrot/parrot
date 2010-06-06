@@ -108,12 +108,19 @@ my $compdir = ($bindir eq 'bin')
 $filename = 'test.pg';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "token TOP { \\s* }\n";
+print $FH <<'PGE';
+grammar WSpace
+
+token TOP { \s* }
+PGE
 close $FH;
-$out = `$parrot $libdir/PGE/Perl6Grammar.pir $filename`;
-ok($out =~ /^\n## <::TOP>/, "check PGE");
+$out = `$parrot $libdir/PGE/Perl6Grammar.pbc $filename`;
+ok($out =~ /## <WSpace::TOP>/, "check PGE");
 unlink($filename);
 
+SKIP:
+{
+skip("pirc", 1) unless (-e $pirc);
 $filename = 'test.pir';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
@@ -126,6 +133,7 @@ close $FH;
 $out = `$pirc -n $filename`;
 ok($out eq "ok\n", "check pirc");
 unlink($filename);
+}
 
 $filename = 'test.nqp';
 open $FH, '>', $filename

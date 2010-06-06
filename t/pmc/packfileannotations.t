@@ -41,7 +41,8 @@ Tests the PackfileAnnotations PMC.
     .local pmc pf
 
     push_eh load_error
-    $P0 = open 't/native_pbc/annotations.pbc'
+    $P0 = new ['FileHandle']
+    $P0.'open'('t/native_pbc/annotations.pbc', 'r')
     $P0.'encoding'('binary')
     $S0 = $P0.'readall'()
     pf = new 'Packfile'

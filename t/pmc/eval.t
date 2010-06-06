@@ -245,21 +245,21 @@ my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 my (undef, $temp2_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string" );
-.loadlib 'io_ops'
 .sub main :main
 
   .local pmc f1, f2
   .local pmc io
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
-  io = open "$temp_pbc", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_pbc", 'w')
   print io, \$S0
-  close io
+  io.'close'()
   load_bytecode "$temp_pbc"
   f2 = compi("foo_2", "hello from foo_2")
-  io = open "$temp2_pbc", 'w'
+  io.'open'("$temp2_pbc", 'w')
   print io, f2
-  close io
+  io.'close'()
   load_bytecode "$temp2_pbc"
 .end
 
@@ -321,23 +321,20 @@ OUTPUT
 close $fh;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
-.loadlib 'io_ops'
 .sub main :main
   .local pmc f1, f2
   .local pmc io, os
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
-  io = open "$temp_pbc", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_pbc", 'w')
   print io, \$S0
-  close io
+  io.'close'()
   load_bytecode "$temp_pbc"
-  \$P0 = loadlib 'os'
-  os = new ['OS']
-  os.'rm'("$temp_pbc")
   f2 = compi("foo_2", "hello from foo_2")
-  io = open "$temp_pbc", 'w'
+  io.'open'("$temp_pbc", 'w')
   print io, f2
-  close io
+  io.'close'()
   load_bytecode "$temp_pbc"
 .end
 
@@ -365,15 +362,15 @@ OUTPUT
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze" );
-.loadlib 'io_ops'
 .sub main :main
   .local pmc f, e
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
-  io = open "$temp_file", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_file", 'w')
   print io, \$S0
-  close io
+  io.'close'()
   say "written"
 .end
 
@@ -399,17 +396,15 @@ written
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw", todo => 'TT #1142' );
-.loadlib 'io_ops'
 .sub main :main
     .local pmc io, e
     .local string file
     .local int size
     file = "$temp_file"
-    .include "stat.pasm"
-    size = stat file, .STAT_FILESIZE
-    io = open file, 'r'
-    \$S0 = read io, size
-    close io
+    io = new ['FileHandle']
+    io.'open'(file, 'rb')
+    \$S0 = io.'readall'()
+    io.'close'()
     e = thaw \$S0
     sweep 1 # ensure all of the object survives GC
     e()
@@ -422,15 +417,15 @@ hello from foo_1
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
-.loadlib 'io_ops'
 .sub main :main
   .local pmc f, e
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
-  io = open "$temp_file", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_file", 'wb')
   print io, \$S0
-  close io
+  io.'close'()
   say "written"
   "read"()
 .end
@@ -464,11 +459,10 @@ MORE
     .local string file
     .local int size
     file = "$temp_file"
-    .include "stat.pasm"
-    size = stat file, .STAT_FILESIZE
-    io = open file, 'r'
-    \$S0 = read io, size
-    close io
+    io = new ['FileHandle']
+    io.'open'(file, 'rb')
+    \$S0 = io.'readall'()
+    io.'close'()
     e = thaw \$S0
     e()
     e = get_global "foo_1"

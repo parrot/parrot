@@ -358,7 +358,8 @@ Pure PIR, without any dependencies.
     .param int pos
     .param string msg
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    .include 'stdio.pasm'
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'("in '")
     $P1.'print'(str)
     $P1.'print'("' at ")
@@ -405,7 +406,8 @@ Pure PIR, without any dependencies.
     goto L8
   L7:
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    .include 'stdio.pasm'
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'("\tunknown config: ")
     $P1.'print'($S1)
     $P1.'print'("\n")

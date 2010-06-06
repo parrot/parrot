@@ -36,8 +36,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
     my $cc     = $conf->data->get('cc');
     my $osname = $conf->data->get('osname');
 
@@ -54,7 +52,7 @@ sub runstep {
     eval { $conf->cc_build( q{}, $extra_libs ) };
     if ( !$@ ) {
         if ( $conf->cc_run() ) {
-            $has_readline = $self->_evaluate_cc_run($verbose);
+            $has_readline = $self->_evaluate_cc_run($conf);
         }
         _handle_readline($conf, $extra_libs);
     }
@@ -71,7 +69,7 @@ sub runstep {
         eval { $conf->cc_build( q{}, $extra_libs) };
         if ( !$@ ) {
             if ( $conf->cc_run() ) {
-                $has_readline = $self->_evaluate_cc_run($verbose);
+                $has_readline = $self->_evaluate_cc_run($conf);
             }
             _handle_readline($conf, $extra_libs);
         }
@@ -83,9 +81,9 @@ sub runstep {
 }
 
 sub _evaluate_cc_run {
-    my ($self, $verbose) = @_;
+    my ($self, $conf) = @_;
     my $has_readline = 1;
-    print " (yes) " if $verbose;
+    $conf->debug(" (yes) ");
     $self->set_result('yes');
     return $has_readline;
 }

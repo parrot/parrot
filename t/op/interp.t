@@ -43,13 +43,10 @@ ending
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works with printing' );
-.loadlib 'io_ops'
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
                test_interp = new 'ParrotInterpreter'
-    .local pmc stdout
-               stdout = getstdout
 
     print "uno\n"
     runinterp test_interp, pasm
@@ -71,15 +68,14 @@ OUTPUT
 # the test fail.
 pasm_output_like(
     <<'CODE', <<'OUTPUT', "restart trace" );
-    .loadlib 'io_ops'
-    printerr "ok 1\n"
+    print "ok 1\n"
     sweepoff
     set I0, 1
     trace I0
     dec I0
     trace I0
     sweepon
-    printerr "ok 2\n"
+    print "ok 2\n"
     end
 CODE
 /^ok\s1\n
@@ -91,8 +87,7 @@ OUTPUT
 pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
     new P0, 'Undef'
     set I0, P0
-    .loadlib 'io_ops'
-    printerr "nada:"
+    print "nada:"
     warningson 1
     new P1, 'Undef'
     set I0, P1

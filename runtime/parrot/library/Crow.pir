@@ -15,8 +15,8 @@
     getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
 
-    getopts = push 'help|h'
-    getopts = push 'type|t=s'
+    push getopts, 'help|h'
+    push getopts, 'type|t=s'
 
     .local pmc opts
     opts = getopts.'get_options'(args)

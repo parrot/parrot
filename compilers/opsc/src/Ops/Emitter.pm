@@ -369,7 +369,8 @@ method _emit_preamble($fh) {
  * This file is generated automatically from '{self<file>}' (and possibly other
  * .ops files). by {self<script>}.
  *
- * Any changes made here will be lost!
+ * Any changes made here will be lost!  To regenerate this file after making
+ * changes to any ops, use the bootstap-ops makefile target.
  *
  */
 |);

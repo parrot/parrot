@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 40;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -41,20 +41,6 @@ sub file_content_is {
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
-pir_output_is( <<"CODE", <<'OUTPUT', "open/close" );
-.sub main :main
-    \$P0 = new ['FileHandle']
-    \$P0.'open'("$temp_file", 'w')
-    print \$P0, "a line\\n"
-    \$P0.'close'()
-    \$P0.'open'("$temp_file", 'r')
-    \$S0 = \$P0.'read'(20)
-    print \$S0
-.end
-CODE
-a line
-OUTPUT
-
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (ops)");
 .loadlib 'io_ops'
 .const string temp_file = '%s'
@@ -71,84 +57,6 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (o
 .end
 CODE
 a line
-OUTPUT
-
-pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction", todo => 'TT #1659' );
-.const string temp_file = '%s'
-.sub main :main
-    interpinfo $I0, 2    # GC mark runs
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'w')
-        needs_destroy $P0
-    print $P0, "a line\n"
-    null $P0            # kill it
-    sweep 0            # a lazy GC has to close the PIO
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'r')
-    $S0 = $P0.'read'(20)
-    print $S0
-.end
-CODE
-a line
-OUTPUT
-
-my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
-
-pir_output_is( sprintf( <<'CODE', $no_such_file, $temp_file ), <<'OUTPUT', "get_bool" );
-.const string no_such_file = '%s'
-.const string temp_file    = '%s'
-
-.sub main :main
-    push_eh read_non_existent_file
-    $P0 = new ['FileHandle']
-    $P0.'open'(no_such_file, 'r')
-
-    print "Huh: '"
-    print no_such_file
-    print "' exists? - not "
-ok1:
-    say "ok 1"
-
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'w')
-    $P0.'print'("a line\n")
-    $P0.'print'("a line\n")
-    $P0.'close'()
-
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'r')
-    if $P0, ok2
-    print "not "
-ok2:    say "ok 2"
-    $S0 = $P0.'read'(1024)
-    $S0 = $P0.'read'(1024)
-    unless $P0, ok3
-    print "not "
-ok3:    say "ok 3"
-    defined $I0, $P0
-    if $I0, ok4
-    print "not "
-ok4:    say "ok 4"
-    $P0.'close'()
-    defined $I0, $P0        # closed file is still defined
-    if $I0, ok5
-    print "not "
-ok5:    say "ok 5"
-    unless $P0, ok6        # but false
-    print "not "
-ok6:    say "ok 6"
-    .return ()
-read_non_existent_file:
-    pop_eh
-    branch ok1
-.end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception (ops)" );
@@ -376,22 +284,23 @@ file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
 Parrot overwrites
 OUTPUT
 
-pasm_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
-.loadlib 'io_ops'
-   set I0, 0
-   set I1, 10000
+pir_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
+.sub "main"
+   set \$I0, 0
+   set \$I1, 10000
 
-   open P0, "$temp_file", 'w'
+   new \$P0, ['FileHandle']
+   \$P0.'open'("$temp_file", 'w')
 
 PRINT:
-   ge I0, I1, END
-   print P0, "words\\n"
-   inc I0
+   ge \$I0, \$I1, END
+   print \$P0, "words\\n"
+   inc \$I0
    branch PRINT
 
 END:
-   close P0
-   end
+   \$P0.'close'()
+.end
 CODE
 
 file_content_is( $temp_file, <<'OUTPUT' x 10000, 'buffered file contents' );
@@ -490,20 +399,21 @@ OUTPUT
 
 # TT #1178
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
+.include 'stdio.pasm'
 .sub main :main
     $P99 = getinterp
-    $P0  = $P99.'stdhandle'(0)
+    $P0  = $P99.'stdhandle'(.PIO_STDIN_FILENO)
     $I0  = $P0.'get_fd'()
     # I0 is 0 on Unix and non-Null on stdio and win32
     print "ok 1\n"
 
-    $P1 = $P99.'stdhandle'(1)
+    $P1 = $P99.'stdhandle'(.PIO_STDOUT_FILENO)
     $I1 = $P1.'get_fd'()
     if $I1, OK_2
     print "not "
 OK_2:
     say "ok 2"
-    $P2 = $P99.'stdhandle'(2)
+    $P2 = $P99.'stdhandle'(.PIO_STDERR_FILENO)
     $I2 = $P2.'get_fd'()
     if $I2, OK_3
     print "not "
@@ -536,9 +446,10 @@ This is a test
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
+.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P2 = $P0.'stdhandle'(1)
+    $P2 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     can $I0, $P2, "puts"
     if $I0, ok1
     print "not "
@@ -552,13 +463,13 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method - PIR' );
-
+.include 'stdio.pasm'
 .sub main :main
    .local string s
    s = "ok 2\n"
    .local pmc io
    $P0 = getinterp
-   io = $P0.'stdhandle'(1)
+   io = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
    $I0 = can io, "puts"
    if $I0 goto ok1
    print "not "
@@ -812,65 +723,6 @@ OUT
 
 print $FOO "T\xc3\xb6tsch\n";
 close $FOO;
-
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled" );
-.loadlib 'io_ops'
-.sub main :main
-    .local pmc pio
-    .local int len
-    .include "stat.pasm"
-    .local string f
-    f = '$temp_file'
-    len = stat f, .STAT_FILESIZE
-    pio = open f, 'r'
-    pio.'encoding'("utf8")
-    \$S0 = read pio, len
-    close pio
-    \$I1 = charset \$S0
-    \$S2 = charsetname \$I1
-    say \$S2
-
-    \$I1 = encoding \$S0
-    \$S2 = encodingname \$I1
-    say \$S2
-
-    \$I1 = find_charset 'iso-8859-1'
-    trans_charset \$S1, \$S0, \$I1
-    print \$S1
-.end
-CODE
-unicode
-utf8
-T\xf6tsch
-OUTPUT
-
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled - readline" );
-.sub main :main
-    .local pmc pio
-    .local string f
-    f = '$temp_file'
-    pio = new ['FileHandle']
-    pio.'open'(f, 'r')
-    pio.'encoding'("utf8")
-    \$S0 = pio.'readline'()
-    pio.'close'()
-    \$I1 = charset \$S0
-    \$S2 = charsetname \$I1
-    say \$S2
-
-    \$I1 = encoding \$S0
-    \$S2 = encodingname \$I1
-    say \$S2
-
-    \$I1 = find_charset 'iso-8859-1'
-    trans_charset \$S1, \$S0, \$I1
-    print \$S1
-.end
-CODE
-unicode
-utf8
-T\xf6tsch
-OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
 .loadlib 'io_ops'

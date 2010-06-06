@@ -687,9 +687,7 @@ handler:
     concat $S5, $S2, " of "
     concat $S5, $S5, $S4
 
-    $I0 = cmp_str $S1, $S3
-    $I0 = not $I0
-
+    $I0 = iseq $S1, $S3
     todo( $I0, $S4 )
 .endm
 

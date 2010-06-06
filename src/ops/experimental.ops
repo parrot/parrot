@@ -27,6 +27,8 @@ may be removed in any release.
 If you rely on any of these opcodes, please open a
 Trac ticket at L<https://trac.parrot.org/>.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =cut
 

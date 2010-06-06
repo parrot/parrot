@@ -132,6 +132,31 @@ Inno Setup
 
 =head2 EXAMPLES
 
+    $ cat hello.pir
+    .sub 'main' :main
+        say 'hello world!'
+    .end
+
+    $ cat setup.pir
+    .sub 'main' :main
+        .param pmc args
+        $S0 = shift args
+        load_bytecode 'distutils.pbc'
+
+        $P0 = new 'Hash'
+        $P1 = new 'Hash'
+        $P1['hello.pbc'] = 'hello.pir'
+        $P0['pbc_pir'] = $P1
+        $P2 = new 'Hash'
+        $P2['parrot-hello'] = 'hello.pbc'
+        $P0['installable_pbc'] = $P2
+        .tailcall setup(args :flat, $P0 :flat :named)
+    .end
+
+    $ parrot setup.pir
+    $ parrot setup.pir install
+    $ parrot setup clean
+
 L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
 
 L<http://github.com/fperrad/markdown/blob/master/setup.pir>
@@ -4521,6 +4546,36 @@ SOURCE_C
     $S0 = cc_run($S0, cflags :named('cflags'), verbose :named('verbose'))
     $I0 = index $S0, 'OK '
     .return ($I0)
+.end
+
+=item runtests
+
+=cut
+
+.sub 'runtests' :multi()
+    .param pmc files :slurpy
+    .param pmc opts :slurpy :named
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc harness
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    .local pmc aggregate
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L1
+    $I0 = exists opts['ignore_error']
+    unless $I0 goto L2
+    $I0 = opts['ignore_error']
+    if $I0 goto L1
+  L2:
+    die "test fails"
+  L1:
+.end
+
+.sub 'runtests' :multi(ResizableStringArray,Hash)
+    .param pmc array
+    .param pmc hash
+    .tailcall runtests(array :flat, hash :flat :named)
 .end
 
 =back
