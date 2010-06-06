@@ -12,6 +12,9 @@ var.ops - Variable Opcodes
 These operations deal with both lexical and global variables,
 as well as the symbol tables that contain them.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =cut
 
 ###############################################################################

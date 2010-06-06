@@ -19,6 +19,9 @@ io.ops - I/O Opcodes
 
 Parrot's IO API
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =cut
 
 ###############################################################################
