@@ -2081,8 +2081,6 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
         else if (Parrot_str_equal(interp, t, CONST_STRING(interp, "-INF"))
              ||  Parrot_str_equal(interp, t, CONST_STRING(interp, "-INFINITY")))
             return PARROT_FLOATVAL_INF_NEGATIVE;
-        else
-            return 0.0;
     }
 
 /* powl() could be used here, but it is an optional POSIX extension that

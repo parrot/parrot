@@ -19,8 +19,6 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(284)
-
     set_s_s_sc()
     test_clone()
     clone_null()
@@ -108,6 +106,7 @@ Tests Parrot string registers and operations.
     index_multibyte_matching_two()
     num_to_string()
     string_to_int()
+    string_to_num()
     concat_or_substr_cow()
     constant_to_cstring()
     cow_with_chopn_leaving_original_untouched()
@@ -148,6 +147,7 @@ Tests Parrot string registers and operations.
     # END_OF_TESTS
     join_get_string_returns_a_null_string()
 
+    done_testing()
 .end
 
 .macro exception_is ( M )
@@ -1067,6 +1067,16 @@ WHILE:
     set $S0, ""
     set $I0, $S0
     is( $I0, "0", 'string to int' )
+.end
+
+.sub string_to_num
+    set $S0, "6foo"
+    set $N0, $S0
+    is( $N0, "6", '6foo to num' )
+
+    set $S0, "16foo"
+    set $N0, $S0
+    is( $N0, "16", '16foo to num' )
 .end
 
 .sub concat_or_substr_cow
