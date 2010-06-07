@@ -92,6 +92,7 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #define GC_C_SOURCE
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
+#include "../string/grapheme.h"
 #include "gc_private.h"
 
 /* HEADERIZER HFILE: include/parrot/gc_api.h */
@@ -400,6 +401,8 @@ void
 Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_gc_free_string_header)
+    if (s->encoding == Parrot_nfg_encoding_ptr && s->extra != NULL)
+        destroy_grapheme_table(interp, s->extra);
     interp->gc_sys->free_string_header(interp, s);
 }
 

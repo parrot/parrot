@@ -47,12 +47,22 @@ UChar32 * add_grapheme_from_substr(PARROT_INTERP,
     UINTVAL hash)
         __attribute__nonnull__(1);
 
+grapheme_table * clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
+        __attribute__nonnull__(1);
+
 grapheme_table * create_grapheme_table(PARROT_INTERP, UINTVAL n)
+        __attribute__nonnull__(1);
+
+void destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_add_grapheme_from_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_clone_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_create_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_destroy_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/grapheme.c */
