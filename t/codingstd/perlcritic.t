@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -85,6 +85,7 @@ if ( !@ARGV ) {
     @files = grep {! m/$filter_languages/}
              map  { $_->path }
              grep { $_->read !~ m/use v6;/ }
+             grep { $_->read !~ m/#! nqp/ }
              $dist->get_perl_language_files();
 }
 else {

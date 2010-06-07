@@ -27,10 +27,6 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 #include "parrot/has_header.h"
 
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
-#  include <sys/utsname.h>
-#endif
-
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /*
@@ -169,7 +165,7 @@ void *
 Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
-    return IMCC_compile_file_s(interp, fullname, error);
+    return imcc_compile_file(interp, fullname, error);
 }
 
 /*
@@ -362,105 +358,6 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
-}
-
-/*
-
-=item C<INTVAL sysinfo_i(PARROT_INTERP, INTVAL info_wanted)>
-
-Returns the system info.
-
-C<info_wanted> is one of:
-
-    PARROT_INTSIZE
-    PARROT_FLOATSIZE
-    PARROT_POINTERSIZE
-    PARROT_INTMAX
-    PARROT_INTMIN
-
-In unknown info is requested then -1 is returned.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
-{
-    ASSERT_ARGS(sysinfo_i)
-    switch (info_wanted) {
-      case PARROT_INTSIZE:
-        return sizeof (INTVAL);
-      case PARROT_FLOATSIZE:
-        return sizeof (FLOATVAL);
-      case PARROT_POINTERSIZE:
-        return sizeof (void *);
-      case PARROT_INTMIN:
-        return PARROT_INTVAL_MIN;
-      case PARROT_INTMAX:
-        return PARROT_INTVAL_MAX;
-      default:
-        return -1;
-    }
-}
-
-/*
-
-=item C<STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)>
-
-Returns the system info string.
-
-C<info_wanted> is one of:
-
-    PARROT_OS
-    PARROT_OS_VERSION
-    PARROT_OS_VERSION_NUMBER
-    CPU_ARCH
-    CPU_TYPE
-
-If unknown info is requested then an empty string is returned.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
-{
-    ASSERT_ARGS(sysinfo_s)
-    switch (info_wanted) {
-      case PARROT_OS:
-        return Parrot_str_new_constant(interp, BUILD_OS_NAME);
-      case PARROT_OS_VERSION:
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
-        {
-            struct utsname info;
-            if (uname(&info) == 0) {
-                return string_make(interp, info.version, strlen(info.version), "ascii", 0);
-            }
-        }
-#endif
-        break;
-      case PARROT_OS_VERSION_NUMBER:
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
-        {
-            struct utsname info;
-            if (uname(&info) == 0) {
-                return string_make(interp, info.release, strlen(info.version), "ascii", 0);
-            }
-        }
-#endif
-        break;
-      case CPU_ARCH:
-        return string_make(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1, "ascii", 0);
-      case CPU_TYPE:
-      default:
-        break;
-    }
-    return CONST_STRING(interp, "");
 }
 
 /*

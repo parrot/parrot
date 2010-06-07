@@ -25,6 +25,8 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
 =cut
 
+.include 'stdio.pasm'
+
 .sub "main" :main
     .param pmc args
     .local string prog
@@ -64,24 +66,27 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
     if ck_output goto OUTPUT_FILE
 
   OUTPUT_STDOUT:
-    outfh = getstdout
+    $P0 = getinterp
+    outfh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     goto OUTPUT_DONE
 
   OUTPUT_FILE:
     outfile = opts['output']
-    outfh = open outfile, 'w'
+    outfh = new ['FileHandle']
+    outfh.'open'(outfile, 'w')
     unless outfh goto ERR_NO_OUTFILE
 
   OUTPUT_DONE:
 
     # Read grammar file and compile here
     .local pmc infh
-    infh = open infile, 'r'
+    infh = new ['FileHandle']
+    infh.'open'(infile, 'r')
     unless infh goto ERR_NO_INFILE
 
     .local string source
-    source = read infh, 65535
-    close infh
+    source = infh.'read'(65535)
+    infh.'close'()
 
     .local pmc grammar
     grammar = new ['TGE';'Compiler']
@@ -99,10 +104,12 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
   goto END
 
   USAGE:
-    printerr "Usage: "
-    printerr prog
-    printerr " [OPTIONS] FILE\n"
-    printerr <<"OPTIONS"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Usage: ")
+    $P1.'print'(prog)
+    $P1.'print'(" [OPTIONS] FILE\n")
+    $P1.'print'(<<"OPTIONS")
  Options:
   --output=OUTFILE  -- redirect output to OUTFILE
   --help            -- print this message
@@ -110,19 +117,25 @@ OPTIONS
     exit 1
 
   ERR_TOO_FEW_ARGS:
-    printerr "Error: too few arguments\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Error: too few arguments\n\n")
     goto USAGE
 
   ERR_NO_INFILE:
-    printerr "Error: file not found: "
-    printerr infile
-    printerr "\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Error: file not found: ")
+    $P1.'print'(infile)
+    $P1.'print'("\n\n")
     goto USAGE
 
   ERR_NO_OUTFILE:
-    printerr "Error: file not found: "
-    printerr outfile
-    printerr "\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Error: file not found: ")
+    $P1.'print'(outfile)
+    $P1.'print'("\n\n")
     goto USAGE
 
   END:

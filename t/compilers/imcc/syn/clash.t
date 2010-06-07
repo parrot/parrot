@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 15;
 
 pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
@@ -208,38 +208,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "setfile w comment" );
 .end
 CODE
 ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "eq_num => eq" );
-.sub test :main
-    .local int i
-    .local int j
-    i = 1
-    j = 1
-    eq_num i, j, ok1
-    print "not "
-ok1:
-    print "ok 1\n"
-    end
-.end
-CODE
-ok 1
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n" );
-.sub test :main
-    .local int i
-    .local num j
-    i = 1
-    j = 1.0
-    eq_num j, i, ok1
-    print "not "
-ok1:
-    print "ok 1\n"
-    end
-.end
-CODE
-ok 1
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUT', "undefined ident" );

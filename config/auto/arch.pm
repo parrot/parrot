@@ -42,8 +42,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-    $verbose and print "\n";
+    $conf->debug("\n");
 
     my $archname = $conf->data->get('archname');
     # This was added to convert IA64.ARCHREV_0 on HP-UX, TT #645, TT #653
@@ -51,10 +50,10 @@ sub runstep {
     my ( $cpuarch, $osname ) = split( /-/, $archname );
 
 
-    if ($verbose) {
-        print "determining operating system and cpu architecture\n";
-        print "archname: $archname\n";
-    }
+    $conf->debug(
+        "determining operating system and cpu architecture\n",
+        "archname: $archname\n")
+    ;
 
     if ( !defined $osname ) {
         ( $osname, $cpuarch ) = ( $cpuarch, q{} );
@@ -127,12 +126,11 @@ sub _get_platform {
 
 sub _report_verbose {
     my ($conf) = @_;
-    my $verbose = $conf->options->get( 'verbose' );
-    if ( $verbose ) {
-        print "osname:   ", $conf->data->get('osname'), "\n";
-        print "cpuarch:  ", $conf->data->get('cpuarch'), "\n";
-        print "platform: ", $conf->data->get('platform'), "\n";
-    }
+    $conf->debug(
+        "osname:   ", $conf->data->get('osname'), "\n",
+        "cpuarch:  ", $conf->data->get('cpuarch'), "\n",
+        "platform: ", $conf->data->get('platform'), "\n",
+    );
     return 1;
 }
 

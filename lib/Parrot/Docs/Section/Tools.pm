@@ -53,8 +53,6 @@ sub new {
             '',
             $self->new_item( '', 'docs/configuration.pod' ),
             $self->new_item( '', 'tools/build/c2str.pl' ),
-            $self->new_item( '', 'tools/build/ops2c.pl' ),
-            $self->new_item( '', 'tools/build/ops2pm.pl' ),
             $self->new_item( '', 'tools/build/parrot_config_c.pl' ),
             $self->new_item( '', 'tools/build/pmc2c.pl' ),
             $self->new_item( '', 'tools/dev/install_files.pl' ),

@@ -17,6 +17,8 @@ You should check where the file is going to be before you run this.
 
 =cut
 
+.loadlib 'io_ops' # convenient I/O dynamic opcodes
+
 .sub 'example' :main
     .local string test_fn
     test_fn = "tmp_example_io.tmp"

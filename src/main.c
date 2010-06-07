@@ -45,17 +45,20 @@ static int is_all_hex_digits(ARGIN(const char *s))
 static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(PARROT_INTERP,
-    ARGMOD(int *argc),
-    ARGMOD(const char **argv[]),
+    int argc,
+    ARGIN(const char *argv[]),
+    ARGOUT(int *pgm_argc),
+    ARGOUT(const char ***pgm_argv),
     ARGMOD(Parrot_Run_core_t *core),
     ARGMOD(Parrot_trace_flags *trace))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        FUNC_MODIFIES(*argc)
-        FUNC_MODIFIES(*argv[])
+        __attribute__nonnull__(6)
+        __attribute__nonnull__(7)
+        FUNC_MODIFIES(*pgm_argc)
+        FUNC_MODIFIES(*pgm_argv)
         FUNC_MODIFIES(*core)
         FUNC_MODIFIES(*trace);
 
@@ -76,8 +79,9 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(argc) \
     , PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(pgm_argc) \
+    , PARROT_ASSERT_ARG(pgm_argv) \
     , PARROT_ASSERT_ARG(core) \
     , PARROT_ASSERT_ARG(trace))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -101,11 +105,13 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    int         stacktop;
-    const char *sourcefile;
-    const char *execname;
-    Interp     *interp;
-    int         status;
+    int          stacktop;
+    const char  *sourcefile;
+    const char  *execname;
+    Interp      *interp;
+    int          status;
+    int          pir_argc;
+    const char **pir_argv;
 
     Parrot_Run_core_t  core  = PARROT_SLOW_CORE;
     Parrot_trace_flags trace = PARROT_NO_TRACE;
@@ -129,65 +135,27 @@ main(int argc, const char *argv[])
 
     /* Now initialize interpreter */
     initialize_interpreter(interp, (void*)&stacktop);
-    imcc_initialize(interp);
 
     /* Parse flags */
-    sourcefile = parseflags(interp, &argc, &argv, &core, &trace);
+    sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
 
     Parrot_set_trace(interp, trace);
     Parrot_set_run_core(interp, (Parrot_Run_core_t) core);
     Parrot_set_executable_name(interp, Parrot_str_new(interp, execname, 0));
 
-    status     = imcc_run(interp, sourcefile, argc, argv);
-    UNUSED(status);
+    status = imcc_run(interp, sourcefile, argc, argv);
+
+    if (status)
+        imcc_run_pbc(interp, interp->output_file, pir_argc, pir_argv);
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
     Parrot_exit(interp, 0);
 }
 
-#define OPT_GC_DEBUG       128
-#define OPT_DESTROY_FLAG   129
-#define OPT_HELP_DEBUG     130
-#define OPT_PBC_OUTPUT     131
-#define OPT_RUNTIME_PREFIX 132
-#define OPT_HASH_SEED      133
-
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
 #define SET_DEBUG(flag)  Parrot_set_debug(interp, (flag))
 #define SET_TRACE(flag)  Parrot_set_trace(interp, (flag))
-
-static struct longopt_opt_decl options[] = {
-    { '.', '.', (OPTION_flags)0, { "--wait" } },
-    { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
-    { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
-    { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
-    { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
-    { 'I', 'I', OPTION_required_FLAG, { "--include" } },
-    { 'L', 'L', OPTION_required_FLAG, { "--library" } },
-    { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
-    { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
-    { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
-    { 'V', 'V', (OPTION_flags)0, { "--version" } },
-    { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
-    { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
-                                 { "--leak-test", "--destroy-at-end" } },
-    { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
-    { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
-    { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
-    { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
-    { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
-    { 'h', 'h', (OPTION_flags)0, { "--help" } },
-    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
-    { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-    { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
-    { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
-    { 't', 't', OPTION_optional_FLAG, { "--trace" } },
-    { 'v', 'v', (OPTION_flags)0, { "--verbose" } },
-    { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
-    { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
-    { 0, 0, (OPTION_flags)0, { NULL } }
-};
 
 /*
 
@@ -423,8 +391,9 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 
 /*
 
-=item C<static const char * parseflags(PARROT_INTERP, int *argc, const char
-**argv[], Parrot_Run_core_t *core, Parrot_trace_flags *trace)>
+=item C<static const char * parseflags(PARROT_INTERP, int argc, const char
+*argv[], int *pgm_argc, const char ***pgm_argv, Parrot_Run_core_t *core,
+Parrot_trace_flags *trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -435,26 +404,20 @@ Parse Parrot's command line for options and set appropriate flags.
 PARROT_CAN_RETURN_NULL
 static const char *
 parseflags(PARROT_INTERP,
-        ARGMOD(int *argc), ARGMOD(const char **argv[]),
+        int argc, ARGIN(const char *argv[]),
+        ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(Parrot_Run_core_t *core), ARGMOD(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
     int                     status;
-    /* g++ complains if we cast char** to const char** directly. However, nobody
-       ever complains if you const to void* first. Sure we lose a certain
-       amount of compiler-enforced type safety, but this is a rare occasion
-       with a very long explanatory comment. */
-    const char ** const _tempargv = (const char **)((void *)*argv);
 
-    if (*argc == 1) {
+    if (argc == 1) {
         usage(stderr);
         exit(EXIT_SUCCESS);
     }
 
-    imcc_start_handling_flags(interp);
-
-    while ((status = longopt_get(interp, *argc, _tempargv, options, &opt)) > 0) {
+    while ((status = longopt_get(interp, argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
           case 'R':
             if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
@@ -544,16 +507,19 @@ parseflags(PARROT_INTERP,
             Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_DYNEXT);
             break;
+          case 'w':
+            /* FIXME It's not best way to set warnings... */
+            Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
+            break;
+          case 'o':
+            interp->output_file = opt.opt_arg;
+            break;
+          case OPT_PBC_OUTPUT:
+            if (!interp->output_file)
+                interp->output_file = "-";
           default:
-            /* Delegate handling of IMCC flags to IMCC */
-            if (imcc_handle_flag(interp, &opt, core))
-                break;
-
-            /* PIRC flags handling goes here */
-            fprintf(stderr,
-                    "main: Invalid flag '%s' used.\n\nhelp: parrot -h\n",
-                    (*argv)[0]);
-            exit(EXIT_FAILURE);
+            /* languages handle their arguments later (after being initialized) */
+            break;
         }
     }
 
@@ -564,7 +530,7 @@ parseflags(PARROT_INTERP,
     }
 
     /* reached the end of the option list and consumed all of argv */
-    if (*argc == opt.opt_index) {
+    if (argc == opt.opt_index) {
         if (interp->output_file) {
             fprintf(stderr, "Missing program name or argument for -o\n");
         }
@@ -576,10 +542,10 @@ parseflags(PARROT_INTERP,
         exit(EXIT_FAILURE);
     }
 
-    *argc -= opt.opt_index;
-    *argv += opt.opt_index;
+    *pgm_argc = argc - opt.opt_index;
+    *pgm_argv = argv + opt.opt_index;
 
-    return (*argv)[0];
+    return (*pgm_argv)[0];
 }
 /*
 

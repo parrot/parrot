@@ -728,10 +728,16 @@ void PbcFile::dump_constant_string(ifstream &pbcfile)
 {
     opcode flags;
     opcode charset;
+    const opcode encoding_none = 0xFFFF;
+    opcode encoding = encoding_none;
     if (pbc_major > 5 && pbc_minor > 11) {
         opcode flags_charset = read_opcode(pbcfile);
         flags = flags_charset & 0xFF;
         charset = flags_charset >> 8;
+        if (pbc_major > 6 || pbc_minor >= 17) {
+            encoding = charset >> 8;
+            charset &= 0xFF;
+        }
     }
     else {
         flags = read_opcode(pbcfile);
@@ -740,6 +746,8 @@ void PbcFile::dump_constant_string(ifstream &pbcfile)
 
     cout << "Flags: 0x" << hex << setw(6) << flags << dec;
     cout << " Charset: " << charset;
+    if (encoding != encoding_none)
+        cout << " Encoding: " << encoding;
 
     // Encoding not saved, see TT #468
     //opcode encoding = read_opcode(pbcfile);

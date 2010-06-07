@@ -50,7 +50,7 @@ EOF
         TEMP_gc_o => "src/gc/alloc_resources\$(O)",
         gc_flag   => '',
     );
-    print(" ($gc) ") if $conf->options->get('verbose');
+    $conf->debug(" ($gc) ");
 
     return 1;
 }

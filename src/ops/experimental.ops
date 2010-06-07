@@ -27,6 +27,8 @@ may be removed in any release.
 If you rely on any of these opcodes, please open a
 Trac ticket at L<https://trac.parrot.org/>.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =cut
 
@@ -367,15 +369,16 @@ op find_codepoint(out INT, in STR) {
 #endif
 }
 
-=item B<unroll>(in PMC)
+=item B<finalize>(in PMC)
 
-Exception handling done, unroll possible inner runloops left. $1 is the
-Exception handled or the ExceptionHandler that is handling it.
+Finalize exception handling, freeing any information needed to resume
+the handled exception, like inner runloops.
+$1 is the Exception handled or the ExceptionHandler that is handling it.
 EXPERIMENTAL. Handle with care.
 
 =cut
 
-op unroll(in PMC) {
+op finalize(in PMC) {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = expr NEXT();
     PMC *eh = PMCNULL;

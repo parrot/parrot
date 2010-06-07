@@ -37,17 +37,16 @@ $conf->include_config_results( $args );
 ##### _handle_icc_ccflags() #####
 
 my $ccflags = '';
-my $verbose = 0;
-$ccflags = init::hints::linux::_handle_icc_ccflags($ccflags, $verbose);
+$ccflags = init::hints::linux::_handle_icc_ccflags($conf, $ccflags);
 like( $ccflags, qr/\s-we147/, "On icc, 'cc_flags' set as expected" );
 
 $ccflags = '';
-$verbose = 1;
 {
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture(
         sub { $ccflags =
-            init::hints::linux::_handle_icc_ccflags($ccflags, $verbose); },
+            init::hints::linux::_handle_icc_ccflags($conf, $ccflags); },
         \$stdout,
         \$stderr,
     );

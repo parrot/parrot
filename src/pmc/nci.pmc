@@ -169,6 +169,7 @@ build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci_info))
 
 pmclass NCI auto_attrs provides invokable {
     /* NCI thunk handling attributes */
+    /* NCI thunk handling attributes */
     ATTR STRING    *signature;              /* The signature. */
     ATTR void      *func;                   /* Function pointer to call. */
     ATTR PMC       *fb_info;                /* Frame-builder info */

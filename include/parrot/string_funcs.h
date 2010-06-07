@@ -235,6 +235,7 @@ STRING* Parrot_str_join(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 

@@ -49,21 +49,20 @@ our @potential_attributes = qw(
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-    print "\n" if $verbose;
+    $conf->debug("\n");
 
     for my $maybe_attr (@potential_attributes) {
-        $self->try_attr( $conf, $maybe_attr, $verbose );
+        $self->try_attr( $conf, $maybe_attr);
     }
     return 1;
 }
 
 sub try_attr {
-    my ( $self, $conf, $attr, $verbose ) = @_;
+    my ( $self, $conf, $attr ) = @_;
 
     my $output_file = 'test.cco';
 
-    $verbose and print "trying attribute '$attr'\n";
+    $conf->debug("trying attribute '$attr'\n");
 
     my $cc = $conf->option_or_data('cc');
     $conf->cc_gen('config/auto/attributes/test_c.in');
@@ -79,29 +78,29 @@ sub try_attr {
     my $tryflags = "$ccflags -D$attr $disable_warnings";
 
     my $command_line = Parrot::Configure::Utils::_build_compile_command( $cc, $tryflags );
-    $verbose and print "  ", $command_line, "\n";
+    $conf->debug("  ", $command_line, "\n");
 
     # Don't use cc_build, because failure is expected.
     my $exit_code =
         Parrot::Configure::Utils::_run_command( $command_line, $output_file, $output_file );
-    $verbose and print "  exit code: $exit_code\n";
+    $conf->debug("  exit code: $exit_code\n");
 
     $conf->cc_clean();
     $conf->data->set( $attr => !$exit_code | 0 );
 
     if ($exit_code) {
         unlink $output_file or die "Unable to unlink $output_file: $!";
-        $verbose and print "Rejecting bogus attribute:  $attr\n";
+        $conf->debug("Rejecting bogus attribute:  $attr\n");
         return;
     }
 
     my $output = Parrot::BuildUtil::slurp_file($output_file);
-    $verbose and print "  output: $output\n";
+    $conf->debug("  output: $output\n");
 
     if ( $output !~ /error|warning/i ) {
         $conf->data->set( ccflags => $tryflags );
         my $ccflags = $conf->data->get("ccflags");
-        $verbose and print "  ccflags: $ccflags\n";
+        $conf->debug("  ccflags: $ccflags\n");
     }
     unlink $output_file or die "Unable to unlink $output_file: $!";
 

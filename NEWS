@@ -1,5 +1,9 @@
 # $Id$
 
+New in 2.5.0
+- Platforms
+  + EPEL (Extra Packages for Enterprise Linux) packages for RHEL6.beta are available
+
 New in 2.4.0
 - Core
   + Various long-standing bugs in IMCC were fixed

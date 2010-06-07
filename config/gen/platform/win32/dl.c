@@ -42,7 +42,7 @@ Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 
 =item C<const char * Parrot_dlerror(void)>
 
-System-dependant error code that indicates failure in opening a DL.
+System-dependent error code that indicates failure in opening a DL.
 
 =cut
 

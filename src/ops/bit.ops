@@ -32,6 +32,9 @@ or in groups.
 
 The variant with an appended B<s> like B<bands> work on strings.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =over 4
 
 =cut
@@ -40,18 +43,10 @@ The variant with an appended B<s> like B<bands> work on strings.
 
 =item B<band>(inout INT, in INT)
 
-=item B<band>(invar PMC, in INT)
-
-=item B<band>(invar PMC, invar PMC)
-
 Set the bits of $1 according to the B<and> of the corresponding bits
 from $1 and $2.
 
 =item B<band>(out INT, in INT, in INT)
-
-=item B<band>(invar PMC, invar PMC, in INT)
-
-=item B<band>(invar PMC, invar PMC, invar PMC)
 
 Set the bits of $1 according to the B<and> of the corresponding bits
 from $2 and $3.
@@ -62,155 +57,18 @@ inline op band(inout INT, in INT) :base_core {
     $1 &= $2;
 }
 
-inline op band(invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = a & $2;
-    VTABLE_set_integer_native(interp, $1, b);
-}
-
-inline op band(invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = VTABLE_get_integer(interp, $2);
-    VTABLE_set_integer_native(interp, $1, a & b);
-}
-
 inline op band(out INT, in INT, in INT) :base_core {
     $1 = $2 & $3;
-}
-
-inline op band(invar PMC, invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    VTABLE_set_integer_native(interp, $1, a & $3);
-}
-
-inline op band(invar PMC, invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    const INTVAL b = VTABLE_get_integer(interp, $3);
-    VTABLE_set_integer_native(interp, $1, a & b);
-}
-
-=item B<bands>(invar PMC, in STR)
-
-=item B<bands>(invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<and> of the corresponding bits
-from $1 and $2.
-
-=item B<bands>(out STR, in STR, in STR)
-
-=item B<bands>(invar PMC, invar PMC, in STR)
-
-=item B<bands>(invar PMC, invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<and> of the corresponding bits
-from $2 and $3.
-
-=cut
-
-inline op bands(invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_and(interp, a, $2);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bands(invar PMC, invar PMC) :base_core {
-    STRING * a = VTABLE_get_string(interp, $1);
-    STRING * const b = VTABLE_get_string(interp, $2);
-    a = Parrot_str_bitwise_and(interp, a, b);
-    VTABLE_set_string_native(interp, $1, a);
-}
-
-inline op bands(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_and(interp, $2, $3);
-}
-
-inline op bands(invar PMC, invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_and(interp, a, $3);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bands(invar PMC, invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_and(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
-}
-
-########################################
-
-=item B<bnot>(inout INT)
-
-=item B<bnot>(invar PMC)
-
-Sets $1 to C<bitwise not> $1 inplace.
-
-=item B<bnot>(out INT, in INT)
-
-=item B<bnot>(out PMC, invar PMC)
-
-=cut
-
-inline op bnot(inout INT) :base_core {
-    $1 = ~ $1;
-}
-
-inline op bnot(out INT, in INT) :base_core {
-    $1 = ~ $2;
-}
-
-inline op bnot(invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    VTABLE_set_integer_native(interp, $1, ~a);
-}
-
-inline op bnot(out PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    PMC * const b = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, b, ~a);
-    $1 = b;
-}
-
-=item B<bnots>(invar PMC)
-
-=item B<bnots>(out STR, in STR)
-
-=item B<bnots>(out PMC, invar PMC)
-
-=cut
-
-inline op bnots(out STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_not(interp, $2);
-}
-
-inline op bnots(invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_not(interp, a);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bnots(out PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_not(interp, a);
-    VTABLE_set_string_native(interp, $1, b);
 }
 
 ########################################
 
 =item B<bor>(inout INT, in INT)
 
-=item B<bor>(invar PMC, in INT)
-
-=item B<bor>(invar PMC, invar PMC)
-
 Set the bits of $1 according to the B<or> of the corresponding bits
 from $1 and $2.
 
 =item B<bor>(out INT, in INT, in INT)
-
-=item B<bor>(invar PMC, invar PMC, in INT)
-
-=item B<bor>(invar PMC, invar PMC, invar PMC)
 
 Set the bits of $1 according to the B<or> of the corresponding bits
 from $2 and $3.
@@ -221,95 +79,17 @@ inline op bor(inout INT, in INT) :base_core {
     $1 |= $2;
 }
 
-inline op bor(invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    VTABLE_set_integer_native(interp, $1, a | $2);
-}
-
-inline op bor(invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = VTABLE_get_integer(interp, $2);
-    VTABLE_set_integer_native(interp, $1, a | b);
-}
-
 inline op bor(out INT, in INT, in INT) :base_core {
     $1 = $2 | $3;
-}
-
-inline op bor(invar PMC, invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    VTABLE_set_integer_native(interp, $1, a | $3);
-}
-
-inline op bor(invar PMC, invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    const INTVAL b = VTABLE_get_integer(interp, $3);
-    VTABLE_set_integer_native(interp, $1, a | b);
-}
-
-=item B<bors>(invar PMC, in STR)
-
-=item B<bors>(invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<or> of the corresponding bits
-from $1 and $2.
-
-=item B<bors>(out STR, in STR, in STR)
-
-=item B<bors>(invar PMC, invar PMC, in STR)
-
-=item B<bors>(invar PMC, invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<or> of the corresponding bits
-from $2 and $3.
-
-=cut
-
-inline op bors(invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_or(interp, a, $2);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bors(invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_or(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
-}
-
-inline op bors(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_or(interp, $2, $3);
-}
-
-inline op bors(invar PMC, invar PMC, in STR) :base_core {
-    STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_or(interp, b, $3);
-    VTABLE_set_string_native(interp, $1, c);
-}
-
-inline op bors(invar PMC, invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_or(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
 }
 
 ########################################
 
 =item B<shl>(inout INT, in INT)
 
-=item B<shl>(invar PMC, in INT)
-
-=item B<shl>(invar PMC, invar PMC)
-
 Shift left $1 by $2 bits.
 
 =item B<shl>(out INT, in INT, in INT)
-
-=item B<shl>(invar PMC, invar PMC, in INT)
-
-=item B<shl>(invar PMC, invar PMC, invar PMC)
 
 Set $1 to the value of $2 shifted left by $3 bits.
 
@@ -319,51 +99,17 @@ inline op shl(inout INT, in INT) :base_core {
     $1 = bit_shift_left($1, $2);
 }
 
-inline op shl(invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = bit_shift_left(a, $2);
-    VTABLE_set_integer_native(interp, $1, b);
-}
-
-inline op shl(invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = VTABLE_get_integer(interp, $2);
-    const INTVAL c = bit_shift_left(a, b);
-    VTABLE_set_integer_native(interp, $1, c);
-}
-
 inline op shl(out INT, in INT, in INT) :base_core {
     $1 = bit_shift_left($2, $3);
-}
-
-inline op shl(invar PMC, invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    const INTVAL b = bit_shift_left(a, $3);
-    VTABLE_set_integer_native(interp, $1, b);
-}
-
-inline op shl(invar PMC, invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    const INTVAL b = VTABLE_get_integer(interp, $3);
-    const INTVAL c = bit_shift_left(a, b);
-    VTABLE_set_integer_native(interp, $1, c);
 }
 
 ########################################
 
 =item B<shr>(inout INT, in INT)
 
-=item B<shr>(invar PMC, in INT)
-
-=item B<shr>(invar PMC, invar PMC)
-
 Shift right $1 by $2 bits.
 
 =item B<shr>(out INT, in INT, in INT)
-
-=item B<shr>(invar PMC, invar PMC, in INT)
-
-=item B<shr>(invar PMC, invar PMC, invar PMC)
 
 Set $1 to the value of $2 shifted right by $3 bits.
 
@@ -374,52 +120,18 @@ inline op shr(inout INT, in INT) :base_core {
     $1 = bit_shift_left($1, signed_shift);
 }
 
-inline op shr(invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = bit_shift_left(a, -$2);
-    VTABLE_set_integer_native(interp, $1, b);
-}
-
-inline op shr(invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    const INTVAL b = VTABLE_get_integer(interp, $2);
-    const INTVAL c = bit_shift_left(a, -b);
-    VTABLE_set_integer_native(interp, $1, c);
-}
-
 inline op shr(out INT, in INT, in INT) :base_core {
     const INTVAL signed_shift = -$3;
     $1 = bit_shift_left($2, signed_shift);
-}
-
-inline op shr(invar PMC, invar PMC, in INT) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    const INTVAL c = bit_shift_left(a, -$3);
-    VTABLE_set_integer_native(interp, $1, c);
-}
-
-inline op shr(invar PMC, invar PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $2);
-    const INTVAL b = VTABLE_get_integer(interp, $3);
-    const INTVAL c = bit_shift_left(a, -b);
-    VTABLE_set_integer_native(interp, $1, c);
 }
 
 ########################################
 
 =item B<lsr>(out INT, in INT)
 
-=item B<lsr>(invar PMC, in INT)
-
-=item B<lsr>(invar PMC, invar PMC)
-
 Shift $1 logically shifted right by $2 bits.
 
 =item B<lsr>(out INT, in INT, in INT)
-
-=item B<lsr>(invar PMC, invar PMC, in INT)
-
-=item B<lsr>(invar PMC, invar PMC, invar PMC)
 
 Set $1 to the value of $2 logically shifted right by $3 bits.
 
@@ -431,76 +143,18 @@ inline op lsr(out INT, in INT) :base_core {
     $1 = (INTVAL)b;
 }
 
-inline op lsr(invar PMC, in INT) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $1);
-    const UINTVAL b = a >> $2;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)b);
-}
-
-inline op lsr(invar PMC, invar PMC) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $1);
-    const UINTVAL b = (UINTVAL)VTABLE_get_integer(interp, $2);
-    const UINTVAL c = a >> b;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)c);
-}
-
 inline op lsr(out INT, in INT, in INT) :base_core {
     $1 = (INTVAL)((UINTVAL)$2 >> $3);
-}
-
-inline op lsr(invar PMC, invar PMC, in INT) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $2);
-    const UINTVAL b = (UINTVAL)$3;
-    const UINTVAL c = a >> b;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)c);
-}
-
-inline op lsr(invar PMC, invar PMC, invar PMC) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $2);
-    const UINTVAL b = (UINTVAL)VTABLE_get_integer(interp, $3);
-    const UINTVAL c = a >> b;
-    VTABLE_set_integer_native(interp, $3, (INTVAL)c);
-}
-
-=item B<rot>(out INT, in INT, in INT, inconst INT)
-
-Rotate $2 left or right by $3 and place result in $1.
-$4 is the amount of bits to rotate, 32 bit on a 32-bit CPU and 32 or 64
-on a 64-bit CPU. If the rotate count is negative a rotate right by ($3+$4)
-is performed.
-
-=cut
-
-inline op rot(out INT, in INT, in INT, inconst INT) {
-    const INTVAL r = $2;
-    INTVAL s = $3;
-    const INTVAL w = $4;
-    INTVAL d, t;
-    if (s < 0)
-        s += w;
-    d = r << s;
-    t = w - s;
-    t = (INTVAL)((UINTVAL)r >> t);
-    d |= t;
-    $1 = d;
 }
 
 ########################################
 
 =item B<bxor>(inout INT, in INT)
 
-=item B<bxor>(invar PMC, in INT)
-
-=item B<bxor>(invar PMC, invar PMC)
-
 Set the bits of $1 according to the B<xor> of the corresponding bits
 from $1 and $2.
 
 =item B<bxor>(out INT, in INT, in INT)
-
-=item B<bxor>(invar PMC, invar PMC, in INT)
-
-=item B<bxor>(invar PMC, invar PMC, invar PMC)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits
 from $2 and $3.
@@ -511,82 +165,8 @@ inline op bxor(inout INT, in INT) :base_core {
     $1 ^= $2;
 }
 
-inline op bxor(invar PMC, in INT) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $1);
-    const UINTVAL b = a ^ $2;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)b);
-}
-
-inline op bxor(invar PMC, invar PMC) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $1);
-    const UINTVAL b = (UINTVAL)VTABLE_get_integer(interp, $2);
-    const UINTVAL c = a ^ b;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)c);
-}
-
 inline op bxor(out INT, in INT, in INT) :base_core {
     $1 = $2 ^ $3;
-}
-
-inline op bxor(invar PMC, invar PMC, in INT) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $2);
-    const UINTVAL b = a ^ $3;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)b);
-}
-
-inline op bxor(invar PMC, invar PMC, invar PMC) :base_core {
-    const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $2);
-    const UINTVAL b = (UINTVAL)VTABLE_get_integer(interp, $3);
-    const UINTVAL c = a ^ b;
-    VTABLE_set_integer_native(interp, $1, (INTVAL)c);
-}
-
-=item B<bxors>(invar PMC, in STR)
-
-=item B<bxors>(invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<xor> of the corresponding bits
-from $1 and $2.
-
-=item B<bxors>(out STR, in STR, in STR)
-
-=item B<bxors>(invar PMC, invar PMC, in STR)
-
-=item B<bxors>(invar PMC, invar PMC, invar PMC)
-
-Set the bits of $1 according to the B<xor> of the corresponding bits
-from $2 and $3.
-
-=cut
-
-inline op bxors(invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_xor(interp, a, $2);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bxors(invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_xor(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
-}
-
-inline op bxors(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_xor(interp, $2, $3);
-}
-
-inline op bxors(invar PMC, invar PMC, in STR) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_xor(interp, a, $3);
-    VTABLE_set_string_native(interp, $1, b);
-}
-
-inline op bxors(invar PMC, invar PMC, invar PMC) :base_core {
-    STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_xor(interp, a, b);
-    VTABLE_set_string_native(interp, $1, c);
 }
 
 =back

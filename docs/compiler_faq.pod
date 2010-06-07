@@ -526,7 +526,9 @@ You can do so either with the class name:
 
 or with the class object:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+    .loadlib 'io_ops'
 
     $P1 = get_class 'Dog'   # find the 'Dog' class
     unless null $P1 goto have_dog_class
@@ -535,7 +537,7 @@ or with the class object:
   have_dog_class:
     new $P0, $P1    # creates a Dog object and stores it in register $P0
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The chief difference is that using a string constant will produce the
 specific error "Class 'Dog' not found" if that happens to be the case;

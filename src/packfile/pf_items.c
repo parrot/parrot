@@ -1370,7 +1370,8 @@ Reports stored size of C<STRING> in C<opcode_t> units given its in-memory byte l
 
 */
 
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 size_t
 PF_size_strlen(const UINTVAL len)
 {

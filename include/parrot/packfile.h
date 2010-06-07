@@ -222,7 +222,6 @@ typedef struct PackFile_FixupEntry {
 
 typedef enum {
     enum_fixup_none,
-    enum_fixup_label,
     enum_fixup_sub
 } enum_fixup_t;
 
@@ -1096,7 +1095,8 @@ PARROT_PURE_FUNCTION
 size_t PF_size_string(ARGIN(const STRING *s))
         __attribute__nonnull__(1);
 
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 size_t PF_size_strlen(const UINTVAL len);
 
 PARROT_WARN_UNUSED_RESULT

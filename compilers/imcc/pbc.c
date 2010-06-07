@@ -736,6 +736,8 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
 =item C<static subs_t * find_sub_by_subid(PARROT_INTERP, const char *lookup,
 const subs_t *sym, int *pc)>
 
+Find the first sub in the current code segment with a given subid.
+
 =cut
 
 */
@@ -913,13 +915,25 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
             charset_name[p- p2 - 2] = '\0';
             /*fprintf(stderr, "%s:%s\n", charset_name, encoding_name);*/
             s_charset = Parrot_find_charset(interp, charset_name);
+            if (s_charset == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "Unknown charset '%s'", charset_name);
             s_encoding = Parrot_find_encoding(interp, encoding_name);
+            if (s_encoding == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "Unknown encoding '%s'", encoding_name);
         }
         else {
             strncpy(charset_name, buf, p - buf - 1);
             charset_name[p - buf - 1] = '\0';
             /*fprintf(stderr, "%s\n", charset_name);*/
             s_charset = Parrot_find_charset(interp, charset_name);
+            if (s_charset == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "Unknown charset '%s'", charset_name);
         }
         if (strcmp(charset_name, "unicode") == 0)
             src_encoding = Parrot_utf8_encoding_ptr;
@@ -972,6 +986,9 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 /*
 
 =item C<STRING * IMCC_string_from__STRINGC(PARROT_INTERP, char *buf)>
+
+Creates a Parrot C<STRING> from a string constant found in PIR or PASM. This
+includes cases where charset and/or encoding are specified.
 
 =cut
 
@@ -1311,7 +1328,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     ASSERT_ARGS(add_const_pmc_sub)
     PMC                   *ns_pmc;
     PMC                   *sub_pmc;
-    Parrot_Sub_attributes *sub, *outer_sub;
+    Parrot_Sub_attributes *sub;
 
     PackFile_ConstTable * const ct    = interp->code->const_table;
     IMC_Unit            * const unit  =
@@ -1324,23 +1341,25 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         SymReg     * const ns = unit->_namespace->reg;
 
         /* strip namespace off from front */
+        static const char ns_sep[]  = "@@@";
+        char             *real_name = strstr(r->name, ns_sep);
 
-        static const char ns_sep[] = "@@@";
-        char *real_name = strstr(r->name, ns_sep);
         if (real_name) {
             /* Unfortunately, there is no strrstr, then iterate until last */
             char *aux = strstr(real_name + 3, ns_sep);
+
             while (aux) {
-                 real_name = aux;
-                aux = strstr(real_name + 3, ns_sep);
+                real_name = aux;
+                aux       = strstr(real_name + 3, ns_sep);
             }
+
             real_name += 3;
         }
 
         IMCC_debug(interp, DEBUG_PBC_CONST,
                 "name space const = %d ns name '%s'\n", ns->color, ns->name);
 
-        ns_const  = ns->color;
+        ns_const = ns->color;
 
         if (real_name) {
             char * const p = mem_sys_strdup(real_name);
@@ -1371,15 +1390,17 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     else {
         /* use a possible type mapping for the Sub PMCs, and create it */
         const INTVAL type = Parrot_get_ctx_HLL_type(interp,
-                                r->pcc_sub->yield ? enum_class_Coroutine : enum_class_Sub);
+                                r->pcc_sub->yield
+                                    ? enum_class_Coroutine
+                                    : enum_class_Sub);
 
         /* TODO create constant - see also src/packfile.c */
         sub_pmc = Parrot_pmc_new(interp, type);
     }
 
     /* Set flags and get the sub info. */
-    PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
     PMC_get_sub(interp, sub_pmc, sub);
+    PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
     Sub_comp_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
 
     r->color  = add_const_str(interp, IMCC_string_from_reg(interp, r));
@@ -1396,7 +1417,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         mem_sys_free(oldname);
 
         /* create string constant for it. */
-        unit->subid->color = add_const_str(interp, IMCC_string_from_reg(interp, unit->subid));
+        unit->subid->color = add_const_str(interp,
+            IMCC_string_from_reg(interp, unit->subid));
     }
 
     sub->subid = ct->constants[unit->subid->color]->u.string;
@@ -1409,7 +1431,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             break;
           case PFC_STRING:
             ns_pmc = Parrot_pmc_new_constant(interp, enum_class_String);
-            VTABLE_set_string_native(interp, ns_pmc, ct->constants[ns_const]->u.string);
+            VTABLE_set_string_native(interp, ns_pmc,
+                ct->constants[ns_const]->u.string);
             break;
           default:
             break;
@@ -1425,7 +1448,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         sub->n_regs_used[i] = unit->n_regs_used[i];
 
     sub->lex_info     = create_lexinfo(interp, unit, sub_pmc,
-            r->pcc_sub->pragma & P_NEED_LEX);
+                                        r->pcc_sub->pragma & P_NEED_LEX);
     sub->outer_sub    = find_outer(interp, unit);
     sub->vtable_index = -1;
 
@@ -1472,7 +1495,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     else
         sub->method_name = Parrot_str_new(interp, "", 0);
 
-
     if (unit->has_ns_entry_name == 1) {
         /* Work out the name of the ns entry. */
         if (unit->ns_entry_name) {
@@ -1487,25 +1509,24 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     Parrot_store_sub_in_namespace(interp, sub_pmc);
 
-    if (sub->outer_sub)
-        PMC_get_sub(interp, sub->outer_sub, outer_sub);
-
     /*
      * store the sub's strings
      * XXX these need to occur before the sub to support thawing properly
      */
     {
         PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
-        int n = VTABLE_elements(interp, strings);
+        int        n = VTABLE_elements(interp, strings);
+
         for (i = 0; i < n; i++) {
-            int unused = add_const_str(interp, VTABLE_get_string_keyed_int(interp, strings, i));
+            int unused = add_const_str(interp,
+                VTABLE_get_string_keyed_int(interp, strings, i));
         }
     }
 
     /* store the sub */
     {
-        const int            k            = add_const_table(interp);
-        PackFile_Constant   * const pfc   = ct->constants[k];
+        const int            k          = add_const_table(interp);
+        PackFile_Constant   * const pfc = ct->constants[k];
 
         pfc->type     = PFC_PMC;
         pfc->u.key    = sub_pmc;
@@ -1513,14 +1534,20 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
         IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
 
-        IMCC_debug(interp, DEBUG_PBC_CONST,
-                "add_const_pmc_sub '%s' flags %x color %d (%Ss) "
-                "lex_info %s :outer(%Ss)\n",
-                r->name, r->pcc_sub->pragma, k,
-                sub_pmc->vtable->whoami,
-                sub->lex_info ? "yes" : "no",
-                sub->outer_sub? outer_sub->name :
-                Parrot_str_new(interp, "*none*", 0));
+        if (DEBUG_PBC_CONST & IMCC_INFO(interp)->debug) {
+            Parrot_Sub_attributes *outer_sub;
+            if (sub->outer_sub)
+                PMC_get_sub(interp, sub->outer_sub, outer_sub);
+
+            IMCC_debug(interp, DEBUG_PBC_CONST,
+                    "add_const_pmc_sub '%s' flags %x color %d (%Ss) "
+                    "lex_info %s :outer(%Ss)\n",
+                    r->name, r->pcc_sub->pragma, k,
+                    sub_pmc->vtable->whoami,
+                    sub->lex_info  ? "yes" : "no",
+                    sub->outer_sub ? outer_sub->name
+                                   : Parrot_str_new(interp, "*none*", 0));
+        }
 
         /*
          * create entry in our fixup (=symbol) table

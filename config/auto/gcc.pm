@@ -62,9 +62,8 @@ sub _evaluate_gcc {
     my $minor = $gnucref->{__GNUC_MINOR__};
     my $intel = $gnucref->{__INTEL_COMPILER};
 
-    my $verbose = $conf->options->get('verbose');
     if ( defined $intel || !defined $major ) {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
         $conf->data->set( gccversion => undef );
         return 1;
@@ -76,7 +75,7 @@ sub _evaluate_gcc {
         undef $minor;    # Don't use it
     }
     if ( ! defined $major ) {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
         $conf->data->set( gccversion => undef );
         return 1;

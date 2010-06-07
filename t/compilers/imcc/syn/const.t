@@ -198,7 +198,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PIR heredocs: accepts inline with concat' );
     $S0 = ""
     $I0 = 0
 LOOP:
-    $S0 = concat <<"end"
+    concat $S0, <<"end"
 ending
 end
     inc $I0

@@ -28,6 +28,7 @@ Coverage plan:
      * Type of index (int, pmc)
      * index negative/in-range/beyond-end
      * Set doesn't clobber other elements
+     * Delete
 
  * Push/Unshift, Pop/Shift
      * Correct values
@@ -42,7 +43,7 @@ Coverage plan:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(41)
+    plan(46)
 
     test_does_interfaces()
 
@@ -54,6 +55,7 @@ Coverage plan:
     test_cant_get_negative()
     test_set_beyond_end()
     test_get_beyond_end()
+    test_delete()
 
     test_conversion()
     test_conversion_overflow()
@@ -69,7 +71,9 @@ Coverage plan:
     test_cant_pop_empty()
     test_shift()
     test_unshift()
+    test_cant_shift_empty()
     test_iterator()
+    test_clone()
 .end
 
 .sub test_does_interfaces
@@ -143,7 +147,11 @@ E:
 .sub test_distinct_storage
     # Walk the array in pseudo-random order
     # Pick a sample size $I4 and another number $I2, such that
-    #   ∀n: n > 0 ∧ $I2 ⁿ % $I4 = 1 ⇒ n % $I4 = 0
+    ############################################################
+    ##### Plase rewrite this with ascii chars, it got unreadable
+    ##### by editing with mixed charsets.
+    #  n: n > 0  $I2  % $I4 = 1  n % $I4 = 0
+    ############################################################
     $I4 = 17
     $I2 = 3
     # Create and fill array in random order
@@ -223,6 +231,27 @@ eh:
 
     $I0 = $P0
     is( $I0, 1, '... and should not extend array' )
+.end
+
+.sub test_delete
+    $P0 = new ['ResizableIntegerArray'], 3
+    $P0[0] = 9
+    $P0[1] = 8
+    $P0[2] = 7
+    delete $P0[1]
+    $I0 = elements $P0
+    is( $I0, 2, 'delete one element dec size')
+    $I0 = $P0[1]
+    is( $I0, 7, 'deleted move back the remaining part')
+    push_eh caught
+    delete $P0[2]
+    pop_eh
+    ok(0, 'delete ouf of bound should throw')
+    goto end
+caught:
+    pop_eh
+    ok(1, 'delete ouf of bound throws')
+end:
 .end
 
 .sub test_conversion
@@ -511,6 +540,17 @@ X1:
     is( $I1, 2, '... and stores values in correct order' )
 .end
 
+.sub test_cant_shift_empty
+    $P0 = new ['ResizableIntegerArray']
+    $I0 = 1
+    push_eh eh
+    $I0 = shift $P0
+    $I0 = 0
+eh:
+    pop_eh
+    ok( $I0, 'Shift from empty array should throw an exception' )
+.end
+
 .sub test_iterator
     $P0 = new ['ResizableIntegerArray']
     push_eh k0
@@ -546,6 +586,14 @@ k1:
 k0:
     pop_eh
     is( $I0, 4, 'get_iter: iterator returns all values in correct sequence' )
+.end
+
+.sub test_clone
+    $P0 = new ['ResizableIntegerArray']
+    push $P0, 1
+    $P1 = clone $P0
+    $I0 = iseq $P0, $P1
+    is( $I0, 1, 'cloned is equal to original')
 .end
 
 # Local Variables:

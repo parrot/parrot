@@ -206,7 +206,13 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 {
     ASSERT_ARGS(Parrot_ex_throw_from_op)
     opcode_t   *address;
-    PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
+    PMC        *handler;
+
+    /* Note the thrower. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
+
+    /* Locate the handler, if there is one. */
+    handler = Parrot_cx_find_handler_local(interp, exception);
     if (PMC_IS_NULL(handler)) {
         STRING * const message     = VTABLE_get_string(interp, exception);
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
@@ -354,10 +360,8 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     /* Note the thrower.
-     * XXX TT #596 - pass in current context instead when we have context PMCs. */
-    /* Don't split line. It will break CONST_STRING handling */
-    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp)));
-
+     * Don't split line. It will break CONST_STRING handling. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
 
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {

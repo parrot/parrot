@@ -824,6 +824,9 @@ _mk_const(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 
 =item C<static int int_overflows(const SymReg *r)>
 
+Determine whether an integer constant would overflow an C<INTVAL>
+register.
+
 =cut
 
 */

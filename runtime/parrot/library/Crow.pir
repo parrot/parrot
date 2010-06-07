@@ -15,8 +15,8 @@
     getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
 
-    getopts = push 'help|h'
-    getopts = push 'type|t=s'
+    push getopts, 'help|h'
+    push getopts, 'type|t=s'
 
     .local pmc opts
     opts = getopts.'get_options'(args)
@@ -65,7 +65,8 @@ END_HELP
     .local pmc newsfile
     .local string buf, news, start
 
-    newsfile = open 'NEWS', 'r'
+    newsfile = new ['FileHandle']
+    newsfile.'open'('NEWS', 'r')
 
     ## find the start of the news item for this version
     start    = concat 'New in ', version
@@ -73,12 +74,12 @@ END_HELP
   before:
     $I0 = newsfile.'eof'()
     if $I0 goto err_news
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, start
     if  $I0 != 0 goto before
 
   blank:
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, "\n"
     if  $I0 == 0 goto blank
     $I0      = index buf, "\r"
@@ -86,7 +87,7 @@ END_HELP
     news    .= buf
 
   item:
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, "\n"
     if  $I0 == 0 goto done
     $I0      = index buf, "\r"

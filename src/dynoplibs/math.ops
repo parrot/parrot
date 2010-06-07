@@ -25,7 +25,169 @@ To use this library of ops, add this directive to your PIR:
 
 =cut
 
-=over
+=head2 General Math
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<cmod>(out INT, in INT, in INT)
+
+=item B<cmod>(invar PMC, invar PMC, in INT)
+
+=item B<cmod>(invar PMC, invar PMC, invar PMC)
+
+NOTE: This "uncorrected mod" algorithm uses the C language's built-in
+mod operator (x % y), which is
+
+    ... the remainder when x is divided by y, and thus is zero
+    when y divides x exactly.
+    ...
+    The direction of truncation for / and the sign of the result
+    for % are machine-dependent for negative operands, as is the
+    action taken on overflow or underflow.
+                                                     -- [1], page 41
+
+Also:
+
+    ... if the second operand is 0, the result is undefined.
+    Otherwise, it is always true that (a/b)*b + a%b is equal to z. If
+    both operands are non-negative, then the remainder is non-
+    negative and smaller than the divisor; if not, it is guaranteed
+    only that the absolute value of the remainder is smaller than
+    the absolute value of the divisor.
+                                                     -- [1], page 205
+
+This op is provided for those who need it (such as speed-sensitive
+applications with heavy use of mod, but using it only with positive
+arguments), but a more mathematically useful mod based on ** floor(x/y)
+and defined with y == 0 is provided by the mod op.
+
+  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+      Language*, Second Edition. Prentice Hall, 1988.
+
+If the denominator is zero, a 'Divide by zero' exception is thrown.
+
+=cut
+
+inline op cmod(out INT, in INT, in INT) :base_core {
+    INTVAL den = $3;
+    if ($3 == 0) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_DIV_BY_ZERO,
+            "Divide by zero");
+        goto ADDRESS(handler);
+    }
+    $1 = $2 % den;
+}
+
+inline op cmod(invar PMC, invar PMC, in INT) :base_core {
+    INTVAL result;
+
+    if ($3 == 0) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_DIV_BY_ZERO,
+            "Divide by zero");
+        goto ADDRESS(handler);
+    }
+
+    result = VTABLE_get_integer(interp, $2) % $3;
+
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
+    VTABLE_set_integer_native(interp, $1, result);
+}
+
+inline op cmod(invar PMC, invar PMC, invar PMC) :base_core {
+    INTVAL result;
+    INTVAL value = VTABLE_get_integer(interp, $3);
+
+    if (value == 0) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_DIV_BY_ZERO,
+            "Divide by zero");
+        goto ADDRESS(handler);
+    }
+
+    result = VTABLE_get_integer(interp, $2) % value;
+
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
+    VTABLE_set_integer_native(interp, $1, result);
+}
+
+########################################
+
+=item B<cmod>(out NUM, in NUM, in NUM)
+
+=item B<cmod>(invar PMC, invar PMC, in NUM)
+
+NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
+fmod() function, which computes
+
+    ... the remainder of dividing x by y. The return value is
+    x - n * y, where n is the quotient of x / y, rounded towards
+    zero to an integer.
+                                -- fmod() manpage on RedHat Linux 7.0
+
+In addition, fmod() returns
+
+    the remainder, unless y is zero, when the function fails and
+    errno is set.
+
+According to page 251 of [1], the result when y is zero is implementation-
+defined.
+
+This op is provided for those who need it, but a more mathematically
+useful numeric mod based on floor(x/y) instead of truncate(x/y) and
+defined with y == 0 is provided by the mod op.
+
+  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+      Language*, Second Edition. Prentice Hall, 1988.
+
+If the denominator is zero, a 'Divide by zero' exception is thrown.
+
+=cut
+
+inline op cmod(out NUM, in NUM, in NUM) :base_core {
+    FLOATVAL den = $3;
+    if (FLOAT_IS_ZERO($3)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_DIV_BY_ZERO,
+            "Divide by zero");
+        goto ADDRESS(handler);
+    }
+    $1 = fmod($2, den);
+}
+
+inline op cmod(invar PMC, invar PMC, in NUM) :base_core {
+    FLOATVAL result;
+    FLOATVAL value = $3;
+
+    if (FLOAT_IS_ZERO(value)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_DIV_BY_ZERO,
+            "Divide by zero");
+        goto ADDRESS(handler);
+    }
+
+    result = fmod(VTABLE_get_integer(interp, $2), value);
+
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
+    VTABLE_set_integer_native(interp, $1, (INTVAL) result);
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Pseudorandom number operations
+
+These operations perform various pseudorandom number operations.
+
+=over 4
 
 =item B<rand>(out NUM)
 
@@ -108,6 +270,8 @@ inline op rand(out INT, in INT, in INT) {
 }
 
 =back
+
+=cut
 
 =head1 COPYRIGHT
 

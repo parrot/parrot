@@ -90,8 +90,6 @@ is($step->_select_lib( {
    '-lz',
    "_select_lib() returned expected value");
 
-my $verbose = undef;
-
 $conf->replenish($serialized);
 
 ########## --without-zlib; _evaluate_cc_run() ##########
@@ -105,8 +103,8 @@ $step = test_step_constructor_and_description($conf);
 my ($test, $has_zlib);
 $test = qq{1.2.3\n};
 $has_zlib = 0;
-$verbose = undef;
-$has_zlib = $step->_evaluate_cc_run($conf, $test, $has_zlib, $verbose);
+$conf->options->set(verbose => undef);
+$has_zlib = $step->_evaluate_cc_run($conf, $test, $has_zlib);
 is($has_zlib, 1, "'has_zlib' set as expected");
 is($step->result(), 'yes, 1.2.3', "Expected result was set");
 # Prepare for next test
@@ -114,8 +112,8 @@ $step->set_result(undef);
 
 $test = qq{foobar};
 $has_zlib = 0;
-$verbose = undef;
-$has_zlib = $step->_evaluate_cc_run($conf, $test, $has_zlib, $verbose);
+$conf->options->set(verbose => undef);
+$has_zlib = $step->_evaluate_cc_run($conf, $test, $has_zlib);
 is($has_zlib, 0, "'has_zlib' set as expected");
 ok(! defined $step->result(), "Result is undefined, as expected");
 
@@ -123,10 +121,10 @@ ok(! defined $step->result(), "Result is undefined, as expected");
     my $stdout;
     $test = qq{1.2.3\n};
     $has_zlib = 0;
-    $verbose = 1;
+    $conf->options->set(verbose => 1);
     capture(
         sub { $has_zlib =
-            $step->_evaluate_cc_run($conf, $test, $has_zlib, $verbose); },
+            $step->_evaluate_cc_run($conf, $test, $has_zlib); },
         \$stdout,
     );
     is($has_zlib, 1, "'has_zlib' set as expected");

@@ -72,11 +72,13 @@ typedef STRING * (*charset_converter_t)(PARROT_INTERP, ARGIN(const STRING *src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const char * Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset);
@@ -89,6 +91,7 @@ INTVAL Parrot_charset_number(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
@@ -102,11 +105,13 @@ void Parrot_charsets_encodings_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const CHARSET * Parrot_default_charset(SHIM_INTERP);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const CHARSET * Parrot_find_charset(SHIM_INTERP,
@@ -114,6 +119,7 @@ const CHARSET * Parrot_find_charset(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 charset_converter_t Parrot_find_charset_converter(SHIM_INTERP,
@@ -123,6 +129,7 @@ charset_converter_t Parrot_find_charset_converter(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const CHARSET * Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset);

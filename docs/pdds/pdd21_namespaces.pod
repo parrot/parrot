@@ -585,7 +585,7 @@ This Perl:
 
 should map roughly to this PIR:
 
-=begin PIR
+=begin PIR_INVALID
 
   .HLL "Perl5"
   .loadlib "perl5_group"
@@ -596,7 +596,7 @@ should map roughly to this PIR:
     set_global "$x", $P0
   .end
 
-=end PIR
+=end PIR_INVALID
 
 In this case, the C<main> sub would be tied to Perl 5 by the C<.HLL>
 directive, so a Perl 5 namespace would be created.
@@ -613,7 +613,7 @@ The C<Foo::> namespace is created at run-time (without any optimizations).  In
 these cases, Parrot should create the namespace based on the HLL of the PIR
 subroutine that calls the store function.
 
-=begin PIR
+=begin PIR_INVALID
 
   .HLL "Perl5"
   .loadlib "perl5_group"
@@ -635,7 +635,7 @@ subroutine that calls the store function.
     set_global $P2, $S0, $P3
   .end
 
-=end PIR
+=end PIR_INVALID
 
 In this case, C<set_global> should see that it was called from "main",
 which is in a Perl 5 namespace, so it will create the "Foo" namespace as

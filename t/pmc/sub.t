@@ -991,21 +991,22 @@ OUTPUT
 unlink( $l1_pbc, $l2_pbc );
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
-.sub make_pi :immediate :anon
-    $N0 = atan 1.0, 1.0
-    $N0 *= 4
+.sub make_phi :immediate :anon
+    $N0 = sqrt 5
+    $N0 += 1
+    $N0 /= 2
     $P0 = new ['Float']
     $P0 = $N0
     .return ($P0)
 .end
 
 .sub main :main
-    .const 'Sub' pi = "make_pi"
-    print pi
+    .const 'Sub' phi = "make_phi"
+    print phi
     print "\n"
 .end
 CODE
-3.14159265358979
+1.61803398874989
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );

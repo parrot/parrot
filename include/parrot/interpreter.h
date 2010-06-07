@@ -522,14 +522,6 @@ void register_raw_nci_method_in_ns(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-PARROT_WARN_UNUSED_RESULT
-INTVAL sysinfo_i(SHIM_INTERP, INTVAL info_wanted);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_interpinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_interpinfo_p __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -556,9 +548,6 @@ STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(func) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_sysinfo_i __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_sysinfo_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_misc.c */
 

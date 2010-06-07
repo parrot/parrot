@@ -81,6 +81,9 @@ print the filename for each match
 # Readability improved!
 .include 'hllmacros.pir'
 
+# for getstdin and friends
+.loadlib 'io_ops'
+
 .sub main :main
 	.param pmc argv # the script name, then our options.
 	.local string progname

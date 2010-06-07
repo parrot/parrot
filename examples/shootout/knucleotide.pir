@@ -1,6 +1,8 @@
 # Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
+.loadlib 'io_ops'
+
 .sub main :main
 	.local pmc stdin
 	.local string line

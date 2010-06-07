@@ -182,10 +182,12 @@ our sub subst ($text, $regex, $repl, :$global?) {
     my $result  := pir::new__Ps('StringBuilder');
 
     for @matches -> $match {
-        pir::push($result, pir::substr($text, $offset, $match.from - $offset))
-            if $match.from > $offset;
-        pir::push($result, $is_code ?? $repl($match) !! $repl);
-        $offset := $match.to;
+        if $match {
+            pir::push($result, pir::substr($text, $offset, $match.from - $offset))
+                if $match.from > $offset;
+            pir::push($result, $is_code ?? $repl($match) !! $repl);
+            $offset := $match.to;
+        }
     }
 
     my $chars := pir::length($text);
@@ -211,9 +213,10 @@ Returns the contents of C<$filename> as a single string.
 =end
 
 our sub slurp ($filename) {
-    my $handle := pir::open__Pss($file, 'r');
+    my $handle := FileHandle.new();
+    $handle.open($file, 'r');
     my $contents := $handle.readall;
-    pir::close($handle);
+    $handle.close();
     $contents;
 }
 
@@ -223,9 +226,10 @@ Write the string value of C<$contents> to C<$filename>.
 =end item
 
 our sub spew($filename, $contents) {
-    my $handle := pir::open__Pss($filename, 'w');
+    my $handle := FileHandle.new();
+    $handle.open($filename, 'w');
     $handle.print($contents);
-    pir::close($handle);
+    $handle.close();
 }
 
 # vim: ft=perl6

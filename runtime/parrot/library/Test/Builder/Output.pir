@@ -57,14 +57,18 @@ STDERR by default.
 	.local pmc output
 	.local pmc diag_output
 
+        .include 'stdio.pasm'
+
 	output = args['output']
 	unless null output goto CHECK_ERROR_OUTPUT
-	getstdout output
+        $P0 = getinterp
+        output = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
 
   CHECK_ERROR_OUTPUT:
 	diag_output = args['diag_output']
 	unless null diag_output goto SET_OUTPUT
-	getstderr diag_output
+        $P0 = getinterp
+        diag_output = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
 
   SET_OUTPUT:
 	setattribute self, "output", output
@@ -144,7 +148,7 @@ unescaped newlines.
     if i == 0 goto LINE_OK
   	line       = lines[i]
   	first_char = substr line, 0, 1
-	eq_str first_char, '#', LINE_OK
+	if first_char == '#' goto LINE_OK
 
 	.local string new_line
 	new_line = '# '
@@ -184,7 +188,7 @@ unescaped newlines.
 
 	.local string first_char
 	first_char = substr message, 0, 1
-	eq_str first_char, '#', WRITE_MESSAGE
+	if first_char == '#' goto WRITE_MESSAGE
 
 	first_char = '# '
 	concat first_char, message
