@@ -11,6 +11,9 @@ $Id$
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
+
+#if PARROT_HAS_ICU
+
 grapheme_table *
 create_grapheme_table(PARROT_INTERP, UINTVAL n)
 {
@@ -43,6 +46,8 @@ add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
             src->encoding->get_codepoint(interp, src, start + i);
     };
 }
+
+#endif /* PARROT_HAS_ICU */
 
 /*
  * Local variables:
