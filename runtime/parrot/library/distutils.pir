@@ -132,6 +132,31 @@ Inno Setup
 
 =head2 EXAMPLES
 
+    $ cat hello.pir
+    .sub 'main' :main
+        say 'hello world!'
+    .end
+
+    $ cat setup.pir
+    .sub 'main' :main
+        .param pmc args
+        $S0 = shift args
+        load_bytecode 'distutils.pbc'
+
+        $P0 = new 'Hash'
+        $P1 = new 'Hash'
+        $P1['hello.pbc'] = 'hello.pir'
+        $P0['pbc_pir'] = $P1
+        $P2 = new 'Hash'
+        $P2['parrot-hello'] = 'hello.pbc'
+        $P0['installable_pbc'] = $P2
+        .tailcall setup(args :flat, $P0 :flat :named)
+    .end
+
+    $ parrot setup.pir
+    $ parrot setup.pir install
+    $ parrot setup clean
+
 L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
 
 L<http://github.com/fperrad/markdown/blob/master/setup.pir>
@@ -171,6 +196,9 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
 
 =cut
+
+.loadlib 'io_ops' # workaround TT #1663
+.loadlib 'sys_ops'
 
 .sub '__onload' :load :init :anon
     load_bytecode 'osutils.pbc'
@@ -340,7 +368,7 @@ Entry point.
     run_step('usage', kv :flat :named)
   L12:
     pop_eh
-    end
+    .return ()
   _handler:
     .local pmc ex
     .get_results (ex)
@@ -3679,7 +3707,8 @@ TEMPLATE
 .end
 
 .sub 'get_timestamp' :anon
-    $P0 = open 'date --rfc-2822', 'rp'
+    $P0 = new 'FileHandle'
+    $P0.'open'('date --rfc-2822', 'rp')
     $S0 = $P0.'readline'()
     $P0.'close'()
     $S0 = chopn $S0, 1
@@ -4481,7 +4510,8 @@ Return the whole config
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
     unlink(srcname, verbose :named('verbose'))
 
-    $P0 = open exename, 'rp'
+    $P0 = new 'FileHandle'
+    $P0.'open'(exename, 'rp')
     $S0 = $P0.'readall'()
     $P0.'close'()
 
@@ -4516,6 +4546,36 @@ SOURCE_C
     $S0 = cc_run($S0, cflags :named('cflags'), verbose :named('verbose'))
     $I0 = index $S0, 'OK '
     .return ($I0)
+.end
+
+=item runtests
+
+=cut
+
+.sub 'runtests' :multi()
+    .param pmc files :slurpy
+    .param pmc opts :slurpy :named
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc harness
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    .local pmc aggregate
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L1
+    $I0 = exists opts['ignore_error']
+    unless $I0 goto L2
+    $I0 = opts['ignore_error']
+    if $I0 goto L1
+  L2:
+    die "test fails"
+  L1:
+.end
+
+.sub 'runtests' :multi(ResizableStringArray,Hash)
+    .param pmc array
+    .param pmc hash
+    .tailcall runtests(array :flat, hash :flat :named)
 .end
 
 =back

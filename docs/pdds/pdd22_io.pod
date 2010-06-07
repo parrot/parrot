@@ -464,6 +464,8 @@ L<Error Handling>.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $P0 = open $S1
   $P0 = open $S1, $S2
   $P0 = open $P1
@@ -488,6 +490,8 @@ object.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   close $P0
   close $P0, $P1
 
@@ -554,14 +558,16 @@ passing it a status object.
 
 =item C<printerr>
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   printerr $I0
   printerr $N0
   printerr $S0
   printerr $P0
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Writes an integer, float, string, or PMC value to standard error.
 
@@ -578,6 +584,8 @@ If they want an asynchronous version, they can use C<print>.]
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $S0 = read $I1
   $S0 = read $P1, $I2
   $P0 = read $P1, $I2, $P3
@@ -598,6 +606,8 @@ string of bytes.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $S0 = readline $P1
   $P0 = readline $P1, $P2
 
@@ -613,12 +623,14 @@ string of bytes.
 
 =item C<peek>
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $S0 = peek
   $S0 = peek $P1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 [C<peek>, C<seek>, C<tell>, and C<poll> are all candidates for moving from
 opcodes to FileHandle object methods.]
@@ -641,6 +653,8 @@ to be a synchronous one.]
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   seek $P0, $I1, $I2
   seek $P0, $I1, $I2, $I3
   seek $P0, $I1, $I2, $P3
@@ -664,6 +678,8 @@ passing it a status object and the stream object it was called on.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $I0 = tell $P1
   ($I0, $I1) = tell $P2
 

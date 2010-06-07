@@ -7,6 +7,8 @@ DYNOP_O_DEPS = \
     $(PARROT_H_HEADERS) \
     include/parrot/runcore_api.h
 
+#########################
+
 $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT): src/dynoplibs/obscure_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/obscure_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
@@ -20,6 +22,7 @@ src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
 src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/obscure.ops --quiet
 
+#########################
 
 $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/math_ops$(O) $(LINKARGS)
@@ -34,6 +37,7 @@ src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
 
 src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
 
+#########################
 
 $(DYNEXT_DIR)/deprecated_ops$(LOAD_EXT): src/dynoplibs/deprecated_ops$(O) $(LIBPARROT)
 	$(LD) @ld_out@$@ src/dynoplibs/deprecated_ops$(O) $(LINKARGS)
@@ -47,3 +51,79 @@ src/dynoplibs/deprecated_ops.h: src/dynoplibs/deprecated_ops.c
 
 src/dynoplibs/deprecated_ops.c: src/dynoplibs/deprecated.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/deprecated.ops --quiet
+
+#########################
+
+$(DYNEXT_DIR)/trans_ops$(LOAD_EXT): src/dynoplibs/trans_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/trans_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/trans_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/trans_ops.c src/dynoplibs/trans_ops.h
+
+src/dynoplibs/trans_ops.h: src/dynoplibs/trans_ops.c
+
+src/dynoplibs/trans_ops.c: src/dynoplibs/trans.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/trans.ops --quiet
+
+#########################
+
+$(DYNEXT_DIR)/bit_ops$(LOAD_EXT): src/dynoplibs/bit_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/bit_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/bit_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/bit_ops.c src/dynoplibs/bit_ops.h
+
+src/dynoplibs/bit_ops.h: src/dynoplibs/bit_ops.c
+
+src/dynoplibs/bit_ops.c: src/dynoplibs/bit.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/bit.ops --quiet
+
+#########################
+
+$(DYNEXT_DIR)/debug_ops$(LOAD_EXT): src/dynoplibs/debug_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/debug_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/debug_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/debug_ops.c src/dynoplibs/debug_ops.h
+
+src/dynoplibs/debug_ops.h: src/dynoplibs/debug_ops.c
+
+src/dynoplibs/debug_ops.c: src/dynoplibs/debug.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/debug.ops --quiet
+
+#########################
+
+$(DYNEXT_DIR)/sys_ops$(LOAD_EXT): src/dynoplibs/sys_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/sys_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/sys_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/sys_ops.c src/dynoplibs/sys_ops.h
+
+src/dynoplibs/sys_ops.h: src/dynoplibs/sys_ops.c
+
+src/dynoplibs/sys_ops.c: src/dynoplibs/sys.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/sys.ops --quiet
+
+#########################
+
+$(DYNEXT_DIR)/io_ops$(LOAD_EXT): src/dynoplibs/io_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/io_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/io_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/io_ops.c src/dynoplibs/io_ops.h
+
+src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
+
+src/dynoplibs/io_ops.c: src/dynoplibs/io.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/io.ops --quiet
+

@@ -15,6 +15,9 @@ pmc.ops - PMC Opcodes
 Operations that deal with PMCs, including creation and
 destruction, manipulation, and introspection.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =cut
 
 ###############################################################################

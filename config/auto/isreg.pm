@@ -63,7 +63,8 @@ sub _evaluate_isreg {
     my $test;
     $test = (! defined $anyerror) ? 1 : 0;
     $conf->data->set( isreg => $test );
-    print( $test ? " (Yep) " : " (no) " ) if $conf->options->get('verbose');
+    my $test_str = $test ? " (Yep) " : " (no) ";
+    $conf->debug($test_str);
     $self->set_result( $test ? 'yes' : 'no' );
     return 1;
 }

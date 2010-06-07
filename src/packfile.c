@@ -3331,7 +3331,6 @@ fixup_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         /* fixup_entry type */
         ++size;
         switch (ft->fixups[i].type) {
-          case enum_fixup_label:
           case enum_fixup_sub:
             size += PF_size_cstring(ft->fixups[i].name);
             ++size; /* offset */
@@ -3373,7 +3372,6 @@ fixup_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor
     for (i = 0; i < ft->fixup_count; ++i) {
         *cursor++ = (opcode_t) ft->fixups[i].type;
         switch (ft->fixups[i].type) {
-          case enum_fixup_label:
           case enum_fixup_sub:
             cursor    = PF_store_cstring(cursor, ft->fixups[i].name);
             *cursor++ = ft->fixups[i].offset;
@@ -3470,7 +3468,6 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
         entry->type = PF_fetch_opcode(pf, &cursor);
 
         switch (entry->type) {
-          case enum_fixup_label:
           case enum_fixup_sub:
             entry->name   = PF_fetch_cstring(interp, pf, &cursor);
             entry->offset = PF_fetch_opcode(pf, &cursor);
@@ -4671,7 +4668,7 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
     else {
         STRING *err;
         PackFile_ByteCode * const cs =
-            (PackFile_ByteCode *)IMCC_compile_file_s(interp,
+            (PackFile_ByteCode *)Parrot_compile_file(interp,
                 filename, &err);
         Parrot_str_free_cstring(filename);
 

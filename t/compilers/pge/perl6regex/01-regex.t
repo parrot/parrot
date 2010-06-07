@@ -54,6 +54,8 @@ Description of the test.
 
 .const string TESTS = 'no_plan'
 
+.loadlib 'io_ops'
+
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'

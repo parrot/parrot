@@ -93,9 +93,10 @@ Variour helper builtins.
 .sub 'slurp'
     .param string file
     .local pmc pio
-    pio  = open file
+    pio = new ['FileHandle']
+    pio.'open'(file)
     $S0  = pio.'readall'()
-    close pio
+    pio.'close'()
     .return ($S0)
 .end
 

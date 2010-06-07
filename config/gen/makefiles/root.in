@@ -617,16 +617,41 @@ all : \
     $(DYNOPLIBS_TARGETS) \
     $(LIBNCI_TEST_SO)
 
+# We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
     $(GEN_PM_INCLUDES) \
     PARROT_LIBS \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
-    $(LIBRARY_DIR)/Test/More.pbc \
-    $(DYNPMC_TARGETS)
+    $(DYNPMC_TARGETS) \
+    $(LIBRARY_DIR)/Test/More.pbc
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
+
+$(LIBRARY_DIR)/Digest/MD5.pbc: $(DYNEXT_DIR)/bit_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/Archive/Zip.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/Configure/genfile.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/LWP/Protocol.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/Test/More.pbc:
+
+$(LIBRARY_DIR)/Archive/Tar.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/Config/JSON.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/LWP/UserAgent.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 # constant string support
 .c.str : # suffix rule (limited support)
@@ -782,6 +807,7 @@ help :
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the Emacs editor."
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
+	@echo "  bootstrap-ops:     Generate C code from .ops files."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."

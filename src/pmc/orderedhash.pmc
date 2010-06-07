@@ -263,7 +263,7 @@ Marks the OrderedHash as live.
                 PARROT_ORDEREDHASH(SELF);
 
         if (attrs->hash)
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)attrs->hash);
+            Parrot_gc_mark_PMC_alive(INTERP, attrs->hash);
 
         /* Don't mark C<first> and C<last>. They are in lookup hash anyway */
     }

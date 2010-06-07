@@ -43,12 +43,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-gmp
-        |
-    );
+    my $without = $conf->options->get( qw| without-gmp | );
 
     if ($without) {
         $conf->data->set( has_gmp => 0 );
@@ -71,7 +66,7 @@ sub runstep {
     my $has_gmp = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp, $verbose );
+        $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp );
     }
     if ($has_gmp) {
         $conf->data->add( ' ', libs => $extra_libs );
@@ -82,10 +77,10 @@ sub runstep {
 }
 
 sub _evaluate_cc_run {
-    my ($self, $conf, $test, $has_gmp, $verbose) = @_;
+    my ($self, $conf, $test, $has_gmp) = @_;
     if ( $test eq $self->{cc_run_expected} ) {
         $has_gmp = 1;
-        print " (yes) " if $verbose;
+        $conf->debug(" (yes) ");
         $self->set_result('yes');
 
         $conf->data->set(

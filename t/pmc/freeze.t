@@ -352,42 +352,51 @@ FixedPMCArray 3
 ok same
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
-    newclass P10, "Foo"
-    set S10, P10
-    print S10
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
+.const string fpmc = 'temp.fpmc'
+.sub 'main' :main
+    $P10 = newclass "Foo"
+    $S10 = $P10
+    print $S10
     print "\n"
-    freeze S11, P10
+    freeze $S11, $P10
     print "ok 1\n"
-    open P3, "temp.fpmc", 'w'
-    print P3, S11
-    close P3
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'w')
+    $P0.'print'($S11)
+    $P0.'close'()
     print "ok 2\n"
-    end
+.end
 CODE
 Foo
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
-    set S3, "temp.fpmc"
-    .include "stat.pasm"
-    stat I0, S3, .STAT_FILESIZE
-    gt I0, 1, ok1
-    print "stat failed\n"
+pir_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
+.const string fpmc = "temp.fpmc"
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'r')
+    if $P0 goto ok1
+
+    .include 'stdio.pasm'
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("couldn't open fpmc for reading")
     exit 1
+
 ok1:
-    open P3, S3, 'r'
-    read S3, P3, I0
-    close P3
+    $S3 = $P0.'readall'()
+    $P0.'close'()
     print "ok 1\n"
-    thaw P4, S3
+    $P4 = thaw $S3
     print "ok 2\n"
-    set S10, P4
-    print S10
+    $S10 = $P4
+    print $S10
     print "\n"
-    end
+.end
 CODE
 ok 1
 ok 2
@@ -413,54 +422,66 @@ ok
 Foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
-    newclass P10, "Foo"
-    addattribute P10, ".aa"
-    set S10, P10
-    print S10
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
+.const string fpmc = 'temp.fpmc'
+.sub 'main' :main
+    $P10 = newclass "Foo"
+    addattribute $P10, ".aa"
+    $S10 = $P10
+    print $S10
     print "\n"
-    freeze S11, P10
+    $S11 = freeze $P10
     print "ok 1\n"
-    open P3, "temp.fpmc", 'w'
-    print P3, S11
-    close P3
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'w')
+    $P0.'print'($S11)
+    $P0.'close'()
     print "ok 2\n"
-    end
+.end
 CODE
 Foo
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
-    set S3, "temp.fpmc"
-    .include "stat.pasm"
-    stat I0, S3, .STAT_FILESIZE
-    gt I0, 1, ok1
-    print "stat failed\n"
+pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
+.const string fpmc = "temp.fpmc"
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'r')
+    if $P0 goto ok1
+
+    .include 'stdio.pasm'
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("couldn't open fpmc for reading\n")
     exit 1
+
 ok1:
-    open P3, S3, 'r'
-    read S3, P3, I0
-    close P3
-    # print S3
-    # print "\n"
+    $S3 = $P0.'readall'()
+    $P0.'close'()
     print "ok 1\n"
-    thaw P4, S3
+
+    $P4 = thaw $S3
     print "ok 2\n"
-    set S10, P4
-    print S10
+
+    $S10 = $P4
+    print $S10
     print "\n"
 
-    new P5, S10
+    $P5 = new $S10
     print "ok 3\n"
-    new P6, ['String']
-    set P6, "ok 5\n"
-    setattribute P5, '.aa', P6
+
+    $P6 = new ['String']
+    $P6 = "ok 5\n"
+
+    setattribute $P5, '.aa', $P6
     print "ok 4\n"
-    getattribute P7, P5, '.aa'
-    print P7
-    end
+
+    $P7 = getattribute $P5, '.aa'
+    print $P7
+.end
 CODE
 ok 1
 ok 2
@@ -470,43 +491,47 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
-    newclass P10, "Foo"
-    addattribute P10, ".aa"
-    addattribute P10, ".bb"
-    set S10, P10
-    print S10
+pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
+.const string fpmc = 'temp.fpmc'
+.sub 'main' :main
+    $P10 = newclass "Foo"
+    addattribute $P10, ".aa"
+    addattribute $P10, ".bb"
+    $S10 = $P10
+    print $S10
     print "\n"
-    freeze S3, P10
-    open P3, "temp.fpmc", 'w'
-    print P3, S3
-    close P3
 
-    # print S3
-    # print "\n"
+    $S3 = freeze $P10
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'w')
+    $P0.'print'($S3)
+    $P0.'close'()
     print "ok 1\n"
-    thaw P4, S3
+
+    $P4 = thaw $S3
     print "ok 2\n"
-    set S10, P4
-    print S10
+
+    $S10 = $P4
+    print $S10
     print "\n"
 
-    new P5, S10
+    $P5 = new $S10
     print "ok 3\n"
-    new P6, ['String']
-    set P6, "ok 5\n"
-    setattribute P5, ["Foo"], ".aa", P6
-    new P6, ['String']
-    set P6, "ok 6\n"
-    setattribute P5, ["Foo"], ".bb", P6
+
+    $P6 = new ['String']
+    $P6 = "ok 5\n"
+    setattribute $P5, ["Foo"], ".aa", $P6
+
+    $P6 = new ['String']
+    $P6 = "ok 6\n"
+    setattribute $P5, ["Foo"], ".bb", $P6
     print "ok 4\n"
-    getattribute P7, P5, ".aa"
-    print P7
-    getattribute P7, P5, ".bb"
-    print P7
-    end
 
-
+    $P7 = getattribute $P5, ".aa"
+    print $P7
+    $P7 = getattribute $P5, ".bb"
+    print $P7
+.end
 CODE
 Foo
 ok 1
@@ -518,37 +543,42 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter" );
-    newclass P10, "Foo"
-    addattribute P10, ".aa"
-    addattribute P10, ".bb"
-    new P10, ['Foo']
-    print S10
-    freeze S3, P10
-    open P3, "temp.fpmc", 'w'
-    print P3, S3
-    close P3
-    print "ok 1\n"
+pir_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter" );
+.const string fpmc = 'temp.fpmc'
+.sub 'main' :main
+    $P10 = newclass "Foo"
+    addattribute $P10, ".aa"
+    addattribute $P10, ".bb"
 
-    thaw P5, S3
+    $P10 = new ['Foo']
+    $S3 = freeze $P10
+    print "ok 1\n"
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'w')
+    $P0.'print'($S3)
+    $P0.'close'()
+
+    $P5 = thaw $S3
     print "ok 2\n"
-    typeof S10, P5
-    print S10
+
+    $S10 = typeof $P5
+    print $S10
     print "\n"
 
     print "ok 3\n"
-    new P6, ['String']
-    set P6, "ok 5\n"
-    setattribute P5, ["Foo"], ".aa", P6
-    new P6, ['String']
-    set P6, "ok 6\n"
-    setattribute P5, ["Foo"], ".bb", P6
+    $P6 = new ['String']
+    $P6 = "ok 5\n"
+    setattribute $P5, ["Foo"], ".aa", $P6
+    $P6 = new ['String']
+    $P6 = "ok 6\n"
+    setattribute $P5, ["Foo"], ".bb", $P6
     print "ok 4\n"
-    getattribute P7, P5, ".aa"
-    print P7
-    getattribute P7, P5, ".bb"
-    print P7
-    end
+
+    $P7 = getattribute $P5, ".aa"
+    print $P7
+    $P7 = getattribute $P5, ".bb"
+    print $P7
+.end
 CODE
 ok 1
 ok 2
@@ -559,37 +589,44 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" );
-    set S3, "temp.fpmc"
-    .include "stat.pasm"
-    stat I0, S3, .STAT_FILESIZE
-    gt I0, 1, ok1
-    print "stat failed\n"
-    exit 1
-ok1:
-    open P3, S3, 'r'
-    read S3, P3, I0
-    close P3
+pir_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" );
+.const string fpmc = 'temp.fpmc'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(fpmc, 'r')
+    if $P0 goto ok1
 
-    thaw P5, S3
+    .include 'stdio.pasm'
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("open failed\n")
+
+ok1:
+    $S3 = $P0.'readall'()
+    $P0.'close'()
+
+    $P5 = thaw $S3
     print "ok 2\n"
-    typeof S10, P5
-    print S10
+    $S10 = typeof $P5
+    print $S10
     print "\n"
 
     print "ok 3\n"
-    new P6, ['String']
-    set P6, "ok 5\n"
-    setattribute P5, ["Foo"], ".aa", P6
-    new P6, ['String']
-    set P6, "ok 6\n"
-    setattribute P5, ["Foo"], ".bb", P6
+    $P6 = new ['String']
+    $P6 = "ok 5\n"
+    setattribute $P5, ["Foo"], ".aa", $P6
+
+    $P6 = new ['String']
+    $P6 = "ok 6\n"
+    setattribute $P5, ["Foo"], ".bb", $P6
+
     print "ok 4\n"
-    getattribute P7, P5, ".aa"
-    print P7
-    getattribute P7, P5, ".bb"
-    print P7
-    end
+    $P7 = getattribute $P5, ".aa"
+    print $P7
+
+    $P7 = getattribute $P5, ".bb"
+    print $P7
+.end
 CODE
 ok 2
 Foo

@@ -74,13 +74,15 @@ method bs()         { self<bs> };
 
 method print_c_header_files() {
 
-    my $fh := pir::open__PSs(self<func_header>, 'w')
+    my $fh := pir::new__Ps('FileHandle');
+    $fh.open(self<func_header>, 'w')
         || die("Can't open "~ self<func_header>);
     self.emit_c_op_func_header($fh);
     $fh.close();
 
     if self.ops_file<core> {
-        $fh := pir::open__PSs(self<enum_header>, 'w')
+        $fh := pir::new__Ps('FileHandle');
+        $fh.open(self<enum_header>, 'w')
             || die("Can't open "~ self<enum_header>);
         self.emit_c_op_enum_header($fh);
         $fh.close();
@@ -119,7 +121,8 @@ method emit_c_op_enum_header($fh) {
 method print_ops_num_files() {
 
     my $file := ~self<dir> ~ "include/parrot/opsenum.h";
-    my $fh := pir::open__pss($file, 'w')
+    my $fh := pir::new__Ps('FileHandle');
+    $fh.open($file, 'w')
         || die("Can't open $file for writing: " ~ ~pir::err__s());
     self.emit_c_opsenum_header($fh, $file);
     $fh.close();
@@ -164,7 +167,8 @@ method print_c_source_file() {
     $fh.close();
 
     # ... and write it to disk
-    my $final := pir::open__PSs(self<source>, 'w') || die("Can't open filehandle");
+    my $final := pir::new__Ps('FileHandle');
+    $final.open(self<source>, 'w') || die("Can't open filehandle");
     $final.print($fh.readall());
     $final.close();
     return self<source>;
@@ -365,7 +369,8 @@ method _emit_preamble($fh) {
  * This file is generated automatically from '{self<file>}' (and possibly other
  * .ops files). by {self<script>}.
  *
- * Any changes made here will be lost!
+ * Any changes made here will be lost!  To regenerate this file after making
+ * changes to any ops, use the bootstap-ops makefile target.
  *
  */
 |);

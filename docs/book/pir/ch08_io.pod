@@ -12,24 +12,32 @@ C<Socket> PMC takes care of network I/O.
 The C<open>X<open opcode> opcode opens a new filehandle. It takes a
 string argument, which is the path to the file:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+
+  # ...
 
   $P0 = open 'my/file/name.txt'
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 By default, it opens the filehandle as read-only, but an optional second string
 argument can specify the mode for the file. The modes are C<r> for read, C<w>
 for write, C<a> for append, and C<p> for pipe:N<These are the same as the C
 language read-modes, so may be familiar.>
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+
+  # ...
 
   $P0 = open 'my/file/name.txt', 'a'
 
   $P0 = open 'myfile.txt', 'r'
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 You can combine modes; a handle that can read and write uses the mode string
 C<rw>. A handle that can read and write but will not overwrite the existing
@@ -42,11 +50,15 @@ file.N<It's generally not a good idea to manually close the standard
 input, standard output, or standard error filehandles, though you can
 recreate them.>
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+
+  # ...
 
   close $P0
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The C<print>X<print opcode> opcode prints a string argument or the
 string form of an integer, number, or PMC to a filehandle:
@@ -71,13 +83,19 @@ appends a trailing newline to whatever it prints. Another opcode worth
 mentioning is the C<printerr>X<printerr opcode> opcode, which prints an
 argument to the standard error instead of standard output:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
   say 'Turnip'
 
+  # ...
+
+  .loadlib 'io_ops'
+
+  # ...
+
   printerr 'Blancmange'
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The C<read>X<read opcode> and C<readline>X<readline opcode> opcodes read
 values from a filehandle.  C<read> takes an integer value and returns a
@@ -85,44 +103,58 @@ string with that many characters (if possible). C<readline> reads a line
 of input from a filehandle and returns the string without the trailing
 newline:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
 
   $S0 = read $P0, 10
 
   $S0 = readline $P0
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The C<read> opcode has a one-argument variant that reads from standard input:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
-      $S0 = read 10
+  .loadlib 'io_ops'
 
-=end PIR_FRAGMENT
+  # ...
+
+  $S0 = read 10
+
+=end PIR_FRAGMENT_INVALID
 
 The C<getstdin>X<getstdin opcode>, C<getstdout>X<getstdout opcode>, and
 C<getstderr>X<getstderr opcode> opcodes fetch the filehandle objects for
 the standard streams: standard input, standard output, and standard
 error:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+
+  # ...
 
   $P0 = getstdin    # Standard input handle
   $P1 = getstdout   # Standard output handle
   $P2 = getstderr   # Standard error handle
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Once you have the filehandle for one of the standard streams, you can use it
 just like any other filehandle object:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+
+  # ...
 
   $P0 = getstdout
   print $P0, 'hello'
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 This following example reads data from the file F<myfile.txt> one line at a
 time using the C<readline> opcode. As it loops over the lines of the file, it
@@ -130,6 +162,8 @@ checks the boolean value of the read-only filehandle C<$P0> to test whether the
 filehandle has reached the end of the file:
 
 =begin PIR
+
+  .loadlib 'io_ops'
 
   .sub 'main'
     $P0 = getstdout

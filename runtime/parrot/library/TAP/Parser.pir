@@ -908,14 +908,14 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     push_eh _handler
     $P0.'open'(filename, 'r')
     pop_eh
-    $S0 = readline $P0
+    $S0 = $P0.'readline'()
     $I0 = index $S0, '#!'
     unless $I0 == 0 goto L1
-    close $P0
+    $P0.'close'()
     $S0 = _get_exec($S0)
     .tailcall self.'exec'($S0, filename)
   L1:
-    seek $P0, 0, 0
+    $P0.'seek'(0, 0)
     setattribute self, 'stream', $P0
     .return ()
   _handler:
@@ -1010,7 +1010,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     st = box 'INIT'
     .lex 'state', st
   L2:
-    $S0 = readline stream
+    $S0 = stream.'readline'()
     if $S0 == '' goto L3
     $S0 = chomp($S0)
     .local pmc token
@@ -1034,7 +1034,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     .yield (token)
     goto L2
   L3:
-    close stream
+    stream.'close'()
     $I0 = can stream, 'exit_status'
     unless $I0 goto L7
     $I0 = stream.'exit_status'()
@@ -1085,9 +1085,12 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     set st, $S0
     goto L5
   L2:
-    printerr "Unhandled token type: "
-    printerr type
-    printerr "\n"
+    $P0 = getinterp
+    .include 'stdio.pasm'
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Unhandled token type: ")
+    $P1.'print'(type)
+    $P1.'print'("\n")
   L5:
 .end
 

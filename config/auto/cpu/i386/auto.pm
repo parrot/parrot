@@ -22,21 +22,19 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
     my @files = qw( test_gcc_cmpxchg_c.in );
     for my $f (@files) {
-        print " $f " if $verbose;
+        $conf->debug(" $f ");
         my ($suffix) = $f =~ /test_(\w+)/;
         my $path_f = "config/auto/cpu/i386/$f";
         $conf->cc_gen($path_f);
         eval { $conf->cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
-            print " $@ " if $verbose;
+            $conf->debug(" $@ ");
         }
         else {
             if ( $conf->cc_run() =~ /ok/ ) {
-                _handle_cc_run_ok($conf, $suffix, $path_f, $verbose);
+                _handle_cc_run_ok($conf, $suffix, $path_f);
             }
         }
         $conf->cc_clean();
@@ -45,12 +43,12 @@ sub runstep {
 }
 
 sub _handle_cc_run_ok {
-    my ($conf, $suffix, $path_f, $verbose) = @_;
+    my ($conf, $suffix, $path_f) = @_;
     $conf->data->set(
         "i386_has_$suffix" => '1',
         "HAS_i386_$suffix" => '1',
     );
-    print " (\U$suffix) " if ($verbose);
+    $conf->debug(" (\U$suffix) ");
     $conf->data->add( ' ', TEMP_generated => $path_f );
 }
 

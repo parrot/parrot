@@ -35,10 +35,10 @@ my $step = test_step_constructor_and_description($conf);
 
 ########## _evaluate_cc_run() ##########
 
-my ($has_readline, $verbose);
+my ($has_readline);
 
-$verbose = undef;
-$has_readline = $step->_evaluate_cc_run($verbose);
+$conf->options->set(verbose => undef);
+$has_readline = $step->_evaluate_cc_run($conf);
 is($has_readline, 1, "Got expected value for has_readline");
 is($step->result(), 'yes', "Expected result was set");
 # Prepare for next test
@@ -46,9 +46,9 @@ $step->set_result(undef);
 
 {
     my $stdout;
-    $verbose = 1;
+    $conf->options->set(verbose => 1);
     capture(
-        sub { $has_readline = $step->_evaluate_cc_run($verbose); },
+        sub { $has_readline = $step->_evaluate_cc_run($conf); },
         \$stdout,
     );
     is($has_readline, 1, "Got expected value for has_readline");
@@ -56,6 +56,7 @@ $step->set_result(undef);
     like($stdout, qr/\(yes\)/, "Got expected verbose output");
     # Prepare for next test
     $step->set_result(undef);
+    $conf->options->set(verbose => undef);
 }
 
 ########## _handle_readline() ##########

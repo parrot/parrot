@@ -226,7 +226,7 @@ automatically aggregated and output to STDOUT.
     .param pmc parser
     $P0 = parser.'delete_spool'()
     if null $P0 goto L1
-    close $P0
+    $P0.'close'()
   L1:
 .end
 

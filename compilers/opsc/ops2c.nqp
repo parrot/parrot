@@ -38,11 +38,6 @@ $arg := $getopts.add();
 $arg.long('help');
 $arg.short('h');
 
-# regenerate ops.num et. al. even if it's not necessary
-$arg := $getopts.add();
-$arg.long('force-regen');
-$arg.short('f');
-
 # suppress timing and debug output on stdout
 $arg := $getopts.add();
 $arg.long('quiet');
@@ -55,7 +50,6 @@ if $opts<core> {
         src/ops/core.ops
         src/ops/bit.ops
         src/ops/cmp.ops
-        src/ops/debug.ops
         src/ops/io.ops
         src/ops/math.ops
         src/ops/object.ops
@@ -73,14 +67,19 @@ elsif $opts<dynamic> {
     @files.push( $opts<dynamic>);
 }
 elsif (+$opts == 0 || $opts<help>) {
-    say("This is ops2c, part of Parrot build infrastructure.
-usage:
-ops2c --core
-ops2c --dynamic path/to/dynops.ops");
+    say("This is ops2c, part of the Parrot VM's build infrastructure.
+normal options:
+ -c --core                generate the C code for core ops (must be run from within Parrot's build directory)
+ -d --dynamic <file.ops>  generate the C code for the dynamic ops in a single .ops file
+ -q --quiet               don't report any non-error messages
+ -h --help                print this usage information
+ -n --no-lines            do not print #line directives in generated C code (line numbers are not currently supported)
+
+#debugging options:
+ -g --debug               perform all processing but do not write to any files
+");
     pir::exit(0);
 }
-
-my $force_regen := ?$opts<force-regen>;
 
 if ($opts<no-lines>) {
     #TODO: figure out how to generate line numbers

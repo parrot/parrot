@@ -40,10 +40,11 @@ my $problematic_flag = 'ccflags';
 my $stored = $conf->data->get($problematic_flag);
 
 {
+    $conf->options->set( verbose => undef );
     my ($stdout, $stderr);
     capture(
         sub { init::hints::darwin::_precheck(
-            $problematic_flag, $stored, 0
+            $conf, $problematic_flag, $stored
         ) },
         \$stdout,
         \$stderr,
@@ -52,10 +53,11 @@ my $stored = $conf->data->get($problematic_flag);
 }
 
 {
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture(
         sub { init::hints::darwin::_precheck(
-            $problematic_flag, $stored, 1
+            $conf, $problematic_flag, $stored
         ) },
         \$stdout,
         \$stderr,
@@ -68,10 +70,11 @@ my $stored = $conf->data->get($problematic_flag);
 }
 
 {
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture(
         sub { init::hints::darwin::_precheck(
-            $problematic_flag, q{}, 1
+            $conf, $problematic_flag, q{}
         ) },
         \$stdout,
         \$stderr,
@@ -81,6 +84,7 @@ my $stored = $conf->data->get($problematic_flag);
         "_precheck():  Got expected verbose output" );
     like($stdout, qr/Pre-check:\s+\(nil\)/,
         "_precheck():  Got expected verbose output" );
+    $conf->options->set( verbose => undef );
 }
 
 ##### _strip_arch_flags_engine #####
@@ -107,22 +111,24 @@ my $stored = $conf->data->get($problematic_flag);
 ##### _postcheck #####
 
 {
+    $conf->options->set( verbose => undef );
     my $flag = 'ccflags';
     my $flagsref = { 'ccflags' => 'my ccflag' };
     my ($stdout, $stderr);
 
     capture(
         sub { init::hints::darwin::_postcheck(
-            $flagsref, $flag, 0
+            $conf, $flagsref, $flag
         ) },
         \$stdout,
         \$stderr,
     );
     ok( ! $stdout, "_postcheck():  Non-verbose mode produced no output" );
 
+    $conf->options->set( verbose => 1 );
     capture(
         sub { init::hints::darwin::_postcheck(
-            $flagsref, $flag, 1
+            $conf, $flagsref, $flag
         ) },
         \$stdout,
         \$stderr,
@@ -131,10 +137,11 @@ my $stored = $conf->data->get($problematic_flag);
     like($stdout, qr/Post-check:\s+$flagsref->{$flag}/,
         "_postcheck():  Got expected verbose output" );
 
+    $conf->options->set( verbose => 1 );
     $flagsref = { 'ccflags' => undef };
     capture(
         sub { init::hints::darwin::_postcheck(
-            $flagsref, $flag, 1
+            $conf, $flagsref, $flag
         ) },
         \$stdout,
         \$stderr,
@@ -164,10 +171,11 @@ my $stored = $conf->data->get($problematic_flag);
         "_strip_arch_flags(): '-arch' flags and extra whitespace removed",
     );
 
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture(
         sub {
-            $flagsref = init::hints::darwin::_strip_arch_flags($conf, 1);
+            $flagsref = init::hints::darwin::_strip_arch_flags($conf);
         },
         \$stdout,
         \$stderr,
@@ -351,17 +359,17 @@ my $stored = $conf->data->get($problematic_flag);
     $addl_flags_ref = undef;
     $flagsref = undef;
     $title = 'Fink';
-    $verbose = 0;
+    $conf->options->set( 'verbose' => undef );
     ok( init::hints::darwin::_add_to_flags(
-        $addl_flags_ref, $flagsref, $title, $verbose
+        $conf, $addl_flags_ref, $flagsref, $title
     ), "_add_to_flags(): returned true value when no probes found" );
 
-    $verbose = 1;
+    $conf->options->set( 'verbose' => 1 );
     {
         my ($stdout, $stderr);
         capture(
             sub { init::hints::darwin::_add_to_flags(
-                $addl_flags_ref, $flagsref, $title, $verbose
+                $conf, $addl_flags_ref, $flagsref, $title
             ); },
             \$stdout,
             \$stderr,
@@ -381,9 +389,9 @@ my $stored = $conf->data->get($problematic_flag);
     $flagsref->{ccflags} = " -pipe -fno-common -Wno-long-double ";
     $flagsref->{linkflags} = undef;
     $title = 'Fink';
-    $verbose = 0;
+    $conf->options->set( 'verbose' => undef );
     my $rv = init::hints::darwin::_add_to_flags(
-        $addl_flags_ref, $flagsref, $title, $verbose
+        $conf, $addl_flags_ref, $flagsref, $title
     );
     is( $flagsref->{linkflags}, " $addl_flags_ref->{linkflags}",
         "_add_to_flags():  flag added where not previously populated" );

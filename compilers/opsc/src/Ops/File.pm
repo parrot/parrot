@@ -246,9 +246,12 @@ method read_ops($file, $nolines) {
     self<quiet> || say("# Parsing $file...");
     my $start_time := pir::time__N();
     my $buffer     := slurp($file);
+    my $start_ops  := +self<ops>;
     self.compile_ops($buffer, :experimental( $file ~~ /experimental\.ops/));
+    my $end_ops  := +self<ops>;
     pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
-    self<quiet> || say("# Parsed $file in $time seconds.");
+    self<quiet> || say("# Parsed $file in $time seconds; found "~
+                       ($end_ops - $start_ops) ~" ops.");
 }
 
 method compile_ops($str, :$experimental? = 0) {

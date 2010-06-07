@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 foreach my $name (qw(Op Ops Sub Label)) {
     my $module = "'POST';'$name'";
@@ -113,6 +113,35 @@ CODE
 
 
 OUT
+
+
+pir_output_is( <<'CODE', <<'OUT', 'Generate directives' );
+.sub _main
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'dumper.pbc'
+    .local pmc node
+    node = new ['POST';'Sub']
+    node.'name'('foo')
+    node.'add_directive'('.include "cclass.pasm"')
+    node.'add_directive'('.include "exception_types.pasm"')
+
+    .local pmc compiler
+    compiler = new ['POST';'Compiler']
+    $S0 = compiler.'to_pir'(node)
+    say $S0
+    .return ()
+.end
+CODE
+
+.namespace []
+.include "cclass.pasm"
+.include "exception_types.pasm"
+.sub "foo"  :subid("post10")
+.end
+
+
+OUT
+
 
 # Local Variables:
 #   mode: cperl

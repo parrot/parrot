@@ -6,6 +6,8 @@
 
 =cut
 
+.loadlib 'io_ops'
+
 .sub '_parse_buffer'
     .param string buffer
 

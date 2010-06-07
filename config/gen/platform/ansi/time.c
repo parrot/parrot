@@ -60,6 +60,8 @@ Parrot_floatval_time(void)
 
 =item C<void Parrot_sleep(unsigned int seconds)>
 
+Sleep for at least the specified number of seconds.
+
 =cut
 
 */

@@ -100,7 +100,7 @@ sub _get_programs {
         if $ask;
     $conf->data->set( ccflags => $ccflags );
 
-    $conf->options->get('verbose') and print "\nccflags: $ccflags\n";
+    $conf->debug("\nccflags: $ccflags\n");
 
     $linkflags = $conf->data->get('linkflags');
     $linkflags =~ s/-libpath:\S+//g;    # TT #854: No idea why.

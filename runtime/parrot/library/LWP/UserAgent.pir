@@ -17,6 +17,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 =cut
 
 .namespace ['LWP';'UserAgent']
+.loadlib 'io_ops'
 
 .sub '' :init :load :anon
     load_bytecode 'URI.pbc'

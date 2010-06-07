@@ -98,14 +98,13 @@ is($step->_select_lib( {
 
 # Mock different outcomes of _evaluate_cc_run
 my ($test, $has_pcre);
-my $verbose = $conf->options->get('verbose');
 
 $test = q{pcre foobar};
-ok(! $step->_evaluate_cc_run($test, $verbose),
+ok(! $step->_evaluate_cc_run($conf, $test),
     "Got expected setting for HAS_PCRE");
 
 $test = q{pcre 4.1};
-ok($step->_evaluate_cc_run($test, $verbose),
+ok($step->_evaluate_cc_run($conf, $test),
     "_evaluate_cc_run returned true value as expected");
 is($step->result(), q{yes, 4.1}, "Got expected PCRE version");
 
@@ -122,14 +121,13 @@ $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 
 # Mock different outcomes of _evaluate_cc_run
-$verbose = $conf->options->get('verbose');
 
 $test = q{pcre 4.0};
 {
     my ($stdout, $stderr);
     capture(
         sub {
-            $has_pcre = $step->_evaluate_cc_run($test, $verbose);
+            $has_pcre = $step->_evaluate_cc_run($conf, $test);
         },
         \$stdout,
     );

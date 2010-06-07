@@ -88,11 +88,13 @@ my @setup = (
 foreach ( @setup ) {
     if ( $_->{reg_type} eq 'I' ) {
         pasm_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "PASM sysinfo  $_->{desc}" );
-   sysinfo_i_ic I1, $_->{pasm_key}
-   print I1
+    .loadlib 'sys_ops'
+    sysinfo_i_ic I1, $_->{pasm_key}
+    print I1
 end
 CODE
         pir_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "PIR sysinfo  $_->{desc}" );
+.loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 .sub main :main
     \$I0 = sysinfo .$_->{pir_key}
@@ -102,11 +104,13 @@ CODE
     }
     else {
         pasm_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "sysinfo $_->{desc}" );
-   sysinfo_s_ic S1, $_->{pasm_key}
-   print S1
+    .loadlib 'sys_ops'
+    sysinfo_s_ic S1, $_->{pasm_key}
+    print S1
 end
 CODE
         pir_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "PIR sysinfo  $_->{desc}" );
+.loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 .sub main :main
     \$S0 = sysinfo .$_->{pir_key}
@@ -130,6 +134,7 @@ SKIP:
         TODO: {
             local $TODO = "Not Currently Implemented";
             pasm_output_is( <<'CODE', $osname, "sysinfo OS version string" );
+    .loadlib 'sys_ops'
     sysinfo_s_ic S1, 5
     print S1
 end
@@ -138,6 +143,7 @@ CODE
             my ( $osvername, $major, $minor, $id ) = Win32::GetOSVersion();
 
             pasm_output_is( <<'CODE', "$major.$minor", "sysinfo OS version number string" );
+    .loadlib 'sys_ops'
     sysinfo_s_ic S1, 6
     print S1
 end
@@ -151,6 +157,7 @@ SKIP:
     skip "Requires a lot of work to find out the correct answer", 1;
 
     pasm_output_is( <<'CODE', $PConfig{archname}, "sysinfo CPU Model" );
+   .loadlib 'sys_ops'
    sysinfo_s_ic S1, 8
    print S1
 end
@@ -165,6 +172,7 @@ SKIP:
         unless $PConfig{osname} eq 'linux';
 
     pir_output_like( <<'CODE', '/^-[1-9][0-9]*\n[1-9][0-9]*\n$/', 'INTVAL min and max values');
+.loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 .sub main :main
     $I0 = sysinfo .SYSINFO_PARROT_INTMIN

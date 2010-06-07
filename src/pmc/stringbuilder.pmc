@@ -145,18 +145,20 @@ Append string to current buffer.
         /* TODO Ask chromatic why in Parrot_str_join he ignored charset */
         cs = Parrot_str_rep_compatible(interp, buffer, s, &enc);
         if (!cs) {
-            cs = Parrot_unicode_charset_ptr;
-            enc = (buffer->encoding == Parrot_utf16_encoding_ptr
-               ||  s->encoding == Parrot_utf16_encoding_ptr
-               ||  buffer->encoding == Parrot_ucs2_encoding_ptr
-               ||  s->encoding == Parrot_ucs2_encoding_ptr)
-                ? Parrot_utf16_encoding_ptr
-                : Parrot_utf8_encoding_ptr;
 
-            buffer = Parrot_unicode_charset_ptr->to_charset(interp, buffer);
-            s      = Parrot_unicode_charset_ptr->to_charset(interp, s);
+            /* Create new temporary string */
+            STRING * const new_buffer = Parrot_unicode_charset_ptr->to_charset(interp, buffer);
+            mem_gc_free(INTERP, buffer->_bufstart);
+            STRUCT_COPY(buffer, new_buffer);
+            buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
+
+            buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
+                                                    new_buffer->_buflen, char);
+            mem_sys_memcopy(buffer->_bufstart, new_buffer->_bufstart, new_buffer->_buflen);
 
             SET_ATTR_buffer(INTERP, SELF, buffer);
+
+            s      = Parrot_unicode_charset_ptr->to_charset(interp, s);
         }
 
         /* Calculate (possibly new) total size */
@@ -164,8 +166,9 @@ Append string to current buffer.
 
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer)) {
+            /* Parrot_unicode_charset_ptr can produce NULL buffer */
             buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
-                    buffer->_bufstart, total_size, char);
+                buffer->_bufstart, total_size, char);
             buffer->_buflen   = total_size;
         }
 

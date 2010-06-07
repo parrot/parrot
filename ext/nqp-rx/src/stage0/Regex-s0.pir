@@ -429,13 +429,15 @@ Log a debug message.
     orig = getattribute self, '$!target'
     line = orig.'lineof'(from)
     inc line
-    printerr from
-    printerr '/'
-    printerr line
-    printerr ': '
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(2)
+    print $P1, from
+    print $P1, '/'
+    print $P1, line
+    print $P1, ': '
     $S0 = join '', args
-    printerr $S0
-    printerr "\n"
+    print $P1, $S0
+    print $P1, "\n"
   done:
     .return (self)
 .end
@@ -997,6 +999,10 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     (cur, pos, tgt) = self.'!cursor_start'()
     $I0 = is_cclass .CCLASS_ALPHABETIC, tgt, pos
     if $I0 goto pass
+
+    $I0 = length tgt
+    if pos >= $I0 goto fail
+
     $S0 = substr tgt, pos, 1
     if $S0 != '_' goto fail
   pass:
@@ -1613,6 +1619,9 @@ Returns C<.to() - .from()>
     $I0 = self.'to'()
     $I1 = self.'from'()
     $I2 = $I0 - $I1
+    if $I2 >= 0 goto done
+    .return (0)
+  done:
     .return ($I2)
 .end
 
@@ -2039,7 +2048,7 @@ An alternate dump output for a Match object and all of its subcaptures.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 ### .include 'src/PAST/Regex.pir'
-# $Id: Regex.pir 41578 2009-09-30 14:45:23Z pmichaud $
+# $Id$
 
 =head1 NAME
 
@@ -2285,6 +2294,22 @@ at this node.
     .tailcall head.'prefix'(prefix, tail :flat)
 .end
 
+.sub 'prefix_pastnode' :method
+    .param string prefix
+    .param pmc tail
+
+    unless tail goto pastnode_none
+    .local string subtype
+    subtype = self.'subtype'()
+    if subtype != 'declarative' goto pastnode_none
+
+    .local pmc head
+    head = shift tail
+    .tailcall head.'prefix'(prefix, tail :flat)
+
+  pastnode_none:
+    .return (prefix)
+.end
 
 .sub 'prefix_subcapture' :method
     .param string prefix
@@ -2298,7 +2323,7 @@ at this node.
     .param pmc tail
 
     .local pmc name, negate, subtype
-    name = self.'name'()
+    name = self[0]
     negate = self.'negate'()
     subtype = self.'subtype'()
     $I0 = does name, 'string'
@@ -2386,7 +2411,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     .lex '$*REG', reghash
 
     .local pmc regexname, regexname_esc
-    $P0 = get_global '@?BLOCK'
+    $P0 = find_dynamic_lex '@*BLOCKPAST'
     $P1 = $P0[0]
     $S0 = $P1.'name'()
     regexname = box $S0
@@ -2476,6 +2501,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     ops.'push_pirop'('.local pmc', 'match')
     ops.'push_pirop'('.lex', '"$/"', 'match')
     ops.'push_pirop'('length', eos, tgt, 'result'=>eos)
+    ops.'push_pirop'('gt', pos, eos, donelabel)
 
     # On Parrot, indexing into variable-width encoded strings
     # (such as utf8) becomes much more expensive as we move

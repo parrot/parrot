@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 37;
+use Test::More tests => 49;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -142,6 +142,44 @@ is($conf->data->get( 'ldflags' ), '-bundle -L/usr/local/lib64',
     "Got expected value for 'ldflags'");
 is($conf->data->get( 'linkflags' ), '-bundle -L/usr/local/lib64',
     "Got expected value for 'linkflags'");
+
+$conf->replenish($serialized);
+
+##### with extra-nci-thunks #####
+($args, $step_list_ref) = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$ret = $step->runstep($conf);
+ok( defined $ret, "runstep() returned defined value" );
+ok($conf->data->get( 'has_extra_nci_thunks' ),
+    "Got expected value for has_extra_nci_thunks" );
+ok($conf->data->get( 'HAS_EXTRA_NCI_THUNKS' ),
+    "Got expected value for HAS_EXTRA_NCI_THUNKS" );
+
+$conf->replenish($serialized);
+
+##### without extra-nci-thunks #####
+($args, $step_list_ref) = process_options(
+    {
+        argv => [ q{--without-extra-nci-thunks} ],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$ret = $step->runstep($conf);
+ok( defined $ret, "runstep() returned defined value" );
+ok(! $conf->data->get( 'has_extra_nci_thunks' ),
+    "Got expected value for has_extra_nci_thunks" );
+ok(! $conf->data->get( 'HAS_EXTRA_NCI_THUNKS' ),
+    "Got expected value for HAS_EXTRA_NCI_THUNKS" );
 
 pass("Completed all tests in $0");
 

@@ -16,12 +16,14 @@ Tests various transcendental operations
 
 =cut
 
+.loadlib 'trans_ops'
+
 .sub main :main
     .include 'test_more.pir'
     .local num epsilon
     epsilon = _epsilon()
 
-    plan(28)
+    plan(69)
 
     test_sin_n(epsilon)
     test_sin_i(epsilon)
@@ -41,6 +43,8 @@ Tests various transcendental operations
     test_asec_i(epsilon)
     test_cosh_n(epsilon)
     test_cosh_i(epsilon)
+    integer_overflow_with_pow()
+    e_raised_pi_time_i__plus_1_equal_0()
 .end
 
 .sub _pi
@@ -234,6 +238,72 @@ Tests various transcendental operations
     $I1 = 1
     $N1 = cosh $I1
     is($N1, 1.543081, "cosh(1)", epsilon)
+.end
+
+.sub integer_overflow_with_pow
+    .include "iglobals.pasm"
+
+    # Check that we aren't 32-bit INTVALs without GMP
+    .local pmc interp     # a handle to our interpreter object.
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int intvalsize
+    intvalsize = config['intvalsize']
+    .local int gmp
+    gmp = config['gmp']
+
+    if intvalsize != 4 goto can_test
+    if gmp goto can_test
+        skip(40,'No integer overflow for 32-bit INTVALs without GMP installed')
+        goto end
+
+  can_test:
+
+    .local pmc i1, i2, r
+    i1 = new 'Integer'
+    i2 = new 'Integer'
+    i1 = 2
+    i2 = 1
+    $I1 = 1
+  next:
+    null r
+    r = pow i1, i2
+    $S0 = r
+
+    $I1 = $I1 * 2
+    is( $S0, $I1, 'integer_overflow_with_pow' )
+
+    inc i2
+# XXX: this must be extended to at least 64 bit range
+# when sure that the result is not floating point.
+# In the meantime, make sure it overflows nicely
+# on 32 bit.
+    unless i2 > 40 goto next
+
+  end:
+.end
+
+.macro sprintf_is(fmt, number, message)
+    c = .number
+    $S0 = sprintf .fmt, c
+    $S1 = .message
+    is( $S0, $S1, $S1 )
+.endm
+
+.sub e_raised_pi_time_i__plus_1_equal_0
+    .local pmc c, c2, c3
+    c  = new ['Complex']
+    c2 = new ['Complex']
+    c3 = new ['Complex']
+    # e^(pi * i) + 1 = 0
+    $N0 = atan 1
+    $N0 *= 4
+    c[0] = 0.0
+    c[1] = $N0
+    c2 = c.'exp'()
+    c2 += 1.0
+    .sprintf_is( "%.3f%+.3fi", c2, "0.000+0.000i" )
 .end
 
 # Local Variables:

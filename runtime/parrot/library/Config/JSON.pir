@@ -25,7 +25,8 @@ If the data is not valid, an exception will be thrown.
     .local string text
     .local pmc fh
 
-    fh = open filename, 'r'
+    fh = new ['FileHandle']
+    fh.'open'(filename, 'r')
     if fh goto slurp_file
     $P0 = new 'Exception'
     $S0 = concat "Can't open file: ", filename
@@ -75,10 +76,11 @@ the rendered JSON will not be formatted. The default is false.
     output = _json( config, expanded )
 
     # write out the file..
-    $P1 = open filename, 'w'
+    $P1 = new ['FileHandle']
+    $P1.'open'(filename, 'w')
     print $P1, output
     print $P1, "\n"
-    close $P1
+    $P1.'close'()
 
 .end
 

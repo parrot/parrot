@@ -49,6 +49,10 @@
 
 .include 'warnings.pasm'
 
+.loadlib 'io_ops'
+.loadlib 'debug_ops'
+.loadlib 'trans_ops'
+
 #-----------------------------------------------------------------------
 
 .sub pirric_aux_loadbytecode

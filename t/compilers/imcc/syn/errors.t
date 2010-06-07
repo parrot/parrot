@@ -13,7 +13,7 @@ use Parrot::Test;
 plan skip_all => 'No reason to compile invalid PBC here'
     if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/--run-pbc/;
 
-plan tests => 6;
+plan tests => 7;
 
 ## tests for imcc error messages
 
@@ -85,6 +85,15 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'no multiple .local, TT #7
 .end
 END_PIR
 /^error:imcc:syntax error, duplicated IDENTIFIER/
+END_EXPECTED
+
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'warn about failing .loadlib (TT #437)' );
+.loadlib 'nosuch'
+.sub main :main
+    say "WTF"
+.end
+END_PIR
+/^error:imcc:loadlib.*nosuch/
 END_EXPECTED
 
 # Local Variables:

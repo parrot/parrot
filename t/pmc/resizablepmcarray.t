@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(129)
+    plan(142)
 
     resize_tests()
     negative_array_size()
@@ -39,8 +39,12 @@ out-of-bounds test. Checks INT and PMC keys.
     get_mro_tests()
     push_and_pop()
     unshift_and_shift()
+    shift_empty()
+    pop_empty()
     multikey_access()
     exists_and_defined()
+    delete_keyed()
+    get_rep()
     append_tests()
     splice_tests()
     splice_replace1()
@@ -356,7 +360,7 @@ done:
 .sub compare_reverse
     .param string a
     .param string b
-    $I0 = cmp_str b, a
+    $I0 = cmp b, a
     .return($I0)
 .end
 
@@ -579,6 +583,74 @@ loop:
     is(elements, 0, "expectedly empty RPA has 0 elements")
 .end
 
+.sub shift_empty
+    .local pmc pmc_arr
+    pmc_arr = new ['ResizablePMCArray']
+    $I1 = 0
+    push_eh handle_i
+    $I0 = shift pmc_arr
+    inc $I1
+handle_i:
+    pop_eh
+    is($I1, 0, 'shift int from empty RPA throws')
+
+    push_eh handle_n
+    $N0 = shift pmc_arr
+    inc $I1
+handle_n:
+    pop_eh
+    is($I1, 0, 'shift num from empty RPA throws')
+
+    push_eh handle_s
+    $S0 = shift pmc_arr
+    inc $I1
+handle_s:
+    pop_eh
+    is($I1, 0, 'shift string from empty RPA throws')
+
+    push_eh handle_p
+    $P0 = shift pmc_arr
+    inc $I1
+handle_p:
+    pop_eh
+    is($I1, 0, 'shift pmc from empty RPA throws')
+
+.end
+
+.sub pop_empty
+    .local pmc pmc_arr
+    pmc_arr = new ['ResizablePMCArray']
+    $I1 = 0
+    push_eh handle_i
+    $I0 = pop pmc_arr
+    inc $I1
+handle_i:
+    pop_eh
+    is($I1, 0, 'pop int from empty RPA throws')
+
+    push_eh handle_n
+    $N0 = pop pmc_arr
+    inc $I1
+handle_n:
+    pop_eh
+    is($I1, 0, 'pop num from empty RPA throws')
+
+    push_eh handle_s
+    $S0 = pop pmc_arr
+    inc $I1
+handle_s:
+    pop_eh
+    is($I1, 0, 'pop string from empty RPA throws')
+
+    push_eh handle_p
+    $P0 = pop pmc_arr
+    inc $I1
+handle_p:
+    pop_eh
+    is($I1, 0, 'pop pmc from empty RPA throws')
+
+.end
+
 ## an Integer Matrix, as used by befunge as a playing field
 .sub multikey_access
     .local pmc matrix, row_in, row_out
@@ -618,6 +690,9 @@ loop:
     is(ex, 1, "element at idx 0 exists")
     def = defined array[0]
     is(def, 1, "element at idx 0 is defined")
+    $P0 = new 'Integer', 0
+    ex = exists array[$P0]
+    is(ex, 1, "element at PMC idx 0 exists")
 
     ## bounds checking: upper (7)
     ex = exists array[7]
@@ -662,6 +737,26 @@ loop:
     is(def, 0, "element at idx 5 is not defined")
 .end
 
+.sub delete_keyed
+    .local pmc array
+    array = new ['ResizablePMCArray']
+    push array, 'a'
+    push array, 'b'
+    push array, 'c'
+    $P0 = new 'Integer', 1
+    delete array[$P0]
+    $S0 = array[1]
+    is($S0, 'c', 'delete_keyed with PMC key')
+.end
+
+.sub get_rep
+    .local pmc array
+    array = new ['ResizablePMCArray']
+    push array, 'a'
+    push array, 'b'
+    $S0 = get_repr array
+    is($S0, '[ a, b ]', 'get_repr')
+.end
 
 .sub append_tests
 
@@ -831,6 +926,24 @@ loop_end:
     $S0 = get_array_string($P1)
     is($S0, "12A45", "splice with empty replacement")
 
+    $P1 = clone ar1
+    $P2 = clone ar2
+    splice $P1, $P2, -3, 2
+    $S0 = get_array_string($P1)
+    is($S0, "12ABCDE5", "splice with negative offset")
+
+    $P1 = clone ar1
+    $P2 = clone ar2
+    $I0 = 1
+    push_eh too_low
+    splice $P1, $P2, -10, 2
+    dec $I0
+    goto too_low_end
+too_low:
+    .get_results($P9)
+    finalize $P9
+too_low_end:
+    ok($I0, "splice with negative offset too low")
 .end
 
 

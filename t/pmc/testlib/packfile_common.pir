@@ -9,7 +9,7 @@
 
 .sub '_filename'
     .local string filename
-    filename = 't/native_pbc/number_1.pbc'
+    filename = 't/native_pbc/number.pbc'
     .return (filename)
 .end
 
@@ -20,9 +20,10 @@
     .local pmc pf, pio
     pf   = new ['Packfile']
     $S0  = '_filename'()
-    pio  = open $S0, 'r'
+    pio  = new ['FileHandle']
+    pio.'open'($S0, 'r')
     $S0  = pio.'readall'()
-    close pio
+    pio.'close'()
     pf   = $S0
     .return(pf)
 .end

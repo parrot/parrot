@@ -150,8 +150,8 @@ After this, go to the directory F<languages/squaak> and type:
 This will compile the generated files and run the test suite. If you want more
 information on what files are being generated, please check out the references
 at the end of this episode or read the documentation included in the file
-F<mk_language_shell.pl>. For that you can use a installed parrot executable from
-your distribution or one you have just compiled.
+F<mk_language_shell.pl>. For that you can use an installed parrot executable
+from your distribution or one you have just compiled.
 
 Note that we didn't write a single line of code, and already we have the basic
 infrastructure in place to get us started. Of course, the generated compiler

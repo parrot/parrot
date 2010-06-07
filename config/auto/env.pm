@@ -57,26 +57,25 @@ sub runstep {
 
 sub _evaluate_env {
     my ($self, $conf, $setenv, $unsetenv) = @_;
-    my $verbose = $conf->options->get('verbose');
     $conf->data->set(
         setenv   => $setenv,
         unsetenv => $unsetenv
     );
 
     if ( $setenv && $unsetenv ) {
-        print " (both) " if $verbose;
+        $conf->debug(" (both) ");
         $self->set_result('both');
     }
     elsif ($setenv) {
-        print " (setenv) " if $verbose;
+        $conf->debug(" (setenv) ");
         $self->set_result('setenv');
     }
     elsif ($unsetenv) {
-        print " (unsetenv) " if $verbose;
+        $conf->debug(" (unsetenv) ");
         $self->set_result('unsetenv');
     }
     else {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
     }
 }

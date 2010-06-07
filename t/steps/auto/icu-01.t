@@ -72,53 +72,59 @@ is($step->_handle_icuconfig_opt($phony), $phony,
 
 my ($autodetect, $without);
 
-($icuconfig, $autodetect, $without) =
-    $step->_handle_search_for_icu_config( {
+($icuconfig, $autodetect, $without) = $step->_handle_search_for_icu_config(
+    $conf,
+    {
         icuconfig   => q{},
         autodetect  => 1,
         without     => 0,
-        verbose     => 0,
         ret         => -1,
-} );
+    }
+);
 ok(! defined $icuconfig, "icu-config not found, as expected");
 is($autodetect, 0, "Autodetection cancelled, as expected");
 is($without, 1, "Continuing to configure without ICU");
 
-($icuconfig, $autodetect, $without) =
-    $step->_handle_search_for_icu_config( {
+($icuconfig, $autodetect, $without) = $step->_handle_search_for_icu_config(
+    $conf,
+    {
         icuconfig   => q{},
         autodetect  => 1,
         without     => 0,
-        verbose     => 0,
         ret         => 256,
-} );
+    }
+);
 ok(! defined $icuconfig, "icu-config not found, as expected");
 is($autodetect, 0, "Autodetection cancelled, as expected");
 is($without, 1, "Continuing to configure without ICU");
 
-($icuconfig, $autodetect, $without) =
-    $step->_handle_search_for_icu_config( {
+($icuconfig, $autodetect, $without) = $step->_handle_search_for_icu_config(
+    $conf,
+    {
         icuconfig   => q{},
         autodetect  => 1,
         without     => 0,
-        verbose     => 0,
         ret         => 0,
-} );
+    }
+);
 is($icuconfig, q{icu-config}, "icu-config found, as expected");
 is($autodetect, 1, "Autodetection continues, as expected");
 is($without, 0, "Continuing to try to configure with ICU");
 
 {
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture( sub {
             ($icuconfig, $autodetect, $without) =
-                $step->_handle_search_for_icu_config( {
+            $step->_handle_search_for_icu_config(
+                $conf,
+                {
                     icuconfig   => q{},
                     autodetect  => 1,
                     without     => 0,
-                    verbose     => 1,
                     ret         => 0,
-            } );
+                }
+            );
         },
         \$stdout,
         \$stderr,
@@ -128,30 +134,33 @@ is($without, 0, "Continuing to try to configure with ICU");
     is($without, 0, "Continuing to try to configure with ICU");
     like($stdout, qr/icu-config found/,
         "Got expected verbose output");
+    $conf->options->set( verbose => undef );
 }
 
 ########## _handle_autodetect() ##########
 
-($icuconfig, $autodetect, $without) =
-    $step->_handle_autodetect( {
+($icuconfig, $autodetect, $without) = $step->_handle_autodetect(
+    $conf,
+    {
         icuconfig   => $phony,
         autodetect  => 1,
         without     => 0,
-        verbose     => 0,
-} );
+    }
+);
 is($icuconfig, $phony, "icu-config unchanged, as expected");
 is($autodetect, 1, "Autodetection still active, as expected");
 is($without, 0, "Continuing to try to configure with ICU");
 
 {
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture( sub {
-        ($icuconfig, $autodetect, $without) =
-            $step->_handle_autodetect( {
+        ($icuconfig, $autodetect, $without) = $step->_handle_autodetect(
+            $conf,
+            {
                 icuconfig   => $phony,
                 autodetect  => 0,
                 without     => 0,
-                verbose     => 1,
             } );
         },
         \$stdout,
@@ -162,6 +171,7 @@ is($without, 0, "Continuing to try to configure with ICU");
     is($without, 0, "Continuing to try to configure with ICU");
     like($stdout, qr/ICU autodetection disabled/s,
         "Got expected verbose output");
+    $conf->options->set( verbose => undef );
 }
 
 ########## _handle_icushared() ##########
@@ -247,7 +257,6 @@ my $cwd = cwd();
             without         => 1,
             autodetect      => 1,
             icuconfig       => 1,
-            verbose         => 0,
         }
     );
 is($without, 1, "Not trying to configure with ICU");
@@ -262,7 +271,6 @@ is($step->result(), q{}, "result is still empty string, as expected");
             without         => 0,
             autodetect      => 0,
             icuconfig       => 1,
-            verbose         => 0,
         }
     );
 is($without, 0, "Still trying to configure with ICU");
@@ -277,7 +285,6 @@ is($step->result(), q{}, "result is still empty string, as expected");
             without         => 0,
             autodetect      => 1,
             icuconfig       => q{},
-            verbose         => 0,
         }
     );
 is($without, 0, "Still trying to configure with ICU");
@@ -292,48 +299,54 @@ like($die, qr/Something is wrong with your ICU installation/s,
     "Got expected die message");
 
 {
+    $conf->options->set( verbose => 1 );
     my $phony = q{/path/to/icu-config};
     my ($stdout, $stderr);
     capture(
-        sub { auto::icu::_verbose_report(1, $phony, undef, undef); },
+        sub { auto::icu::_verbose_report($conf, $phony, undef, undef); },
         \$stdout,
         \$stderr,
     );
     like( $stdout, qr/icuconfig:\s+$phony/s,
         "Got expected verbose output"
     );
+    $conf->options->set( verbose => undef );
 }
 
 {
+    $conf->options->set( verbose => 1 );
     my $phony = q{-lalpha};
     my ($stdout, $stderr);
     capture(
-        sub { auto::icu::_verbose_report(1, undef, $phony, undef); },
+        sub { auto::icu::_verbose_report($conf, undef, $phony, undef); },
         \$stdout,
         \$stderr,
     );
     like( $stdout, qr/icushared='$phony'/s,
         "Got expected verbose output"
     );
+    $conf->options->set( verbose => undef );
 }
 
 {
+    $conf->options->set( verbose => 1 );
     my $phony = q{alpha/include};
     my ($stdout, $stderr);
     capture(
-        sub { auto::icu::_verbose_report(1, undef, undef, $phony); },
+        sub { auto::icu::_verbose_report($conf, undef, undef, $phony); },
         \$stdout,
         \$stderr,
     );
     like( $stdout, qr/headers='$phony'/s,
         "Got expected verbose output"
     );
+    $conf->options->set( verbose => undef );
 }
 
 {
     my ($stdout, $stderr);
     capture(
-        sub { auto::icu::_verbose_report(0, 'alpha', 'beta', 'gamma'); },
+        sub { auto::icu::_verbose_report($conf, 'alpha', 'beta', 'gamma'); },
         \$stdout,
         \$stderr,
     );
@@ -343,6 +356,7 @@ like($die, qr/Something is wrong with your ICU installation/s,
 ########## _handle_icuconfig_errors() ##########
 
 {
+    $conf->options->set( verbose => undef );
     my ($stdout, $stderr);
     capture(
         sub {
@@ -368,13 +382,14 @@ $icuheaders = q{alpha};
 my $status = $conf->data->get( 'ccflags' );
 
 {
+    $conf->options->set(verbose => 1);
     my ($stdout, $stderr);
     capture(
         sub {
-           auto::icu::_handle_ccflags_status($conf,
+           auto::icu::_handle_ccflags_status(
+               $conf,
                {
                    ccflags_status  => 1,
-                   verbose         => 1,
                    icuheaders      => $icuheaders,
                },
            );
@@ -388,13 +403,14 @@ my $status = $conf->data->get( 'ccflags' );
 $conf->data->set( ccflags => $status ); # re-set for next test
 
 {
+    $conf->options->set(verbose => 1);
     my ($stdout, $stderr);
     capture(
         sub {
-           auto::icu::_handle_ccflags_status($conf,
+           auto::icu::_handle_ccflags_status(
+               $conf,
                {
                    ccflags_status  => 0,
-                   verbose         => 1,
                    icuheaders      => $icuheaders,
                },
            );
@@ -427,13 +443,14 @@ else {
 $conf->data->set( ccflags => $status ); # re-set for next test
 
 {
+    $conf->options->set( verbose => undef );
     my ($stdout, $stderr);
     capture(
         sub {
-           auto::icu::_handle_ccflags_status($conf,
+           auto::icu::_handle_ccflags_status(
+               $conf,
                {
                    ccflags_status  => 0,
-                   verbose         => 0,
                    icuheaders      => $icuheaders,
                },
            );
@@ -652,6 +669,7 @@ $conf->replenish($serialized);
         $conf->options->set( %{$args} );
         $step = test_step_constructor_and_description($conf);
         {
+            $conf->options->set( verbose => 1 );
             my ($stdout, $stderr, $ret);
             my $icuconfig;
             my ($without, $icushared, $icuheaders);
@@ -664,7 +682,6 @@ $conf->replenish($serialized);
                             without         => 0,
                             autodetect      => 1,
                             icuconfig       => $icuconfig,
-                            verbose         => 1,
                         }
                     );
                 },

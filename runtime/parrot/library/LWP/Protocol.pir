@@ -85,6 +85,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .namespace ['LWP';'Protocol';'file']
 
+.loadlib 'io_ops'
 .include 'stat.pasm'
 
 .sub '' :init :load :anon

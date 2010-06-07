@@ -2,6 +2,11 @@ DYNOPLIBS_TARGETS = \
     $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT) \
     $(DYNEXT_DIR)/math_ops$(LOAD_EXT) \
     $(DYNEXT_DIR)/deprecated_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/trans_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/debug_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/io_ops$(LOAD_EXT) \
 
 DYNOPLIBS_CLEANUPS = \
     src/dynoplibs/*.c \

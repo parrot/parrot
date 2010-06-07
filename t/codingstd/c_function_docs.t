@@ -91,16 +91,10 @@ foreach my $path (@files) {
 }
 
 __DATA__
-compilers/imcc/parser_util.c
-compilers/imcc/pbc.c
-compilers/imcc/pcc.c
-compilers/imcc/reg_alloc.c
-compilers/imcc/symreg.c
 compilers/pirc/src/pircapi.c
 config/gen/platform/ansi/dl.c
 config/gen/platform/ansi/exec.c
 config/gen/platform/ansi/time.c
-config/gen/platform/darwin/dl.c
 config/gen/platform/darwin/memalign.c
 config/gen/platform/generic/dl.c
 config/gen/platform/generic/exec.c

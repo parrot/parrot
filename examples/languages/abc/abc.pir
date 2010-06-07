@@ -56,8 +56,6 @@ object.
 
 .namespace [ 'abc'; 'Compiler' ]
 
-.loadlib 'abc_group'
-
 .sub '' :anon :load :init
     .local pmc abc
     $P0 = get_root_global ['parrot'], 'P6metaclass'

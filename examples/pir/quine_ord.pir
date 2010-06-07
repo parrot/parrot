@@ -1,6 +1,9 @@
 # Copyright (C) 2006-2010, Parrot Foundation.
 # ATT no autoexpanding svn markers please
 
+# XXX currently broken
+.loadlib 'io_ops'
+
 .sub quine :main
     .param pmc argv
 
