@@ -32,41 +32,6 @@ static void no_ICU_lib(PARROT_INTERP) /* HEADERIZER SKIP */
 }
 #endif
 
-#if PARROT_HAS_ICU
-static void
-nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
-           UINTVAL offs, UINTVAL len, UINTVAL graphemes)
-{
-    UChar32 *buf  = (UChar32 *) (dest->strstart);
-    UINTVAL  hash = 0xffff; // TODO: put a real seed here.
-    UINTVAL  aux;
-
-    while (offs < len) {
-        buf[index] = src->encoding->get_codepoint(interp, src, offs);
-        aux = offs;
-
-        while (ISCOMBINING(buf[index]) && offs < len) {
-            hash += hash << 5;
-            hash += buf[index];
-            buf[index] = src->encoding->get_codepoint(interp, src, ++offs);
-        }
-
-        if (hash != 0xffff) {
-            nfg_encode(interp, dest, index, src, offs, len, graphemes + 1);
-            buf[index] = add_grapheme_from_substr(interp, dest->extra, src, aux, offs-aux, hash);
-            return;
-        }
-        offs++;
-        index++;
-    }
-
-    dest->extra   = create_grapheme_table(interp, graphemes);
-    dest->strlen  = index;
-    dest->bufused = index * sizeof (UChar32);
-
-}
-
-#endif
 
 /* HEADERIZER HFILE: src/string/encoding/nfg.h */
 
@@ -224,6 +189,41 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 
 #if PARROT_HAS_ICU
 #  include <unicode/ustring.h>
+
+static void
+nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
+           UINTVAL offs, UINTVAL len, UINTVAL graphemes)
+{
+    ASSERT_ARGS(nfg_encode)
+    UChar32 *buf  = (UChar32 *) (dest->strstart);
+    UINTVAL  hash = 0xffff; // TODO: put a real seed here.
+    UINTVAL  aux;
+
+    while (offs < len) {
+        buf[index] = src->encoding->get_codepoint(interp, src, offs);
+        aux = offs;
+
+        while (ISCOMBINING(buf[index]) && offs < len) {
+            hash += hash << 5;
+            hash += buf[index];
+            buf[index] = src->encoding->get_codepoint(interp, src, ++offs);
+        }
+
+        if (hash != 0xffff) {
+            nfg_encode(interp, dest, index, src, offs, len, graphemes + 1);
+            buf[index] = add_grapheme_from_substr(interp, dest->extra, src, aux, offs-aux, hash);
+            return;
+        }
+        offs++;
+        index++;
+    }
+
+    dest->extra   = create_grapheme_table(interp, graphemes);
+    dest->strlen  = index;
+    dest->bufused = index * sizeof (UChar32);
+
+}
+
 #endif
 
 
@@ -249,7 +249,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     }
     else {
         /* Make sure we have NFC Unicode string. */
-        STRING  *from = Parrot_unicode_charset_ptr->compose(interp, 
+        STRING  *from = Parrot_unicode_charset_ptr->compose(interp,
                             Parrot_unicode_charset_ptr->to_charset(interp, src));
         UINTVAL  len  = Parrot_str_length(interp, from);
         STRING  *to   = Parrot_str_new_init(interp, NULL, len * sizeof (UChar32),

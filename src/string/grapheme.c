@@ -17,8 +17,9 @@ $Id$
 grapheme_table *
 create_grapheme_table(PARROT_INTERP, UINTVAL n)
 {
-    UINTVAL entries = ( n > MIN_TABLE_LENGTH) ? n - MIN_TABLE_LENGTH : 0;
-    grapheme_table *table = mem_sys_allocate(sizeof (grapheme_table) 
+    ASSERT_ARGS(create_grapheme_table)
+    UINTVAL entries = (n > MIN_TABLE_LENGTH) ? n - MIN_TABLE_LENGTH : 0;
+    grapheme_table *table = mem_sys_allocate(sizeof (grapheme_table)
                                               + entries * sizeof (grapheme));
     table->size = entries + MIN_TABLE_LENGTH;
     table->used = 0;
@@ -30,10 +31,11 @@ UChar32 *
 add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
                          UINTVAL start, UINTVAL len, UINTVAL hash)
 {
+    ASSERT_ARGS(add_grapheme_from_substr)
     int32_t i;
     /* Check if it's in the table already... */
     for (i = 0; i < table->used; i++) {
-        if (table->graphemes[i].hash == hash )
+        if (table->graphemes[i].hash == hash)
             return (UChar32) (-1 * (i + 1));
     }
 
@@ -42,7 +44,7 @@ add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
     table->graphemes[table->used].hash = hash;
     table->graphemes[table->used].codepoints  = mem_gc_allocate_n_typed(interp, len, UChar32);
     for (i = 0; i < len; i++){
-        table->graphemes[table->used].codepoints[i] = 
+        table->graphemes[table->used].codepoints[i] =
             src->encoding->get_codepoint(interp, src, start + i);
     };
 }

@@ -17,7 +17,7 @@ struct grapheme_t {
 
 typedef struct grapheme_t grapheme;
 
-#define MIN_TABLE_LENGTH 1
+#  define MIN_TABLE_LENGTH 1
 
 struct grapheme_table_t {
     UINTVAL size; /* Total table size, in graphemes. */
@@ -31,10 +31,10 @@ struct grapheme_table_t {
 
 typedef struct grapheme_table_t grapheme_table;
 
-#define ISCOMBINING(c) ( (0x0299 < (c) &&  (c) < 0x0370)\
-                      || (0x1dbf < (c) &&  (c) < 0x1e00)\
-                      || (0x20cf < (c) &&  (c) < 0x2100)\
-                      || (0xfe1f < (c) &&  (c) < 0xfe30))
+#  define ISCOMBINING(c) ( (0x0299 < (c) &&  (c) < 0x0370)\
+                        || (0x1dbf < (c) &&  (c) < 0x1e00)\
+                        || (0x20cf < (c) &&  (c) < 0x2100)\
+                        || (0xfe1f < (c) &&  (c) < 0xfe30))
 
 /* HEADERIZER BEGIN: src/string/grapheme.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
