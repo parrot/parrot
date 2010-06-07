@@ -2580,7 +2580,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     reserved = string_max_bytes(interp, result, srclen);
     Parrot_gc_allocate_string_storage(interp, result, reserved);
     result->bufused = reserved;
-    result->extra = NULL; // TODO: Check wether we'll need a grapheme table here and create one if we will.
+    result->extra = NULL;
 
     src->encoding->iter_init(interp, src, &itersrc);
     encoding->iter_init(interp, result, &iterdest);

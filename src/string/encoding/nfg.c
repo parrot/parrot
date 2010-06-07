@@ -507,6 +507,7 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     s[pos++] = (UChar32) c;
     ++i->charpos;
     i->bytepos = pos * sizeof (UChar32);
+    // TODO: properly compose stuff here.
 #else
     UNUSED(i);
     no_ICU_lib(interp);
