@@ -73,32 +73,27 @@ Initializes the StringBuilder with initial size of buffer.
 
         SET_ATTR_buffer(INTERP, SELF, buffer);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
 
-=item C<void mark()>
+=item C<void destroy()>
 
-Marks the StringBuilder as live.
+Free the buffer on destruction.
 
 =cut
 
 */
 
-    VTABLE void mark() {
-    }
-
     VTABLE void destroy() {
-        STRING *buffer;
-
-        if (!PMC_data(SELF))
-            return;
-
-        GET_ATTR_buffer(INTERP, SELF, buffer);
-        if (buffer->_bufstart)
-            mem_gc_free(INTERP, buffer->_bufstart);
-        mem_gc_free(INTERP, buffer);
+        if (PMC_data(SELF)) {
+            STRING *buffer;
+            GET_ATTR_buffer(INTERP, SELF, buffer);
+            if (buffer->_bufstart)
+                mem_gc_free(INTERP, buffer->_bufstart);
+            mem_gc_free(INTERP, buffer);
+        }
     }
 
 /*
