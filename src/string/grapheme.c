@@ -40,7 +40,7 @@ clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
         dst->graphemes[i].len =  src->graphemes[i].len;
         dst->graphemes[i].hash = src->graphemes[i].hash;
         dst->graphemes[i].codepoints = mem_gc_allocate_n_typed(interp, src->graphemes[i].len, UChar32);
-        memcpy(dst->graphemes[i].codepoints, src->graphemes[i].codepoints, 
+        memcpy(dst->graphemes[i].codepoints, src->graphemes[i].codepoints,
                src->graphemes[i].len * sizeof (UChar32));
     }
 
