@@ -27,6 +27,17 @@ create_grapheme_table(PARROT_INTERP, UINTVAL n)
     return table;
 }
 
+grapheme_table *
+clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
+{
+    grapheme_table * dst = create_grapheme_table(interp, src->used);
+
+    dst->used = src->used;
+    memcpy(&(dst->graphemes), &(dst->graphemes), dst->used * sizeof (grapheme));
+
+    return dst;
+}
+
 UChar32 *
 add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
                          UINTVAL start, UINTVAL len, UINTVAL hash)
