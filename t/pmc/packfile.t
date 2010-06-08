@@ -15,6 +15,8 @@ t/pmc/packfile.t - test the Packfile PMC
 
 Tests the Packfile PMC.
 
+If you see this tests failing after bumping PBC_COMPAT rerun tools/dev/mk_packfile_pbc.
+
 =cut
 
 .include 't/pmc/testlib/packfile_common.pir'
