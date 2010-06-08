@@ -61,7 +61,7 @@ Free the buffer when destroying.
     }
 
     VTABLE void mark() {
-        const STRING * source;
+        STRING * source;
         GET_ATTR_source(INTERP, SELF, source);
         if (!STRING_IS_NULL(source))
             Parrot_gc_mark_STRING_alive(INTERP, source);
