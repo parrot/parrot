@@ -401,8 +401,10 @@ void
 Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_gc_free_string_header)
+#if PARROT_HAS_ICU
     if (s->encoding == Parrot_nfg_encoding_ptr && s->extra != NULL)
         destroy_grapheme_table(interp, s->extra);
+#endif /* PARROT_HAS_ICU */
     interp->gc_sys->free_string_header(interp, s);
 }
 

@@ -363,8 +363,10 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     /* and copy it over */
     mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
 
+#if PARROT_HAS_ICU
     if (s->encoding == Parrot_nfg_encoding_ptr && s->extra != NULL)
         result->extra = clone_grapheme_table(s->extra);
+#endif /* PARROT_HAS_ICU */
 
     return result;
 }
