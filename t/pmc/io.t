@@ -113,16 +113,21 @@ OUTPUT
 print $FOO "2\n1\n";
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "open and readline" );
-.loadlib 'io_ops'
-    open P0, "$temp_file"
-    set S0, ""
-    set S1, ""
-    readline S0, P0
-    readline S1, P0
-    print S1
-    print S0
-    end
+pir_output_is( sprintf( <<'CODE', $temp_file ), <<'OUTPUT', "open and readline" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file)
+
+    $S0 = ''
+    $S1 = ''
+
+    $S0 = $P0.'readline'()
+    $S1 = $P0.'readline'()
+
+    print $S1
+    print $S0
+.end
 CODE
 1
 2
@@ -132,16 +137,21 @@ OUTPUT
 print $FOO "12\n34";
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "open and readline, no final newline" );
-.loadlib 'io_ops'
-    open P0, "$temp_file"
-    set S0, ""
-    set S1, ""
-    readline S0, P0
-    readline S1, P0
-    print S1
-    print S0
-    end
+pir_output_is( sprintf( <<'CODE', $temp_file ), <<'OUTPUT', "open and readline, no final newline" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file)
+
+    $S0 = ''
+    $S1 = ''
+
+    $S0 = $P0.'readline'()
+    $S1 = $P0.'readline'()
+
+    print $S1
+    print $S0
+.end
 CODE
 3412
 OUTPUT
@@ -149,27 +159,30 @@ OUTPUT
 ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "open & print" );
-.loadlib 'io_ops'
-   set I0, -12
-   set N0, 2.2
-   set S0, "Foo"
-   new P0, ['String']
-   set P0, "Bar\\n"
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "open & print" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $I0 = -12
+    $N0 = 2.2
+    $S0 = "Foo"
+    $P0 = new ['String']
+    $P0 = "Bar\n"
 
-   open P1, "$temp_file", "w"
-   print P1, I0
-   print P1, N0
-   print P1, S0
-   print P1, P0
-   close P1
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'w')
+    $P1.'print'($I0)
+    $P1.'print'($N0)
+    $P1.'print'($S0)
+    $P1.'print'($P0)
+    $P1.'close'()
 
-   open P2, "$temp_file"
-   readline S1, P2
-   close P2
+    $P2 = new ['FileHandle']
+    $P2.'open'(temp_file)
+    $S1 = $P2.'readline'()
+    $P2.'close'()
 
-   print S1
-   end
+    print $S1
+.end
 CODE
 -122.2FooBar
 OUTPUT
