@@ -16,7 +16,7 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 11
+.const int TESTS = 12
 
 .loadlib 'io_ops'
 
@@ -32,6 +32,7 @@ Tests various io opcodes.
     open_pipe_for_reading()
     getfd_fdopen()
     printerr_tests()
+    stat_tests()
 
     # must come after (these don't use test_more)
     open_pipe_for_writing()
@@ -159,7 +160,7 @@ Tests various io opcodes.
     pipe = open command, 'wp'
     unless pipe goto open_pipe_for_writing_failed
 
-    pipe.'puts'("ok 8 - open pipe for writing\n")
+    pipe.'puts'("ok 9 - open pipe for writing\n")
     close pipe
     .return ()
 
@@ -203,7 +204,7 @@ Tests various io opcodes.
     print "not "
 
 _readline_handler:
-        print "ok 9\n"
+        print "ok 10\n"
         pop_eh
 
     push_eh _read_handler
@@ -211,7 +212,7 @@ _readline_handler:
     print "not "
 
 _read_handler:
-        print "ok 10\n"
+        print "ok 11\n"
         pop_eh
 
     push_eh _print_handler
@@ -219,7 +220,7 @@ _read_handler:
     print "not "
 
 _print_handler:
-        print "ok 11\n"
+        print "ok 12\n"
         pop_eh
 .end
 
@@ -251,6 +252,22 @@ _print_handler:
 foo
 This is a test
 OUTPUT
+.end
+
+.sub 'stat_tests'
+    .local pmc pio
+    .local int len
+    .const string description = 'stat failed'
+    .include "stat.pasm"
+  push_eh eh
+    len = stat 'no_such_file', .STAT_FILESIZE
+    ok(0, description)
+    goto ret
+  eh:
+    ok(1, description)
+  ret:
+    pop_eh
+    .return ()
 .end
 
 .namespace ["Testing"]

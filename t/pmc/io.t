@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 36;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -449,16 +449,23 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
-.loadlib 'io_ops'
-   getstderr P2    # the object
-   set S0, "puts"    # method
-   set S5, "ok 1\n"    # 2nd param
-   set_args "0,0", P2, S5
-   callmethodcc P2, S0
-   set S5, "ok 2\n"
-   set_args "0,0", P2, S5
-   callmethodcc P2, S0
-   end
+.include 'stdio.pasm'
+    getinterp P0                 # invocant
+    set I0, .PIO_STDERR_FILENO   # 1st argument
+    set_args "0,0", P0, I0
+    callmethodcc P0, "stdhandle"
+    get_results "0", P2          # STDERR
+
+    set S0, "puts"               # method
+    set S5, "ok 1\n"             # 2nd param
+    set_args "0,0", P2, S5
+    callmethodcc P2, S0
+
+    set S5, "ok 2\n"
+    set_args "0,0", P2, S5
+    callmethodcc P2, S0
+
+    end
 CODE
 ok 1
 ok 2
@@ -758,21 +765,6 @@ ok:
 .end
 CODE
 ok
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<"OUTPUT", "stat failed" );
-.loadlib 'io_ops'
-.sub main :main
-    .local pmc pio
-    .local int len
-    .include "stat.pasm"
-    .local string f
-    f = 'no_such_file'
-    len = stat f, .STAT_FILESIZE
-    print "never\n"
-.end
-CODE
-/stat failed:/
 OUTPUT
 
 # Local Variables:
