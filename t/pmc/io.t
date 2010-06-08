@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 37;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -411,25 +411,6 @@ ok 2
 ok 3
 OUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'printerr op' );
-.loadlib 'io_ops'
-   new P0, ['String']
-   set P0, "This is a test\n"
-   printerr 10
-   printerr "\n"
-   printerr 1.0
-   printerr "\n"
-   printerr "foo"
-   printerr "\n"
-   printerr P0
-   end
-CODE
-10
-1
-foo
-This is a test
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
 .include 'stdio.pasm'
 .sub main :main
@@ -483,20 +464,24 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'seek/tell' );
-.loadlib 'io_ops'
-   open P0, "$temp_file", 'w'
-   print P0, "Hello "
-   tell I0, P0
-   print P0, "World!"
-   seek P0, I0, 0
-   print P0, "Parrot!\\n"
-   close P0
-   say "ok 1"
-   open P0, "$temp_file", 'r'
-   read S0, P0, 65635
-   print S0
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'seek/tell' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+
+    $P0.'open'(temp_file, 'w')
+    $P0.'print'("Hello ")
+    $I0 = $P0.'tell'()
+    $P0.'print'("World!")
+    $P0.'seek'(0, $I0)
+    $P0.'print'("Parrot!\n")
+    $P0.'close'()
+    say "ok 1"
+
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'read'(65635)
+    print $S0
+.end
 CODE
 ok 1
 Hello Parrot!
