@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2036);
+plan(2051);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -632,6 +632,8 @@ sub test_match_result_from_constant () {
        "Match result from Constant 1 is a PAST::Pattern::Match.");
     ok(?$/,
        "Match result from Constant 1 converts to boolean truth.");
+    ok($/.from() == 5,
+       "Match result from Constant 1 has correct .from.");
 
     $node := 6;
     $/ := $node ~~ $pattern;
@@ -639,6 +641,84 @@ sub test_match_result_from_constant () {
        "Match result from Constant 0 is a PAST::Pattern::Match.");
     ok(!?$/,
        "Match result from Constant 0 converts to boolean falsehood.");
+}
+
+sub test_match_result_from_node_children () {
+    my $pattern := PAST::Pattern::Block.new(PAST::Pattern::Op.new(),
+                                            :blocktype("lexical"));
+    my $past := PAST::Block.new(PAST::Op.new(),
+                                :blocktype("lexical"));
+    my $/ := $past ~~ $pattern;
+
+    ok($/<blocktype>.from() eq "lexical",
+       '$/<blocktype> is correct for PAST::Pattern::Blocks.');
+    ok($/[0].from() =:= $past[0],
+       '$/[0] is correct for PAST::Pattern::Blocks.');
+
+    $pattern := 
+      PAST::Pattern::Op.new(PAST::Pattern::Val.new(:returns<Integer>),
+                            PAST::Pattern::Val.new(:returns<Integer>),
+                            :pirop<add>);
+    $past := PAST::Op.new(PAST::Val.new(:returns<Integer>),
+                          PAST::Val.new(:returns<Integer>),
+                         :pirop<add>);
+    $/ := $past ~~ $pattern;
+
+    ok($/<pirop>.from() eq "add",
+       '$/<pirop> is correct for PAST::Pattern::Ops.');
+    ok($/[0].from() =:= $past[0],
+       '$/[0] is correct for PAST::Pattern::Ops.');
+    ok($/[1].from() =:= $past[1],
+       '$/[1] is correct for PAST::Pattern::Ops.');
+
+    $pattern := PAST::Pattern::Stmts.new(:name<foo>,
+                                         PAST::Pattern::Op.new());
+    $past := PAST::Stmts.new(:name<foo>,
+                             PAST::Op.new());
+    $/ := $past ~~ $pattern;
+
+    ok($/<name>.from() eq "foo",
+       '$/<name> is correct for PAST::Pattern::Stmts.');
+    ok($/[0].from() =:= $past[0],
+       '$/[0] is correct for PAST::Pattern::Stmts.');
+
+    $pattern :=
+      PAST::Pattern::Val.new(:value(PAST::Pattern::Block.new()),
+                             PAST::Pattern::Block.new());
+    $past := PAST::Val.new(:value(PAST::Block.new()),
+                           PAST::Block.new());
+    $/ := $past ~~ $pattern;
+
+    ok($/<value>.from() =:= $past.value(),
+       '$/<value> is correct for PAST::Pattern::Vals.');
+    ok($/[0].from() =:= $past[0],
+       '$/[0] is correct for PAST::Pattern::Vals.');
+
+    $pattern :=
+      PAST::Pattern::Var.new(:name<foo>,
+                             :scope<package>,
+                             PAST::Pattern::Val.new());
+    $past := PAST::Var.new(:name<foo>, :scope<package>,
+                           PAST::Val.new());
+    $/ := $past ~~ $pattern;
+
+    ok($/<name>.from() eq "foo",
+       '$/<name> is correct for PAST::Pattern::Vars.');
+    ok($/<scope>.from() eq "package",
+       '$/<scope> is correct for PAST::Pattern::Vars.');
+    ok($/[0].from() =:= $past[0],
+       '$/[0] is correct for PAST::Pattern::Vars.');
+
+    $pattern := PAST::Pattern::VarList.new(:name<params>,
+                                           PAST::Pattern::Var.new());
+    $past := PAST::VarList.new(:name<params>,
+                               PAST::Var.new());
+    $/ := $past ~~ $pattern;
+
+    ok($/<name>.from() eq "params",
+       '$/<name> is correct for PAST::Pattern::VarList.');
+    ok($/[0].from() =:= $past[0],
+       '$/[0] is correct for PAST::Pattern::VarList.');
 }
 
 # Local Variables:

@@ -76,8 +76,12 @@ class PAST::Pattern::Node is PAST::Pattern {
         }
         my $nAttr := $node.attr($attribute, null, 0);
         my $result := $nAttr ~~ $pAttr;
-        $/{$attribute} := $result;
-        $/.success(0) unless $result;
+        if ($result) {
+            $/{$attribute} := $result;
+        }
+        else {
+            $/.success(0);
+        }
         $result;
     }
 
@@ -119,20 +123,19 @@ class PAST::Pattern::Node is PAST::Pattern {
 
     method ACCEPTS ($node) {
         my $result := self.ACCEPTSEXACTLY($node);
-        if ($result) {
-            $result := PAST::Pattern::Match.new(1, $node);
-        }
-        elsif ($node ~~ PAST::Node) {
-            my $index := 0;
-            my $max := pir::elements__IP($node);
-            until ($index == $max) {
-                $result := $node[$index] ~~ self;
-                return $result if $result;
-                $index++;
+        unless ($result) {
+            if ($node ~~ PAST::Node) {
+                my $index := 0;
+                my $max := pir::elements__IP($node);
+                until ($index == $max) {
+                    $result := $node[$index] ~~ self;
+                    return $result if $result;
+                    $index++;
+                }
+                $result := PAST::Pattern::Match.new(0);
+            } else {
+                $result := PAST::Pattern::Match.new(0);
             }
-            $result := PAST::Pattern::Match.new(0);
-        } else {
-            $result := PAST::Pattern::Match.new(0);
         }
         $result;
     }
@@ -228,6 +231,7 @@ class PAST::Pattern::Block is PAST::Pattern::Node {
                                                  "pirflags", $/)
          && PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/.from($node) if $/;
         $/;
     }
 }
@@ -258,6 +262,7 @@ class PAST::Pattern::Op is PAST::Pattern::Node {
                                                  "inline", $/)
          && PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/.from($node) if $/;
         $/;
     }
 }
@@ -268,6 +273,7 @@ class PAST::Pattern::Stmts is PAST::Pattern::Node {
         my $/ := PAST::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/.from($node) if $/;
         $/;
     }
 }
@@ -284,6 +290,7 @@ class PAST::Pattern::Val is PAST::Pattern::Node {
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/)
          && PAST::Pattern::Node::check_attribute(self, $node, 
                                                  "value", $/));
+        $/.from($node) if $/;
         $/;
     }
 }
@@ -342,6 +349,7 @@ class PAST::Pattern::Var is PAST::Pattern::Node {
                                                  "multitype", $/)
          && PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/.from($node) if $/;
         $/;
     }
 }
@@ -352,6 +360,7 @@ class PAST::Pattern::VarList is PAST::Pattern::Node {
         my $/ := PAST::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/.from($node) if $/;
         $/;
     }
 }
