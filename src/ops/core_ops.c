@@ -14516,7 +14516,8 @@ Parrot_get_results_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
             PARROT_ERRORS_RESULT_COUNT_FLAG);
 
-    argc = VTABLE_elements(interp, signature);return (opcode_t *)cur_opcode + argc + 2;
+    argc = VTABLE_elements(interp, signature);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);return (opcode_t *)cur_opcode + argc + 2;
 }
 
 opcode_t *
@@ -14797,7 +14798,7 @@ Parrot_exit_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t        *dest;
     opcode_t * const ret       =cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
-    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, 
+    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
 
     VTABLE_set_pointer(interp, resume, ret);
@@ -14815,7 +14816,7 @@ Parrot_exit_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t        *dest;
     opcode_t * const ret       =cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
-    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, 
+    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
 
     VTABLE_set_pointer(interp, resume, ret);
