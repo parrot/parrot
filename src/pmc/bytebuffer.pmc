@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id:  $
+$Id$
 
 =head1 NAME
 
@@ -52,13 +52,13 @@ Free the buffer when destroying.
         STATICSELF.init();
         SET_ATTR_size(INTERP, SELF, initial_size);
         SET_ATTR_allocated_size(INTERP, SELF, initial_size);
-	content = Parrot_gc_allocate_memory_chunk(INTERP, initial_size);
+        content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, initial_size);
         SET_ATTR_content(INTERP, SELF, content);
     }
 
     VTABLE void destroy() {
         unsigned char *content;
-	GET_ATTR_content(INTERP, SELF, content);
+        GET_ATTR_content(INTERP, SELF, content);
         Parrot_gc_free_memory_chunk(INTERP, content);
     }
 
