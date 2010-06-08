@@ -548,6 +548,7 @@ sub test_match_result () {
     test_match_result_from_sub_node();
     test_match_result_from_closure();
     test_match_result_from_constant();
+    test_match_result_from_node_children();
 }
 
 sub test_match_result_from_top_node () {

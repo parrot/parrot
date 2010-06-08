@@ -64,27 +64,24 @@ class PAST::Pattern::Node is PAST::Pattern {
         }
         $result;
     }
-    
-    sub check ($patt, $val) {
-        my $result := 1;
-        if (pir::defined__IP($patt)) {
-            if (!pir::defined__IP($val)) {
-                $result := 0;
-            }
-            else {
-                $result := ($val ~~ $patt);
-            }
+
+    sub check_attribute ($pattern, $node, $attribute, $/) {
+        my $pAttr := $pattern.attr($attribute, null, 0);
+        unless pir::defined__IP($pAttr) {
+            return 1;
         }
+        unless pir::defined__IP($pAttr) {
+            $/.success(0);
+            return 0;
+        }
+        my $nAttr := $node.attr($attribute, null, 0);
+        my $result := $nAttr ~~ $pAttr;
+        $/{$attribute} := $result;
+        $/.success(0) unless $result;
         $result;
     }
 
-
-    sub check_attribute ($pattern, $node, $attribute) {
-        check($pattern.attr($attribute, null, 0),
-              $node.attr($attribute, null, 0));
-    }
-
-    sub check_children ($pattern, $node) {
+    sub check_children ($pattern, $node, $/) {
         my $pLen := pir::elements($pattern);
         my $nLen := pir::elements($node);
         my $result;
@@ -92,27 +89,32 @@ class PAST::Pattern::Node is PAST::Pattern {
         if ($pLen == $nLen) {
             $index := 0;
             while ($index < $pLen) {
-                unless (check($pattern[$index], $node[$index])) {
+                if ($result := $node[$index] ~~ $pattern[$index]) {
+                    $/[$index] := $result;
+                }
+                else {
+                    $/.success(0);
                     return 0;
                 }
                 $index++;
             }
             $result := 1;
         } else {
+            $/.success(0);
             $result := 0;
         }
         $result;
     }
 
-    sub check_node_attributes ($pattern, $node) {
-        (check_attribute($pattern, $node, "name")
-         && check_attribute($pattern, $node, "source")
-         && check_attribute($pattern, $node, "pos")
-         && check_attribute($pattern, $node, "returns")
-         && check_attribute($pattern, $node, "arity")
-         && check_attribute($pattern, $node, "named")
-         && check_attribute($pattern, $node, "flat")
-         && check_attribute($pattern, $node, "lvalue"));
+    sub check_node_attributes ($pattern, $node, $/) {
+        (check_attribute($pattern, $node, "name", $/)
+         && check_attribute($pattern, $node, "source", $/)
+         && check_attribute($pattern, $node, "pos", $/)
+         && check_attribute($pattern, $node, "returns", $/)
+         && check_attribute($pattern, $node, "arity", $/)
+         && check_attribute($pattern, $node, "named", $/)
+         && check_attribute($pattern, $node, "flat", $/)
+         && check_attribute($pattern, $node, "lvalue", $/));
     }
 
     method ACCEPTS ($node) {
@@ -192,43 +194,41 @@ class PAST::Pattern::Block is PAST::Pattern::Node {
     method pirflags ($val?) {
         self.attr("pirflags", $val, !pir::isnull__iP($val));
     }
-
-    sub check_block_attributes($pattern, $node) {
-        (PAST::Pattern::Node::check_attribute($pattern, $node,
-                                              "blocktype")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "closure")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "control")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "loadinit")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "namespace")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "multi")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "hll")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "nsentry")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "symtable")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "lexical")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "compiler")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, 
-                                                 "compiler_args")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "subid")
-         && PAST::Pattern::Node::check_attribute($pattern, $node,
-                                                 "pirflags"));
-    }
     
     method ACCEPTSEXACTLY ($node) {
-        ($node ~~ PAST::Block
-         && PAST::Pattern::Node::check_children(self, $node)
-         && PAST::Pattern::Node::check_node_attributes(self, $node)
-         && check_block_attributes(self, $node));
+        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Block;
+        my $/ := PAST::Pattern::Match.new(1);
+        (PAST::Pattern::Node::check_attribute(self, $node,
+                                              "blocktype", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "closure", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "control", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "loadinit", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "namespace", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "multi", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "hll", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "nsentry", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "symtable", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "lexical", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "compiler", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node, 
+                                                 "compiler_args", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "subid", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "pirflags", $/)
+         && PAST::Pattern::Node::check_children(self, $node, $/)
+         && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/;
     }
 }
 
@@ -246,25 +246,29 @@ class PAST::Pattern::Op is PAST::Pattern::Node {
         self.attr("inline", $val, !pir::isnull__iP($val));
     }
 
-    sub check_op_attributes ($pattern, $node) {
-        (PAST::Pattern::Node::check_attribute($pattern, $node, "pasttype")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "pirop")
-         && PAST::Pattern::Node::check_attribute($pattern, $node, "inline"));          
-    }
 
     method ACCEPTSEXACTLY ($node) {
-        (($node ~~ PAST::Op)
-         && PAST::Pattern::Node::check_children(self, $node)
-         && PAST::Pattern::Node::check_node_attributes(self, $node)
-         && check_op_attributes(self, $node));
+        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Op;
+        my $/ := PAST::Pattern::Match.new(1);
+        (PAST::Pattern::Node::check_attribute(self, $node,
+                                              "pasttype", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "pirop", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "inline", $/)
+         && PAST::Pattern::Node::check_children(self, $node, $/)
+         && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/;
     }
 }
 
 class PAST::Pattern::Stmts is PAST::Pattern::Node {
     method ACCEPTSEXACTLY ($node) {
-        ($node ~~ PAST::Stmts
-         && PAST::Pattern::Node::check_children(self, $node)
-         && PAST::Pattern::Node::check_node_attributes(self, $node));
+        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Stmts;
+        my $/ := PAST::Pattern::Match.new(1);
+        (PAST::Pattern::Node::check_children(self, $node, $/)
+         && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/;
     }
 }
 
@@ -274,10 +278,13 @@ class PAST::Pattern::Val is PAST::Pattern::Node {
     }
 
     method ACCEPTSEXACTLY ($node) {
-        ($node ~~ PAST::Val
-         && PAST::Pattern::Node::check_children(self, $node)
-         && PAST::Pattern::Node::check_node_attributes(self, $node)
-         && PAST::Pattern::Node::check_attribute(self, $node, "value"));
+        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Val;
+        my $/ := PAST::Pattern::Match.new(1);
+        (PAST::Pattern::Node::check_children(self, $node, $/)
+         && PAST::Pattern::Node::check_node_attributes(self, $node, $/)
+         && PAST::Pattern::Node::check_attribute(self, $node, 
+                                                 "value", $/));
+        $/;
     }
 }
 
@@ -315,26 +322,37 @@ class PAST::Pattern::Var is PAST::Pattern::Node {
     }
 
     method ACCEPTSEXACTLY ($node) {
-        ($node ~~ PAST::Var
-         && PAST::Pattern::Node::check_children(self, $node)
-         && PAST::Pattern::Node::check_node_attributes(self, $node)
-         && PAST::Pattern::Node::check_attribute(self, $node, "scope")
-         && PAST::Pattern::Node::check_attribute(self, $node, "isdecl")
-         && PAST::Pattern::Node::check_attribute(self, $node, "namespace")
-         && PAST::Pattern::Node::check_attribute(self, $node, "slurpy")
-         && PAST::Pattern::Node::check_attribute(self, $node, "call_sig")
-         && PAST::Pattern::Node::check_attribute(self, $node, "viviself")
-         && PAST::Pattern::Node::check_attribute(self, $node, "vivibase")
-         && PAST::Pattern::Node::check_attribute(self, $node, "multitype"));
+        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Var;
+        my $/ := PAST::Pattern::Match.new(1);
+        (PAST::Pattern::Node::check_attribute(self, $node,
+                                              "scope", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "isdecl", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "namespace", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "slurpy", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "call_sig", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "viviself", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "vivibase", $/)
+         && PAST::Pattern::Node::check_attribute(self, $node,
+                                                 "multitype", $/)
+         && PAST::Pattern::Node::check_children(self, $node, $/)
+         && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/;
     }
 }
 
 class PAST::Pattern::VarList is PAST::Pattern::Node {
     method ACCEPTSEXACTLY ($node) {
-        my $result := ($node ~~ PAST::VarList
-         && PAST::Pattern::Node::check_children(self, $node)
-         && PAST::Pattern::Node::check_node_attributes(self, $node));
-        $result;
+        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::VarList;
+        my $/ := PAST::Pattern::Match.new(1);
+        (PAST::Pattern::Node::check_children(self, $node, $/)
+         && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
+        $/;
     }
 }
 
