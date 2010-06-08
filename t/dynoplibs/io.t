@@ -16,7 +16,7 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 6
+.const int TESTS = 10
 
 .loadlib 'io_ops'
 
@@ -31,7 +31,10 @@ Tests various io opcodes.
     open_null_mode()
     open_pipe_for_reading()
     getfd_fdopen()
-    open_pipe_for_writing() # must be last (doesn't use test_more)
+
+    # must come after (these don't use test_more)
+    open_pipe_for_writing()
+    read_invalid_fh()
 .end
 
 .sub open_delegates_to_filehandle_pmc
@@ -155,7 +158,7 @@ Tests various io opcodes.
     pipe = open command, 'wp'
     unless pipe goto open_pipe_for_writing_failed
 
-    pipe.'puts'("ok 5 - open pipe for writing\n")
+    pipe.'puts'("ok 7 - open pipe for writing\n")
     close pipe
     .return ()
 
@@ -170,13 +173,6 @@ Tests various io opcodes.
 
 # TT #1178
 .sub 'getfd_fdopen'
-    getstdout $P0
-    $I0 = $P0.'get_fd'()
-    fdopen $P1, $I0, 'w'
-    $I0 = defined $P1
-    ok($I0, 'get_fd()/fdopen')
-    close $P1
-
     getstdout $P0
     $I0 = $P0.'get_fd'()
     fdopen $P1, $I0, 'w'
@@ -196,6 +192,34 @@ Tests various io opcodes.
   ret:
     pop_eh
     .return ()
+.end
+
+.sub 'read_invalid_fh'
+    $P0 = new ['FileHandle']
+
+    push_eh _readline_handler
+    $S0 = readline $P0
+    print "not "
+
+_readline_handler:
+        print "ok 8\n"
+        pop_eh
+
+    push_eh _read_handler
+    $S0 = read $P0, 1
+    print "not "
+
+_read_handler:
+        print "ok 9\n"
+        pop_eh
+
+    push_eh _print_handler
+    print $P0, "kill me now\n"
+    print "not "
+
+_print_handler:
+        print "ok 10\n"
+        pop_eh
 .end
 
 .namespace ["Testing"]

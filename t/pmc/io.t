@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 38;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -41,13 +41,13 @@ sub file_content_is {
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
-pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (ops)");
-.loadlib 'io_ops'
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction", todo => 'TT #1659');
 .const string temp_file = '%s'
 .sub main :main
     interpinfo $I0, 2    # GC mark runs
-    $P0 = open temp_file, 'w'
-        needs_destroy $P0
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    needs_destroy $P0
     print $P0, "a line\n"
     null $P0            # kill it
     sweep 0            # a lazy GC has to close the PIO
@@ -57,42 +57,6 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (o
 .end
 CODE
 a line
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception (ops)" );
-.loadlib 'io_ops'
-.sub main :main
-    new $P0, ['FileHandle']
-
-    push_eh _readline_handler
-    $S0 = readline $P0
-    print "not "
-
-_readline_handler:
-        print "ok 1\n"
-        pop_eh
-
-    push_eh _read_handler
-    $S0 = read $P0, 1
-    print "not "
-
-_read_handler:
-        print "ok 2\n"
-        pop_eh
-
-    push_eh _print_handler
-    print $P0, "kill me now\n"
-    print "not "
-
-_print_handler:
-        print "ok 3\n"
-        pop_eh
-
-.end
-CODE
-ok 1
-ok 2
-ok 3
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception" );
