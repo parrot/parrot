@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 39;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -708,50 +708,33 @@ sub_1: 012
 sub_2: 345
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'read on null PMC throws exception');
-.loadlib 'io_ops'
-.sub main :main
-    null $P1
-    $S0 = read $P1, 1
-    end
-.end
-CODE
-/read from null/
-OUT
-
 ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 
 print $FOO "T\xc3\xb6tsch\n";
 close $FOO;
 
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
-.loadlib 'io_ops'
+pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, read parts" );
+.const string temp_file = '%s'
 .sub main :main
     .local pmc pio
-    .local int len
-    .include "stat.pasm"
-    .local string f
-    f = '$temp_file'
-    len = stat f, .STAT_FILESIZE
     pio = new ['FileHandle']
-    pio.'open'(f, 'r')
+    pio.'open'(temp_file, 'r')
     pio.'encoding'("utf8")
-    \$S0 = pio.'read'(2)
-    len -= 2
-    \$S1 = pio.'read'(len)
-    \$S0 .= \$S1
+    $S0 = pio.'read'(2)
+    $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
+    $S0 .= $S1
     pio.'close'()
-    \$I1 = charset \$S0
-    \$S2 = charsetname \$I1
-    say \$S2
+    $I1 = charset $S0
+    $S2 = charsetname $I1
+    say $S2
 
-    \$I1 = encoding \$S0
-    \$S2 = encodingname \$I1
-    say \$S2
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    say $S2
 
-    \$I1 = find_charset 'iso-8859-1'
-    trans_charset \$S1, \$S0, \$I1
-    print \$S1
+    $I1 = find_charset 'iso-8859-1'
+    trans_charset $S1, $S0, $I1
+    print $S1
 .end
 CODE
 unicode

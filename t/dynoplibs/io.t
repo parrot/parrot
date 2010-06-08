@@ -16,7 +16,7 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 5
+.const int TESTS = 6
 
 .loadlib 'io_ops'
 
@@ -25,6 +25,7 @@ Tests various io opcodes.
 
     plan(TESTS)
 
+    read_on_null()
     open_delegates_to_filehandle_pmc()
     open_null_filename()
     open_null_mode()
@@ -181,6 +182,20 @@ Tests various io opcodes.
     fdopen $P1, $I0, 'w'
     $I0 = defined $P1
     ok($I0, 'fdopen - no close')
+.end
+
+.sub 'read_on_null'
+    .const string description = "read on null PMC throws exception"
+    push_eh eh
+    null $P1
+    $S0 = read $P1, 1
+    ok(0, description)
+    goto ret
+  eh:
+    ok(1, description)
+  ret:
+    pop_eh
+    .return ()
 .end
 
 .namespace ["Testing"]
