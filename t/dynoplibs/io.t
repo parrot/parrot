@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -244,7 +244,7 @@ _print_handler:
 
     # restore stderr
     setstderr $P0
-    
+
     $S0 = $P1.'readall'()
     is($S0, <<'OUTPUT', 'printerr opcode')
 10
