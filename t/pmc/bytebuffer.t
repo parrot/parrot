@@ -18,9 +18,10 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(2)
+    plan(7)
 
     test_init()
+    test_set()
 .end
 
 .sub test_init
@@ -34,6 +35,27 @@ Tests C<ByteBuffer> PMC..
     n = elements bb
     is(n, 42, "size of a new buffer with initial size is correct")
 
+.end
+
+.sub test_set
+    .local pmc bb
+    .local string s
+    .local int n, c
+    bb = new ['ByteBuffer']
+    s = 'Hi'
+    bb = s
+    n = elements bb
+    is(n, 2, "size is the same as the source string bytelength")
+    n = bb[0]
+    c = ord 'H'
+    is(n, c, "first byte is the same as the source string")
+    n = bb[1]
+    c = ord 'i'
+    is(n, c, "second byte is the same as the source string")
+    n = bb[2]
+    is(n, 0, "byte out of size is 0")
+    n = bb[-1]
+    is(n, 0, "byte at negative index is 0")
 .end
 
 # Local Variables:

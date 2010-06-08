@@ -22,6 +22,7 @@ individual bytes and conversions from and to parrot strings.
 pmclass ByteBuffer auto_attrs {
     ATTR INTVAL allocated_size;
     ATTR INTVAL size;
+    ATTR STRING *source;
     ATTR unsigned char *content;
 
 /*
@@ -36,6 +37,9 @@ Create an empty buffer
 =item C<void init_int()>
 Create a buffer of initial_size capacity.
 
+=item C<void mark()>
+Mark the source string if any.
+
 =item C<void destroy()>
 Free the buffer when destroying.
 
@@ -44,7 +48,7 @@ Free the buffer when destroying.
 */
 
     VTABLE void init() {
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     VTABLE void init_int(INTVAL initial_size) {
@@ -56,10 +60,21 @@ Free the buffer when destroying.
         SET_ATTR_content(INTERP, SELF, content);
     }
 
+    VTABLE void mark() {
+        const STRING * source;
+        GET_ATTR_source(INTERP, SELF, source);
+        if (!STRING_IS_NULL(source))
+            Parrot_gc_mark_STRING_alive(INTERP, source);
+    }
+
     VTABLE void destroy() {
-        unsigned char *content;
-        GET_ATTR_content(INTERP, SELF, content);
-        Parrot_gc_free_memory_chunk(INTERP, content);
+        INTVAL allocated_size;
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (allocated_size) {
+            unsigned char *content;
+            GET_ATTR_content(INTERP, SELF, content);
+            Parrot_gc_free_memory_chunk(INTERP, content);
+        }
     }
 
 /*
@@ -75,6 +90,46 @@ Get current size.
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
+    }
+
+/*
+
+=item C<void set_string_native()>
+Reset the buffer with the content of the string.
+
+=cut
+
+*/
+
+    VTABLE void set_string_native(STRING *new_string) {
+        INTVAL allocated_size;
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (allocated_size) {
+            unsigned char *content;
+            GET_ATTR_content(INTERP, SELF, content);
+            Parrot_gc_free_memory_chunk(INTERP, content);
+            SET_ATTR_allocated_size(INTERP, SELF, 0);
+        }
+        SET_ATTR_source(INTERP, SELF, new_string);
+        SET_ATTR_size(INTERP, SELF, Parrot_str_byte_length(INTERP, new_string));
+        SET_ATTR_content(INTERP, SELF, (unsigned char *)new_string->strstart);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int()>
+Get the value of the byte at position or 0 if out of bounds.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL position) {
+        INTVAL size;
+        unsigned char *content;
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_content(INTERP, SELF, content);
+        return (position >= 0 && position < size) ? content[position] : (INTVAL) 0;
     }
 
 } /* pmclass end */
