@@ -16,7 +16,7 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 10
+.const int TESTS = 11
 
 .loadlib 'io_ops'
 
@@ -31,6 +31,7 @@ Tests various io opcodes.
     open_null_mode()
     open_pipe_for_reading()
     getfd_fdopen()
+    printerr_tests()
 
     # must come after (these don't use test_more)
     open_pipe_for_writing()
@@ -158,7 +159,7 @@ Tests various io opcodes.
     pipe = open command, 'wp'
     unless pipe goto open_pipe_for_writing_failed
 
-    pipe.'puts'("ok 7 - open pipe for writing\n")
+    pipe.'puts'("ok 8 - open pipe for writing\n")
     close pipe
     .return ()
 
@@ -202,7 +203,7 @@ Tests various io opcodes.
     print "not "
 
 _readline_handler:
-        print "ok 8\n"
+        print "ok 9\n"
         pop_eh
 
     push_eh _read_handler
@@ -210,7 +211,7 @@ _readline_handler:
     print "not "
 
 _read_handler:
-        print "ok 9\n"
+        print "ok 10\n"
         pop_eh
 
     push_eh _print_handler
@@ -218,8 +219,38 @@ _read_handler:
     print "not "
 
 _print_handler:
-        print "ok 10\n"
+        print "ok 11\n"
         pop_eh
+.end
+
+.sub 'printerr_tests'
+    # temporarily capture stderr
+    $P0 = getstderr
+    $P1 = new ['StringHandle']
+    $S0 = null
+    $P1.'open'($S0, 'w')
+    setstderr $P1
+
+    $P2 = new ['String']
+    $P2 = "This is a test\n"
+    printerr 10
+    printerr "\n"
+    printerr 1.0
+    printerr "\n"
+    printerr "foo"
+    printerr "\n"
+    printerr $P2
+
+    # restore stderr
+    setstderr $P0
+    
+    $S0 = $P1.'readall'()
+    is($S0, <<'OUTPUT', 'printerr opcode')
+10
+1
+foo
+This is a test
+OUTPUT
 .end
 
 .namespace ["Testing"]

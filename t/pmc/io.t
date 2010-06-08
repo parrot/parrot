@@ -191,43 +191,47 @@ OUTPUT
 close $FOO;
 
 # write to file opened for reading
-pasm_output_is( <<"CODE", <<'OUTPUT', "3-arg open" );
-.loadlib 'io_ops'
-   open P1, "$temp_file", 'w'
-   print P1, "Foobar\\n"
-   close P1
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "3-arg open" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'w')
+    $P1.'print'("Foobar\n")
+    $P1.'close'()
 
-   push_eh _print_to_read_only
+    push_eh _print_to_read_only
 
-   open P2, "$temp_file", 'r'
-   print P2, "baz\\n"
-   say "skipped"
+    $P2 = new ['FileHandle']
+    $P2.'open'(temp_file, 'r')
+    $P2.'print'("baz\n")
+    say "skipped"
 
-_print_to_read_only:
-   say "caught writing to file opened for reading"
-   pop_eh
+  _print_to_read_only:
+    say "caught writing to file opened for reading"
+    pop_eh
 
-   close P2
+    $P2.'close'()
 
-   open P3, "$temp_file", 'r'
-   readline S1, P3
-   close P3
-   print S1
-
-
-   end
+    $P3 = new ['FileHandle']
+    $P3.'open'(temp_file, 'r')
+    $S1 = $P3.'readline'()
+    $P3.'close'()
+    print $S1
+.end
 CODE
 caught writing to file opened for reading
 Foobar
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'open and close' );
-.loadlib 'io_ops'
-   open P1, "$temp_file", "w"
-   print P1, "Hello, World!\\n"
-   close P1
-   say "done"
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'open and close' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, "w")
+    $P1.'print'("Hello, World!\n")
+    $P1.'close'()
+    say "done"
+.end
 CODE
 done
 OUTPUT
@@ -236,12 +240,14 @@ file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
 Hello, World!
 OUTPUT
 
-pasm_output_is( <<"CODE", '', 'append' );
-.loadlib 'io_ops'
-   open P1, "$temp_file", 'wa'
-   print P1, "Parrot flies\\n"
-   close P1
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), '', 'append' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'wa')
+    $P1.'print'("Parrot flies\n")
+    $P1.'close'()
+.end
 CODE
 
 file_content_is( $temp_file, <<'OUTPUT', 'append file contents' );
@@ -249,12 +255,14 @@ Hello, World!
 Parrot flies
 OUTPUT
 
-pasm_output_is( <<"CODE", '', 'write to file' );
-.loadlib 'io_ops'
-   open P1, "$temp_file", 'w'
-   print P1, "Parrot overwrites\\n"
-   close P1
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), '', 'write to file' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'w')
+    $P1.'print'("Parrot overwrites\n")
+    $P1.'close'()
+.end
 CODE
 
 file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
