@@ -16,14 +16,17 @@ Tests C<ByteBuffer> PMC..
 
 =cut
 
+.include 'iglobals.pasm'
+
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(17)
+    plan(18)
 
     test_init()
     test_set_string()
     test_set_byte()
     test_get_string()
+    test_alloc()
 .end
 
 .sub test_init
@@ -120,6 +123,63 @@ end:
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s
     is(n, 0xD1, "getting utf8 from buffer gives correct codepoint")
+.end
+
+.sub test_alloc
+    # Exercise buffer reallocation building a utf16 string with the
+    # codepoints 32-8192
+    .local pmc bb
+    .local int i, big, pos, b0, b1, c
+
+    # Get endianess to set the bytes in the appropiate order.
+    # *** XXX *** Need report from big endian platforms.
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    big = $P0['bigendian']
+
+    bb = new ['ByteBuffer']
+    pos = 0
+    i = 32
+loopset:
+    b0 = div i, 256
+    b1 = mod i, 256
+    if big goto setbig
+    bb[pos] = b1
+    inc pos
+    bb[pos] = b0
+    inc pos
+    goto setdone
+setbig:
+    bb[pos] = b0
+    inc pos
+    bb[pos] = b1
+    inc pos
+setdone:
+    inc i
+    if i < 8192 goto loopset
+
+    .local string s
+    s = bb.'get_string'('unicode', 'utf16')
+
+    # Check string size
+    i = length s
+    if i != 8160 goto failed
+
+    # Check string content
+    i = 32
+    pos = 0
+loopcheck:
+    c = ord s, pos
+    if c != i goto failed
+    inc pos
+    inc i
+    if i < 8192 goto loopcheck
+    ok(1, "reallocation")
+    goto end
+failed:
+    say i
+    ok(0, "reallocation")
+end:
 .end
 
 # Local Variables:

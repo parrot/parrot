@@ -28,9 +28,11 @@ static STRING * build_string(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static INTVAL grow_to(INTVAL position);
 #define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(content))
+#define ASSERT_ARGS_grow_to __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -173,7 +175,7 @@ Set the value of the byte at position.
 
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
         if (position >= allocated_size) {
-            INTVAL newsize = position + 1;
+            INTVAL newsize = grow_to(position);
             if (allocated_size == 0) {
                 INTVAL copysize = newsize;
                 STRING * source;
@@ -271,6 +273,11 @@ as the string argument.
 
 =over 4
 
+=item C<static INTVAL grow_to(INTVAL position)>
+
+Calculate new size enough for using position and with some margin to
+decrease the number of reallocations.
+
 =item C<static STRING * build_string(PARROT_INTERP, const unsigned char
 *content, INTVAL size, const CHARSET *charset, const ENCODING *encoding)>
 
@@ -279,6 +286,17 @@ Build a string fro the buffer content with the charset and encoding specified.
 =cut
 
 */
+
+static INTVAL
+grow_to(INTVAL position)
+{
+    const UINTVAL blocksize = 2048;
+    UINTVAL minsize = position + 1;
+    return (INTVAL) (minsize < 64 ? 64 :
+           minsize < 256 ? 256 :
+           minsize < 1024 ? 1024 :
+           ((minsize + blocksize - 1) / blocksize) * blocksize);
+}
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
@@ -295,7 +313,7 @@ build_string(PARROT_INTERP, ARGIN(const unsigned char *content),
     if (encoding == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Invalid encoding");
-    result = Parrot_str_new_init(interp, (char *)content, size, encoding, charset, 0);
+    result = Parrot_str_new_init(interp, (const char *)content, size, encoding, charset, 0);
     if (!CHARSET_VALIDATE(interp, result))
         Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
