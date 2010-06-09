@@ -132,6 +132,58 @@ Get the value of the byte at position or 0 if out of bounds.
         return (position >= 0 && position < size) ? content[position] : (INTVAL) 0;
     }
 
+/*
+
+=item C<void set_integer_keyed_int()>
+Set the value of the byte at position.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed_int(INTVAL position, INTVAL value) {
+        unsigned char *content;
+        INTVAL size, allocated_size;
+        if (position < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Negative position not allowed");
+
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (position >= allocated_size) {
+            INTVAL newsize = position + 1;
+            if (allocated_size == 0) {
+                INTVAL copysize = newsize;
+                STRING * source;
+                content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, newsize);
+                GET_ATTR_source(INTERP, SELF, source);
+                if (!STRING_IS_NULL(source)) {
+                    INTVAL srclen = Parrot_str_byte_length(INTERP, source);
+                    if (srclen < copysize)
+                        copysize = srclen;
+                    memcpy(content, source->strstart, copysize);
+                    SET_ATTR_source(INTERP, SELF, STRINGNULL);
+                }
+            }
+            else {
+                GET_ATTR_content(INTERP, SELF, content);
+                content = (unsigned char *)
+                    Parrot_gc_reallocate_memory_chunk(INTERP, content, newsize);
+            }
+
+            SET_ATTR_content(INTERP, SELF, content);
+            SET_ATTR_allocated_size(INTERP, SELF, newsize);
+        }
+        else
+            GET_ATTR_content(INTERP, SELF, content);
+
+        GET_ATTR_size(INTERP, SELF, size);
+        if (position >= size) {
+            size = position + 1;
+            SET_ATTR_size(INTERP, SELF, size);
+        }
+        content[position] = value;
+    }
+
 } /* pmclass end */
 
 /*

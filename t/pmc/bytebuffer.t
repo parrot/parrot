@@ -18,10 +18,11 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(7)
+    plan(12)
 
     test_init()
-    test_set()
+    test_set_string()
+    test_set_byte()
 .end
 
 .sub test_init
@@ -37,7 +38,7 @@ Tests C<ByteBuffer> PMC..
 
 .end
 
-.sub test_set
+.sub test_set_string
     .local pmc bb
     .local string s
     .local int n, c
@@ -56,6 +57,32 @@ Tests C<ByteBuffer> PMC..
     is(n, 0, "byte out of size is 0")
     n = bb[-1]
     is(n, 0, "byte at negative index is 0")
+.end
+
+.sub test_set_byte
+    .local pmc bb
+    .local int n
+    bb = new ['ByteBuffer']
+    bb[255] = 42
+    n = elements bb
+    is(n, 256, "setting a byte resize empty buffer")
+
+    .local string s
+    s = 'Hi'
+    bb = s
+    bb[2] = 42
+    n = elements bb
+    is(n, 3, "setting a byte resize buffer initialized from string")
+
+    bb = new ['ByteBuffer'], 42
+    bb[41] = 9
+    n = elements bb
+    is(n, 42, "setting a byte within range does not resize")
+    bb[42] = 7
+    n = elements bb
+    is(n, 43, "setting a byte resize buffer with initial size")
+    n = bb[41]
+    is(n, 9, "resized buffer preserve old value")
 .end
 
 # Local Variables:
