@@ -18,11 +18,12 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(12)
+    plan(16)
 
     test_init()
     test_set_string()
     test_set_byte()
+    test_get_string()
 .end
 
 .sub test_init
@@ -83,6 +84,29 @@ Tests C<ByteBuffer> PMC..
     is(n, 43, "setting a byte resize buffer with initial size")
     n = bb[41]
     is(n, 9, "resized buffer preserve old value")
+.end
+
+.sub test_get_string
+    .local pmc bb
+    bb = new ['ByteBuffer']
+    # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
+    bb = utf16:unicode:"\x{D1}"
+    .local string s
+    s = bb.'get_string'('unicode', 'utf16')
+    .local int n
+    n = length s
+    is(n, 1, "getting utf16 from buffer gives correct length")
+    n = ord s
+    is(n, 0xD1, "getting utf16 from buffer gives correct codepoint")
+
+    bb = new ['ByteBuffer']
+    bb[0] = 0xC3
+    bb[1] = 0x91
+    s = bb.'get_string_as'(utf8:unicode:"")
+    n = length s
+    is(n, 1, "getting utf8 from buffer gives correct length")
+    n = ord s
+    is(n, 0xD1, "getting utf8 from buffer gives correct codepoint")
 .end
 
 # Local Variables:

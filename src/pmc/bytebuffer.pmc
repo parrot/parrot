@@ -19,6 +19,21 @@ individual bytes and conversions from and to parrot strings.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+static STRING * build_string(PARROT_INTERP,
+    ARGIN(const unsigned char *content),
+    INTVAL size,
+    ARGIN_NULLOK(const CHARSET *charset),
+    ARGIN_NULLOK(const ENCODING *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(content))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 pmclass ByteBuffer auto_attrs {
     ATTR INTVAL allocated_size;
     ATTR INTVAL size;
@@ -192,7 +207,101 @@ Set the value of the byte at position.
         content[position] = value;
     }
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<get_string(string charset, string encoding)>
+
+Create a string with the buffer content and the charset and encoding
+specified.
+
+=cut
+
+*/
+
+    METHOD get_string(STRING *charsetname, STRING *encodingname) {
+        STRING *result;
+        unsigned char *content;
+        INTVAL size;
+        const CHARSET *charset = Parrot_get_charset(INTERP,
+            Parrot_charset_number(INTERP, charsetname));
+        const ENCODING *encoding = Parrot_get_encoding(INTERP,
+            Parrot_encoding_number(INTERP, encodingname));
+        GET_ATTR_content(INTERP, SELF, content);
+        GET_ATTR_size(INTERP, SELF, size);
+        result = build_string(INTERP, content, size, charset, encoding);
+        RETURN(STRING *result);
+    }
+
+/*
+
+=item C<get_string_as(string as)>
+
+Create a string with the buffer content and the same charset and encoding
+as the string argument.
+
+=cut
+
+*/
+
+    METHOD get_string_as(STRING *as :optional) {
+        STRING *result;
+        unsigned char *content;
+        INTVAL size;
+        const CHARSET* charset = STRING_IS_NULL(as) ? PARROT_DEFAULT_CHARSET : as->charset;
+        const ENCODING *encoding = STRING_IS_NULL(as) ? PARROT_DEFAULT_ENCODING : as->encoding;
+        GET_ATTR_content(INTERP, SELF, content);
+        GET_ATTR_size(INTERP, SELF, size);
+        result = build_string(INTERP, content, size, charset, encoding);
+        RETURN(STRING *result);
+    }
+
 } /* pmclass end */
+
+/*
+
+=back
+
+=head2 Auxiliar functions
+
+=over 4
+
+=item C<static STRING * build_string(PARROT_INTERP, const unsigned char
+*content, INTVAL size, const CHARSET *charset, const ENCODING *encoding)>
+
+Build a string fro the buffer content with the charset and encoding specified.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+build_string(PARROT_INTERP, ARGIN(const unsigned char *content),
+        INTVAL size,
+        ARGIN_NULLOK(const CHARSET *charset),
+        ARGIN_NULLOK(const ENCODING *encoding))
+{
+    ASSERT_ARGS(build_string)
+    STRING *result;
+    if (charset == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                "Invalid charset");
+    if (encoding == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                "Invalid encoding");
+    result = Parrot_str_new_init(interp, (char *)content, size, encoding, charset, 0);
+    if (!CHARSET_VALIDATE(interp, result))
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_STRING_REPRESENTATION,
+                "Invalid buffer content");
+    return result;
+}
 
 /*
 
