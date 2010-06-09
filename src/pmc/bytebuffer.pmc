@@ -304,6 +304,8 @@ Build a string fro the buffer content with the charset and encoding specified.
 static INTVAL
 grow_to(INTVAL position)
 {
+    ASSERT_ARGS(grow_to)
+
     const UINTVAL blocksize = 2048;
     UINTVAL minsize = position + 1;
     return (INTVAL) (minsize < 64 ? 64 :
