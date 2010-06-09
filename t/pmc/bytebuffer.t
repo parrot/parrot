@@ -18,7 +18,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(16)
+    plan(17)
 
     test_init()
     test_set_string()
@@ -46,6 +46,10 @@ Tests C<ByteBuffer> PMC..
     bb = new ['ByteBuffer']
     s = 'Hi'
     bb = s
+
+    # Exercise mark vtable
+    sweep 1
+
     n = elements bb
     is(n, 2, "size is the same as the source string bytelength")
     n = bb[0]
@@ -84,6 +88,15 @@ Tests C<ByteBuffer> PMC..
     is(n, 43, "setting a byte resize buffer with initial size")
     n = bb[41]
     is(n, 9, "resized buffer preserve old value")
+
+    push_eh catch
+    bb[-1] = 0
+    ok(0, "setting a byte with negative index should throw")
+    goto end
+catch:
+    pop_eh
+    ok(1, "setting a byte with negative index throws")
+end:
 .end
 
 .sub test_get_string
