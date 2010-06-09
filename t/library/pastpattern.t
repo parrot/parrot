@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2054);
+plan(2075);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -14,6 +14,7 @@ test_attribute_smart_matching();
 test_child_smart_matching();
 
 test_deep_matching_in_children();
+test_global_matching();
 
 test_match_result();
 
@@ -32,71 +33,39 @@ sub node_with_attr_set ($class, $attr, $val) {
 }
 
 sub test_type_matching() {
-    my $blockPat := PAST::Pattern::Block.new();
-    my $opPat := PAST::Pattern::Op.new();
-    my $stmtsPat := PAST::Pattern::Stmts.new();
-    my $valPat := PAST::Pattern::Val.new();
-    my $varPat := PAST::Pattern::Var.new();
-    my $varListPat := PAST::Pattern::VarList.new();
+    my @classes := [ [ PAST::Block, PAST::Pattern::Block ],
+                     [ PAST::Op, PAST::Pattern::Op ],
+                     [ PAST::Stmts, PAST::Pattern::Stmts ],
+                     [ PAST::Val, PAST::Pattern::Val ],
+                     [ PAST::Var, PAST::Pattern::Var ],
+                     [ PAST::VarList, PAST::Pattern::VarList ]
+                   ];
 
-    my $block := PAST::Block.new();
-    my $op := PAST::Op.new();
-    my $stmts := PAST::Stmts.new();
-    my $val := PAST::Val.new();
-    my $var := PAST::Var.new();
-    my $varList := PAST::VarList.new();
+    for @classes {
+        my $class := $_[0];
+        my $patternClass := $_[1];
 
-    my @objs := [ $block, $op, $stmts, $val, $var, $varList ];
+        my $pattern := $patternClass.new();
+        my $node := $class.new();
+        ok($node ~~ $pattern,
+           "Empty $class ~~ empty $patternClass.");
 
-    for @objs {
-        if $_ ~~ PAST::Block {
-            ok($_ ~~ $blockPat, "PAST::Block ~~ PAST::Pattern::Block.");
-        }
-        else {
-            ok(!($_ ~~ $blockPat), 
-               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Block.");
-        }
+        $node := $class.new(5);
+        ok($node ~~ $pattern,
+           "Non-empty $class ~~ empty $patternClass.");
 
-        if $_ ~~ PAST::Op {
-            ok($_ ~~ $opPat, "PAST::Op ~~ PAST::Pattern::Op.");
+        $node := $class.new(:name('foo'));
+        ok($node ~~ $pattern,
+           "Attributed $class ~~ empty $patternClass.");
+        
+        for @classes {
+            my $otherClass := $_[0];
+            unless ($class =:= $otherClass) {
+                $node := $otherClass.new();
+                ok(!($node ~~ $pattern),
+                   "Empty $otherClass !~~ empty $patternClass.");
+            }
         }
-        else {
-            ok(!($_ ~~ $opPat),
-               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Op.");
-        }
-
-        if $_ ~~ PAST::Stmts {
-            ok($_ ~~ $stmtsPat, "PAST::Stmts ~~ PAST::Pattern::Stmts.");
-        } 
-        else {
-            ok(!($_ ~~ $stmtsPat),
-               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Stmts.");
-        }
-
-        if $_ ~~ PAST::Val {
-            ok($_ ~~ $valPat, "PAST::Val ~~ PAST::Pattern::Val.");
-        }
-        else {
-            ok(!($_ ~~ $valPat),
-               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Val.");
-        }
-
-        if $_ ~~ PAST::Var {
-            ok($_ ~~ $varPat, "PAST::Var ~~ PAST::Pattern::Var.");
-        }
-        else {
-            ok(!($_ ~~ $varPat),
-               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::Var.");
-        }
-
-        if $_ ~~ PAST::VarList {
-            ok($_ ~~ $varListPat,
-               "PAST::VarList ~~ PAST::Pattern::VarList.");
-        }
-        else {
-            ok(!($_ ~~ $varListPat),
-               ~pir::class__PP($_) ~ " !~~ PAST::Pattern::VarList.");
-	}
     }
 }
 
@@ -545,6 +514,28 @@ sub test_deep_matching_in_children () {
 
 }
 
+sub test_global_matching () {
+    my $pattern := PAST::Pattern::Block.new();
+    my $past := PAST::Block.new(PAST::Val.new(PAST::Block.new()),
+                                PAST::Block.new(),
+                                PAST::Op.new(PAST::Val.new(),
+                                             PAST::Block.new()));
+    my $/ := $pattern.ACCEPTS($past, :g(1));
+
+    ok($/ ~~ PAST::Pattern::Match,
+       '$/ is a PAST::Pattern::Match for global matches.');
+    ok(pir::elements__iP($/) == 4,
+       '$/ has the right number of elements for global matches.');
+    ok($/[0].from() =:= $past,
+       'Global matching can match the top node.');
+    ok($/[1].from() =:= $past[0][0],
+       '$/[1] is correct for global matches.');
+    ok($/[2].from() =:= $past[1],
+       '$/[2] is correct for global matches.');
+    ok($/[3].from() =:= $past[2][1],
+       '$/[3] is correct for global matches.');
+}
+
 sub test_match_result () {
     test_match_result_from_top_node();
     test_match_result_from_sub_node();
@@ -733,7 +724,19 @@ sub test_match_method () {
     ok(?$/,
        'PAST::Node.match returns a true match result when it should.');
     ok($/.from() =:= $past,
-       "PAST::Node.match's return value has the right .from()/");
+       "PAST::Node.match's return value has the right .from().");
+
+    $past := PAST::Block.new(PAST::Block.new(),
+                             PAST::Block.new(PAST::Block.new()));
+    my $match1 := $past.match($pattern, :g(1));
+    my $match2 := $pattern.ACCEPTS($past, :g(1));
+
+    ok($match1 ~~ PAST::Pattern::Match,
+       'PAST::Node.match returns a PAST::Pattern::Match with :g');
+    ok(?$match1 == ?$match2,
+       'PAST::Node.match with :g has same bool value as ~~.');
+    ok(pir::elements__iP($match1) == pir::elements__iP($match2),
+       'PAST::Node.match with :g has same number of results as ~~.');
 }
 
 # Local Variables:

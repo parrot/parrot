@@ -90,7 +90,10 @@ class PAST::Pattern::Node is PAST::Pattern {
         my $nLen := pir::elements($node);
         my $result;
         my $index;
-        if ($pLen == $nLen) {
+        if $pLen == 0 {
+            $result := 1;
+        }
+        elsif ($pLen == $nLen) {
             $index := 0;
             while ($index < $pLen) {
                 if ($result := $node[$index] ~~ $pattern[$index]) {
@@ -103,7 +106,8 @@ class PAST::Pattern::Node is PAST::Pattern {
                 $index++;
             }
             $result := 1;
-        } else {
+        }
+        else {
             $/.success(0);
             $result := 0;
         }
@@ -121,23 +125,54 @@ class PAST::Pattern::Node is PAST::Pattern {
          && check_attribute($pattern, $node, "lvalue", $/));
     }
 
-    method ACCEPTS ($node) {
-        my $result := self.ACCEPTSEXACTLY($node);
-        unless ($result) {
+    method ACCEPTS ($node, *%opts) {
+        my $global := ?%opts<g>;
+        my $/;
+        my $first := self.ACCEPTSEXACTLY($node);
+        if ($global && $node ~~ PAST::Node) {
+            my $matches := ?$first;
+            my $index := 0;
+            my $max := pir::elements__IP($node);
+            my $submatch;
+            $/ := PAST::Pattern::Match.new(?$first);
+            $/[0] := $first if $first;
+            until ($index == $max) {
+                $submatch := self.ACCEPTS($node[$index], :g);
+                if ($submatch) {
+                    $/.success(1) unless $matches;
+                    if pir::defined__iP($submatch.from()) {
+                        $/[$matches++] := $submatch;
+                    }
+                    else { # The submatch is a list of multiple matches.
+                        my $subIndex := 0;
+                        my $subMax := pir::elements__IP($submatch);
+                        until ($subIndex == $subMax) {
+                            $/[$matches++] := $submatch[$subIndex];
+                            $subIndex++;
+                        }
+                    }
+                }
+                $index++;
+            }
+            $/ := $/[0] if $matches == 1;
+        }
+        elsif ($first) {
+            $/ := $first;
+        } else {
             if ($node ~~ PAST::Node) {
                 my $index := 0;
                 my $max := pir::elements__IP($node);
                 until ($index == $max) {
-                    $result := $node[$index] ~~ self;
-                    return $result if $result;
+                    $/ := $node[$index] ~~ self;
+                    return $/ if $/;
                     $index++;
                 }
-                $result := PAST::Pattern::Match.new(0);
+                $/ := PAST::Pattern::Match.new(0);
             } else {
-                $result := PAST::Pattern::Match.new(0);
+                $/ := PAST::Pattern::Match.new(0);
             }
         }
-        $result;
+        $/;
     }
 }
 
