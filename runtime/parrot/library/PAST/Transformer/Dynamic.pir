@@ -94,6 +94,18 @@ has_handler:
     .tailcall $P0(walker, node)
 .end
 
+.sub 'walk' :multi(['PAST'; 'Transformer'; 'Dynamic'], ['PAST'; 'VarList'])
+    .param pmc walker
+    .param pmc node
+    $P0 = getattribute walker, 'varlist'
+    unless null $P0 goto has_handler
+    $P1 = 'walkChildren'(walker, node)
+    'replaceChildren'(node, $P1)
+    .return (node)
+has_handler:
+    .tailcall $P0(walker, node)
+.end
+
 =back
 
 =cut
