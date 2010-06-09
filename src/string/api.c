@@ -497,6 +497,13 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     dest->bufused = a->bufused + b->bufused;
     dest->strlen  = a->strlen + b_len;
 
+#if PARROT_HAS_ICU
+    if (enc == Parrot_nfg_encoding_ptr) {
+        dest->extra = a->extra;
+        merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
+    }
+#endif /* PARROT_HAS_ICU */
+
     return dest;
 }
 

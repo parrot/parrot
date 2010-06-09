@@ -39,7 +39,10 @@ typedef struct grapheme_table_t grapheme_table;
 /* HEADERIZER BEGIN: src/string/grapheme.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-UChar32 * add_grapheme_from_substr(PARROT_INTERP,
+UChar32 add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
+        __attribute__nonnull__(1);
+
+UChar32 add_grapheme_from_substr(PARROT_INTERP,
     grapheme_table *table,
     STRING *src,
     UINTVAL start,
@@ -56,6 +59,18 @@ grapheme_table * create_grapheme_table(PARROT_INTERP, UINTVAL n)
 void destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
         __attribute__nonnull__(1);
 
+grapheme_table * grow_grapheme_table(SHIM_INTERP,
+    grapheme_table *src,
+    UINTVAL n);
+
+void merge_tables_and_fixup_string(PARROT_INTERP,
+    STRING *dest,
+    grapheme_table *table,
+    UINTVAL offset)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_add_grapheme __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_add_grapheme_from_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_clone_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -63,6 +78,9 @@ void destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
 #define ASSERT_ARGS_create_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_destroy_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_grow_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_merge_tables_and_fixup_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/grapheme.c */
