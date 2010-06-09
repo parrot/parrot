@@ -32,15 +32,19 @@ pmclass ByteBuffer auto_attrs {
 =over 4
 
 =item C<void init()>
+
 Create an empty buffer
 
 =item C<void init_int()>
+
 Create a buffer of initial_size capacity.
 
 =item C<void mark()>
+
 Mark the source string if any.
 
 =item C<void destroy()>
+
 Free the buffer when destroying.
 
 =cut
@@ -80,6 +84,7 @@ Free the buffer when destroying.
 /*
 
 =item C<INTVAL elements()>
+
 Get current size.
 
 =cut
@@ -95,6 +100,7 @@ Get current size.
 /*
 
 =item C<void set_string_native()>
+
 Reset the buffer with the content of the string.
 
 =cut
@@ -118,6 +124,7 @@ Reset the buffer with the content of the string.
 /*
 
 =item C<INTVAL get_integer_keyed_int()>
+
 Get the value of the byte at position or 0 if out of bounds.
 
 =cut
@@ -135,6 +142,7 @@ Get the value of the byte at position or 0 if out of bounds.
 /*
 
 =item C<void set_integer_keyed_int()>
+
 Set the value of the byte at position.
 
 =cut
