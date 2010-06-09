@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2051);
+plan(2054);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -16,6 +16,8 @@ test_child_smart_matching();
 test_deep_matching_in_children();
 
 test_match_result();
+
+test_match_method();
 
 sub node_with_attr_set ($class, $attr, $val) {
     my $node := $class.new();
@@ -719,6 +721,19 @@ sub test_match_result_from_node_children () {
        '$/<name> is correct for PAST::Pattern::VarList.');
     ok($/[0].from() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::VarList.');
+}
+
+sub test_match_method () {
+    my $pattern := PAST::Pattern::Block.new();
+    my $past := PAST::Block.new();
+
+    my $/ := $past.match($pattern);
+    ok($/ ~~ PAST::Pattern::Match,
+       'PAST::Node.match returns a PAST::Pattern::Match.');
+    ok(?$/,
+       'PAST::Node.match returns a true match result when it should.');
+    ok($/.from() =:= $past,
+       "PAST::Node.match's return value has the right .from()/");
 }
 
 # Local Variables:

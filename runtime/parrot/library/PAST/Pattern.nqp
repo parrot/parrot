@@ -25,12 +25,16 @@ class PAST::Pattern is Capture {
     }
 }
 
+
+
 INIT {
     pir::load_bytecode('PAST/Pattern/Match.pbc');
 
     pir::load_bytecode('PAST/Pattern/Closure.pbc');
     pir::load_bytecode('PAST/Pattern/Constant.pbc');
     pir::load_bytecode('PAST/Pattern/Node.pbc');
+
+    pir::load_bytecode('PAST/Pattern/augment-past.pbc');
 }
 
 # Local Variables:
