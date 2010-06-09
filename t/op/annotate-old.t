@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -23,10 +23,6 @@ be covered with pir based tests.
 
 =cut
 
-TODO: {
-    local $TODO = q|fails in fast runcore - TT #1135|
-        if ($ENV{TEST_PROG_ARGS} || '') =~ /--runcore=fast/;
-
 pir_error_output_like( <<CODE, <<OUTPUT, 'unhandled exception from loaded function');
 .sub main :main
     # Not using test more, just a quick way to pick a function
@@ -40,7 +36,6 @@ CODE
 /\(foobar:42\)/
 OUTPUT
 
-}
 
 # Local Variables:
 #   mode: cperl
