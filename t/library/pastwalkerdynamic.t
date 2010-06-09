@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Walker/Dynamic.pbc');
 
-plan(5);
+plan(6);
 test_count_node_types();
 
 # Tests
@@ -19,6 +19,7 @@ my $ops;
 my $stmts;
 my $vals;
 my $vars;
+my $varlists;
 
 sub walkBlock ($walker, $past) {
     ++$blocks;
@@ -40,6 +41,10 @@ sub walkVar ($walker, $past) {
     ++$vars;
     PAST::Walker::walkChildren($walker, $past);
 }
+sub walkVarList ($walker, $past) {
+    ++$varlists;
+    PAST::Walker::walkChildren($walker, $past);
+}
 
 sub zeroCounts () {
     $blocks := 0;
@@ -47,6 +52,7 @@ sub zeroCounts () {
     $stmts := 0;
     $vals := 0;
     $vars := 0;
+    $varlists := 0;
 }
 
 sub test_count_node_types() {
@@ -57,6 +63,7 @@ sub test_count_node_types() {
     $walker.stmts(walkStmts);
     $walker.val(walkVal);
     $walker.var(walkVar);
+    $walker.varlist(walkVarList);
 
     zeroCounts();
 
@@ -69,6 +76,7 @@ sub test_count_node_types() {
     ok($vars == 2, "PAST::Var");
     ok($vals == 1, "PAST::Val");
     ok($stmts == 2, "PAST::Stmts");
+    ok($varlists == 1, "PAST::VarList");
 }
 
 sub build_count_node_types_past() {
@@ -79,6 +87,7 @@ sub build_count_node_types_past() {
 				     :pirop<call>),
 			PAST::Stmts.new(PAST::Op.new(),
 					PAST::Op.new(),
+                                        PAST::VarList.new(),
 					PAST::Block.new()),
 			PAST::Stmts.new());
     $past;

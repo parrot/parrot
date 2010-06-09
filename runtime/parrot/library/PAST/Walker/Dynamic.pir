@@ -19,7 +19,7 @@ PAST::Walker's behavior can only be customized by subclassing. This subclass det
     p6meta = new 'P6metaclass'
     base = get_class ['PAST'; 'Walker']
     name = 'PAST::Walker::Dynamic'
-    attrs = 'block op stmts val var'
+    attrs = 'block op stmts val var varlist'
     p6meta.'new_class'(name, 'parent'=>base, 'attr'=>attrs)
 .end
 
@@ -117,6 +117,22 @@ setter:
     setattribute self, 'var', value
 .end
 
+=item varlist([sub])
+
+Gets/sets the sub to be called when traversing a PAST::VarList node.
+
+=cut
+
+.sub 'varlist' :method
+    .param pmc value :optional
+    .param int has_value :opt_flag
+    if has_value goto setter
+    $P0 = getattribute self, 'varlist'
+    .return ($P0)
+setter:
+    setattribute self, 'varlist', value
+.end
+
 .namespace ['PAST'; 'Walker']
 
 .sub 'walk' :multi(['PAST'; 'Walker'; 'Dynamic'], ['PAST'; 'Block'])
@@ -163,6 +179,16 @@ has_handler:
     .param pmc walker
     .param pmc node
     $P0 = getattribute walker, 'var'
+    unless null $P0 goto has_handler
+    .tailcall 'walkChildren'(walker, node)
+has_handler:
+    .tailcall $P0(walker, node)
+.end
+
+.sub 'walk' :multi(['PAST'; 'Walker'; 'Dynamic'], ['PAST'; 'VarList'])
+    .param pmc walker
+    .param pmc node
+    $P0 = getattribute walker, 'varlist'
     unless null $P0 goto has_handler
     .tailcall 'walkChildren'(walker, node)
 has_handler:

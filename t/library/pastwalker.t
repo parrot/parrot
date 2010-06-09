@@ -23,7 +23,7 @@ Test PAST::Walker.
     load_bytecode 'PAST/Walker.pbc'
     register_classes()
 
-    plan(5)
+    plan(6)
     test_count_node_types()
 .end
 
@@ -62,6 +62,9 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
 
     $P3 = $P2['stmts']
     is($P3, 2, "PAST::Stmts")
+
+    $P3 = $P2['varlists']
+    is($P3, 1, "PAST::VarList")
 .end
 
 .sub 'build_count_node_types_past'
@@ -81,6 +84,8 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     $P1 = new ['PAST'; 'Op']
     push $P0, $P1
     $P1 = new ['PAST'; 'Op']
+    push $P0, $P1
+    $P1 = new ['PAST'; 'VarList']
     push $P0, $P1
     $P1 = new ['PAST'; 'Block']
     push $P0, $P1
@@ -150,6 +155,16 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     $I0 = $P0['vars']
     inc $I0
     $P0['vars'] = $I0
+    'walkChildren'(walker, node)
+.end
+
+.sub 'walk' :multi(['PAST';'Walker';'NodeCounter'], ['PAST';'VarList'])
+    .param pmc walker
+    .param pmc node
+    $P0 = getattribute walker, 'counts'
+    $I0 = $P0['varlists']
+    inc $I0
+    $P0['varlists'] = $I0
     'walkChildren'(walker, node)
 .end
 
