@@ -41,7 +41,7 @@ sub file_content_is {
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
-pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction", todo => 'TT #1659');
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
 .sub main :main
     interpinfo $I0, 2    # GC mark runs
@@ -51,7 +51,8 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction", 
     print $P0, "a line\n"
     null $P0            # kill it
     sweep 0            # a lazy GC has to close the PIO
-    $P0 = open temp_file, 'r'
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
     $S0 = $P0.'read'(20)
     print $S0
 .end
