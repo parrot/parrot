@@ -17,16 +17,18 @@ Tests C<ByteBuffer> PMC..
 =cut
 
 .include 'iglobals.pasm'
+.include 'iterator.pasm'
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(18)
+    plan(19)
 
     test_init()
     test_set_string()
     test_set_byte()
     test_get_string()
     test_alloc()
+    test_iterate()
 .end
 
 .sub test_init
@@ -180,6 +182,27 @@ failed:
     say i
     ok(0, "reallocation")
 end:
+.end
+
+.sub test_iterate
+    .local pmc bb, it, arr
+    .local string s
+    s = 'abcd'
+    bb = new ['ByteBuffer']
+    bb = s
+    it = iter bb
+    it = .ITERATE_FROM_START
+    arr = new ['ResizableStringArray']
+loop:
+    unless it goto donearray
+    $I0 = shift it
+    $S0 = chr $I0
+    push arr, $S0
+    goto loop
+donearray:
+    .local string r
+    r = join '', arr
+    is(r, s, 'iterate buffer content')
 .end
 
 # Local Variables:

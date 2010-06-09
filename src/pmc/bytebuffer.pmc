@@ -211,6 +211,20 @@ Set the value of the byte at position.
 
 /*
 
+=item C<PMC *get_iter()>
+
+Return a new Iterator for this PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+    }
+
+/*
+
 =back
 
 =head2 Methods
