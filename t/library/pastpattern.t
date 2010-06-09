@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2075);
+plan(2080);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -17,6 +17,8 @@ test_deep_matching_in_children();
 test_global_matching();
 
 test_match_result();
+
+test_transform();
 
 test_match_method();
 
@@ -712,6 +714,46 @@ sub test_match_result_from_node_children () {
        '$/<name> is correct for PAST::Pattern::VarList.');
     ok($/[0].from() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::VarList.');
+}
+
+sub test_transform () {
+    test_transform_sub();
+}
+
+sub test_transform_sub () {
+    sub isComparison ($opName) {
+        ($opName eq 'isgt' ||
+         $opName eq 'islt');
+    }
+    sub flipComparison ($op) {
+        my $temp := $op[0];
+        $op[0] := $op[1];
+        $op[1] := $temp;
+        $op;
+    }
+
+    my $pattern := PAST::Pattern::Op.new(:pirop(isComparison));
+    my $past := 
+      PAST::Stmts.new(PAST::Op.new(:pirop<isgt>,
+                                   PAST::Val.new(:value(2)),
+                                   PAST::Val.new(:value(1))),
+                      PAST::Op.new(:pirop<islt>,
+                                   PAST::Op.new(:pirop<islt>,
+                                                PAST::Val.new(:value(1)),
+                                                PAST::Val.new(:value(2))),
+                                   PAST::Val.new(:value(1))));
+    my $result := $pattern.transform($past, flipComparison);
+
+    ok($result ~~ PAST::Stmts,
+       'Non-matched nodes left unchanged.');
+    ok($result[0][0].value() == 1,
+       'Matched node 1 is changed.');
+    ok($result[1][0] ~~ PAST::Val,
+       'Matched node 2 is changed. 1');
+    ok($result[1][0].value() == 1,
+       'Matched node 2 is changed. 2');
+    ok($result[1][1][0].value() == 2,
+       'Matched nodes within other matched nodes are changed.');
 }
 
 sub test_match_method () {

@@ -23,6 +23,20 @@ class PAST::Pattern is Capture {
         }
         $result;
     }
+
+    method transform ($past, $transform) {
+        my &transSub;
+        if ($transform ~~ PAST::Transformer) {
+            &transSub := sub ($node) { $transformer.walk($node); };
+        } elsif (pir::does__iPS($transform, 'invokable')) {
+            &transSub := $transform;
+        } else {
+            pir::die('$transform must be invokable or a PAST::Transformer.');
+        }
+        my $transformer :=
+          PAST::Pattern::Transformer.new(self, &transSub);
+        $transformer.walk($past);
+    }
 }
 
 
@@ -35,6 +49,7 @@ INIT {
     pir::load_bytecode('PAST/Pattern/Node.pbc');
 
     pir::load_bytecode('PAST/Pattern/augment-past.pbc');
+    pir::load_bytecode('PAST/Pattern/Transformer.pbc');
 }
 
 # Local Variables:
