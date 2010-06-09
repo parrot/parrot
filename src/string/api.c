@@ -499,8 +499,14 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
 
 #if PARROT_HAS_ICU
     if (enc == Parrot_nfg_encoding_ptr) {
-        dest->extra = a->extra;
-        merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
+		if (a->extra != NULL) {
+            dest->extra = clone_grapheme_table(a->extra);
+            if (b->extra != NULL)
+                merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
+		}
+		else {
+            dest->extra = clone_grapheme_table(b->extra);
+        }
     }
 #endif /* PARROT_HAS_ICU */
 
