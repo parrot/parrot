@@ -1,6 +1,16 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
+=head1 NAME
+
+PAST::Transformer::Dynamic - A PAST::Transformer subclass that doesn't require creating a new subclass to change its behavior.
+
+=head1 DESCRIPTION
+
+PAST::Transformer's behavior can only be customized by subclassing. This subclass determines its behavior based on Subs stored in its attributes, allowing modification of its behavior without creating a new class, including at runtime.
+
+=cut
+
 .sub 'onload' :anon :init :load
     load_bytecode 'PAST/Transformer.pbc'
     load_bytecode 'PAST/Walker/Dynamic.pbc'
@@ -13,6 +23,14 @@
     $P0 = p6meta.'new_class'($S0, 'parent'=> walkdyn)
     p6meta.'add_parent'($P0, trans)
 .end
+
+=head1 PAST::Transformer::Dynamic
+
+It has the same attributes as PAST::Walker::Dynamic.
+
+They should behave just like specializations of 'walk' for PAST::Transformer subclasses, taking a walker and a PAST::Node and returning the replacement node or null to delete it.
+
+=cut
 
 .namespace ['PAST'; 'Walker']
 
@@ -75,6 +93,10 @@ has_handler:
 has_handler:
     .tailcall $P0(walker, node)
 .end
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir

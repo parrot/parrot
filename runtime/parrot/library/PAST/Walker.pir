@@ -7,7 +7,7 @@ PAST::Walker - A tool for traversing PAST::Nodes.
 
 =head1 DESCRIPTION
 
-A tool for traversing and modifying Parrot Abstract Syntax Trees.
+A tool for traversing Parrot Abstract Syntax Trees.
 
 =cut
 

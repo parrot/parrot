@@ -1,6 +1,16 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
+=head1 NAME
+
+PAST::Walker::Dynamic - A PAST::Walker subclass that doesn't require creating a new subclass to change its behavior.
+
+=head1 DESCRIPTION
+
+PAST::Walker's behavior can only be customized by subclassing. This subclass determines its behavior based on Subs stored in its attributes, allowing modification of its behavior without creating a new class, including at runtime.
+
+=cut
+
 .sub 'onload' :anon :init :load
     load_bytecode 'PAST/Walker.pbc'
     load_bytecode 'P6object.pbc'
@@ -15,6 +25,24 @@
 
 .namespace ['PAST'; 'Walker'; 'Dynamic']
 
+=head1 PAST::Walker::Dynamic
+
+=head2 Attribute accessors
+
+Each attribute should hold a sub that takes a walker and a PAST::Node.
+
+It will be called when the appropriate node type is traversed.
+
+As with PAST::Walker, the sub must explicitly call 'walkChildren' in order to traverse the children.
+
+=over 4
+
+=item block([sub])
+
+Gets/sets the sub to be called when traversing a PAST::Block node.
+
+=cut
+
 .sub 'block' :method
     .param pmc value :optional
     .param int has_value :opt_flag
@@ -24,6 +52,12 @@
 setter:
     setattribute self, 'block', value
 .end
+
+=item op([sub])
+
+Gets/sets the sub to be called when traversing a PAST::Op node.
+
+=cut
 
 .sub 'op' :method
     .param pmc value :optional
@@ -35,6 +69,12 @@ setter:
     setattribute self, 'op', value
 .end
 
+=item stmts([sub])
+
+Gets/sets the sub to be called when traversing a PAST::Stmts node.
+
+=cut
+
 .sub 'stmts' :method
     .param pmc value :optional
     .param int has_value :opt_flag
@@ -45,6 +85,12 @@ setter:
     setattribute self, 'stmts', value
 .end
 
+=item val([sub])
+
+Gets/sets the sub to be called when traversing a PAST::Val node.
+
+=cut
+
 .sub 'val' :method
     .param pmc value :optional
     .param int has_value :opt_flag
@@ -54,6 +100,12 @@ setter:
 setter:
     setattribute self, 'val', value
 .end
+
+=item var([sub])
+
+Gets/sets the sub to be called when traversing a PAST::Var node.
+
+=cut
 
 .sub 'var' :method
     .param pmc value :optional
@@ -116,6 +168,10 @@ has_handler:
 has_handler:
     .tailcall $P0(walker, node)
 .end
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir
