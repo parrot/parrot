@@ -32,20 +32,25 @@ grapheme_table *
 clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
 {
     ASSERT_ARGS(clone_grapheme_table)
-    UINTVAL i;
-    grapheme_table * dst = create_grapheme_table(interp, src->used);
+    if (src != NULL) {
+        UINTVAL i;
+        grapheme_table * dst = create_grapheme_table(interp, src->used);
 
-    dst->used = src->used;
+        dst->used = src->used;
 
-    for (i = 0; i < src->used; i++) {
-        dst->graphemes[i].len =  src->graphemes[i].len;
-        dst->graphemes[i].hash = src->graphemes[i].hash;
-        dst->graphemes[i].codepoints = mem_gc_allocate_n_typed(interp, src->graphemes[i].len, UChar32);
-        memcpy(dst->graphemes[i].codepoints, src->graphemes[i].codepoints,
-               src->graphemes[i].len * sizeof (UChar32));
-    }
+        for (i = 0; i < src->used; i++) {
+            dst->graphemes[i].len =  src->graphemes[i].len;
+            dst->graphemes[i].hash = src->graphemes[i].hash;
+            dst->graphemes[i].codepoints = mem_gc_allocate_n_typed(interp, src->graphemes[i].len, UChar32);
+            memcpy(dst->graphemes[i].codepoints, src->graphemes[i].codepoints,
+                   src->graphemes[i].len * sizeof (UChar32));
+        }
 
-    return dst;
+        return dst;
+	}
+    else {
+        return NULL;
+	}
 }
 
 grapheme_table *
