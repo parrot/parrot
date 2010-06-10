@@ -26,6 +26,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "parrot/parrot.h"
 #include "private_cstring.h"
 #include "api.str"
+#include "grapheme.h"
 
 /* for parrot/interpreter.h */
 #if PARROT_CATCH_NULL
@@ -365,7 +366,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
 
 #if PARROT_HAS_ICU
     if (s->encoding == Parrot_nfg_encoding_ptr)
-        result->extra = clone_grapheme_table(s->extra);
+        result->extra = clone_grapheme_table(interp, s->extra);
 #endif /* PARROT_HAS_ICU */
 
     return result;
@@ -502,12 +503,12 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         if (a->extra != NULL) {
             dest->extra = clone_grapheme_table(interp, a->extra);
             if (b->extra != NULL) {
-                dest->extra = grow_grapheme_table(interp, a->extra, b->used);
+                dest->extra = grow_grapheme_table(interp, a->extra, ((grapheme_table *)b->extra)->used);
                 merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
             }
         }
         else {
-            dest->extra = clone_grapheme_table(b->extra);
+            dest->extra = clone_grapheme_table(interp, b->extra);
         }
     }
 #endif /* PARROT_HAS_ICU */
