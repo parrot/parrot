@@ -31,6 +31,25 @@ Tests C<ByteBuffer> PMC..
     test_iterate()
 .end
 
+################################################################
+# Helper subs
+
+.sub hasicu
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['has_icu']
+    .return($I0)
+.end
+
+.sub isbigendian
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['bigendian']
+    .return($I0)
+.end
+
+################################################################
+
 .sub test_init
     .local pmc bb
     .local int n
@@ -106,9 +125,29 @@ end:
 
 .sub test_get_string
     .local pmc bb
+    .local int big
+
+    $I0 = hasicu()
+    unless $I0 goto skip_it
+
     bb = new ['ByteBuffer']
+
     # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
-    bb = utf16:unicode:"\x{D1}"
+    #bb = utf16:unicode:"\x{D1}"
+    # Can't do that, or the program can't be compiled without ICU.
+    # Fill the buffer with bytes instead.
+
+    # Get endianess to set the bytes in the appropiate order.
+    # *** XXX *** Need report from big endian platforms.
+    big = isbigendian()
+    if big goto isbig
+    bb[0] = 0xD1
+    bb[1] = 0x00
+    goto doit
+isbig:
+    bb[0] = 0x00
+    bb[1] = 0xD1
+doit:
     .local string s
     s = bb.'get_string'('unicode', 'utf16')
     .local int n
@@ -116,7 +155,6 @@ end:
     is(n, 1, "getting utf16 from buffer gives correct length")
     n = ord s
     is(n, 0xD1, "getting utf16 from buffer gives correct codepoint")
-
     bb = new ['ByteBuffer']
     bb[0] = 0xC3
     bb[1] = 0x91
@@ -125,6 +163,10 @@ end:
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s
     is(n, 0xD1, "getting utf8 from buffer gives correct codepoint")
+    goto end
+skip_it:
+    skip(4, "this test needs ICU")
+end:
 .end
 
 .sub test_alloc
@@ -133,11 +175,12 @@ end:
     .local pmc bb
     .local int i, big, pos, b0, b1, c
 
+    $I0 = hasicu()
+    unless $I0 goto skip_it
+
     # Get endianess to set the bytes in the appropiate order.
     # *** XXX *** Need report from big endian platforms.
-    $P0 = getinterp
-    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
-    big = $P0['bigendian']
+    big = isbigendian()
 
     bb = new ['ByteBuffer']
     pos = 0
@@ -181,6 +224,9 @@ loopcheck:
 failed:
     say i
     ok(0, "reallocation")
+    goto end
+skip_it:
+    skip(1, "this test needs ICU")
 end:
 .end
 
