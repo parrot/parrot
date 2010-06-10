@@ -287,7 +287,7 @@ method get_body( $trans ) {
 
 our multi method process_body_chunk($trans, PAST::Var $chunk) {
     my $n := +$chunk.name;
-    return $trans.access_arg( self.arg_type($n - 1), $n);
+    $trans.access_arg( self.arg_type($n - 1), $n);
 }
 
 our multi method process_body_chunk($trans, PAST::Op $chunk) {
@@ -330,8 +330,7 @@ our multi method process_body_chunk($trans, PAST::Stmts $chunk) {
     for @($chunk) {
         @children.push(self.process_body_chunk($trans, $_));
     }
-    my $children := join('', |@children);
-    return $children;
+    join('', |@children);
 }
 
 =begin
