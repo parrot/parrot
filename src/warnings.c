@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -138,6 +138,8 @@ PARROT_EXPORT
 void
 Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
 {
+    ASSERT_ARGS(Parrot_warn_deprecated)
+
     if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
         STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
         print_warning(interp, msg);
