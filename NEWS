@@ -15,7 +15,6 @@ New in 2.5.0
   + Added a bunch of tests for Array PMCs
   + Modify some PMC vtable functions to reduce complexity, simplifying its coverage.
   + Deleted do-nothing custom mark in StringBuilder
-  + Predef constants true and false
   + Fixed ticket #389; subs are not entered into a namespace unless you declare them
   + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
   + Modified PAST so that it can generate symbolic pasm constants in PIR output.
@@ -37,7 +36,6 @@ New in 2.5.0
 - Languages
   + resurrected partcl
 - Miscellaneous
-  + Improved example ajax
 
 New in 2.4.0
 - Core
