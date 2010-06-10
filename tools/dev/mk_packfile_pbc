@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# sh tools/dev/mk_packfile_pbc
+#
+# generate t/native_pbc/*.pbc for testing Packfile* PMCs.
+
+./parrot -o t/native_pbc/integer.pbc -a - <<EOF
+print 0x10203040
+end
+EOF
+[ $? -le 0 ] && echo "t/native_pbc/integer.pbc updated"
+./parrot -o t/native_pbc/number.pbc t/native_pbc/testdata/number.pasm && echo "t/native_pbc/number.pbc updated"
+./parrot -o t/native_pbc/string.pbc t/native_pbc/testdata/string.pasm  && echo "t/native_pbc/string.pbc updated"
+
+./parrot -o t/native_pbc/annotations.pbc - <<EOF
+.sub 'main'
+.annotate "file", "annotations.pir"
+.annotate "creator", "Parrot Foundation"
+.annotate "line", 1
+    say "Hi"
+    say "line"
+.annotate "line", 2
+    .return ()
+.end
+EOF
+

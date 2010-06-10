@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(33)
+    plan(36)
 
     test_set_size()
     test_reset_size()
@@ -31,6 +31,8 @@ out-of-bounds test. Checks INT and PMC keys.
     test_interface_done()
     test_get_iter()
     test_equality()
+    test_repr()
+    test_sort()
     test_new_style_init()
     test_invalid_init_tt1509()
 .end
@@ -227,7 +229,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub 'test_equality'
-    .local pmc a1, a2
+    .local pmc a1, a2, a3
     a1 = new ['FixedIntegerArray']
     a2 = new ['FixedIntegerArray']
 
@@ -247,6 +249,20 @@ out-of-bounds test. Checks INT and PMC keys.
 
     a2[1] = 84
     is(a1, a2, "Equal when second element same")
+
+    a3 = new ['Complex']
+    isnt(a1, a3, "Different PMC type is not equal")
+.end
+
+.sub 'test_repr'
+    .local pmc a1
+    .local string r
+    a1 = new ['FixedIntegerArray']
+    a1 = 2
+    a1[0] = 7
+    a1[1] = 1
+    r = get_repr a1
+    is(r, '[ 7, 1 ]', 'get_repr')
 .end
 
 .sub 'test_new_style_init'
@@ -254,6 +270,23 @@ out-of-bounds test. Checks INT and PMC keys.
 
     $I0 = $P0
     is($I0, 10, "New style init creates the correct # of elements")
+.end
+
+.sub 'test_sort'
+    .local pmc a1, a2
+    a1 = new ['FixedIntegerArray'], 3
+    a1[0] = 7
+    a1[1] = 1
+    a1[2] = 5
+
+    a2 = new ['FixedIntegerArray'], 3
+    a2[0] = 1
+    a2[1] = 5
+    a2[2] = 7
+
+    a1.'sort'()
+    $I0 = iseq a1, a2
+    is($I0, 1, 'default sort')
 .end
 
 .sub test_invalid_init_tt1509
@@ -269,6 +302,8 @@ CODE
     .end
 CODE
 .end
+
+
 
 # Local Variables:
 #   mode: pir

@@ -56,6 +56,8 @@ Run faster.
 
 =cut
 
+.loadlib 'io_ops'
+
 .sub _MAIN :main
     .param pmc argv
     # the command line

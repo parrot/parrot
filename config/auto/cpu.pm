@@ -32,20 +32,18 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
     $conf->data->add( ' ', TEMP_atomic_o => '' );    # assure a default
 
     my $hints = "auto::cpu::" . $conf->data->get('cpuarch') . "::auto";
 
-    print "\t(cpu hints = '$hints') " if $verbose;
+    $conf->debug("\t(cpu hints = '$hints') ");
 
     eval "use $hints";
     unless ($@) {
         $hints->runstep( $conf, @_ );
     }
     else {
-        print "(no cpu specific hints)" if $verbose;
+        $conf->debug("(no cpu specific hints)");
     }
 
     return 1;

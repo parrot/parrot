@@ -523,9 +523,6 @@ pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
 
             /* Set new offset and bytecode pointer. */
             switch (copy->type) {
-                case enum_fixup_label:
-                    copy->offset = cur_entry->offset + inputs[i]->code_start;
-                    break;
                 case enum_fixup_sub:
                     copy->offset = cur_entry->offset + inputs[i]->const_start;
                     break;

@@ -14,7 +14,7 @@ $Revision$
 
 =head2 Synopsis
 
-=begin PIR
+=begin PIR_INVALID
 
     .sub 'foo'
         .lex "$a", $P0
@@ -52,7 +52,7 @@ $Revision$
         $P0 = find_lex "x"   # SUCCEEDS
     .end
 
-=end PIR
+=end PIR_INVALID
 
 =head2 Description
 

@@ -40,11 +40,10 @@ my @ctags_variations =
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get( 'verbose' );
-    print "\n" if $verbose;
+    $conf->debug("\n");
 
     my ($ctags, $has_ctags) =
-        _probe_for_ctags($conf, [ @ctags_variations ], $verbose);
+        _probe_for_ctags($conf, [ @ctags_variations ]);
     $self->_evaluate_ctags($conf, $ctags, $has_ctags);
     return 1;
 }
@@ -52,12 +51,11 @@ sub runstep {
 sub _probe_for_ctags {
     my $conf = shift;
     my $variations_ref = shift;
-    my $verbose = shift;
     my ($ctags, $has_ctags);
     while (defined (my $t = shift(@$variations_ref))) {
         my $output = capture_output( $t, '--version' ) || '';
-        print $output, "\n" if $verbose;
-        $has_ctags = _probe_for_ctags_output($output, $verbose);
+        $conf->debug("$output\n");
+        $has_ctags = _probe_for_ctags_output($conf, $output);
         $ctags = $t if $has_ctags;
         last if $has_ctags;
     }
@@ -65,9 +63,9 @@ sub _probe_for_ctags {
 }
 
 sub _probe_for_ctags_output {
-    my ($output, $verbose) = @_;
+    my ($conf, $output) = @_;
     my $has_ctags = ( $output =~ m/Exuberant Ctags/ ) ? 1 : 0;
-    print $has_ctags, "\n" if $verbose;
+    $conf->debug("$has_ctags\n");
     return $has_ctags;
 }
 

@@ -19,6 +19,8 @@ You'll have to Ctl-C to exit.
 
 =cut
 
+.loadlib 'io_ops'
+
 	getstdin P0
 	getstdout P1
 REDO:

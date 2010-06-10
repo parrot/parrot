@@ -40,20 +40,32 @@ undefined values) is undefined, and may be rather funky.
 =cut
 
 .include "interpinfo.pasm"
-.include "stat.pasm"
 
 .sub _config
     .local string prefix, conf_file
     prefix = interpinfo .INTERPINFO_RUNTIME_PREFIX
 
     $S0 = concat prefix, "/runtime"
-    $I0 = stat $S0, .STAT_EXISTS
-    if $I0 goto L1
+
+    push_eh L1
+        # 'os' is dynop and can be absent at this point.
+        # Treat it as developers mode.
+        $P0 = loadlib 'os'
+        $P0 = new ['OS']
+        pop_eh
+
+    push_eh file_not_found
+        # OS.stat throws on file not found
+        $P0.'stat'($S0)
+        goto L1
+  file_not_found:
+    # Treat it as installed parrot.
     conf_file = "@libdir@@versiondir@/include/config.fpmc"
     goto L2
   L1:
     conf_file = prefix . "/runtime/parrot/include/config.fpmc"
   L2:
+    pop_eh
 
     .local pmc CONF
     CONF = new 'FileHandle'

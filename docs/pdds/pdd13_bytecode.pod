@@ -389,7 +389,9 @@ the start of the constant including its type.
   | 5      | n      | String data with trailing zero padding as required.    |
   +--------+--------+--------------------------------------------------------+
 
-Note: The encoding field is not implemented yet and is set to 0.
+Note: The encoding and charset are currently packed together with the Flags,
+using an unique field of Length 1.
+
 
 =item * PMC Constants
 

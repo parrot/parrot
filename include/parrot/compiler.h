@@ -136,11 +136,35 @@
 #define PARROT_IGNORABLE_RESULT
 #define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
 
+#define PARROT_PURE_FUNCTION        __attribute__pure__  __attribute__warn_unused_result__
 /* Pure functions have no side-effects, and depend only on parms or globals. e.g. strlen() */
-#define PARROT_PURE_FUNCTION                __attribute__pure__  __attribute__warn_unused_result__
+/* "Many functions have no effects except the return value and their
+    return value depends only on the parameters and/or global
+    variables. Such a function can be subject to common subexpression
+    elimination and loop optimization just as an arithmetic operator
+    would be. For example, "PARROT_PURE_FUNCTION int square(int x)"
+    says that the hypothetical function square is safe to call fewer
+    times than the program says.
 
-/* Const functions are pure functions, and do not examine targets of pointers. e.g. sqrt() */
-#define PARROT_CONST_FUNCTION               __attribute__const__ __attribute__warn_unused_result__
+    Some of common examples of pure functions are strlen or
+    memcmp. Interesting non-pure functions are functions with infinite
+    loops or those depending on volatile memory or other system resource,
+    that may change between two consecutive calls (such as feof in a
+    multithreading environment)." -- http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
+*/
+
+#define PARROT_CONST_FUNCTION       __attribute__const__ __attribute__warn_unused_result__
+/* Const functions are pure functions, and also do not examine targets of pointer args or globals. e.g. sqrt() */
+/* "Many functions do not examine any values except their arguments,
+    and have no effects except the return value. Basically this is just
+    slightly more strict class than the pure attribute below, since
+    function is not allowed to read global memory. Note that a function
+    that has pointer arguments and examines the data pointed to must
+    not be declared const. Likewise, a function that calls a non-const
+    function usually must not be const. It does not make sense for a
+    const function to return void."
+        -- http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
+*/
 
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/

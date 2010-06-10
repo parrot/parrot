@@ -888,6 +888,7 @@ This allows 64-bit seeks with only 32-bit C<INTVALS>.
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_make_offset32(INTVAL hi, INTVAL lo)

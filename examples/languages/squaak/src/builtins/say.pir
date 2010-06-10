@@ -24,9 +24,13 @@ Squaak built-in routines
     .return ()
 .end
 
+.include 'stdio.pasm'
+
 .sub 'read'
-    $P0 = getstdin
-    $S0 = readline $P0
+    .local pmc stdin
+    $P0 = getinterp
+    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    $S0 = stdin.'readline'()
     .return ($S0)
 .end
 

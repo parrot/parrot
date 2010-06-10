@@ -53,6 +53,7 @@ INTVAL Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_HOT
 INTVAL Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc));
@@ -84,6 +85,7 @@ PMC * Parrot_pmc_new_constant_init_int(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
@@ -242,6 +244,9 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 #define pmc_reuse_no_init       Parrot_pmc_reuse_noinit
 #define pmc_type                Parrot_pmc_get_type_str
 #define pmc_type_p              Parrot_pmc_get_type
+
+#define PMC_IS_TYPE(p, t) ((p)->vtable->base_type == enum_class_ ## t)
+#define PMC_IS_TYPE_ENUM(p, e) ((p)->vtable->base_type == (e))
 
 #endif /* PARROT_PMC_H_GUARD */
 

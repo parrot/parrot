@@ -30,25 +30,25 @@ Exchange the contents of registers $1 and $2
 
 =cut
 
-op exchange(inout INT, inout INT) :base_core {
+op exchange(inout INT, inout INT) :deprecated {
     const INTVAL temp = $1;
     $1 = $2;
     $2 = temp;
 }
 
-op exchange(inout PMC, inout PMC) :base_core {
+op exchange(inout PMC, inout PMC) :deprecated {
     PMC * const temp = $1;
     $1 = $2;
     $2 = temp;
 }
 
-op exchange(inout NUM, inout NUM) :base_core {
+op exchange(inout NUM, inout NUM) :deprecated {
     FLOATVAL temp = $1;
     $1 = $2;
     $2 = temp;
 }
 
-op exchange(inout STR, inout STR) :base_core {
+op exchange(inout STR, inout STR) :deprecated {
     STRING * const temp = $1;
     $1 = $2;
     $2 = temp;
@@ -62,7 +62,7 @@ affected register - handle with care.
 
 =cut
 
-inline op setp_ind(in INT, invar PMC) :base_ref {
+inline op setp_ind(in INT, invar PMC) :deprecated {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
         PANIC(interp, "Out of bound register access");
     REG_PMC(interp, $1) = $2;
@@ -76,7 +76,7 @@ affected register - handle with care.
 
 =cut
 
-inline op setn_ind(in INT, in NUM) :base_ref {
+inline op setn_ind(in INT, in NUM) :deprecated {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
         PANIC(interp, "Out of bound register access");
     REG_NUM(interp, $1) = $2;
@@ -90,7 +90,7 @@ affected register - handle with care.
 
 =cut
 
-inline op sets_ind(in INT, in STR) :base_ref {
+inline op sets_ind(in INT, in STR) :deprecated {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
         PANIC(interp, "Out of bound register access");
     REG_STR(interp, $1) = $2;
@@ -104,7 +104,7 @@ affected register - handle with care.
 
 =cut
 
-inline op seti_ind(in INT, in INT) :base_ref {
+inline op seti_ind(in INT, in INT) :deprecated {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
         PANIC(interp, "Out of bound register access");
     REG_INT(interp, $1) = $2;
@@ -128,19 +128,19 @@ PMC ('p') and STRING ('s') registers clear to NULL.
 
 =cut
 
-inline op cleari() :base_core {
+inline op cleari() :deprecated {
     Parrot_clear_i(interp);
 }
 
-inline op clearn() :base_core {
+inline op clearn() :deprecated {
     Parrot_clear_n(interp);
 }
 
-inline op clears() :base_core {
+inline op clears() :deprecated {
     Parrot_clear_s(interp);
 }
 
-inline op clearp() :base_core {
+inline op clearp() :deprecated {
     Parrot_clear_p(interp);
 }
 

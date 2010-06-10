@@ -86,7 +86,10 @@ loop:	ge $I0, $I2, getout
 	inc $I0
 	mod $I31,$I0,100
 	if $I31, skip
-	printerr "."
+        $P0 = getinterp
+        .include 'stdio.pasm'
+        $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+	print $P1, "."
 skip:
 
 	local_branch jmpstack,  generate

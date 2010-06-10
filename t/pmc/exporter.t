@@ -172,8 +172,8 @@ pir_output_is( <<'CODE', <<'OUT', 'globals' );
   ok_2:
     say 'ok 2 - globals() with empty array arg sets PMCNULL'
 
-    $P99 = push 'Alex'
-    $P99 = push 'Prince'
+    push $P99, 'Alex'
+    push $P99, 'Prince'
 
     $P0.'globals'($P99)
     $P1 = $P0.'globals'()
@@ -323,8 +323,8 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as array' );
 
     src     = get_namespace [ 'Test'; 'More' ]
     globals = new ['ResizableStringArray']
-    globals = push 'ok'
-    globals = push 'plan'
+    push globals, 'ok'
+    push globals, 'plan'
 
     exporter = new ['Exporter']
     exporter.'import'( src :named('source'), globals :named('globals') )
@@ -385,8 +385,8 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
     src     = get_namespace [ 'Test'; 'More' ]
     dest    = get_namespace ['foo']
     globals = new ['ResizableStringArray']
-    globals = push 'ok'
-    globals = push 'plan'
+    push globals, 'ok'
+    push globals, 'plan'
 
     exporter = new ['Exporter']
     exporter.'import'( src :named('source'), dest :named('destination'), globals :named('globals') )

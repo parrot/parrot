@@ -406,7 +406,7 @@ numbers count from the end.
         const INTVAL k = VTABLE_get_integer(INTERP, key);
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        n = Parrot_str_byte_length(INTERP, str_val);
+        n = Parrot_str_length(INTERP, str_val);
 
         return (INTVAL)((k >= 0 && k <= n) || (k < 0 && -k <= n));
     }
@@ -470,7 +470,7 @@ Replace the string at C<key> with the chr of C<value>.
 
     VTABLE void set_string_keyed_int(INTVAL pos, STRING * const value) {
         STRING      *str_val;
-        const INTVAL len = Parrot_str_byte_length(INTERP, value);
+        const INTVAL len = Parrot_str_length(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
         str_val = Parrot_str_replace(INTERP, str_val, pos, len, value);
         SET_ATTR_str_val(INTERP, SELF, str_val);
@@ -506,8 +506,8 @@ Replace every occurrence of C<orig> with C<_new>.
 */
 
     METHOD replace(STRING *orig, STRING *_new) {
-        const INTVAL   old_len = Parrot_str_byte_length(INTERP, orig);
-        const INTVAL   new_len = Parrot_str_byte_length(INTERP, _new);
+        const INTVAL   old_len = Parrot_str_length(INTERP, orig);
+        const INTVAL   new_len = Parrot_str_length(INTERP, _new);
         STRING       * s       = VTABLE_get_string(INTERP, SELF);
         INTVAL         i       = 0;
 
@@ -607,7 +607,7 @@ Return length of the string.
     VTABLE INTVAL elements() {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_byte_length(INTERP, str_val);
+        return Parrot_str_length(INTERP, str_val);
     }
 
     VTABLE PMC *get_iter() {
@@ -691,7 +691,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
         INTVAL         i;
         STRING        *dest;
 
-        const INTVAL len = Parrot_str_byte_length(INTERP, src);
+        const INTVAL len = Parrot_str_length(INTERP, src);
 
         if (!len)
             RETURN(STRING src);
@@ -729,7 +729,7 @@ Checks if the ascii STRING C<str> is just an integer.
     METHOD is_integer(STRING *src) {
         INTVAL         i;
         unsigned char *p;
-        const INTVAL   len = Parrot_str_byte_length(INTERP, src);
+        const INTVAL   len = Parrot_str_length(INTERP, src);
 
         if (!len)
             RETURN(INTVAL 0);
@@ -787,7 +787,7 @@ Find last occurrence of C<substring>, but not after the C<start> position.
         if (start < 0)
             RETURN(INTVAL res);
 
-        len = Parrot_str_byte_length(INTERP, src);
+        len = Parrot_str_length(INTERP, src);
 
         if (!len)
             RETURN(INTVAL res);
@@ -795,7 +795,7 @@ Find last occurrence of C<substring>, but not after the C<start> position.
         if (start >= (INTVAL)len)
             RETURN(INTVAL res);
 
-        if (!Parrot_str_byte_length(INTERP, substring))
+        if (!Parrot_str_length(INTERP, substring))
             RETURN(INTVAL res);
 
         res = CHARSET_RINDEX(INTERP, src, substring, (UINTVAL)start);
@@ -820,7 +820,7 @@ EXPERIMENTAL, for testing only. See TT #1628
             Parrot_encoding_number(INTERP, encodingname));
         STRING * const src = VTABLE_get_string(INTERP, SELF);
         STRING * const dest = Parrot_str_unescape_string(INTERP, src,
-                charset, encoding);
+                charset, encoding, 0);
         RETURN(STRING *dest);
     }
 

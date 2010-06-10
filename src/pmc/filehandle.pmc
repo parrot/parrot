@@ -698,6 +698,70 @@ platforms that use integer file descriptors).
         RETURN(INTVAL -1);
     }
 
+/*
+
+=item C<METHOD tell()>
+
+Get the file position of the stream. 2 C<INTVAL>s are returned. The first is
+the position. The second is the position shifted down by 32 bits to handle
+overflows on 32-bit systems.
+
+=cut
+
+*/
+
+    METHOD tell() {
+        PIOOFF_T pos;
+        GET_ATTR_file_pos(INTERP, SELF, pos);
+        RETURN(INTVAL pos, INTVAL pos >> 32);
+    }
+
+/*
+
+=item C<METHOD seek(INTVAL whence, INTVAL offs, INTVAL offs_overflow)>
+
+Set the file position to an offset specified by C<offs> (and optionally
+C<offs_overflow>). C<whence> determines from where in the file the offset is
+taken.
+
+ Whence Value      Meaning
+ 0                 Seek from the beginning of the file
+ 1                 Seek from the current position
+ 2                 Seek from the end of the file
+
+C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
+32bit systems.
+
+=cut
+
+*/
+
+    METHOD seek(INTVAL whence, INTVAL offs, INTVAL offs_overflow :optional,
+                int has_overflow :opt_flag) {
+        const PIOOFF_T pio_offs = has_overflow ?
+                                    Parrot_io_make_offset32(offs_overflow, offs) :
+                                    offs;
+        if (0 > Parrot_io_seek(INTERP, SELF, pio_offs, whence))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR, "seek failed");
+    }
+
+/*
+
+=item C<METHOD peek()>
+
+Returns the next byte from the stream, but does not remove it.
+
+=cut
+
+*/
+
+    METHOD peek() {
+        STRING *s = NULL;
+        if (Parrot_io_peek(INTERP, SELF, &s) < 0)
+            RETURN(STRING* STRINGNULL);
+        else
+            RETURN(STRING* s);
+    }
 
 /*
 

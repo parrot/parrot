@@ -44,8 +44,6 @@ General Options:
                         which upon failure cause Configure.pl to halt
    --silent             Don't be verbose, interactive or fatal
    --nomanicheck        Don't check the MANIFEST
-   --languages="list of languages"
-                        Specify a list of languages to process
 
    --ask                Have Configure ask for commonly-changed info
    --test=configure     Run tests of configuration tools before configuring

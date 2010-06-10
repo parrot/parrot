@@ -26,6 +26,9 @@ Parrot's core library of ops.
 Core operations are primarily flow control and interpreter
 introspection.
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =cut
 
 # ' for emacs
@@ -379,6 +382,8 @@ inline op invokecc(invar PMC) :flow {
     PMC      * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
     interp->current_cont   = NEED_CONTINUATION;
@@ -392,6 +397,8 @@ inline op invoke(invar PMC, invar PMC) :flow {
     PMC * const p          = $1;
     PMC * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
+
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
@@ -535,6 +542,7 @@ op get_results(inconst PMC) :flow {
             PARROT_ERRORS_RESULT_COUNT_FLAG);
 
     argc = VTABLE_elements(interp, signature);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);
     goto OFFSET(argc + 2);
 }
 
@@ -819,7 +827,8 @@ inline op exit(in INT) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
-    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit, $1, NULL);
+    PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
+                                                           CONTROL_EXIT, NULL);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -1103,7 +1112,7 @@ Trigger a GC run unconditionally.
 
 op sweep(inconst INT) {
     if ($1)
-        Parrot_gc_mark_and_sweep(interp, 0);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_normal_FLAG);
     else
         if (Parrot_gc_impatient_pmcs(interp))
             Parrot_gc_mark_and_sweep(interp, GC_lazy_FLAG);

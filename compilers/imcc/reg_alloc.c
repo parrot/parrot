@@ -229,6 +229,8 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 
 =item C<void free_reglist(IMC_Unit *unit)>
 
+Frees the register list associated with a compilation unit.
+
 =cut
 
 */
@@ -405,6 +407,8 @@ reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 
 =item C<static void sort_reglist(IMC_Unit *unit)>
 
+Sort a compilation unit's register list (by line number of first appearance).
+
 =cut
 
 */
@@ -528,6 +532,8 @@ compute_du_chain(ARGMOD(IMC_Unit *unit))
 /*
 
 =item C<static void compute_one_du_chain(SymReg *r, IMC_Unit *unit)>
+
+Compute the DU-chain for one register within the compilation unit.
 
 =cut
 
@@ -691,6 +697,9 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 
 =item C<static void vanilla_reg_alloc(PARROT_INTERP, IMC_Unit *unit)>
 
+Vanilla register allocator - assign every virtual register to an actual
+register.
+
 =cut
 
 */
@@ -744,6 +753,9 @@ vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 /*
 
 =item C<static void allocate_lexicals(PARROT_INTERP, IMC_Unit *unit)>
+
+Allocate registers for lexical variables. These must have unique registers
+because they are accessible through the LexPad.
 
 =cut
 

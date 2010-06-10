@@ -450,12 +450,16 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     if (!cs) {
         /* upgrade strings for concatenation */
         cs = Parrot_unicode_charset_ptr;
-        enc = (a->encoding == Parrot_utf16_encoding_ptr
-           ||  b->encoding == Parrot_utf16_encoding_ptr
-           ||  a->encoding == Parrot_ucs2_encoding_ptr
-           ||  b->encoding == Parrot_ucs2_encoding_ptr)
-            ? Parrot_utf16_encoding_ptr
-            : Parrot_utf8_encoding_ptr;
+        if (a->encoding == Parrot_ucs4_encoding_ptr
+            || b->encoding == Parrot_ucs4_encoding_ptr)
+            enc = Parrot_ucs4_encoding_ptr;
+        else if (a->encoding == Parrot_utf16_encoding_ptr
+            ||  b->encoding == Parrot_utf16_encoding_ptr
+            ||  a->encoding == Parrot_ucs2_encoding_ptr
+            ||  b->encoding == Parrot_ucs2_encoding_ptr)
+            enc = Parrot_utf16_encoding_ptr;
+        else
+            enc = Parrot_utf8_encoding_ptr;
 
         a = Parrot_unicode_charset_ptr->to_charset(interp, a);
         b = Parrot_unicode_charset_ptr->to_charset(interp, b);
@@ -977,6 +981,7 @@ Returns the number of characters in the specified Parrot string.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
@@ -2076,8 +2081,6 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
         else if (Parrot_str_equal(interp, t, CONST_STRING(interp, "-INF"))
              ||  Parrot_str_equal(interp, t, CONST_STRING(interp, "-INFINITY")))
             return PARROT_FLOATVAL_INF_NEGATIVE;
-        else
-            return 0.0;
     }
 
 /* powl() could be used here, but it is an optional POSIX extension that
@@ -2528,7 +2531,7 @@ throw_illegal_escape(PARROT_INTERP)
 /*
 
 =item C<STRING * Parrot_str_unescape_string(PARROT_INTERP, const STRING *src,
-const CHARSET *charset, const ENCODING *encoding)>
+const CHARSET *charset, const ENCODING *encoding, UINTVAL flags)>
 
 EXPERIMENTAL, see TT #1628
 
@@ -2545,12 +2548,13 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
         ARGIN(const CHARSET *charset),
-        ARGIN(const ENCODING *encoding))
+        ARGIN(const ENCODING *encoding),
+        UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_str_unescape_string)
 
     UINTVAL srclen = Parrot_str_byte_length(interp, src);
-    STRING *result = Parrot_gc_new_string_header(interp, 0);
+    STRING *result = Parrot_gc_new_string_header(interp, flags);
     String_iter itersrc;
     String_iter iterdest;
     UINTVAL reserved;
@@ -2613,13 +2617,18 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     }
                     else {
                         /* \xhh 1..2 hex digits */
-                        for (digcount = 0; digcount < 2; ++digcount) {
+                        pending = 1;
+                        for (digcount = 0; digcount < 2;) {
                             if (!isxdigit(c))
                                 break;
                             digbuf[digcount] = c;
+                            ++digcount;
+                            if (itersrc.bytepos >= srclen) {
+                                pending = 0;
+                                break;
+                            }
                             c = itersrc.get_and_advance(interp, &itersrc);
                         }
-                        pending = 1;
                     }
                     if (digcount == 0)
                         throw_illegal_escape(interp);
@@ -3235,7 +3244,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         mem_sys_memcopy(pos, next->strstart, next->bufused);
         pos += next->bufused;
 
-        PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res));
+        /* We can consume all buffer and pos will be next-after-end of buffer */
+        PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);
     }
 
     res->bufused  = pos - res->strstart;

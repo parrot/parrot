@@ -122,6 +122,7 @@ Returns a C<time_t> structure for the current Greenwich Mean Time.
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_gmtime_r(const time_t *t, struct tm *tm)
 {
@@ -139,6 +140,7 @@ Returns a C<time_t> struct for the current local time.
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_localtime_r(const time_t *t, struct tm *tm)
 {
@@ -157,6 +159,7 @@ character array C<buffer>.
 
 */
 
+PARROT_EXPORT
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {

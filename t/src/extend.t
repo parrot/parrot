@@ -334,13 +334,13 @@ my ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
   get_params ""
-  printerr "in sub1\n"
+  print "in sub1\n"
   set_returns ""
   returncc
   .pcc_sub _sub2:
   get_params "0", P5
-  printerr P5
-  printerr "in sub2\n"
+  print P5
+  print "in sub2\n"
   set_returns ""
   returncc
 EOF
@@ -471,8 +471,8 @@ OUTPUT
 print $TEMP <<'EOF';
   .sub foo
       .param pmc input
-      printerr input
-      printerr "in sub2\n"
+      print input
+      print "in sub2\n"
       $P0 = new "Integer"
       $P0 = 42
       .return($P0)
@@ -540,9 +540,9 @@ OUTPUT
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
   get_params ""
-  printerr "in sub1\n"
+  print "in sub1\n"
   find_lex P2, "no_such_var"
-  printerr "never\n"
+  print "never\n"
   returncc
 EOF
 close $TEMP;

@@ -14,6 +14,9 @@ object.ops - Class and Object Opcodes
 
 Parrot's library of object ops
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =over 4
 
 =cut
@@ -56,6 +59,8 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
     PMC      * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+
     if (PMC_IS_NULL(method_pmc)) {
         PMC * const _class = VTABLE_get_class(interp, object);
         if (PMC_IS_NULL(_class)) {
@@ -85,6 +90,8 @@ op callmethodcc(invar PMC, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, $1);
     interp->current_cont   = NEED_CONTINUATION;
@@ -103,6 +110,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
 
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
@@ -126,6 +134,8 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base :flow {
     opcode_t *dest;
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
+
+    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, object);

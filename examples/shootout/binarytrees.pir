@@ -6,6 +6,8 @@
 # by Joshua Isom, modified by Leopold Toetsch
 # modified by karl : default value of N=10 to match shootout output
 
+.loadlib 'trans_ops'
+
 .sub itemcheck
 	.param pmc node
 	$I0 = exists node[0]

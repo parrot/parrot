@@ -40,19 +40,17 @@ sub cleanup {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
     build_asm( $self, $conf );
 
     my @files = qw( test_atomic_c.in );
     for my $f (@files) {
-        print " $f " if $verbose;
+        $conf->debug(" $f ");
         my ($suffix) = $f =~ /test_(\w+)/;
         $f = "config/auto/cpu/sun4/$f";
         $conf->cc_gen($f);
         eval { $conf->cc_build("-DPARROT_CONFIG_TEST", "sparcasm" . $conf->data->get('o') ) };
         if ($@) {
-            print " $@ " if $verbose;
+            $conf->debug(" $@ ");
         }
         else {
             if ( $conf->cc_run() =~ /ok/ ) {
@@ -60,7 +58,7 @@ sub runstep {
                     "sparc_has_$suffix" => '1',
                     "HAS_SPARC_$suffix" => '1',
                 );
-                print " (\U$suffix) " if ($verbose);
+                $conf->debug(" (\U$suffix) ");
                 $conf->data->add( ' ', TEMP_atomic_o => 'src/atomic/sparc_v9.o' );
             }
         }

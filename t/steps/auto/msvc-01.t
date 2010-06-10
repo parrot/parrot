@@ -93,15 +93,13 @@ my ($status, $major, $minor, $verbose);
 
 $major = 13;
 $minor = 99;
-$verbose = undef;
-$status = $step->_handle_not_msvc($conf, $major, $minor, $verbose);
+$status = $step->_handle_not_msvc($conf, $major, $minor);
 ok(! defined $status, 'sub return value, as expected, not yet set');
 ok(! $step->result(), 'result, as expected, not yet set');
 
 $major = 13;
 $minor = undef;
-$verbose = undef;
-$status = $step->_handle_not_msvc($conf, $major, $minor, $verbose);
+$status = $step->_handle_not_msvc($conf, $major, $minor);
 ok($status, 'sub return value, as expected, set to true value');
 is($step->result(), q{no}, 'Got expected result');
 ok(! defined ($conf->data->get( 'msvcversion' )),
@@ -109,13 +107,21 @@ ok(! defined ($conf->data->get( 'msvcversion' )),
 
 $major = undef;
 $minor = 99;
-$verbose = undef;
-$status = $step->_handle_not_msvc($conf, $major, $minor, $verbose);
+$status = $step->_handle_not_msvc($conf, $major, $minor);
 ok($status, 'sub return value, as expected, set to true value');
 is($step->result(), q{no}, 'Got expected result');
 ok(! defined ($conf->data->get( 'msvcversion' )),
     'msvcversion is undef, as expected');
 
+$conf->replenish($serialized);
+
+########## _handle_not_msvc() ##########
+
+($args, $step_list_ref) = process_options( {
+    argv            => [ q{--verbose=1} ],
+    mode            => q{configure},
+} );
+$conf->options->set(%{$args});
 {
     my $stdout;
     $major = undef;
@@ -123,7 +129,7 @@ ok(! defined ($conf->data->get( 'msvcversion' )),
     $verbose = 1;
     capture(
         sub { $status =
-            $step->_handle_not_msvc($conf, $major, $minor, $verbose); },
+            $step->_handle_not_msvc($conf, $major, $minor); },
         \$stdout,
     );
     ok($status, 'sub return value, as expected, set to true value');
@@ -141,8 +147,7 @@ my $msvcversion;
 
 $major = 13;
 $minor = 99;
-$verbose = undef;
-$msvcversion = $step->_compose_msvcversion($major, $minor, $verbose);
+$msvcversion = $step->_compose_msvcversion($major, $minor);
 is($msvcversion, '13.99', "Got expected MSVC version");
 is($step->result(), 'yes, 13.99', "Got expected result");
 $step->set_result(undef);
@@ -151,10 +156,9 @@ $step->set_result(undef);
     my $stdout;
     $major = 13;
     $minor = 99;
-    $verbose = 1;
     capture(
         sub { $msvcversion =
-            $step->_compose_msvcversion($major, $minor, $verbose); },
+            $step->_compose_msvcversion($major, $minor); },
         \$stdout,
     );
     is($msvcversion, '13.99', "Got expected MSVC version");

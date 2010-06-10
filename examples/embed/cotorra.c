@@ -227,18 +227,18 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
     if (stname) {
         Parrot_PMC rootns = Parrot_get_root_namespace(interp);
         Parrot_String parrotname = create_string(interp, "parrot");
-        Parrot_PMC parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
+        Parrot_PMC parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns, parrotname);
         Parrot_String name = create_string(interp, stname);
-        Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
+        Parrot_PMC start = Parrot_PMC_get_pmc_keyed_str(interp, parrotns, name);
         if (Parrot_pmc_is_null(interp, start))
             fail("start sub not found");
         if (i < argc) {
             int pos;
             Parrot_PMC arg = Parrot_PMC_new(interp,
                     Parrot_PMC_typenum(interp, "FixedStringArray"));
-            Parrot_PMC_set_intval(interp, arg, argc - i);
+            Parrot_PMC_set_integer_native(interp, arg, argc - i);
             for (pos = 0; i < argc; ++i, ++pos) {
-                Parrot_PMC_set_string_intkey(interp, arg, pos, create_string(interp, argv[i]));
+                Parrot_PMC_set_string_keyed_int(interp, arg, pos, create_string(interp, argv[i]));
             }
             Parrot_ext_call(interp, start, "P->", arg);
         }

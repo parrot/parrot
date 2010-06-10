@@ -297,7 +297,7 @@ TEST
     $I1 = index $S0, '/branches/'
     unless $I1 >= 0 goto L2
     $I1 += 10
-    $I2 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
+    $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
     $I3 = $I2 - $I1
     $S1 = substr $S0, $I1, $I3
   L2:
@@ -305,7 +305,7 @@ TEST
     $P0.'open'('svn status', 'pr')
     $P1 = new 'ResizableStringArray'
   L3:
-    $S0 = readline $P0
+    $S0 = $P0.'readline'()
     if $S0 == '' goto L4
     $I0 = index $S0, 'M'
     unless $I0 == 0 goto L3
@@ -361,10 +361,11 @@ TEST
     set $P0, 1
     $P0[0] = 'parrot_test_run.tar.gz'
     push contents, $P0
-    load_bytecode 'LWP.pir'
+    load_bytecode 'LWP/UserAgent.pir'
     .const string url = 'http://smolder.plusthree.com/app/projects/process_add_report/8'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
+    ua.'env_proxy'()
     ua.'show_progress'(1)
     response = ua.'post'(url, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
     $I0 = response.'code'()

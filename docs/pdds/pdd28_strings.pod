@@ -161,7 +161,7 @@ This means that even in the most normalized Unicode form, string manipulation
 code must always assume a variable-byte encoding, and use expensive
 lookaheads. The cost is incurred on every operation, though the particular
 string operated on might not contain combining characters. It's particularly
-noticeable in parsing and regular expression matches, where backtracking
+noticeable in parsing and regular expres699sion matches, where backtracking
 operations may re-traverse the characters of a simple string hundreds of
 times.
 
@@ -296,7 +296,7 @@ The length of the string, in bytes. {{NOTE, not in characters, as characters
 may be variably sized.}}
 
 =item hashval
-
+699
 A cache of the hash value of the string, for rapid lookups when the string is
 used as a hash key.
 

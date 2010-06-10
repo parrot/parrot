@@ -10,14 +10,16 @@ This example demonstrates basic file operations.
 .sub main :main
     .local pmc fileout, filein
 
-    fileout = open '40_file_ops_data.txt', 'w'
-    print fileout, "The quick brown fox jumps over the lazy dog.\n"
-    close fileout
+    fileout = new ['FileHandle']
+    fileout.'open'('40_file_ops_data.txt', 'w')
+    fileout.'print'("The quick brown fox jumps over the lazy dog.\n")
+    fileout.'close'()
 
-    filein = open '40_file_ops_data.txt', 'r'
-    $S0 = readline filein
+    filein = new ['FileHandle']
+    filein.'open'('40_file_ops_data.txt', 'r')
+    $S0 = filein.'readline'()
     say $S0
-    close filein
+    filein.'close'()
 
     # Be nice and remove the temporary file we created.
     $P0 = loadlib 'os'

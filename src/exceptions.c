@@ -68,7 +68,7 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
         long error, ARGIN_NULLOK(STRING *msg))
 {
     ASSERT_ARGS(Parrot_ex_build_exception)
-    PMC *exception = Parrot_pmc_new(interp, enum_class_Exception);
+    PMC * const exception = Parrot_pmc_new(interp, enum_class_Exception);
 
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"), severity);
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"), error);
@@ -206,7 +206,13 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 {
     ASSERT_ARGS(Parrot_ex_throw_from_op)
     opcode_t   *address;
-    PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
+    PMC        *handler;
+
+    /* Note the thrower. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
+
+    /* Locate the handler, if there is one. */
+    handler = Parrot_cx_find_handler_local(interp, exception);
     if (PMC_IS_NULL(handler)) {
         STRING * const message     = VTABLE_get_string(interp, exception);
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
@@ -354,10 +360,8 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     /* Note the thrower.
-     * XXX TT #596 - pass in current context instead when we have context PMCs. */
-    /* Don't split line. It will break CONST_STRING handling */
-    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp)));
-
+     * Don't split line. It will break CONST_STRING handling. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
 
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
@@ -680,9 +684,9 @@ developers
 
 */
 
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-PARROT_EXPORT
 void
 do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
          ARGIN_NULLOK(const char *file), unsigned int line)

@@ -35,6 +35,7 @@ An Mines::Field object has the following methods:
 =cut
 
 .include "iterator.pasm"
+.loadlib 'math_ops'
 .namespace ["Mines::Field"]
 
 # size of a single mine field, in pixels

@@ -19,6 +19,7 @@ received the buffer is printed and the program is terminated.
 =cut
 
 .include 'cclass.pasm'
+.loadlib 'io_ops'
 
 .sub "example" :main
         .local pmc stdin

@@ -315,13 +315,13 @@ STRING* hash_value_to_string(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
 int int_compare(SHIM_INTERP,
     ARGIN_NULLOK(const void *a),
     ARGIN_NULLOK(const void *b));
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
 size_t key_hash_int(SHIM_INTERP,
     ARGIN_NULLOK(const void *value),
     size_t seed);

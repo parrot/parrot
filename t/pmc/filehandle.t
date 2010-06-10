@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 20;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -263,7 +263,7 @@ pir_output_is( <<"CODE", <<'OUT', 'readline 10,000 lines' );
     \$I0 = filehandle.'eof'()
     if \$I0 goto end_read_loop
 
-    test_line = readline filehandle
+    test_line = filehandle.'readline'()
     if test_line == "" goto end_read_loop
     test_line = chomp( test_line )
     \$I1 = test_line
@@ -453,26 +453,46 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 
     \$P1.'open'('$temp_file')
 
-    \$S1 = \$P1.'readline'()
-    if \$S1 == "1234567890\\n" goto ok_1
-print \$S1
+    .local string line
+    line = \$P1.'readline'()
+    if line == "1234567890\\n" goto ok_1
+print line
     print 'not '
   ok_1:
     say 'ok 1 - \$S1 = \$P1.readline() # read with utf8 encoding on'
 
-    \$S2 = \$P1.'readline'()
-    if \$S2 == \$S0 goto ok_2
-print \$S2
+    line = \$P1.'readline'()
+    if line == \$S0 goto ok_2
+print line
     print 'not '
   ok_2:
     say 'ok 2 - \$S2 = \$P1.readline() # read iso-8859-1 string'
 
     \$P1.'close'()
 
+    \$I1 = charset line
+    \$S2 = charsetname \$I1
+    if \$S2 == 'unicode' goto ok_3
+    print \$S2
+    print 'not '
+  ok_3:
+    say 'ok 3 # unicode charset'
+
+
+    \$I1 = encoding line
+    \$S2 = encodingname \$I1
+    if \$S2 == 'utf8' goto ok_4
+    print \$S2
+    print 'not '
+  ok_4:
+    say 'ok 4 # utf8 encoding'
+
 .end
 CODE
 ok 1 - $S1 = $P1.readline() # read with utf8 encoding on
 ok 2 - $S2 = $P1.readline() # read iso-8859-1 string
+ok 3 # unicode charset
+ok 4 # utf8 encoding
 OUT
 
 
@@ -586,7 +606,6 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .sub 'main'
     .local pmc pipe, conf, interp
     .local string cmd
-    pipe = new ['FileHandle']
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
@@ -601,7 +620,8 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     aux = conf['exe']
     cmd .= aux
 
-    pipe = open cmd, "rp"
+    pipe = new ['FileHandle']
+    pipe.'open'(cmd, "rp")
     pipe.'readall'()
     pipe.'close'()
     print "expect 0 exit status: "
@@ -609,7 +629,8 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     say $I0
 
     cmd .= ' --this_is_not_a_valid_option'
-    pipe = open cmd, "rp"
+    pipe = new ['FileHandle']
+    pipe.'open'(cmd, "rp")
     pipe.'readall'()
     pipe.'close'()
     print "expect 1 exit status: "
@@ -621,6 +642,84 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 CODE
 expect 0 exit status: 0
 expect 1 exit status: 1
+OUTPUT
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
+.const string temp_file = '%s'
+.sub main :main
+    interpinfo $I0, 2    # GC mark runs
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+        needs_destroy $P0
+    print $P0, "a line\n"
+    null $P0            # kill it
+    sweep 0            # a lazy GC has to close the PIO
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'read'(20)
+    print $S0
+.end
+CODE
+a line
+OUTPUT
+
+my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
+
+pir_output_is( sprintf( <<'CODE', $no_such_file, $temp_file ), <<'OUTPUT', "get_bool" );
+.const string no_such_file = '%s'
+.const string temp_file    = '%s'
+
+.sub main :main
+    push_eh read_non_existent_file
+    $P0 = new ['FileHandle']
+    $P0.'open'(no_such_file, 'r')
+
+    print "Huh: '"
+    print no_such_file
+    print "' exists? - not "
+ok1:
+    say "ok 1"
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    $P0.'print'("a line\n")
+    $P0.'print'("a line\n")
+    $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    if $P0, ok2
+    print "not "
+ok2:    say "ok 2"
+    $S0 = $P0.'read'(1024)
+    $S0 = $P0.'read'(1024)
+    unless $P0, ok3
+    print "not "
+ok3:    say "ok 3"
+    defined $I0, $P0
+    if $I0, ok4
+    print "not "
+ok4:    say "ok 4"
+    $P0.'close'()
+    defined $I0, $P0        # closed file is still defined
+    if $I0, ok5
+    print "not "
+ok5:    say "ok 5"
+    unless $P0, ok6        # but false
+    print "not "
+ok6:    say "ok 6"
+    .return ()
+read_non_existent_file:
+    pop_eh
+    branch ok1
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 # TT #1178

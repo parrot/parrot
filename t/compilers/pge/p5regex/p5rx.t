@@ -55,6 +55,8 @@ Column 6, if present, contains a description of what is being tested.
 
 .const int TESTS = 960
 
+.loadlib 'io_ops'
+
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'

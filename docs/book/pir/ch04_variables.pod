@@ -133,12 +133,16 @@ C<exsec>X<exsec opcode> (exsecant), C<hav>X<hav opcode> (haversine), and
 C<vers>X<vers opcode> (versine).  All angle arguments for the X<trigonometric
 opcodes> trigonometric opcodes are in radians:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'trans_ops'
+
+  # ...
 
   $N0 = sin $N1
   $N0 = exp 2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The majority of the floating-point operations have a single argument and a
 single result. The arguments can generally be either an integer or number, but
@@ -167,14 +171,18 @@ it's false and the second argument otherwise:
 The C<or>X<or opcode> opcode returns the first argument if
 it's true and the second argument otherwise:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = or 1, 0  # returns 1
   $I0 = or 0, 2  # returns 2
 
   $P0 = or $P1, $P2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID[
 
 Both C<and> and C<or> are short-circuiting ops. If they can determine what
 value to return from the first argument, they'll never evaluate the second.
@@ -210,30 +218,42 @@ C<band>X<band opcode>, C<bor>X<bor opcode>, and C<bxor>X<bxor opcode> return a
 value that is the logical AND, OR, or XOR of each bit in the source arguments.
 They each take two arguments.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = bor $I1, $I2
   $P0 = bxor $P1, $I2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 C<band>, C<bor>, and C<bxor> also have variants that modify the result
 in place.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = band $I1
   $P0 = bor $P1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 C<bnot>X<bnot opcode> is the logical NOT of each bit in the source argument.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = bnot $I1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 X<shl opcode>
 X<shr opcode>
@@ -241,13 +261,17 @@ X<lsr opcode>
 The logical and arithmetic shift operations shift their values by a specified
 number of bits:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = shl $I1, $I2        # shift $I1 left by count $I2
   $I0 = shr $I1, $I2        # arithmetic shift right
   $P0 = lsr $P1, $P2        # logical shift right
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 =head2 Working with Strings
 
@@ -889,14 +913,18 @@ These take string or string-like PMC arguments and perform the logical
 operation on each byte of the strings to produce the result string.
 Remember that in-place string operations are no longer available.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $P0 = bors $P1
   $P0 = bands $P1
   $S0 = bors $S1, $S2
   $P0 = bxors $P1, $S2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The bitwise string opcodes produce meaningful results only when used with
 simple ASCII strings, because Parrot performs bitwise operations per byte.

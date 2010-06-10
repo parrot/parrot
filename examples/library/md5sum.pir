@@ -24,6 +24,8 @@ Leopold Toetsch    - <lt@toetsch.at>
 
 =cut
 
+.loadlib 'os'       # OS object
+
 .sub _main :main
     .param pmc args
 
@@ -34,9 +36,9 @@ Leopold Toetsch    - <lt@toetsch.at>
     $I0 = $I0 - 1
     if $I0 > 0 goto has_args
     $S0 = args[0]
-    printerr "(parrot) "
-    printerr $S0
-    printerr " filename [filename ...]\n"
+    print "(parrot) "
+    print $S0
+    print " filename [filename ...]\n"
     exit 1
 
 has_args:
@@ -50,7 +52,10 @@ next_iter:
     file = args[$I1]
     .include "stat.pasm"
     # Get size of file
-    size = stat file, .STAT_FILESIZE
+    .local pmc os, stat_buf
+    os = new ['OS']
+    stat_buf = os.'stat'(file)
+    size = stat_buf[7]
     .local pmc pio, cl
     cl = new 'FileHandle'
     # slurp the file into memory
@@ -60,8 +65,12 @@ next_iter:
     $I2 = length contents
     if $I2 == size goto size_ok
 
-    printerr file
-    printerr ": size mismatch\n"
+    print file
+    print ": size mismatch ("
+    print size
+    print " vs "
+    print $I2
+    print ")\n"
     goto iter_cont
 
 size_ok:

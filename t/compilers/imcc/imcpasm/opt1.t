@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 78;
+use Parrot::Test tests => 77;
 use Parrot::Config;
 
 my $output;
@@ -308,22 +308,6 @@ CODE
 _main:
    div I0, 10, 5
    div N0, 10.0, 5.0
-   end
-OUT
-
-##############################
-pir_2_pasm_is( <<'CODE', <<'OUT', "constant cmod" );
-.sub _main
-   cmod $I0, 33, 10
-   cmod $N0, 33.0, 10.0
-   end
-.end
-CODE
-# IMCC does produce b0rken PASM files
-# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
-_main:
-   set I0, 3
-   set N0, 3
    end
 OUT
 

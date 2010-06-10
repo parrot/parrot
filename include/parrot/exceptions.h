@@ -90,6 +90,7 @@ typedef enum {
     CONTROL_ERROR,
     CONTROL_TAKE,
     CONTROL_LEAVE,
+    CONTROL_EXIT,
 
     CONTROL_LOOP_NEXT,
     CONTROL_LOOP_LAST,
@@ -115,9 +116,9 @@ typedef enum {
 /* HEADERIZER BEGIN: src/exceptions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-PARROT_EXPORT
 void do_panic(
     NULLOK_INTERP,
     ARGIN_NULLOK(const char *message),

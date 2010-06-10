@@ -132,6 +132,31 @@ Inno Setup
 
 =head2 EXAMPLES
 
+    $ cat hello.pir
+    .sub 'main' :main
+        say 'hello world!'
+    .end
+
+    $ cat setup.pir
+    .sub 'main' :main
+        .param pmc args
+        $S0 = shift args
+        load_bytecode 'distutils.pbc'
+
+        $P0 = new 'Hash'
+        $P1 = new 'Hash'
+        $P1['hello.pbc'] = 'hello.pir'
+        $P0['pbc_pir'] = $P1
+        $P2 = new 'Hash'
+        $P2['parrot-hello'] = 'hello.pbc'
+        $P0['installable_pbc'] = $P2
+        .tailcall setup(args :flat, $P0 :flat :named)
+    .end
+
+    $ parrot setup.pir
+    $ parrot setup.pir install
+    $ parrot setup clean
+
 L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
 
 L<http://github.com/fperrad/markdown/blob/master/setup.pir>
@@ -171,6 +196,9 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
 
 =cut
+
+.loadlib 'io_ops' # workaround TT #1663
+.loadlib 'sys_ops'
 
 .sub '__onload' :load :init :anon
     load_bytecode 'osutils.pbc'
@@ -340,7 +368,7 @@ Entry point.
     run_step('usage', kv :flat :named)
   L12:
     pop_eh
-    end
+    .return ()
   _handler:
     .local pmc ex
     .get_results (ex)
@@ -1057,8 +1085,6 @@ the value is the OPS pathname
     .param string cflags
     .param string ldflags
     mkpath('dynext', 1 :named('verbose'))
-    .local pmc cores
-    cores = get_cores()
     .local string load_ext
     load_ext = get_load_ext()
     $P0 = iter hash
@@ -1067,18 +1093,10 @@ the value is the OPS pathname
     .local string ops, src
     ops = shift $P0
     src = hash[ops]
-    $P1 = iter cores
-  L3:
-    unless $P1 goto L4
-    .local string core, suffix
-    core = shift $P1
-    suffix = cores[core]
-    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    $S0 = _mk_path_dynops(ops, load_ext)
     $I0 = newer($S0, src)
-    if $I0 goto L3
-    __build_dynops(src, ops, core, suffix, cflags, ldflags)
-    goto L3
-  L4:
+    if $I0 goto L1
+    __build_dynops(src, ops, cflags, ldflags)
     goto L1
   L2:
 .end
@@ -1086,31 +1104,24 @@ the value is the OPS pathname
 .sub '__build_dynops' :anon
     .param string src
     .param string ops
-    .param string core
-    .param string suffix
     .param string cflags
     .param string ldflags
     .local pmc config
     config = get_config()
     .local string cmd
-    cmd = config['perl']
-    cmd .= " "
-    $S0 = get_tool('build/ops2c.pl')
-    cmd .= $S0
-    cmd .= " "
-    cmd .= core
+    cmd = get_executable('ops2c')
     cmd .= " --dynamic "
     cmd .= src
     system(cmd, 1 :named('verbose'))
 
     $S0 = config['o']
-    $S1 = _mk_path_gen_dynops(src, ops, suffix, $S0)
-    $S2 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    $S1 = _mk_path_gen_dynops(src, ops, $S0)
+    $S2 = _mk_path_gen_dynops(src, ops, '.c')
     __compile_cc($S1, $S2, cflags)
 
     .local string dynext
     $S0 = config['load_ext']
-    dynext = _mk_path_dynops(ops, suffix, $S0)
+    dynext = _mk_path_dynops(ops, $S0)
     cmd = config['ld']
     cmd .= " "
     $S0 = config['ld_out']
@@ -1118,7 +1129,7 @@ the value is the OPS pathname
     cmd .= dynext
     cmd .= " "
     $S0 = config['o']
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, $S0)
+    $S0 = _mk_path_gen_dynops(src, ops, $S0)
     cmd .= $S0
     cmd .= " "
     $S0 = get_ldflags()
@@ -1176,10 +1187,8 @@ the value is the OPS pathname
 
 .sub '_mk_path_dynops' :anon
     .param string ops
-    .param string suffix
     .param string load_ext
     $S0 = "dynext/" . ops
-    $S0 .= suffix
     $S0 .= load_ext
     .return ($S0)
 .end
@@ -1187,20 +1196,12 @@ the value is the OPS pathname
 .sub '_mk_path_gen_dynops' :anon
     .param string src
     .param string ops
-    .param string suffix
     .param string ext
     $S0 = dirname(src)
     $S0 .= "/"
     $S0 .= ops
-    $S0 .= suffix
     $S0 .= ext
     .return ($S0)
-.end
-
-.sub 'get_cores'
-    $P0 = new 'Hash'
-    $P0['C'] = ''
-    .return ($P0)
 .end
 
 =item dynpmc
@@ -1711,8 +1712,6 @@ the value is the POD pathname
 
 .sub 'clean_dynops'
     .param pmc hash
-    .local pmc cores
-    cores = get_cores()
     .local string load_ext, obj
     load_ext = get_load_ext()
     obj = get_obj()
@@ -1722,22 +1721,14 @@ the value is the POD pathname
     .local string ops, src
     ops = shift $P0
     src = hash[ops]
-    $P1 = iter cores
-  L3:
-    unless $P1 goto L4
-    .local string core, suffix
-    core = shift $P1
-    suffix = cores[core]
-    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    $S0 = _mk_path_dynops(ops, load_ext)
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    $S0 = _mk_path_gen_dynops(src, ops, '.c')
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.h')
+    $S0 = _mk_path_gen_dynops(src, ops, '.h')
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, obj)
+    $S0 = _mk_path_gen_dynops(src, ops, obj)
     unlink($S0, 1 :named('verbose'))
-    goto L3
-  L4:
     goto L1
   L2:
 .end
@@ -2152,9 +2143,10 @@ a hash
     set $P0, 1
     $P0[0] = archive
     push contents, $P0
-    load_bytecode 'LWP.pir'
+    load_bytecode 'LWP/UserAgent.pir'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
+    ua.'env_proxy'()
     ua.'show_progress'(1)
     $S0 = kv['smolder_url']
     response = ua.'post'($S0, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
@@ -2406,26 +2398,17 @@ array of pathname or a single pathname
 .sub 'get_install_dynops' :anon
     .param pmc files
     .param pmc hash
-    .local string libdir, load_ext, ops, suffix
+    .local string libdir, load_ext, ops
     libdir = get_libdir()
     load_ext = get_load_ext()
-    .local pmc cores
-    cores = get_cores()
     $P0 = iter hash
   L1:
     unless $P0 goto L2
     ops = shift $P0
-    $P1 = iter cores
-  L3:
-    unless $P1 goto L4
-    $S0 = shift $P1
-    suffix = cores[$S0]
-    $S1 = _mk_path_dynops(ops, suffix, load_ext)
+    $S1 = _mk_path_dynops(ops, load_ext)
     $S2 = libdir . "/"
     $S2 .= $S1
     files[$S2] = $S1
-    goto L3
-  L4:
     goto L1
   L2:
 .end
@@ -3724,7 +3707,8 @@ TEMPLATE
 .end
 
 .sub 'get_timestamp' :anon
-    $P0 = open 'date --rfc-2822', 'rp'
+    $P0 = new 'FileHandle'
+    $P0.'open'('date --rfc-2822', 'rp')
     $S0 = $P0.'readline'()
     $P0.'close'()
     $S0 = chopn $S0, 1
@@ -4526,7 +4510,8 @@ Return the whole config
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
     unlink(srcname, verbose :named('verbose'))
 
-    $P0 = open exename, 'rp'
+    $P0 = new 'FileHandle'
+    $P0.'open'(exename, 'rp')
     $S0 = $P0.'readall'()
     $P0.'close'()
 
@@ -4561,6 +4546,36 @@ SOURCE_C
     $S0 = cc_run($S0, cflags :named('cflags'), verbose :named('verbose'))
     $I0 = index $S0, 'OK '
     .return ($I0)
+.end
+
+=item runtests
+
+=cut
+
+.sub 'runtests' :multi()
+    .param pmc files :slurpy
+    .param pmc opts :slurpy :named
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc harness
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    .local pmc aggregate
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L1
+    $I0 = exists opts['ignore_error']
+    unless $I0 goto L2
+    $I0 = opts['ignore_error']
+    if $I0 goto L1
+  L2:
+    die "test fails"
+  L1:
+.end
+
+.sub 'runtests' :multi(ResizableStringArray,Hash)
+    .param pmc array
+    .param pmc hash
+    .tailcall runtests(array :flat, hash :flat :named)
 .end
 
 =back

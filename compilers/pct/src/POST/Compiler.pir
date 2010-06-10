@@ -368,6 +368,11 @@ the sub.
     subpir.'append_format'("\n.HLL %0\n", $P0)
   subpir_ns:
     subpir.'append_format'("\n.namespace %0\n", nskey)
+  subpir_directives:
+    $S0 = node['directives']
+    unless $S0 goto subpir_decl
+    subpir.'append_format'("%0", $S0)
+  subpir_decl:
     $S0 = self.'escape'(name)
     subpir.'append_format'(".sub %0 %1\n", $S0, pirflags)
     .local pmc paramlist

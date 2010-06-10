@@ -88,7 +88,6 @@ end
 
 # for-statement
 
-var i = 1
 
 for var i = 18, 20 do
     print("ok ", i)
@@ -104,11 +103,11 @@ g = 21
 #end
 
 
-i = 0
-while i < 5 do
+var j = 0
+while j < 5 do
 
-    print("ok ", i + g)
-    i = i + 1
+    print("ok ", j + g)
+    j = j + 1
 end
 
 

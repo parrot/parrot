@@ -18,6 +18,7 @@ places with that code from around the world.
 =cut
 
 .include 'socket.pasm'
+.loadlib 'io_ops'
 
 .sub _main :main
     .param pmc argv

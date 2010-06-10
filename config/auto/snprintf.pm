@@ -56,7 +56,7 @@ sub _evaluate_snprintf {
     elsif ( $res =~ /^old snprintf/ ) {
         $conf->data->set( HAS_OLD_SNPRINTF => 1 );
     }
-    print " ($res) " if $conf->options->get('verbose');
+    $conf->debug(" ($res) ");
     return 1;
 }
 

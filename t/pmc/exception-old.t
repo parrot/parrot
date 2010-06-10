@@ -342,7 +342,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)' );
 catch:
         .get_results($P1)
         say "caught"
-	unroll $P1
+	finalize $P1
         .return()
 .end
 

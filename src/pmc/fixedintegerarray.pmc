@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -21,7 +21,19 @@ INTVALs.  It uses Integer PMCs for all of the conversions.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static int auxcmpfunc(const INTVAL *i, const INTVAL *j);
+#define ASSERT_ARGS_auxcmpfunc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+static int
+auxcmpfunc(const INTVAL *i, const INTVAL *j)
+{
+    ASSERT_ARGS(auxcmpfunc)
+    return *i - *j;
+}
 
 pmclass FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL   size;  /* number of INTVALs stored in this array */
@@ -492,19 +504,23 @@ Sets the string value of the element at index C<key> to C<value>.
         SELF.set_pmc_keyed_int(k, value);
     }
 
-    METHOD sort(PMC *cmp_func) {
-        INTVAL *int_array;
+    METHOD sort(PMC *cmp_func :optional) {
         UINTVAL n;
         INTVAL  size;
 
         GET_ATTR_size(INTERP, SELF, size);
-
         n = (UINTVAL)size;
 
         if (n > 1) {
+            INTVAL *int_array;
             GET_ATTR_int_array(INTERP, SELF, int_array);
-            Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
+            if (PMC_IS_NULL(cmp_func))
+                qsort(int_array, n, sizeof (INTVAL),
+                        (int (*)(const void *, const void*))auxcmpfunc);
+            else
+                Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
         }
+        RETURN(PMC *SELF);
     }
 
 /*

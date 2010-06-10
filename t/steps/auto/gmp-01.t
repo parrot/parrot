@@ -110,12 +110,12 @@ my $cwd = cwd();
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 
-my ($test, $has_gmp, $verbose);
+my ($test, $has_gmp);
 
 $test = $step->{cc_run_expected};
 $has_gmp = 0;
-$verbose = undef;
-$has_gmp = $step->_evaluate_cc_run($conf, $test, $has_gmp, $verbose);
+$conf->options->set(verbose => undef);
+$has_gmp = $step->_evaluate_cc_run($conf, $test, $has_gmp);
 is($step->result, 'yes', "Got expected result");
 is($conf->data->get('gmp'), 'define', "Expected value set for 'gmp'");
 is($conf->data->get('HAS_GMP'), 1, "Expected value set for 'HAS_GMP'");
@@ -126,8 +126,8 @@ $step->set_result(undef);
 
 $test = '12345';
 $has_gmp = 0;
-$verbose = undef;
-$has_gmp = $step->_evaluate_cc_run($conf, $test, $has_gmp, $verbose);
+$conf->options->set(verbose => undef);
+$has_gmp = $step->_evaluate_cc_run($conf, $test, $has_gmp);
 ok(! defined($step->result), "Result undefined as expected");
 is($has_gmp, 0, "gmp status unchanged");
 
@@ -135,10 +135,10 @@ is($has_gmp, 0, "gmp status unchanged");
     my $stdout;
     $test = $step->{cc_run_expected};
     $has_gmp = 0;
-    $verbose = 1;
+    $conf->options->set(verbose => 1);
     capture(
         sub { $has_gmp =
-            $step->_evaluate_cc_run($conf, $test, $has_gmp, $verbose); },
+            $step->_evaluate_cc_run($conf, $test, $has_gmp); },
         \$stdout,
     );
     is($step->result, 'yes', "Got expected result");
