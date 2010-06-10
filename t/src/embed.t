@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 9;
+plan tests => 10;
 
 =head1 NAME
 
@@ -290,6 +290,79 @@ int main(void)
 }
 CODE
 Hello, sub
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with argument and return" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler;
+    Parrot_String errstr;
+    Parrot_PMC code;
+    Parrot_PMC rootns;
+    Parrot_String parrotname;
+    Parrot_PMC parrotns;
+    Parrot_String subname;
+    Parrot_PMC sub;
+    Parrot_String msg;
+    Parrot_String retstr;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir code */
+    compiler = Parrot_new_string(interp, "PIR", 3, (const char *)NULL, 0);
+    code = Parrot_compile_string(interp, compiler,
+".sub main :main\n"
+"  say 'Must not be seen!'\n"
+"\n"
+".end\n"
+"\n"
+".sub hello\n"
+"  .param string s\n"
+"  print s\n"
+"  .return('world!')\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+
+    /* Get parrot namespace */
+    rootns = Parrot_get_root_namespace(interp);
+    parrotname = Parrot_new_string(interp, "parrot", 6, (const char *)NULL, 0);
+    parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+    /* Get the sub */
+    subname = Parrot_new_string(interp, "hello", 5, (const char *)NULL, 0);
+    sub = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+
+    /* Execute it */
+    msg = Parrot_new_string(interp, "Hello, ", 7, (const char *)NULL, 0);
+    Parrot_ext_call(interp, sub, "S->S", msg, &retstr);
+    Parrot_printf(interp, "%Ss\n", retstr);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+Hello, world!
 OUTPUT
 
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub" );
