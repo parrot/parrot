@@ -21,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(21)
+    plan(23)
 
     test_init()
     test_set_string()
@@ -29,6 +29,7 @@ Tests C<ByteBuffer> PMC..
     test_get_string()
     test_alloc()
     test_iterate()
+    test_invalid()
 .end
 
 ################################################################
@@ -256,6 +257,35 @@ donearray:
     .local string r
     r = join '', arr
     is(r, s, 'iterate buffer content')
+.end
+
+.sub test_invalid
+    .local pmc bb, ex
+    .local string s
+    bb = new ['ByteBuffer']
+    bb = 'something'
+    push_eh catch_charset
+    s = bb.'get_string'('***INVALID cHARsET%%%%', 'fixed_8')
+    pop_eh
+    ok(0, "get_string with invalid charset should throw")
+    goto check_encoding
+catch_charset:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    ok(1, "get_string with invalid charset throws")
+check_encoding:
+    push_eh catch_encoding
+    s = bb.'get_string'('ascii', '???INVALID eNCODING===')
+    pop_eh
+    ok(0, "get_string with invalid encoding should throw")
+    goto end
+catch_encoding:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    ok(1, "get_string with invalid encoding throws")
+end:
 .end
 
 # Local Variables:
