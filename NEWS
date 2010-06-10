@@ -12,6 +12,7 @@ New in 2.5.0
            http://trac.parrot.org/parrot/wiki/Lorito
            http://trac.parrot.org/parrot/wiki/LoritoRoadmap
 - Core
+  + Added ByteBuffer PMC
   + Added a bunch of tests for Array PMCs
   + Modify some PMC vtable functions to reduce complexity, simplifying its coverage.
   + Deleted do-nothing custom mark in StringBuilder
