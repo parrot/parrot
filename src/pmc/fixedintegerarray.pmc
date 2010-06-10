@@ -505,15 +505,14 @@ Sets the string value of the element at index C<key> to C<value>.
     }
 
     METHOD sort(PMC *cmp_func :optional) {
-        INTVAL *int_array;
         UINTVAL n;
         INTVAL  size;
 
         GET_ATTR_size(INTERP, SELF, size);
-
         n = (UINTVAL)size;
 
         if (n > 1) {
+            INTVAL *int_array;
             GET_ATTR_int_array(INTERP, SELF, int_array);
             if (PMC_IS_NULL(cmp_func))
                 qsort(int_array, n, sizeof(INTVAL),
@@ -521,6 +520,7 @@ Sets the string value of the element at index C<key> to C<value>.
             else
                 Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
         }
+        RETURN(PMC *SELF);
     }
 
 /*
