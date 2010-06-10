@@ -327,8 +327,13 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/STM.pbc \
     $(LIBRARY_DIR)/libpcre.pbc \
     $(LIBRARY_DIR)/postgres.pbc \
-    $(LIBRARY_DIR)/Instrument/Instrument.pbc \
-	$(LIBRARY_DIR)/Instrument/Probe.pbc
+	$(LIBRARY_DIR)/Instrument/InstrumentLib.pbc \
+	$(LIBRARY_DIR)/Instrument/Instrument.pbc \
+	$(LIBRARY_DIR)/Instrument/Base.pbc \
+	$(LIBRARY_DIR)/Instrument/Probe.pbc \
+	$(LIBRARY_DIR)/Instrument/Event.pbc \
+	$(LIBRARY_DIR)/Instrument/EventDispatcher.pbc \
+	$(LIBRARY_DIR)/Instrument/EventLibrary.pbc
 
 FLUID_FILES_1 = \
     $(GEN_HEADERS) \
@@ -1122,8 +1127,29 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_R
 #
 ###############################################################################
 
+$(LIBRARY_DIR)/Instrument/InstrumentLib.pbc: $(LIBRARY_DIR)/Instrument/Instrument.pbc \
+	$(LIBRARY_DIR)/Instrument/Base.pbc $(LIBRARY_DIR)/Instrument/Probe.pbc \
+	$(LIBRARY_DIR)/Instrument/EventDispatcher.pbc $(LIBRARY_DIR)/Instrument/Event.pbc \
+	$(LIBRARY_DIR)/Instrument/EventLibrary.pbc
+	$(PBC_MERGE) -o $@ $(LIBRARY_DIR)/Instrument/Instrument.pbc \
+	$(LIBRARY_DIR)/Instrument/Base.pbc $(LIBRARY_DIR)/Instrument/Probe.pbc \
+	$(LIBRARY_DIR)/Instrument/EventDispatcher.pbc $(LIBRARY_DIR)/Instrument/Event.pbc \
+	$(LIBRARY_DIR)/Instrument/EventLibrary.pbc
+
+$(LIBRARY_DIR)/Instrument/Base.pir: $(LIBRARY_DIR)/Instrument/Base.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Base.nqp > $@
+
 $(LIBRARY_DIR)/Instrument/Probe.pir: $(LIBRARY_DIR)/Instrument/Probe.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Probe.nqp > $@
+
+$(LIBRARY_DIR)/Instrument/EventDispatcher.pir: $(LIBRARY_DIR)/Instrument/EventDispatcher.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/EventDispatcher.nqp > $@
+
+$(LIBRARY_DIR)/Instrument/Event.pir: $(LIBRARY_DIR)/Instrument/Event.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Event.nqp > $@
+
+$(LIBRARY_DIR)/Instrument/EventLibrary.pir: $(LIBRARY_DIR)/Instrument/EventLibrary.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/EventLibrary.nqp > $@
 
 runtime/parrot/include/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@

@@ -18,8 +18,7 @@ A simple example of how to use the Instrument dynpmc in nqp.
 =cut
 
 Q:PIR {
-    load_bytecode 'Instrument/Instrument.pbc'
-    load_bytecode 'Instrument/Probe.pbc'
+    load_bytecode 'Instrument/InstrumentLib.pbc'
 };
 
 my $args := pir::getinterp__p()[2];

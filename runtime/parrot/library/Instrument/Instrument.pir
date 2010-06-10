@@ -8,7 +8,7 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
 =head1 SYNOPSIS
 
    # Load the instrument dynpmc and required libraries.
-   load_bytecode 'Instrument/Instrument.pbc'
+   load_bytecode 'Instrument/InstrumentLib.pbc'
 
 =cut
 
@@ -26,6 +26,11 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
 .sub 'say'
     .param pmc msg
     say msg
+.end
+
+.sub 'die'
+	.param pmc msg
+	die msg
 .end
 
 # Local Variables:
