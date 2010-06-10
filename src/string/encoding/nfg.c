@@ -217,10 +217,10 @@ nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
         offs++;
         index++;
     }
-
-    dest->extra   = create_grapheme_table(interp, graphemes);
-    dest->strlen  = index;
-    dest->bufused = index * sizeof (UChar32);
+    if (graphemes)
+        dest->extra   = create_grapheme_table(interp, graphemes);
+    dest->strlen  = index + 1;
+    dest->bufused = dest->strlen * sizeof (UChar32);
 
 }
 
