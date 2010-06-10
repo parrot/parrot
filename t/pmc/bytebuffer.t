@@ -21,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(19)
+    plan(21)
 
     test_init()
     test_set_string()
@@ -125,7 +125,16 @@ end:
 
 .sub test_get_string
     .local pmc bb
+    .local string s
+    .local int n
     .local int big
+
+    bb = new ['ByteBuffer']
+    bb = binary:"abcd"
+    s = bb.'get_string'('ascii', 'fixed_8')
+    n = length s
+    is(n, 4, "getting ascii from buffer gives correct length")
+    is(s, "abcd", "getting ascii from buffer gives correct content")
 
     $I0 = hasicu()
     unless $I0 goto skip_it
@@ -148,9 +157,7 @@ isbig:
     bb[0] = 0x00
     bb[1] = 0xD1
 doit:
-    .local string s
     s = bb.'get_string'('unicode', 'utf16')
-    .local int n
     n = length s
     is(n, 1, "getting utf16 from buffer gives correct length")
     n = ord s
