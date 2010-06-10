@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -515,7 +515,7 @@ Sets the string value of the element at index C<key> to C<value>.
             INTVAL *int_array;
             GET_ATTR_int_array(INTERP, SELF, int_array);
             if (PMC_IS_NULL(cmp_func))
-                qsort(int_array, n, sizeof(INTVAL),
+                qsort(int_array, n, sizeof (INTVAL),
                         (int (*)(const void *, const void*))auxcmpfunc);
             else
                 Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
