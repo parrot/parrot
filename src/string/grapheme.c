@@ -116,6 +116,8 @@ add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
             return (UChar32) (-1 - i);
     }
 
+    PARROT_ASSERT(table->used < table->size);
+
     /* ... and add it if it isn't */
     table->graphemes[i].len = src->len;
     table->graphemes[i].hash = src->hash;

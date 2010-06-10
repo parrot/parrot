@@ -364,7 +364,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
 
 #if PARROT_HAS_ICU
-    if (s->encoding == Parrot_nfg_encoding_ptr && s->extra != NULL)
+    if (s->encoding == Parrot_nfg_encoding_ptr)
         result->extra = clone_grapheme_table(s->extra);
 #endif /* PARROT_HAS_ICU */
 
@@ -499,12 +499,14 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
 
 #if PARROT_HAS_ICU
     if (enc == Parrot_nfg_encoding_ptr) {
-		if (a->extra != NULL) {
-            dest->extra = clone_grapheme_table(a->extra);
-            if (b->extra != NULL)
+        if (a->extra != NULL) {
+            dest->extra = clone_grapheme_table(interp, a->extra);
+            if (b->extra != NULL) {
+                dest->extra = grow_grapheme_table(interp, a->extra, b->used);
                 merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
-		}
-		else {
+            }
+        }
+        else {
             dest->extra = clone_grapheme_table(b->extra);
         }
     }
