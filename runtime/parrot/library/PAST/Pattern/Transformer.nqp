@@ -56,7 +56,7 @@ module PAST::Walker {
         }
         my $result;
         if ($shouldTransform) {
-            $result := $walker.transform()($node);
+            $result := $walker.transform()($shouldTransform);
         }
         else {
             $result := $node;

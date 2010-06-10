@@ -27,7 +27,7 @@ class PAST::Pattern is Capture {
     method transform ($past, $transform) {
         my &transSub;
         if ($transform ~~ PAST::Transformer) {
-            &transSub := sub ($node) { $transformer.walk($node); };
+            &transSub := sub ($/) { $transformer.walk($/.from()); };
         } elsif (pir::does__iPS($transform, 'invokable')) {
             &transSub := $transform;
         } else {
