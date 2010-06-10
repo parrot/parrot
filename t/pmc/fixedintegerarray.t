@@ -274,12 +274,12 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'test_sort'
     .local pmc a1, a2
-    a1 = new ['FixedIntegerArray'], 3    
+    a1 = new ['FixedIntegerArray'], 3
     a1[0] = 7
     a1[1] = 1
     a1[2] = 5
 
-    a2 = new ['FixedIntegerArray'], 3    
+    a2 = new ['FixedIntegerArray'], 3
     a2[0] = 1
     a2[1] = 5
     a2[2] = 7
