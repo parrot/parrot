@@ -124,6 +124,28 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
 
 /*
 
+=item C<void Parrot_warn_deprecated(PARROT_INTERP, const char *message)>
+
+Warn about use of a deprecated feature
+
+C<message> is a C string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
+{
+    if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
+        STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
+        print_warning(interp, msg);
+    }
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

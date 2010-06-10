@@ -61,10 +61,18 @@ Parrot_warn(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_warn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(message))
+#define ASSERT_ARGS_Parrot_warn_deprecated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(message))
 #define ASSERT_ARGS_print_pbc_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
