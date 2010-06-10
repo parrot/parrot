@@ -69,20 +69,18 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include "parrot/embed.h"
 #include "parrot/extend.h"
 
-void fail(const char *msg);
-Parrot_String createstring(Parrot_Interp interp, const char * value);
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
 
-void fail(const char *msg)
+static void fail(const char *msg)
 {
     fprintf(stderr, "failed: %s\n", msg);
     exit(EXIT_FAILURE);
 }
 
-Parrot_String createstring(Parrot_Interp interp, const char * value)
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
 {
-    Parrot_String result;
-    size_t l = strlen(value);
-    return Parrot_new_string(interp, value, l, (const char*)NULL, 0);
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
 }
 
 CODE
