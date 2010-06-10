@@ -725,7 +725,8 @@ sub test_transform_sub () {
         ($opName eq 'isgt' ||
          $opName eq 'islt');
     }
-    sub flipComparison ($op) {
+    sub flipComparison ($/) {
+        my $op := $/.from();
         my $temp := $op[0];
         $op[0] := $op[1];
         $op[1] := $temp;
