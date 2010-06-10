@@ -21,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(23)
+    plan(24)
 
     test_init()
     test_set_string()
@@ -279,12 +279,24 @@ check_encoding:
     s = bb.'get_string'('ascii', '???INVALID eNCODING===')
     pop_eh
     ok(0, "get_string with invalid encoding should throw")
-    goto end
+    goto check_content
 catch_encoding:
     .get_results(ex)
     finalize ex
     pop_eh
     ok(1, "get_string with invalid encoding throws")
+check_content:
+    bb[0] = 128 # Out of ascii range
+    push_eh catch_content
+    s = bb.'get_string'('ascii', 'fixed_8')
+    pop_eh
+    ok(0, "get_string with invalid content should throw")
+    goto end
+catch_content:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    ok(1, "get_string with invalid content throws")
 end:
 .end
 
