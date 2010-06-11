@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 159
+.const int TESTS = 161
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
@@ -436,6 +436,11 @@ Tests the Float PMC.
     $P0 = -5.0
     abs $P0
     is($P0, 5.0, 'abs of -5.0', PRECISION)
+
+    $P0 = -6.0
+    $P1 = abs $P0
+    is($P1, 6.0, 'abs two operands from -6.0', PRECISION)
+    is($P0, -6.0, 'abs two operands source unchanged', PRECISION)
 .end
 
 .sub 'lt'
