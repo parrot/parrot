@@ -19,6 +19,9 @@ Tests the low level interface provided by instrument.pmc.
 .sub main :main
     .include 'test_more.pir'
 
+    # Load the Instrument library.
+    load_bytecode 'Instrument/InstrumentLib.pbc'
+
     plan(18)
     test_loadlib()
     test_instantiate()
@@ -213,7 +216,7 @@ Tests the low level interface provided by instrument.pmc.
     setattribute self, '$!identifier', $P0
 .end
 
-.sub 'enable' :method
+.sub '_on_attach' :method
     ok(1, 'Enable is called')
 
     .local pmc instr_obj
