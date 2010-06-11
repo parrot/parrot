@@ -25,7 +25,7 @@ Tests the C<StringBuilder> PMC.
     test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
-    test_set_string_native()    # 3 tests
+    test_set_string_native()    # 4 tests
     test_set_string_native_with_hash()    # 2 tests
     test_set_pmc()
     test_substr()
@@ -176,6 +176,14 @@ Tests the C<StringBuilder> PMC.
     is( $S0, "foobar", "... with appending string after")
     is( $S99, "foo", "... without touching of original string")
 
+    # Assumed that the previous operations does not reach initial
+    # capacity of the buffer, the next test should cause a
+    # reallocation, ensuring full coverage of the set_string_native
+    # vtable function.
+    $S1 = repeat 'x', 4096
+    sb = $S1
+    $I0 = sb.'get_string_length'()
+    is( $I0, 4096, "... with a big size change")
 .end
 
 .sub 'test_set_string_native_with_hash'
