@@ -106,10 +106,6 @@ has_handler:
     .tailcall $P0(walker, node)
 .end
 
-=back
-
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
