@@ -73,7 +73,9 @@ Initalize the concurrency scheduler for the interpreter.
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
+
     ASSERT_ARGS(Parrot_cx_init_scheduler)
+
     if (!interp->parent_interpreter) {
         PMC *scheduler;
 
@@ -407,9 +409,10 @@ Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
         const INTVAL tid = VTABLE_get_integer(interp, task);
         VTABLE_delete_keyed_int(interp, interp->scheduler, tid);
     }
-    else if (interp->scheduler)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Scheduler was not initialized for this interpreter.\n");
+    /* TODO: What was this exception trying to tell us? */
+    /* else if (interp->scheduler) */
+    /*   Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, */
+    /*       "Scheduler was not initialized for this interpreter.\n"); */
 }
 
 
