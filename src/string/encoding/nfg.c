@@ -218,8 +218,8 @@ nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
         index++;
     }
     if (graphemes)
-        dest->extra   = create_grapheme_table(interp, graphemes);
-    dest->strlen  = index + 1;
+        dest->extra = create_grapheme_table(interp, graphemes);
+    dest->strlen  = index;
     dest->bufused = dest->strlen * sizeof (UChar32);
 
 }
@@ -256,7 +256,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                            Parrot_nfg_encoding_ptr, Parrot_unicode_charset_ptr, 0);
         UChar32 *buf  = (UChar32 *) to->strstart;
 
-        nfg_encode(interp, to, 0, src, 0, len - 1, 0);
+        nfg_encode(interp, to, 0, src, 0, len, 0);
 
         return to;
     }
