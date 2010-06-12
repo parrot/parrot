@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(35)
+    plan(36)
 
     test_set_size()
     test_reset_size()
@@ -32,6 +32,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_get_iter()
     test_equality()
     test_repr()
+    test_sort()
     test_new_style_init()
     test_invalid_init_tt1509()
 .end
@@ -271,6 +272,23 @@ out-of-bounds test. Checks INT and PMC keys.
     is($I0, 10, "New style init creates the correct # of elements")
 .end
 
+.sub 'test_sort'
+    .local pmc a1, a2
+    a1 = new ['FixedIntegerArray'], 3
+    a1[0] = 7
+    a1[1] = 1
+    a1[2] = 5
+
+    a2 = new ['FixedIntegerArray'], 3
+    a2[0] = 1
+    a2[1] = 5
+    a2[2] = 7
+
+    a1.'sort'()
+    $I0 = iseq a1, a2
+    is($I0, 1, 'default sort')
+.end
+
 .sub test_invalid_init_tt1509
     throws_substring(<<'CODE', 'FixedIntegerArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
     .sub main
@@ -284,6 +302,8 @@ CODE
     .end
 CODE
 .end
+
+
 
 # Local Variables:
 #   mode: pir

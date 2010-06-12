@@ -844,6 +844,7 @@ This method is experimental. See TT #264.
 
     METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
         PMC * const handle = Parrot_io_stdhandle(INTERP, fileno, newhandle);
+        Parrot_warn_deprecated(INTERP, "stdhandle method is experimental");
         RETURN(PMC *handle);
     }
 

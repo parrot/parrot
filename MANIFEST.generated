@@ -42,6 +42,7 @@ include/pmc/pmc_arrayiterator.h                  [devel]include
 include/pmc/pmc_bigint.h                         [devel]include
 include/pmc/pmc_bignum.h                         [devel]include
 include/pmc/pmc_boolean.h                        [devel]include
+include/pmc/pmc_bytebuffer.h                     [devel]include
 include/pmc/pmc_callcontext.h                    [devel]include
 include/pmc/pmc_capture.h                        [devel]include
 include/pmc/pmc_class.h                          [devel]include
@@ -295,7 +296,7 @@ runtime/parrot/library/Stream/Writer.pbc         [main]
 runtime/parrot/library/TAP/Formatter.pbc         [main]
 runtime/parrot/library/TAP/Harness.pbc           [main]
 runtime/parrot/library/TAP/Parser.pbc            [main]
-runtime/parrot/library/TGE.pbc			 [main]
+runtime/parrot/library/TGE.pbc                   [main]
 runtime/parrot/library/Tcl/Glob.pbc              [main]
 runtime/parrot/library/TclLibrary.pbc            [main]
 runtime/parrot/library/Test/Builder.pbc          [main]
@@ -336,6 +337,7 @@ src/pmc/arrayiterator.dump                       [devel]src
 src/pmc/bigint.dump                              [devel]src
 src/pmc/bignum.dump                              [devel]src
 src/pmc/boolean.dump                             [devel]src
+src/pmc/bytebuffer.dump                          [devel]src
 src/pmc/callcontext.dump                         [devel]src
 src/pmc/capture.dump                             [devel]src
 src/pmc/class.dump                               [devel]src

@@ -518,7 +518,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_alloc_context)
-    PMC            *pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
 
     allocate_registers(interp, pmcctx, number_regs_used);
     init_context(interp, pmcctx, old);
@@ -544,7 +544,7 @@ PMC *
 Parrot_pcc_allocate_empty_context(PARROT_INTERP, ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_pcc_allocate_empty_context)
-    PMC            *pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
 
     init_context(interp, pmcctx, old);
 
@@ -622,8 +622,9 @@ void
 Parrot_clear_i(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_i)
+    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_INT);
     UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_INT); ++i)
+    for (i = 0; i < regs_used; ++i)
         REG_INT(interp, i) = 0;
 }
 
@@ -643,8 +644,9 @@ void
 Parrot_clear_s(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_s)
+    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR);
     UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR); ++i)
+    for (i = 0; i < regs_used; ++i)
         REG_STR(interp, i) = NULL;
 }
 
@@ -664,8 +666,9 @@ void
 Parrot_clear_p(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_p)
+    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_PMC);
     UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_PMC); ++i)
+    for (i = 0; i < regs_used; ++i)
         REG_PMC(interp, i) = PMCNULL;
 }
 
@@ -685,8 +688,9 @@ void
 Parrot_clear_n(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_n)
+    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_NUM);
     UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_NUM); ++i)
+    for (i = 0; i < regs_used; ++i)
         REG_NUM(interp, i) = 0.0;
 }
 

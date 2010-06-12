@@ -3,6 +3,40 @@
 New in 2.5.0
 - Platforms
   + EPEL (Extra Packages for Enterprise Linux) packages for RHEL6.beta are available
+  + Building and testing on amd64/i386, with gcc/g++
+  + Almost finished Parrot configure on RTEMS
+- Parrot starts to going Lorito
+  Lorito is the code name for a set of planned refactors to the core opcodes.
+  + The ops_pct branch has been merged into trunk. The "Stage 0" is done with it.
+       for more Information about Lorito see:
+           http://trac.parrot.org/parrot/wiki/Lorito
+           http://trac.parrot.org/parrot/wiki/LoritoRoadmap
+- Core
+  + Added ByteBuffer PMC
+  + Added a bunch of tests for Array PMCs
+  + Modify some PMC vtable functions to reduce complexity, simplifying its coverage.
+  + Deleted do-nothing custom mark in StringBuilder
+  + Fixed ticket #389; subs are not entered into a namespace unless you declare them
+  + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
+  + Modified PAST so that it can generate symbolic pasm constants in PIR output.
+  + Fixed some substr-out-of-range errors in Regex.match
+  + Various cleanups and some added functionality to NFG (Grapheme Normal Form).
+  + Various parts of the STRING API are now more graceful
+  + Improved implemented PAST::Pattern:
+      Can match on types, children, attributes, based on iseq to a constant,
+      based on true result from a closure and based on anything with an
+      ACCEPTS method.
+- Tests
+  + Fixed some tests that were failing because of dynops
+  + Some tests for the instrument dynpmc are added
+- NQP
+  + nqp-rx now supports multisubs and multimethods
+  + Fixed sigspace handling ** quantifier in regexes
+  + Added \e strings
+  + Added use of inversion lists for charclass lists in regexes
+- Languages
+  + resurrected partcl
+- Miscellaneous
 
 New in 2.4.0
 - Core

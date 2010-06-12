@@ -1852,9 +1852,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named" );
 .pcc_sub main:
     set_args  "0, 0, 0, 0x200, 0, 0x200, 0", 10, 20, 30, 'a', 40, 'b', 50
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:

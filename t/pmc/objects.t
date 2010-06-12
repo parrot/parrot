@@ -1603,46 +1603,46 @@ end:
     new $P5, ['String']        # set attribute values
     set $P5, "i"       # attribute slots have reference semantics
     set_args "0,0", $P5, "i"
-    get_results ""
     callmethodcc $P13, "Foo54__set"
+    get_results ""
 
     new $P5, ['String']
     set $P5, "j"
     set_args "0,0", $P5, "j"
-    get_results ""
     callmethodcc  $P13,"Foo54__set"
+    get_results ""
 
     new $P5, ['String']
     set $P5, "k"
     set_args "0,0", $P5, "k"
-    get_results ""
     callmethodcc  $P13,"Bar54__set"
+    get_results ""
 
     new $P5, ['String']
     set $P5, "l"
     set_args "0,0", $P5, "l"
-    get_results ""
     callmethodcc  $P13,"Bar54__set"
+    get_results ""
 
     # now retrieve attributes
     set_args "0",  "i"
-    get_results "0", $P5
     callmethodcc  $P13,"Foo54__get"
+    get_results "0", $P5
     is( $P5, "i", 'got attrib i from Bar54->Foo54__get' )
 
     set_args "0",  "j"
-    get_results "0", $P5
     callmethodcc  $P13,"Foo54__get"
+    get_results "0", $P5
     is( $P5, "j", 'got attrib j from Bar54->Foo54__get' )
 
     set_args "0",  "k"
-    get_results "0", $P5
     callmethodcc  $P13,"Bar54__get"
+    get_results "0", $P5
     is( $P5, "k", 'got attrib k from Bar54->Bar54__get' )
 
     set_args "0",  "l"
-    get_results "0", $P5
     callmethodcc  $P13,"Bar54__get"
+    get_results "0", $P5
     is( $P5, "l", 'got attrib l from Bar54->Bar54__get' )
 .end
 

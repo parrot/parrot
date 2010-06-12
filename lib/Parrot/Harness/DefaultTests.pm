@@ -64,6 +64,7 @@ our @EXPORT_OK = qw(
     t/op/*.t
     t/pmc/*.t
     t/oo/*.t
+    t/pir/*.t
     t/native_pbc/*.t
 );
 
