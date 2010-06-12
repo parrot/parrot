@@ -1,4 +1,6 @@
 #!./parrot
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
 
 .include 'timer.pasm'
 
@@ -26,3 +28,9 @@
    exit 0
    say "not ok 2"
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
