@@ -20,17 +20,19 @@ string operations.
 
 .include 'stringinfo.pasm'
 
-.const int TESTS = 3
+.const int TESTS = 6
 
 .sub _main :main
     .include 'test_more.pir'
 
     plan(TESTS)
 
-    without_graphemes()
+    transcode_without_graphemes()
+    transcode_with_graphemes()
+
 .end
 
-.sub without_graphemes
+.sub transcode_without_graphemes
 
     $S0 = "Hello, world"
     $I0 = find_encoding 'nfg'
@@ -42,9 +44,28 @@ string operations.
     $I1 = stringinfo $S1, .STRINGINFO_STRLEN
     is($I0, $I1, "Lenght is the same.")
 
-    $I2 =  stringinfo $S1, .STRINGINFO_BUFLEN
+    $I2 =  stringinfo $S1, .STRINGINFO_BUFUSED
     $I1 *= 4
-    is($I2, $I1, "buflen = 4 * strlen")
+    is($I2, $I1, "bufused = 4 * strlen")
+
+.end
+
+.sub transcode_with_graphemes
+
+    $S0 = utf16:unicode:"\u006e\u0303\u0303\u0303\u0303\u00d1\u00d1"
+    $I0 = find_encoding 'nfg'
+    $S1 = trans_encoding $S0, $I0
+
+    $I1 = stringinfo $S1, .STRINGINFO_EXTRA
+    isnt($I1, 0, "Lazy table creation.")
+
+    $I0 = stringinfo $S0, .STRINGINFO_STRLEN
+    $I1 = stringinfo $S1, .STRINGINFO_STRLEN
+    isnt($I0, $I1, "Lenght is not the same.")
+
+    $I2 =  stringinfo $S1, .STRINGINFO_BUFUSED
+    $I1 *= 4
+    is($I2, $I1, "bufused = 4 * strlen")
 
 .end
 
