@@ -126,10 +126,28 @@ class PAST::Pattern::Node is PAST::Pattern {
     }
 
     method ACCEPTS ($node, *%opts) {
-        my $global := ?%opts<g>;
+        my $global := ?%opts<g> || ?%opts<global>;
+        return self.ACCEPTSGLOBALLY($node) if $global;
+        my $/ := self.ACCEPTSEXACTLY($node);
+        if (!$/ && ($node ~~ PAST::Node)) {
+            my $index := 0;
+            my $max := pir::elements__IP($node);
+            until ($index == $max) {
+                $/ := $node[$index] ~~ self;
+                return $/ if $/;
+                $index++;
+            }
+            $/ := PAST::Pattern::Match.new(0);
+        }
+        $/;
+    }
+
+    method ACCEPTSGLOBALLY ($node) {
+        say("Accepting globally");
         my $/;
         my $first := self.ACCEPTSEXACTLY($node);
-        if ($global && $node ~~ PAST::Node) {
+        if ($node ~~ PAST::Node) {
+            say('$node is a node.');
             my $matches := ?$first;
             my $index := 0;
             my $max := pir::elements__IP($node);
@@ -156,21 +174,8 @@ class PAST::Pattern::Node is PAST::Pattern {
             }
             $/ := $/[0] if $matches == 1;
         }
-        elsif ($first) {
+        else {
             $/ := $first;
-        } else {
-            if ($node ~~ PAST::Node) {
-                my $index := 0;
-                my $max := pir::elements__IP($node);
-                until ($index == $max) {
-                    $/ := $node[$index] ~~ self;
-                    return $/ if $/;
-                    $index++;
-                }
-                $/ := PAST::Pattern::Match.new(0);
-            } else {
-                $/ := PAST::Pattern::Match.new(0);
-            }
         }
         $/;
     }
