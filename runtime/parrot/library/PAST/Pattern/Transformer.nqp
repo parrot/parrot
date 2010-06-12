@@ -2,10 +2,6 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-INIT {
-    pir::load_bytecode('PAST/Transformer.pbc');
-}
-
 class PAST::Pattern::Transformer is PAST::Transformer {
     has $pattern;
     has $transform;

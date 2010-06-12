@@ -42,6 +42,24 @@ Subclasses should override this for specific PAST::Node subclasses in order to p
     .tailcall 'walkChildren'(walker, node)
 .end
 
+.sub 'walk' :multi(['PAST';'Walker'], ['String'])
+    .param pmc walker
+    .param pmc str
+    .local pmc node
+    $P0 = get_hll_global ['PAST'], 'Val'
+    node = $P0.'new'('value' => str)
+    .tailcall 'walk'(walker, node)
+.end
+
+.sub 'walk' :multi(['PAST';'Walker'], ['Integer'])
+    .param pmc walker
+    .param pmc i
+    .local pmc node
+    $P0 = get_hll_global ['PAST'], 'Val'
+    node = $P0.'new'('value' => i)
+    .tailcall 'walk'(walker, node)
+.end
+
 =item walkChildren(walker, node)
 
 Iterates through the children of node, calling 'walk' with the walker and each child node. This should not generally be overridden.

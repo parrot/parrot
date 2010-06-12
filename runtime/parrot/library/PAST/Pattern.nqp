@@ -2,6 +2,10 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
+INIT {
+    pir::load_bytecode('PAST/Transformer.pbc');
+}
+
 class PAST::Pattern is Capture {
     sub patternize ($value) {
         unless (pir::can__IPS($value, 'ACCEPTS')) {
