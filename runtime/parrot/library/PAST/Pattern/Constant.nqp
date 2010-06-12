@@ -17,7 +17,7 @@ class PAST::Pattern::Constant is PAST::Pattern {
         self.attr("value", $value, pir::defined__IP($value));
     }
 
-    method ACCEPTS ($node, *%opts) {
+    method ACCEPTSEXACTLY ($node) {
         PAST::Pattern::Match.new(pir::iseq__IPP(self.value(), $node),
                                  $node);
     }

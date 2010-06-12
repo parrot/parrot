@@ -41,6 +41,61 @@ class PAST::Pattern is Capture {
           PAST::Pattern::Transformer.new(self, &transSub);
         $transformer.walk($past);
     }
+
+    method ACCEPTS ($node, *%opts) {
+        my $global := ?%opts<g> || ?%opts<global>;
+        return self.ACCEPTSGLOBALLY($node) if $global;
+        my $pos := %opts<p> || %opts<pos>;
+        return self.ACCEPTSEXACTLY($pos) if $pos;
+        my $/ := self.ACCEPTSEXACTLY($node);
+        if (!$/ && ($node ~~ PAST::Node)) {
+            my $index := 0;
+            my $max := pir::elements__IP($node);
+            until ($index == $max) {
+                $/ := $node[$index] ~~ self;
+                return $/ if $/;
+                $index++;
+            }
+            $/ := PAST::Pattern::Match.new(0);
+        }
+        $/;
+    }
+
+    method ACCEPTSGLOBALLY ($node) {
+        my $/;
+        my $first := self.ACCEPTSEXACTLY($node);
+        if ($node ~~ PAST::Node) {
+            my $matches := ?$first;
+            my $index := 0;
+            my $max := pir::elements__IP($node);
+            my $submatch;
+            $/ := PAST::Pattern::Match.new(?$first);
+            $/[0] := $first if $first;
+            until ($index == $max) {
+                $submatch := self.ACCEPTS($node[$index], :g);
+                if ($submatch) {
+                    $/.success(1) unless $matches;
+                    if pir::defined__iP($submatch.from()) {
+                        $/[$matches++] := $submatch;
+                    }
+                    else { # The submatch is a list of multiple matches.
+                        my $subIndex := 0;
+                        my $subMax := pir::elements__IP($submatch);
+                        until ($subIndex == $subMax) {
+                            $/[$matches++] := $submatch[$subIndex];
+                            $subIndex++;
+                        }
+                    }
+                }
+                $index++;
+            }
+            $/ := $/[0] if $matches == 1;
+        }
+        else {
+            $/ := $first;
+        }
+        $/;
+    }
 }
 
 

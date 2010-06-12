@@ -18,7 +18,7 @@ class PAST::Pattern::Closure is PAST::Pattern {
         self.attr("code", &code, pir::defined__IP(&code));
     }
 
-    method ACCEPTS ($node, *%opts) {
+    method ACCEPTSEXACTLY ($node) {
         PAST::Pattern::Match.new(self.code()($node),
                                  $node);
     }
