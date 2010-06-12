@@ -809,6 +809,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
     ASSERT_ARGS(Parrot_get_runtime_prefix)
     char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
 
+    Parrot_warn_deprecated(interp, "Parrot_get_runtime_prefix is deprecated TT #1191");
     if (env)
         return env;
     else {

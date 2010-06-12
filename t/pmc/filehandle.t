@@ -644,7 +644,7 @@ expect 0 exit status: 0
 expect 1 exit status: 1
 OUTPUT
 
-pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction", todo => 'TT #1659' );
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
 .sub main :main
     interpinfo $I0, 2    # GC mark runs

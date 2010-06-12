@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 5
+.const int TESTS = 12
 
 .loadlib 'io_ops'
 
@@ -25,12 +25,18 @@ Tests various io opcodes.
 
     plan(TESTS)
 
+    read_on_null()
     open_delegates_to_filehandle_pmc()
     open_null_filename()
     open_null_mode()
     open_pipe_for_reading()
     getfd_fdopen()
-    open_pipe_for_writing() # must be last (doesn't use test_more)
+    printerr_tests()
+    stat_tests()
+
+    # must come after (these don't use test_more)
+    open_pipe_for_writing()
+    read_invalid_fh()
 .end
 
 .sub open_delegates_to_filehandle_pmc
@@ -154,7 +160,7 @@ Tests various io opcodes.
     pipe = open command, 'wp'
     unless pipe goto open_pipe_for_writing_failed
 
-    pipe.'puts'("ok 5 - open pipe for writing\n")
+    pipe.'puts'("ok 9 - open pipe for writing\n")
     close pipe
     .return ()
 
@@ -173,14 +179,95 @@ Tests various io opcodes.
     $I0 = $P0.'get_fd'()
     fdopen $P1, $I0, 'w'
     $I0 = defined $P1
-    ok($I0, 'get_fd()/fdopen')
-    close $P1
-
-    getstdout $P0
-    $I0 = $P0.'get_fd'()
-    fdopen $P1, $I0, 'w'
-    $I0 = defined $P1
     ok($I0, 'fdopen - no close')
+.end
+
+.sub 'read_on_null'
+    .const string description = "read on null PMC throws exception"
+    push_eh eh
+    null $P1
+    $S0 = read $P1, 1
+    ok(0, description)
+    goto ret
+  eh:
+    ok(1, description)
+  ret:
+    pop_eh
+    .return ()
+.end
+
+.sub 'read_invalid_fh'
+    $P0 = new ['FileHandle']
+
+    push_eh _readline_handler
+    $S0 = readline $P0
+    print "not "
+
+_readline_handler:
+        print "ok 10\n"
+        pop_eh
+
+    push_eh _read_handler
+    $S0 = read $P0, 1
+    print "not "
+
+_read_handler:
+        print "ok 11\n"
+        pop_eh
+
+    push_eh _print_handler
+    print $P0, "kill me now\n"
+    print "not "
+
+_print_handler:
+        print "ok 12\n"
+        pop_eh
+.end
+
+.sub 'printerr_tests'
+    # temporarily capture stderr
+    $P0 = getstderr
+    $P1 = new ['StringHandle']
+    $S0 = null
+    $P1.'open'($S0, 'w')
+    setstderr $P1
+
+    $P2 = new ['String']
+    $P2 = "This is a test\n"
+    printerr 10
+    printerr "\n"
+    printerr 1.0
+    printerr "\n"
+    printerr "foo"
+    printerr "\n"
+    printerr $P2
+
+    # restore stderr
+    setstderr $P0
+
+    $S0 = $P1.'readall'()
+    is($S0, <<'OUTPUT', 'printerr opcode')
+10
+1
+foo
+This is a test
+OUTPUT
+.end
+
+.sub 'stat_tests'
+    .local pmc pio
+    .local int len
+    .const string description = 'stat failed'
+    .include "stat.pasm"
+  push_eh eh
+    len = stat 'no_such_file', .STAT_FILESIZE
+    ok(0, description)
+    goto ret
+  eh:
+    ok(1, description)
+  ret:
+    pop_eh
+    .return ()
 .end
 
 .namespace ["Testing"]

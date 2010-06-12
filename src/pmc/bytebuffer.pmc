@@ -1,0 +1,353 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/bytebuffer.pmc - A byte buffer
+
+=head1 DESCRIPTION
+
+C<ByteBuffer> provides a resizable byte buffer with random access to
+individual bytes and conversions from and to parrot strings.
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+static STRING * build_string(PARROT_INTERP,
+    ARGIN(const unsigned char *content),
+    INTVAL size,
+    ARGIN_NULLOK(const CHARSET *charset),
+    ARGIN_NULLOK(const ENCODING *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL grow_to(INTVAL position);
+#define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(content))
+#define ASSERT_ARGS_grow_to __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+pmclass ByteBuffer auto_attrs {
+    ATTR INTVAL allocated_size;
+    ATTR INTVAL size;
+    ATTR STRING *source;
+    ATTR unsigned char *content;
+
+/*
+
+=head2 Vtable functions
+
+=over 4
+
+=item C<void init()>
+
+Create an empty buffer
+
+=item C<void init_int()>
+
+Create a buffer of initial_size capacity.
+
+=item C<void mark()>
+
+Mark the source string if any.
+
+=item C<void destroy()>
+
+Free the buffer when destroying.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    VTABLE void init_int(INTVAL initial_size) {
+        unsigned char *content;
+        STATICSELF.init();
+        SET_ATTR_size(INTERP, SELF, initial_size);
+        SET_ATTR_allocated_size(INTERP, SELF, initial_size);
+        content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, initial_size);
+        SET_ATTR_content(INTERP, SELF, content);
+    }
+
+    VTABLE void mark() {
+        STRING * source;
+        GET_ATTR_source(INTERP, SELF, source);
+        if (!STRING_IS_NULL(source))
+            Parrot_gc_mark_STRING_alive(INTERP, source);
+    }
+
+    VTABLE void destroy() {
+        INTVAL allocated_size;
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (allocated_size) {
+            unsigned char *content;
+            GET_ATTR_content(INTERP, SELF, content);
+            Parrot_gc_free_memory_chunk(INTERP, content);
+        }
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Get current size.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+    }
+
+/*
+
+=item C<void set_string_native()>
+
+Reset the buffer with the content of the string.
+
+=cut
+
+*/
+
+    VTABLE void set_string_native(STRING *new_string) {
+        INTVAL allocated_size;
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (allocated_size) {
+            unsigned char *content;
+            GET_ATTR_content(INTERP, SELF, content);
+            Parrot_gc_free_memory_chunk(INTERP, content);
+            SET_ATTR_allocated_size(INTERP, SELF, 0);
+        }
+        SET_ATTR_source(INTERP, SELF, new_string);
+        SET_ATTR_size(INTERP, SELF, Parrot_str_byte_length(INTERP, new_string));
+        SET_ATTR_content(INTERP, SELF, (unsigned char *)new_string->strstart);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int()>
+
+Get the value of the byte at position or 0 if out of bounds.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL position) {
+        INTVAL size;
+        unsigned char *content;
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_content(INTERP, SELF, content);
+        return (position >= 0 && position < size) ? content[position] : (INTVAL) 0;
+    }
+
+/*
+
+=item C<void set_integer_keyed_int()>
+
+Set the value of the byte at position.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed_int(INTVAL position, INTVAL value) {
+        unsigned char *content;
+        INTVAL size, allocated_size;
+        if (position < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Negative position not allowed");
+
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (position >= allocated_size) {
+            INTVAL newsize = grow_to(position);
+            if (allocated_size == 0) {
+                INTVAL copysize = newsize;
+                STRING * source;
+                content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, newsize);
+                GET_ATTR_source(INTERP, SELF, source);
+                if (!STRING_IS_NULL(source)) {
+                    INTVAL srclen = Parrot_str_byte_length(INTERP, source);
+                    if (srclen < copysize)
+                        copysize = srclen;
+                    memcpy(content, source->strstart, copysize);
+                    SET_ATTR_source(INTERP, SELF, STRINGNULL);
+                }
+            }
+            else {
+                GET_ATTR_content(INTERP, SELF, content);
+                content = (unsigned char *)
+                    Parrot_gc_reallocate_memory_chunk(INTERP, content, newsize);
+            }
+
+            SET_ATTR_content(INTERP, SELF, content);
+            SET_ATTR_allocated_size(INTERP, SELF, newsize);
+        }
+        else
+            GET_ATTR_content(INTERP, SELF, content);
+
+        GET_ATTR_size(INTERP, SELF, size);
+        if (position >= size) {
+            size = position + 1;
+            SET_ATTR_size(INTERP, SELF, size);
+        }
+        content[position] = value;
+    }
+
+/*
+
+=item C<PMC *get_iter()>
+
+Return a new Iterator for this PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<get_string(string charset, string encoding)>
+
+Create a string with the buffer content and the charset and encoding
+specified.
+
+=cut
+
+*/
+
+    METHOD get_string(STRING *charsetname, STRING *encodingname) {
+        STRING *result;
+        unsigned char *content;
+        INTVAL size;
+        const CHARSET *charset = Parrot_get_charset(INTERP,
+            Parrot_charset_number(INTERP, charsetname));
+        const ENCODING *encoding = Parrot_get_encoding(INTERP,
+            Parrot_encoding_number(INTERP, encodingname));
+        GET_ATTR_content(INTERP, SELF, content);
+        GET_ATTR_size(INTERP, SELF, size);
+        result = build_string(INTERP, content, size, charset, encoding);
+        RETURN(STRING *result);
+    }
+
+/*
+
+=item C<get_string_as(string as)>
+
+Create a string with the buffer content and the same charset and encoding
+as the string argument.
+
+=cut
+
+*/
+
+    METHOD get_string_as(STRING *as :optional) {
+        STRING *result;
+        unsigned char *content;
+        INTVAL size;
+        const CHARSET* charset = STRING_IS_NULL(as) ? PARROT_DEFAULT_CHARSET : as->charset;
+        const ENCODING *encoding = STRING_IS_NULL(as) ? PARROT_DEFAULT_ENCODING : as->encoding;
+        GET_ATTR_content(INTERP, SELF, content);
+        GET_ATTR_size(INTERP, SELF, size);
+        result = build_string(INTERP, content, size, charset, encoding);
+        RETURN(STRING *result);
+    }
+
+} /* pmclass end */
+
+/*
+
+=back
+
+=head2 Auxiliar functions
+
+=over 4
+
+=item C<static INTVAL grow_to(INTVAL position)>
+
+Calculate new size enough for using position and with some margin to
+decrease the number of reallocations.
+
+=item C<static STRING * build_string(PARROT_INTERP, const unsigned char
+*content, INTVAL size, const CHARSET *charset, const ENCODING *encoding)>
+
+Build a string fro the buffer content with the charset and encoding specified.
+
+=cut
+
+*/
+
+static INTVAL
+grow_to(INTVAL position)
+{
+    ASSERT_ARGS(grow_to)
+
+    const UINTVAL blocksize = 2048;
+    UINTVAL minsize = position + 1;
+    return (INTVAL) (minsize < 64 ? 64 :
+           minsize < 256 ? 256 :
+           minsize < 1024 ? 1024 :
+           ((minsize + blocksize - 1) / blocksize) * blocksize);
+}
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+build_string(PARROT_INTERP, ARGIN(const unsigned char *content),
+        INTVAL size,
+        ARGIN_NULLOK(const CHARSET *charset),
+        ARGIN_NULLOK(const ENCODING *encoding))
+{
+    ASSERT_ARGS(build_string)
+    STRING *result;
+    if (charset == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                "Invalid charset");
+    if (encoding == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                "Invalid encoding");
+    result = Parrot_str_new_init(interp, (const char *)content, size, encoding, charset, 0);
+    if (!CHARSET_VALIDATE(interp, result))
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_STRING_REPRESENTATION,
+                "Invalid buffer content");
+    return result;
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -503,7 +503,8 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         if (a->extra != NULL) {
             dest->extra = clone_grapheme_table(interp, a->extra);
             if (b->extra != NULL) {
-                dest->extra = grow_grapheme_table(interp, a->extra, ((grapheme_table *)b->extra)->used);
+                dest->extra = grow_grapheme_table(interp, a->extra,
+                                                  ((grapheme_table *)b->extra)->used);
                 merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
             }
         }

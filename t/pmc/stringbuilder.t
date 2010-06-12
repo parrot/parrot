@@ -21,12 +21,14 @@ Tests the C<StringBuilder> PMC.
     .include 'test_more.pir'
 
     test_create()               # 2 tests
-    test_push_string()          # 9 tests
+    test_push_string()
     test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
-    test_set_string_native()    # 3 tests
+    test_set_string_native()    # 4 tests
     test_set_string_native_with_hash()    # 2 tests
+    test_set_pmc()
+    test_substr()
 
     emit_with_pos_args()
     emit_with_percent_args()
@@ -104,6 +106,11 @@ Tests the C<StringBuilder> PMC.
     $I0 = sb
     is( $I0, 16384, "... and capacity increased" )
 
+    null $S0
+    push sb, $S0
+    $I0 = sb
+    is( $I0, 16384, "push a null string does nothing" )
+
 .end
 
 .sub 'test_push_pmc'
@@ -152,7 +159,6 @@ Tests the C<StringBuilder> PMC.
 
     $S0 = sb
     is( $S0, "foobarbaz", "StringBuilder handles concat properly")
-
 .end
 
 .sub 'test_set_string_native'
@@ -170,6 +176,14 @@ Tests the C<StringBuilder> PMC.
     is( $S0, "foobar", "... with appending string after")
     is( $S99, "foo", "... without touching of original string")
 
+    # Assumed that the previous operations does not reach initial
+    # capacity of the buffer, the next test should cause a
+    # reallocation, ensuring full coverage of the set_string_native
+    # vtable function.
+    $S1 = repeat 'x', 4096
+    sb = $S1
+    $I0 = sb.'get_string_length'()
+    is( $I0, 4096, "... with a big size change")
 .end
 
 .sub 'test_set_string_native_with_hash'
@@ -193,6 +207,24 @@ Tests the C<StringBuilder> PMC.
     $S99 = hash[$S1]
     is ( $S99, "foobar", "Second string stored in hash" )
 
+.end
+
+.sub 'test_set_pmc'
+    .local pmc sb, i
+    sb = new ["StringBuilder"]
+    i  = new ["Integer"], 17
+    assign sb, i
+    $S0 = sb
+    $I0 = iseq $S0, '17'
+    is( $I0, 1, "set_pmc gives the pmc string value")
+.end
+
+.sub test_substr
+    .local pmc sb
+    sb = new ["StringBuilder"]
+    sb = 'foobar'
+    $S0 = substr sb, 2, 3
+    is( $S0, 'oba', "substr result is correct")
 .end
 
 .sub emit_with_pos_args

@@ -43,7 +43,7 @@ Coverage plan:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(46)
+    plan(47)
 
     test_does_interfaces()
 
@@ -74,6 +74,7 @@ Coverage plan:
     test_cant_shift_empty()
     test_iterator()
     test_clone()
+    test_freeze()
 .end
 
 .sub test_does_interfaces
@@ -594,6 +595,17 @@ k0:
     $P1 = clone $P0
     $I0 = iseq $P0, $P1
     is( $I0, 1, 'cloned is equal to original')
+.end
+
+.sub test_freeze
+    .local pmc ria, th
+    .local string s
+    ria = new ['ResizableIntegerArray']
+    push ria, 1
+    push ria, 0x1FFFF
+    s = freeze ria
+    th = thaw s
+    is( ria, th, 'freeze/thaw copy is equal to original' )
 .end
 
 # Local Variables:

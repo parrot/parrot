@@ -41,21 +41,23 @@ clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
         for (i = 0; i < src->used; i++) {
             dst->graphemes[i].len =  src->graphemes[i].len;
             dst->graphemes[i].hash = src->graphemes[i].hash;
-            dst->graphemes[i].codepoints = mem_gc_allocate_n_typed(interp, src->graphemes[i].len, UChar32);
+            dst->graphemes[i].codepoints =
+                mem_gc_allocate_n_typed(interp, src->graphemes[i].len, UChar32);
             memcpy(dst->graphemes[i].codepoints, src->graphemes[i].codepoints,
                    src->graphemes[i].len * sizeof (UChar32));
         }
 
         return dst;
-	}
+    }
     else {
         return NULL;
-	}
+    }
 }
 
 grapheme_table *
 grow_grapheme_table(SHIM_INTERP, grapheme_table *src, UINTVAL n)
 {
+    ASSERT_ARGS(grow_grapheme_table)
     return (grapheme_table *) mem_sys_realloc(src,
         sizeof (grapheme_table) + (src->size + n) * sizeof (grapheme));
 }
@@ -74,19 +76,20 @@ destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
 void
 merge_tables_and_fixup_string(PARROT_INTERP, STRING *dest, grapheme_table *table, UINTVAL offset)
 {
+    ASSERT_ARGS(merge_tables_and_fixup_string)
     INTVAL i;
     UChar32 *buf = (UChar32 *) dest->strstart;
     UChar32 *new_codepoints;
 
-	if (table == NULL || table->used == 0)
+    if (table == NULL || table->used == 0)
         return;
 
-	if (dest->extra == NULL) {
+    if (dest->extra == NULL) {
         dest->extra = clone_grapheme_table(interp, table);
         return;
     }
 
-	new_codepoints = mem_gc_allocate_n_typed(interp, table->used, UChar32);
+    new_codepoints = mem_gc_allocate_n_typed(interp, table->used, UChar32);
 
     /* Add the new graphemes to the old table. */
     for (i = 0; i < table->used; i++) {
@@ -96,7 +99,7 @@ merge_tables_and_fixup_string(PARROT_INTERP, STRING *dest, grapheme_table *table
 
     /* And fixup the string. */
     for (i = offset; i < dest->strlen; i++) {
-		int32_t codepoint = buf[i];
+        int32_t codepoint = buf[i];
         if (codepoint < 0)
             buf[i] = new_codepoints[(-1 - codepoint)];
     }
@@ -107,7 +110,7 @@ merge_tables_and_fixup_string(PARROT_INTERP, STRING *dest, grapheme_table *table
 UChar32
 add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
 {
-    ASSERT_ARGS(add_grapheme_from_substr)
+    ASSERT_ARGS(add_grapheme)
     int32_t i;
 
     /* Check if it's in the table already... */
