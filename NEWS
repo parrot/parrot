@@ -11,6 +11,7 @@ New in 2.5.0
        for more Information about Lorito see:
            http://trac.parrot.org/parrot/wiki/Lorito
            http://trac.parrot.org/parrot/wiki/LoritoRoadmap
+  + New executable "ops2c" added; take care by packing
 - Core
   + Added ByteBuffer PMC
   + Added a bunch of tests for Array PMCs
@@ -26,6 +27,7 @@ New in 2.5.0
       Can match on types, children, attributes, based on iseq to a constant,
       based on true result from a closure and based on anything with an
       ACCEPTS method.
+  + Branch ns_func_cleanup created, will be merged after this release
 - Tests
   + Fixed some tests that were failing because of dynops
   + Some tests for the instrument dynpmc are added
@@ -35,8 +37,7 @@ New in 2.5.0
   + Added \e strings
   + Added use of inversion lists for charclass lists in regexes
 - Languages
-  + resurrected partcl
-- Miscellaneous
+  + Resurrected partcl
 
 New in 2.4.0
 - Core
