@@ -75,7 +75,10 @@ class PAST::Pattern::Node is PAST::Pattern {
             return 0;
         }
         my $nAttr := $node.attr($attribute, null, 0);
-        my $result := $nAttr ~~ $pAttr;
+        my $result := 
+          ($pAttr ~~ PAST::Pattern
+           ?? $pAttr.ACCEPTS($nAttr, :p($nAttr))
+           !! $nAttr ~~ $pAttr);
         if ($result) {
             $/{$attribute} := $result;
         }
@@ -88,6 +91,8 @@ class PAST::Pattern::Node is PAST::Pattern {
     sub check_children ($pattern, $node, $/) {
         my $pLen := pir::elements($pattern);
         my $nLen := pir::elements($node);
+        my $pChild;
+        my $nChild;
         my $result;
         my $index;
         if $pLen == 0 {
@@ -96,7 +101,12 @@ class PAST::Pattern::Node is PAST::Pattern {
         elsif ($pLen == $nLen) {
             $index := 0;
             while ($index < $pLen) {
-                if ($result := $node[$index] ~~ $pattern[$index]) {
+                $nChild := $node[$index];
+                $pChild := $pattern[$index];
+                if ($result := 
+                    ($pChild ~~ PAST::Pattern
+                     ?? $pChild.ACCEPTS($nChild, :p($nChild))
+                     !! $nChild ~~ $pChild)) {
                     $/[$index] := $result;
                 }
                 else {

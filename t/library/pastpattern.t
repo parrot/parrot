@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2080);
+plan(2092);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -486,15 +486,19 @@ sub test_child_smart_matching () {
 }
 
 sub test_deep_matching_in_children () {
-    my @classes := [ PAST::Block, PAST::Op, PAST::Stmts,
-                     PAST::Val, PAST::Var, PAST::VarList ];
+    my @classes := [ [ PAST::Block, PAST::Pattern::Block],
+                     [ PAST::Op, PAST::Pattern::Op],
+                     [ PAST::Stmts, PAST::Pattern::Stmts],
+                     [ PAST::Val, PAST::Pattern::Val],
+                     [ PAST::Var, PAST::Pattern::Var],
+                     [ PAST::VarList, PAST::Pattern::VarList ] ];
 
     my $pattern := PAST::Pattern::Val.new(:returns('Integer'));
-    my $node, my $class;
+    my $node, my $class, my $patternClass;
     my $childNode := PAST::Val.new(:returns('Integer'));
 
     for @classes {
-        $class := $_;
+        $class := $_[0];
 
         $node := $class.new($childNode);
         ok($node ~~ $pattern, 
@@ -512,6 +516,27 @@ sub test_deep_matching_in_children () {
         $node := $class.new(PAST::Var.new());
         ok(!($node ~~ $pattern),
            "Deep matching $class: wrong type of child.");
+    }
+
+    for @classes {
+        $class := $_[0];
+        $patternClass := $_[1];
+
+        if $class =:= PAST::Var {
+            $pattern := $patternClass.new(PAST::Pattern::Val.new());
+            $node := $class.new(PAST::Op.new(PAST::Val.new()));
+        }
+        else {
+            $pattern := $patternClass.new(PAST::Pattern::Val.new());
+            $node := $class.new(PAST::Var.new(PAST::Val.new()));
+        }
+        ok(!($node ~~ $pattern),
+           "Child subpatterns must match exactly.");
+
+        $pattern := $patternClass.new(:name(PAST::Pattern::Val.new()));
+        $node := $class.new(:name(PAST::Var.new(PAST::Val.new())));
+        ok(!($node ~~ $pattern),
+           "Attribute subpatterns must match exactly.");
     }
 
 }
