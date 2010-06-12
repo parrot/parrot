@@ -63,10 +63,11 @@ grapheme_table * grow_grapheme_table(SHIM_INTERP,
     grapheme_table *src,
     UINTVAL n);
 
-void merge_tables_and_fixup_string(PARROT_INTERP,
+void merge_tables_and_fixup_substring(PARROT_INTERP,
     STRING *dest,
     grapheme_table *table,
-    UINTVAL offset)
+    UINTVAL offset,
+    UINTVAL len)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_add_grapheme __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -80,7 +81,8 @@ void merge_tables_and_fixup_string(PARROT_INTERP,
 #define ASSERT_ARGS_destroy_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_grow_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_merge_tables_and_fixup_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_merge_tables_and_fixup_substring \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/grapheme.c */

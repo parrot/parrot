@@ -505,7 +505,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             if (b->extra != NULL) {
                 dest->extra = grow_grapheme_table(interp, a->extra,
                                                   ((grapheme_table *)b->extra)->used);
-                merge_tables_and_fixup_string(interp, dest, b->extra, a->strlen);
+                merge_tables_and_fixup_substring(interp, dest, b->extra, a->strlen, b->strlen);
             }
         }
         else {
@@ -1230,9 +1230,11 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     dest->encoding = enc;
     dest->charset  = cs;
 
-    /* TODO: We should merge the grapheme tables here and translate the
-       dynamic graphemes in the second string if needed. */
-    dest->extra    = NULL;
+#if PARROT_HAS_ICU
+    /* Clone grapheme table, if appropiate */
+    if (dest->encoding == Parrot_nfg_encoding_ptr)
+        dest->extra = clone_grapheme_table(interp, src->extra);
+#endif /* PARROT_HAS_ICU */
 
     /* Clear COW flag. We own buffer */
     PObj_get_FLAGS(dest) = PObj_is_string_FLAG
@@ -1252,6 +1254,15 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     /* Copy the replacement in */
     mem_sys_memcopy((char *)dest->strstart + start_byte, rep->strstart,
             rep->bufused);
+
+#if PARROT_HAS_ICU
+    if (dest->encoding == Parrot_nfg_encoding_ptr && rep->extra != NULL) {
+        dest->extra = grow_grapheme_table(interp, dest->extra,
+                                          ((grapheme_table *)rep->extra)->used);
+        merge_tables_and_fixup_substring(interp, dest, rep->extra,
+                                         start_byte / sizeof (UChar32), rep->strlen);
+    }
+#endif /* PARROT_HAS_ICU */
 
     /* Copy the end of old string */
     mem_sys_memcopy((char *)dest->strstart + start_byte + rep->bufused,

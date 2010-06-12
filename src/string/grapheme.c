@@ -74,9 +74,10 @@ destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
     mem_gc_free(interp, table);
 }
 void
-merge_tables_and_fixup_string(PARROT_INTERP, STRING *dest, grapheme_table *table, UINTVAL offset)
+merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
+    grapheme_table *table, UINTVAL offset, UINTVAL len)
 {
-    ASSERT_ARGS(merge_tables_and_fixup_string)
+    ASSERT_ARGS(merge_tables_and_fixup_substring)
     INTVAL i;
     UChar32 *buf = (UChar32 *) dest->strstart;
     UChar32 *new_codepoints;
@@ -98,7 +99,7 @@ merge_tables_and_fixup_string(PARROT_INTERP, STRING *dest, grapheme_table *table
     }
 
     /* And fixup the string. */
-    for (i = offset; i < dest->strlen; i++) {
+    for (i = offset; i < len; i++) {
         int32_t codepoint = buf[i];
         if (codepoint < 0)
             buf[i] = new_codepoints[(-1 - codepoint)];
