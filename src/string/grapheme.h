@@ -59,6 +59,11 @@ grapheme_table * create_grapheme_table(PARROT_INTERP, UINTVAL n)
 void destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
         __attribute__nonnull__(1);
 
+UINTVAL get_grapheme_base(PARROT_INTERP,
+    grapheme_table *table,
+    int32_t codepoint)
+        __attribute__nonnull__(1);
+
 grapheme_table * grow_grapheme_table(SHIM_INTERP,
     grapheme_table *src,
     UINTVAL n);
@@ -79,6 +84,8 @@ void merge_tables_and_fixup_substring(PARROT_INTERP,
 #define ASSERT_ARGS_create_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_destroy_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_grapheme_base __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_grow_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_merge_tables_and_fixup_substring \

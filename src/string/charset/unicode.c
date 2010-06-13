@@ -192,6 +192,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
 #  include <unicode/uchar.h>
 #  include <unicode/ustring.h>
 #  include <unicode/unorm.h>
+#  include <../grapheme.h>
 #endif
 #define EXCEPTION(err, str) \
     Parrot_ex_throw_from_c_args(interp, NULL, (err), (str))
@@ -849,6 +850,12 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
 
     codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
 
+#if PARROT_HAS_ICU
+    if (src->encoding == Parrot_nfg_encoding_ptr)
+        codepoint = get_grapheme_base(interp, (grapheme_table *)src->extra,
+                                      (int32_t) codepoint);
+#endif /* PARROT_HAS_ICU */
+
     if (codepoint >= 256)
         return u_iscclass(interp, codepoint, flags) != 0;
 
@@ -882,6 +889,12 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offse
 
     for (; pos < end; ++pos) {
         codepoint = iter.get_and_advance(interp, &iter);
+#if PARROT_HAS_ICU
+        if (src->encoding == Parrot_nfg_encoding_ptr)
+            codepoint = get_grapheme_base(interp, (grapheme_table *)src->extra,
+                                          (int32_t) codepoint);
+#endif /* PARROT_HAS_ICU */
+
         if (codepoint >= 256) {
             if (u_iscclass(interp, codepoint, flags))
                     return pos;
@@ -933,6 +946,11 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
 
     for (; pos < end; ++pos) {
         codepoint = iter.get_and_advance(interp, &iter);
+#if PARROT_HAS_ICU
+        if (src->encoding == Parrot_nfg_encoding_ptr)
+            codepoint = get_grapheme_base(interp, (grapheme_table *)src->extra,
+                                          (int32_t) codepoint);
+#endif /* PARROT_HAS_ICU */
         if (codepoint >= 256) {
             for (bit = enum_cclass_uppercase;
                     bit <= enum_cclass_word ; bit <<= 1) {

@@ -33,7 +33,7 @@ clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
 {
     ASSERT_ARGS(clone_grapheme_table)
     if (src != NULL) {
-        UINTVAL i;
+        INTVAL i;
         grapheme_table * dst = create_grapheme_table(interp, src->used);
 
         dst->used = src->used;
@@ -67,7 +67,7 @@ void
 destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
 {
     ASSERT_ARGS(destroy_grapheme_table)
-    UINTVAL i = 0;
+    INTVAL i = 0;
     while (i < table->used) {
         mem_gc_free(interp, table->graphemes[i++].codepoints);
     }
@@ -156,6 +156,21 @@ add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
     };
     i = table->used;
     return (UChar32) (-1 - i);
+}
+
+UINTVAL
+get_grapheme_base(PARROT_INTERP, grapheme_table *table, int32_t codepoint)
+{
+    const int32_t index = -1 - codepoint;
+
+    if (codepoint > 0)
+        return (UINTVAL) codepoint;
+
+    if (index >= table->used)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "Grapheme table index out of bounds!");
+
+    return table->graphemes[index].codepoints[0];
 }
 
 #endif /* PARROT_HAS_ICU */
