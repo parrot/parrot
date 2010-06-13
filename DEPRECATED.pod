@@ -339,7 +339,7 @@ Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
 
-=item Parrot_get_runtime_prefix [eligible in 2.6]
+=item Parrot_get_runtime_prefix [eligible in 2.7]
 
 Use Parrot_get_runtime_path instead.
 
