@@ -9,7 +9,7 @@ New in 2.5.0
   + Increased test coverage of core PMCs
   + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
 - NQP-rx
-  + Added proper supprot for multisubs and multimethods
+  + Added proper support for multisubs and multimethods
   + Fixed sigspace handling ** quantifier in regexes
   + Added \e strings
   + Added use of inversion lists for charclass lists in regexes
