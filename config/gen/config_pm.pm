@@ -119,7 +119,11 @@ END
                     # String
                     $v =~ s/(["\\])/\\$1/g;
                     $v =~ s/\n/\\n/g;
-                    print {$OUT} qq(    set \$P0["$k"], "$v"\n);
+                    my $charset = q{};
+                    if ($v =~ /[^[:ascii:]]/) {
+                        $charset = 'binary:';
+                    }
+                    print {$OUT} qq(    set \$P0["$k"], $charset"$v"\n);
                 }
                 else {
                     # Null
