@@ -84,7 +84,9 @@ Destinations for conditional branches are an integer offset from the current
 PC.
 
 All registers have a type prefix of P, S, I, or N, for PMC, string, integer,
-and number respectively.
+and number respectively. While parrot bytecode does not have a fixed limit
+on the number of registers, PASM has an implementation limit on the number of
+addressable registers of each type, currently set at 100 (0-99).
 
 =head2 Assembly Syntax
 
