@@ -196,7 +196,7 @@ nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
 {
     ASSERT_ARGS(nfg_encode)
     UChar32 *buf  = (UChar32 *) (dest->strstart);
-    UINTVAL  hash = 0xffff; // TODO: put a real seed here.
+    UINTVAL  hash = 0xffff; /* TODO: put a real seed here. */
     UINTVAL  aux;
 
     while (offs < len) {
@@ -507,7 +507,7 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     s[pos++] = (UChar32) c;
     ++i->charpos;
     i->bytepos = pos * sizeof (UChar32);
-    // TODO: properly compose stuff here.
+    /* TODO: properly compose stuff here. */
 #else
     UNUSED(i);
     no_ICU_lib(interp);

@@ -3290,7 +3290,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         mem_sys_memcopy(pos, next->strstart, next->bufused);
         pos += next->bufused;
 
-        // TODO: Merge grapheme tables as we go. If it's needed.
+        /* TODO: Merge grapheme tables as we go. If it's needed. */
 
         /* We can consume all buffer and pos will be next-after-end of buffer */
         PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);
