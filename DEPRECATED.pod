@@ -339,6 +339,12 @@ Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
 
+=item Parrot_get_runtime_prefix [eligible in 2.6]
+
+Use Parrot_get_runtime_path instead.
+
+L<https://trac.parrot.org/parrot/ticket/1191>
+
 =back
 
 =head1 Compiler tools
