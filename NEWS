@@ -3,7 +3,6 @@
 New in 2.5.0
 - Core
   + Added ByteBuffer PMC
-  + Added a bunch of tests for Array PMCs
   + Modified some PMC vtable functions to reduce complexity, simplifying its coverage.
   + Deleted do-nothing custom mark in StringBuilder
   + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
@@ -17,6 +16,7 @@ New in 2.5.0
   + Added \e strings
   + Added use of inversion lists for charclass lists in regexes
 - Tests
+  + Added a bunch of tests for Array PMCs
   + Fixed some tests that were failing because of dynops
   + Some tests for the instrument dynpmc are added
 - Platforms
