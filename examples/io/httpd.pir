@@ -270,7 +270,6 @@ SERVE_404:
 
 ERR_NO_SOCKET:
     print "Could not open socket.\n"
-    print "Did you enable PARROT_NET_DEVEL in include/io_private.h?\n"
     end
 ERR_bind:
     print "bind failed\n"
