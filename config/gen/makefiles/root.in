@@ -1799,7 +1799,7 @@ buildtools_tests : corevm
 manifest_tests :
 	$(PERL) t/harness $(MANIFEST_TEST_FILES)
 
-examples_tests :
+examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
 
 # benchmark tests
