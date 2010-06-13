@@ -10,7 +10,7 @@ $Id$
 #  include <unicode/uchar.h>
 
 struct grapheme_t {
-    UINTVAL  len;        /* Grapheme length in codepoints. */
+    INTVAL   len;        /* Grapheme length in codepoints. */
     UChar32 *codepoints; /* UCS-4 codepoints that make up the grapheme */
     UINTVAL  hash;
 };
@@ -20,8 +20,8 @@ typedef struct grapheme_t grapheme;
 #  define MIN_TABLE_LENGTH 1
 
 struct grapheme_table_t {
-    UINTVAL size; /* Total table size, in graphemes. */
-    UINTVAL used; /* Number of slots used from the table. */
+    INTVAL size; /* Total table size, in graphemes. */
+    INTVAL used; /* Number of slots used from the table. */
     grapheme graphemes[MIN_TABLE_LENGTH];
     /*
      * Not really a static array. When we need a bigger table, we just allocate
