@@ -44,8 +44,10 @@ class PAST::Pattern is Capture {
 
     method ACCEPTS ($node, *%opts) {
         my $global := ?%opts<g> || ?%opts<global>;
-        return self.ACCEPTSGLOBALLY($node) if $global;
         my $pos := %opts<p> || %opts<pos>;
+        pir::die("ACCEPTS cannot take both :global and :pos modifiers.")
+            if $global && $pos;
+        return self.ACCEPTSGLOBALLY($node) if $global;
         return self.ACCEPTSEXACTLY($pos) if $pos;
         my $/ := self.ACCEPTSEXACTLY($node);
         if (!$/ && ($node ~~ PAST::Node)) {
