@@ -8,6 +8,7 @@ New in 2.5.0
   + General STRING API cleanups
   + Increased test coverage of core PMCs
   + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
+  + Experimental 'unroll' opcode renamed to 'finalize'
 - NQP-rx
   + Added proper support for multisubs and multimethods
   + Fixed sigspace handling ** quantifier in regexes
