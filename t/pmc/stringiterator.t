@@ -21,11 +21,46 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(18)
+    plan(21)
 
+    test_clone()
+    test_elements()
     iterate_forward() # 10 tests
     iterate_backward() # 8 tests
 
+.end
+
+.sub 'test_clone'
+    .local pmc s, it, itc
+    .local int nit, nitc
+
+    s = new ['String']
+    s = 'somestring'
+    it = iter s
+    # Get a clone and make sure both the original and the clone
+    # gets marked.
+    sweep 1
+    nit = elements it
+    itc = clone it
+    sweep 1
+    nitc = elements itc
+    is(nit, nitc, "clone has same length as original")
+.end
+
+.sub test_elements
+    .local string s
+    .local pmc ps, it
+    .local int ns, nit
+
+    s = 'someotherstring'
+    ps = new ['String']
+    ps = s
+    it = iter ps
+    ns = length s
+    nit = elements it
+    is(ns, nit, "iter elements is equal to string length")
+    nit = it
+    is(ns, nit, "iter get_integer is equal to string length")
 .end
 
 .sub 'iterate_forward'
