@@ -33,13 +33,29 @@ Tests whether the I<node> or any sub-tree thereof matches the pattern. Returns a
 
 =back
 
+=head2 Subclass Methods
+
+The following method should be implemented in any subclass, as C<.ACCEPTS> relies on it.
+
+=over 4
+
+=item C<ACCEPTSEXACTLY(I<node>)>
+
+Tests whether the specific node matches the pattern without recursing into children. The result should be a PAST::Pattern::Match object. Every PAST::Pattern subclass B<MUST> implement this method.
+
+=back
+
 =head2 Internal Methods
 
 =over 4
 
-=item attr($name, $value, $has_value)
+=item C<attr(I<name>, I<value>, I<has_value>)>
 
 A helper method for defining attribute accessors.
+
+=item C<ACCEPTSGLOBALLY(I<node>)
+
+Used by C<ACCEPTS> to implement global matching.
 
 =back
 
