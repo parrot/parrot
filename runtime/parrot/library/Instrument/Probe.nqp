@@ -11,10 +11,12 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
 =head1 SYNOPSIS
     
     ## In PIR.
-    
+    .local pmc probe_class
+    probe_class = get_hll_global ['Instrument'], 'Probe'
+
     # Create a probe that will be called whenever the
     #  specified ops are encountered.
-    probe = new ['Instrument';'Probe']
+    probe = probe_class.'new'()
     probe.'inspect'('lt')
     probe.'inspect'('gt')
     probe.'set_callback'('specific_callback')
@@ -22,7 +24,7 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
     
     # Create a catchall probe which will be called for
     #  each op.
-    probe = new ['Instrument';'Probe']
+    probe = probe_class.'new'()
     probe.'make_catchall'()
     probe.'set_callback'('catchall_callback')
     probe.'set_finalize'('catchall_finalize')

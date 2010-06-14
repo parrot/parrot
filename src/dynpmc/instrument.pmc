@@ -26,6 +26,7 @@ to be done on a child interpreter.
 
 /*
  * Structures for the linked list data type.
+ * TODO: Await merge to trunk of bacek's list. Then we use that instead.
  */
 
 typedef struct probe_node_t {
@@ -56,6 +57,7 @@ typedef struct Instrument_runcore_t {
     PMC                      *supervisor_pmc;
     probe_list_t            **op_hooks;
     probe_list_t             *op_catchall;
+    PMC                      *old_dynlibs;
 } Instrument_runcore_t;
 
 /* Runcore Function Prototypes */
@@ -65,6 +67,11 @@ static void      Instrument_init_probes(Parrot_Interp supervisor, Parrot_Interp 
 
 /* Helper prototype */
 static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP);
+
+/* dynlib detection */
+static void normalise_vtables(Parrot_Interp src, Parrot_Interp dest);
+static void normalise_op_tables(Parrot_Interp src, Parrot_Interp dest);
+static void detect_loadlib(PARROT_INTERP);
 
 /* Linked List operations */
 static probe_list_t *probe_list_create_list(PARROT_INTERP);
@@ -155,10 +162,12 @@ Marks internal data structures as live to the gc.
 
     VTABLE void mark() {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
 
         /* Mark attributes as alive */
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->probes);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->evt_dispatcher);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, core->old_dynlibs);
     }
 
 /*
@@ -243,14 +252,8 @@ Loads the given file and run it with the args given.
             }
         }
 
-        /* TODO: Apparently, dynpmcs also have the same problem as dynops.
-                 I'm not sure why, but it seems that whenever 2 interps try
-                 to load the same dynpmc (at different times), something bad happens.
-                 Below is a hack as a temporary work around for that.
-        */
-        attr->supervised->vtables          = INTERP->vtables;
-        attr->supervised->n_vtable_max     = INTERP->n_vtable_max;
-        attr->supervised->n_vtable_alloced = INTERP->n_vtable_alloced;
+        /* Normalise the vtables */
+        normalise_vtables(INTERP, attr->supervised);
 
         /* Begin Execution */
         status = imcc_run(attr->supervised,
@@ -566,7 +569,13 @@ arg_type is as defined in parrot/op.h
             break;
           case PARROT_ARG_KC:
             /* Key is String reg or String const */
-            ret = (Parrot_pcc_get_constants(attr->supervised, cc)[arg])->u.key;
+            ret = Parrot_pmc_new(INTERP, enum_class_String);
+            {
+                PMC *key;
+                key = (Parrot_pcc_get_constants(attr->supervised, cc)[arg])->u.key;
+                
+                VTABLE_set_string_native(INTERP, ret, VTABLE_get_string(attr->supervised, key));
+            }
 
             break;
           case PARROT_ARG_KI:
@@ -607,32 +616,20 @@ Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc
     Instrument_runcore_t *core = (Instrument_runcore_t *) runcore;
     Parrot_Interp supervisor = core->supervisor_interp;
 
+    /* Detect any dynlib loading, for example during load_bytecode. */
+    detect_loadlib(interp);
+
     while (pc) {
+        opcode_t *pc_copy = pc;
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
-
-        /* TODO: This is a hack to get around dynops for now.
-                 Since dynops are loaded by the child interpreter
-                 and there is no easy way to get notification of that,
-                 this will do for now.
-        */
-        if (supervisor->op_func_table != interp->op_func_table) {
-            Instrument_init_probes(supervisor, interp);
-            
-            supervisor->op_lib        = interp->op_lib;
-            supervisor->op_count      = interp->op_count;
-            supervisor->op_func_table = interp->op_func_table;
-            supervisor->op_info_table = interp->op_info_table;
-
-            if(supervisor->evc_func_table != NULL) {
-                mem_gc_free(supervisor, supervisor->evc_func_table);    
-            
-                supervisor->evc_func_table = NULL;
-                supervisor->save_func_table = NULL;
-            }
-        }
 
         Instrument_fire_hooks(pc, interp);
         DO_OP(pc, interp);
+        
+        /* Todo: Move this to a probe. This detects loadlib opcodes. */
+        if(*pc_copy >= 96 && *pc_copy <= 101) {
+            detect_loadlib(interp);
+        }
 
         /* Force events */
         Parrot_cx_handle_tasks(interp, interp->scheduler);
@@ -651,6 +648,7 @@ void
 Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument) {
     Instrument_runcore_t * const coredata =
         mem_gc_allocate_zeroed_typed(interp, Instrument_runcore_t);
+    PMC *dynlibs = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_DYN_LIBS);
 
     /* Ensure the current loaded runcore is the slow core */
     Parrot_set_run_core(interp, PARROT_SLOW_CORE);
@@ -670,6 +668,7 @@ Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument
     coredata->supervisor_pmc     = instrument;
     coredata->op_hooks           = NULL;
     coredata->op_catchall        = NULL;
+    coredata->old_dynlibs        = VTABLE_clone(supervisor, dynlibs);
 
     PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *)coredata);
 
@@ -757,7 +756,6 @@ static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP) {
         /* Fire the probe. */
         callback = cur_probe->list_obj;
         next     = cur_probe->next;
-
         if (!PMC_IS_NULL(callback)) {
             Parrot_ext_call(supervisor, callback, "IPP->", pc_relative, op_data, instrument);
         }
@@ -766,6 +764,130 @@ static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP) {
 
     /* Done */
     return pc;
+}
+
+/*
+ * Functions implementing internal detection of newly loaded dynlibs.
+ */
+
+/*
+ * Detect newly loaded dynlibs in the passed interp by comparing it
+ * with a hash of previously known loaded dynlibs.
+ */
+static void detect_loadlib(PARROT_INTERP) {
+    PMC *dynlibs, *old_dynlibs, *super_dynlibs;
+    Instrument_runcore_t *core;
+    Parrot_Interp supervisor;
+    INTVAL old_count, new_count;
+    
+    core          = (Instrument_runcore_t *) interp->run_core;
+    supervisor    = core->supervisor_interp;
+    super_dynlibs = supervisor->iglobals;
+    old_dynlibs   = core->old_dynlibs;
+    dynlibs       = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_DYN_LIBS);
+    
+    /* Check if any libraries were loaded. */
+    old_count = VTABLE_get_integer(supervisor, old_dynlibs);
+    new_count = VTABLE_get_integer(interp, dynlibs);
+    
+    if (old_count != new_count) {
+        PMC *iter;
+    
+        /* Normalise the vtables of both interps due to singletons. */
+        normalise_vtables(interp, supervisor);
+        
+        /* Before we normalise the op tables, we need to update the hooks table. */
+        Instrument_init_probes(supervisor, interp);
+        normalise_op_tables(interp, supervisor);
+        
+        /* Look for the new dynlibs and raise an event about them. */
+        iter = VTABLE_get_iter(interp, dynlibs);
+        while (VTABLE_get_bool(interp, iter)) {
+            PMC *key;
+            
+            key = VTABLE_shift_pmc(interp, iter);
+            
+            if (!VTABLE_exists_keyed(supervisor, old_dynlibs, key)) {
+                /* New lib detected. */
+                PMC *lib, *task, *task_hash, *task_data;
+                
+                lib = VTABLE_get_pmc_keyed(interp, dynlibs, key);
+                
+                task_data = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+                VTABLE_push_string(supervisor, task_data, VTABLE_get_string(interp, lib));
+                
+                task_hash = Parrot_pmc_new(supervisor, enum_class_Hash);
+                VTABLE_set_string_keyed_str(supervisor, task_hash,
+                                            CONST_STRING(supervisor, "type"),
+                                            CONST_STRING(supervisor, "event"));
+                VTABLE_set_string_keyed_str(supervisor, task_hash,
+                                            CONST_STRING(supervisor, "subtype"),
+                                            CONST_STRING(supervisor,
+                                                         "Instrument::Event::Internal::loadlib"));
+                VTABLE_set_pmc_keyed_str(supervisor, task_hash,
+                                         CONST_STRING(supervisor, "data"),
+                                         task_data);
+                
+                task = Parrot_pmc_new_init(supervisor, enum_class_Task, task_hash);
+                Parrot_cx_schedule_task(supervisor, task);
+                
+                /* Add lib to the old dynlib hash */
+                VTABLE_set_pmc_keyed(supervisor, old_dynlibs, key, lib);
+            }
+        }
+    }
+    
+    /* Force handling of any pending tasks in super. */
+    Parrot_cx_handle_tasks(supervisor, supervisor->scheduler);
+}
+
+/*
+ * Normalise the vtables between the source and dest interpreters.
+ */
+static void normalise_vtables(Parrot_Interp src, Parrot_Interp dest) {
+    INTVAL i;
+
+    /* Extend dest's vtable. */
+    if (dest->n_vtable_alloced < src->n_vtable_max) {
+        INTVAL new_size;
+
+        new_size = src->n_vtable_max + 16;
+
+        dest->vtables = mem_gc_realloc_n_typed_zeroed(dest, dest->vtables,
+                                                      new_size, dest->n_vtable_alloced,
+                                                      VTABLE *);
+        dest->n_vtable_alloced = new_size;
+    }
+
+    /* Copy over the new vtable entries. */
+    for (i = dest->n_vtable_max; i < src->n_vtable_max; i++) {
+        dest->vtables[i] = src->vtables[i];
+    }
+}
+
+/*
+ * Normalise the op tables of the dest interpreter.
+ */
+static void normalise_op_tables(Parrot_Interp src, Parrot_Interp dest) {
+    op_lib_t *core_lib;
+
+    /* Reset dest's optables if needed. */
+    core_lib = dest->run_core->opinit(dest, 1);
+    if (dest->op_count != core_lib->op_count) {
+        dest->op_count      = core_lib->op_count;
+        dest->op_info_table = core_lib->op_info_table;
+        dest->op_func_table = core_lib->op_func_table;
+
+        /* Remove dest's evc_func_table */
+        if (dest->evc_func_table != NULL) {
+            mem_gc_free(dest, dest->evc_func_table);
+
+            dest->evc_func_table  = NULL;
+            dest->save_func_table = NULL;
+
+            Parrot_setup_event_func_ptrs(dest);
+        }
+    }
 }
 
 /*

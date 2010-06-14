@@ -34,8 +34,7 @@ runtime/parrot/library/Instrument/EventLibrary.nqp
 =item Instrument::Event::Internal::loadlib
 
 Raises an event whenever a dynlib is loaded.
-
-TODO: Need some C code for .loadlib directives. Not sure how to yet.
+Events are raised in the C code.
 
 =cut
 =end
@@ -44,27 +43,7 @@ class Instrument::Event::Internal::loadlib is Instrument::Event {
 
 	method _self_init() {
 		$!event_type := 'Instrument::Event::Internal::loadlib';
-
-		$!probe_obj := Instrument::Probe.new();
-
-		$!probe_obj.inspect('loadlib');
-		$!probe_obj.set_callback(pir::get_global__PS('callback'));
-	};
-
-	sub callback ($pc, $op, $instr_obj) {
-		my $op_lib   := Q:PIR { %r = new ['OpLib'] };
-    	my $op_code  := pir::set_p_p_ki__PPI($op_lib, $op[0]);
-    	my $arg_type := pir::set_i_p_ki__IPI($op_code, 1);
-    	my $lib      := $instr_obj.get_op_arg($op[2], $arg_type);
-
-		my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
-		$data.push($lib);
-		$data.push($pc);
-		$data.push($op);
-		$data.push($instr_obj);
-
-		Instrument::Event::_raise_event('Instrument::Event::Internal::loadlib', $data);
-	};
+    };
 };
 
 =begin

@@ -61,7 +61,9 @@ Registers callbacks with the EventDispatcher Object in the Instrument dynpmc.
 =end
 
     method _on_attach () {
-    	$!instr_obj.attach($!probe_obj);
+        if pir::defined__IP($!probe_obj) {
+    	    $!instr_obj.attach($!probe_obj);
+    	}
 
     	my $dispatcher := Q:PIR {
     		$P0 = getattribute self, '$!instr_obj'
