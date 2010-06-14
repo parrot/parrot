@@ -863,6 +863,8 @@ static void normalise_vtables(Parrot_Interp src, Parrot_Interp dest) {
     for (i = dest->n_vtable_max; i < src->n_vtable_max; i++) {
         dest->vtables[i] = src->vtables[i];
     }
+    
+    dest->n_vtable_max = src->n_vtable_max;
 }
 
 /*
