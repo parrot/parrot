@@ -1,0 +1,56 @@
+=head1 NAME
+
+PAST::Pattern - A library for pattern matching on PAST::Nodes.
+
+=head1 SYNOPSIS
+
+    load_bytecode('PAST/Pattern.pbc');
+    $P1 = get_hll_global ['PAST';'Pattern'], 'Val'
+    $P0 = $P1.'new'('value'=>1)
+    $P2 = get_a_past_node_from_somewhere()
+    $P3 = $P0.match($P2)
+    $I0 = istrue $P3
+    print "Result as bool is "
+    say $I0
+
+=head1 DESCRIPTION
+
+PAST::Pattern and its subclasses allow determining whether a PAST::Node matches a certain pattern, in addition to allowing modification of any matches sub-trees similarly to regex substitution.
+
+=head1 PAST::Pattern is Capture
+
+=head2 Public Methods
+
+=over 4
+
+=item C<transform(I<past>, I<transform>)>
+
+Uses the C<invokable> object or C<PAST::Transformer> in I<transform> to transform any sub-trees of I<past> that match the pattern.
+
+=item C<ACCEPTS(I<node>, [option1 => value1, option2 => value2, ...])>
+
+Tests whether the I<node> or any sub-tree thereof matches the pattern. Returns a C<PAST::Pattern::Match> result object. Valid options are C<g> or C<global> and C<p> or C<pos>. If C<g> or C<global> are true, the match is global. After the first match is found, the search will continue until every sub-tree has been checked for matching. If no matches are found, a false C<PAST::Pattern::Match> object will be returned. If only one match is found, C<ACCEPTS> returns the same value with or without C<g> or C<global>. If multiple matches are found, the result is a true C<PAST::Pattern::Match> object whose array part contains the individual match results. If C<p> or C<pos> are provided, they specify a PAST::Node that must exactly match the pattern. Supplying one of both C<g> or C<global> and C<p> or C<pos> produces an error.
+
+=back
+
+=head2 Internal Methods
+
+=over 4
+
+=item attr($name, $value, $has_value)
+
+A helper method for defining attribute accessors.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * docs/pct/past_building_blocks.pod
+
+=item * docs/pdds/pdd26_ast.pod
+
+=back
+
+=cut
