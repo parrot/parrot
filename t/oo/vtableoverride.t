@@ -120,7 +120,7 @@ CODE
     $P1 = new $P0
     $P2 = $P1[0]
     $I0 = isnull $P2
-    ok($I0, "Override get_pmc_keyed_int without .return")
+    ok($I0, "Override get_pmc_keyed_int without .return - TT #1593")
 .end
 
 .namespace [ 'MyObject' ]
