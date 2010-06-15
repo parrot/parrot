@@ -19,7 +19,7 @@ class PAST::Pattern::Match is Capture {
     }
 
     method Bool () {
-        pir::getattribute__PPS(self, '$!success');
+        ?self;
     }
 
     method ast () {
@@ -49,17 +49,18 @@ class PAST::Pattern::Match is Capture {
 }
 
 INIT {
-    my $parrotclass :=
+    my $pc :=
       pir::getattribute__PPS(PAST::Pattern::Match.HOW(), "parrotclass");
-    $parrotclass.add_vtable_override("get_bool", 
-                                     sub ($self) {
-                                         $self.Bool();
-                                     });
-
-    $parrotclass.add_method("!make",
-                            method ($ast) {
-                                pir::setattribute(self,  ~'$!ast', $ast);
+    $pc.add_vtable_override("get_bool", 
+                            method () {
+                                ?pir::getattribute__PPS(self,
+                                                        '$!success');
                             });
+
+    $pc.add_method("!make",
+                   method ($ast) {
+                       pir::setattribute(self,  ~'$!ast', $ast);
+                   });
 }
 
 # Local Variables:
