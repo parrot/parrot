@@ -383,7 +383,7 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
             $1 = $2->strlen;
             break;
           case STRINGINFO_EXTRA:
-            $1 = $2->extra;
+            $1 = PTR2UINTVAL($2->extra);
             break;
           default:
             {
