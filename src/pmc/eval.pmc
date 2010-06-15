@@ -57,30 +57,25 @@ clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
 {
     ASSERT_ARGS(clear_fixups)
 
-    INTVAL               i;
-    PackFile_ByteCode   * const seg = sub_data->seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
+    PackFile_ByteCode * const seg = sub_data->seg;
 
-    if (!seg)
-        return;
+    if (seg) {
+        PackFile_FixupTable * const ft = seg->fixups;
+        if (ft) {
+            PackFile_ConstTable * const ct = seg->const_table;
+            if (ct) {
+                INTVAL i;
+                for (i = 0; i < ft->fixup_count; ++i) {
+                    PackFile_FixupEntry * const e = ft->fixups + i;
 
-    ft = seg->fixups;
-    if (!ft)
-        return;
+                    if (e->type == enum_fixup_sub) {
+                        opcode_t  ci             = e->offset;
 
-    ct = seg->const_table;
-    if (!ct)
-        return;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        PackFile_FixupEntry * const e = ft->fixups + i;
-
-        if (e->type == enum_fixup_sub) {
-            opcode_t  ci             = e->offset;
-
-            ct->constants[ci]->u.key = NULL;
-            e->type                  = 0;
+                        ct->constants[ci]->u.key = NULL;
+                        e->type                  = 0;
+                    }
+                }
+            }
         }
     }
 }
@@ -92,34 +87,29 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 {
     ASSERT_ARGS(get_sub)
 
-    INTVAL                 i, n;
     Parrot_Sub_attributes *sub;
     PackFile_ByteCode     *seg;
-    PackFile_FixupTable   *ft;
-    PackFile_ConstTable   *ct;
 
     PMC_get_sub(interp, self, sub);
     seg = sub->seg;
 
-    if (!seg)
-        return PMCNULL;
+    if (seg) {
+        PackFile_FixupTable * const ft = seg->fixups;
+        if (ft) {
+            PackFile_ConstTable * const ct = seg->const_table;
+            if (ct) {
+                INTVAL i, n;
+                for (i = n = 0; i < ft->fixup_count; ++i) {
+                    const PackFile_FixupEntry * const e = ft->fixups + i;
 
-    ft = seg->fixups;
-    if (!ft)
-        return PMCNULL;
+                    if (e->type == enum_fixup_sub) {
+                        opcode_t ci = e->offset;
 
-    ct = seg->const_table;
-    if (!ct)
-        return PMCNULL;
-
-    for (i = n = 0; i < ft->fixup_count; ++i) {
-        const PackFile_FixupEntry * const e = ft->fixups + i;
-
-        if (e->type == enum_fixup_sub) {
-            opcode_t ci = e->offset;
-
-            if (n++ == idx)
-                return ct->constants[ci]->u.key;
+                        if (n++ == idx)
+                            return ct->constants[ci]->u.key;
+                    }
+                }
+            }
         }
     }
 
@@ -133,32 +123,27 @@ mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 
     Parrot_Sub_attributes *sub;
     PackFile_ByteCode   *seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
-    INTVAL               i;
 
     PMC_get_sub(interp, self, sub);
     seg = sub->seg;
 
-    if (!seg)
-        return;
+    if (seg) {
+        PackFile_FixupTable * const ft = seg->fixups;
+        if (ft) {
+            PackFile_ConstTable * const ct = seg->const_table;
+            if (ct) {
+                INTVAL i;
+                for (i = 0; i < ft->fixup_count; ++i) {
+                    const PackFile_FixupEntry * const e = ft->fixups + i;
 
-    ft = seg->fixups;
-    if (!ft)
-        return;
+                    if (e->type == enum_fixup_sub) {
+                        opcode_t  ci  = e->offset;
+                        PMC      *sub = ct->constants[ci]->u.key;
 
-    ct = seg->const_table;
-    if (!ct)
-        return;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        const PackFile_FixupEntry * const e = ft->fixups + i;
-
-        if (e->type == enum_fixup_sub) {
-            opcode_t  ci  = e->offset;
-            PMC      *sub = ct->constants[ci]->u.key;
-
-            Parrot_gc_mark_PMC_alive(interp, sub);
+                        Parrot_gc_mark_PMC_alive(interp, sub);
+                    }
+                }
+            }
         }
     }
 }
@@ -411,26 +396,24 @@ Unarchives the code.
     }
 
     VTABLE INTVAL elements() {
-        INTVAL               i, n;
+        INTVAL                 n = 0;
         Parrot_Sub_attributes *sub;
-        PackFile_ByteCode   *seg;
-        PackFile_FixupTable *ft;
+        PackFile_ByteCode     *seg;
 
         PMC_get_sub(INTERP, SELF, sub);
         seg = sub->seg;
 
-        if (!seg)
-            return 0;
+        if (seg) {
+            PackFile_FixupTable *const ft = seg->fixups;
+            if (ft) {
+                INTVAL i;
+                for (i = n = 0; i < ft->fixup_count; ++i) {
+                    const PackFile_FixupEntry * const e = ft->fixups + i;
 
-        ft = seg->fixups;
-        if (!ft)
-            return 0;
-
-        for (i = n = 0; i < ft->fixup_count; ++i) {
-            const PackFile_FixupEntry * const e = ft->fixups + i;
-
-            if (e->type == enum_fixup_sub)
-                ++n;
+                    if (e->type == enum_fixup_sub)
+                        ++n;
+                }
+            }
         }
 
         return n;
