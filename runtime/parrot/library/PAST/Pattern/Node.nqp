@@ -70,10 +70,6 @@ class PAST::Pattern::Node is PAST::Pattern {
         unless pir::defined__IP($pAttr) {
             return 1;
         }
-        unless pir::defined__IP($pAttr) {
-            $/.success(0);
-            return 0;
-        }
         my $nAttr := $node.attr($attribute, null, 0);
         my $result := 
           ($pAttr ~~ PAST::Pattern
