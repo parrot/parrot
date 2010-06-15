@@ -224,7 +224,7 @@ Extends the buffer by adding a byte of value C<value> to the end.
         INTVAL size;
 
         GET_ATTR_size(INTERP, SELF, size);
-        STATICSELF.set_integer_keyed_int(size, value);
+        SELF.set_integer_keyed_int(size, value);
     }
 
 /*
