@@ -1,0 +1,75 @@
+=head1 NAME
+
+PAST::Pattern::Node and subclasses - PAST::Pattern subclasses for matching specific node types.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+C<PAST::Pattern::Node> subclasses correspond to C<PAST::Node> subclasses. They match nodes of the corresponding types. If the pattern has child sub-patterns, the matched node must have the same number of children and each child of the node must match the corresponding child of the pattern. If the pattern has attribute sub-patterns, the matched node must have each attribute that the pattern has, and that attribute value must match the value of the corresponding attribute of the pattern.
+
+=head1 PAST::Pattern::Node is PAST::Pattern
+
+C<PAST::Pattern::Node> is the superclass for all the C<PAST::Pattern> types that are specific to a certain C<PAST::Node> subclass.
+
+=head2 Attributes
+
+Each attribute can contain a PAST::Pattern or other object with an C<ACCEPTS> method, an object that does the C<invokable> role(such as a C<Sub>), or any other object. If the value of an attribute does not have an C<ACCEPTS> method, C<PAST::Pattern::patternize> is called on it to produce an object that does. C<Invokable> objects are used to create C<PAST::Pattern::Closure> objects, which match any object for which their associated C<invokable> object returns true. For other objects without an C<ACCEPTS> method, the object is used to create a C<PAST::Pattern::Constant> object which matches any object for which the result of the C<is_equal> vtable of the object is true.
+
+Attributes can be set or accessed using hash indexing(in which case, you must manually call C<PAST::Pattern::patternize> if necessary), using the C<attr> method, or as named arguments to the C<new> method.
+
+The attributes of PAST::Nodes and their subclasses can be set or accessed using accessor methods with the appropriate name.
+
+PAST::Pattern::Node has attributes with accessors for the following PAST::Node or PCT::Node attributes:
+
+=over 4
+
+=item I<name>
+
+=item I<source>
+
+=item I<pos>
+
+=item I<returns>
+
+=item I<arity>
+
+=item I<name>
+
+=item I<flat>
+
+=item I<lvalue>
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<new([I<child0>, ...], [I<attrib0>=>I<value0>, ...])>
+
+Creates a new pattern with the supplied children and attribute values.
+
+=back
+
+=head2 Subroutines
+
+These subroutines are used in subclasses to simplify checking of attribute and child sub-patterns.
+
+=over 4
+
+=item C<check_attribute(I<pattern>, I<node>, I<attr>, I<match>)>
+
+Verifies that I<node>'s attribute I<attr> matches I<pattern>'s attribute I<attr>, if one exists. The success and attributes of I<match>, which should be a C<PAST::Pattern::Match> object, will are then modified appropriately. If a sub-pattern is not found, it returns 1. Otherwise, it returns the boolean value of the result of attempting to match I<node>'s I<attr> attribute with the sub-pattern. If there is a sub-pattern and it matches, then I<match>'s attribute I<attr> is set to the result. If the sub-pattern does not match, then the success value of I<match> will be set to 0.
+
+=item C<check_children(I<pattern>, I<node>, I<match>)>
+
+Verifies that the children of I<pattern> match the corresponding children of I<node>. The I<match> argument should be a C<PAST::Pattern::Match> variable. If there are no child sub-patterns of I<pattern> or all of the child sub-patterns match the corresponding children of I<node>, it returns 1. The children of I<match> with the same index as the child sub-patterns are set to the result of their matches if they are successful. If any child sub-patterns do not match the corresponding child of I<node>, the success value of I<match> is set to 0 and 0 is returned.
+
+=item C<check_node_attributes(I<pattern>, I<node>, I<match>)>
+
+A convenience sub for checking the PAST::Node attributes of I<pattern> and I<node>. C<check_attribute> is called with I<pattern>, I<node>, each attribute, and I<match>. The checking aborts as soon as any existing I<pattern> attribute does not match.
+
+=back
+
+=cut
