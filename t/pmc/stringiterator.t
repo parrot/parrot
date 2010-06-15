@@ -21,12 +21,13 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(21)
+    plan(22)
 
     test_clone()
     test_elements()
     iterate_forward() # 10 tests
     iterate_backward() # 8 tests
+    iterate_wrong() # 1 test
 
 .end
 
@@ -129,6 +130,27 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
   fail:
     pop_eh
     ok($I0, "Shifting from finished iterator throws exception")
+.end
+
+.sub 'iterate_wrong'
+    .local pmc s, it, ex
+    .local int r
+
+    s = new ['String']
+    s = 'BAZ'
+
+    it = iter s
+    push_eh catch_wrong
+    it = 42 # Let's hope we'll never have such direction
+    r = 0
+    goto dotest
+catch_wrong:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    r = 1
+dotest:
+    ok(r, "Caught wrong direction")
 .end
 
 # Local Variables:
