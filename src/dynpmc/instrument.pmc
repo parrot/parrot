@@ -101,23 +101,23 @@ Initializes the pmc and creates a child interpreter.
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         PMC *evt_key1, *evt_key2, *nothing;
         INTVAL evt_class_type;
-        
+
         /* Obtain the class type of Instrument::EventDispatcher. */
-		evt_key1 = key_new_cstring(INTERP, "Instrument");
-		evt_key2 = key_new_cstring(INTERP, "EventDispatcher");
-		key_append(INTERP, evt_key1, evt_key2);
-		
-		evt_class_type = Parrot_pmc_get_type(INTERP, evt_key1);
+        evt_key1 = key_new_cstring(INTERP, "Instrument");
+        evt_key2 = key_new_cstring(INTERP, "EventDispatcher");
+        key_append(INTERP, evt_key1, evt_key2);
+
+        evt_class_type = Parrot_pmc_get_type(INTERP, evt_key1);
 
         /* Create the child interpreter PMC */
         attr->supervised     = Parrot_new(INTERP);
         attr->probes         = Parrot_pmc_new(INTERP, enum_class_Hash);
         attr->evt_dispatcher = Parrot_pmc_new(INTERP, evt_class_type);
 
-		/* Initialise the event dispatcher */
-		(PMC *nothing) = PCCINVOKE(INTERP, attr->evt_dispatcher, "_self_init");
+        /* Initialise the event dispatcher */
+        (PMC *nothing) = PCCINVOKE(INTERP, attr->evt_dispatcher, "_self_init");
 
-        /* Initialize the runcore for the child interpreter */  
+        /* Initialize the runcore for the child interpreter */
         Instrument_runcore_init(attr->supervised, INTERP, SELF);
 
         /* Initialize the scheduler for the child interpreter */
@@ -197,7 +197,7 @@ Unknown keys are sent to the supervised interpreter.
         if (Parrot_str_equal(INTERP, name, item)) {
             return attr->probes;
         }
-        
+
         /* eventdispatcher: return the event dispatcher instance */
         name = CONST_STRING(INTERP, "eventdispatcher");
         if (Parrot_str_equal(INTERP, name, item)) {
@@ -325,10 +325,8 @@ and attribute 'instr_obj'. Set the 'instr_obj' to SELF and call the
         enable_method = VTABLE_find_method(INTERP, obj, CONST_STRING(INTERP, "_on_attach"));
         if (PMC_IS_NULL(enable_method)) {
             /* Error! Could not find the enable method. */
-            Parrot_ex_throw_from_c_args(
-                INTERP, NULL, 1,
-                "Could not locate the method '_on_attach'."
-            );
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Could not locate the method '_on_attach'.");
         }
 
         /* Call the method.
@@ -350,7 +348,7 @@ Insert a hook for the given op number.
 =cut
 
 */
-    
+
     METHOD insert_op_hook(PMC *id, INTVAL op_num, PMC *hook) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
@@ -359,7 +357,7 @@ Insert a hook for the given op number.
 
         if (index >= attr->supervised->op_count) {
             /* Invalid op num */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,"Invalid op number %d.", index);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "Invalid op number %d.", index);
         }
 
         if (list[index] == NULL) {
@@ -378,7 +376,7 @@ Removes a hook for the given op number.
 =cut
 
 */
-    
+
     METHOD remove_op_hook(PMC *id, INTVAL op_num, PMC *callback) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
@@ -388,7 +386,7 @@ Removes a hook for the given op number.
 
         if (index >= attr->supervised->op_count) {
             /* Invalid op num */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,"Invalid op number %d.", index);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "Invalid op number %d.", index);
         }
 
         if (list[index] != NULL) {
@@ -516,7 +514,7 @@ arg_type is as defined in parrot/op.h
         cc = CURRENT_CONTEXT(attr->supervised);
 
         switch (type) {
-          case PARROT_ARG_IC:            
+          case PARROT_ARG_IC:
             /* Integer constants are stored as part of the opcode
                in the packfile */
             ret = Parrot_pmc_new(INTERP, enum_class_Integer);
@@ -573,7 +571,7 @@ arg_type is as defined in parrot/op.h
             {
                 PMC *key;
                 key = (Parrot_pcc_get_constants(attr->supervised, cc)[arg])->u.key;
-                
+
                 VTABLE_set_string_native(INTERP, ret, VTABLE_get_string(attr->supervised, key));
             }
 
@@ -593,7 +591,7 @@ arg_type is as defined in parrot/op.h
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "Currently unhandled op arg type %d.", type );
+                                        "Currently unhandled op arg type %d.", type);
         };
 
         RETURN(PMC *ret);
@@ -608,11 +606,10 @@ arg_type is as defined in parrot/op.h
  * This is the simplified custom runops function.
  * This is based on the PARROT_FAST_RUNCORE.
  */
- 
+
 static
 opcode_t *
-Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc)
-{    
+Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc) {
     Instrument_runcore_t *core = (Instrument_runcore_t *) runcore;
     Parrot_Interp supervisor = core->supervisor_interp;
 
@@ -625,9 +622,9 @@ Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc
 
         Instrument_fire_hooks(pc, interp);
         DO_OP(pc, interp);
-        
+
         /* Todo: Move this to a probe. This detects loadlib opcodes. */
-        if(*pc_copy >= 96 && *pc_copy <= 101) {
+        if (*pc_copy >= 96 && *pc_copy <= 101) {
             detect_loadlib(interp);
         }
 
@@ -682,9 +679,9 @@ Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument
  * This is the initializer for the probe tables.
  * Probes are stored in the extended runcore_t.
  */
- 
+
 static void Instrument_init_probes(Parrot_Interp supervisor, Parrot_Interp supervised) {
-    Instrument_runcore_t    *core;
+    Instrument_runcore_t *core;
     INTVAL op_count;
 
     core     = (Instrument_runcore_t *) supervised->run_core;
@@ -779,43 +776,43 @@ static void detect_loadlib(PARROT_INTERP) {
     Instrument_runcore_t *core;
     Parrot_Interp supervisor;
     INTVAL old_count, new_count;
-    
+
     core          = (Instrument_runcore_t *) interp->run_core;
     supervisor    = core->supervisor_interp;
     super_dynlibs = supervisor->iglobals;
     old_dynlibs   = core->old_dynlibs;
     dynlibs       = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_DYN_LIBS);
-    
+
     /* Check if any libraries were loaded. */
     old_count = VTABLE_get_integer(supervisor, old_dynlibs);
     new_count = VTABLE_get_integer(interp, dynlibs);
-    
+
     if (old_count != new_count) {
         PMC *iter;
-    
+
         /* Normalise the vtables of both interps due to singletons. */
         normalise_vtables(interp, supervisor);
-        
+
         /* Before we normalise the op tables, we need to update the hooks table. */
         Instrument_init_probes(supervisor, interp);
         normalise_op_tables(interp, supervisor);
-        
+
         /* Look for the new dynlibs and raise an event about them. */
         iter = VTABLE_get_iter(interp, dynlibs);
         while (VTABLE_get_bool(interp, iter)) {
             PMC *key;
-            
+
             key = VTABLE_shift_pmc(interp, iter);
-            
+
             if (!VTABLE_exists_keyed(supervisor, old_dynlibs, key)) {
                 /* New lib detected. */
                 PMC *lib, *task, *task_hash, *task_data;
-                
+
                 lib = VTABLE_get_pmc_keyed(interp, dynlibs, key);
-                
+
                 task_data = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
                 VTABLE_push_string(supervisor, task_data, VTABLE_get_string(interp, lib));
-                
+
                 task_hash = Parrot_pmc_new(supervisor, enum_class_Hash);
                 VTABLE_set_string_keyed_str(supervisor, task_hash,
                                             CONST_STRING(supervisor, "type"),
@@ -827,16 +824,16 @@ static void detect_loadlib(PARROT_INTERP) {
                 VTABLE_set_pmc_keyed_str(supervisor, task_hash,
                                          CONST_STRING(supervisor, "data"),
                                          task_data);
-                
+
                 task = Parrot_pmc_new_init(supervisor, enum_class_Task, task_hash);
                 Parrot_cx_schedule_task(supervisor, task);
-                
+
                 /* Add lib to the old dynlib hash */
                 VTABLE_set_pmc_keyed(supervisor, old_dynlibs, key, lib);
             }
         }
     }
-    
+
     /* Force handling of any pending tasks in super. */
     Parrot_cx_handle_tasks(supervisor, supervisor->scheduler);
 }
@@ -863,7 +860,7 @@ static void normalise_vtables(Parrot_Interp src, Parrot_Interp dest) {
     for (i = dest->n_vtable_max; i < src->n_vtable_max; i++) {
         dest->vtables[i] = src->vtables[i];
     }
-    
+
     dest->n_vtable_max = src->n_vtable_max;
 }
 

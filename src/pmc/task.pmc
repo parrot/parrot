@@ -110,8 +110,6 @@ A C<Sub> or descendant PMC related to this task.
 
 An interpreter in which to execute this task.
 
-=back
-
 =item C<data>
 
 Additional data for the task.
@@ -175,7 +173,7 @@ Additional data for the task.
 
         core_struct->codeblock = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
         core_struct->data      = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
-        
+
         core_struct->interp = (Parrot_Interp)VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
     }
 

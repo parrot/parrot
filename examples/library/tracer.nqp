@@ -6,16 +6,15 @@
 
 examples/library/tracer.nqp - Implementation of the tracing runcore using the Instrument dynpmc
 
-=head1 SYNOPSIS
-
-    % ./parrot-nqp examples/library/tracer.nqp <file>
-
 =head1 DESCRIPTION
 
 A simple example of how to use the Instrument dynpmc in nqp.
 
+=head1 SYNOPSIS
+
+% ./parrot-nqp examples/library/tracer.nqp <file>
+
 =end
-=cut
 
 Q:PIR {
     load_bytecode 'Instrument/InstrumentLib.pbc'
@@ -41,12 +40,12 @@ sub tracer ($pc, $op, $instr_obj) {
     my $param_cnt    := pir::elements($op_code);
     my $params       := '';
     my $cur_arg      := 0;
-    
+
     my $arg_list     := [];
     while $cur_arg < $param_cnt {
         my $arg_str;
         my $arg_type := pir::set_i_p_ki__IPI($op_code, $cur_arg);
-        
+
         # Evaluate in order of:
         # 1. keys
         # 2. constants
@@ -60,7 +59,7 @@ sub tracer ($pc, $op, $instr_obj) {
                     # String constant key.
                     my $arg := $instr_obj.get_op_arg($op[$cur_arg + 1], $arg_type);
                     $arg_str := '["' ~ $arg ~ '"]';
-                    
+
                 } else {
                     # Integer constant key.
                     $arg_str := '[' ~ $op[$cur_arg + 1] ~ ']';
@@ -76,28 +75,28 @@ sub tracer ($pc, $op, $instr_obj) {
                     $arg_str := '[P' ~ $op[$cur_arg + 1] ~ ']';
                 }
             }
-            
+
             my $prev := $arg_list.pop();
             $arg_str := $prev ~ $arg_str;
-            
+
         } elsif pir::band__III($arg_type, 16) == 16
                 && pir::band__III($arg_type, 2) != 2 {
             my $arg := $instr_obj.get_op_arg($op[$cur_arg + 1], $arg_type);
-            
+
             if pir::band__III($arg_type, 1) == 1 {
                 $arg_str := '"' ~ $arg ~ '"';
-                
+
             } else {
                 $arg_str := $arg;
             }
         }  elsif !$arg_type {
             # 0 is int reg.
             $arg_str := 'I' ~ $op[$cur_arg + 1];
-            
+
         } elsif pir::band__III($arg_type, 1) == 1{
             # 1 is string reg.
             $arg_str := 'S' ~ $op[$cur_arg + 1];
-            
+
         } elsif pir::band__III($arg_type, 2) == 2 {
             # 2 is pmc.
             if pir::band__III($arg_type, 16) == 16 {
@@ -107,23 +106,23 @@ sub tracer ($pc, $op, $instr_obj) {
                 # Normal reg.
                 $arg_str := 'P' ~ $op[$cur_arg + 1];
             }
-            
+
         } elsif pir::band__III($arg_type, 3) == 3 {
             # 3 is num reg.
             $arg_str := 'N' ~ $op[$cur_arg + 1];
-            
+
         }
-        
+
         $arg_list.push($arg_str);
         $cur_arg++;
     }
-    
+
     my $prefix := ' ';
     for $arg_list {
         $params := $params ~ $prefix ~ $_;
         $prefix := ', '
     }
-    
+
     say($pc_hex ~ ' ' ~ $op_name ~ $params);
 };
 

@@ -40,7 +40,7 @@ Tests the low level interface provided by instrument.pmc.
     ok($I0, 'Instrument dynpmc loaded')
 
     .return()
-    
+
 .end
 
 .sub 'test_instantiate'
@@ -52,7 +52,7 @@ Tests the low level interface provided by instrument.pmc.
 
 .end
 
-.sub 'test_attach'    
+.sub 'test_attach'
     .local pmc mock_probe, instr
 
     mock_probe = new ['MockProbe']
