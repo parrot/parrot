@@ -21,12 +21,13 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(24)
+    plan(26)
 
     test_init()
     test_set_string()
     test_set_byte()
     test_get_string()
+    test_push()
     test_alloc()
     test_iterate()
     test_invalid()
@@ -175,6 +176,22 @@ doit:
 skip_it:
     skip(4, "this test needs ICU")
 end:
+.end
+
+.sub test_push
+    .local pmc bb
+    .local int c, n, m
+    bb = new ['ByteBuffer']
+    bb = 'hell'
+    n = elements bb
+    inc n
+    c = ord 'o'
+    push bb, c
+    m = elements bb
+    is(n, m, "push increments size")
+    .local string s
+    s = bb.'get_string_as'(ascii:"")
+    is(s, 'hello', "push gives expected string result")
 .end
 
 .sub test_alloc
