@@ -31,17 +31,10 @@ use base qw( Parrot::Docs::Section );
 use Parrot::Distribution;
 
 use Parrot::Docs::Section::Developer;
-#use Parrot::Docs::Section::Examples;
 use Parrot::Docs::Section::PMCs;
-#use Parrot::Docs::Section::C;
 use Parrot::Docs::Section::Ops;
-#use Parrot::Docs::Section::IMCC;
-#use Parrot::Docs::Section::Perl;
-#use Parrot::Docs::Section::Libs;
 use Parrot::Docs::Section::Tools;
 use Parrot::Docs::Section::Compilers;
-#use Parrot::Docs::Section::Config;
-#use Parrot::Docs::Section::Tests;
 use Parrot::Docs::Section::PDDs;
 use Parrot::Docs::Section::PCT_Tutorial;
 
@@ -74,7 +67,6 @@ sub new {
             '',
             $self->new_item( 'Running Parrot', 'docs/running.pod'),
             $self->new_item( 'Testing Parrot', 'docs/tests.pod'),
-#            Parrot::Docs::Section::Examples->new,
             $self->new_item( 'Developer FAQ', 'docs/gettingstarted.pod'),
             $self->new_item( 'Submitting Bug Reports & Patches', 'docs/submissions.pod' ),
         ),
@@ -122,13 +114,6 @@ sub new {
             $self->new_item( 'Chapter 4 Grammar Engine', 'docs/book/pct/ch04_pge.pod'),
             $self->new_item( 'Chapter 5 Grammar Actions', 'docs/book/pct/ch05_nqp.pod'),
         ),
-
-#        Parrot::Docs::Section::C->new,
-#        Parrot::Docs::Section::IMCC->new,
-#        Parrot::Docs::Section::Perl->new,
-#        Parrot::Docs::Section::Libs->new,
-#        Parrot::Docs::Section::Tests->new,
-#        Parrot::Docs::Section::Config->new,
     );
 }
 
@@ -164,38 +149,6 @@ sub write_docs {
 
     return;
 }
-
-=back
-
-=head1 SEE ALSO
-
-=over 4
-
-=item C<Parrot::Docs::Section::Info>
-
-=item C<Parrot::Docs::Section::Docs>
-
-=item C<Parrot::Docs::Section::Examples>
-
-=item C<Parrot::Docs::Section::PMCs>
-
-=item C<Parrot::Docs::Section::C>
-
-=item C<Parrot::Docs::Section::Ops>
-
-=item C<Parrot::Docs::Section::IMCC>
-
-=item C<Parrot::Docs::Section::Perl>
-
-=item C<Parrot::Docs::Section::Libs>
-
-=item C<Parrot::Docs::Section::Tools>
-
-=item C<Parrot::Docs::Section::Compilers>
-
-=item C<Parrot::Docs::Section::Config>
-
-=item C<Parrot::Docs::Section::Tests>
 
 =back
 

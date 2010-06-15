@@ -20,7 +20,7 @@
 #include "parrot/oplib.h"
 #include "parrot/runcore_api.h"
 
- op_lib_t *Parrot_DynOp_core_2_4_0(PARROT_INTERP, long init);
+ op_lib_t *Parrot_DynOp_core_2_5_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);

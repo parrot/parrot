@@ -156,15 +156,6 @@ address of the PMC. Uses of get_addr and set_addr that would set label values
 for Sub, Exception, and related PMC types will instead be handled by
 get_label and set_label.
 
-=item All bitwise ops [eligible in 2.1]
-
-All bitwise ops (all ops containing C<bitwise> in their names) will be provided
-by dynops.  B<NOTE>: Before removing the bitwise ops, make sure that the
-equivalent dynops are available and that the major HLLs (Rakudo, Partcl, Lua,
-etc) have switched to using them.
-
-L<https://trac.parrot.org/parrot/ticket/1260>
-
 =item get_results opcode order and features [eligible in 2.1]
 
 get_results no longer used to fetch exception object.
@@ -347,6 +338,12 @@ This function is an experimental addition to enhance and maybe replace
 Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
+
+=item Parrot_get_runtime_prefix [eligible in 2.7]
+
+Use Parrot_get_runtime_path instead.
+
+L<https://trac.parrot.org/parrot/ticket/1191>
 
 =back
 

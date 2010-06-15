@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/pmc/objects.t - Objects
+t/oo/objects.t - Objects
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/objects.t
+    % prove t/oo/objects.t
 
 =head1 DESCRIPTION
 

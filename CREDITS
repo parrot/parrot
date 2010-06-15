@@ -402,7 +402,7 @@ D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
 N: Gerd Pokorra
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0 and 2.3.0
+D: Release manager for 1.9.0, 2.3.0 and 2.5.0
 
 N: Goplat
 D: Win98 and other fixes.

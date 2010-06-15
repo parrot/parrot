@@ -635,9 +635,10 @@ $(LIBRARY_DIR)/Archive/Zip.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/i
 
 $(LIBRARY_DIR)/Configure/genfile.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+# Message.pbc and distutils.pbc load io_ops to work around TT #1663
+638	$(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
@@ -1798,7 +1799,7 @@ buildtools_tests : corevm
 manifest_tests :
 	$(PERL) t/harness $(MANIFEST_TEST_FILES)
 
-examples_tests :
+examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
 
 # benchmark tests
