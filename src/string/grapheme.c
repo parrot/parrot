@@ -161,6 +161,7 @@ add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
 UINTVAL
 get_grapheme_base(PARROT_INTERP, grapheme_table *table, int32_t codepoint)
 {
+    ASSERT_ARGS(get_grapheme_base)
     const int32_t index = -1 - codepoint;
 
     if (codepoint > 0)
