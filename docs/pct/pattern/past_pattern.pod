@@ -19,6 +19,16 @@ PAST::Pattern and its subclasses allow determining whether a PAST::Node matches 
 
 =head1 PAST::Pattern is Capture
 
+=head2 Subroutines
+
+=over 4
+
+=item C<patternize(I<value>)>
+
+Converts an object that is not a pattern(does not implement the C<ACCEPTS> method) into one that is. If I<value> does the C<invokable> role, it is used to create a C<PAST::Pattern::Closure> pattern. Otherwise, it is used to create a C<PAST::Pattern::Constant> pattern.
+
+=back
+
 =head2 Public Methods
 
 =over 4
@@ -53,7 +63,7 @@ Tests whether the specific node matches the pattern without recursing into child
 
 A helper method for defining attribute accessors.
 
-=item C<ACCEPTSGLOBALLY(I<node>)
+=item C<ACCEPTSGLOBALLY(I<node>)>
 
 Used by C<ACCEPTS> to implement global matching.
 
