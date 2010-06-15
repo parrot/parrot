@@ -1,9 +1,9 @@
 {
-    "release.version"  : "2.4.0",
-    "release.name"     : "Sulfur Crest",
+    "release.version"  : "2.5.0",
+    "release.name"     : "Cheops",
     "release.day"      : "Tuesday",
-    "release.date"     : "18 May 2010",
-    "release.nextdate" : "15 June 2010",
+    "release.date"     : "15 June 2010",
+    "release.nextdate" : "20 July 2010",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,13 +11,12 @@
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "12 June 2010",
+    "bugday.date"      : "17 July 2010",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2010_06_12",
+    "wiki.bugday"      : "bug_day_2010_07_17",
 
-    "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.4.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.5.0/",
     "subversion.root"  : "http://subversion.apache.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }

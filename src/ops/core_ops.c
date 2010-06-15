@@ -25138,7 +25138,7 @@ static void hop_deinit(PARROT_INTERP)
     }
 }
 op_lib_t *
-Parrot_DynOp_core_2_4_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_2_5_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -25167,7 +25167,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_4_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_5_0;
     dynop_register(interp, lib);
     return lib;
 }
