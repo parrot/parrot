@@ -94,6 +94,53 @@ C<setattribute> for the change to stick:
 
 =end PIR_FRAGMENT
 
+=head2 Instantiation
+
+With a created class, we can use the C<new> opcode to instantiate an object of
+that class in the same way we can instantiate a new PMC.
+
+=begin PIR_FRAGMENT
+
+    $P0 = newclass "Foo"
+    $P1 = new $P0
+
+=end PIR_FRAGMENT
+
+Or, if we don't have the class object handy, we can do it by name too:
+
+=begin PIR_FRAGMENT
+
+    $P1 = new "Foo"
+
+=end PIR_FRAGMENT
+
+PMCs have two VTABLE interface functions for dealing with instantiating a new
+object: C<init> and C<init_pmc>. The former is called when a new PMC is
+created, the later is called when a new PMC is created with an initialization
+argument. 
+
+=begin PIR_FRAGMENT
+
+    .namespace ["Foo"]
+    .sub 'init' :vtable
+        say "Creating a new Foo"
+    .end
+    
+    .sub 'init_pmc' :vtable
+        .param pmc args
+        print "Creating a new Foo with argument "
+        say args
+    .end
+    
+    .namespace[]
+    .sub 'main' :main
+        $P1 = new ['Foo']       # init
+        $P2 = new ['Foo'], $P1  # init_pmc
+    .end
+    
+=end PIR_FRAGMENT
+
+
 =head2 Methods
 
 X<methods>
