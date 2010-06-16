@@ -23,6 +23,7 @@ to be done on a child interpreter.
 #include "parrot/imcc.h"
 #include "parrot/runcore_api.h"
 #include "parrot/embed.h"
+#include "parrot/opsenum.h"
 
 /*
  * Structures for the linked list data type.
@@ -624,7 +625,12 @@ Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc
         DO_OP(pc, interp);
 
         /* Todo: Move this to a probe. This detects loadlib opcodes. */
-        if (*pc_copy >= 96 && *pc_copy <= 101) {
+        if (*pc_copy == enum_ops_loadlib_p_s
+         || *pc_copy == enum_ops_loadlib_p_sc
+         || *pc_copy == enum_ops_loadlib_p_s_p
+         || *pc_copy == enum_ops_loadlib_p_sc_p
+         || *pc_copy == enum_ops_loadlib_p_s_pc
+         || *pc_copy == enum_ops_loadlib_p_sc_pc) {
             detect_loadlib(interp);
         }
 
@@ -656,11 +662,11 @@ Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument
     */
     mem_copy_n_typed(coredata, interp->run_core, 1, Parrot_runcore_t);
 
-    coredata->name                 = string_from_literal(interp, "instrument");
+    coredata->name               = string_from_literal(interp, "instrument");
     coredata->runops             = Instrument_runcore_runops;
-    coredata->prepare_run         = NULL;
-    coredata->destroy             = NULL;
-    coredata->flags                 = 0;
+    coredata->prepare_run        = NULL;
+    coredata->destroy            = NULL;
+    coredata->flags              = 0;
     coredata->supervisor_interp  = supervisor;
     coredata->supervisor_pmc     = instrument;
     coredata->op_hooks           = NULL;
