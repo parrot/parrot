@@ -8,7 +8,7 @@ tools/docs/write_docs.pl - Write HTML documentation
 
 =head1 SYNOPSIS
 
-    % perl tools/docs/write_docs.pl [--silent] [--delete]
+    % perl tools/docs/write_docs.pl [--silent]
 
 =head1 DESCRIPTION
 
@@ -22,16 +22,15 @@ use lib 'lib';
 use Getopt::Long;
 use Parrot::Docs::Section::Parrot;
 
-my ( $silent, $delete, $version );
+my ( $silent, $version );
 
 die unless GetOptions( 'silent'    => \$silent,
-                       'delete'    => \$delete,
                        'version=s' => \$version,
                      );
 
 my $docs = Parrot::Docs::Section::Parrot->new;
 
-$docs->write_docs( $silent, $delete, $version );
+$docs->write_docs( $silent, $version );
 
 exit 0;
 

@@ -123,26 +123,19 @@ sub new {
 
 =over 4
 
-=item C<write_docs($silent, $delete)>
+=item C<write_docs($silent)>
 
 Writes the HTML documentation.
 
 If C<$silent> is true then progress is not reported.
-
-If C<$delete> is true then the contents of C<$target> will be deleted
-before any HTML is written. This argument is intended to be used only
-once by the root section, it is not passed to subsections.
 
 =cut
 
 sub write_docs {
     my $self    = shift;
     my $silent  = shift || 0;
-    my $delete  = shift || 0;
     my $version = shift || '';
     my $dist    = Parrot::Distribution->new;
-
-    $dist->delete_html_docs if $delete;
 
     $self->{VERSION} = $version;
     $self->write_html( $dist, $dist->html_docs_directory, $silent );

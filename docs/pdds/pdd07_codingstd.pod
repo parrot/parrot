@@ -886,11 +886,8 @@ Each comment should be of the form
 
     */
 
-This inline Pod documentation is parsed to HTML by running:
+This inline Pod documentation is transformed to HTML with:
 
-    $ perl tools/docs/write_docs.pl --delete
-
-or:
     $ make html
 
 =item Optimizations

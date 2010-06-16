@@ -761,18 +761,6 @@ sub html_docs_directory {
     return $self->docs_directory->directory_with_name('html');
 }
 
-=item C<delete_html_docs()>
-
-Deletes the HTML documentation directory.
-
-=cut
-
-sub delete_html_docs {
-    my $self = shift;
-
-    return $self->html_docs_directory->delete();
-}
-
 =item C<generated_files>
 
 Returns a hash where the keys are the files in F<MANIFEST.generated> and the
