@@ -94,7 +94,7 @@ sub footer {
             </div> <!-- "mainbody" -->
             <div id="divider"></div>
             <div id="footer">
-	        Copyright &copy; 2002-2009, Parrot Foundation.
+	        Copyright &copy; 2002-2010, Parrot Foundation.
 FOOTER
 
     $footer .= "\n<br>Parrot version $version" if $version;
