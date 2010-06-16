@@ -1,0 +1,52 @@
+=head1 NAME
+
+PAST::Pattern::Closure - A PAST::Pattern subclass for predicate functions.
+
+=head1 SYNOPSIS
+
+    pir::load_bytecode('PAST/Pattern.pbc');
+    my &isOdd := sub ($_) { $_ % 2 };
+    my $pattern := PAST::Val.new(:value(PAST::Pattern::Closure.new(&isOdd));
+    my $/ := $past ~~ $pattern;
+    say('$past ' ~ ($/ ?? 'had' !! 'did not have' ~ ' an odd :value.');
+    say('The value was ' ~ $<value>.from());
+
+=head1 DESCRIPTION
+
+A PAST::Pattern::Closure matches any pattern for which its associated subroutine or other invokable object returns a true result.
+
+=head1 PAST::Pattern::Closure is PAST::Pattern
+
+A PAST::Pattern::Closure contains a predicate subroutine or other object that can be invoked. This predicate sub is used to determine whether or not an object matches the pattern. If the predicate, when called with the object to be matched, produces a true result, the object matches the pattern. Otherwise, it does not.
+
+PAST::Pattern::patternize produces a PAST::Pattern::Closure when called with an object which provides the invokable role.
+
+=head2 Attributes
+
+=over 4
+
+=item code
+
+The code attribute holds the predicate invokable object that is used to determine whether the pattern matches an object.
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item new(code)
+
+Creates a PAST::Pattern::Closure with code as its associated predicate.
+
+=item code([value])
+
+If value is provided, set the code attribute of the pattern to value. Otherwise, return the current value of the code attribute.
+
+=item ACCEPTSEXACTLY(node)
+
+Used internally by the inherited ACCEPTS method to determine whether a node exactly matches the pattern.
+
+=back
+
+=cut
