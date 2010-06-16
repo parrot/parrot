@@ -21,13 +21,14 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(22)
+    plan(23)
 
     test_clone()
     test_elements()
     iterate_forward() # 10 tests
     iterate_backward() # 8 tests
     iterate_wrong() # 1 test
+    iterate_out() # 1 test
 
 .end
 
@@ -151,6 +152,56 @@ catch_wrong:
     r = 1
 dotest:
     ok(r, "Caught wrong direction")
+.end
+
+# out of bounds conditions not covered by previous tests
+.sub 'iterate_out'
+    .local pmc s, it, eh
+    s = new ['String']
+    s = 'hi'
+    it = iter s
+    .local string rs
+    rs = pop it
+    rs = pop it
+    eh = new ['ExceptionHandler']
+
+    # pop string
+    set_addr eh, catch1
+    push_eh eh
+    rs = pop it
+    goto fail
+catch1:
+    finalize eh
+
+    # pop integer
+    set_addr eh, catch2
+    .local int ri
+    ri = pop it
+    goto fail
+catch2:
+    finalize eh
+
+    # shift string
+    set_addr eh, catch3
+    .local int ri
+    rs = shift it
+    goto fail
+catch3:
+    finalize eh
+
+    # shift integer
+    set_addr eh, catch4
+    .local int ri
+    ri = shift it
+    goto fail
+catch4:
+    finalize eh
+
+    ok(1, "Caught out of bounds iterations")
+    goto end
+fail:
+    ok(0, "Out of bounds iteration should throw")
+end:
 .end
 
 # Local Variables:
