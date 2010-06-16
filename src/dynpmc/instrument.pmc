@@ -613,9 +613,31 @@ opcode_t *
 Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc) {
     Instrument_runcore_t *core = (Instrument_runcore_t *) runcore;
     Parrot_Interp supervisor = core->supervisor_interp;
+    Parrot_runloop exc_handler;
 
     /* Detect any dynlib loading, for example during load_bytecode. */
     detect_loadlib(interp);
+
+    /* Setup an exception handler to handle exits and unhandled exceptions. */
+    if(setjmp(exc_handler.resume)) {
+        /* Check for exit or unhandled exception. */
+        if(*pc == enum_ops_exit_i || *pc == enum_ops_exit_ic) {
+            /* Exit called. Do nothing but return so we
+               can go on to finalize the instruments. */
+        }
+        else {
+            /* Unhandled exception found.
+               Print the exception type for now. */
+            Parrot_io_printf(supervisor,
+                            "Unhandled exception of type %i found\n",
+                            VTABLE_get_integer_keyed_str(interp, exc_handler.exception,
+                                                         CONST_STRING(interp, "type")));
+        }
+        
+        return pc;
+    }
+
+    Parrot_ex_add_c_handler(interp, &exc_handler);
 
     while (pc) {
         opcode_t *pc_copy = pc;
