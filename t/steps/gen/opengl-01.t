@@ -54,14 +54,14 @@ SKIP: {
     # $real_opengl_status is false.  So we'll SKIP.
 
     $conf->replenish($serialized);
-    
+
     ########### verbose ###########
-    
+
     ($args, $step_list_ref) = process_options( {
         argv => [ q{--verbose} ],
         mode => q{configure},
     } );
-    
+
     $conf->add_steps($pkg);
     $conf->options->set( %{$args} );
     $step = test_step_constructor_and_description($conf);
@@ -90,16 +90,16 @@ SKIP: {
             "Got expected verbose output"
         );
     }
-    
+
     $conf->replenish($serialized);
-    
+
     ########### extra verbose ###########
-    
+
     ($args, $step_list_ref) = process_options( {
         argv => [ q{--verbose=3} ],
         mode => q{configure},
     } );
-    
+
     $conf->add_steps($pkg);
     $conf->options->set( %{$args} );
     $step = test_step_constructor_and_description($conf);
