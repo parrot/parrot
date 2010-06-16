@@ -18,9 +18,8 @@ Each attribute can contain a PAST::Pattern or other object with an C<ACCEPTS> me
 
 Attributes can be set or accessed using hash indexing(in which case, you must manually call C<PAST::Pattern::patternize> if necessary), using the C<attr> method, or as named arguments to the C<new> method.
 
-The attributes of PAST::Nodes and their subclasses can be set or accessed using accessor methods with the appropriate name.
-
-PAST::Pattern::Node has attributes with accessors for the following PAST::Node or PCT::Node attributes:
+The attributes of C<PAST::Nodes> and their subclasses can be set or accessed using accessor methods with the appropriate name.
+C<PAST::Pattern::Node> has attributes with accessors for the following C<PAST::Node> and C<PCT::Node> attributes:
 
 =over 4
 
@@ -46,7 +45,7 @@ PAST::Pattern::Node has attributes with accessors for the following PAST::Node o
 
 =over 4
 
-=item C<new([I<child0>, ...], [I<attrib0>=>I<value0>, ...])>
+=item new([child0, ...], [attrib0=>value0, ...])
 
 Creates a new pattern with the supplied children and attribute values.
 
@@ -71,5 +70,105 @@ Verifies that the children of I<pattern> match the corresponding children of I<n
 A convenience sub for checking the PAST::Node attributes of I<pattern> and I<node>. C<check_attribute> is called with I<pattern>, I<node>, each attribute, and I<match>. The checking aborts as soon as any existing I<pattern> attribute does not match.
 
 =back
+
+=head1 PAST::Pattern::Block is PAST::Pattern::Node
+
+C<PAST::Pattern::Block> patterns are used to match C<PAST::Block> nodes. Their attributes correspond to those of C<PAST::Block>.
+
+=head2 Attributes
+
+=over 4
+
+=item I<blocktype>
+
+=item I<closure>
+
+=item I<control>
+
+=item I<loadinit>
+
+=item I<namespace>
+
+=item I<multi>
+
+=item I<hll>
+
+=item I<nsentry>
+
+=item I<symtable>
+
+=item I<lexical>
+
+=item I<compiler>
+
+=item I<compiler_args>
+
+=item I<subid>
+
+=item I<pirflags>
+
+=back
+
+=head1 PAST::Pattern::Op is PAST::Pattern::Node
+
+C<PAST::Pattern::Op> patterns are used to match C<PAST::Op> nodes. Their attributes correspond to those of C<PAST::Op>.
+
+=head2 Attributes
+
+=over 4
+
+=item I<pasttype>
+
+=item I<pirop>
+
+=item I<inline>
+
+=back
+
+=head1 PAST::Pattern::Stmts is PAST::Pattern::Node
+
+C<PAST::Pattern::Stmts> patterns are used to match C<PAST::Stmts> nodes. They have no additional attributes beyond those of C<PAST::Pattern::Node>.
+
+=head1 PAST::Pattern::Val is PAST::Pattern::Node
+
+C<PAST::Pattern::Val> patterns are used to match C<PAST::Val> nodes. Their attributes correspond to those of C<PAST::Val>. Since C<PAST::Val> nodes cannot have I<lvalue> attributes, the I<lvalue> attribute of C<PAST::Pattern::Node> is unimportant for C<PAST::Pattern::Val> nodes.
+
+=head2 Attributes
+
+=over 4
+
+=item I<value>
+
+=back
+
+=head1 PAST::Pattern::Var is PAST::Pattern::Node
+
+C<PAST::Pattern::Var> patterns are used to match C<PAST::Var> nodes. Their attributes correspond to those of C<PAST::Var>.
+
+=head2 Attributes
+
+=over 4
+
+=item I<scope>
+
+=item I<isdecl>
+
+=item I<namespace>
+
+=item I<slurpy>
+
+=item I<call_sig>
+
+=item I<viviself>
+
+=item I<vivibase>
+
+=item I<multitype>
+
+=back
+
+=head1 PAST::Pattern::VarList is PAST::Pattern::Node
+
+C<PAST::Pattern::VarList> patterns are used to match C<PAST::VarList> nodes. They have no additional attributes beyond those of C<PAST::Pattern::Node>
 
 =cut
