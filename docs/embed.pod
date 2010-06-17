@@ -1105,12 +1105,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_get_integer_keyed_str>
 
-=item C<Parrot_PMC_get_intval>
-
-=item C<Parrot_PMC_get_intval_intkey>
-
-=item C<Parrot_PMC_get_intval_pmckey>
-
 =item C<Parrot_PMC_get_iter>
 
 =item C<Parrot_PMC_get_namespace>
