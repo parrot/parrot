@@ -23,11 +23,12 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(21)
+    plan(22)
 
     iterate_forward() # 8 tests
     iterate_backward() # 6 tests
     iterate_backward_string() # 6 test
+    iterate_wrong() # 1 test
     iterator_init() # 1 test
 .end
 
@@ -114,6 +115,26 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
   fail:
     pop_eh
     ok($I0, "Shifting from finished iterator throws exception - string")
+.end
+
+.sub 'iterate_wrong'
+    .local pmc foo, it, ex
+    .local int r
+
+    foo = new ['FixedIntegerArray'], 1
+
+    it = iter foo
+    push_eh catch_wrong
+    it = 42 # Let's hope we'll never have such direction
+    r = 0
+    goto dotest
+catch_wrong:
+    .get_results(ex)
+    finalize ex
+    r = 1
+dotest:
+    pop_eh
+    ok(r, "Caught wrong direction")
 .end
 
 .sub 'iterator_init'
