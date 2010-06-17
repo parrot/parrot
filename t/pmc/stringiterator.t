@@ -161,38 +161,39 @@ dotest:
     s = 'hi'
     it = iter s
     .local string rs
-    rs = pop it
-    rs = pop it
+    rs = shift it
+    rs = shift it
     eh = new ['ExceptionHandler']
-
-    # pop string
-    set_addr eh, catch1
     push_eh eh
-    rs = pop it
+
+    # shift string
+    set_addr eh, catch1
+    rs = shift it
     goto fail
 catch1:
     finalize eh
 
-    # pop integer
+    # shift integer
     set_addr eh, catch2
     .local int ri
-    ri = pop it
+    ri = shift it
     goto fail
 catch2:
     finalize eh
 
-    # shift string
+t3:
+    # pop string
     set_addr eh, catch3
     .local int ri
-    rs = shift it
+    rs = pop it
     goto fail
 catch3:
     finalize eh
 
-    # shift integer
+    # pop integer
     set_addr eh, catch4
     .local int ri
-    ri = shift it
+    ri = pop it
     goto fail
 catch4:
     finalize eh
