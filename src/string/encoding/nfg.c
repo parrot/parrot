@@ -504,10 +504,41 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 #if PARROT_HAS_ICU
     UChar32 *s   = (UChar32 *) i->str->strstart;
     size_t   pos = i->bytepos / sizeof (UChar32);
-    s[pos++] = (UChar32) c;
-    ++i->charpos;
-    i->bytepos = pos * sizeof (UChar32);
-    /* TODO: properly compose stuff here. */
+	if (!ISCOMBINING(c)) {
+        s[pos++] = (UChar32) c;
+        ++i->charpos;
+        i->bytepos = pos * sizeof (UChar32);
+    }
+    // TODO: This can create dynamic graphemes for valid Unicode compositions.
+	else {
+	    int32_t  prev = s[pos - 1];
+        grapheme g;
+		if (prev < 0) {
+		    grapheme_table *table = (grapheme_table *) i->str->extra;
+            g.len = table->graphemes[-1 - prev].len + 1;
+            g.hash = table->graphemes[-1 - prev].hash;
+            g.hash += g.hash << 5;
+            g.hash += c;
+            g.codepoints = mem_gc_allocate_n_typed(interp, g.len, UChar32);
+			memcpy(g.codepoints, table->graphemes[-1 - prev].codepoints,
+                   g.len * sizeof (UChar))
+        }
+        else {
+            g.len  = 2;
+            g.hash = 0xffff;
+            g.codepoints = mem_gc_allocate_n_typed(interp, g.len, UChar32);
+
+            g.codepoints[0] = prev;
+            g.hash += g.hash << 5;
+            g.hash += prev;
+
+            g.codepoints[1] = c;
+            g.hash += g.hash << 5;
+            g.hash += c;
+        }
+	    s[pos - 1] = add_grapheme(interp, (grapheme_table *) i->str->extra, &g);
+		mem_gc_free(interp, g.codepoints);
+    }
 #else
     UNUSED(i);
     no_ICU_lib(interp);
