@@ -14,7 +14,7 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
 
 .include 'call_bits.pasm'
 .loadlib 'bit_ops'
-.loadlib 'instrument'
+.loadlib 'instrument_group'
 
 .sub '__instrument_lib_init' :init :load :anon
     .local pmc lib

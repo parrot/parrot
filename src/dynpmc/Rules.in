@@ -178,10 +178,17 @@ src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/subproxy.pmc
 	
 
-$(DYNEXT_DIR)/instrument$(LOAD_EXT): src/dynpmc/instrument$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/instrument$(LOAD_EXT) src/dynpmc/instrument$(O) $(LINKARGS)
+$(DYNEXT_DIR)/instrument_group$(LOAD_EXT): $(DYNPMC_INSTRUMENT_OBJS) src/dynpmc/instrument_group$(O)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/instrument_group$(LOAD_EXT) src/dynpmc/instrument_group$(O) $(DYNPMC_INSTRUMENT_OBJS) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+
+src/dynpmc/instrument_group$(O): src/dynpmc/instrument.c src/dynpmc/instrumentop.c $(DYNPMC_H_FILES)
+
+src/dynpmc/instrument_group.c: $(DYNPMC_INSTRUMENT_OBJS)
+	$(PMC2C) --library instrument_group --c $(DYNPMC_INSTRUMENT)
+	$(MV) instrument_group.c src/dynpmc/instrument_group.c
+	$(MV) instrument_group.h src/dynpmc/instrument_group.h
 
 src/dynpmc/pmc_instrument.h : src/dynpmc/instrument.c
 
@@ -194,4 +201,13 @@ src/dynpmc/instrument.c: src/dynpmc/instrument.dump
 src/dynpmc/instrument.dump: src/dynpmc/instrument.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/instrument.pmc
 
+src/dynpmc/pmc_instrumentop.h : src/dynpmc/instrumentop.c
 
+src/dynpmc/instrumentop$(O): src/dynpmc/instrumentop.c $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_instrumentop.h
+
+src/dynpmc/instrumentop.c: src/dynpmc/instrumentop.dump
+	$(PMC2CC) src/dynpmc/instrumentop.pmc
+
+src/dynpmc/instrumentop.dump: src/dynpmc/instrumentop.pmc vtable.dump $(CLASS_O_FILES)
+	$(PMC2CD) src/dynpmc/instrumentop.pmc

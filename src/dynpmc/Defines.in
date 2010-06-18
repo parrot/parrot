@@ -11,7 +11,7 @@ DYNPMC_TARGETS = \
     $(DYNEXT_DIR)/rotest$(LOAD_EXT) \
     $(DYNEXT_DIR)/rational$(LOAD_EXT) \
     $(DYNEXT_DIR)/subproxy$(LOAD_EXT) \
-    $(DYNEXT_DIR)/instrument$(LOAD_EXT) 
+    $(DYNEXT_DIR)/instrument_group$(LOAD_EXT)
 
 DYNPMC_FOO = \
     src/dynpmc/foo.pmc \
@@ -20,6 +20,14 @@ DYNPMC_FOO = \
 DYNPMC_FOO_OBJS = \
     src/dynpmc/foo$(O) \
     src/dynpmc/foo2$(O)
+
+DYNPMC_INSTRUMENT = \
+    src/dynpmc/instrument.pmc \
+    src/dynpmc/instrumentop.pmc
+
+DYNPMC_INSTRUMENT_OBJS = \
+    src/dynpmc/instrument$(O) \
+    src/dynpmc/instrumentop$(O)
 
 DYNPMC_H_FILES = \
     include/parrot/caches.h \

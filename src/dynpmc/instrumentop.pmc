@@ -1,0 +1,58 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/instrumentop.pmc - Interface to current executing opcode info.
+
+=head1 DESCRIPTION
+
+C<InstrumentOp> is a PMC class that provides an interface to obtain
+information about the current executing op.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass InstrumentOp auto_attrs dynpmc group instrument_group {
+    ATTR Parrot_Interp  interp;
+    ATTR opcode_t      *pc;
+
+    VTABLE void init() {
+        SETATTR_InstrumentOp_interp(INTERP, SELF, NULL);
+        SETATTR_InstrumentOp_pc(INTERP, SELF, NULL);
+    }
+
+    VTABLE void init_pmc(PMC *interp_pmc) {
+        Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
+
+        attr->interp = (Parrot_Interp) VTABLE_get_pointer(INTERP, interp_pmc);
+        attr->pc     = NULL;
+    }
+
+    VTABLE void set_pointer(void *vptr_pc) {
+        SETATTR_InstrumentOp_pc(INTERP, SELF, (opcode_t *) vptr_pc);
+    }
+
+    VTABLE void * get_pointer() {
+        opcode_t *pc;
+        GETATTR_InstrumentOp_pc(INTERP, SELF, pc);
+
+        return (void *) pc;
+    }
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

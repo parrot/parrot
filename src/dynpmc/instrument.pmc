@@ -85,7 +85,7 @@ static PMC          *probe_list_pop(PARROT_INTERP, probe_list_t *list);
 static PMC          *probe_list_remove(PARROT_INTERP, probe_list_t *list, probe_node_t *node);
 static probe_node_t *probe_list_find(PARROT_INTERP, probe_list_t *list, PMC *val);
 
-pmclass Instrument auto_attrs dynpmc provides hash {
+pmclass Instrument auto_attrs dynpmc provides hash group instrument_group {
     ATTR Parrot_Interp  supervised;  /* The interpreter running the code */
     ATTR PMC           *probes;      /* A list of probes registered. */
     ATTR PMC           *evt_dispatcher;
