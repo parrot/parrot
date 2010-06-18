@@ -47,8 +47,10 @@ packfile-c.pod: ../src/packfile.c
 clean:
 	$(RM_F) packfile-c.pod $(POD) doc-prep
 
-html: all
+html-old: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
+html: all
+	$(PERL) -I../lib ../tools/docs/make_html_docs.pl --version=$(VERSION)
 
 # The pdf target is to generate a parrot PDF document.
 # If you are missing the command 'pdflatex' then you have first to install a
