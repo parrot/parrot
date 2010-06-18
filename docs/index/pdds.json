@@ -1,0 +1,11 @@
+{
+   "page" : "pdds",
+   "content" : [
+      {
+         "source" : "docs/pdds/**",
+         "type" : "group",
+         "title" : "Design Documents"
+      }
+   ],
+   "title" : "Parrot Design Documents (PDDs)"
+}

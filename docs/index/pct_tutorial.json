@@ -1,0 +1,21 @@
+{
+   "page" : "PCT_Tutorial",
+   "content" : [
+      {
+         "source" : [
+            "examples/languages/squaak/doc/tutorial_episode_1.pod",
+            "examples/languages/squaak/doc/tutorial_episode_2.pod",
+            "examples/languages/squaak/doc/tutorial_episode_3.pod",
+            "examples/languages/squaak/doc/tutorial_episode_4.pod",
+            "examples/languages/squaak/doc/tutorial_episode_5.pod",
+            "examples/languages/squaak/doc/tutorial_episode_6.pod",
+            "examples/languages/squaak/doc/tutorial_episode_7.pod",
+            "examples/languages/squaak/doc/tutorial_episode_8.pod",
+            "examples/languages/squaak/doc/tutorial_episode_9.pod"
+         ],
+         "type" : "group",
+         "title" : "Tutorial of Parrot Compiler Tools"
+      }
+   ],
+   "title" : "PCT_Tutorial"
+}

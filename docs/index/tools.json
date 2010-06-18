@@ -1,0 +1,74 @@
+{
+   "page" : "tools",
+   "content" : [
+      {
+         "source" : [
+            "tools/dev/as2c.pl",
+            "tools/build/vtable_h.pl",
+            "tools/build/vtable_extend.pl"
+         ],
+         "type" : "group",
+         "title" : "Configuration"
+      },
+      {
+         "source" : [
+            "docs/configuration.pod",
+            "tools/build/c2str.pl",
+            "tools/build/parrot_config_c.pl",
+            "tools/build/pmc2c.pl",
+            "tools/dev/install_files.pl",
+            "tools/dev/mk_manifest_and_skip.pl",
+            "tools/dev/symlink.pl",
+            "tools/dev/mk_native_pbc"
+         ],
+         "type" : "group",
+         "title" : "Building"
+      },
+      {
+         "source" : [
+            "parrotbug",
+            "tools/dev/manicheck.pl",
+            "docs/tests.pod"
+         ],
+         "type" : "group",
+         "title" : "Testing"
+      },
+      {
+         "source" : [
+            "tools/dev/lib_deps.pl",
+            "tools/dev/parrot_coverage.pl",
+            "tools/docs/write_docs.pl"
+         ],
+         "type" : "group",
+         "title" : "Documentation"
+      },
+      {
+         "source" : [
+            "tools/dev/bench_op.pir",
+            "tools/dev/parrotbench.pl"
+         ],
+         "type" : "group",
+         "title" : "Benchmarking"
+      },
+      {
+         "source" : [
+            "tools/dev/list_unjitted.pl",
+            "tools/dev/gen_class.pl",
+            "tools/dev/nm.pl",
+            "tools/util/ncidef2pasm.pl",
+            "tools/dev/pbc_header.pl"
+         ],
+         "type" : "group",
+         "title" : "Utilities"
+      },
+      {
+         "source" : [
+            "docs/debug.pod",
+            "docs/debugger.pod"
+         ],
+         "type" : "group",
+         "title" : "Debugging"
+      }
+   ],
+   "title" : "Tools"
+}
