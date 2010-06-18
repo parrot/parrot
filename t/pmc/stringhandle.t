@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 
 =head1 NAME
 
@@ -542,6 +542,22 @@ ok:
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<"OUTPUT", "is_closed" );
+.sub main
+    .local pmc sh
+    .local int i
+    sh = new ['StringHandle']
+    i = sh.'is_closed'()
+    say i
+    sh.'open'("foo", "w")
+    i = sh.'is_closed'()
+    say i
+.end
+CODE
+1
+0
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed stringhandle" );
