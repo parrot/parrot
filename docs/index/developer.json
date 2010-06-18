@@ -1,5 +1,5 @@
 {
-   "page" : "ops",
+   "page" : "developer",
    "content" : [
       {
          "source" : [
@@ -29,5 +29,5 @@
          "title" : "Articles"
       }
    ],
-   "title" : "Opcodes"
+   "title" : "Developer Documentation"
 }
