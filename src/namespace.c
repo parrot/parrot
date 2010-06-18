@@ -367,8 +367,8 @@ Parrot_ns_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc
 
 /*
 
-=item C<PMC * Parrot_ns_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING
-*str_key)>
+=item C<PMC * Parrot_ns_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns,
+STRING *str_key)>
 
 Find the namespace relative to the namespace C<base_ns> with the string key
 C<str_key>.  Return the namespace, or NULL if not found.
@@ -523,8 +523,8 @@ Parrot_ns_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *
 
 /*
 
-=item C<void Parrot_ns_set_global(PARROT_INTERP, PMC *ns, STRING *globalname, PMC
-*val)>
+=item C<void Parrot_ns_set_global(PARROT_INTERP, PMC *ns, STRING *globalname,
+PMC *val)>
 
 Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
@@ -544,7 +544,8 @@ Parrot_ns_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
 /*
 
-=item C<PMC * Parrot_ns_find_namespace_global(PARROT_INTERP, PMC *ns, STRING *globalname)>
+=item C<PMC * Parrot_ns_find_namespace_global(PARROT_INTERP, PMC *ns, STRING
+*globalname)>
 
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
@@ -584,7 +585,8 @@ Parrot_ns_find_namespace_global(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_ns_find_current_namespace_global(PARROT_INTERP, STRING *globalname)>
+=item C<PMC * Parrot_ns_find_current_namespace_global(PARROT_INTERP, STRING
+*globalname)>
 
 Finds and returns the data time named C<globalname> in the current namespace.
 
@@ -686,8 +688,8 @@ Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 
 /*
 
-=item C<PMC * Parrot_ns_find_global_from_op(PARROT_INTERP, PMC *ns, STRING *globalname,
-void *next)>
+=item C<PMC * Parrot_ns_find_global_from_op(PARROT_INTERP, PMC *ns, STRING
+*globalname, void *next)>
 
 If the global exists in the given namespace PMC, return it.  If not, return
 PMCNULL. Throw an exception if a NULL name is passed.
@@ -718,7 +720,8 @@ Parrot_ns_find_global_from_op(PARROT_INTERP, ARGIN(PMC *ns),
 
 /*
 
-=item C<PMC * Parrot_ns_find_named_item(PARROT_INTERP, STRING *name, void *next)>
+=item C<PMC * Parrot_ns_find_named_item(PARROT_INTERP, STRING *name, void
+*next)>
 
 TT #1223 - THIS IS BROKEN - it doesn't walk up the scopes yet
 
