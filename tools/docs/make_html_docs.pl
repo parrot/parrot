@@ -8,7 +8,7 @@ tools/docs/make_html_docs.pl - Write HTML documentation
 
 =head1 SYNOPSIS
 
-    % perl tools/docs/make_html_docs.pl [--silent] [--version]
+    % perl tools/docs/make_html_docs.pl --version
 
 =head1 DESCRIPTION
 
@@ -24,11 +24,11 @@ use Fatal qw/open close/;
 use Getopt::Long;
 use JSON;
 
-my ( $silent, $version );
+my ( $version );
 
-die unless GetOptions( 'silent'    => \$silent,
-                       'version=s' => \$version,
-                     );
+die unless GetOptions( 'version=s' => \$version );
+
+die "Usage: $0 --version\n" unless $version;
 
 my $json = JSON->new();
 
