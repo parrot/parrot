@@ -54,6 +54,7 @@ typedef struct Instrument_runcore_t {
     INTVAL                   flags;
 
     /* End of common members */
+    INTVAL                    has_ended;
     Parrot_Interp             supervisor_interp;
     PMC                      *supervisor_pmc;
     probe_list_t            **op_hooks;
@@ -636,25 +637,34 @@ Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc
     /* Setup an exception handler to handle exits and unhandled exceptions. */
     if (setjmp(exc_handler.resume)) {
         /* Check for exit or unhandled exception. */
+        Parrot_Context_info info;
+        INTVAL ret = Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
+
         if (*pc == enum_ops_exit_i || *pc == enum_ops_exit_ic) {
-            /* Exit called. Do nothing but return so we
-               can go on to finalize the instruments. */
+            /* Exit called. */
+            Parrot_io_eprintf(supervisor, "Exit called in file \"%Ss\" line %d.\n",
+                             info.file, info.line);
         }
         else {
-            /* Unhandled exception found.
-               Print the exception type for now. */
-            Parrot_io_printf(supervisor,
-                            "Unhandled exception of type %i found\n",
-                            VTABLE_get_integer_keyed_str(interp, exc_handler.exception,
-                                                         CONST_STRING(interp, "type")));
+            /* Unhandled exception found. */
+            INTVAL type = VTABLE_get_integer_keyed_str(interp, exc_handler.exception,
+                                                         CONST_STRING(interp, "type"));
+            STRING *message = VTABLE_get_string(interp, exc_handler.exception);
+            Parrot_io_eprintf(supervisor,
+                            "Unhandled exception of type (%d) thrown in file \"%Ss\" line %d,\n"
+                            "with message \"%Ss\".\n",
+                            type, info.file, info.line, message);
         }
+
+         /* Set the flag to exit all runloops. */
+         core->has_ended = 1;
 
         return pc;
     }
 
     Parrot_ex_add_c_handler(interp, &exc_handler);
 
-    while (pc) {
+    while (pc && !(core->has_ended)) {
         opcode_t *pc_copy = pc;
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
 
@@ -709,6 +719,7 @@ Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument
     coredata->op_hooks           = NULL;
     coredata->op_catchall        = NULL;
     coredata->old_dynlibs        = VTABLE_clone(supervisor, dynlibs);
+    coredata->has_ended          = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *)coredata);
 
