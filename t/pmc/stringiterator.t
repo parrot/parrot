@@ -21,11 +21,11 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(23)
+    plan(24)
 
     test_clone()
     test_elements()
-    iterate_forward() # 10 tests
+    iterate_forward() # 11 tests
     iterate_backward() # 8 tests
     iterate_wrong() # 1 test
     iterate_out() # 1 test
@@ -83,6 +83,9 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     $S0 = shift it
     ok(it, "Can shift 1st character")
     is($S0, 'b', "With correct value")
+
+    $S0 = it[0]
+    is($S0, 'a', "can get string keyed int correct value")
 
     $S0 = shift it
     ok(it, "Can shift 2nd character")
