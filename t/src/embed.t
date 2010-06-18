@@ -451,7 +451,7 @@ run(PARROT_INTERP, int argc, cosnt char *argv[])
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
-    entry = Parrot_find_global_cur(interp, smain);
+    entry = Parrot_ns_find_current_namespace_global(interp, smain);
 
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
@@ -516,7 +516,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
-    entry = Parrot_find_global_cur(interp, smain);
+    entry = Parrot_ns_find_current_namespace_global(interp, smain);
 
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
@@ -607,7 +607,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
-    entry = Parrot_find_global_cur(interp, smain);
+    entry = Parrot_ns_find_current_namespace_global(interp, smain);
 
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
@@ -698,7 +698,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
-    entry = Parrot_find_global_cur(interp, smain);
+    entry = Parrot_ns_find_current_namespace_global(interp, smain);
 
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
@@ -788,7 +788,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
-    entry = Parrot_find_global_cur(interp, smain);
+    entry = Parrot_ns_find_current_namespace_global(interp, smain);
 
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);

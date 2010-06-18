@@ -329,9 +329,9 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
 {
     ASSERT_ARGS(Parrot_mmd_find_multi_from_long_sig)
     STRING * const multi_str = CONST_STRING(interp, "MULTI");
-    PMC    * const ns        = Parrot_make_namespace_keyed_str(interp,
+    PMC    * const ns        = Parrot_ns_make_namespace_keyed_str(interp,
                                     interp->root_namespace, multi_str);
-    PMC    * const multi_sub = Parrot_get_global(interp, ns, name);
+    PMC    * const multi_sub = Parrot_ns_get_global(interp, ns, name);
 
     if (PMC_IS_NULL(multi_sub)) {
         return PMCNULL;
@@ -844,7 +844,7 @@ mmd_search_by_sig_obj(PARROT_INTERP, ARGIN(STRING *name),
     if (PMC_IS_NULL(ns))
         return;
 
-    multi_sub = Parrot_get_global(interp, ns, name);
+    multi_sub = Parrot_ns_get_global(interp, ns, name);
 
     if (PMC_IS_NULL(multi_sub))
         return;
@@ -868,9 +868,9 @@ mmd_search_global(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *cl))
 {
     ASSERT_ARGS(mmd_search_global)
     STRING * const multi_str = CONST_STRING(interp, "MULTI");
-    PMC    * const ns        = Parrot_get_namespace_keyed_str(interp,
+    PMC    * const ns        = Parrot_ns_get_namespace_keyed_str(interp,
                                     interp->root_namespace, multi_str);
-    PMC           *multi_sub = Parrot_get_global(interp, ns, name);
+    PMC           *multi_sub = Parrot_ns_get_global(interp, ns, name);
 
     if (PMC_IS_NULL(multi_sub))
         return;
@@ -896,13 +896,13 @@ mmd_add_multi_global(PARROT_INTERP, ARGIN(STRING *sub_name), ARGIN(PMC *sub_obj)
 {
     ASSERT_ARGS(mmd_add_multi_global)
     STRING * const multi_str = CONST_STRING(interp, "MULTI");
-    PMC    * const ns        = Parrot_make_namespace_keyed_str(interp,
+    PMC    * const ns        = Parrot_ns_make_namespace_keyed_str(interp,
                                     interp->root_namespace, multi_str);
-    PMC           *multi_sub = Parrot_get_global(interp, ns, sub_name);
+    PMC           *multi_sub = Parrot_ns_get_global(interp, ns, sub_name);
 
     if (PMC_IS_NULL(multi_sub)) {
         multi_sub = Parrot_pmc_new_constant(interp, enum_class_MultiSub);
-        Parrot_set_global(interp, ns, sub_name, multi_sub);
+        Parrot_ns_set_global(interp, ns, sub_name, multi_sub);
     }
 
     PARROT_ASSERT(multi_sub->vtable->base_type == enum_class_MultiSub);
@@ -930,12 +930,12 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
                         interp->HLL_namespace,
                         Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-    PMC * const ns     = Parrot_make_namespace_keyed_str(interp, hll_ns, ns_name);
-    PMC        *multi_sub = Parrot_get_global(interp, ns, sub_name);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed_str(interp, hll_ns, ns_name);
+    PMC        *multi_sub = Parrot_ns_get_global(interp, ns, sub_name);
 
     if (PMC_IS_NULL(multi_sub)) {
         multi_sub = Parrot_pmc_new_constant(interp, enum_class_MultiSub);
-        Parrot_set_global(interp, ns, sub_name, multi_sub);
+        Parrot_ns_set_global(interp, ns, sub_name, multi_sub);
     }
 
     PARROT_ASSERT(multi_sub->vtable->base_type == enum_class_MultiSub);
