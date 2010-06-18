@@ -2,7 +2,10 @@
    "page" : "pdds",
    "content" : [
       {
-         "source" : "docs/pdds/**",
+         "source" : [
+             "docs/pdds/*",
+             "docs/pdds/draft/*"
+         ], 
          "title" : "Design Documents"
       }
    ],
