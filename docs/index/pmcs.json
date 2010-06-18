@@ -5,7 +5,6 @@
          "source" : [
             "tools/dev/gen_class.pl"
          ],
-         "type" : "group",
          "title" : "Tools"
       },
       {
@@ -13,12 +12,10 @@
             "src/pmc/default.pmc",
             "src/pmc/scalar.pmc"
          ],
-         "type" : "group",
          "title" : "Abstract PMCs"
       },
       {
          "source" : "src/pmc/*.pmc",
-         "type" : "group",
          "title" : "Abstract PMCs",
          "exclude" : [
             "src/pmc/default.pmc",
@@ -27,7 +24,6 @@
       },
       {
          "source" : "src/dynpmc/*.pmc",
-         "type" : "group",
          "title" : "Dynamic PMCs"
       }
    ],

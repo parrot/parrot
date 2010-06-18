@@ -3,12 +3,10 @@
    "content" : [
       {
          "source" : "src/ops/*.ops",
-         "type" : "group",
          "title" : "Opcode Libraries"
       },
       {
          "source" : "src/dynoplibs/*.ops",
-         "type" : "group",
          "title" : "Dynamic Opcode Libraries"
       }
    ],

@@ -10,12 +10,10 @@
             "docs/embed.pod",
             "docs/porting_intro.pod"
          ],
-         "type" : "group",
          "title" : "Internals"
       },
       {
          "source" : "docs/dev/*",
-         "type" : "group",
          "title" : "Development Notes"
       },
       {
@@ -25,7 +23,6 @@
             "docs/pmc/struct.pod",
             "docs/pmc/subs.pod"
          ],
-         "type" : "group",
          "title" : "Articles"
       }
    ],

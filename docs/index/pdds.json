@@ -3,7 +3,6 @@
    "content" : [
       {
          "source" : "docs/pdds/**",
-         "type" : "group",
          "title" : "Design Documents"
       }
    ],

@@ -12,7 +12,6 @@
             "docs/glossary.pod",
             "docs/project/support_policy.pod"
          ],
-         "type" : "group",
          "title" : "Introduction"
       },
       {
@@ -22,7 +21,6 @@
             "docs/gettingstarted.pod",
             "docs/submissions.pod"
          ],
-         "type" : "group",
          "title" : "Working with Parrot"
       },
       {
@@ -33,7 +31,6 @@
             "docs/book/pct/ch05_nqp.pod",
             "docs/compiler_faq.pod"
          ],
-         "type" : "group",
          "title" : "Implementing Languages on Parrot"
       },
       {
@@ -46,21 +43,18 @@
             ":tools",
             "editor/README.pod"
          ],
-         "type" : "group",
          "title" : "Design, Internals & Development"
       },
       {
          "source" : [
             "docs/book/pir/*"
          ],
-         "type" : "group",
          "title" : "PIR Book"
       },
       {
          "source" : [
             "docs/book/pir/*"
          ],
-         "type" : "group",
          "title" : "PCT Book"
       }
    ],

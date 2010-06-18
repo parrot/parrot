@@ -7,7 +7,6 @@
             "tools/build/vtable_h.pl",
             "tools/build/vtable_extend.pl"
          ],
-         "type" : "group",
          "title" : "Configuration"
       },
       {
@@ -21,7 +20,6 @@
             "tools/dev/symlink.pl",
             "tools/dev/mk_native_pbc"
          ],
-         "type" : "group",
          "title" : "Building"
       },
       {
@@ -30,7 +28,6 @@
             "tools/dev/manicheck.pl",
             "docs/tests.pod"
          ],
-         "type" : "group",
          "title" : "Testing"
       },
       {
@@ -39,7 +36,6 @@
             "tools/dev/parrot_coverage.pl",
             "tools/docs/write_docs.pl"
          ],
-         "type" : "group",
          "title" : "Documentation"
       },
       {
@@ -47,7 +43,6 @@
             "tools/dev/bench_op.pir",
             "tools/dev/parrotbench.pl"
          ],
-         "type" : "group",
          "title" : "Benchmarking"
       },
       {
@@ -58,7 +53,6 @@
             "tools/util/ncidef2pasm.pl",
             "tools/dev/pbc_header.pl"
          ],
-         "type" : "group",
          "title" : "Utilities"
       },
       {
@@ -66,7 +60,6 @@
             "docs/debug.pod",
             "docs/debugger.pod"
          ],
-         "type" : "group",
          "title" : "Debugging"
       }
    ],
