@@ -18,16 +18,18 @@ Tests C<ByteBuffer> PMC..
 
 .include 'iglobals.pasm'
 .include 'iterator.pasm'
+.include 'except_types.pasm'
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(26)
+    plan(33)
 
     test_init()
     test_set_string()
     test_set_byte()
     test_get_string()
     test_push()
+    test_resize()
     test_alloc()
     test_iterate()
     test_invalid()
@@ -192,6 +194,53 @@ end:
     .local string s
     s = bb.'get_string_as'(ascii:"")
     is(s, 'hello', "push gives expected string result")
+.end
+
+.sub test_resize
+    .local pmc bb
+    .local int n
+    .local string s
+    bb = new ['ByteBuffer']
+
+    bb = 723
+    n = elements bb
+    is(n, 723, 'resize from empty')
+
+    bb = 42
+    n = elements bb
+    is(n, 42, 'reduce size')
+
+    bb = 0
+    n = elements bb
+    is(n, 0, 'resize to 0')
+
+    bb = 'foobar'
+    bb = 3
+    n = elements bb
+    is(n, 3, 'reduce size from string content')
+
+    s = bb.'get_string_as'(ascii:"")
+    is(s, 'foo', 'resized string content has correct value')
+
+    bb = 'foobar'
+    bb = 24
+    n = elements bb
+    is(n, 24, 'increase size from string content')
+
+    .local pmc eh
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    set_addr eh, catch_negative
+    n = 1
+    push_eh eh
+    bb = -1
+    n = 0
+    goto test_negative
+catch_negative:
+    finalize eh
+test_negative:
+    pop_eh
+    ok(n, 'negative size throws')
 .end
 
 .sub test_alloc
