@@ -281,6 +281,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/osutils.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/PAST/Pattern.pbc \
+    $(LIBRARY_DIR)/PAST/Pattern/Any.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Closure.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Constant.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Match.pbc \
@@ -1090,6 +1091,15 @@ $(LIBRARY_DIR)/PAST/Pattern.pbc: $(LIBRARY_DIR)/PAST/Pattern.pir
 
 $(LIBRARY_DIR)/PAST/Pattern.pir: $(LIBRARY_DIR)/PAST/Pattern.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern.nqp > $@
+
+$(LIBRARY_DIR)/PAST/Pattern/Any.pbc: \
+	$(LIBRARY_DIR)/PAST/Pattern/Any.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Pattern/Any.pir
+
+$(LIBRARY_DIR)/PAST/Pattern/Any.pir: \
+	$(LIBRARY_DIR)/PAST/Pattern/Any.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern/Any.nqp \
+	> $@
 
 $(LIBRARY_DIR)/PAST/Pattern/Constant.pbc: \
 	$(LIBRARY_DIR)/PAST/Pattern/Constant.pir

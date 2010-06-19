@@ -5,13 +5,15 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2101);
+plan(2109);
 
 test_type_matching();
 test_attribute_exact_matching();
 test_child_exact_matching();
 test_attribute_smart_matching();
 test_child_smart_matching();
+
+test_any_matching();
 
 test_deep_matching_in_children();
 test_global_matching();
@@ -483,6 +485,35 @@ sub test_child_smart_matching () {
         wrong($class.new(6, 3), $pattern,
               "Single closure, extra child of wrong result first");
     }
+}
+
+sub test_any_matching () {
+    my $pattern := PAST::Pattern::Any.new(PAST::Pattern::Val.new(),
+                                          PAST::Pattern::Var.new());
+    my $past := PAST::Val.new();
+    my $/ := $past ~~ $pattern;
+    ok($/ ~~ PAST::Pattern::Match,
+       'PAST::Pattern::Any: Matching 1st option produces a match result.');
+    ok(?$/,
+       'PAST::Pattern::Any: Matching 1st option matches.');
+    ok($/.from() =:= $past,
+       'PAST::Pattern::Any: Matching 1st option has correct .from.');
+
+    $past := PAST::Var.new();
+    $/ := $past ~~ $pattern;
+    ok($/ ~~ PAST::Pattern::Match,
+       'PAST::Pattern::Any: Matching 2nd option produces a match result.');
+    ok(?$/,
+       'PAST::Pattern::Any: Matching 2nd option matches.');
+    ok($/.from() =:= $past,
+       'PAST::Pattern::Any: Matching 2nd option has correct .from.');
+
+    $past := PAST::Block.new();
+    $/ := $past ~~ $pattern;
+    ok($/ ~~ PAST::Pattern::Match,
+       'PAST::Pattern::Any: None matching produces a match result.');
+    ok(!$/,
+       'PAST::Pattern::Any: None matching does not match.');
 }
 
 sub test_deep_matching_in_children () {

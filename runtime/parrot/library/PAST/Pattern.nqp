@@ -117,6 +117,8 @@ INIT {
     pir::load_bytecode('PAST/Pattern/Constant.pbc');
     pir::load_bytecode('PAST/Pattern/Node.pbc');
 
+    pir::load_bytecode('PAST/Pattern/Any.pbc');
+
     pir::load_bytecode('PAST/Pattern/Transformer.pbc');
 }
 
