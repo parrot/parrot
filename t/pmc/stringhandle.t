@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -92,6 +92,23 @@ pir_output_is( <<'CODE', <<'OUT', 'get_bool' );
 CODE
 0
 1
+OUT
+
+# StringHandle doesn't use file descriptor, get_fd always return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    .local pmc sh
+    .local int fd
+    sh = new ['StringHandle']
+    fd = sh.'get_fd'()
+    say fd
+    sh.'open'('mockname', 'r')
+    fd = sh.'get_fd'()
+    say fd
+.end
+CODE
+-1
+-1
 OUT
 
 SKIP: {
