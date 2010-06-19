@@ -18,15 +18,18 @@ well.
 
 =cut
 
+.include 'except_types.pasm'
+.include 'datatypes.pasm'
+.include 'hash_key_type.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    .include 'except_types.pasm'
-    .include 'datatypes.pasm'
 
-    plan(168)
+    plan(171)
 
     initial_hash_tests()
     more_than_one_hash()
+    hash_key_type()
     null_key()
     hash_keys_with_nulls_in_them()
     nearly_the_same_hash_keys()
@@ -123,6 +126,32 @@ well.
 
     is( $I0, 1, 'two hashes: lookup Int from hash via Str' )
     is( $I1, 2, 'two hashes: lookup Int from hash via Str in second' )
+.end
+
+.sub hash_key_type
+    .local pmc h
+    .local int i
+    h = new ['Hash']
+    h = .Hash_key_type_int
+    h['01'] = 42
+    i = h[1]
+    is(i, 42, 'key type int')
+
+    # Use the method here to check it at the same time.
+    h.'set_key_type'(.Hash_key_type_STRING)
+    h[1] = 42
+    i = h['01']
+    isnt(i, 42, 'key type STRING')
+
+    push_eh invalid_type
+    h = -973 # Let's hope it will never become a valid type
+    pop_eh
+    ok(0, "Setting invalid type should throw")
+    goto end
+invalid_type:
+    pop_eh
+    ok(1, 'Setting invalid type throws')
+end:
 .end
 
 .sub null_key
