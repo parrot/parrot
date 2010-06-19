@@ -31,20 +31,19 @@ my $instr := Q:PIR { %r = new ['Instrument'] };
 $instr.attach($probe);
 $instr.run($args[0], $args);
 
-sub tracer ($pc, $op, $instr_obj) {
-    my $op_lib       := Q:PIR { %r = new ['OpLib'] };
-    my $op_code      := pir::set_p_p_ki__PPI($op_lib, $op[0]);
-    my $sprintf_args := [$pc];
+sub tracer ($op, $instr_obj) {
+    my $sprintf_args := [$op.pc()];
     my $pc_hex       := pir::sprintf__SSP("%04x", $sprintf_args);
-    my $op_name      := $op_code.family_name();
-    my $param_cnt    := pir::elements($op_code);
+    my $op_name      := $op.family();
+    my $param_cnt    := $op.count();
     my $params       := '';
     my $cur_arg      := 0;
 
     my $arg_list     := [];
     while $cur_arg < $param_cnt {
         my $arg_str;
-        my $arg_type := pir::set_i_p_ki__IPI($op_code, $cur_arg);
+        my $arg_type := $op.arg_type($cur_arg);
+        my $arg      := $op.get_arg($cur_arg, 1);
 
         # Evaluate in order of:
         # 1. keys
@@ -57,22 +56,22 @@ sub tracer ($pc, $op, $instr_obj) {
                 # Constant keys are int constants or strings.
                 if pir::band__III($arg_type, 2) == 2 {
                     # String constant key.
-                    my $arg := $instr_obj.get_op_arg($op[$cur_arg + 1], $arg_type);
-                    $arg_str := '["' ~ $arg ~ '"]';
+                    my $arg_val := $op.get_arg($cur_arg);
+                    $arg_str := '["' ~ $arg_val ~ '"]';
 
                 } else {
                     # Integer constant key.
-                    $arg_str := '[' ~ $op[$cur_arg + 1] ~ ']';
+                    $arg_str := '[' ~ $arg ~ ']';
                 }
             } else {
                 # Non-constant keys. Reference regs only.
                 if !$arg_type {
                     # 0 is int reg.
-                    $arg_str := '[I' ~ $op[$cur_arg + 1] ~ ']';
+                    $arg_str := '[I' ~ $arg ~ ']';
                     
                 } elsif pir::band__III($arg_type, 2) == 2 {
                     # 2 is pmc.
-                    $arg_str := '[P' ~ $op[$cur_arg + 1] ~ ']';
+                    $arg_str := '[P' ~ $arg ~ ']';
                 }
             }
 
@@ -81,35 +80,35 @@ sub tracer ($pc, $op, $instr_obj) {
 
         } elsif pir::band__III($arg_type, 16) == 16
                 && pir::band__III($arg_type, 2) != 2 {
-            my $arg := $instr_obj.get_op_arg($op[$cur_arg + 1], $arg_type);
 
             if pir::band__III($arg_type, 1) == 1 {
-                $arg_str := '"' ~ $arg ~ '"';
+                my $arg_val := $op.get_arg($cur_arg);
+                $arg_str := '"' ~ $arg_val ~ '"';
 
             } else {
                 $arg_str := $arg;
             }
         }  elsif !$arg_type {
             # 0 is int reg.
-            $arg_str := 'I' ~ $op[$cur_arg + 1];
+            $arg_str := 'I' ~ $arg;
 
         } elsif pir::band__III($arg_type, 1) == 1{
             # 1 is string reg.
-            $arg_str := 'S' ~ $op[$cur_arg + 1];
+            $arg_str := 'S' ~ $arg;
 
         } elsif pir::band__III($arg_type, 2) == 2 {
             # 2 is pmc.
             if pir::band__III($arg_type, 16) == 16 {
                 # Constant pmc.
-                $arg_str := 'PC' ~ $op[$cur_arg + 1];
+                $arg_str := 'PC' ~ $arg;
             } else {
                 # Normal reg.
-                $arg_str := 'P' ~ $op[$cur_arg + 1];
+                $arg_str := 'P' ~ $arg;
             }
 
         } elsif pir::band__III($arg_type, 3) == 3 {
             # 3 is num reg.
-            $arg_str := 'N' ~ $op[$cur_arg + 1];
+            $arg_str := 'N' ~ $arg;
 
         }
 

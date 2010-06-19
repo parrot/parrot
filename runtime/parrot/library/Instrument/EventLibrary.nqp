@@ -8,7 +8,7 @@
     
 runtime/parrot/library/Instrument/EventLibrary.nqp
 
-	Library for the many classes that provide handlers for Events.
+    Library for the many classes that provide handlers for Events.
 
 =head1 SYNOPSIS
 
@@ -22,8 +22,8 @@ runtime/parrot/library/Instrument/EventLibrary.nqp
     evt = new ['Instrument';'Event';'Internal';'loadlib']
     evt.'set_callback'('loadlib_callback')
 
-	instr = new ['Instrument']
-	instr.attach(evt)
+    instr = new ['Instrument']
+    instr.attach(evt)
 
 =cut
 
@@ -41,8 +41,8 @@ Events are raised in the C code.
 
 class Instrument::Event::Internal::loadlib is Instrument::Event {
 
-	method _self_init() {
-		$!event_type := 'Instrument::Event::Internal::loadlib';
+    method _self_init() {
+        $!event_type := 'Instrument::Event::Internal::loadlib';
     };
 };
 
@@ -58,29 +58,25 @@ TODO: Add inspect so that specific classes can be targetted.
 
 class Instrument::Event::Class::instantiate is Instrument::Event {
 
-	method _self_init() {
-		$!event_type := 'Instrument::Event::Class::instantiate';
+    method _self_init() {
+        $!event_type := 'Instrument::Event::Class::instantiate';
 
-		$!probe_obj := Instrument::Probe.new();
+        $!probe_obj := Instrument::Probe.new();
 
-		$!probe_obj.inspect('new');
-		$!probe_obj.set_callback(pir::get_global__PS('callback'));
-	};
+        $!probe_obj.inspect('new');
+        $!probe_obj.set_callback(pir::get_global__PS('callback'));
+    };
 
-	sub callback ($pc, $op, $instr_obj) {
-		my $op_lib   := Q:PIR { %r = new ['OpLib'] };
-    	my $op_code  := pir::set_p_p_ki__PPI($op_lib, $op[0]);
-    	my $arg_type := pir::set_i_p_ki__IPI($op_code, 1);
-    	my $class    := $instr_obj.get_op_arg($op[2], $arg_type);
+    sub callback ($op, $instr_obj) {
+        my $class    := $op.get_arg(1);
 
-		my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
-		$data.push($class);
-		$data.push($pc);
-		$data.push($op);
-		$data.push($instr_obj);
+        my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
+        $data.push($class);
+        $data.push($op);
+        $data.push($instr_obj);
 
-		Instrument::Event::_raise_event('Instrument::Event::Class::instantiate', $data);
-	};
+        Instrument::Event::_raise_event('Instrument::Event::Class::instantiate', $data);
+    };
 };
 
 =begin
@@ -95,30 +91,26 @@ TODO: Add inspect so that specific methods and classes can be targetted.
 
 class Instrument::Event::Class::callmethod is Instrument::Event {
 
-	method _self_init() {
-		$!event_type := 'Instrument::Event::Class::callmethod';
+    method _self_init() {
+        $!event_type := 'Instrument::Event::Class::callmethod';
 
-		$!probe_obj := Instrument::Probe.new();
+        $!probe_obj := Instrument::Probe.new();
 
-		$!probe_obj.inspect('callmethod');
-		$!probe_obj.inspect('callmethodcc');
-		$!probe_obj.set_callback(pir::get_global__PS('callback'));
-	};
+        $!probe_obj.inspect('callmethod');
+        $!probe_obj.inspect('callmethodcc');
+        $!probe_obj.set_callback(pir::get_global__PS('callback'));
+    };
 
-	sub callback ($pc, $op, $instr_obj) {
-		my $op_lib   := Q:PIR { %r = new ['OpLib'] };
-    	my $op_code  := pir::set_p_p_ki__PPI($op_lib, $op[0]);
-    	my $arg_type := pir::set_i_p_ki__IPI($op_code, 1);
-    	my $method   := $instr_obj.get_op_arg($op[2], $arg_type);
+    sub callback ($op, $instr_obj) {
+        my $method    := $op.get_arg(1);
 
-		my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
-		$data.push($method);
-		$data.push($pc);
-		$data.push($op);
-		$data.push($instr_obj);
+        my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
+        $data.push($method);
+        $data.push($op);
+        $data.push($instr_obj);
 
-		Instrument::Event::_raise_event('Instrument::Event::Class::callmethod', $data);
-	};
+        Instrument::Event::_raise_event('Instrument::Event::Class::callmethod', $data);
+    };
 };
 
 # vim: ft=perl6 expandtab shiftwidth=4:
