@@ -19,6 +19,7 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
 .namespace []
 
 .include 'iterator.pasm'
+.include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
@@ -55,13 +56,38 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     nok(it, "Iterator is finished after second shift")
     is($P0, 42, "2nd element has correct value")
 
-    $I0 = 1
-    push_eh fail
+    .local int result
+    .local pmc ehandler
+    result = 0
+    ehandler = new ['ExceptionHandler']
+    ehandler.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh ehandler
+
+    set_addr ehandler, handlep
     $P0 = shift it
-    $I0 = 0
+    goto fail
+handlep:
+    finalize ehandler
+    set_addr ehandler, handlei
+    $I0 = shift it
+    goto fail
+handlei:
+    finalize ehandler
+    set_addr ehandler, handlen
+    $N0 = shift it
+    goto fail
+handlen:
+    finalize ehandler
+    set_addr ehandler, handles
+    $S0 = shift it
+    goto fail
+handles:
+    finalize ehandler
+
+    result = 1
   fail:
     pop_eh
-    ok($I0, "Shifting from finished iterator throws exception")
+    ok(result, "Shifting from finished iterator throws out of bounds exception")
 
 .end
 
