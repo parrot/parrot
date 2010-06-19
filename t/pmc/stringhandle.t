@@ -239,7 +239,6 @@ pir_output_is( <<'CODE', <<'OUT', 'puts' );
     sh = new ['StringHandle']
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_PIO_ERROR)
-    
     push_eh eh
 
     # puts to SH not opened
