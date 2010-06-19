@@ -195,7 +195,7 @@ pcf_i_tp(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     PMC *t_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SP", &ts_0, &t_1);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1));
@@ -296,7 +296,7 @@ STRING *final_destination;
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSI", &t_1, &ts_2, &t_3);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(interp, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2, t_3);
@@ -346,7 +346,7 @@ STRING *final_destination;
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_0, &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
@@ -392,7 +392,7 @@ pcf_v_pit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIS", &t_0, &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -417,7 +417,7 @@ pcf_v_ptt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSS", &t_0, &ts_1, &ts_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -445,7 +445,7 @@ pcf_v_Jtiiipt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_6; STRING *ts_6;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SIIIPS", &ts_1, &t_2, &t_3, &t_4, &t_5, &ts_6);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_6 = ts_6 ? Parrot_str_to_cstring(interp, ts_6) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_6 = STRING_IS_NULL(ts_6) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_6);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3, t_4, PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), t_6);
@@ -476,7 +476,7 @@ PMC * final_destination = PMCNULL;
     PMC * t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SSPP", &ts_1, &ts_2, &t_3, &t_4);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
@@ -507,7 +507,7 @@ pcf_P_Jtpi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SPI", &ts_1, &t_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2), t_3);
@@ -585,7 +585,7 @@ pcf_v_pt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_0, &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
@@ -608,7 +608,7 @@ pcf_v_Jpt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2);
@@ -1369,7 +1369,7 @@ pcf_i_ptii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSII", &t_0, &ts_1, &t_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -1424,7 +1424,7 @@ STRING *final_destination;
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSI", &t_0, &ts_1, &ts_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -1452,7 +1452,7 @@ STRING *final_destination;
     INTVAL t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSI", &t_0, &ts_1, &t_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -1481,7 +1481,7 @@ STRING *final_destination;
     INTVAL t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSSI", &t_0, &ts_1, &ts_2, &ts_3, &t_4);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4);
@@ -1642,7 +1642,7 @@ STRING *final_destination;
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SS", &ts_0, &ts_1);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(t_0, t_1);
@@ -1666,7 +1666,7 @@ pcf_I_JOt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
@@ -2027,7 +2027,7 @@ pcf_l_lttl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "ISSI", &t_0, &ts_1, &ts_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (long)(*fn_pointer)(t_0, t_1, t_2, t_3);
@@ -2223,7 +2223,7 @@ pcf_i_pttttt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_5; STRING *ts_5;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSSSS", &t_0, &ts_1, &ts_2, &ts_3, &ts_4, &ts_5);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;t_4 = ts_4 ? Parrot_str_to_cstring(interp, ts_4) : (char *)NULL;t_5 = ts_5 ? Parrot_str_to_cstring(interp, ts_5) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);t_4 = STRING_IS_NULL(ts_4) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_4);t_5 = STRING_IS_NULL(ts_5) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_5);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5);
@@ -2252,7 +2252,7 @@ pcf_c_pttt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_3; STRING *ts_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSS", &t_0, &ts_1, &ts_2, &ts_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -2284,7 +2284,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_7;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSSSISI", &t_0, &ts_1, &ts_2, &ts_3, &ts_4, &t_5, &ts_6, &t_7);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;t_4 = ts_4 ? Parrot_str_to_cstring(interp, ts_4) : (char *)NULL;t_6 = ts_6 ? Parrot_str_to_cstring(interp, ts_6) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);t_4 = STRING_IS_NULL(ts_4) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_4);t_6 = STRING_IS_NULL(ts_6) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_6);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5, t_6, t_7);
@@ -2317,7 +2317,7 @@ pcf_i_pt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_0, &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
@@ -2341,7 +2341,7 @@ pcf_i_ptl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSI", &t_0, &ts_1, &t_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -2431,7 +2431,7 @@ PMC * final_destination = PMCNULL;
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_0, &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
@@ -2460,7 +2460,7 @@ PMC * final_destination = PMCNULL;
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSS", &t_0, &ts_1, &ts_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -2489,7 +2489,7 @@ pcf_i_pit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIS", &t_0, &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -2542,7 +2542,7 @@ pcf_l_ttl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SSI", &ts_0, &ts_1, &t_2);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (long)(*fn_pointer)(t_0, t_1, t_2);
@@ -2568,7 +2568,7 @@ pcf_l_pttl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSI", &t_0, &ts_1, &ts_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (long)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -2592,7 +2592,7 @@ pcf_v_t(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_0; STRING *ts_0;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_0);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(t_0);
@@ -2621,7 +2621,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_7;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSSSISI", &t_0, &ts_1, &ts_2, &ts_3, &ts_4, &t_5, &ts_6, &t_7);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;t_4 = ts_4 ? Parrot_str_to_cstring(interp, ts_4) : (char *)NULL;t_6 = ts_6 ? Parrot_str_to_cstring(interp, ts_6) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);t_4 = STRING_IS_NULL(ts_4) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_4);t_6 = STRING_IS_NULL(ts_6) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_6);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5, t_6, t_7);
@@ -2658,7 +2658,7 @@ PMC * final_destination = PMCNULL;
     PMC * t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SISPP", &ts_0, &t_1, &ts_2, &t_3, &t_4);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *) NULL;i_3 = VTABLE_get_integer(interp, t_3);
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);t_2 = STRING_IS_NULL(ts_2) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_2);i_3 = VTABLE_get_integer(interp, t_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, &t_2, &i_3, t_4);
@@ -2692,7 +2692,7 @@ PMC * final_destination = PMCNULL;
     PMC * t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SIPPP", &ts_0, &t_1, &t_2, &t_3, &t_4);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;i_3 = VTABLE_get_integer(interp, t_3);
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);i_3 = VTABLE_get_integer(interp, t_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2), &i_3, t_4);
@@ -2728,7 +2728,7 @@ pcf_i_pPtiiipi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_7;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPSIIIPI", &t_0, &t_1, &ts_2, &t_3, &t_4, &t_5, &t_6, &t_7);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5, PMC_IS_NULL((PMC*)t_6) ? (void *)NULL : VTABLE_get_pointer(interp, t_6), t_7);
@@ -2761,7 +2761,7 @@ pcf_i_tpiibi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_5;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SPIISI", &ts_0, &t_1, &t_2, &t_3, &t_4, &t_5);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2, t_3, Buffer_bufstart(t_4), t_5);
@@ -2795,7 +2795,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_7;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSIPPPPI", &t_0, &ts_1, &t_2, &t_3, &t_4, &t_5, &t_6, &t_7);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, PMC_IS_NULL((PMC*)t_3) ? (void *)NULL : VTABLE_get_pointer(interp, t_3), PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4), PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), PMC_IS_NULL((PMC*)t_6) ? (void *)NULL : VTABLE_get_pointer(interp, t_6), t_7);
@@ -2870,7 +2870,7 @@ PMC * final_destination = PMCNULL;
     PMC *t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSSIP", &t_0, &ts_1, &ts_2, &t_3, &t_4);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4));
@@ -2906,7 +2906,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_6;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSIPPPI", &t_0, &ts_1, &t_2, &t_3, &t_4, &t_5, &t_6);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, PMC_IS_NULL((PMC*)t_3) ? (void *)NULL : VTABLE_get_pointer(interp, t_3), PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4), PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), t_6);
@@ -3052,7 +3052,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSI", &t_0, &ts_1, &t_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -3108,7 +3108,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSII", &t_0, &ts_1, &t_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -3138,7 +3138,7 @@ PMC * final_destination = PMCNULL;
     INTVAL t_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SI", &ts_0, &t_1);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1);
@@ -3167,7 +3167,7 @@ PMC * final_destination = PMCNULL;
     PMC *t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSP", &t_0, &ts_1, &t_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2));
@@ -3197,7 +3197,7 @@ pcf_i_pt33(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     PMC *t_3; int i_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSPP", &t_0, &ts_1, &t_2, &t_3);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;i_2 = VTABLE_get_integer(interp, t_2);i_3 = VTABLE_get_integer(interp, t_3);
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);i_2 = VTABLE_get_integer(interp, t_2);i_3 = VTABLE_get_integer(interp, t_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, &i_2, &i_3);
@@ -3643,7 +3643,7 @@ pcf_i_iit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "IIS", &t_0, &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, t_1, t_2);
@@ -3669,7 +3669,7 @@ pcf_i_iiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "IISI", &t_0, &t_1, &ts_2, &t_3);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, t_1, t_2, t_3);
@@ -3722,7 +3722,7 @@ pcf_i_iti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "ISI", &t_0, &ts_1, &t_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, t_1, t_2);
@@ -4253,7 +4253,7 @@ pcf_i_piit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_3; STRING *ts_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIIS", &t_0, &t_1, &t_2, &ts_3);
-    t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;
+    t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -4281,7 +4281,7 @@ pcf_i_piiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIISI", &t_0, &t_1, &t_2, &ts_3, &t_4);
-    t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;
+    t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4);
@@ -4615,7 +4615,7 @@ pcf_i_pti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSI", &t_0, &ts_1, &t_2);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
@@ -4641,7 +4641,7 @@ pcf_i_pitl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_3;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PISI", &t_0, &t_1, &ts_2, &t_3);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
@@ -4813,7 +4813,7 @@ pcf_i_t(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_0; STRING *ts_0;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_0);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0);
@@ -4835,7 +4835,7 @@ pcf_i_ti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SI", &ts_0, &t_1);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, t_1);
@@ -5097,7 +5097,7 @@ PMC * final_destination = PMCNULL;
     char *t_0; STRING *ts_0;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_0);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *) NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(&t_0);
@@ -5149,7 +5149,7 @@ PMC * final_destination = PMCNULL;
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, t_1);
@@ -5402,7 +5402,7 @@ PMC * final_destination = PMCNULL;
     char *t_0; STRING *ts_0;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_0);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0);
@@ -5430,7 +5430,7 @@ PMC * final_destination = PMCNULL;
     PMC *t_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SPP", &ts_0, &t_1, &t_2);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2));
@@ -5464,7 +5464,7 @@ PMC * final_destination = PMCNULL;
     char *t_6; STRING *ts_6;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SSSSSSS", &ts_0, &ts_1, &ts_2, &ts_3, &ts_4, &ts_5, &ts_6);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;t_3 = ts_3 ? Parrot_str_to_cstring(interp, ts_3) : (char *)NULL;t_4 = ts_4 ? Parrot_str_to_cstring(interp, ts_4) : (char *)NULL;t_5 = ts_5 ? Parrot_str_to_cstring(interp, ts_5) : (char *)NULL;t_6 = ts_6 ? Parrot_str_to_cstring(interp, ts_6) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);t_3 = STRING_IS_NULL(ts_3) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_3);t_4 = STRING_IS_NULL(ts_4) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_4);t_5 = STRING_IS_NULL(ts_5) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_5);t_6 = STRING_IS_NULL(ts_6) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_6);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, t_2, t_3, t_4, t_5, t_6);
@@ -5636,7 +5636,7 @@ STRING *final_destination;
     char *t_0; STRING *ts_0;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_0);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(t_0);
@@ -5661,7 +5661,7 @@ STRING *final_destination;
     PMC *t_2; long i_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SIP", &ts_0, &t_1, &t_2);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;i_2 = VTABLE_get_integer(interp, t_2);
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);i_2 = VTABLE_get_integer(interp, t_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(t_0, t_1, &i_2);
@@ -5687,7 +5687,7 @@ STRING *final_destination;
     PMC *t_1; long i_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SP", &ts_0, &t_1);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;i_1 = VTABLE_get_integer(interp, t_1);
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);i_1 = VTABLE_get_integer(interp, t_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(t_0, &i_1);
@@ -5851,7 +5851,7 @@ STRING *final_destination;
     char *t_0; STRING *ts_0;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_0);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *) NULL;
+    t_0 = STRING_IS_NULL(ts_0) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_0);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (char *)(*fn_pointer)(&t_0);
@@ -6062,7 +6062,7 @@ pcf_i_JOt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
@@ -6085,7 +6085,7 @@ pcf_i_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_1; STRING *ts_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1);
@@ -6385,7 +6385,7 @@ pcf_i_ppt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     char *t_2; STRING *ts_2;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPS", &t_0, &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2);
@@ -6608,7 +6608,7 @@ pcf_i_tV(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     PMC *t_1; void *v_1;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SP", &ts_0, &t_1);
-    t_0 = ts_0 ? Parrot_str_to_cstring(interp, ts_0) : (char *)NULL;v_1 = VTABLE_get_pointer(interp, t_1);
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);v_1 = VTABLE_get_pointer(interp, t_1);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, &v_1);
@@ -6634,7 +6634,7 @@ pcf_i_ptiVp(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     PMC *t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSIPP", &t_0, &ts_1, &t_2, &t_3, &t_4);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;v_3 = VTABLE_get_pointer(interp, t_3);
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);v_3 = VTABLE_get_pointer(interp, t_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, &v_3, PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4));
@@ -6688,7 +6688,7 @@ pcf_i_pitii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     INTVAL t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PISII", &t_0, &t_1, &ts_2, &t_3, &t_4);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4);

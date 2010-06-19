@@ -160,7 +160,8 @@ Get the value of the byte at position or 0 if out of bounds.
 
 =item C<void set_integer_keyed_int()>
 
-Set the value of the byte at position.
+Set the value of the byte at position, resizing the buffer if the position
+is out of current size.
 
 =cut
 
@@ -207,6 +208,23 @@ Set the value of the byte at position.
             SET_ATTR_size(INTERP, SELF, size);
         }
         content[position] = value;
+    }
+
+/*
+
+=item C<void push_integer(INTVAL value)>
+
+Extends the buffer by adding a byte of value C<value> to the end.
+
+=cut
+
+*/
+
+    VTABLE void push_integer(INTVAL value) {
+        INTVAL size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        SELF.set_integer_keyed_int(size, value);
     }
 
 /*

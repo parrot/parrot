@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -67,6 +67,48 @@ ok 2 - $P1.close()
 ok 3 - $P3.open($S1, $S2) # rw mode
 ok 4 - $P3.open()         # reopening
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'get_bool' );
+.sub test :main
+    .local pmc sh
+    .local int b
+    sh = new ['StringHandle']
+    b = 0
+    unless sh goto b_false
+    b = 1
+  b_false:
+    say b
+    sh.'open'('mockname', 'w')
+    sh.'print'('Some content')
+    sh.'close'()
+    sh.'open'()
+    b = 0
+    unless sh goto b_true
+    b = 1
+  b_true:
+    say b
+.end
+CODE
+0
+1
+OUT
+
+# StringHandle doesn't use file descriptor, get_fd always return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    .local pmc sh
+    .local int fd
+    sh = new ['StringHandle']
+    fd = sh.'get_fd'()
+    say fd
+    sh.'open'('mockname', 'r')
+    fd = sh.'get_fd'()
+    say fd
+.end
+CODE
+-1
+-1
 OUT
 
 SKIP: {
@@ -204,6 +246,44 @@ ok 3 - $P0.print($S1)
 ok 4 - $P0.print($P1)
 ok 5 - read integer back from file
 ok 6 - read string back from file
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'puts' );
+.include 'except_types.pasm'
+.sub 'test' :main
+    .local pmc sh, eh
+    .local int result
+    sh = new ['StringHandle']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    push_eh eh
+
+    # puts to SH not opened
+    result = 0
+    set_addr eh, handle1
+    sh.'puts'('something')
+    result = 1
+    goto done1
+handle1:
+    finalize eh
+done1:
+    say result
+
+    # puts to SH opened for reading
+    result = 0
+    set_addr eh, handle2
+    sh.'open'('mockname', 'r')
+    sh.'puts'('something')
+    result = 1
+    goto done2
+handle2:
+    finalize eh
+done2:
+    say result
+.end
+CODE
+0
+0
 OUT
 
 # L<PDD22/I\/O PMC API/=item print.*=item readline>
@@ -520,6 +600,25 @@ CODE
 ok
 OUTPUT
 
+pir_output_is( <<"CODE", <<"OUTPUT", "readall - stringhandle with null content" );
+.sub main :main
+    .local pmc sh
+    .local string s
+    sh = new ['StringHandle']
+    sh.'open'('mockname', 'r')
+    # Open sets content to an empty string, flush resets is to null
+    # and that is the case we are testing here.
+    # Also, ensures coverage of the flush method.
+    sh.'flush'()
+    s = sh.'readall'()
+    print '['
+    print s
+    say ']'
+.end
+CODE
+[]
+OUTPUT
+
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - opened stringhandle" );
 .sub main :main
     \$S0 = <<"EOS"
@@ -542,6 +641,22 @@ ok:
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<"OUTPUT", "is_closed" );
+.sub main
+    .local pmc sh
+    .local int i
+    sh = new ['StringHandle']
+    i = sh.'is_closed'()
+    say i
+    sh.'open'("foo", "w")
+    i = sh.'is_closed'()
+    say i
+.end
+CODE
+1
+0
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed stringhandle" );

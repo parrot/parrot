@@ -19803,7 +19803,7 @@ Parrot_root_new_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const key      = PREG(2);
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -19823,7 +19823,7 @@ Parrot_root_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const key      = CONST(2)->u.key;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -19843,7 +19843,7 @@ Parrot_root_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const key      = PREG(2);
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -19863,7 +19863,7 @@ Parrot_root_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const key      = CONST(2)->u.key;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -19883,7 +19883,7 @@ Parrot_root_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const key      = PREG(2);
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -19903,7 +19903,7 @@ Parrot_root_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const key      = CONST(2)->u.key;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -22823,7 +22823,7 @@ opcode_t *
 Parrot_get_namespace_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, PREG(2));
+    PMC * const ns     = Parrot_ns_get_namespace_keyed(interp, cur_ns, PREG(2));
 
     PREG(1) = PMC_IS_NULL(ns) ? PMCNULL : ns;
 
@@ -22833,7 +22833,7 @@ opcode_t *
 Parrot_get_namespace_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, CONST(2)->u.key);
+    PMC * const ns     = Parrot_ns_get_namespace_keyed(interp, cur_ns, CONST(2)->u.key);
 
     PREG(1) = PMC_IS_NULL(ns) ? PMCNULL : ns;
 
@@ -22854,7 +22854,7 @@ Parrot_get_hll_namespace_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(hll_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, PREG(2));
         PREG(1) = ns;
     }
 
@@ -22867,7 +22867,7 @@ Parrot_get_hll_namespace_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(hll_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, CONST(2)->u.key);
         PREG(1) = ns;
     }
 
@@ -22888,7 +22888,7 @@ Parrot_get_root_namespace_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(root_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, PREG(2));
         PREG(1) = ns;
     }
 
@@ -22901,7 +22901,7 @@ Parrot_get_root_namespace_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(root_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, CONST(2)->u.key);
         PREG(1) = ns;
     }
 
@@ -22911,7 +22911,7 @@ opcode_t *
 Parrot_get_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PREG(1) = Parrot_find_global_op(interp, cur_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -22919,7 +22919,7 @@ opcode_t *
 Parrot_get_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PREG(1) = Parrot_find_global_op(interp, cur_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -22931,11 +22931,11 @@ Parrot_get_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, PREG(2));
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22948,11 +22948,11 @@ Parrot_get_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, CONST(2)->u.key);
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22965,11 +22965,11 @@ Parrot_get_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, PREG(2));
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22982,11 +22982,11 @@ Parrot_get_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, CONST(2)->u.key);
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22995,7 +22995,7 @@ opcode_t *
 Parrot_get_hll_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PREG(1) = Parrot_find_global_op(interp, hll_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23003,7 +23003,7 @@ opcode_t *
 Parrot_get_hll_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PREG(1) = Parrot_find_global_op(interp, hll_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23015,11 +23015,11 @@ Parrot_get_hll_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, PREG(2));
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23032,11 +23032,11 @@ Parrot_get_hll_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, CONST(2)->u.key);
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23049,11 +23049,11 @@ Parrot_get_hll_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, PREG(2));
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23066,11 +23066,11 @@ Parrot_get_hll_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, CONST(2)->u.key);
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23079,7 +23079,7 @@ opcode_t *
 Parrot_get_root_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PREG(1) = Parrot_find_global_op(interp, root_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23087,7 +23087,7 @@ opcode_t *
 Parrot_get_root_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PREG(1) = Parrot_find_global_op(interp, root_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23098,11 +23098,11 @@ Parrot_get_root_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(root_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, PREG(2));
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23114,11 +23114,11 @@ Parrot_get_root_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(root_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, CONST(2)->u.key);
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23130,11 +23130,11 @@ Parrot_get_root_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(root_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, PREG(2));
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, PREG(2));
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23146,11 +23146,11 @@ Parrot_get_root_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (PMC_IS_NULL(root_ns))
         PREG(1) = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, CONST(2)->u.key);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, CONST(2)->u.key);
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_find_global_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23159,7 +23159,7 @@ opcode_t *
 Parrot_set_global_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    Parrot_set_global(interp, cur_ns, SREG(1), PREG(2));
+    Parrot_ns_set_global(interp, cur_ns, SREG(1), PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23167,7 +23167,7 @@ opcode_t *
 Parrot_set_global_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    Parrot_set_global(interp, cur_ns, CONST(1)->u.string, PREG(2));
+    Parrot_ns_set_global(interp, cur_ns, CONST(1)->u.string, PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23175,9 +23175,9 @@ opcode_t *
 Parrot_set_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, PREG(1));
 
-    Parrot_set_global(interp, ns, SREG(2), PREG(3));
+    Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23185,9 +23185,9 @@ opcode_t *
 Parrot_set_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
 
-    Parrot_set_global(interp, ns, SREG(2), PREG(3));
+    Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23195,9 +23195,9 @@ opcode_t *
 Parrot_set_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, PREG(1));
 
-    Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
+    Parrot_ns_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23205,9 +23205,9 @@ opcode_t *
 Parrot_set_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, CONST(1)->u.key);
 
-    Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
+    Parrot_ns_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23215,7 +23215,7 @@ opcode_t *
 Parrot_set_hll_global_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    Parrot_set_global(interp, hll_ns, SREG(1), PREG(2));
+    Parrot_ns_set_global(interp, hll_ns, SREG(1), PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23223,7 +23223,7 @@ opcode_t *
 Parrot_set_hll_global_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    Parrot_set_global(interp, hll_ns, CONST(1)->u.string, PREG(2));
+    Parrot_ns_set_global(interp, hll_ns, CONST(1)->u.string, PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23231,9 +23231,9 @@ opcode_t *
 Parrot_set_hll_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PREG(1));
 
-    Parrot_set_global(interp, ns, SREG(2), PREG(3));
+    Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23241,9 +23241,9 @@ opcode_t *
 Parrot_set_hll_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
 
-    Parrot_set_global(interp, ns, SREG(2), PREG(3));
+    Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23251,9 +23251,9 @@ opcode_t *
 Parrot_set_hll_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, PREG(1));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PREG(1));
 
-    Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
+    Parrot_ns_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23261,9 +23261,9 @@ opcode_t *
 Parrot_set_hll_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, CONST(1)->u.key);
 
-    Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
+    Parrot_ns_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23271,7 +23271,7 @@ opcode_t *
 Parrot_set_root_global_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    Parrot_set_global(interp, root_ns, SREG(1), PREG(2));
+    Parrot_ns_set_global(interp, root_ns, SREG(1), PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23279,7 +23279,7 @@ opcode_t *
 Parrot_set_root_global_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    Parrot_set_global(interp, root_ns, CONST(1)->u.string, PREG(2));
+    Parrot_ns_set_global(interp, root_ns, CONST(1)->u.string, PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23287,9 +23287,9 @@ opcode_t *
 Parrot_set_root_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, PREG(1));
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, PREG(1));
 
-    Parrot_set_global(interp, ns, SREG(2), PREG(3));
+    Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23297,9 +23297,9 @@ opcode_t *
 Parrot_set_root_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
 
-    Parrot_set_global(interp, ns, SREG(2), PREG(3));
+    Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23307,9 +23307,9 @@ opcode_t *
 Parrot_set_root_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, PREG(1));
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, PREG(1));
 
-    Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
+    Parrot_ns_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23317,9 +23317,9 @@ opcode_t *
 Parrot_set_root_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, CONST(1)->u.key);
 
-    Parrot_set_global(interp, ns, CONST(2)->u.string, PREG(3));
+    Parrot_ns_set_global(interp, ns, CONST(2)->u.string, PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23332,7 +23332,7 @@ Parrot_find_name_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
                 "Tried to find null name");return (opcode_t *)handler;
     }
 
-    PREG(1) = Parrot_find_name_op(interp, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_named_item(interp, SREG(2),cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23345,7 +23345,7 @@ Parrot_find_name_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
                 "Tried to find null name");return (opcode_t *)handler;
     }
 
-    PREG(1) = Parrot_find_name_op(interp, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_named_item(interp, CONST(2)->u.string,cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23353,7 +23353,7 @@ opcode_t *
 Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t *dest =cur_opcode + 3;
-    PMC *sub = Parrot_find_name_op(interp, SREG(2), dest);
+    PMC *sub = Parrot_ns_find_named_item(interp, SREG(2), dest);
 
     if (PMC_IS_NULL(sub)) {
         opcode_t *handler;
@@ -23371,7 +23371,7 @@ opcode_t *
 Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t *dest =cur_opcode + 3;
-    PMC *sub = Parrot_find_name_op(interp, CONST(2)->u.string, dest);
+    PMC *sub = Parrot_ns_find_named_item(interp, CONST(2)->u.string, dest);
 
     if (PMC_IS_NULL(sub)) {
         opcode_t *handler;
@@ -24779,7 +24779,7 @@ Parrot_root_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     /* if it's clearly a PIR-level PMC */
     if (type > enum_class_core_max) {
         PMC * const root_ns  = interp->root_namespace;
-        PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,
@@ -24813,7 +24813,7 @@ Parrot_root_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     /* if it's clearly a PIR-level PMC */
     if (type > enum_class_core_max) {
         PMC * const root_ns  = interp->root_namespace;
-        PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,
@@ -24847,7 +24847,7 @@ Parrot_root_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     /* if it's clearly a PIR-level PMC */
     if (type > enum_class_core_max) {
         PMC * const root_ns  = interp->root_namespace;
-        PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,
@@ -24881,7 +24881,7 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     /* if it's clearly a PIR-level PMC */
     if (type > enum_class_core_max) {
         PMC * const root_ns  = interp->root_namespace;
-        PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,
@@ -25032,7 +25032,7 @@ static op_lib_t core_op_lib = {
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*
@@ -25138,7 +25138,7 @@ static void hop_deinit(PARROT_INTERP)
     }
 }
 op_lib_t *
-Parrot_DynOp_core_2_4_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_2_5_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -25167,7 +25167,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_4_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_5_0;
     dynop_register(interp, lib);
     return lib;
 }

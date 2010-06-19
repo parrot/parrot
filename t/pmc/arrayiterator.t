@@ -19,15 +19,17 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
 .namespace []
 
 .include 'iterator.pasm'
+.include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
 
-    plan(21)
+    plan(22)
 
     iterate_forward() # 8 tests
     iterate_backward() # 6 tests
     iterate_backward_string() # 6 test
+    iterate_wrong() # 1 test
     iterator_init() # 1 test
 .end
 
@@ -54,13 +56,38 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     nok(it, "Iterator is finished after second shift")
     is($P0, 42, "2nd element has correct value")
 
-    $I0 = 1
-    push_eh fail
+    .local int result
+    .local pmc ehandler
+    result = 0
+    ehandler = new ['ExceptionHandler']
+    ehandler.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh ehandler
+
+    set_addr ehandler, handlep
     $P0 = shift it
-    $I0 = 0
+    goto fail
+handlep:
+    finalize ehandler
+    set_addr ehandler, handlei
+    $I0 = shift it
+    goto fail
+handlei:
+    finalize ehandler
+    set_addr ehandler, handlen
+    $N0 = shift it
+    goto fail
+handlen:
+    finalize ehandler
+    set_addr ehandler, handles
+    $S0 = shift it
+    goto fail
+handles:
+    finalize ehandler
+
+    result = 1
   fail:
     pop_eh
-    ok($I0, "Shifting from finished iterator throws exception")
+    ok(result, "Shifting from finished iterator throws out of bounds exception")
 
 .end
 
@@ -114,6 +141,26 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
   fail:
     pop_eh
     ok($I0, "Shifting from finished iterator throws exception - string")
+.end
+
+.sub 'iterate_wrong'
+    .local pmc foo, it, ex
+    .local int r
+
+    foo = new ['FixedIntegerArray'], 1
+
+    it = iter foo
+    push_eh catch_wrong
+    it = 42 # Let's hope we'll never have such direction
+    r = 0
+    goto dotest
+catch_wrong:
+    .get_results(ex)
+    finalize ex
+    r = 1
+dotest:
+    pop_eh
+    ok(r, "Caught wrong direction")
 .end
 
 .sub 'iterator_init'

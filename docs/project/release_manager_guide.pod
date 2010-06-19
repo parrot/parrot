@@ -118,10 +118,23 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
+In the two files F<src/ops/core_ops.c> and F<include/parrot/oplib/core_ops.h>
+is the function C<Parrot_DynOp_core_a_b_c>, which has a name that includes
+the version number. a_b_c is the version number. You have to update this
+version number on two places in the file F<src/ops/core_ops.c>.
+In the file F<include/parrot/oplib/core_ops.h> you have to change this line:
+
+ op_lib_t *Parrot_DynOp_core_a_b_c(PARROT_INTERP, long init);
+
+Ignore the warning to not edit this files. It is necessary to edit this files,
+so that "make" builds with the increased version number.
+
+=item g
+
 Configure parrot and run C<make distro_tests>, and either fix
 what those tests complain about, or fix them so they don't complain.
 
-=item g
+=item h
 
 If this is a developer release, or there have been no new entries to the
 F<PBC_COMPAT> file, skip this step.
@@ -142,7 +155,7 @@ pbc files used in the native pbc tests.  Note that you must have Parrot already
 built for this to work, and that this script will reconfigure and rebuild
 Parrot with various primitive size options.
 
-=item h
+=item i
 
 Make sure everything works:
 
@@ -394,7 +407,6 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Jun 15, 2010 - 2.5  - gerd
  - Jul 20, 2010 - 2.6* - coke
  - Aug 17, 2010 - 2.7  - ??
  - Sep 21, 2010 - 2.8  - gerd

@@ -456,11 +456,11 @@ really a public API.
                 key                 = VTABLE_shift_pmc(INTERP, key);
 
                 if (!key) {
-                    Parrot_set_global(INTERP, ns, part, value);
+                    Parrot_ns_set_global(INTERP, ns, part, value);
                     return;
                 }
 
-                ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
+                ns = Parrot_ns_make_namespace_keyed_str(INTERP, ns, part);
             }
         }
 
@@ -471,11 +471,11 @@ really a public API.
                 STRING * const part = VTABLE_get_string_keyed_int(INTERP, key, i);
 
                 if ((i + 1) >= elements) { /* Last entry in the array */
-                    Parrot_set_global(INTERP, ns, part, value);
+                    Parrot_ns_set_global(INTERP, ns, part, value);
                     return;
                 }
 
-                ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
+                ns = Parrot_ns_make_namespace_keyed_str(INTERP, ns, part);
             }
         }
 
@@ -515,7 +515,7 @@ really a public API.
             if (!key)
                 return VTABLE_get_pmc_keyed_str(INTERP, ns, part);
 
-            ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
+            ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, part);
 
             if (PMC_IS_NULL(ns))
                 return PMCNULL;
@@ -531,14 +531,14 @@ really a public API.
                     /* What to do here? Throw an exception or something? */
                     break;
                 }
-                ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
+                ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, name);
                 ++i;
             }
             return ns;
         }
         else {
             STRING * const name = VTABLE_get_string(INTERP, key);
-            ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
+            ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, name);
             return ns;
         }
         /* If we get the wrong type, should we throw an exception?
@@ -605,7 +605,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                     if (!key)
                         return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
 
-                    ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
+                    ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, part);
 
                     if (PMC_IS_NULL(ns))
                         return PMCNULL;
@@ -621,7 +621,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                     if ((i + 1) >= elements)
                         return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
 
-                    ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
+                    ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, part);
 
                     if (PMC_IS_NULL(ns))
                         return PMCNULL;
@@ -729,9 +729,9 @@ already exists, only retrieve it.
 */
 
     METHOD make_namespace(PMC *key) {
-        PMC *ns = Parrot_get_namespace_keyed(INTERP, SELF, key);
+        PMC *ns = Parrot_ns_get_namespace_keyed(INTERP, SELF, key);
         if (PMC_IS_NULL(ns)) {
-            ns = Parrot_make_namespace_keyed(INTERP, SELF, key);
+            ns = Parrot_ns_make_namespace_keyed(INTERP, SELF, key);
         }
         RETURN(PMC *ns);
     }

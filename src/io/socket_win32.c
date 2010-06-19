@@ -51,13 +51,11 @@ static void get_sockaddr_in(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#  if PARROT_NET_DEVEL
-
 /* Helper macros to get sockaddr_in */
-#    define SOCKADDR_LOCAL(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
-                PARROT_SOCKET((p))->local))
-#    define SOCKADDR_REMOTE(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
-                PARROT_SOCKET((p))->remote))
+#  define SOCKADDR_LOCAL(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
+              PARROT_SOCKET((p))->local))
+#  define SOCKADDR_REMOTE(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
+              PARROT_SOCKET((p))->remote))
 
 /*
 
@@ -262,13 +260,13 @@ AGAIN:
         switch (errno) {
           case WSAEINTR:
             goto AGAIN;
-#    ifdef WSAEWOULDBLOCK
+#  ifdef WSAEWOULDBLOCK
           case WSAEWOULDBLOCK:
             goto AGAIN;
-#    else
+#  else
           case WSAEAGAIN:
             goto AGAIN;
-#    endif
+#  endif
           case EPIPE:
             /* XXX why close it here and not below */
             close((int)io->os_handle);
@@ -311,13 +309,13 @@ AGAIN:
         switch (errno) {
           case EINTR:
             goto AGAIN;
-#    ifdef WSAEWOULDBLOCK
+#  ifdef WSAEWOULDBLOCK
           case WSAEWOULDBLOCK:
             goto AGAIN;
-#    else
+#  else
           case WSAEAGAIN:
             goto AGAIN;
-#    endif
+#  endif
           case WSAECONNRESET:
             /* XXX why close it on err return result is -1 anyway */
             close((int)io->os_handle);
@@ -451,8 +449,6 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
     Parrot_str_free_cstring(s);
     return sockaddr;
 }
-
-#  endif /* PARROT_NET_DEVEL */
 
 #endif /* PIO_OS_WIN32 */
 

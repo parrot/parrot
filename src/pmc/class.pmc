@@ -284,7 +284,7 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
         else {
             PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
                     interp->HLL_namespace, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-            new_namespace = Parrot_make_namespace_keyed(interp, hll_ns, name_arg);
+            new_namespace = Parrot_ns_make_namespace_keyed(interp, hll_ns, name_arg);
         }
 
         if (PMC_IS_NULL(new_namespace))
@@ -1589,13 +1589,13 @@ Used to unarchive the class.
         STRING * const semicolon_str = CONST_STRING(INTERP, ";");
         PMC    * const namespace_array =
             Parrot_str_split(INTERP, semicolon_str, serial_namespace);
-        PMC *ns = Parrot_get_namespace_keyed(INTERP,
+        PMC *ns = Parrot_ns_get_namespace_keyed(INTERP,
                 INTERP->root_namespace, namespace_array);
 
         /* If the namespace doesn't exist, we create it, and initialize
          * ourselves in it */
         if (PMC_IS_NULL(ns)) {
-            ns = Parrot_make_namespace_keyed(INTERP,
+            ns = Parrot_ns_make_namespace_keyed(INTERP,
                     INTERP->root_namespace, namespace_array);
             SELF.init_pmc(ns);
         }

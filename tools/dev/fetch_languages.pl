@@ -229,8 +229,8 @@ my @hlls = (
 
     {
         name       => 'pir',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/pir/trunk'
+        scm        => 'GIT',
+        repository => 'http://github.com/bacek/pir.git'
     },
 
     {

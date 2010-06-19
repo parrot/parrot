@@ -134,10 +134,8 @@ Parrot_io_init_win32(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_win32)
     HANDLE h;
-#  if PARROT_NET_DEVEL
     struct WSAData sockinfo;
     int ret;
-#  endif
 
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
         _PIO_STDIN(interp) = Parrot_io_fdopen_win32(interp, PMCNULL, h, PIO_F_READ);
@@ -157,7 +155,6 @@ Parrot_io_init_win32(PARROT_INTERP)
     else {
         _PIO_STDERR(interp) = PMCNULL;
     }
-#  if PARROT_NET_DEVEL
     /* Start Winsock
      * no idea where or whether destroy it
      */
@@ -167,7 +164,6 @@ Parrot_io_init_win32(PARROT_INTERP)
                   WSAGetLastError());
         return -4;
     }
-#  endif
     return 0;
 }
 

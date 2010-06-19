@@ -139,19 +139,21 @@ Reset the Iterator. C<value> must be one of
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
-        if (value == ITERATE_FROM_START) {
+        switch (value) {
+          case ITERATE_FROM_START:
             attrs->reverse   = 0;
             attrs->pos       = 0;
             attrs->length    = VTABLE_elements(INTERP, attrs->string);
-        }
-        else if (value == ITERATE_FROM_END) {
+            break;
+          case ITERATE_FROM_END:
             attrs->reverse   = 1;
             attrs->pos       = attrs->length
                              = VTABLE_elements(INTERP, attrs->string);
-        }
-        else
+            break;
+          default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Wrong direction for StringIterator");
+        }
     }
 
 /*

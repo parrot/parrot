@@ -67,8 +67,6 @@ static void get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr),
 
 =head2 Networking
 
-Define C<PARROT_NET_DEVEL> to enable networking.
-
 These could be native extensions but they probably should be here if we
 wish to make them integrated with the async IO system.
 
@@ -109,8 +107,6 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
     return sockaddr;
 }
 
-
-#  if PARROT_NET_DEVEL
 
 /*
 
@@ -314,13 +310,13 @@ AGAIN:
         switch (errno) {
           case EINTR:
             goto AGAIN;
-#    ifdef EWOULDBLOCK
+#  ifdef EWOULDBLOCK
           case EWOULDBLOCK:
             goto AGAIN;
-#    else
+#  else
           case EAGAIN:
             goto AGAIN;
-#    endif
+#  endif
           case EPIPE:
             /* XXX why close it here and not below */
             close(io->os_handle);
@@ -363,13 +359,13 @@ AGAIN:
         switch (errno) {
           case EINTR:
             goto AGAIN;
-#    ifdef EWOULDBLOCK
+#  ifdef EWOULDBLOCK
           case EWOULDBLOCK:
             goto AGAIN;
-#    else
+#  else
           case EAGAIN:
             goto AGAIN;
-#    endif
+#  endif
           case ECONNRESET:
             /* XXX why close it on err return result is -1 anyway */
             close(io->os_handle);
@@ -457,12 +453,12 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
     const int family = AF_INET;
 
     struct sockaddr_in * const sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
-#    ifdef PARROT_DEF_INET_ATON
+#  ifdef PARROT_DEF_INET_ATON
     if (inet_aton(host, &sa->sin_addr) != 0) {
-#    else
+#  else
     /* positive retval is success */
     if (inet_pton(family, host, &sa->sin_addr) > 0) {
-#    endif
+#  endif
         /* Success converting numeric IP */
     }
     else {
@@ -482,7 +478,6 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
     sa->sin_family = family;
     sa->sin_port = htons(port);
 }
-#  endif
 
 
 #endif /* PIO_OS_UNIX */

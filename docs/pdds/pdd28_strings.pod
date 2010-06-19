@@ -583,7 +583,7 @@ Only useful on a very narrow set of string encodings/character sets.
 =head4 string_make
 
 A crippled version of a string initializer, now replaced with the full version
-C<Parrot_string_new_init>.
+C<Parrot_str_new_init>.
 
 =head4 string_capacity
 

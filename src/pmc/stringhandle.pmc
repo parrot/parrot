@@ -109,12 +109,9 @@ Create a copy of the stringhandle.
         PMC * const copy = Parrot_pmc_new(INTERP, enum_class_StringHandle);
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
-        if (old_struct->stringhandle != NULL)
-            data_struct->stringhandle = old_struct->stringhandle;
-        if (old_struct->mode != NULL)
-            data_struct->mode     = old_struct->mode;
-        if (old_struct->encoding != NULL)
-            data_struct->encoding = old_struct->encoding;
+        data_struct->stringhandle = old_struct->stringhandle;
+        data_struct->mode     = old_struct->mode;
+        data_struct->encoding = old_struct->encoding;
         data_struct->flags    = old_struct->flags;
 
         return copy;
