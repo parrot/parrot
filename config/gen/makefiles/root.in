@@ -390,7 +390,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/vtables.h \
 	$(INC_DIR)/multidispatch.h \
 	$(INC_DIR)/library.h \
-	$(INC_DIR)/global.h \
+	$(INC_DIR)/namespace.h \
 	$(INC_DIR)/stat.h \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
@@ -451,7 +451,6 @@ INTERP_O_FILES = \
     src/gc/gc_inf$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
-    src/global$(O) \
     src/global_setup$(O) \
     src/hash$(O) \
     src/hll$(O) \
@@ -468,6 +467,7 @@ INTERP_O_FILES = \
     src/longopt$(O) \
     src/misc$(O) \
     src/multidispatch$(O) \
+    src/namespace$(O) \
     src/frame_builder$(O) \
     src/nci/api$(O) \
     src/nci/core_thunks$(O) \
@@ -662,7 +662,6 @@ STR_FILES = \
     src/debug.str \
     src/dynext.str \
     src/exceptions.str \
-    src/global.str \
     src/global_setup.str \
     src/hll.str \
     src/call/pcc.str \
@@ -674,6 +673,7 @@ STR_FILES = \
     src/key.str \
     src/library.str \
     src/multidispatch.str \
+    src/namespace.str \
     src/frame_builder.str \
     src/nci/api.str \
     src/nci/core_thunks.str \
@@ -1254,7 +1254,7 @@ src/extend_vtable$(O) : $(PARROT_H_HEADERS) \
 
 src/global_setup$(O) : $(PARROT_H_HEADERS) src/global_setup.str src/global_setup.c
 
-src/global$(O) : $(PARROT_H_HEADERS) src/global.str src/global.c \
+src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
 	include/pmc/pmc_sub.h
 
 src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
@@ -1803,7 +1803,7 @@ buildtools_tests : corevm
 manifest_tests :
 	$(PERL) t/harness $(MANIFEST_TEST_FILES)
 
-examples_tests :
+examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
 
 # benchmark tests

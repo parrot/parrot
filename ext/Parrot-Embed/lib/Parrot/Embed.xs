@@ -153,26 +153,26 @@ CODE:
             ns_str += 2;
 
             if (!ns)
-                ns = Parrot_find_global_cur(real_interp,
+                ns = Parrot_ns_find_current_namespace_global(real_interp,
                     Parrot_str_new_constant(real_interp, prev));
             else
-                ns = Parrot_find_global_n(real_interp, ns,
+                ns = Parrot_ns_find_namespace_global(real_interp, ns,
                     Parrot_str_new_constant(real_interp, prev));
             prev    = ns_str;
         }
 
         if (!ns)
-            ns = Parrot_find_global_cur(real_interp,
+            ns = Parrot_ns_find_current_namespace_global(real_interp,
                 Parrot_str_new_constant(real_interp, prev));
         else
-            ns = Parrot_find_global_n(real_interp, ns,
+            ns = Parrot_ns_find_namespace_global(real_interp, ns,
                 Parrot_str_new_constant(real_interp, prev));
 
-        pmc          = Parrot_find_global_n(real_interp, ns, p_global);
+        pmc          = Parrot_ns_find_namespace_global(real_interp, ns, p_global);
         Safefree(ns_copy);
     }
     else
-        pmc         = Parrot_find_global_cur( real_interp, p_global );
+        pmc         = Parrot_ns_find_current_namespace_global( real_interp, p_global );
 
     RETVAL = make_pmc( aTHX_ ST(0), pmc );
 OUTPUT:

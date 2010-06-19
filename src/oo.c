@@ -190,7 +190,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
                 PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
                                         interp->HLL_namespace,
                                         Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-                PMC * const ns     = Parrot_get_namespace_keyed(interp,
+                PMC * const ns     = Parrot_ns_get_namespace_keyed(interp,
                                         hll_ns, key);
 
                 if (!PMC_IS_NULL(ns))
@@ -334,9 +334,9 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
         return type_class;
     }
     else {
-        PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
+        PMC * const parrot_hll = Parrot_ns_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
         PMC * const pmc_ns =
-            Parrot_make_namespace_keyed_str(interp, parrot_hll,
+            Parrot_ns_make_namespace_keyed_str(interp, parrot_hll,
                 interp->vtables[type]->whoami);
         PMC * proxy = VTABLE_get_class(interp, pmc_ns);
 
@@ -375,7 +375,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         /* First check in current HLL namespace */
         PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
                                Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-        PMC * const ns     = Parrot_get_namespace_keyed_str(interp, hll_ns, name);
+        PMC * const ns     = Parrot_ns_get_namespace_keyed_str(interp, hll_ns, name);
         PMC * const _class = PMC_IS_NULL(ns)
                            ? PMCNULL : VTABLE_get_class(interp, ns);
 

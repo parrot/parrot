@@ -288,12 +288,12 @@ or risk memory leaks.
 
 =over 4
 
-=item C<Parrot_PMC Parrot_find_global_cur(PARROT_INTERP, Parrot_String name)>
+=item C<Parrot_PMC Parrot_ns_find_current_namespace_global(PARROT_INTERP, Parrot_String name)>
 
 Find and return a global called C<name> in the current namespace.  Returns
 C<PMCNULL> if not found.
 
-=item C<Parrot_PMC Parrot_find_global_n(PARROT_INTERP, PMC namespace, Parrot_String name)>
+=item C<Parrot_PMC Parrot_ns_find_namespace_global(PARROT_INTERP, PMC namespace, Parrot_String name)>
 
 Search the namespace PMC C<namespace> for an object with name C<globalname>.
 Return the object, or NULL if not found.
@@ -303,7 +303,7 @@ Return the object, or NULL if not found.
 Find and return a global called C<name> in the namespace C<namespace>.  Returns
 C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_n(PARROT_INTERP, PMC namespace, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_ns_store_global(PARROT_INTERP, PMC namespace, Parrot_String name, Parrot_PMC val)>
 
 Store the PMC C<val> into the namespace PMC C<namespace> with name C<globalname>.
 
@@ -467,7 +467,7 @@ future.
 
         /* find the subroutine named "foo" in the global namespace */
         pstr = string_from_literal(interp, "foo");
-        sub = Parrot_find_global_cur(interp, pstr);
+        sub = Parrot_ns_find_current_namespace_global(interp, pstr);
 
         /* run foo(), which returns nothing */
 	Parrot_ext_call(interp, sub, "->");
@@ -709,13 +709,13 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_find_encoding_converter>
 
-=item C<Parrot_find_global_cur>
+=item C<Parrot_ns_find_current_namespace_global>
 
 =item C<Parrot_find_global_k>
 
-=item C<Parrot_find_global_n>
+=item C<Parrot_ns_find_namespace_global>
 
-=item C<Parrot_find_global_op>
+=item C<Parrot_ns_find_global_from_op>
 
 =item C<Parrot_find_global_s>
 
@@ -725,7 +725,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_find_method_with_cache>
 
-=item C<Parrot_find_name_op>
+=item C<Parrot_ns_find_named_item>
 
 =item C<Parrot_float_rand>
 
@@ -761,7 +761,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_encoding>
 
-=item C<Parrot_get_global>
+=item C<Parrot_ns_get_global>
 
 =item C<Parrot_get_HLL_id>
 
@@ -775,9 +775,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_namespace_autobase>
 
-=item C<Parrot_get_namespace_keyed>
+=item C<Parrot_ns_get_namespace_keyed>
 
-=item C<Parrot_get_namespace_keyed_str>
+=item C<Parrot_ns_get_namespace_keyed_str>
 
 =item C<Parrot_get_numreg>
 
@@ -949,11 +949,11 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_make_default_encoding>
 
-=item C<Parrot_make_namespace_autobase>
+=item C<Parrot_ns_make_namespace_autobase>
 
-=item C<Parrot_make_namespace_keyed>
+=item C<Parrot_ns_make_namespace_keyed>
 
-=item C<Parrot_make_namespace_keyed_str>
+=item C<Parrot_ns_make_namespace_keyed_str>
 
 =item C<Parrot_mmd_cache_create>
 
@@ -1104,12 +1104,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_get_integer_keyed_int>
 
 =item C<Parrot_PMC_get_integer_keyed_str>
-
-=item C<Parrot_PMC_get_intval>
-
-=item C<Parrot_PMC_get_intval_intkey>
-
-=item C<Parrot_PMC_get_intval_pmckey>
 
 =item C<Parrot_PMC_get_iter>
 
@@ -1503,7 +1497,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_set_flag>
 
-=item C<Parrot_set_global>
+=item C<Parrot_ns_set_global>
 
 =item C<Parrot_set_intreg>
 
@@ -1533,11 +1527,11 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_srand>
 
-=item C<Parrot_store_global_n>
+=item C<Parrot_ns_store_global>
 
 =item C<Parrot_store_global_s>
 
-=item C<Parrot_store_sub_in_namespace>
+=item C<Parrot_ns_store_sub>
 
 =item C<Parrot_str_boolean>
 

@@ -56,10 +56,6 @@ Marks the string as live.
 
     VTABLE void mark() {
         STRING *str_val;
-
-        if (!PMC_data(SELF))
-            return;
-
         GET_ATTR_str_val(INTERP, SELF, str_val);
         Parrot_gc_mark_STRING_alive(INTERP, str_val);
     }

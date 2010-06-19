@@ -78,7 +78,7 @@
 
     $P1 = new 'PackfileFixupEntry'
     $P1 = 'hello'
-    $P1.'set_type'(2)
+    $P1.'set_type'(1)
     $P1 = 5 # offset
     pffixup[0] = $P1
 

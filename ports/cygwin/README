@@ -1,7 +1,7 @@
 parrot
 ----------------------------------
 Parrot is a virtual machine designed to efficiently compile and
-execute bytecode for interpreted languages. Parrot is a target for Perl 6 
+execute bytecode for interpreted languages. Parrot is a target for Perl 6
 and a lot of other languages.
 
 Runtime requirements:
@@ -11,7 +11,7 @@ Optional requirements:
   w32api pcre libpq5 openssl
 
 Build requirements:
-  readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl 
+  readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl
   make gcc
 
 Optional build requirements:
@@ -40,7 +40,7 @@ This will create:
   /usr/src/parrot-devel-<VER>-<REL>.tar.bz2
   /usr/src/parrot-docs-<VER>-<REL>.tar.bz2
 
-Or use 'cygport parrot-<VER>-<REL>.cygport prep' to get a patched 
+Or use 'cygport parrot-<VER>-<REL>.cygport prep' to get a patched
 source directory.
 
 -------------------------------------------------------------------------------
@@ -657,7 +657,6 @@ Files included in the =parrot-devel= package:
  /usr/include/parrot/1.0.0/parrot/extend.h
  /usr/include/parrot/1.0.0/parrot/extend_vtable.h
  /usr/include/parrot/1.0.0/parrot/feature.h
- /usr/include/parrot/1.0.0/parrot/global.h
  /usr/include/parrot/1.0.0/parrot/global_setup.h
  /usr/include/parrot/1.0.0/parrot/has_header.h
  /usr/include/parrot/1.0.0/parrot/hash.h
@@ -676,6 +675,7 @@ Files included in the =parrot-devel= package:
  /usr/include/parrot/1.0.0/parrot/memory.h
  /usr/include/parrot/1.0.0/parrot/misc.h
  /usr/include/parrot/1.0.0/parrot/mmd.h
+ /usr/include/parrot/1.0.0/parrot/namespace.h
  /usr/include/parrot/1.0.0/parrot/nci.h
  /usr/include/parrot/1.0.0/parrot/oo.h
  /usr/include/parrot/1.0.0/parrot/oo_private.h
@@ -1877,7 +1877,7 @@ Port Notes:
 ----- version parrot-1.0.0-1 -----
 * cygwin 1.7, gcc-4.3 only
 * renamed libparrot-devel to parrot-devel
-* removed libparrot1 
+* removed libparrot1
 * new parrot-docs for make html
 * library.c patch to allow library/*.pbc
 * removed pbc_info
@@ -1910,21 +1910,21 @@ Port Notes:
 
 ----- version parrot-0.7.0-1 -----
 * removed /usr/runtime and its preremove and postinstall scripts
-* added parrot_exists_check to .cygport. Already installed parrot 
+* added parrot_exists_check to .cygport. Already installed parrot
   still not supported, despite my #39742 patch
 * other minor .cygport improvements: export PATH in seperate lines to fix check
-* new patches: 
+* new patches:
   [perl #39742] [BUG]   installed conflict
   [perl #58034] [TODO]  config_args
   [perl #56996] [TODO]  FHS runtime paths
-* enhanced patch: 
+* enhanced patch:
   [perl #56554] [TODO]  make install -C languages
 * upstream fixed patches:
   [perl #56544] [PATCH] install_files.pl
   [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
   [perl #57006] [PATCH] add cygwin opengl config quirks
   [perl #57296] [TODO]  make install -C languages
-* fixed pipp, perl6, pheme, tcl installables. added pcbc's to library  
+* fixed pipp, perl6, pheme, tcl installables. added pcbc's to library
 
 ----- version parrot-0.6.4-2 -----
 * fixed invalid parrot languages and perl6 paths referencing the build_dir
@@ -1933,7 +1933,7 @@ Port Notes:
 * added myconfig parrotbug VERSION to /usr/lib/parrot
 * moved language dll's to parrot-languages
 * added more sublanguage exe's: bfc, bfco
-* added usr/lib/parrot/include/config.fpmc usr/lib/parrot/include/interpinfo.pasm 
+* added usr/lib/parrot/include/config.fpmc usr/lib/parrot/include/interpinfo.pasm
   to parrot
 
 ----- version parrot-0.6.4-1 -----
@@ -1951,11 +1951,11 @@ Port Notes:
      [perl #57114] [PATCH] urm RealBin issue
 
 ----- version parrot-0.6.3-1 -----
-* first port, with the help from #parrot, fedora spec, 
+* first port, with the help from #parrot, fedora spec,
   gentoo ebuild and freebsd ports.
 * the php implementation plumhead is still named plumhead.
   will be renamed to pipp from the next release 0.6.4 on.
 
 Cygwin port maintained by: Reini Urban <rurban@x-ray.at>
-Please address all questions to the Cygwin mailing list 
+Please address all questions to the Cygwin mailing list
 at <cygwin@cygwin.com>

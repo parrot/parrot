@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,6 +68,10 @@ Tests the SchedulerMessage PMC.
     $P0['type'] = 'nine'
 
     $P1 = new ['SchedulerMessage'], $P0
+
+    # Make sure the mark vtable function is exercised.
+    null $P0
+    sweep 1
 
     $S0 = $P1
     is($S0, "nine", "hash-initialized message has correct type")

@@ -92,7 +92,7 @@ usage:
     .include 'stdio.pasm'
     $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
     $P1.'print'($S0)
-    $P1.'print'(" [ <config-key> | --dump | --help ]\n")
+    $P1.'print'(" [ <config-key> [ <config-key> ... ] | --dump | --help ]\n")
     exit 1
 .end
 

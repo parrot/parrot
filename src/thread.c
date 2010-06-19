@@ -197,7 +197,7 @@ make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PMC *arg))
         /* Skip vtable overrides and methods. */
         if (ret_val_sub->vtable_index == -1
                 && !(ret_val_sub->comp_flags & SUB_COMP_FLAG_METHOD)) {
-            Parrot_store_sub_in_namespace(interp, ret_val);
+            Parrot_ns_store_sub(interp, ret_val);
         }
     }
     else {
