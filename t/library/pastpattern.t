@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2092);
+plan(2101);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -805,6 +805,37 @@ sub test_match_method () {
        'PAST::Node.match with :g has same bool value as ~~.');
     ok(pir::elements__iP($match1) == pir::elements__iP($match2),
        'PAST::Node.match with :g has same number of results as ~~.');
+
+    $match1 := $past.match($pattern, :global(1));
+    $match2 := $pattern.ACCEPTS($past, :global(1));
+
+    ok($match1 ~~ PAST::Pattern::Match,
+       'PAST::Node.match returns a PAST::Pattern::Match with :global');
+    ok(?$match1 == ?$match2,
+       'PAST::Node.match with :global has same bool value as ~~.');
+    ok(pir::elements__iP($match1) == pir::elements__iP($match2),
+       'PAST::Node.match with :global has same number of results as ~~.');
+
+    $past := PAST::Block.new();
+    $match1 := $past.match($pattern, :p(1));
+    $match2 := $pattern.ACCEPTS($past, :p(1));
+
+    ok($match1 ~~ PAST::Pattern::Match,
+       'PAST::Node.match returns a PAST::Pattern::Match with :p');
+    ok(?$match1 == ?$match2,
+       'PAST::Node.match with :p has same bool value as ~~.');
+    ok($match1.from() =:= $match2.from(),
+       'PAST::Node.match with :p has same .from as ~~.');
+
+    $match1 := $past.match($pattern, :pos(1));
+    $match2 := $pattern.ACCEPTS($past, :pos(1));
+
+    ok($match1 ~~ PAST::Pattern::Match,
+       'PAST::Node.match returns a PAST::Pattern::Match with :pos');
+    ok(?$match1 == ?$match2,
+       'PAST::Node.match with :pos has same bool value as ~~.');
+    ok($match1.from() =:= $match2.from(),
+       'PAST::Node.match with :pos has same .from as ~~.');
 }
 
 # Local Variables:

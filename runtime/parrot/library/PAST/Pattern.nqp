@@ -100,7 +100,15 @@ class PAST::Pattern is Capture {
     }
 }
 
+module PAST::Node {
+    method match ($pattern, *%options) {
+        $pattern.ACCEPTS(self, |%options);
+    }
 
+    method subst ($pattern, *%options) {
+        $pattern.transform(self, |%options);
+    }
+}
 
 INIT {
     pir::load_bytecode('PAST/Pattern/Match.pbc');
@@ -109,7 +117,6 @@ INIT {
     pir::load_bytecode('PAST/Pattern/Constant.pbc');
     pir::load_bytecode('PAST/Pattern/Node.pbc');
 
-    pir::load_bytecode('PAST/Pattern/augment-past.pbc');
     pir::load_bytecode('PAST/Pattern/Transformer.pbc');
 }
 
