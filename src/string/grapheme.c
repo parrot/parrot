@@ -14,6 +14,12 @@ $Id$
 
 #if PARROT_HAS_ICU
 
+INTVAL
+grapheme_table_capacity(PARROT_INTERP, grapheme_table *table)
+{
+    return table->size - table->used;
+}
+
 grapheme_table *
 create_grapheme_table(PARROT_INTERP, UINTVAL n)
 {

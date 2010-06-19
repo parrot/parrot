@@ -249,14 +249,13 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     }
     else {
         /* Make sure we have NFC Unicode string. */
-        STRING  *from = Parrot_unicode_charset_ptr->compose(interp,
-                            Parrot_unicode_charset_ptr->to_charset(interp, src));
+        STRING  *from = Parrot_unicode_charset_ptr->to_charset(interp, src);
         UINTVAL  len  = Parrot_str_length(interp, from);
         STRING  *to   = Parrot_str_new_init(interp, NULL, len * sizeof (UChar32),
                            Parrot_nfg_encoding_ptr, Parrot_unicode_charset_ptr, 0);
         UChar32 *buf  = (UChar32 *) to->strstart;
 
-        nfg_encode(interp, to, 0, src, 0, len, 0);
+        nfg_encode(interp, to, 0, Parrot_unicode_charset_ptr->compose(interp, from), 0, len, 0);
 
         return to;
     }
@@ -504,24 +503,31 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 #if PARROT_HAS_ICU
     UChar32 *s   = (UChar32 *) i->str->strstart;
     size_t   pos = i->bytepos / sizeof (UChar32);
-	if (!ISCOMBINING(c)) {
+
+    if (!ISCOMBINING(c)) {
         s[pos++] = (UChar32) c;
         ++i->charpos;
         i->bytepos = pos * sizeof (UChar32);
     }
     // TODO: This can create dynamic graphemes for valid Unicode compositions.
-	else {
-	    int32_t  prev = s[pos - 1];
+    else {
+        grapheme_table *table = (grapheme_table *) i->str->extra;
+        int32_t  prev = s[pos - 1];
         grapheme g;
-		if (prev < 0) {
-		    grapheme_table *table = (grapheme_table *) i->str->extra;
+
+        if (table == NULL) {
+            table = create_grapheme_table(interp, 1);
+            i->str->extra = table;
+        }
+
+        if (prev < 0) {
             g.len = table->graphemes[-1 - prev].len + 1;
             g.hash = table->graphemes[-1 - prev].hash;
             g.hash += g.hash << 5;
             g.hash += c;
             g.codepoints = mem_gc_allocate_n_typed(interp, g.len, UChar32);
-			memcpy(g.codepoints, table->graphemes[-1 - prev].codepoints,
-                   g.len * sizeof (UChar))
+            memcpy(g.codepoints, table->graphemes[-1 - prev].codepoints,
+                   g.len * sizeof (UChar));
         }
         else {
             g.len  = 2;
@@ -536,8 +542,10 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
             g.hash += g.hash << 5;
             g.hash += c;
         }
-	    s[pos - 1] = add_grapheme(interp, (grapheme_table *) i->str->extra, &g);
-		mem_gc_free(interp, g.codepoints);
+        if (grapheme_table_capacity(interp, (grapheme_table *)i->str->extra) < 1)
+            i->str->extra = grow_grapheme_table(interp, (grapheme_table *) i->str->extra, 2);
+        s[pos - 1] = add_grapheme(interp, (grapheme_table *) i->str->extra, &g);
+        mem_gc_free(interp, g.codepoints);
     }
 #else
     UNUSED(i);

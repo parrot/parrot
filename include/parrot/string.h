@@ -30,7 +30,7 @@ typedef enum Forward_flag {
 
 /* String iterator */
 typedef struct string_iterator_t {
-    const STRING *str;
+    STRING *str;
     UINTVAL bytepos;
     UINTVAL charpos;
     UINTVAL (*get_and_advance)(PARROT_INTERP, struct string_iterator_t *i);
