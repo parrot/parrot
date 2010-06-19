@@ -238,33 +238,6 @@ key_set_string(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
     return;
 }
 
-
-/*
-
-=item C<void key_set_pmc(PARROT_INTERP, PMC *key, PMC *value)>
-
-Set the PMC C<value> in C<key>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
-{
-    ASSERT_ARGS(key_set_pmc)
-    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |=  KEY_pmc_FLAG;
-
-    /*
-     * XXX leo
-     * what for is this indirection?
-     */
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "this is broken - see slice.pmc");
-}
-
-
 /*
 
 =item C<INTVAL key_type(PARROT_INTERP, const PMC *key)>
