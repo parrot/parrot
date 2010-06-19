@@ -4,13 +4,17 @@ PAST::Pattern::Constant - A PAST::Pattern subclass for exact matching of constan
 
 =head1 DESCRIPTION
 
-A PAST::Pattern::Constant matches objects that are equal to(according to the is_equal vtable) its value.
+A PAST::Pattern::Constant matches objects that are equal to(according to the is_equal vtable) its
+value.
 
 =head1 PAST::Pattern::Constant is PAST::Pattern
 
-A PAST::Pattern::Constant contains a constant value. This constant value specifies what objects the pattern matches. The pattern matches if the is_equal vtable of the value produces a true result when called with the object to be matched.
+A PAST::Pattern::Constant contains a constant value. This constant value specifies what objects the
+pattern matches. The pattern matches if the is_equal vtable of the value produces a true result
+when called with the object to be matched.
 
-PAST::Pattern::patternize produces a PAST::Pattern::Constant when called with an object which neither has an ACCEPTS method nor provides the invokable role.
+PAST::Pattern::patternize produces a PAST::Pattern::Constant when called with an object which
+neither has an ACCEPTS method nor provides the invokable role.
 
 =head2 Attributes
 
@@ -18,10 +22,10 @@ PAST::Pattern::patternize produces a PAST::Pattern::Constant when called with an
 
 =item value
 
-The value attribute holds the constant value that must be equal to any matching objects. If the value lacks an is_equal vtable, the ACCEPTSEXACTLY method will throw an exception.
+The value attribute holds the constant value that must be equal to any matching objects. If the
+value lacks an is_equal vtable, the ACCEPTSEXACTLY method will throw an exception.
 
 =back
-
 
 =head2 Methods
 
@@ -33,30 +37,13 @@ Creates a PAST::Pattern::Constant with value as its constant target value.
 
 =item value([new_value])
 
-If new_value is provided, set the value attribute of the pattern to new_value. Otherwise, return the current value of the value attribute.
+If new_value is provided, set the value attribute of the pattern to new_value. Otherwise, return the
+current value of the value attribute.
 
 =item ACCEPTSEXACTLY(node)
 
-Used internally by the inherited ACCEPTS method to determine whether a node exactly matches the pattern.
-
-=back
-
-=cut
-=head2 Methods
-
-=over 4
-
-=item new(code)
-
-Creates a PAST::Pattern::Closure with code as its associated predicate.
-
-=item code([value])
-
-If value is provided, set the code attribute of the pattern to value. Otherwise, return the current value of the code attribute.
-
-=item ACCEPTSEXACTLY(node)
-
-Used internally by the inherited ACCEPTS method. to determine whether a node exactly matches the pattern.
+Used internally by the inherited ACCEPTS method to determine whether a node exactly matches the
+pattern.
 
 =back
 

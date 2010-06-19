@@ -6,17 +6,26 @@ PAST::Pattern::Match - the result object from matching a PAST::Pattern.
 
 =head1 DESCRIPTION
 
-Any matching operation with a C<PAST::Pattern> produces a C<PAST::Pattern::Match> object. It can be used to determine whether the match was successful, to find the matching node, and to find the results of the child and attribute sub-patterns.
+Any matching operation with a C<PAST::Pattern> produces a C<PAST::Pattern::Match> object. It can be
+used to determine whether the match was successful, to find the matching node, and to find the
+results of the child and attribute sub-patterns.
 
 =head1 PAST::Pattern::Match is Capture
 
 =head2 Sub-pattern result objects
 
-Some C<PAST::Pattern> subclasses allow supplying child or attribute sub-patterns. When matching these patterns, the C<PAST::Pattern::Match> result object can be used to access the results of the sub-patterns.
+Some C<PAST::Pattern> subclasses allow supplying child or attribute sub-patterns. When matching
+these patterns, the C<PAST::Pattern::Match> result object can be used to access the results of the
+sub-patterns.
 
-The results of child sub-patterns are accessible through array indexing on the result object. The result of the first child sub-pattern of the pattern will be C<match_result[0]>, the result of the second will be C<match_result[1]>, and so on.
+The results of child sub-patterns are accessible through array indexing on the result object. The
+result of the first child sub-pattern of the pattern will be C<match_result[0]>, the result of the
+second will be C<match_result[1]>, and so on.
 
-The results of attribute sub-patterns are accessible through hash indexing on the result object. The result of the "foo" attribute sub-pattern will be C<match_result['foo']>, for example. In NQP, these can also be accessed using the I<$<foo>> syntax if the C<PAST::Pattern::Match> object is bound to I<$/>.
+The results of attribute sub-patterns are accessible through hash indexing on the result object. The
+result of the "foo" attribute sub-pattern will be C<match_result['foo']>, for example. In NQP, these
+can also be accessed using the I<$<foo>> syntax if the C<PAST::Pattern::Match> object is bound to
+I<$/>.
 
 =head2 Attributes
 
@@ -29,11 +38,14 @@ It can be accessed or set with the C<success([I<value>])> method.
 
 =item I<$!ast>
 
-An "abstract object" that has been associated with the C<PAST::Pattern::Match> object. It can be accessed with the C<ast()> method. It can be set with the C<!make(I<ast>)>, or using the C<make> statement in NQP if the C<PAST::Pattern::Match> object is bound to I<$/>.
+An "abstract object" that has been associated with the C<PAST::Pattern::Match> object. It can be
+accessed with the C<ast()> method. It can be set with the C<!make(I<ast>)>, or using the C<make>
+statement in NQP if the C<PAST::Pattern::Match> object is bound to I<$/>.
 
 =item I<$!from>
 
-Contains the matching node(or other value). It can be accessed or set with the C<from([I<value>])> method.
+Contains the matching node(or other value). It can be accessed or set with the C<from([I<value>])>
+method.
 
 =back
 
@@ -43,7 +55,8 @@ Contains the matching node(or other value). It can be accessed or set with the C
 
 =item C<new([I<success>, [I<from>]])>
 
-Creates a new C<PAST::Pattern::Match> object with the I<$!success> and I<$!from> attributes set to the values of I<success> and I<from>, if provided.
+Creates a new C<PAST::Pattern::Match> object with the I<$!success> and I<$!from> attributes set to
+the values of I<success> and I<from>, if provided.
 
 =item C<Bool()>
 
@@ -55,15 +68,18 @@ Returns the value of the I<$!ast> attribute.
 
 =item C<!make(I<ast>)>
 
-Sets the value of the I<$!ast> attribute to I<ast>. In NQP, if I<$/> is a C<PAST::Pattern::Match> object, C<make I<foo>> is equivalent to C<$/."!make"(I<foo>)>.
+Sets the value of the I<$!ast> attribute to I<ast>. In NQP, if I<$/> is a C<PAST::Pattern::Match>
+object, C<make I<foo>> is equivalent to C<$/."!make"(I<foo>)>.
 
 =item C<from([I<from>])>
 
-If I<from> is provide, sets the I<$!from> attribute to I<from>. Otherwise, returns the value of the I<$!from> attribute.
+If I<from> is provide, sets the I<$!from> attribute to I<from>. Otherwise, returns the value of the
+I<$!from> attribute.
 
 =item C<success([I<success>])>
 
-If I<success> is provide, sets the I<$!success> attribute to I<success>. Otherwise, returns the value of the I<$!success> attribute.
+If I<success> is provide, sets the I<$!success> attribute to I<success>. Otherwise, returns the
+value of the I<$!success> attribute.
 
 =back
 

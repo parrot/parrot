@@ -6,20 +6,35 @@ PAST::Pattern::Node and subclasses - PAST::Pattern subclasses for matching speci
 
 =head1 DESCRIPTION
 
-C<PAST::Pattern::Node> subclasses correspond to C<PAST::Node> subclasses. They match nodes of the corresponding types. If the pattern has child sub-patterns, the matched node must have the same number of children and each child of the node must match the corresponding child of the pattern. If the pattern has attribute sub-patterns, the matched node must have each attribute that the pattern has, and that attribute value must match the value of the corresponding attribute of the pattern.
+C<PAST::Pattern::Node> subclasses correspond to C<PAST::Node> subclasses. They match nodes of the
+corresponding types. If the pattern has child sub-patterns, the matched node must have the same
+number of children and each child of the node must match the corresponding child of the pattern. If
+the pattern has attribute sub-patterns, the matched node must have each attribute that the pattern
+has, and that attribute value must match the value of the corresponding attribute of the pattern.
 
 =head1 PAST::Pattern::Node is PAST::Pattern
 
-C<PAST::Pattern::Node> is the superclass for all the C<PAST::Pattern> types that are specific to a certain C<PAST::Node> subclass.
+C<PAST::Pattern::Node> is the superclass for all the C<PAST::Pattern> types that are specific to a
+certain C<PAST::Node> subclass.
 
 =head2 Attributes
 
-Each attribute can contain a PAST::Pattern or other object with an C<ACCEPTS> method, an object that does the C<invokable> role(such as a C<Sub>), or any other object. If the value of an attribute does not have an C<ACCEPTS> method, C<PAST::Pattern::patternize> is called on it to produce an object that does. C<Invokable> objects are used to create C<PAST::Pattern::Closure> objects, which match any object for which their associated C<invokable> object returns true. For other objects without an C<ACCEPTS> method, the object is used to create a C<PAST::Pattern::Constant> object which matches any object for which the result of the C<is_equal> vtable of the object is true.
+Each attribute can contain a PAST::Pattern or other object with an C<ACCEPTS> method, an object that
+does the C<invokable> role(such as a C<Sub>), or any other object. If the value of an attribute does
+not have an C<ACCEPTS> method, C<PAST::Pattern::patternize> is called on it to produce an object
+that does. C<Invokable> objects are used to create C<PAST::Pattern::Closure> objects, which match
+any object for which their associated C<invokable> object returns true. For other objects without an
+C<ACCEPTS> method, the object is used to create a C<PAST::Pattern::Constant> object which matches
+any object for which the result of the C<is_equal> vtable of the object is true.
 
-Attributes can be set or accessed using hash indexing(in which case, you must manually call C<PAST::Pattern::patternize> if necessary), using the C<attr> method, or as named arguments to the C<new> method.
+Attributes can be set or accessed using hash indexing(in which case, you must manually call
+C<PAST::Pattern::patternize> if necessary), using the C<attr> method, or as named arguments to the
+C<new> method.
 
-The attributes of C<PAST::Nodes> and their subclasses can be set or accessed using accessor methods with the appropriate name.
-C<PAST::Pattern::Node> has attributes with accessors for the following C<PAST::Node> and C<PCT::Node> attributes:
+The attributes of C<PAST::Nodes> and their subclasses can be set or accessed using accessor methods
+with the appropriate name.
+C<PAST::Pattern::Node> has attributes with accessors for the following C<PAST::Node> and
+C<PCT::Node> attributes:
 
 =over 4
 
@@ -59,21 +74,34 @@ These subroutines are used in subclasses to simplify checking of attribute and c
 
 =item C<check_attribute(I<pattern>, I<node>, I<attr>, I<match>)>
 
-Verifies that I<node>'s attribute I<attr> matches I<pattern>'s attribute I<attr>, if one exists. The success and attributes of I<match>, which should be a C<PAST::Pattern::Match> object, will are then modified appropriately. If a sub-pattern is not found, it returns 1. Otherwise, it returns the boolean value of the result of attempting to match I<node>'s I<attr> attribute with the sub-pattern. If there is a sub-pattern and it matches, then I<match>'s attribute I<attr> is set to the result. If the sub-pattern does not match, then the success value of I<match> will be set to 0.
+Verifies that I<node>'s attribute I<attr> matches I<pattern>'s attribute I<attr>, if one exists. The
+success and attributes of I<match>, which should be a C<PAST::Pattern::Match> object, will are then
+modified appropriately. If a sub-pattern is not found, it returns 1. Otherwise, it returns the
+boolean value of the result of attempting to match I<node>'s I<attr> attribute with the sub-pattern.
+If there is a sub-pattern and it matches, then I<match>'s attribute I<attr> is set to the result. If
+the sub-pattern does not match, then the success value of I<match> will be set to 0.
 
 =item C<check_children(I<pattern>, I<node>, I<match>)>
 
-Verifies that the children of I<pattern> match the corresponding children of I<node>. The I<match> argument should be a C<PAST::Pattern::Match> variable. If there are no child sub-patterns of I<pattern> or all of the child sub-patterns match the corresponding children of I<node>, it returns 1. The children of I<match> with the same index as the child sub-patterns are set to the result of their matches if they are successful. If any child sub-patterns do not match the corresponding child of I<node>, the success value of I<match> is set to 0 and 0 is returned.
+Verifies that the children of I<pattern> match the corresponding children of I<node>. The I<match>
+argument should be a C<PAST::Pattern::Match> variable. If there are no child sub-patterns of
+I<pattern> or all of the child sub-patterns match the corresponding children of I<node>, it returns
+1. The children of I<match> with the same index as the child sub-patterns are set to the result of
+their matches if they are successful. If any child sub-patterns do not match the corresponding child
+of I<node>, the success value of I<match> is set to 0 and 0 is returned.
 
 =item C<check_node_attributes(I<pattern>, I<node>, I<match>)>
 
-A convenience sub for checking the PAST::Node attributes of I<pattern> and I<node>. C<check_attribute> is called with I<pattern>, I<node>, each attribute, and I<match>. The checking aborts as soon as any existing I<pattern> attribute does not match.
+A convenience sub for checking the PAST::Node attributes of I<pattern> and I<node>.
+C<check_attribute> is called with I<pattern>, I<node>, each attribute, and I<match>. The checking
+aborts as soon as any existing I<pattern> attribute does not match.
 
 =back
 
 =head1 PAST::Pattern::Block is PAST::Pattern::Node
 
-C<PAST::Pattern::Block> patterns are used to match C<PAST::Block> nodes. Their attributes correspond to those of C<PAST::Block>.
+C<PAST::Pattern::Block> patterns are used to match C<PAST::Block> nodes. Their attributes correspond
+to those of C<PAST::Block>.
 
 =head2 Attributes
 
@@ -111,7 +139,8 @@ C<PAST::Pattern::Block> patterns are used to match C<PAST::Block> nodes. Their a
 
 =head1 PAST::Pattern::Op is PAST::Pattern::Node
 
-C<PAST::Pattern::Op> patterns are used to match C<PAST::Op> nodes. Their attributes correspond to those of C<PAST::Op>.
+C<PAST::Pattern::Op> patterns are used to match C<PAST::Op> nodes. Their attributes correspond to
+those of C<PAST::Op>.
 
 =head2 Attributes
 
@@ -127,11 +156,14 @@ C<PAST::Pattern::Op> patterns are used to match C<PAST::Op> nodes. Their attribu
 
 =head1 PAST::Pattern::Stmts is PAST::Pattern::Node
 
-C<PAST::Pattern::Stmts> patterns are used to match C<PAST::Stmts> nodes. They have no additional attributes beyond those of C<PAST::Pattern::Node>.
+C<PAST::Pattern::Stmts> patterns are used to match C<PAST::Stmts> nodes. They have no additional
+attributes beyond those of C<PAST::Pattern::Node>.
 
 =head1 PAST::Pattern::Val is PAST::Pattern::Node
 
-C<PAST::Pattern::Val> patterns are used to match C<PAST::Val> nodes. Their attributes correspond to those of C<PAST::Val>. Since C<PAST::Val> nodes cannot have I<lvalue> attributes, the I<lvalue> attribute of C<PAST::Pattern::Node> is unimportant for C<PAST::Pattern::Val> nodes.
+C<PAST::Pattern::Val> patterns are used to match C<PAST::Val> nodes. Their attributes correspond to
+those of C<PAST::Val>. Since C<PAST::Val> nodes cannot have I<lvalue> attributes, the I<lvalue>
+attribute of C<PAST::Pattern::Node> is unimportant for C<PAST::Pattern::Val> nodes.
 
 =head2 Attributes
 
@@ -143,7 +175,8 @@ C<PAST::Pattern::Val> patterns are used to match C<PAST::Val> nodes. Their attri
 
 =head1 PAST::Pattern::Var is PAST::Pattern::Node
 
-C<PAST::Pattern::Var> patterns are used to match C<PAST::Var> nodes. Their attributes correspond to those of C<PAST::Var>.
+C<PAST::Pattern::Var> patterns are used to match C<PAST::Var> nodes. Their attributes correspond to
+those of C<PAST::Var>.
 
 =head2 Attributes
 
@@ -169,6 +202,7 @@ C<PAST::Pattern::Var> patterns are used to match C<PAST::Var> nodes. Their attri
 
 =head1 PAST::Pattern::VarList is PAST::Pattern::Node
 
-C<PAST::Pattern::VarList> patterns are used to match C<PAST::VarList> nodes. They have no additional attributes beyond those of C<PAST::Pattern::Node>
+C<PAST::Pattern::VarList> patterns are used to match C<PAST::VarList> nodes. They have no additional
+attributes beyond those of C<PAST::Pattern::Node>
 
 =cut

@@ -15,7 +15,8 @@ PAST::Pattern - A library for pattern matching on PAST::Nodes.
 
 =head1 DESCRIPTION
 
-PAST::Pattern and its subclasses allow determining whether a PAST::Node matches a certain pattern, in addition to allowing modification of any matches sub-trees similarly to regex substitution.
+PAST::Pattern and its subclasses allow determining whether a PAST::Node matches a certain pattern,
+in addition to allowing modification of any matches sub-trees similarly to regex substitution.
 
 =head1 PAST::Pattern is Capture
 
@@ -25,7 +26,9 @@ PAST::Pattern and its subclasses allow determining whether a PAST::Node matches 
 
 =item C<patternize(I<value>)>
 
-Converts an object that is not a pattern(does not implement the C<ACCEPTS> method) into one that is. If I<value> does the C<invokable> role, it is used to create a C<PAST::Pattern::Closure> pattern. Otherwise, it is used to create a C<PAST::Pattern::Constant> pattern.
+Converts an object that is not a pattern(does not implement the C<ACCEPTS> method) into one that
+is. If I<value> does the C<invokable> role, it is used to create a C<PAST::Pattern::Closure>
+pattern. Otherwise, it is used to create a C<PAST::Pattern::Constant> pattern.
 
 =back
 
@@ -35,11 +38,20 @@ Converts an object that is not a pattern(does not implement the C<ACCEPTS> metho
 
 =item C<transform(I<past>, I<transform>)>
 
-Uses the C<invokable> object or C<PAST::Transformer> in I<transform> to transform any sub-trees of I<past> that match the pattern.
+Uses the C<invokable> object or C<PAST::Transformer> in I<transform> to transform any sub-trees of
+I<past> that match the pattern.
 
 =item C<ACCEPTS(I<node>, [option1 => value1, option2 => value2, ...])>
 
-Tests whether the I<node> or any sub-tree thereof matches the pattern. Returns a C<PAST::Pattern::Match> result object. Valid options are C<g> or C<global> and C<p> or C<pos>. If C<g> or C<global> are true, the match is global. After the first match is found, the search will continue until every sub-tree has been checked for matching. If no matches are found, a false C<PAST::Pattern::Match> object will be returned. If only one match is found, C<ACCEPTS> returns the same value with or without C<g> or C<global>. If multiple matches are found, the result is a true C<PAST::Pattern::Match> object whose array part contains the individual match results. If C<p> or C<pos> are provided, they specify a PAST::Node that must exactly match the pattern. Supplying one of both C<g> or C<global> and C<p> or C<pos> produces an error.
+Tests whether the I<node> or any sub-tree thereof matches the pattern. Returns a
+C<PAST::Pattern::Match> result object. Valid options are C<g> or C<global> and C<p> or C<pos>.
+If C<g> or C<global> are true, the match is global. After the first match is found, the search will
+continue until every sub-tree has been checked for matching. If no matches are found, a false
+C<PAST::Pattern::Match> object will be returned. If only one match is found, C<ACCEPTS> returns the
+same value with or without C<g> or C<global>. If multiple matches are found, the result is a true
+C<PAST::Pattern::Match> object whose array part contains the individual match results. If C<p> or
+C<pos> are provided, they specify a PAST::Node that must exactly match the pattern. Supplying one
+of both C<g> or C<global> and C<p> or C<pos> produces an error.
 
 =back
 
@@ -51,7 +63,8 @@ The following method should be implemented in any subclass, as C<.ACCEPTS> relie
 
 =item C<ACCEPTSEXACTLY(I<node>)>
 
-Tests whether the specific node matches the pattern without recursing into children. The result should be a PAST::Pattern::Match object. Every PAST::Pattern subclass B<MUST> implement this method.
+Tests whether the specific node matches the pattern without recursing into children. The result
+should be a PAST::Pattern::Match object. Every PAST::Pattern subclass B<MUST> implement this method.
 
 =back
 
