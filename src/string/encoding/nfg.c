@@ -190,6 +190,19 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #if PARROT_HAS_ICU
 #  include <unicode/ustring.h>
 
+
+/*
+
+=item C<static void nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
+UINTVAL offs, UINTVAL len, UINTVAL graphemes)
+
+Helper function to NFG-encode strings. It handles the (lazy) creation of the grapheme
+table and the graphemes it contains.
+
+=cut
+
+*/
+
 static void
 nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
            UINTVAL offs, UINTVAL len, UINTVAL graphemes)

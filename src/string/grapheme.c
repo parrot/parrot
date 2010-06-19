@@ -17,6 +17,7 @@ $Id$
 INTVAL
 grapheme_table_capacity(PARROT_INTERP, grapheme_table *table)
 {
+    ASSERT_ARGS(grapheme_table_capacity)
     return table->size - table->used;
 }
 
