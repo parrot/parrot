@@ -8,7 +8,7 @@
 
 runtime/parrot/library/Instrument/EventDispatcher.nqp
 
-	Specific eventhandler to handle Instrument related events.
+    Specific eventhandler to handle Instrument related events.
 
 =head1 SYNOPSIS
 
@@ -33,15 +33,15 @@ Private method to perform required initialisation.
 
 =end
 
-	method _self_init () {
-		$!events := Q:PIR { %r = new ['Hash'] };
-		
-		Q:PIR {
+    method _self_init () {
+        $!events := Q:PIR { %r = new ['Hash'] };
+        
+        Q:PIR {
             $P0 = get_global 'handler'
             setattribute self, 'code', $P0
             addhandler self
         };
-	};
+    };
 
 =begin
 
@@ -73,11 +73,11 @@ Registers the handler for the given event.
 =end
 
     method register ($event, $callback) {
-		my $list := Q:PIR {
-			find_lex $P0, '$event'
-			$P1 = getattribute self, '$!events'
-			%r  = $P1[$P0]
-		};
+        my $list := Q:PIR {
+            find_lex $P0, '$event'
+            $P1 = getattribute self, '$!events'
+            %r  = $P1[$P0]
+        };
 
         if !pir::defined__IP($list) {
             $list := Q:PIR { %r = new ['ResizablePMCArray'] };
@@ -103,9 +103,10 @@ with it.
         my $subtype := pir::getattribute_p_p_s__PPS($task, "subtype");
         my $events  := pir::getattribute_p_p_s__PPS($handler, '$!events');
         my $list    := pir::set_p_p_kc__PPS($events, $subtype);
+        my $data    := pir::getattribute_p_p_s__PPS($task, "data");
 
         for $list {
-            $_($task);
+            $_($data);
         }
     };
 };

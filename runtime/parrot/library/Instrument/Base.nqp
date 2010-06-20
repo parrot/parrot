@@ -37,24 +37,24 @@ _self_init method.
 
 =end
 
-	method new () {
-		self := Q:PIR {
-			$P0 = self.'HOW'()
-		    $P1 = getattribute $P0, 'parrotclass'
-		    %r = new $P1
-		};
-		
-		if !pir::defined__IP($id_count) {
-			$id_count := 0;
-		}
-		
-		my $id := $id_count++;
-		$!identifier := "Instrument-" ~ $id;
-		
-		self._self_init();
-		
-		return self;
-	};
+    method new () {
+        self := Q:PIR {
+            $P0 = self.'HOW'()
+            $P1 = getattribute $P0, 'parrotclass'
+            %r = new $P1
+        };
+        
+        if !pir::defined__IP($id_count) {
+            $id_count := 0;
+        }
+        
+        my $id := $id_count++;
+        $!identifier := "Instrument-" ~ $id;
+        
+        self._self_init();
+        
+        return self;
+    };
 
 =begin
 
@@ -67,9 +67,9 @@ Stub method for abstract base class.
 
 =end
 
-	method _self_init () {
-		die("Abstract class Instrument::Base cannot be instantiated.");
-	};
+    method _self_init () {
+        die("Abstract class Instrument::Base cannot be instantiated.");
+    };
 
 =begin
 
@@ -114,7 +114,7 @@ Sets the data attribute.
 =end   
 
     method set_data ($data) {
-    	$!data := $data;
+        $!data := $data;
     };
 
 =begin
@@ -126,9 +126,9 @@ Stub method. To be implemented by child classes.
 =cut
 =end
 
-	method _on_attach () {
-		die("Method _on_attach is unimplemented for abstract class Instrument::Base.");
-	};
+    method _on_attach () {
+        die("Method _on_attach is unimplemented for abstract class Instrument::Base.");
+    };
 
 =begin
 =item enable()
@@ -156,7 +156,7 @@ Stub method. To be implemented by child classes.
 
     # Helper sub: returns the Sub PMC object of a given sub name.
     sub get_sub_obj ($sub) {
-    	if !pir::defined__IP($sub) {
+        if !pir::defined__IP($sub) {
             die('$sub is not defined.');
         }
 

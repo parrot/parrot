@@ -18,7 +18,7 @@ runtime/parrot/library/Instrument/Event.nqp - Abstract class for the Instruments
 =end
 
 class Instrument::Event is Instrument::Base {
-	has $!initialiser;
+    has $!initialiser;
     has $!event_type;
     has $!probe_obj;
 
@@ -34,8 +34,8 @@ Stub method for abstract base Instrument::Event class.
 =end
 
     method _self_init () {
-		die("Abstract class Instrument::Event cannot be instantiated.");
-	};
+        die("Abstract class Instrument::Event cannot be instantiated.");
+    };
 
 =begin
 
@@ -62,17 +62,17 @@ Registers callbacks with the EventDispatcher Object in the Instrument dynpmc.
 
     method _on_attach () {
         if pir::defined__IP($!probe_obj) {
-    	    $!instr_obj.attach($!probe_obj);
-    	}
+            $!instr_obj.attach($!probe_obj);
+        }
 
-    	my $dispatcher := Q:PIR {
-    		$P0 = getattribute self, '$!instr_obj'
-    		%r  = $P0['eventdispatcher']
-    	};
+        my $dispatcher := Q:PIR {
+            $P0 = getattribute self, '$!instr_obj'
+            %r  = $P0['eventdispatcher']
+        };
 
-    	if pir::defined__IP($!callback) {
-	    	$dispatcher.register($!event_type, $!callback);
-    	}
+        if pir::defined__IP($!callback) {
+            $dispatcher.register($!event_type, $!callback);
+        }
     };
 
 =begin
@@ -108,14 +108,14 @@ Helper sub that creates a Task instance and schedules it.
 =end
 
     sub _raise_event ($evt, $data) {
-    	my $hash := Q:PIR { %r = new ['Hash'] };
-    	pir::set_p_k_p($hash, 'type',    'event');
-    	pir::set_p_k_p($hash, 'subtype', $evt);
-    	pir::set_p_k_p($hash, 'data',    $data);
+        my $hash := Q:PIR { %r = new ['Hash'] };
+        pir::set_p_k_p($hash, 'type',    'event');
+        pir::set_p_k_p($hash, 'subtype', $evt);
+        pir::set_p_k_p($hash, 'data',    $data);
 
-    	my $task := pir::new_p_s_p__PSP('Task', $hash);
+        my $task := pir::new_p_s_p__PSP('Task', $hash);
 
-    	pir::schedule($task);
+        pir::schedule($task);
     }
 };
 

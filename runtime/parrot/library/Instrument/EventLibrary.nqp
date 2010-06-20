@@ -67,7 +67,7 @@ class Instrument::Event::Class::instantiate is Instrument::Event {
         $!probe_obj.set_callback(pir::get_global__PS('callback'));
     };
 
-    sub callback ($op, $instr_obj) {
+    sub callback ($op, $instr_obj, $probe) {
         my $class    := $op.get_arg(1);
 
         my $data := Q:PIR { %r = new ['ResizablePMCArray'] };

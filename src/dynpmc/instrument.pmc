@@ -360,7 +360,7 @@ and attribute 'instr_obj'. Set the 'instr_obj' to SELF and call the
 
 /*
 
-=item C<void *insert_op_hooks(PMC *id, INTVAL op_num, PMC *hook)>
+=item C<void *insert_op_hooks(PMC *probe, INTVAL op_num)>
 
 Insert a hook for the given op number.
 
@@ -368,7 +368,7 @@ Insert a hook for the given op number.
 
 */
 
-    METHOD insert_op_hook(PMC *id, INTVAL op_num, PMC *hook) {
+    METHOD insert_op_hook(PMC *probe, INTVAL op_num) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
         probe_list_t        **list = core->op_hooks;
@@ -383,12 +383,12 @@ Insert a hook for the given op number.
             list[index] = probe_list_create_list(INTERP);
         }
 
-        probe_list_push(INTERP, list[index], hook);
+        probe_list_push(INTERP, list[index], probe);
     }
 
 /*
 
-=item C<void *remove_op_hooks(PMC *id, INTVAL op_num, PMC *callback)>
+=item C<void *remove_op_hooks(PMC *probe, INTVAL op_num)>
 
 Removes a hook for the given op number.
 
@@ -396,7 +396,7 @@ Removes a hook for the given op number.
 
 */
 
-    METHOD remove_op_hook(PMC *id, INTVAL op_num, PMC *callback) {
+    METHOD remove_op_hook(PMC *probe, INTVAL op_num) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
         probe_list_t        **list = core->op_hooks;
@@ -409,7 +409,7 @@ Removes a hook for the given op number.
         }
 
         if (list[index] != NULL) {
-            node = probe_list_find(INTERP, list[index], callback);
+            node = probe_list_find(INTERP, list[index], probe);
 
             if (node != NULL) {
                 probe_list_remove(INTERP, list[index], node);
@@ -418,8 +418,9 @@ Removes a hook for the given op number.
 
         if (node == NULL) {
             /* Callback was not found. */
+            PMC *id = VTABLE_get_attr_str(INTERP, probe, CONST_STRING(INTERP, "$!identifier"));
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "Probe of '%S' not found in 'removal_op_hook'",
+                                        "Probe '%Ss' not found in 'remove_op_hook'",
                                         VTABLE_get_string(INTERP, id));
         }
     }
@@ -449,41 +450,42 @@ Returns the number of enabled op catchall probes.
     }
 
 /*
-=item C<void *insert_op_catchall(PMC *id, PMC *callback)>
+=item C<void *insert_op_catchall(PMC *probe)>
 
 Register a catchall op callback
 
 =cut
 */
 
-    METHOD insert_op_catchall(PMC *id, PMC *callback) {
+    METHOD insert_op_catchall(PMC *probe) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
         probe_list_t  *list = core->op_catchall;
 
-        probe_list_push(INTERP, list, callback);
+        probe_list_push(INTERP, list, probe);
     }
 
 /*
-=item C<void *remove_op_catchall(PMC *id, PMC *callback)>
+=item C<void *remove_op_catchall(PMC *probe)>
 
 Deregister a catchall op callback
 
 =cut
 */
 
-    METHOD remove_op_catchall(PMC *id, PMC *callback) {
+    METHOD remove_op_catchall(PMC *probe) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         Instrument_runcore_t *core = (Instrument_runcore_t *) attr->supervised->run_core;
         probe_list_t  *list = core->op_catchall;
         probe_node_t  *node = NULL;
 
-        node = probe_list_find(INTERP, list, callback);
+        node = probe_list_find(INTERP, list, probe);
 
         if (node == NULL) {
             /* Callback was not found. */
+            PMC *id = VTABLE_get_attr_str(INTERP, probe, CONST_STRING(INTERP, "$!identifier"));
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "Probe of '%S' not found in 'removal_op_hook'",
+                                        "Probe '%S' not found in 'remove_op_catchall'",
                                         VTABLE_get_string(INTERP, id));
         }
 
@@ -703,10 +705,14 @@ static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP) {
         }
 
         /* Fire the probe. */
-        callback = cur_probe->list_obj;
+        callback =  VTABLE_get_attr_str(supervisor, cur_probe->list_obj,
+                                        CONST_STRING(supervisor, "$!callback"));
         next     = cur_probe->next;
         if (!PMC_IS_NULL(callback)) {
-            Parrot_ext_call(supervisor, callback, "PP->", op_data, instrument);
+            /* Pass params: InstrumentOp, Instrument, Instrument::Probe */
+            Parrot_ext_call(supervisor, callback,
+                            "PPP->",
+                            op_data, instrument, cur_probe->list_obj);
         }
         cur_probe = next;
     }
@@ -764,6 +770,7 @@ static void detect_loadlib(PARROT_INTERP) {
 
                 task_data = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
                 VTABLE_push_string(supervisor, task_data, VTABLE_get_string(interp, lib));
+                VTABLE_push_pmc(supervisor, task_data, core->supervisor_pmc);
 
                 task_hash = Parrot_pmc_new(supervisor, enum_class_Hash);
                 VTABLE_set_string_keyed_str(supervisor, task_hash,

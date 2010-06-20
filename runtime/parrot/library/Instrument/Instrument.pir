@@ -29,8 +29,8 @@ runtime/parrot/library/Instrument/Instrument.pir - Loads all libraries required 
 .end
 
 .sub 'die'
-	.param pmc msg
-	die msg
+    .param pmc msg
+    die msg
 .end
 
 # Local Variables:

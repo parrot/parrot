@@ -31,7 +31,7 @@ my $instr := Q:PIR { %r = new ['Instrument'] };
 $instr.attach($probe);
 $instr.run($args[0], $args);
 
-sub tracer ($op, $instr_obj) {
+sub tracer ($op, $instr_obj, $probe) {
     my $sprintf_args := [$op.pc()];
     my $pc_hex       := pir::sprintf__SSP("%04x", $sprintf_args);
     my $op_name      := $op.family();
@@ -56,7 +56,7 @@ sub tracer ($op, $instr_obj) {
                 # Constant keys are int constants or strings.
                 if pir::band__III($arg_type, 2) == 2 {
                     # String constant key.
-                    my $arg_val := $op.get_arg($cur_arg);
+                    my $arg_val := pir::escape__SS($op.get_arg($cur_arg));
                     $arg_str := '["' ~ $arg_val ~ '"]';
 
                 } else {
@@ -82,7 +82,7 @@ sub tracer ($op, $instr_obj) {
                 && pir::band__III($arg_type, 2) != 2 {
 
             if pir::band__III($arg_type, 1) == 1 {
-                my $arg_val := $op.get_arg($cur_arg);
+                my $arg_val := pir::escape__SS($op.get_arg($cur_arg));
                 $arg_str := '"' ~ $arg_val ~ '"';
 
             } else {
@@ -116,13 +116,9 @@ sub tracer ($op, $instr_obj) {
         $cur_arg++;
     }
 
-    my $prefix := ' ';
-    for $arg_list {
-        $params := $params ~ $prefix ~ $_;
-        $prefix := ', '
-    }
+    $params := pir::join__SSP(', ', $arg_list);
 
-    say($pc_hex ~ ' ' ~ $op_name ~ $params);
+    say($pc_hex ~ ' ' ~ $op_name ~ ' ' ~ $params);
 };
 
 # vim: ft=perl6 expandtab shiftwidth=4:
