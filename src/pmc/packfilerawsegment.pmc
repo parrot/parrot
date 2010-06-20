@@ -189,8 +189,7 @@ Set an integer's worth of data in the segment.
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         SELF.set_integer_keyed_int(
             VTABLE_get_integer(INTERP, key),
-            VTABLE_get_integer(INTERP, value)
-        );
+            VTABLE_get_integer(INTERP, value));
     }
 
 /*
