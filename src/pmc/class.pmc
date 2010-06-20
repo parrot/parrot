@@ -1352,13 +1352,8 @@ Returns whether the class is or inherits from C<*class>.
         if (classobj->vtable->base_type == enum_class_Class
         ||  classobj->vtable->base_type == enum_class_PMCProxy) {
             STRING *classname = make_class_name(INTERP, classobj);
-
-            if (Parrot_str_equal(INTERP, SELF->vtable->whoami, classname))
-                return 1;
-
-            if (SELF->vtable->isa_hash
-            &&  parrot_hash_exists(INTERP, SELF->vtable->isa_hash,
-                                    (void *)classname))
+            PARROT_ASSERT(SELF->vtable->isa_hash);
+            if (parrot_hash_exists(INTERP, SELF->vtable->isa_hash, classname))
                 return 1;
         }
 

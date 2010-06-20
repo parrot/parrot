@@ -506,8 +506,6 @@ END_MULTI_LIST
     my $multi_list_size = @multi_list;
     my $multi_list = join( "\n", @multi_list);
 
-    my @isa = grep { $_ ne 'default' } @{ $self->parents };
-
     my $provides        = join( " ", keys( %{ $self->{flags}{provides} } ) );
     my $class_init_code = "";
 
@@ -586,17 +584,9 @@ EOC
 EOC
     }
 
-    if (@isa) {
-        unshift @isa, $classname;
-        $cout .= <<"EOC";
+    $cout .= <<"EOC";
         vt->isa_hash     = Parrot_${classname}_get_isa(interp, NULL);
 EOC
-    }
-    else {
-        $cout .= <<"EOC";
-        vt->isa_hash     = NULL;
-EOC
-    }
 
     for my $k ( keys %extra_vt ) {
         my $k_flags = $self->$k->vtable_flags;
