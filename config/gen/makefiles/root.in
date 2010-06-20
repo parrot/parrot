@@ -320,6 +320,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Tcl/Glob.pbc \
     $(LIBRARY_DIR)/TclLibrary.pbc \
     $(LIBRARY_DIR)/URI.pbc \
+    $(LIBRARY_DIR)/URI/Escape.pbc \
     $(LIBRARY_DIR)/uuid.pbc \
     $(LIBRARY_DIR)/YAML/Dumper/Base.pbc \
     $(LIBRARY_DIR)/YAML/Dumper/Default.pbc \
