@@ -874,10 +874,19 @@ $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Hash* Parrot_${classname}_get_isa(PARROT_INTERP, Hash* isa) {
+EOC
+
+    if ($get_isa ne '') {
+        $cout .= $get_isa;
+    }
+    else {
+        $cout .= <<"EOC";
     if (isa == NULL) {
         isa = parrot_new_hash(interp);
     }
-$get_isa
+EOC
+    }
+    $cout .= <<"EOC";
     parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
     return isa;
 }
