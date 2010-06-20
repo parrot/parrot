@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-20010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 161
+.const int TESTS = 162
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
@@ -89,32 +89,47 @@ Tests the Float PMC.
 .include 'fp_equality.pasm'
 
 .sub 'basic_assignment'
-    $P0 = new ['Float']
+    # Assignments can morph to other PMC type,
+    # use a new Float for each test to be sure we are testing
+    # the intended code.
 
+    $P0 = new ['Float']
     $P0 = 0.001
     is($P0, 0.001, 'basic float assignment 1', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 12.5
     is($P0, 12.5, 'basic assignment 2', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 1000
     is($P0, 1000.0, 'basic integer assignment', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 'Twelve point five'
     is($P0, 0.0, 'basic string assignment', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 123.45
     $I0 = $P0
     is($I0, 123, 'rounding to integer')
 
+    $P0 = new ['Float']
     $P0 = 123.45
     $N0 = $P0
     is($N0, 123.45, 'get_float_value', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 123.45
     $S0 = $P0
     is($S0, '123.45', 'get string')
 
+    $P0 = new ['Float']
+    $P0 = 123.45
+    $S0 = get_repr $P0
+    is($S0, '123.45', 'get_repr')
+
+    $P0 = new ['Float']
     $P0 = "12.49"
     is($P0, 12.49, 'setting value from String', PRECISION)
 .end
