@@ -147,6 +147,15 @@ Get the number of elements in the array.
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
     }
 
+    VTABLE INTVAL get_integer() {
+        return VTABLE_elements(INTERP,
+                PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
+    }
+
+    VTABLE FLOATVAL get_number() {
+        return VTABLE_elements(INTERP,
+                PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
+    }
 
 /*
 
@@ -177,6 +186,13 @@ Set an integer's worth of data in the segment.
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, key, value);
     }
 
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        SELF.set_integer_keyed_int(
+            VTABLE_get_integer(INTERP, key),
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
 /*
 
 =item C<void push_integer(INTVAL value)>
@@ -189,6 +205,12 @@ Append opcode to segment
     VTABLE void push_integer(INTVAL value)  {
         VTABLE_push_integer(INTERP,
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, value);
+    }
+
+    VTABLE void push_pmc(PMC *value)  {
+        VTABLE_push_integer(INTERP,
+            PARROT_PACKFILERAWSEGMENT(SELF)->opcodes,
+                VTABLE_get_integer(INTERP, value));
     }
 
 /*
