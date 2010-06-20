@@ -22,7 +22,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(33)
+    plan(37)
 
     test_init()
     test_set_string()
@@ -210,6 +210,10 @@ end:
     n = elements bb
     is(n, 42, 'reduce size')
 
+    bb = 999
+    n = elements bb
+    is(n, 999, 'increase size')
+
     bb = 0
     n = elements bb
     is(n, 0, 'resize to 0')
@@ -223,9 +227,24 @@ end:
     is(s, 'foo', 'resized string content has correct value')
 
     bb = 'foobar'
-    bb = 24
+    bb = 7
     n = elements bb
-    is(n, 24, 'increase size from string content')
+    is(n, 7, 'increase size from string content')
+
+    # This test is for code coverage, zero filling is not a feature
+    # you should expect, it can be changed for performance reasons.
+    s = bb.'get_string_as'(binary:"")
+    is(s, binary:"foobar\x{0}", 'resized from string content is zero filled')
+
+    bb = 'barfoo'
+    bb = 0
+    n = elements bb
+    is(n, 0, 'resize to zero from string content')
+
+    bb = 42
+    bb = 0
+    n = elements bb
+    is(n, 0, 'resize to zero from allocated content')
 
     .local pmc eh
     eh = new ['ExceptionHandler']

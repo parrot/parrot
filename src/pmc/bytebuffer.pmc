@@ -147,7 +147,7 @@ Resize the buffer to the given value.
             GET_ATTR_size(INTERP, SELF, size);
             /* If reducing size, just change the size value */
             if (set_size > size) {
-                INTVAL copysize = set_size > size ? set_size : size;
+                INTVAL copysize = set_size < size ? set_size : size;
                 if (allocated_size == 0) {
                     content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, set_size);
                     if (size > 0) {
