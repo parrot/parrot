@@ -65,34 +65,32 @@ Tests the low level interface provided by instrument.pmc.
 .sub 'test_insert_and_remove_op_hook'
     # Plan: Test insertion and removal of hooks.
     .local pmc instr
-    .local pmc stub1, stub2, fake_id
+    .local pmc probe1, probe2
 
-    fake_id = box 'FakeProbeId'
-    stub1   = get_global 'stub_1'
-    stub2   = get_global 'stub_2'
-
-    instr = new ['Instrument']
+    probe1 = new ['MockProbe']
+    probe2 = new ['MockProbe']
+    instr  = new ['Instrument']
 
     # Test insert and remove 1 hook on existing op (op 0 = noop).
-    instr.'insert_op_hook'(fake_id, 0, stub1)
+    instr.'insert_op_hook'(probe1, 0)
     $I0 = instr.'count_op_hooks'(0)
     is($I0, 1, 'Insertion successful')
 
-    instr.'remove_op_hook'(fake_id, 0, stub1)
+    instr.'remove_op_hook'(probe1, 0)
     $I0 = instr.'count_op_hooks'(0)
     is($I0, 0, 'Removal successful')
 
     # Test insert and removal 2 hooks on existing op.
-    instr.'insert_op_hook'(fake_id, 0, stub1)
-    instr.'insert_op_hook'(fake_id, 0, stub2)
+    instr.'insert_op_hook'(probe1, 0)
+    instr.'insert_op_hook'(probe2, 0)
     $I0 = instr.'count_op_hooks'(0)
     is($I0, 2, 'Insertion successful')
 
-    instr.'remove_op_hook'(fake_id, 0, stub1)
+    instr.'remove_op_hook'(probe1, 0)
     $I0 = instr.'count_op_hooks'(0)
     is($I0, 1, 'Removal of probe 1 successful')
 
-    instr.'remove_op_hook'(fake_id, 0, stub2)
+    instr.'remove_op_hook'(probe2, 0)
     $I0 = instr.'count_op_hooks'(0)
     is($I0, 0, 'Removal of probe 2 successful')
 
@@ -102,7 +100,7 @@ Tests the low level interface provided by instrument.pmc.
     set_addr eh, NON_EXIST_OP_OK
     push_eh eh
 
-    instr.'insert_op_hook'(fake_id, 5000, stub1)
+    instr.'insert_op_hook'(probe1, 5000)
 
     ok(0, 'Managed to insert probe for non-existent op.')
     goto NON_EXIST_OP_END
@@ -120,7 +118,7 @@ Tests the low level interface provided by instrument.pmc.
     set_addr eh, NON_EXIST_PROBE_OK
     push_eh eh
 
-    instr.'remove_op_hook'(fake_id, 0, stub1)
+    instr.'remove_op_hook'(probe1, 0)
 
     ok(0, 'Managed to remove non-existent probe.')
     goto NON_EXIST_PROBE_END
@@ -138,34 +136,32 @@ Tests the low level interface provided by instrument.pmc.
 .sub 'test_insert_and_remove_op_catchall'
     # Plan: Test insertion and removal of catchall probes.
     .local pmc instr
-    .local pmc stub1, stub2, fake_id
+    .local pmc probe1, probe2
 
-    fake_id = box 'FakeCatchallProbeId'
-    stub1   = get_global 'stub_1'
-    stub2   = get_global 'stub_2'
-
-    instr = new ['Instrument']
+    probe1 = new ['MockProbe']
+    probe2 = new ['MockProbe']
+    instr  = new ['Instrument']
 
     # Test insert and remove 1 catchall.
-    instr.'insert_op_catchall'(fake_id, stub1)
+    instr.'insert_op_catchall'(probe1)
     $I0 = instr.'count_op_catchalls'()
     is($I0, 1, 'Insertion of catchall successful')
 
-    instr.'remove_op_catchall'(fake_id, stub1)
+    instr.'remove_op_catchall'(probe1)
     $I0 = instr.'count_op_catchalls'()
     is($I0, 0, 'Removal of catchall successful')
 
     # Test insert and removal 2 catchalls.
-    instr.'insert_op_catchall'(fake_id, stub1)
-    instr.'insert_op_catchall'(fake_id, stub2)
+    instr.'insert_op_catchall'(probe1)
+    instr.'insert_op_catchall'(probe2)
     $I0 = instr.'count_op_catchalls'()
     is($I0, 2, 'Insertion of catchalls successful')
 
-    instr.'remove_op_catchall'(fake_id, stub1)
+    instr.'remove_op_catchall'(probe1)
     $I0 = instr.'count_op_catchalls'()
     is($I0, 1, 'Removal of catchall probe 1 successful')
 
-    instr.'remove_op_catchall'(fake_id, stub2)
+    instr.'remove_op_catchall'(probe2)
     $I0 = instr.'count_op_catchalls'()
     is($I0, 0, 'Removal of catchall probe 2 successful')
 
@@ -175,7 +171,7 @@ Tests the low level interface provided by instrument.pmc.
     set_addr eh, NON_EXIST_CATCHALL_OK
     push_eh eh
 
-    instr.'remove_op_catchall'(fake_id, stub1)
+    instr.'remove_op_catchall'(probe1)
 
     ok(0, 'Managed to remove non-existent probe.')
     goto NON_EXIST_CATCHALL_END
@@ -190,14 +186,6 @@ Tests the low level interface provided by instrument.pmc.
 
 .end
 
-
-# Stub callbacks to test insertion and removal.
-.sub 'stub_1'
-.end
-
-.sub 'stub_2'
-.end
-
 #
 # Simple Mock of Instrument::Probe to test
 #  attach.
@@ -208,11 +196,19 @@ Tests the low level interface provided by instrument.pmc.
     class = newclass ['MockProbe']
     addattribute class, '$!instr_obj'
     addattribute class, '$!identifier'
+
+    $P0 = box 0
+    set_hll_global "$MockProbe-count", $P0
 .end
 
 .sub 'init' :vtable :method
+    $P1 = get_hll_global "$MockProbe-count"
+    inc $P1
+    set_hll_global "$MockProbe-count", $P1
+
     $P0 = new ['String']
-    $P0 = 'MockProbe-0'
+    $P0 = 'MockProbe-'
+    $P0 .= $P1
     setattribute self, '$!identifier', $P0
 .end
 

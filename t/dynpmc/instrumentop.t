@@ -84,6 +84,7 @@ PROG
 .sub test_one_op_callback
     .param pmc op
     .param pmc instr
+    .param pmc probe
 
     # Test op name.
     $S0 = op.'name'()
