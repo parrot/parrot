@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 =head1 NAME
 
@@ -656,6 +656,18 @@ pir_output_is( <<'CODE', <<"OUTPUT", "is_closed" );
 .end
 CODE
 1
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'StringHandle is not a tty' );
+.sub main
+    .local pmc sh
+    .local int i
+    sh = new ['StringHandle']
+    i = sh.'is_tty'()
+    say i
+.end
+CODE
 0
 OUTPUT
 
