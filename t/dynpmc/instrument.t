@@ -35,7 +35,7 @@ Tests the low level interface provided by instrument.pmc.
 .sub 'test_loadlib'
     .local pmc lib
 
-    lib = loadlib 'instrument'
+    lib = loadlib 'instrument_group'
     $I0 = defined lib
     ok($I0, 'Instrument dynpmc loaded')
 

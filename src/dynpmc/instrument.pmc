@@ -60,6 +60,7 @@ typedef struct Instrument_runcore_t {
     probe_list_t            **op_hooks;
     probe_list_t             *op_catchall;
     PMC                      *old_dynlibs;
+    PMC                      *instr_op;
 } Instrument_runcore_t;
 
 /* Runcore Function Prototypes */
@@ -185,6 +186,7 @@ Marks internal data structures as live to the gc.
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->probes);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->evt_dispatcher);
         Parrot_gc_mark_PMC_alive_fun(INTERP, core->old_dynlibs);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, core->instr_op);
     }
 
 /*
@@ -596,7 +598,15 @@ void
 Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument) {
     Instrument_runcore_t * const coredata =
         mem_gc_allocate_zeroed_typed(interp, Instrument_runcore_t);
-    PMC *dynlibs = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_DYN_LIBS);
+    PMC *dynlibs, *interp_pmc;
+    INTVAL instr_op_type;
+
+    /* Get the pmc type of InstrumentOp. */
+    interp_pmc    = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
+    instr_op_type = Parrot_pmc_get_type_str(supervisor, CONST_STRING(supervisor, "InstrumentOp"));
+
+    /* Grab the dynlib hash. */
+    dynlibs = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_DYN_LIBS);
 
     /* Ensure the current loaded runcore is the slow core */
     Parrot_set_run_core(interp, PARROT_SLOW_CORE);
@@ -618,6 +628,7 @@ Instrument_runcore_init(PARROT_INTERP, Parrot_Interp supervisor, PMC *instrument
     coredata->op_catchall        = NULL;
     coredata->old_dynlibs        = VTABLE_clone(supervisor, dynlibs);
     coredata->has_ended          = 0;
+    coredata->instr_op           = Parrot_pmc_new_init(supervisor, instr_op_type, interp_pmc);
 
     PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *)coredata);
 
@@ -663,9 +674,8 @@ static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP) {
     probe_node_t *cur_probe;
     Instrument_runcore_t    *core;
     Parrot_Interp            supervisor;
-    PMC                     *instrument, *op_data, *interp_pmc;
-    INTVAL                   op_params, cur_op_param, pc_relative, done_catchalls;
-    INTVAL                   instr_op_type;
+    PMC                     *instrument, *op_data;
+    INTVAL                   done_catchalls;
 
     core         = (Instrument_runcore_t *) interp->run_core;
     to_recall    = NULL; /* TODO: Implement probe recalls */
@@ -674,14 +684,8 @@ static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP) {
     supervisor   = core->supervisor_interp;
     instrument   = core->supervisor_pmc;
 
-    /* Calculate the relative position of the pc. */
-    pc_relative = pc - interp->code->base.data;
-
-    /* Create the InstrumentOp instance and set it. */
-    interp_pmc    = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
-    instr_op_type = Parrot_pmc_get_type_str(supervisor, CONST_STRING(supervisor, "InstrumentOp"));
-    op_data       = Parrot_pmc_new_init(supervisor, instr_op_type, interp_pmc);
-
+    /* Update the pc of the InstrumentOp object. */
+    op_data = core->instr_op;
     VTABLE_set_pointer(supervisor, op_data, pc);
 
     /* Execute any probes. */
