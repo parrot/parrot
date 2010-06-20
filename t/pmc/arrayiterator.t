@@ -108,13 +108,39 @@ handles:
     nok(it, "Iterator is finished after second shift")
     is($P0, 1, "2nd element has correct value")
 
-    $I0 = 1
-    push_eh fail
-    $P0 = shift it
-    $I0 = 0
+    .local int result
+    .local pmc ehandler
+    result = 0
+    ehandler = new ['ExceptionHandler']
+    ehandler.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh ehandler
+
+    set_addr ehandler, handlep
+    $P0 = pop it
+    goto fail
+handlep:
+    finalize ehandler
+    set_addr ehandler, handlei
+    $I0 = pop it
+    goto fail
+handlei:
+    finalize ehandler
+    set_addr ehandler, handlen
+    $N0 = pop it
+    goto fail
+handlen:
+    finalize ehandler
+    set_addr ehandler, handles
+    $S0 = pop it
+    goto fail
+handles:
+    finalize ehandler
+
+    result = 1
   fail:
     pop_eh
-    ok($I0, "Shifting from finished iterator throws exception")
+    ok(result, "pop from finished iterator throws out of bounds exception")
+
 .end
 
 .sub 'iterate_backward_string'
