@@ -94,7 +94,7 @@ well.
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
     set_addr eh, catch
     push_eh catch
-    it = 987 # Arbitrary value, let's hope we never use 
+    it = 987 # Arbitrary value, let's hope we never use
     i = 0
     goto report
   catch:
