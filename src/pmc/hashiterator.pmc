@@ -172,7 +172,7 @@ Marks the hash as live.
         Parrot_HashIterator_attributes * const attrs =
                 PARROT_HASHITERATOR(SELF);
 
-        if (value == 0) {
+        if (value == ITERATE_FROM_START) {
             /* Restart iterator */
             attrs->bucket           = 0;
             attrs->pos              = 0;
