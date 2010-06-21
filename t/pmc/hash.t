@@ -25,7 +25,7 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(171)
+    plan(172)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -142,6 +142,8 @@ well.
     h[1] = 42
     i = h['01']
     isnt(i, 42, 'key type STRING')
+    i = h.'get_key_type'()
+    is(i, .Hash_key_type_STRING, 'method get_key_type return type STRING')
 
     push_eh invalid_type
     h = -973 # Let's hope it will never become a valid type
