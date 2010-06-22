@@ -23,7 +23,7 @@ Tests the ExceptionHandler PMC.
     .include 'test_more.pir'
 
     # If test exited with "bad plan" MyHandlerCan.can_handle wasn't invoked.
-    plan(9)
+    plan(11)
 
     .local pmc eh
     eh = new ['ExceptionHandler']
@@ -89,6 +89,8 @@ Tests the ExceptionHandler PMC.
 
     pop_eh
     pop_eh
+
+    test_handle_types_except()
 
     goto subclass_handler
 
@@ -216,6 +218,54 @@ Tests the ExceptionHandler PMC.
     .param pmc ex
     ok(1, 'MyHandlerCan.can_handle invoked')
     .return(1)
+.end
+
+.namespace [ ]
+
+.sub 'test_handle_types_except'
+    .local pmc badeh, eh, ex
+    .local int i
+    .const int TYPEUSED = .EXCEPTION_UNEXPECTED_NULL
+    .const int TYPEOTHER = .EXCEPTION_SYNTAX_ERROR
+
+    i = 0
+    eh = new ['ExceptionHandler']
+    badeh = new ['ExceptionHandler']
+    eh.'handle_types_except'(TYPEUSED)
+    set_addr eh, catch
+    set_addr badeh, badcatch
+    push_eh badeh
+    push_eh eh
+    ex = new ['Exception']
+    ex['type'] = TYPEOTHER
+    throw ex
+    goto report1
+  badcatch:
+    finalize eh
+    goto report1
+  catch:
+    finalize eh
+    i = 1
+  report1:
+    ok(i, 'type not in except is list is caught')
+
+    i = 0
+    set_addr badeh, catchall
+    set_addr eh, dontcatch
+    ex = new ['Exception']
+    ex['type'] = TYPEUSED
+    throw ex
+    goto report2
+  catchall:
+    finalize eh
+    i = 1
+    goto report2
+  dontcatch:
+    finalize eh
+  report2:
+    pop_eh
+    pop_eh
+    ok(i, 'type in except is list is not caught')
 .end
 
 # Local Variables:
