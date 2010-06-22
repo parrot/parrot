@@ -2090,10 +2090,10 @@ int
 e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(e_pbc_end_sub)
-    Instruction *ins;
+    Instruction *ins = unit->instructions;
     int          pragma;
 
-    if (!unit->instructions)
+    if (!ins)
         return 0;
 
     /*
@@ -2101,7 +2101,6 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
      * This is *dangerous*: all possible global state can be messed
      * up, e.g. when that sub starts loading bytecode
      */
-    ins   = unit->instructions;
 
     /* we run only PCC subs */
     if (!ins->symregs[0] || !ins->symregs[0]->pcc_sub)
