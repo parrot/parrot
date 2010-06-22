@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More 'tests' => 25;
+use Test::More 'tests' => 24;
 use File::Spec::Functions qw(:ALL);
 
 =head1 NAME
@@ -60,7 +60,6 @@ ok( $f->contains_pod, 'contains_pod yes, no errors' );
 is( $f->num_pod_errors, 0, 'num_pod_errors none' );
 
 # Not the best of tests, but at least something.
-like( $f->pod_as_html, qr|<html.*?</html>|si, 'pod_as_html' );
 $f->write("=haed1 FOO\n\nFoo\n\n=cut\n\nbar\n");
 ok( $f->contains_pod, 'contains_pod yes, errors' );
 is( $f->num_pod_errors, 1, 'num_pod_errors one' );

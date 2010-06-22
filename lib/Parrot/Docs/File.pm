@@ -279,26 +279,6 @@ sub pod_errors {
     return $self->{POD_ERRORS};
 }
 
-=item C<pod_as_html()>
-
-Runs C<Parrot::Docs::POD2HTML> on the contents of the file. Executable files
-are assumed not to contain POD and therefore not formatted.
-
-=cut
-
-sub pod_as_html {
-    my $self = shift;
-
-    if ( $self->contains_pod ) {
-        my $formatter = Parrot::Docs::POD2HTML->new;
-        $formatter->no_errata_section(1); # don't dump errors into HTML output
-
-        $self->{POD_HTML} = $formatter->html_for_file($self);
-    }
-
-    return $self->{POD_HTML};
-}
-
 =item C<is_docs_link()>
 
 Returns whether the file is suitable for inclusion in a documentation link.
