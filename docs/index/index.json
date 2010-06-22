@@ -37,7 +37,7 @@
          "source" : [
             "docs/overview.pod",
             ":pdds",
-            ":pmcs",
+            ":pmc",
             ":ops",
             ":developer",
             ":tools",
