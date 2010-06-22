@@ -50,7 +50,8 @@ foreach my $index_file (glob 'docs/index/*.json') {
         my @raw_sources;
         if (ref $chunk->{source} eq "ARRAY" ) {
             @raw_sources = @{$chunk->{source}};
-        } else {
+        }
+        else {
             push @raw_sources, $chunk->{source};
         };
 
@@ -78,7 +79,7 @@ my $target_dir = 'docs/html2';
 ## print Dumper(\%pages); use Data::Dumper;
 
 foreach my $page (keys %pages) {
-    $page = $pages{$page}; 
+    $page = $pages{$page};
     foreach my $section (@{$page->{content}}) {
         foreach my $source (@{$section->{input_files}}) {
             if ($source =~ /^:(.*)/) {
