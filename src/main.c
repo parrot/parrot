@@ -25,6 +25,7 @@ Start Parrot
 #include "parrot/imcc.h"
 #include "parrot/longopt.h"
 #include "parrot/runcore_api.h"
+#include "parrot/alarm.h"
 #include "pmc/pmc_callcontext.h"
 
 /* For gc_sys_type_enum */
@@ -135,6 +136,9 @@ main(int argc, const char *argv[])
 
     /* Now initialize interpreter */
     initialize_interpreter(interp, (void*)&stacktop);
+
+    /* Register signal handler for timers */
+    Parrot_alarm_init();
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);

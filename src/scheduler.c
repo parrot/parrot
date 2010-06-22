@@ -70,11 +70,20 @@ Initalize the concurrency scheduler for the interpreter.
 
 */
 
+static int interp_count = 0;
+
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
 
     ASSERT_ARGS(Parrot_cx_init_scheduler)
+
+/*
+    if(interp_count++ > 1) {
+       fprintf(stderr, "More than one interp?\n");
+        exit(0);
+    }
+*/
 
     if (!interp->parent_interpreter) {
         PMC *scheduler;

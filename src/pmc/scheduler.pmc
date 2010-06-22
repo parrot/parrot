@@ -454,6 +454,8 @@ PMCNULL.
         STRING * const iter_str    = CONST_STRING(INTERP, "handler_iter");
         PMC    *iter;
 
+        fprintf(stderr, "Derf\n");
+
         /* Exceptions store the handler iterator for rethrow, other kinds of
          * tasks don't (though they could). */
         if (task->vtable->base_type == enum_class_Exception

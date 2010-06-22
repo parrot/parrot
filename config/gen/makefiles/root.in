@@ -445,6 +445,7 @@ INTERP_O_FILES = \
     src/exit$(O) \
     src/extend$(O) \
     src/extend_vtable$(O) \
+	src/alarm$(O) \
     src/gc/alloc_memory$(O) \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
@@ -914,6 +915,10 @@ src/scheduler$(O) : $(PARROT_H_HEADERS) src/scheduler.str src/scheduler.c \
 	include/pmc/pmc_timer.h \
 	$(INC_DIR)/scheduler_private.h \
 	$(INC_DIR)/runcore_api.h
+
+src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
+	$(INC_DIR)/alarm.h \
+	$(INC_DIR)/alarm_private.h
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
