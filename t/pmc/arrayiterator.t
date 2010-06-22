@@ -24,7 +24,7 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(27)
+    plan(28)
 
     iterate_forward() # 8 tests
     iterate_backward() # 6 tests
@@ -56,6 +56,9 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     $P1 = new ['Integer'], 0
     $I0 = exists it[$P1]
     is($I0, 1, "exists_keyed gives expected value")
+
+    $I0 = defined it[$P1]
+    is($I0, 1, "defined_keyed gives expected value")
 
     $P2 = it[$P1]
     is($P2, 42, "get_pmc_keyed gives expected value")
