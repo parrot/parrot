@@ -261,12 +261,7 @@ static void
 init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
-    Parrot_Context * const ctx    = CONTEXT_STRUCT(pmcctx);
-
-    /* pmcold may be null */
-    Parrot_Context *old    = PMC_IS_NULL(pmcold)
-                           ? NULL
-                           : CONTEXT_STRUCT(pmcold);
+    Parrot_Context * const ctx = CONTEXT_STRUCT(pmcctx);
 
     PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
@@ -286,7 +281,17 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->current_sig       = PMCNULL;
     ctx->current_sub       = PMCNULL;
 
-    if (old) {
+    if (PMC_IS_NULL(pmcold)) {
+        ctx->constants         = NULL;
+        ctx->warns             = 0;
+        ctx->errors            = 0;
+        ctx->trace_flags       = 0;
+        ctx->current_HLL       = 0;
+        ctx->current_namespace = PMCNULL;
+        ctx->recursion_depth   = 0;
+    }
+    else {
+        Parrot_Context *old = CONTEXT_STRUCT(pmcold);
         /* some items should better be COW copied */
         ctx->constants         = old->constants;
         ctx->warns             = old->warns;
@@ -297,15 +302,6 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
         ctx->caller_ctx        = pmcold;
-    }
-    else {
-        ctx->constants         = NULL;
-        ctx->warns             = 0;
-        ctx->errors            = 0;
-        ctx->trace_flags       = 0;
-        ctx->current_HLL       = 0;
-        ctx->current_namespace = PMCNULL;
-        ctx->recursion_depth   = 0;
     }
 
     /* other stuff is set inside Sub.invoke */
