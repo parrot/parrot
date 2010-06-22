@@ -108,6 +108,7 @@ Initializes the subroutine.
         attrs->outer_sub       = PMCNULL;
         attrs->multi_signature = PMCNULL;
         attrs->namespace_name  = PMCNULL;
+        attrs->vtable_index    = -1;
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -167,6 +168,8 @@ surboutine is fully constructed but not attached to interpreter.
         field = CONST_STRING(INTERP, "vtable_index");
         if (VTABLE_exists_keyed_str(INTERP, init, field))
             attrs->vtable_index = VTABLE_get_integer_keyed_str(INTERP, init, field);
+        else
+            attrs->vtable_index = -1;
 
         field = CONST_STRING(INTERP, "multi_signature");
         if (VTABLE_exists_keyed_str(INTERP, init, field))
