@@ -25,7 +25,7 @@ Tests the op information interface provided by the InstrumentOp.pmc.
     # Load the Instrument library.
     load_bytecode 'Instrument/InstrumentLib.pbc'
 
-    plan(10)
+    plan(11)
 
     setup()
     test_one_op()
@@ -89,42 +89,47 @@ PROG
     # Test op name.
     $S0 = op.'name'()
     is($S0, 'say_sc', 'Op name correct.')
-    
+
     # Test op family name.
     $S0 = op.'family'()
     is($S0, 'say', 'Op family name correct.')
-    
+
     # Test op argument count.
     $I0 = op.'count'()
     is($I0, 1, 'Op argument count correct.')
-    
+
     # Test op arg type.
     $I1 = .PARROT_ARG_STRING + .PARROT_ARG_CONSTANT
     $I0 = op.'arg_type'(0)
     is($I0, $I1, 'Op argument type correct.')
-    
+
     # Test op arg value.
     $S0 = op.'get_arg'(0)
     is($S0, 'In test program', 'Op argument value correct.')
-    
+
     # Test pc. Op is the first op, so pc is 0.
     $I0 = op.'pc'()
     is($I0, 0, 'Op pc value correct.')
-    
+
+    ## Test context info.
+    $P0 = op.'get_context_info'()
+    $S0 = typeof $P0
+    is($S0, 'Hash', 'get_context_info returns a hash.')
+
     # Test file.
-    $S0 = op.'file'()
+    $S0 = $P0['file']
     is($S0, 't/dynpmc/instrumentop-test1.pir', 'Op filename correct.')
-    
+
     # Test line.
-    $I0 = op.'line'()
+    $I0 = $P0['line']
     is($I0, 3, 'Op line correct.')
-    
+
     # Test subroutine.
-    $S0 = op.'sub'()
+    $S0 = $P0['sub']
     is($S0, 'main', 'Op sub correct.')
-    
+
     # Test namespace.
-    $S0 = op.'namespace'()
+    $S0 = $P0['namespace']
     is($S0, 'TestNS', 'Op namespace correct.')
 .end
 

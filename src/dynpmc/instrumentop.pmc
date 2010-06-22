@@ -332,78 +332,36 @@ Takes into account the special ops with variable arguments.
 
 /*
 
-=item C<STRING* file()>
+=item C<PMC* get_context_info()>
 
-Returns the filename where the current op resides in.
-
-=cut
-
-*/
-
-    METHOD file() {
-        Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
-        Parrot_Context_info info;
-
-        INTVAL ret = Parrot_Context_get_info(attr->interp, CURRENT_CONTEXT(attr->interp), &info);
-        STRING *file = info.file;
-        RETURN(STRING *file);
-    }
-
-/*
-
-=item C<INTVAL line()>
-
-Returns the line number of the file where the current op resides in.
+Returns the following information in a Hash PMC gathered from the current context:
+1. sub
+2. namespace
+3. file
+4. line
 
 =cut
 
 */
 
-    METHOD line() {
+    METHOD get_context_info() {
         Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
         Parrot_Context_info info;
+        PMC *ctx_hash;
 
         INTVAL ret = Parrot_Context_get_info(attr->interp, CURRENT_CONTEXT(attr->interp), &info);
-        INTVAL line = info.line;
-        RETURN(INTVAL line);
-    }
+        ctx_hash   = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-/*
+        VTABLE_set_string_keyed_str(INTERP, ctx_hash,
+                                    CONST_STRING(INTERP, "sub"), info.subname);
+        VTABLE_set_string_keyed_str(INTERP, ctx_hash,
+                                    CONST_STRING(INTERP, "namespace"), info.nsname);
+        VTABLE_set_string_keyed_str(INTERP, ctx_hash,
+                                    CONST_STRING(INTERP, "file"), info.file);
+        VTABLE_set_integer_keyed_str(INTERP, ctx_hash,
+                                    CONST_STRING(INTERP, "line"), info.line);
 
-=item C<STRING* sub()>
-
-Returns the name of the subroutine containing the current op.
-
-=cut
-
-*/
-
-    METHOD sub() {
-        Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
-        Parrot_Context_info info;
-
-        INTVAL ret = Parrot_Context_get_info(attr->interp, CURRENT_CONTEXT(attr->interp), &info);
-        STRING *sub = info.subname;
-        RETURN(STRING *sub);
-    }
-
-/*
-
-=item C<STRING* sub()>
-
-Returns the namespace of the subroutine containing the current op.
-
-=cut
-
-*/
-
-    METHOD namespace() {
-        Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
-        Parrot_Context_info info;
-
-        INTVAL ret = Parrot_Context_get_info(attr->interp, CURRENT_CONTEXT(attr->interp), &info);
-        STRING *nsname = info.nsname;
-        RETURN(STRING *nsname);
+        RETURN(PMC *ctx_hash);
     }
 }
 
