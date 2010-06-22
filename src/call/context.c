@@ -303,9 +303,6 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->recursion_depth   = old->recursion_depth;
         ctx->caller_ctx        = pmcold;
     }
-
-    /* other stuff is set inside Sub.invoke */
-    clear_regs(interp, ctx);
 }
 
 
