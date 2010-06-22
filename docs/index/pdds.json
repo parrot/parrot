@@ -3,8 +3,8 @@
    "content" : [
       {
          "source" : [
-             "docs/pdds/*",
-             "docs/pdds/draft/*"
+             "docs/pdds/*.pod",
+             "docs/pdds/draft/*.pod"
          ], 
          "title" : "Design Documents"
       }
