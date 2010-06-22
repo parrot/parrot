@@ -20,9 +20,12 @@ use strict;
 use warnings;
 use lib 'lib';
 
+use Cwd;
 use Fatal qw/open close/;
+use File::Spec;
 use Getopt::Long;
 use JSON;
+use Parrot::Docs::Item;
 
 my ( $version );
 
@@ -32,6 +35,8 @@ die "Usage: $0 --version\n" unless $version;
 
 my $json = JSON->new();
 
+# Transform the json
+my %pages;
 foreach my $index_file (glob 'docs/index/*.json') {
     my $contents;
     open my $fh, '<', $index_file;
@@ -40,12 +45,8 @@ foreach my $index_file (glob 'docs/index/*.json') {
 
     my $outfile = $section->{page} . '.html';
     my $title   = $section->{title};
-    print "   URL  : $outfile\n";
-    print "  Title : $title\n";
 
     foreach my $chunk (@{$section->{content}}) {
-        print " Section Title : " . $chunk->{title} . "\n";
-
         my @raw_sources;
         if (ref $chunk->{source} eq "ARRAY" ) {
             @raw_sources = @{$chunk->{source}};
@@ -66,10 +67,50 @@ foreach my $index_file (glob 'docs/index/*.json') {
                 delete $sources{$exclusion}
             }
         }
-        print join('; ', sort keys %sources);
-        print "\n";
+        $chunk->{input_files} = [keys %sources];
     }
-    print "\n";
+    $pages{lc $section->{page}} = $section;
+}
+
+# Generate all the raw pages we'll need.
+my $target_dir = 'docs/html2';
+
+## print Dumper(\%pages); use Data::Dumper;
+
+foreach my $page (keys %pages) {
+    $page = $pages{$page}; 
+    foreach my $section (@{$page->{content}}) {
+        foreach my $source (@{$section->{input_files}}) {
+            if ($source =~ /^:(.*)/) {
+                # Indicates link to other page.
+                my $link = $1;
+                if (! exists $pages{lc $link}) {
+                    die "invalid link $source specified.\n";
+                }
+            }
+            else {
+                transform_input($source);
+            }
+        }
+    }
+}
+
+my %generated;
+sub transform_input {
+    my $input = shift;
+    if (! -f $input) {
+        die "$input not found or not a regular file\n" .
+            "You might need to restrict your glob specification.";
+    }
+    my $path = File::Spec->catfile(cwd() , $input);
+
+    my $docfile = Parrot::Docs::Item->new('', $input);
+
+    # If the file has pod, use pod2html on it.
+
+    # Otherwise, use text2html.
+
+    $generated{$input} = 1;
 }
 
 exit 0;
