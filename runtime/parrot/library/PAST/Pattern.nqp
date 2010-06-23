@@ -7,28 +7,6 @@ INIT {
 }
 
 class PAST::Pattern is PCT::Pattern {
-    method attr ($name, $value, $has_value) {
-        my $result;
-        if ($has_value) {
-            self{$name} := Tree::Pattern::patternize($value);
-        } else {
-            $result := self{$name};
-        }
-        $result;
-    }
-
-    method name ($val?) {
-        self.attr("name", $val, !pir::isnull__iP($val));
-    }
-
-    method source ($val?) {
-        self.attr("source", $val, !pir::isnull__iP($val));
-    }
-
-    method pos ($val?) {
-        self.attr("pos", $val, !pir::isnull__iP($val));
-    }
-
     method returns ($val?) {
         self.attr("returns", $val, !pir::isnull__iP($val));
     }
