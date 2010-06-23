@@ -35,7 +35,7 @@ These are the vtable functions for the Capture PMC.
             SETATTR_Capture_hash((i), (obj),  Parrot_pmc_new((i), enum_class_Hash)); \
     } while (0)
 
-pmclass Capture auto_attrs {
+pmclass Capture provides hash auto_attrs {
     ATTR PMC    *array;
     ATTR PMC    *hash;
 
@@ -855,8 +855,8 @@ Mark the array.
             PMC    *ns        = INTERP->root_namespace;
             STRING *attribute = CONST_STRING(INTERP, "proxy");
 
-            ns                = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
-            ns                = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
+            ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
+            ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
             classobj          = Parrot_oo_get_class(INTERP, ns);
             capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
         }
