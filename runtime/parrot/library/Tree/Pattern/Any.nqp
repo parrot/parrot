@@ -2,7 +2,7 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-class PAST::Pattern::Any is PAST::Pattern {
+class Tree::Pattern::Any is Tree::Pattern {
     method new (*@_) {
         my $self := Q:PIR {
             $P0 = self.'HOW'()

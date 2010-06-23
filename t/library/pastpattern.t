@@ -488,32 +488,32 @@ sub test_child_smart_matching () {
 }
 
 sub test_any_matching () {
-    my $pattern := PAST::Pattern::Any.new(PAST::Pattern::Val.new(),
+    my $pattern := Tree::Pattern::Any.new(PAST::Pattern::Val.new(),
                                           PAST::Pattern::Var.new());
     my $past := PAST::Val.new();
     my $/ := $past ~~ $pattern;
     ok($/ ~~ Tree::Pattern::Match,
-       'PAST::Pattern::Any: Matching 1st option produces a match result.');
+       'Tree::Pattern::Any: Matching 1st option produces a match result.');
     ok(?$/,
-       'PAST::Pattern::Any: Matching 1st option matches.');
+       'Tree::Pattern::Any: Matching 1st option matches.');
     ok($/.from() =:= $past,
-       'PAST::Pattern::Any: Matching 1st option has correct .from.');
+       'Tree::Pattern::Any: Matching 1st option has correct .from.');
 
     $past := PAST::Var.new();
     $/ := $past ~~ $pattern;
     ok($/ ~~ Tree::Pattern::Match,
-       'PAST::Pattern::Any: Matching 2nd option produces a match result.');
+       'Tree::Pattern::Any: Matching 2nd option produces a match result.');
     ok(?$/,
-       'PAST::Pattern::Any: Matching 2nd option matches.');
+       'Tree::Pattern::Any: Matching 2nd option matches.');
     ok($/.from() =:= $past,
-       'PAST::Pattern::Any: Matching 2nd option has correct .from.');
+       'Tree::Pattern::Any: Matching 2nd option has correct .from.');
 
     $past := PAST::Block.new();
     $/ := $past ~~ $pattern;
     ok($/ ~~ Tree::Pattern::Match,
-       'PAST::Pattern::Any: None matching produces a match result.');
+       'Tree::Pattern::Any: None matching produces a match result.');
     ok(!$/,
-       'PAST::Pattern::Any: None matching does not match.');
+       'Tree::Pattern::Any: None matching does not match.');
 }
 
 sub test_deep_matching_in_children () {

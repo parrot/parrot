@@ -85,6 +85,7 @@ class Tree::Pattern is Capture {
 INIT {
     pir::load_bytecode('Tree/Pattern/Match.pbc');
 
+    pir::load_bytecode('Tree/Pattern/Any.pbc');
     pir::load_bytecode('Tree/Pattern/Closure.pbc');
     pir::load_bytecode('Tree/Pattern/Constant.pbc');
 }

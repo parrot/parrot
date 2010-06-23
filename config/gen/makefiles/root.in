@@ -282,8 +282,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/PAST/Pattern.pbc \
     $(LIBRARY_DIR)/PAST/Pattern.pir \
-    $(LIBRARY_DIR)/PAST/Pattern/Any.pbc \
-    $(LIBRARY_DIR)/PAST/Pattern/Any.pir \
     $(LIBRARY_DIR)/PAST/Pattern/Node.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Node.pir \
     $(LIBRARY_DIR)/PAST/Pattern/Transformer.pbc \
@@ -333,6 +331,8 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/TclLibrary.pbc \
     $(LIBRARY_DIR)/Tree/Pattern.pbc \
     $(LIBRARY_DIR)/Tree/Pattern.pir \
+    $(LIBRARY_DIR)/Tree/Pattern/Any.pbc \
+    $(LIBRARY_DIR)/Tree/Pattern/Any.pir \
     $(LIBRARY_DIR)/Tree/Pattern/Closure.pbc \
     $(LIBRARY_DIR)/Tree/Pattern/Closure.pir \
     $(LIBRARY_DIR)/Tree/Pattern/Constant.pbc \
@@ -1194,6 +1194,15 @@ $(LIBRARY_DIR)/Tree/Pattern.pbc: \
 $(LIBRARY_DIR)/Tree/Pattern.pir: \
 	$(LIBRARY_DIR)/Tree/Pattern.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Pattern.nqp \
+	> $@
+
+$(LIBRARY_DIR)/Tree/Pattern/Any.pbc: \
+	$(LIBRARY_DIR)/Tree/Pattern/Any.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/Tree/Pattern/Any.pir
+
+$(LIBRARY_DIR)/Tree/Pattern/Any.pir: \
+	$(LIBRARY_DIR)/Tree/Pattern/Any.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Pattern/Any.nqp \
 	> $@
 
 $(LIBRARY_DIR)/Tree/Pattern/Closure.pbc: \
