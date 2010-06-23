@@ -24,7 +24,7 @@ typedef enum {
 
     PARROT_IS_THREAD        = 0x1000, /* interpreter is a thread */
     PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */
-    PARROT_THR_THREAD_POOL  = 0x4000, /* type3 threads */
+    PARROT_THR_THREAD_POOL  = 0x4000  /* type3 threads */
 
 } Parrot_Interp_flag;
 /* &end_gen */

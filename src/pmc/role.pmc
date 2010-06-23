@@ -101,7 +101,7 @@ init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
          * to look one up with and do so. */
         PMC *_namespace = VTABLE_get_pmc_keyed_str(interp, info, namespace_str);
         if (!VTABLE_isa(interp, _namespace, ns_string))
-            _namespace = Parrot_make_namespace_autobase(interp, _namespace);
+            _namespace = Parrot_ns_make_namespace_autobase(interp, _namespace);
 
         /* If we get something null back it's an error; otherwise, store it. */
         if (!PMC_IS_NULL(_namespace))
@@ -121,7 +121,7 @@ init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
 
         /* Namespace is nested in the current namespace and with the name of
          * the role. */
-        role->_namespace = Parrot_make_namespace_keyed_str(interp,
+        role->_namespace = Parrot_ns_make_namespace_keyed_str(interp,
             Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp)), role->name);
     }
 
@@ -131,7 +131,7 @@ init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
          * to look one up with and do so. */
         PMC *_namespace = VTABLE_get_pmc_keyed_str(interp, info, namespace_str);
         if (!VTABLE_isa(interp, _namespace, ns_string))
-            _namespace = Parrot_make_namespace_autobase(interp, _namespace);
+            _namespace = Parrot_ns_make_namespace_autobase(interp, _namespace);
 
         /* If we get something null back it's an error; otherwise, store it. */
         if (PMC_IS_NULL(_namespace))

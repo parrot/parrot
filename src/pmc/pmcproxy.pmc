@@ -251,12 +251,8 @@ Returns whether the class is or inherits from C<*classname>.
         /* Look in the isa hash. */
         if (INTERP->vtables[_proxy->id]) {
             Hash *isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
-
-            if (!isa_hash && Parrot_str_equal(INTERP,
-                     INTERP->vtables[_proxy->id]->whoami, classname))
-                return 1;
-
-            if (isa_hash && parrot_hash_exists(INTERP, isa_hash, classname))
+            PARROT_ASSERT(isa_hash);
+            if (parrot_hash_exists(INTERP, isa_hash, classname))
                 return 1;
         }
 

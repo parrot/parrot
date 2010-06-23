@@ -109,7 +109,7 @@ any value type.
     piropsig['shl']        = 'PP+'
     piropsig['shr']        = 'PP+'
     piropsig['sleep']      = 'v+'
-    piropsig['splice']     = 'PPii'
+    piropsig['splice']     = '0PPii'
     piropsig['split']      = 'Pss'
     piropsig['sub']        = 'PP+'
     piropsig['substr']     = 'Ssii'

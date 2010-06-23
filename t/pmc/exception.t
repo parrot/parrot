@@ -18,7 +18,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan( 19 )
+    plan(20)
     test_bool()
     test_int()
     test_attrs()
@@ -30,66 +30,12 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_obj()
 .end
 
-.sub test_throw_obj
-    new $P20, ['ExceptionHandler']
-    set_addr $P20, _handler
-    push_eh $P20
-    new $P30, ['Exception']
-    throw $P30
-    say "not reached"
-_handler:
-    ok(1,'caught exception object thrown')
-.end
-
-.sub test_die
-    push_eh handler
-    die 3, 100
-    say "not reached"
-    .return()
-  handler:
-    ok(1,'die works')
-.end
-
-.sub test_push_pop_eh
-    push_eh handler
-    ok(1,'push_eh works')
-
-    pop_eh
-    ok(1,'pop_eh works')
-    .return()
-
-  handler:
-    say "i am the decider"
-.end
-
-.sub test_push_eh_throw
-    push_eh handler
-    $P0 = new ['Exception']
-    throw $P0
-    ok(0,'throw does not throw')
-
-  handler:
-    ok(1,'throw can throw')
-.end
-
-.sub test_push_pop_eh_long
-    $P0 = new ['ExceptionHandler']
-    set_addr $P0, handler
-    push_eh $P0
-    ok(1,'push_eh works (long)')
-
-    pop_eh
-    ok(1,'pop_eh works (long)')
-    .return()
-
-  handler:
-    say "i am the decider"
-.end
-
 .sub test_bool
     $P0 = new 'ExceptionHandler'
     set_addr $P0, _handler
-    ok($P0,'ExceptionHandler objects return true')
+    ok($P0,'ExceptionHandler object return true')
+    $P1 = new 'Exception'
+    ok($P1,'Exception object return true')
     .return()
   _handler:
     say "howdy bool!"
@@ -155,20 +101,76 @@ _handler:
     .get_results($P0)
 
     $P16 = getattribute $P0, 'message'
-    is($P16, "just pining")
+    is($P16, "just pining", 'got message')
 
     $P17 = getattribute $P0, 'severity'
-    is($P17, 5)
+    is($P17, 5, 'got severity')
 
     $P18 = getattribute $P0, 'payload'
-    is($P18, "additional payload")
+    is($P18, "additional payload", 'got payload')
 
     $P19 = getattribute $P0, 'backtrace'
     $P20 = $P19[0]
-    is($P20, "backtrace line 1")
+    is($P20, "backtrace line 1", 'got backtrace data')
 
     $P20 = $P19[1]
-    is($P20, "backtrace line 2")
+    is($P20, "backtrace line 2", 'more backtrace data')
+.end
+
+.sub test_push_pop_eh
+    push_eh handler
+    ok(1,'push_eh works')
+
+    pop_eh
+    ok(1,'pop_eh works')
+    .return()
+
+  handler:
+    say "i am the decider"
+.end
+
+.sub test_push_eh_throw
+    push_eh handler
+    $P0 = new ['Exception']
+    throw $P0
+    ok(0,'throw does not throw')
+
+  handler:
+    ok(1,'throw can throw')
+.end
+
+.sub test_push_pop_eh_long
+    $P0 = new ['ExceptionHandler']
+    set_addr $P0, handler
+    push_eh $P0
+    ok(1,'push_eh works (long)')
+
+    pop_eh
+    ok(1,'pop_eh works (long)')
+    .return()
+
+  handler:
+    say "i am the decider"
+.end
+
+.sub test_die
+    push_eh handler
+    die 3, 100
+    say "not reached"
+    .return()
+  handler:
+    ok(1,'die works')
+.end
+
+.sub test_throw_obj
+    new $P20, ['ExceptionHandler']
+    set_addr $P20, _handler
+    push_eh $P20
+    new $P30, ['Exception']
+    throw $P30
+    say "not reached"
+_handler:
+    ok(1,'caught exception object thrown')
 .end
 
 # Local Variables:

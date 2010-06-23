@@ -95,7 +95,7 @@ method goto_offset($offset) { "return (opcode_t *)cur_opcode + $offset"; }
 
 method expr_address($addr) { $addr; }
 
-method expr_offset($offset) { "cur_opcode + $offset"; }
+method expr_offset($offset) { " cur_opcode + $offset"; }
 
 =begin
 

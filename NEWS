@@ -1,8 +1,26 @@
 # $Id$
 
 New in 2.5.0
+- Core
+  + Added ByteBuffer PMC to allow direct byte manipulation
+  + Modified some PMC vtable functions to reduce complexity, simplifying coverage.
+  + Modified PAST to generate symbolic PASM constants in PIR output.
+  + General STRING API cleanups
+  + Increased test coverage of core PMCs
+  + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
+  + Experimental 'unroll' opcode renamed to 'finalize'
+- NQP-rx
+  + Added proper support for multisubs and multimethods
+  + Fixed sigspace handling ** quantifier in regexes
+  + Added \e strings
+  + Added use of inversion lists for charclass lists in regexes
 - Platforms
   + EPEL (Extra Packages for Enterprise Linux) packages for RHEL6.beta are available
+- Begin moving towards Lorito, the ops refactor to enable pervasive self-hosting and JIT compilation.
+  + All ops are now built with the self-hosted opsc compiler.
+  + For more Information about Lorito see:
+      http://trac.parrot.org/parrot/wiki/Lorito
+      http://trac.parrot.org/parrot/wiki/LoritoRoadmap
 
 New in 2.4.0
 - Core

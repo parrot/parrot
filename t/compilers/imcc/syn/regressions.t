@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 21;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -190,19 +190,6 @@ pir_output_is( <<"CODE", <<'OUT', 'long register numbers in PIR (TT #1025)');
 CODE
 3
 OUT
-
-TODO: {
-    local $TODO = "works in PIR, not PASM";
-
-pasm_output_is( <<"CODE", <<'OUT', 'long register numbers in PASM (TT #1025)');
-      new P$register, 'Integer'
-      assign P$register, 3
-  say P$register
-CODE
-3
-OUT
-
-}
 
 pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
 .sub 'foo' :immediate

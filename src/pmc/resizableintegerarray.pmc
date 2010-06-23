@@ -313,8 +313,12 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(PMC *info) {
-        const INTVAL n = VTABLE_shift_integer(INTERP, info);
-        const INTVAL rt = VTABLE_shift_integer(INTERP, info);
+        INTVAL n, rt;
+
+        SUPER(info);
+
+        n = VTABLE_shift_integer(INTERP, info);
+        rt = VTABLE_shift_integer(INTERP, info);
 
         SET_ATTR_size(INTERP, SELF, 0);
         SET_ATTR_resize_threshold(INTERP, SELF, rt);

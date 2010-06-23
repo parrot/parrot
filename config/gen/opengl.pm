@@ -245,6 +245,7 @@ my %C_TYPE = (
     GLsizeiptr              => 'ptrdiff_t',
     GLintptrARB             => 'ptrdiff_t',
     GLsizeiptrARB           => 'ptrdiff_t',
+    GLvdpauSurfaceNV        => 'ptrdiff_t',
 );
 
 my %NCI_TYPE = (
@@ -265,6 +266,7 @@ my %NCI_TYPE = (
     'short*'     => 'p',
     'int*'       => 'p',
     'long*'      => 'p',
+    'ptrdiff_t*' => 'p',
     'longlong*'  => 'p',
     'float*'     => 'p',
     'double*'    => 'p',

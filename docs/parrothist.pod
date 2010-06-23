@@ -109,5 +109,6 @@ Starred release numbers indicate supported releases.
 
  Gerd        2.3.0 *        2010-Apr-20     "Samoan Lory"
  Whiteknight 2.4.0          2010-May-18     "Sulfer Crest"
+ Gerd        2.5.0          2010-Jun-15     "Cheops"
 
 =cut

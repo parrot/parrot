@@ -20,25 +20,46 @@ t/pmc/orderedhash.t.
 .sub 'main'
     .include 'test_more.pir'
 
-    plan(2)
+    plan(3)
 
-    # Just test that we can't create OrderedHashIterator directly
-    $I0 = 1
-    push_eh fail
-    $P0 = new ['OrderedHashIterator']
-    $I0 = 0
-  fail:
-    pop_eh
-    ok($I0, "Can't create OrderedHashIterator directly")
-
-    $P0 = new ['OrderedHash']
-    $P1 = iter $P0
-    $I0 = isa $P1, 'Iterator'
-    ok($I0, 'OrderedHashIterator has proper type')
-
-
+    'test_init'()
+    'test_bad_type'()
 .end
 
+.sub 'test_init'
+    .local pmc oh, it
+    .local int i, i2
+    # We can't create OrderedHashIterator directly
+    i = 1
+    push_eh fail
+    oh = new ['OrderedHashIterator']
+    i = 0
+  fail:
+    pop_eh
+    ok(i, "Can't create OrderedHashIterator directly")
+
+    oh = new ['OrderedHash']
+    it = iter oh
+    sweep 1 # Make sure the mark vtable is covered
+    i = isa it, 'Iterator'
+    i2 = isa it, 'OrderedHashIterator'
+    add i, i2
+    is(i, 2, 'OrderedHashIterator has proper type')
+.end
+
+.sub 'test_bad_type'
+    .local pmc oh, it
+    .local int i
+    oh = new ['OrderedHash']
+    it = iter oh
+    i = 1
+    push_eh catch
+    it = 9999 # Let's hope it will never be a valid iteration type
+    i = 0
+  catch:
+    pop_eh
+    ok(i, 'invalid iteration type throws')
+.end
 
 # Local Variables:
 #   mode: pir

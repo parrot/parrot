@@ -46,11 +46,15 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1
+    get_results "0", P2
+    elements I0, P2
+    say I0
     get_global P0, "_foo"
     invokecc P0
     print "back\n"
     end
 CODE
+1
 foo
 back
 OUTPUT
@@ -66,8 +70,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
     concat S5, "returncc\n"
     compreg P1, "PASM"
     set_args "0", S5
-    get_results "0", P6
     invokecc P1
+    get_results "0", P6
     get_global P2, "_foo"
     invokecc P2
     print "back\n"

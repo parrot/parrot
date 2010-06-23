@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -19,7 +19,7 @@ Test the Sockaddr PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(4)
+    plan(5)
 
     new $P0, ['Socket']
     ok(1, 'Instantiated a Socket PMC')
@@ -30,8 +30,13 @@ Test the Sockaddr PMC.
     $I0 = isnull $P0
     $I0 = not $I0
     ok($I0, 'Sockaddr PMC created')
+
     $S0 = typeof $P1
     is($S0, 'Sockaddr', 'PMC has correct type')
+
+    $P2 = clone $P1
+    $S2 = typeof $P2
+    is($S2, 'Sockaddr', 'PMC clone has correct type')
 .end
 
 # Local Variables:

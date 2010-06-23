@@ -284,61 +284,54 @@ method get_body( $trans ) {
 }
 
 # Recursively process body chunks returning string.
-# Ideally bunch of multisubs, but...
-method process_body_chunk($trans, $chunk) {
-    my $what := $chunk.WHAT;
-    # Poor man multis...
-    if $what eq 'PAST::Var()' {
-        my $n := +$chunk.name;
-        return $trans.access_arg( self.arg_type($n - 1), $n);
-    }
-    elsif $what eq 'PAST::Op()' {
-        my $type := $chunk.pasttype;
-        #say('OP ' ~ $type);
-        if $type eq 'inline' {
-            #_dumper($chunk);
-            #pir::say('RET ' ~ $chunk<inline>);
-            return $chunk.inline;
-        }
-        elsif $type eq 'call' {
-            my $name     := $chunk.name;
-            #say('NAME '~$name ~ ' ' ~ $is_next);
-            if $name eq 'OPSIZE' {
-                #say('is_next');
-                return ~self.size;
-            }
 
-            my @children := list();
-            for @($chunk) {
-                @children.push(self.process_body_chunk($trans, $_));
-            }
-            my $children := join('', |@children);
+our multi method process_body_chunk($trans, PAST::Var $chunk) {
+    my $n := +$chunk.name;
+    $trans.access_arg( self.arg_type($n - 1), $n);
+}
 
-            #pir::say('children ' ~ $children);
-            my $ret := Q:PIR<
-                $P0 = find_lex '$trans'
-                $P1 = find_lex '$name'
-                $S0 = $P1
-                $P1 = find_lex '$children'
-                %r  = $P0.$S0($P1)
-            >;
-            #pir::say('RET ' ~ $ret);
-            return $ret;
-        }
+our multi method process_body_chunk($trans, PAST::Op $chunk) {
+    my $type := $chunk.pasttype;
+    #say('OP ' ~ $type);
+    if $type eq 'inline' {
+        #_dumper($chunk);
+        #pir::say('RET ' ~ $chunk<inline>);
+        return $chunk.inline;
     }
-    elsif $what eq 'PAST::Stmts()' {
+    elsif $type eq 'call' {
+        my $name     := $chunk.name;
+        #say('NAME '~$name ~ ' ' ~ $is_next);
+        if $name eq 'OPSIZE' {
+            #say('is_next');
+            return ~self.size;
+        }
+
         my @children := list();
         for @($chunk) {
             @children.push(self.process_body_chunk($trans, $_));
         }
         my $children := join('', |@children);
-        return $children;
-    }
-    else {
-        pir::die('HOLEY');
+
+        #pir::say('children ' ~ $children);
+        my $ret := Q:PIR<
+            $P0 = find_lex '$trans'
+            $P1 = find_lex '$name'
+            $S0 = $P1
+            $P1 = find_lex '$children'
+            %r  = $P0.$S0($P1)
+        >;
+        #pir::say('RET ' ~ $ret);
+        return $ret;
     }
 }
 
+our multi method process_body_chunk($trans, PAST::Stmts $chunk) {
+    my @children := list();
+    for @($chunk) {
+        @children.push(self.process_body_chunk($trans, $_));
+    }
+    join('', |@children);
+}
 
 =begin
 

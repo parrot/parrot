@@ -7,8 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 40;
-use Parrot::Test::Util 'create_tempfile';
+use Parrot::Test tests => 32;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -41,58 +40,23 @@ sub file_content_is {
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
-pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction (ops)");
-.loadlib 'io_ops'
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
 .sub main :main
     interpinfo $I0, 2    # GC mark runs
-    $P0 = open temp_file, 'w'
-        needs_destroy $P0
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    needs_destroy $P0
     print $P0, "a line\n"
     null $P0            # kill it
     sweep 0            # a lazy GC has to close the PIO
-    $P0 = open temp_file, 'r'
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
     $S0 = $P0.'read'(20)
     print $S0
 .end
 CODE
 a line
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception (ops)" );
-.loadlib 'io_ops'
-.sub main :main
-    new $P0, ['FileHandle']
-
-    push_eh _readline_handler
-    $S0 = readline $P0
-    print "not "
-
-_readline_handler:
-        print "ok 1\n"
-        pop_eh
-
-    push_eh _read_handler
-    $S0 = read $P0, 1
-    print "not "
-
-_read_handler:
-        print "ok 2\n"
-        pop_eh
-
-    push_eh _print_handler
-    print $P0, "kill me now\n"
-    print "not "
-
-_print_handler:
-        print "ok 3\n"
-        pop_eh
-
-.end
-CODE
-ok 1
-ok 2
-ok 3
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception" );
@@ -149,16 +113,21 @@ OUTPUT
 print $FOO "2\n1\n";
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "open and readline" );
-.loadlib 'io_ops'
-    open P0, "$temp_file"
-    set S0, ""
-    set S1, ""
-    readline S0, P0
-    readline S1, P0
-    print S1
-    print S0
-    end
+pir_output_is( sprintf( <<'CODE', $temp_file ), <<'OUTPUT', "open and readline" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file)
+
+    $S0 = ''
+    $S1 = ''
+
+    $S0 = $P0.'readline'()
+    $S1 = $P0.'readline'()
+
+    print $S1
+    print $S0
+.end
 CODE
 1
 2
@@ -168,16 +137,21 @@ OUTPUT
 print $FOO "12\n34";
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "open and readline, no final newline" );
-.loadlib 'io_ops'
-    open P0, "$temp_file"
-    set S0, ""
-    set S1, ""
-    readline S0, P0
-    readline S1, P0
-    print S1
-    print S0
-    end
+pir_output_is( sprintf( <<'CODE', $temp_file ), <<'OUTPUT', "open and readline, no final newline" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file)
+
+    $S0 = ''
+    $S1 = ''
+
+    $S0 = $P0.'readline'()
+    $S1 = $P0.'readline'()
+
+    print $S1
+    print $S0
+.end
 CODE
 3412
 OUTPUT
@@ -185,27 +159,30 @@ OUTPUT
 ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "open & print" );
-.loadlib 'io_ops'
-   set I0, -12
-   set N0, 2.2
-   set S0, "Foo"
-   new P0, ['String']
-   set P0, "Bar\\n"
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "open & print" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $I0 = -12
+    $N0 = 2.2
+    $S0 = "Foo"
+    $P0 = new ['String']
+    $P0 = "Bar\n"
 
-   open P1, "$temp_file", "w"
-   print P1, I0
-   print P1, N0
-   print P1, S0
-   print P1, P0
-   close P1
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'w')
+    $P1.'print'($I0)
+    $P1.'print'($N0)
+    $P1.'print'($S0)
+    $P1.'print'($P0)
+    $P1.'close'()
 
-   open P2, "$temp_file"
-   readline S1, P2
-   close P2
+    $P2 = new ['FileHandle']
+    $P2.'open'(temp_file)
+    $S1 = $P2.'readline'()
+    $P2.'close'()
 
-   print S1
-   end
+    print $S1
+.end
 CODE
 -122.2FooBar
 OUTPUT
@@ -214,43 +191,47 @@ OUTPUT
 close $FOO;
 
 # write to file opened for reading
-pasm_output_is( <<"CODE", <<'OUTPUT', "3-arg open" );
-.loadlib 'io_ops'
-   open P1, "$temp_file", 'w'
-   print P1, "Foobar\\n"
-   close P1
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "3-arg open" );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'w')
+    $P1.'print'("Foobar\n")
+    $P1.'close'()
 
-   push_eh _print_to_read_only
+    push_eh _print_to_read_only
 
-   open P2, "$temp_file", 'r'
-   print P2, "baz\\n"
-   say "skipped"
+    $P2 = new ['FileHandle']
+    $P2.'open'(temp_file, 'r')
+    $P2.'print'("baz\n")
+    say "skipped"
 
-_print_to_read_only:
-   say "caught writing to file opened for reading"
-   pop_eh
+  _print_to_read_only:
+    say "caught writing to file opened for reading"
+    pop_eh
 
-   close P2
+    $P2.'close'()
 
-   open P3, "$temp_file", 'r'
-   readline S1, P3
-   close P3
-   print S1
-
-
-   end
+    $P3 = new ['FileHandle']
+    $P3.'open'(temp_file, 'r')
+    $S1 = $P3.'readline'()
+    $P3.'close'()
+    print $S1
+.end
 CODE
 caught writing to file opened for reading
 Foobar
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'open and close' );
-.loadlib 'io_ops'
-   open P1, "$temp_file", "w"
-   print P1, "Hello, World!\\n"
-   close P1
-   say "done"
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'open and close' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, "w")
+    $P1.'print'("Hello, World!\n")
+    $P1.'close'()
+    say "done"
+.end
 CODE
 done
 OUTPUT
@@ -259,12 +240,14 @@ file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
 Hello, World!
 OUTPUT
 
-pasm_output_is( <<"CODE", '', 'append' );
-.loadlib 'io_ops'
-   open P1, "$temp_file", 'wa'
-   print P1, "Parrot flies\\n"
-   close P1
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), '', 'append' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'wa')
+    $P1.'print'("Parrot flies\n")
+    $P1.'close'()
+.end
 CODE
 
 file_content_is( $temp_file, <<'OUTPUT', 'append file contents' );
@@ -272,12 +255,14 @@ Hello, World!
 Parrot flies
 OUTPUT
 
-pasm_output_is( <<"CODE", '', 'write to file' );
-.loadlib 'io_ops'
-   open P1, "$temp_file", 'w'
-   print P1, "Parrot overwrites\\n"
-   close P1
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), '', 'write to file' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P1 = new ['FileHandle']
+    $P1.'open'(temp_file, 'w')
+    $P1.'print'("Parrot overwrites\n")
+    $P1.'close'()
+.end
 CODE
 
 file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
@@ -426,25 +411,6 @@ ok 2
 ok 3
 OUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'printerr op' );
-.loadlib 'io_ops'
-   new P0, ['String']
-   set P0, "This is a test\n"
-   printerr 10
-   printerr "\n"
-   printerr 1.0
-   printerr "\n"
-   printerr "foo"
-   printerr "\n"
-   printerr P0
-   end
-CODE
-10
-1
-foo
-This is a test
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
 .include 'stdio.pasm'
 .sub main :main
@@ -483,35 +449,46 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
-.loadlib 'io_ops'
-   getstderr P2    # the object
-   set S0, "puts"    # method
-   set S5, "ok 1\n"    # 2nd param
-   set_args "0,0", P2, S5
-   callmethodcc P2, S0
-   set S5, "ok 2\n"
-   set_args "0,0", P2, S5
-   callmethodcc P2, S0
-   end
+.include 'stdio.pasm'
+    getinterp P0                 # invocant
+    set I0, .PIO_STDERR_FILENO   # 1st argument
+    set_args "0,0", P0, I0
+    callmethodcc P0, "stdhandle"
+    get_results "0", P2          # STDERR
+
+    set S0, "puts"               # method
+    set S5, "ok 1\n"             # 2nd param
+    set_args "0,0", P2, S5
+    callmethodcc P2, S0
+
+    set S5, "ok 2\n"
+    set_args "0,0", P2, S5
+    callmethodcc P2, S0
+
+    end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'seek/tell' );
-.loadlib 'io_ops'
-   open P0, "$temp_file", 'w'
-   print P0, "Hello "
-   tell I0, P0
-   print P0, "World!"
-   seek P0, I0, 0
-   print P0, "Parrot!\\n"
-   close P0
-   say "ok 1"
-   open P0, "$temp_file", 'r'
-   read S0, P0, 65635
-   print S0
-   end
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'seek/tell' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+
+    $P0.'open'(temp_file, 'w')
+    $P0.'print'("Hello ")
+    $I0 = $P0.'tell'()
+    $P0.'print'("World!")
+    $P0.'seek'(0, $I0)
+    $P0.'print'("Parrot!\n")
+    $P0.'close'()
+    say "ok 1"
+
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'read'(65635)
+    print $S0
+.end
 CODE
 ok 1
 Hello Parrot!
@@ -529,16 +506,6 @@ CODE
 /seek failed/
 OUTPUT
 
-pasm_error_output_like( <<"CODE", <<'OUTPUT', '32bit seek: exception (ops)' );
-.loadlib 'io_ops'
-   open P0, "$temp_file", 'w'
-   seek P0, -1, 0
-   say "error!"
-   end
-CODE
-/seek failed \(32bit\)/
-OUTPUT
-
 pir_error_output_like( sprintf(<<'CODE', $temp_file), <<'OUTPUT', '64bit seek: exception' );
 .const string temp_file = '%s'
 .sub main :main
@@ -549,16 +516,6 @@ pir_error_output_like( sprintf(<<'CODE', $temp_file), <<'OUTPUT', '64bit seek: e
 .end
 CODE
 /seek failed/
-OUTPUT
-
-pasm_error_output_like( <<"CODE", <<'OUTPUT', '64bit seek: exception (ops)' );
-.loadlib 'io_ops'
-   open P0, "$temp_file", 'w'
-   seek P0, -1, -1, 0
-   say "error!"
-   end
-CODE
-/seek failed \(64bit\)/
 OUTPUT
 
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "peek" );
@@ -586,27 +543,6 @@ aa
 l
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "peek (ops)" );
-.loadlib 'io_ops'
-    open P0, "$temp_file", 'w'
-    print P0, "a line\\n"
-    close P0
-    open P0, "$temp_file", 'r'
-    peek S0, P0
-    print S0
-    peek S1, P0
-    print S1
-    print "\\n"
-    read S2, P0, 2
-    peek S3, P0
-    print S3
-    print "\\n"
-    end
-CODE
-aa
-l
-OUTPUT
-
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "peek on an empty file" );
 .const string temp_file = '%s'
 .sub main :main
@@ -622,21 +558,6 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "peek on an empty file
 OK1:
     say "ok 1"
 .end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "peek on an empty file (ops)" );
-.loadlib 'io_ops'
-    open P0, "$temp_file", 'w'
-    close P0
-    open P0, "$temp_file", 'r'
-    peek S0, P0
-    eq S0, "", OK1
-    print "not "
-OK1:
-    say "ok 1"
-    end
 CODE
 ok 1
 OUTPUT
@@ -708,50 +629,33 @@ sub_1: 012
 sub_2: 345
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'read on null PMC throws exception');
-.loadlib 'io_ops'
-.sub main :main
-    null $P1
-    $S0 = read $P1, 1
-    end
-.end
-CODE
-/read from null/
-OUT
-
 ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 
 print $FOO "T\xc3\xb6tsch\n";
 close $FOO;
 
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
-.loadlib 'io_ops'
+pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, read parts" );
+.const string temp_file = '%s'
 .sub main :main
     .local pmc pio
-    .local int len
-    .include "stat.pasm"
-    .local string f
-    f = '$temp_file'
-    len = stat f, .STAT_FILESIZE
     pio = new ['FileHandle']
-    pio.'open'(f, 'r')
+    pio.'open'(temp_file, 'r')
     pio.'encoding'("utf8")
-    \$S0 = pio.'read'(2)
-    len -= 2
-    \$S1 = pio.'read'(len)
-    \$S0 .= \$S1
+    $S0 = pio.'read'(2)
+    $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
+    $S0 .= $S1
     pio.'close'()
-    \$I1 = charset \$S0
-    \$S2 = charsetname \$I1
-    say \$S2
+    $I1 = charset $S0
+    $S2 = charsetname $I1
+    say $S2
 
-    \$I1 = encoding \$S0
-    \$S2 = encodingname \$I1
-    say \$S2
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    say $S2
 
-    \$I1 = find_charset 'iso-8859-1'
-    trans_charset \$S1, \$S0, \$I1
-    print \$S1
+    $I1 = find_charset 'iso-8859-1'
+    trans_charset $S1, $S0, $I1
+    print $S1
 .end
 CODE
 unicode
@@ -805,21 +709,6 @@ ok:
 .end
 CODE
 ok
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<"OUTPUT", "stat failed" );
-.loadlib 'io_ops'
-.sub main :main
-    .local pmc pio
-    .local int len
-    .include "stat.pasm"
-    .local string f
-    f = 'no_such_file'
-    len = stat f, .STAT_FILESIZE
-    print "never\n"
-.end
-CODE
-/stat failed:/
 OUTPUT
 
 # Local Variables:
