@@ -26,7 +26,7 @@ class PAST::Pattern::Any is PAST::Pattern {
             }
             $index++;
         }
-        PAST::Pattern::Match.new(0);
+        Tree::Pattern::Match.new(0);
     }
 }
 

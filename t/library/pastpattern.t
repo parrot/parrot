@@ -492,7 +492,7 @@ sub test_any_matching () {
                                           PAST::Pattern::Var.new());
     my $past := PAST::Val.new();
     my $/ := $past ~~ $pattern;
-    ok($/ ~~ PAST::Pattern::Match,
+    ok($/ ~~ Tree::Pattern::Match,
        'PAST::Pattern::Any: Matching 1st option produces a match result.');
     ok(?$/,
        'PAST::Pattern::Any: Matching 1st option matches.');
@@ -501,7 +501,7 @@ sub test_any_matching () {
 
     $past := PAST::Var.new();
     $/ := $past ~~ $pattern;
-    ok($/ ~~ PAST::Pattern::Match,
+    ok($/ ~~ Tree::Pattern::Match,
        'PAST::Pattern::Any: Matching 2nd option produces a match result.');
     ok(?$/,
        'PAST::Pattern::Any: Matching 2nd option matches.');
@@ -510,7 +510,7 @@ sub test_any_matching () {
 
     $past := PAST::Block.new();
     $/ := $past ~~ $pattern;
-    ok($/ ~~ PAST::Pattern::Match,
+    ok($/ ~~ Tree::Pattern::Match,
        'PAST::Pattern::Any: None matching produces a match result.');
     ok(!$/,
        'PAST::Pattern::Any: None matching does not match.');
@@ -580,8 +580,8 @@ sub test_global_matching () {
                                              PAST::Block.new()));
     my $/ := $pattern.ACCEPTS($past, :g(1));
 
-    ok($/ ~~ PAST::Pattern::Match,
-       '$/ is a PAST::Pattern::Match for global matches.');
+    ok($/ ~~ Tree::Pattern::Match,
+       '$/ is a Tree::Pattern::Match for global matches.');
     ok(pir::elements__iP($/) == 4,
        '$/ has the right number of elements for global matches.');
     ok($/[0].from() =:= $past,
@@ -620,8 +620,8 @@ sub test_match_result_from_top_node () {
         my $pattern := $patternClass.new();
         my $node := $class.new();
         my $/ := $node ~~ $pattern;
-        ok($/ ~~ PAST::Pattern::Match,
-           "$begin 1, returns a PAST::Pattern::Match");
+        ok($/ ~~ Tree::Pattern::Match,
+           "$begin 1, returns a Tree::Pattern::Match");
         ok(?$/, "$begin 1, Bool conversion");
         ok($/.from() =:= $node,
            "$begin 1, .from");
@@ -629,8 +629,8 @@ sub test_match_result_from_top_node () {
         $node := ($class =:= PAST::Block
                   ?? PAST::Op !! PAST::Block).new();
         $/ := $node ~~ $pattern;
-        ok($/ ~~ PAST::Pattern::Match,
-           "$begin 0, returns PAST::Pattern::Match");
+        ok($/ ~~ Tree::Pattern::Match,
+           "$begin 0, returns Tree::Pattern::Match");
         ok(!?$/, "$begin 0, Bool conversion.");
     }
 }
@@ -642,8 +642,8 @@ sub test_match_result_from_sub_node () {
                                            :returns<Integer>));
     my $/ := $node ~~ $pattern;
 
-    ok($/ ~~ PAST::Pattern::Match,
-       "Deep match result on Node 1 is a PAST::Pattern::Match.");
+    ok($/ ~~ Tree::Pattern::Match,
+       "Deep match result on Node 1 is a Tree::Pattern::Match.");
     ok(?$/,
        "Deep match result on Node 1 converts to boolean truth.");
     ok($/.from() =:= $node[0],
@@ -659,8 +659,8 @@ sub test_match_result_from_closure () {
     my $node := PAST::Val.new(:returns('Integer'));
     my $/ := $node ~~ $pattern;
     
-    ok($/ ~~ PAST::Pattern::Match, 
-       "Match result from Closure 1 is a PAST::Pattern::Match.");
+    ok($/ ~~ Tree::Pattern::Match, 
+       "Match result from Closure 1 is a Tree::Pattern::Match.");
     ok(?$/,
        "Match result from Closure 1 converts to boolean truth.");
     ok($/.from =:= $node,
@@ -668,8 +668,8 @@ sub test_match_result_from_closure () {
 
     $node := PAST::Val.new(:returns('String'));
     $/ := $node ~~ $pattern;
-    ok($/ ~~ PAST::Pattern::Match,
-       "Match result from Closure 0 is a PAST::Pattern::Match.");
+    ok($/ ~~ Tree::Pattern::Match,
+       "Match result from Closure 0 is a Tree::Pattern::Match.");
     ok(!?$/,
        "Match result from Closure 0 converts to boolean falsehood.");
 }
@@ -679,8 +679,8 @@ sub test_match_result_from_constant () {
     my $node := 5;
     my $/ := $node ~~ $pattern;
     
-    ok($/ ~~ PAST::Pattern::Match, 
-       "Match result from Constant 1 is a PAST::Pattern::Match.");
+    ok($/ ~~ Tree::Pattern::Match, 
+       "Match result from Constant 1 is a Tree::Pattern::Match.");
     ok(?$/,
        "Match result from Constant 1 converts to boolean truth.");
     ok($/.from() == 5,
@@ -688,8 +688,8 @@ sub test_match_result_from_constant () {
 
     $node := 6;
     $/ := $node ~~ $pattern;
-    ok($/ ~~ PAST::Pattern::Match,
-       "Match result from Constant 0 is a PAST::Pattern::Match.");
+    ok($/ ~~ Tree::Pattern::Match,
+       "Match result from Constant 0 is a Tree::Pattern::Match.");
     ok(!?$/,
        "Match result from Constant 0 converts to boolean falsehood.");
 }
@@ -818,8 +818,8 @@ sub test_match_method () {
     my $past := PAST::Block.new();
 
     my $/ := $past.match($pattern);
-    ok($/ ~~ PAST::Pattern::Match,
-       'PAST::Node.match returns a PAST::Pattern::Match.');
+    ok($/ ~~ Tree::Pattern::Match,
+       'PAST::Node.match returns a Tree::Pattern::Match.');
     ok(?$/,
        'PAST::Node.match returns a true match result when it should.');
     ok($/.from() =:= $past,
@@ -830,8 +830,8 @@ sub test_match_method () {
     my $match1 := $past.match($pattern, :g(1));
     my $match2 := $pattern.ACCEPTS($past, :g(1));
 
-    ok($match1 ~~ PAST::Pattern::Match,
-       'PAST::Node.match returns a PAST::Pattern::Match with :g');
+    ok($match1 ~~ Tree::Pattern::Match,
+       'PAST::Node.match returns a Tree::Pattern::Match with :g');
     ok(?$match1 == ?$match2,
        'PAST::Node.match with :g has same bool value as ~~.');
     ok(pir::elements__iP($match1) == pir::elements__iP($match2),
@@ -840,8 +840,8 @@ sub test_match_method () {
     $match1 := $past.match($pattern, :global(1));
     $match2 := $pattern.ACCEPTS($past, :global(1));
 
-    ok($match1 ~~ PAST::Pattern::Match,
-       'PAST::Node.match returns a PAST::Pattern::Match with :global');
+    ok($match1 ~~ Tree::Pattern::Match,
+       'PAST::Node.match returns a Tree::Pattern::Match with :global');
     ok(?$match1 == ?$match2,
        'PAST::Node.match with :global has same bool value as ~~.');
     ok(pir::elements__iP($match1) == pir::elements__iP($match2),
@@ -851,8 +851,8 @@ sub test_match_method () {
     $match1 := $past.match($pattern, :p(1));
     $match2 := $pattern.ACCEPTS($past, :p(1));
 
-    ok($match1 ~~ PAST::Pattern::Match,
-       'PAST::Node.match returns a PAST::Pattern::Match with :p');
+    ok($match1 ~~ Tree::Pattern::Match,
+       'PAST::Node.match returns a Tree::Pattern::Match with :p');
     ok(?$match1 == ?$match2,
        'PAST::Node.match with :p has same bool value as ~~.');
     ok($match1.from() =:= $match2.from(),
@@ -861,8 +861,8 @@ sub test_match_method () {
     $match1 := $past.match($pattern, :pos(1));
     $match2 := $pattern.ACCEPTS($past, :pos(1));
 
-    ok($match1 ~~ PAST::Pattern::Match,
-       'PAST::Node.match returns a PAST::Pattern::Match with :pos');
+    ok($match1 ~~ Tree::Pattern::Match,
+       'PAST::Node.match returns a Tree::Pattern::Match with :pos');
     ok(?$match1 == ?$match2,
        'PAST::Node.match with :pos has same bool value as ~~.');
     ok($match1.from() =:= $match2.from(),

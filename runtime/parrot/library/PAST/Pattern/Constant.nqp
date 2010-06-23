@@ -18,7 +18,7 @@ class PAST::Pattern::Constant is PAST::Pattern {
     }
 
     method ACCEPTSEXACTLY ($node) {
-        PAST::Pattern::Match.new(pir::iseq__IPP(self.value(), $node),
+        Tree::Pattern::Match.new(pir::iseq__IPP(self.value(), $node),
                                  $node);
     }
 }

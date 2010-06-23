@@ -190,8 +190,8 @@ class PAST::Pattern::Block is PAST::Pattern::Node {
     }
     
     method ACCEPTSEXACTLY ($node) {
-        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Block;
-        my $/ := PAST::Pattern::Match.new(1);
+        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Block;
+        my $/ := Tree::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_attribute(self, $node,
                                               "blocktype", $/)
          && PAST::Pattern::Node::check_attribute(self, $node,
@@ -243,8 +243,8 @@ class PAST::Pattern::Op is PAST::Pattern::Node {
 
 
     method ACCEPTSEXACTLY ($node) {
-        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Op;
-        my $/ := PAST::Pattern::Match.new(1);
+        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Op;
+        my $/ := Tree::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_attribute(self, $node,
                                               "pasttype", $/)
          && PAST::Pattern::Node::check_attribute(self, $node,
@@ -260,8 +260,8 @@ class PAST::Pattern::Op is PAST::Pattern::Node {
 
 class PAST::Pattern::Stmts is PAST::Pattern::Node {
     method ACCEPTSEXACTLY ($node) {
-        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Stmts;
-        my $/ := PAST::Pattern::Match.new(1);
+        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Stmts;
+        my $/ := Tree::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
         $/.from($node) if $/;
@@ -275,8 +275,8 @@ class PAST::Pattern::Val is PAST::Pattern::Node {
     }
 
     method ACCEPTSEXACTLY ($node) {
-        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Val;
-        my $/ := PAST::Pattern::Match.new(1);
+        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Val;
+        my $/ := Tree::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/)
          && PAST::Pattern::Node::check_attribute(self, $node, 
@@ -320,8 +320,8 @@ class PAST::Pattern::Var is PAST::Pattern::Node {
     }
 
     method ACCEPTSEXACTLY ($node) {
-        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::Var;
-        my $/ := PAST::Pattern::Match.new(1);
+        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Var;
+        my $/ := Tree::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_attribute(self, $node,
                                               "scope", $/)
          && PAST::Pattern::Node::check_attribute(self, $node,
@@ -347,8 +347,8 @@ class PAST::Pattern::Var is PAST::Pattern::Node {
 
 class PAST::Pattern::VarList is PAST::Pattern::Node {
     method ACCEPTSEXACTLY ($node) {
-        return PAST::Pattern::Match.new(0) unless $node ~~ PAST::VarList;
-        my $/ := PAST::Pattern::Match.new(1);
+        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::VarList;
+        my $/ := Tree::Pattern::Match.new(1);
         (PAST::Pattern::Node::check_children(self, $node, $/)
          && PAST::Pattern::Node::check_node_attributes(self, $node, $/));
         $/.from($node) if $/;

@@ -19,7 +19,7 @@ class PAST::Pattern::Closure is PAST::Pattern {
     }
 
     method ACCEPTSEXACTLY ($node) {
-        PAST::Pattern::Match.new(self.code()($node),
+        Tree::Pattern::Match.new(self.code()($node),
                                  $node);
     }
 }

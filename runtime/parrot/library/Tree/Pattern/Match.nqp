@@ -1,8 +1,8 @@
 #!./parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
+# $Id: Match.nqp 47631 2010-06-15 00:14:01Z tcurtis $
 
-class PAST::Pattern::Match is Capture {
+class Tree::Pattern::Match is Capture {
     has $!success;
     has $!ast;
     has $!from;
@@ -50,7 +50,7 @@ class PAST::Pattern::Match is Capture {
 
 INIT {
     my $pc :=
-      pir::getattribute__PPS(PAST::Pattern::Match.HOW(), "parrotclass");
+      pir::getattribute__PPS(Tree::Pattern::Match.HOW(), "parrotclass");
     $pc.add_vtable_override("get_bool", 
                             method () {
                                 ?pir::getattribute__PPS(self,
