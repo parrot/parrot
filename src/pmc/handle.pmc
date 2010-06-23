@@ -57,7 +57,7 @@ pmclass Handle provides Handle manual_attrs {
 =item C<METHOD isatty()>
 
 Returns a boolean value indicating whether C<SELF> is a console/tty.
-This default implementation always return false. Override it in 
+This default implementation always return false. Override it in
 subtypes that are or can be tty.
 
 =cut
