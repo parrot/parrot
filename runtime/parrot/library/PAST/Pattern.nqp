@@ -8,19 +8,7 @@ INIT {
 }
 
 class PAST::Pattern is Tree::Pattern {
-    method transform ($past, $transform) {
-        my &transSub;
-        if ($transform ~~ PAST::Transformer) {
-            &transSub := sub ($/) { $transformer.walk($/.from()); };
-        } elsif (pir::does__iPS($transform, 'invokable')) {
-            &transSub := $transform;
-        } else {
-            pir::die('$transform must be invokable or a PAST::Transformer.');
-        }
-        my $transformer :=
-          PAST::Pattern::Transformer.new(self, &transSub);
-        $transformer.walk($past);
-    }
+
 }
 
 module PAST::Node {
@@ -35,8 +23,6 @@ module PAST::Node {
 
 INIT {
     pir::load_bytecode('PAST/Pattern/Node.pbc');
-
-    pir::load_bytecode('PAST/Pattern/Transformer.pbc');
 }
 
 # Local Variables:

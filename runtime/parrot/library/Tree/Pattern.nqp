@@ -24,6 +24,20 @@ class Tree::Pattern is Capture {
         $result;
     }
 
+    method transform ($node, $transform) {
+        my &transSub;
+        if ($transform ~~ PAST::Transformer) {
+            &transSub := sub ($/) { $transformer.walk($/.from()); };
+        } elsif (pir::does__iPS($transform, 'invokable')) {
+            &transSub := $transform;
+        } else {
+            pir::die('$transform must be invokable or a PAST::Transformer.');
+        }
+        my $transformer :=
+          Tree::Pattern::Transformer.new(self, &transSub);
+        $transformer.walk($node);
+    }
+
     method ACCEPTS ($node, *%opts) {
         my $global := ?%opts<g> || ?%opts<global>;
         my $pos := %opts<p> || %opts<pos>;
@@ -88,6 +102,8 @@ INIT {
     pir::load_bytecode('Tree/Pattern/Any.pbc');
     pir::load_bytecode('Tree/Pattern/Closure.pbc');
     pir::load_bytecode('Tree/Pattern/Constant.pbc');
+
+    pir::load_bytecode('Tree/Pattern/Transformer.pbc');
 }
 
 # Local Variables:

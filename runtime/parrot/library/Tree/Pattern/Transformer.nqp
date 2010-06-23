@@ -2,7 +2,11 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-class PAST::Pattern::Transformer is PAST::Transformer {
+INIT {
+    pir::load_bytecode('PAST/Transformer.pbc');
+}
+
+class Tree::Pattern::Transformer is PAST::Transformer {
     has $pattern;
     has $transform;
 
@@ -40,12 +44,12 @@ class PAST::Pattern::Transformer is PAST::Transformer {
 }
 
 module PAST::Walker {
-    our multi sub walk (PAST::Pattern::Transformer $walker,
+    our multi sub walk (Tree::Pattern::Transformer $walker,
                     PAST::Node $node) {
         my $pattern := $walker.pattern();
         my $shouldTransform;
-        if ($pattern ~~ PAST::Pattern::Node) {
-            $shouldTransform := $pattern.ACCEPTSEXACTLY($node);
+        if ($pattern ~~ Tree::Pattern) {
+            $shouldTransform := $pattern.ACCEPTS($node, :pos($node));
         }
         else {
             $shouldTransform := $pattern.ACCEPTS($node);
