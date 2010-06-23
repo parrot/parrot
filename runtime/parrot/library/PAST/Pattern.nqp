@@ -251,6 +251,11 @@ class PAST::Pattern::VarList is PAST::Pattern {
     }
 }
 
+INIT {
+    PAST::Pattern.new_subtype('PAST::Pattern::Control',
+                              PAST::Control,
+                              :attr(<handle_types handle_types_except>));
+}
 
 # Local Variables:
 #   mode: cperl

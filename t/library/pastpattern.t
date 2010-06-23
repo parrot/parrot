@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2109);
+plan(2124);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -38,6 +38,7 @@ sub node_with_attr_set ($class, $attr, $val) {
 
 sub test_type_matching() {
     my @classes := [ [ PAST::Block, PAST::Pattern::Block ],
+                     [ PAST::Control, PAST::Pattern::Control ],
                      [ PAST::Op, PAST::Pattern::Op ],
                      [ PAST::Stmts, PAST::Pattern::Stmts ],
                      [ PAST::Val, PAST::Pattern::Val ],

@@ -18,6 +18,41 @@ module PCT::Node {
 }
 
 class PCT::Pattern is Tree::Pattern {
+    method new_subtype ($name, $targetClass, *%adverbs) {
+        my $parent := %adverbs<parent> || self;
+        my $class := P6metaclass.new().new_class($name, :parent($parent));
+        
+        my @attributes := %adverbs<attr> || [];
+
+        for (@attributes) {
+            $class.HOW().add_method($class, $_,
+                                    sub ($value?) {
+                                        self.attr($_, $value,
+                                                  pir::defined__iP($value));
+                                    });
+        }
+
+        my &ACCEPTSEXACTLY := method ($node) {
+            return Tree::Pattern::Match.new(0)
+              unless $node ~~ $targetClass;
+            my $/ := Tree::Pattern::Match.new(1);
+            self.check_children($node, $/);
+            for @attributes {
+                last unless self.check_attribute($node, $_, $/);
+            }
+            if self ~~ PAST::Pattern {
+                self.check_past_node_attributes($node, $/);
+            }
+            else {
+                self.check_pct_node_attributes($node, $/);
+            }
+            $/.from($node) if $/;
+            $/;
+        }
+
+        $class.HOW().add_method($class, 'ACCEPTSEXACTLY', &ACCEPTSEXACTLY);
+    }
+
     method attr ($name, $value, $has_value) {
         my $result;
         if ($has_value) {
