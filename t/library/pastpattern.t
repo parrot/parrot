@@ -652,7 +652,7 @@ sub test_match_result_from_sub_node () {
 
 sub test_match_result_from_closure () {
     my $pattern := 
-      PAST::Pattern::Closure.new(sub ($_) { 
+      Tree::Pattern::Closure.new(sub ($_) { 
                                      $_ ~~ PAST::Val
                                        && $_.returns() eq 'Integer';
                                  });
@@ -675,7 +675,7 @@ sub test_match_result_from_closure () {
 }
 
 sub test_match_result_from_constant () {
-    my $pattern := PAST::Pattern::Constant.new(5);
+    my $pattern := Tree::Pattern::Constant.new(5);
     my $node := 5;
     my $/ := $node ~~ $pattern;
     

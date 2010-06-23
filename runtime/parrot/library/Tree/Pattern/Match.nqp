@@ -1,6 +1,6 @@
 #!./parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id: Match.nqp 47631 2010-06-15 00:14:01Z tcurtis $
+# $Id$
 
 class Tree::Pattern::Match is Capture {
     has $!success;

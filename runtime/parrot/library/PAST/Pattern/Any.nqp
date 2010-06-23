@@ -11,7 +11,7 @@ class PAST::Pattern::Any is PAST::Pattern {
         };
         my $index := 0;
         for @_ {
-            $self[$index++] := PAST::Pattern::patternize($_);
+            $self[$index++] := Tree::Pattern::patternize($_);
         }
         $self;
     }

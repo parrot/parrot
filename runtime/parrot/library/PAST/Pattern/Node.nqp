@@ -10,7 +10,7 @@ class PAST::Pattern::Node is PAST::Pattern {
     method attr ($name, $value, $has_value) {
         my $result;
         if ($has_value) {
-            self{$name} := PAST::Pattern::patternize($value);
+            self{$name} := Tree::Pattern::patternize($value);
         } else {
             $result := self{$name};
         }
@@ -60,7 +60,7 @@ class PAST::Pattern::Node is PAST::Pattern {
             $result.attr($_, %attrs{$_}, 1);
         }
         for @children {
-            pir::push($result, PAST::Pattern::patternize($_));
+            pir::push($result, Tree::Pattern::patternize($_));
         }
         $result;
     }

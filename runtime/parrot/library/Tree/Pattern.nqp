@@ -3,6 +3,27 @@
 # $Id$
 
 class Tree::Pattern is Capture {
+    sub patternize ($value) {
+        unless (pir::can__IPS($value, 'ACCEPTS')) {
+            if (pir::isa__IPP($value, Sub)) {
+                $value := Tree::Pattern::Closure.new($value);
+            } else {
+                $value := Tree::Pattern::Constant.new($value);
+            }
+        }
+        $value;
+    }
+
+    method attr ($name, $value, $has_value) {
+        my $result;
+        if ($has_value) {
+            self{$name} := $value;
+        } else {
+            $result := self{$name};
+        }
+        $result;
+    }
+
     method ACCEPTS ($node, *%opts) {
         my $global := ?%opts<g> || ?%opts<global>;
         my $pos := %opts<p> || %opts<pos>;
@@ -63,6 +84,9 @@ class Tree::Pattern is Capture {
 
 INIT {
     pir::load_bytecode('Tree/Pattern/Match.pbc');
+
+    pir::load_bytecode('Tree/Pattern/Closure.pbc');
+    pir::load_bytecode('Tree/Pattern/Constant.pbc');
 }
 
 # Local Variables:

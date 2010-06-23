@@ -8,27 +8,6 @@ INIT {
 }
 
 class PAST::Pattern is Tree::Pattern {
-    sub patternize ($value) {
-        unless (pir::can__IPS($value, 'ACCEPTS')) {
-            if (pir::isa__IPP($value, Sub)) {
-                $value := PAST::Pattern::Closure.new($value);
-            } else {
-                $value := PAST::Pattern::Constant.new($value);
-            }
-        }
-        $value;
-    }
-
-    method attr ($name, $value, $has_value) {
-        my $result;
-        if ($has_value) {
-            self{$name} := $value;
-        } else {
-            $result := self{$name};
-        }
-        $result;
-    }
-
     method transform ($past, $transform) {
         my &transSub;
         if ($transform ~~ PAST::Transformer) {
@@ -55,8 +34,6 @@ module PAST::Node {
 }
 
 INIT {
-    pir::load_bytecode('PAST/Pattern/Closure.pbc');
-    pir::load_bytecode('PAST/Pattern/Constant.pbc');
     pir::load_bytecode('PAST/Pattern/Node.pbc');
 
     pir::load_bytecode('PAST/Pattern/Any.pbc');

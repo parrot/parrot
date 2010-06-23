@@ -2,7 +2,7 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-class PAST::Pattern::Constant is PAST::Pattern {
+class Tree::Pattern::Constant is Tree::Pattern {
     method new ($value) {
         my $self := Q:PIR {
             $P0 = self.'HOW'()

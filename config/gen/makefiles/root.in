@@ -284,10 +284,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PAST/Pattern.pir \
     $(LIBRARY_DIR)/PAST/Pattern/Any.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Any.pir \
-    $(LIBRARY_DIR)/PAST/Pattern/Closure.pbc \
-    $(LIBRARY_DIR)/PAST/Pattern/Closure.pir \
-    $(LIBRARY_DIR)/PAST/Pattern/Constant.pbc \
-    $(LIBRARY_DIR)/PAST/Pattern/Constant.pir \
     $(LIBRARY_DIR)/PAST/Pattern/Node.pbc \
     $(LIBRARY_DIR)/PAST/Pattern/Node.pir \
     $(LIBRARY_DIR)/PAST/Pattern/Transformer.pbc \
@@ -337,6 +333,10 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/TclLibrary.pbc \
     $(LIBRARY_DIR)/Tree/Pattern.pbc \
     $(LIBRARY_DIR)/Tree/Pattern.pir \
+    $(LIBRARY_DIR)/Tree/Pattern/Closure.pbc \
+    $(LIBRARY_DIR)/Tree/Pattern/Closure.pir \
+    $(LIBRARY_DIR)/Tree/Pattern/Constant.pbc \
+    $(LIBRARY_DIR)/Tree/Pattern/Constant.pir \
     $(LIBRARY_DIR)/Tree/Pattern/Match.pbc \
     $(LIBRARY_DIR)/Tree/Pattern/Match.pir \
     $(LIBRARY_DIR)/URI.pbc \
@@ -1194,6 +1194,24 @@ $(LIBRARY_DIR)/Tree/Pattern.pbc: \
 $(LIBRARY_DIR)/Tree/Pattern.pir: \
 	$(LIBRARY_DIR)/Tree/Pattern.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Pattern.nqp \
+	> $@
+
+$(LIBRARY_DIR)/Tree/Pattern/Closure.pbc: \
+	$(LIBRARY_DIR)/Tree/Pattern/Closure.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/Tree/Pattern/Closure.pir
+
+$(LIBRARY_DIR)/Tree/Pattern/Closure.pir: \
+	$(LIBRARY_DIR)/Tree/Pattern/Closure.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Pattern/Closure.nqp \
+	> $@
+
+$(LIBRARY_DIR)/Tree/Pattern/Constant.pbc: \
+	$(LIBRARY_DIR)/Tree/Pattern/Constant.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/Tree/Pattern/Constant.pir
+
+$(LIBRARY_DIR)/Tree/Pattern/Constant.pir: \
+	$(LIBRARY_DIR)/Tree/Pattern/Constant.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Pattern/Constant.nqp \
 	> $@
 
 $(LIBRARY_DIR)/Tree/Pattern/Match.pbc: \

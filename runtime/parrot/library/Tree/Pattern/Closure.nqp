@@ -2,7 +2,7 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-class PAST::Pattern::Closure is PAST::Pattern {
+class Tree::Pattern::Closure is Tree::Pattern {
 
     method new (&code) {
         my $self := Q:PIR {
