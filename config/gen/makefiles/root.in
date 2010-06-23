@@ -282,8 +282,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/PAST/Pattern.pbc \
     $(LIBRARY_DIR)/PAST/Pattern.pir \
-    $(LIBRARY_DIR)/PAST/Pattern/Node.pbc \
-    $(LIBRARY_DIR)/PAST/Pattern/Node.pir \
     $(LIBRARY_DIR)/PAST/Transformer.pbc \
     $(LIBRARY_DIR)/PAST/Transformer/Dynamic.pbc \
     $(LIBRARY_DIR)/PAST/Walker.pbc \
@@ -1102,15 +1100,6 @@ $(LIBRARY_DIR)/PAST/Pattern.pbc: $(LIBRARY_DIR)/PAST/Pattern.pir
 
 $(LIBRARY_DIR)/PAST/Pattern.pir: $(LIBRARY_DIR)/PAST/Pattern.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern.nqp > $@
-
-$(LIBRARY_DIR)/PAST/Pattern/Node.pbc: \
-	$(LIBRARY_DIR)/PAST/Pattern/Node.pir
-	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Pattern/Node.pir
-
-$(LIBRARY_DIR)/PAST/Pattern/Node.pir: \
-	$(LIBRARY_DIR)/PAST/Pattern/Node.nqp $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern/Node.nqp \
-	> $@
 
 #
 # Profiling runcore test supporting code
