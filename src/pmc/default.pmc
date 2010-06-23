@@ -968,11 +968,15 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     VTABLE INTVAL isa(STRING *_class) {
-        const Hash * const isa_hash = SELF->vtable->isa_hash;
-        if (!isa_hash)
-            return Parrot_str_equal(INTERP, SELF->vtable->whoami, _class);
+        if (SELF->vtable->whoami == _class)
+            return 1;
+        else {
+            const Hash * const isa_hash = SELF->vtable->isa_hash;
+            if (!isa_hash)
+                return Parrot_str_equal(INTERP, SELF->vtable->whoami, _class);
 
-        return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
+            return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
+        }
     }
 
 /*
