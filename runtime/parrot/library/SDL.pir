@@ -91,7 +91,6 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .local pmc env
     env = new 'Env'
     .local string sdlpath
-    say'Hu'
     sdlpath = env['SDLLIBPATH']
     if sdlpath == '' goto default_locations
     say sdlpath
