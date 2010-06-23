@@ -39,6 +39,68 @@ class PCT::Pattern is Tree::Pattern {
     method pos ($val?) {
         self.attr("pos", $val, !pir::isnull__iP($val));
     }
+
+    method check_attribute ($node, $attribute, $/) {
+        my $pAttr := self.attr($attribute, null, 0);
+        unless pir::defined__IP($pAttr) {
+            return 1;
+        }
+        my $nAttr := $node.attr($attribute, null, 0);
+        my $result := 
+          ($pAttr ~~ Tree::Pattern
+           ?? $pAttr.ACCEPTS($nAttr, :p($nAttr))
+           !! $nAttr ~~ $pAttr);
+        if ($result) {
+            $/{$attribute} := $result;
+        }
+        else {
+            $/.success(0);
+        }
+        $result;
+    }
+
+    method check_children ($node, $/) {
+        my $pLen := pir::elements(self);
+        my $nLen := pir::elements($node);
+        my $pChild;
+        my $nChild;
+        my $result;
+        my $index;
+        if $pLen == 0 {
+            $result := 1;
+        }
+        elsif ($pLen == $nLen) {
+            $index := 0;
+            while ($index < $pLen) {
+                $nChild := $node[$index];
+                $pChild := self[$index];
+                if ($result := 
+                    ($pChild ~~ Tree::Pattern
+                     ?? $pChild.ACCEPTS($nChild, :p($nChild))
+                     !! $nChild ~~ $pChild)) {
+                    $/[$index] := $result;
+                }
+                else {
+                    $/.success(0);
+                    return 0;
+                }
+                $index++;
+            }
+            $result := 1;
+        }
+        else {
+            $/.success(0);
+            $result := 0;
+        }
+        $result;
+    }
+
+    method check_pct_node_attributes ($node, $/) {
+        (self.check_attribute($node, "name", $/)
+         && self.check_attribute($node, "source", $/)
+         && self.check_attribute($node, "pos", $/));
+
+    }
 }
 
 # Local Variables:

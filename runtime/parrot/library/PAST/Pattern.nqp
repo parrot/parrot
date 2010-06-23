@@ -43,70 +43,13 @@ class PAST::Pattern is PCT::Pattern {
         $result;
     }
 
-    sub check_attribute ($pattern, $node, $attribute, $/) {
-        my $pAttr := $pattern.attr($attribute, null, 0);
-        unless pir::defined__IP($pAttr) {
-            return 1;
-        }
-        my $nAttr := $node.attr($attribute, null, 0);
-        my $result := 
-          ($pAttr ~~ Tree::Pattern
-           ?? $pAttr.ACCEPTS($nAttr, :p($nAttr))
-           !! $nAttr ~~ $pAttr);
-        if ($result) {
-            $/{$attribute} := $result;
-        }
-        else {
-            $/.success(0);
-        }
-        $result;
-    }
-
-    sub check_children ($pattern, $node, $/) {
-        my $pLen := pir::elements($pattern);
-        my $nLen := pir::elements($node);
-        my $pChild;
-        my $nChild;
-        my $result;
-        my $index;
-        if $pLen == 0 {
-            $result := 1;
-        }
-        elsif ($pLen == $nLen) {
-            $index := 0;
-            while ($index < $pLen) {
-                $nChild := $node[$index];
-                $pChild := $pattern[$index];
-                if ($result := 
-                    ($pChild ~~ Tree::Pattern
-                     ?? $pChild.ACCEPTS($nChild, :p($nChild))
-                     !! $nChild ~~ $pChild)) {
-                    $/[$index] := $result;
-                }
-                else {
-                    $/.success(0);
-                    return 0;
-                }
-                $index++;
-            }
-            $result := 1;
-        }
-        else {
-            $/.success(0);
-            $result := 0;
-        }
-        $result;
-    }
-
-    sub check_node_attributes ($pattern, $node, $/) {
-        (check_attribute($pattern, $node, "name", $/)
-         && check_attribute($pattern, $node, "source", $/)
-         && check_attribute($pattern, $node, "pos", $/)
-         && check_attribute($pattern, $node, "returns", $/)
-         && check_attribute($pattern, $node, "arity", $/)
-         && check_attribute($pattern, $node, "named", $/)
-         && check_attribute($pattern, $node, "flat", $/)
-         && check_attribute($pattern, $node, "lvalue", $/));
+    method check_past_node_attributes ($node, $/) {
+        (self.check_pct_node_attributes($node, $/)
+         && self.check_attribute($node, "returns", $/)
+         && self.check_attribute($node, "arity", $/)
+         && self.check_attribute($node, "named", $/)
+         && self.check_attribute($node, "flat", $/)
+         && self.check_attribute($node, "lvalue", $/));
     }
 }
 
@@ -170,36 +113,22 @@ class PAST::Pattern::Block is PAST::Pattern {
     method ACCEPTSEXACTLY ($node) {
         return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Block;
         my $/ := Tree::Pattern::Match.new(1);
-        (PAST::Pattern::check_attribute(self, $node,
-                                              "blocktype", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "closure", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "control", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "loadinit", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "namespace", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "multi", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "hll", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "nsentry", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "symtable", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "lexical", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "compiler", $/)
-         && PAST::Pattern::check_attribute(self, $node, 
-                                                 "compiler_args", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "subid", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "pirflags", $/)
-         && PAST::Pattern::check_children(self, $node, $/)
-         && PAST::Pattern::check_node_attributes(self, $node, $/));
+        (self.check_attribute($node, "blocktype", $/)
+         && self.check_attribute($node, "closure", $/)
+         && self.check_attribute($node, "control", $/)
+         && self.check_attribute($node, "loadinit", $/)
+         && self.check_attribute($node, "namespace", $/)
+         && self.check_attribute($node, "multi", $/)
+         && self.check_attribute($node, "hll", $/)
+         && self.check_attribute($node, "nsentry", $/)
+         && self.check_attribute($node, "symtable", $/)
+         && self.check_attribute($node, "lexical", $/)
+         && self.check_attribute($node, "compiler", $/)
+         && self.check_attribute($node, "compiler_args", $/)
+         && self.check_attribute($node, "subid", $/)
+         && self.check_attribute($node, "pirflags", $/)
+         && self.check_children($node, $/)
+         && self.check_past_node_attributes($node, $/));
         $/.from($node) if $/;
         $/;
     }
@@ -223,14 +152,11 @@ class PAST::Pattern::Op is PAST::Pattern {
     method ACCEPTSEXACTLY ($node) {
         return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Op;
         my $/ := Tree::Pattern::Match.new(1);
-        (PAST::Pattern::check_attribute(self, $node,
-                                              "pasttype", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "pirop", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "inline", $/)
-         && PAST::Pattern::check_children(self, $node, $/)
-         && PAST::Pattern::check_node_attributes(self, $node, $/));
+        (self.check_attribute($node, "pasttype", $/)
+         && self.check_attribute($node, "pirop", $/)
+         && self.check_attribute($node, "inline", $/)
+         && self.check_children($node, $/)
+         && self.check_past_node_attributes($node, $/));
         $/.from($node) if $/;
         $/;
     }
@@ -240,8 +166,8 @@ class PAST::Pattern::Stmts is PAST::Pattern {
     method ACCEPTSEXACTLY ($node) {
         return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Stmts;
         my $/ := Tree::Pattern::Match.new(1);
-        (PAST::Pattern::check_children(self, $node, $/)
-         && PAST::Pattern::check_node_attributes(self, $node, $/));
+        (self.check_children($node, $/)
+         && self.check_past_node_attributes($node, $/));
         $/.from($node) if $/;
         $/;
     }
@@ -255,10 +181,9 @@ class PAST::Pattern::Val is PAST::Pattern {
     method ACCEPTSEXACTLY ($node) {
         return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Val;
         my $/ := Tree::Pattern::Match.new(1);
-        (PAST::Pattern::check_children(self, $node, $/)
-         && PAST::Pattern::check_node_attributes(self, $node, $/)
-         && PAST::Pattern::check_attribute(self, $node, 
-                                                 "value", $/));
+        (self.check_children($node, $/)
+         && self.check_past_node_attributes($node, $/)
+         && self.check_attribute($node, "value", $/));
         $/.from($node) if $/;
         $/;
     }
@@ -300,24 +225,16 @@ class PAST::Pattern::Var is PAST::Pattern {
     method ACCEPTSEXACTLY ($node) {
         return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Var;
         my $/ := Tree::Pattern::Match.new(1);
-        (PAST::Pattern::check_attribute(self, $node,
-                                              "scope", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "isdecl", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "namespace", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "slurpy", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "call_sig", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "viviself", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "vivibase", $/)
-         && PAST::Pattern::check_attribute(self, $node,
-                                                 "multitype", $/)
-         && PAST::Pattern::check_children(self, $node, $/)
-         && PAST::Pattern::check_node_attributes(self, $node, $/));
+        (self.check_attribute($node, "scope", $/)
+         && self.check_attribute($node, "isdecl", $/)
+         && self.check_attribute($node, "namespace", $/)
+         && self.check_attribute($node, "slurpy", $/)
+         && self.check_attribute($node, "call_sig", $/)
+         && self.check_attribute($node, "viviself", $/)
+         && self.check_attribute($node, "vivibase", $/)
+         && self.check_attribute($node, "multitype", $/)
+         && self.check_children($node, $/)
+         && self.check_past_node_attributes($node, $/));
         $/.from($node) if $/;
         $/;
     }
@@ -327,8 +244,8 @@ class PAST::Pattern::VarList is PAST::Pattern {
     method ACCEPTSEXACTLY ($node) {
         return Tree::Pattern::Match.new(0) unless $node ~~ PAST::VarList;
         my $/ := Tree::Pattern::Match.new(1);
-        (PAST::Pattern::check_children(self, $node, $/)
-         && PAST::Pattern::check_node_attributes(self, $node, $/));
+        (self.check_children($node, $/)
+         && self.check_past_node_attributes($node, $/));
         $/.from($node) if $/;
         $/;
     }
