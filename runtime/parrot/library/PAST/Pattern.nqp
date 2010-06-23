@@ -6,16 +6,6 @@ INIT {
     pir::load_bytecode('PCT/Pattern.pbc');
 }
 
-module PAST::Node {
-    method match ($pattern, *%options) {
-        $pattern.ACCEPTS(self, |%options);
-    }
-
-    method subst ($pattern, *%options) {
-        $pattern.transform(self, |%options);
-    }
-}
-
 class PAST::Pattern is PCT::Pattern {
     method attr ($name, $value, $has_value) {
         my $result;
