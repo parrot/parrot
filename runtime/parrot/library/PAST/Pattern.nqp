@@ -3,8 +3,7 @@
 # $Id$
 
 INIT {
-    pir::load_bytecode('Tree/Pattern.pbc');
-    pir::load_bytecode('PCT.pbc');
+    pir::load_bytecode('PCT/Pattern.pbc');
 }
 
 module PAST::Node {
@@ -17,7 +16,7 @@ module PAST::Node {
     }
 }
 
-class PAST::Pattern is Tree::Pattern {
+class PAST::Pattern is PCT::Pattern {
     method attr ($name, $value, $has_value) {
         my $result;
         if ($has_value) {
