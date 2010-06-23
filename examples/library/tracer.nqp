@@ -24,8 +24,8 @@ my $args := pir::getinterp__p()[2];
 $args.shift();
 
 my $probe := Instrument::Probe.new();
-$probe.make_catchall();
-$probe.set_callback('tracer');
+$probe.catchall(1);
+$probe.callback('tracer');
 
 my $instr := Q:PIR { %r = new ['Instrument'] };
 $instr.attach($probe);

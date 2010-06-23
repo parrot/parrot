@@ -84,7 +84,9 @@ Make the event hooks active.
 =end
 
     method enable () {
-        $!probe_obj.enable();
+        if pir::defined__IP($!probe_obj) {
+            $!probe_obj.enable();
+        }
     };
 
 =begin
@@ -96,9 +98,11 @@ Remove the event hooks.
 =end
 
     method disable () {
-        $!probe_obj.disable();
+        if pir::defined__IP($!probe_obj) {
+            $!probe_obj.disable();
+        }
     };
-    
+
 =begin
 =item _raise_event($event, $data)
 

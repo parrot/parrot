@@ -73,48 +73,60 @@ Stub method for abstract base class.
 
 =begin
 
-=item set_callback(sub) or set_callback('sub')
+=item callback(sub) or callback('sub') or callback()
 
 Set the sub callback to be called when the desired op is
 encountered. sub can be passed by name or reference through a 
-Sub PMC object.
+Sub PMC object. Returns the current registered callback.
 
 =cut
 
 =end
 
-    method set_callback ($sub) {
-        $!callback := get_sub_obj($sub);
+    method callback ($sub?) {
+        if pir::defined__IP($sub) {
+            $!callback := get_sub_obj($sub);
+        }
+        return $!callback;
     };
 
 =begin
 
-=item set_finalize(sub) or set_finalize('sub')
+=item finalize(sub) or finalize('sub') or finalize()
 
 Set the sub callback to be called at the end of execution.
 sub can be passed by name or reference through a Sub PMC object.
 Sub will only be called if the probe is enabled at the end of execution.
 
+Returns the registered finalize sub.
+
 =cut
 
 =end
 
-    method set_finalize ($sub) {
-        $!finalize := get_sub_obj($sub);
+    method finalize ($sub?) {
+        if pir::defined__IP($sub) {
+            $!finalize := get_sub_obj($sub);
+        }
+        return $!finalize;
     };
 
 =begin
 
-=item set_data(data)
+=item data(data) or data()
 
 Sets the data attribute.
+Returns the current set data.
 
 =cut
 
 =end   
 
-    method set_data ($data) {
-        $!data := $data;
+    method data ($data?) {
+        if pir::defined__IP($data) {
+            $!data := $data;
+        }
+        return $data;
     };
 
 =begin
@@ -175,7 +187,7 @@ Stub method. To be implemented by child classes.
             }
 
             if !pir::defined__IP($lookup) {
-                pir::die('Could not find sub ' ~ $sub ~ ' in the namespaces.');
+                die('Could not find sub ' ~ $sub ~ ' in the namespaces.');
             }
 
             $sub := $lookup;

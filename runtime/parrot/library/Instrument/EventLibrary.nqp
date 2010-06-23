@@ -17,8 +17,7 @@ runtime/parrot/library/Instrument/EventLibrary.nqp
 
     Example usage:
 
-    # Create a catchall probe which will be called for
-    #  each op.
+    # Create an event handler to receive loadlib notifications.
     evt = new ['Instrument';'Event';'Internal';'loadlib']
     evt.'set_callback'('loadlib_callback')
 
@@ -64,7 +63,7 @@ class Instrument::Event::Class::instantiate is Instrument::Event {
         $!probe_obj := Instrument::Probe.new();
 
         $!probe_obj.inspect('new');
-        $!probe_obj.set_callback(pir::get_global__PS('callback'));
+        $!probe_obj.callback(pir::get_global__PS('callback'));
     };
 
     sub callback ($op, $instr_obj, $probe) {
@@ -98,7 +97,7 @@ class Instrument::Event::Class::callmethod is Instrument::Event {
 
         $!probe_obj.inspect('callmethod');
         $!probe_obj.inspect('callmethodcc');
-        $!probe_obj.set_callback(pir::get_global__PS('callback'));
+        $!probe_obj.callback(pir::get_global__PS('callback'));
     };
 
     sub callback ($op, $instr_obj) {

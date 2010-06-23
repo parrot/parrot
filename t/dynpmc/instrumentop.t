@@ -1,6 +1,6 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id: instrument.t 47641 2010-06-15 16:38:51Z khairul $
+# $Id$
 
 =head1 NAME
 
@@ -72,7 +72,7 @@ PROG
     probe_class = get_hll_global ['Instrument'], 'Probe'
     probe = probe_class.'new'()
     probe.'inspect'('say_sc')
-    probe.'set_callback'('test_one_op_callback')
+    probe.'callback'('test_one_op_callback')
 
     # Create the Instrument instance and run it
     #  against t/dynpmc/instrumentop-test1.pir.

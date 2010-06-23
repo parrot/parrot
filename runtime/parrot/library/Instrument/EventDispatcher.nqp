@@ -56,7 +56,7 @@ to handle that task.
 =end
 
     method can_handle ($task) {
-        my $subtype    := pir::getattribute_p_p_s__PPS($task, "subtype");
+        my $subtype    := pir::getattribute__PPS($task, "subtype");
         my $list       := pir::set_p_p_kc__PPS($!events, $subtype);
 
         return pir::defined__IP($list);
@@ -100,10 +100,10 @@ with it.
 =end
 
     sub handler ($handler, $task) {
-        my $subtype := pir::getattribute_p_p_s__PPS($task, "subtype");
-        my $events  := pir::getattribute_p_p_s__PPS($handler, '$!events');
+        my $subtype := pir::getattribute__PPS($task, "subtype");
+        my $events  := pir::getattribute__PPS($handler, '$!events');
         my $list    := pir::set_p_p_kc__PPS($events, $subtype);
-        my $data    := pir::getattribute_p_p_s__PPS($task, "data");
+        my $data    := pir::getattribute__PPS($task, "data");
 
         for $list {
             $_($data);

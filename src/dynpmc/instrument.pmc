@@ -245,6 +245,7 @@ Loads the given file and run it with the args given.
         int argc = 0, status;
         char * default_argv[] = {NULL};
         char ** argv = default_argv;
+        char * file_c;
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         PMC *probe_iter;
         int counter = 0;
@@ -275,14 +276,16 @@ Loads the given file and run it with the args given.
         normalise_vtables(INTERP, attr->supervised);
 
         /* Begin Execution */
+        file_c = Parrot_str_to_cstring(attr->supervised, file);
         status = imcc_run(attr->supervised,
-                    Parrot_str_cstring(attr->supervised, file),
+                    file_c,
                     argc, (const char **) argv);
         if (status) {
             imcc_run_pbc(attr->supervised,
                          attr->supervised->output_file,
                          argc, (const char **) argv);
         }
+        Parrot_str_free_cstring(file_c);
 
         /* Finalize the instruments */
         probe_iter = VTABLE_get_iter(INTERP, attr->probes);

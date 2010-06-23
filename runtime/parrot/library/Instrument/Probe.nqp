@@ -5,7 +5,7 @@
 =begin
 
 =head1 NAME
-    
+
 runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting and removing hooks from the interpreter.
 
 =head1 SYNOPSIS
@@ -57,15 +57,19 @@ Private method to perform additional initialisation.
     };
 
 =begin
-=item make_catchall()
+=item catchall($catchall?)
 
-Set this probe to catch all ops.
+Set this probe to catch all ops if $catchall is not zero.
+Returns the current catchall status.
 
 =cut
 =end
     
-    method make_catchall () {
-        $!is_catchall := 1;
+    method catchall ($catchall?) {
+        if pir::defined__IP($catchall) {
+            $!is_catchall := $catchall;
+        }
+        return $!is_catchall
     }
 
 =begin
@@ -87,20 +91,28 @@ everytime a dynlib is loaded.
             for $op {
                 self.inspect($_);
             }
-        } else {
+        }
+        else {
             # $op is singular.
-            my $type := pir::typeof__PP($op);
+            my $oplib := Q:PIR { %r = new ['OpLib'] };
+            my $type  := pir::typeof__PP($op);
 
             if $type eq 'Integer' {
                 # $op = op number.
-                $!oplist.push($op);
-            } else {
-                my $oplib := Q:PIR { %r = new ['OpLib'] };
-                
+                if $op > pir::set__IP($oplib) {
+                    # op number is invalid.
+                    # Put it in the todo list.
+                    $!todo_oplist.push($op);
+                }
+                else {
+                    $!oplist.push($op);
+                }
+            }
+            else {
                 # Lookup the op.
                 my $op_ret;
                 my $op_num;
-                
+
                 $op_ret := $oplib.op_family($op);
                 if pir::defined__IP($op_ret) {
                     # $op = short name.
@@ -108,7 +120,8 @@ everytime a dynlib is loaded.
                         $op_num := pir::set__IP($_);
                         $!oplist.push($op_num);
                     }
-                } else {
+                }
+                else {
                     # $op = long name.
                     $op_ret := pir::set_p_p_k__PPP($oplib, $op);
                     $op_num := pir::set__IP($op_ret);
@@ -144,7 +157,7 @@ eg,
         }
 
         # Check for any todo_oplist.
-        if pir::set_i_p__IP($!todo_oplist) != 0 {
+        if pir::set__IP($!todo_oplist) != 0 {
             # Double check the todo_oplist.
             my $list      := $!todo_oplist;
             $!todo_oplist := Q:PIR { %r = new ['ResizablePMCArray'] };
@@ -154,13 +167,13 @@ eg,
 
             # If there is still a todo_oplist,
             #  set up an event handler to update.
-            if pir::set_i_p__IP($!todo_oplist) != 0 {
+            if pir::set__IP($!todo_oplist) != 0 {
                 $Instrument::Probe::loadlib_probelist.push(self);
 
                 if !pir::defined__IP($Instrument::Probe::loadlib_evt) {
                     $Instrument::Probe::loadlib_evt := Instrument::Event::Internal::loadlib.new();
-                    $Instrument::Probe::loadlib_evt.set_callback(pir::get_global__PS('loadlib_callback'));
-                    $Instrument::Probe::loadlib_evt.set_data(self);
+                    $Instrument::Probe::loadlib_evt.callback(pir::get_global__PS('loadlib_callback'));
+                    $Instrument::Probe::loadlib_evt.data(self);
                     $!instr_obj.attach($Instrument::Probe::loadlib_evt);
                 }
             }
@@ -194,7 +207,7 @@ You can dynamically attach and remove hooks dynamically.
 
 =cut
 =end
-    
+
     method disable () {
         if !pir::defined__IP($!instr_obj) {
             pir::die('Probe has not been attached to an Instrument object.');
@@ -214,6 +227,30 @@ You can dynamically attach and remove hooks dynamically.
             $!is_enabled := 0;
         }
     };
+
+=begin
+=item get_op_list()
+
+Returns the list of op numbers inspected by this probe.
+
+=cut
+=end
+
+    method get_op_list () {
+        return $!oplist;
+    }
+
+=begin
+=item get_op_todo_list()
+
+Returns the list of items passed to inspect
+
+=cut
+=end
+
+    method get_op_todo_list () {
+        return $!todo_oplist;
+    }
 
     # Internal helper: Callback for loadlib events registered when the probe has
     #                  any outstanding ops in $!todo_oplist.
