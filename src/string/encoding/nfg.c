@@ -517,10 +517,11 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     UChar32 *s   = (UChar32 *) i->str->strstart;
     size_t   pos = i->bytepos / sizeof (UChar32);
 
-    if (!ISCOMBINING(c)) {
+    if (pos = 0 || !ISCOMBINING(c)) {
         s[pos++] = (UChar32) c;
         ++i->charpos;
         i->bytepos = pos * sizeof (UChar32);
+        return;
     }
     // TODO: This can create dynamic graphemes for valid Unicode compositions.
     else {
