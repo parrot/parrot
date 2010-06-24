@@ -1218,7 +1218,8 @@ examples-clean:
     examples/mops/mops$(EXE) \
     examples/pasm/hello.pbc \
     examples/pasm/hello$(O) \
-    examples/pasm/hello$(EXE)
+    examples/pasm/hello$(EXE) \
+    generated_hello.pbc
 
 # hello
 hello: test_prep examples/pasm/hello$(EXE)
