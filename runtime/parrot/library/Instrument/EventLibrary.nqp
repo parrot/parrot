@@ -50,31 +50,44 @@ class Instrument::Event::Internal::loadlib is Instrument::Event {
 
 Raises an event whenever a class is instantiated.
 
-TODO: Add inspect so that specific classes can be targetted.
+TODO: How about instantiations from C? Inspecting new opcodes
+      don't really help that. Redo. Hold off until InstrumentPMC is done.
 
 =cut
 =end
 
 class Instrument::Event::Class::instantiate is Instrument::Event {
-
     method _self_init() {
         $!event_type := 'Instrument::Event::Class::instantiate';
 
+        my $class_hash := Q:PIR { %r = new ['Hash'] };
+        self.data($class_hash);
+
         $!probe_obj := Instrument::Probe.new();
+        $!probe_obj.data(self);
 
         $!probe_obj.inspect('new');
         $!probe_obj.callback(pir::get_global__PS('callback'));
     };
 
+    method inspect ($class) {
+        pir::set_p_k_ic($!class_hash, $class, 1);
+    };
+
     sub callback ($op, $instr_obj, $probe) {
         my $class    := $op.get_arg(1);
 
-        my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
-        $data.push($class);
-        $data.push($op);
-        $data.push($instr_obj);
+        # Check if class is to be inspected.
+        my $data := $probe.data().data();
+        if pir::set__IP($data) == 0
+        || pir::exists_i_p_k__IPP($data, $class) {
+            my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
+            $data.push($class);
+            $data.push($op);
+            $data.push($instr_obj);
 
-        Instrument::Event::_raise_event('Instrument::Event::Class::instantiate', $data);
+            Instrument::Event::_raise_event('Instrument::Event::Class::instantiate', $data);
+        }
     };
 };
 
@@ -83,7 +96,7 @@ class Instrument::Event::Class::instantiate is Instrument::Event {
 
 Raises an event whenever a class method is called.
 
-TODO: Add inspect so that specific methods and classes can be targetted.
+TODO: Similarly, how about calling from C? Hold off until InstrumentPMC is done.
 
 =cut
 =end
