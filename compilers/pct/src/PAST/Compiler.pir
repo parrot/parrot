@@ -18,6 +18,7 @@ what sorts of conversions are allowed (or desired).  The
 basic flags are:
 
     P,S,I,N   PMC, string, int, or num register
+    Q         keyed PMC, next flag indicates type of key
     s         string register or constant
     i         int register or constant
     n         num register or constant
@@ -67,11 +68,13 @@ any value type.
     piropsig['concat']     = 'PP~'
     piropsig['copy']       = '0PP'
     piropsig['defined']    = 'IP'
+    piropsig['delete']     = 'vQ*'
     piropsig['die']        = 'v~'
     piropsig['div']        = 'PP+'
     piropsig['does']       = 'IPs'
     piropsig['downcase']   = 'Ss'
     piropsig['elements']   = 'IP'
+    piropsig['exists']     = 'IQ*'
     piropsig['exit']       = 'vi'
     piropsig['fdiv']       = 'PP+'
     piropsig['find_codepoint']   = 'Is'
@@ -430,6 +433,7 @@ third and subsequent children can be any value they wish.
     sigidx = 1
     rtype = substr signature, sigidx, 1
   iter_loop:
+    if rtype == 'Q' goto keyed_pos
     unless iter goto iter_end
     .local pmc cpast, cpost
     cpast = shift iter
@@ -472,6 +476,32 @@ third and subsequent children can be any value they wish.
     inc sigidx
     rtype = substr signature, sigidx, 1
     goto iter_loop
+  keyed_pos:
+    # rtype is 'Q', so construct a keyed pmc argument
+    # first, get the base PMC
+    unless iter goto iter_end
+    cpast = shift iter
+    cpost = self.'as_post'(cpast, 'rtype'=>'P')
+    cpost = self.'coerce'(cpost, 'P')
+    # now process the key arg
+    unless iter goto iter_end
+    .local pmc kpast, kpost
+    kpast = shift iter
+    inc sigidx
+    rtype = substr signature, sigidx, 1
+    kpost = self.'as_post'(kpast, 'rtype'=>rtype)
+    kpost = self.'coerce'(kpost, rtype)
+    ops.'push'(kpost)
+    ops.'push'(cpost)
+    # now construct the keyed PMC
+    $S0 = cpost
+    concat $S0, '['
+    $S1 = kpost
+    concat $S0, $S1
+    concat $S0, ']'
+    say $S0
+    push posargs, $S0
+    goto iter_rtype
   iter_end:
     .return (ops, posargs, namedargs)
 .end
@@ -1101,8 +1131,8 @@ a 'pasttype' of 'pirop'.
     signature = 'vP'
   have_signature:
 
-    .local pmc ops
-    ops = self.'post_children'(node, 'signature'=>signature)
+    .local pmc ops, posargs
+    (ops, posargs) = self.'post_children'(node, 'signature'=>signature)
 
     .local pmc arglist
     arglist = ops.'list'()
@@ -1118,10 +1148,10 @@ a 'pasttype' of 'pirop'.
     .local string result
     result = self.'uniquereg'($S0)
     ops.'result'(result)
-    ops.'push_pirop'(pirop, result, arglist :flat)
+    ops.'push_pirop'(pirop, result, posargs :flat)
     .return (ops)
   pirop_void:
-    ops.'push_pirop'(pirop, arglist :flat)
+    ops.'push_pirop'(pirop, posargs :flat)
     .return (ops)
 .end
 
