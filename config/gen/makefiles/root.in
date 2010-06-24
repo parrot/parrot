@@ -283,7 +283,9 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PAST/Pattern.pbc \
     $(LIBRARY_DIR)/PAST/Pattern.pir \
     $(LIBRARY_DIR)/PAST/Transformer.pbc \
+    $(LIBRARY_DIR)/PAST/Transformer.pir \
     $(LIBRARY_DIR)/PAST/Transformer/Dynamic.pbc \
+    $(LIBRARY_DIR)/PAST/Transformer/Dynamic.pir \
     $(LIBRARY_DIR)/PAST/Walker.pbc \
     $(LIBRARY_DIR)/PAST/Walker.pir \
     $(LIBRARY_DIR)/PAST/Walker/Dynamic.pbc \
@@ -1106,6 +1108,20 @@ $(LIBRARY_DIR)/PAST/Pattern.pbc: $(LIBRARY_DIR)/PAST/Pattern.pir
 
 $(LIBRARY_DIR)/PAST/Pattern.pir: $(LIBRARY_DIR)/PAST/Pattern.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Pattern.nqp > $@
+
+$(LIBRARY_DIR)/PAST/Transformer.pbc: $(LIBRARY_DIR)/PAST/Transformer.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Transformer.pir
+
+$(LIBRARY_DIR)/PAST/Transformer.pir: $(LIBRARY_DIR)/PAST/Transformer.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Transformer.nqp > $@
+
+$(LIBRARY_DIR)/PAST/Transformer/Dynamic.pbc: \
+	$(LIBRARY_DIR)/PAST/Transformer/Dynamic.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Transformer/Dynamic.pir
+
+$(LIBRARY_DIR)/PAST/Transformer/Dynamic.pir: \
+	$(LIBRARY_DIR)/PAST/Transformer/Dynamic.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PAST/Transformer/Dynamic.nqp > $@
 
 $(LIBRARY_DIR)/PAST/Walker.pbc: $(LIBRARY_DIR)/PAST/Walker.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/PAST/Walker.pir
