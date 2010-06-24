@@ -65,8 +65,7 @@ subtypes that are or can be tty.
 */
 
     METHOD isatty() {
-        const INTVAL isatty = Parrot_io_is_tty(INTERP, SELF);
-        RETURN(INTVAL isatty);
+        RETURN(INTVAL 0);
     }
 
 }
