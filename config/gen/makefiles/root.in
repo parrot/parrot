@@ -288,6 +288,8 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PAST/Walker/Dynamic.pbc \
     $(LIBRARY_DIR)/PCT/Pattern.pbc \
     $(LIBRARY_DIR)/PCT/Pattern.pir \
+    $(LIBRARY_DIR)/POST/Pattern.pbc \
+    $(LIBRARY_DIR)/POST/Pattern.pir \
     $(LIBRARY_DIR)/ProfTest.pbc \
     $(LIBRARY_DIR)/ProfTest/PIRProfile.pir \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
@@ -1108,6 +1110,12 @@ $(LIBRARY_DIR)/PCT/Pattern.pbc: $(LIBRARY_DIR)/PCT/Pattern.pir
 
 $(LIBRARY_DIR)/PCT/Pattern.pir: $(LIBRARY_DIR)/PCT/Pattern.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/PCT/Pattern.nqp > $@
+
+$(LIBRARY_DIR)/POST/Pattern.pbc: $(LIBRARY_DIR)/POST/Pattern.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/POST/Pattern.pir
+
+$(LIBRARY_DIR)/POST/Pattern.pir: $(LIBRARY_DIR)/POST/Pattern.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/POST/Pattern.nqp > $@
 
 #
 # Profiling runcore test supporting code

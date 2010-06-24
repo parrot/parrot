@@ -43,6 +43,9 @@ class PCT::Pattern is Tree::Pattern {
             if self ~~ PAST::Pattern {
                 self.check_past_node_attributes($node, $/);
             }
+            elsif self ~~ POST::Pattern {
+                self.check_post_node_attributes($node, $/);
+            }
             else {
                 self.check_pct_node_attributes($node, $/);
             }
@@ -134,8 +137,13 @@ class PCT::Pattern is Tree::Pattern {
         (self.check_attribute($node, "name", $/)
          && self.check_attribute($node, "source", $/)
          && self.check_attribute($node, "pos", $/));
-
+        $/;
     }
+}
+
+INIT {
+    pir::load_bytecode('PAST/Pattern.pbc');
+    pir::load_bytecode('POST/Pattern.pbc');
 }
 
 # Local Variables:
