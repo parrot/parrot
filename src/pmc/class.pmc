@@ -1396,8 +1396,22 @@ Returns whether the class is or inherits from C<*classname>.
 
         if (SELF == want_class)
             return 1;
+        else {
+            Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
-        return VTABLE_isa_pmc(INTERP, SELF, want_class);
+            INTVAL num_classes = VTABLE_elements(INTERP, _class->all_parents);
+            int    i           = 0;
+
+            for (i = 1; i < num_classes; ++i) {
+                PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
+                                            _class->all_parents, i);
+
+                if (VTABLE_is_same(INTERP, want_class, cur_class))
+                    return 1;
+            }
+        }
+
+        return 0;
     }
 
 /*
