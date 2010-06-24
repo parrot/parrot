@@ -23,11 +23,12 @@ t/pmc/orderedhash.t.
 .sub 'main'
     .include 'test_more.pir'
 
-    plan(5)
+    plan(6)
 
     'test_init'()
     'test_bad_type'()
     'test_shift'()
+    'test_pop'()
 .end
 
 .sub 'test_init'
