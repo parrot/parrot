@@ -1006,6 +1006,14 @@ D: Nicer command line handling in ops2c.pl
 N: Tony Payne
 D: Example hanoi.pasm
 
+N: Tyler Curtis
+U: tcurtis
+E: tyler.l.curtis@gmail.com
+E: ekiru.0@gmail.com
+D: PAST Optimization GSoC 2010
+A: tylercurtis
+A: ekiru
+
 N: Ujwal Reddy Malipeddi
 U: ujwalic
 E: ujwalic@gmail.com
