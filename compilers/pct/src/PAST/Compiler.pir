@@ -499,7 +499,6 @@ third and subsequent children can be any value they wish.
     $S1 = kpost
     concat $S0, $S1
     concat $S0, ']'
-    say $S0
     push posargs, $S0
     goto iter_rtype
   iter_end:
