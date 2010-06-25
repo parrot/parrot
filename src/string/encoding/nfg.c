@@ -532,11 +532,11 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
         return;
     }
     else {
-        grapheme_table *table = (grapheme_table *) i->str->extra;
         int32_t  prev = s[pos - 1];
         grapheme g;
 
         if (prev < 0) {
+            grapheme_table *table = (grapheme_table *) i->str->extra;
             PARROT_ASSERT(table);
             g.len = table->graphemes[-1 - prev].len + 1;
             g.hash = table->graphemes[-1 - prev].hash;
