@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -159,8 +159,10 @@ default.
 
 */
 
-PARROT_DYNEXT_EXPORT char
-nci_c(void) {
+PARROT_DYNEXT_EXPORT
+char
+nci_c(void)
+{
     return nci_dlvar_char;
 }
 
@@ -174,7 +176,9 @@ Multiplies C<l1> and C<l2> together and returns the first byte of the result.
 
 */
 
-PARROT_DYNEXT_EXPORT char
+PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
+char
 nci_csc(short l1, char l2)
 {
     return l1 * l2;
@@ -191,7 +195,8 @@ the new value.
 
 */
 
-PARROT_DYNEXT_EXPORT double
+PARROT_DYNEXT_EXPORT
+double
 nci_d(void)
 {
     nci_dlvar_double *= 10.0;
@@ -209,7 +214,9 @@ Returns the value C<d> multiplied by 2.0.
 
 */
 
-PARROT_DYNEXT_EXPORT double
+PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
+double
 nci_dd(double d)
 {
     return d * 2.0;
@@ -226,7 +233,8 @@ value.
 
 */
 
-PARROT_DYNEXT_EXPORT float
+PARROT_DYNEXT_EXPORT
+float
 nci_f(void)
 {
     nci_dlvar_float *= 10.0;
@@ -244,7 +252,9 @@ Returns the result of C<l1> / C<l2>.
 
 */
 
-PARROT_DYNEXT_EXPORT float
+PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
+float
 nci_fff(float l1, float l2)
 {
     return l1 / l2;
@@ -260,7 +270,8 @@ Returns the current value of <nci_dlvar_int>.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 nci_i(void)
 {
     return nci_dlvar_int;
@@ -276,7 +287,9 @@ Returns the int product of C<l1 * l2>.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
+int
 nci_isc(short l1, char l2)
 {
     return l1 * l2;
@@ -292,7 +305,8 @@ Performs a series of operations on values stored at pointer C<p>.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 nci_ip(void *p)
 {
     typedef struct _dfi {
@@ -318,7 +332,8 @@ Prints the first two characters in C<p>, in reversed order.  Returns 2.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 nci_it(void *p)
 {
     fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
@@ -337,7 +352,8 @@ Returns the value of C<nci_dlvar_long>.
 
 */
 
-PARROT_DYNEXT_EXPORT long
+PARROT_DYNEXT_EXPORT
+long
 nci_l(void)
 {
     return nci_dlvar_long;
@@ -353,7 +369,8 @@ Returns the address of C<nci_dlvar_int>.
 
 */
 
-PARROT_DYNEXT_EXPORT int *
+PARROT_DYNEXT_EXPORT
+int *
 nci_p(void)
 {
     return &nci_dlvar_int;
@@ -369,7 +386,8 @@ Returns the value of C<nci_dlvar_cstring>.
 
 */
 
-PARROT_DYNEXT_EXPORT char *
+PARROT_DYNEXT_EXPORT
+char *
 nci_t(void)
 {
     return nci_dlvar_cstring;
@@ -388,7 +406,8 @@ of C<p>, in reverse order.
 
 static char b[] = "xx worked\n";
 
-PARROT_DYNEXT_EXPORT char *
+PARROT_DYNEXT_EXPORT
+char *
 nci_tb(void *p)
 {
     b[0] = ((char*) p)[1];
@@ -410,7 +429,8 @@ of C<p>, in reverse order.
 
 static char s[] = "xx worked\n";
 
-PARROT_DYNEXT_EXPORT char *
+PARROT_DYNEXT_EXPORT
+char *
 nci_tt(char *p)
 {
     s[0] = p[1];
@@ -432,7 +452,8 @@ of C<p>, in reverse order.
 
 static char B[] = "xx done\n";
 
-PARROT_DYNEXT_EXPORT char *
+PARROT_DYNEXT_EXPORT
+char *
 nci_tB(void **p)
 {
     B[0] = (*(char**) p)[1];
@@ -451,7 +472,8 @@ Returns the value C<p> directly.
 
 */
 
-PARROT_DYNEXT_EXPORT void *
+PARROT_DYNEXT_EXPORT
+void *
 nci_pp(void *p)
 {
     return p;
@@ -468,7 +490,8 @@ Returns 2.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 nci_iiii(int i1, int i2, int i3)
 {
     fprintf(stderr, "%d %d %d\n", i1, i2, i3);
@@ -487,7 +510,8 @@ Returns the product of C<*l> and C<i>, as an int.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 nci_i4i(long * l, int i)
 {
 
@@ -505,7 +529,8 @@ to the value  4711.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 nci_ii3(int a, int *bp)
 {
     int r = a * *bp;
@@ -524,7 +549,8 @@ writes the string C<str> to stdout and returns the value 4711.
 
 */
 
-PARROT_DYNEXT_EXPORT int
+PARROT_DYNEXT_EXPORT
+int
 call_back(const char *str)
 {
     puts(str);
@@ -543,7 +569,8 @@ Performs one from a series of tests, depending on the value given for C<test>.
 
 */
 
-PARROT_DYNEXT_EXPORT void *
+PARROT_DYNEXT_EXPORT
+void *
 nci_pi(int test)
 {
     switch (test) {
@@ -691,7 +718,8 @@ Returns the value of C<nci_dlvar_short>.
 
 */
 
-PARROT_DYNEXT_EXPORT short
+PARROT_DYNEXT_EXPORT
+short
 nci_s(void)
 {
     return nci_dlvar_short;
@@ -707,7 +735,8 @@ Returns the product of C<l1 * l2>.
 
 */
 
-PARROT_DYNEXT_EXPORT short
+PARROT_DYNEXT_EXPORT
+short
 nci_ssc(short l1, char l2)
 {
     return l1 * l2;
@@ -723,7 +752,8 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_vP(void *pmc)
 {
     /* TODO:
@@ -760,7 +790,8 @@ No return value.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_C1(cb_C1_func cb, void* user_data)
 {
     const char *result = "succeeded";
@@ -781,7 +812,8 @@ No return value.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_C2(cb_C2_func cb, void* user_data)
 {
     /* call the cb synchronously */
@@ -803,7 +835,8 @@ No return value.
 
 static int int_cb_C3 = 99;
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_C3(cb_C3_func cb, void* user_data)
 {
     /* call the cb synchronously */
@@ -823,7 +856,8 @@ No return value.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_D1(cb_D1_func cb, void* user_data)
 {
     const char *result = "succeeded";
@@ -844,7 +878,8 @@ No return value.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_D2(cb_D2_func cb, void* user_data)
 {
     /* call the cb synchronously */
@@ -866,7 +901,8 @@ No return value.
 
 static int int_cb_D3 = 111;
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_D3(cb_D3_func cb, void* user_data)
 {
     /* call the cb synchronously */
@@ -888,7 +924,8 @@ No return value.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_cb_D4(cb_D4_func times_ten, void* user_data)
 {
     int cnt;
@@ -911,7 +948,8 @@ Prints a count integer and the coordinates of 4 rectangles.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_pip(int count, Rect_Like *rects)
 {
     int i;
@@ -931,8 +969,9 @@ Doubles C<double_me> and triples C<triple_me>. Returns their sum.
 
 */
 
-PARROT_DYNEXT_EXPORT int
-nci_i33(int *double_me, int *triple_me)
+PARROT_DYNEXT_EXPORT
+int
+nci_i33(ARGMOD(int *double_me), ARGMOD(int *triple_me))
 {
     *double_me *= 2;
     *triple_me *= 3;
@@ -951,8 +990,9 @@ C<my_y>.
 
 */
 
-PARROT_DYNEXT_EXPORT void
-nci_vpii(Outer *my_data, int my_x, int my_y)
+PARROT_DYNEXT_EXPORT
+void
+nci_vpii(ARGMOD(Outer *my_data), int my_x, int my_y)
 {
     my_data->x            = my_x;
     my_data->nested->y    = my_y;
@@ -972,7 +1012,8 @@ of that structure.
 
 static int my_array[4];
 
-PARROT_DYNEXT_EXPORT void *
+PARROT_DYNEXT_EXPORT
+void *
 nci_piiii(int alpha, int beta, int gamma, int delta)
 {
     static struct array_container
@@ -1003,7 +1044,8 @@ to the product of C<fac1 * fac2>.
 
 */
 
-PARROT_DYNEXT_EXPORT void *
+PARROT_DYNEXT_EXPORT
+void *
 nci_pii(int fac1, int fac2)
 {
     nci_dlvar_int = fac1 * fac2;
@@ -1021,7 +1063,8 @@ Multiplies the global variable C<nci_dlvar_int> times 10.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_v(void)
 {
     nci_dlvar_int *= 10;
@@ -1037,7 +1080,8 @@ Multiplies the global variable C<nci_dlvar_int> by 3.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_vv(void)
 {
     nci_dlvar_int *= 3;
@@ -1053,8 +1097,9 @@ Test an NCI opaque struct out value.
 
 */
 
-PARROT_DYNEXT_EXPORT void
-nci_vVi(Opaque **outOpaque, int x)
+PARROT_DYNEXT_EXPORT
+void
+nci_vVi(ARGOUT(Opaque **outOpaque), int x)
 {
     static Opaque opaque;
     opaque.x = x;
@@ -1072,8 +1117,9 @@ to an NCI function correctly.
 
 */
 
-PARROT_DYNEXT_EXPORT void
-nci_vp(Opaque *inOpaque)
+PARROT_DYNEXT_EXPORT
+void
+nci_vp(ARGIN(Opaque *inOpaque))
 {
     if (inOpaque)
         printf("got %d\n", inOpaque->x);
@@ -1091,7 +1137,8 @@ Prints and returns "s2, s2, s1"
 
 */
 
-PARROT_DYNEXT_EXPORT char *
+PARROT_DYNEXT_EXPORT
+char *
 nci_ttt(char *s1, char *s2)
 {
     char* s = (char*) malloc((2 * strlen(s2)) + strlen(s1) + 5);
@@ -1102,7 +1149,8 @@ nci_ttt(char *s1, char *s2)
 
 
 static void
-validate_float(float f, double checkval) {
+validate_float(float f, double checkval)
+{
     int valid;
     double error_ratio;
     error_ratio = (((double)f) - checkval) / checkval;
@@ -1121,7 +1169,8 @@ error of 0.01.
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_vfff(float l1, float l2, float l3)
 {
     validate_float(l1, 3456.54);
@@ -1140,7 +1189,8 @@ Sets C<*ptr> to "Hello bright new world\n".
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_vV(const char **ptr)
 {
     *ptr = "Hello bright new world\n";
@@ -1158,7 +1208,8 @@ day!\n", and C<*ptr3> to "Go suck a lemon.\n".
 
 */
 
-PARROT_DYNEXT_EXPORT void
+PARROT_DYNEXT_EXPORT
+void
 nci_vVVV(const char **ptr1, const char **ptr2, const char **ptr3)
 {
     *ptr1 = "Hello bright new world!\n";
