@@ -548,15 +548,15 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
         }
         else {
             UErrorCode err = U_ZERO_ERROR;
+            UChar src[3];
             int dst_len = 1;
-            int src_len = 1;
-            UChar src[2];
             UChar dst[2];
             src[0] = s[pos - 1];
             src[1] = s[pos];
+            src[2] = 0;
 
             /* Delegate composition to ICU. */
-            dst_len = unorm_normalize(src, src_len, UNORM_DEFAULT, 0,
+            dst_len = unorm_normalize(src, -1 , UNORM_DEFAULT, 0,
                                       dst, dst_len, &err);
 
             if (U_SUCCESS(err)) {
@@ -566,11 +566,6 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
             }
 
             /* Composition failed, we need a dynamic codepoint. */
-            if (table == NULL) {
-                table = create_grapheme_table(interp, 1);
-                i->str->extra = table;
-            }
-
             g.len  = 2;
             g.hash = 0xffff;
             g.codepoints = mem_gc_allocate_n_typed(interp, g.len, UChar32);

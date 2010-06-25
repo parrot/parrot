@@ -49,11 +49,11 @@ string operations.
     is($I0, $I1, "Bufused is the same.")
 
     # Do the same thing again, without dynamic codepoints.
-    $S2 = utf16:unicode:"O\u0308"
+    $S2 = utf16:unicode:"n\u0303"
     $I0 = find_encoding 'nfg'
     $S2 = trans_encoding $S2, $I0
 
-    $S3 = nfg:unicode:"O\u0308"
+    $S3 = nfg:unicode:"n\u0303"
 
     $I0 = stringinfo $S2, .STRINGINFO_STRLEN
     $I1 = stringinfo $S3, .STRINGINFO_STRLEN
