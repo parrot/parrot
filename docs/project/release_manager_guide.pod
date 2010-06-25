@@ -407,9 +407,13 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Jul 20, 2010 - 2.6* - coke
- - Aug 17, 2010 - 2.7  - ??
- - Sep 21, 2010 - 2.8  - gerd
+ - Jul 20, 2010 - 2.6*  - coke
+ - Aug 17, 2010 - 2.7   - ??
+ - Sep 21, 2010 - 2.8   - gerd
+ - Oct 19, 2010 - 2.9*  - ??
+ - Nov 16, 2010 - 2.10  - ??
+ - Dec 21, 2010 - 2.11  - ??
+ - Jan 18, 2010 - 3.0*  - ??
 
 =cut
 
