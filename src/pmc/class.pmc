@@ -141,10 +141,19 @@ static void initialize_parents_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+static size_t key_hash_pointer(SHIM_INTERP,
+    ARGIN(const void *value),
+    size_t seed)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static int pointer_compare(SHIM_INTERP,
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
 
 #define ASSERT_ARGS_build_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -169,9 +178,12 @@ static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
     , PARROT_ASSERT_ARG(object) \
     , PARROT_ASSERT_ARG(all_parents) \
     , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_make_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF))
+#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
