@@ -43,9 +43,9 @@ class Tree::Pattern::Transformer is PAST::Transformer {
 
 }
 
-module PAST::Walker {
+module Tree::Walker {
     our multi sub walk (Tree::Pattern::Transformer $walker,
-                    PAST::Node $node) {
+                        Capture $node) {
         my $pattern := $walker.pattern();
         my $shouldTransform;
         if ($pattern ~~ Tree::Pattern) {

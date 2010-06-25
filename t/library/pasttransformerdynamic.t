@@ -76,8 +76,8 @@ sub trim ($walker, $node) {
     my $length := pir::elements__IP($node);
     if ($length <= 1) {
 	$result := $node;
-	my $children := PAST::Walker::walkChildren($walker, $node);
-	PAST::Walker::replaceChildren($result, $children);
+	my $children := Tree::Walker::walkChildren($walker, $node);
+	Tree::Walker::replaceChildren($result, $children);
     }
     else {
 	$result := null;

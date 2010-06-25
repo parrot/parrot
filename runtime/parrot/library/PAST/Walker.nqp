@@ -4,31 +4,15 @@
 
 INIT {
     pir::load_bytecode('PCT.pbc');
+    pir::load_bytecode('Tree/Walker.pbc');
 }
 
-class PAST::Walker {
+class PAST::Walker is Tree::Walker { }
+
+module Tree::Walker {
     our multi sub walk (PAST::Walker $walker, PAST::Node $node) {
+        say('PAST::Walker, PAST::Node');
         walkChildren($walker, $node);
-    }
-
-    our multi sub walk (PAST::Walker $walker, $node) {
-        $node;
-    }
-
-    our multi sub walkChildren (PAST::Walker $walker, PAST::Node $node) {
-        my $index := 0;
-        my $max := pir::elements__IP($node);
-        while ($index < $max) {
-            walk($walker, $node[$index++]);
-        }
-    }
-
-    method walk ($node) {
-        walk(self, $node);
-    }
-
-    method walkChildren ($node) {
-        walkChildren(self, $node);
     }
 }
 

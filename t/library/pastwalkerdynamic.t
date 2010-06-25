@@ -23,27 +23,27 @@ my $varlists;
 
 sub walkBlock ($walker, $past) {
     ++$blocks;
-    PAST::Walker::walkChildren($walker, $past);
+    Tree::Walker::walkChildren($walker, $past);
 }
 sub walkOp ($walker, $past) {
     ++$ops;
-    PAST::Walker::walkChildren($walker, $past);
+    Tree::Walker::walkChildren($walker, $past);
 }
 sub walkStmts ($walker, $past) {
     ++$stmts;
-    PAST::Walker::walkChildren($walker, $past);
+    Tree::Walker::walkChildren($walker, $past);
 }
 sub walkVal ($walker, $past) {
     ++$vals;
-    PAST::Walker::walkChildren($walker, $past);
+    Tree::Walker::walkChildren($walker, $past);
 }
 sub walkVar ($walker, $past) {
     ++$vars;
-    PAST::Walker::walkChildren($walker, $past);
+    Tree::Walker::walkChildren($walker, $past);
 }
 sub walkVarList ($walker, $past) {
     ++$varlists;
-    PAST::Walker::walkChildren($walker, $past);
+    Tree::Walker::walkChildren($walker, $past);
 }
 
 sub zeroCounts () {

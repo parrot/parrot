@@ -12,7 +12,7 @@ class PAST::Transformer::Dynamic is PAST::Transformer {
                                                 PAST::Walker::Dynamic);
 }
 
-module PAST::Walker {
+module Tree::Walker {
     our multi sub walk (PAST::Transformer::Dynamic $walker,
                         PAST::Block $node) {
         my $result;

@@ -228,7 +228,7 @@ Uses PAST::Transformer::Trim to delete PAST::Blocks with multiple children. It t
     $P0 = subclass $P1, ['PAST'; 'Transformer'; 'Trim']
 .end
 
-.namespace ['PAST'; 'Walker']
+.namespace ['Tree'; 'Walker']
 
 .sub 'walk' :multi(['PAST'; 'Transformer'; 'Increment'], ['PAST'; 'Val'])
     .param pmc walker

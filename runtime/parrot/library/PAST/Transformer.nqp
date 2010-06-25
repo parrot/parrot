@@ -8,11 +8,15 @@ INIT {
 
 class PAST::Transformer is PAST::Walker { }
 
-module PAST::Walker {
+module Tree::Walker {
     our multi sub walk (PAST::Transformer $walker, PAST::Node $node) {
         my $result := $node;
         replaceChildren($result, walkChildren($walker, $node));
         $result;
+    }
+
+    our multi sub walk (PAST::Transformer $walker, $node) {
+        $node; # Don't touch things that we don't know what to do with.
     }
 
     our multi sub walkChildren (PAST::Transformer $walker,

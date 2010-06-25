@@ -34,7 +34,7 @@ class PAST::Walker::Dynamic is PAST::Walker {
     }
 }
 
-module PAST::Walker {
+module Tree::Walker {
     our multi sub walk (PAST::Walker::Dynamic $walker, PAST::Block $node) {
         my &fn := $walker.block();
         if &fn {

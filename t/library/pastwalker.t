@@ -41,11 +41,14 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     .local pmc walker, past
     walker = new ['PAST';'Walker';'NodeCounter']
     walker.'reset'()
+    say 'before build'
 
     past = 'build_count_node_types_past'()
 
+    say 'after build'
     walker.'walk'(past)
 
+    say 'after walk'
     $P2 = getattribute walker, 'counts'
 
     $P3 = $P2['blocks']
@@ -106,7 +109,7 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     addattribute $P0, 'counts'
 .end
 
-.namespace ['PAST'; 'Walker']
+.namespace ['Tree'; 'Walker']
 
 .sub 'walk' :multi(['PAST';'Walker';'NodeCounter'], ['PAST';'Block'])
     .param pmc walker
