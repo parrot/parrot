@@ -1147,6 +1147,16 @@ nci_ttt(char *s1, char *s2)
     return s;
 }
 
+/*
+
+=item C<static void validate_float(float f, double checkval)>
+
+Check that a float value f is has an error ratio of less than 0.01
+when compared to a double value checkval
+
+=cut
+
+*/
 
 static void
 validate_float(float f, double checkval)
