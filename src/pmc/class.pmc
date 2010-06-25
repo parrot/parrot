@@ -176,6 +176,21 @@ static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
 /* HEADERIZER END: static */
 
 static int
+pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b))
+{
+    ASSERT_ARGS(pointer_compare)
+    return a != b;
+}
+
+static size_t
+key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
+{
+    ASSERT_ARGS(key_hash_pointer)
+    return ((size_t) value ^ seed);
+}
+
+static int
 cache_class_attribs(PARROT_INTERP,
         ARGIN(PMC *cur_class), ARGIN(PMC *attrib_index),
         ARGIN(PMC *cache), int cur_index)
@@ -559,8 +574,9 @@ pmclass Class auto_attrs {
     ATTR PMC *attrib_cache;     /* Cache of visible attrib names to indexes. */
     ATTR PMC *resolve_method;   /* List of method names the class provides to resolve
                                  * conflicts with methods from roles. */
-    ATTR PMC *parent_overrides;
-    ATTR PMC *meth_cache;
+    ATTR PMC  *parent_overrides;
+    ATTR PMC  *meth_cache;
+    ATTR Hash *isa_cache;
 
 /*
 
@@ -600,6 +616,9 @@ arguments. The class is attached to the current HLL namespace.
 
         _class->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
         _class->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
+        _class->isa_cache        = parrot_create_hash(INTERP,
+            enum_type_INTVAL, Hash_key_type_PMC,
+            (hash_comp_fn)pointer_compare, (hash_hash_key_fn)key_hash_pointer);
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(INTERP, _class->all_parents, SELF);
@@ -657,6 +676,11 @@ arguments. The class is attached to the current HLL namespace.
         init_class_from_hash(INTERP, SELF, arg);
     }
 
+    void destroy() {
+        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        parrot_hash_destroy(INTERP, _class->isa_cache);
+    }
+
 /*
 
 =item C<STRING *get_string()>
@@ -697,6 +721,8 @@ Marks any referenced strings and PMCs in the structure as live.
         Parrot_gc_mark_PMC_alive(INTERP, _class->attrib_cache);
         Parrot_gc_mark_PMC_alive(INTERP, _class->resolve_method);
         Parrot_gc_mark_PMC_alive(INTERP, _class->meth_cache);
+        if (_class->isa_cache)
+            parrot_mark_hash(INTERP, _class->isa_cache);
     }
 
 
@@ -922,6 +948,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* Add to the lists of our immediate parents and all parents. */
         VTABLE_push_pmc(INTERP, _class->parents, parent);
+        parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)1);
         calculate_mro(INTERP, SELF, parent_count + 1);
     }
 
@@ -969,6 +996,7 @@ if the class has been instantiated.
                 "Can't remove_parent: is not a parent.");
 
         VTABLE_delete_keyed_int(INTERP, _class->parents, index);
+        parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)0);
         calculate_mro(INTERP, SELF, parent_count - 1);
     }
 
@@ -1329,7 +1357,8 @@ Returns whether the class is or inherits from C<*class>.
     VTABLE INTVAL isa_pmc(PMC *lookup) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         PMC          *classobj;
-        INTVAL        i, num_classes;
+        HashBucket   *b;
+        INTVAL        i, num_classes, retval = 0;
 
         if (PMC_IS_NULL(lookup))
             return 0;
@@ -1344,7 +1373,14 @@ Returns whether the class is or inherits from C<*class>.
 
         /* Check if the class object is the same as self's class object */
         if (VTABLE_is_same(INTERP, SELF, classobj))
-            return 1;
+            goto found;
+
+        if (_class->instantiated) {
+            b = parrot_hash_get_bucket(INTERP, _class->isa_cache,
+                 (void *)classobj);
+            if (b)
+                return (INTVAL)b->value;
+        }
 
         /* this is effectively what the default PMC's isa_pmc does
          * ... but this can cheat and avoid COW STRINGs for the classobj
@@ -1354,7 +1390,7 @@ Returns whether the class is or inherits from C<*class>.
             STRING *classname = make_class_name(INTERP, classobj);
             PARROT_ASSERT(SELF->vtable->isa_hash);
             if (parrot_hash_exists(INTERP, SELF->vtable->isa_hash, classname))
-                return 1;
+                goto found;
         }
 
         /* Iterate over all the parents and check if they respond true
@@ -1366,10 +1402,18 @@ Returns whether the class is or inherits from C<*class>.
                     _class->parents, i);
 
             if (VTABLE_isa_pmc(INTERP, cur_class, lookup))
-                return 1;
+                goto found;
         }
 
-        return 0;
+    cache_and_return:
+        if (_class->instantiated)
+            parrot_hash_put(INTERP, _class->isa_cache, (void *)classobj,
+                 (void *)retval);
+        return retval;
+
+    found:
+        retval = 1;
+        goto cache_and_return;
     }
 
 /*
