@@ -1454,6 +1454,19 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
     parrot_hash_clone_prunable(interp, hash, dest, 1);
 }
 
+/*
+
+=item C<void parrot_hash_clone_prunable(PARROT_INTERP, const Hash *hash, Hash
+*dest, int deep)>
+
+helper function to Clone C<hash> to C<dest>
+
+allows deep cloning of PMC types if deep set
+
+=cut
+
+*/
+
 void
 parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
     ARGOUT(Hash *dest), int deep)
