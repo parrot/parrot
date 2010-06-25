@@ -81,38 +81,18 @@ Initializes a PMCProxy PMC.
 */
 
     VTABLE void init() {
-        Parrot_Class_attributes * const _pmc =
-                (Parrot_Class_attributes *) PMC_data(SELF);
-        PMC          * const new_attribute   = Parrot_pmc_new(INTERP, enum_class_Hash);
-        STRING       * const name            = CONST_STRING(INTERP, "proxy");
+        Parrot_PMCProxy_attributes * const _pmc = PARROT_PMCPROXY(SELF);
+        STRING                     * const name = CONST_STRING(INTERP, "proxy");
+        PMC                        * const new_attribute
+             = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-        /* Set flag for custom GC mark. */
-        PObj_custom_mark_SET(SELF);
-
-        /* Set up the object. */
-        _pmc->id               = 0;
-        _pmc->name             = CONST_STRING(INTERP, "");
-        _pmc->_namespace       = PMCNULL;
-        _pmc->parents          = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        _pmc->all_parents      = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        _pmc->roles            = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        _pmc->methods          = Parrot_pmc_new(INTERP, enum_class_Hash);
-        _pmc->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
-        _pmc->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
-        _pmc->attrib_metadata  = Parrot_pmc_new(INTERP, enum_class_Hash);
-        _pmc->attrib_index     = PMCNULL;
-        _pmc->attrib_cache     = PMCNULL;
-        _pmc->resolve_method   = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        SUPER();
 
         /* Set up the attribute storage for the proxy instance */
         VTABLE_set_string_keyed_str(INTERP, new_attribute, CONST_STRING(INTERP, "name"), name);
         VTABLE_set_pmc_keyed_str(INTERP, _pmc->attrib_metadata, name, new_attribute);
 
-        /* We put ourself on the all parents list. */
-        VTABLE_push_pmc(INTERP, _pmc->all_parents, SELF);
-
-        /* We are a class. */
-        PObj_is_class_SET(SELF);
+        CLASS_is_anon_CLEAR(SELF);
     }
 
     VTABLE void init_int(INTVAL type_num) {
