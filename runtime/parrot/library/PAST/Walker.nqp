@@ -7,13 +7,10 @@ INIT {
     pir::load_bytecode('Tree/Walker.pbc');
 }
 
+# Doesn't actually have any unique behavior, but separating it out is good
+# for readability, documentation, and in case we end up needing to change
+# its behavior later.
 class PAST::Walker is Tree::Walker { }
-
-module Tree::Walker {
-    our multi sub walk (PAST::Walker $walker, PAST::Node $node) {
-        walkChildren($walker, $node);
-    }
-}
 
 # Local Variables:
 #   mode: cperl
