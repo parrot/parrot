@@ -669,7 +669,7 @@ Returns whether the class is or inherits from C<*classname>.
         if (SUPER(classname))
             return 1;
         else {
-            PMC const * const _class = VTABLE_get_class(INTERP, SELF);
+            PMC * _class = VTABLE_get_class(INTERP, SELF);
             return VTABLE_isa(INTERP, _class, classname);
         }
     }
