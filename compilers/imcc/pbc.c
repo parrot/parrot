@@ -901,7 +901,6 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         const CHARSET *s_charset;
         const ENCODING *s_encoding = NULL;
         const ENCODING *src_encoding;
-        const char *charset;
         #define MAX_NAME 31
         char charset_name[MAX_NAME + 1];
         char encoding_name[MAX_NAME + 1];
