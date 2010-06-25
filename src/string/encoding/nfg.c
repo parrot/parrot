@@ -21,6 +21,14 @@ NFG encoding with the help of the ICU library.
 #include "parrot/parrot.h"
 #include "../unicode.h"
 #include "../grapheme.h"
+#if PARROT_HAS_ICU
+#  include <unicode/ucnv.h>
+#  include <unicode/utypes.h>
+#  include <unicode/uchar.h> 
+#  include <unicode/ustring.h>
+#  include <unicode/unorm.h>
+#endif  
+
 
 #if !PARROT_HAS_ICU
 PARROT_DOES_NOT_RETURN
@@ -523,18 +531,13 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
         i->bytepos = pos * sizeof (UChar32);
         return;
     }
-    // TODO: This can create dynamic graphemes for valid Unicode compositions.
     else {
         grapheme_table *table = (grapheme_table *) i->str->extra;
         int32_t  prev = s[pos - 1];
         grapheme g;
 
-        if (table == NULL) {
-            table = create_grapheme_table(interp, 1);
-            i->str->extra = table;
-        }
-
         if (prev < 0) {
+            PARROT_ASSERT(table);
             g.len = table->graphemes[-1 - prev].len + 1;
             g.hash = table->graphemes[-1 - prev].hash;
             g.hash += g.hash << 5;
@@ -544,6 +547,30 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
                    g.len * sizeof (UChar));
         }
         else {
+            UErrorCode err = U_ZERO_ERROR;
+            int dst_len = 1;
+            int src_len = 1;
+            UChar src[2];
+            UChar dst[2];
+            src[0] = s[pos - 1];
+            src[1] = s[pos];
+
+            /* Delegate composition to ICU. */
+            dst_len = unorm_normalize(src, src_len, UNORM_DEFAULT, 0,
+                                      dst, dst_len, &err);
+
+            if (U_SUCCESS(err)) {
+                /* Composition succeded, we have a valid Uncode codepoint. */
+                s[pos - 1] = dst[0];
+                return;
+            }
+
+            /* Composition failed, we need a dynamic codepoint. */
+            if (table == NULL) {
+                table = create_grapheme_table(interp, 1);
+                i->str->extra = table;
+            }
+
             g.len  = 2;
             g.hash = 0xffff;
             g.codepoints = mem_gc_allocate_n_typed(interp, g.len, UChar32);
@@ -556,8 +583,14 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
             g.hash += g.hash << 5;
             g.hash += c;
         }
+
+        /* 
+         * If we reach this point, then a dynamic codepoint was created earlier.
+         * Insert it into the table, growing it if needed.
+         */
         if (grapheme_table_capacity(interp, (grapheme_table *)i->str->extra) < 1)
             i->str->extra = grow_grapheme_table(interp, (grapheme_table *) i->str->extra, 2);
+
         s[pos - 1] = add_grapheme(interp, (grapheme_table *) i->str->extra, &g);
         mem_gc_free(interp, g.codepoints);
     }

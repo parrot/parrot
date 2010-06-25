@@ -20,7 +20,7 @@ string operations.
 
 .include 'stringinfo.pasm'
 
-.const int TESTS = 8
+.const int TESTS = 12
 
 .sub _main :main
     .include 'test_more.pir'
@@ -47,6 +47,26 @@ string operations.
     $I0 = stringinfo $S0, .STRINGINFO_BUFUSED
     $I1 = stringinfo $S1, .STRINGINFO_BUFUSED
     is($I0, $I1, "Bufused is the same.")
+
+    # Do the same thing again, without dynamic codepoints.
+    $S2 = utf16:unicode:"O\u0308"
+    $I0 = find_encoding 'nfg'
+    $S2 = trans_encoding $S2, $I0
+
+    $S3 = nfg:unicode:"O\u0308"
+
+    $I0 = stringinfo $S2, .STRINGINFO_STRLEN
+    $I1 = stringinfo $S3, .STRINGINFO_STRLEN
+    is($I0, $I1, "Lenght is the same.")
+
+    $I0 = stringinfo $S2, .STRINGINFO_BUFUSED
+    $I1 = stringinfo $S3, .STRINGINFO_BUFUSED
+    is($I0, $I1, "Bufused is the same.")
+
+    $I0 = stringinfo $S2, .STRINGINFO_EXTRA
+    $I1 = stringinfo $S3, .STRINGINFO_EXTRA
+    is($I0, $I1, "EXTRA is the same.")
+    is($I1, 0, "EXTRA is NULL.")
 
 .end
 
