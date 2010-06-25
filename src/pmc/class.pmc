@@ -1125,8 +1125,8 @@ Array of Class PMCs representing the direct parents of this class.
             /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
             PMC * const hash = Parrot_pmc_new(INTERP, enum_class_Hash);
-            Hash       *src  = VTABLE_get_pointer(interp, found);
-            Hash       *dest = VTABLE_get_pointer(interp, hash);
+            Hash       *src  = (Hash *)VTABLE_get_pointer(interp, found);
+            Hash       *dest = (Hash *)VTABLE_get_pointer(interp, hash);
 
             parrot_hash_clone_prunable(interp, src, dest, 0);
 
