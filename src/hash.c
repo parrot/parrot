@@ -592,15 +592,17 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
     ASSERT_ARGS(hash_thaw)
 
     /* during thaw, info->extra is the key/value count */
-    const size_t     num_entries = (size_t) hash->entries;
-    size_t           entry_index;
+    const size_t           num_entries = (size_t) hash->entries;
+    const Hash_key_type    key_type    = hash->key_type;
+    const PARROT_DATA_TYPE entry_type  = hash->entry_type;
+    size_t                 entry_index;
 
     hash->entries = 0;
 
     for (entry_index = 0; entry_index < num_entries; ++entry_index) {
         HashBucket *b;
 
-        switch (hash->key_type) {
+        switch (key_type) {
           case Hash_key_type_int:
             {
                 const INTVAL i_key = VTABLE_shift_integer(interp, info);
@@ -625,7 +627,7 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
             break;
         }
 
-        switch (hash->entry_type) {
+        switch (entry_type) {
           case enum_hash_int:
             {
                 const INTVAL i = VTABLE_shift_integer(interp, info);
