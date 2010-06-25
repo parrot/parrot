@@ -11,7 +11,6 @@ class PAST::Walker is Tree::Walker { }
 
 module Tree::Walker {
     our multi sub walk (PAST::Walker $walker, PAST::Node $node) {
-        say('PAST::Walker, PAST::Node');
         walkChildren($walker, $node);
     }
 }
