@@ -24,10 +24,10 @@ NFG encoding with the help of the ICU library.
 #if PARROT_HAS_ICU
 #  include <unicode/ucnv.h>
 #  include <unicode/utypes.h>
-#  include <unicode/uchar.h> 
+#  include <unicode/uchar.h>
 #  include <unicode/ustring.h>
 #  include <unicode/unorm.h>
-#endif  
+#endif
 
 
 #if !PARROT_HAS_ICU
@@ -201,11 +201,10 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static void nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
-UINTVAL offs, UINTVAL len, UINTVAL graphemes)
+=item C<static void nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src, UINTVAL offs, UINTVAL len, UINTVAL graphemes)>
 
-Helper function to NFG-encode strings. It handles the (lazy) creation of the grapheme
-table and the graphemes it contains.
+Helper function to NFG-encode strings. It handles the (lazy) creation of the
+grapheme table and the graphemes it contains.
 
 =cut
 
@@ -579,7 +578,7 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
             g.hash += c;
         }
 
-        /* 
+        /*
          * If we reach this point, then a dynamic codepoint was created earlier.
          * Insert it into the table, growing it if needed.
          */
