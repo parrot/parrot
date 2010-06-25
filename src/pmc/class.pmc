@@ -1112,13 +1112,11 @@ Array of Class PMCs representing the direct parents of this class.
         if (found->vtable->base_type == enum_class_Hash) {
             /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
-            PMC * const hash  = Parrot_pmc_new(INTERP, enum_class_Hash);
-            PMC * const iter  = VTABLE_get_iter(INTERP, found);
-            while (VTABLE_get_bool(INTERP, iter)) {
-                STRING * const key   = VTABLE_shift_string(INTERP, iter);
-                PMC    * const value = VTABLE_get_pmc_keyed_str(INTERP, found, key);
-                VTABLE_set_pmc_keyed_str(INTERP, hash, key, value);
-            }
+            PMC * const hash = Parrot_pmc_new(INTERP, enum_class_Hash);
+            Hash       *src  = VTABLE_get_pointer(interp, found);
+            Hash       *dest = VTABLE_get_pointer(interp, hash);
+
+            parrot_hash_clone_prunable(interp, src, dest, 0);
 
             return hash;
         }

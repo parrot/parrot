@@ -1451,6 +1451,14 @@ void
 parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
 {
     ASSERT_ARGS(parrot_hash_clone)
+    parrot_hash_clone_prunable(interp, hash, dest, 1);
+}
+
+void
+parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
+    ARGOUT(Hash *dest), int deep)
+{
+    ASSERT_ARGS(parrot_hash_clone_prunable)
     UINTVAL entries = hash->entries;
     UINTVAL i;
 
@@ -1474,7 +1482,10 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
             if (PMC_IS_NULL((PMC *)b->value))
                 valtmp = (void *)PMCNULL;
             else
-                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                if (deep)
+                    valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                else
+                    valtmp = b->value;
             break;
 
           default:

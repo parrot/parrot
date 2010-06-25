@@ -365,6 +365,15 @@ Hash * parrot_create_hash(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+void parrot_hash_clone_prunable(PARROT_INTERP,
+    ARGIN(const Hash *hash),
+    ARGOUT(Hash *dest),
+    int deep)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int PMC_compare(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
@@ -505,6 +514,10 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compare) \
     , PARROT_ASSERT_ARG(keyhash))
+#define ASSERT_ARGS_parrot_hash_clone_prunable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash) \
+    , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_PMC_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \
