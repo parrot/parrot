@@ -956,16 +956,9 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     }
 
     /* Now iterate over the named arguments and parameters. */
-    while (1) {
+    while (param_index < param_count) {
         STRING *param_name;
-        INTVAL  param_flags;
-
-        /* Check if we've used up all the parameters. We'll check for leftover
-         * named args after the loop. */
-        if (param_index >= param_count)
-            break;
-
-        param_flags = raw_params[param_index];
+        INTVAL  param_flags = raw_params[param_index];
 
         /* All remaining parameters must be named. */
         if (!(param_flags & PARROT_ARG_NAME))
