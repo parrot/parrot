@@ -160,6 +160,7 @@ default.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_PURE_FUNCTION
 char
 nci_c(void)
 {
@@ -271,6 +272,7 @@ Returns the current value of <nci_dlvar_int>.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_PURE_FUNCTION
 int
 nci_i(void)
 {
@@ -353,6 +355,7 @@ Returns the value of C<nci_dlvar_long>.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_PURE_FUNCTION
 long
 nci_l(void)
 {
@@ -370,6 +373,7 @@ Returns the address of C<nci_dlvar_int>.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
 int *
 nci_p(void)
 {
@@ -387,6 +391,7 @@ Returns the value of C<nci_dlvar_cstring>.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
 char *
 nci_t(void)
 {
@@ -473,6 +478,7 @@ Returns the value C<p> directly.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
 void *
 nci_pp(void *p)
 {
@@ -511,6 +517,7 @@ Returns the product of C<*l> and C<i>, as an int.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_PURE_FUNCTION
 int
 nci_i4i(long * l, int i)
 {
@@ -719,6 +726,7 @@ Returns the value of C<nci_dlvar_short>.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_PURE_FUNCTION
 short
 nci_s(void)
 {
@@ -736,6 +744,7 @@ Returns the product of C<l1 * l2>.
 */
 
 PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
 short
 nci_ssc(short l1, char l2)
 {
