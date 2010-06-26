@@ -377,7 +377,7 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
     INTVAL  i;
 
     for (i = h->mask; i >= 0; --i) {
-        HashBucket *b = h->bi[i];
+        HashBucket *b = h->bucket_indices[i];
 
         while (b) {
             Parrot_gc_mark_STRING_alive(interp, (STRING *)b->key);
@@ -403,7 +403,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
         result = Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
 
         for (i = 0; i <= hash->mask; ++i) {
-            HashBucket *b = hash->bi[i];
+            HashBucket *b = hash->bucket_indices[i];
 
             while (b) {
                 VTABLE_set_string_keyed_int(interp, result,
@@ -600,7 +600,7 @@ stored.)
             UINTVAL i;
 
             for (i = 0; i <= hash->mask; ++i) {
-                HashBucket *b = hash->bi[i];
+                HashBucket *b = hash->bucket_indices[i];
 
                 while (b) {
                     FREE_CELL(INTERP, (Pcc_cell *)b->value);
@@ -638,7 +638,7 @@ stored.)
             UINTVAL i;
 
             for (i = 0; i <= hash->mask; ++i) {
-                HashBucket *b = hash->bi[i];
+                HashBucket *b = hash->bucket_indices[i];
 
                 while (b) {
                     FREE_CELL(INTERP, (Pcc_cell *)b->value);

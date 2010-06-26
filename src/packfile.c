@@ -3223,7 +3223,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         return;
 
     for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
 
         while (bucket) {
             PackFile_ConstTable * const table      =

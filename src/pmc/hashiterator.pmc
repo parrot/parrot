@@ -87,7 +87,7 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
         if (attrs->pos == attrs->total_buckets)
             break;
 
-        bucket = attrs->parrot_hash->bi[attrs->pos++];
+        bucket = attrs->parrot_hash->bucket_indices[attrs->pos++];
     }
     attrs->bucket = bucket;
     --attrs->elements;

@@ -9,10 +9,6 @@
 #ifndef PARROT_HASH_H_GUARD
 #define PARROT_HASH_H_GUARD
 
-/* Prototypes */
-
-/* Hash is really a hashtable, but 'hash' is standard perl nomenclature. */
-
 typedef enum {
     enum_hash_undef,
     enum_hash_int = enum_type_INTVAL,
@@ -22,14 +18,6 @@ typedef enum {
     enum_hash_ptr = enum_type_ptr
 } HashEntryType;
 
-/*
- * hash_entry is currently unused in the hash structure
-
-typedef struct _hash_entry {
-    HashEntryType type;
-    UnionVal val;
-} HashEntry;
-*/
 
 /* A BucketIndex is an index into the pool of available buckets. */
 typedef UINTVAL BucketIndex;
@@ -59,18 +47,38 @@ typedef struct _hashbucket {
 } HashBucket;
 
 struct _hash {
-    HashBucket *bs;             /* store of buckets */
-    HashBucket **bi;            /* list of Bucket pointers */
-    HashBucket *free_list;      /* empty buckets */
-    UINTVAL entries;            /* Number of values stored in hashtable */
-    UINTVAL mask;               /* alloced - 1 */
-    PMC *container;             /* e.g. the PerlHash PMC */
-    Hash_key_type key_type;     /* cstring, ascii-string, utf8-string */
-    PARROT_DATA_TYPE entry_type;/* type of value */
-    size_t seed;                /* randomizes the hash_key generation
-                                   updated for each new hash */
-    hash_comp_fn   compare;     /* compare two keys, 0 = equal */
-    hash_hash_key_fn hash_val;  /* generate a hash value for key */
+    /* Large slab store of buckets */
+    HashBucket *buckets;
+
+    /* List of Bucket pointers */
+    HashBucket **bucket_indices;
+
+    /* Store for empty buckets */
+    HashBucket *free_list;
+
+    /* Number of values stored in hashtable */
+    UINTVAL entries;
+
+    /* alloced - 1 */
+    UINTVAL mask;
+
+    /* The owner PMC */
+    PMC *container;
+
+    /* The type of key object this hash uses */
+    Hash_key_type key_type;
+
+    /* Type of value */
+    PARROT_DATA_TYPE entry_type;
+
+    /* Random seed value for seeding hash algorithms */
+    size_t seed;
+
+    /* Comparison function pointer. Returns 0 if elements are equal */
+    hash_comp_fn   compare;
+
+    /* Function pointer to generate a hash value for the object */
+    hash_hash_key_fn hash_val;
 };
 
 typedef void (*value_free)(ARGFREE(void *));
