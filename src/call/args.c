@@ -879,6 +879,14 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
             /* Go ahead and fill the parameter with a positional argument. */
             switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
+              case PARROT_ARG_PMC:
+                *accessor->pmc(interp, arg_info, param_index) =
+                    VTABLE_get_pmc_keyed_int(interp, call_object, arg_index);
+                break;
+              case PARROT_ARG_STRING:
+                *accessor->string(interp, arg_info, param_index) =
+                    VTABLE_get_string_keyed_int(interp, call_object, arg_index);
+                break;
               case PARROT_ARG_INTVAL:
                 *accessor->intval(interp, arg_info, param_index) =
                     VTABLE_get_integer_keyed_int(interp, call_object, arg_index);
@@ -886,14 +894,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
               case PARROT_ARG_FLOATVAL:
                 *accessor->numval(interp, arg_info, param_index) =
                     VTABLE_get_number_keyed_int(interp, call_object, arg_index);
-                break;
-              case PARROT_ARG_STRING:
-                *accessor->string(interp, arg_info, param_index) =
-                    VTABLE_get_string_keyed_int(interp, call_object, arg_index);
-                break;
-              case PARROT_ARG_PMC:
-                *accessor->pmc(interp, arg_info, param_index) =
-                    VTABLE_get_pmc_keyed_int(interp, call_object, arg_index);
                 break;
               default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
