@@ -3,14 +3,14 @@
 # $Id$
 
 INIT {
-    pir::load_bytecode('PAST/Transformer.pbc');
+    pir::load_bytecode('Tree/Transformer.pbc');
 }
 
-class Tree::Pattern::Transformer is PAST::Transformer {
+class Tree::Pattern::Transformer is Tree::Transformer {
     has $pattern;
     has $transform;
 
-    method new ($pattern?, $transform?) {
+    method new ($pattern, $transform) {
         my $class := pir::getattribute__PPS(self.HOW(),
                                            'parrotclass');
         my $self := pir::new__PP($class);

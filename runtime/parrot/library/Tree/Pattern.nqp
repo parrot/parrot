@@ -2,6 +2,10 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
+INIT {
+    pir::load_bytecode('Tree/Transformer.pbc');
+}
+
 class Tree::Pattern is Capture {
     sub patternize ($value) {
         unless (pir::can__IPS($value, 'ACCEPTS')) {
@@ -26,7 +30,7 @@ class Tree::Pattern is Capture {
 
     method transform ($node, $transform) {
         my &transSub;
-        if ($transform ~~ PAST::Transformer) {
+        if ($transform ~~ Tree::Transformer) {
             &transSub := sub ($/) { $transformer.walk($/.from()); };
         } elsif (pir::does__iPS($transform, 'invokable')) {
             &transSub := $transform;
