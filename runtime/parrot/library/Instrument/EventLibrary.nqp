@@ -5,7 +5,7 @@
 =begin
 
 =head1 NAME
-    
+
 runtime/parrot/library/Instrument/EventLibrary.nqp
 
     Library for the many classes that provide handlers for Events.
@@ -122,6 +122,18 @@ class Instrument::Event::Class::callmethod is Instrument::Event {
         $data.push($instr_obj);
 
         Instrument::Event::_raise_event('Instrument::Event::Class::callmethod', $data);
+    };
+};
+
+class Instrument::Event::GC::allocate is Instrument::Event {
+    method _self_init() {
+        $!event_type := 'Instrument::Event::GC::allocate';
+    };
+};
+
+class Instrument::Event::GC::reallocate is Instrument::Event {
+    method _self_init() {
+        $!event_type := 'Instrument::Event::GC::reallocate';
     };
 };
 

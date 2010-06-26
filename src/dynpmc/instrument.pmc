@@ -90,6 +90,7 @@ pmclass Instrument auto_attrs dynpmc provides hash group instrument_group {
     ATTR Parrot_Interp  supervised;  /* The interpreter running the code */
     ATTR PMC           *probes;      /* A list of probes registered. */
     ATTR PMC           *evt_dispatcher;
+    ATTR PMC           *instrument_gc;
 
 /*
 
@@ -103,8 +104,8 @@ Initializes the pmc and creates a child interpreter.
 
     VTABLE void init() {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-        PMC *evt_key1, *evt_key2, *nothing;
-        INTVAL evt_class_type;
+        PMC *evt_key1, *evt_key2, *nothing, *supervised_pmc;
+        INTVAL evt_class_type, gc_class_type;
 
         /* Obtain the class type of Instrument::EventDispatcher. */
         evt_key1 = key_new_cstring(INTERP, "Instrument");
@@ -113,7 +114,10 @@ Initializes the pmc and creates a child interpreter.
 
         evt_class_type = Parrot_pmc_get_type(INTERP, evt_key1);
 
-        /* Create the child interpreter PMC */
+        /* Obtain the class type of InstrumentGC. */
+        gc_class_type = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentGC"));
+
+        /* Initialise the attributes. */
         attr->supervised     = Parrot_new(INTERP);
         attr->probes         = Parrot_pmc_new(INTERP, enum_class_Hash);
         attr->evt_dispatcher = Parrot_pmc_new(INTERP, evt_class_type);
@@ -130,6 +134,12 @@ Initializes the pmc and creates a child interpreter.
 
         /* Prepare the child interpreter's op table for instrumentation */
         Instrument_init_probes(INTERP, attr->supervised);
+
+        /* Prepare for GC instrumentation. */
+        supervised_pmc       = VTABLE_get_pmc_keyed_int(attr->supervised,
+                                                        attr->supervised->iglobals,
+                                                        IGLOBALS_INTERPRETER);
+        attr->instrument_gc  = Parrot_pmc_new_init(INTERP, gc_class_type, supervised_pmc);
 
         /* Set self to destroy manually */
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -185,6 +195,7 @@ Marks internal data structures as live to the gc.
         /* Mark attributes as alive */
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->probes);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->evt_dispatcher);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->instrument_gc);
         Parrot_gc_mark_PMC_alive_fun(INTERP, core->old_dynlibs);
         Parrot_gc_mark_PMC_alive_fun(INTERP, core->instr_op);
     }
@@ -588,6 +599,7 @@ Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc
 
         /* Force events */
         Parrot_cx_handle_tasks(interp, interp->scheduler);
+        Parrot_cx_handle_tasks(supervisor, supervisor->scheduler);
     }
 
     return pc;
