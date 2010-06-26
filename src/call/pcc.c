@@ -291,12 +291,19 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 {
     ASSERT_ARGS(do_run_ops)
 
-    if (sub_obj->vtable->base_type < enum_class_core_max)
-        return sub_obj->vtable->base_type == enum_class_Sub
-            || sub_obj->vtable->base_type == enum_class_MultiSub
-            || sub_obj->vtable->base_type == enum_class_Eval;
-    else
-        return is_invokable(interp, sub_obj);
+    if (sub_obj->vtable->base_type < enum_class_core_max) {
+        switch (sub_obj->vtable->base_type) {
+          case enum_class_Sub:
+          case enum_class_MultiSub:
+          case enum_class_Eval:
+            return 1;
+          case enum_class_Object:
+            break;
+          default:
+            return 0;
+        }
+    }
+    return is_invokable(interp, sub_obj);
 }
 
 /*
@@ -352,7 +359,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     /* PIR Subs need runops to run their opcodes. Methods and NCI subs
      * don't. */
-    if (do_run_ops(interp, sub_obj)) {
+    if (dest && do_run_ops(interp, sub_obj)) {
         Parrot_runcore_t *old_core = interp->run_core;
         const opcode_t offset = dest - interp->code->base.data;
 
