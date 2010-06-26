@@ -345,6 +345,8 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Tree/Pattern/Match.pir \
     $(LIBRARY_DIR)/Tree/Pattern/Transformer.pbc \
     $(LIBRARY_DIR)/Tree/Pattern/Transformer.pir \
+    $(LIBRARY_DIR)/Tree/Transformer.pbc \
+    $(LIBRARY_DIR)/Tree/Transformer.pir \
     $(LIBRARY_DIR)/Tree/Walker.pbc \
     $(LIBRARY_DIR)/Tree/Walker.pir \
     $(LIBRARY_DIR)/URI.pbc \
@@ -1242,6 +1244,15 @@ $(LIBRARY_DIR)/Tree/Pattern/Transformer.pbc: \
 $(LIBRARY_DIR)/Tree/Pattern/Transformer.pir: \
 	$(LIBRARY_DIR)/Tree/Pattern/Transformer.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Pattern/Transformer.nqp \
+	> $@
+
+$(LIBRARY_DIR)/Tree/Transformer.pbc: \
+	$(LIBRARY_DIR)/Tree/Transformer.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/Tree/Transformer.pir
+
+$(LIBRARY_DIR)/Tree/Transformer.pir: \
+	$(LIBRARY_DIR)/Tree/Transformer.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Tree/Transformer.nqp \
 	> $@
 
 $(LIBRARY_DIR)/Tree/Walker.pbc: $(LIBRARY_DIR)/Tree/Walker.pir
