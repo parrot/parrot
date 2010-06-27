@@ -23,9 +23,6 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 #define INT2KEY(i, k) key_new_integer((i), (k))
 
-/* undef 'interface' to keep MSVC happy */
-#undef interface
-
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -903,18 +900,18 @@ true (1) is returned; otherwise, false (0) is returned.
 
 /*
 
-=item C<INTVAL does(STRING *interface)>
+=item C<INTVAL does(STRING *interface_name)>
 
-Reports whether the PMC "does" perform C<interface>.
-If the interface C<interface> is found in the PMC's interface list,
+Reports whether the PMC "does" perform C<interface_name>.
+If the interface C<interface_name> is found in the PMC's interface list,
 true (1) is returned; otherwise, false (0) is returned.
 
 =cut
 
 */
 
-    VTABLE INTVAL does(STRING *_interface) {
-        return Parrot_pmc_type_does(INTERP, _interface, SELF->vtable->base_type);
+    VTABLE INTVAL does(STRING *interface_name) {
+        return Parrot_pmc_type_does(INTERP, interface_name, SELF->vtable->base_type);
     }
 
 /*
@@ -968,11 +965,15 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     VTABLE INTVAL isa(STRING *_class) {
-        const Hash * const isa_hash = SELF->vtable->isa_hash;
-        if (!isa_hash)
-            return Parrot_str_equal(INTERP, SELF->vtable->whoami, _class);
+        if (SELF->vtable->whoami == _class)
+            return 1;
+        else {
+            const Hash * const isa_hash = SELF->vtable->isa_hash;
+            if (!isa_hash)
+                return Parrot_str_equal(INTERP, SELF->vtable->whoami, _class);
 
-        return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
+            return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
+        }
     }
 
 /*

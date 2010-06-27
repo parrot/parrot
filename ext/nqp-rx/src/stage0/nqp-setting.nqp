@@ -17,6 +17,22 @@ more methods typical of Perl 6 lists and arrays.
 
 module ResizablePMCArray {
 
+    =begin item delete
+    Remove item at C<$pos>
+    =end item
+
+    method delete($pos) {
+        pir::delete__vQi(self, $pos);
+    }
+
+    =begin item exists
+    Return true if item exists at C<$pos>
+    =end item
+
+    method exists($pos) {
+        pir::exists__IQi(self, $pos);
+    }
+
     =begin item join
     Return all elements joined by $sep.
     =end item

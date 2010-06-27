@@ -14,10 +14,7 @@ creation, the types of key and value as well as appropriate compare and
 hashing functions can be set.
 
 This hash implementation uses just one piece of malloced memory. The
-C<< hash->bs >> bucket store points to this region.
-
-This hash doesn't move during GC, therefore a lot of the old caveats
-don't apply.
+C<< hash->buckets >> bucket store points to this region.
 
 =head2 Functions
 
@@ -357,7 +354,7 @@ PMC_compare(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
     if (a == b)
         return 0;
 
-    /* PMCs of different types are differ */
+    /* PMCs of different types are different */
     if (a->vtable->base_type != b->vtable->base_type)
         return 1;
 
@@ -427,8 +424,8 @@ parrot_dump_hash(SHIM_INTERP, SHIM(const Hash *hash))
 
 =item C<void parrot_mark_hash(PARROT_INTERP, Hash *hash)>
 
-Marks the hash and its contents as live.  Assumes that key and value are non
-null in all buckets.
+Marks the hash and its contents as live.  Assumes that key and value are
+non-null in all buckets.
 
 =cut
 
@@ -482,7 +479,7 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
     INTVAL  i;
 
     for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
 
         while (bucket) {
             if (++found > entries)
@@ -518,7 +515,7 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     INTVAL  i;
 
     for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
 
         while (bucket) {
             if (++found > entries)
@@ -533,7 +530,6 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
         }
     }
 }
-
 
 /*
 
@@ -554,7 +550,7 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
     INTVAL  i;
 
     for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
 
         while (bucket) {
             if (++found > entries)
@@ -592,31 +588,34 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
     ASSERT_ARGS(hash_thaw)
 
     /* during thaw, info->extra is the key/value count */
-    const size_t     num_entries = (size_t) hash->entries;
-    size_t           entry_index;
+    const size_t           num_entries = (size_t) hash->entries;
+    const Hash_key_type    key_type    = hash->key_type;
+    const PARROT_DATA_TYPE entry_type  = hash->entry_type;
+    size_t                 entry_index;
 
     hash->entries = 0;
 
     for (entry_index = 0; entry_index < num_entries; ++entry_index) {
         HashBucket *b;
+        void       *key;
 
-        switch (hash->key_type) {
+        switch (key_type) {
           case Hash_key_type_int:
             {
                 const INTVAL i_key = VTABLE_shift_integer(interp, info);
-                b = parrot_hash_put(interp, hash, (void*)i_key, NULL);
+                key                = (void *)i_key;
             }
             break;
           case Hash_key_type_STRING:
             {
                 STRING * const s_key = VTABLE_shift_string(interp, info);
-                b = parrot_hash_put(interp, hash, s_key, NULL);
+                key                  = (void *)s_key;
             }
             break;
           case Hash_key_type_PMC:
             {
                 PMC * const p_key = VTABLE_shift_pmc(interp, info);
-                b = parrot_hash_put(interp, hash, p_key, NULL);
+                key               = (void *)p_key;
                 break;
             }
           default:
@@ -625,23 +624,23 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
             break;
         }
 
-        switch (hash->entry_type) {
+        switch (entry_type) {
           case enum_hash_int:
             {
                 const INTVAL i = VTABLE_shift_integer(interp, info);
-                b->value       = (void *)i;
+                parrot_hash_put(interp, hash, key, (void *)i);
                 break;
             }
           case enum_hash_string:
             {
                 STRING * const s = VTABLE_shift_string(interp, info);
-                b->value = (void *)s;
+                parrot_hash_put(interp, hash, key, (void *)s);
                 break;
             }
           case enum_hash_pmc:
             {
                 PMC * const p = VTABLE_shift_pmc(interp, info);
-                b->value = (void *)p;
+                parrot_hash_put(interp, hash, key, (void *)p);
                 break;
             }
           default:
@@ -675,7 +674,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
     size_t           i;
 
     for (i = 0; i < hash->entries; ++i) {
-        HashBucket * const b = hash->bs+i;
+        HashBucket * const b = hash->buckets + i;
 
         switch (hash->key_type) {
           case Hash_key_type_int:
@@ -784,9 +783,9 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     HashBucket   *bs, *b, *new_mem;
     HashBucket * const old_offset = (HashBucket *)((char *)hash + sizeof (Hash));
 
-    void * const  old_mem    = hash->bs;
+    void * const  old_mem    = hash->buckets;
     const UINTVAL old_size   = hash->mask + 1;
-    const UINTVAL new_size   = old_size << 1;
+    const UINTVAL new_size   = old_size << 1; /* Double. Right-shift is 2x */
     const UINTVAL old_nb     = N_BUCKETS(old_size);
     size_t        offset, i;
 
@@ -795,10 +794,10 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
        e.g. 3 buckets, 4 pointers:
 
          +---+---+---+-+-+-+-+
-         | --> bs    | -> bi |
+         | --> buckets |     |
          +---+---+---+-+-+-+-+
-         ^           ^
-         | old_mem   | hash->bi
+         ^             ^
+         | old_mem     | hash->bucket_indices
     */
 
     /* resize mem */
@@ -816,11 +815,12 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
     /*
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
-         |  bs       | old_bi    |  new_bi       |
+         |  buckets  | old_bi    |  new_bi       |
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
-           ^                       ^
-         | new_mem                 | hash->bi
+         ^                       ^
+         | new_mem               | hash->bucket_indices
     */
+
     bs     = new_mem;
     old_bi = (HashBucket **)(bs + old_nb);
     new_bi = (HashBucket **)(bs + N_BUCKETS(new_size));
@@ -832,8 +832,8 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     mem_sys_memmove(new_bi, old_bi, old_size * sizeof (HashBucket *));
 
     /* update hash data */
-    hash->bi   = new_bi;
-    hash->bs   = bs;
+    hash->bucket_indices = new_bi;
+    hash->buckets        = bs;
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
@@ -1024,12 +1024,6 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
     hash->entries    = 0;
     hash->container  = PMCNULL;
 
-    /*
-     * TODO if we have a significant amount of small hashes:
-     * - allocate a bigger hash structure e.g. 128 byte
-     * - use the bucket store and bi inside this structure
-     * - when reallocate copy this part
-     */
     bp = (HashBucket *)((char *)alloc + sizeof (Hash));
     hash->free_list = NULL;
 
@@ -1037,9 +1031,9 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
      * buckets[i] directly in an OrderedHash, *if* nothing
      * was deleted */
 
-    hash->bs  = bp;
-    bp       += N_BUCKETS(INITIAL_BUCKETS);
-    hash->bi  = (HashBucket **)bp;
+    hash->buckets = bp;
+    bp += N_BUCKETS(INITIAL_BUCKETS);
+    hash->bucket_indices = (HashBucket **)bp;
 
     for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
         bp->next        = hash->free_list;
@@ -1048,7 +1042,6 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 
     return hash;
 }
-
 
 /*
 
@@ -1069,8 +1062,8 @@ parrot_hash_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_destroy)
     HashBucket * const bp = (HashBucket*)((char*)hash + sizeof (Hash));
-    if (bp != hash->bs)
-        mem_gc_free(interp, hash->bs);
+    if (bp != hash->buckets)
+        mem_gc_free(interp, hash->buckets);
     mem_gc_free(interp, hash);
 }
 
@@ -1093,7 +1086,7 @@ parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
     UINTVAL i;
 
     for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
         while (bucket) {
             mem_gc_free(interp, bucket->key);
             mem_gc_free(interp, bucket->value);
@@ -1127,7 +1120,7 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_fre
     UINTVAL i;
 
     for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
         while (bucket) {
             mem_gc_free(interp, bucket->key);
             func(bucket->value);
@@ -1206,7 +1199,7 @@ parrot_hash_get_idx(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
 
     res = NULL;
 
-    for (b = hash->bs + i; i < size ; ++i, ++b) {
+    for (b = hash->buckets + i; i < size ; ++i, ++b) {
         /* XXX int keys may be zero - use different iterator */
         if (b->key) {
             if (!res)
@@ -1255,7 +1248,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
         UINTVAL        i;
 
         for (i = 0; i < entries; ++i) {
-            HashBucket * const bucket = hash->bs + i;
+            HashBucket * const bucket = hash->buckets + i;
 
             /* the hash->compare cost is too high for this fast path */
             if (bucket->key == key)
@@ -1266,7 +1259,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
     /* if the fast search didn't work, try the normal hashing search */
     {
         const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
-        HashBucket   *bucket  = hash->bi[hashval & hash->mask];
+        HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
 
         while (bucket) {
             /* key equality is always a match, so it's worth checking */
@@ -1347,7 +1340,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 {
     ASSERT_ARGS(parrot_hash_put)
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket   *bucket  = hash->bi[hashval & hash->mask];
+    HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
 
     /* When the hash is constant, check that the key and value are also
      * constant. */
@@ -1364,6 +1357,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
                 "Used non-constant value in constant hash.");
     }
 
+    /* See if we have an existing value for this key */
     while (bucket) {
         /* store hash_val or not */
         if ((hash->compare)(interp, key, bucket->key) == 0)
@@ -1371,22 +1365,26 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         bucket = bucket->next;
     }
 
+    /* If we have a bucket already, put the value in it. Otherwise, we need
+       to get a new bucket */
     if (bucket)
         bucket->value = value;
     else {
+        /* Get a new bucket off the free list. If the free list is empty, we
+           expand the hash so we get more items on the free list */
         bucket = hash->free_list;
-
         if (!bucket) {
             expand_hash(interp, hash);
             bucket = hash->free_list;
         }
 
+        /* Add the value to the new bucket, increasing the count of elements */
         ++hash->entries;
         hash->free_list                = bucket->next;
         bucket->key                    = key;
         bucket->value                  = value;
-        bucket->next                   = hash->bi[hashval & hash->mask];
-        hash->bi[hashval & hash->mask] = bucket;
+        bucket->next = hash->bucket_indices[hashval & hash->mask];
+        hash->bucket_indices[hashval & hash->mask] = bucket;
     }
 
     return bucket;
@@ -1412,13 +1410,13 @@ parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
     HashBucket   *prev    = NULL;
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed) & hash->mask;
 
-    for (bucket = hash->bi[hashval]; bucket; bucket = bucket->next) {
+    for (bucket = hash->bucket_indices[hashval]; bucket; bucket = bucket->next) {
         if ((hash->compare)(interp, key, bucket->key) == 0) {
 
             if (prev)
                 prev->next = bucket->next;
             else
-                hash->bi[hashval] = bucket->next;
+                hash->bucket_indices[hashval] = bucket->next;
 
             --hash->entries;
             bucket->next    = hash->free_list;
@@ -1448,12 +1446,33 @@ void
 parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
 {
     ASSERT_ARGS(parrot_hash_clone)
+    parrot_hash_clone_prunable(interp, hash, dest, 1);
+}
+
+/*
+
+=item C<void parrot_hash_clone_prunable(PARROT_INTERP, const Hash *hash, Hash
+*dest, int deep)>
+
+helper function to Clone C<hash> to C<dest>
+
+allows deep cloning of PMC types if deep set
+
+=cut
+
+*/
+
+void
+parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
+    ARGOUT(Hash *dest), int deep)
+{
+    ASSERT_ARGS(parrot_hash_clone_prunable)
     UINTVAL entries = hash->entries;
     UINTVAL i;
 
     for (i = 0; i < entries; ++i) {
         void         *valtmp;
-        HashBucket   *b   = hash->bs+i;
+        HashBucket   *b   = hash->buckets + i;
         void * const  key = b->key;
 
         switch (hash->entry_type) {
@@ -1471,7 +1490,10 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
             if (PMC_IS_NULL((PMC *)b->value))
                 valtmp = (void *)PMCNULL;
             else
-                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                if (deep)
+                    valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                else
+                    valtmp = b->value;
             break;
 
           default:

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -93,6 +93,24 @@ ok 4 - $P3.open()         # reopening
 ok 5 - $P5.open($S1)      # with bad file
 ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'isatty' );
+.sub 'test' :main
+    .local pmc fh
+    .local int i
+    fh = new ['FileHandle']
+    i = fh.'isatty'()
+    print i
+    say ' unopened FileHandle is not a tty'
+    fh.'open'('README')
+    i = fh.'isatty'()
+    print i
+    say ' regular file is not a tty'
+.end
+CODE
+0 unopened FileHandle is not a tty
+0 regular file is not a tty
 OUT
 
 SKIP: {
