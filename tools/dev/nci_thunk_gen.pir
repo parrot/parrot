@@ -639,7 +639,7 @@ TEMPLATE
     typedef %s(* func_t)(%s);
     func_t fn_pointer;
     void *orig_func;
-    PMC *       ctx         = CURRENT_CONTEXT(interp);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC *       ret_object  = PMCNULL;
     %s
