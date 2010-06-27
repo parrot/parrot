@@ -42,7 +42,7 @@ also included.
     load_bytecode 'PGE/Util.pbc'
     .local pmc p6meta
     p6meta = new 'P6metaclass'
-    p6meta.'new_class'('PCT::Grammar', 'parent'=>'PGE::Grammar')
+    p6meta.'new_class'('PCT::Grammar', 'parent'=>'PGE::Grammar', 'hll'=>'parrot')
     $P0 = split '::', 'PCT::Grammar'
     $P0 = get_class $P0
     $P1 = get_hll_global ['PGE';'Util'], 'die'
