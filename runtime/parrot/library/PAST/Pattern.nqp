@@ -27,22 +27,6 @@ class PAST::Pattern is PCT::Pattern {
         self.attr("lvalue", $val, !pir::isnull__iP($val));
     }    
 
-    method new (*@children, *%attrs) {
-        my $result := Q:PIR {
-            $P0 = self.'HOW'()
-            $P0 = getattribute $P0, 'parrotclass'
-            %r = new $P0
-        };
-
-        for %attrs {
-            $result.attr($_, %attrs{$_}, 1);
-        }
-        for @children {
-            pir::push($result, Tree::Pattern::patternize($_));
-        }
-        $result;
-    }
-
     method check_past_node_attributes ($node, $/) {
         (self.check_pct_node_attributes($node, $/)
          && self.check_attribute($node, "returns", $/)

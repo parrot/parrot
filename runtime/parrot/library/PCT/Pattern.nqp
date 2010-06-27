@@ -34,7 +34,7 @@ class PCT::Pattern is Tree::Pattern {
 
         my &ACCEPTSEXACTLY := method ($node) {
             return Tree::Pattern::Match.new(0)
-              unless $node ~~ $targetClass;
+              unless pir::isa__iPP($node, $targetClass);
             my $/ := Tree::Pattern::Match.new(1);
             self.check_children($node, $/);
             for @attributes {
@@ -54,6 +54,22 @@ class PCT::Pattern is Tree::Pattern {
         }
 
         $class.HOW().add_method($class, 'ACCEPTSEXACTLY', &ACCEPTSEXACTLY);
+    }
+
+    method new (*@children, *%attrs) {
+        my $result := Q:PIR {
+            $P0 = self.'HOW'()
+            $P0 = getattribute $P0, 'parrotclass'
+            %r = new $P0
+        };
+
+        for %attrs {
+            $result.attr($_, %attrs{$_}, 1);
+        }
+        for @children {
+            pir::push($result, Tree::Pattern::patternize($_));
+        }
+        $result;
     }
 
     method attr ($name, $value, $has_value) {
