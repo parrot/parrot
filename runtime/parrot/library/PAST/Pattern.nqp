@@ -27,13 +27,16 @@ class PAST::Pattern is PCT::Pattern {
         self.attr("lvalue", $val, !pir::isnull__iP($val));
     }    
 
-    method check_past_node_attributes ($node, $/) {
-        (self.check_pct_node_attributes($node, $/)
-         && self.check_attribute($node, "returns", $/)
-         && self.check_attribute($node, "arity", $/)
-         && self.check_attribute($node, "named", $/)
-         && self.check_attribute($node, "flat", $/)
-         && self.check_attribute($node, "lvalue", $/));
+    my @attributes := pir::clone__PP(PCT::Pattern.attributes());
+    for (<returns arity named flat lvalue>) {
+        pir::push(@attributes, $_);
+    }
+    method attributes () {
+        @attributes;
+    }
+
+    method target_class () {
+        PAST::Node;
     }
 }
 
@@ -94,27 +97,17 @@ class PAST::Pattern::Block is PAST::Pattern {
         self.attr("pirflags", $val, !pir::isnull__iP($val));
     }
     
-    method ACCEPTSEXACTLY ($node) {
-        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Block;
-        my $/ := Tree::Pattern::Match.new(1);
-        (self.check_attribute($node, "blocktype", $/)
-         && self.check_attribute($node, "closure", $/)
-         && self.check_attribute($node, "control", $/)
-         && self.check_attribute($node, "loadinit", $/)
-         && self.check_attribute($node, "namespace", $/)
-         && self.check_attribute($node, "multi", $/)
-         && self.check_attribute($node, "hll", $/)
-         && self.check_attribute($node, "nsentry", $/)
-         && self.check_attribute($node, "symtable", $/)
-         && self.check_attribute($node, "lexical", $/)
-         && self.check_attribute($node, "compiler", $/)
-         && self.check_attribute($node, "compiler_args", $/)
-         && self.check_attribute($node, "subid", $/)
-         && self.check_attribute($node, "pirflags", $/)
-         && self.check_children($node, $/)
-         && self.check_past_node_attributes($node, $/));
-        $/.from($node) if $/;
-        $/;
+    my @attributes := pir::clone__PP(PAST::Pattern.attributes());
+    for (<blocktype closure control loadinit namespace multi hll
+         subid nsentry symtable lexical compiler compiler_args pirflags>) {
+        pir::push(@attributes, $_);
+    }
+    method attributes () {
+        @attributes;
+    }
+
+    method target_class () {
+        PAST::Block;
     }
 }
 
@@ -132,29 +125,17 @@ class PAST::Pattern::Op is PAST::Pattern {
         self.attr("inline", $val, !pir::isnull__iP($val));
     }
 
-
-    method ACCEPTSEXACTLY ($node) {
-        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Op;
-        my $/ := Tree::Pattern::Match.new(1);
-        (self.check_attribute($node, "pasttype", $/)
-         && self.check_attribute($node, "pirop", $/)
-         && self.check_attribute($node, "inline", $/)
-         && self.check_children($node, $/)
-         && self.check_past_node_attributes($node, $/));
-        $/.from($node) if $/;
-        $/;
+    my @attributes := pir::clone__PP(PAST::Pattern.attributes());
+    for (<pasttype pirop inline>) {
+        pir::push(@attributes, $_);
     }
+    method attributes () { @attributes; }
+
+    method target_class () { PAST::Op; }
 }
 
 class PAST::Pattern::Stmts is PAST::Pattern {
-    method ACCEPTSEXACTLY ($node) {
-        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Stmts;
-        my $/ := Tree::Pattern::Match.new(1);
-        (self.check_children($node, $/)
-         && self.check_past_node_attributes($node, $/));
-        $/.from($node) if $/;
-        $/;
-    }
+    method target_class () { PAST::Stmts; }
 }
 
 class PAST::Pattern::Val is PAST::Pattern {
@@ -162,15 +143,11 @@ class PAST::Pattern::Val is PAST::Pattern {
         self.attr("value", $val, !pir::isnull__iP($val));
     }
 
-    method ACCEPTSEXACTLY ($node) {
-        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Val;
-        my $/ := Tree::Pattern::Match.new(1);
-        (self.check_children($node, $/)
-         && self.check_past_node_attributes($node, $/)
-         && self.check_attribute($node, "value", $/));
-        $/.from($node) if $/;
-        $/;
-    }
+    my @attributes := pir::clone__PP(PAST::Pattern.attributes());
+    @attributes.pop();
+    @attributes.push('value');
+    method attributes () { @attributes; }
+    method target_class () { PAST::Val; }
 }
 
 class PAST::Pattern::Var is PAST::Pattern {
@@ -206,39 +183,27 @@ class PAST::Pattern::Var is PAST::Pattern {
         self.attr("multitype", $val, !pir::isnull__iP($val));
     }
 
-    method ACCEPTSEXACTLY ($node) {
-        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::Var;
-        my $/ := Tree::Pattern::Match.new(1);
-        (self.check_attribute($node, "scope", $/)
-         && self.check_attribute($node, "isdecl", $/)
-         && self.check_attribute($node, "namespace", $/)
-         && self.check_attribute($node, "slurpy", $/)
-         && self.check_attribute($node, "call_sig", $/)
-         && self.check_attribute($node, "viviself", $/)
-         && self.check_attribute($node, "vivibase", $/)
-         && self.check_attribute($node, "multitype", $/)
-         && self.check_children($node, $/)
-         && self.check_past_node_attributes($node, $/));
-        $/.from($node) if $/;
-        $/;
+    my @attributes := pir::clone__PP(PAST::Pattern.attributes());
+    for (<scope isdecl namespace slurpy call_sig viviself
+         vivibase multitype>) {
+        pir::push(@attributes, $_);
     }
+    method attributes () { @attributes; }
+
+    method target_class () { PAST::Var; }
 }
 
 class PAST::Pattern::VarList is PAST::Pattern {
-    method ACCEPTSEXACTLY ($node) {
-        return Tree::Pattern::Match.new(0) unless $node ~~ PAST::VarList;
-        my $/ := Tree::Pattern::Match.new(1);
-        (self.check_children($node, $/)
-         && self.check_past_node_attributes($node, $/));
-        $/.from($node) if $/;
-        $/;
-    }
+    method target_class () { PAST::VarList; }
 }
 
-INIT {
-    PAST::Pattern.new_subtype('PAST::Pattern::Control',
-                              PAST::Control,
-                              :attr(<handle_types handle_types_except>));
+class PAST::Pattern::Control is PAST::Pattern {
+    my @attributes := pir::clone__PP(PAST::Pattern.attributes());
+    pir::push(@attributes, 'handle_types');
+    pir::push(@attributes, 'handle_types_except');
+    method attributes () { @attributes; }
+
+    method target_class () { PAST::Control; }
 }
 
 # Local Variables:

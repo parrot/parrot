@@ -18,43 +18,7 @@ module PCT::Node {
 }
 
 class PCT::Pattern is Tree::Pattern {
-    method new_subtype ($name, $targetClass, *%adverbs) {
-        my $parent := %adverbs<parent> || self;
-        my $class := P6metaclass.new().new_class($name, :parent($parent));
-        
-        my @attributes := %adverbs<attr> || [];
 
-        for (@attributes) {
-            $class.HOW().add_method($class, $_,
-                                    sub ($value?) {
-                                        self.attr($_, $value,
-                                                  pir::defined__iP($value));
-                                    });
-        }
-
-        my &ACCEPTSEXACTLY := method ($node) {
-            return Tree::Pattern::Match.new(0)
-              unless pir::isa__iPP($node, $targetClass);
-            my $/ := Tree::Pattern::Match.new(1);
-            self.check_children($node, $/);
-            for @attributes {
-                last unless self.check_attribute($node, $_, $/);
-            }
-            if self ~~ PAST::Pattern {
-                self.check_past_node_attributes($node, $/);
-            }
-            elsif self ~~ POST::Pattern {
-                self.check_post_node_attributes($node, $/);
-            }
-            else {
-                self.check_pct_node_attributes($node, $/);
-            }
-            $/.from($node) if $/;
-            $/;
-        }
-
-        $class.HOW().add_method($class, 'ACCEPTSEXACTLY', &ACCEPTSEXACTLY);
-    }
 
     method new (*@children, *%attrs) {
         my $result := Q:PIR {
@@ -149,17 +113,32 @@ class PCT::Pattern is Tree::Pattern {
         $result;
     }
 
-    method check_pct_node_attributes ($node, $/) {
-        (self.check_attribute($node, "name", $/)
-         && self.check_attribute($node, "source", $/)
-         && self.check_attribute($node, "pos", $/));
-        $/;
+    method check_attributes ($node, $/) {
+        for self.attributes() {
+            last unless self.check_attribute($node, $_, $/);
+        }
+        ?$/;
     }
-}
 
-INIT {
-    pir::load_bytecode('PAST/Pattern.pbc');
-    pir::load_bytecode('POST/Pattern.pbc');
+    method ACCEPTSEXACTLY ($node) {
+        if !($node ~~ self.target_class()) {
+            Tree::Pattern::Match.new(0);
+        }
+        else {
+            my $/ := Tree::Pattern::Match.new(1, $node);
+            (self.check_attributes($node, $/)
+             && self.check_children($node, $/));
+            $/;
+        }
+    }
+
+    method attributes () {
+        <name source pos>;
+    }
+
+    method target_class () {
+        PCT::Node;
+    }
 }
 
 # Local Variables:
