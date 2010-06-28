@@ -40,6 +40,7 @@ my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
+    .local int i
     \$P1 = new ['FileHandle']
     \$P1.'open'('README')
     say 'ok 1 - \$P1.open(\$S1)'
@@ -73,6 +74,14 @@ pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
     \$P7.'open'('$temp_file', 'w')
     say 'ok 7 - \$P7.open(\$S1, \$S2) # new file, write mode succeeds'
 
+    i = \$P7.'is_closed'()
+    print 'is_closed: '
+    say i
+    \$P7.'close'()
+    i = \$P7.'is_closed'()
+    print 'is_closed after close: '
+    say i
+
     goto end
 
   eh_bad_file_1:
@@ -93,6 +102,8 @@ ok 4 - $P3.open()         # reopening
 ok 5 - $P5.open($S1)      # with bad file
 ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
+is_closed: 0
+is_closed after close: 1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'isatty' );
