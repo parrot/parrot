@@ -66,6 +66,7 @@
     $P0['ns_entry_name']= 'hello'
     $P0['method']       = ''
     $P0['HLL_id']       = 0
+    $P0['vtable_index'] = -1 # It required to store sub in namespace
 
     $P1 = new 'Sub', $P0
     # and store it in PackfileConstantTable

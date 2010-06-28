@@ -28,7 +28,6 @@
 #if defined(PARROT_IN_CORE)
 
 #define Parrot_Language Parrot_Int
-#define Parrot_VTABLE VTABLE *
 
 /* Macro to save off the original stack pointer for GC scanning. If
    the stacktop was NULL, then set it to the address of the cached

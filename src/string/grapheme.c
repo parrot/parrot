@@ -64,11 +64,13 @@ clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
 }
 
 grapheme_table *
-grow_grapheme_table(SHIM_INTERP, grapheme_table *src, UINTVAL n)
+grow_grapheme_table(PARROT_INTERP, grapheme_table *src, UINTVAL n)
 {
     ASSERT_ARGS(grow_grapheme_table)
-    return (grapheme_table *) mem_sys_realloc(src,
-        sizeof (grapheme_table) + (src->size + n) * sizeof (grapheme));
+    if (src)
+        return (grapheme_table *) mem_sys_realloc(src,
+            sizeof (grapheme_table) + (src->size + n) * sizeof (grapheme));
+    return create_grapheme_table(interp, n);
 }
 
 

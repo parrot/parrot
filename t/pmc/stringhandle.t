@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 25;
 
 =head1 NAME
 
@@ -92,6 +92,23 @@ pir_output_is( <<'CODE', <<'OUT', 'get_bool' );
 CODE
 0
 1
+OUT
+
+# StringHandle doesn't use file descriptor, get_fd always return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    .local pmc sh
+    .local int fd
+    sh = new ['StringHandle']
+    fd = sh.'get_fd'()
+    say fd
+    sh.'open'('mockname', 'r')
+    fd = sh.'get_fd'()
+    say fd
+.end
+CODE
+-1
+-1
 OUT
 
 SKIP: {
@@ -639,6 +656,23 @@ pir_output_is( <<'CODE', <<"OUTPUT", "is_closed" );
 .end
 CODE
 1
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'StringHandle is not a tty' );
+.sub main
+    .local pmc sh
+    .local int i
+    sh = new ['StringHandle']
+
+    # See TT #1689
+    i = sh.'is_tty'()
+    say i
+    i = sh.'isatty'()
+    say i
+.end
+CODE
+0
 0
 OUTPUT
 

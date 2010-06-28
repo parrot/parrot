@@ -280,6 +280,7 @@ use Cwd;
 use File::Spec;
 use File::Basename;
 use Memoize ();
+use IO::File ();
 
 use lib qw( lib );
 use Parrot::BuildUtil ();

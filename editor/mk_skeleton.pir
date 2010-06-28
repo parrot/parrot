@@ -4,6 +4,7 @@
 # Generate a skeleton PIR file that adheres to parrot developer standards.
 # intended for people who hack on parrot itself, not users of parrot.
 
+.loadlib 'sys_ops'
 .include 'tm.pasm'
 
 .sub 'main' :main

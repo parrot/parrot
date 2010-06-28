@@ -201,7 +201,8 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static void nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src, UINTVAL offs, UINTVAL len, UINTVAL graphemes)>
+=item C<static void nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index,
+STRING *src, UINTVAL offs, UINTVAL len, UINTVAL graphemes)>
 
 Helper function to NFG-encode strings. It handles the (lazy) creation of the
 grapheme table and the graphemes it contains.
@@ -525,6 +526,7 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     size_t   pos = i->bytepos / sizeof (UChar32);
 
     if (pos == 0 || !ISCOMBINING(c)) {
+        /* Nothing special here , encode and advance.*/
         s[pos++] = (UChar32) c;
         ++i->charpos;
         i->bytepos = pos * sizeof (UChar32);
@@ -535,6 +537,12 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
         grapheme g;
 
         if (prev < 0) {
+            /*
+             * We have a dynamic codepoint in the prev slot and a combining character.
+             * 'Combine' the character into the dynamic codepoint and replace it in the slot.
+             * This unconditionally appends to the grapheme table, with some care we might be
+             * able to substitute an entry in some cases.
+             */
             grapheme_table *table = (grapheme_table *) i->str->extra;
             PARROT_ASSERT(table);
             g.len = table->graphemes[-1 - prev].len + 1;
@@ -546,12 +554,13 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
                    g.len * sizeof (UChar));
         }
         else {
+            /* Regular character plus combining character, try to compose via ICU... */
             UErrorCode err = U_ZERO_ERROR;
             UChar src[3];
             int dst_len = 1;
             UChar dst[2];
             src[0] = s[pos - 1];
-            src[1] = s[pos];
+            src[1] = c;
             src[2] = 0;
 
             /* Delegate composition to ICU. */
@@ -559,12 +568,12 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
                                       dst, dst_len, &err);
 
             if (U_SUCCESS(err)) {
-                /* Composition succeded, we have a valid Uncode codepoint. */
+                /* Composition succeded. We have a valid codepoint, substitute and move on. */
                 s[pos - 1] = dst[0];
                 return;
             }
 
-            /* Composition failed, we need a dynamic codepoint. */
+            /* Composition failed, we need a dynamic codepoint. Create, substitute, etc. */
             g.len  = 2;
             g.hash = 0xffff;
             g.codepoints = mem_gc_allocate_n_typed(interp, g.len, UChar32);
