@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2124);
+plan(2138);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -499,6 +499,8 @@ sub test_any_matching () {
        'Tree::Pattern::Any: Matching 1st option matches.');
     ok($/.from() =:= $past,
        'Tree::Pattern::Any: Matching 1st option has correct .from.');
+    ok($/.orig() =:= $past,
+       'Tree::Pattern::any: Matching 1st option has correct .orig.');
 
     $past := PAST::Var.new();
     $/ := $past ~~ $pattern;
@@ -508,6 +510,8 @@ sub test_any_matching () {
        'Tree::Pattern::Any: Matching 2nd option matches.');
     ok($/.from() =:= $past,
        'Tree::Pattern::Any: Matching 2nd option has correct .from.');
+    ok($/.orig() =:= $past,
+       'Tree::Pattern::Any: Matching 2nd option has correct .orig.');
 
     $past := PAST::Block.new();
     $/ := $past ~~ $pattern;
@@ -585,13 +589,13 @@ sub test_global_matching () {
        '$/ is a Tree::Pattern::Match for global matches.');
     ok(pir::elements__iP($/) == 4,
        '$/ has the right number of elements for global matches.');
-    ok($/[0].from() =:= $past,
+    ok($/[0].orig() =:= $past,
        'Global matching can match the top node.');
-    ok($/[1].from() =:= $past[0][0],
+    ok($/[1].orig() =:= $past[0][0],
        '$/[1] is correct for global matches.');
-    ok($/[2].from() =:= $past[1],
+    ok($/[2].orig() =:= $past[1],
        '$/[2] is correct for global matches.');
-    ok($/[3].from() =:= $past[2][1],
+    ok($/[3].orig() =:= $past[2][1],
        '$/[3] is correct for global matches.');
 }
 
@@ -626,6 +630,8 @@ sub test_match_result_from_top_node () {
         ok(?$/, "$begin 1, Bool conversion");
         ok($/.from() =:= $node,
            "$begin 1, .from");
+        ok($/.orig() =:= $node,
+           "$begin 1, .orig");
 
         $node := ($class =:= PAST::Block
                   ?? PAST::Op !! PAST::Block).new();
@@ -649,6 +655,8 @@ sub test_match_result_from_sub_node () {
        "Deep match result on Node 1 converts to boolean truth.");
     ok($/.from() =:= $node[0],
        "Deep match result on Node 1 has correct .from.");
+    ok($/.orig() =:= $node[0],
+       "Deep match result on Node 1 has correct .orig.");
 }
 
 sub test_match_result_from_closure () {
@@ -666,6 +674,8 @@ sub test_match_result_from_closure () {
        "Match result from Closure 1 converts to boolean truth.");
     ok($/.from =:= $node,
        "Match result from Closure 1 has correct .from.");
+    ok($/.orig =:= $node,
+       "Match result from Closure 1 has correct .orig.");
 
     $node := PAST::Val.new(:returns('String'));
     $/ := $node ~~ $pattern;
@@ -686,6 +696,8 @@ sub test_match_result_from_constant () {
        "Match result from Constant 1 converts to boolean truth.");
     ok($/.from() == 5,
        "Match result from Constant 1 has correct .from.");
+    ok($/.orig() == 5,
+       "Match result from Constant 1 has correct .orig.");
 
     $node := 6;
     $/ := $node ~~ $pattern;
@@ -702,9 +714,9 @@ sub test_match_result_from_node_children () {
                                 :blocktype("lexical"));
     my $/ := $past ~~ $pattern;
 
-    ok($/<blocktype>.from() eq "lexical",
+    ok($/<blocktype>.orig() eq "lexical",
        '$/<blocktype> is correct for PAST::Pattern::Blocks.');
-    ok($/[0].from() =:= $past[0],
+    ok($/[0].orig() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::Blocks.');
 
     $pattern := 
@@ -716,11 +728,11 @@ sub test_match_result_from_node_children () {
                          :pirop<add>);
     $/ := $past ~~ $pattern;
 
-    ok($/<pirop>.from() eq "add",
+    ok($/<pirop>.orig() eq "add",
        '$/<pirop> is correct for PAST::Pattern::Ops.');
-    ok($/[0].from() =:= $past[0],
+    ok($/[0].orig() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::Ops.');
-    ok($/[1].from() =:= $past[1],
+    ok($/[1].orig() =:= $past[1],
        '$/[1] is correct for PAST::Pattern::Ops.');
 
     $pattern := PAST::Pattern::Stmts.new(:name<foo>,
@@ -729,9 +741,9 @@ sub test_match_result_from_node_children () {
                              PAST::Op.new());
     $/ := $past ~~ $pattern;
 
-    ok($/<name>.from() eq "foo",
+    ok($/<name>.orig() eq "foo",
        '$/<name> is correct for PAST::Pattern::Stmts.');
-    ok($/[0].from() =:= $past[0],
+    ok($/[0].orig() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::Stmts.');
 
     $pattern :=
@@ -741,9 +753,9 @@ sub test_match_result_from_node_children () {
                            PAST::Block.new());
     $/ := $past ~~ $pattern;
 
-    ok($/<value>.from() =:= $past.value(),
+    ok($/<value>.orig() =:= $past.value(),
        '$/<value> is correct for PAST::Pattern::Vals.');
-    ok($/[0].from() =:= $past[0],
+    ok($/[0].orig() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::Vals.');
 
     $pattern :=
@@ -754,11 +766,11 @@ sub test_match_result_from_node_children () {
                            PAST::Val.new());
     $/ := $past ~~ $pattern;
 
-    ok($/<name>.from() eq "foo",
+    ok($/<name>.orig() eq "foo",
        '$/<name> is correct for PAST::Pattern::Vars.');
-    ok($/<scope>.from() eq "package",
+    ok($/<scope>.orig() eq "package",
        '$/<scope> is correct for PAST::Pattern::Vars.');
-    ok($/[0].from() =:= $past[0],
+    ok($/[0].orig() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::Vars.');
 
     $pattern := PAST::Pattern::VarList.new(:name<params>,
@@ -767,9 +779,9 @@ sub test_match_result_from_node_children () {
                                PAST::Var.new());
     $/ := $past ~~ $pattern;
 
-    ok($/<name>.from() eq "params",
+    ok($/<name>.orig() eq "params",
        '$/<name> is correct for PAST::Pattern::VarList.');
-    ok($/[0].from() =:= $past[0],
+    ok($/[0].orig() =:= $past[0],
        '$/[0] is correct for PAST::Pattern::VarList.');
 }
 
@@ -783,7 +795,7 @@ sub test_transform_sub () {
          $opName eq 'islt');
     }
     sub flipComparison ($/) {
-        my $op := $/.from();
+        my $op := $/.orig();
         my $temp := $op[0];
         $op[0] := $op[1];
         $op[1] := $temp;
@@ -825,6 +837,8 @@ sub test_match_method () {
        'PAST::Node.match returns a true match result when it should.');
     ok($/.from() =:= $past,
        "PAST::Node.match's return value has the right .from().");
+    ok($/.orig() =:= $past,
+       "PAST::Node.match's return value has the right .orig().");
 
     $past := PAST::Block.new(PAST::Block.new(),
                              PAST::Block.new(PAST::Block.new()));
@@ -858,6 +872,8 @@ sub test_match_method () {
        'PAST::Node.match with :p has same bool value as ~~.');
     ok($match1.from() =:= $match2.from(),
        'PAST::Node.match with :p has same .from as ~~.');
+    ok($match1.orig() =:= $match2.orig(),
+       'PAST::Node.match with :p has same .orig as ~~.');
 
     $match1 := $past.match($pattern, :pos(1));
     $match2 := $pattern.ACCEPTS($past, :pos(1));
@@ -867,6 +883,8 @@ sub test_match_method () {
     ok(?$match1 == ?$match2,
        'PAST::Node.match with :pos has same bool value as ~~.');
     ok($match1.from() =:= $match2.from(),
+       'PAST::Node.match with :pos has same .from as ~~.');
+    ok($match1.orig() =:= $match2.orig(),
        'PAST::Node.match with :pos has same .from as ~~.');
 }
 
