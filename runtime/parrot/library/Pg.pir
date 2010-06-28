@@ -40,6 +40,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 ## TODO generate includes from libpq-fe.h
 ## .include 'postgres.pasm'
 
+.HLL 'parrot'
 .const int CONNECTION_OK = 0
 
 .sub __load :load
