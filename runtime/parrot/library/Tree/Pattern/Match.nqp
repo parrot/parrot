@@ -5,16 +5,16 @@
 class Tree::Pattern::Match is Capture {
     has $!success;
     has $!ast;
-    has $!from;
+    has $!orig;
 
-    method new ($success?, $from?) {
+    method new ($success?, $orig?) {
         my $self := Q:PIR {
             $P0 = self.'HOW'()
             $P0 = getattribute $P0, 'parrotclass'
             %r = new $P0
         };
         $self.success($success);
-        $self.from($from);
+        $self.orig($orig);
         $self;
     }
 
@@ -27,11 +27,16 @@ class Tree::Pattern::Match is Capture {
     }
 
     method from ($from?) {
+        self.orig($from);
+    }
+
+    method orig ($orig?) {
         my $result;
-        if pir::defined__IP($from) {
-            pir::setattribute(self, ~'$!from', $from);
-        } else {
-            $result := pir::getattribute__PPS(self, '$!from');
+        if pir::defined__IP($orig) {
+            pir::setattribute(self, ~'$!orig', $orig);
+        }
+        else {
+            $result := pir::getattribute__PPS(self, '$!orig');
         }
         $result;
     }
