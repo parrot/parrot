@@ -208,7 +208,8 @@ Get the property with the key.
 
 Keys:
 probes          : returns the hash of probes currently registered.
-eventdispatcher : return the event dispatcher instance.
+eventdispatcher : returns the event dispatcher instance.
+gc              : returns the InstrumentGC instance.
 
 Unknown keys are sent to the supervised interpreter.
 
@@ -228,10 +229,16 @@ Unknown keys are sent to the supervised interpreter.
             return attr->probes;
         }
 
-        /* eventdispatcher: return the event dispatcher instance */
+        /* eventdispatcher: returns the event dispatcher instance */
         name = CONST_STRING(INTERP, "eventdispatcher");
         if (Parrot_str_equal(INTERP, name, item)) {
             return attr->evt_dispatcher;
+        }
+
+        /* gc: returns the InstrumentGC instance. */
+        name = CONST_STRING(INTERP, "gc");
+        if (Parrot_str_equal(INTERP, name, item)) {
+            return attr->instrument_gc;
         }
 
         /* push to the supervised interpreter. */

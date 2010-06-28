@@ -137,4 +137,16 @@ class Instrument::Event::GC::reallocate is Instrument::Event {
     };
 };
 
+class Instrument::Event::GC::free is Instrument::Event {
+    method _self_init() {
+        $!event_type := 'Instrument::Event::GC::free';
+    };
+};
+
+class Instrument::Event::GC::administration is Instrument::Event {
+    method _self_init() {
+        $!event_type := 'Instrument::Event::GC::administration';
+    };
+};
+
 # vim: ft=perl6 expandtab shiftwidth=4:
