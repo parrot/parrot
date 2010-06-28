@@ -31,7 +31,7 @@ class Tree::Pattern is Capture {
     method transform ($node, $transform) {
         my &transSub;
         if ($transform ~~ Tree::Transformer) {
-            &transSub := sub ($/) { $transformer.walk($/.from()); };
+            &transSub := sub ($/) { $transformer.walk($/.orig()); };
         } elsif (pir::does__iPS($transform, 'invokable')) {
             &transSub := $transform;
         } else {
