@@ -159,6 +159,11 @@ pmclass InstrumentGC auto_attrs dynpmc group instrument_group  {
     VTABLE void destroy() {
         Parrot_InstrumentGC_attributes * const attr = PARROT_INSTRUMENTGC(SELF);
 
+        /* Free the hashes. */
+        parrot_hash_destroy(INTERP, attr->stub_hash);
+        parrot_hash_destroy(INTERP, attr->original_hash);
+        parrot_hash_destroy(INTERP, attr->entry_hash);
+
         /* Free gc_original. gc_instrumented will be freed when
            supervised is killed. */
         mem_gc_free(INTERP, attr->gc_original);
