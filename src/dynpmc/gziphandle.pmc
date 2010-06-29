@@ -27,7 +27,7 @@ This PMC wraps the zlib.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass GzipHandle provides Handle dynpmc auto_attrs {
+pmclass GzipHandle extends Handle dynpmc auto_attrs {
     ATTR void *file;
 
 /*
