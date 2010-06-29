@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, Parrot Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,29 +11,21 @@ config/gen/platform/generic/math.c
 
 =head1 DESCRIPTION
 
-math stuff
+Mathematical functions.
 
 =head2 Functions
 
 =over 4
 
-=cut
-
-*/
-
-/*
-
 =item C<extern int Parrot_signbit(double x)>
 
-return true if the Numval has a negative sign.
+Return true if the Numval has a negative sign.
 This is mostly for handling the -0.0 case.
 
 =cut
 
 */
 
-/*
- */
 #if DOUBLE_SIZE == 2 * INT_SIZE
 extern int
 Parrot_signbit(double x)
@@ -54,6 +46,8 @@ Parrot_signbit(double x)
 /*
 
 =item C<int Parrot_signbit_l(long double x)>
+
+Like C<Parrot_signbit()>, only taking long double instead of double.
 
 =cut
 

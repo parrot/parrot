@@ -20,8 +20,8 @@ The C<FileHandle> PMC provides the class-based interface for filehandles that
 is used in Parrot ops.
 
 TODO: Where possible, extract some of the filehandle-related details into
-src/io/filehandle.c, and extract the stringhandle details into
-src/io/io_string.c.
+F<src/io/filehandle.c>, and extract the stringhandle details into
+a new F<src/io/io_string.c>.
 
 =cut
 
