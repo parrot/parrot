@@ -153,6 +153,13 @@ L<https://trac.parrot.org/parrot/ticket/1689>
 
 =over 4
 
+=item open and close opcodes will be removed [eligible in 2.7]
+
+L<https://trac.parrot.org/parrot/ticket/1697>
+
+These opcodes will be removed. The open/close methods on File or
+the FileHandle PMC should be used instead.
+
 =item get_addr and set_addr [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/218>
