@@ -101,7 +101,6 @@ void stub_block_mark(PARROT_INTERP);
 void stub_unblock_mark(PARROT_INTERP);
 void stub_block_sweep(PARROT_INTERP);
 void stub_unblock_sweep(PARROT_INTERP);
-
 void stub_finalize_gc_system(PARROT_INTERP);
 void stub_destroy_child_interp(Interp *dest_interp, Interp *child_interp);
 void stub_compact_string_pool(PARROT_INTERP);
@@ -112,11 +111,16 @@ void stub_init_pool(PARROT_INTERP, struct Fixed_Size_Pool *pool);
 /* Prototypes for helper functions. */
 void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *event, PMC *data);
 PMC *get_gc_funcs(PARROT_INTERP, STRING *name);
+void build_gc_func_hash(PARROT_INTERP, Hash *instr_hash, Hash *orig_hash, Hash *entry_hash,
+                        InstrumentGC_Subsystem *gc_instr, GC_Subsystem *gc_orig);
 
 pmclass InstrumentGC auto_attrs dynpmc group instrument_group  {
     ATTR PMC                           *instrument;
     ATTR struct GC_Subsystem           *gc_original;
     ATTR struct InstrumentGC_Subsystem *gc_instrumented;
+    ATTR Hash                          *stub_hash;
+    ATTR Hash                          *original_hash;
+    ATTR Hash                          *entry_hash;
 
     VTABLE void init() {
         /* Not supposed to be init on its own. */
@@ -142,6 +146,13 @@ pmclass InstrumentGC auto_attrs dynpmc group instrument_group  {
         mem_copy_n_typed(attr->gc_instrumented, attr->gc_original, 1, GC_Subsystem);
         supervised->gc_sys = (GC_Subsystem *) attr->gc_instrumented;
 
+        /* Initialise the hashes. */
+        attr->stub_hash     = parrot_new_pointer_hash(INTERP);
+        attr->original_hash = parrot_new_pointer_hash(INTERP);
+        attr->entry_hash    = parrot_new_pointer_hash(INTERP);
+        build_gc_func_hash(INTERP, attr->stub_hash, attr->original_hash, attr->entry_hash,
+                           attr->gc_instrumented, attr->gc_original);
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -166,137 +177,16 @@ pmclass InstrumentGC auto_attrs dynpmc group instrument_group  {
         while(VTABLE_get_bool(INTERP, iter)) {
             PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
             STRING *item  = VTABLE_get_string(INTERP, item_pmc);
+            size_t **entry, *func;
 
-            /* Individual Matching. */
-            if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "finalize_gc_system"))) {
-                attr->gc_instrumented->finalize_gc_system = stub_finalize_gc_system;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "destroy_child_interp"))) {
-                attr->gc_instrumented->destroy_child_interp = stub_destroy_child_interp;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "do_gc_mark"))) {
-                attr->gc_instrumented->do_gc_mark = stub_do_gc_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "compact_string_pool"))) {
-                attr->gc_instrumented->compact_string_pool = stub_compact_string_pool;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "mark_special"))) {
-                attr->gc_instrumented->mark_special = stub_mark_special;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "pmc_needs_early_collection"))) {
-                attr->gc_instrumented->pmc_needs_early_collection = stub_pmc_needs_early_collection;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "init_pool"))) {
-                attr->gc_instrumented->init_pool = stub_init_pool;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_pmc_header"))) {
-                attr->gc_instrumented->allocate_pmc_header = stub_allocate_pmc_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_pmc_header"))) {
-                attr->gc_instrumented->free_pmc_header = stub_free_pmc_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_string_header"))) {
-                attr->gc_instrumented->allocate_string_header = stub_allocate_string_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_string_header"))) {
-                attr->gc_instrumented->free_string_header = stub_free_string_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_bufferlike_header"))) {
-                attr->gc_instrumented->allocate_bufferlike_header = stub_allocate_bufferlike_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_bufferlike_header"))) {
-                attr->gc_instrumented->free_bufferlike_header = stub_free_bufferlike_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_pmc_attributes"))) {
-                attr->gc_instrumented->allocate_pmc_attributes = stub_allocate_pmc_attributes;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_pmc_attributes"))) {
-                attr->gc_instrumented->free_pmc_attributes = stub_free_pmc_attributes;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_string_storage"))) {
-                attr->gc_instrumented->allocate_string_storage = stub_allocate_string_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "reallocate_string_storage"))) {
-                attr->gc_instrumented->reallocate_string_storage = stub_reallocate_string_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_buffer_storage"))) {
-                attr->gc_instrumented->allocate_buffer_storage = stub_allocate_buffer_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "reallocate_buffer_storage"))) {
-                attr->gc_instrumented->reallocate_buffer_storage = stub_reallocate_buffer_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_fixed_size_storage"))) {
-                attr->gc_instrumented->allocate_fixed_size_storage =
-                    stub_allocate_fixed_size_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_fixed_size_storage"))) {
-                attr->gc_instrumented->free_fixed_size_storage = stub_free_fixed_size_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_memory_chunk"))) {
-                attr->gc_instrumented->allocate_memory_chunk = stub_allocate_memory_chunk;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "reallocate_memory_chunk"))) {
-                attr->gc_instrumented->reallocate_memory_chunk = stub_reallocate_memory_chunk;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP,
-                                                 "allocate_memory_chunk_with_interior_pointers"))) {
-                attr->gc_instrumented->allocate_memory_chunk_with_interior_pointers =
-                    stub_allocate_memory_chunk_with_interior_pointers;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP,
-                                               "reallocate_memory_chunk_with_interior_pointers"))) {
-                attr->gc_instrumented->reallocate_memory_chunk_with_interior_pointers =
-                    stub_reallocate_memory_chunk_with_interior_pointers;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_memory_chunk"))) {
-                attr->gc_instrumented->free_memory_chunk = stub_free_memory_chunk;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "block_mark"))) {
-                attr->gc_instrumented->block_mark = stub_block_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "unblock_mark"))) {
-                attr->gc_instrumented->unblock_mark = stub_unblock_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "block_sweep"))) {
-                attr->gc_instrumented->block_sweep = stub_block_sweep;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "unblock_sweep"))) {
-                attr->gc_instrumented->unblock_sweep = stub_unblock_sweep;
-            }
-            else {
+            /* Replace the entry with the stub. */
+            entry = (size_t **) parrot_hash_get(INTERP, attr->entry_hash, item);
+            func  = (size_t *)  parrot_hash_get(INTERP, attr->stub_hash, item);
+            if(entry == NULL || func == NULL) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                                             "Unknown GC function: %Ss", item);
             }
+            *entry = func;
         }
     }
     
@@ -311,144 +201,16 @@ pmclass InstrumentGC auto_attrs dynpmc group instrument_group  {
         while(VTABLE_get_bool(INTERP, iter)) {
             PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
             STRING *item  = VTABLE_get_string(INTERP, item_pmc);
+            size_t **entry, *func;
 
-            /* Individual Matching. */
-            if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "finalize_gc_system"))) {
-                instr->finalize_gc_system = orig->finalize_gc_system;
+            /* Simply replace the stub with the original entry. */
+            entry = (size_t **) parrot_hash_get(INTERP, attr->entry_hash, item);
+            func  = (size_t *)  parrot_hash_get(INTERP, attr->original_hash, item);
+            if(entry == NULL || func == NULL) {
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                            "Unknown GC function: %Ss", item);
             }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "destroy_child_interp"))) {
-                instr->destroy_child_interp = orig->destroy_child_interp;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "do_gc_mark"))) {
-                instr->do_gc_mark = orig->do_gc_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "compact_string_pool"))) {
-                instr->compact_string_pool = orig->compact_string_pool;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "mark_special"))) {
-                instr->mark_special = orig->mark_special;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "pmc_needs_early_collection"))) {
-                instr->pmc_needs_early_collection = orig->pmc_needs_early_collection;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "init_pool"))) {
-                instr->init_pool = orig->init_pool;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_pmc_header"))) {
-                instr->allocate_pmc_header = orig->allocate_pmc_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_pmc_header"))) {
-                instr->free_pmc_header = orig->free_pmc_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_string_header"))) {
-                instr->allocate_string_header = orig->allocate_string_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_string_header"))) {
-                instr->free_string_header = orig->free_string_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_bufferlike_header"))) {
-                instr->allocate_bufferlike_header = orig->allocate_bufferlike_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_bufferlike_header"))) {
-                instr->free_bufferlike_header = orig->free_bufferlike_header;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_pmc_attributes"))) {
-                instr->allocate_pmc_attributes = orig->allocate_pmc_attributes;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_pmc_attributes"))) {
-                instr->free_pmc_attributes = orig->free_pmc_attributes;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_string_storage"))) {
-                instr->allocate_string_storage = orig->allocate_string_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "reallocate_string_storage"))) {
-                instr->reallocate_string_storage = orig->reallocate_string_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_buffer_storage"))) {
-                instr->allocate_buffer_storage = orig->allocate_buffer_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "reallocate_buffer_storage"))) {
-                instr->reallocate_buffer_storage = orig->reallocate_buffer_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_fixed_size_storage"))) {
-                instr->allocate_fixed_size_storage = orig->allocate_fixed_size_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_fixed_size_storage"))) {
-                instr->free_fixed_size_storage = orig->free_fixed_size_storage;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "allocate_memory_chunk"))) {
-                instr->allocate_memory_chunk = orig->allocate_memory_chunk;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "reallocate_memory_chunk"))) {
-                instr->reallocate_memory_chunk = orig->reallocate_memory_chunk;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP,
-                                                "allocate_memory_chunk_with_interior_pointers"))) {
-                instr->allocate_memory_chunk_with_interior_pointers =
-                    orig->allocate_memory_chunk_with_interior_pointers;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP,
-                                               "reallocate_memory_chunk_with_interior_pointers"))) {
-                instr->reallocate_memory_chunk_with_interior_pointers =
-                    orig->reallocate_memory_chunk_with_interior_pointers;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "free_memory_chunk"))) {
-                instr->free_memory_chunk = orig->free_memory_chunk;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "block_mark"))) {
-                instr->block_mark = orig->block_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "unblock_mark"))) {
-                instr->unblock_mark = orig->unblock_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "is_blocked_mark"))) {
-                instr->is_blocked_mark = orig->is_blocked_mark;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "block_sweep"))) {
-                instr->block_sweep = orig->block_sweep;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "unblock_sweep"))) {
-                instr->unblock_sweep = orig->unblock_sweep;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "is_blocked_sweep"))) {
-                instr->is_blocked_sweep = orig->is_blocked_sweep;
-            }
-            else if (Parrot_str_equal(INTERP, item,
-                                      CONST_STRING(INTERP, "get_gc_info"))) {
-                instr->get_gc_info = orig->get_gc_info;
-            }
+            *entry = func;
         }
     }
 }
@@ -1153,10 +915,210 @@ PMC *get_gc_funcs(PARROT_INTERP, STRING *name) {
         VTABLE_push_string(interp, list, CONST_STRING(interp, "unblock_sweep"));
     }
     else {
-        VTABLE_push_string(interp, list, name);
+        /* Convert name to a constant string. */
+        char *c_str     = Parrot_str_to_cstring(interp, name);
+        STRING *con_str = CONST_STRING(interp, c_str);
+        VTABLE_push_string(interp, list, con_str);
+        Parrot_free_cstring(c_str);
     }
     
     return list;
+}
+
+void build_gc_func_hash(PARROT_INTERP,
+                        Hash *instr_hash, Hash *orig_hash, Hash *entry_hash,
+                        InstrumentGC_Subsystem *gc_instr, GC_Subsystem *gc_orig) {
+    /* Build the pointer hash to the stubs. */
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "finalize_gc_system"),
+                    stub_finalize_gc_system);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "destroy_child_interp"),
+                    stub_destroy_child_interp);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "do_gc_mark"),
+                    stub_do_gc_mark);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "compact_string_pool"),
+                    stub_compact_string_pool);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "mark_special"),
+                    stub_mark_special);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "pmc_needs_early_collection"),
+                    stub_pmc_needs_early_collection);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "init_pool"),
+                    stub_init_pool);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_pmc_header"),
+                    stub_allocate_pmc_header);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_pmc_header"),
+                    stub_free_pmc_header);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_string_header"),
+                    stub_allocate_string_header);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_string_header"),
+                    stub_free_string_header);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_bufferlike_header"),
+                    stub_allocate_bufferlike_header);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_bufferlike_header"),
+                    stub_free_bufferlike_header);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_pmc_attributes"),
+                    stub_allocate_pmc_attributes);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_pmc_attributes"),
+                    stub_free_pmc_attributes);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_string_storage"),
+                    stub_allocate_string_storage);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "reallocate_string_storage"),
+                    stub_reallocate_string_storage);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_buffer_storage"),
+                    stub_allocate_buffer_storage);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "reallocate_buffer_storage"),
+                    stub_reallocate_buffer_storage);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_fixed_size_storage"),
+                    stub_allocate_fixed_size_storage);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_fixed_size_storage"),
+                    stub_free_fixed_size_storage);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_memory_chunk"),
+                    stub_allocate_memory_chunk);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "reallocate_memory_chunk"),
+                    stub_reallocate_memory_chunk);
+    parrot_hash_put(interp, instr_hash,
+                    CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
+                    stub_allocate_memory_chunk_with_interior_pointers);
+    parrot_hash_put(interp, instr_hash,
+                    CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
+                    stub_reallocate_memory_chunk_with_interior_pointers);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_memory_chunk"),
+                    stub_free_memory_chunk);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "block_mark"),
+                    stub_block_mark);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "unblock_mark"),
+                    stub_unblock_mark);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "block_sweep"),
+                    stub_block_sweep);
+    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "unblock_sweep"),
+                    stub_unblock_sweep);
+
+    /* Build the pointer hash to the original. */
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "finalize_gc_system"),
+                    gc_orig->finalize_gc_system);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "destroy_child_interp"),
+                    gc_orig->destroy_child_interp);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "do_gc_mark"),
+                    gc_orig->do_gc_mark);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "compact_string_pool"),
+                    gc_orig->compact_string_pool);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "mark_special"),
+                    gc_orig->mark_special);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "pmc_needs_early_collection"),
+                    gc_orig->pmc_needs_early_collection);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "init_pool"),
+                    gc_orig->init_pool);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_pmc_header"),
+                    gc_orig->allocate_pmc_header);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_pmc_header"),
+                    gc_orig->free_pmc_header);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_string_header"),
+                    gc_orig->allocate_string_header);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_string_header"),
+                    gc_orig->free_string_header);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_bufferlike_header"),
+                    gc_orig->allocate_bufferlike_header);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_bufferlike_header"),
+                    gc_orig->free_bufferlike_header);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_pmc_attributes"),
+                    gc_orig->allocate_pmc_attributes);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_pmc_attributes"),
+                    gc_orig->free_pmc_attributes);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_string_storage"),
+                    gc_orig->allocate_string_storage);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "reallocate_string_storage"),
+                    gc_orig->reallocate_string_storage);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_buffer_storage"),
+                    gc_orig->allocate_buffer_storage);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "reallocate_buffer_storage"),
+                    gc_orig->reallocate_buffer_storage);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_fixed_size_storage"),
+                    gc_orig->allocate_fixed_size_storage);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_fixed_size_storage"),
+                    gc_orig->free_fixed_size_storage);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_memory_chunk"),
+                    gc_orig->allocate_memory_chunk);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "reallocate_memory_chunk"),
+                    gc_orig->reallocate_memory_chunk);
+    parrot_hash_put(interp, orig_hash,
+                    CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
+                    gc_orig->allocate_memory_chunk_with_interior_pointers);
+    parrot_hash_put(interp, orig_hash,
+                    CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
+                    gc_orig->reallocate_memory_chunk_with_interior_pointers);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_memory_chunk"),
+                    gc_orig->free_memory_chunk);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "block_mark"),
+                    gc_orig->block_mark);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "unblock_mark"),
+                    gc_orig->unblock_mark);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "block_sweep"),
+                    gc_orig->block_sweep);
+    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "unblock_sweep"),
+                    gc_orig->unblock_sweep);
+
+    /* Build the pointer hash for name to InstrumentGC_Subsystem entry. */
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "finalize_gc_system"),
+                    &(gc_instr->finalize_gc_system));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "destroy_child_interp"),
+                    &(gc_instr->destroy_child_interp));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "do_gc_mark"),
+                    &(gc_instr->do_gc_mark));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "compact_string_pool"),
+                    &(gc_instr->compact_string_pool));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "mark_special"),
+                    &(gc_instr->mark_special));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "pmc_needs_early_collection"),
+                    &(gc_instr->pmc_needs_early_collection));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "init_pool"),
+                    &(gc_instr->init_pool));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_pmc_header"),
+                    &(gc_instr->allocate_pmc_header));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_pmc_header"),
+                    &(gc_instr->free_pmc_header));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_string_header"),
+                    &(gc_instr->allocate_string_header));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_string_header"),
+                    &(gc_instr->free_string_header));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_bufferlike_header"),
+                    &(gc_instr->allocate_bufferlike_header));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_bufferlike_header"),
+                    &(gc_instr->free_bufferlike_header));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_pmc_attributes"),
+                    &(gc_instr->allocate_pmc_attributes));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_pmc_attributes"),
+                    &(gc_instr->free_pmc_attributes));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_string_storage"),
+                    &(gc_instr->allocate_string_storage));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "reallocate_string_storage"),
+                    &(gc_instr->reallocate_string_storage));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_buffer_storage"),
+                    &(gc_instr->allocate_buffer_storage));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "reallocate_buffer_storage"),
+                    &(gc_instr->reallocate_buffer_storage));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_fixed_size_storage"),
+                    &(gc_instr->allocate_fixed_size_storage));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_fixed_size_storage"),
+                    &(gc_instr->free_fixed_size_storage));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_memory_chunk"),
+                    &(gc_instr->allocate_memory_chunk));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "reallocate_memory_chunk"),
+                    &(gc_instr->reallocate_memory_chunk));
+    parrot_hash_put(interp, entry_hash,
+                    CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
+                    &(gc_instr->allocate_memory_chunk_with_interior_pointers));
+    parrot_hash_put(interp, entry_hash,
+                    CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
+                    &(gc_instr->reallocate_memory_chunk_with_interior_pointers));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_memory_chunk"),
+                    &(gc_instr->free_memory_chunk));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "block_mark"),
+                    &(gc_instr->block_mark));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "unblock_mark"),
+                    &(gc_instr->unblock_mark));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "block_sweep"),
+                    &(gc_instr->block_sweep));
+    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "unblock_sweep"),
+                    &(gc_instr->unblock_sweep));
 }
 
 /*
