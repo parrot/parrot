@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -104,6 +104,46 @@ ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
 is_closed: 0
 is_closed after close: 1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
+.include 'except_types.pasm'
+
+.sub main :main
+    .local pmc fh, eh
+    .local int i
+    i = 1
+    eh = new['ExceptionHandler']
+    eh = .EXCEPTION_PIO_ERROR
+    set_addr eh, catchnoname
+    push_eh eh
+    fh = new['FileHandle']
+    # Open without filename
+    fh.'open'()
+    i = 0
+    goto reportnoname
+  catchnoname:
+    finalize eh
+  reportnoname:
+    say i
+
+    i = 0
+    set_addr eh, catchreopen
+    fh.'open'('README')
+    i = 1
+    # Open already opened
+    fh.'open'('README')
+    i = 0
+    goto reportreopen
+  catchreopen:
+    finalize eh
+  reportreopen:
+    say i
+    pop_eh
+.end
+CODE
+1
+1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'isatty' );
