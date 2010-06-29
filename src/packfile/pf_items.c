@@ -33,6 +33,9 @@ for "little endian".
 */
 
 #include "parrot/parrot.h"
+#if PARROT_HAS_ICU
+#include "../string/grapheme.h"
+#endif /* PARROT_HAS_ICU */
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -1200,6 +1203,7 @@ Opcode format is:
 
     opcode_t flags8 | encoding
     opcode_t size
+    opcode_t extra
     * data
 
 When used for freeze/thaw the C<pf> argument might be NULL.
@@ -1221,6 +1225,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     const ENCODING *encoding;
     const CHARSET  *charset;
     size_t    size;
+    INTVAL    extra;
     const int wordsize          = pf ? pf->header->wordsize : sizeof (opcode_t);
     opcode_t  flag_charset_word = PF_fetch_opcode(pf, cursor);
 
@@ -1235,6 +1240,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
 
     size = (size_t)PF_fetch_opcode(pf, cursor);
+    extra = (size_t)PF_fetch_opcode(pf, cursor);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("encoding_nr=%ld, ", encoding_nr));
@@ -1252,6 +1258,11 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
     s = Parrot_str_new_init(interp, (const char *)*cursor, size,
             encoding, charset, flags);
+
+    if (extra) {
+        // TODO.
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+    }
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
@@ -1319,6 +1330,37 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
                 (PObj_get_FLAGS(s) & PObj_private7_FLAG ? 0x2 : 0x0) ;
     *cursor++ = s->bufused;
 
+    if (s->extra) {
+#if PARROT_HAS_ICU
+       grapheme_table *table = (grapheme_table *) s->extra;
+       INTVAL i = 0;
+       *cursor++ = table->used;
+
+       while (i++ < table->used) {
+           char *auxcursor;
+           INTVAL len = table->graphemes[i].len;
+           /* Store the length and then memcpy() the codepoints over. */
+           *cursor++ = len;
+           auxcursor = (char *) memcpy(cursor, table->graphemes[i].codepoints,
+                                       len * sizeof (UChar32));
+
+           /* Adjust the cursor, and auxcursor ... */
+           cursor += ((len * sizeof (UChar32)) % sizeof (opcode_t)) + 1;
+           auxcursor += len * sizeof (UChar32); 
+
+           /* ...and pad the difference with zeros. */
+           while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t)) {
+               *charcursor++ = 0;
+           }
+       }
+#else
+       Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+#endif /* PARROT_HAS_ICU */
+    }
+    else {
+        *cursor++ = 0;
+    }
+
     /* Switch to char * since rest of string is addressed by
      * characters to ensure padding.  */
     charcursor = (char *)cursor;
@@ -1382,8 +1424,8 @@ PF_size_strlen(const UINTVAL len)
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
     }
 
-    /* Include space for flags, representation, and size fields.  */
-    return 2 + (size_t)padded_size / sizeof (opcode_t);
+    /* Include space for flags, representation, extra and size fields. */
+    return 3 + (size_t)padded_size / sizeof (opcode_t);
 }
 
 /*
