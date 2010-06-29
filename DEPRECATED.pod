@@ -141,6 +141,12 @@ things that aren't really logical ops (don't do that!).
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
+=item Method is_tty in PMCs derived from Handle [eligible in 2.7]
+
+Use isatty instead.
+
+L<https://trac.parrot.org/parrot/ticket/1689>
+
 =back
 
 =head1 Opcodes
