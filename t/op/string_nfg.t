@@ -20,7 +20,7 @@ string operations.
 
 .include 'stringinfo.pasm'
 
-.const int TESTS = 12
+.const int TESTS = 10
 
 .sub _main :main
     .include 'test_more.pir'
@@ -62,12 +62,6 @@ string operations.
     $I0 = stringinfo $S2, .STRINGINFO_BUFUSED
     $I1 = stringinfo $S3, .STRINGINFO_BUFUSED
     is($I0, $I1, "Bufused is the same.")
-
-    $I0 = stringinfo $S2, .STRINGINFO_EXTRA
-    $I1 = stringinfo $S3, .STRINGINFO_EXTRA
-    is($I0, $I1, "EXTRA is the same.")
-    is($I1, 0, "EXTRA is NULL.")
-
 .end
 
 .sub transcode_without_graphemes
