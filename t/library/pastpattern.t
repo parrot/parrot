@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2143);
+plan(2150);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -788,6 +788,7 @@ sub test_match_result_from_node_children () {
 sub test_transform () {
     test_transform_sub();
     test_transform_min_depth();
+    test_transform_descend_until();
 }
 
 sub test_transform_sub () {
@@ -866,6 +867,72 @@ sub test_transform_min_depth () {
     $pattern.transform($past, &transform, :min_depth(2));
     ok(@matches == 1 && @matches[0] =:= $past[1][0],
        'The second child of the top is not transformed with :min_depth(2).');
+}
+
+sub test_transform_descend_until () {
+    my @matches := [];
+    my &transform := sub ($/) {
+        pir::push(@matches, $/.orig);
+        $/.orig;
+    }
+    my $pattern := PAST::Pattern::Block.new();
+    my $limit := PAST::Pattern::Block.new();
+    my $past := PAST::Block.new();
+
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past,
+       ":descend_until doesn't affect transforming child-less nodes, " ~
+       "even if they match the limit pattern.");
+
+    @matches := [];
+    $pattern := PAST::Pattern::Block.new();
+    $limit := PAST::Pattern::Var.new();
+    $past := PAST::Block.new();
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past,
+       ":descend_until doesn't affect transforms of child-less nodes " ~
+       "that don't match the limit pattern.");
+
+    @matches := [];
+    $pattern := PAST::Pattern::Block.new();
+    $limit := PAST::Pattern::Block.new();
+    $past := PAST::Block.new(PAST::Block.new());
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past,
+       ":descend_until doesn't transform children if the top node " ~
+       "matches both the limit and the pattern.");
+
+    @matches := [];
+    $pattern := PAST::Pattern::Block.new();
+    $limit := PAST::Pattern::Stmts.new();
+    $past := PAST::Stmts.new(PAST::Block.new());
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 0,
+       ":descend_until doesn't transform children if the top node " ~
+       "matches only the limit.");
+
+    @matches := [];
+    $pattern := PAST::Pattern::Val.new();
+    $limit := PAST::Pattern::Stmts.new();
+    $past := PAST::Block.new(PAST::Block.new(PAST::Val.new()),
+                             PAST::Stmts.new(PAST::Val.new()));
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past[0][0],
+       ":descend_until transforms children of siblings before the limit.");
+
+    @matches := [];
+    $past := PAST::Block.new(PAST::Stmts.new(PAST::Val.new()),
+                             PAST::Val.new());
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past[1],
+       ":descend_until transforms following siblings of the limit.");
+
+    @matches := [];
+    $past := PAST::Block.new(PAST::Stmts.new(PAST::Val.new()),
+                             PAST::Block.new(PAST::Val.new()));
+    $pattern.transform($past, &transform, :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past[1][0],
+       ":descenduntil transforms children of siblings after the limit.");
 }
 
 sub test_match_method () {

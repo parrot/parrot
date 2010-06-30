@@ -19,11 +19,8 @@ class Tree::Pattern::Transformer is Tree::Transformer {
                                            'parrotclass');
         my $self := pir::new__PP($class);
         $self.depth(0);
-        my $descend_until :=
-          (%adverbs<descend_until>
-           ?? Tree::Pattern::patternize(%adverbs<descend_until>)
-           !! 0);
-        $self.descend_until($descend_until);
+        $self.descend_until(%adverbs<descend_until>)
+          if pir::defined__IP(%adverbs<descend_until>);
         $self.min_depth(%adverbs<min_depth> || 0);
         $self.pattern($pattern);
         $self.transform($transform);
@@ -110,15 +107,15 @@ module Tree::Walker {
         }
         
         my $shouldDescend;
-        if (!$walker.descend_until) {
+        if (!pir::defined__IP($walker.descend_until)) {
             $shouldDescend := 1;
         }
         elsif ($walker.descend_until ~~ Tree::Pattern) {
-            $shouldDescend := $walker.descend_until.ACCEPTS($node,
+            $shouldDescend := !$walker.descend_until.ACCEPTS($node,
                                                             :pos($node));
         }
         else {
-            $shouldDescend := $walker.descend_until.ACCEPTS($node);
+            $shouldDescend := !$walker.descend_until.ACCEPTS($node);
         }
 
         if ($shouldDescend) {
