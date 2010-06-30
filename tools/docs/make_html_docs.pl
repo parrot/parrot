@@ -16,22 +16,26 @@ This script writes the HTML documentation for Parrot.
 
 =cut
 
-use strict;
+use 5.12.0;
+
 use warnings;
 use lib 'lib';
-
-use Cwd;
 use Fatal qw/open close/;
+
+use File::Basename qw/basename dirname/;
+use File::Path qw/make_path/;
 use File::Spec;
 use Getopt::Long;
 use JSON;
-use Parrot::Docs::Item;
+use Parrot::Docs::PodToHtml;
 
 my ( $version );
 
 die unless GetOptions( 'version=s' => \$version );
 
 die "Usage: $0 --version\n" unless $version;
+
+my $target_dir = 'docs/html2';
 
 my $json = JSON->new();
 
@@ -73,11 +77,6 @@ foreach my $index_file (glob 'docs/index/*.json') {
     $pages{lc $section->{page}} = $section;
 }
 
-# Generate all the raw pages we'll need.
-my $target_dir = 'docs/html2';
-
-## print Dumper(\%pages); use Data::Dumper;
-
 foreach my $page (keys %pages) {
     $page = $pages{$page};
     foreach my $section (@{$page->{content}}) {
@@ -103,13 +102,20 @@ sub transform_input {
         die "$input not found or not a regular file\n" .
             "You might need to restrict your glob specification.";
     }
-    my $path = File::Spec->catfile(cwd() , $input);
 
-    my $docfile = Parrot::Docs::Item->new('', $input);
+    my $formatter = Parrot::Docs::PodToHtml->new();
 
-    # If the file has pod, use pod2html on it.
+    my $outfile = File::Spec->catfile($target_dir, $input);
+    $outfile =~ s/\.[^.]*$/.html/;
 
-    # Otherwise, use text2html.
+    my $dir = File::Path::make_path(File::Basename::dirname($outfile));
+
+    open my $out_fh, '>', $outfile;
+
+    $formatter->output_fh($out_fh);
+    $formatter->parse_file($input);
+    warn "$input generated no HTML output\n"
+        unless $formatter->content_seen;
 
     $generated{$input} = 1;
 }
