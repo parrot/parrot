@@ -89,7 +89,8 @@ module Tree::Walker {
                         Capture $node) {
         my $pattern := $walker.pattern();
         my $shouldTransform;
-        if ($walker.depth < $walker.min_depth) {
+        my $belowMinDepth := $walker.depth < $walker.min_depth;
+        if ($belowMinDepth) {
             $shouldTransform := 0;
         }
         elsif ($pattern ~~ Tree::Pattern) {
@@ -107,7 +108,7 @@ module Tree::Walker {
         }
         
         my $shouldDescend;
-        if (!pir::defined__IP($walker.descend_until)) {
+        if ($belowMinDepth || !pir::defined__IP($walker.descend_until)) {
             $shouldDescend := 1;
         }
         elsif ($walker.descend_until ~~ Tree::Pattern) {
