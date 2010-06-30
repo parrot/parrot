@@ -1228,6 +1228,9 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     INTVAL    extra;
     const int wordsize          = pf ? pf->header->wordsize : sizeof (opcode_t);
     opcode_t  flag_charset_word = PF_fetch_opcode(pf, cursor);
+#if PARROT_HAS_ICU
+    grapheme_table *table = NULL;
+#endif
 
     if (flag_charset_word == -1)
         return STRINGNULL;
@@ -1240,7 +1243,28 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
 
     size = (size_t)PF_fetch_opcode(pf, cursor);
-    extra = (size_t)PF_fetch_opcode(pf, cursor);
+    extra = PF_fetch_opcode(pf, cursor);
+
+    if (extra) {
+#if PARROT_HAS_ICU
+        INTVAL i;
+        table = create_grapheme_table(interp, extra);
+        for (i = 0; i < extra; i++) {
+            table->graphemes[i].len = *cursor++;
+            table->graphemes[i].hash = 0;
+            table->graphemes[i].codepoints =
+                mem_gc_allocate_n_typed(interp, table->graphemes[i].len, UChar32);
+
+            memcpy(table->graphemes[i].codepoints, cursor,
+                   table->graphemes[i].len * sizeof (UChar32));
+            cursor += ((table->graphemes[i].len * sizeof (UChar32)) 
+                      / sizeof (opcode_t)) + 1;
+        } 
+        table->used = extra;
+#else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+#endif /* PARROT_HAS_ICU */
+    }
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("encoding_nr=%ld, ", encoding_nr));
@@ -1259,10 +1283,9 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     s = Parrot_str_new_init(interp, (const char *)*cursor, size,
             encoding, charset, flags);
 
-    if (extra) {
-        // TODO.
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
-    }
+#if PARROT_HAS_ICU
+    s->extra = rehash_grapheme_table(interp, table);
+#endif /* PARROT_HAS_ICU */
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
@@ -1336,23 +1359,22 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
        INTVAL i = 0;
        *cursor++ = table->used;
 
-       while (i++ < table->used) {
-           char *auxcursor;
-           INTVAL len = table->graphemes[i].len;
-           /* Store the length and then memcpy() the codepoints over. */
-           *cursor++ = len;
-           auxcursor = (char *) memcpy(cursor, table->graphemes[i].codepoints,
-                                       len * sizeof (UChar32));
+        while (i++ < table->used) {
+            char *auxcursor;
+            INTVAL len = table->graphemes[i].len;
+            /* Store the length and then memcpy() the codepoints over. */
+            *cursor++ = len;
+            auxcursor = (char *) memcpy(cursor, table->graphemes[i].codepoints,
+                                        len * sizeof (UChar32));
 
-           /* Adjust the cursor, and auxcursor ... */
-           cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t)) + 1;
-           auxcursor += len * sizeof (UChar32);
+            /* Adjust the cursor, and auxcursor ... */
+            cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t)) + 1;
+            auxcursor += len * sizeof (UChar32); 
 
-           /* ...and pad the difference with zeros. */
-           while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t)) {
-               *charcursor++ = 0;
-           }
-       }
+            /* ...and pad the difference with zeros. */
+            while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t))
+                *charcursor++ = 0;
+        }
     }
     else {
         *cursor++ = 0;
