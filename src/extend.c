@@ -180,6 +180,7 @@ Return the root namespace
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC
 Parrot_get_root_namespace(PARROT_INTERP)
 {
@@ -243,6 +244,7 @@ Returns the special C<NULL> PMC.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC
 Parrot_PMC_null(void)
 {
@@ -337,6 +339,7 @@ Return the value of an integer register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Int
 Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -355,6 +358,7 @@ Return the value of a numeric register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Float
 Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -373,6 +377,7 @@ Return the value of a string register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_String
 Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -391,6 +396,7 @@ Return the value of a PMC register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC
 Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -513,7 +519,8 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 
 /*
 
-=item C<Parrot_Language Parrot_find_language(PARROT_INTERP, char *language)>
+=item C<Parrot_Language Parrot_find_language(PARROT_INTERP, const char
+*language)>
 
 Find the magic language token for a language, by language name.
 
@@ -522,9 +529,10 @@ Find the magic language token for a language, by language name.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language
-Parrot_find_language(SHIM_INTERP, SHIM(char *language))
+Parrot_find_language(SHIM_INTERP, SHIM(const char *language))
 {
     ASSERT_ARGS(Parrot_find_language)
     return 0;
