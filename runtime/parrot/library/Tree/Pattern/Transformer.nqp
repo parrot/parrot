@@ -7,6 +7,7 @@ INIT {
 }
 
 class Tree::Pattern::Transformer is Tree::Transformer {
+    has $min_depth;
     has $pattern;
     has $transform;
 
@@ -17,6 +18,7 @@ class Tree::Pattern::Transformer is Tree::Transformer {
                                            'parrotclass');
         my $self := pir::new__PP($class);
         $self.depth(0);
+        $self.min_depth(%adverbs<min_depth> || 0);
         $self.pattern($pattern);
         $self.transform($transform);
         $self;
@@ -29,6 +31,17 @@ class Tree::Pattern::Transformer is Tree::Transformer {
         }
         else {
             $result := pir::getattribute__PPS(self, '$depth');
+        }
+        $result;
+    }
+
+    method min_depth ($min_depth?) {
+        my $result;
+        if pir::defined__IP($min_depth) {
+            pir::setattribute(self, '$min_depth', $min_depth);
+        }
+        else {
+            $result := pir::getattribute__PPS(self, '$min_depth');
         }
         $result;
     }
@@ -62,7 +75,10 @@ module Tree::Walker {
                         Capture $node) {
         my $pattern := $walker.pattern();
         my $shouldTransform;
-        if ($pattern ~~ Tree::Pattern) {
+        if ($walker.depth < $walker.min_depth) {
+            $shouldTransform := 0;
+        }
+        elsif ($pattern ~~ Tree::Pattern) {
             $shouldTransform := $pattern.ACCEPTS($node, :pos($node));
         }
         else {
