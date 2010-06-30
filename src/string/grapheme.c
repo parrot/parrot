@@ -67,12 +67,19 @@ grapheme_table *
 grow_grapheme_table(PARROT_INTERP, grapheme_table *src, UINTVAL n)
 {
     ASSERT_ARGS(grow_grapheme_table)
-    if (src)
-        return (grapheme_table *) mem_sys_realloc(src,
-            sizeof (grapheme_table) + (src->size + n) * sizeof (grapheme));
-    return create_grapheme_table(interp, n);
-}
+    grapheme_table *table;
+    if (src) {
+        const INTVAL newsize = src->size + n;
+        table = (grapheme_table *) mem_sys_realloc(src, sizeof (grapheme_table)
+                                                        + newsize * sizeof (grapheme));
+        table->size = newsize;
+    }
+    else {
+        table = create_grapheme_table(interp, n);
+    }
 
+    return table;
+}
 
 void
 destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
@@ -84,6 +91,7 @@ destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
     }
     mem_gc_free(interp, table);
 }
+
 void
 merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
     grapheme_table *table, UINTVAL offset, UINTVAL len)
@@ -102,6 +110,8 @@ merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
     }
 
     new_codepoints = mem_gc_allocate_n_typed(interp, table->used, UChar32);
+
+    dest->extra = grow_grapheme_table(interp, (grapheme_table *)dest->extra, table->used);
 
     /* Add the new graphemes to the old table. */
     for (i = 0; i < table->used; i++) {
@@ -122,7 +132,7 @@ merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
 grapheme_table *
 rehash_grapheme_table(PARROT_INTERP, grapheme_table *src)
 {
-//    ASSERT_ARGS(rehash_grapheme_table)
+    ASSERT_ARGS(rehash_grapheme_table)
     if (src != NULL) {
         INTVAL i;
         UINTVAL hash = 0xffff;
@@ -160,6 +170,7 @@ add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
         mem_gc_allocate_n_typed(interp, src->len, UChar32);
     memcpy(table->graphemes[i].codepoints, src->codepoints,
                src->len * sizeof (UChar32));
+    table->used++;
 
     return (UChar32) (-1 - i);
 }
@@ -185,7 +196,7 @@ add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
         table->graphemes[table->used].codepoints[i] =
             src->encoding->get_codepoint(interp, src, start + i);
     };
-    i = table->used;
+    i = table->used++;
     return (UChar32) (-1 - i);
 }
 
