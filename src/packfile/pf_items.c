@@ -1330,8 +1330,8 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
                 (PObj_get_FLAGS(s) & PObj_private7_FLAG ? 0x2 : 0x0) ;
     *cursor++ = s->bufused;
 
-    if (s->extra) {
 #if PARROT_HAS_ICU
+    if (s->extra) {
        grapheme_table *table = (grapheme_table *) s->extra;
        INTVAL i = 0;
        *cursor++ = table->used;
@@ -1353,13 +1353,13 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
                *charcursor++ = 0;
            }
        }
-#else
-       Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
-#endif /* PARROT_HAS_ICU */
     }
     else {
         *cursor++ = 0;
     }
+#else
+    *cursor++ = 0;
+#endif /* PARROT_HAS_ICU */
 
     /* Switch to char * since rest of string is addressed by
      * characters to ensure padding.  */
