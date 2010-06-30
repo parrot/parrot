@@ -20,7 +20,7 @@ string operations.
 
 .include 'stringinfo.pasm'
 
-.const int TESTS = 10
+.const int TESTS = 14
 
 .sub _main :main
     .include 'test_more.pir'
@@ -30,6 +30,7 @@ string operations.
     literals_and_transcoding()
     transcode_without_graphemes()
     transcode_with_graphemes()
+    freeze_and_thaw()
 .end
 
 .sub literals_and_transcoding
@@ -98,6 +99,35 @@ string operations.
     $I2 =  stringinfo $S1, .STRINGINFO_BUFUSED
     $I1 *= 4
     is($I2, $I1, "bufused = 4 * strlen")
+
+.end
+
+.sub freeze_and_thaw
+
+    $S0 = nfg:unicode:"\u006e\u0303\u0303\u0303\u0303\u00d1\u00d1"
+
+    $P0 = new ['String']
+    $P0 = $S0
+
+    $S1 = freeze $P0
+    $P1 = thaw $S1
+
+    $S2 = $P1
+
+    $I0 = encoding $S0
+    $I1 = encoding $S2
+    is($I0, $I1, "Encoding is preserved.")
+
+    $I0 = encoding $S0
+    $I1 = encoding $S2
+    is($I0, $I1, "Encoding is preserved.")
+
+    $I0 = stringinfo $S0, .STRINGINFO_STRLEN
+    $I1 = stringinfo $S2, .STRINGINFO_STRLEN
+    is($I0, $I1, "Length is preserved.")
+
+    $I1 = stringinfo $S2, .STRINGINFO_EXTRA
+    isnt(0, $I1, "Graphemes are preserved.")
 
 .end
 
