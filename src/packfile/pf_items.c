@@ -1359,7 +1359,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
        INTVAL i = 0;
        *cursor++ = table->used;
 
-        while (i++ < table->used) {
+        for (i = 0; i < table->used; i++) {
             char *auxcursor;
             INTVAL len = table->graphemes[i].len;
             /* Store the length and then memcpy() the codepoints over. */
@@ -1368,12 +1368,15 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
                                         len * sizeof (UChar32));
 
             /* Adjust the cursor, and auxcursor ... */
-            cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t)) + 1;
+            cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t));
+            cursor++;
             auxcursor += len * sizeof (UChar32); 
 
+            
             /* ...and pad the difference with zeros. */
-            while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t))
-                *charcursor++ = 0;
+            while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t)){
+                *auxcursor++ = 0;
+            }
         }
     }
     else {
@@ -1427,11 +1430,9 @@ PF_size_string(ARGIN(const STRING *s))
         grapheme_table *table = (grapheme_table *) s->extra;
         INTVAL              i = 0;
 
-        while (i < table->used) {
-            extra_len += ((table->graphemes[i].len * sizeof (UChar32)) / sizeof (opcode_t) + 1)
+        while (i < table->used)
+            extra_len += ((table->graphemes[i++].len * sizeof (UChar32)) / sizeof (opcode_t) + 2)
                          * sizeof (opcode_t);
-            extra_len += sizeof (opcode_t);
-        }
     }
 #endif /* PARROT_HAS_ICU */
     return PF_size_strlen(len + extra_len);
