@@ -738,6 +738,8 @@ validate(PARROT_INTERP, ARGIN(const STRING *src))
 
 =item C<static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)>
 
+Returns Boolean.
+
 =cut
 
 */
@@ -834,6 +836,8 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 =item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING *src,
 UINTVAL offset)>
 
+Returns Boolean.
+
 =cut
 
 */
@@ -860,6 +864,8 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
 
 =item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, const STRING
 *src, UINTVAL offset, UINTVAL count)>
+
+Find a character in the given character class.
 
 =cut
 
@@ -900,6 +906,8 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offse
 
 =item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, const STRING
 *src, UINTVAL offset, UINTVAL count)>
+
+Returns C<INTVAL>.
 
 =cut
 

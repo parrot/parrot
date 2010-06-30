@@ -95,7 +95,7 @@ method goto_offset($offset) { "return (opcode_t *)cur_opcode + $offset"; }
 
 method expr_address($addr) { $addr; }
 
-method expr_offset($offset) { "cur_opcode + $offset"; }
+method expr_offset($offset) { " cur_opcode + $offset"; }
 
 =begin
 
@@ -299,7 +299,10 @@ static void hop_deinit(PARROT_INTERP);
  * returns >= 0 (found idx into info_table), -1 if not
  */
 
-static size_t hash_str(const char *str) {
+PARROT_PURE_FUNCTION
+static
+size_t hash_str(ARGIN(const char *str))
+{
     size_t      key = 0;
     const char *s   = str;
 
@@ -311,7 +314,8 @@ static size_t hash_str(const char *str) {
     return key;
 }
 
-static void store_op(PARROT_INTERP, op_info_t *info, int full) {
+static void store_op(PARROT_INTERP, op_info_t *info, int full)
+{
     HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
@@ -320,7 +324,9 @@ static void store_op(PARROT_INTERP, op_info_t *info, int full) {
     p->next   = hop[hidx];
     hop[hidx] = p;
 }
-static int get_op(PARROT_INTERP, const char * name, int full) {
+
+static int get_op(PARROT_INTERP, const char * name, int full)
+{
     const HOP * p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
@@ -333,7 +339,9 @@ static int get_op(PARROT_INTERP, const char * name, int full) {
     }
     return -1;
 }
-static void hop_init(PARROT_INTERP) {
+
+static void hop_init(PARROT_INTERP)
+{
     size_t i;
     op_info_t * const info = [[BS]]op_lib.op_info_table;
     /* store full names */
@@ -344,6 +352,7 @@ static void hop_init(PARROT_INTERP) {
         if (get_op(interp, info[i].name, 0) == -1)
             store_op(interp, info + i, 0);
 }
+
 static void hop_deinit(PARROT_INTERP)
 {
     if (hop) {

@@ -78,11 +78,8 @@ Creates and returns a clone of the key.
                 break;
               case KEY_pmc_FLAG:
               case KEY_pmc_FLAG | KEY_register_FLAG:
-                {
-                    PMC * const p = key_pmc(INTERP, key);
-                    key_set_pmc(INTERP, dkey, VTABLE_clone(INTERP, p));
-                }
-                break;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                        "this is broken - see TT #1683");
               default:
                 break;
             }
@@ -223,7 +220,8 @@ Sets the value of the key to C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        key_set_pmc(INTERP, SELF, value);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "this is broken - see TT #1683");
     }
 
 /*

@@ -73,13 +73,13 @@ that hold pointers to arbitrary data.
 A keyed version of C<Parrot_PMC_get_pointer>. Returns the pointer value of
 whatever is stored at the element of the PMC indexed by C<key>.
 
-=item C<Parrot_PMC_get_intval(interp, pmc)>
+=item C<Parrot_PMC_get_integer(interp, pmc)>
 
 Returns the integer value of the PMC.
 
-=item C<Parrot_PMC_get_intval_intkey(interp, pmc, Parrot_Int key)>
+=item C<Parrot_PMC_get_integer_keyed_int(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_intval>. Returns the integer value of
+A keyed version of C<Parrot_PMC_get_integer>. Returns the integer value of
 whatever is stored at the element of the PMC indexed by C<key>.
 
 =item C<Parrot_PMC_get_numval(interp, pmc)>

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007-2008, Parrot Foundation.
+ * Copyright (C) 2007-2010, Parrot Foundation.
  */
 
 /*
@@ -26,6 +26,8 @@ File stat stuff
 
 =item C<PMC * Parrot_stat_file(PARROT_INTERP, STRING *filename)>
 
+B<Not implemented.>  Returns C<NULL>.
+
 =cut
 
 */
@@ -41,6 +43,8 @@ Parrot_stat_file(SHIM_INTERP, SHIM(STRING *filename))
 =item C<PMC * Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL
 thing)>
 
+B<Not implemented.>  Returns C<NULL>.
+
 =cut
 
 */
@@ -55,6 +59,55 @@ Parrot_stat_info_pmc(SHIM_INTERP, SHIM(STRING *filename), SHIM(INTVAL thing))
 
 =item C<static INTVAL stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL
 thing, int status)>
+
+Stats the file, and returns the information specified by C<thing>. C<thing> can
+be one of:
+
+=over 4
+
+=item * C<STAT_EXISTS>
+
+=item * C<STAT_FILESIZE>
+
+=item * C<STAT_ISDIR>
+
+=item * C<STAT_ISREG>
+
+=item * C<STAT_ISDEV>
+
+=item * C<STAT_ACCESSTIME>
+
+=item * C<STAT_MODIFYTIME>
+
+=item * C<STAT_CHANGETIME>
+
+=item * C<STAT_UID>
+
+=item * C<STAT_GID>
+
+=item * C<STAT_PLATFORM_DEV>
+
+=item * C<STAT_PLATFORM_INODE>
+
+=item * C<STAT_PLATFORM_MODE>
+
+=item * C<STAT_PLATFORM_NLINKS>
+
+=item * C<STAT_PLATFORM_DEVTYPE>
+
+=item * C<STAT_PLATFORM_MODE>
+
+=item * C<STAT_PLATFORM_NLINKS>
+
+=item * C<STAT_PLATFORM_DEVTYPE>
+
+=item * C<STAT_PLATFORM_BLOCKSIZE>
+
+=item * C<STAT_PLATFORM_BLOCKS>
+
+=back
+
+C<STAT_CREATETIME> and C<STAT_BACKUPTIME> are not supported and will return C<-1>.
 
 =cut
 
@@ -141,6 +194,8 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
 =item C<INTVAL Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL
 thing)>
 
+Returns the stat field given by C<thing> of file C<file>.
+
 =cut
 
 */
@@ -164,6 +219,8 @@ Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 =item C<INTVAL Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL
 thing)>
 
+Returns the fstat field given by C<thing> from file identifier C<file>.
+
 =cut
 
 */
@@ -184,6 +241,8 @@ Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)
 =item C<FLOATVAL Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename,
 INTVAL thing)>
 
+Currently returns C<-1.0> and has no side effects.
+
 =cut
 
 */
@@ -198,6 +257,8 @@ Parrot_stat_info_floatval(SHIM_INTERP, SHIM(STRING *filename), SHIM(INTVAL thing
 
 =item C<STRING * Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL
 thing)>
+
+B<Not implemented.> Returns C<NULL>.
 
 =cut
 

@@ -241,7 +241,7 @@ key_2_idx(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
                     "key doesn't exist");
 
-            ix = b - hash->bs;
+            ix = b - hash->buckets;
         }
         else
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,

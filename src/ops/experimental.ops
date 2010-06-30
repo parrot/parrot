@@ -325,7 +325,7 @@ op root_new(out PMC, in PMC, in INT) {
     /* if it's clearly a PIR-level PMC */
     if (type > enum_class_core_max) {
         PMC * const root_ns  = interp->root_namespace;
-        PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,

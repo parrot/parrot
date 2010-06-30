@@ -1271,7 +1271,7 @@ add_sub_pmc(ARGIN(bytecode * const bc), ARGIN(sub_info * const info), int needle
      * XXX must this be done always? (this w.r.t. the recent discussion about :vtable/:method
      * and being :anon etc.
      */
-    Parrot_store_sub_in_namespace(bc->interp, sub_pmc);
+    Parrot_ns_store_sub(bc->interp, sub_pmc);
     subconst_index = add_pmc_const(bc, sub_pmc);
 
     /* Add a new fixup entry in the fixup table for this sub. */

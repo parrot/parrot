@@ -32,7 +32,6 @@ use warnings;
 use lib qw(lib);
 
 use Test::More;
-use IO::File ();
 use Parrot::Config;
 use File::Spec;
 use Parrot::Test;

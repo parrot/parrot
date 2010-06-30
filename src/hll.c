@@ -167,7 +167,7 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
      * ns_hash to another type, if mappings provide one
      * XXX - FIXME
      */
-    ns_hash = Parrot_make_namespace_keyed_str(interp, interp->root_namespace,
+    ns_hash = Parrot_ns_make_namespace_keyed_str(interp, interp->root_namespace,
                                               hll_name);
 
     /* cache HLL's toplevel namespace */
@@ -500,7 +500,7 @@ Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
              * here because the typemap already exists, but it is not currently
              * done for consistency.
              */
-            ns_hash = Parrot_make_namespace_keyed_str(interp,
+            ns_hash = Parrot_ns_make_namespace_keyed_str(interp,
                 interp->root_namespace, hll_name);
 
             VTABLE_set_pmc_keyed_int(interp, interp->HLL_namespace,
