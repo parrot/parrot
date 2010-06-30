@@ -1257,7 +1257,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
             memcpy(table->graphemes[i].codepoints, *cursor, len * sizeof (UChar32));
             *cursor += (len * sizeof (UChar32)) / sizeof (opcode_t) + 1;
-        } 
+        }
         table->used = extra;
 #else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
@@ -1368,9 +1368,8 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
             /* Adjust the cursor, and auxcursor ... */
             cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t));
             cursor++;
-            auxcursor += len * sizeof (UChar32); 
+            auxcursor += len * sizeof (UChar32);
 
-            
             /* ...and pad the difference with zeros. */
             while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t)){
                 *auxcursor++ = 0;
