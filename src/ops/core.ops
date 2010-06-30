@@ -153,6 +153,7 @@ Branch forward or backward by the amount in $1.
 =cut
 
 inline op branch(in LABEL) :base_loop :flow {
+    Parrot_cx_check_tasks(interp, interp->scheduler);
     goto OFFSET($1);
 }
 

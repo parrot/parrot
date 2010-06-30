@@ -101,6 +101,11 @@ void Parrot_cx_runloop_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_cx_schedule_callback(PARROT_INTERP,
     ARGIN(PMC *user_data),
     ARGIN(char *ext_data))
@@ -216,6 +221,9 @@ void Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_runloop_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_cx_schedule_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(alarm))
 #define ASSERT_ARGS_Parrot_cx_schedule_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(user_data) \
@@ -263,9 +271,22 @@ typedef enum {
     PARROT_TIMER_INTERVAL,
     PARROT_TIMER_RUNNING,
     PARROT_TIMER_HANDLER,
-    PARROT_TIMER_MAX
+    PARROT_TIMER_MAX,
+    PARROT_ALARM_TIME,
+    PARROT_ALARM_SUB
 } parrot_timer_enum_t;
 /* &end_gen */
+
+/* Alarm PMC interface constants */
+/* &gen_from_enum(alarm.pasm) */
+/* TODO: Figure out how to actually gen alarm.pasm
+typedef enum {
+    PARROT_ALARM_TIME,
+    PARROT_ALARM_SUB
+} parrot_alarm_enum_t;
+*/
+/* &end_gen */
+
 
 
 #endif /* PARROT_SCHEDULER_H_GUARD */

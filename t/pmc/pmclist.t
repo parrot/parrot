@@ -5,7 +5,7 @@
 .sub main :main
     .include 'test_more.pir'
 
-    plan(9)
+    plan(10)
 
     empty_exceptions()
     push_five()
@@ -13,6 +13,7 @@
     unshift_two_shift_two()
     push_shift()
     unshift_pop()
+    insert_by_num()
 .end
 
 .sub empty_exceptions
@@ -176,6 +177,49 @@ value_good:
     
 value_good:
     ok(1, "unshift pop")
+.end
+
+.sub insert_by_num
+    $P0 = new 'PMCList'
+
+    $P1 = new 'Float'
+    $P1 = 3.14
+    $P0.'insert_by_number'($P1)
+
+    $P1 = new 'Float'
+    $P1 = 1.41
+    $P0.'insert_by_number'($P1)
+
+    $P1 = new 'Float'
+    $P1 = 9.8
+    $P0.'insert_by_number'($P1)
+
+    
+    $I0 = $P0
+    if $I0 == 3 goto size_good
+    ok(0, "insert by num")
+    .return()
+    
+size_good:
+    $P2 = shift $P0
+    $P1 = new 'Float'
+    $P1 = 1.41
+
+    eq_num $P1, $P2, shift_good 
+    ok(0, "insert by num")
+    .return()
+    
+shift_good:
+    $P2 = pop $P0
+    $P1 = new 'Float'
+    $P1 = 9.8
+
+    eq_num $P1, $P2, pop_good 
+    ok(0, "insert by num")
+    .return()
+
+pop_good:
+    ok(1, "insert by num")
 .end
 
 # Local Variables:

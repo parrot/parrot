@@ -26,19 +26,22 @@ Implements the core concurrency scheduler.
 
 pmclass Scheduler auto_attrs {
 
-    ATTR INTVAL        id;         /* The scheduler's ID. */
-    ATTR INTVAL        max_tid;    /* The highest assigned task ID. */
-    ATTR INTVAL        pending;    /* A count of pending tasks (cached for fast
-                                     lookup). */
-    ATTR PMC          *task_list;  /* The current list of tasks. */
-    ATTR PMC          *task_index; /* An index into the current list of tasks,
-                                     ordered by priority. */
-    ATTR PMC          *wait_index; /* An unordered index of inactive tasks. */
-    ATTR PMC          *handlers;   /* The list of currently active handlers. */
-    ATTR PMC          *messages;   /* A message queue used for communication
-                                     between schedulers. */
-    ATTR Parrot_mutex  msg_lock;   /* Lock to synchronize the message queue. */
-    ATTR Parrot_Interp interp;     /* A link to the scheduler's interpreter. */
+    ATTR INTVAL        id;           /* The scheduler's ID. */
+    ATTR INTVAL        max_tid;      /* The highest assigned task ID. */
+    ATTR INTVAL        pending;      /* A count of pending tasks (cached for fast
+                                        lookup). */
+    ATTR PMC          *task_list;    /* The current list of tasks. */
+    ATTR PMC          *task_index;   /* An index into the current list of tasks,
+                                        ordered by priority. */
+    ATTR PMC          *wait_index;   /* An unordered index of inactive tasks. */
+    ATTR PMC          *handlers;     /* The list of currently active handlers. */
+    ATTR PMC          *messages;     /* A message queue used for communication
+                                        between schedulers. */
+
+    ATTR PMC          *alarms;       /* Array of future alarms ordered by time */
+
+    ATTR Parrot_mutex  msg_lock;     /* Lock to synchronize the message queue. */
+    ATTR Parrot_Interp interp;       /* A link to the scheduler's interpreter. */
 
 /*
 
@@ -55,7 +58,7 @@ Initializes a concurrency scheduler object.
             (Parrot_Scheduler_attributes *) PMC_data(SELF);
 
         /* Set flags for custom GC mark and destroy. */
-        PObj_custom_mark_SET(SELF);
+        /* PObj_custom_mark_SET(SELF); */
         PObj_custom_destroy_SET(SELF);
 
         /* Set up the core struct. */
@@ -65,7 +68,8 @@ Initializes a concurrency scheduler object.
         core_struct->task_index  = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         core_struct->wait_index  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->handlers    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        core_struct->messages    = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        core_struct->messages    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        core_struct->alarms      = Parrot_pmc_new(INTERP, enum_class_PMCList);
         core_struct->interp      = INTERP;
         MUTEX_INIT(core_struct->msg_lock);
     }
@@ -277,6 +281,12 @@ Marks any referenced strings and PMCs as live.
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->wait_index);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->handlers);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->messages);
+
+            if(PObj_is_PMC_TEST(core_struct->alarms)) {
+                Parrot_gc_mark_PMC_alive(INTERP, core_struct->alarms);
+            } else {
+                fprintf(stderr, "Why is this thing not a PMC?\n");
+            }
         }
     }
 

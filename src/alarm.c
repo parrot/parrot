@@ -13,12 +13,9 @@ src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 #include "parrot/alarm_private.h"
 #include "parrot/alarm.h"
 
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/alarm.c */
-
 /* Some per-process state */
 static Parrot_alarm_queue* alarm_queue;
-static volatile unsigned int alarm_serial;
+static volatile UINTVAL    alarm_serial;
 
 /* This file relies on POSIX. Probably need two other versions of it: 
  *  one for Windows and one for platforms with no signals or threads. */
@@ -27,6 +24,15 @@ static volatile unsigned int alarm_serial;
 #include <errno.h>
 
 /* HEADERIZER HFILE: include/parrot/alarm.h */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void set_posix_alarm(FLOATVAL wait);
+#define ASSERT_ARGS_set_posix_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 =head1 Parrot_alarm_init()
@@ -123,7 +129,7 @@ Parrot_alarm_callback(SHIM(int sig_number))
 }
 
 /*
-=head1 Parrot_alarm_check(Parrot_alarm_state*)
+=head1 Parrot_alarm_check(UINTVAL*)
 
 Has any alarm triggered since we last checked?
 
@@ -135,7 +141,7 @@ set the alarm.
 
 PARROT_EXPORT
 int
-Parrot_alarm_check(Parrot_alarm_state* last_serial)
+Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
     if(*last_serial == alarm_serial) {
         return 0;

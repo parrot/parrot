@@ -14231,12 +14231,14 @@ return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
 Parrot_branch_i(opcode_t *cur_opcode, PARROT_INTERP)  {
-    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);return (opcode_t *)cur_opcode + IREG(1);
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    Parrot_cx_check_tasks(interp, interp->scheduler);return (opcode_t *)cur_opcode + IREG(1);
 }
 
 opcode_t *
 Parrot_branch_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
-    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);return (opcode_t *)cur_opcode + cur_opcode[1];
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    Parrot_cx_check_tasks(interp, interp->scheduler);return (opcode_t *)cur_opcode + cur_opcode[1];
 }
 
 opcode_t *
@@ -25027,7 +25029,7 @@ static op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  4,    /* minor_version */
+  5,    /* minor_version */
   0,    /* patch_version */
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */

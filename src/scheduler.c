@@ -19,10 +19,12 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 #include "parrot/runcore_api.h"
+#include "parrot/alarm.h"
 
 #include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_task.h"
 #include "pmc/pmc_timer.h"
+#include "pmc/pmc_alarm.h"
 
 #include "scheduler.str"
 
@@ -78,12 +80,10 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
     ASSERT_ARGS(Parrot_cx_init_scheduler)
 
-/*
     if(interp_count++ > 1) {
-       fprintf(stderr, "More than one interp?\n");
+        fprintf(stderr, "More than one interp?\n");
         exit(0);
     }
-*/
 
     if (!interp->parent_interpreter) {
         PMC *scheduler;
@@ -112,8 +112,10 @@ void
 Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_tasks)
-    if (SCHEDULER_wake_requested_TEST(scheduler))
+    if  ( Parrot_alarm_check(&(interp->last_alarm)) 
+          || SCHEDULER_wake_requested_TEST(scheduler)) {
         Parrot_cx_handle_tasks(interp, interp->scheduler);
+    }
 }
 
 /*
@@ -133,6 +135,9 @@ void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_handle_tasks)
+
+    
+
     SCHEDULER_wake_requested_CLEAR(scheduler);
     Parrot_cx_refresh_task_list(interp, scheduler);
 
@@ -971,6 +976,38 @@ Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
 
 /*
 
+=item C<void Parrot_cx_schedule_alarm(PARROT_INTERP, PMC *alarm)>
+
+Schedule an alarm.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
+{
+    ASSERT_ARGS(Parrot_cx_schedule_alarm)
+    FLOATVAL alarm_time; 
+    int i;
+    PMC *tmp1;
+    PMC *tmp2;
+
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+
+    alarm_time = VTABLE_get_number(interp, alarm);
+
+    fprintf(stderr, "Schedule alarm for %.02f\n", alarm_time);
+    Parrot_alarm_set(alarm_time);
+
+    /* Insert new alarm at correct (ordered by time) position in array. */
+    Parrot_pmc_list_insert_by_number(interp, sched->alarms, alarm);
+}
+
+
+/*
+
 =item C<void Parrot_cx_invoke_callback(PARROT_INTERP, PMC *callback)>
 
 Run the associated code block for a callback event.
@@ -1051,7 +1088,6 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 #endif
     return next;
 }
-
 
 /*
 
