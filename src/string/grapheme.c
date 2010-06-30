@@ -119,6 +119,26 @@ merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
     mem_gc_free(interp, new_codepoints);
 }
 
+grapheme_table *
+rehash_grapheme_table(PARROT_INTERP, grapheme_table *src)
+{
+//    ASSERT_ARGS(rehash_grapheme_table)
+    if (src != NULL) {
+        INTVAL i;
+        UINTVAL hash = 0xffff;
+        for (i = 0; i < src->used; i++) {
+            INTVAL    j = 0;
+            while (j < src->graphemes[i].len) {
+                hash += hash << 5;
+                hash += src->graphemes[i].codepoints[j++];
+            }
+            src->graphemes[i].hash = hash;
+        }
+    }
+
+    return src;
+}
+
 UChar32
 add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
 {

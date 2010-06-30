@@ -79,6 +79,9 @@ void merge_tables_and_fixup_substring(PARROT_INTERP,
     UINTVAL len)
         __attribute__nonnull__(1);
 
+grapheme_table * rehash_grapheme_table(PARROT_INTERP, grapheme_table *src)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_add_grapheme __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_add_grapheme_from_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -97,6 +100,8 @@ void merge_tables_and_fixup_substring(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_merge_tables_and_fixup_substring \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_rehash_grapheme_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/grapheme.c */
