@@ -10,7 +10,7 @@ class Tree::Pattern::Transformer is Tree::Transformer {
     has $pattern;
     has $transform;
 
-    method new ($pattern, $transform) {
+    method new ($pattern, $transform, *%adverbs) {
         my $class := pir::getattribute__PPS(self.HOW(),
                                            'parrotclass');
         my $self := pir::new__PP($class);
