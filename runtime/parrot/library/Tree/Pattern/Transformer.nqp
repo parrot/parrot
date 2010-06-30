@@ -7,6 +7,7 @@ INIT {
 }
 
 class Tree::Pattern::Transformer is Tree::Transformer {
+    has $descend_until;
     has $min_depth;
     has $pattern;
     has $transform;
@@ -18,6 +19,11 @@ class Tree::Pattern::Transformer is Tree::Transformer {
                                            'parrotclass');
         my $self := pir::new__PP($class);
         $self.depth(0);
+        my $descend_until :=
+          (%adverbs<descend_until>
+           ?? Tree::Pattern::patternize(%adverbs<descend_until>)
+           !! 0);
+        $self.descend_until($descend_until);
         $self.min_depth(%adverbs<min_depth> || 0);
         $self.pattern($pattern);
         $self.transform($transform);
@@ -31,6 +37,17 @@ class Tree::Pattern::Transformer is Tree::Transformer {
         }
         else {
             $result := pir::getattribute__PPS(self, '$depth');
+        }
+        $result;
+    }
+
+    method descend_until ($descend_until?) {
+        my $result;
+        if pir::defined__IP($descend_until) {
+            pir::setattribute(self, '$descend_until', $descend_until);
+        }
+        else {
+            $result := pir::getattribute__PPS(self, '$descend_until');
         }
         $result;
     }
@@ -91,13 +108,27 @@ module Tree::Walker {
         else {
             $result := $node;
         }
-        $walker.depth($walker.depth + 1);
-        my $newChildren := walkChildren($walker, $result);
-        replaceChildren($result, $newChildren);
-        $walker.depth($walker.depth - 1);
+        
+        my $shouldDescend;
+        if (!$walker.descend_until) {
+            $shouldDescend := 1;
+        }
+        elsif ($walker.descend_until ~~ Tree::Pattern) {
+            $shouldDescend := $walker.descend_until.ACCEPTS($node,
+                                                            :pos($node));
+        }
+        else {
+            $shouldDescend := $walker.descend_until.ACCEPTS($node);
+        }
+
+        if ($shouldDescend) {
+            $walker.depth($walker.depth + 1);
+            my $newChildren := walkChildren($walker, $result);
+            replaceChildren($result, $newChildren);
+            $walker.depth($walker.depth - 1);
+        }
         $result;
     }
-
 }
 
 # Local Variables:
