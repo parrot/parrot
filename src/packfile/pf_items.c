@@ -1250,15 +1250,13 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
         INTVAL i;
         table = create_grapheme_table(interp, extra);
         for (i = 0; i < extra; i++) {
-            table->graphemes[i].len = *cursor++;
+            INTVAL len = table->graphemes[i].len = PF_fetch_opcode(pf, cursor);
             table->graphemes[i].hash = 0;
             table->graphemes[i].codepoints =
-                mem_gc_allocate_n_typed(interp, table->graphemes[i].len, UChar32);
+                mem_gc_allocate_n_typed(interp, len, UChar32);
 
-            memcpy(table->graphemes[i].codepoints, cursor,
-                   table->graphemes[i].len * sizeof (UChar32));
-            cursor += ((table->graphemes[i].len * sizeof (UChar32)) 
-                      / sizeof (opcode_t)) + 1;
+            memcpy(table->graphemes[i].codepoints, *cursor, len * sizeof (UChar32));
+            *cursor += (len * sizeof (UChar32)) / sizeof (opcode_t) + 1;
         } 
         table->used = extra;
 #else
