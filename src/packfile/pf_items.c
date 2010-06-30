@@ -1346,7 +1346,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
            /* Adjust the cursor, and auxcursor ... */
            cursor += ((len * sizeof (UChar32)) % sizeof (opcode_t)) + 1;
-           auxcursor += len * sizeof (UChar32); 
+           auxcursor += len * sizeof (UChar32);
 
            /* ...and pad the difference with zeros. */
            while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t)) {
