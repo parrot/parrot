@@ -28,7 +28,7 @@ class Tree::Pattern is Capture {
         $result;
     }
 
-    method transform ($node, $transform) {
+    method transform ($node, $transform, *%adverbs) {
         my &transSub;
         if ($transform ~~ Tree::Transformer) {
             &transSub := sub ($/) { $transformer.walk($/.orig()); };
@@ -38,7 +38,7 @@ class Tree::Pattern is Capture {
             pir::die('$transform must be invokable or a PAST::Transformer.');
         }
         my $transformer :=
-          Tree::Pattern::Transformer.new(self, &transSub);
+          Tree::Pattern::Transformer.new(self, &transSub, |%adverbs);
         $transformer.walk($node);
     }
 
