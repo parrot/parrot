@@ -1345,7 +1345,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
                                        len * sizeof (UChar32));
 
            /* Adjust the cursor, and auxcursor ... */
-           cursor += ((len * sizeof (UChar32)) % sizeof (opcode_t)) + 1;
+           cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t)) + 1;
            auxcursor += len * sizeof (UChar32);
 
            /* ...and pad the difference with zeros. */
@@ -1396,10 +1396,23 @@ PF_size_string(ARGIN(const STRING *s))
     ASSERT_ARGS(PF_size_string)
     /* TODO: don't break encapsulation on strings */
     const UINTVAL len = s->bufused;
+    UINTVAL extra_len = 0;
     if (STRING_IS_NULL(s))
         return 1;
-    else
-        return PF_size_strlen(len);
+
+#if PARROT_HAS_ICU
+    if (s->extra) {
+        grapheme_table *table = (grapheme_table *) s->extra;
+        INTVAL              i = 0;
+
+        while (i < table->used) {
+            extra_len += ((table->graphemes[i].len * sizeof (UChar32)) / sizeof (opcode_t) + 1)
+                         * sizeof (opcode_t);
+            extra_len += sizeof (opcode_t);
+        }
+    }
+#endif /* PARROT_HAS_ICU */
+    return PF_size_strlen(len + extra_len);
 }
 
 /*
