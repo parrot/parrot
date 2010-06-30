@@ -10,13 +10,27 @@ class Tree::Pattern::Transformer is Tree::Transformer {
     has $pattern;
     has $transform;
 
+    has $depth;
+
     method new ($pattern, $transform, *%adverbs) {
         my $class := pir::getattribute__PPS(self.HOW(),
                                            'parrotclass');
         my $self := pir::new__PP($class);
+        $self.depth(0);
         $self.pattern($pattern);
         $self.transform($transform);
         $self;
+    }
+
+    method depth ($depth?) {
+        my $result;
+        if pir::defined__IP($depth) {
+            pir::setattribute(self, '$depth', $depth);
+        }
+        else {
+            $result := pir::getattribute__PPS(self, '$depth');
+        }
+        $result;
     }
 
     method pattern ($pattern?) {
@@ -61,8 +75,10 @@ module Tree::Walker {
         else {
             $result := $node;
         }
+        $walker.depth($walker.depth + 1);
         my $newChildren := walkChildren($walker, $result);
         replaceChildren($result, $newChildren);
+        $walker.depth($walker.depth - 1);
         $result;
     }
 
