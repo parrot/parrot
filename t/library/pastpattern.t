@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2150);
+plan(2151);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -787,8 +787,7 @@ sub test_match_result_from_node_children () {
 
 sub test_transform () {
     test_transform_sub();
-    test_transform_min_depth();
-    test_transform_descend_until();
+    test_transform_options();
 }
 
 sub test_transform_sub () {
@@ -826,6 +825,24 @@ sub test_transform_sub () {
        'Matched node 2 is changed. 2');
     ok($result[1][1][0].value() == 2,
        'Matched nodes within other matched nodes are changed.');
+}
+
+sub test_transform_options () {
+    test_transform_min_depth();
+    test_transform_descend_until();
+
+    my @matches := [];
+    my &transform := sub ($/) {
+        pir::push(@matches, $/.orig);
+        $/.orig;
+    }
+    my $pattern := PAST::Pattern::Block.new();
+    my $past := PAST::Block.new(PAST::Block.new());
+    my $limit := PAST::Pattern::Block.new();
+    $pattern.transform($past, &transform,
+                       :min_depth(1), :descend_until($limit));
+    ok(@matches == 1 && @matches[0] =:= $past[0],
+       ":descended_until and :min_depth work together.");
 }
 
 sub test_transform_min_depth () {
