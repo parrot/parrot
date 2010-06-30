@@ -5,7 +5,7 @@
 pir::load_bytecode('PCT.pbc');
 pir::load_bytecode('PAST/Pattern.pbc');
 
-plan(2138);
+plan(2143);
 
 test_type_matching();
 test_attribute_exact_matching();
@@ -787,6 +787,7 @@ sub test_match_result_from_node_children () {
 
 sub test_transform () {
     test_transform_sub();
+    test_transform_min_depth();
 }
 
 sub test_transform_sub () {
@@ -824,6 +825,47 @@ sub test_transform_sub () {
        'Matched node 2 is changed. 2');
     ok($result[1][1][0].value() == 2,
        'Matched nodes within other matched nodes are changed.');
+}
+
+sub test_transform_min_depth () {
+    my $pattern := PAST::Pattern::Block.new;
+    my $past := PAST::Block.new(PAST::Block.new());
+
+    my @matches := [];
+    my &transform := sub ($/) {
+        pir::push(@matches, $/.orig);
+        $/.orig;
+    };
+
+    $pattern.transform($past, &transform, :min_depth(0));
+    ok(@matches == 2 &&
+       @matches[0] =:= $past &&
+       @matches[1] =:= $past[0],
+       'Transforming with :min_depth(0) is the same as without min_depth.');
+
+    @matches := [];
+    $pattern.transform($past, &transform, :min_depth(1));
+    ok(@matches == 1 && @matches[0] =:= $past[0], 
+       'The top node was not transformed with :min_depth(1).');
+
+    @matches := [];
+    $past := PAST::Stmts.new(PAST::Block.new());
+    $pattern.transform($past, &transform, :min_depth(1));
+    ok(@matches == 1 && @matches[0] =:= $past[0],
+       'Non-matching top node was not transformed with :min_depth(1).');
+
+    @matches := [];
+    $past := PAST::Block.new(PAST::Block.new(PAST::Block.new()));
+    $pattern.transform($past, &transform, :min_depth(2));
+    ok(@matches == 1 && @matches[0] =:= $past[0][0],
+       'First two levels are not transformed with :min_depth(2).');
+
+    @matches := [];
+    $past := PAST::Block.new(PAST::Block.new(),
+                             PAST::Block.new(PAST::Block.new()));
+    $pattern.transform($past, &transform, :min_depth(2));
+    ok(@matches == 1 && @matches[0] =:= $past[1][0],
+       'The second child of the top is not transformed with :min_depth(2).');
 }
 
 sub test_match_method () {
