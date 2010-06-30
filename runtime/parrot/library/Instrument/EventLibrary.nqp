@@ -41,7 +41,7 @@ Events are raised in the C code.
 class Instrument::Event::Internal::loadlib is Instrument::Event {
 
     method _self_init() {
-        $!event_type := 'Instrument::Event::Internal::loadlib';
+        $!event_type := 'Internal::loadlib';
     };
 };
 
@@ -125,27 +125,72 @@ class Instrument::Event::Class::callmethod is Instrument::Event {
     };
 };
 
-class Instrument::Event::GC::allocate is Instrument::Event {
-    method _self_init() {
-        $!event_type := 'Instrument::Event::GC::allocate';
-    };
-};
+=begin
+=item Instrument::Event::GC
 
-class Instrument::Event::GC::reallocate is Instrument::Event {
-    method _self_init() {
-        $!event_type := 'Instrument::Event::GC::reallocate';
-    };
-};
+Interface to register callbacks for any given GC event.
 
-class Instrument::Event::GC::free is Instrument::Event {
-    method _self_init() {
-        $!event_type := 'Instrument::Event::GC::free';
-    };
-};
+Usage (in PIR):
+    # Inspect a group (allocate) and two separate free events.
+    $P0 = get_hll_global ['Instrument';'Event'], 'GC'
+    $P1 = $P0.'new'()
+    $P1.'callback'('gc_cb2')
+    $P1.'inspect'('allocate')
+    $P1.'inspect'('free_pmc_header')
+    $P1.'inspect'('free_pmc_attributes')
 
-class Instrument::Event::GC::administration is Instrument::Event {
+    $P2 = new ['Instrument']
+    $P2.'attach'($P1)
+
+=cut
+=end
+
+class Instrument::Event::GC is Instrument::Event {
+    has $!probe_list;
+
     method _self_init() {
-        $!event_type := 'Instrument::Event::GC::administration';
+        $!probe_list := Q:PIR { %r = new ['ResizablePMCArray'] };
+    };
+
+    method inspect($item) {
+        $!probe_list.push($item);
+    };
+
+    method _on_attach() {
+        self.enable();
+    };
+
+    method enable() {
+        # Grab the InstrumentGC and EventDispatcher object.
+        my $gc := Q:PIR {
+            $P0 = getattribute self, '$!instr_obj'
+            %r  = $P0['gc']
+        };
+        my $dispatcher := Q:PIR {
+            $P0 = getattribute self, '$!instr_obj'
+            %r  = $P0['eventdispatcher']
+        };
+
+        # For each item in $!probe_list, insert the gc hook
+        #  and register the event handler.
+        for $!probe_list {
+            my $hooks := $gc.get_hook_list($_);
+
+            for $hooks {
+                $gc.insert_gc_hook($_);
+
+                my $tokens := pir::split__PSS('_', $_);
+                my $group  := $tokens[0];
+                if $group ne 'allocate' && $group ne  'reallocate' && $group ne 'free' {
+                    $group := 'administration';
+                }
+
+                my $event := 'GC::' ~ $group ~ '::' ~ $_;
+
+                # Register the callback.
+                $dispatcher.register($event, $!callback);
+            }
+        }
     };
 };
 

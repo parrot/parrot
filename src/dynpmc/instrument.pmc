@@ -70,6 +70,7 @@ static void      Instrument_init_probes(Parrot_Interp supervisor, Parrot_Interp 
 
 /* Helper prototype */
 static opcode_t *Instrument_fire_hooks(opcode_t *pc, PARROT_INTERP);
+static void raise_dynlib_event(PARROT_INTERP, PMC *lib);
 
 /* dynlib detection */
 static void normalise_vtables(Parrot_Interp src, Parrot_Interp dest);
@@ -790,24 +791,7 @@ static void detect_loadlib(PARROT_INTERP) {
 
                 lib = VTABLE_get_pmc_keyed(interp, dynlibs, key);
 
-                task_data = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
-                VTABLE_push_string(supervisor, task_data, VTABLE_get_string(interp, lib));
-                VTABLE_push_pmc(supervisor, task_data, core->supervisor_pmc);
-
-                task_hash = Parrot_pmc_new(supervisor, enum_class_Hash);
-                VTABLE_set_string_keyed_str(supervisor, task_hash,
-                                            CONST_STRING(supervisor, "type"),
-                                            CONST_STRING(supervisor, "event"));
-                VTABLE_set_string_keyed_str(supervisor, task_hash,
-                                            CONST_STRING(supervisor, "subtype"),
-                                            CONST_STRING(supervisor,
-                                                         "Instrument::Event::Internal::loadlib"));
-                VTABLE_set_pmc_keyed_str(supervisor, task_hash,
-                                         CONST_STRING(supervisor, "data"),
-                                         task_data);
-
-                task = Parrot_pmc_new_init(supervisor, enum_class_Task, task_hash);
-                Parrot_cx_schedule_task(supervisor, task);
+                raise_dynlib_event(supervisor, lib);
 
                 /* Add lib to the old dynlib hash */
                 VTABLE_set_pmc_keyed(supervisor, old_dynlibs, key, lib);
@@ -869,6 +853,43 @@ static void normalise_op_tables(Parrot_Interp src, Parrot_Interp dest) {
         }
     }
 }
+
+/*
+ * Raises an Internal::loadlib event.
+ */
+static void raise_dynlib_event(PARROT_INTERP, PMC *lib) {
+    PMC *data, *task_hash, *task;
+
+    data = Parrot_pmc_new(interp, enum_class_Hash);
+    VTABLE_set_string_keyed_str(interp, data,
+                                CONST_STRING(interp, "library"),
+                                VTABLE_get_string(interp, lib));
+    VTABLE_set_string_keyed_str(interp, data,
+                                CONST_STRING(interp, "event_category"),
+                                CONST_STRING(interp, "Internal"));
+    VTABLE_set_string_keyed_str(interp, data,
+                                CONST_STRING(interp, "event_subtype"),
+                                CONST_STRING(interp, "loadlib"));
+    VTABLE_set_string_keyed_str(interp, data,
+                                CONST_STRING(interp, "event_fulltype"),
+                                VTABLE_get_string(interp, lib));
+
+    task_hash = Parrot_pmc_new(interp, enum_class_Hash);
+    VTABLE_set_string_keyed_str(interp, task_hash,
+                                CONST_STRING(interp, "type"),
+                                CONST_STRING(interp, "event"));
+    VTABLE_set_string_keyed_str(interp, task_hash,
+                                CONST_STRING(interp, "subtype"),
+                                CONST_STRING(interp,
+                                             "Instrument"));
+    VTABLE_set_pmc_keyed_str(interp, task_hash,
+                             CONST_STRING(interp, "data"),
+                             data);
+
+    task = Parrot_pmc_new_init(interp, enum_class_Task, task_hash);
+    Parrot_cx_schedule_task(interp, task);
+}
+
 
 /*
  * Functions implementing the linked list for the probes.

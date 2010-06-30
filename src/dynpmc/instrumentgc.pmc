@@ -15,8 +15,7 @@ instrument the gc_sys entry of Parrot_Interp.
 
 =head1 TODO
 
-1. Update Instrument::Events::GC
-2. Tests.
+1. Tests.
 
 =over 4
 
@@ -211,8 +210,9 @@ inserts stubs for all functions in that group.
 
     METHOD insert_gc_hook(STRING *name) {
         Parrot_InstrumentGC_attributes * const attr = PARROT_INSTRUMENTGC(SELF);
-        PMC *list = get_gc_funcs(INTERP, name);
+        PMC *list;
         PMC *iter;
+        (PMC *list) = PCCINVOKE(INTERP, SELF, "get_hook_list", STRING *name);
 
         iter = VTABLE_get_iter(INTERP, list);
         while (VTABLE_get_bool(INTERP, iter)) {
@@ -245,10 +245,11 @@ removes stubs for all functions in that group.
 
     METHOD remove_gc_hook(STRING *name) {
         Parrot_InstrumentGC_attributes * const attr = PARROT_INSTRUMENTGC(SELF);
-        PMC *list = get_gc_funcs(INTERP, name);
+        PMC *list;
         PMC *iter;
         GC_Subsystem           *orig  = attr->gc_original;
         InstrumentGC_Subsystem *instr = attr->gc_instrumented;
+        (PMC *list) = PCCINVOKE(INTERP, SELF, "get_hook_list", STRING *name);
 
         iter = VTABLE_get_iter(INTERP, list);
         while (VTABLE_get_bool(INTERP, iter)) {
@@ -266,6 +267,75 @@ removes stubs for all functions in that group.
             *entry = func;
         }
     }
+
+/*
+
+=item C<PMC* get_hook_list(STRING *name)>
+
+Returns a ResizableStringArray PMC filled with
+the names of the gc entries to instrument.
+
+=cut
+
+*/
+
+    METHOD get_hook_list(STRING *name) {
+        PMC *list;
+
+        list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "allocate"))) {
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_pmc_header"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_string_header"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_bufferlike_header"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_pmc_attributes"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_string_storage"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_buffer_storage"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_fixed_size_storage"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_memory_chunk"));
+            VTABLE_push_string(INTERP, list,
+                               CONST_STRING(INTERP, "allocate_memory_chunk_with_interior_pointers"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "reallocate"))) {
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "reallocate_string_storage"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "reallocate_buffer_storage"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "reallocate_memory_chunk"));
+            VTABLE_push_string(INTERP, list,
+                               CONST_STRING(INTERP, "reallocate_memory_chunk_with_interior_pointers"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "free"))) {
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_pmc_header"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_string_header"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_bufferlike_header"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_pmc_attributes"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_fixed_size_storage"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_memory_chunk"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "administration"))) {
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "finalize_gc_system"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "destroy_child_interp"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "do_gc_mark"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "compact_string_pool"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "mark_special"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "pmc_needs_early_collection"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "init_pool"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "block_mark"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "unblock_mark"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "block_sweep"));
+            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "unblock_sweep"));
+        }
+        else {
+            /* Convert name to a constant string since we use the address of the
+               constant string as the key to the various hashes. */
+            char *c_str     = Parrot_str_to_cstring(INTERP, name);
+            STRING *con_str = CONST_STRING(INTERP, c_str);
+            VTABLE_push_string(INTERP, list, con_str);
+            Parrot_free_cstring(c_str);
+        }
+
+        RETURN(PMC *list);
+    }
+
 }
 
 /*
@@ -1021,86 +1091,31 @@ void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *event, PMC 
     PMC *task, *task_hash;
     STRING *event_str;
     Parrot_Context_info info;
+    event_str = VTABLE_get_string_keyed_str(interp, data, CONST_STRING(interp, "type"));
 
     Parrot_Context_get_info(interp, CURRENT_CONTEXT(supervised), &info);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "file"),      info.file);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "sub"),       info.subname);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "namespace"), info.nsname);
     VTABLE_set_integer_keyed_str(interp, data, CONST_STRING(interp, "line"),      info.line);
-
-    event_str = Parrot_str_concat(interp, CONST_STRING(interp, "Instrument::Event::GC::"), event);
+    VTABLE_set_string_keyed_str(interp, data,  CONST_STRING(interp, "event_category"),
+                                CONST_STRING(interp, "GC"));
+    VTABLE_set_string_keyed_str(interp, data,  CONST_STRING(interp, "event_subtype"),
+                                event);
+    VTABLE_set_string_keyed_str(interp, data,  CONST_STRING(interp, "event_fulltype"),
+                                event_str);
 
     task_hash = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_string_keyed_str(interp, task_hash,
                                 CONST_STRING(interp, "type"),
                                 CONST_STRING(interp, "event"));
-    VTABLE_set_string_keyed_str(interp, task_hash, CONST_STRING(interp, "subtype"), event_str);
+    VTABLE_set_string_keyed_str(interp, task_hash,
+                                CONST_STRING(interp, "subtype"),
+                                CONST_STRING(interp, "Instrument"));
     VTABLE_set_pmc_keyed_str(interp, task_hash, CONST_STRING(interp, "data"), data);
 
     task = Parrot_pmc_new_init(interp, enum_class_Task, task_hash);
     Parrot_cx_schedule_task(interp, task);
-}
-
-/*
- * get_gc_funcs: Returns a ResizableStringArray PMC filled with
- *               the names of the gc entries to instrument.
- */
-
-PMC *get_gc_funcs(PARROT_INTERP, STRING *name) {
-    PMC *list;
-
-    list = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-
-    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "allocate"))) {
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_pmc_header"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_string_header"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_bufferlike_header"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_pmc_attributes"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_string_storage"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_buffer_storage"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_fixed_size_storage"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "allocate_memory_chunk"));
-        VTABLE_push_string(interp, list,
-                           CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"));
-    }
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "reallocate"))) {
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "reallocate_string_storage"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "reallocate_buffer_storage"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "reallocate_memory_chunk"));
-        VTABLE_push_string(interp, list,
-                           CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"));
-    }
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "free"))) {
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "free_pmc_header"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "free_string_header"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "free_bufferlike_header"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "free_pmc_attributes"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "free_fixed_size_storage"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "free_memory_chunk"));
-    }
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "administration"))) {
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "finalize_gc_system"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "destroy_child_interp"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "do_gc_mark"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "compact_string_pool"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "mark_special"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "pmc_needs_early_collection"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "init_pool"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "block_mark"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "unblock_mark"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "block_sweep"));
-        VTABLE_push_string(interp, list, CONST_STRING(interp, "unblock_sweep"));
-    }
-    else {
-        /* Convert name to a constant string since we use the address of the
-           constant string as the key to the various hashes. */
-        char *c_str     = Parrot_str_to_cstring(interp, name);
-        STRING *con_str = CONST_STRING(interp, c_str);
-        VTABLE_push_string(interp, list, con_str);
-        Parrot_free_cstring(c_str);
-    }
-
-    return list;
 }
 
 /*

@@ -112,9 +112,9 @@ PROG2
 .sub test_loadlib_callback
     .param pmc data
 
-    # data[0] is the library name.
+    # data['library'] is the library name.
     $P0 = get_global '%test_loadlib_res'
-    $S0 = data[0]
+    $S0 = data['library']
     $P0[$S0] = 1
 .end
 
