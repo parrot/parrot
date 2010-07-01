@@ -1138,6 +1138,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     FLOATVAL now_time   = Parrot_floatval_time();
     FLOATVAL done_time  = now_time + time;
     FLOATVAL alarm_time = done_time;
+    FLOATVAL sleep_time;
     INTVAL   alarm_count;
     PMC      *alarm;
 
@@ -1150,8 +1151,13 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
             VTABLE_unshift_pmc(interp, sched->alarms, alarm);
         }
 
-        Parrot_floatval_sleep(done_time - fmin(done_time, alarm_time));
-        Parrot_cx_check_tasks(interp, interp->scheduler);
+        sleep_time = now_time - fmin(done_time, alarm_time);
+        if(sleep_time > 0.0) {
+            Parrot_floatval_sleep();
+            Parrot_cx_check_tasks(interp, interp->scheduler);
+        }
+
+        now_time = Parrot_floatval_time();
     }
 
 #ifdef PARROT_CX_BUILD_OLD_STUFF
