@@ -94,9 +94,9 @@ Parrot_usleep(unsigned int microseconds)
 
 /*
 
-=item C<FLOATVAL Parrot_floatval_sleep(void)>
+=item C<void Parrot_floatval_sleep(FLOATVAL time)>
 
-Parrot wrapper around standard library C<time()> function, returning a FLOATVAL.
+Sleep for the specified number of seconds.
 
 =cut
 
