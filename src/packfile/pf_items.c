@@ -34,7 +34,7 @@ for "little endian".
 
 #include "parrot/parrot.h"
 #if PARROT_HAS_ICU
-#include "../string/grapheme.h"
+#  include "../string/grapheme.h"
 #endif /* PARROT_HAS_ICU */
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
@@ -1353,9 +1353,9 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
 #if PARROT_HAS_ICU
     if (s->extra) {
-       grapheme_table *table = (grapheme_table *) s->extra;
-       INTVAL i = 0;
-       *cursor++ = table->used;
+        grapheme_table *table = (grapheme_table *) s->extra;
+        INTVAL i = 0;
+        *cursor++ = table->used;
 
         for (i = 0; i < table->used; i++) {
             char *auxcursor;
@@ -1363,7 +1363,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
             /* Store the length and then memcpy() the codepoints over. */
             *cursor++ = len;
             auxcursor = (char *) memcpy(cursor, table->graphemes[i].codepoints,
-                                        len * sizeof (UChar32));
+                                         len * sizeof (UChar32));
 
             /* Adjust the cursor, and auxcursor ... */
             cursor += ((len * sizeof (UChar32)) / sizeof (opcode_t));
@@ -1371,9 +1371,8 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
             auxcursor += len * sizeof (UChar32);
 
             /* ...and pad the difference with zeros. */
-            while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t)){
-                *auxcursor++ = 0;
-            }
+            while ((unsigned long) (auxcursor - (char *) cursor) % sizeof (opcode_t))
+                 *auxcursor++ = 0;
         }
     }
     else {
