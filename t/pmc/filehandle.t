@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -633,6 +633,39 @@ ok:
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
+.include 'except_types.pasm'
+.sub main :main
+    .local pmc fh, eh
+    fh = new ['FileHandle']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    set_addr eh, catch1
+    push_eh eh
+    # Using unopened FileHandle
+    fh.'readall'()
+    say 'should never happen'
+    goto test2
+  catch1:
+    finalize eh
+    say 'caught unopened'
+  test2:
+    set_addr eh, catch2
+    fh.'open'('README')
+    # Using opened FileHandle with the filepath option
+    fh.'readall'('README')
+    say 'should never happen'
+    goto end
+  catch2:
+    finalize eh
+    say 'caught reopen'
+  end:
+.end
+CODE
+caught unopened
+caught reopen
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
