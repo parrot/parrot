@@ -38,7 +38,8 @@ pmclass Scheduler auto_attrs {
     ATTR PMC          *messages;     /* A message queue used for communication
                                         between schedulers. */
 
-    ATTR PMC          *alarms;       /* Array of future alarms ordered by time */
+    ATTR PMC          *task_queue;   /* List of tasks/green threads waiting to run */
+    ATTR PMC          *alarms;       /* List of future alarms ordered by time */
 
     ATTR Parrot_mutex  msg_lock;     /* Lock to synchronize the message queue. */
     ATTR Parrot_Interp interp;       /* A link to the scheduler's interpreter. */
@@ -69,6 +70,7 @@ Initializes a concurrency scheduler object.
         core_struct->wait_index  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->handlers    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->messages    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        core_struct->task_queue  = Parrot_pmc_new(INTERP, enum_class_PMCList);
         core_struct->alarms      = Parrot_pmc_new(INTERP, enum_class_PMCList);
         core_struct->interp      = INTERP;
         MUTEX_INIT(core_struct->msg_lock);
@@ -281,12 +283,8 @@ Marks any referenced strings and PMCs as live.
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->wait_index);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->handlers);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->messages);
-
-            if(PObj_is_PMC_TEST(core_struct->alarms)) {
-                Parrot_gc_mark_PMC_alive(INTERP, core_struct->alarms);
-            } else {
-                fprintf(stderr, "Why is this thing not a PMC?\n");
-            }
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->task_queue);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->alarms);
         }
     }
 

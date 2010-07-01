@@ -85,8 +85,6 @@ set_posix_alarm(FLOATVAL wait)
     itmr.it_interval.tv_sec  = 0;
     itmr.it_interval.tv_usec = 0;
 
-    fprintf(stderr, "setitimer(%.02lf): sec = %d; usec = %d\n", wait, sec, usec);
-    
     if(setitimer(ITIMER_REAL, &itmr, 0) == -1) {
         perror("setitimer failed in set_posix_alarm");
         exit(EXIT_FAILURE);
@@ -108,8 +106,6 @@ Parrot_alarm_callback(SHIM(int sig_number))
     FLOATVAL now, wait;
     Parrot_alarm_queue* qp;
 
-    fprintf(stderr, "Got Parrot_timers_alarm_callback()\n");
-
     /* Not atomic; only one thread ever writes this value */
     alarm_serial += 1;
 
@@ -121,10 +117,9 @@ Parrot_alarm_callback(SHIM(int sig_number))
         alarm_queue = qp;
     }
 
-    if(alarm_queue != NULL && alarm_queue->alarm_set == 0) {
+    if(alarm_queue != NULL) {
         wait = alarm_queue->when - now;
         set_posix_alarm(wait);
-        qp->alarm_set = 1;
     }
 }
 
@@ -176,7 +171,6 @@ Parrot_alarm_set(FLOATVAL when) {
 
     if(alarm_queue == NULL || when < alarm_queue->when) {
         new_alarm->next = alarm_queue;
-        new_alarm->alarm_set = 1;
         alarm_queue = new_alarm;
         set_posix_alarm(when - now);
         return;
@@ -188,7 +182,6 @@ Parrot_alarm_set(FLOATVAL when) {
     }
 
     new_alarm->next = *qpp;
-    new_alarm->alarm_set = 0;
     *qpp = new_alarm;
 }
 

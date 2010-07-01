@@ -10,7 +10,6 @@ $Id$
 
 typedef struct Parrot_alarm_queue {
     FLOATVAL when;
-    int alarm_set;
     struct Parrot_alarm_queue *next;
 } Parrot_alarm_queue;
 

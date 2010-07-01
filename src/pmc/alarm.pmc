@@ -48,6 +48,10 @@ Initializes the alarm.
 */
 
     VTABLE void init() {
+        Parrot_Alarm_attributes *data = PARROT_ALARM(SELF);
+        data->alarm_time = 0.0;
+        data->alarm_sub  = PMCNULL;
+
         PObj_custom_mark_SET(SELF);
     }
 

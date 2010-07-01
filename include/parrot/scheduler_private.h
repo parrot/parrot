@@ -22,6 +22,8 @@ typedef enum {
     SCHEDULER_terminate_requested_FLAG = PObj_private2_FLAG
 } scheduler_flags_enum;
 
+void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value);
+
 #define SCHEDULER_get_FLAGS(o) (PObj_get_FLAGS(o))
 #define SCHEDULER_flag_TEST(flag, o) (SCHEDULER_get_FLAGS(o) & SCHEDULER_ ## flag ## _FLAG)
 #define SCHEDULER_flag_SET(flag, o) (SCHEDULER_get_FLAGS(o) |= SCHEDULER_ ## flag ## _FLAG)

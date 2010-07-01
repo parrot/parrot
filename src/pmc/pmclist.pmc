@@ -480,10 +480,6 @@ Insert an item into a sorted list by its num value.
 =cut
 */
 
-void debug_my_face() { 
-    fprintf(stderr, "");
-};
-
 PARROT_EXPORT
 void 
 Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) {

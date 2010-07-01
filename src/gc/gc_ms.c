@@ -636,11 +636,14 @@ gc_ms_finalize_memory_pools(PARROT_INTERP, ARGIN(Memory_Pools * const mem_pools)
 
     /* keep the scheduler and its kids alive for Task-like PMCs to destroy
      * themselves; run a sweep to collect them */
+    /* TODO: Figure out if this stuff was important */
+#ifdef PARROT_CX_BUILD_OLD_STUFF
     if (interp->scheduler) {
         Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
         VTABLE_mark(interp, interp->scheduler);
         Parrot_gc_sweep_pool(interp, mem_pools, mem_pools->pmc_pool);
     }
+#endif
 
     /* now sweep everything that's left */
     Parrot_gc_sweep_pool(interp, mem_pools, mem_pools->pmc_pool);
