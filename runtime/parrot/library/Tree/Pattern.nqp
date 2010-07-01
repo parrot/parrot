@@ -8,14 +8,15 @@ INIT {
 
 class Tree::Pattern is Capture {
     sub patternize ($value) {
-        unless (pir::can__IPS($value, 'ACCEPTS')) {
-            if (pir::isa__IPP($value, Sub)) {
-                $value := Tree::Pattern::Closure.new($value);
-            } else {
-                $value := Tree::Pattern::Constant.new($value);
-            }
+        if ($value ~~ Regex::Method) {
+            $value;
+        } elsif (pir::isa__IPP($value, Sub)) {
+            Tree::Pattern::Closure.new($value);
+        } elsif (pir::can__IPS($value, 'ACCEPTS')) {
+            $value;
+        } else {
+            Tree::Pattern::Constant.new($value);
         }
-        $value;
     }
 
     method attr ($name, $value, $has_value) {
