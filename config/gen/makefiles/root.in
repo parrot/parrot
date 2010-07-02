@@ -2420,6 +2420,8 @@ release : MANIFEST MANIFEST.generated
     tar -zcv -T - -f parrot-$(VERSION).tar.gz
 	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' \
 	     MANIFEST | tar -jcv -T - -f parrot-$(VERSION).tar.bz2
+	sha256sum parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
+	sha256sum parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
