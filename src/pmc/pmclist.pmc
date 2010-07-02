@@ -59,7 +59,7 @@ Initializes the list.
 */
 
     VTABLE void init() {
-        /* PObj_custom_mark_SET(SELF); */
+        PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
 
         SET_ATTR_head(INTERP, SELF, NULL);
@@ -356,6 +356,7 @@ Used to unarchive the array.
 
 */
 
+#ifdef CODE_THAT_BREAKS
     VTABLE void visit(PMC *info) {
         void* tmp;
         PMC_List_Item *it;
@@ -367,19 +368,19 @@ Used to unarchive the array.
             VISIT_PMC(INTERP, info, it->data);
             it = it->next;
         }
-
         SUPER(info);
     }
 
     VTABLE void freeze(PMC *info) {
         SUPER(info);
-        VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
+        /* VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF)); */
     }
 
     VTABLE void thaw(PMC *info) {
         SUPER(info);
-        SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
+        /* SELF.set_integer_native(VTABLE_shift_integer(INTERP, info)); */
     }
+#endif
 
 /*
 =item C<void mark()>

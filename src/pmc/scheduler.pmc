@@ -59,7 +59,7 @@ Initializes a concurrency scheduler object.
             (Parrot_Scheduler_attributes *) PMC_data(SELF);
 
         /* Set flags for custom GC mark and destroy. */
-        /* PObj_custom_mark_SET(SELF); */
+        PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
 
         /* Set up the core struct. */
@@ -125,6 +125,12 @@ current maximum, and a birthtime of the current time.
 */
 
     void push_pmc(PMC *task) {
+        Parrot_Scheduler_attributes *const core_struct = PARROT_SCHEDULER(SELF);
+
+        PMC *const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
+        STRING *const type  = VTABLE_get_string(interp, type_pmc);
+
+#ifdef COMPILE_OLD_SCHEDULER_CODE
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         STRING                  *task_id_str;
         INTVAL                   new_tid;
@@ -148,6 +154,7 @@ current maximum, and a birthtime of the current time.
 
         if (task->vtable->base_type != enum_class_Exception)
             Parrot_cx_runloop_wake(core_struct->INTERP, SELF);
+#endif
     }
 
 
@@ -285,7 +292,7 @@ Marks any referenced strings and PMCs as live.
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->messages);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->task_queue);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->alarms);
-        }
+       }
     }
 
 
@@ -330,7 +337,6 @@ Archives the scheduler.
         VTABLE_push_integer(INTERP, info, core_struct->max_tid);
     }
 
-
 /*
 
 =item C<void thaw(PMC *info)>
@@ -370,7 +376,7 @@ Finishes thawing the scheduler.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_cx_refresh_task_list(INTERP, SELF);
+        /* Parrot_cx_refresh_task_list(INTERP, SELF); */
     }
 
 
