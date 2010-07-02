@@ -5,6 +5,23 @@
 
 PCT::Pattern - The base class for patterns matching PCT::Node subclasses
 
+=head1 SYNOPSIS
+
+pir::load_bytecode('PCT/Pattern.pbc');
+class PAST::Pattern is PCT::Pattern {
+    my @attributes := pir::clone__PP(PCT::Pattern.attributes);
+    for <returns arity named flat lvalue> {
+        pir::push(@attributes, $_);
+    }
+    method attributes () {
+        @attributes;
+    }
+
+    method target_class () {
+        PAST::Node;
+    }
+}
+
 =head1 DESCRIPTION
 
 PCT::Pattern is the base class for all Tree::Pattern classes intended to match specific PCT::Node subclasses. It handles all of the child-, attribute-, and type-checking involved in pattern matching for subclasses. All tht a subclass need do is implement attributes() and target_class() methods as described below and matching will behave correctly.
