@@ -1,0 +1,60 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+Tree::Pattern::Match - the result object from matching a Tree::Pattern
+
+=head1  DESCRIPTION
+
+Tree::Pattern::Match objects are returned by matching operations on Tree::Patterns. It can be used to determine whether the match was successful, find the matching node, and to find the match results of subpatterns.
+
+=head1 Tree::Pattern::Match
+
+=head2 Attributes
+
+=over 4
+
+=item success([value])
+
+This attribute is true if the match was successful and false otherwise.
+
+=item orig([value])
+
+This attribute holds the original matching node if there is one. It is not present for matches with the C<global> or C<g> options if more than one match was found. It is meaningless for an unsuccessful match.
+
+=item ast()
+
+This attribute, like the ast attribute of regex match results, holds an abstract object that has been associated with the match result with the "!make" method or the NQP-rx make statement.
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item new([success], [orig])
+
+Creates a new match result object with the supplied values for the success and orig attributes, if supplied.
+
+=item Bool()
+
+Converts the match result to a boolean value, 1 if the match was successful; otherwise, 0.
+
+=item !make(ast)
+
+Set the match result's ast attribute to the supplied value.
+
+=back
+
+=head2 Vtable overrides
+
+=over 4
+
+=item get_bool()
+
+1 if the match was successful, 0 otherwise.
+
+=back
+
+=cut
