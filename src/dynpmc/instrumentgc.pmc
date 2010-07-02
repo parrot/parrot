@@ -118,6 +118,7 @@ pmclass InstrumentGC auto_attrs dynpmc group instrument_group  {
     ATTR Hash                          *stub_hash;
     ATTR Hash                          *original_hash;
     ATTR Hash                          *entry_hash;
+    ATTR PMC                           *hook_count;
 
 /*
 
@@ -154,6 +155,7 @@ Initialises and prepares the supervised interpreter for GC instrumenting.
         attr->instrument      = instrument;
         attr->gc_original     = supervised->gc_sys;
         attr->gc_instrumented = mem_gc_allocate_zeroed_typed(INTERP, InstrumentGC_Subsystem);
+        attr->hook_count      = Parrot_pmc_new(INTERP, enum_class_Hash);
 
         /* Initiliase the instrumented gc_sys with the original values. */
         attr->gc_instrumented->instrument_gc = SELF;
@@ -216,18 +218,27 @@ inserts stubs for all functions in that group.
 
         iter = VTABLE_get_iter(INTERP, list);
         while (VTABLE_get_bool(INTERP, iter)) {
+            INTVAL count;
             PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
             STRING *item  = VTABLE_get_string(INTERP, item_pmc);
             size_t **entry, *func;
 
-            /* Replace the entry with the stub. */
-            entry = (size_t **) parrot_hash_get(INTERP, attr->entry_hash, item);
-            func  = (size_t *)  parrot_hash_get(INTERP, attr->stub_hash, item);
-            if (entry == NULL || func == NULL) {
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                            "Unknown GC function: %Ss", item);
+            /* Check if the entry has already been instrumented. */
+            count = VTABLE_get_integer_keyed_str(INTERP, attr->hook_count, item);
+            if (count == 0) {
+                /* Replace the entry with the stub. */
+                entry = (size_t **) parrot_hash_get(INTERP, attr->entry_hash, item);
+                func  = (size_t *)  parrot_hash_get(INTERP, attr->stub_hash, item);
+                if (entry == NULL || func == NULL) {
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "Unknown GC function: %Ss", item);
+                }
+                *entry = func;
             }
-            *entry = func;
+
+            /* Update the count. */
+            count++;
+            VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
         }
     }
 
@@ -253,19 +264,62 @@ removes stubs for all functions in that group.
 
         iter = VTABLE_get_iter(INTERP, list);
         while (VTABLE_get_bool(INTERP, iter)) {
+            INTVAL count;
             PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
             STRING *item  = VTABLE_get_string(INTERP, item_pmc);
             size_t **entry, *func;
 
-            /* Simply replace the stub with the original entry. */
-            entry = (size_t **) parrot_hash_get(INTERP, attr->entry_hash, item);
-            func  = (size_t *)  parrot_hash_get(INTERP, attr->original_hash, item);
-            if (entry == NULL || func == NULL) {
+            /* Only remove the stub if request count == 1 => Last request. */
+            count = VTABLE_get_integer_keyed_str(INTERP, attr->hook_count, item);
+            if (count <= 0) {
+                /* Tried to remove 1 time too many. */
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                            "Unknown GC function: %Ss", item);
+                                            "GC function %Ss is not instrumented.", item);
             }
-            *entry = func;
+            else if (count == 1) {
+                /* Simply replace the stub with the original entry. */
+                entry = (size_t **) parrot_hash_get(INTERP, attr->entry_hash, item);
+                func  = (size_t *)  parrot_hash_get(INTERP, attr->original_hash, item);
+                if (entry == NULL || func == NULL) {
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "Unknown GC function: %Ss", item);
+                }
+                *entry = func;
+            }
+
+            /* Update the count. */
+            count--;
+            VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
         }
+    }
+
+/*
+
+=item C<PMC* get_instrumented_list()>
+
+Returns a ResizableStringArray PMC filled with
+the names of the gc entries that has been instrumented.
+
+=cut
+
+*/
+
+    METHOD get_instrumented_list() {
+        PMC *ret = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+        PMC *iter, *hook_hash;
+
+        GETATTR_InstrumentGC_hook_count(INTERP, SELF, hook_hash);
+        iter = VTABLE_get_iter(INTERP, hook_hash);
+
+        while (VTABLE_get_bool(INTERP, iter)) {
+            PMC *key     = VTABLE_shift_pmc(INTERP, iter);
+            INTVAL count = VTABLE_get_integer_keyed(INTERP, hook_hash, key);
+            if (count > 0) {
+                VTABLE_push_pmc(INTERP, ret, key);
+            }
+        }
+
+        RETURN(PMC *ret);
     }
 
 /*
@@ -327,10 +381,20 @@ the names of the gc entries to instrument.
         else {
             /* Convert name to a constant string since we use the address of the
                constant string as the key to the various hashes. */
+            size_t *check;
+            Hash *stub_hash;
             char *c_str     = Parrot_str_to_cstring(INTERP, name);
             STRING *con_str = CONST_STRING(INTERP, c_str);
             VTABLE_push_string(INTERP, list, con_str);
             Parrot_free_cstring(c_str);
+
+            /* Ensure that con_str is the name of a hook. */
+            GETATTR_InstrumentGC_stub_hash(INTERP, SELF, stub_hash);
+            check = (size_t *) parrot_hash_get(INTERP, stub_hash, con_str);
+            if (check == NULL) {
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                            "Unknown GC function: %Ss", con_str);
+            }
         }
 
         RETURN(PMC *list);

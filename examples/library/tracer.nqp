@@ -14,6 +14,8 @@ A simple example of how to use the Instrument dynpmc in nqp.
 
 % ./parrot-nqp examples/library/tracer.nqp <file>
 
+=cut
+
 =end
 
 Q:PIR {
