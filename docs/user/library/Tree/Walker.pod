@@ -7,7 +7,7 @@ Tree::Walker - A tool for traversing trees.
 
 =head1 DESCRIPTION
 
-Tree::Walker and its subclasses use multi-methods to traverse trees and perform some operation on them. Trees are represented as Captures or subclasses of Capture. This conveniently include PCT::Node and its subclasses PAST::Node and POST::Node.
+Tree::Walker and its subclasses use multi-methods to traverse trees and perform some operation on them. Trees are represented as Captures or subclasses of Capture. This conveniently includes PCT::Node and its subclasses PAST::Node and POST::Node.
 
 =head1 Tree::Walker
 
