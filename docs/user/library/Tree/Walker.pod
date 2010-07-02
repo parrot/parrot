@@ -1,0 +1,50 @@
+# Copyright (C) 2001-2005, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+Tree::Walker - A tool for traversing trees.
+
+=head1 DESCRIPTION
+
+Tree::Walker and its subclasses use multi-methods to traverse trees and perform some operation on them. Trees are represented as Captures or subclasses of Capture. This conveniently include PCT::Node and its subclasses PAST::Node and POST::Node.
+
+=head1 Tree::Walker
+
+=head2 Multi-subs
+
+The Tree::Walker interface is specified by a pair of multi-subs. The default for both of these takes a Tree::Walker and a Capture. In addition, there are Tree::Walker methods of the same name as each multi-method that take a tree argument and call the appropriate multi-sub with the invocant and the tree.
+
+=over 4
+
+=item walk(Tree::Walker walker, Capture tree)
+
+By default, 'walk' simply calls 'walkChildren' with the same arguments.
+
+Subclasses should specialize this multi-sub in order to act on the traversed nodes. Subclasses that wish to traverse the node's children must remember fo call 'walkChildren' in their implementations of the multi-sub.
+
+=item walkChildren(Tree::Walker walker, Capture tree)
+
+Iterates through the children of tree, calling 'walk' with the walker and each child tree. This should not typically be overridden.
+
+However, in some rare situations, subclasses may wish to override walkChildren(for example, in order to add support for traversing new kinds of trees).
+
+=back
+
+=head2 Convenience methods
+
+Convenience methods are provided for Tree::Walker objects are provided to make traversing trees more convenient in code outside of the Tree::Walker namespace.
+
+=over 4
+
+=item walk(tree)
+
+C<walker.walk(tree)> is equivalent to C<Tree::Walker::walk(walker, tree)>.
+
+=item walkChildren(tree)
+
+C<walker.walkChildren(tree)> is equivaelent to C<Tree::Walker::walkChildren(walker, tree)>.
+
+=back
+
+=cut
