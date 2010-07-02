@@ -83,4 +83,12 @@ An internal method used to implement the C<global>/C<g> option to ACCEPTS.
 
 =back
 
+=head1 See also
+
+=over 4
+
+=item * docs/user/library/Tree/Pattern/Match.pod
+
+=back
+
 =cut
