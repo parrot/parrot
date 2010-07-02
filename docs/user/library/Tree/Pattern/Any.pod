@@ -1,0 +1,28 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+Tree::Pattern::Any - Match any of a list of patterns.
+
+=head1 DESCRIPTION
+
+Tree::Pattern::Any patterns match any object that matches any of their subpatterns, similar to Perl 6's junctions. Unlike Perl 6 junctions, they currently operate sequentially from their first child to their last. As soon as any subpattern has matches, its result is returned.
+
+=head1 Tree::Pattern::Any
+
+=head2 Public methods
+
+=over 4
+
+=item new(subpatterns :slurpy)
+
+Creates a new Tree::Pattern::Any with the specified subpatterns.
+
+=item ACCEPTSEXACTLY(tree)
+
+Checks the tree for matching the pattern exactly. Returns the result of the first subpattern that matches, otherwise a false Tree::Pattern::Match object.
+
+=back
+
+=cut
