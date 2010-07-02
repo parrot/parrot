@@ -1,0 +1,92 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+PCT::Pattern - The base class for patterns matching PCT::Node subclasses
+
+=head1 DESCRIPTION
+
+PCT::Pattern is the base class for all Tree::Pattern classes intended to match specific PCT::Node subclasses. It handles all of the child-, attribute-, and type-checking involved in pattern matching for subclasses. All tht a subclass need do is implement attributes() and target_class() methods as described below and matching will behave correctly.
+
+=head1 PCT::Node convenience methods
+
+For convenience, paralleling the match and subst subs for Regexes, match and subst methods are added to the PCT::Node class when PCT/Pattern.pbc is loaded.
+
+=over 4
+
+=item match(pattern, adverbs :named :slurpy)
+
+An alias for the ACCEPTS method of the pattern.
+
+=item subst(pattern, transform, adverbs :named :slurpy)
+
+An alias for the transform method of the pattern.
+
+=back
+
+=head1 PCT::Pattern
+
+PCT::Pattern is a subclass of Tree::Pattern.
+
+=head2 Attributes
+
+Each PCT::Pattern attribute corresponds to the PCT::Node pattern of the same name. There is an accessor method for each attributes.
+
+=over 4
+
+=item name
+
+=item source
+
+=item pos
+
+=back
+
+=head2 Public methods
+
+=over 4
+
+=item new(children :slurpy, attrs :slurpy :named)
+
+Creates a new pattern with the supplied children and attribute subpatterns. Tree::Pattern::patternize is called on each subpattern to ensure that they are patterns.
+
+=item ACCEPTSEXACTLY(tree)
+
+Determines if the tree matches the pattern exactly. If the tree is not of the class produced by calling the target_class method on the pattern, the match is unsuccessful. If either of the check_attributes or the check_children methods are unsuccessful, the match is unsuccessful.
+
+=item attributes()
+
+Returns an array of the attribute names that check_attributes should check. Subclasses should override this method to return any additional attributes as well as those of the parent class.
+
+=item target_class()
+
+Returns the class which matching trees must be instances of.
+
+=back
+
+=head2 Internal methods
+
+=over 4
+
+=item attr(name, value, has_value)
+
+Identical to the corresponding Tree::Pattern method except that it calls Tree::Pattern::patternize on the value before storing it.
+
+=item check_attribute(tree, attr, match)
+
+Checks the value of the attr attribute for matching. If the pattern has an attribute attr, check that the corresponding attribute of tree both exists and matches the pattern's attribute(supplying the pos named argument with the tree's attribute if the subpattern is a Tree::Pattern).
+
+Returns 1 either if there is no subpattern or if the subpattern matches the corresponding subtree. If there is a subpattern and it does not match the subtree, the success value of match is set to zero. If the subpattern does match, then match[attr] is set to the match result of the subpattern.
+
+=item check_children(tree, match)
+
+Checks any children subpatterns for matching. If the pattern has any children and the tree does not have the same number of children, the match fails; in this case, set the success value of match to zero and return zero. If the pattern has no child subpatterns, return one. If the pattern and tree have the same non-zero number of children, then iterate along the children, attempting to match each child subpattern(supplying the pos named parameter with the subtree if the subpattern is a Tree::Pattern). If any subpattern does not match, set the success value of match to 0 and return 0. For each subpattern that matches, store the subpattern match result in the array part of match with the corresponding index. If every subpattern matches, return 1.
+
+=item check_attributes(tree, match)
+
+Calls the check_attribute method on each attribute name in C<tree.attribute()>.
+
+=back
+
+=cut
