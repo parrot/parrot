@@ -12,8 +12,8 @@ module PCT::Node {
         $pattern.ACCEPTS(self, |%options);
     }
 
-    method subst ($pattern, *%options) {
-        $pattern.transform(self, |%options);
+    method subst ($pattern, $transformation, *%options) {
+        $pattern.transform(self, $transformation, |%options);
     }
 }
 
