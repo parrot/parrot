@@ -206,30 +206,6 @@ Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
 }
 
-/*
-
-=item C<void Parrot_cx_refresh_task_list(PARROT_INTERP, PMC *scheduler)>
-
-Tell the scheduler to perform maintenance on its list of active tasks, checking
-for completed timers or sleep events, sorting for priority, checking for
-messages, etc.
-
-=cut
-
-*/
-
-void
-Parrot_cx_refresh_task_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
-{
-    ASSERT_ARGS(Parrot_cx_refresh_task_list)
-    scheduler_process_wait_list(interp, scheduler);
-    scheduler_process_messages(interp, scheduler);
-
-    /* TODO: Sort the task list index */
-
-    SCHEDULER_cache_valid_SET(scheduler);
-    return;
-}
 
 /*
 
@@ -267,9 +243,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_runloop_end)
     SCHEDULER_terminate_requested_SET(interp->scheduler);
-
-    /* TODO: Figure out why this was here, fix it if useful. */
-    /* Parrot_cx_handle_tasks(interp, interp->scheduler); */
+    Parrot_cx_handle_tasks(interp, interp->scheduler);
 }
 
 /*
@@ -317,74 +291,6 @@ Parrot_cx_peek_task(PARROT_INTERP)
             "Scheduler was not initialized for this interpreter.\n");
 
     return VTABLE_pop_pmc(interp, interp->scheduler);
-}
-
-/*
-
-=item C<void Parrot_cx_schedule_timer(PARROT_INTERP, STRING *type, FLOATVAL
-duration, FLOATVAL interval, INTVAL repeat, PMC *sub)>
-
-Create a new timer event due at C<diff> from now, repeated at C<interval>
-and running the passed C<sub>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_schedule_timer(PARROT_INTERP,
-        ARGIN_NULLOK(STRING *type), FLOATVAL duration, FLOATVAL interval,
-        INTVAL repeat, ARGIN_NULLOK(PMC *sub))
-{
-    ASSERT_ARGS(Parrot_cx_schedule_timer)
-    PMC * const timer = Parrot_pmc_new(interp, enum_class_Timer);
-
-    VTABLE_set_number_keyed_int(interp, timer, PARROT_TIMER_NSEC, duration);
-    VTABLE_set_number_keyed_int(interp, timer, PARROT_TIMER_INTERVAL, interval);
-    VTABLE_set_integer_keyed_int(interp, timer, PARROT_TIMER_REPEAT, repeat);
-
-    if (!PMC_IS_NULL(sub))
-        VTABLE_set_pmc_keyed_int(interp, timer, PARROT_TIMER_HANDLER, sub);
-
-    if (!STRING_IS_NULL(type))
-        VTABLE_set_string_native(interp, timer, type);
-
-    if (repeat && FLOAT_IS_ZERO(interval))
-        VTABLE_set_number_keyed_int(interp, timer, PARROT_TIMER_INTERVAL, duration);
-
-    Parrot_cx_schedule_task(interp, timer);
-}
-
-/*
-
-=item C<void Parrot_cx_schedule_repeat(PARROT_INTERP, PMC *task)>
-
-Add a repeat task to scheduler's task list.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_schedule_repeat(PARROT_INTERP, ARGIN(PMC *task))
-{
-    ASSERT_ARGS(Parrot_cx_schedule_repeat)
-    INTVAL repeat = VTABLE_get_integer_keyed_int(interp, task,
-            PARROT_TIMER_REPEAT);
-    FLOATVAL duration = VTABLE_get_number_keyed_int(interp, task,
-            PARROT_TIMER_INTERVAL);
-    if (repeat != 0) {
-        PMC * const repeat_task = VTABLE_clone(interp, task);
-        VTABLE_set_number_keyed_int(interp, repeat_task, PARROT_TIMER_NSEC, duration);
-
-        if (repeat > 0)
-            VTABLE_set_integer_keyed_int(interp, repeat_task,
-                PARROT_TIMER_REPEAT, repeat - 1);
-
-        Parrot_cx_schedule_task(interp, repeat_task);
-    }
 }
 
 /*
@@ -532,8 +438,8 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
     ASSERT_ARGS(Parrot_cx_add_handler_local)
     if (PMC_IS_NULL(Parrot_pcc_get_handlers(interp, interp->ctx)))
-        Parrot_pcc_set_handlers(interp, interp->ctx, Parrot_pmc_new(interp,
-                                                                    enum_class_ResizablePMCArray));
+        Parrot_pcc_set_handlers(interp, interp->ctx, 
+                                Parrot_pmc_new(interp, enum_class_ResizablePMCArray));
 
     VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
 
@@ -981,32 +887,6 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<void Parrot_cx_timer_invoke(PARROT_INTERP, PMC *timer)>
-
-Run the associated code block for a timer event, when the timer fires.
-
-=cut
-
-*/
-
-void
-Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
-{
-    ASSERT_ARGS(Parrot_cx_timer_invoke)
-    Parrot_Timer_attributes * const timer_struct = PARROT_TIMER(timer);
-#if CX_DEBUG
-    fprintf(stderr, "current timer time: %f, %f\n",
-                    timer_struct->birthtime + timer_struct->duration,
-                    Parrot_floatval_time());
-#endif
-    if (!PMC_IS_NULL(timer_struct->codeblock)) {
-        Parrot_pcc_invoke_sub_from_c_args(interp,
-                timer_struct->codeblock, "->");
-    }
-}
-
-/*
-
 =item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *sub) >
 
 Add a task to the task queue for immediate execution.
@@ -1142,6 +1022,9 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     INTVAL   alarm_count;
     PMC      *alarm;
 
+    Parrot_cx_check_tasks(interp, interp->scheduler);
+    now_time = Parrot_floatval_time();
+
     while(now_time < done_time) {
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
         
@@ -1152,48 +1035,14 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
         }
 
         sleep_time = now_time - fmin(done_time, alarm_time);
+
         if(sleep_time > 0.0) {
-            Parrot_floatval_sleep();
-            Parrot_cx_check_tasks(interp, interp->scheduler);
+            Parrot_floatval_sleep(sleep_time);
         }
 
+        Parrot_cx_check_tasks(interp, interp->scheduler);
         now_time = Parrot_floatval_time();
     }
-
-#ifdef PARROT_CX_BUILD_OLD_STUFF
-#ifdef PARROT_HAS_THREADS
-    Parrot_cond condition;
-    Parrot_mutex lock;
-    const FLOATVAL timer_end = time + Parrot_floatval_time();
-    struct timespec time_struct;
-
-    /* Tell the scheduler runloop to wake, this is a good time to process
-     * pending tasks. */
-    Parrot_cx_runloop_wake(interp, interp->scheduler);
-
-    /* Tell this thread to sleep for the requested time. */
-    COND_INIT(condition);
-    MUTEX_INIT(lock);
-    LOCK(lock);
-    time_struct.tv_sec = (time_t) timer_end;
-    time_struct.tv_nsec = (long)((timer_end - time_struct.tv_sec)*1000.0f) *1000L*1000L;
-    COND_TIMED_WAIT(condition, lock, &time_struct);
-    UNLOCK(lock);
-    COND_DESTROY(condition);
-    MUTEX_DESTROY(lock);
-#else
-    /* A more primitive, platform-specific, non-threaded form of sleep. */
-    if (time > 1000) {
-        /* prevent integer overflow when converting to microseconds */
-        const int seconds = floor(time);
-        Parrot_sleep(seconds);
-        time -= seconds;
-    }
-    Parrot_usleep((UINTVAL) time*1000000);
-#endif
-#endif
-
-    
 
     return next;
 }
@@ -1221,6 +1070,8 @@ static void
 scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(scheduler_process_wait_list)
+
+#ifdef BUILD_OLD_CODE
     Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
     INTVAL num_tasks, index;
 
@@ -1248,6 +1099,7 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
             }
         }
     }
+#endif
 }
 
 /*
