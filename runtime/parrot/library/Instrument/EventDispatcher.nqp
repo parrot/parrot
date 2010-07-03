@@ -27,6 +27,30 @@ class Instrument::EventDispatcher is EventHandler {
 
 =begin
 
+=item new ()
+
+Overrides the default constructor provided in P6object.pbc.
+Initialises $!identifer and then calls the subclass specific
+_self_init method.
+
+=cut
+
+=end
+
+    method new () {
+        self := Q:PIR {
+            $P0 = self.'HOW'()
+            $P1 = getattribute $P0, 'parrotclass'
+            %r = new $P1
+        };
+
+        self._self_init();
+
+        return self;
+    };
+
+=begin
+
 =item _self_init ()
 
 Private method to perform required initialisation.
@@ -133,15 +157,50 @@ Removes the handler for the given event.
         }
 
         # Look for $callback in $list.
+        my $found := 0;
         my $index := 0;
         for $list {
-            if $_ eq $callback {
+            if pir::defined__IP($_) && $_ eq $callback {
                 pir::delete_p_k($list, $index);
+                $found := 1;
                 break;
             }
             $index++;
         }
+
+        # Check that the callback was found and removed.
+        if !$found {
+            die('Callback for event "' ~ $event ~ '" was not found.');
+        }
     };
+
+=begin
+
+=item get_handlers ($event)
+
+Returns a ResizablePMCArray of all the handlers registered for that event.
+
+=cut
+
+=end
+
+    method get_handlers ($event) {
+        my $tokens   := pir::split__PSS('::', $event);
+
+        # Get the lists and join them into 1 big list.
+        my $key    := Q:PIR { %r = new ['ResizablePMCArray'] };
+        my $list   := Q:PIR { %r = new ['ResizablePMCArray'] };
+        my $hashes := [$!evt_category, $!evt_subtype, $!evt_fulltype];
+        my $index  := 0;
+
+        for $tokens {
+            $key.push($_);
+            $list.append(get_list($hashes[$index], pir::join__SSP('::', $key)));
+            $index++;
+        }
+
+        return $list;
+    }
 
 =begin
 
