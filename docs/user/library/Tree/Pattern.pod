@@ -7,7 +7,8 @@ Tree::Pattern - Pattern matching on trees
 
 =head1 DESCRIPTION
 
-Tree::Pattern is the base class for a number of pattern classes that allow regex-like pattern matching on trees.
+Tree::Pattern is the base class for a number of pattern classes that allow
+regex-like pattern matching on trees.
 
 =head1 Tree::Pattern
 
@@ -17,9 +18,11 @@ Tree::Pattern is the base class for a number of pattern classes that allow regex
 
 =item patternize(value)
 
-Converts an object that is not a pattern(does not implement the ACCEPTS method) into one that
-is. If value is a Sub, it is used to create a Tree::Pattern::Closure
-pattern. Otherwise, it is used to create a Tree::Pattern::Constant pattern.
+Converts an object that is not a pattern(does not implement the ACCEPTS method)
+into one that is.
+
+If value is a Sub, it is used to create a Tree::Pattern::Closure pattern.
+Otherwise, it is used to create a Tree::Pattern::Constant pattern.
 
 =back
 
@@ -29,41 +32,85 @@ pattern. Otherwise, it is used to create a Tree::Pattern::Constant pattern.
 
 =item ACCEPTS(tree, adverbs :named :slurpy)
 
-This method tests the tree for matching the pattern. The result is always a Tree::Pattern::Match object. Normally, it matches at most one subtree and uses a depth-first traversal of the children of the tree to find matches. This behavior can be modified with named parameters.
+This method tests the tree for matching the pattern.
 
-The ACCEPTS method can also be called in NQP-rx using the smart-matching operator. C<$pattern.ACCEPTS($tree)> can also be written C<$tree ~~ $pattern>.
+The result is always a Tree::Pattern::Match object.
 
-The named slurpy parameter "adverbs" is used to pass options that can be used to modify the behavior of matching:
+Normally, it matches at most one subtree and uses a depth-first traversal of the
+children of the tree to find matches.
+
+This behavior can be modified with named parameters.
+
+The ACCEPTS method can also be called in NQP-rx using the smart-matching
+operator.
+
+C<$pattern.ACCEPTS($tree)> can also be written C<$tree ~~ $pattern>.
+
+The named slurpy parameter "adverbs" is used to pass options that can be used
+to modify the behavior of matching:
 
 =over 4
 
 =item * C<g> or C<global>
 
-The C<global> option, also named C<g>, causes the match to search through the entire tree and collect every matching subtree into the array part of a Tree::Pattern::Match. This match result will not have a .orig method.
+The C<global> option, also named C<g>, causes the match to search through the
+entire tree and collect every matching subtree into the array part of a
+Tree::Pattern::Match.
+
+This match result will not have a .orig method.
 
 =item * C<p> or C<pos>
 
-The ACCEPTS method with the C<pos> option, also named C<p>, checks only the top of the tree for matching the pattern. It will not recursively search the tree's children until it finds a matching sub-tree.
+The ACCEPTS method with the C<pos> option, also named C<p>, checks only the top
+of the tree for matching the pattern.
+
+It will not recursively search the tree's children until it finds a matching
+sub-tree.
 
 =back
 
 =item transform(tree, transform, adverbs :named :slurpy)
 
-Traverse the tree, transforming any subtrees that match the pattern using transform, which should be either an C<invokable> object or a Tree::Transformer. The children of the result of transforming a tree are recursively traversed following the transformation. Returns the resulting tree.
+Traverse the tree, transforming any subtrees that match the pattern using
+transform, which should be either an C<invokable> object or a Tree::Transformer.
 
-The transform method is implemented using the Tree::Pattern::Transformer class. Reading its documentation may be helpful for more thoroughly understanding how transform works..
+The children of the result of transforming a tree are recursively traversed
+following the transformation.
 
-The slurpy named parameter "adverbs" is used to pass options that modify the behavior of transformation, including:
+Returns the resulting tree.
+
+The transform method is implemented using the Tree::Pattern::Transformer class.
+
+Reading its documentation may be helpful for more thoroughly understanding how
+transform works..
+
+The slurpy named parameter "adverbs" is used to pass options that modify the
+behavior of transformation, including:
 
 =over 4
 
 =item * C<descend_until>
 
-If supplied, the C<descend_until> parameter specifies a pattern that limits the descent of the transformation. Once a transformation reaches a subtree that matches the limit pattern, it stops descending along that branch of the tree. However, it does still transform the subtree that matches the limit pattern if it also matches the transformation pattern. It also continues to descend down other branches of the tree.
+If supplied, the C<descend_until> parameter specifies a pattern that limits the
+descent of the transformation.
+
+Once a transformation reaches a subtree that matches the limit pattern, it
+stops descending along that branch of the tree.
+
+However, it does still transform the subtree that matches the limit pattern if
+it also matches the transformation pattern. It also continues to descend down
+other branches of the tree.
 
 =item * C<min_depth>
 
-If supplied, specifies a minimum depth above which transformations will not be performed. By default, it is set to zero. The depth starts at zero. Therefore, by default, every node of the tree can potentially be transformed. If a subtree is above the minimum depth, it is also not checked against the limit pattern set by the C<descend_until> parameter.
+If supplied, specifies a minimum depth above which transformations will not be
+performed.
+
+By default, it is set to zero. The depth starts at zero. Therefore, by default,
+every node of the tree can potentially be transformed.
+
+If a subtree is above the minimum depth, it is also not checked against the
+limit pattern set by the C<descend_until> parameter.
 
 =back
 
@@ -75,7 +122,10 @@ If supplied, specifies a minimum depth above which transformations will not be p
 
 =item attr(name, value, has_value)
 
-A helper method for defining accessors. If has_value is true, the attribute name is set to value. Otherwise, the value of the attribute name is returned.
+A helper method for defining accessors.
+
+If has_value is true, the attribute name is set to value.
+Otherwise, the value of the attribute name is returned.
 
 =item ACCEPTSGLOBALLY(node)
 
