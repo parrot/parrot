@@ -104,6 +104,12 @@ Returns the size of the list.
         return size;
     }
 
+    VTABLE INTVAL elements() {
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+    }
+
 /*
 =item C<PMC *shift_pmc()>
 
@@ -356,7 +362,6 @@ Used to unarchive the array.
 
 */
 
-#ifdef CODE_THAT_BREAKS
     VTABLE void visit(PMC *info) {
         void* tmp;
         PMC_List_Item *it;
@@ -373,14 +378,18 @@ Used to unarchive the array.
 
     VTABLE void freeze(PMC *info) {
         SUPER(info);
-        /* VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF)); */
+        VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF));
     }
 
     VTABLE void thaw(PMC *info) {
+        int n, i;
         SUPER(info);
-        /* SELF.set_integer_native(VTABLE_shift_integer(INTERP, info)); */
+        n = VTABLE_shift_integer(INTERP, info);
+        SET_ATTR_size(INTERP, SELF, n);
+
+        for(i = 0; i < n; ++i)
+            VTABLE_push_pmc(INTERP, SELF, PMCNULL);
     }
-#endif
 
 /*
 =item C<void mark()>

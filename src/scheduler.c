@@ -79,8 +79,9 @@ static int interp_count = 0;
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
-
     ASSERT_ARGS(Parrot_cx_init_scheduler)
+
+    interp->quantum_done = Parrot_floatval_time() + PARROT_TASK_SWITCH_QUANTUM;
 
     if(interp_count++ > 1) {
         fprintf(stderr, "More than one interp?\n");
@@ -104,7 +105,8 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
 =item C<void Parrot_cx_check_tasks(PARROT_INTERP, PMC *scheduler)>
 
-If a wake request has been received, handle tasks.
+If a wake request has been received or an OS timer has expired 
+then handle tasks.
 
 =cut
 
@@ -116,7 +118,7 @@ Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
     ASSERT_ARGS(Parrot_cx_check_tasks)
     if  ( Parrot_alarm_check(&(interp->last_alarm)) 
           || SCHEDULER_wake_requested_TEST(scheduler)) {
-        Parrot_cx_handle_tasks(interp, interp->scheduler);
+        Parrot_cx_handle_tasks(interp, scheduler);
     }
 }
 
@@ -140,11 +142,13 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     SCHEDULER_wake_requested_CLEAR(scheduler);
 
-    Parrot_cx_handle_alarms(interp, scheduler);
-    // Parrot_cx_check_quantum(interp)
+    Parrot_cx_check_alarms(interp, scheduler);
+    Parrot_cx_check_quantum(interp, scheduler);
 
-    if(SCHEDULER_wake_requested_TEST(scheduler))
+    if(SCHEDULER_resched_requested_TEST(scheduler)) {
+        SCHEDULER_resched_requested_CLEAR(scheduler);
         Parrot_cx_schedule_next_task(interp, scheduler);
+    }
 
 #ifdef PARROT_CX_BUILD_OLD_STUFF
     Parrot_cx_refresh_task_list(interp, scheduler);
@@ -187,6 +191,28 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 }
 
 /*
+
+=item C<void Parrot_cx_check_quantum(PARROT_INTERP, PMC *scheduler)>
+
+If the quantum has expired, schedule the next task.
+
+=end
+
+*/
+
+void
+Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
+{
+    ASSERT_ARGS(Parrot_cx_check_quantum)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    FLOATVAL time_now = Parrot_floatval_time();
+
+    if(time_now >= interp->quantum_done)
+        SCHEDULER_resched_requested_SET(scheduler);
+}
+
+
+/*
 =item C<void Parrot_cx_schedule_next_task(PARROT_INTERP, PMC *scheduler)>
 
 Put the current task on the foot of the task queue and schedule whatever
@@ -197,13 +223,22 @@ TODO: Make the above true rather than a dirty lie.
 =end
 */
 
-PARROT_EXPORT
 void
 Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
-    PMC *sub = VTABLE_shift_pmc(interp, sched->task_queue);
-    Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
+    ASSERT_ARGS(Parrot_cx_schedule_next_task)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    INTVAL task_count = VTABLE_get_integer(interp, sched->task_queue);
+
+    if(task_count > 0) {
+        PMC *sub = VTABLE_shift_pmc(interp, sched->task_queue);
+
+        FLOATVAL time_now = Parrot_floatval_time();
+        interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
+        Parrot_alarm_set(interp->quantum_done);
+
+        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
+    }
 }
 
 
@@ -250,8 +285,10 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 
 =item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC *task)>
 
-Add a task to scheduler's task list. Cannot be called across
-interpreters/threads, must be called from within the interpreter's runloop.
+Add a task to to the task queue for execution.
+
+Probably cannot be called across interpreters/threads, must instead be 
+called from within the interpreter's runloop.
 
 =cut
 
@@ -262,11 +299,34 @@ void
 Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_cx_schedule_task)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-    VTABLE_push_pmc(interp, interp->scheduler, task);
+    VTABLE_push_pmc(interp, sched->task_queue, task);
+}
+
+/*
+
+=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *task) >
+
+Add a task to the task queue for immediate execution.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task)) 
+{
+    ASSERT_ARGS(Parrot_cx_schedule_immediate)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+    VTABLE_unshift_pmc(interp, sched->task_queue, task);
+    SCHEDULER_wake_requested_SET(interp->scheduler);    
+    SCHEDULER_resched_requested_SET(interp->scheduler);
 }
 
 /*
@@ -280,6 +340,7 @@ from the list.
 
 */
 
+#ifdef COMPILE_OLD_STUFF
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -289,6 +350,8 @@ Parrot_cx_peek_task(PARROT_INTERP)
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
+
+
 
     return VTABLE_pop_pmc(interp, interp->scheduler);
 }
@@ -306,8 +369,7 @@ Create a new callback event, with an argument for the call.
 
 PARROT_EXPORT
 void
-Parrot_cx_schedule_callback(PARROT_INTERP,
-        ARGIN(PMC *user_data), ARGIN(char *ext_data))
+Parrot_cx_schedule_callback(PARROT_INTERP, ARGIN(PMC *user_data), ARGIN(char *ext_data))
 {
     ASSERT_ARGS(Parrot_cx_schedule_callback)
     PMC * const callback = Parrot_pmc_new(interp, enum_class_Task);
@@ -319,6 +381,7 @@ Parrot_cx_schedule_callback(PARROT_INTERP,
 
     Parrot_cx_schedule_task(interp, callback);
 }
+#endif
 
 /*
 
@@ -340,32 +403,6 @@ Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
 #endif
     Parrot_cx_send_message(interp, CONST_STRING(interp, "suspend_for_gc"), PMCNULL);
 }
-
-/*
-
-=item C<void Parrot_cx_delete_task(PARROT_INTERP, PMC *task)>
-
-Remove a task from the scheduler's task list.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
-{
-    ASSERT_ARGS(Parrot_cx_delete_task)
-    if (interp->scheduler) {
-        const INTVAL tid = VTABLE_get_integer(interp, task);
-        VTABLE_delete_keyed_int(interp, interp->scheduler, tid);
-    }
-    /* TODO: What was this exception trying to tell us? */
-    /* else if (interp->scheduler) */
-    /*   Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, */
-    /*       "Scheduler was not initialized for this interpreter.\n"); */
-}
-
 
 /*
 
@@ -887,26 +924,6 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *sub) >
-
-Add a task to the task queue for immediate execution.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *sub)) 
-{
-    ASSERT_ARGS(Parrot_cx_schedule_immediate)
-    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
-    VTABLE_unshift_pmc(interp, sched->task_queue, sub);
-    SCHEDULER_wake_requested_SET(interp->scheduler);    
-}
-
-/*
-
 =item C<void Parrot_cx_schedule_alarm(PARROT_INTERP, PMC *alarm)>
 
 Schedule an alarm.
@@ -931,7 +948,7 @@ Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
 
 /*
 
-=item C<void Parrot_cx_handle_alarms(PARROT_INTERP, PMC *scheduler) >
+=item C<void Parrot_cx_check_alarms(PARROT_INTERP, PMC *scheduler) >
 
 Add the subs attached to any expired alarms to the task queue.
 
@@ -941,10 +958,10 @@ Add the subs attached to any expired alarms to the task queue.
 
 PARROT_EXPORT
 void
-Parrot_cx_handle_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler)) 
+Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler)) 
 {
-    ASSERT_ARGS(Parrot_cx_handle_alarms)
-    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+    ASSERT_ARGS(Parrot_cx_check_alarms)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     INTVAL   alarm_count = VTABLE_get_integer(interp, sched->alarms);
     FLOATVAL now_time    = Parrot_floatval_time();
 

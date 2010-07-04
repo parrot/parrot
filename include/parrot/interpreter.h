@@ -167,7 +167,7 @@ struct _handler_node_t; /* forward def - exit.h */
 struct parrot_interp_t {
     PMC           *ctx;                       /* current Context */
 
-    struct Memory_Pools *mem_pools;                /* Pointer to this interpreter's
+    struct Memory_Pools *mem_pools;           /* Pointer to this interpreter's
                                                * arena */
 
     struct GC_Subsystem *gc_sys;              /*functions and data specific
@@ -269,7 +269,8 @@ struct parrot_interp_t {
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
 
-    UINTVAL last_alarm;                       /* has an alarm triggered? */
+    UINTVAL  last_alarm;                      /* has an alarm triggered? */
+    FLOATVAL quantum_done;                    /* expiration of current quantum */ 
 
     struct _Thread_data *thread_data;         /* thread specific items */
 
