@@ -3,8 +3,8 @@ Copyright (C) 2010, Parrot Foundation.
 $Id$
 */
 
-#ifndef PARROT_ALARM_PRIVATE_GUARD_H
-#define PARROT_ALARM_PRIVATE_GUARD_H
+#ifndef PARROT_ALARM_PRIVATE_H_GUARD
+#define PARROT_ALARM_PRIVATE_H_GUARD
 
 #include "parrot.h"
 
@@ -13,7 +13,7 @@ typedef struct Parrot_alarm_queue {
     struct Parrot_alarm_queue *next;
 } Parrot_alarm_queue;
 
-#endif /* PARROT_ALARM_PRIVATE_GUARD_H */
+#endif /* PARROT_ALARM_PRIVATE_H_GUARD */
 
 /*
  * Local variables:
