@@ -71,7 +71,8 @@ create_grapheme_table(PARROT_INTERP, UINTVAL n)
 
 /*
 
-=item C<grapheme_table * clone_grapheme_table(PARROT_INTERP, grapheme_table *src)>
+=item C<grapheme_table * clone_grapheme_table(PARROT_INTERP, grapheme_table
+*src)>
 
 Creates and returns a deep clone of the grapheme table passed in C<src>.
 
@@ -202,8 +203,8 @@ merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
 
 /*
 
-=item C<grapheme_table * rehash_grapheme_table(PARROT_INTERP,
-grapheme_table *src)>
+=item C<grapheme_table * rehash_grapheme_table(PARROT_INTERP, grapheme_table
+*src)>
 
 Recalculates the hash value for all graphemes in C<src>.
 
@@ -231,8 +232,8 @@ rehash_grapheme_table(PARROT_INTERP, grapheme_table *src)
 
 /*
 
-=item C<UChar32 add_grapheme(PARROT_INTERP, grapheme_table *table,
-grapheme *src)>
+=item C<UChar32 add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme
+*src)>
 
 Adds a copy of the grapheme passed in C<src> to the grapheme table passed in
 C<table> returning the dynamic codepoint value.
