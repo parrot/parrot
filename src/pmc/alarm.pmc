@@ -11,7 +11,7 @@ src/pmc/alarm.pmc - Alarm
     .include 'alarm.pasm'
 
     new P0, 'Alarm'
-    set P0[.PARROT_ALARM_TIME], N_time   # A FLOATVAL    
+    set P0[.PARROT_ALARM_TIME], N_time   # A FLOATVAL
     set P0[.PARROT_ALARM_SUB],  P_sub    # set handler sub PMC
     invoke P0                            # schedule the alarm
 
@@ -35,7 +35,7 @@ Sometime after N_time, P_sub will be called exactly once.
 
 pmclass Alarm provides invokable auto_attrs {
     ATTR FLOATVAL alarm_time;
-    ATTR PMC     *alarm_sub; 
+    ATTR PMC     *alarm_sub;
 
 /*
 

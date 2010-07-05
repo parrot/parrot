@@ -270,7 +270,7 @@ struct parrot_interp_t {
     int current_runloop_id;
 
     UINTVAL  last_alarm;                      /* has an alarm triggered? */
-    FLOATVAL quantum_done;                    /* expiration of current quantum */ 
+    FLOATVAL quantum_done;                    /* expiration of current quantum */
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

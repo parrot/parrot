@@ -23,8 +23,8 @@
 #=head2 gt_exit ()
 #
 # Exit the current green thread.
-# 
-#=cut 
+#
+#=cut
 #
 
 .include 'interpinfo.pasm'
@@ -50,7 +50,7 @@
     $P0[5] = 0
     $P0[6] = .PARROT_TIMER_RUNNING
     $P0[7] = 1
-    
+
     $P2 = new 'Timer', $P0
     set_global 'gt_resched_timer', $P2
 .end
@@ -62,9 +62,9 @@
     $I0 = threads
     print "In gt_resched; t = "
     say $I0
-    
+
     if $I0 <= 0 goto done
-    
+
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     push threads, $P0
 
@@ -82,7 +82,7 @@ done:
 .sub gt_spawn
     .param pmc my_sub
     .param pmc args :slurpy
-    
+
     $P0 = new 'Continuation'
     set_addr $P0, run_sub
 

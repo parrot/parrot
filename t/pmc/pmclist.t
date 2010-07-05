@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 .sub main :main
@@ -25,14 +25,14 @@
 
     ok(0, "pop empty")
     goto try_shift
-    
+
 pop_good:
     ok(1, "pop empty")
 
 try_shift:
 
     $P0 = new 'PMCList'
-    
+
     push_eh shift_good
     $P1 = pop $P0
     pop_eh
@@ -49,7 +49,7 @@ shift_good:
     .param int n
 
     if n < 1 goto done
-    
+
     $P0 = new 'Integer'
     $P0 = n
     push a, $P0
@@ -69,7 +69,7 @@ done:
     pop_eh
 
     $I0 = $P0
-    
+
     if $I0 != 5 goto fail
     ok(1, "push five")
 
@@ -88,10 +88,10 @@ fail:
     $I0 = $P0
 
     if $I0 == 1 goto size_good
-    
+
     ok(0, "push two pop one")
     goto try_value
-    
+
 size_good:
     ok(1, "push two pop one")
 
@@ -102,8 +102,8 @@ try_value:
     if $I0 == 2 goto value_good
     ok(0, "push two pop two")
     .return()
-    
-value_good:     
+
+value_good:
     ok(1, "push two pop two")
 .end
 
@@ -115,15 +115,15 @@ value_good:
 
     $P1 = new 'Integer', 1
     unshift $P0, $P1
-    
+
     $P1 = shift $P0
     $I0 = $P0
 
     if $I0 == 1 goto size_good
-    
+
     ok(0, "unshift shift size")
     goto try_value
-    
+
 size_good:
     ok(1, "unshift shift size")
 
@@ -134,8 +134,8 @@ try_value:
     if $I0 == 2 goto value_good
     ok(0, "unshift shift value")
     .return()
-    
-value_good:     
+
+value_good:
     ok(1, "unshift shift value")
 .end
 
@@ -154,7 +154,7 @@ value_good:
     if $I0 == 5 goto value_good
     ok(0, "push shift")
     .return()
-    
+
 value_good:
     ok(1, "push shift")
 .end
@@ -174,7 +174,7 @@ value_good:
     if $I0 == 5 goto value_good
     ok(0, "unshift pop")
     .return()
-    
+
 value_good:
     ok(1, "unshift pop")
 .end
@@ -194,27 +194,27 @@ value_good:
     $P1 = 9.8
     $P0.'insert_by_number'($P1)
 
-    
+
     $I0 = $P0
     if $I0 == 3 goto size_good
     ok(0, "insert by num")
     .return()
-    
+
 size_good:
     $P2 = shift $P0
     $P1 = new 'Float'
     $P1 = 1.41
 
-    eq_num $P1, $P2, shift_good 
+    eq_num $P1, $P2, shift_good
     ok(0, "insert by num")
     .return()
-    
+
 shift_good:
     $P2 = pop $P0
     $P1 = new 'Float'
     $P1 = 9.8
 
-    eq_num $P1, $P2, pop_good 
+    eq_num $P1, $P2, pop_good
     ok(0, "insert by num")
     .return()
 

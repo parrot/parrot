@@ -55,7 +55,7 @@ current point in the computation as a continuation and runs the next thread.
     cur_th = interpinfo .INTERPINFO_CURRENT_CONT
     push ths, cur_th
 
-again:  
+again:
     next_th = shift ths
     invokecc next_th
 
@@ -73,16 +73,16 @@ sure the program doesn't exit before all the threads have run to completion.
 .sub th_main
     .local pmc ths
 
-again1: 
+again1:
     ths = get_global 'threads'
 
     $I0 = ths
     if $I0 <= 0 goto done
 
     th_resched()
-    
+
     goto again1
-done:   
+done:
 .end
 
 =head1
@@ -115,12 +115,12 @@ That's it. All we need now is some test threads and a main function to run them.
     say "sub3: Good morning"
 
     th_resched()
-    
+
     $I0 = 5
     $I1 = $I0 + 3
 
     th_resched()
-    
+
     print "sub3: 5 + 3 = "
     say $I1
 
@@ -137,7 +137,7 @@ That's it. All we need now is some test threads and a main function to run them.
 
     $P0 = get_global 'sub3'
     th_create($P0)
-    
+
     $P0 = get_global 'sub2'
     th_create($P0)
 
@@ -162,7 +162,7 @@ sub3: Is leaving.
 All done
 
 =cut
-                         
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

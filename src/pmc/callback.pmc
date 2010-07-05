@@ -43,7 +43,7 @@ Actually run the callback.
         Parrot_Callback_attributes *cb_data = PARROT_CALLBACK(SELF);
         PMC *user_data = cb_data->user_data;
         PMC *ext_data  = cb_data->external_data;
-        
+
         Parrot_run_callback(INTERP, user_data, ext_data);
 
         return (opcode_t*) next;
