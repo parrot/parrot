@@ -196,7 +196,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 If the quantum has expired, schedule the next task.
 
-=end
+=cut
 
 */
 
@@ -220,7 +220,8 @@ is on the head, then reset the rescheduling quantum.
 
 TODO: Make the above true rather than a dirty lie.
 
-=end
+=cut
+
 */
 
 void
@@ -1121,8 +1122,6 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 }
 
 /*
-
-=over 4
 
 =item C<static void scheduler_process_messages(PARROT_INTERP, PMC *scheduler)>
 
