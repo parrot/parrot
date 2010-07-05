@@ -3223,7 +3223,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         return;
 
     for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
 
         while (bucket) {
             PackFile_ConstTable * const table      =
@@ -3313,7 +3313,8 @@ fixup_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 =item C<static size_t fixup_packed_size(PARROT_INTERP, PackFile_Segment *self)>
 
-I<What does this do?>
+Calculates the size, in multiples of C<opcode_t>, required to store the
+passed C<PackFile_FixupTable> in bytecode.
 
 =cut
 

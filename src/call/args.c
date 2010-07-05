@@ -777,18 +777,15 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
        callee side only. Does not add :call_sig arg support on the caller side.
        This is not the final form of the algorithm, but should provide the
        tools that HLL designers need in the interim. */
-    if (param_count == 1) {
-        const INTVAL first_flag = raw_params[0];
-
-        if (first_flag & PARROT_ARG_CALL_SIG) {
-            *accessor->pmc(interp, arg_info, 0) = call_object;
-            return;
+    if (param_count > 2 || param_count == 0)
+        /* help branch predictors */;
+    else {
+        const INTVAL second_flag = raw_params[param_count - 1];
+        if (second_flag & PARROT_ARG_CALL_SIG) {
+            *accessor->pmc(interp, arg_info, param_count - 1) = call_object;
+            if (param_count == 1)
+                return;
         }
-    }
-    else if (param_count == 2) {
-        const INTVAL second_flag = raw_params[1];
-        if (second_flag & PARROT_ARG_CALL_SIG)
-            *accessor->pmc(interp, arg_info, 1) = call_object;
     }
 
     /* First iterate over positional args and positional parameters. */
@@ -882,6 +879,14 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
             /* Go ahead and fill the parameter with a positional argument. */
             switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
+              case PARROT_ARG_PMC:
+                *accessor->pmc(interp, arg_info, param_index) =
+                    VTABLE_get_pmc_keyed_int(interp, call_object, arg_index);
+                break;
+              case PARROT_ARG_STRING:
+                *accessor->string(interp, arg_info, param_index) =
+                    VTABLE_get_string_keyed_int(interp, call_object, arg_index);
+                break;
               case PARROT_ARG_INTVAL:
                 *accessor->intval(interp, arg_info, param_index) =
                     VTABLE_get_integer_keyed_int(interp, call_object, arg_index);
@@ -889,14 +894,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
               case PARROT_ARG_FLOATVAL:
                 *accessor->numval(interp, arg_info, param_index) =
                     VTABLE_get_number_keyed_int(interp, call_object, arg_index);
-                break;
-              case PARROT_ARG_STRING:
-                *accessor->string(interp, arg_info, param_index) =
-                    VTABLE_get_string_keyed_int(interp, call_object, arg_index);
-                break;
-              case PARROT_ARG_PMC:
-                *accessor->pmc(interp, arg_info, param_index) =
-                    VTABLE_get_pmc_keyed_int(interp, call_object, arg_index);
                 break;
               default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
@@ -959,16 +956,9 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     }
 
     /* Now iterate over the named arguments and parameters. */
-    while (1) {
+    while (param_index < param_count) {
         STRING *param_name;
-        INTVAL  param_flags;
-
-        /* Check if we've used up all the parameters. We'll check for leftover
-         * named args after the loop. */
-        if (param_index >= param_count)
-            break;
-
-        param_flags = raw_params[param_index];
+        INTVAL  param_flags = raw_params[param_index];
 
         /* All remaining parameters must be named. */
         if (!(param_flags & PARROT_ARG_NAME))

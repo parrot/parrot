@@ -95,21 +95,22 @@ Marks the hash as live.
 
         /* Restart iterator */
         attrs->elements = VTABLE_elements(INTERP, attrs->pmc_hash);
-        if (value == ITERATE_FROM_START || value == ITERATE_FROM_START_KEYS) {
+        switch (value) {
+          case ITERATE_FROM_START:
+          case ITERATE_FROM_START_KEYS:
             attrs->pos          = 0;
             attrs->reverse      = 0;
             attrs->next_entry   = PARROT_ORDEREDHASH(attrs->pmc_hash)->first;
-            return;
-        }
-        else if (value == ITERATE_FROM_END) {
+            break;
+          case ITERATE_FROM_END:
             attrs->pos          = attrs->elements;
             attrs->reverse      = 1;
             attrs->next_entry   = PARROT_ORDEREDHASH(attrs->pmc_hash)->last;
-            return;
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "HashIterator: unknown iterator type");
         }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "HashIterator: unknown iterator type");
     };
 
 /*

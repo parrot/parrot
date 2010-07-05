@@ -1,0 +1,19 @@
+--- lib/Parrot/Install.pm	2009-06-01 09:29:57.000000000 +0200
++++ lib/Parrot/Install.pm	2009-06-03 08:41:22.000000000 +0200
+@@ -220,6 +220,16 @@
+         else {
+             next unless -e $src;
+             next if $^O eq 'cygwin' and -e "$src.exe"; # stat works, copy not
++            if (-l $src) { 
++                # check if the system supports symbolic linking 
++                use Config; 
++                if ($Config{d_symlink} && $Config{d_readlink}) { 
++                # copy as symbolic link 
++                    symlink(readlink($src), $dest); 
++                    print "$dest\n"; 
++                    next; 
++                } 
++            } 
+             copy( $src, $dest ) or die "Error: couldn't copy $src to $dest: $!\n";
+             print "$dest\n";
+         }

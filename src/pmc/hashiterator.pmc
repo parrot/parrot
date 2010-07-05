@@ -87,7 +87,7 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
         if (attrs->pos == attrs->total_buckets)
             break;
 
-        bucket = attrs->parrot_hash->bi[attrs->pos++];
+        bucket = attrs->parrot_hash->bucket_indices[attrs->pos++];
     }
     attrs->bucket = bucket;
     --attrs->elements;
@@ -172,7 +172,7 @@ Marks the hash as live.
         Parrot_HashIterator_attributes * const attrs =
                 PARROT_HASHITERATOR(SELF);
 
-        if (value == 0) {
+        if (value == ITERATE_FROM_START) {
             /* Restart iterator */
             attrs->bucket           = 0;
             attrs->pos              = 0;
@@ -264,10 +264,17 @@ the next one.
 */
 
     VTABLE STRING* shift_string() {
-        PMC    * const key = SELF.shift_pmc();
-        STRING * const ret = VTABLE_get_string(INTERP, key);
-        Parrot_pmc_free_temporary(INTERP, key);
-        return ret;
+        Parrot_HashIterator_attributes * const attrs =
+                PARROT_HASHITERATOR(SELF);
+        HashBucket                     * const bucket = attrs->bucket;
+
+        if (!attrs->parrot_hash || !attrs->bucket)
+            return CONST_STRING(INTERP, "");
+
+        /* Move to next bucket */
+        advance_to_next(INTERP, SELF);
+
+        return hash_key_to_string(INTERP, attrs->parrot_hash, bucket->key);
     }
 
 }

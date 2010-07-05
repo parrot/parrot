@@ -47,6 +47,23 @@ Initialize PackfileFixupEntry.
         PObj_custom_mark_SET(SELF);
     }
 
+    VTABLE void init_pmc(PMC *init) {
+        Parrot_PackfileFixupEntry_attributes * attrs =
+                PMC_data_typed(SELF, Parrot_PackfileFixupEntry_attributes*);
+        STRING *name    = CONST_STRING_GEN(INTERP, "name");
+        STRING *type    = CONST_STRING_GEN(INTERP, "type");
+        STRING *offset  = CONST_STRING_GEN(INTERP, "offset");
+
+        attrs->name = VTABLE_get_string(INTERP,
+                        VTABLE_get_pmc_keyed_str(INTERP, init, name));
+        attrs->type = VTABLE_get_integer(INTERP,
+                        VTABLE_get_pmc_keyed_str(INTERP, init, type));
+        attrs->offset = VTABLE_get_integer(INTERP,
+                        VTABLE_get_pmc_keyed_str(INTERP, init, offset));
+
+        PObj_custom_mark_SET(SELF);
+    }
+
 /*
 
 =item C<void mark()>

@@ -16,10 +16,12 @@ Tests the SchedulerMessage PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
 
-    plan(7)
+    plan(8)
 
     init_check()
     type_and_id_tests()
@@ -30,6 +32,22 @@ Tests the SchedulerMessage PMC.
 .sub init_check
     new $P0, ['SchedulerMessage']
     ok(1, 'Instantiated SchedulerMessage PMC')
+
+    .local pmc eh
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_addr eh, catch
+    push_eh eh
+    $I0 = 1
+    $P1 = new ['Integer']
+    $P0 = new ['SchedulerMessage'], $P1
+    $I0 = 0
+    goto check
+catch:
+    finalize eh
+check:
+    pop_eh
+    ok($I0, 'initializing with invalid type throws')
 .end
 
 .sub type_and_id_tests

@@ -27,7 +27,7 @@ This PMC wraps the zlib.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass GzipHandle provides Handle dynpmc auto_attrs {
+pmclass GzipHandle extends Handle dynpmc auto_attrs {
     ATTR void *file;
 
 /*
@@ -224,6 +224,8 @@ GzipHandles are never tty's, returns false.
 
 */
     METHOD is_tty() {
+        Parrot_warn_deprecated(INTERP,
+            "'is_tty' is deprecated, use 'isatty' instead - TT #1689");
         RETURN(INTVAL 0);
     }
 

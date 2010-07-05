@@ -91,28 +91,6 @@ foreach my $path (@files) {
 }
 
 __DATA__
-compilers/pirc/src/pircapi.c
-config/gen/platform/ansi/dl.c
-config/gen/platform/ansi/exec.c
-config/gen/platform/ansi/time.c
-config/gen/platform/darwin/memalign.c
-config/gen/platform/generic/dl.c
-config/gen/platform/generic/exec.c
-config/gen/platform/generic/math.c
-config/gen/platform/generic/memalign.c
-config/gen/platform/generic/stat.c
-config/gen/platform/generic/time.c
-config/gen/platform/netbsd/math.c
-config/gen/platform/openbsd/math.c
-config/gen/platform/solaris/math.c
-config/gen/platform/solaris/time.c
-examples/compilers/japhc.c
-src/gc/generational_ms.c
-src/io/io_string.c
-src/string/charset/ascii.c
-src/string/charset/binary.c
-src/string/charset/iso-8859-1.c
-src/string/charset/unicode.c
 
 # Local Variables:
 #   mode: cperl

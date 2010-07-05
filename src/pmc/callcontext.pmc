@@ -359,14 +359,18 @@ static void
 mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 {
     ASSERT_ARGS(mark_positionals)
-    INTVAL size, i;
-    Pcc_cell *cells;
+    INTVAL size;
 
     GETATTR_CallContext_num_positionals(interp, self, size);
-    GETATTR_CallContext_positionals(interp, self, cells);
 
-    for (i = 0; i < size; ++i)
-        mark_cell(interp, &cells[i]);
+    if (size) {
+        Pcc_cell *cells;
+        INTVAL i;
+        GETATTR_CallContext_positionals(interp, self, cells);
+
+        for (i = 0; i < size; ++i)
+            mark_cell(interp, &cells[i]);
+    }
 }
 
 /* don't look now, but here goes encapsulation.... */
@@ -377,7 +381,7 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
     INTVAL  i;
 
     for (i = h->mask; i >= 0; --i) {
-        HashBucket *b = h->bi[i];
+        HashBucket *b = h->bucket_indices[i];
 
         while (b) {
             Parrot_gc_mark_STRING_alive(interp, (STRING *)b->key);
@@ -403,7 +407,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
         result = Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
 
         for (i = 0; i <= hash->mask; ++i) {
-            HashBucket *b = hash->bi[i];
+            HashBucket *b = hash->bucket_indices[i];
 
             while (b) {
                 VTABLE_set_string_keyed_int(interp, result,
@@ -494,34 +498,31 @@ Mark any referenced strings and PMCs.
 */
     VTABLE void mark() {
         Hash     *hash;
+        PMC      *tmp;
         STRING   *short_sig;
         Pcc_cell *positionals;
-        INTVAL    num_positionals;
-        PMC      *arg_flags, *type_tuple, *return_flags, *tmp;
-        UINTVAL   i;
         UINTVAL  *n_regs_used;
-        Regs_ps   bp_ps;
 
         if (!PMC_data(SELF))
             return;
 
-        GET_ATTR_type_tuple(INTERP, SELF, type_tuple);
         GET_ATTR_short_sig(INTERP, SELF, short_sig);
-        GET_ATTR_arg_flags(INTERP, SELF, arg_flags);
-        GET_ATTR_return_flags(INTERP, SELF, return_flags);
-        GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
-        GET_ATTR_positionals(INTERP, SELF, positionals);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
-        Parrot_gc_mark_PMC_alive(INTERP, type_tuple);
         Parrot_gc_mark_STRING_alive(INTERP, short_sig);
-        Parrot_gc_mark_PMC_alive(INTERP, arg_flags);
-        Parrot_gc_mark_PMC_alive(INTERP, return_flags);
 
         mark_positionals(INTERP, SELF);
 
+        GET_ATTR_hash(INTERP, SELF, hash);
         if (hash)
             mark_hash(INTERP, hash);
+
+        GET_ATTR_arg_flags(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_return_flags(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_type_tuple(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_caller_ctx(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
@@ -551,21 +552,26 @@ Mark any referenced strings and PMCs.
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
-        if (!n_regs_used)
-            return;
 
-        GET_ATTR_bp_ps(INTERP, SELF, bp_ps);
-        for (i = 0; i < n_regs_used[REGNO_PMC]; ++i) {
-            PMC * const p = bp_ps.regs_p[-1L-(i)];
-            /* Original code from CTX_REG_PMC */
-            if (p)
-                Parrot_gc_mark_PMC_alive(INTERP, p);
-        }
+        if (n_regs_used) {
+            Regs_ps         bp_ps;
+            const UINTVAL   regs_p = n_regs_used[REGNO_PMC];
+            const UINTVAL   regs_s = n_regs_used[REGNO_STR];
+            UINTVAL         i;
 
-        for (i = 0; i < n_regs_used[REGNO_STR]; ++i) {
-            STRING * const s = bp_ps.regs_s[i];
-            if (s)
-                Parrot_gc_mark_STRING_alive(INTERP, s);
+            GET_ATTR_bp_ps(INTERP, SELF, bp_ps);
+            for (i = 0; i < regs_p; ++i) {
+                PMC * const p = bp_ps.regs_p[-1L-(i)];
+                /* Original code from CTX_REG_PMC */
+                if (p)
+                    Parrot_gc_mark_PMC_alive(INTERP, p);
+            }
+
+            for (i = 0; i < regs_s; ++i) {
+                STRING * const s = bp_ps.regs_s[i];
+                if (s)
+                    Parrot_gc_mark_STRING_alive(INTERP, s);
+            }
         }
     }
 
@@ -600,7 +606,7 @@ stored.)
             UINTVAL i;
 
             for (i = 0; i <= hash->mask; ++i) {
-                HashBucket *b = hash->bi[i];
+                HashBucket *b = hash->bucket_indices[i];
 
                 while (b) {
                     FREE_CELL(INTERP, (Pcc_cell *)b->value);
@@ -638,7 +644,7 @@ stored.)
             UINTVAL i;
 
             for (i = 0; i <= hash->mask; ++i) {
-                HashBucket *b = hash->bi[i];
+                HashBucket *b = hash->bucket_indices[i];
 
                 while (b) {
                     FREE_CELL(INTERP, (Pcc_cell *)b->value);

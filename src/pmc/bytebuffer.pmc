@@ -116,6 +116,63 @@ Get current size.
 
 /*
 
+=item C<void set_integer_native()>
+
+Resize the buffer to the given value.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL set_size) {
+        INTVAL size,  allocated_size;
+        unsigned char *content;
+        if (set_size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "Negative size in ByteBuffer");
+
+        GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        if (set_size == 0) {
+            if (allocated_size == 0)
+                SET_ATTR_source(INTERP, SELF, STRINGNULL);
+            else {
+                GET_ATTR_content(INTERP, SELF, content);
+                Parrot_gc_free_memory_chunk(INTERP, content);
+            }
+            SET_ATTR_allocated_size(INTERP, SELF, 0);
+            SET_ATTR_size(INTERP, SELF, 0);
+            SET_ATTR_content(INTERP, SELF, NULL);
+        }
+        else {
+            GET_ATTR_size(INTERP, SELF, size);
+            /* If reducing size, just change the size value */
+            if (set_size > size) {
+                INTVAL copysize = set_size < size ? set_size : size;
+                if (allocated_size == 0) {
+                    content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, set_size);
+                    if (size > 0) {
+                        STRING * source;
+                        GET_ATTR_source(INTERP, SELF, source);
+                        memcpy(content, source->strstart, copysize);
+                    }
+                    SET_ATTR_source(INTERP, SELF, STRINGNULL);
+                }
+                else {
+                    GET_ATTR_content(INTERP, SELF, content);
+                    content = (unsigned char *)
+                        Parrot_gc_reallocate_memory_chunk(INTERP, content, set_size);
+                }
+                if (copysize < set_size)
+                    memset(content + copysize, '\0', set_size - copysize);
+                SET_ATTR_allocated_size(INTERP, SELF, set_size);
+                SET_ATTR_content(INTERP, SELF, content);
+            }
+            SET_ATTR_size(INTERP, SELF, set_size);
+        }
+    }
+
+/*
+
 =item C<void set_string_native()>
 
 Reset the buffer with the content of the string.

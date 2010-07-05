@@ -105,7 +105,7 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
             INTVAL  i;
 
             for (i = hash->mask; i >= 0; --i) {
-                HashBucket *bucket = hash->bi[i];
+                HashBucket *bucket = hash->bucket_indices[i];
                 while (bucket) {
                     if (++found > entries)
                         Parrot_ex_throw_from_c_args(INTERP, NULL, 1,

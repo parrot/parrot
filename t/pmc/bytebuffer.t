@@ -18,16 +18,18 @@ Tests C<ByteBuffer> PMC..
 
 .include 'iglobals.pasm'
 .include 'iterator.pasm'
+.include 'except_types.pasm'
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(26)
+    plan(37)
 
     test_init()
     test_set_string()
     test_set_byte()
     test_get_string()
     test_push()
+    test_resize()
     test_alloc()
     test_iterate()
     test_invalid()
@@ -192,6 +194,72 @@ end:
     .local string s
     s = bb.'get_string_as'(ascii:"")
     is(s, 'hello', "push gives expected string result")
+.end
+
+.sub test_resize
+    .local pmc bb
+    .local int n
+    .local string s
+    bb = new ['ByteBuffer']
+
+    bb = 723
+    n = elements bb
+    is(n, 723, 'resize from empty')
+
+    bb = 42
+    n = elements bb
+    is(n, 42, 'reduce size')
+
+    bb = 999
+    n = elements bb
+    is(n, 999, 'increase size')
+
+    bb = 0
+    n = elements bb
+    is(n, 0, 'resize to 0')
+
+    bb = 'foobar'
+    bb = 3
+    n = elements bb
+    is(n, 3, 'reduce size from string content')
+
+    s = bb.'get_string_as'(ascii:"")
+    is(s, 'foo', 'resized string content has correct value')
+
+    bb = 'foobar'
+    bb = 7
+    n = elements bb
+    is(n, 7, 'increase size from string content')
+
+    # This test is for code coverage, zero filling is not a feature
+    # you should expect, it can be changed for performance reasons.
+    s = bb.'get_string_as'(binary:"")
+    is(s, binary:"foobar\x{0}", 'resized from string content is zero filled')
+
+    bb = 'barfoo'
+    bb = 0
+    n = elements bb
+    is(n, 0, 'resize to zero from string content')
+
+    bb = 42
+    bb = 0
+    n = elements bb
+    is(n, 0, 'resize to zero from allocated content')
+
+    .local pmc eh
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    set_addr eh, catch_negative
+    n = 1
+    push_eh eh
+    bb = -1
+    n = 0
+    goto test_negative
+catch_negative:
+    finalize eh
+test_negative:
+    pop_eh
+    ok(n, 'negative size throws')
 .end
 
 .sub test_alloc

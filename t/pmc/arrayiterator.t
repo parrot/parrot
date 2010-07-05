@@ -24,7 +24,7 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(22)
+    plan(28)
 
     iterate_forward() # 8 tests
     iterate_backward() # 6 tests
@@ -52,6 +52,26 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     $P0 = shift it
     ok(it, "Can shift 1st element")
     is($P0, 1, "With expected value")
+
+    $P1 = new ['Integer'], 0
+    $I0 = exists it[$P1]
+    is($I0, 1, "exists_keyed gives expected value")
+
+    $I0 = defined it[$P1]
+    is($I0, 1, "defined_keyed gives expected value")
+
+    $P2 = it[$P1]
+    is($P2, 42, "get_pmc_keyed gives expected value")
+
+    $I0 = it[$P1]
+    is($I0, 42, "get_integer_keyed gives expected value")
+
+    $N0 = it[$P1]
+    is($N0, 42.0, "get_number_keyed gives expected value")
+
+    $S0 = it[$P1]
+    is($S0, '42', "get_string_keyed gives expected value")
+
     $P0 = shift it
     nok(it, "Iterator is finished after second shift")
     is($P0, 42, "2nd element has correct value")
@@ -108,13 +128,39 @@ handles:
     nok(it, "Iterator is finished after second shift")
     is($P0, 1, "2nd element has correct value")
 
-    $I0 = 1
-    push_eh fail
-    $P0 = shift it
-    $I0 = 0
+    .local int result
+    .local pmc ehandler
+    result = 0
+    ehandler = new ['ExceptionHandler']
+    ehandler.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh ehandler
+
+    set_addr ehandler, handlep
+    $P0 = pop it
+    goto fail
+handlep:
+    finalize ehandler
+    set_addr ehandler, handlei
+    $I0 = pop it
+    goto fail
+handlei:
+    finalize ehandler
+    set_addr ehandler, handlen
+    $N0 = pop it
+    goto fail
+handlen:
+    finalize ehandler
+    set_addr ehandler, handles
+    $S0 = pop it
+    goto fail
+handles:
+    finalize ehandler
+
+    result = 1
   fail:
     pop_eh
-    ok($I0, "Shifting from finished iterator throws exception")
+    ok(result, "pop from finished iterator throws out of bounds exception")
+
 .end
 
 .sub 'iterate_backward_string'

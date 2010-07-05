@@ -28,7 +28,6 @@
 #if defined(PARROT_IN_CORE)
 
 #define Parrot_Language Parrot_Int
-#define Parrot_VTABLE VTABLE *
 
 /* Macro to save off the original stack pointer for GC scanning. If
    the stacktop was NULL, then set it to the address of the cached
@@ -74,8 +73,10 @@ void Parrot_ext_call(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(SHIM_INTERP, SHIM(char *language));
+Parrot_Language Parrot_find_language(SHIM_INTERP,
+    SHIM(const char *language));
 
 PARROT_EXPORT
 int Parrot_fprintf(PARROT_INTERP,
@@ -90,22 +91,27 @@ PARROT_EXPORT
 void Parrot_free_cstring(ARGFREE(char *string));
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Float Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC Parrot_get_root_namespace(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_String Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
@@ -128,6 +134,7 @@ Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC Parrot_PMC_null(void);
 
 PARROT_EXPORT

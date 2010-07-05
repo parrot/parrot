@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -27,6 +27,10 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     $P0 = new ['Exporter']
     say "ok 1 - $P0 = new ['Exporter']"
+
+    # Most uses of export are short-lived, so use a explicit sweep
+    # here to ensure coverage of the mark vtable.
+    sweep 1
 
     $I0 = isa $P0, 'Exporter'
     if $I0 goto ok_2

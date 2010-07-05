@@ -14181,7 +14181,7 @@ return (opcode_t *)cur_opcode + 1;}
 opcode_t *
 Parrot_check_events(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t * const next =cur_opcode + 1;
+    opcode_t * const next = cur_opcode + 1;
     Parrot_cx_check_tasks(interp, interp->scheduler);return (opcode_t *)next;   /* force this being a branch op */
 }
 
@@ -14243,7 +14243,7 @@ opcode_t *
 Parrot_local_branch_p_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL return_addr;
-    opcode_t * const dest =cur_opcode + 3;
+    opcode_t * const dest = cur_opcode + 3;
 
     if (PMC_IS_NULL(PREG(1)) || PREG(1)->vtable->base_type != enum_class_ResizableIntegerArray) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
@@ -14259,7 +14259,7 @@ opcode_t *
 Parrot_local_branch_p_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL return_addr;
-    opcode_t * const dest =cur_opcode + 3;
+    opcode_t * const dest = cur_opcode + 3;
 
     if (PMC_IS_NULL(PREG(1)) || PREG(1)->vtable->base_type != enum_class_ResizableIntegerArray) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
@@ -14276,7 +14276,7 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL return_addr;
     opcode_t *next;
-    opcode_t * const dest =cur_opcode + 2;
+    opcode_t * const dest = cur_opcode + 2;
 
     if (PMC_IS_NULL(PREG(1)) || PREG(1)->vtable->base_type != enum_class_ResizableIntegerArray) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
@@ -14375,7 +14375,7 @@ opcode_t *
 Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const p     = PREG(1);
-    opcode_t *dest         =cur_opcode + 2;
+    opcode_t *dest         = cur_opcode + 2;
     PMC      * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
@@ -14390,7 +14390,7 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t   *dest       =cur_opcode + 3;
+    opcode_t   *dest       = cur_opcode + 3;
     PMC * const p          = PREG(1);
     PMC * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
@@ -14407,7 +14407,7 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_yield(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t   *dest =cur_opcode + 1;
+    opcode_t   *dest = cur_opcode + 1;
     PMC * const p    = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 
     VTABLE_increment(interp, p);
@@ -14418,7 +14418,7 @@ opcode_t *
 Parrot_tailcall_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const p               = PREG(1);
-    opcode_t   *dest            =cur_opcode + 2;
+    opcode_t   *dest            = cur_opcode + 2;
     PMC * const ctx             = CURRENT_CONTEXT(interp);
     PMC * const parent_ctx      = Parrot_pcc_get_caller_ctx(interp, ctx);
     PMC * const this_call_sig   = Parrot_pcc_get_signature(interp, ctx);
@@ -14435,7 +14435,7 @@ opcode_t *
 Parrot_returncc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-    opcode_t * const dest = VTABLE_invoke(interp, p,cur_opcode + 1);return (opcode_t *)dest;
+    opcode_t * const dest = VTABLE_invoke(interp, p, cur_opcode + 1);return (opcode_t *)dest;
 }
 
 opcode_t *
@@ -14629,7 +14629,7 @@ Parrot_throw_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * except = PREG(1);
     opcode_t *dest;
-    opcode_t * const ret    =cur_opcode + 2;
+    opcode_t * const ret    = cur_opcode + 2;
     PMC      * const resume = pmc_new(interp, enum_class_Continuation);
 
     VTABLE_set_pointer(interp, resume, ret);
@@ -14661,7 +14661,7 @@ Parrot_rethrow_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t * dest;
     if (PMC_IS_NULL(PREG(1)) || PREG(1)->vtable->base_type != enum_class_Exception) {
-        opcode_t * const ret    =cur_opcode + 2;
+        opcode_t * const ret    = cur_opcode + 2;
         PMC      * const except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
@@ -14682,7 +14682,7 @@ opcode_t *
 Parrot_die_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const ret       =cur_opcode + 2;
+    opcode_t * const ret       = cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_error,
                                     CONTROL_ERROR, SREG(1));
@@ -14698,7 +14698,7 @@ opcode_t *
 Parrot_die_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const ret       =cur_opcode + 2;
+    opcode_t * const ret       = cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_error,
                                     CONTROL_ERROR, CONST(1)->u.string);
@@ -14714,7 +14714,7 @@ opcode_t *
 Parrot_die_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const ret       =cur_opcode + 2;
+    opcode_t * const ret       = cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     STRING   * const msg       = PMC_IS_NULL(PREG(1)) ? NULL : VTABLE_get_string(interp, PREG(1));
     PMC      * const exception =
@@ -14731,7 +14731,7 @@ opcode_t *
 Parrot_die_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const ret       =cur_opcode + 2;
+    opcode_t * const ret       = cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     STRING   * const msg       = PMC_IS_NULL(CONST(1)->u.key) ? NULL : VTABLE_get_string(interp, CONST(1)->u.key);
     PMC      * const exception =
@@ -14750,7 +14750,7 @@ Parrot_die_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (IREG(1) == EXCEPT_doomed)
         _exit(IREG(2));
     else {
-        opcode_t * const ret       =cur_opcode + 3;
+        opcode_t * const ret       = cur_opcode + 3;
         PMC      * const exception = Parrot_ex_build_exception(interp, IREG(1), IREG(2), NULL);
         opcode_t * const dest      = Parrot_ex_throw_from_op(interp, exception, ret);return (opcode_t *)dest;
     }
@@ -14762,7 +14762,7 @@ Parrot_die_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (cur_opcode[1] == EXCEPT_doomed)
         _exit(IREG(2));
     else {
-        opcode_t * const ret       =cur_opcode + 3;
+        opcode_t * const ret       = cur_opcode + 3;
         PMC      * const exception = Parrot_ex_build_exception(interp, cur_opcode[1], IREG(2), NULL);
         opcode_t * const dest      = Parrot_ex_throw_from_op(interp, exception, ret);return (opcode_t *)dest;
     }
@@ -14774,7 +14774,7 @@ Parrot_die_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (IREG(1) == EXCEPT_doomed)
         _exit(cur_opcode[2]);
     else {
-        opcode_t * const ret       =cur_opcode + 3;
+        opcode_t * const ret       = cur_opcode + 3;
         PMC      * const exception = Parrot_ex_build_exception(interp, IREG(1), cur_opcode[2], NULL);
         opcode_t * const dest      = Parrot_ex_throw_from_op(interp, exception, ret);return (opcode_t *)dest;
     }
@@ -14786,7 +14786,7 @@ Parrot_die_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (cur_opcode[1] == EXCEPT_doomed)
         _exit(cur_opcode[2]);
     else {
-        opcode_t * const ret       =cur_opcode + 3;
+        opcode_t * const ret       = cur_opcode + 3;
         PMC      * const exception = Parrot_ex_build_exception(interp, cur_opcode[1], cur_opcode[2], NULL);
         opcode_t * const dest      = Parrot_ex_throw_from_op(interp, exception, ret);return (opcode_t *)dest;
     }
@@ -14796,7 +14796,7 @@ opcode_t *
 Parrot_exit_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const ret       =cur_opcode + 2;
+    opcode_t * const ret       = cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
@@ -14814,7 +14814,7 @@ opcode_t *
 Parrot_exit_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const ret       =cur_opcode + 2;
+    opcode_t * const ret       = cur_opcode + 2;
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
@@ -15126,7 +15126,6 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    char * const  name      = Parrot_str_to_cstring(interp, (SREG(3)));
     void         *dl_handle = NULL;
     void         *ptr       = NULL;
     funcptr_t     p;
@@ -15137,27 +15136,25 @@ Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym(dl_handle, name);
+    ptr = Parrot_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", SREG(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
         PREG(1) = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, PREG(1), SREG(4), F2DPTR(p));
     }
-    Parrot_str_free_cstring(name);
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    char * const  name      = Parrot_str_to_cstring(interp, (CONST(3)->u.string));
     void         *dl_handle = NULL;
     void         *ptr       = NULL;
     funcptr_t     p;
@@ -15168,27 +15165,25 @@ Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym(dl_handle, name);
+    ptr = Parrot_dlsym_str(interp, dl_handle, CONST(3)->u.string);
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", CONST(3)->u.string, err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
         PREG(1) = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, PREG(1), SREG(4), F2DPTR(p));
     }
-    Parrot_str_free_cstring(name);
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    char * const  name      = Parrot_str_to_cstring(interp, (SREG(3)));
     void         *dl_handle = NULL;
     void         *ptr       = NULL;
     funcptr_t     p;
@@ -15199,27 +15194,25 @@ Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym(dl_handle, name);
+    ptr = Parrot_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", SREG(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
         PREG(1) = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, PREG(1), CONST(4)->u.string, F2DPTR(p));
     }
-    Parrot_str_free_cstring(name);
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    char * const  name      = Parrot_str_to_cstring(interp, (CONST(3)->u.string));
     void         *dl_handle = NULL;
     void         *ptr       = NULL;
     funcptr_t     p;
@@ -15230,27 +15223,25 @@ Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym(dl_handle, name);
+    ptr = Parrot_dlsym_str(interp, dl_handle, CONST(3)->u.string);
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", CONST(3)->u.string, err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
         PREG(1) = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, PREG(1), CONST(4)->u.string, F2DPTR(p));
     }
-    Parrot_str_free_cstring(name);
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    char * const  name      = Parrot_str_to_cstring(interp, (SREG(3)));
     void *        dl_handle = NULL;
     void *        p         = NULL;
 
@@ -15260,12 +15251,12 @@ Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    p = Parrot_dlsym(dl_handle, name);
+    p = Parrot_dlsym_str(interp, dl_handle, SREG(3));
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", SREG(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
@@ -15274,14 +15265,12 @@ Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, PREG(1), p);
     }
-    Parrot_str_free_cstring(name);
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    char * const  name      = Parrot_str_to_cstring(interp, (CONST(3)->u.string));
     void *        dl_handle = NULL;
     void *        p         = NULL;
 
@@ -15291,12 +15280,12 @@ Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    p = Parrot_dlsym(dl_handle, name);
+    p = Parrot_dlsym_str(interp, dl_handle, CONST(3)->u.string);
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", CONST(3)->u.string, err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
@@ -15305,7 +15294,6 @@ Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, PREG(1), p);
     }
-    Parrot_str_free_cstring(name);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -15363,7 +15351,7 @@ opcode_t *
 Parrot_annotations_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     if (interp->code->annotations) {
-        const opcode_t cur_pos = (cur_opcode + 2) - interp->code->base.data;
+        const opcode_t cur_pos = ( cur_opcode + 2) - interp->code->base.data;
         PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations,
                 cur_pos, NULL);
     }
@@ -15377,7 +15365,7 @@ opcode_t *
 Parrot_annotations_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     if (interp->code->annotations) {
-        const opcode_t cur_pos = (cur_opcode + 3) - interp->code->base.data;
+        const opcode_t cur_pos = ( cur_opcode + 3) - interp->code->base.data;
         PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations,
                 cur_pos, SREG(2));
     }
@@ -15391,7 +15379,7 @@ opcode_t *
 Parrot_annotations_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     if (interp->code->annotations) {
-        const opcode_t cur_pos = (cur_opcode + 3) - interp->code->base.data;
+        const opcode_t cur_pos = ( cur_opcode + 3) - interp->code->base.data;
         PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations,
                 cur_pos, CONST(2)->u.string);
     }
@@ -17375,7 +17363,7 @@ Parrot_say_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC * const p = PREG(1);
 
     if (PMC_IS_NULL(p)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 2,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 2,
              EXCEPTION_UNEXPECTED_NULL,
             "Null PMC in say");return (opcode_t *)handler;
     }
@@ -17685,7 +17673,7 @@ Parrot_div_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL den = IREG(2);
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17698,7 +17686,7 @@ Parrot_div_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL den = cur_opcode[2];
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17711,7 +17699,7 @@ Parrot_div_n_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = NREG(2);
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17724,7 +17712,7 @@ Parrot_div_n_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = CONST(2)->u.number;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17772,7 +17760,7 @@ Parrot_div_i_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL den = IREG(3);
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17785,7 +17773,7 @@ Parrot_div_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL den = IREG(3);
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17798,7 +17786,7 @@ Parrot_div_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL den = cur_opcode[3];
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17811,7 +17799,7 @@ Parrot_div_i_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     INTVAL den = cur_opcode[3];
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17824,7 +17812,7 @@ Parrot_div_n_n_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = NREG(3);
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17837,7 +17825,7 @@ Parrot_div_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = NREG(3);
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17850,7 +17838,7 @@ Parrot_div_n_n_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = CONST(3)->u.number;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17863,7 +17851,7 @@ Parrot_div_n_nc_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = CONST(3)->u.number;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17913,7 +17901,7 @@ Parrot_fdiv_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17930,7 +17918,7 @@ Parrot_fdiv_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17945,7 +17933,7 @@ Parrot_fdiv_n_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = NREG(2);
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -17958,7 +17946,7 @@ Parrot_fdiv_n_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = CONST(2)->u.number;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18008,7 +17996,7 @@ Parrot_fdiv_i_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18025,7 +18013,7 @@ Parrot_fdiv_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18042,7 +18030,7 @@ Parrot_fdiv_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18057,7 +18045,7 @@ Parrot_fdiv_n_n_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = NREG(3);
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18070,7 +18058,7 @@ Parrot_fdiv_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = NREG(3);
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18083,7 +18071,7 @@ Parrot_fdiv_n_n_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     FLOATVAL den = CONST(3)->u.number;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");return (opcode_t *)handler;
     }
@@ -18665,16 +18653,23 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const object     = PREG(1);
     STRING   * const meth       = SREG(2);
-    opcode_t * const next       =cur_opcode + 3;
+    opcode_t * const next       = cur_opcode + 3;
 
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
-    PMC      * const signature  = Parrot_pcc_get_signature(interp,
-                                    CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
 
-    if (PMC_IS_NULL(method_pmc)) {
+    if (!PMC_IS_NULL(method_pmc)) {
+        PMC * const signature = Parrot_pcc_get_signature(interp,
+                                    CURRENT_CONTEXT(interp));
+        if (!PMC_IS_NULL(signature))
+            Parrot_pcc_set_object(interp, signature, object);
+
+        interp->current_cont = NEED_CONTINUATION;
+        dest                 = VTABLE_invoke(interp, method_pmc, next);
+    }
+    else {
         PMC * const _class = VTABLE_get_class(interp, object);
         if (PMC_IS_NULL(_class)) {
             dest = Parrot_ex_throw_from_op_args(interp, next,
@@ -18687,12 +18682,6 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
                 "Method '%Ss' not found for invocant of class '%Ss'", meth,
                 VTABLE_get_string(interp, _class));
         }
-    }
-    else {
-        if (!PMC_IS_NULL(signature))
-            Parrot_pcc_set_object(interp, signature, object);
-        interp->current_cont   = NEED_CONTINUATION;
-        dest                   = VTABLE_invoke(interp, method_pmc, next);
     }return (opcode_t *)dest;
 }
 
@@ -18701,16 +18690,23 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const object     = PREG(1);
     STRING   * const meth       = CONST(2)->u.string;
-    opcode_t * const next       =cur_opcode + 3;
+    opcode_t * const next       = cur_opcode + 3;
 
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
-    PMC      * const signature  = Parrot_pcc_get_signature(interp,
-                                    CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
 
-    if (PMC_IS_NULL(method_pmc)) {
+    if (!PMC_IS_NULL(method_pmc)) {
+        PMC * const signature = Parrot_pcc_get_signature(interp,
+                                    CURRENT_CONTEXT(interp));
+        if (!PMC_IS_NULL(signature))
+            Parrot_pcc_set_object(interp, signature, object);
+
+        interp->current_cont = NEED_CONTINUATION;
+        dest                 = VTABLE_invoke(interp, method_pmc, next);
+    }
+    else {
         PMC * const _class = VTABLE_get_class(interp, object);
         if (PMC_IS_NULL(_class)) {
             dest = Parrot_ex_throw_from_op_args(interp, next,
@@ -18723,12 +18719,6 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
                 "Method '%Ss' not found for invocant of class '%Ss'", meth,
                 VTABLE_get_string(interp, _class));
         }
-    }
-    else {
-        if (!PMC_IS_NULL(signature))
-            Parrot_pcc_set_object(interp, signature, object);
-        interp->current_cont   = NEED_CONTINUATION;
-        dest                   = VTABLE_invoke(interp, method_pmc, next);
     }return (opcode_t *)dest;
 }
 
@@ -18736,7 +18726,7 @@ opcode_t *
 Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t        *dest;
-    opcode_t * const next  =cur_opcode + 3;
+    opcode_t * const next  = cur_opcode + 3;
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
@@ -18753,7 +18743,7 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const object     = PREG(1);
     STRING   * const meth       = SREG(2);
-    opcode_t * const next       =cur_opcode + 4;
+    opcode_t * const next       = cur_opcode + 4;
 
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
@@ -18780,7 +18770,7 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const object     = PREG(1);
     STRING   * const meth       = CONST(2)->u.string;
-    opcode_t * const next       =cur_opcode + 4;
+    opcode_t * const next       = cur_opcode + 4;
 
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
@@ -18807,7 +18797,7 @@ Parrot_callmethod_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const object     = PREG(1);
     PMC      * const method_pmc = PREG(2);
-    opcode_t * const next       =cur_opcode + 4;
+    opcode_t * const next       = cur_opcode + 4;
 
     opcode_t *dest;
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
@@ -18824,7 +18814,7 @@ Parrot_callmethod_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_tailcallmethod_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t * const next       =cur_opcode + 3;
+    opcode_t * const next       = cur_opcode + 3;
     PMC      * const object     = PREG(1);
     STRING   * const meth       = SREG(2);
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
@@ -18850,7 +18840,7 @@ Parrot_tailcallmethod_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_tailcallmethod_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t * const next       =cur_opcode + 3;
+    opcode_t * const next       = cur_opcode + 3;
     PMC      * const object     = PREG(1);
     STRING   * const meth       = CONST(2)->u.string;
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
@@ -18876,7 +18866,7 @@ Parrot_tailcallmethod_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_tailcallmethod_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t * const next       =cur_opcode + 3;
+    opcode_t * const next       = cur_opcode + 3;
     PMC      * const object     = PREG(1);
     PMC      * const method_pmc = PREG(2);
 
@@ -19012,7 +19002,7 @@ opcode_t *
 Parrot_subclass_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, PREG(2));
-    opcode_t * const next         =cur_opcode + 3;
+    opcode_t * const next         = cur_opcode + 3;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19027,7 +19017,7 @@ opcode_t *
 Parrot_subclass_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, CONST(2)->u.key);
-    opcode_t * const next         =cur_opcode + 3;
+    opcode_t * const next         = cur_opcode + 3;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19042,7 +19032,7 @@ opcode_t *
 Parrot_subclass_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, PREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t * handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19057,7 +19047,7 @@ opcode_t *
 Parrot_subclass_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, CONST(2)->u.key);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t * handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19072,7 +19062,7 @@ opcode_t *
 Parrot_subclass_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, PREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t * handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19087,7 +19077,7 @@ opcode_t *
 Parrot_subclass_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, CONST(2)->u.key);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t * handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19102,7 +19092,7 @@ opcode_t *
 Parrot_subclass_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, PREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19117,7 +19107,7 @@ opcode_t *
 Parrot_subclass_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, CONST(2)->u.key);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19132,7 +19122,7 @@ opcode_t *
 Parrot_subclass_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, PREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19147,7 +19137,7 @@ opcode_t *
 Parrot_subclass_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class(interp, CONST(2)->u.key);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19162,7 +19152,7 @@ opcode_t *
 Parrot_subclass_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, SREG(2));
-    opcode_t * const next         =cur_opcode + 3;
+    opcode_t * const next         = cur_opcode + 3;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19178,7 +19168,7 @@ opcode_t *
 Parrot_subclass_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, CONST(2)->u.string);
-    opcode_t * const next         =cur_opcode + 3;
+    opcode_t * const next         = cur_opcode + 3;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19194,7 +19184,7 @@ opcode_t *
 Parrot_subclass_p_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, SREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19210,7 +19200,7 @@ opcode_t *
 Parrot_subclass_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, CONST(2)->u.string);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19226,7 +19216,7 @@ opcode_t *
 Parrot_subclass_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, SREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19242,7 +19232,7 @@ opcode_t *
 Parrot_subclass_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, CONST(2)->u.string);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19258,7 +19248,7 @@ opcode_t *
 Parrot_subclass_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, SREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19274,7 +19264,7 @@ opcode_t *
 Parrot_subclass_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, CONST(2)->u.string);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19290,7 +19280,7 @@ opcode_t *
 Parrot_subclass_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, SREG(2));
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19306,7 +19296,7 @@ opcode_t *
 Parrot_subclass_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, CONST(2)->u.string);
-    opcode_t * const next         =cur_opcode + 4;
+    opcode_t * const next         = cur_opcode + 4;
 
     if (PMC_IS_NULL(parent_class)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
@@ -19559,7 +19549,7 @@ Parrot_new_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -19581,7 +19571,7 @@ Parrot_new_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -19603,7 +19593,7 @@ Parrot_new_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -19625,7 +19615,7 @@ Parrot_new_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -19647,7 +19637,7 @@ Parrot_new_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -19669,7 +19659,7 @@ Parrot_new_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -19689,7 +19679,7 @@ Parrot_new_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
         }
@@ -19709,7 +19699,7 @@ Parrot_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
         }
@@ -19729,7 +19719,7 @@ Parrot_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
         }
@@ -19749,7 +19739,7 @@ Parrot_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
         }
@@ -19769,7 +19759,7 @@ Parrot_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
         }
@@ -19789,7 +19779,7 @@ Parrot_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
         }
@@ -19811,7 +19801,7 @@ Parrot_root_new_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (!PMC_IS_NULL(classobj))
         PREG(1) = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));return (opcode_t *)dest;
     }
@@ -19831,7 +19821,7 @@ Parrot_root_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (!PMC_IS_NULL(classobj))
         PREG(1) = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 3,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));return (opcode_t *)dest;
     }
@@ -19851,7 +19841,7 @@ Parrot_root_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (!PMC_IS_NULL(classobj))
         PREG(1) = VTABLE_instantiate(interp, classobj, PREG(3));
     else {
-        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));return (opcode_t *)dest;
     }
@@ -19871,7 +19861,7 @@ Parrot_root_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (!PMC_IS_NULL(classobj))
         PREG(1) = VTABLE_instantiate(interp, classobj, PREG(3));
     else {
-        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));return (opcode_t *)dest;
     }
@@ -19891,7 +19881,7 @@ Parrot_root_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (!PMC_IS_NULL(classobj))
         PREG(1) = VTABLE_instantiate(interp, classobj, CONST(3)->u.key);
     else {
-        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));return (opcode_t *)dest;
     }
@@ -19911,7 +19901,7 @@ Parrot_root_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     if (!PMC_IS_NULL(classobj))
         PREG(1) = VTABLE_instantiate(interp, classobj, CONST(3)->u.key);
     else {
-        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));return (opcode_t *)dest;
     }
@@ -19942,7 +19932,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_find_method_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t * const resume =cur_opcode + 4;
+    opcode_t * const resume = cur_opcode + 4;
     PREG(1) = VTABLE_find_method(interp, PREG(2), SREG(3));
     if (PMC_IS_NULL(PREG(1)) || !VTABLE_defined(interp, PREG(1))) {
         opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, resume,
@@ -19955,7 +19945,7 @@ Parrot_find_method_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_find_method_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t * const resume =cur_opcode + 4;
+    opcode_t * const resume = cur_opcode + 4;
     PREG(1) = VTABLE_find_method(interp, PREG(2), CONST(3)->u.string);
     if (PMC_IS_NULL(PREG(1)) || !VTABLE_defined(interp, PREG(1))) {
         opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, resume,
@@ -21087,7 +21077,7 @@ opcode_t *
 Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     if (PMC_IS_NULL(PREG(1))) {
-        opcode_t * const dest =cur_opcode + 3;
+        opcode_t * const dest = cur_opcode + 3;
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
                 EXCEPTION_NULL_REG_ACCESS, "Null PMC in copy");return (opcode_t *)handler;
     }
@@ -22576,7 +22566,7 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_sleep_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t *next =cur_opcode + 2;
+    opcode_t *next = cur_opcode + 2;
     if (IREG(1) < 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NEG_SLEEP,
@@ -22588,7 +22578,7 @@ Parrot_sleep_i(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_sleep_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t *next =cur_opcode + 2;
+    opcode_t *next = cur_opcode + 2;
     if (cur_opcode[1] < 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NEG_SLEEP,
@@ -22600,7 +22590,7 @@ Parrot_sleep_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_sleep_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t *next =cur_opcode + 2;
+    opcode_t *next = cur_opcode + 2;
     if (NREG(1) < 0.0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NEG_SLEEP,
@@ -22612,7 +22602,7 @@ Parrot_sleep_n(opcode_t *cur_opcode, PARROT_INTERP)  {
 opcode_t *
 Parrot_sleep_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t *next =cur_opcode + 2;
+    opcode_t *next = cur_opcode + 2;
     if (CONST(1)->u.number < 0.0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NEG_SLEEP,
@@ -22911,7 +22901,7 @@ opcode_t *
 Parrot_get_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, SREG(2), cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -22919,7 +22909,7 @@ opcode_t *
 Parrot_get_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, cur_ns, CONST(2)->u.string, cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -22935,7 +22925,7 @@ Parrot_get_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3), cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22952,7 +22942,7 @@ Parrot_get_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3), cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22969,7 +22959,7 @@ Parrot_get_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string, cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22986,7 +22976,7 @@ Parrot_get_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string, cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -22995,7 +22985,7 @@ opcode_t *
 Parrot_get_hll_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, SREG(2), cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23003,7 +22993,7 @@ opcode_t *
 Parrot_get_hll_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, CONST(2)->u.string, cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23019,7 +23009,7 @@ Parrot_get_hll_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3), cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23036,7 +23026,7 @@ Parrot_get_hll_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3), cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23053,7 +23043,7 @@ Parrot_get_hll_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string, cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23070,7 +23060,7 @@ Parrot_get_hll_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string, cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23079,7 +23069,7 @@ opcode_t *
 Parrot_get_root_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, SREG(2), cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23087,7 +23077,7 @@ opcode_t *
 Parrot_get_root_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC * const root_ns = interp->root_namespace;
-    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, CONST(2)->u.string, cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23102,7 +23092,7 @@ Parrot_get_root_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3), cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23118,7 +23108,7 @@ Parrot_get_root_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3),cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, SREG(3), cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23134,7 +23124,7 @@ Parrot_get_root_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string, cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23150,7 +23140,7 @@ Parrot_get_root_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         if (PMC_IS_NULL(ns))
             PREG(1) = PMCNULL;
         else
-            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string,cur_opcode + 4);
+            PREG(1) = Parrot_ns_find_global_from_op(interp, ns, CONST(3)->u.string, cur_opcode + 4);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -23332,7 +23322,7 @@ Parrot_find_name_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
                 "Tried to find null name");return (opcode_t *)handler;
     }
 
-    PREG(1) = Parrot_ns_find_named_item(interp, SREG(2),cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_named_item(interp, SREG(2), cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23345,14 +23335,14 @@ Parrot_find_name_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
                 "Tried to find null name");return (opcode_t *)handler;
     }
 
-    PREG(1) = Parrot_ns_find_named_item(interp, CONST(2)->u.string,cur_opcode + 3);
+    PREG(1) = Parrot_ns_find_named_item(interp, CONST(2)->u.string, cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t *dest =cur_opcode + 3;
+    opcode_t *dest = cur_opcode + 3;
     PMC *sub = Parrot_ns_find_named_item(interp, SREG(2), dest);
 
     if (PMC_IS_NULL(sub)) {
@@ -23370,7 +23360,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    opcode_t *dest =cur_opcode + 3;
+    opcode_t *dest = cur_opcode + 3;
     PMC *sub = Parrot_ns_find_named_item(interp, CONST(2)->u.string, dest);
 
     if (PMC_IS_NULL(sub)) {
@@ -23424,7 +23414,7 @@ Parrot_fetch_p_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23446,7 +23436,7 @@ Parrot_fetch_p_pc_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23468,7 +23458,7 @@ Parrot_fetch_p_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23490,7 +23480,7 @@ Parrot_fetch_p_pc_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23512,7 +23502,7 @@ Parrot_fetch_p_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23534,7 +23524,7 @@ Parrot_fetch_p_pc_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23556,7 +23546,7 @@ Parrot_fetch_p_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23578,7 +23568,7 @@ Parrot_fetch_p_pc_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23600,7 +23590,7 @@ Parrot_fetch_p_p_i_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23622,7 +23612,7 @@ Parrot_fetch_p_pc_i_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23644,7 +23634,7 @@ Parrot_fetch_p_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23666,7 +23656,7 @@ Parrot_fetch_p_pc_ic_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23688,7 +23678,7 @@ Parrot_fetch_p_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23710,7 +23700,7 @@ Parrot_fetch_p_pc_i_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23732,7 +23722,7 @@ Parrot_fetch_p_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23754,7 +23744,7 @@ Parrot_fetch_p_pc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23776,7 +23766,7 @@ Parrot_fetch_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23798,7 +23788,7 @@ Parrot_fetch_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23820,7 +23810,7 @@ Parrot_fetch_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23842,7 +23832,7 @@ Parrot_fetch_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23864,7 +23854,7 @@ Parrot_fetch_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23886,7 +23876,7 @@ Parrot_fetch_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23908,7 +23898,7 @@ Parrot_fetch_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23930,7 +23920,7 @@ Parrot_fetch_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -23954,7 +23944,7 @@ Parrot_vivify_p_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -23979,7 +23969,7 @@ Parrot_vivify_p_pc_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24004,7 +23994,7 @@ Parrot_vivify_p_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24029,7 +24019,7 @@ Parrot_vivify_p_pc_pc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24054,7 +24044,7 @@ Parrot_vivify_p_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24079,7 +24069,7 @@ Parrot_vivify_p_pc_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24104,7 +24094,7 @@ Parrot_vivify_p_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24129,7 +24119,7 @@ Parrot_vivify_p_pc_pc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24153,7 +24143,7 @@ Parrot_vivify_p_p_i_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24178,7 +24168,7 @@ Parrot_vivify_p_pc_i_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24203,7 +24193,7 @@ Parrot_vivify_p_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24228,7 +24218,7 @@ Parrot_vivify_p_pc_ic_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24253,7 +24243,7 @@ Parrot_vivify_p_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24278,7 +24268,7 @@ Parrot_vivify_p_pc_i_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24303,7 +24293,7 @@ Parrot_vivify_p_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24328,7 +24318,7 @@ Parrot_vivify_p_pc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24353,7 +24343,7 @@ Parrot_vivify_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24378,7 +24368,7 @@ Parrot_vivify_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24403,7 +24393,7 @@ Parrot_vivify_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24428,7 +24418,7 @@ Parrot_vivify_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, PREG(4));
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));return (opcode_t *)dest;
             }
 
@@ -24453,7 +24443,7 @@ Parrot_vivify_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24478,7 +24468,7 @@ Parrot_vivify_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24503,7 +24493,7 @@ Parrot_vivify_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24528,7 +24518,7 @@ Parrot_vivify_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
             const INTVAL type = Parrot_pmc_get_type(interp, CONST(4)->u.key);
             if (type <= 0) {
                 opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp,cur_opcode + 5, EXCEPTION_NO_CLASS,
+                    interp, cur_opcode + 5, EXCEPTION_NO_CLASS,
                     "Class '%Ss' not found", VTABLE_get_repr(interp, CONST(4)->u.key));return (opcode_t *)dest;
             }
 
@@ -24556,7 +24546,7 @@ Parrot_new_p_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -24581,7 +24571,7 @@ Parrot_new_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -24606,7 +24596,7 @@ Parrot_new_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -24631,7 +24621,7 @@ Parrot_new_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);return (opcode_t *)dest;
         }
@@ -24665,7 +24655,7 @@ Parrot_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24697,7 +24687,7 @@ Parrot_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24729,7 +24719,7 @@ Parrot_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24761,7 +24751,7 @@ Parrot_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24795,7 +24785,7 @@ Parrot_root_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24829,7 +24819,7 @@ Parrot_root_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24863,7 +24853,7 @@ Parrot_root_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24897,7 +24887,7 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp,cur_opcode + 4,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 4,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));return (opcode_t *)dest;
     }
@@ -24914,7 +24904,7 @@ Parrot_find_codepoint_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_str_free_cstring(cstr);
     IREG(1) = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    opcode_t * const dest =cur_opcode + 3;
+    opcode_t * const dest = cur_opcode + 3;
     Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
@@ -24931,7 +24921,7 @@ Parrot_find_codepoint_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_str_free_cstring(cstr);
     IREG(1) = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    opcode_t * const dest =cur_opcode + 3;
+    opcode_t * const dest = cur_opcode + 3;
     Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
@@ -24942,7 +24932,7 @@ opcode_t *
 Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     /* Go to the next op after loop unrolling */
-    opcode_t * const dest =cur_opcode + 2;
+    opcode_t * const dest = cur_opcode + 2;
     PMC *eh = PMCNULL;
     if (!PMC_IS_NULL(PREG(1))) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
@@ -24981,7 +24971,7 @@ opcode_t *
 Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     /* Go to the next op after loop unrolling */
-    opcode_t * const dest =cur_opcode + 2;
+    opcode_t * const dest = cur_opcode + 2;
     PMC *eh = PMCNULL;
     if (!PMC_IS_NULL(CONST(1)->u.key)) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
@@ -25027,12 +25017,12 @@ static op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  4,    /* minor_version */
+  5,    /* minor_version */
   0,    /* patch_version */
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */
+  get_op          /* op_code() */ 
 };
 
 /*
@@ -25076,7 +25066,10 @@ static void hop_deinit(PARROT_INTERP);
  * returns >= 0 (found idx into info_table), -1 if not
  */
 
-static size_t hash_str(const char *str) {
+PARROT_PURE_FUNCTION
+static
+size_t hash_str(ARGIN(const char *str))
+{
     size_t      key = 0;
     const char *s   = str;
 
@@ -25088,7 +25081,8 @@ static size_t hash_str(const char *str) {
     return key;
 }
 
-static void store_op(PARROT_INTERP, op_info_t *info, int full) {
+static void store_op(PARROT_INTERP, op_info_t *info, int full)
+{
     HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
@@ -25097,7 +25091,9 @@ static void store_op(PARROT_INTERP, op_info_t *info, int full) {
     p->next   = hop[hidx];
     hop[hidx] = p;
 }
-static int get_op(PARROT_INTERP, const char * name, int full) {
+
+static int get_op(PARROT_INTERP, const char * name, int full)
+{
     const HOP * p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
@@ -25110,7 +25106,9 @@ static int get_op(PARROT_INTERP, const char * name, int full) {
     }
     return -1;
 }
-static void hop_init(PARROT_INTERP) {
+
+static void hop_init(PARROT_INTERP)
+{
     size_t i;
     op_info_t * const info = core_op_lib.op_info_table;
     /* store full names */
@@ -25121,6 +25119,7 @@ static void hop_init(PARROT_INTERP) {
         if (get_op(interp, info[i].name, 0) == -1)
             store_op(interp, info + i, 0);
 }
+
 static void hop_deinit(PARROT_INTERP)
 {
     if (hop) {

@@ -406,14 +406,6 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
 Get/set whether this node is an lvalue, or treats its first
 child as an lvalue (e.g., for assignment).
 
-=cut
-
-.sub 'lvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('lvalue', value, has_value)
-.end
-
 =item inline([STRING code])
 
 Get/set the code to be used for inline PIR when C<pasttype> is

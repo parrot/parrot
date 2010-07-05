@@ -79,7 +79,7 @@ You can install Parrot with:
 By default, this installs in /usr/local, with the Parrot executable in
 /usr/local/bin. If you want to install Parrot into another location use:
 
-    perl Configure.pl --prefix=/Users/foo/parrot-0.7.0
+    perl Configure.pl --prefix=/home/joe/bird
     make install
 
 But please note that dynamic libs will not be found for non-standard
