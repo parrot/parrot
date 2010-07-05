@@ -311,7 +311,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *task) >
+=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *task)>
 
 Add a task to the task queue for immediate execution.
 
@@ -949,7 +949,7 @@ Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
 
 /*
 
-=item C<void Parrot_cx_check_alarms(PARROT_INTERP, PMC *scheduler) >
+=item C<void Parrot_cx_check_alarms(PARROT_INTERP, PMC *scheduler)>
 
 Add the subs attached to any expired alarms to the task queue.
 

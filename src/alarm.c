@@ -19,6 +19,7 @@ static volatile UINTVAL    alarm_serial;
 
 /* This file relies on POSIX. Probably need two other versions of it:
  *  one for Windows and one for platforms with no signals or threads. */
+
 #include <sys/time.h>
 #include <signal.h>
 #include <errno.h>
@@ -35,12 +36,16 @@ static void set_posix_alarm(FLOATVAL wait);
 
 
 /*
-=head1 Parrot_alarm_init()
+
+=over 4
+
+=item C<void Parrot_alarm_init(void)>
 
 Initialize the alarm queue. This function should only be called from the initial
 pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 =cut
+
 */
 
 void Parrot_alarm_callback(SHIM(int sig_number));
@@ -65,11 +70,13 @@ Parrot_alarm_init(void)
 }
 
 /*
-=head1 Parrot_alarm_set(FLOATVAL when)
+
+=item C<static void set_posix_alarm(FLOATVAL wait)>
 
 A helper function to set an alarm.
 
 =cut
+
 */
 
 static void
@@ -97,11 +104,13 @@ set_posix_alarm(FLOATVAL wait)
 
 
 /*
-=head1 Parrot_alarm_callback()
+
+=item C<void Parrot_alarm_callback(int sig_number)>
 
 Callback for SIGALRM. When this is called, a timer should be ready to fire.
 
 =cut
+
 */
 
 void
@@ -130,7 +139,8 @@ Parrot_alarm_callback(SHIM(int sig_number))
 }
 
 /*
-=head1 Parrot_alarm_check(UINTVAL*)
+
+=item C<int Parrot_alarm_check(UINTVAL* last_serial)>
 
 Has any alarm triggered since we last checked?
 
@@ -138,6 +148,7 @@ Possible design improvement: Alert only the thread that
 set the alarm.
 
 =cut
+
 */
 
 PARROT_EXPORT
@@ -156,11 +167,13 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 }
 
 /*
-=head1 Parrot_alarm_set(FLOATVAL when)
+
+=item C<void Parrot_alarm_set(FLOATVAL when)>
 
 Sets an alarm to trigger at time 'when'.
 
 =cut
+
 */
 
 PARROT_EXPORT
