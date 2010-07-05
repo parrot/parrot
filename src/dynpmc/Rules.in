@@ -184,7 +184,7 @@ $(DYNEXT_DIR)/instrument_group$(LOAD_EXT): $(DYNPMC_INSTRUMENT_OBJS) src/dynpmc/
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
 src/dynpmc/instrument_group$(O): src/dynpmc/instrument.c src/dynpmc/instrumentop.c \
-    src/dynpmc/instrumentpmc.c src/dynpmc/instrumentgc.c $(DYNPMC_H_FILES)
+    src/dynpmc/instrumentvtable.c src/dynpmc/instrumentgc.c $(DYNPMC_H_FILES)
 
 src/dynpmc/instrument_group.c: $(DYNPMC_INSTRUMENT_OBJS)
 	$(PMC2C) --library instrument_group --c $(DYNPMC_INSTRUMENT)
@@ -224,13 +224,13 @@ src/dynpmc/instrumentop.c: src/dynpmc/instrumentop.dump
 src/dynpmc/instrumentop.dump: src/dynpmc/instrumentop.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/instrumentop.pmc
 
-src/dynpmc/pmc_instrumentpmc.h : src/dynpmc/instrumentpmc.c
+src/dynpmc/pmc_instrumentvtable.h : src/dynpmc/instrumentvtable.c
 
-src/dynpmc/instrumentpmc$(O): src/dynpmc/instrumentpmc.c $(DYNPMC_H_FILES) \
-    src/dynpmc/pmc_instrumentpmc.h
+src/dynpmc/instrumentvtable$(O): src/dynpmc/instrumentvtable.c $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_instrumentvtable.h
 
-src/dynpmc/instrumentpmc.c: src/dynpmc/instrumentpmc.dump
-	$(PMC2CC) src/dynpmc/instrumentpmc.pmc
+src/dynpmc/instrumentvtable.c: src/dynpmc/instrumentvtable.dump
+	$(PMC2CC) src/dynpmc/instrumentvtable.pmc
 
-src/dynpmc/instrumentpmc.dump: src/dynpmc/instrumentpmc.pmc vtable.dump $(CLASS_O_FILES)
-	$(PMC2CD) src/dynpmc/instrumentpmc.pmc
+src/dynpmc/instrumentvtable.dump: src/dynpmc/instrumentvtable.pmc vtable.dump $(CLASS_O_FILES)
+	$(PMC2CD) src/dynpmc/instrumentvtable.pmc

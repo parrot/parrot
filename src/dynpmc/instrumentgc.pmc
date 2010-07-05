@@ -13,10 +13,6 @@ instrument the gc_sys entry of Parrot_Interp.
 
 =head2 Methods
 
-=head1 TODO
-
-1. Tests.
-
 =over 4
 
 =cut

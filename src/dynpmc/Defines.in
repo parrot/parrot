@@ -25,13 +25,13 @@ DYNPMC_INSTRUMENT = \
     src/dynpmc/instrument.pmc \
     src/dynpmc/instrumentgc.pmc \
     src/dynpmc/instrumentop.pmc \
-    src/dynpmc/instrumentpmc.pmc
+    src/dynpmc/instrumentvtable.pmc
 
 DYNPMC_INSTRUMENT_OBJS = \
     src/dynpmc/instrument$(O) \
     src/dynpmc/instrumentgc$(O) \
     src/dynpmc/instrumentop$(O) \
-    src/dynpmc/instrumentpmc$(O)
+    src/dynpmc/instrumentvtable$(O)
 
 DYNPMC_H_FILES = \
     include/parrot/caches.h \
