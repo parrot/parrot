@@ -83,7 +83,7 @@ Free all the list cells.
         GET_ATTR_head(INTERP, SELF, tmp);
         aa = (PMC_List_Item*) tmp;
 
-        while(aa != NULL) {
+        while (aa != NULL) {
             bb = aa;
             aa = aa->next;
             free(bb);
@@ -97,7 +97,7 @@ Returns the size of the list.
 
 =cut
 */
-    
+
     VTABLE INTVAL get_integer() {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
@@ -141,14 +141,14 @@ Removes and returns an item from the start of the array.
         head = item->next;
         SET_ATTR_head(INTERP, SELF, head);
 
-        if(head == NULL) {
+        if (head == NULL) {
             /* size == 0 */
             SET_ATTR_foot(INTERP, SELF, NULL);
         } else {
             head->prev = NULL;
         }
-        
-        if(size == 1) {
+
+        if (size == 1) {
             head->next = NULL;
             SET_ATTR_foot(INTERP, SELF, head);
         }
@@ -178,20 +178,20 @@ the array.
         GET_ATTR_foot(INTERP, SELF, tmp);
         foot = (PMC_List_Item*) tmp;
 
-        item = (PMC_List_Item*) malloc(sizeof(PMC_List_Item));
+        item = (PMC_List_Item*) malloc(sizeof (PMC_List_Item));
         item->next = NULL;
         item->prev = foot;
         item->data = value;
 
-        if(foot)
+        if (foot)
             foot->next = item;
 
         size += 1;
-        
+
         SET_ATTR_foot(INTERP, SELF, item);
         SET_ATTR_size(INTERP, SELF, size);
 
-        if(size == 1)
+        if (size == 1)
             SET_ATTR_head(INTERP, SELF, item);
 
         return;
@@ -227,14 +227,14 @@ Removes and returns the last element in the array.
         foot = item->prev;
         SET_ATTR_foot(INTERP, SELF, foot);
 
-        if(foot == NULL) {
+        if (foot == NULL) {
             /* size == 0 */
             SET_ATTR_head(INTERP, SELF, NULL);
         } else {
             foot->next = NULL;
         }
-        
-        if(size == 1) {
+
+        if (size == 1) {
             foot->prev = NULL;
             SET_ATTR_head(INTERP, SELF, foot);
         }
@@ -264,20 +264,20 @@ the array.
         GET_ATTR_head(INTERP, SELF, tmp);
         head = (PMC_List_Item*) tmp;
 
-        item = (PMC_List_Item*) malloc(sizeof(PMC_List_Item));
+        item = (PMC_List_Item*) malloc(sizeof (PMC_List_Item));
         item->prev = NULL;
         item->next = head;
         item->data = value;
 
-        if(head)
+        if (head)
             head->prev = item;
 
         size += 1;
-        
+
         SET_ATTR_head(INTERP, SELF, item);
         SET_ATTR_size(INTERP, SELF, size);
 
-        if(size == 1)
+        if (size == 1)
             SET_ATTR_foot(INTERP, SELF, item);
 
         return;
@@ -301,11 +301,11 @@ Creates and returns a copy of the list.
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
 
-        while(it != NULL) {
+        while (it != NULL) {
             VTABLE_push_pmc(INTERP, copy, it->data);
             it = it->next;
         }
-        
+
         return copy;
     }
 
@@ -328,7 +328,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
 
-        while(it != NULL) {
+        while (it != NULL) {
             res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, it->data));
             res = Parrot_str_concat(INTERP, res, space);
             it = it->next;
@@ -369,7 +369,7 @@ Used to unarchive the array.
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
 
-        while(it != NULL) {
+        while (it != NULL) {
             VISIT_PMC(INTERP, info, it->data);
             it = it->next;
         }
@@ -387,7 +387,7 @@ Used to unarchive the array.
         n = VTABLE_shift_integer(INTERP, info);
         SET_ATTR_size(INTERP, SELF, n);
 
-        for(i = 0; i < n; ++i)
+        for (i = 0; i < n; ++i)
             VTABLE_push_pmc(INTERP, SELF, PMCNULL);
     }
 
@@ -406,8 +406,8 @@ Mark the stuff.
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
 
-        while(it != NULL) {
-            if(!PObj_is_PMC_TEST(it->data)) {
+        while (it != NULL) {
+            if (!PObj_is_PMC_TEST(it->data)) {
                 fprintf(stderr, "not a pmc\n");
                 exit(1);
             }
@@ -461,7 +461,7 @@ Method forms to add a PMC to the beginning or end of the array.
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 
-/* 
+/*
 =item METHOD insert_by_number(PMC* value)
 
 Inserts an item into an ordered list by it's number value.
@@ -491,7 +491,7 @@ Insert an item into a sorted list by its num value.
 */
 
 PARROT_EXPORT
-void 
+void
 Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) {
     void *tmp;
     PMC_List_Item *item;
@@ -503,29 +503,29 @@ Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) {
     GETATTR_PMCList_size(interp, list, size);
     GETATTR_PMCList_head(interp, list, tmp);
 
-    item = (PMC_List_Item*) malloc(sizeof(PMC_List_Item));
+    item = (PMC_List_Item*) malloc(sizeof (PMC_List_Item));
     item->data = value;
     item->next = (PMC_List_Item*) tmp;
     item->prev = NULL;
 
     vkey = VTABLE_get_number(interp, value);
-    
+
     /* Find the list item to insert before */
-    while(item->next != NULL) {
+    while (item->next != NULL) {
         ikey = VTABLE_get_number(interp, item->next->data);
-        if(ikey > vkey)
+        if (ikey > vkey)
             break;
         item->prev = item->next;
         item->next = item->next->next;
     }
 
-    if(item->next == NULL) {
+    if (item->next == NULL) {
         SETATTR_PMCList_foot(interp, list, item);
     } else {
         item->next->prev = item;
     }
 
-    if(item->prev == NULL) {
+    if (item->prev == NULL) {
         SETATTR_PMCList_head(interp, list, item);
     } else {
         item->prev->next = item;
