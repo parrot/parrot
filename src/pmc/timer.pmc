@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -262,7 +262,7 @@ Sets the value associated with C<key> to C<value>.
             break;
           case PARROT_TIMER_RUNNING:
             core_struct->running = value;
-            if(value)
+            if (value)
                 (void) SELF.invoke(0);
             break;
           default:
@@ -308,10 +308,10 @@ Invoke the codeblock and schedule any repeats.
         PMC* alarm;
 
         /* If the timer has been cancelled, we're done */
-        if(timer->running == 0)
+        if (timer->running == 0)
             return (opcode_t*) next;
 
-        if(timer->started == 0) {
+        if (timer->started == 0) {
             /* We're being called to start the timer. */
             timer->started = 1;
             timer->running = 1;
@@ -319,7 +319,7 @@ Invoke the codeblock and schedule any repeats.
             now_time = Parrot_floatval_time();
 
             alarm = Parrot_pmc_new(INTERP, enum_class_Alarm);
-            VTABLE_set_number_keyed_int(INTERP, alarm, PARROT_ALARM_TIME, 
+            VTABLE_set_number_keyed_int(INTERP, alarm, PARROT_ALARM_TIME,
                                         now_time + timer->duration);
             VTABLE_set_pmc_keyed_int(INTERP, alarm, PARROT_ALARM_SUB, SELF);
             next = VTABLE_invoke(INTERP, alarm, next);
@@ -331,14 +331,14 @@ Invoke the codeblock and schedule any repeats.
             }
 
             /* Repeat semantics as documented. */
-            if(timer->repeat != 0) {
-                if(timer->repeat > 0)
+            if (timer->repeat != 0) {
+                if (timer->repeat > 0)
                     timer->repeat--;
 
                 now_time = Parrot_floatval_time();
 
                 alarm = Parrot_pmc_new(INTERP, enum_class_Alarm);
-                VTABLE_set_number_keyed_int(INTERP, alarm, PARROT_ALARM_TIME, 
+                VTABLE_set_number_keyed_int(INTERP, alarm, PARROT_ALARM_TIME,
                                             now_time + timer->interval);
                 VTABLE_set_pmc_keyed_int(INTERP, alarm, PARROT_ALARM_SUB, SELF);
                 next = VTABLE_invoke(INTERP, alarm, next);
