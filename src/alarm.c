@@ -53,7 +53,7 @@ Parrot_alarm_init(void)
     sa.sa_handler = Parrot_alarm_callback;
     sa.sa_flags   = SA_RESTART;
 
-    if(sigaction(SIGALRM, &sa, 0) == -1) {
+    if (sigaction(SIGALRM, &sa, 0) == -1) {
         perror("sigaction failed in Parrot_timers_init");
         exit(EXIT_FAILURE);
     }
@@ -85,7 +85,7 @@ set_posix_alarm(FLOATVAL wait)
     itmr.it_interval.tv_sec  = 0;
     itmr.it_interval.tv_usec = 0;
 
-    if(setitimer(ITIMER_REAL, &itmr, 0) == -1) {
+    if (setitimer(ITIMER_REAL, &itmr, 0) == -1) {
         perror("setitimer failed in set_posix_alarm");
         exit(EXIT_FAILURE);
     }
@@ -111,13 +111,13 @@ Parrot_alarm_callback(SHIM(int sig_number))
 
     /* Find the first future item. */
     now = Parrot_floatval_time();
-    while(alarm_queue != NULL && alarm_queue->when < now) {
+    while (alarm_queue != NULL && alarm_queue->when < now) {
         qp = alarm_queue->next;
         free(alarm_queue);
         alarm_queue = qp;
     }
 
-    if(alarm_queue != NULL) {
+    if (alarm_queue != NULL) {
         wait = alarm_queue->when - now;
         set_posix_alarm(wait);
     }
@@ -138,7 +138,7 @@ PARROT_EXPORT
 int
 Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
-    if(*last_serial == alarm_serial) {
+    if (*last_serial == alarm_serial) {
         return 0;
     } else {
         *last_serial = alarm_serial;
@@ -166,10 +166,10 @@ Parrot_alarm_set(FLOATVAL when) {
 
     now = Parrot_floatval_time();
 
-    new_alarm = (Parrot_alarm_queue*) malloc(sizeof(Parrot_alarm_queue));
+    new_alarm = (Parrot_alarm_queue*) malloc(sizeof (Parrot_alarm_queue));
     new_alarm->when = when;
 
-    if(alarm_queue == NULL || when < alarm_queue->when) {
+    if (alarm_queue == NULL || when < alarm_queue->when) {
         new_alarm->next = alarm_queue;
         alarm_queue = new_alarm;
         set_posix_alarm(when - now);
@@ -177,7 +177,7 @@ Parrot_alarm_set(FLOATVAL when) {
     }
 
     qpp = &alarm_queue;
-    while(*qpp != NULL && (*qpp)->when < when) {
+    while (*qpp != NULL && (*qpp)->when < when) {
         qpp = &(alarm_queue->next);
     }
 
