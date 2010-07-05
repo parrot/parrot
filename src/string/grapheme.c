@@ -14,6 +14,14 @@ $Id$
 
 #if PARROT_HAS_ICU
 
+/*
+
+=item C<INTVAL grapheme_table_capacity(PARROT_INTERP, grapheme_table *table)>
+
+Return the space left on C<table>.
+
+*/
+
 INTVAL
 grapheme_table_capacity(PARROT_INTERP, grapheme_table *table)
 {
@@ -22,6 +30,14 @@ grapheme_table_capacity(PARROT_INTERP, grapheme_table *table)
         return table->size - table->used;
     return 0;
 }
+
+/*
+
+=item C<grapheme_table * create_grapheme_table(PARROT_INTERP, UINTVAL n)>
+
+Creates and returns a grapheme table with space for at least C<n> graphemes.
+
+*/
 
 grapheme_table *
 create_grapheme_table(PARROT_INTERP, UINTVAL n)
@@ -36,6 +52,14 @@ create_grapheme_table(PARROT_INTERP, UINTVAL n)
 
     return table;
 }
+
+/*
+
+=item C<grapheme_table * clone_grapheme_table(PARROT_INTERP, grapheme_table *src)>
+
+Creates and returns a deep clone of the grapheme table passed in C<src>.
+
+*/
 
 grapheme_table *
 clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
@@ -63,6 +87,15 @@ clone_grapheme_table(PARROT_INTERP, grapheme_table *src)
     }
 }
 
+/*
+
+=item C<grapheme_table * grow_grapheme_table(PARROT_INTERP, grapheme_table *src,
+UINTVAL n)>
+
+Returns a grapheme table with the same contents as C<src> and space for at least
+C<n> extra graphemes.
+
+*/
 grapheme_table *
 grow_grapheme_table(PARROT_INTERP, grapheme_table *src, UINTVAL n)
 {
@@ -81,6 +114,15 @@ grow_grapheme_table(PARROT_INTERP, grapheme_table *src, UINTVAL n)
     return table;
 }
 
+/*
+
+=item C<void destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)>
+
+Releases back to the system all resources consumed by the grapheme table an
+the graphemes it contains.
+
+*/
+
 void
 destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
 {
@@ -91,6 +133,19 @@ destroy_grapheme_table(PARROT_INTERP, grapheme_table *table)
     }
     mem_gc_free(interp, table);
 }
+
+
+/*
+
+=item C<void merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
+grapheme_table *table, UINTVAL offset, UINTVAL len)>
+
+Causes all graphemes contained in C<table> to be appended to C<dest>'s grapheme
+table and any references to the codepoints in  C<table> found in the C<len>
+positions that follow C<offset> are changed to be consistent with the graphemes
+stored in C<dest>'s grapheme table.
+
+*/
 
 void
 merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
@@ -129,6 +184,15 @@ merge_tables_and_fixup_substring(PARROT_INTERP, STRING *dest,
     mem_gc_free(interp, new_codepoints);
 }
 
+/*
+
+=item C<grapheme_table * rehash_grapheme_table(PARROT_INTERP,
+grapheme_table *src)>
+
+Recalculates the hash value for all graphemes in C<src>.
+
+*/
+
 grapheme_table *
 rehash_grapheme_table(PARROT_INTERP, grapheme_table *src)
 {
@@ -148,6 +212,16 @@ rehash_grapheme_table(PARROT_INTERP, grapheme_table *src)
 
     return src;
 }
+
+/*
+
+=item C<UChar32 add_grapheme(PARROT_INTERP, grapheme_table *table,
+grapheme *src)>
+
+Adds a copy of the grapheme passed in C<src> to the grapheme table passed in
+C<table> returning the dynamic codepoint value.
+
+*/
 
 UChar32
 add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
@@ -175,6 +249,17 @@ add_grapheme(PARROT_INTERP, grapheme_table *table, grapheme *src)
     return (UChar32) (-1 - i);
 }
 
+/*
+
+=item C<UChar32 add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table,
+STRING *src, UINTVAL start, UINTVAL len, UINTVAL hash)>
+
+Creates and adds to the grapheme table passed in C<table> a grapheme consisting
+of the C<len> characters found after C<start> in the string C<src>.
+It returns the dynamic codepoint value for the new grapheme.
+
+*/
+
 UChar32
 add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
                          UINTVAL start, UINTVAL len, UINTVAL hash)
@@ -199,6 +284,16 @@ add_grapheme_from_substr(PARROT_INTERP, grapheme_table *table, STRING *src,
     i = table->used++;
     return (UChar32) (-1 - i);
 }
+
+/*
+
+=item C<UINTVAL get_grapheme_base(PARROT_INTERP, grapheme_table *table, int32_t
+codepoint)>
+
+Returns the base character for the grapheme passed in C<codepoint>, as stored in
+C<table>.
+
+*/
 
 UINTVAL
 get_grapheme_base(PARROT_INTERP, grapheme_table *table, int32_t codepoint)
