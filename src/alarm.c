@@ -49,6 +49,8 @@ PARROT_EXPORT
 void
 Parrot_alarm_init(void)
 {
+    ASSERT_ARGS(Parrot_alarm_init)
+
     struct sigaction sa;
     sa.sa_handler = Parrot_alarm_callback;
     sa.sa_flags   = SA_RESTART;
@@ -73,6 +75,8 @@ A helper function to set an alarm.
 static void
 set_posix_alarm(FLOATVAL wait)
 {
+    ASSERT_ARGS(set_posix_alarm)
+
     const int MIL = 1000000;
     struct itimerval itmr;
     int sec, usec;
@@ -103,6 +107,8 @@ Callback for SIGALRM. When this is called, a timer should be ready to fire.
 void
 Parrot_alarm_callback(SHIM(int sig_number))
 {
+    ASSERT_ARGS(Parrot_alarm_callback)
+
     FLOATVAL now, wait;
     Parrot_alarm_queue* qp;
 
@@ -138,6 +144,8 @@ PARROT_EXPORT
 int
 Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
+    ASSERT_ARGS(Parrot_alarm_check)
+
     if (*last_serial == alarm_serial) {
         return 0;
     }
@@ -157,7 +165,10 @@ Sets an alarm to trigger at time 'when'.
 
 PARROT_EXPORT
 void
-Parrot_alarm_set(FLOATVAL when) {
+Parrot_alarm_set(FLOATVAL when)
+{
+    ASSERT_ARGS(Parrot_alarm_set)
+
     Parrot_alarm_queue *new_alarm;
     Parrot_alarm_queue **qpp;
     FLOATVAL now;
