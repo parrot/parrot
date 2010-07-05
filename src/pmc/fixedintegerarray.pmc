@@ -23,13 +23,20 @@ INTVALs.  It uses Integer PMCs for all of the conversions.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static int auxcmpfunc(const INTVAL *i, const INTVAL *j);
-#define ASSERT_ARGS_auxcmpfunc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+PARROT_PURE_FUNCTION
+static int auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_auxcmpfunc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(i) \
+    , PARROT_ASSERT_ARG(j))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+PARROT_PURE_FUNCTION
 static int
-auxcmpfunc(const INTVAL *i, const INTVAL *j)
+auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
 {
     ASSERT_ARGS(auxcmpfunc)
     return *i - *j;
@@ -545,8 +552,8 @@ The C<==> operation. Compares two array to hold equal elements.
             return 0;
 
         for (j = 0; j < n; ++j) {
-            INTVAL item1 = SELF.get_integer_keyed_int(j);
-            INTVAL item2 = VTABLE_get_integer_keyed_int(INTERP, value, j);
+            const INTVAL item1 = SELF.get_integer_keyed_int(j);
+            const INTVAL item2 = VTABLE_get_integer_keyed_int(INTERP, value, j);
 
             if (item1 != item2)
                 return 0;

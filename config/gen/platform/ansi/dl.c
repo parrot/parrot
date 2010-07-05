@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, Parrot Foundation.
+ * Copyright (C) 2007-2010, Parrot Foundation.
  */
 
 /*
@@ -11,20 +11,16 @@ config/gen/platform/ansi/dl.c
 
 =head1 DESCRIPTION
 
-Dynlib stuff.  (Currently, just placeholders.)
+Parrot functions -- B<none yet implemented> -- which wrap around standard
+library functions for handling dynamic libraries.
 
 =head2 Functions
 
 =over 4
 
-=cut
+=item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
-*/
-
-/*
-
-=item C<void * Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags
-flags)>
+Parrot wrapper around C<dlopen>.  B<Not yet implemented.>
 
 =cut
 
@@ -42,6 +38,8 @@ Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 
 =item C<const char * Parrot_dlerror(void)>
 
+Parrot wrapper around C<dlerror>.  B<Not yet implemented.>
+
 =cut
 
 */
@@ -56,6 +54,8 @@ Parrot_dlerror(void)
 /*
 
 =item C<void * Parrot_dlsym(void *handle, const char *symbol)>
+
+Parrot wrapper around C<dlsym>.  B<Not yet implemented.>
 
 =cut
 
@@ -72,6 +72,8 @@ Parrot_dlsym(void *handle, const char *symbol)
 /*
 
 =item C<int Parrot_dlclose(void *handle)>
+
+Parrot wrapper around C<dlclose>.  B<Not yet implemented.>
 
 =cut
 

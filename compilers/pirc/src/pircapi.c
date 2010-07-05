@@ -17,6 +17,9 @@
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 
@@ -72,16 +75,14 @@ open_file(ARGIN(char const * const filename), ARGIN(char const * const mode))
 =item C<void parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const
 filename, int flags, int thr_id, unsigned macro_size, char * const outputfile)>
 
-=cut
-
 This will be the proper declaration after testing for thread-safety:
 
 void parse_file(int flexdebug, FILE *infile, char * const filename, int flags,
                 char * const outputfile)
 
+=cut
+
 */
-
-
 
 void
 parse_file(PARROT_INTERP, int flexdebug, ARGIN(FILE *infile),
@@ -260,6 +261,8 @@ parse_string(PARROT_INTERP, ARGIN(char *pirstring), int flags, int pasminput,
 =item C<PackFile_ByteCode * pirc_compile_file(PARROT_INTERP, const char
 *filename, STRING **error_message)>
 
+Returns NULL.
+
 =cut
 
 */
@@ -273,8 +276,6 @@ pirc_compile_file(SHIM_INTERP, SHIM(const char *filename),
     return NULL;
 }
 
-
-/* HEADERIZER END: static */
 
 
 /*

@@ -69,6 +69,8 @@ Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)
 
 =item C<static int unescape(char *string)>
 
+Unescape a string.
+
 =cut
 
 */

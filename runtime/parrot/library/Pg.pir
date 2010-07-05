@@ -8,7 +8,7 @@ Pg.pir - OO interface to libpq
 =head1 SYNOPSIS
 
   .local pmc pg, con, res
-  pg = get_class 'Pg'
+  pg = new 'Pg'
   con = pg.'connectdb'('dbname = db')
   res = con.'exec'('SELECT * from tab')
   n = res.'ntuples'()
@@ -40,6 +40,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 ## TODO generate includes from libpq-fe.h
 ## .include 'postgres.pasm'
 
+.HLL 'parrot'
 .const int CONNECTION_OK = 0
 
 .sub __load :load
@@ -61,7 +62,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 
 =item con = Pg::connectdb('var=val var=val ...')
 
-A class method that returns a new connection object.
+A method that returns a new connection object.
 
 =back
 
