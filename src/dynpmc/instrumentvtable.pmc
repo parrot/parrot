@@ -307,8 +307,10 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group {
         /* Modify the entry. */
         instr  = (size_t **) parrot_hash_get(INTERP, attr->instrumented_hash, key);
         stub   = (size_t *)  parrot_hash_get(INTERP, Instrument_Vtable_Stubs, key);
-        printf("instr, stub: %p, %p\n", instr, stub);
-        printf("Meh: %p\n", attr->instrumented_vtable);
+        if (instr == NULL || stub ==  NULL) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Unknown VTABLE entry: %Ss", vtable_str);
+        }
         *instr = stub;
     }
 
