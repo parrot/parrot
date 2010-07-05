@@ -116,7 +116,7 @@ void
 Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_tasks)
-    if  ( Parrot_alarm_check(&(interp->last_alarm))
+    if  (Parrot_alarm_check(&(interp->last_alarm))
           || SCHEDULER_wake_requested_TEST(scheduler)) {
         Parrot_cx_handle_tasks(interp, scheduler);
     }
