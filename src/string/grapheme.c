@@ -1,6 +1,22 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
 $Id$
+
+=head1 NAME
+
+src/string/grapheme.c - Grapheme table handling
+
+=head1 DESCRIPTION
+
+This file implements the grapheme tables tha underly the NFG support
+for the Parrot string subsystem.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -312,6 +328,14 @@ get_grapheme_base(PARROT_INTERP, grapheme_table *table, int32_t codepoint)
 }
 
 #endif /* PARROT_HAS_ICU */
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
