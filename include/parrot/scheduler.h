@@ -31,6 +31,16 @@ void Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void  Parrot_cx_begin_execution(PARROT_INTERP,
+    ARGMOD(PMC *main),
+    ARGMOD(PMC *argv))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*main)
+        FUNC_MODIFIES(*argv);
+
+PARROT_EXPORT
 void Parrot_cx_broadcast_message(PARROT_INTERP,
     ARGIN(STRING *messagetype),
     ARGIN_NULLOK(PMC *data))
@@ -91,11 +101,6 @@ void Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         FUNC_MODIFIES(*scheduler);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_cx_peek_task(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -107,14 +112,6 @@ PARROT_EXPORT
 void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_cx_schedule_callback(PARROT_INTERP,
-    ARGIN(PMC *user_data),
-    ARGIN(char *ext_data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task))
@@ -154,16 +151,12 @@ void Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_cx_invoke_callback(PARROT_INTERP, ARGIN(PMC *callback))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
+void Parrot_cx_reschedule(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
-void Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
+void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
@@ -174,6 +167,10 @@ void Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #define ASSERT_ARGS_Parrot_cx_add_handler_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handler))
+#define ASSERT_ARGS_Parrot_cx_begin_execution __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(main) \
+    , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_Parrot_cx_broadcast_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(messagetype))
@@ -209,8 +206,6 @@ void Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #define ASSERT_ARGS_Parrot_cx_handle_tasks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
-#define ASSERT_ARGS_Parrot_cx_peek_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_request_suspend_for_gc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -219,10 +214,6 @@ void Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #define ASSERT_ARGS_Parrot_cx_schedule_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(alarm))
-#define ASSERT_ARGS_Parrot_cx_schedule_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(user_data) \
-    , PARROT_ASSERT_ARG(ext_data))
 #define ASSERT_ARGS_Parrot_cx_schedule_immediate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(task))
@@ -242,13 +233,10 @@ void Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
     , PARROT_ASSERT_ARG(scheduler))
 #define ASSERT_ARGS_Parrot_cx_init_scheduler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_cx_invoke_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(callback))
-#define ASSERT_ARGS_Parrot_cx_runloop_wake __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_cx_reschedule __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
-#define ASSERT_ARGS_Parrot_cx_schedule_next_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_cx_runloop_wake __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

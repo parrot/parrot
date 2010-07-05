@@ -43,16 +43,7 @@ static void scheduler_process_messages(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
-static void scheduler_process_wait_list(PARROT_INTERP,
-    ARGMOD(PMC *scheduler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
-
 #define ASSERT_ARGS_scheduler_process_messages __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(scheduler))
-#define ASSERT_ARGS_scheduler_process_wait_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -103,6 +94,43 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_cx_begin_execution(PARROT_INTERP, PMC *main, PMC *argv)>
+
+Construct the main task, add it to the task queue, and then execute tasks
+until the task queue becomes empty.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
+{
+    ASSERT_ARGS(Parrot_cx_begin_execution)
+    PMC *scheduler = interp->scheduler;
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    INTVAL task_count = 1;
+
+    PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
+    Parrot_Task_attributes *tdata = PARROT_TASK(main_task);
+    tdata->codeblock = main;
+    tdata->data      = argv;
+
+    Parrot_cx_schedule_task(interp, main_task);
+
+    do {
+        Parrot_cx_reschedule(interp, scheduler);
+        task_count = VTABLE_get_integer(interp, sched->task_queue);
+    } while (task_count > 0);
+}
+
+
+/* Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", userargv); */
+
+
+/*
+
 =item C<void Parrot_cx_check_tasks(PARROT_INTERP, PMC *scheduler)>
 
 If a wake request has been received or an OS timer has expired
@@ -147,7 +175,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     if (SCHEDULER_resched_requested_TEST(scheduler)) {
         SCHEDULER_resched_requested_CLEAR(scheduler);
-        Parrot_cx_schedule_next_task(interp, scheduler);
+        Parrot_cx_reschedule(interp, scheduler);
     }
 
 #ifdef PARROT_CX_BUILD_OLD_STUFF
@@ -213,7 +241,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 
 /*
-=item C<void Parrot_cx_schedule_next_task(PARROT_INTERP, PMC *scheduler)>
+=item C<void Parrot_cx_reschedule(PARROT_INTERP, PMC *scheduler)>
 
 Put the current task on the foot of the task queue and schedule whatever
 is on the head, then reset the rescheduling quantum.
@@ -225,20 +253,25 @@ TODO: Make the above true rather than a dirty lie.
 */
 
 void
-Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
+Parrot_cx_reschedule(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_schedule_next_task)
+    ASSERT_ARGS(Parrot_cx_reschedule)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     INTVAL task_count = VTABLE_get_integer(interp, sched->task_queue);
 
     if (task_count > 0) {
-        PMC *sub = VTABLE_shift_pmc(interp, sched->task_queue);
-
         FLOATVAL time_now = Parrot_floatval_time();
+        PMC *task0 = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        PMC *task1 = VTABLE_shift_pmc(interp, sched->task_queue);
+
+        if (!PMC_IS_NULL(task0))
+            VTABLE_push_pmc(interp, sched->task_queue, task0);
+
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
 
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
+        if (!PMC_IS_NULL(task1))
+            Parrot_pcc_invoke_sub_from_c_args(interp, task1, "->");
     }
 }
 
@@ -329,60 +362,6 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task))
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
 }
-
-/*
-
-=item C<PMC * Parrot_cx_peek_task(PARROT_INTERP)>
-
-Retrieve the the top task on the scheduler's task list, but don't remove it
-from the list.
-
-=cut
-
-*/
-
-#ifdef COMPILE_OLD_STUFF
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_cx_peek_task(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_cx_peek_task)
-    if (!interp->scheduler)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Scheduler was not initialized for this interpreter.\n");
-
-
-
-    return VTABLE_pop_pmc(interp, interp->scheduler);
-}
-
-/*
-
-=item C<void Parrot_cx_schedule_callback(PARROT_INTERP, PMC *user_data, char
-*ext_data)>
-
-Create a new callback event, with an argument for the call.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_schedule_callback(PARROT_INTERP, ARGIN(PMC *user_data), ARGIN(char *ext_data))
-{
-    ASSERT_ARGS(Parrot_cx_schedule_callback)
-    PMC * const callback = Parrot_pmc_new(interp, enum_class_Task);
-    Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
-
-    task_struct->type    = CONST_STRING(interp, "callback");
-    task_struct->data    = user_data;
-    task_struct->cb_data = ext_data;
-
-    Parrot_cx_schedule_task(interp, callback);
-}
-#endif
 
 /*
 
@@ -985,27 +964,6 @@ Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_invoke_callback(PARROT_INTERP, PMC *callback)>
-
-Run the associated code block for a callback event.
-
-=cut
-
-*/
-
-void
-Parrot_cx_invoke_callback(PARROT_INTERP, ARGIN(PMC *callback))
-{
-    ASSERT_ARGS(Parrot_cx_invoke_callback)
-    Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
-    if (!PMC_IS_NULL(task_struct->data)) {
-        Parrot_run_callback(interp, task_struct->data,
-                task_struct->cb_data);
-    }
-}
-
-/*
-
 =back
 
 =head2 Opcode Functions
@@ -1066,60 +1024,6 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     return next;
 }
 
-/*
-
-=back
-
-=head2 Internal Functions
-
-Functions that are only used within the scheduler.
-
-=over 4
-
-=item C<static void scheduler_process_wait_list(PARROT_INTERP, PMC *scheduler)>
-
-Scheduler maintenance, scan the list of waiting tasks to see if any are ready
-to become active tasks.
-
-=cut
-
-*/
-
-static void
-scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
-{
-    ASSERT_ARGS(scheduler_process_wait_list)
-
-#ifdef BUILD_OLD_CODE
-    Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
-    INTVAL num_tasks, index;
-
-    /* Sweep the wait list for completed timers */
-    num_tasks = VTABLE_elements(interp, sched_struct->wait_index);
-    for (index = 0; index < num_tasks; ++index) {
-        INTVAL tid = VTABLE_get_integer_keyed_int(interp, sched_struct->wait_index, index);
-        if (tid > 0) {
-            PMC *task = VTABLE_get_pmc_keyed_int(interp, sched_struct->task_list, tid);
-            if (PMC_IS_NULL(task)) {
-                /* Cleanup expired tasks. */
-                VTABLE_set_integer_keyed_int(interp, sched_struct->wait_index, index, 0);
-            }
-            else {
-                /* Move the timer to the active task list if the timer has
-                 * completed. */
-                FLOATVAL timer_end_time = VTABLE_get_number_keyed_int(interp,
-                        task, PARROT_TIMER_NSEC);
-                if (timer_end_time <= Parrot_floatval_time()) {
-                    VTABLE_push_integer(interp, sched_struct->task_index, tid);
-                    VTABLE_set_integer_keyed_int(interp, sched_struct->wait_index, index, 0);
-                    Parrot_cx_schedule_repeat(interp, task);
-                    SCHEDULER_cache_valid_CLEAR(scheduler);
-                }
-            }
-        }
-    }
-#endif
-}
 
 /*
 

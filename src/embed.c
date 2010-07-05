@@ -808,7 +808,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table->constants);
 
-    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", userargv);
+    Parrot_cx_begin_execution(interp, main_sub, userargv);
 }
 
 

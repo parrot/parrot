@@ -14,8 +14,9 @@ src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 #include "parrot/alarm.h"
 
 /* Some per-process state */
-static Parrot_alarm_queue* alarm_queue;
-static volatile UINTVAL    alarm_serial;
+static Parrot_alarm_queue* alarm_queue  = NULL;
+static volatile UINTVAL    alarm_serial = 0;
+static volatile UINTVAL    alarm_init   = 0;
 
 /* This file relies on POSIX. Probably need two other versions of it:
  *  one for Windows and one for platforms with no signals or threads. */
@@ -65,8 +66,7 @@ Parrot_alarm_init(void)
         exit(EXIT_FAILURE);
     }
 
-    alarm_serial = 1;
-    alarm_queue  = NULL;
+    alarm_init = 1;
 }
 
 /*
@@ -88,6 +88,9 @@ set_posix_alarm(FLOATVAL wait)
     struct itimerval itmr;
     int sec, usec;
 
+    if (!alarm_init)
+        Parrot_alarm_init();
+
     sec  = (int) wait;
     usec = (int) ((wait - sec) * MIL);
 
@@ -97,8 +100,13 @@ set_posix_alarm(FLOATVAL wait)
     itmr.it_interval.tv_usec = 0;
 
     if (setitimer(ITIMER_REAL, &itmr, 0) == -1) {
-        perror("setitimer failed in set_posix_alarm");
-        exit(EXIT_FAILURE);
+        if (errno == EINVAL) {
+            raise(SIGALRM);
+        }
+        else {
+            perror("setitimer failed in set_posix_alarm");
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -193,6 +201,7 @@ Parrot_alarm_set(FLOATVAL when)
 
     new_alarm = (Parrot_alarm_queue*) malloc(sizeof (Parrot_alarm_queue));
     new_alarm->when = when;
+    new_alarm->next = NULL;
 
     if (alarm_queue == NULL || when < alarm_queue->when) {
         new_alarm->next = alarm_queue;
