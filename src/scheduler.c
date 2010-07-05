@@ -83,7 +83,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
     interp->quantum_done = Parrot_floatval_time() + PARROT_TASK_SWITCH_QUANTUM;
 
-    if(interp_count++ > 1) {
+    if (interp_count++ > 1) {
         fprintf(stderr, "More than one interp?\n");
         exit(0);
     }
@@ -105,7 +105,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
 =item C<void Parrot_cx_check_tasks(PARROT_INTERP, PMC *scheduler)>
 
-If a wake request has been received or an OS timer has expired 
+If a wake request has been received or an OS timer has expired
 then handle tasks.
 
 =cut
@@ -116,7 +116,7 @@ void
 Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_tasks)
-    if  ( Parrot_alarm_check(&(interp->last_alarm)) 
+    if  ( Parrot_alarm_check(&(interp->last_alarm))
           || SCHEDULER_wake_requested_TEST(scheduler)) {
         Parrot_cx_handle_tasks(interp, scheduler);
     }
@@ -145,7 +145,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
 
-    if(SCHEDULER_resched_requested_TEST(scheduler)) {
+    if (SCHEDULER_resched_requested_TEST(scheduler)) {
         SCHEDULER_resched_requested_CLEAR(scheduler);
         Parrot_cx_schedule_next_task(interp, scheduler);
     }
@@ -207,7 +207,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     FLOATVAL time_now = Parrot_floatval_time();
 
-    if(time_now >= interp->quantum_done)
+    if (time_now >= interp->quantum_done)
         SCHEDULER_resched_requested_SET(scheduler);
 }
 
@@ -230,7 +230,7 @@ Parrot_cx_schedule_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     INTVAL task_count = VTABLE_get_integer(interp, sched->task_queue);
 
-    if(task_count > 0) {
+    if (task_count > 0) {
         PMC *sub = VTABLE_shift_pmc(interp, sched->task_queue);
 
         FLOATVAL time_now = Parrot_floatval_time();
@@ -287,7 +287,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 
 Add a task to to the task queue for execution.
 
-Probably cannot be called across interpreters/threads, must instead be 
+Probably cannot be called across interpreters/threads, must instead be
 called from within the interpreter's runloop.
 
 =cut
@@ -320,12 +320,12 @@ Add a task to the task queue for immediate execution.
 
 PARROT_EXPORT
 void
-Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task)) 
+Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_cx_schedule_immediate)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
     VTABLE_unshift_pmc(interp, sched->task_queue, task);
-    SCHEDULER_wake_requested_SET(interp->scheduler);    
+    SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
 }
 
@@ -475,7 +475,7 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
     ASSERT_ARGS(Parrot_cx_add_handler_local)
     if (PMC_IS_NULL(Parrot_pcc_get_handlers(interp, interp->ctx)))
-        Parrot_pcc_set_handlers(interp, interp->ctx, 
+        Parrot_pcc_set_handlers(interp, interp->ctx,
                                 Parrot_pmc_new(interp, enum_class_ResizablePMCArray));
 
     VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
@@ -958,18 +958,18 @@ Add the subs attached to any expired alarms to the task queue.
 
 PARROT_EXPORT
 void
-Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler)) 
+Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_alarms)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     INTVAL   alarm_count = VTABLE_get_integer(interp, sched->alarms);
     FLOATVAL now_time    = Parrot_floatval_time();
 
-    while(alarm_count) {
+    while (alarm_count) {
         PMC *alarm = VTABLE_shift_pmc(interp, sched->alarms);
         FLOATVAL alarm_time = VTABLE_get_number(interp, alarm);
 
-        if(alarm_time < now_time) {
+        if (alarm_time < now_time) {
             Parrot_Alarm_attributes *data = PARROT_ALARM(alarm);
             Parrot_cx_schedule_immediate(interp, data->alarm_sub);
         } else {
@@ -1042,10 +1042,10 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     Parrot_cx_check_tasks(interp, interp->scheduler);
     now_time = Parrot_floatval_time();
 
-    while(now_time < done_time) {
+    while (now_time < done_time) {
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
-        
-        if(alarm_count > 0) {
+
+        if (alarm_count > 0) {
             alarm = VTABLE_shift_pmc(interp, sched->alarms);
             alarm_time = VTABLE_get_number(interp, alarm);
             VTABLE_unshift_pmc(interp, sched->alarms, alarm);
@@ -1053,7 +1053,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 
         sleep_time = now_time - fmin(done_time, alarm_time);
 
-        if(sleep_time > 0.0) {
+        if (sleep_time > 0.0) {
             Parrot_floatval_sleep(sleep_time);
         }
 
