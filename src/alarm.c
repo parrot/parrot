@@ -140,7 +140,8 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
     if (*last_serial == alarm_serial) {
         return 0;
-    } else {
+    }
+    else {
         *last_serial = alarm_serial;
         return 1;
     }

@@ -972,7 +972,8 @@ Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
         if (alarm_time < now_time) {
             Parrot_Alarm_attributes *data = PARROT_ALARM(alarm);
             Parrot_cx_schedule_immediate(interp, data->alarm_sub);
-        } else {
+        }
+        else {
             VTABLE_unshift_pmc(interp, sched->alarms, alarm);
             break;
         }

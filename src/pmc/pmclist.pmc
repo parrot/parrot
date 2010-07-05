@@ -144,7 +144,8 @@ Removes and returns an item from the start of the array.
         if (head == NULL) {
             /* size == 0 */
             SET_ATTR_foot(INTERP, SELF, NULL);
-        } else {
+        }
+        else {
             head->prev = NULL;
         }
 
@@ -230,7 +231,8 @@ Removes and returns the last element in the array.
         if (foot == NULL) {
             /* size == 0 */
             SET_ATTR_head(INTERP, SELF, NULL);
-        } else {
+        }
+        else {
             foot->next = NULL;
         }
 
@@ -521,13 +523,15 @@ Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) {
 
     if (item->next == NULL) {
         SETATTR_PMCList_foot(interp, list, item);
-    } else {
+    }
+    else {
         item->next->prev = item;
     }
 
     if (item->prev == NULL) {
         SETATTR_PMCList_head(interp, list, item);
-    } else {
+    }
+    else {
         item->prev->next = item;
     }
 
