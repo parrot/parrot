@@ -12,7 +12,7 @@ if (-e 'DEVELOPING' and ! -e 'Makefile') {
 }
 else {
     plan skip_all =>
-        qq{Relevant only when working in checkout from repository and prior to configuration};
+        q{Relevant only when working in checkout from repository and prior to configuration};
 }
 use Carp;
 use Cwd;
