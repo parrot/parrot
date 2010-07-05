@@ -8,18 +8,18 @@
     .include 'test_more.pir'
 
     plan(7)
-    
+
     $P0 = new 'Integer'
     $P0 = 0
     set_global 'A', $P0
 
     $N0 = time
     $N0 = $N0 + 0.25
-    
+
     $P0 = get_global 'alarm2'
     $N1 = $N0 + 0.04
     make_alarm($N1, $P0)
-    
+
     $P0 = get_global 'alarm1'
     $N1 = $N0 + 0.02
     make_alarm($N1, $P0)
@@ -54,7 +54,7 @@ good:
     $P1 = get_global 'alarm_finish'
     $N0 = time
     $N0 = $N0 + 0.1
-    
+
     $P0 = new 'Float'
     $P0 = $N0
     set_global 'FT', $P0
@@ -68,9 +68,9 @@ good:
 .sub make_alarm
     .param num when
     .param pmc proc
-    
+
     $P1 = new 'Alarm'
-    $P1[.PARROT_ALARM_TIME] = when 
+    $P1[.PARROT_ALARM_TIME] = when
     $P1[.PARROT_ALARM_SUB]  = proc
 
     $P1()
@@ -85,11 +85,11 @@ good:
 
 .sub alarm1
     $P0 = inc_A()
-    
+
     if $P0 == 1 goto a1_good
     ok(0, "alarm 1")
     .return()
- 
+
 a1_good:
     ok(1, "alarm 1")
     .return()
@@ -97,11 +97,11 @@ a1_good:
 
 .sub alarm2
     $P0 = inc_A()
-    
+
     if $P0 == 2 goto a1_good
     ok(0, "alarm 2")
     .return()
- 
+
 a1_good:
     ok(1, "alarm 2")
     .return()
@@ -109,11 +109,11 @@ a1_good:
 
 .sub alarm3
     $P0 = inc_A()
-    
+
     if $P0 == 3 goto a1_good
     ok(0, "alarm 3")
     .return()
- 
+
 a1_good:
     ok(1, "alarm 3")
     .return()
@@ -121,11 +121,11 @@ a1_good:
 
 .sub alarm4
     $P0 = inc_A()
-    
+
     if $P0 == 4 goto a1_good
     ok(0, "alarm 4")
     .return()
- 
+
 a1_good:
     ok(1, "alarm 4")
     .return()
@@ -136,7 +136,7 @@ a1_good:
 
     $P0 = get_global 'FT'
     $N1 = $P0
-    
+
     if $N0 < $N1 goto fail
     $N1 = $N1 + 0.5
     if $N0 > $N1 goto fail
@@ -147,3 +147,9 @@ a1_good:
 fail:
     ok(0, "Alarm/sleep interaction")
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
