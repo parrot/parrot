@@ -32,6 +32,13 @@ PMC * Parrot_clone_lib_into(
         FUNC_MODIFIES(*s);
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+void * Parrot_dlsym_str(PARROT_INTERP,
+    ARGIN_NULLOK(void *handle),
+    ARGIN_NULLOK(STRING *symbol))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_init_lib(PARROT_INTERP,
     NULLOK(dynext_load_func load_func),
@@ -50,6 +57,8 @@ PMC * Parrot_load_lib(PARROT_INTERP,
        PARROT_ASSERT_ARG(d) \
     , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(lib_pmc))
+#define ASSERT_ARGS_Parrot_dlsym_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_init_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_load_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

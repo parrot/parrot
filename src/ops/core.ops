@@ -1253,7 +1253,6 @@ inline op loadlib(out PMC, in STR, in PMC) {
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
-    char * const  name      = Parrot_str_to_cstring(interp, ($3));
     void         *dl_handle = NULL;
     void         *ptr       = NULL;
     funcptr_t     p;
@@ -1264,24 +1263,22 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
     }
 
-    ptr = Parrot_dlsym(dl_handle, name);
+    ptr = Parrot_dlsym_str(interp, dl_handle, $3);
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
         $1 = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
     }
-    Parrot_str_free_cstring(name);
 }
 
 op dlvar(out PMC, invar PMC, in STR) {
-    char * const  name      = Parrot_str_to_cstring(interp, ($3));
     void *        dl_handle = NULL;
     void *        p         = NULL;
 
@@ -1291,12 +1288,12 @@ op dlvar(out PMC, invar PMC, in STR) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
     }
 
-    p = Parrot_dlsym(dl_handle, name);
+    p = Parrot_dlsym_str(interp, dl_handle, $3);
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
+                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
@@ -1305,7 +1302,6 @@ op dlvar(out PMC, invar PMC, in STR) {
         $1 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, $1, p);
     }
-    Parrot_str_free_cstring(name);
 }
 
 inline op compreg(in STR, invar PMC) {
