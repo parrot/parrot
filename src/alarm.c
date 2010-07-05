@@ -17,7 +17,7 @@ src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 static Parrot_alarm_queue* alarm_queue;
 static volatile UINTVAL    alarm_serial;
 
-/* This file relies on POSIX. Probably need two other versions of it: 
+/* This file relies on POSIX. Probably need two other versions of it:
  *  one for Windows and one for platforms with no signals or threads. */
 #include <sys/time.h>
 #include <signal.h>
@@ -71,7 +71,7 @@ A helper function to set an alarm.
 */
 
 static void
-set_posix_alarm(FLOATVAL wait) 
+set_posix_alarm(FLOATVAL wait)
 {
     const int MIL = 1000000;
     struct itimerval itmr;
@@ -109,7 +109,7 @@ Parrot_alarm_callback(SHIM(int sig_number))
     /* Not atomic; only one thread ever writes this value */
     alarm_serial += 1;
 
-    // Find the first future item.
+    /* Find the first future item. */
     now = Parrot_floatval_time();
     while(alarm_queue != NULL && alarm_queue->when < now) {
         qp = alarm_queue->next;
@@ -157,7 +157,7 @@ Sets an alarm to trigger at time 'when'.
 PARROT_EXPORT
 void
 Parrot_alarm_set(FLOATVAL when) {
-    Parrot_alarm_queue *new_alarm; 
+    Parrot_alarm_queue *new_alarm;
     Parrot_alarm_queue **qpp;
     FLOATVAL now;
 
