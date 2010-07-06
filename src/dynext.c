@@ -413,6 +413,36 @@ Parrot_init_lib(PARROT_INTERP,
 
 /*
 
+=item C<void * Parrot_dlsym_str(PARROT_INTERP, void *handle, STRING *symbol)>
+
+Same as Parrot_dlsym but takes the symbol name from a Parrot String instead
+of a C string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+void *
+Parrot_dlsym_str(PARROT_INTERP,
+        ARGIN_NULLOK(void *handle), ARGIN_NULLOK(STRING *symbol))
+{
+    ASSERT_ARGS(Parrot_dlsym_str)
+
+    void *ptr;
+    if (STRING_IS_NULL(symbol))
+        ptr = NULL;
+    else {
+        char *const symbol_cs = Parrot_str_to_cstring(interp, symbol);
+        ptr = Parrot_dlsym(handle, symbol_cs);
+        Parrot_str_free_cstring(symbol_cs);
+    }
+    return ptr;
+}
+
+/*
+
 =item C<static PMC * run_init_lib(PARROT_INTERP, void *handle, STRING *lib_name,
 STRING *wo_ext)>
 
@@ -453,18 +483,14 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
                                         "Parrot_lib_%Ss_load", lib_name);
         STRING * const init_func_name  = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_init", lib_name);
-        char   * const cload_func_name = Parrot_str_to_cstring(interp, load_name);
-        char   * const cinit_func_name = Parrot_str_to_cstring(interp, init_func_name);
 
         /* get load_func */
-        void * dlsymfunc = Parrot_dlsym(handle, cload_func_name);
+        void * dlsymfunc = Parrot_dlsym_str(interp, handle, load_name);
         load_func = (PMC * (*)(PARROT_INTERP)) D2FPTR(dlsymfunc);
-        Parrot_str_free_cstring(cload_func_name);
 
         /* get init_func */
-        dlsymfunc = Parrot_dlsym(handle, cinit_func_name);
+        dlsymfunc = Parrot_dlsym_str(interp, handle, init_func_name);
         init_func = (void (*)(PARROT_INTERP, PMC *)) D2FPTR(dlsymfunc);
-        Parrot_str_free_cstring(cinit_func_name);
     }
     else {
         load_func = NULL;

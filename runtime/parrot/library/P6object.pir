@@ -111,7 +111,8 @@ Return the C<P6protoobject> for the invocant.
 .sub 'WHAT' :method :nsentry
     .local pmc how, what
     how = self.'HOW'()
-    .tailcall how.'WHAT'()
+    what = getattribute how, 'protoobject'
+    .return (what)
 .end
 
 
@@ -162,25 +163,13 @@ below).
 
 =over
 
-=item WHAT()
-
-Return the protoobject for this metaclass.
-
-=cut
-
-.namespace ['P6metaclass']
-
-.sub 'WHAT' :method :nsentry
-    $P0 = getattribute self, 'protoobject'
-    .return ($P0)
-.end
-
 =item isa(x)
 
 Return a true value if the invocant 'isa' C<x>.
 
 =cut
 
+.namespace ['P6metaclass']
 .sub 'isa' :method :multi(_,_, _)
     .param pmc obj
     .param pmc x

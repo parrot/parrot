@@ -19,18 +19,19 @@ Parrot::Test::Util::Runloop - consolidated test for lots of files
 =head1 DESCRIPTION
 
 This module provides a basic runloop for test scripts which perform the same
-test, over and over, on lots of files.  It is intended to consolidate some code
-to handle loops, skips etc, replicated many times in the t/distro/ and
-t/codingstd/ test directories.
+test, over and over, on lots of files.  It is intended to consolidate some
+code to handle loops, skips etc, replicated many times in the F<t/distro/> and
+F<t/codingstd/> test directories.
 
 You can specify a callback routine to get called back once per line (with the
-per_line attribute), or once per file (with the per_file attribute).  The
-per_line callback gets passed the line as a text string.  The per_file callback
-gets passed the whole file as a text string.  If the callback function returns
-positive, the test passed, otherwise the test failed.  Failures are tallied,
-and later reported to the test harness once, as a single test.  On failure,
-some informational diagnostics are also generated, showing the user which
-file(s) and which line(s) (if applicable) had the failure.
+C<per_line> attribute), or once per file (with the C<per_file> attribute).
+The C<per_line> callback gets passed the line as a text string.  The
+C<per_file> callback gets passed the whole file as a text string.  If the
+callback function returns positive, the test passed, otherwise the test
+failed.  Failures are tallied, and later reported to the test harness once, as
+a single test.  On failure, some informational diagnostics are also generated,
+showing the user which file(s) and which line(s) (if applicable) had the
+failure.
 
 
 =head1 AUTHOR
