@@ -122,6 +122,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     do {
         Parrot_cx_reschedule(interp, scheduler);
         task_count = VTABLE_get_integer(interp, sched->task_queue);
+        return;
     } while (task_count > 0);
 }
 
@@ -261,17 +262,18 @@ Parrot_cx_reschedule(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     if (task_count > 0) {
         FLOATVAL time_now = Parrot_floatval_time();
-        PMC *task0 = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        /* PMC *task0 = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp)); */
         PMC *task1 = VTABLE_shift_pmc(interp, sched->task_queue);
 
-        if (!PMC_IS_NULL(task0))
-            VTABLE_push_pmc(interp, sched->task_queue, task0);
+        /*if (!PMC_IS_NULL(task0))
+          VTABLE_push_pmc(interp, sched->task_queue, task0); */
 
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
 
-        if (!PMC_IS_NULL(task1))
+        if (!PMC_IS_NULL(task1)) {
             Parrot_pcc_invoke_sub_from_c_args(interp, task1, "->");
+        }
     }
 }
 
@@ -954,6 +956,7 @@ Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
             Parrot_cx_schedule_immediate(interp, data->alarm_sub);
         }
         else {
+            Parrot_alarm_set(alarm_time);
             VTABLE_unshift_pmc(interp, sched->alarms, alarm);
             break;
         }

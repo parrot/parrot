@@ -15,15 +15,11 @@ int Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
         FUNC_MODIFIES(* last_serial);
 
 PARROT_EXPORT
-void Parrot_alarm_init(void);
-
-PARROT_EXPORT
 void Parrot_alarm_set(FLOATVAL when);
 
 void Parrot_alarm_callback(NULLOK(int sig_number));
 #define ASSERT_ARGS_Parrot_alarm_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(last_serial))
-#define ASSERT_ARGS_Parrot_alarm_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_alarm_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_alarm_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

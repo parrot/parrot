@@ -31,7 +31,7 @@ void Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void  Parrot_cx_begin_execution(PARROT_INTERP,
+void Parrot_cx_begin_execution(PARROT_INTERP,
     ARGMOD(PMC *main),
     ARGMOD(PMC *argv))
         __attribute__nonnull__(1)

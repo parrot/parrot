@@ -10,13 +10,13 @@ src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 
 */
 
-#include "parrot/alarm_private.h"
+#include "parrot/parrot.h"
 #include "parrot/alarm.h"
 
 /* Some per-process state */
-static Parrot_alarm_queue* alarm_queue  = NULL;
-static volatile UINTVAL    alarm_serial = 0;
-static volatile UINTVAL    alarm_init   = 0;
+static volatile UINTVAL  alarm_serial = 0;
+static volatile UINTVAL  alarm_init   = 0;
+static volatile FLOATVAL alarm_set_to = 0.0;
 
 /* This file relies on POSIX. Probably need two other versions of it:
  *  one for Windows and one for platforms with no signals or threads. */
@@ -30,8 +30,10 @@ static volatile UINTVAL    alarm_init   = 0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void set_posix_alarm(FLOATVAL wait);
-#define ASSERT_ARGS_set_posix_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+static void posix_alarm_init(void);
+static void posix_alarm_set(FLOATVAL wait);
+#define ASSERT_ARGS_posix_alarm_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_posix_alarm_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -40,7 +42,7 @@ static void set_posix_alarm(FLOATVAL wait);
 
 =over 4
 
-=item C<void Parrot_alarm_init(void)>
+=item C<static void posix_alarm_init(void)>
 
 Initialize the alarm queue. This function should only be called from the initial
 pthread. Any other pthreads should make sure to mask out SIGALRM.
@@ -51,11 +53,10 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 void Parrot_alarm_callback(SHIM(int sig_number));
 
-PARROT_EXPORT
-void
-Parrot_alarm_init(void)
+static void
+posix_alarm_init(void)
 {
-    ASSERT_ARGS(Parrot_alarm_init)
+    ASSERT_ARGS(posix_alarm_init)
 
     struct sigaction sa;
     sa.sa_handler = Parrot_alarm_callback;
@@ -71,7 +72,7 @@ Parrot_alarm_init(void)
 
 /*
 
-=item C<static void set_posix_alarm(FLOATVAL wait)>
+=item C<static void posix_alarm_set(FLOATVAL wait)>
 
 A helper function to set an alarm.
 
@@ -80,16 +81,16 @@ A helper function to set an alarm.
 */
 
 static void
-set_posix_alarm(FLOATVAL wait)
+posix_alarm_set(FLOATVAL wait)
 {
-    ASSERT_ARGS(set_posix_alarm)
+    ASSERT_ARGS(posix_alarm_set)
 
     const int MIL = 1000000;
     struct itimerval itmr;
     int sec, usec;
 
     if (!alarm_init)
-        Parrot_alarm_init();
+        posix_alarm_init();
 
     sec  = (int) wait;
     usec = (int) ((wait - sec) * MIL);
@@ -101,7 +102,7 @@ set_posix_alarm(FLOATVAL wait)
 
     if (setitimer(ITIMER_REAL, &itmr, 0) == -1) {
         if (errno == EINVAL) {
-            raise(SIGALRM);
+            Parrot_alarm_callback(SIGALRM);
         }
         else {
             perror("setitimer failed in set_posix_alarm");
@@ -126,24 +127,8 @@ Parrot_alarm_callback(SHIM(int sig_number))
 {
     ASSERT_ARGS(Parrot_alarm_callback)
 
-    FLOATVAL now, wait;
-    Parrot_alarm_queue* qp;
-
     /* Not atomic; only one thread ever writes this value */
     alarm_serial += 1;
-
-    /* Find the first future item. */
-    now = Parrot_floatval_time();
-    while (alarm_queue != NULL && alarm_queue->when < now) {
-        qp = alarm_queue->next;
-        free(alarm_queue);
-        alarm_queue = qp;
-    }
-
-    if (alarm_queue != NULL) {
-        wait = alarm_queue->when - now;
-        set_posix_alarm(wait);
-    }
 }
 
 /*
@@ -190,33 +175,16 @@ Parrot_alarm_set(FLOATVAL when)
 {
     ASSERT_ARGS(Parrot_alarm_set)
 
-    Parrot_alarm_queue *new_alarm;
-    Parrot_alarm_queue **qpp;
-    FLOATVAL now;
+    FLOATVAL now = Parrot_floatval_time();
 
     /* Better late than early */
     when += 0.0001;
 
-    now = Parrot_floatval_time();
-
-    new_alarm = (Parrot_alarm_queue*) malloc(sizeof (Parrot_alarm_queue));
-    new_alarm->when = when;
-    new_alarm->next = NULL;
-
-    if (alarm_queue == NULL || when < alarm_queue->when) {
-        new_alarm->next = alarm_queue;
-        alarm_queue = new_alarm;
-        set_posix_alarm(when - now);
+    if (alarm_set_to > now && alarm_set_to < when)
         return;
-    }
 
-    qpp = &alarm_queue;
-    while (*qpp != NULL && (*qpp)->when < when) {
-        qpp = &(alarm_queue->next);
-    }
-
-    new_alarm->next = *qpp;
-    *qpp = new_alarm;
+    alarm_set_to = when;
+    posix_alarm_set(when - now);
 }
 
 /*

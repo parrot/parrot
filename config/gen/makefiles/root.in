@@ -918,8 +918,7 @@ src/scheduler$(O) : $(PARROT_H_HEADERS) src/scheduler.str src/scheduler.c \
 	$(INC_DIR)/runcore_api.h
 
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
-	$(INC_DIR)/alarm.h \
-	$(INC_DIR)/alarm_private.h
+	$(INC_DIR)/alarm.h
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
