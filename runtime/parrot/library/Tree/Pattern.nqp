@@ -39,8 +39,12 @@ class Tree::Pattern is Capture {
             pir::die('$transform must be invokable or a PAST::Transformer.');
         }
         my $transformer :=
-          Tree::Pattern::Transformer.new(self, &transSub, |%adverbs);
+          self.transformer_class.new(self, &transSub, |%adverbs);
         $transformer.walk($node);
+    }
+
+    method transformer_class () {
+        Tree::Pattern::Transformer;
     }
 
     method ACCEPTS ($node, *%opts) {
