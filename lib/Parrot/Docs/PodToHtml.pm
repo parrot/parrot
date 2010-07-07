@@ -189,7 +189,7 @@ sub process_code_start_token {
 
     # We make the code tags in items bold because they are almost
     # always part of function and arguments, or constants listings
-    #Êand should stand out.
+    # and should stand out.
 
     print { $self->{'output_fh'} } '<b>' if $self->{IN_ITEM_TEXT};
 
@@ -604,30 +604,30 @@ C<$source> to the equivalent location in C<$target>.
     ## my $rel_path = shift;
     ## my $item     = shift;
     ## my $file     = $source->file_with_relative_path($rel_path);
-## 
+##
     ## return unless $file->contains_pod;
-## 
+##
     ## $self->{TARGET} = $target;
-## 
+##
     ## # Use our own method for consistency.
     ## $self->{'Title'} = $file->title;
-## 
+##
     ## $rel_path = $self->append_html_suffix($rel_path);
-## 
+##
     ## my $docs_file = $target->file_with_relative_path($rel_path);
-## 
+##
     ## $self->{DOCS_FILE} = $docs_file;
-## 
+##
     ## $rel_path = $self->href_path( $docs_file->parent->relative_path( $target->parent_path ) );
-## 
+##
     ## my $name = $target->name;
-## 
+##
     ## # This is a cheat because we know that all top-level sections
     ## # have their indexes in the root directory - but it works.
-## 
+##
     ## $self->{NAV_BAR}       = $item->html_navigation("$rel_path/$name");
     ## $self->{RESOURCES_URL} = "$rel_path/resources";
-## 
+##
     ## $docs_file->write( $self->html_for_file($file) );
 ## }
 
