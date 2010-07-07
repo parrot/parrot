@@ -4,12 +4,34 @@
 
 INIT {
     pir::load_bytecode('PAST/Transformer.pbc');
-    pir::load_bytecode('PAST/Walker/Dynamic.pbc');
+}
+
+my sub gen_accessor ($class, $meth, $attr) {
+    $class.HOW().add_method($class, $meth, 
+                             method ($val?) {
+                                 my $result;
+                                 if (pir::defined__IP($val)) {
+                                     pir::setattribute(self, ~$attr, $val);
+                                 }
+                                 else {
+                                     $result := 
+                                       pir::getattribute__PPS(self, $attr);
+                                 }
+                                 $result;
+                             });
 }
 
 class PAST::Transformer::Dynamic is PAST::Transformer {
-    PAST::Transformer::Dynamic.HOW().add_parent(PAST::Transformer::Dynamic,
-                                                PAST::Walker::Dynamic);
+    has $block;
+    has $op;
+    has $stmts;
+    has $val;
+    has $var;
+    has $varlist;
+
+    for (<block op stmts val var varlist>) {
+        gen_accessor(PAST::Transformer::Dynamic, $_, "\$" ~ $_);
+    }
 }
 
 module Tree::Walker {
