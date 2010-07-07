@@ -52,7 +52,7 @@ vim-install: pir.vim skeleton.pir
 	$(CP) pmc.vim "$(VIM_SYN_DIR)"
 	$(MKPATH) "$(VIM_FT_DIR)"
 	$(CP) filetype_parrot.vim "$(VIM_FT_DIR)/parrot.vim"
-	echo "$(LINE)" >> "$(VIM_FT_DIR)/parrot.vim"
+	echo $(LINE) >> "$(VIM_FT_DIR)/parrot.vim"
 	$(MKPATH) "$(VIM_IN_DIR)"
 	$(CP) indent_pir.vim "$(VIM_IN_DIR)/pir.vim"
 
