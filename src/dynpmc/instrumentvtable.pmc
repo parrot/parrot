@@ -242,13 +242,13 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group {
         attr->instrument          = instrument;
         attr->original_vtable     = NULL;
         attr->instrumented_vtable = NULL;
-        attr->original_hash        = parrot_new_pointer_hash(INTERP);
-        attr->instrumented_hash   = parrot_new_pointer_hash(INTERP);
+        attr->original_hash        = parrot_new_hash(INTERP);
+        attr->instrumented_hash   = parrot_new_hash(INTERP);
 
         /* Initialise the Instrumented Vtable registry if needed. */
         if (Instrument_Vtable_Entries == NULL) {
-            Instrument_Vtable_Entries = parrot_new_pointer_hash(INTERP);
-            Instrument_Vtable_Stubs   = parrot_new_pointer_hash(INTERP);
+            Instrument_Vtable_Entries = parrot_new_hash(INTERP);
+            Instrument_Vtable_Stubs   = parrot_new_hash(INTERP);
         }
 
         PObj_custom_destroy_SET(SELF);
@@ -293,44 +293,32 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group {
                             attr->original_vtable, attr->instrumented_vtable);
     }
 
-    METHOD insert_vtable_hook(STRING *vtable_str) {
+    METHOD insert_vtable_hook(STRING *key) {
         Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
-        STRING *key;
         char *con_string;
         size_t **instr, *stub;
-
-        /* Convert vtable_str to a constant STRING so that it can be used as a key. */
-        con_string = Parrot_str_to_cstring(INTERP, vtable_str);
-        key        = CONST_STRING(INTERP, con_string);
-        Parrot_free_cstring(con_string);
 
         /* Modify the entry. */
         instr  = (size_t **) parrot_hash_get(INTERP, attr->instrumented_hash, key);
         stub   = (size_t *)  parrot_hash_get(INTERP, Instrument_Vtable_Stubs, key);
         if (instr == NULL || stub ==  NULL) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "Unknown VTABLE entry: %Ss", vtable_str);
+                                        "Unknown VTABLE entry: %Ss", key);
         }
         *instr = stub;
     }
 
-    METHOD remove_vtable_hook(STRING *vtable_str) {
+    METHOD remove_vtable_hook(STRING *key) {
         Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
-        STRING *key;
         char *con_string;
         size_t **instr, *orig;
-
-        /* Convert vtable_str to a constant STRING so that it can be used as a key. */
-        con_string = Parrot_str_to_cstring(INTERP, vtable_str);
-        key        = CONST_STRING(INTERP, con_string);
-        Parrot_free_cstring(con_string);
 
         /* Modify the entry. */
         instr  = (size_t **) parrot_hash_get(INTERP, attr->instrumented_hash, key);
         orig   = (size_t *)  parrot_hash_get(INTERP, attr->original_hash, key);
         if (instr == NULL || orig ==  NULL) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "Unknown VTABLE entry: %Ss", vtable_str);
+                                        "Unknown VTABLE entry: %Ss", key);
         }
         *instr = orig;
     }

@@ -35,10 +35,10 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
 
 class Instrument::Probe is Instrument::Base {
     has $!is_catchall;
-    has $!oplist;
-    has $!todo_oplist;
+    has @!oplist;
+    has @!todo_oplist;
     our $loadlib_evt;
-    our $loadlib_probelist := Q:PIR { %r = new ['ResizablePMCArray'] };
+    our @loadlib_probelist := ();
 
 =begin
 
@@ -51,8 +51,8 @@ Private method to perform additional initialisation.
 =end
 
     method _self_init () {
-        $!todo_oplist := Q:PIR { %r = new ['ResizablePMCArray'] };
-        $!oplist      := Q:PIR { %r = new ['ResizablePMCArray'] };
+        @!todo_oplist := ();
+        @!oplist      := ();
         $!is_catchall := 0;
     };
 
@@ -94,7 +94,7 @@ everytime a dynlib is loaded.
         }
         else {
             # $op is singular.
-            my $oplib := Q:PIR { %r = new ['OpLib'] };
+            my $oplib := pir::new__PS('OpLib');
             my $type  := pir::typeof__PP($op);
 
             if $type eq 'Integer' {
@@ -102,10 +102,10 @@ everytime a dynlib is loaded.
                 if $op > pir::set__IP($oplib) {
                     # op number is invalid.
                     # Put it in the todo list.
-                    $!todo_oplist.push($op);
+                    @!todo_oplist.push($op);
                 }
                 else {
-                    $!oplist.push($op);
+                    @!oplist.push($op);
                 }
             }
             else {
@@ -118,20 +118,20 @@ everytime a dynlib is loaded.
                     # $op = short name.
                     for $op_ret {
                         $op_num := pir::set__IP($_);
-                        $!oplist.push($op_num);
+                        @!oplist.push($op_num);
                     }
                 }
                 else {
                     # $op = long name.
                     $op_ret := pir::set_p_p_k__PPP($oplib, $op);
                     $op_num := pir::set__IP($op_ret);
-                    $!oplist.push($op_num);
+                    @!oplist.push($op_num);
                 }
             }
         }
         CATCH {
             # Push to todo_oplist
-            $!todo_oplist.push($op);
+            @!todo_oplist.push($op);
         }
     };
 
@@ -157,22 +157,23 @@ eg,
         }
 
         # Check for any todo_oplist.
-        if pir::set__IP($!todo_oplist) != 0 {
+        if pir::set__IP(@!todo_oplist) != 0 {
             # Double check the todo_oplist.
-            my $list      := $!todo_oplist;
-            $!todo_oplist := Q:PIR { %r = new ['ResizablePMCArray'] };
-            for $list {
+            my @list      := @!todo_oplist;
+            @!todo_oplist := ();
+            for @list {
                 self.inspect($_);
             }
 
             # If there is still a todo_oplist,
             #  set up an event handler to update.
-            if pir::set__IP($!todo_oplist) != 0 {
-                $Instrument::Probe::loadlib_probelist.push(self);
+            if pir::set__IP(@!todo_oplist) != 0 {
+                @Instrument::Probe::loadlib_probelist.push(self);
 
                 if !pir::defined__IP($Instrument::Probe::loadlib_evt) {
+                    my $callback := pir::get_global__PS('loadlib_callback');
                     $Instrument::Probe::loadlib_evt := Instrument::Event::Internal::loadlib.new();
-                    $Instrument::Probe::loadlib_evt.callback(pir::get_global__PS('loadlib_callback'));
+                    $Instrument::Probe::loadlib_evt.callback($callback);
                     $Instrument::Probe::loadlib_evt.data(self);
                     $!instr_obj.attach($Instrument::Probe::loadlib_evt);
                 }
@@ -185,7 +186,7 @@ eg,
                 $!instr_obj.insert_op_catchall(self);
             } else {
                 # Attach a hook to each op in @!oplist.
-                for $!oplist {
+                for @!oplist {
                     $!instr_obj.insert_op_hook(self, $_);
                 }
             }
@@ -219,7 +220,7 @@ You can dynamically attach and remove hooks dynamically.
                 $!instr_obj.remove_op_catchall(self);
             } else {
                 # Attach a hook to each op in @!oplist.
-                for $!oplist {
+                for @!oplist {
                     $!instr_obj.remove_op_hook(self, $_);
                 }
             }
@@ -237,7 +238,7 @@ Returns the list of op numbers inspected by this probe.
 =end
 
     method get_op_list () {
-        return $!oplist;
+        return @!oplist;
     }
 
 =begin
@@ -249,16 +250,16 @@ Returns the list of items passed to inspect
 =end
 
     method get_op_todo_list () {
-        return $!todo_oplist;
+        return @!todo_oplist;
     }
 
     # Internal helper: Callback for loadlib events registered when the probe has
     #                  any outstanding ops in $!todo_oplist.
     sub loadlib_callback ($data) {
         # Simply disable and reenable the probe.
-        my $list                              := $Instrument::Probe::loadlib_probelist;
-        $Instrument::Probe::loadlib_probelist := Q:PIR { %r = new ['ResizablePMCArray'] };
-        for $list {
+        my @list                              := @Instrument::Probe::loadlib_probelist;
+        @Instrument::Probe::loadlib_probelist := ();
+        for @list {
             $_.disable();
             $_.enable();
         }

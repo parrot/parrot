@@ -146,14 +146,14 @@ Usage (in PIR):
 =end
 
 class Instrument::Event::GC is Instrument::Event {
-    has $!probe_list;
+    has @!probe_list;
 
     method _self_init() {
-        $!probe_list := Q:PIR { %r = new ['ResizablePMCArray'] };
+        @!probe_list := ();
     };
 
     method inspect($item) {
-        $!probe_list.push($item);
+        @!probe_list.push($item);
     };
 
     method _on_attach() {
@@ -173,10 +173,10 @@ class Instrument::Event::GC is Instrument::Event {
 
         # For each item in $!probe_list, insert the gc hook
         #  and register the event handler.
-        for $!probe_list {
-            my $hooks := $gc.get_hook_list($_);
+        for @!probe_list {
+            my @hooks := $gc.get_hook_list($_);
 
-            for $hooks {
+            for @hooks {
                 $gc.insert_gc_hook($_);
 
                 my $tokens := pir::split__PSS('_', $_);
@@ -191,6 +191,58 @@ class Instrument::Event::GC is Instrument::Event {
                 $dispatcher.register($event, $!callback);
             }
         }
+    };
+    
+    method disable() {
+    }
+};
+
+# Incomplete.
+class Instrument::Event::Class is Instrument::Event {
+    has $!class_name;
+    has @!vtable_probes;
+    has @!method_probes;
+
+    method _self_init() {
+        @!vtable_probes := ();
+        @!method_probes := ();
+    };
+
+    method inspect_class($class) {
+        $!class_name := $class;
+    };
+
+    method inspect_vtable($item) {
+        @!vtable_probes.push($item);
+    };
+
+    method inspect_method($item) {
+        @!method_probes.push($item);
+    };
+
+    method _on_attach() {
+        self.enable();
+    };
+
+    method enable() {
+        my $dispatcher := Q:PIR {
+            $P0 = getattribute self, '$!instr_obj'
+            %r  = $P0['eventdispatcher']
+        };
+
+        my $class        := $!instr_obj.instrument_class($!class_name);
+        my $event_prefix := 'Class::' ~ $!class_name ~ '::';
+
+        # Register the vtable probes.
+        for @!vtable_probes {
+            $class.insert_vtable_hook($_);
+            
+            my $event := $event_prefix ~ $_;
+            $dispatcher.register($event, $!callback);
+        }
+    };
+
+    method disable() {
     };
 };
 

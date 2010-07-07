@@ -162,9 +162,9 @@ Initialises and prepares the supervised interpreter for GC instrumenting.
         supervised->gc_sys = (GC_Subsystem *) attr->gc_instrumented;
 
         /* Initialise the hashes. */
-        attr->stub_hash     = parrot_new_pointer_hash(INTERP);
-        attr->original_hash = parrot_new_pointer_hash(INTERP);
-        attr->entry_hash    = parrot_new_pointer_hash(INTERP);
+        attr->stub_hash     = parrot_new_hash(INTERP);
+        attr->original_hash = parrot_new_hash(INTERP);
+        attr->entry_hash    = parrot_new_hash(INTERP);
         build_gc_func_hash(INTERP, attr->stub_hash, attr->original_hash, attr->entry_hash,
                            attr->gc_instrumented, attr->gc_original);
 
@@ -375,22 +375,18 @@ the names of the gc entries to instrument.
             VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "unblock_sweep"));
         }
         else {
-            /* Convert name to a constant string since we use the address of the
-               constant string as the key to the various hashes. */
+            /* Ensure that con_str is the name of a hook before pushing it in. */
             size_t *check;
             Hash *stub_hash;
-            char *c_str     = Parrot_str_to_cstring(INTERP, name);
-            STRING *con_str = CONST_STRING(INTERP, c_str);
-            VTABLE_push_string(INTERP, list, con_str);
-            Parrot_free_cstring(c_str);
 
-            /* Ensure that con_str is the name of a hook. */
             GETATTR_InstrumentGC_stub_hash(INTERP, SELF, stub_hash);
-            check = (size_t *) parrot_hash_get(INTERP, stub_hash, con_str);
+            check = (size_t *) parrot_hash_get(INTERP, stub_hash, name);
             if (check == NULL) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                            "Unknown GC function: %Ss", con_str);
+                                            "Unknown GC function: %Ss", name);
             }
+
+            VTABLE_push_string(INTERP, list, name);
         }
 
         RETURN(PMC *list);

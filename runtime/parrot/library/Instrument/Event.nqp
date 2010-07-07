@@ -112,12 +112,12 @@ Helper sub that creates a Task instance and schedules it.
 =end
 
     sub _raise_event ($evt, $data) {
-        my $hash := Q:PIR { %r = new ['Hash'] };
-        pir::set_p_k_p($hash, 'type',    'event');
-        pir::set_p_k_p($hash, 'subtype', $evt);
-        pir::set_p_k_p($hash, 'data',    $data);
+        my %hash := {};
+        %hash<type>    := 'event';
+        %hash<subtype> := $evt;
+        %hash<data>    := $data;
 
-        my $task := pir::new_p_s_p__PSP('Task', $hash);
+        my $task := pir::new__PSP('Task', %hash);
 
         pir::schedule($task);
     }

@@ -537,6 +537,20 @@ Returns the number of enabled op catchall probes.
 
         RETURN(INTVAL count);
     }
+
+
+    METHOD instrument_class(STRING *classname) {
+        INTVAL class_type;
+        PMC   *class_instr;
+
+        class_type  = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentVtable"));
+        class_instr = Parrot_pmc_new_init(INTERP, class_type, SELF);
+
+        () = PCCINVOKE(INTERP, class_instr, "attach_to_class", STRING *classname);
+
+        RETURN(PMC *class_instr);
+    }
+
 }
 
 /*
