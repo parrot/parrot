@@ -78,9 +78,10 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
 {
     ASSERT_ARGS(Parrot_freeze_pbc)
     PMC *visitor;
-
     PMC * const pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, pf_pmc, (void *)pf);
+    DECL_CONST_CAST;
+
+    VTABLE_set_pointer(interp, pf_pmc, PARROT_const_cast(void *, (const void*)pf));
 
     visitor  = Parrot_pmc_new_init(interp, enum_class_ImageIO, pf_pmc);
     VTABLE_set_pmc(interp, visitor, pmc);
@@ -131,10 +132,11 @@ UINTVAL
 Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
 {
     ASSERT_ARGS(Parrot_freeze_pbc_size)
-    PMC     *pf_pmc, *visitor, *pmc_result;
+    PMC *pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    PMC *visitor, *pmc_result;
+    DECL_CONST_CAST;
 
-    pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, pf_pmc, (void *)pf);
+    VTABLE_set_pointer(interp, pf_pmc, PARROT_const_cast(void *, (const void *)pf));
 
     visitor = Parrot_pmc_new_init(interp, enum_class_ImageIOSize, pf_pmc);
     VTABLE_set_pmc(interp, visitor, pmc);

@@ -855,8 +855,8 @@ Mark the array.
             PMC    *ns        = INTERP->root_namespace;
             STRING *attribute = CONST_STRING(INTERP, "proxy");
 
-            ns                = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
-            ns                = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
+            ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
+            ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
             classobj          = Parrot_oo_get_class(INTERP, ns);
             capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
         }

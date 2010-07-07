@@ -192,7 +192,7 @@ op get_namespace(out PMC) {
 
 op get_namespace(out PMC, in PMC) {
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+    PMC * const ns     = Parrot_ns_get_namespace_keyed(interp, cur_ns, $2);
 
     $1 = PMC_IS_NULL(ns) ? PMCNULL : ns;
 }
@@ -219,7 +219,7 @@ op get_hll_namespace(out PMC, in PMC) {
     if (PMC_IS_NULL(hll_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, $2);
         $1 = ns;
     }
 }
@@ -245,7 +245,7 @@ op get_root_namespace(out PMC, in PMC) {
     if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, $2);
         $1 = ns;
     }
 }
@@ -275,7 +275,7 @@ doesn't exist, $1 is set to null.
 
 op get_global(out PMC, in STR) {
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
+    $1 = Parrot_ns_find_global_from_op(interp, cur_ns, $2, expr NEXT());
 }
 
 op get_global(out PMC, in PMC, in STR) {
@@ -284,11 +284,11 @@ op get_global(out PMC, in PMC, in STR) {
         $1 = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
-            $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
+            $1 = Parrot_ns_find_global_from_op(interp, ns, $3, expr NEXT());
     }
 }
 
@@ -307,7 +307,7 @@ global doesn't exist, $1 is set to null.
 
 op get_hll_global(out PMC, in STR) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    $1 = Parrot_find_global_op(interp, hll_ns, $2, expr NEXT());
+    $1 = Parrot_ns_find_global_from_op(interp, hll_ns, $2, expr NEXT());
 }
 
 op get_hll_global(out PMC, in PMC, in STR) {
@@ -316,11 +316,11 @@ op get_hll_global(out PMC, in PMC, in STR) {
         $1 = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
-            $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
+            $1 = Parrot_ns_find_global_from_op(interp, ns, $3, expr NEXT());
     }
 }
 
@@ -339,7 +339,7 @@ doesn't exist, $1 is set to null.
 
 op get_root_global(out PMC, in STR) {
     PMC * const root_ns = interp->root_namespace;
-    $1 = Parrot_find_global_op(interp, root_ns, $2, expr NEXT());
+    $1 = Parrot_ns_find_global_from_op(interp, root_ns, $2, expr NEXT());
 }
 
 op get_root_global(out PMC, in PMC, in STR) {
@@ -347,11 +347,11 @@ op get_root_global(out PMC, in PMC, in STR) {
     if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
-            $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
+            $1 = Parrot_ns_find_global_from_op(interp, ns, $3, expr NEXT());
     }
 }
 
@@ -379,14 +379,14 @@ it is created.
 
 op set_global(in STR, invar PMC) {
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    Parrot_set_global(interp, cur_ns, $1, $2);
+    Parrot_ns_set_global(interp, cur_ns, $1, $2);
 }
 
 op set_global(in PMC, in STR, invar PMC) {
     PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, $1);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, $1);
 
-    Parrot_set_global(interp, ns, $2, $3);
+    Parrot_ns_set_global(interp, ns, $2, $3);
 }
 
 =item B<set_hll_global>(in STR, invar PMC)
@@ -403,14 +403,14 @@ does not exist, it is created.
 
 op set_hll_global(in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    Parrot_set_global(interp, hll_ns, $1, $2);
+    Parrot_ns_set_global(interp, hll_ns, $1, $2);
 }
 
 op set_hll_global(in PMC, in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, $1);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, $1);
 
-    Parrot_set_global(interp, ns, $2, $3);
+    Parrot_ns_set_global(interp, ns, $2, $3);
 }
 
 =item B<set_root_global>(in STR, invar PMC)
@@ -427,14 +427,14 @@ not exist, it is created.
 
 op set_root_global(in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
-    Parrot_set_global(interp, root_ns, $1, $2);
+    Parrot_ns_set_global(interp, root_ns, $1, $2);
 }
 
 op set_root_global(in PMC, in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, $1);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, $1);
 
-    Parrot_set_global(interp, ns, $2, $3);
+    Parrot_ns_set_global(interp, ns, $2, $3);
 }
 
 =back
@@ -470,7 +470,7 @@ op find_name(out PMC, in STR) {
         goto ADDRESS(handler);
     }
 
-    $1 = Parrot_find_name_op(interp, $2, expr NEXT());
+    $1 = Parrot_ns_find_named_item(interp, $2, expr NEXT());
 }
 
 =item B<find_sub_not_null>(out PMC, in STR)
@@ -482,7 +482,7 @@ found.
 
 inline op find_sub_not_null(out PMC, in STR) :base_core {
     opcode_t *dest = expr NEXT();
-    PMC *sub = Parrot_find_name_op(interp, $2, dest);
+    PMC *sub = Parrot_ns_find_named_item(interp, $2, dest);
 
     if (PMC_IS_NULL(sub)) {
         opcode_t *handler;

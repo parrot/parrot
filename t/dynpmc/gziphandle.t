@@ -24,7 +24,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .local pmc config_hash, interp
     .local int num_tests
 
-    num_tests = 9
+    num_tests = 10
     plan(num_tests)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
@@ -48,8 +48,8 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     $P0 = new 'GzipHandle'
     $S0 = typeof $P0
     is($S0, 'GzipHandle', 'GzipHandle typeof')
-    $I0 = does $P0, 'Handle'
-    ok($I0, 'does Handle')
+    $I0 = isa $P0, 'Handle'
+    ok($I0, 'isa Handle')
 .end
 
 .include 'stat.pasm'
@@ -70,6 +70,8 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     ok($I2, "compressed")
     $P2 = new 'GzipHandle'
     $P2.'open'(filename, 'rb')
+    $I2 = $P2.'isatty'()
+    is($I2, 0, 'isatty')
     $S1 = $P2.'read'($I0)
     $P2.'close'()
     is($S1, $S0, "gzip stream")

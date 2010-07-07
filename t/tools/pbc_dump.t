@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -32,7 +32,6 @@ use warnings;
 use lib qw(lib);
 
 use Test::More;
-use IO::File ();
 use Parrot::Config;
 use Parrot::Test;
 use File::Spec;

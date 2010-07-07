@@ -1080,26 +1080,6 @@ Check if two hashes hold the same keys and values.
 
 /*
 
-=item C<PMC *slice(PMC *key)>
-
-Return a new iterator for the slice PMC C<key>
-
-=cut
-
-*/
-
-    VTABLE PMC *slice(PMC *key, INTVAL f) {
-        if (f == 0) {
-            return SELF.get_iter();
-        }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-            "Hash: Unknown slice type");
-    }
-
-
-/*
-
 =item C<void visit(PMC *info)>
 
 Used during archiving to visit the elements in the hash.

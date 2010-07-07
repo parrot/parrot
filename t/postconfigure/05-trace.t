@@ -14,7 +14,8 @@ if ( ( -e qq{./lib/Parrot/Config/Generated.pm} )
     plan tests => 40;
 }
 else {
-    plan skip_all => q{Tests irrelevant unless configuration completed with tracing requested};
+    plan skip_all =>
+        q{Tests irrelevant unless configuration completed with tracing requested};
 }
 use lib qw( lib );
 use Parrot::Config;

@@ -141,11 +141,24 @@ things that aren't really logical ops (don't do that!).
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
+=item Method is_tty in PMCs derived from Handle [eligible in 2.7]
+
+Use isatty instead.
+
+L<https://trac.parrot.org/parrot/ticket/1689>
+
 =back
 
 =head1 Opcodes
 
 =over 4
+
+=item open and close opcodes will be removed [eligible in 2.7]
+
+L<https://trac.parrot.org/parrot/ticket/1697>
+
+These opcodes will be removed. The open/close methods on File or
+the FileHandle PMC should be used instead.
 
 =item get_addr and set_addr [eligible in 1.5]
 
@@ -309,6 +322,12 @@ All C API functions that aren't currently named according to the
 functions will be kept in the ticket at:
 
 L<https://trac.parrot.org/parrot/ticket/443>
+
+=item C<Parrot_find_global_s> and C<Parrot_store_global_s>
+
+This function is not used or tested anywhere.
+
+http://trac.parrot.org/parrot/ticket/1660
 
 =item PMC Attributes Allocation Functions [experimental]
 

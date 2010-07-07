@@ -248,6 +248,7 @@ D: Patch for key flags in pdd08
 D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
+A: Christoph Otto
 D: Pipp
 E: christoph@mksig.org
 
@@ -514,6 +515,10 @@ U: jimmy
 E: zhuomingliang@yahoo.com.cn
 D: Bugfixes, cage cleaning
 
+N: John Harrison
+E: ash@greatethaninfinity.com 
+U: ash_
+
 N: John J. Trammell
 E: trammell@el-swifto.com
 D: coding standard tests
@@ -576,6 +581,7 @@ D: Getopt/Obj.pir
 N: Julian Albo
 U: NotFound
 A: julianalbo
+A: julian.notfound
 E: julian.notfound@gmail.com
 
 N: Julian Fondren
@@ -1004,6 +1010,14 @@ D: Nicer command line handling in ops2c.pl
 
 N: Tony Payne
 D: Example hanoi.pasm
+
+N: Tyler Curtis
+U: tcurtis
+E: tyler.l.curtis@gmail.com
+E: ekiru.0@gmail.com
+D: PAST Optimization GSoC 2010
+A: tylercurtis
+A: ekiru
 
 N: Ujwal Reddy Malipeddi
 U: ujwalic

@@ -222,6 +222,8 @@ StringHandles are never tty's, returns false.
 
 */
     METHOD is_tty() {
+        Parrot_warn_deprecated(INTERP,
+            "'is_tty' is deprecated, use 'isatty' instead - TT #1689");
         RETURN(INTVAL 0);
     }
 

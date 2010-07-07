@@ -68,7 +68,7 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
     opcode_t i;
 
     for (i = 0; i < self->const_count; ++i) {
-        Parrot_io_printf(interp, "    # %ld:\n", (long)i);
+        Parrot_io_printf(interp, "    # %x:\n", (long)i);
         PackFile_Constant_dump(interp, self, self->constants[i]);
     }
 }

@@ -146,7 +146,7 @@ to do with the initializer.
 op root_new(out PMC, in PMC) {
     PMC * const key      = $2;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -164,7 +164,7 @@ op root_new(out PMC, in PMC) {
 op root_new(out PMC, in PMC, in PMC) {
     PMC * const key      = $2;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))

@@ -146,31 +146,6 @@ key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
     return key_new_string(interp, Parrot_str_new(interp, value, 0));
 }
 
-
-/*
-
-=item C<PMC * key_new_pmc(PARROT_INTERP, PMC *value)>
-
-Returns a new PMC C<Key> PMC with value C<value>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
-{
-    ASSERT_ARGS(key_new_pmc)
-    PMC * const key = Parrot_pmc_new(interp, enum_class_Key);
-
-    PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "this is broken - see slice.pmc");
-}
-
-
 /*
 
 =item C<void key_set_integer(PARROT_INTERP, PMC *key, INTVAL value)>
@@ -262,33 +237,6 @@ key_set_string(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 
     return;
 }
-
-
-/*
-
-=item C<void key_set_pmc(PARROT_INTERP, PMC *key, PMC *value)>
-
-Set the PMC C<value> in C<key>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
-{
-    ASSERT_ARGS(key_set_pmc)
-    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |=  KEY_pmc_FLAG;
-
-    /*
-     * XXX leo
-     * what for is this indirection?
-     */
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "this is broken - see slice.pmc");
-}
-
 
 /*
 

@@ -320,6 +320,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Tcl/Glob.pbc \
     $(LIBRARY_DIR)/TclLibrary.pbc \
     $(LIBRARY_DIR)/URI.pbc \
+    $(LIBRARY_DIR)/URI/Escape.pbc \
     $(LIBRARY_DIR)/uuid.pbc \
     $(LIBRARY_DIR)/YAML/Dumper/Base.pbc \
     $(LIBRARY_DIR)/YAML/Dumper/Default.pbc \
@@ -390,7 +391,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/vtables.h \
 	$(INC_DIR)/multidispatch.h \
 	$(INC_DIR)/library.h \
-	$(INC_DIR)/global.h \
+	$(INC_DIR)/namespace.h \
 	$(INC_DIR)/stat.h \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
@@ -451,7 +452,6 @@ INTERP_O_FILES = \
     src/gc/gc_inf$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
-    src/global$(O) \
     src/global_setup$(O) \
     src/hash$(O) \
     src/hll$(O) \
@@ -468,6 +468,7 @@ INTERP_O_FILES = \
     src/longopt$(O) \
     src/misc$(O) \
     src/multidispatch$(O) \
+    src/namespace$(O) \
     src/frame_builder$(O) \
     src/nci/api$(O) \
     src/nci/core_thunks$(O) \
@@ -662,7 +663,6 @@ STR_FILES = \
     src/debug.str \
     src/dynext.str \
     src/exceptions.str \
-    src/global.str \
     src/global_setup.str \
     src/hll.str \
     src/call/pcc.str \
@@ -674,6 +674,7 @@ STR_FILES = \
     src/key.str \
     src/library.str \
     src/multidispatch.str \
+    src/namespace.str \
     src/frame_builder.str \
     src/nci/api.str \
     src/nci/core_thunks.str \
@@ -1217,7 +1218,8 @@ examples-clean:
     examples/mops/mops$(EXE) \
     examples/pasm/hello.pbc \
     examples/pasm/hello$(O) \
-    examples/pasm/hello$(EXE)
+    examples/pasm/hello$(EXE) \
+    generated_hello.pbc
 
 # hello
 hello: test_prep examples/pasm/hello$(EXE)
@@ -1254,7 +1256,7 @@ src/extend_vtable$(O) : $(PARROT_H_HEADERS) \
 
 src/global_setup$(O) : $(PARROT_H_HEADERS) src/global_setup.str src/global_setup.c
 
-src/global$(O) : $(PARROT_H_HEADERS) src/global.str src/global.c \
+src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
 	include/pmc/pmc_sub.h
 
 src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
@@ -2418,6 +2420,8 @@ release : MANIFEST MANIFEST.generated
     tar -zcv -T - -f parrot-$(VERSION).tar.gz
 	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' \
 	     MANIFEST | tar -jcv -T - -f parrot-$(VERSION).tar.bz2
+	sha256sum parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
+	sha256sum parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 

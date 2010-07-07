@@ -46,10 +46,6 @@ C<PCT::Node> (see F<compilers/pct/src/PCT/Node.pir>).
 
 =over 4
 
-=item result([value])
-
-Get/set
-
 =cut
 
 .namespace [ 'POST';'Node' ]

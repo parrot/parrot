@@ -41,7 +41,6 @@ DYNPMC_H_FILES = \
     include/parrot/extend_vtable.h \
     include/parrot/feature.h \
     include/parrot/gc_api.h \
-    include/parrot/global.h \
     include/parrot/global_setup.h \
     include/parrot/has_header.h \
     include/parrot/hash.h \
@@ -54,6 +53,7 @@ DYNPMC_H_FILES = \
     include/parrot/memory.h \
     include/parrot/misc.h \
     include/parrot/multidispatch.h \
+    include/parrot/namespace.h \
     include/parrot/nci.h \
     include/parrot/oo.h \
     include/parrot/op.h \

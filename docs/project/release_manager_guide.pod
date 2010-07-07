@@ -231,9 +231,11 @@ create the new directory in F<~/ftp/releases/supported> instead.
 
  $ mkdir ~/ftp/releases/supported/a.b.c
 
-Copy the different compressed tarballs from your machine into the new directory.
+Copy the different compressed tarballs and the according checksum files from
+your machine into the new directory.
 
  $ scp parrot-a.b.c.tar.gz parrot-a.b.c.tar.bz2 \
+       parrot-a.b.c.tar.gz.sha256 parrot-a.b.c.tar.bz2.sha256 \
    <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
 
 (Or using C<wget> or whatever tool you prefer.)
@@ -407,9 +409,13 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Jul 20, 2010 - 2.6* - coke
- - Aug 17, 2010 - 2.7  - ??
- - Sep 21, 2010 - 2.8  - gerd
+ - Jul 20, 2010 - 2.6*  - coke
+ - Aug 17, 2010 - 2.7   - mikehh
+ - Sep 21, 2010 - 2.8   - gerd
+ - Oct 19, 2010 - 2.9*  - ??
+ - Nov 16, 2010 - 2.10  - ??
+ - Dec 21, 2010 - 2.11  - ??
+ - Jan 18, 2010 - 3.0*  - ??
 
 =cut
 

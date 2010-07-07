@@ -3129,7 +3129,7 @@ clone_constant(PARROT_INTERP, ARGIN(PackFile_Constant *old_const))
         /* Vtable overrides and methods were already cloned, so don't reclone them. */
         if (new_sub->vtable_index == -1
         && !(old_sub->comp_flags   &  SUB_COMP_FLAG_METHOD))
-            Parrot_store_sub_in_namespace(interp, new_sub_pmc);
+            Parrot_ns_store_sub(interp, new_sub_pmc);
 
         ret->u.key = new_sub_pmc;
 
@@ -3223,7 +3223,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         return;
 
     for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bi[i];
+        HashBucket *bucket = hash->bucket_indices[i];
 
         while (bucket) {
             PackFile_ConstTable * const table      =
@@ -3313,7 +3313,8 @@ fixup_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 =item C<static size_t fixup_packed_size(PARROT_INTERP, PackFile_Segment *self)>
 
-I<What does this do?>
+Calculates the size, in multiples of C<opcode_t>, required to store the
+passed C<PackFile_FixupTable> in bytecode.
 
 =cut
 
@@ -3987,7 +3988,7 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     /* finally place the sub into some namespace stash
      * XXX place this code in Sub.thaw ?  */
     if (VTABLE_isa(interp, pmc, _sub))
-        Parrot_store_sub_in_namespace(interp, pmc);
+        Parrot_ns_store_sub(interp, pmc);
 
     /* restore code */
     interp->code = cs_save;

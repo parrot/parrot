@@ -91,6 +91,42 @@
 #endif
 
 /*
+** Enumerated constants
+** Changes here require update PBC_COMPAT
+** The prefered way to eliminate a value is just to stop using it without
+** renumbering others, that helps to keep backward compatibility.
+*/
+
+/* Packfile segment types */
+
+/* &gen_from_enum(packfile_segments.pasm) */
+
+typedef enum {
+    PF_DIR_SEG          = 0,
+    PF_UNKNOWN_SEG      = 1,
+    PF_FIXUP_SEG        = 2,
+    PF_CONST_SEG        = 3,
+    PF_BYTEC_SEG        = 4,
+    PF_DEBUG_SEG        = 5,
+    PF_ANNOTATIONS_SEG  = 6,
+
+    PF_MAX_SEG          = 7
+} pack_file_types;
+
+/* &end_gen */
+
+#define PF_DIR_FORMAT 1
+
+/* Fixup types */
+
+typedef enum {
+    enum_fixup_none = 0,
+    enum_fixup_sub  = 1,
+    enum_fixup_MAXUSEDVALUE = enum_fixup_sub
+} enum_fixup_t;
+
+
+/*
 ** Structure Definitions:
 */
 
@@ -174,24 +210,6 @@ typedef struct PackFile_funcs {
     PackFile_Segment_dump_func_t        dump;
 } PackFile_funcs;
 
-/* &gen_from_enum(packfile_segments.pasm) */
-
-typedef enum {
-    PF_DIR_SEG          = 0,
-    PF_UNKNOWN_SEG      = 1,
-    PF_FIXUP_SEG        = 2,
-    PF_CONST_SEG        = 3,
-    PF_BYTEC_SEG        = 4,
-    PF_DEBUG_SEG        = 5,
-    PF_ANNOTATIONS_SEG  = 6,
-
-    PF_MAX_SEG          = 7
-} pack_file_types;
-
-/* &end_gen */
-
-#define PF_DIR_FORMAT 1
-
 typedef struct PackFile_Segment {
     struct PackFile           * pf;
     struct PackFile_Directory * dir;
@@ -219,11 +237,6 @@ typedef struct PackFile_FixupEntry {
     char                     *name;     /* name of the label */
     opcode_t                  offset;   /* location of the item */
 } PackFile_FixupEntry;
-
-typedef enum {
-    enum_fixup_none,
-    enum_fixup_sub
-} enum_fixup_t;
 
 typedef struct PackFile_FixupTable {
     PackFile_Segment             base;
