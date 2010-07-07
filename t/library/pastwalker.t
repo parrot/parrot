@@ -52,7 +52,7 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     is($P3, 3, "PAST::Block")
 
     $P3 = $P2['ops']
-    is($P3, 3, "PAST::Op")
+    is($P3, 4, "PAST::Op")
 
     $P3 = $P2['vars']
     is($P3, 2, "PAST::Var")
@@ -72,6 +72,8 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     past = new ['PAST';'Block']
 
     $P0 = new ['PAST'; 'Var']
+    $P1 = new ['PAST'; 'Op']
+    $P0.'vivibase'($P1)
     push past, $P0
     $P0 = new ['PAST'; 'Op']
     $P0.'pirop'("call")

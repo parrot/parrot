@@ -27,6 +27,7 @@ module Tree::Walker {
             walk($walker, $var[$index++]);
         }
         walk($walker, $var.viviself) if $walker.walkable($var.viviself);
+        walk($walker, $var.vivibase) if $walker.walkable($var.vivibase);
     }
 }
 
