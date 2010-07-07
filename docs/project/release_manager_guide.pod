@@ -231,9 +231,11 @@ create the new directory in F<~/ftp/releases/supported> instead.
 
  $ mkdir ~/ftp/releases/supported/a.b.c
 
-Copy the different compressed tarballs from your machine into the new directory.
+Copy the different compressed tarballs and the according checksum files from
+your machine into the new directory.
 
  $ scp parrot-a.b.c.tar.gz parrot-a.b.c.tar.bz2 \
+       parrot-a.b.c.tar.gz.sha256 parrot-a.b.c.tar.bz2.sha256 \
    <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
 
 (Or using C<wget> or whatever tool you prefer.)

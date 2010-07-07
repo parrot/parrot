@@ -191,7 +191,6 @@ sub _set_implementations {
         dl.c
         stat.c
         math.c
-        memalign.c
         signal.c
         itimer.c
         memexec.c

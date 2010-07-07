@@ -407,6 +407,8 @@ validate(SHIM_INTERP, SHIM(const STRING *src))
 =item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING *src,
 UINTVAL offset)>
 
+Returns Boolean.
+
 =cut
 
 */
@@ -422,6 +424,8 @@ is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *src), SHIM(UINTVAL
 
 =item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, const STRING
 *src, UINTVAL offset, UINTVAL count)>
+
+Find a character in the given character class.
 
 =cut
 
@@ -440,6 +444,8 @@ find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 =item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, const STRING
 *src, UINTVAL offset, UINTVAL count)>
 
+Returns C<INTVAL>.
+
 =cut
 
 */
@@ -455,6 +461,9 @@ find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 /*
 
 =item C<static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
+
+Creates a new STRING object from a single codepoint C<codepoint>. Returns
+the new STRING.
 
 =cut
 

@@ -1104,7 +1104,7 @@ Used to archive the hash.
 */
 
     VTABLE void freeze(PMC *info) {
-        Hash     * const hash = (Hash *)SELF.get_pointer();;
+        Hash     * const hash = (Hash *)SELF.get_pointer();
 
         SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));

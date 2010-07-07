@@ -678,6 +678,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 =item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING *src,
 UINTVAL offset)>
 
+Returns Boolean.
+
 =cut
 
 */
@@ -728,6 +730,8 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offse
 
 =item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, const STRING
 *src, UINTVAL offset, UINTVAL count)>
+
+Returns C<INTVAL>.
 
 =cut
 
@@ -881,6 +885,14 @@ charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, ARGIN(const STRING *src))
     dest->charset = Parrot_iso_8859_1_charset_ptr;
     return dest;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

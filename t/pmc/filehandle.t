@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -104,6 +104,46 @@ ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
 is_closed: 0
 is_closed after close: 1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
+.include 'except_types.pasm'
+
+.sub main :main
+    .local pmc fh, eh
+    .local int i
+    i = 1
+    eh = new['ExceptionHandler']
+    eh = .EXCEPTION_PIO_ERROR
+    set_addr eh, catchnoname
+    push_eh eh
+    fh = new['FileHandle']
+    # Open without filename
+    fh.'open'()
+    i = 0
+    goto reportnoname
+  catchnoname:
+    finalize eh
+  reportnoname:
+    say i
+
+    i = 0
+    set_addr eh, catchreopen
+    fh.'open'('README')
+    i = 1
+    # Open already opened
+    fh.'open'('README')
+    i = 0
+    goto reportreopen
+  catchreopen:
+    finalize eh
+  reportreopen:
+    say i
+    pop_eh
+.end
+CODE
+1
+1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'isatty' );
@@ -593,6 +633,39 @@ ok:
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
+.include 'except_types.pasm'
+.sub main :main
+    .local pmc fh, eh
+    fh = new ['FileHandle']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    set_addr eh, catch1
+    push_eh eh
+    # Using unopened FileHandle
+    fh.'readall'()
+    say 'should never happen'
+    goto test2
+  catch1:
+    finalize eh
+    say 'caught unopened'
+  test2:
+    set_addr eh, catch2
+    fh.'open'('README')
+    # Using opened FileHandle with the filepath option
+    fh.'readall'('README')
+    say 'should never happen'
+    goto end
+  catch2:
+    finalize eh
+    say 'caught reopen'
+  end:
+.end
+CODE
+caught unopened
+caught reopen
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
