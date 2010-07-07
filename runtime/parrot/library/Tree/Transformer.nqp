@@ -2,11 +2,15 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-INIT {
-pir::load_bytecode('Tree/Walker.pbc');
-}
+class Tree::Transformer {
+    method walk ($node) {
+        Tree::Walker::walk(self, $node);
+    }
 
-class Tree::Transformer is Tree::Walker { }
+    method walkChildren ($node) {
+        Tree::Walker::walkChildren(self, $node);
+    }
+}
 
 module Tree::Walker {
     our multi sub walk (Tree::Transformer $walker, Capture $node) {
