@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -43,7 +43,7 @@ my $d = Parrot::Docs::Directory->new( catfile(qw(lib Parrot Docs)) );
 my @a = $d->files_of_type('Perl module');
 
 # This will fail if you add a new module.
-is( @a, 8, 'files_of_type succeed' );
+is( @a, 9, 'files_of_type succeed' );
 @a = $d->files_of_type('foo');
 is( @a, 0, 'files_of_type fail' );
 
