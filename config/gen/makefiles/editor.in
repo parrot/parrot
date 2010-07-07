@@ -13,6 +13,9 @@ CP     = @cp@
 MKPATH = @mkpath@
 RM_F   = @rm_f@
 
+SKEL_FILE_DIR = `$(PERL) -e 'print "$(SKELETON)" || "$(VIM_DIR)"'`
+LINE          = "au BufNewFile         *.pir 0r $(SKEL_FILE_DIR)/skeleton.pir"
+
 default: all
 
 all: pir.vim imc.kate skeleton.pir
@@ -49,7 +52,7 @@ vim-install: pir.vim skeleton.pir
 	$(CP) pmc.vim "$(VIM_SYN_DIR)"
 	$(MKPATH) "$(VIM_FT_DIR)"
 	$(CP) filetype_parrot.vim "$(VIM_FT_DIR)/parrot.vim"
-	echo "au BufNewFile         *.pir 0r $(VIM_DIR)/skeleton.pir" >> "$(VIM_FT_DIR)/parrot.vim"
+	echo "$(LINE)" >> "$(VIM_FT_DIR)/parrot.vim"
 	$(MKPATH) "$(VIM_IN_DIR)"
 	$(CP) indent_pir.vim "$(VIM_IN_DIR)/pir.vim"
 
