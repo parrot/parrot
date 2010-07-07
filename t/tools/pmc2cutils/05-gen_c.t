@@ -177,7 +177,7 @@ my ( $tie, $msg, @lines );
         capture(
             sub { eval { $rv = $self->gen_c(); } },
             \$stdout
-        );;
+        );
         like(
             $@,
             qr<^cannot find file '.*/src/pmc/default.dump' in path>,
