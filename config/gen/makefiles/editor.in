@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 #IF(win32):VIM_DIR     = $(USERPROFILE)/vimfiles
@@ -49,6 +49,7 @@ vim-install: pir.vim skeleton.pir
 	$(CP) pmc.vim "$(VIM_SYN_DIR)"
 	$(MKPATH) "$(VIM_FT_DIR)"
 	$(CP) filetype_parrot.vim "$(VIM_FT_DIR)/parrot.vim"
+	echo "au BufNewFile         *.pir 0r $(VIM_DIR)/skeleton.pir" >> "$(VIM_FT_DIR)/parrot.vim"
 	$(MKPATH) "$(VIM_IN_DIR)"
 	$(CP) indent_pir.vim "$(VIM_IN_DIR)/pir.vim"
 
