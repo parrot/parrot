@@ -26,7 +26,7 @@ module Tree::Walker {
         until ($index == $max) {
             walk($walker, $var[$index++]);
         }
-        walk($walker, $var.viviself) if $walker.walkable(viviself);
+        walk($walker, $var.viviself) if $walker.walkable($var.viviself);
     }
 }
 
