@@ -69,6 +69,7 @@ typedef struct InstrumentGC_Subsystem {
 } InstrumentGC_Subsystem;
 
 /* Prototypes for stub functions. */
+/* BEGIN gc prototypes */
 PMC* stub_allocate_pmc_header(PARROT_INTERP, UINTVAL flags);
 void* stub_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc);
 void* stub_allocate_memory_chunk(PARROT_INTERP, size_t size);
@@ -100,6 +101,7 @@ void stub_compact_string_pool(PARROT_INTERP);
 void stub_mark_special(PARROT_INTERP, PMC *pmc);
 void stub_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc);
 void stub_init_pool(PARROT_INTERP, struct Fixed_Size_Pool *pool);
+/* END gc prototypes */
 
 /* Prototypes for helper functions. */
 void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *event, PMC *data);
@@ -403,6 +405,7 @@ the names of the gc entries to instrument.
  * 3. Raise an event denoting that the function has been accessed.
  */
 
+/* BEGIN gc stubs */
 /*
  * Allocations
  */
@@ -1133,6 +1136,8 @@ void stub_init_pool(PARROT_INTERP, struct Fixed_Size_Pool *pool) {
     return;
 }
 
+/* END gc stubs */
+
 /*
  * Helper functions
  */
@@ -1184,6 +1189,7 @@ void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *event, PMC 
 void build_gc_func_hash(PARROT_INTERP,
                         Hash *instr_hash, Hash *orig_hash, Hash *entry_hash,
                         InstrumentGC_Subsystem *gc_instr, GC_Subsystem *gc_orig) {
+    /* BEGIN gc mappings */
     /* Build the pointer hash to the stubs. */
     parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "finalize_gc_system"),
                     stub_finalize_gc_system);
@@ -1375,6 +1381,7 @@ void build_gc_func_hash(PARROT_INTERP,
                     &(gc_instr->block_sweep));
     parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "unblock_sweep"),
                     &(gc_instr->unblock_sweep));
+    /* END gc mappings */
 }
 
 /*

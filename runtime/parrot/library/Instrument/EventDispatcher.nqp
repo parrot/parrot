@@ -21,9 +21,7 @@ runtime/parrot/library/Instrument/EventDispatcher.nqp
 =end
 
 class Instrument::EventDispatcher is EventHandler {
-    has $!evt_category;
-    has $!evt_subtype;
-    has $!evt_fulltype;
+    has %!callbacks;
 
 =begin
 
@@ -60,9 +58,7 @@ Private method to perform required initialisation.
 =end
 
     method _self_init () {
-        $!evt_category := Q:PIR { %r = new ['Hash'] };
-        $!evt_subtype  := Q:PIR { %r = new ['Hash'] };
-        $!evt_fulltype := Q:PIR { %r = new ['Hash'] };
+        %!callbacks := {};
 
         Q:PIR {
             $P0 = get_global 'handler'
@@ -98,29 +94,8 @@ Registers the handler for the given event.
 =end
 
     method register ($event, $callback) {
-        my $tokens   := pir::split__PSS('::', $event);
-        my $count    := pir::set__IP($tokens);
-        if $count > 3 || $count < 1 {
-            die('Invalid Instrument event: ' ~ $event ~ "\n"
-              ~ 'Expected between 1 to 3 tokens when split with \'::\'.');
-        }
-
-        my $list;
-
-        if    $count == 3 {
-            # Assume callback is for an exact event.
-            $list  := get_list($!evt_fulltype, $event);
-        }
-        elsif $count == 2 {
-            # Assume callback is for a subtype event.
-            $list  := get_list($!evt_subtype, $event);
-        }
-        elsif $count == 1 {
-            # Assume callback is for a category event.
-            $list  := get_list($!evt_category, $event);
-        }
-
-        $list.push($callback);
+        my @list := get_list(%!callbacks, $event);
+        @list.push($callback);
     };
 
 =begin
@@ -134,34 +109,14 @@ Removes the handler for the given event.
 =end
 
     method deregister ($event, $callback) {
-        my $tokens   := pir::split__PSS('::', $event);
-        my $count    := pir::set__IP($tokens);
-        if $count > 3 || $count < 1 {
-            die('Invalid Instrument event: ' ~ $event ~ "\n"
-              ~ 'Expected between 1 to 3 tokens when split with \'::\'.');
-        }
+        my @list := get_list(%!callbacks, $event);
 
-        my $list;
-
-        if    $count == 3 {
-            # Assume callback is for an exact event.
-            $list  := get_list($!evt_fulltype, $event);
-        }
-        elsif $count == 2 {
-            # Assume callback is for a subtype event.
-            $list  := get_list($!evt_subtype, $event);
-        }
-        elsif $count == 1 {
-            # Assume callback is for a category event.
-            $list  := get_list($!evt_category, $event);
-        }
-
-        # Look for $callback in $list.
+        # Look for $callback in @list.
         my $found := 0;
         my $index := 0;
-        for $list {
+        for @list {
             if pir::defined__IP($_) && $_ eq $callback {
-                pir::delete_p_k($list, $index);
+                pir::delete_p_k(@list, $index);
                 $found := 1;
                 break;
             }
@@ -185,21 +140,18 @@ Returns a ResizablePMCArray of all the handlers registered for that event.
 =end
 
     method get_handlers ($event) {
-        my $tokens   := pir::split__PSS('::', $event);
+        my @tokens   := pir::split__PSS('::', $event);
 
         # Get the lists and join them into 1 big list.
-        my $key    := Q:PIR { %r = new ['ResizablePMCArray'] };
-        my $list   := Q:PIR { %r = new ['ResizablePMCArray'] };
-        my $hashes := [$!evt_category, $!evt_subtype, $!evt_fulltype];
-        my $index  := 0;
+        my @key    := ();
+        my @list   := ();
 
-        for $tokens {
-            $key.push($_);
-            $list.append(get_list($hashes[$index], pir::join__SSP('::', $key)));
-            $index++;
+        for @tokens {
+            @key.push($_);
+            @list.append(get_list(%!callbacks, pir::join__SSP('::', @key)));
         }
 
-        return $list;
+        return @list;
     }
 
 =begin
@@ -210,14 +162,14 @@ Helper sub that acts as the callback for the EventDispatcher
 to dispatch the events to all the appropriate handler(s) registered
 with it.
 
+TODO: Update gc and vtable generator scripts before updating this.
+
 =cut
 
 =end
 
     sub handler ($handler, $task) {
-        my $evt_category := pir::getattribute__PPS($handler, '$!evt_category');
-        my $evt_subtype  := pir::getattribute__PPS($handler, '$!evt_subtype');
-        my $evt_fulltype := pir::getattribute__PPS($handler, '$!evt_fulltype');
+        my %callbacks := pir::getattribute__PPS($handler, '%!callbacks');
 
         # Get the required subkeys.
         my $data    := pir::getattribute__PPS($task, "data");
@@ -226,16 +178,16 @@ with it.
         my $fulltype := pir::set_p_p_kc__PPS($data, 'event_fulltype');
 
         # Get the lists and join them into 1 big list.
-        my $key  := [$category];
-        my $list := Q:PIR { %r = new ['ResizablePMCArray'] };
-        $list.append(get_list($evt_category, $category));
-        $key.push($subtype);
-        $list.append(get_list($evt_subtype, pir::join__SSP('::', $key)));
-        $key.push($fulltype);
-        $list.append(get_list($evt_fulltype, pir::join__SSP('::', $key)));
+        my @key  := [$category];
+        my @list := ();
+        @list.append(get_list(%callbacks, $category));
+        @key.push($subtype);
+        @list.append(get_list(%callbacks, pir::join__SSP('::', @key)));
+        @key.push($fulltype);
+        @list.append(get_list(%callbacks, pir::join__SSP('::', @key)));
 
         # Call the callbacks.
-        for $list {
+        for @list {
             $_($data);
         }
     };
@@ -252,19 +204,15 @@ for it.
 
 =end
 
-    sub get_list ($hash, $key) {
-        my $list  := Q:PIR {
-            find_lex $P0, '$hash'
-            find_lex $P1, '$key'
-            %r  = $P0[$P1]
-        };
+    sub get_list (%hash, $key) {
+        my @list  := %hash{$key};
 
-        if !pir::defined__IP($list) {
-            $list := Q:PIR { %r = new ['ResizablePMCArray'] };
-            pir::set_p_k_p($hash, $key, $list);
+        if !pir::defined__IP(@list) {
+            @list       := ();
+            %hash{$key} := @list;
         }
 
-        return $list;
+        return @list;
     };
 };
 

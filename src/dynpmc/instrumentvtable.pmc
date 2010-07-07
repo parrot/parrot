@@ -23,6 +23,7 @@ instrument a PMC.
 #include "pmc_instrument.h"
 
 /* Stub Prototypes */
+/* BEGIN: vtable_prototypes */
 static PMC* stub_vtable_absolute(PARROT_INTERP, PMC* pmc, PMC* dest);
 static PMC* stub_vtable_add(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest);
 static void stub_vtable_add_attribute(PARROT_INTERP, PMC* pmc, STRING* name, PMC* type);
@@ -210,6 +211,7 @@ static void stub_vtable_unshift_integer(PARROT_INTERP, PMC* pmc, INTVAL value);
 static void stub_vtable_unshift_pmc(PARROT_INTERP, PMC* pmc, PMC* value);
 static void stub_vtable_unshift_string(PARROT_INTERP, PMC* pmc, STRING* value);
 static void stub_vtable_visit(PARROT_INTERP, PMC* pmc, PMC* info);
+/* END vtable_prototypes */
 
 /* Helper Prototypes. */
 void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised, PMC *pmc, PMC *data, STRING *type);
@@ -368,6 +370,7 @@ void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised,
 
 void build_vtable_hashes(PARROT_INTERP, Hash *orig, Hash *instr, Hash *stub,
                          _vtable *orig_vtable, _vtable *instr_vtable) {
+    /* BEGIN vtable mappings */
     /* Build mappings for name -> original function.vtable entry */
     parrot_hash_put(interp, orig, CONST_STRING(interp, "absolute"),
                     orig_vtable->absolute);
@@ -1491,12 +1494,14 @@ void build_vtable_hashes(PARROT_INTERP, Hash *orig, Hash *instr, Hash *stub,
         parrot_hash_put(interp, stub, CONST_STRING(interp, "visit"),
                         stub_vtable_visit);
     }
+    /* END vtable mappings */
 }
 
 /*
  * Stubs
  */
 
+/* BEGIN vtable stubs */
 static
 PMC* stub_vtable_absolute(PARROT_INTERP, PMC* pmc, PMC* dest) {
     PMC *instr_vt, *data;
@@ -5500,6 +5505,7 @@ void stub_vtable_visit(PARROT_INTERP, PMC* pmc, PMC* info) {
 
     return;
 }
+/* END vtable stubs */
 
 /*
  * Local variables:
