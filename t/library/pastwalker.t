@@ -49,7 +49,7 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     $P2 = getattribute walker, 'counts'
 
     $P3 = $P2['blocks']
-    is($P3, 3, "PAST::Block")
+    is($P3, 4, "PAST::Block")
 
     $P3 = $P2['ops']
     is($P3, 4, "PAST::Op")
@@ -61,7 +61,7 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     is($P3, 1, "PAST::Val")
 
     $P3 = $P2['stmts']
-    is($P3, 2, "PAST::Stmts")
+    is($P3, 3, "PAST::Stmts")
 
     $P3 = $P2['varlists']
     is($P3, 1, "PAST::VarList")
@@ -79,6 +79,8 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     $P0.'pirop'("call")
     $P1 = new ['PAST'; 'Var']
     $P2 = new ['PAST'; 'Block']
+    $P3 = new ['PAST'; 'Block']
+    $P2.'control'($P3)
     $P1.'viviself'($P2)
     push $P0, $P1
     $P1 = new ['PAST'; 'Val']
@@ -92,6 +94,8 @@ Uses PAST::Walker::NodeCounter to count the number of each node type in a PAST. 
     $P1 = new ['PAST'; 'VarList']
     push $P0, $P1
     $P1 = new ['PAST'; 'Block']
+    $P2 = new ['PAST'; 'Stmts']
+    $P1.'loadinit'($P2)
     push $P0, $P1
     push past, $P0
     $P0 = new ['PAST'; 'Stmts']

@@ -19,6 +19,18 @@ module Tree::Walker {
     our multi sub walk (PAST::Walker $walker, Integer $i) { }
     our multi sub walk (PAST::Walker $walker, String $s) { }
 
+    our multi sub walkChildren (PAST::Walker $walker, PAST::Block $block) {
+        my $index := 0;
+        my $max := pir::elements__IP($block);
+        until ($index == $max) {
+            walk($walker, $block[$index++]);
+        }
+        walk($walker, $block.control) if $walker.walkable($block.control);
+        walk($walker, $block.loadinit) 
+          if pir::exists__IQS($block, 'loadinit')
+            && $walker.walkable($block.loadinit);
+    }
+
     our multi sub walkChildren (PAST::Walker $walker, PAST::Var $var) {
         my $index := 0;
         my $max := pir::elements__IP($var);
