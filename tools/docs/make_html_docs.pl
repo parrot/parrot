@@ -39,7 +39,7 @@ die unless GetOptions( 'version=s' => \$version );
 
 die "Usage: $0 --version\n" unless $version;
 
-my $target_dir = 'docs/html2';
+my $target_dir = 'docs/html';
 
 my $json = JSON->new();
 
