@@ -8,10 +8,11 @@ INIT {
     pir::load_bytecode('PAST/Pattern.pbc');
 }
 
-plan(3);
+plan(4);
 test_change_node_attributes();
 test_change_node_types();
 test_delete_nodes();
+test_traverse_var_attributes();
 
 class Increment is PAST::Transformer { }
 class Negate is PAST::Transformer { }
@@ -105,6 +106,19 @@ sub test_delete_nodes () {
     $target[0][1] := PAST::Pattern::Block.new(PAST::Pattern::Val.new);
     ok($result.match($target, :pos($result)),
        "Nodes can be deleted by PAST::Transformers.");
+}
+
+sub test_traverse_var_attributes () {
+    my $past :=
+      PAST::Var.new(:viviself(PAST::Val.new(:value(5))),
+                    :vivibase(PAST::Val.new(:value(6))));
+    my $transformer := Increment.new;
+    my $result := $transformer.walk($past);
+    my $target :=
+      PAST::Pattern::Var.new(:viviself(PAST::Pattern::Val.new(:value(6))),
+                             :vivibase(PAST::Pattern::Val.new(:value(7))));
+    ok($result.match($target, :pos($result)),
+       "PAST::Transformer walks PAST::Var.viviself and .vivibase.");
 }
 
 # Local Variables:
