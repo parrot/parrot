@@ -41,7 +41,8 @@ Run:
 
 in F<editor/> to build it.
 
-TODO: How do we install Kate syntax files?
+Copy the file F<imcc.xml> to F<~/.kde/share/apps/katepart/systax>.
+TODO: Not tested if this really works!
 
 =head2 Emacs
 
