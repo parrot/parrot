@@ -18,7 +18,6 @@
             "tools/dev/install_files.pl",
             "tools/dev/mk_manifest_and_skip.pl",
             "tools/dev/symlink.pl",
-            "tools/dev/mk_native_pbc"
          ],
          "title" : "Building"
       },
