@@ -33,8 +33,7 @@
       {
          "source" : [
             "tools/dev/lib_deps.pl",
-            "tools/dev/parrot_coverage.pl",
-            "tools/docs/write_docs.pl"
+            "tools/dev/parrot_coverage.pl"
          ],
          "title" : "Documentation"
       },
