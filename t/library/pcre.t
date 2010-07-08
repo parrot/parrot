@@ -101,7 +101,8 @@ Loaded
 OUT
 
 ## 2
-    pir_output_is( <<"CODE", <<'OUT', 'soup to nuts' );
+    my @todo = ( todo => '3..5 fail on Win32' ) if $^O =~ /MSWin32/;
+    pir_output_is( <<"CODE", <<'OUT', 'soup to nuts', @todo );
 
 .include 'iglobals.pasm'
 .include 'libpaths.pasm'

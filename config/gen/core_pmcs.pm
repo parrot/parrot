@@ -76,7 +76,7 @@ END_H
 END_H
     print {$OUT} coda();
 
-    close $OUT or die "Can't close file: $!";;
+    close $OUT or die "Can't close file: $!";
 
     move_if_diff( "$file.tmp", $file );
 

@@ -472,7 +472,7 @@ ARGIN(opcode_t *pc))
     }
 
     Profiling_exit_check_SET(runcore);
-    runcore->runcore_finish = Parrot_hires_get_time();;
+    runcore->runcore_finish = Parrot_hires_get_time();
     return pc;
 }
 
