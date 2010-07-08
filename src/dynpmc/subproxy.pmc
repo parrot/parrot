@@ -1,18 +1,20 @@
 /*
- * $Id$
- * Copyright (C) 2003-2009, Parrot Foundation.
- */
+Copyright (C) 2003-2009, Parrot Foundation.
+$Id$
 
-/*
- * Sample SubProxy class
- *
- * s. src/dynpmc/main.pasm for usage
- */
+=head1 NAME
 
-/*
- * the real class enum is created at load time
- */
-#define enum_class_SubProxy -1
+src/dynpmc/subproxy.pmc
+
+=head1 DESCRIPTION
+
+Sample SubProxy class
+
+see src/dynpmc/main.pasm for usage
+
+=cut
+
+*/
 
 pmclass SubProxy dynpmc extends Sub auto_attrs {
 
