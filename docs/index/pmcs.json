@@ -24,7 +24,12 @@
       },
       {
          "source" : "src/dynpmc/*.pmc",
-         "title" : "Dynamic PMCs"
+         "title" : "Dynamic PMCs",
+         "exclude" : [
+             "src/dynpmc/rotest.pmc",
+             "src/dynpmc/foo.pmc",
+             "src/dynpmc/foo2.pmc"
+         ]
       }
    ],
    "title" : "PMCs"
