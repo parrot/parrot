@@ -27,6 +27,8 @@
          "title" : "Dynamic PMCs",
          "exclude" : [
              "src/dynpmc/rotest.pmc",
+             "src/dynpmc/subproxy.pmc",
+             "src/dynpmc/pccmethod_test.pmc",
              "src/dynpmc/foo.pmc",
              "src/dynpmc/foo2.pmc"
          ]
