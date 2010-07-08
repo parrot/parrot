@@ -1,5 +1,10 @@
 # $Id$
 
+New in 2.6.0
+- Platforms
+  + The Fedora package 'parrot-devel' install the files for syntax-highlighting
+    and automatic indenting for the vim editor.
+
 New in 2.5.0
 - Core
   + Added ByteBuffer PMC to allow direct byte manipulation
