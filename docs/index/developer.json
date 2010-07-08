@@ -4,7 +4,7 @@
       {
          "source" : [
             "docs/parrotbyte.pod",
-            "docs/packfile-c.pod",
+            "src/packfile.c",
             "docs/memory_internals.pod",
             "docs/vtables.pod",
             "docs/embed.pod",
