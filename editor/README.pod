@@ -41,8 +41,7 @@ Run:
 
 in F<editor/> to build it.
 
-Copy the file F<imcc.xml> to F<~/.kde/share/apps/katepart/systax>.
-TODO: Not tested if this really works!
+Copy the file F<imcc.xml> to F<~/.kde/share/apps/katepart/syntax>.
 
 =head2 Emacs
 
@@ -84,7 +83,7 @@ Additionally, you might want to add:
               (function (lambda ()
                           (setq indent-tabs-mode nil))))
 
-to F<~/.emacs> as this seems to prevent the odd behavior that is noted when 
+to F<~/.emacs> as this seems to prevent the odd behavior that is noted when
 using tabs in the pasm mode.
 
 =back
