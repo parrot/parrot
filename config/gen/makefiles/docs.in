@@ -27,11 +27,16 @@ help :
 	@echo ""
 	@echo "Following targets are available to the user:"
 	@echo ""
-	@echo "  all:               Generate documentation from .pod files or from the sources."
-	@echo "                     This is the default target."
-	@echo "  clean:             Remove the generated documentation."
-	@echo "  html:              Generate HTML documentation."
-	@echo "  html-clean:        Remove the generated HTML documentation."
+	@echo "all:             Generate documentation from .pod files or from the sources."
+	@echo "                 This is the default target."
+	@echo ""
+	@echo "htmlhelp:        windows only, generate a .chm file."
+	@echo "htmlhelp-clean:  Remove generated .chm"
+	@echo ""
+	@echo "pdf:             Generate a PDF from the html docs"
+	@echo "pdf-clean:       Remove generated pdf"
+	@echo ""
+	@echo "   clean:        Remove the generated documentation."
 	@echo ""
 
 $(POD): doc-prep
@@ -47,12 +52,11 @@ packfile-c.pod: ../src/packfile.c
 clean:
 	$(RM_F) packfile-c.pod $(POD) doc-prep
 
-html-old: all
-	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
-html: all
+html:
 	$(PERL) -I../lib ../tools/docs/make_html_docs.pl --version=$(VERSION)
+html-clean:
+	$(RM_RF) html
 
-# The pdf target is to generate a parrot PDF document.
 # If you are missing the command 'pdflatex' then you have first to install a
 # LaTeX distribution with it. For Windows and UNIX downloads are for example
 # available from: http://miktex.org, http://tug.org/texlive or
@@ -67,9 +71,6 @@ pdf: ../tools/docs/filename_and_chapter.pl
 
 pdf-clean:
 	$(RM_RF) build
-
-html-clean:
-	$(RM_RF) html
 
 htmlhelp: html
 #IF(win32):	cd .. && $(PERL) tools/docs/mk_chm.pl
