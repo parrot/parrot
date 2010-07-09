@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -18,7 +18,6 @@ This script writes the HTML documentation for Parrot.
 
 use 5.12.0;
 
-use strict;
 use warnings;
 
 # as long as we have a separate docs/ makefile, this will be run from
