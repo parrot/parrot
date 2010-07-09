@@ -18,11 +18,13 @@ This script writes the HTML documentation for Parrot.
 
 use 5.12.0;
 
+use strict;
+use warnings;
+
 # as long as we have a separate docs/ makefile, this will be run from
 # inside it. So jump up a dir to catch all the files.
 chdir '..';
 
-use warnings;
 use lib 'lib';
 use Fatal qw/open close/;
 
