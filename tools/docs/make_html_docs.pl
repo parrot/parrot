@@ -45,11 +45,19 @@ my $json = JSON->new();
 
 # Transform the json
 my %pages;
-foreach my $index_file (glob 'docs/index/*.json') {
+my @json_index_files = glob 'docs/index/*.json';
+foreach my $index_file (@json_index_files) {
     my $contents;
     open my $fh, '<', $index_file;
     { local $/; $contents = <$fh>}
-    my $section = $json->decode($contents);
+    my $section = '';
+    eval {
+        $section = $json->decode($contents);
+    };
+    if ($@) {
+        say STDERR "Error in $index_file:";
+        die $@;
+    }
 
     my $outfile = $section->{page} . '.html';
     my $title   = $section->{title};
