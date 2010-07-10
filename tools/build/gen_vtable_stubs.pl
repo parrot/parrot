@@ -165,7 +165,7 @@ sub gen_stub {
 
     my($ret_dec, $ret_ret, $ret_last) = ('','','');
     if ($ret ne 'void') {
-        $ret_dec  = $ret.' ret;'."\n";
+        $ret_dec  = '    '.$ret.' ret;'."\n";
         $ret_ret  = ' ret =';
         $ret_last = ' ret';
     }
@@ -176,7 +176,7 @@ $ret stub_$name($params) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    $ret_dec
+$ret_dec
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);

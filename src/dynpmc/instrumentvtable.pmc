@@ -1259,7 +1259,7 @@ void stub_init_pmc(PARROT_INTERP, PMC* pmc, PMC* initializer) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1302,7 +1302,7 @@ void stub_morph(PARROT_INTERP, PMC* pmc, PMC* type) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1345,7 +1345,7 @@ void stub_setprop(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1366,7 +1366,7 @@ void stub_delprop(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1761,7 +1761,7 @@ void stub_set_integer_native(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1782,7 +1782,7 @@ void stub_set_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1803,7 +1803,7 @@ void stub_set_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, INTVAL valu
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1824,7 +1824,7 @@ void stub_set_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, INTVAL val
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1845,7 +1845,7 @@ void stub_set_number_native(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1866,7 +1866,7 @@ void stub_set_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1887,7 +1887,7 @@ void stub_set_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, FLOATVAL val
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1908,7 +1908,7 @@ void stub_set_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, FLOATVAL va
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1929,7 +1929,7 @@ void stub_set_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1950,7 +1950,7 @@ void stub_assign_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1971,7 +1971,7 @@ void stub_set_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -1992,7 +1992,7 @@ void stub_set_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, STRING* valu
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2013,7 +2013,7 @@ void stub_set_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, STRING* val
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2034,7 +2034,7 @@ void stub_set_bool(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2055,7 +2055,7 @@ void stub_set_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2076,7 +2076,7 @@ void stub_assign_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2097,7 +2097,7 @@ void stub_set_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2118,7 +2118,7 @@ void stub_set_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2139,7 +2139,7 @@ void stub_set_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2160,7 +2160,7 @@ void stub_set_pointer(PARROT_INTERP, PMC* pmc, void* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2181,7 +2181,7 @@ void stub_set_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, void* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2202,7 +2202,7 @@ void stub_set_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, void* value
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2223,7 +2223,7 @@ void stub_set_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, void* valu
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2244,7 +2244,7 @@ void stub_push_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2265,7 +2265,7 @@ void stub_push_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2286,7 +2286,7 @@ void stub_push_string(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2307,7 +2307,7 @@ void stub_push_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2328,7 +2328,7 @@ void stub_unshift_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2349,7 +2349,7 @@ void stub_unshift_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2370,7 +2370,7 @@ void stub_unshift_string(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2391,7 +2391,7 @@ void stub_unshift_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2412,7 +2412,7 @@ void stub_splice(PARROT_INTERP, PMC* pmc, PMC* value, INTVAL offset, INTVAL coun
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2499,7 +2499,7 @@ void stub_i_add(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2520,7 +2520,7 @@ void stub_i_add_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2541,7 +2541,7 @@ void stub_i_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2628,7 +2628,7 @@ void stub_i_subtract(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2649,7 +2649,7 @@ void stub_i_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2670,7 +2670,7 @@ void stub_i_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2757,7 +2757,7 @@ void stub_i_multiply(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2778,7 +2778,7 @@ void stub_i_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2799,7 +2799,7 @@ void stub_i_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2886,7 +2886,7 @@ void stub_i_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2907,7 +2907,7 @@ void stub_i_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -2928,7 +2928,7 @@ void stub_i_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3015,7 +3015,7 @@ void stub_i_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3036,7 +3036,7 @@ void stub_i_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3057,7 +3057,7 @@ void stub_i_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3144,7 +3144,7 @@ void stub_i_modulus(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3165,7 +3165,7 @@ void stub_i_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3186,7 +3186,7 @@ void stub_i_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3559,7 +3559,7 @@ void stub_i_concatenate(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3580,7 +3580,7 @@ void stub_i_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3645,7 +3645,7 @@ void stub_i_repeat(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3666,7 +3666,7 @@ void stub_i_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3687,7 +3687,7 @@ void stub_substr(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length, PMC* des
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3862,7 +3862,7 @@ void stub_delete_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3883,7 +3883,7 @@ void stub_delete_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -3904,7 +3904,7 @@ void stub_delete_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4101,7 +4101,7 @@ void stub_set_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4122,7 +4122,7 @@ void stub_set_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx, PMC* va
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4143,7 +4143,7 @@ void stub_add_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4164,7 +4164,7 @@ void stub_remove_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4185,7 +4185,7 @@ void stub_add_role(PARROT_INTERP, PMC* pmc, PMC* role) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4206,7 +4206,7 @@ void stub_remove_role(PARROT_INTERP, PMC* pmc, PMC* role) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4227,7 +4227,7 @@ void stub_add_attribute(PARROT_INTERP, PMC* pmc, STRING* name, PMC* type) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4248,7 +4248,7 @@ void stub_remove_attribute(PARROT_INTERP, PMC* pmc, STRING* name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4269,7 +4269,7 @@ void stub_add_method(PARROT_INTERP, PMC* pmc, STRING* method_name, PMC* sub_pmc)
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4290,7 +4290,7 @@ void stub_remove_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4311,7 +4311,7 @@ void stub_add_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name, PMC*
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4332,7 +4332,7 @@ void stub_remove_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4375,7 +4375,7 @@ void stub_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4396,7 +4396,7 @@ void stub_thaw(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4417,7 +4417,7 @@ void stub_thawfinish(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4438,7 +4438,7 @@ void stub_visit(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
@@ -4459,7 +4459,7 @@ void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
-    
+
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
     GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
