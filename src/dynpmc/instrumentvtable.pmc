@@ -13,6 +13,7 @@ instrument a PMC.
 
 =head2 Methods
 
+=over 4
 
 =cut
 
@@ -287,6 +288,432 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group {
                                         "Unknown VTABLE entry: %Ss", key);
         }
         *instr = orig;
+    }
+
+/*
+
+=item C<PMC* get_hook_list(STRING *name)>
+
+Returns a ResizableStringArray PMC filled with
+the names of the gc entries to instrument.
+
+=cut
+
+*/
+
+    METHOD get_hook_list(STRING *name) {
+        PMC *list;
+
+        list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+
+        /* BEGIN vtable groupings */
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exists"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "exists_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "exists_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "exists_keyed_str"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "fetch"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_integer_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_integer_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_integer_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_number_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_number_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_number_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_string_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_string_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_string_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_pmc_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_pmc_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_pmc_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_pointer_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_pointer_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_pointer_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_integer_native"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_integer_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_integer_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_integer_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_number_native"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_number_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_number_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_number_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_string_native"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "assign_string_native"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_string_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_string_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_string_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_bool"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "assign_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pmc_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pmc_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pmc_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pointer"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pointer_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pointer_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_pointer_keyed_str"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "string"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "concatenate"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "concatenate_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_concatenate"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_concatenate_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "repeat"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "repeat_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_repeat"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_repeat_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "substr"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "substr_str"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "math"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_add"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_add_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_add_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "subtract"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "subtract_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "subtract_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_subtract"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_subtract_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_subtract_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "multiply"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "multiply_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "multiply_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_multiply"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_multiply_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_multiply_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "divide"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "divide_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "divide_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_divide"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_divide_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_divide_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "floor_divide"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "floor_divide_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "floor_divide_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_floor_divide"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_floor_divide_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_floor_divide_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "modulus"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "modulus_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "modulus_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_modulus"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_modulus_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_modulus_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "absolute"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "neg"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "main"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "defined_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "defined_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "defined_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "delete_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "delete_keyed_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "delete_keyed_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "invoke"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "can"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "does_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "does"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "isa_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "isa"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_attr_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "get_attr_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_attr_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_attr_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_parent"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_parent"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_role"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_role"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_attribute"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_attribute"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_method"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_method"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_vtable_override"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_vtable_override"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "inspect_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "freeze"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "thaw"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "thawfinish"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "visit"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "init_int"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "fetchsize"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "push_integer"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "push_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "push_string"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "push_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "unshift_integer"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "unshift_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "unshift_string"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "unshift_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "splice"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "cmp"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "is_equal"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "is_equal_num"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "is_equal_string"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "is_same"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "cmp"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "cmp_num"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "cmp_string"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "cmp_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "logical_or"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "logical_and"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "logical_xor"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "logical_not"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "core"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "init_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "instantiate"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "morph"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "getprop"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "setprop"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "delprop"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "clone_pmc"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "find_method"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "write"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "morph"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_add"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_add_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_add_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_subtract"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_subtract_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_subtract_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_multiply"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_multiply_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_multiply_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_divide"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_divide_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_divide_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_floor_divide"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_floor_divide_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_floor_divide_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_modulus"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_modulus_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_modulus_float"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_concatenate"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_concatenate_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_repeat"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "i_repeat_int"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_attr_str"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "set_attr_keyed"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_parent"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_parent"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_role"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_role"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_attribute"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_attribute"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_method"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_method"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "add_vtable_override"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "remove_vtable_override"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "thaw"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "thawfinish"));
+        }
+
+        /* END vtable groupings */
+        else {
+            /* Ensure that name is the name of a hook before pushing it in. */
+            size_t *check;
+            check = (size_t *) parrot_hash_get(INTERP, Instrument_Vtable_Stubs, name);
+            if (check == NULL) {
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                            "Unknown GC function: %Ss", name);
+            }
+
+            VTABLE_push_string(INTERP, list, name);
+        }
+
+        RETURN(PMC *list);
     }
 
 }
@@ -1259,6 +1686,8 @@ void stub_init_pmc(PARROT_INTERP, PMC* pmc, PMC* initializer) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1267,7 +1696,14 @@ void stub_init_pmc(PARROT_INTERP, PMC* pmc, PMC* initializer) {
 
     orig_vtable->init_pmc(interp, pmc, initializer);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, initializer);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "init_pmc"));
@@ -1280,6 +1716,8 @@ PMC* stub_instantiate(PARROT_INTERP, PMC* pmc, PMC* sig) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1289,7 +1727,14 @@ PMC* stub_instantiate(PARROT_INTERP, PMC* pmc, PMC* sig) {
 
     ret = orig_vtable->instantiate(interp, pmc, sig);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, sig);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "instantiate"));
@@ -1302,6 +1747,8 @@ void stub_morph(PARROT_INTERP, PMC* pmc, PMC* type) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1310,7 +1757,14 @@ void stub_morph(PARROT_INTERP, PMC* pmc, PMC* type) {
 
     orig_vtable->morph(interp, pmc, type);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, type);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "morph"));
@@ -1323,6 +1777,8 @@ PMC* stub_getprop(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1332,7 +1788,16 @@ PMC* stub_getprop(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->getprop(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "getprop"));
@@ -1345,6 +1810,8 @@ void stub_setprop(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1353,7 +1820,17 @@ void stub_setprop(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
 
     orig_vtable->setprop(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "setprop"));
@@ -1366,6 +1843,8 @@ void stub_delprop(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1374,7 +1853,16 @@ void stub_delprop(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     orig_vtable->delprop(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "delprop"));
@@ -1387,6 +1875,8 @@ PMC* stub_clone_pmc(PARROT_INTERP, PMC* pmc, PMC* args) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1396,7 +1886,14 @@ PMC* stub_clone_pmc(PARROT_INTERP, PMC* pmc, PMC* args) {
 
     ret = orig_vtable->clone_pmc(interp, pmc, args);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, args);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "clone_pmc"));
@@ -1409,6 +1906,8 @@ PMC* stub_find_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1418,7 +1917,16 @@ PMC* stub_find_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
 
     ret = orig_vtable->find_method(interp, pmc, method_name);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, method_name);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "find_method"));
@@ -1431,6 +1939,8 @@ INTVAL stub_get_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1440,7 +1950,14 @@ INTVAL stub_get_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->get_integer_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_integer_keyed"));
@@ -1453,6 +1970,8 @@ INTVAL stub_get_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1462,7 +1981,16 @@ INTVAL stub_get_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->get_integer_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_integer_keyed_int"));
@@ -1475,6 +2003,8 @@ INTVAL stub_get_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1484,7 +2014,16 @@ INTVAL stub_get_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->get_integer_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_integer_keyed_str"));
@@ -1497,6 +2036,8 @@ FLOATVAL stub_get_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     FLOATVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1506,7 +2047,14 @@ FLOATVAL stub_get_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->get_number_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_number_keyed"));
@@ -1519,6 +2067,8 @@ FLOATVAL stub_get_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     FLOATVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1528,7 +2078,16 @@ FLOATVAL stub_get_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->get_number_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_number_keyed_int"));
@@ -1541,6 +2100,8 @@ FLOATVAL stub_get_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     FLOATVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1550,7 +2111,16 @@ FLOATVAL stub_get_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->get_number_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_number_keyed_str"));
@@ -1563,6 +2133,8 @@ STRING* stub_get_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     STRING* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1572,7 +2144,14 @@ STRING* stub_get_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->get_string_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_string_keyed"));
@@ -1585,6 +2164,8 @@ STRING* stub_get_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     STRING* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1594,7 +2175,16 @@ STRING* stub_get_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->get_string_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_string_keyed_int"));
@@ -1607,6 +2197,8 @@ STRING* stub_get_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     STRING* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1616,7 +2208,16 @@ STRING* stub_get_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->get_string_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_string_keyed_str"));
@@ -1629,6 +2230,8 @@ PMC* stub_get_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1638,7 +2241,14 @@ PMC* stub_get_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->get_pmc_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_pmc_keyed"));
@@ -1651,6 +2261,8 @@ PMC* stub_get_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1660,7 +2272,16 @@ PMC* stub_get_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->get_pmc_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_pmc_keyed_int"));
@@ -1673,6 +2294,8 @@ PMC* stub_get_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1682,7 +2305,16 @@ PMC* stub_get_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->get_pmc_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_pmc_keyed_str"));
@@ -1695,6 +2327,8 @@ void* stub_get_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     void* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1704,7 +2338,14 @@ void* stub_get_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->get_pointer_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_pointer_keyed"));
@@ -1717,6 +2358,8 @@ void* stub_get_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     void* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1726,7 +2369,16 @@ void* stub_get_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->get_pointer_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_pointer_keyed_int"));
@@ -1739,6 +2391,8 @@ void* stub_get_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     void* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -1748,7 +2402,16 @@ void* stub_get_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->get_pointer_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_pointer_keyed_str"));
@@ -1761,6 +2424,8 @@ void stub_set_integer_native(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1769,7 +2434,16 @@ void stub_set_integer_native(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->set_integer_native(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_integer_native"));
@@ -1782,6 +2456,8 @@ void stub_set_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1790,7 +2466,17 @@ void stub_set_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, INTVAL value) {
 
     orig_vtable->set_integer_keyed(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_integer_keyed"));
@@ -1803,6 +2489,8 @@ void stub_set_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, INTVAL valu
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1811,7 +2499,19 @@ void stub_set_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, INTVAL valu
 
     orig_vtable->set_integer_keyed_int(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_integer_keyed_int"));
@@ -1824,6 +2524,8 @@ void stub_set_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, INTVAL val
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1832,7 +2534,19 @@ void stub_set_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, INTVAL val
 
     orig_vtable->set_integer_keyed_str(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_integer_keyed_str"));
@@ -1845,6 +2559,8 @@ void stub_set_number_native(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1853,7 +2569,16 @@ void stub_set_number_native(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->set_number_native(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_number_native"));
@@ -1866,6 +2591,8 @@ void stub_set_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1874,7 +2601,17 @@ void stub_set_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key, FLOATVAL value) {
 
     orig_vtable->set_number_keyed(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_number_keyed"));
@@ -1887,6 +2624,8 @@ void stub_set_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, FLOATVAL val
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1895,7 +2634,19 @@ void stub_set_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, FLOATVAL val
 
     orig_vtable->set_number_keyed_int(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_number_keyed_int"));
@@ -1908,6 +2659,8 @@ void stub_set_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, FLOATVAL va
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1916,7 +2669,19 @@ void stub_set_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, FLOATVAL va
 
     orig_vtable->set_number_keyed_str(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_number_keyed_str"));
@@ -1929,6 +2694,8 @@ void stub_set_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1937,7 +2704,16 @@ void stub_set_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
 
     orig_vtable->set_string_native(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_string_native"));
@@ -1950,6 +2726,8 @@ void stub_assign_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1958,7 +2736,16 @@ void stub_assign_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
 
     orig_vtable->assign_string_native(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "assign_string_native"));
@@ -1971,6 +2758,8 @@ void stub_set_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -1979,7 +2768,17 @@ void stub_set_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* value) {
 
     orig_vtable->set_string_keyed(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_string_keyed"));
@@ -1992,6 +2791,8 @@ void stub_set_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, STRING* valu
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2000,7 +2801,19 @@ void stub_set_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, STRING* valu
 
     orig_vtable->set_string_keyed_int(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_string_keyed_int"));
@@ -2013,6 +2826,8 @@ void stub_set_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, STRING* val
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2021,7 +2836,19 @@ void stub_set_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, STRING* val
 
     orig_vtable->set_string_keyed_str(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_string_keyed_str"));
@@ -2034,6 +2861,8 @@ void stub_set_bool(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2042,7 +2871,16 @@ void stub_set_bool(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->set_bool(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_bool"));
@@ -2055,6 +2893,8 @@ void stub_set_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2063,7 +2903,14 @@ void stub_set_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->set_pmc(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pmc"));
@@ -2076,6 +2923,8 @@ void stub_assign_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2084,7 +2933,14 @@ void stub_assign_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->assign_pmc(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "assign_pmc"));
@@ -2097,6 +2953,8 @@ void stub_set_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2105,7 +2963,15 @@ void stub_set_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key, PMC* value) {
 
     orig_vtable->set_pmc_keyed(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pmc_keyed"));
@@ -2118,6 +2984,8 @@ void stub_set_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2126,7 +2994,17 @@ void stub_set_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, PMC* value) {
 
     orig_vtable->set_pmc_keyed_int(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pmc_keyed_int"));
@@ -2139,6 +3017,8 @@ void stub_set_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2147,7 +3027,17 @@ void stub_set_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
 
     orig_vtable->set_pmc_keyed_str(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pmc_keyed_str"));
@@ -2160,6 +3050,8 @@ void stub_set_pointer(PARROT_INTERP, PMC* pmc, void* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2168,7 +3060,16 @@ void stub_set_pointer(PARROT_INTERP, PMC* pmc, void* value) {
 
     orig_vtable->set_pointer(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pointer"));
@@ -2181,6 +3082,8 @@ void stub_set_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, void* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2189,7 +3092,17 @@ void stub_set_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, void* value) {
 
     orig_vtable->set_pointer_keyed(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pointer_keyed"));
@@ -2202,6 +3115,8 @@ void stub_set_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, void* value
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2210,7 +3125,19 @@ void stub_set_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, void* value
 
     orig_vtable->set_pointer_keyed_int(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pointer_keyed_int"));
@@ -2223,6 +3150,8 @@ void stub_set_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, void* valu
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2231,7 +3160,19 @@ void stub_set_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, void* valu
 
     orig_vtable->set_pointer_keyed_str(interp, pmc, key, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_pointer_keyed_str"));
@@ -2244,6 +3185,8 @@ void stub_push_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2252,7 +3195,16 @@ void stub_push_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->push_integer(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "push_integer"));
@@ -2265,6 +3217,8 @@ void stub_push_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2273,7 +3227,16 @@ void stub_push_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->push_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "push_float"));
@@ -2286,6 +3249,8 @@ void stub_push_string(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2294,7 +3259,16 @@ void stub_push_string(PARROT_INTERP, PMC* pmc, STRING* value) {
 
     orig_vtable->push_string(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "push_string"));
@@ -2307,6 +3281,8 @@ void stub_push_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2315,7 +3291,14 @@ void stub_push_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->push_pmc(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "push_pmc"));
@@ -2328,6 +3311,8 @@ void stub_unshift_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2336,7 +3321,16 @@ void stub_unshift_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->unshift_integer(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "unshift_integer"));
@@ -2349,6 +3343,8 @@ void stub_unshift_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2357,7 +3353,16 @@ void stub_unshift_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->unshift_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "unshift_float"));
@@ -2370,6 +3375,8 @@ void stub_unshift_string(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2378,7 +3385,16 @@ void stub_unshift_string(PARROT_INTERP, PMC* pmc, STRING* value) {
 
     orig_vtable->unshift_string(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "unshift_string"));
@@ -2391,6 +3407,8 @@ void stub_unshift_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2399,7 +3417,14 @@ void stub_unshift_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->unshift_pmc(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "unshift_pmc"));
@@ -2412,6 +3437,8 @@ void stub_splice(PARROT_INTERP, PMC* pmc, PMC* value, INTVAL offset, INTVAL coun
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2420,7 +3447,20 @@ void stub_splice(PARROT_INTERP, PMC* pmc, PMC* value, INTVAL offset, INTVAL coun
 
     orig_vtable->splice(interp, pmc, value, offset, count);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, offset);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, count);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "splice"));
@@ -2433,6 +3473,8 @@ PMC* stub_add(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2442,7 +3484,15 @@ PMC* stub_add(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->add(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add"));
@@ -2455,6 +3505,8 @@ PMC* stub_add_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2464,7 +3516,17 @@ PMC* stub_add_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->add_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_int"));
@@ -2477,6 +3539,8 @@ PMC* stub_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2486,7 +3550,17 @@ PMC* stub_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
 
     ret = orig_vtable->add_float(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_float"));
@@ -2499,6 +3573,8 @@ void stub_i_add(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2507,7 +3583,14 @@ void stub_i_add(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_add(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_add"));
@@ -2520,6 +3603,8 @@ void stub_i_add_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2528,7 +3613,16 @@ void stub_i_add_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_add_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_add_int"));
@@ -2541,6 +3635,8 @@ void stub_i_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2549,7 +3645,16 @@ void stub_i_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->i_add_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_add_float"));
@@ -2562,6 +3667,8 @@ PMC* stub_subtract(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2571,7 +3678,15 @@ PMC* stub_subtract(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->subtract(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "subtract"));
@@ -2584,6 +3699,8 @@ PMC* stub_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2593,7 +3710,17 @@ PMC* stub_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->subtract_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "subtract_int"));
@@ -2606,6 +3733,8 @@ PMC* stub_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2615,7 +3744,17 @@ PMC* stub_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
 
     ret = orig_vtable->subtract_float(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "subtract_float"));
@@ -2628,6 +3767,8 @@ void stub_i_subtract(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2636,7 +3777,14 @@ void stub_i_subtract(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_subtract(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_subtract"));
@@ -2649,6 +3797,8 @@ void stub_i_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2657,7 +3807,16 @@ void stub_i_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_subtract_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_subtract_int"));
@@ -2670,6 +3829,8 @@ void stub_i_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2678,7 +3839,16 @@ void stub_i_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->i_subtract_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_subtract_float"));
@@ -2691,6 +3861,8 @@ PMC* stub_multiply(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2700,7 +3872,15 @@ PMC* stub_multiply(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->multiply(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "multiply"));
@@ -2713,6 +3893,8 @@ PMC* stub_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2722,7 +3904,17 @@ PMC* stub_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->multiply_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "multiply_int"));
@@ -2735,6 +3927,8 @@ PMC* stub_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2744,7 +3938,17 @@ PMC* stub_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
 
     ret = orig_vtable->multiply_float(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "multiply_float"));
@@ -2757,6 +3961,8 @@ void stub_i_multiply(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2765,7 +3971,14 @@ void stub_i_multiply(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_multiply(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_multiply"));
@@ -2778,6 +3991,8 @@ void stub_i_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2786,7 +4001,16 @@ void stub_i_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_multiply_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_multiply_int"));
@@ -2799,6 +4023,8 @@ void stub_i_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2807,7 +4033,16 @@ void stub_i_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->i_multiply_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_multiply_float"));
@@ -2820,6 +4055,8 @@ PMC* stub_divide(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2829,7 +4066,15 @@ PMC* stub_divide(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->divide(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "divide"));
@@ -2842,6 +4087,8 @@ PMC* stub_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2851,7 +4098,17 @@ PMC* stub_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->divide_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "divide_int"));
@@ -2864,6 +4121,8 @@ PMC* stub_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2873,7 +4132,17 @@ PMC* stub_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
 
     ret = orig_vtable->divide_float(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "divide_float"));
@@ -2886,6 +4155,8 @@ void stub_i_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2894,7 +4165,14 @@ void stub_i_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_divide(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_divide"));
@@ -2907,6 +4185,8 @@ void stub_i_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2915,7 +4195,16 @@ void stub_i_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_divide_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_divide_int"));
@@ -2928,6 +4217,8 @@ void stub_i_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -2936,7 +4227,16 @@ void stub_i_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->i_divide_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_divide_float"));
@@ -2949,6 +4249,8 @@ PMC* stub_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2958,7 +4260,15 @@ PMC* stub_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->floor_divide(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "floor_divide"));
@@ -2971,6 +4281,8 @@ PMC* stub_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -2980,7 +4292,17 @@ PMC* stub_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->floor_divide_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "floor_divide_int"));
@@ -2993,6 +4315,8 @@ PMC* stub_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest)
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3002,7 +4326,17 @@ PMC* stub_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest)
 
     ret = orig_vtable->floor_divide_float(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "floor_divide_float"));
@@ -3015,6 +4349,8 @@ void stub_i_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3023,7 +4359,14 @@ void stub_i_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_floor_divide(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_floor_divide"));
@@ -3036,6 +4379,8 @@ void stub_i_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3044,7 +4389,16 @@ void stub_i_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_floor_divide_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_floor_divide_int"));
@@ -3057,6 +4411,8 @@ void stub_i_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3065,7 +4421,16 @@ void stub_i_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->i_floor_divide_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_floor_divide_float"));
@@ -3078,6 +4443,8 @@ PMC* stub_modulus(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3087,7 +4454,15 @@ PMC* stub_modulus(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->modulus(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "modulus"));
@@ -3100,6 +4475,8 @@ PMC* stub_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3109,7 +4486,17 @@ PMC* stub_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->modulus_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "modulus_int"));
@@ -3122,6 +4509,8 @@ PMC* stub_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3131,7 +4520,17 @@ PMC* stub_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
 
     ret = orig_vtable->modulus_float(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "modulus_float"));
@@ -3144,6 +4543,8 @@ void stub_i_modulus(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3152,7 +4553,14 @@ void stub_i_modulus(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_modulus(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_modulus"));
@@ -3165,6 +4573,8 @@ void stub_i_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3173,7 +4583,16 @@ void stub_i_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_modulus_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_modulus_int"));
@@ -3186,6 +4605,8 @@ void stub_i_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3194,7 +4615,16 @@ void stub_i_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
 
     orig_vtable->i_modulus_float(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_modulus_float"));
@@ -3207,6 +4637,8 @@ PMC* stub_absolute(PARROT_INTERP, PMC* pmc, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3216,7 +4648,14 @@ PMC* stub_absolute(PARROT_INTERP, PMC* pmc, PMC* dest) {
 
     ret = orig_vtable->absolute(interp, pmc, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "absolute"));
@@ -3229,6 +4668,8 @@ PMC* stub_neg(PARROT_INTERP, PMC* pmc, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3238,7 +4679,14 @@ PMC* stub_neg(PARROT_INTERP, PMC* pmc, PMC* dest) {
 
     ret = orig_vtable->neg(interp, pmc, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "neg"));
@@ -3251,6 +4699,8 @@ INTVAL stub_is_equal(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3260,7 +4710,14 @@ INTVAL stub_is_equal(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->is_equal(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "is_equal"));
@@ -3273,6 +4730,8 @@ INTVAL stub_is_equal_num(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3282,7 +4741,14 @@ INTVAL stub_is_equal_num(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->is_equal_num(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "is_equal_num"));
@@ -3295,6 +4761,8 @@ INTVAL stub_is_equal_string(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3304,7 +4772,14 @@ INTVAL stub_is_equal_string(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->is_equal_string(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "is_equal_string"));
@@ -3317,6 +4792,8 @@ INTVAL stub_is_same(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3326,7 +4803,14 @@ INTVAL stub_is_same(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->is_same(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "is_same"));
@@ -3339,6 +4823,8 @@ INTVAL stub_cmp(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3348,7 +4834,14 @@ INTVAL stub_cmp(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->cmp(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "cmp"));
@@ -3361,6 +4854,8 @@ INTVAL stub_cmp_num(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3370,7 +4865,14 @@ INTVAL stub_cmp_num(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->cmp_num(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "cmp_num"));
@@ -3383,6 +4885,8 @@ INTVAL stub_cmp_string(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3392,7 +4896,14 @@ INTVAL stub_cmp_string(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->cmp_string(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "cmp_string"));
@@ -3405,6 +4916,8 @@ PMC* stub_cmp_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3414,7 +4927,14 @@ PMC* stub_cmp_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     ret = orig_vtable->cmp_pmc(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "cmp_pmc"));
@@ -3427,6 +4947,8 @@ PMC* stub_logical_or(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3436,7 +4958,15 @@ PMC* stub_logical_or(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->logical_or(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "logical_or"));
@@ -3449,6 +4979,8 @@ PMC* stub_logical_and(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3458,7 +4990,15 @@ PMC* stub_logical_and(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->logical_and(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "logical_and"));
@@ -3471,6 +5011,8 @@ PMC* stub_logical_xor(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3480,7 +5022,15 @@ PMC* stub_logical_xor(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->logical_xor(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "logical_xor"));
@@ -3493,6 +5043,8 @@ PMC* stub_logical_not(PARROT_INTERP, PMC* pmc, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3502,7 +5054,14 @@ PMC* stub_logical_not(PARROT_INTERP, PMC* pmc, PMC* dest) {
 
     ret = orig_vtable->logical_not(interp, pmc, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "logical_not"));
@@ -3515,6 +5074,8 @@ PMC* stub_concatenate(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3524,7 +5085,15 @@ PMC* stub_concatenate(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->concatenate(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "concatenate"));
@@ -3537,6 +5106,8 @@ PMC* stub_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3546,7 +5117,17 @@ PMC* stub_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value, PMC* dest) {
 
     ret = orig_vtable->concatenate_str(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "concatenate_str"));
@@ -3559,6 +5140,8 @@ void stub_i_concatenate(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3567,7 +5150,14 @@ void stub_i_concatenate(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_concatenate(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_concatenate"));
@@ -3580,6 +5170,8 @@ void stub_i_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3588,7 +5180,16 @@ void stub_i_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value) {
 
     orig_vtable->i_concatenate_str(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_concatenate_str"));
@@ -3601,6 +5202,8 @@ PMC* stub_repeat(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3610,7 +5213,15 @@ PMC* stub_repeat(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
 
     ret = orig_vtable->repeat(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "repeat"));
@@ -3623,6 +5234,8 @@ PMC* stub_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3632,7 +5245,17 @@ PMC* stub_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
 
     ret = orig_vtable->repeat_int(interp, pmc, value, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "repeat_int"));
@@ -3645,6 +5268,8 @@ void stub_i_repeat(PARROT_INTERP, PMC* pmc, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3653,7 +5278,14 @@ void stub_i_repeat(PARROT_INTERP, PMC* pmc, PMC* value) {
 
     orig_vtable->i_repeat(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_repeat"));
@@ -3666,6 +5298,8 @@ void stub_i_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3674,7 +5308,16 @@ void stub_i_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
 
     orig_vtable->i_repeat_int(interp, pmc, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, value);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "i_repeat_int"));
@@ -3687,6 +5330,8 @@ void stub_substr(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length, PMC* des
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3695,7 +5340,20 @@ void stub_substr(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length, PMC* des
 
     orig_vtable->substr(interp, pmc, offset, length, dest);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, offset);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, length);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, dest);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "substr"));
@@ -3708,6 +5366,8 @@ STRING* stub_substr_str(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     STRING* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3717,7 +5377,19 @@ STRING* stub_substr_str(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length) {
 
     ret = orig_vtable->substr_str(interp, pmc, offset, length);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, offset);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, length);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "substr_str"));
@@ -3730,6 +5402,8 @@ INTVAL stub_exists_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3739,7 +5413,14 @@ INTVAL stub_exists_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->exists_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "exists_keyed"));
@@ -3752,6 +5433,8 @@ INTVAL stub_exists_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3761,7 +5444,16 @@ INTVAL stub_exists_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->exists_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "exists_keyed_int"));
@@ -3774,6 +5466,8 @@ INTVAL stub_exists_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3783,7 +5477,16 @@ INTVAL stub_exists_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->exists_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "exists_keyed_str"));
@@ -3796,6 +5499,8 @@ INTVAL stub_defined_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3805,7 +5510,14 @@ INTVAL stub_defined_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     ret = orig_vtable->defined_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "defined_keyed"));
@@ -3818,6 +5530,8 @@ INTVAL stub_defined_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3827,7 +5541,16 @@ INTVAL stub_defined_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     ret = orig_vtable->defined_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "defined_keyed_int"));
@@ -3840,6 +5563,8 @@ INTVAL stub_defined_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3849,7 +5574,16 @@ INTVAL stub_defined_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     ret = orig_vtable->defined_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "defined_keyed_str"));
@@ -3862,6 +5596,8 @@ void stub_delete_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3870,7 +5606,14 @@ void stub_delete_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
 
     orig_vtable->delete_keyed(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "delete_keyed"));
@@ -3883,6 +5626,8 @@ void stub_delete_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3891,7 +5636,16 @@ void stub_delete_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
 
     orig_vtable->delete_keyed_int(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "delete_keyed_int"));
@@ -3904,6 +5658,8 @@ void stub_delete_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -3912,7 +5668,16 @@ void stub_delete_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
 
     orig_vtable->delete_keyed_str(interp, pmc, key);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, key);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "delete_keyed_str"));
@@ -3925,6 +5690,8 @@ opcode_t* stub_invoke(PARROT_INTERP, PMC* pmc, void* next) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     opcode_t* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3934,7 +5701,16 @@ opcode_t* stub_invoke(PARROT_INTERP, PMC* pmc, void* next) {
 
     ret = orig_vtable->invoke(interp, pmc, next);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, next);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "invoke"));
@@ -3947,6 +5723,8 @@ INTVAL stub_can(PARROT_INTERP, PMC* pmc, STRING* method) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3956,7 +5734,16 @@ INTVAL stub_can(PARROT_INTERP, PMC* pmc, STRING* method) {
 
     ret = orig_vtable->can(interp, pmc, method);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, method);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "can"));
@@ -3969,6 +5756,8 @@ INTVAL stub_does_pmc(PARROT_INTERP, PMC* pmc, PMC* role) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -3978,7 +5767,14 @@ INTVAL stub_does_pmc(PARROT_INTERP, PMC* pmc, PMC* role) {
 
     ret = orig_vtable->does_pmc(interp, pmc, role);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, role);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "does_pmc"));
@@ -3991,6 +5787,8 @@ INTVAL stub_does(PARROT_INTERP, PMC* pmc, STRING* role) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -4000,7 +5798,16 @@ INTVAL stub_does(PARROT_INTERP, PMC* pmc, STRING* role) {
 
     ret = orig_vtable->does(interp, pmc, role);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, role);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "does"));
@@ -4013,6 +5820,8 @@ INTVAL stub_isa_pmc(PARROT_INTERP, PMC* pmc, PMC* _class) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -4022,7 +5831,14 @@ INTVAL stub_isa_pmc(PARROT_INTERP, PMC* pmc, PMC* _class) {
 
     ret = orig_vtable->isa_pmc(interp, pmc, _class);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, _class);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "isa_pmc"));
@@ -4035,6 +5851,8 @@ INTVAL stub_isa(PARROT_INTERP, PMC* pmc, STRING* _class) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     INTVAL ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -4044,7 +5862,16 @@ INTVAL stub_isa(PARROT_INTERP, PMC* pmc, STRING* _class) {
 
     ret = orig_vtable->isa(interp, pmc, _class);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, _class);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "isa"));
@@ -4057,6 +5884,8 @@ PMC* stub_get_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -4066,7 +5895,16 @@ PMC* stub_get_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx) {
 
     ret = orig_vtable->get_attr_str(interp, pmc, idx);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, idx);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_attr_str"));
@@ -4079,6 +5917,8 @@ PMC* stub_get_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -4088,7 +5928,17 @@ PMC* stub_get_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx) {
 
     ret = orig_vtable->get_attr_keyed(interp, pmc, key, idx);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, idx);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "get_attr_keyed"));
@@ -4101,6 +5951,8 @@ void stub_set_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx, PMC* value) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4109,7 +5961,17 @@ void stub_set_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx, PMC* value) {
 
     orig_vtable->set_attr_str(interp, pmc, idx, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, idx);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_attr_str"));
@@ -4122,6 +5984,8 @@ void stub_set_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx, PMC* va
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4130,7 +5994,18 @@ void stub_set_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx, PMC* va
 
     orig_vtable->set_attr_keyed(interp, pmc, key, idx, value);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, key);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, idx);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, value);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "set_attr_keyed"));
@@ -4143,6 +6018,8 @@ void stub_add_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4151,7 +6028,14 @@ void stub_add_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
 
     orig_vtable->add_parent(interp, pmc, parent);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, parent);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_parent"));
@@ -4164,6 +6048,8 @@ void stub_remove_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4172,7 +6058,14 @@ void stub_remove_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
 
     orig_vtable->remove_parent(interp, pmc, parent);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, parent);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "remove_parent"));
@@ -4185,6 +6078,8 @@ void stub_add_role(PARROT_INTERP, PMC* pmc, PMC* role) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4193,7 +6088,14 @@ void stub_add_role(PARROT_INTERP, PMC* pmc, PMC* role) {
 
     orig_vtable->add_role(interp, pmc, role);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, role);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_role"));
@@ -4206,6 +6108,8 @@ void stub_remove_role(PARROT_INTERP, PMC* pmc, PMC* role) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4214,7 +6118,14 @@ void stub_remove_role(PARROT_INTERP, PMC* pmc, PMC* role) {
 
     orig_vtable->remove_role(interp, pmc, role);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, role);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "remove_role"));
@@ -4227,6 +6138,8 @@ void stub_add_attribute(PARROT_INTERP, PMC* pmc, STRING* name, PMC* type) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4235,7 +6148,17 @@ void stub_add_attribute(PARROT_INTERP, PMC* pmc, STRING* name, PMC* type) {
 
     orig_vtable->add_attribute(interp, pmc, name, type);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, name);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, type);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_attribute"));
@@ -4248,6 +6171,8 @@ void stub_remove_attribute(PARROT_INTERP, PMC* pmc, STRING* name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4256,7 +6181,16 @@ void stub_remove_attribute(PARROT_INTERP, PMC* pmc, STRING* name) {
 
     orig_vtable->remove_attribute(interp, pmc, name);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, name);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "remove_attribute"));
@@ -4269,6 +6203,8 @@ void stub_add_method(PARROT_INTERP, PMC* pmc, STRING* method_name, PMC* sub_pmc)
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4277,7 +6213,17 @@ void stub_add_method(PARROT_INTERP, PMC* pmc, STRING* method_name, PMC* sub_pmc)
 
     orig_vtable->add_method(interp, pmc, method_name, sub_pmc);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, method_name);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, sub_pmc);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_method"));
@@ -4290,6 +6236,8 @@ void stub_remove_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4298,7 +6246,16 @@ void stub_remove_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
 
     orig_vtable->remove_method(interp, pmc, method_name);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, method_name);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "remove_method"));
@@ -4311,6 +6268,8 @@ void stub_add_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name, PMC*
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4319,7 +6278,17 @@ void stub_add_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name, PMC*
 
     orig_vtable->add_vtable_override(interp, pmc, vtable_name, sub_pmc);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, vtable_name);
+    VTABLE_push_pmc(supervisor, params, temp);
+    VTABLE_push_pmc(supervisor, params, sub_pmc);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "add_vtable_override"));
@@ -4332,6 +6301,8 @@ void stub_remove_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4340,7 +6311,16 @@ void stub_remove_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name) {
 
     orig_vtable->remove_vtable_override(interp, pmc, vtable_name);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, vtable_name);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "remove_vtable_override"));
@@ -4353,6 +6333,8 @@ PMC* stub_inspect_str(PARROT_INTERP, PMC* pmc, STRING* what) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     PMC* ret;
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
@@ -4362,7 +6344,16 @@ PMC* stub_inspect_str(PARROT_INTERP, PMC* pmc, STRING* what) {
 
     ret = orig_vtable->inspect_str(interp, pmc, what);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, what);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "inspect_str"));
@@ -4375,6 +6366,8 @@ void stub_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4383,7 +6376,14 @@ void stub_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
 
     orig_vtable->freeze(interp, pmc, info);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, info);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "freeze"));
@@ -4396,6 +6396,8 @@ void stub_thaw(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4404,7 +6406,14 @@ void stub_thaw(PARROT_INTERP, PMC* pmc, PMC* info) {
 
     orig_vtable->thaw(interp, pmc, info);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, info);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "thaw"));
@@ -4417,6 +6426,8 @@ void stub_thawfinish(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4425,7 +6436,14 @@ void stub_thawfinish(PARROT_INTERP, PMC* pmc, PMC* info) {
 
     orig_vtable->thawfinish(interp, pmc, info);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, info);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "thawfinish"));
@@ -4438,6 +6456,8 @@ void stub_visit(PARROT_INTERP, PMC* pmc, PMC* info) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4446,7 +6466,14 @@ void stub_visit(PARROT_INTERP, PMC* pmc, PMC* info) {
 
     orig_vtable->visit(interp, pmc, info);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    VTABLE_push_pmc(supervisor, params, info);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "visit"));
@@ -4459,6 +6486,8 @@ void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -4467,7 +6496,16 @@ void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer) {
 
     orig_vtable->init_int(interp, pmc, initializer);
 
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, initializer);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "init_int"));
@@ -4477,6 +6515,16 @@ void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer) {
 
 
 /* END vtable stubs */
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+=cut
+
+*/
 
 /*
  * Local variables:

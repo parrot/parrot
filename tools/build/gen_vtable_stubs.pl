@@ -85,7 +85,8 @@ while(<$vtable_fh>) {
 my %placeholders = (
     'vtable prototypes' => join('', @prototypes),
     'vtable stubs'      => join('', @stubs),
-    'vtable mappings'   => gen_mapping_string(@entries)
+    'vtable mappings'   => gen_mapping_string(@entries),
+    'vtable groupings'     => gen_grouping_string(\%groups, \@entries)
 );
 
 my @contents = ();
@@ -125,7 +126,7 @@ $dynpmc_fh = IO::File->new($dynpmc_file, O_WRONLY | O_CREAT | O_TRUNC)
 or die "Could not write to file $dynpmc_file!";
 
 flock($dynpmc_fh, LOCK_EX);
-print $dynpmc_fh join("\n", @contents);
+print $dynpmc_fh join("\n", @contents)."\n";
 flock($dynpmc_fh, LOCK_UN);
 
 $dynpmc_fh->close();
@@ -170,12 +171,54 @@ sub gen_stub {
         $ret_last = ' ret';
     }
 
+    # Prepare to pass the parameter list to instrument.
+    my $instr_params = '';
+    for(my $i = 1; $i < @param_types; $i++) {
+        if($param_types[$i] eq 'size_t' || $param_types[$i] eq 'UINTVAL'
+        || $param_types[$i] eq 'INTVAL') {
+            $instr_params .= <<INTEGER;
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, $param_names[$i]);
+    VTABLE_push_pmc(supervisor, params, temp);
+INTEGER
+        }
+        elsif($param_types[$i] eq 'FLOATVAL') {
+            $instr_params .= <<FLOAT;
+    temp = Parrot_pmc_new(supervisor, enum_class_Float);
+    VTABLE_set_number_native(supervisor, temp, $param_names[$i]);
+    VTABLE_push_pmc(supervisor, params, temp);
+FLOAT
+        }
+        elsif($param_types[$i] eq 'PMC*') {
+            $instr_params .= <<PMC;
+    VTABLE_push_pmc(supervisor, params, $param_names[$i]);
+PMC
+        }
+        elsif($param_types[$i] eq 'STRING*') {
+            $instr_params .= <<STRING;
+    temp = Parrot_pmc_new(supervisor, enum_class_String);
+    VTABLE_set_string_native(supervisor, temp, $param_names[$i]);
+    VTABLE_push_pmc(supervisor, params, temp);
+STRING
+        }
+        else {
+            # Assume pointer.
+            $instr_params .= <<POINTER;
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, $param_names[$i]);
+    VTABLE_push_pmc(supervisor, params, temp);
+POINTER
+        }
+    }
+
     return <<CODE;
 static
 $ret stub_$name($params) {
     PMC *instr_vt, *data;
     _vtable *orig_vtable;
     Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 $ret_dec
     instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
 
@@ -184,7 +227,12 @@ $ret_dec
 
    $ret_ret orig_vtable->$name($param_list_flat);
 
+$instr_params
+
     data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
                        CONST_STRING(supervisor, "$name"));
@@ -232,3 +280,40 @@ STUB_ENTRY
     }
 MAPPINGS
 }
+
+sub gen_grouping_string {
+    my($groups, $entries) = @_;
+    my($group, $entry);
+
+    my @groups;
+    foreach $group (keys %{$groups}) {
+        my @list = @{$groups->{$group}};
+        $group = lc($group);
+
+        my $ret .= <<PRE;
+if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "$group"))) {
+PRE
+
+        foreach $entry (@list) {
+            $ret .= <<ENTRY;
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "$entry"));
+ENTRY
+        }
+
+        $ret .= <<END;
+        }
+END
+
+        push @groups, $ret;
+    }
+
+    return '        '.join('        else ', @groups);
+}
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -70,37 +70,38 @@ typedef struct InstrumentGC_Subsystem {
 
 /* Prototypes for stub functions. */
 /* BEGIN gc prototypes */
-PMC* stub_allocate_pmc_header(PARROT_INTERP, UINTVAL flags);
-void* stub_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc);
-void* stub_allocate_memory_chunk(PARROT_INTERP, size_t size);
-void* stub_allocate_memory_chunk_with_interior_pointers(PARROT_INTERP, size_t size);
-STRING* stub_allocate_string_header(PARROT_INTERP, UINTVAL flags);
-void stub_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size);
-Buffer* stub_allocate_bufferlike_header(PARROT_INTERP, size_t size);
-void stub_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t nsize);
-void* stub_allocate_fixed_size_storage(PARROT_INTERP, size_t size);
-void stub_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t size);
-void stub_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize);
-void* stub_reallocate_memory_chunk(PARROT_INTERP, void *data, size_t newsize);
-void* stub_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void *data,
-        size_t oldsize, size_t newsize);
-void stub_free_pmc_header(PARROT_INTERP, PMC *pmc);
-void stub_free_string_header(PARROT_INTERP, STRING *string);
-void stub_free_bufferlike_header(PARROT_INTERP, Buffer *buffer, size_t size);
-void stub_free_pmc_attributes(PARROT_INTERP, PMC *pmc);
-void stub_free_fixed_size_storage(PARROT_INTERP, size_t size, void *ptr);
-void stub_free_memory_chunk(PARROT_INTERP, void *data);
-void stub_do_gc_mark(PARROT_INTERP, UINTVAL flags);
-void stub_block_mark(PARROT_INTERP);
-void stub_unblock_mark(PARROT_INTERP);
-void stub_block_sweep(PARROT_INTERP);
-void stub_unblock_sweep(PARROT_INTERP);
-void stub_finalize_gc_system(PARROT_INTERP);
-void stub_destroy_child_interp(Interp *dest_interp, Interp *child_interp);
-void stub_compact_string_pool(PARROT_INTERP);
-void stub_mark_special(PARROT_INTERP, PMC *pmc);
-void stub_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc);
-void stub_init_pool(PARROT_INTERP, struct Fixed_Size_Pool *pool);
+void  stub_finalize_gc_system(PARROT_INTERP);
+void  stub_destroy_child_interp(Interp* dest_interp, Interp* child_interp);
+void  stub_do_gc_mark(PARROT_INTERP, UINTVAL flags);
+void  stub_compact_string_pool(PARROT_INTERP);
+void  stub_mark_special(PARROT_INTERP, PMC*  stub_var1);
+void  stub_pmc_needs_early_collection(PARROT_INTERP, PMC*  stub_var1);
+void  stub_init_pool(PARROT_INTERP, struct Fixed_Size_Pool*  stub_var1);
+PMC*  stub_allocate_pmc_header(PARROT_INTERP, UINTVAL flags);
+void  stub_free_pmc_header(PARROT_INTERP, PMC*  stub_var1);
+STRING*  stub_allocate_string_header(PARROT_INTERP, UINTVAL flags);
+void  stub_free_string_header(PARROT_INTERP, STRING* stub_var1);
+Buffer*  stub_allocate_bufferlike_header(PARROT_INTERP, size_t size);
+void  stub_free_bufferlike_header(PARROT_INTERP, Buffer* stub_var1, size_t size);
+void*  stub_allocate_pmc_attributes(PARROT_INTERP, PMC*  stub_var1);
+void  stub_free_pmc_attributes(PARROT_INTERP, PMC*  stub_var1);
+void  stub_allocate_string_storage(PARROT_INTERP, STRING* str, size_t size);
+void  stub_reallocate_string_storage(PARROT_INTERP, STRING* str, size_t size);
+void  stub_allocate_buffer_storage(PARROT_INTERP, Buffer* buffer, size_t nsize);
+void  stub_reallocate_buffer_storage(PARROT_INTERP, Buffer* buffer, size_t newsize);
+void*  stub_allocate_fixed_size_storage(PARROT_INTERP, size_t size);
+void  stub_free_fixed_size_storage(PARROT_INTERP, size_t size, void*  stub_var1);
+void*  stub_allocate_memory_chunk(PARROT_INTERP, size_t size);
+void*  stub_reallocate_memory_chunk(PARROT_INTERP, void* data, size_t newsize);
+void*  stub_allocate_memory_chunk_with_interior_pointers(PARROT_INTERP, size_t size);
+void*  stub_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void* data,
+                                                           size_t oldsize, size_t newsize);
+void  stub_free_memory_chunk(PARROT_INTERP, void* data);
+void  stub_block_mark(PARROT_INTERP);
+void  stub_unblock_mark(PARROT_INTERP);
+void  stub_block_sweep(PARROT_INTERP);
+void  stub_unblock_sweep(PARROT_INTERP);
+
 /* END gc prototypes */
 
 /* Prototypes for helper functions. */
@@ -336,48 +337,79 @@ the names of the gc entries to instrument.
 
         list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "allocate"))) {
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_pmc_header"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_string_header"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_bufferlike_header"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_pmc_attributes"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_string_storage"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_buffer_storage"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_fixed_size_storage"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "allocate_memory_chunk"));
-            VTABLE_push_string(INTERP, list,
-                               CONST_STRING(INTERP, "allocate_memory_chunk_with_interior_pointers"));
-        }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "reallocate"))) {
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "reallocate_string_storage"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "reallocate_buffer_storage"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "reallocate_memory_chunk"));
-            VTABLE_push_string(INTERP, list,
-                               CONST_STRING(INTERP, "reallocate_memory_chunk_with_interior_pointers"));
-        }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "free"))) {
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_pmc_header"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_string_header"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_bufferlike_header"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_pmc_attributes"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_fixed_size_storage"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "free_memory_chunk"));
+        /* BEGIN gc groupings */
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "free"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "free_pmc_header"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "free_string_header"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "free_bufferlike_header"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "free_pmc_attributes"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "free_fixed_size_storage"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "free_memory_chunk"));
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "administration"))) {
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "finalize_gc_system"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "destroy_child_interp"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "do_gc_mark"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "compact_string_pool"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "mark_special"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "pmc_needs_early_collection"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "init_pool"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "block_mark"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "unblock_mark"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "block_sweep"));
-            VTABLE_push_string(INTERP, list, CONST_STRING(INTERP, "unblock_sweep"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "finalize_gc_system"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "destroy_child_interp"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "do_gc_mark"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "compact_string_pool"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "mark_special"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "pmc_needs_early_collection"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "init_pool"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "block_mark"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "unblock_mark"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "block_sweep"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "unblock_sweep"));
         }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "allocate"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_pmc_header"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_string_header"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_bufferlike_header"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_pmc_attributes"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_string_storage"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_buffer_storage"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_fixed_size_storage"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_memory_chunk"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "allocate_memory_chunk_with_interior_pointers"));
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "reallocate"))) {
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "reallocate_string_storage"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "reallocate_buffer_storage"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "reallocate_memory_chunk"));
+           VTABLE_push_string(INTERP, list,
+               CONST_STRING(INTERP, "reallocate_memory_chunk_with_interior_pointers"));
+        }
+
+        /* END gc groupings */
         else {
-            /* Ensure that con_str is the name of a hook before pushing it in. */
+            /* Ensure that name is the name of a hook before pushing it in. */
             size_t *check;
             Hash *stub_hash;
 
@@ -406,735 +438,865 @@ the names of the gc entries to instrument.
  */
 
 /* BEGIN gc stubs */
-/*
- * Allocations
- */
-PMC* stub_allocate_pmc_header(PARROT_INTERP, UINTVAL flags) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    PMC *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-
-    ret = gc_orig->allocate_pmc_header(interp, flags);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_pmc_header"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "flags"), flags);
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), sizeof (struct PMC));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-void* stub_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    void *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-
-    ret = gc_orig->allocate_pmc_attributes(interp, pmc);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_pmc_attributes"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), pmc->vtable->attr_size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-    VTABLE_set_string_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "pmc_type"),
-                                VTABLE_name(interp, pmc));
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-STRING* stub_allocate_string_header(PARROT_INTERP, UINTVAL flags) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    STRING *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-
-    ret = gc_orig->allocate_string_header(interp, flags);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_string_header"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "flags"), flags);
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), sizeof (struct parrot_string_t));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-void stub_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-
-    gc_orig->allocate_string_storage(interp, str, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, str);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_string_storage"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"), size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return;
-}
-
-void* stub_allocate_memory_chunk(PARROT_INTERP, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    void *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    ret = gc_orig->allocate_memory_chunk(interp, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_memory_chunk"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-void* stub_allocate_memory_chunk_with_interior_pointers(PARROT_INTERP, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    void *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    ret = gc_orig->allocate_memory_chunk_with_interior_pointers(interp, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "allocate_memory_chunk_with_interior_pointers"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-Buffer* stub_allocate_bufferlike_header(PARROT_INTERP, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    Buffer *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    ret = gc_orig->allocate_bufferlike_header(interp, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_bufferlike_header"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-void stub_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t nsize) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->allocate_buffer_storage(interp, buffer, nsize);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, buffer);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_buffer_storage"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"), nsize);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return;
-}
-
-void* stub_allocate_fixed_size_storage(PARROT_INTERP, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    void *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    ret = gc_orig->allocate_fixed_size_storage(interp, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, ret);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "allocate_fixed_size_storage"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
-
-    return ret;
-}
-
-/*
- * Reallocations
- */
-
-void stub_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-
-    gc_orig->reallocate_string_storage(interp, str, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, str);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "reallocate_string_storage"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"), size);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
-
-    return;
-}
-
-void stub_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->reallocate_buffer_storage(interp, buffer, newsize);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, buffer);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "reallocate_buffer_storage"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"), newsize);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
-
-    return;
-}
-
-void* stub_reallocate_memory_chunk(PARROT_INTERP, void *data, size_t newsize) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    void *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    ret = gc_orig->reallocate_memory_chunk(interp, data, newsize);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, data);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                                CONST_STRING(supervisor, "type"),
-                                CONST_STRING(supervisor, "reallocate_memory_chunk"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), newsize);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
-
-    return ret;
-}
-
-void* stub_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void *data,
-        size_t oldsize, size_t newsize) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    void *ret;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    ret = gc_orig->reallocate_memory_chunk_with_interior_pointers(interp, data, oldsize, newsize);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, data);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "reallocate_memory_chunk_with_interior_pointers"));
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "size"), newsize);
-    VTABLE_set_integer_keyed_str(supervisor, event_data,
-                                 CONST_STRING(supervisor, "oldsize"), oldsize);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
-
-    return ret;
-}
-
-/*
- * Frees
- */
-void stub_free_pmc_header(PARROT_INTERP, PMC *pmc) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    STRING *pmc_type;
-
-    pmc_type = VTABLE_name(interp, pmc);
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->free_pmc_header(interp, pmc);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, pmc);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "free_pmc_header"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-    VTABLE_set_string_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "pmc_type"),
-                                pmc_type);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
-
-    return;
-}
-
-void stub_free_pmc_attributes(PARROT_INTERP, PMC *pmc) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    STRING *pmc_type;
-
-    pmc_type = VTABLE_name(interp, pmc);
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->free_pmc_attributes(interp, pmc);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, pmc);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "free_pmc_attributes"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-    VTABLE_set_string_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "pmc_type"),
-                                pmc_type);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
-
-    return;
-}
-
-void stub_free_string_header(PARROT_INTERP, STRING* string) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->free_string_header(interp, string);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, string);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "free_string_header"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
-
-    return;
-}
-
-void stub_free_bufferlike_header(PARROT_INTERP, Buffer *buffer, size_t size) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->free_bufferlike_header(interp, buffer, size);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, buffer);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "free_bufferlike_header"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
-
-    return;
-}
-
-void stub_free_fixed_size_storage(PARROT_INTERP, size_t size, void *ptr) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr_obj;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->free_fixed_size_storage(interp, size, ptr);
-
-    ptr_obj = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr_obj, ptr);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "free_fixed_size_storage"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr_obj);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
-
-    return;
-}
-
-void stub_free_memory_chunk(PARROT_INTERP, void *data) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->free_memory_chunk(interp, data);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, data);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "free_memory_chunk"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
-
-    return;
-}
-
-/*
- * Administration
- */
-void stub_do_gc_mark(PARROT_INTERP, UINTVAL flags) {
+void  stub_finalize_gc_system(Parrot_Interp interp) {
     PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
     Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
     GC_Subsystem *gc_orig;
     PMC *event_data;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->do_gc_mark(interp, flags);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "do_gc_mark"));
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_block_mark(PARROT_INTERP) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->block_mark(interp);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "block_mark"));
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_unblock_mark(PARROT_INTERP) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->unblock_mark(interp);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "unblock_mark"));
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_block_sweep(PARROT_INTERP) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->block_sweep(interp);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "block_sweep"));
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_unblock_sweep(PARROT_INTERP) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->unblock_sweep(interp);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "unblock_sweep"));
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_finalize_gc_system(PARROT_INTERP) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
 
     GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
     gc_orig->finalize_gc_system(interp);
 
+
     event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
     VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "finalize_gc_system"));
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "finalize_gc_system"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
 
     return;
 }
 
-void stub_destroy_child_interp(Interp *dest_interp, Interp *child_interp) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) dest_interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) dest_interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data;
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->destroy_child_interp(dest_interp, child_interp);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "destroy_child_interp"));
-
-    raise_gc_event(supervisor, dest_interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_compact_string_pool(PARROT_INTERP) {
+void  stub_destroy_child_interp(Interp* interp, Interp* child_interp) {
     PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
     Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
     GC_Subsystem *gc_orig;
     PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->destroy_child_interp(interp, child_interp);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, child_interp);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "destroy_child_interp"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+void  stub_do_gc_mark(Parrot_Interp interp, UINTVAL flags) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->do_gc_mark(interp, flags);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, flags);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "do_gc_mark"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+void  stub_compact_string_pool(Parrot_Interp interp) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
 
     GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
     gc_orig->compact_string_pool(interp);
 
+
     event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
     VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "compact_string_pool"));
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "compact_string_pool"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
 
     return;
 }
 
-void stub_mark_special(PARROT_INTERP, PMC *pmc) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    STRING *pmc_type;
-
-    pmc_type = VTABLE_name(interp, pmc);
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->mark_special(interp, pmc);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, pmc);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "mark_special"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-    VTABLE_set_string_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "pmc_type"),
-                                pmc_type);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
-    PMC *event_data, *ptr;
-    STRING *pmc_type;
-
-    pmc_type = VTABLE_name(interp, pmc);
-
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->pmc_needs_early_collection(interp, pmc);
-
-    ptr = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, ptr, pmc);
-
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "pmc_needs_early_collection"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "address"), ptr);
-    VTABLE_set_string_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "pmc_type"),
-                                pmc_type);
-
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
-
-    return;
-}
-
-void stub_init_pool(PARROT_INTERP, struct Fixed_Size_Pool *pool) {
+void  stub_mark_special(Parrot_Interp interp, PMC* stub_var1) {
     PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
     Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
     GC_Subsystem *gc_orig;
     PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
 
     GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
-    gc_orig->init_pool(interp, pool);
+    gc_orig->mark_special(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
 
     event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
     VTABLE_set_string_keyed_str(supervisor, event_data,
-                          CONST_STRING(supervisor, "type"),
-                          CONST_STRING(supervisor, "init_pool"));
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "mark_special"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
 
     return;
 }
+
+void  stub_pmc_needs_early_collection(Parrot_Interp interp, PMC* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->pmc_needs_early_collection(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "pmc_needs_early_collection"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+void  stub_init_pool(Parrot_Interp interp, struct Fixed_Size_Pool* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->init_pool(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "init_pool"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+PMC*  stub_allocate_pmc_header(Parrot_Interp interp, UINTVAL flags) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    PMC*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_pmc_header(interp, flags);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, flags);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_pmc_header"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void  stub_free_pmc_header(Parrot_Interp interp, PMC* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->free_pmc_header(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "free_pmc_header"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
+
+    return;
+}
+
+STRING*  stub_allocate_string_header(Parrot_Interp interp, UINTVAL flags) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    STRING*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_string_header(interp, flags);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, flags);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_string_header"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void  stub_free_string_header(Parrot_Interp interp, STRING* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->free_string_header(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "free_string_header"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
+
+    return;
+}
+
+Buffer*  stub_allocate_bufferlike_header(Parrot_Interp interp, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    Buffer*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_bufferlike_header(interp, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_bufferlike_header"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void  stub_free_bufferlike_header(Parrot_Interp interp, Buffer* stub_var1, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->free_bufferlike_header(interp, stub_var1, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "free_bufferlike_header"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
+
+    return;
+}
+
+void*  stub_allocate_pmc_attributes(Parrot_Interp interp, PMC* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    void*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_pmc_attributes(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_pmc_attributes"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void  stub_free_pmc_attributes(Parrot_Interp interp, PMC* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->free_pmc_attributes(interp, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "free_pmc_attributes"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
+
+    return;
+}
+
+void  stub_allocate_string_storage(Parrot_Interp interp, STRING* str, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->allocate_string_storage(interp, str, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, str);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_string_storage"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return;
+}
+
+void  stub_reallocate_string_storage(Parrot_Interp interp, STRING* str, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->reallocate_string_storage(interp, str, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, str);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "reallocate_string_storage"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
+
+    return;
+}
+
+void  stub_allocate_buffer_storage(Parrot_Interp interp, Buffer* buffer, size_t nsize) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->allocate_buffer_storage(interp, buffer, nsize);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, buffer);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, nsize);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_buffer_storage"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return;
+}
+
+void  stub_reallocate_buffer_storage(Parrot_Interp interp, Buffer* buffer, size_t newsize) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->reallocate_buffer_storage(interp, buffer, newsize);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, buffer);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, newsize);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "reallocate_buffer_storage"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
+
+    return;
+}
+
+void*  stub_allocate_fixed_size_storage(Parrot_Interp interp, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    void*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_fixed_size_storage(interp, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_fixed_size_storage"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void  stub_free_fixed_size_storage(Parrot_Interp interp, size_t size, void* stub_var1) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->free_fixed_size_storage(interp, size, stub_var1);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, stub_var1);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "free_fixed_size_storage"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
+
+    return;
+}
+
+void*  stub_allocate_memory_chunk(Parrot_Interp interp, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    void*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_memory_chunk(interp, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_memory_chunk"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void*  stub_reallocate_memory_chunk(Parrot_Interp interp, void* data, size_t newsize) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    void*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->reallocate_memory_chunk(interp, data, newsize);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, data);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, newsize);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "reallocate_memory_chunk"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
+
+    return ret;
+}
+
+void*  stub_allocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, size_t size) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    void*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->allocate_memory_chunk_with_interior_pointers(interp, size);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, size);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "allocate_memory_chunk_with_interior_pointers"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
+
+    return ret;
+}
+
+void*  stub_reallocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, void* data,
+                                                           size_t oldsize, size_t newsize) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    void*  ret;
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    ret = gc_orig->reallocate_memory_chunk_with_interior_pointers(interp, data, oldsize, newsize);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, data);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, oldsize);
+    VTABLE_push_pmc(supervisor, params, temp);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp, newsize);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "reallocate_memory_chunk_with_interior_pointers"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
+
+    return ret;
+}
+
+void  stub_free_memory_chunk(Parrot_Interp interp, void* data) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->free_memory_chunk(interp, data);
+
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, data);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "free_memory_chunk"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "free"), event_data);
+
+    return;
+}
+
+void  stub_block_mark(Parrot_Interp interp) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->block_mark(interp);
+
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "block_mark"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+void  stub_unblock_mark(Parrot_Interp interp) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->unblock_mark(interp);
+
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "unblock_mark"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+void  stub_block_sweep(Parrot_Interp interp) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->block_sweep(interp);
+
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "block_sweep"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
+void  stub_unblock_sweep(Parrot_Interp interp) {
+    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    GC_Subsystem *gc_orig;
+    PMC *event_data;
+    PMC *temp;
+    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+
+    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+    gc_orig->unblock_sweep(interp);
+
+
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_string_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "type"),
+        CONST_STRING(supervisor, "unblock_sweep"));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "administration"), event_data);
+
+    return;
+}
+
 
 /* END gc stubs */
 
@@ -1191,196 +1353,284 @@ void build_gc_func_hash(PARROT_INTERP,
                         InstrumentGC_Subsystem *gc_instr, GC_Subsystem *gc_orig) {
     /* BEGIN gc mappings */
     /* Build the pointer hash to the stubs. */
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "finalize_gc_system"),
-                    stub_finalize_gc_system);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "destroy_child_interp"),
-                    stub_destroy_child_interp);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "do_gc_mark"),
-                    stub_do_gc_mark);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "compact_string_pool"),
-                    stub_compact_string_pool);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "mark_special"),
-                    stub_mark_special);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "pmc_needs_early_collection"),
-                    stub_pmc_needs_early_collection);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "init_pool"),
-                    stub_init_pool);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_pmc_header"),
-                    stub_allocate_pmc_header);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_pmc_header"),
-                    stub_free_pmc_header);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_string_header"),
-                    stub_allocate_string_header);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_string_header"),
-                    stub_free_string_header);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_bufferlike_header"),
-                    stub_allocate_bufferlike_header);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_bufferlike_header"),
-                    stub_free_bufferlike_header);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_pmc_attributes"),
-                    stub_allocate_pmc_attributes);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_pmc_attributes"),
-                    stub_free_pmc_attributes);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_string_storage"),
-                    stub_allocate_string_storage);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "reallocate_string_storage"),
-                    stub_reallocate_string_storage);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_buffer_storage"),
-                    stub_allocate_buffer_storage);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "reallocate_buffer_storage"),
-                    stub_reallocate_buffer_storage);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_fixed_size_storage"),
-                    stub_allocate_fixed_size_storage);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_fixed_size_storage"),
-                    stub_free_fixed_size_storage);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "allocate_memory_chunk"),
-                    stub_allocate_memory_chunk);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "reallocate_memory_chunk"),
-                    stub_reallocate_memory_chunk);
-    parrot_hash_put(interp, instr_hash,
-                    CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
-                    stub_allocate_memory_chunk_with_interior_pointers);
-    parrot_hash_put(interp, instr_hash,
-                    CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
-                    stub_reallocate_memory_chunk_with_interior_pointers);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "free_memory_chunk"),
-                    stub_free_memory_chunk);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "block_mark"),
-                    stub_block_mark);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "unblock_mark"),
-                    stub_unblock_mark);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "block_sweep"),
-                    stub_block_sweep);
-    parrot_hash_put(interp, instr_hash, CONST_STRING(interp, "unblock_sweep"),
-                    stub_unblock_sweep);
+        parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "finalize_gc_system"),
+        stub_finalize_gc_system);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "destroy_child_interp"),
+        stub_destroy_child_interp);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "do_gc_mark"),
+        stub_do_gc_mark);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "compact_string_pool"),
+        stub_compact_string_pool);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "mark_special"),
+        stub_mark_special);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "pmc_needs_early_collection"),
+        stub_pmc_needs_early_collection);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "init_pool"),
+        stub_init_pool);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_pmc_header"),
+        stub_allocate_pmc_header);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "free_pmc_header"),
+        stub_free_pmc_header);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_string_header"),
+        stub_allocate_string_header);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "free_string_header"),
+        stub_free_string_header);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_bufferlike_header"),
+        stub_allocate_bufferlike_header);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "free_bufferlike_header"),
+        stub_free_bufferlike_header);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_pmc_attributes"),
+        stub_allocate_pmc_attributes);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "free_pmc_attributes"),
+        stub_free_pmc_attributes);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_string_storage"),
+        stub_allocate_string_storage);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "reallocate_string_storage"),
+        stub_reallocate_string_storage);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_buffer_storage"),
+        stub_allocate_buffer_storage);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "reallocate_buffer_storage"),
+        stub_reallocate_buffer_storage);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_fixed_size_storage"),
+        stub_allocate_fixed_size_storage);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "free_fixed_size_storage"),
+        stub_free_fixed_size_storage);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_memory_chunk"),
+        stub_allocate_memory_chunk);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "reallocate_memory_chunk"),
+        stub_reallocate_memory_chunk);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
+        stub_allocate_memory_chunk_with_interior_pointers);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
+        stub_reallocate_memory_chunk_with_interior_pointers);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "free_memory_chunk"),
+        stub_free_memory_chunk);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "block_mark"),
+        stub_block_mark);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "unblock_mark"),
+        stub_unblock_mark);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "block_sweep"),
+        stub_block_sweep);
+     parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "unblock_sweep"),
+        stub_unblock_sweep);
+
 
     /* Build the pointer hash to the original. */
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "finalize_gc_system"),
-                    gc_orig->finalize_gc_system);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "destroy_child_interp"),
-                    gc_orig->destroy_child_interp);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "do_gc_mark"),
-                    gc_orig->do_gc_mark);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "compact_string_pool"),
-                    gc_orig->compact_string_pool);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "mark_special"),
-                    gc_orig->mark_special);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "pmc_needs_early_collection"),
-                    gc_orig->pmc_needs_early_collection);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "init_pool"),
-                    gc_orig->init_pool);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_pmc_header"),
-                    gc_orig->allocate_pmc_header);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_pmc_header"),
-                    gc_orig->free_pmc_header);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_string_header"),
-                    gc_orig->allocate_string_header);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_string_header"),
-                    gc_orig->free_string_header);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_bufferlike_header"),
-                    gc_orig->allocate_bufferlike_header);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_bufferlike_header"),
-                    gc_orig->free_bufferlike_header);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_pmc_attributes"),
-                    gc_orig->allocate_pmc_attributes);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_pmc_attributes"),
-                    gc_orig->free_pmc_attributes);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_string_storage"),
-                    gc_orig->allocate_string_storage);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "reallocate_string_storage"),
-                    gc_orig->reallocate_string_storage);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_buffer_storage"),
-                    gc_orig->allocate_buffer_storage);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "reallocate_buffer_storage"),
-                    gc_orig->reallocate_buffer_storage);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_fixed_size_storage"),
-                    gc_orig->allocate_fixed_size_storage);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_fixed_size_storage"),
-                    gc_orig->free_fixed_size_storage);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "allocate_memory_chunk"),
-                    gc_orig->allocate_memory_chunk);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "reallocate_memory_chunk"),
-                    gc_orig->reallocate_memory_chunk);
-    parrot_hash_put(interp, orig_hash,
-                    CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
-                    gc_orig->allocate_memory_chunk_with_interior_pointers);
-    parrot_hash_put(interp, orig_hash,
-                    CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
-                    gc_orig->reallocate_memory_chunk_with_interior_pointers);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "free_memory_chunk"),
-                    gc_orig->free_memory_chunk);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "block_mark"),
-                    gc_orig->block_mark);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "unblock_mark"),
-                    gc_orig->unblock_mark);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "block_sweep"),
-                    gc_orig->block_sweep);
-    parrot_hash_put(interp, orig_hash, CONST_STRING(interp, "unblock_sweep"),
-                    gc_orig->unblock_sweep);
+        parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "finalize_gc_system"),
+        gc_orig->finalize_gc_system);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "destroy_child_interp"),
+        gc_orig->destroy_child_interp);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "do_gc_mark"),
+        gc_orig->do_gc_mark);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "compact_string_pool"),
+        gc_orig->compact_string_pool);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "mark_special"),
+        gc_orig->mark_special);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "pmc_needs_early_collection"),
+        gc_orig->pmc_needs_early_collection);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "init_pool"),
+        gc_orig->init_pool);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_pmc_header"),
+        gc_orig->allocate_pmc_header);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "free_pmc_header"),
+        gc_orig->free_pmc_header);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_string_header"),
+        gc_orig->allocate_string_header);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "free_string_header"),
+        gc_orig->free_string_header);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_bufferlike_header"),
+        gc_orig->allocate_bufferlike_header);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "free_bufferlike_header"),
+        gc_orig->free_bufferlike_header);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_pmc_attributes"),
+        gc_orig->allocate_pmc_attributes);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "free_pmc_attributes"),
+        gc_orig->free_pmc_attributes);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_string_storage"),
+        gc_orig->allocate_string_storage);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "reallocate_string_storage"),
+        gc_orig->reallocate_string_storage);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_buffer_storage"),
+        gc_orig->allocate_buffer_storage);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "reallocate_buffer_storage"),
+        gc_orig->reallocate_buffer_storage);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_fixed_size_storage"),
+        gc_orig->allocate_fixed_size_storage);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "free_fixed_size_storage"),
+        gc_orig->free_fixed_size_storage);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_memory_chunk"),
+        gc_orig->allocate_memory_chunk);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "reallocate_memory_chunk"),
+        gc_orig->reallocate_memory_chunk);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
+        gc_orig->allocate_memory_chunk_with_interior_pointers);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
+        gc_orig->reallocate_memory_chunk_with_interior_pointers);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "free_memory_chunk"),
+        gc_orig->free_memory_chunk);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "block_mark"),
+        gc_orig->block_mark);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "unblock_mark"),
+        gc_orig->unblock_mark);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "block_sweep"),
+        gc_orig->block_sweep);
+     parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "unblock_sweep"),
+        gc_orig->unblock_sweep);
+
 
     /* Build the pointer hash for name to InstrumentGC_Subsystem entry. */
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "finalize_gc_system"),
-                    &(gc_instr->finalize_gc_system));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "destroy_child_interp"),
-                    &(gc_instr->destroy_child_interp));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "do_gc_mark"),
-                    &(gc_instr->do_gc_mark));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "compact_string_pool"),
-                    &(gc_instr->compact_string_pool));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "mark_special"),
-                    &(gc_instr->mark_special));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "pmc_needs_early_collection"),
-                    &(gc_instr->pmc_needs_early_collection));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "init_pool"),
-                    &(gc_instr->init_pool));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_pmc_header"),
-                    &(gc_instr->allocate_pmc_header));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_pmc_header"),
-                    &(gc_instr->free_pmc_header));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_string_header"),
-                    &(gc_instr->allocate_string_header));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_string_header"),
-                    &(gc_instr->free_string_header));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_bufferlike_header"),
-                    &(gc_instr->allocate_bufferlike_header));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_bufferlike_header"),
-                    &(gc_instr->free_bufferlike_header));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_pmc_attributes"),
-                    &(gc_instr->allocate_pmc_attributes));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_pmc_attributes"),
-                    &(gc_instr->free_pmc_attributes));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_string_storage"),
-                    &(gc_instr->allocate_string_storage));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "reallocate_string_storage"),
-                    &(gc_instr->reallocate_string_storage));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_buffer_storage"),
-                    &(gc_instr->allocate_buffer_storage));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "reallocate_buffer_storage"),
-                    &(gc_instr->reallocate_buffer_storage));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_fixed_size_storage"),
-                    &(gc_instr->allocate_fixed_size_storage));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_fixed_size_storage"),
-                    &(gc_instr->free_fixed_size_storage));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "allocate_memory_chunk"),
-                    &(gc_instr->allocate_memory_chunk));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "reallocate_memory_chunk"),
-                    &(gc_instr->reallocate_memory_chunk));
-    parrot_hash_put(interp, entry_hash,
-                    CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
-                    &(gc_instr->allocate_memory_chunk_with_interior_pointers));
-    parrot_hash_put(interp, entry_hash,
-                    CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
-                    &(gc_instr->reallocate_memory_chunk_with_interior_pointers));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "free_memory_chunk"),
-                    &(gc_instr->free_memory_chunk));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "block_mark"),
-                    &(gc_instr->block_mark));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "unblock_mark"),
-                    &(gc_instr->unblock_mark));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "block_sweep"),
-                    &(gc_instr->block_sweep));
-    parrot_hash_put(interp, entry_hash, CONST_STRING(interp, "unblock_sweep"),
-                    &(gc_instr->unblock_sweep));
+        parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "finalize_gc_system"),
+        &(gc_instr->finalize_gc_system));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "destroy_child_interp"),
+        &(gc_instr->destroy_child_interp));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "do_gc_mark"),
+        &(gc_instr->do_gc_mark));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "compact_string_pool"),
+        &(gc_instr->compact_string_pool));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "mark_special"),
+        &(gc_instr->mark_special));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "pmc_needs_early_collection"),
+        &(gc_instr->pmc_needs_early_collection));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "init_pool"),
+        &(gc_instr->init_pool));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_pmc_header"),
+        &(gc_instr->allocate_pmc_header));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "free_pmc_header"),
+        &(gc_instr->free_pmc_header));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_string_header"),
+        &(gc_instr->allocate_string_header));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "free_string_header"),
+        &(gc_instr->free_string_header));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_bufferlike_header"),
+        &(gc_instr->allocate_bufferlike_header));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "free_bufferlike_header"),
+        &(gc_instr->free_bufferlike_header));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_pmc_attributes"),
+        &(gc_instr->allocate_pmc_attributes));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "free_pmc_attributes"),
+        &(gc_instr->free_pmc_attributes));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_string_storage"),
+        &(gc_instr->allocate_string_storage));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "reallocate_string_storage"),
+        &(gc_instr->reallocate_string_storage));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_buffer_storage"),
+        &(gc_instr->allocate_buffer_storage));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "reallocate_buffer_storage"),
+        &(gc_instr->reallocate_buffer_storage));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_fixed_size_storage"),
+        &(gc_instr->allocate_fixed_size_storage));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "free_fixed_size_storage"),
+        &(gc_instr->free_fixed_size_storage));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_memory_chunk"),
+        &(gc_instr->allocate_memory_chunk));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "reallocate_memory_chunk"),
+        &(gc_instr->reallocate_memory_chunk));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"),
+        &(gc_instr->allocate_memory_chunk_with_interior_pointers));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"),
+        &(gc_instr->reallocate_memory_chunk_with_interior_pointers));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "free_memory_chunk"),
+        &(gc_instr->free_memory_chunk));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "block_mark"),
+        &(gc_instr->block_mark));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "unblock_mark"),
+        &(gc_instr->unblock_mark));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "block_sweep"),
+        &(gc_instr->block_sweep));
+     parrot_hash_put(interp, entry_hash,
+        CONST_STRING(interp, "unblock_sweep"),
+        &(gc_instr->unblock_sweep));
+
+
     /* END gc mappings */
 }
 
