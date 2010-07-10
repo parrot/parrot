@@ -159,7 +159,7 @@ Returns the pointer value as a Parrot string.
 */
 
     VTABLE STRING *get_string() {
-        return Parrot_sprintf_c(INTERP, "%s", PARROT_POINTER(SELF)->pointer);
+        return Parrot_sprintf_c(INTERP, "%p", PARROT_POINTER(SELF)->pointer);
     }
 
 /*

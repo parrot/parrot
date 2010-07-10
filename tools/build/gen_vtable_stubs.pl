@@ -16,10 +16,6 @@ there, generate the prototypes, stubs and groups and
 put the information in the appropriate placeholders in
 src/dynpmc/instrumentvtable.pmc.
 
-=head2 TODO
-
--Add support for groups.
-
 =cut
 
 use warnings;
