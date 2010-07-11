@@ -27,6 +27,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "pmc/pmc_timer.h"
 #include "pmc/pmc_alarm.h"
 #include "pmc/pmc_pmclist.h"
+#include "pmc/pmc_continuation.h"
 
 #include "scheduler.str"
 
@@ -120,64 +121,89 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     Parrot_cx_schedule_task(interp, main_task);
 
     do {
-        Parrot_cx_reschedule(interp, scheduler);
+        Parrot_cx_next_task(interp, scheduler);
         task_count = VTABLE_get_integer(interp, sched->task_queue);
-        return;
+        
+        if(task_count == 0) {
+            INTVAL alarm_count = VTABLE_get_integer(interp, sched->alarms);
+
+            if (alarm_count > 0) {
+                PMC     *alarm      = VTABLE_shift_pmc(interp, sched->alarms);
+                FLOATVAL alarm_time = VTABLE_get_number(interp, alarm);
+                FLOATVAL now_time   = Parrot_floatval_time();
+                FLOATVAL sleep_time = now_time - alarm_time;
+                VTABLE_unshift_pmc(interp, sched->alarms, alarm);
+
+                if(sleep_time > 0.0)
+                    Parrot_floatval_sleep(sleep_time);
+
+                Parrot_cx_check_alarms(interp, interp->scheduler);
+                task_count = 1;
+            }            
+        }
     } while (task_count > 0);
 }
 
 
-/* Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", userargv); */
-
-
 /*
 
-=item C<void Parrot_cx_check_tasks(PARROT_INTERP, PMC *scheduler)>
+=item C<opcode_t* Parrot_cx_check_tasks(PARROT_INTERP, opcode_t* next)>
 
 If a wake request has been received or an OS timer has expired
-then handle tasks.
+then deal with that.
 
 =cut
 
 */
 
-void
-Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
+PARROT_CANNOT_RETURN_NULL
+opcode_t*
+Parrot_cx_check_tasks(PARROT_INTERP, ARGIN(opcode_t* next))
 {
     ASSERT_ARGS(Parrot_cx_check_tasks)
+    PMC *scheduler = interp->scheduler;
+
     if  (Parrot_alarm_check(&(interp->last_alarm))
           || SCHEDULER_wake_requested_TEST(scheduler)) {
-        Parrot_cx_handle_tasks(interp, scheduler);
+        SCHEDULER_wake_requested_CLEAR(scheduler);
+        return Parrot_cx_handle_tasks(interp, scheduler, next);
     }
+
+    return next;
 }
 
 /*
 
-=item C<void Parrot_cx_handle_tasks(PARROT_INTERP, PMC *scheduler)>
+=item C<opcode_t* Parrot_cx_handle_tasks(PARROT_INTERP, PMC *scheduler, opcode_t
+*next)>
 
-Handle the pending tasks in the scheduler's task list. Returns when there are
-no more pending tasks. Returns 0 to terminate the scheduler runloop, or 1 to
-continue the runloop.
+Checks to see if any tasks need to be scheduled or if the current task
+needs to be pre-empted.
 
 =cut
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
-void
-Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
+opcode_t*
+Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_handle_tasks)
-
-    SCHEDULER_wake_requested_CLEAR(scheduler);
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
 
     if (SCHEDULER_resched_requested_TEST(scheduler)) {
         SCHEDULER_resched_requested_CLEAR(scheduler);
-        Parrot_cx_reschedule(interp, scheduler);
+
+        /* Exiting the runloop to swap tasks doesn't play
+           nice with nested runloops */
+        if (interp->current_runloop_level <= 1)
+            return Parrot_cx_reschedule(interp, scheduler, next);
     }
+
+    return next;
 
 #ifdef PARROT_CX_BUILD_OLD_STUFF
     Parrot_cx_refresh_task_list(interp, scheduler);
@@ -240,43 +266,61 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
         SCHEDULER_resched_requested_SET(scheduler);
 }
 
-
 /*
-=item C<void Parrot_cx_reschedule(PARROT_INTERP, PMC *scheduler)>
+=item C<void Parrot_cx_next_task(PARROT_INTERP, PMC *scheduler)>
 
-Put the current task on the foot of the task queue and schedule whatever
-is on the head, then reset the rescheduling quantum.
-
-TODO: Make the above true rather than a dirty lie.
+Run the task at the head of the task queue until it ends or is
+pre-empted.
 
 =cut
-
 */
 
 void
-Parrot_cx_reschedule(PARROT_INTERP, ARGMOD(PMC *scheduler))
+Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_reschedule)
+    ASSERT_ARGS(Parrot_cx_next_task)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
-    INTVAL task_count = VTABLE_get_integer(interp, sched->task_queue);
+    INTVAL task_count;
+
+    task_count = VTABLE_get_integer(interp, sched->task_queue);
 
     if (task_count > 0) {
-        FLOATVAL time_now = Parrot_floatval_time();
-        /* PMC *task0 = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp)); */
-        PMC *task1 = VTABLE_shift_pmc(interp, sched->task_queue);
-
-        /*if (!PMC_IS_NULL(task0))
-          VTABLE_push_pmc(interp, sched->task_queue, task0); */
+        FLOATVAL  time_now = Parrot_floatval_time();
+        PMC      *task     = VTABLE_shift_pmc(interp, sched->task_queue);
+        opcode_t *dest;
 
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
 
-        if (!PMC_IS_NULL(task1)) {
-            Parrot_pcc_invoke_sub_from_c_args(interp, task1, "->");
-        }
+        Parrot_pcc_invoke_sub_from_c_args(interp, task, "->");
     }
 }
 
+/*
+=item C<opcode_t* Parrot_cx_reschedule(PARROT_INTERP, PMC *scheduler, opcode_t
+*next)>
+
+Pre-empt the current task. It goes on the foot of the task queue,
+and then we jump all the way back to the task scheduling loop.
+
+=cut
+*/
+
+PARROT_CANNOT_RETURN_NULL
+opcode_t*
+Parrot_cx_reschedule(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
+{
+    ASSERT_ARGS(Parrot_cx_reschedule)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+
+    PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
+    VTABLE_set_pointer(interp, cont, next);
+
+    if (!PMC_IS_NULL(cont))
+          VTABLE_push_pmc(interp, sched->task_queue, cont);
+
+    return (opcode_t*) 0;
+}
 
 /*
 
@@ -314,7 +358,8 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_runloop_end)
     SCHEDULER_terminate_requested_SET(interp->scheduler);
-    Parrot_cx_handle_tasks(interp, interp->scheduler);
+    /* Chandon TODO: Why is this here? */
+    /* Parrot_cx_handle_tasks(interp, interp->scheduler); */
 }
 
 /*
@@ -995,38 +1040,21 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 {
     ASSERT_ARGS(Parrot_cx_schedule_sleep)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
-    FLOATVAL now_time   = Parrot_floatval_time();
-    FLOATVAL done_time  = now_time + time;
-    FLOATVAL alarm_time = done_time;
-    FLOATVAL sleep_time;
-    INTVAL   alarm_count;
-    PMC      *alarm;
+    FLOATVAL now_time  = Parrot_floatval_time();
+    FLOATVAL done_time = now_time + time;
 
-    Parrot_cx_check_tasks(interp, interp->scheduler);
-    now_time = Parrot_floatval_time();
+    PMC *alarm = Parrot_pmc_new(interp, enum_class_Alarm);
+    Parrot_Alarm_attributes *adata = PARROT_ALARM(alarm);
 
-    while (now_time < done_time) {
-        alarm_count = VTABLE_get_integer(interp, sched->alarms);
+    PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
+    VTABLE_set_pointer(interp, cont, next);
 
-        if (alarm_count > 0) {
-            alarm = VTABLE_shift_pmc(interp, sched->alarms);
-            alarm_time = VTABLE_get_number(interp, alarm);
-            VTABLE_unshift_pmc(interp, sched->alarms, alarm);
-        }
+    adata->alarm_time = done_time;
+    adata->alarm_sub  = cont;
+    VTABLE_invoke(interp, alarm, 0);
 
-        sleep_time = now_time - fmin(done_time, alarm_time);
-
-        if (sleep_time > 0.0) {
-            Parrot_floatval_sleep(sleep_time);
-        }
-
-        Parrot_cx_check_tasks(interp, interp->scheduler);
-        now_time = Parrot_floatval_time();
-    }
-
-    return next;
+    return (opcode_t*) 0;
 }
-
 
 /*
 
