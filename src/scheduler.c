@@ -123,8 +123,8 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     do {
         Parrot_cx_next_task(interp, scheduler);
         task_count = VTABLE_get_integer(interp, sched->task_queue);
-        
-        if(task_count == 0) {
+
+        if (task_count == 0) {
             INTVAL alarm_count = VTABLE_get_integer(interp, sched->alarms);
 
             if (alarm_count > 0) {
@@ -134,12 +134,12 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
                 FLOATVAL sleep_time = now_time - alarm_time;
                 VTABLE_unshift_pmc(interp, sched->alarms, alarm);
 
-                if(sleep_time > 0.0)
+                if (sleep_time > 0.0)
                     Parrot_floatval_sleep(sleep_time);
 
                 Parrot_cx_check_alarms(interp, interp->scheduler);
                 task_count = 1;
-            }            
+            }
         }
     } while (task_count > 0);
 }
