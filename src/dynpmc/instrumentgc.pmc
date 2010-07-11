@@ -105,7 +105,7 @@ void  stub_unblock_sweep(PARROT_INTERP);
 /* END gc prototypes */
 
 /* Prototypes for helper functions. */
-void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *event, PMC *data);
+void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *group, PMC *data);
 PMC *get_gc_funcs(PARROT_INTERP, STRING *name);
 void build_gc_func_hash(PARROT_INTERP, Hash *instr_hash, Hash *orig_hash, Hash *entry_hash,
                         InstrumentGC_Subsystem *gc_instr, GC_Subsystem *gc_orig);
@@ -1310,23 +1310,23 @@ void  stub_unblock_sweep(Parrot_Interp interp) {
  *                 sub, namespace and line information to the data hash.
  */
 
-void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *event, PMC *data) {
-    PMC *task, *task_hash;
+void raise_gc_event(PARROT_INTERP, Parrot_Interp supervised, STRING *group, PMC *data) {
+    PMC *task, *task_hash, *event;
     STRING *event_str;
     Parrot_Context_info info;
     event_str = VTABLE_get_string_keyed_str(interp, data, CONST_STRING(interp, "type"));
+
+    event = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    VTABLE_push_string(interp, event, CONST_STRING(interp, "GC"));
+    VTABLE_push_string(interp, event, group);
+    VTABLE_push_string(interp, event, event_str);
 
     Parrot_Context_get_info(interp, CURRENT_CONTEXT(supervised), &info);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "file"),      info.file);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "sub"),       info.subname);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "namespace"), info.nsname);
     VTABLE_set_integer_keyed_str(interp, data, CONST_STRING(interp, "line"),      info.line);
-    VTABLE_set_string_keyed_str(interp, data,  CONST_STRING(interp, "event_category"),
-                                CONST_STRING(interp, "GC"));
-    VTABLE_set_string_keyed_str(interp, data,  CONST_STRING(interp, "event_subtype"),
-                                event);
-    VTABLE_set_string_keyed_str(interp, data,  CONST_STRING(interp, "event_fulltype"),
-                                event_str);
+    VTABLE_set_pmc_keyed_str(interp, data, CONST_STRING(interp, "event"), event);
 
     task_hash = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_string_keyed_str(interp, task_hash,

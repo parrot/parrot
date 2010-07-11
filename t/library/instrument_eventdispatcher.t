@@ -220,11 +220,14 @@ Ensure that it dispatches correctly based on category, subtype and fulltype.
     set_global '$handler_specific', $P2
 
     # Raise the event.
+    $P1 = new ['ResizableStringArray']
+    push $P1, 'Category'
+    push $P1, 'Group'
+    push $P1, 'Specific'
+
     $P0 = new ['Hash']
-    $P0['event_category'] = 'Category'
-    $P0['event_subtype']  = 'Group'
-    $P0['event_fulltype'] = 'Specific'
-    $P0['otherdata']      = 'Can be anything else'
+    $P0['event']     = $P1
+    $P0['otherdata'] = 'Can be anything else'
 
     $P1 = new ['Hash']
     $P1['type']    = 'event'

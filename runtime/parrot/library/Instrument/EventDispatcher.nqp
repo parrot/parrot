@@ -172,23 +172,20 @@ TODO: Update gc and vtable generator scripts before updating this.
         my %callbacks := pir::getattribute__PPS($handler, '%!callbacks');
 
         # Get the required subkeys.
-        my $data    := pir::getattribute__PPS($task, "data");
-        my $category := pir::set_p_p_kc__PPS($data, 'event_category');
-        my $subtype  := pir::set_p_p_kc__PPS($data, 'event_subtype');
-        my $fulltype := pir::set_p_p_kc__PPS($data, 'event_fulltype');
+        my %data  := pir::getattribute__PPS($task, "data");
+        my @event := %data<event>;
 
         # Get the lists and join them into 1 big list.
-        my @key  := [$category];
         my @list := ();
-        @list.append(get_list(%callbacks, $category));
-        @key.push($subtype);
-        @list.append(get_list(%callbacks, pir::join__SSP('::', @key)));
-        @key.push($fulltype);
-        @list.append(get_list(%callbacks, pir::join__SSP('::', @key)));
+        my @key;
+        for @event {
+            @key.push($_);
+            @list.append(get_list(%callbacks, pir::join__SSP('::', @key)));
+        }
 
         # Call the callbacks.
         for @list {
-            $_($data);
+            $_(%data);
         }
     };
 

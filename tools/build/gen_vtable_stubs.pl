@@ -64,17 +64,22 @@ while(<$vtable_fh>) {
                  ? 'PARROT_INTERP, PMC* pmc'
                  : 'PARROT_INTERP, PMC* pmc, '.$data[2];
 
-        push @prototypes, gen_prototype(@data);
-        push @stubs, gen_stub(@data);
-        push @entries, $data[1];
-
+        # Set the groups that this vtable entry belongs to.
+        my @groups = ($cur_group);
         my $annotation;
         foreach $annotation (split /\s+/, $data[3]) {
             $annotation =~ s/://;
             push @{$groups{$annotation}}, $data[1];
+            push @groups, $annotation;
         }
-
         push @{$groups{$cur_group}}, $data[1];
+        push @data, \@groups;
+
+        push @prototypes, gen_prototype(@data);
+        push @stubs, gen_stub(@data);
+        push @entries, $data[1];
+
+
     }
 }
 
@@ -136,7 +141,7 @@ PROTO
 }
 
 sub gen_stub {
-    my($ret, $name, $params, $anno) = @_;
+    my($ret, $name, $params, $anno, $groups) = @_;
 
     # Process the parameter list.
     my @param_types = ();
@@ -207,6 +212,19 @@ POINTER
         }
     }
 
+    # Set up the individual group events for this
+    # stub.
+    my $events = '';
+    my $group;
+    foreach $group (@{$groups}) {
+        $group = lc $group;
+        $events .= <<EVENT;
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "$group"),
+                   CONST_STRING(supervisor, "$name"));
+EVENT
+    }
+
     return <<CODE;
 static
 $ret stub_$name($params) {
@@ -230,8 +248,7 @@ $instr_params
         CONST_STRING(supervisor, "parameters"),
         params);
 
-    raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "$name"));
+$events
 
     return$ret_last;
 }

@@ -179,7 +179,8 @@ static void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer);
 /* END vtable prototypes */
 
 /* Helper Prototypes. */
-void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised, PMC *pmc, PMC *data, STRING *type);
+void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised, PMC *pmc,
+                        PMC *data, STRING *group, STRING *type);
 void build_vtable_hashes(PARROT_INTERP, Hash *orig, Hash *instr, Hash *stub,
                          _vtable *vtable, _vtable *instr_vtable);
 
@@ -723,23 +724,26 @@ the names of the gc entries to instrument.
  */
 
 void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised,
-                        PMC *pmc, PMC *data, STRING *type) {
+                        PMC *pmc, PMC *data, STRING *group, STRING *type) {
     Parrot_Context_info info;
     PMC *task_hash, *task;
+    PMC *event_arr;
 
     /* Get the current context info. */
     Parrot_Context_get_info(interp, CURRENT_CONTEXT(supervised), &info);
 
+    /* Set the event type. */
+    event_arr = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    VTABLE_push_string(interp, event_arr, CONST_STRING(interp, "Class"));
+    VTABLE_push_string(interp, event_arr, VTABLE_name(supervised, pmc));
+    VTABLE_push_string(interp, event_arr, CONST_STRING(interp, "vtable"));
+    VTABLE_push_string(interp, event_arr, group);
+    VTABLE_push_string(interp, event_arr, type);
+
     /* Populate data with common items. */
-    VTABLE_set_string_keyed_str(interp, data,
-                                CONST_STRING(interp, "event_category"),
-                                CONST_STRING(interp, "Class"));
-    VTABLE_set_string_keyed_str(interp, data,
-                                CONST_STRING(interp, "event_subtype"),
-                                VTABLE_name(supervised, pmc));
-    VTABLE_set_string_keyed_str(interp, data,
-                                CONST_STRING(interp, "event_fulltype"),
-                                type);
+    VTABLE_set_pmc_keyed_str(interp, data,
+                                CONST_STRING(interp, "event"),
+                                event_arr);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "file"),      info.file);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "sub"),       info.subname);
     VTABLE_set_string_keyed_str(interp,  data, CONST_STRING(interp, "namespace"), info.nsname);
@@ -1706,7 +1710,9 @@ void stub_init_pmc(PARROT_INTERP, PMC* pmc, PMC* initializer) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "init_pmc"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "init_pmc"));
+
 
     return;
 }
@@ -1737,7 +1743,9 @@ PMC* stub_instantiate(PARROT_INTERP, PMC* pmc, PMC* sig) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "instantiate"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "instantiate"));
+
 
     return ret;
 }
@@ -1767,7 +1775,12 @@ void stub_morph(PARROT_INTERP, PMC* pmc, PMC* type) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "morph"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "morph"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "morph"));
+
 
     return;
 }
@@ -1800,7 +1813,9 @@ PMC* stub_getprop(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "getprop"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "getprop"));
+
 
     return ret;
 }
@@ -1833,7 +1848,9 @@ void stub_setprop(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "setprop"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "setprop"));
+
 
     return;
 }
@@ -1865,7 +1882,9 @@ void stub_delprop(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "delprop"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "delprop"));
+
 
     return;
 }
@@ -1896,7 +1915,9 @@ PMC* stub_clone_pmc(PARROT_INTERP, PMC* pmc, PMC* args) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "clone_pmc"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "clone_pmc"));
+
 
     return ret;
 }
@@ -1929,7 +1950,9 @@ PMC* stub_find_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "find_method"));
+                   CONST_STRING(supervisor, "core"),
+                   CONST_STRING(supervisor, "find_method"));
+
 
     return ret;
 }
@@ -1960,7 +1983,9 @@ INTVAL stub_get_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_integer_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_integer_keyed"));
+
 
     return ret;
 }
@@ -1993,7 +2018,9 @@ INTVAL stub_get_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_integer_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_integer_keyed_int"));
+
 
     return ret;
 }
@@ -2026,7 +2053,9 @@ INTVAL stub_get_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_integer_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_integer_keyed_str"));
+
 
     return ret;
 }
@@ -2057,7 +2086,9 @@ FLOATVAL stub_get_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_number_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_number_keyed"));
+
 
     return ret;
 }
@@ -2090,7 +2121,9 @@ FLOATVAL stub_get_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_number_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_number_keyed_int"));
+
 
     return ret;
 }
@@ -2123,7 +2156,9 @@ FLOATVAL stub_get_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_number_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_number_keyed_str"));
+
 
     return ret;
 }
@@ -2154,7 +2189,9 @@ STRING* stub_get_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_string_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_string_keyed"));
+
 
     return ret;
 }
@@ -2187,7 +2224,9 @@ STRING* stub_get_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_string_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_string_keyed_int"));
+
 
     return ret;
 }
@@ -2220,7 +2259,9 @@ STRING* stub_get_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_string_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_string_keyed_str"));
+
 
     return ret;
 }
@@ -2251,7 +2292,9 @@ PMC* stub_get_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_pmc_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_pmc_keyed"));
+
 
     return ret;
 }
@@ -2284,7 +2327,9 @@ PMC* stub_get_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_pmc_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_pmc_keyed_int"));
+
 
     return ret;
 }
@@ -2317,7 +2362,9 @@ PMC* stub_get_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_pmc_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_pmc_keyed_str"));
+
 
     return ret;
 }
@@ -2348,7 +2395,9 @@ void* stub_get_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_pointer_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_pointer_keyed"));
+
 
     return ret;
 }
@@ -2381,7 +2430,9 @@ void* stub_get_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_pointer_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_pointer_keyed_int"));
+
 
     return ret;
 }
@@ -2414,7 +2465,9 @@ void* stub_get_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_pointer_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "get_pointer_keyed_str"));
+
 
     return ret;
 }
@@ -2446,7 +2499,9 @@ void stub_set_integer_native(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_integer_native"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_integer_native"));
+
 
     return;
 }
@@ -2479,7 +2534,9 @@ void stub_set_integer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_integer_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_integer_keyed"));
+
 
     return;
 }
@@ -2514,7 +2571,9 @@ void stub_set_integer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, INTVAL valu
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_integer_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_integer_keyed_int"));
+
 
     return;
 }
@@ -2549,7 +2608,9 @@ void stub_set_integer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, INTVAL val
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_integer_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_integer_keyed_str"));
+
 
     return;
 }
@@ -2581,7 +2642,9 @@ void stub_set_number_native(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_number_native"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_number_native"));
+
 
     return;
 }
@@ -2614,7 +2677,9 @@ void stub_set_number_keyed(PARROT_INTERP, PMC* pmc, PMC* key, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_number_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_number_keyed"));
+
 
     return;
 }
@@ -2649,7 +2714,9 @@ void stub_set_number_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, FLOATVAL val
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_number_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_number_keyed_int"));
+
 
     return;
 }
@@ -2684,7 +2751,9 @@ void stub_set_number_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, FLOATVAL va
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_number_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_number_keyed_str"));
+
 
     return;
 }
@@ -2716,7 +2785,9 @@ void stub_set_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_string_native"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_string_native"));
+
 
     return;
 }
@@ -2748,7 +2819,9 @@ void stub_assign_string_native(PARROT_INTERP, PMC* pmc, STRING* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "assign_string_native"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "assign_string_native"));
+
 
     return;
 }
@@ -2781,7 +2854,9 @@ void stub_set_string_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_string_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_string_keyed"));
+
 
     return;
 }
@@ -2816,7 +2891,9 @@ void stub_set_string_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, STRING* valu
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_string_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_string_keyed_int"));
+
 
     return;
 }
@@ -2851,7 +2928,9 @@ void stub_set_string_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, STRING* val
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_string_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_string_keyed_str"));
+
 
     return;
 }
@@ -2883,7 +2962,9 @@ void stub_set_bool(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_bool"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_bool"));
+
 
     return;
 }
@@ -2913,7 +2994,9 @@ void stub_set_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pmc"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pmc"));
+
 
     return;
 }
@@ -2943,7 +3026,9 @@ void stub_assign_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "assign_pmc"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "assign_pmc"));
+
 
     return;
 }
@@ -2974,7 +3059,9 @@ void stub_set_pmc_keyed(PARROT_INTERP, PMC* pmc, PMC* key, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pmc_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pmc_keyed"));
+
 
     return;
 }
@@ -3007,7 +3094,9 @@ void stub_set_pmc_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pmc_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pmc_keyed_int"));
+
 
     return;
 }
@@ -3040,7 +3129,9 @@ void stub_set_pmc_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pmc_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pmc_keyed_str"));
+
 
     return;
 }
@@ -3072,7 +3163,9 @@ void stub_set_pointer(PARROT_INTERP, PMC* pmc, void* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pointer"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pointer"));
+
 
     return;
 }
@@ -3105,7 +3198,9 @@ void stub_set_pointer_keyed(PARROT_INTERP, PMC* pmc, PMC* key, void* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pointer_keyed"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pointer_keyed"));
+
 
     return;
 }
@@ -3140,7 +3235,9 @@ void stub_set_pointer_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key, void* value
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pointer_keyed_int"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pointer_keyed_int"));
+
 
     return;
 }
@@ -3175,7 +3272,9 @@ void stub_set_pointer_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key, void* valu
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_pointer_keyed_str"));
+                   CONST_STRING(supervisor, "fetch"),
+                   CONST_STRING(supervisor, "set_pointer_keyed_str"));
+
 
     return;
 }
@@ -3207,7 +3306,9 @@ void stub_push_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "push_integer"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "push_integer"));
+
 
     return;
 }
@@ -3239,7 +3340,9 @@ void stub_push_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "push_float"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "push_float"));
+
 
     return;
 }
@@ -3271,7 +3374,9 @@ void stub_push_string(PARROT_INTERP, PMC* pmc, STRING* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "push_string"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "push_string"));
+
 
     return;
 }
@@ -3301,7 +3406,9 @@ void stub_push_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "push_pmc"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "push_pmc"));
+
 
     return;
 }
@@ -3333,7 +3440,9 @@ void stub_unshift_integer(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "unshift_integer"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "unshift_integer"));
+
 
     return;
 }
@@ -3365,7 +3474,9 @@ void stub_unshift_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "unshift_float"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "unshift_float"));
+
 
     return;
 }
@@ -3397,7 +3508,9 @@ void stub_unshift_string(PARROT_INTERP, PMC* pmc, STRING* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "unshift_string"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "unshift_string"));
+
 
     return;
 }
@@ -3427,7 +3540,9 @@ void stub_unshift_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "unshift_pmc"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "unshift_pmc"));
+
 
     return;
 }
@@ -3463,7 +3578,9 @@ void stub_splice(PARROT_INTERP, PMC* pmc, PMC* value, INTVAL offset, INTVAL coun
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "splice"));
+                   CONST_STRING(supervisor, "fetchsize"),
+                   CONST_STRING(supervisor, "splice"));
+
 
     return;
 }
@@ -3495,7 +3612,9 @@ PMC* stub_add(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "add"));
+
 
     return ret;
 }
@@ -3529,7 +3648,9 @@ PMC* stub_add_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "add_int"));
+
 
     return ret;
 }
@@ -3563,7 +3684,9 @@ PMC* stub_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "add_float"));
+
 
     return ret;
 }
@@ -3593,7 +3716,12 @@ void stub_i_add(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_add"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_add"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_add"));
+
 
     return;
 }
@@ -3625,7 +3753,12 @@ void stub_i_add_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_add_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_add_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_add_int"));
+
 
     return;
 }
@@ -3657,7 +3790,12 @@ void stub_i_add_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_add_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_add_float"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_add_float"));
+
 
     return;
 }
@@ -3689,7 +3827,9 @@ PMC* stub_subtract(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "subtract"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "subtract"));
+
 
     return ret;
 }
@@ -3723,7 +3863,9 @@ PMC* stub_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "subtract_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "subtract_int"));
+
 
     return ret;
 }
@@ -3757,7 +3899,9 @@ PMC* stub_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "subtract_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "subtract_float"));
+
 
     return ret;
 }
@@ -3787,7 +3931,12 @@ void stub_i_subtract(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_subtract"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_subtract"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_subtract"));
+
 
     return;
 }
@@ -3819,7 +3968,12 @@ void stub_i_subtract_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_subtract_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_subtract_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_subtract_int"));
+
 
     return;
 }
@@ -3851,7 +4005,12 @@ void stub_i_subtract_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_subtract_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_subtract_float"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_subtract_float"));
+
 
     return;
 }
@@ -3883,7 +4042,9 @@ PMC* stub_multiply(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "multiply"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "multiply"));
+
 
     return ret;
 }
@@ -3917,7 +4078,9 @@ PMC* stub_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "multiply_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "multiply_int"));
+
 
     return ret;
 }
@@ -3951,7 +4114,9 @@ PMC* stub_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "multiply_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "multiply_float"));
+
 
     return ret;
 }
@@ -3981,7 +4146,12 @@ void stub_i_multiply(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_multiply"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_multiply"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_multiply"));
+
 
     return;
 }
@@ -4013,7 +4183,12 @@ void stub_i_multiply_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_multiply_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_multiply_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_multiply_int"));
+
 
     return;
 }
@@ -4045,7 +4220,12 @@ void stub_i_multiply_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_multiply_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_multiply_float"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_multiply_float"));
+
 
     return;
 }
@@ -4077,7 +4257,9 @@ PMC* stub_divide(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "divide"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "divide"));
+
 
     return ret;
 }
@@ -4111,7 +4293,9 @@ PMC* stub_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "divide_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "divide_int"));
+
 
     return ret;
 }
@@ -4145,7 +4329,9 @@ PMC* stub_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "divide_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "divide_float"));
+
 
     return ret;
 }
@@ -4175,7 +4361,12 @@ void stub_i_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_divide"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_divide"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_divide"));
+
 
     return;
 }
@@ -4207,7 +4398,12 @@ void stub_i_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_divide_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_divide_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_divide_int"));
+
 
     return;
 }
@@ -4239,7 +4435,12 @@ void stub_i_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_divide_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_divide_float"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_divide_float"));
+
 
     return;
 }
@@ -4271,7 +4472,9 @@ PMC* stub_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "floor_divide"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "floor_divide"));
+
 
     return ret;
 }
@@ -4305,7 +4508,9 @@ PMC* stub_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "floor_divide_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "floor_divide_int"));
+
 
     return ret;
 }
@@ -4339,7 +4544,9 @@ PMC* stub_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest)
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "floor_divide_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "floor_divide_float"));
+
 
     return ret;
 }
@@ -4369,7 +4576,12 @@ void stub_i_floor_divide(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_floor_divide"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_floor_divide"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_floor_divide"));
+
 
     return;
 }
@@ -4401,7 +4613,12 @@ void stub_i_floor_divide_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_floor_divide_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_floor_divide_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_floor_divide_int"));
+
 
     return;
 }
@@ -4433,7 +4650,12 @@ void stub_i_floor_divide_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_floor_divide_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_floor_divide_float"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_floor_divide_float"));
+
 
     return;
 }
@@ -4465,7 +4687,9 @@ PMC* stub_modulus(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "modulus"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "modulus"));
+
 
     return ret;
 }
@@ -4499,7 +4723,9 @@ PMC* stub_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "modulus_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "modulus_int"));
+
 
     return ret;
 }
@@ -4533,7 +4759,9 @@ PMC* stub_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "modulus_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "modulus_float"));
+
 
     return ret;
 }
@@ -4563,7 +4791,12 @@ void stub_i_modulus(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_modulus"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_modulus"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_modulus"));
+
 
     return;
 }
@@ -4595,7 +4828,12 @@ void stub_i_modulus_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_modulus_int"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_modulus_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_modulus_int"));
+
 
     return;
 }
@@ -4627,7 +4865,12 @@ void stub_i_modulus_float(PARROT_INTERP, PMC* pmc, FLOATVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_modulus_float"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "i_modulus_float"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_modulus_float"));
+
 
     return;
 }
@@ -4658,7 +4901,9 @@ PMC* stub_absolute(PARROT_INTERP, PMC* pmc, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "absolute"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "absolute"));
+
 
     return ret;
 }
@@ -4689,7 +4934,9 @@ PMC* stub_neg(PARROT_INTERP, PMC* pmc, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "neg"));
+                   CONST_STRING(supervisor, "math"),
+                   CONST_STRING(supervisor, "neg"));
+
 
     return ret;
 }
@@ -4720,7 +4967,9 @@ INTVAL stub_is_equal(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "is_equal"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "is_equal"));
+
 
     return ret;
 }
@@ -4751,7 +5000,9 @@ INTVAL stub_is_equal_num(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "is_equal_num"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "is_equal_num"));
+
 
     return ret;
 }
@@ -4782,7 +5033,9 @@ INTVAL stub_is_equal_string(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "is_equal_string"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "is_equal_string"));
+
 
     return ret;
 }
@@ -4813,7 +5066,9 @@ INTVAL stub_is_same(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "is_same"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "is_same"));
+
 
     return ret;
 }
@@ -4844,7 +5099,9 @@ INTVAL stub_cmp(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "cmp"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "cmp"));
+
 
     return ret;
 }
@@ -4875,7 +5132,9 @@ INTVAL stub_cmp_num(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "cmp_num"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "cmp_num"));
+
 
     return ret;
 }
@@ -4906,7 +5165,9 @@ INTVAL stub_cmp_string(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "cmp_string"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "cmp_string"));
+
 
     return ret;
 }
@@ -4937,7 +5198,9 @@ PMC* stub_cmp_pmc(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "cmp_pmc"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "cmp_pmc"));
+
 
     return ret;
 }
@@ -4969,7 +5232,9 @@ PMC* stub_logical_or(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "logical_or"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "logical_or"));
+
 
     return ret;
 }
@@ -5001,7 +5266,9 @@ PMC* stub_logical_and(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "logical_and"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "logical_and"));
+
 
     return ret;
 }
@@ -5033,7 +5300,9 @@ PMC* stub_logical_xor(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "logical_xor"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "logical_xor"));
+
 
     return ret;
 }
@@ -5064,7 +5333,9 @@ PMC* stub_logical_not(PARROT_INTERP, PMC* pmc, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "logical_not"));
+                   CONST_STRING(supervisor, "cmp"),
+                   CONST_STRING(supervisor, "logical_not"));
+
 
     return ret;
 }
@@ -5096,7 +5367,9 @@ PMC* stub_concatenate(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "concatenate"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "concatenate"));
+
 
     return ret;
 }
@@ -5130,7 +5403,9 @@ PMC* stub_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "concatenate_str"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "concatenate_str"));
+
 
     return ret;
 }
@@ -5160,7 +5435,12 @@ void stub_i_concatenate(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_concatenate"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "i_concatenate"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_concatenate"));
+
 
     return;
 }
@@ -5192,7 +5472,12 @@ void stub_i_concatenate_str(PARROT_INTERP, PMC* pmc, STRING* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_concatenate_str"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "i_concatenate_str"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_concatenate_str"));
+
 
     return;
 }
@@ -5224,7 +5509,9 @@ PMC* stub_repeat(PARROT_INTERP, PMC* pmc, PMC* value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "repeat"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "repeat"));
+
 
     return ret;
 }
@@ -5258,7 +5545,9 @@ PMC* stub_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "repeat_int"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "repeat_int"));
+
 
     return ret;
 }
@@ -5288,7 +5577,12 @@ void stub_i_repeat(PARROT_INTERP, PMC* pmc, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_repeat"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "i_repeat"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_repeat"));
+
 
     return;
 }
@@ -5320,7 +5614,12 @@ void stub_i_repeat_int(PARROT_INTERP, PMC* pmc, INTVAL value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "i_repeat_int"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "i_repeat_int"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "i_repeat_int"));
+
 
     return;
 }
@@ -5356,7 +5655,9 @@ void stub_substr(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length, PMC* des
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "substr"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "substr"));
+
 
     return;
 }
@@ -5392,7 +5693,9 @@ STRING* stub_substr_str(PARROT_INTERP, PMC* pmc, INTVAL offset, INTVAL length) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "substr_str"));
+                   CONST_STRING(supervisor, "string"),
+                   CONST_STRING(supervisor, "substr_str"));
+
 
     return ret;
 }
@@ -5423,7 +5726,9 @@ INTVAL stub_exists_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "exists_keyed"));
+                   CONST_STRING(supervisor, "exists"),
+                   CONST_STRING(supervisor, "exists_keyed"));
+
 
     return ret;
 }
@@ -5456,7 +5761,9 @@ INTVAL stub_exists_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "exists_keyed_int"));
+                   CONST_STRING(supervisor, "exists"),
+                   CONST_STRING(supervisor, "exists_keyed_int"));
+
 
     return ret;
 }
@@ -5489,7 +5796,9 @@ INTVAL stub_exists_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "exists_keyed_str"));
+                   CONST_STRING(supervisor, "exists"),
+                   CONST_STRING(supervisor, "exists_keyed_str"));
+
 
     return ret;
 }
@@ -5520,7 +5829,9 @@ INTVAL stub_defined_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "defined_keyed"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "defined_keyed"));
+
 
     return ret;
 }
@@ -5553,7 +5864,9 @@ INTVAL stub_defined_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "defined_keyed_int"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "defined_keyed_int"));
+
 
     return ret;
 }
@@ -5586,7 +5899,9 @@ INTVAL stub_defined_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "defined_keyed_str"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "defined_keyed_str"));
+
 
     return ret;
 }
@@ -5616,7 +5931,9 @@ void stub_delete_keyed(PARROT_INTERP, PMC* pmc, PMC* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "delete_keyed"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "delete_keyed"));
+
 
     return;
 }
@@ -5648,7 +5965,9 @@ void stub_delete_keyed_int(PARROT_INTERP, PMC* pmc, INTVAL key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "delete_keyed_int"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "delete_keyed_int"));
+
 
     return;
 }
@@ -5680,7 +5999,9 @@ void stub_delete_keyed_str(PARROT_INTERP, PMC* pmc, STRING* key) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "delete_keyed_str"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "delete_keyed_str"));
+
 
     return;
 }
@@ -5713,7 +6034,9 @@ opcode_t* stub_invoke(PARROT_INTERP, PMC* pmc, void* next) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "invoke"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "invoke"));
+
 
     return ret;
 }
@@ -5746,7 +6069,9 @@ INTVAL stub_can(PARROT_INTERP, PMC* pmc, STRING* method) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "can"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "can"));
+
 
     return ret;
 }
@@ -5777,7 +6102,9 @@ INTVAL stub_does_pmc(PARROT_INTERP, PMC* pmc, PMC* role) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "does_pmc"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "does_pmc"));
+
 
     return ret;
 }
@@ -5810,7 +6137,9 @@ INTVAL stub_does(PARROT_INTERP, PMC* pmc, STRING* role) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "does"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "does"));
+
 
     return ret;
 }
@@ -5841,7 +6170,9 @@ INTVAL stub_isa_pmc(PARROT_INTERP, PMC* pmc, PMC* _class) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "isa_pmc"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "isa_pmc"));
+
 
     return ret;
 }
@@ -5874,7 +6205,9 @@ INTVAL stub_isa(PARROT_INTERP, PMC* pmc, STRING* _class) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "isa"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "isa"));
+
 
     return ret;
 }
@@ -5907,7 +6240,9 @@ PMC* stub_get_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_attr_str"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "get_attr_str"));
+
 
     return ret;
 }
@@ -5941,7 +6276,9 @@ PMC* stub_get_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "get_attr_keyed"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "get_attr_keyed"));
+
 
     return ret;
 }
@@ -5974,7 +6311,12 @@ void stub_set_attr_str(PARROT_INTERP, PMC* pmc, STRING* idx, PMC* value) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_attr_str"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "set_attr_str"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "set_attr_str"));
+
 
     return;
 }
@@ -6008,7 +6350,12 @@ void stub_set_attr_keyed(PARROT_INTERP, PMC* pmc, PMC* key, STRING* idx, PMC* va
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "set_attr_keyed"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "set_attr_keyed"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "set_attr_keyed"));
+
 
     return;
 }
@@ -6038,7 +6385,12 @@ void stub_add_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_parent"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "add_parent"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "add_parent"));
+
 
     return;
 }
@@ -6068,7 +6420,12 @@ void stub_remove_parent(PARROT_INTERP, PMC* pmc, PMC* parent) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "remove_parent"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "remove_parent"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "remove_parent"));
+
 
     return;
 }
@@ -6098,7 +6455,12 @@ void stub_add_role(PARROT_INTERP, PMC* pmc, PMC* role) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_role"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "add_role"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "add_role"));
+
 
     return;
 }
@@ -6128,7 +6490,12 @@ void stub_remove_role(PARROT_INTERP, PMC* pmc, PMC* role) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "remove_role"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "remove_role"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "remove_role"));
+
 
     return;
 }
@@ -6161,7 +6528,12 @@ void stub_add_attribute(PARROT_INTERP, PMC* pmc, STRING* name, PMC* type) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_attribute"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "add_attribute"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "add_attribute"));
+
 
     return;
 }
@@ -6193,7 +6565,12 @@ void stub_remove_attribute(PARROT_INTERP, PMC* pmc, STRING* name) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "remove_attribute"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "remove_attribute"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "remove_attribute"));
+
 
     return;
 }
@@ -6226,7 +6603,12 @@ void stub_add_method(PARROT_INTERP, PMC* pmc, STRING* method_name, PMC* sub_pmc)
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_method"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "add_method"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "add_method"));
+
 
     return;
 }
@@ -6258,7 +6640,12 @@ void stub_remove_method(PARROT_INTERP, PMC* pmc, STRING* method_name) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "remove_method"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "remove_method"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "remove_method"));
+
 
     return;
 }
@@ -6291,7 +6678,12 @@ void stub_add_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name, PMC*
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "add_vtable_override"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "add_vtable_override"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "add_vtable_override"));
+
 
     return;
 }
@@ -6323,7 +6715,12 @@ void stub_remove_vtable_override(PARROT_INTERP, PMC* pmc, STRING* vtable_name) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "remove_vtable_override"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "remove_vtable_override"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "remove_vtable_override"));
+
 
     return;
 }
@@ -6356,7 +6753,9 @@ PMC* stub_inspect_str(PARROT_INTERP, PMC* pmc, STRING* what) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "inspect_str"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "inspect_str"));
+
 
     return ret;
 }
@@ -6386,7 +6785,9 @@ void stub_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "freeze"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "freeze"));
+
 
     return;
 }
@@ -6416,7 +6817,12 @@ void stub_thaw(PARROT_INTERP, PMC* pmc, PMC* info) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "thaw"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "thaw"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "thaw"));
+
 
     return;
 }
@@ -6446,7 +6852,12 @@ void stub_thawfinish(PARROT_INTERP, PMC* pmc, PMC* info) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "thawfinish"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "thawfinish"));
+    raise_vtable_event(supervisor, interp, pmc, data,
+                   CONST_STRING(supervisor, "write"),
+                   CONST_STRING(supervisor, "thawfinish"));
+
 
     return;
 }
@@ -6476,7 +6887,9 @@ void stub_visit(PARROT_INTERP, PMC* pmc, PMC* info) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "visit"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "visit"));
+
 
     return;
 }
@@ -6508,7 +6921,9 @@ void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer) {
         params);
 
     raise_vtable_event(supervisor, interp, pmc, data,
-                       CONST_STRING(supervisor, "init_int"));
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "init_int"));
+
 
     return;
 }
