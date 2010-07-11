@@ -694,6 +694,7 @@ Return the POST representation of a C<PAST::Control>.
     concat $S0, rtype
     ops.'push_pirop'('.local pmc exception')
     ops.'push_pirop'('.get_results (exception)')
+    ops.'push_pirop'('pop_eh')
     children = self.'post_children'(node, 'signature'=>$S0)
     ops.'push'(children)
     handled = self.'uniquereg'('I')
