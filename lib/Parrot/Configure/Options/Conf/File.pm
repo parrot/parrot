@@ -73,7 +73,7 @@ sub conditional_assignments {
     else {
         die "Configuration file $data->{file} did not parse correctly: $!";
     }
-    return ($data, $steps_list_ref);;
+    return ($data, $steps_list_ref);
 }
 
 sub _get_substitutions {
@@ -124,7 +124,7 @@ sub _set_general {
 }
 
 sub _set_steps {
-    my ($data, $steps, $optsref) = @_;;
+    my ($data, $steps, $optsref) = @_;
     my @steplines = split /\n/, $steps;
     my @steps_list = ();
     LINE: foreach my $line (@steplines) {

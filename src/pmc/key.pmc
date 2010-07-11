@@ -388,6 +388,18 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     VTABLE STRING* get_repr() {
         return key_set_to_string(INTERP, SELF);
     }
+
+/*
+=item C<set_register(reg_no, type)>
+
+Set key to hold particular register.
+
+=cut
+*/
+    METHOD set_register(INTVAL reg_no, INTVAL reg_type) {
+        key_set_register(INTERP, SELF, reg_no, reg_type);
+    }
+
 }
 
 /*
