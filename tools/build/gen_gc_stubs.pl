@@ -43,10 +43,12 @@ my $contents = join('', map { chomp;$_; } <$source_fh>);
 
 # Extract struct GC_Subsystem.
 $contents =~ /typedef struct GC_Subsystem {(.*)} GC_Subsystem;/;
-my $subsystem = $1;
+my $subsystem      = $1;
 
 # Remove comments.
 $subsystem =~ s/\/\*.*?\*\///g;
+
+# Extract the entries.
 foreach (split /\s*;\s*/, $subsystem) {
     chomp;
 
@@ -81,15 +83,20 @@ foreach (split /\s*;\s*/, $subsystem) {
         push @prototypes, gen_prototype(@data);
         push @stubs, gen_stub(@data);
 
-        push @entries, $data[1];
+        push @entries, \@data;
     }
 }
 
 my %placeholders = (
-    'gc prototypes' => join('', @prototypes),
-    'gc stubs'      => join('', @stubs),
-    'gc mappings'   => gen_mapping_string(@entries),
-    'gc groupings'  => gen_grouping_string(\%groups, \@entries)
+    'gc struct entries'        => join("\n", map { s/^\s+//;chomp; $_.';'; }
+                                             split(/\s*;\s*/, $subsystem)),
+    'gc prototypes'            => join("\n", map { chomp; $_; } @prototypes),
+    'gc stubs'                 => join("\n", map { chomp; $_; } @stubs),
+    'gc mapping name stubs'    => gen_mapping_name_stubs(@entries),
+    'gc mapping name offset'   => gen_mapping_name_offset(@entries),
+    'gc mapping name original' => gen_mapping_name_original(@entries),
+    'gc mapping group items'   => gen_mapping_group_items(\%groups),
+    'gc mapping item groups'   => gen_mapping_item_groups(@entries)
 );
 
 my @contents = ();
@@ -215,14 +222,14 @@ POINTER
 
     return <<STUB;
 $ret stub_$name($params) {
-    PMC *instr_gc            = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    GC_Subsystem *gc_orig    = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
     Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    GC_Subsystem *gc_orig;
+
     PMC *event_data;
     PMC *temp;
     PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
 $ret_dec
-    GETATTR_InstrumentGC_gc_original(supervisor, instr_gc, gc_orig);
+
    $ret_ret gc_orig->$name($param_list_flat);
 
 $instr_params
@@ -242,67 +249,95 @@ $instr_params
 STUB
 }
 
-sub gen_mapping_string {
+sub gen_mapping_name_stubs {
     my @entries = @_;
-
-    my($name, @orig, @instr, @stubs);
-    foreach $name (@entries) {
-        push @stubs, <<STUBS;
-    parrot_hash_put(interp, instr_hash,
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $stub = <<STUB;
+    parrot_hash_put(interp, gc_name_stubs,
         CONST_STRING(interp, "$name"),
         stub_$name);
-STUBS
-        push @orig, <<ORIG;
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
+}
+
+sub gen_mapping_name_original {
+    my @entries = @_;
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $stub = <<STUB;
     parrot_hash_put(interp, orig_hash,
         CONST_STRING(interp, "$name"),
         gc_orig->$name);
-ORIG
-        push @instr, <<INSTR;
-    parrot_hash_put(interp, entry_hash,
-        CONST_STRING(interp, "$name"),
-        &(gc_instr->$name));
-INSTR
-    }
-
-    return <<MAPPINGS;
-    /* Build the pointer hash to the stubs. */
-    @stubs
-
-    /* Build the pointer hash to the original. */
-    @orig
-
-    /* Build the pointer hash for name to InstrumentGC_Subsystem entry. */
-    @instr
-MAPPINGS
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
 }
 
-sub gen_grouping_string {
-    my($groups, $entries) = @_;
-    my($group, $entry);
+sub gen_mapping_name_offset {
+    my @entries = @_;
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $stub = <<STUB;
+    parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "$name"),
+        &(gc_instr->$name));
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
+}
 
-    my @groups;
-    foreach $group (keys %{$groups}) {
-        my @list = @{$groups->{$group}};
+sub gen_mapping_group_items {
+    my %groups = %{shift @_};
 
-        my $ret .= <<PRE;
-if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "$group"))) {
+    my $key;
+    my @ret;
+    foreach $key (keys %groups) {
+        my $item;
+        my $entry = <<PRE;
+    temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
 PRE
 
-        foreach $entry (@list) {
-            $ret .= <<ENTRY;
-           VTABLE_push_string(INTERP, list,
-               CONST_STRING(INTERP, "$entry"));
+        foreach $item (@{$groups{$key}}) {
+            $entry .= <<ENTRY;
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "$item"));
 ENTRY
         }
 
-        $ret .= <<END;
-        }
-END
+        $entry .= <<POST;
+    parrot_hash_put(interp, gc_group_items,
+                    CONST_STRING(interp, "$key"),
+                    temp);
+POST
 
-        push @groups, $ret;
+        chomp $entry;
+        push @ret, $entry;
     }
 
-    return '        '.join('        else ', @groups);
+    return join("\n\n", @ret);
+}
+
+sub gen_mapping_item_groups {
+my @entries = @_;
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $group = @{$_}[3];
+        my $stub = <<STUB;
+    temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "$group"));
+    parrot_hash_put(interp, gc_item_groups,
+        CONST_STRING(interp, "$name"),
+        temp);
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
 }
 
 sub fix_params {

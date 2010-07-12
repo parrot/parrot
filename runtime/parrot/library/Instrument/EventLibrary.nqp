@@ -177,7 +177,7 @@ class Instrument::Event::GC is Instrument::Event {
             my @hooks := $gc.get_hook_list($_);
 
             for @hooks {
-                $gc.insert_gc_hook($_);
+                $gc.insert_hook($_);
 
                 my $tokens := pir::split__PSS('_', $_);
                 my $group  := $tokens[0];
@@ -192,7 +192,7 @@ class Instrument::Event::GC is Instrument::Event {
             }
         }
     };
-    
+
     method disable() {
     }
 };
@@ -202,6 +202,8 @@ class Instrument::Event::Class is Instrument::Event {
     has $!class_name;
     has @!vtable_probes;
     has @!method_probes;
+    our @todo;
+    our $loadlib_event;
 
     method _self_init() {
         @!vtable_probes := ();
@@ -234,10 +236,12 @@ class Instrument::Event::Class is Instrument::Event {
         my $event_prefix := 'Class::' ~ $!class_name ~ '::';
 
         # Register the vtable probes.
+        my $vtable_prefix := $event_prefix ~ 'vtable::';
         for @!vtable_probes {
-            $class.insert_vtable_hook($_);
-            
-            my $event := $event_prefix ~ $_;
+            $class.insert_hook($_);
+            my $group := ($class.get_hook_group($_)).shift();
+
+            my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
             $dispatcher.register($event, $!callback);
         }
     };

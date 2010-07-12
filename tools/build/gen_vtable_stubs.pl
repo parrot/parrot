@@ -77,17 +77,18 @@ while(<$vtable_fh>) {
 
         push @prototypes, gen_prototype(@data);
         push @stubs, gen_stub(@data);
-        push @entries, $data[1];
-
-
+        push @entries, \@data;
     }
 }
 
 my %placeholders = (
-    'vtable prototypes' => join('', @prototypes),
-    'vtable stubs'      => join('', @stubs),
-    'vtable mappings'   => gen_mapping_string(@entries),
-    'vtable groupings'     => gen_grouping_string(\%groups, \@entries)
+    'vtable prototypes'            => join("\n", map { chomp; $_; } @prototypes),
+    'vtable stubs'                 => join("\n", map { chomp; $_; } @stubs),
+    'vtable mapping name stubs'    => gen_mapping_name_stubs(@entries),
+    'vtable mapping name offset'   => gen_mapping_name_offset(@entries),
+    'vtable mapping name original' => gen_mapping_name_original(@entries),
+    'vtable mapping group items'   => gen_mapping_group_items(\%groups),
+    'vtable mapping item groups'   => gen_mapping_item_groups(@entries)
 );
 
 my @contents = ();
@@ -229,17 +230,17 @@ EVENT
 static
 $ret stub_$name($params) {
     PMC *instr_vt, *data;
-    _vtable *orig_vtable;
+    void *orig_vtable;
     Parrot_Interp supervisor;
     PMC *temp;
     PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 $ret_dec
-    instr_vt = (PMC *) parrot_hash_get(interp, Instrument_Vtable_Entries, pmc->vtable);
+    instr_vt = (PMC *) parrot_hash_get(interp, vtable_registry, pmc->vtable);
 
-    GETATTR_InstrumentVtable_original_vtable(interp, instr_vt, orig_vtable);
+    GETATTR_InstrumentVtable_original_struct(interp, instr_vt, orig_vtable);
     GETATTR_InstrumentVtable_supervisor(interp, instr_vt, supervisor);
 
-   $ret_ret orig_vtable->$name($param_list_flat);
+   $ret_ret ((_vtable *)orig_vtable)->$name($param_list_flat);
 
 $instr_params
 
@@ -249,79 +250,115 @@ $instr_params
         params);
 
 $events
-
     return$ret_last;
 }
 
 CODE
 }
 
-sub gen_mapping_string {
+sub gen_mapping_name_stubs {
     my @entries = @_;
-
-    my($name, @orig, @instr, @stubs);
-    foreach $name (@entries) {
-        my $orig = <<OFFSET;
-    parrot_hash_put(interp, orig, CONST_STRING(interp, "$name"),
-                orig_vtable->$name);
-OFFSET
-        push @orig, $orig;
-
-        my $instr = <<INSTR;
-    parrot_hash_put(interp, instr, CONST_STRING(interp, "$name"),
-                &(instr_vtable->$name));
-INSTR
-        push @instr, $instr;
-
-        my $stub_entry = <<STUB_ENTRY;
-        parrot_hash_put(interp, stub, CONST_STRING(interp, "$name"),
-                        stub_$name);
-STUB_ENTRY
-        push @stubs, $stub_entry;
-    }
-
-    return <<MAPPINGS;
-    /* Build mappings for name -> original function.vtable entry */
-@orig
-
-    /* Build mappings for name -> instrumented function.vtable entry. */
-@instr
-
-    /* Build mappings for name -> stub_function if it wasn't done already. */
-    if (parrot_hash_size(interp, stub) == 0) {
-@stubs
-    }
-MAPPINGS
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $stub = <<STUB;
+    parrot_hash_put(interp, vtable_name_stubs,
+        CONST_STRING(interp, "$name"),
+        stub_$name);
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
 }
 
-sub gen_grouping_string {
-    my($groups, $entries) = @_;
-    my($group, $entry);
+sub gen_mapping_name_original {
+    my @entries = @_;
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $stub = <<STUB;
+    parrot_hash_put(interp, orig_hash,
+        CONST_STRING(interp, "$name"),
+        vt_orig->$name);
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
+}
 
-    my @groups;
-    foreach $group (keys %{$groups}) {
-        my @list = @{$groups->{$group}};
-        $group = lc($group);
+sub gen_mapping_name_offset {
+    my @entries = @_;
+    return join("\n", map {
+        my $name = @{$_}[1];
+        my $stub = <<STUB;
+    parrot_hash_put(interp, instr_hash,
+        CONST_STRING(interp, "$name"),
+        &(vt_instr->$name));
+STUB
+        chomp $stub;
+        $stub;
+    } @entries);
+}
 
-        my $ret .= <<PRE;
-if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "$group"))) {
+sub gen_mapping_group_items {
+    my %groups = %{shift @_};
+
+    my $key;
+    my @ret;
+    foreach $key (keys %groups) {
+        my $item;
+        my $entry = <<PRE;
+    temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
 PRE
 
-        foreach $entry (@list) {
-            $ret .= <<ENTRY;
-           VTABLE_push_string(INTERP, list,
-               CONST_STRING(INTERP, "$entry"));
+        foreach $item (@{$groups{$key}}) {
+            $entry .= <<ENTRY;
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "$item"));
 ENTRY
         }
 
-        $ret .= <<END;
-        }
-END
+        $entry .= <<POST;
+    parrot_hash_put(interp, vtable_group_items,
+        CONST_STRING(interp, "$key"),
+        temp);
+POST
 
-        push @groups, $ret;
+        chomp $entry;
+        push @ret, $entry;
     }
 
-    return '        '.join('        else ', @groups);
+    return join("\n\n", @ret);
+}
+
+sub gen_mapping_item_groups {
+    my @entries = @_;
+
+    my $data;
+    my @ret;
+    foreach $data (@entries) {
+        my $item;
+        my $name = $data->[1];
+        my $entry = <<PRE;
+    temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+PRE
+
+        foreach $item (@{$data->[4]}) {
+            $entry .= <<ENTRY;
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "$item"));
+ENTRY
+        }
+
+        $entry .= <<POST;
+    parrot_hash_put(interp, vtable_item_groups,
+        CONST_STRING(interp, "$name"),
+        temp);
+POST
+
+        chomp $entry;
+        push @ret, $entry;
+    }
+
+    return join("\n\n", @ret);
 }
 
 # Local Variables:

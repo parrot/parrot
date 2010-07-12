@@ -23,12 +23,14 @@ DYNPMC_FOO_OBJS = \
 
 DYNPMC_INSTRUMENT = \
     src/dynpmc/instrument.pmc \
+    src/dynpmc/instrumentstubbase.pmc \
     src/dynpmc/instrumentgc.pmc \
     src/dynpmc/instrumentop.pmc \
     src/dynpmc/instrumentvtable.pmc
 
 DYNPMC_INSTRUMENT_OBJS = \
     src/dynpmc/instrument$(O) \
+    src/dynpmc/instrumentstubbase$(O) \
     src/dynpmc/instrumentgc$(O) \
     src/dynpmc/instrumentop$(O) \
     src/dynpmc/instrumentvtable$(O)

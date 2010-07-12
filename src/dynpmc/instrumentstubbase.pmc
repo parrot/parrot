@@ -1,0 +1,219 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id: instrumentgc.pmc 48073 2010-07-11 16:47:36Z khairul $
+
+=head1 NAME
+
+src/dynpmc/instrumentgc.pmc - Interface to instrument the gc_sys entry of Parrot_Interp.
+
+=head1 DESCRIPTION
+
+C<InstrumentPMC> is a PMC class that provides an interface to
+instrument the gc_sys entry of Parrot_Interp.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
+    ATTR PMC  *instrument;          /* Reference to the Instrument object, for various purposes. */
+    ATTR PMC  *hook_count;          /* Keeps track of hook requests for a particular entry. */
+    ATTR Hash *name_stubs;          /* Mapping item name with the corresponding stub entry. */
+    ATTR Hash *name_original;       /* Mapping item name with the original item entry. */
+    ATTR Hash *name_offset;         /* Mapping item name with the pointer address in the struct. */
+    ATTR Hash *group_items;         /* Mapping groups with the items that belongs in it. */
+    ATTR Hash *item_groups;         /* Mapping item name to the groups it belongs to. */
+    ATTR Hash *registry;            /* Used by stubs to locate the instrumenting PMC. */
+    ATTR void *original_struct;     /* Reference to the original struct. */
+    ATTR void *instrumented_struct; /* Reference to the struct with stubs inserted. */
+
+    VTABLE void init() {
+        /* Not supposed to be init on its own. */
+        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                    "%Ss should be instantiated with initpmc instead.",
+                                   VTABLE_name(INTERP, SELF));
+    }
+
+    VTABLE void init_pmc(PMC *instrument) {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+
+        /* Initialise the common attributes, setting the others to NULL. */
+        attr->instrument          = instrument;
+        attr->hook_count          = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->name_stubs          = NULL;
+        attr->name_original       = parrot_new_hash(INTERP);
+        attr->name_offset         = parrot_new_hash(INTERP);
+        attr->group_items         = NULL;
+        attr->item_groups         = NULL;
+        attr->original_struct     = NULL;
+        attr->instrumented_struct = NULL;
+
+        /* Set custom mark and destroy. */
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    VTABLE void mark() {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->hook_count);
+    }
+
+    VTABLE void destroy() {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+
+        /* Destroy the hashes, except for the following:
+           1. registry
+           2. name_stub
+           3. group_items
+           4. item_groups
+           These hashes are handled by the child class. */
+        parrot_hash_destroy(INTERP, attr->name_original);
+        parrot_hash_destroy(INTERP, attr->name_offset);
+
+        /* Free the original struct. The instrumented struct will be freed when
+           the object is destroyed. */
+        mem_gc_free(INTERP, attr->original_struct);
+    }
+
+    METHOD insert_hook(STRING *name) {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+        PMC *list;
+        PMC *iter;
+        (PMC *list) = PCCINVOKE(INTERP, SELF, "get_hook_list", STRING *name);
+
+        iter = VTABLE_get_iter(INTERP, list);
+        while (VTABLE_get_bool(INTERP, iter)) {
+            INTVAL count;
+            PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
+            STRING *item  = VTABLE_get_string(INTERP, item_pmc);
+            size_t **entry, *func;
+
+            /* Check if the entry has already been instrumented. */
+            count = VTABLE_get_integer_keyed_str(INTERP, attr->hook_count, item);
+            if (count == 0) {
+                /* Replace the entry with the stub. */
+                entry = (size_t **) parrot_hash_get(INTERP, attr->name_offset, item);
+                func  = (size_t *)  parrot_hash_get(INTERP, attr->name_stubs, item);
+                if (entry == NULL || func == NULL) {
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : Unknown function, '%Ss'",
+                                                VTABLE_name(INTERP, SELF), item);
+                }
+                *entry = func;
+            }
+
+            /* Update the count. */
+            count++;
+            VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
+        }
+    }
+
+    METHOD remove_hook(STRING *name) {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+        PMC *list;
+        PMC *iter;
+        (PMC *list) = PCCINVOKE(INTERP, SELF, "get_hook_list", STRING *name);
+
+        iter = VTABLE_get_iter(INTERP, list);
+        while (VTABLE_get_bool(INTERP, iter)) {
+            INTVAL count;
+            PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
+            STRING *item  = VTABLE_get_string(INTERP, item_pmc);
+            size_t **entry, *func;
+
+            /* Only remove the stub if request count == 1 => Last request. */
+            count = VTABLE_get_integer_keyed_str(INTERP, attr->hook_count, item);
+            if (count <= 0) {
+                /* Tried to remove 1 time too many. */
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : Unknown function, '%Ss'",
+                                                VTABLE_name(INTERP, SELF), item);
+            }
+            else if (count == 1) {
+                /* Simply replace the stub with the original entry. */
+                entry = (size_t **) parrot_hash_get(INTERP, attr->name_offset, item);
+                func  = (size_t *)  parrot_hash_get(INTERP, attr->name_original, item);
+                if (entry == NULL || func == NULL) {
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : Unknown function, '%Ss'",
+                                                VTABLE_name(INTERP, SELF), item);
+                }
+                *entry = func;
+            }
+
+            /* Update the count. */
+            count--;
+            VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
+        }
+    }
+
+    METHOD get_hook_list(STRING *name) {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+        PMC *list;
+
+        list = (PMC *) parrot_hash_get(INTERP, attr->group_items, name);
+        if (PMC_IS_NULL(list)) {
+            /* Assume that name is a specific item. Ensure that it refers
+               to a stub name before pushing it into list. */
+            size_t *check;
+
+            check = (size_t *) parrot_hash_get(INTERP, attr->name_stubs, name);
+            if (check == NULL) {
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : Unknown function, '%Ss'",
+                                                VTABLE_name(INTERP, SELF), name);
+            }
+
+            list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+            VTABLE_push_string(INTERP, list, name);
+        }
+
+        RETURN(PMC *list);
+    }
+
+    METHOD get_hook_group(STRING *name) {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+        PMC *groups;
+
+        groups = (PMC *) parrot_hash_get(INTERP, attr->item_groups, name);
+        if(PMC_IS_NULL(groups)) {
+            /* Should not happen. All items should have a group mapping. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "%Ss : Unknown function, '%Ss'",
+                                        VTABLE_name(INTERP, SELF), name);
+        }
+
+        RETURN(PMC *groups);
+    }
+
+    METHOD get_instrumented_list() {
+        Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
+        PMC *ret = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+        PMC *iter;
+
+        iter = VTABLE_get_iter(INTERP, attr->hook_count);
+
+        while (VTABLE_get_bool(INTERP, iter)) {
+            PMC *key     = VTABLE_shift_pmc(INTERP, iter);
+            INTVAL count = VTABLE_get_integer_keyed(INTERP, attr->hook_count, key);
+            if (count > 0) {
+                VTABLE_push_pmc(INTERP, ret, key);
+            }
+        }
+
+        RETURN(PMC *ret);
+    }
+}
+
+/*
+ * Local Variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -194,7 +194,7 @@ PROG
 
     # Test inserting an individual hook.
     # sample: allocate_pmc_header
-    gc.'insert_gc_hook'('allocate_pmc_header')
+    gc.'insert_hook'('allocate_pmc_header')
     $P0 = gc.'get_instrumented_list'()
     $I0 = $P0
     is($I0, 1, 'Insert: Insert single hook count ok.')
@@ -202,7 +202,7 @@ PROG
     is($S0, 'allocate_pmc_header', 'Insert: Insert single hook name ok.')
 
     # Test inserting the same hook again.
-    gc.'insert_gc_hook'('allocate_pmc_header')
+    gc.'insert_hook'('allocate_pmc_header')
     $P0 = gc.'get_instrumented_list'()
     $I0 = $P0
     is($I0, 1, 'Re-insert: Re-inserting single hook count ok.')
@@ -210,12 +210,12 @@ PROG
     is($S0, 'allocate_pmc_header', 'Re-insert: Re-inserting single hook name ok.')
 
     # Remove the hook before testing inserting groups.
-    gc.'remove_gc_hook'('allocate_pmc_header')
-    gc.'remove_gc_hook'('allocate_pmc_header')
+    gc.'remove_hook'('allocate_pmc_header')
+    gc.'remove_hook'('allocate_pmc_header')
 
     # Test inserting a group of hooks.
     # sample: free
-    gc.'insert_gc_hook'('free')
+    gc.'insert_hook'('free')
     $P0 = gc.'get_instrumented_list'()
     $P1 = groups['free']
     $I0 = $P0
@@ -231,7 +231,7 @@ PROG
     set_addr eh, NON_EXISTENT_OK
     push_eh eh
 
-    gc.'insert_gc_hook'('non-existent')
+    gc.'insert_hook'('non-existent')
 
     ok(0, 'Insert: Non-existent entry fail.')
     goto NON_EXISTENT_END
@@ -253,28 +253,28 @@ PROG
 
     # Test removing an individual hook.
     # sample: allocate_pmc_header
-    gc.'insert_gc_hook'('allocate_pmc_header')
-    gc.'remove_gc_hook'('allocate_pmc_header')
+    gc.'insert_hook'('allocate_pmc_header')
+    gc.'remove_hook'('allocate_pmc_header')
     $P0 = gc.'get_instrumented_list'()
     $I0 = $P0
     is($I0, 0, 'Remove: Single hook removal ok.')
 
     # Test insert 2 hooks, remove 1 hook.
     # sample: allocate_pmc_header, free_pmc_header
-    gc.'insert_gc_hook'('allocate_pmc_header')
-    gc.'insert_gc_hook'('free_pmc_header')
-    gc.'remove_gc_hook'('free_pmc_header')
+    gc.'insert_hook'('allocate_pmc_header')
+    gc.'insert_hook'('free_pmc_header')
+    gc.'remove_hook'('free_pmc_header')
     $P0 = gc.'get_instrumented_list'()
     $I0 = $P0
     is($I0, 1, 'Remove2: Removal count ok.')
     $S0 = $P0[0]
     is($S0, 'allocate_pmc_header', 'Remove2: Removal name ok.')
-    gc.'remove_gc_hook'('allocate_pmc_header')
+    gc.'remove_hook'('allocate_pmc_header')
 
     # Test removing of groups.
     # sample: allocate
-    gc.'insert_gc_hook'('allocate')
-    gc.'remove_gc_hook'('allocate')
+    gc.'insert_hook'('allocate')
+    gc.'remove_hook'('allocate')
     $P0 = gc.'get_instrumented_list'()
     $I0 = $P0
     is($I0, 0, 'Remove Group: Removal ok.')
@@ -286,7 +286,7 @@ PROG
     set_addr eh, NON_EXISTENT_OK
     push_eh eh
 
-    gc.'remove_gc_hook'('non-existent')
+    gc.'remove_hook'('non-existent')
 
     ok(0, 'Remove: Non-existent removal fail.')
     goto NON_EXISTENT_END
@@ -302,9 +302,9 @@ PROG
     set_addr eh, TOO_MANY_OK
     push_eh eh
 
-    gc.'insert_gc_hook'('allocate_pmc_header')
-    gc.'remove_gc_hook'('allocate_pmc_header')
-    gc.'remove_gc_hook'('allocate_pmc_header')
+    gc.'insert_hook'('allocate_pmc_header')
+    gc.'remove_hook'('allocate_pmc_header')
+    gc.'remove_hook'('allocate_pmc_header')
 
     ok(0, 'Remove: Too many removal fail.')
     goto TOO_MANY_END
