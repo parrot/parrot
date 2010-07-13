@@ -804,7 +804,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "exists_keyed_str"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "EXISTS"),
+        CONST_STRING(interp, "exists"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -885,7 +885,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "set_pointer_keyed_str"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "FETCH"),
+        CONST_STRING(interp, "fetch"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -910,7 +910,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "substr_str"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "STRING"),
+        CONST_STRING(interp, "string"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -991,7 +991,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "neg"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "MATH"),
+        CONST_STRING(interp, "math"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -1060,7 +1060,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "init_int"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "MAIN"),
+        CONST_STRING(interp, "main"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -1083,7 +1083,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "splice"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "FETCHSIZE"),
+        CONST_STRING(interp, "fetchsize"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -1112,7 +1112,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "logical_not"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "CMP"),
+        CONST_STRING(interp, "cmp"),
         temp);
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -1212,7 +1212,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "find_method"));
     parrot_hash_put(interp, vtable_group_items,
-        CONST_STRING(interp, "CORE"),
+        CONST_STRING(interp, "core"),
         temp);
     /* END vtable mapping group items */
 
