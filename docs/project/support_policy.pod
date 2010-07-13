@@ -71,13 +71,19 @@ After a feature is announced as deprecated, it might not appear in the
 next supported release. We sometimes delay removing deprecated features
 for various reasons, including dependencies by other parts of the core.
 
-The developer releases have more flexibility in feature removal, while
-still meeting the deprecation requirements for support releases. A
-feature that has a deprecation notification in the 2.0 release may be
-removed from any monthly developer release between 2.0 and the next
-supported release, though we're likely to stagger the removals. An
-experimental feature that was never included in a supported release may
-be removed before a supported release without a deprecation cycle.
+The developer releases have more flexibility in feature removal, while still
+meeting the deprecation requirements for support releases. A feature that has a
+deprecation notification in the 2.0 release may be removed from any monthly
+developer release between 2.0 and the next supported release, though we're
+likely to stagger the removals.
+
+=head2 Experimental Features
+
+From time to time, we may add features to get feedback on their utility and
+design.  Marking them as "Experimental" in F<DEPRECATED.pod> indicates that we
+may modify or remove them without official deprecation notices.  Use them at
+your own risk--and please provide feedback through official channels if you use
+them successfully or otherwise.
 
 =head2 Supported Older Versions
 
