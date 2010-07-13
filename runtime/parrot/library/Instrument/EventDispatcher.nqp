@@ -162,8 +162,6 @@ Helper sub that acts as the callback for the EventDispatcher
 to dispatch the events to all the appropriate handler(s) registered
 with it.
 
-TODO: Update gc and vtable generator scripts before updating this.
-
 =cut
 
 =end

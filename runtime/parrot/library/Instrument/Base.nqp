@@ -5,11 +5,11 @@
 =begin
 
 =head1 NAME
-    
+
 runtime/parrot/library/Instrument/Base.nqp - Abstract class for the Instruments library
 
 =head1 SYNOPSIS
-    
+
     Abstract class for the Instruments library.
 
 =cut
@@ -43,16 +43,18 @@ _self_init method.
             $P1 = getattribute $P0, 'parrotclass'
             %r = new $P1
         };
-        
+
         if !pir::defined__IP($id_count) {
             $id_count := 0;
         }
-        
+
         my $id := $id_count++;
         $!identifier := "Instrument-" ~ $id;
-        
+
+        $!is_enabled := 0;
+
         self._self_init();
-        
+
         return self;
     };
 
@@ -76,7 +78,7 @@ Stub method for abstract base class.
 =item callback(sub) or callback('sub') or callback()
 
 Set the sub callback to be called when the desired op is
-encountered. sub can be passed by name or reference through a 
+encountered. sub can be passed by name or reference through a
 Sub PMC object. Returns the current registered callback.
 
 =cut
@@ -120,7 +122,7 @@ Returns the current set data.
 
 =cut
 
-=end   
+=end
 
     method data ($data?) {
         if pir::defined__IP($data) {

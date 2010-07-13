@@ -158,7 +158,7 @@ Performs cleanup for InstrumentGC attributes.
  */
 
 /*
- * raise_gc_event: Creates a Task of subtype Instrument::Event::GC::<*>
+ * raise_gc_event: Creates a Task of subtype Instrument
  *                 and sets its data to the given data, adding file,
  *                 sub, namespace and line information to the data hash.
  */
@@ -232,7 +232,7 @@ void  stub_unblock_sweep(PARROT_INTERP);
 
 void setup_gc_common_hashes(PARROT_INTERP) {
     PMC *temp;
-    if(!gc_first_run) return;
+    if (!gc_first_run) return;
 
     gc_first_run   = 0;
     gc_registry    = parrot_new_pointer_hash(interp);
@@ -600,7 +600,7 @@ void setup_gc_common_hashes(PARROT_INTERP) {
 }
 
 void destroy_gc_common_hashes(PARROT_INTERP) {
-    if(parrot_hash_size(interp, gc_registry) == 0) {
+    if (parrot_hash_size(interp, gc_registry) == 0) {
         parrot_hash_destroy(interp, gc_registry);
         parrot_hash_destroy(interp, gc_name_stubs);
         parrot_hash_destroy(interp, gc_group_items);

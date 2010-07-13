@@ -316,6 +316,7 @@ PRE
 ENTRY
         }
 
+        $key = lc $key;
         $entry .= <<POST;
     parrot_hash_put(interp, vtable_group_items,
         CONST_STRING(interp, "$key"),
@@ -342,6 +343,7 @@ sub gen_mapping_item_groups {
 PRE
 
         foreach $item (@{$data->[4]}) {
+            $item = lc $item;
             $entry .= <<ENTRY;
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "$item"));

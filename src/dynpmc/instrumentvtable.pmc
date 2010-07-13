@@ -42,6 +42,17 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group extends Instru
     ATTR size_t        class_index;
     ATTR Parrot_Interp supervisor;
 
+/*
+
+=item C<void init_pmc(PMC *instrument)>
+
+Perform a partial initialization. The remaining attributes are initialised
+upon calling 'attach_to_class'.
+
+=cut
+
+*/
+
     VTABLE void init_pmc(PMC *instrument) {
         Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
         SUPER(instrument);
@@ -59,12 +70,35 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group extends Instru
         attr->item_groups = vtable_item_groups;
     }
 
+/*
+
+=item C<void destroy()>
+
+Cleanup internal data structures.
+
+=cut
+
+*/
+
     VTABLE void destroy() {
         Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
         SUPER();
-        parrot_hash_delete(INTERP, vtable_registry, attr->instrumented_struct);
+        if (attr->instrumented_struct != NULL) {
+            parrot_hash_delete(INTERP, vtable_registry, attr->instrumented_struct);
+        }
         destroy_vtable_common_hashes(INTERP);
     }
+
+/*
+
+=item C<void attach_to_class(STRING *classname)>
+
+Prepare the given class' vtable for instrumentation.
+If class is not found, throw an exception.
+
+=cut
+
+*/
 
     METHOD attach_to_class(STRING *classname) {
         Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
@@ -75,6 +109,13 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group extends Instru
         /* Find the class. */
         attr->class_index     = Parrot_pmc_get_type_str(supervised, classname);
         attr->original_struct = supervised->vtables[attr->class_index];
+
+        /* class_index must not be 0. (0 = default). */
+        if (attr->class_index == 0) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "%Ss : Class not found, '%Ss'",
+                                        VTABLE_name(INTERP, SELF), classname);
+        }
 
         /* Prepare the class's vtable for instrumentation. */
         attr->instrumented_struct = mem_gc_allocate_zeroed_typed(supervised, _vtable);
@@ -107,7 +148,7 @@ void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised,
     /* Set the event type. */
     event_arr = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_push_string(interp, event_arr, CONST_STRING(interp, "Class"));
-    VTABLE_push_string(interp, event_arr, VTABLE_name(supervised, pmc));
+    VTABLE_push_string(interp, event_arr, pmc->vtable->whoami);
     VTABLE_push_string(interp, event_arr, CONST_STRING(interp, "vtable"));
     VTABLE_push_string(interp, event_arr, group);
     VTABLE_push_string(interp, event_arr, type);
@@ -293,7 +334,7 @@ static void stub_init_int(PARROT_INTERP, PMC* pmc, INTVAL initializer);
 
 void setup_vtable_common_hashes(PARROT_INTERP) {
     PMC *temp;
-    if(!vtable_first_run) return;
+    if (!vtable_first_run) return;
 
     vtable_first_run   = 0;
     vtable_registry    = parrot_new_pointer_hash(interp);
@@ -2303,7 +2344,7 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
 }
 
 void destroy_vtable_common_hashes(PARROT_INTERP) {
-    if(parrot_hash_size(interp, vtable_registry) == 0) {
+    if (parrot_hash_size(interp, vtable_registry) == 0) {
         parrot_hash_destroy(interp, vtable_registry);
         parrot_hash_destroy(interp, vtable_name_stubs);
         parrot_hash_destroy(interp, vtable_group_items);

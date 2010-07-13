@@ -1,15 +1,15 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id: instrumentgc.pmc 48073 2010-07-11 16:47:36Z khairul $
+$Id$
 
 =head1 NAME
 
-src/dynpmc/instrumentgc.pmc - Interface to instrument the gc_sys entry of Parrot_Interp.
+src/dynpmc/instrumentstubbase.pmc - Provides common methods for InstrumentVtable and InstrumentGC.
 
 =head1 DESCRIPTION
 
-C<InstrumentPMC> is a PMC class that provides an interface to
-instrument the gc_sys entry of Parrot_Interp.
+Since both InstrumentVtable and InstrumentGC work in a similar fashion,
+InstrumentStubBase serves as the base class for both of them.
 
 =head2 Methods
 
@@ -33,12 +33,32 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
     ATTR void *original_struct;     /* Reference to the original struct. */
     ATTR void *instrumented_struct; /* Reference to the struct with stubs inserted. */
 
+/*
+
+=item C<void init()>
+
+Throws an exception since this class should be instantiated using init_pmc instead.
+
+=cut
+
+*/
+
     VTABLE void init() {
         /* Not supposed to be init on its own. */
         Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                                     "%Ss should be instantiated with initpmc instead.",
                                    VTABLE_name(INTERP, SELF));
     }
+
+/*
+
+=item C<void init_pmc(PMC *instrument)>
+
+Initialises the common attributes.
+
+=cut
+
+*/
 
     VTABLE void init_pmc(PMC *instrument) {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
@@ -58,11 +78,31 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+/*
+
+=item C<void mark()>
+
+Marks internal data structures as live to the gc.
+
+=cut
+
+*/
+
     VTABLE void mark() {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
 
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->hook_count);
     }
+
+/*
+
+=item C<void destroy()>
+
+Perform common cleanup duties.
+
+=cut
+
+*/
 
     VTABLE void destroy() {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
@@ -80,6 +120,17 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
            the object is destroyed. */
         mem_gc_free(INTERP, attr->original_struct);
     }
+
+/*
+
+=item C<void insert_hook(STRING *name)>
+
+Inserts the stub function for the entry given by name.
+If name denotes a group, inserts stubs for all functions in that group.
+
+=cut
+
+*/
 
     METHOD insert_hook(STRING *name) {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
@@ -102,7 +153,7 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
                 func  = (size_t *)  parrot_hash_get(INTERP, attr->name_stubs, item);
                 if (entry == NULL || func == NULL) {
                     Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                                "%Ss : Unknown function, '%Ss'",
+                                                "%Ss : c Unknown function, '%Ss'",
                                                 VTABLE_name(INTERP, SELF), item);
                 }
                 *entry = func;
@@ -113,6 +164,17 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
             VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
         }
     }
+
+/*
+
+=item C<void remove_hook(STRING *name)>
+
+Removes the stub function for the given entry given by name.
+If name denotes a group, removes stubs for all functions in that group.
+
+=cut
+
+*/
 
     METHOD remove_hook(STRING *name) {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
@@ -153,6 +215,18 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
         }
     }
 
+/*
+
+=item C<PMC* get_hook_list(STRING *name)>
+
+Returns a ResizableStringArray PMC filled with
+the names of the entries to attached to name.
+If name denotes a group, returns all the entries within that group.
+
+=cut
+
+*/
+
     METHOD get_hook_list(STRING *name) {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
         PMC *list;
@@ -166,7 +240,7 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
             check = (size_t *) parrot_hash_get(INTERP, attr->name_stubs, name);
             if (check == NULL) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                                "%Ss : Unknown function, '%Ss'",
+                                                "%Ss : a Unknown function, '%Ss'",
                                                 VTABLE_name(INTERP, SELF), name);
             }
 
@@ -177,6 +251,17 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
         RETURN(PMC *list);
     }
 
+/*
+
+=item C<PMC* get_hook_group(STRING *name)>
+
+Returns a ResizableStringArray PMC filled with
+the names of the groups that the entry given by name belongs to.
+
+=cut
+
+*/
+
     METHOD get_hook_group(STRING *name) {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
         PMC *groups;
@@ -185,12 +270,23 @@ pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
         if(PMC_IS_NULL(groups)) {
             /* Should not happen. All items should have a group mapping. */
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "%Ss : Unknown function, '%Ss'",
+                                        "%Ss : b Unknown function, '%Ss'",
                                         VTABLE_name(INTERP, SELF), name);
         }
 
         RETURN(PMC *groups);
     }
+
+/*
+
+=item C<PMC* get_instrumented_list()>
+
+Returns a ResizableStringArray PMC filled with
+the names of the entries that has been instrumented.
+
+=cut
+
+*/
 
     METHOD get_instrumented_list() {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);

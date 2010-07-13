@@ -161,6 +161,8 @@ class Instrument::Event::GC is Instrument::Event {
     };
 
     method enable() {
+        if $!is_enabled { return; }
+
         # Grab the InstrumentGC and EventDispatcher object.
         my $gc := Q:PIR {
             $P0 = getattribute self, '$!instr_obj'
@@ -191,27 +193,64 @@ class Instrument::Event::GC is Instrument::Event {
                 $dispatcher.register($event, $!callback);
             }
         }
+
+        $!is_enabled := 1;
     };
 
     method disable() {
-    }
+        if !$!is_enabled { return; }
+
+        # Grab the InstrumentGC and EventDispatcher object.
+        my $gc := Q:PIR {
+            $P0 = getattribute self, '$!instr_obj'
+            %r  = $P0['gc']
+        };
+        my $dispatcher := Q:PIR {
+            $P0 = getattribute self, '$!instr_obj'
+            %r  = $P0['eventdispatcher']
+        };
+
+        # For each item in $!probe_list, insert the gc hook
+        #  and register the event handler.
+        for @!probe_list {
+            my @hooks := $gc.get_hook_list($_);
+
+            for @hooks {
+                $gc.remove_hook($_);
+
+                my $tokens := pir::split__PSS('_', $_);
+                my $group  := $tokens[0];
+                if $group ne 'allocate' && $group ne  'reallocate' && $group ne 'free' {
+                    $group := 'administration';
+                }
+
+                my $event := 'GC::' ~ $group ~ '::' ~ $_;
+
+                # Register the callback.
+                $dispatcher.deregister($event, $!callback);
+            }
+        }
+
+        $!is_enabled := 0;
+    };
 };
 
 # Incomplete.
 class Instrument::Event::Class is Instrument::Event {
-    has $!class_name;
+    has @!class_names;
     has @!vtable_probes;
     has @!method_probes;
     our @todo;
     our $loadlib_event;
 
     method _self_init() {
+        @!class_names   := ();
         @!vtable_probes := ();
         @!method_probes := ();
     };
 
     method inspect_class($class) {
-        $!class_name := $class;
+        @!class_names.push($class);
     };
 
     method inspect_vtable($item) {
@@ -227,23 +266,40 @@ class Instrument::Event::Class is Instrument::Event {
     };
 
     method enable() {
+        if $!is_enabled { return; }
+
         my $dispatcher := Q:PIR {
             $P0 = getattribute self, '$!instr_obj'
             %r  = $P0['eventdispatcher']
         };
 
-        my $class        := $!instr_obj.instrument_class($!class_name);
-        my $event_prefix := 'Class::' ~ $!class_name ~ '::';
+        for (@!class_names) {
+            my $class_name   := $_;
+            my $class        := $!instr_obj.instrument_class($class_name);
+            my $event_prefix := 'Class::' ~ $class_name ~ '::';
 
-        # Register the vtable probes.
-        my $vtable_prefix := $event_prefix ~ 'vtable::';
-        for @!vtable_probes {
-            $class.insert_hook($_);
-            my $group := ($class.get_hook_group($_)).shift();
+            # Register the vtable probes.
+            my $vtable_prefix := $event_prefix ~ 'vtable::';
+            for @!vtable_probes {
+                my @hooks := $class.get_hook_list($_);
 
-            my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
-            $dispatcher.register($event, $!callback);
+                for @hooks {
+                    $class.insert_hook($_);
+                    my $group := ($class.get_hook_group($_)).shift();
+
+                    my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
+                    $dispatcher.register($event, $!callback);
+                }
+            }
+
+            CATCH {
+                # Something was not found.
+                # Push to todo list.
+                say("OH NOES! Class not found.");
+            }
         }
+
+        $!is_enabled := 1;
     };
 
     method disable() {
