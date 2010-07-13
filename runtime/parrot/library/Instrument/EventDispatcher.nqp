@@ -79,8 +79,7 @@ and handle only tasks with subtype 'Instrument'.
 =end
 
     method can_handle ($task) {
-        my $subtype    := pir::getattribute__PPS($task, "subtype");
-        return $subtype eq 'Instrument';
+        pir::getattribute__PPS($task, "subtype") eq 'Instrument';
     };
 
 =begin
@@ -116,7 +115,7 @@ Removes the handler for the given event.
         my $index := 0;
         for @list {
             if pir::defined__IP($_) && $_ eq $callback {
-                pir::delete_p_k(@list, $index);
+                pir::delete(@list, $index);
                 $found := 1;
                 break;
             }
@@ -134,13 +133,17 @@ Removes the handler for the given event.
 =item get_handlers ($event)
 
 Returns a ResizablePMCArray of all the handlers registered for that event.
+$event can be an array or a string.
 
 =cut
 
 =end
 
     method get_handlers ($event) {
-        my @tokens   := pir::split__PSS('::', $event);
+        my @tokens   := $event;
+        if pir::does__IPS($event, 'string') {
+            @tokens := pir::split__PSS('::', $event);
+        }
 
         # Get the lists and join them into 1 big list.
         my @key    := ();
@@ -167,19 +170,11 @@ with it.
 =end
 
     sub handler ($handler, $task) {
-        my %callbacks := pir::getattribute__PPS($handler, '%!callbacks');
-
         # Get the required subkeys.
         my %data  := pir::getattribute__PPS($task, "data");
-        my @event := %data<event>;
 
-        # Get the lists and join them into 1 big list.
-        my @list := ();
-        my @key;
-        for @event {
-            @key.push($_);
-            @list.append(get_list(%callbacks, pir::join__SSP('::', @key)));
-        }
+        # Get the list of callbacks for this event.
+        my @list := $handler.get_handlers(%data<event>);
 
         # Call the callbacks.
         for @list {
@@ -200,14 +195,8 @@ for it.
 =end
 
     sub get_list (%hash, $key) {
-        my @list  := %hash{$key};
-
-        if !pir::defined__IP(@list) {
-            @list       := ();
-            %hash{$key} := @list;
-        }
-
-        return @list;
+        %hash{$key} := %hash{$key} // ();
+        return %hash{$key};
     };
 };
 

@@ -53,7 +53,7 @@ while(<$vtable_fh>) {
 
     # Separate out the components.
     # type name(params) annotations
-    if(m/^(.+)\s+(.+)\s*\((.+)\)\s*(.*)$/) {
+    if(m/^(.+)\s+(.+)\s*\((.*)\)\s*(.*)$/) {
         # Generate the components.
         my @data = ($1, $2, $3, $4);
         #print "($1) ($2) ($3) ($4)\n";

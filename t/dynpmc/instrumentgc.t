@@ -328,6 +328,10 @@ PROG
     gc_event = gc_class.'new'()
     instr    = new ['Instrument']
 
+    # Set up the globals.
+    $P0 = new ['Hash']
+    set_global '%!notifications', $P0
+
     # Test do_gc_mark
     gc_event.'inspect'('do_gc_mark')
     gc_event.'callback'('sample_notification_callback')
@@ -335,15 +339,13 @@ PROG
     instr.'attach'(gc_event)
     instr.'run'($S0, args)
 
-.end
-
-.sub sample_notification_callback
-    .param pmc data
+    # Check that the event was fired.
+    .local pmc data
+    data = get_global '%!notifications'
 
     # Event fired.
-    ok(1, 'Event: Event fired.')
-
-    ## Test the interesting bits.
+    $I0 = data['fired']
+    is($I0, 1, 'Event: Event fired.')
 
     # Test line.
     $I0 = data['line']
@@ -360,6 +362,25 @@ PROG
     # Test type.
     $S0 = data['type']
     is($S0, 'do_gc_mark', 'Event: Type ok.')
+.end
+
+.sub sample_notification_callback
+    .param pmc data
+
+    .local pmc results
+    results = get_global '%!notifications'
+
+    # Save the parameters.
+    results['fired'] = 1
+    $I0 = data['line']
+    results['line']  = $I0
+    $S0 = data['file']
+    results['file']  = $S0
+    $S0 = data['sub']
+    results['sub']   = $S0
+    $S0 = data['type']
+    results['type']  = $S0
+
 .end
 
 # Helper sub: Check if 2 sets with unique items are the same.

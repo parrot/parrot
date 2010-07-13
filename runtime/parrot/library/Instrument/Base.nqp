@@ -44,18 +44,15 @@ _self_init method.
             %r = new $P1
         };
 
-        if !pir::defined__IP($id_count) {
-            $id_count := 0;
-        }
+        $id_count := $id_count // 0;
 
         my $id := $id_count++;
         $!identifier := "Instrument-" ~ $id;
-
         $!is_enabled := 0;
 
         self._self_init();
 
-        return self;
+        self;
     };
 
 =begin
@@ -89,7 +86,7 @@ Sub PMC object. Returns the current registered callback.
         if pir::defined__IP($sub) {
             $!callback := get_sub_obj($sub);
         }
-        return $!callback;
+        $!callback;
     };
 
 =begin
@@ -110,7 +107,7 @@ Returns the registered finalize sub.
         if pir::defined__IP($sub) {
             $!finalize := get_sub_obj($sub);
         }
-        return $!finalize;
+        $!finalize;
     };
 
 =begin
@@ -125,10 +122,7 @@ Returns the current set data.
 =end
 
     method data ($data?) {
-        if pir::defined__IP($data) {
-            $!data := $data;
-        }
-        return $data;
+        $!data := $data // $!data;
     };
 
 =begin
@@ -174,19 +168,10 @@ Stub method. To be implemented by child classes.
             die('$sub is not defined.');
         }
 
-        my $type := pir::typeof__PP($sub);
-
-        if ($type eq 'String') {
-            my $lookup;
-
-            # Lookup the sub in the 3 namespaces.
-            $lookup := pir::get_global__PS($sub);
-            if !pir::defined__IP($lookup) {
-                $lookup := pir::get_hll_global__PS($sub);
-            }
-            if !pir::defined__IP($lookup) {
-                $lookup := pir::get_root_global__PS($sub);
-            }
+        if pir::does__IPS($sub, 'string') {
+            my $lookup := pir::get_global__PS($sub)
+                       // pir::get_hll_global__PS($sub)
+                       // pir::get_root_global__PS($sub);
 
             if !pir::defined__IP($lookup) {
                 die('Could not find sub ' ~ $sub ~ ' in the namespaces.');
@@ -196,9 +181,8 @@ Stub method. To be implemented by child classes.
         }
 
         # Ensure that $sub is of type 'Sub'.
-        $type := pir::typeof__PP($sub);
-        if $type ne 'Sub' {
-            die('Type of $sub is not "Sub" but ' ~ $type ~ ' instead.');
+        if !pir::does__IPS($sub, 'invokable') {
+            die('Type of $sub is not invokable. (' ~ pir::typeof__SP($sub) ~ ')');
         }
 
         return $sub;

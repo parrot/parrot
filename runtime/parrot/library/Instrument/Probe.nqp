@@ -9,7 +9,7 @@
 runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting and removing hooks from the interpreter.
 
 =head1 SYNOPSIS
-    
+
     ## In PIR.
     .local pmc probe_class
     probe_class = get_hll_global ['Instrument'], 'Probe'
@@ -21,7 +21,7 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
     probe.'inspect'('gt')
     probe.'set_callback'('specific_callback')
     probe.'set_finalize'('specific_finalize')
-    
+
     # Create a catchall probe which will be called for
     #  each op.
     probe = probe_class.'new'()
@@ -36,7 +36,7 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
 class Instrument::Probe is Instrument::Base {
     has $!is_catchall;
     has @!oplist;
-    has @!todo_oplist;
+    has @!op_todo_list;
     our $loadlib_evt;
     our @loadlib_probelist := ();
 
@@ -51,7 +51,7 @@ Private method to perform additional initialisation.
 =end
 
     method _self_init () {
-        @!todo_oplist := ();
+        @!op_todo_list := ();
         @!oplist      := ();
         $!is_catchall := 0;
     };
@@ -64,12 +64,9 @@ Returns the current catchall status.
 
 =cut
 =end
-    
+
     method catchall ($catchall?) {
-        if pir::defined__IP($catchall) {
-            $!is_catchall := $catchall;
-        }
-        return $!is_catchall
+        $!is_catchall := $catchall // $!iscatchall;
     }
 
 =begin
@@ -94,15 +91,14 @@ everytime a dynlib is loaded.
         }
         else {
             # $op is singular.
-            my $oplib := pir::new__PS('OpLib');
-            my $type  := pir::typeof__PP($op);
+            my %oplib := pir::new__PS('OpLib');
 
-            if $type eq 'Integer' {
+            if pir::does__IPS($op, 'integer') {
                 # $op = op number.
-                if $op > pir::set__IP($oplib) {
+                if $op > +%oplib {
                     # op number is invalid.
                     # Put it in the todo list.
-                    @!todo_oplist.push($op);
+                    @!op_todo_list.push($op);
                 }
                 else {
                     @!oplist.push($op);
@@ -110,28 +106,22 @@ everytime a dynlib is loaded.
             }
             else {
                 # Lookup the op.
-                my $op_ret;
-                my $op_num;
-
-                $op_ret := $oplib.op_family($op);
-                if pir::defined__IP($op_ret) {
+                my @op_ret := %oplib.op_family($op);
+                if pir::defined__IP(@op_ret) {
                     # $op = short name.
-                    for $op_ret {
-                        $op_num := pir::set__IP($_);
-                        @!oplist.push($op_num);
+                    for @op_ret {
+                        @!oplist.push(pir::set__IP($_));
                     }
                 }
                 else {
                     # $op = long name.
-                    $op_ret := pir::set_p_p_k__PPP($oplib, $op);
-                    $op_num := pir::set__IP($op_ret);
-                    @!oplist.push($op_num);
+                    @!oplist.push(pir::set__IP(%oplib{$op}));
                 }
             }
         }
         CATCH {
-            # Push to todo_oplist
-            @!todo_oplist.push($op);
+            # Push to op_todo_list
+            @!op_todo_list.push($op);
         }
     };
 
@@ -156,18 +146,18 @@ eg,
             pir::die('Probe has not been attached to an Instrument object.');
         }
 
-        # Check for any todo_oplist.
-        if pir::set__IP(@!todo_oplist) != 0 {
-            # Double check the todo_oplist.
-            my @list      := @!todo_oplist;
-            @!todo_oplist := ();
+        # Check for any op_todo_list.
+        if pir::set__IP(@!op_todo_list) != 0 {
+            # Double check the op_todo_list.
+            my @list      := @!op_todo_list;
+            @!op_todo_list := ();
             for @list {
                 self.inspect($_);
             }
 
-            # If there is still a todo_oplist,
+            # If there is still a op_todo_list,
             #  set up an event handler to update.
-            if pir::set__IP(@!todo_oplist) != 0 {
+            if +@!op_todo_list != 0 {
                 @Instrument::Probe::loadlib_probelist.push(self);
 
                 if !pir::defined__IP($Instrument::Probe::loadlib_evt) {
@@ -203,7 +193,7 @@ This should only be called after attaching to an Instrument object.
 eg,
     instr_obj = new ['Instrument']
     instr_obj.'attach'(probe)
-    
+
 You can dynamically attach and remove hooks dynamically.
 
 =cut
@@ -238,7 +228,7 @@ Returns the list of op numbers inspected by this probe.
 =end
 
     method get_op_list () {
-        return @!oplist;
+        @!oplist;
     }
 
 =begin
@@ -250,11 +240,11 @@ Returns the list of items passed to inspect
 =end
 
     method get_op_todo_list () {
-        return @!todo_oplist;
+        @!op_todo_list;
     }
 
     # Internal helper: Callback for loadlib events registered when the probe has
-    #                  any outstanding ops in $!todo_oplist.
+    #                  any outstanding ops in @!op_todo_list.
     sub loadlib_callback ($data) {
         # Simply disable and reenable the probe.
         my @list                              := @Instrument::Probe::loadlib_probelist;

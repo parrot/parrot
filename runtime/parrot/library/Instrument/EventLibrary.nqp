@@ -39,89 +39,8 @@ Events are raised in the C code.
 =end
 
 class Instrument::Event::Internal::loadlib is Instrument::Event {
-
     method _self_init() {
         $!event_type := 'Internal::loadlib';
-    };
-};
-
-=begin
-=item Instrument::Event::Class:instantiate
-
-Raises an event whenever a class is instantiated.
-
-TODO: How about instantiations from C? Inspecting new opcodes
-      don't really help that. Redo. Hold off until InstrumentPMC is done.
-
-=cut
-=end
-
-class Instrument::Event::Class::instantiate is Instrument::Event {
-    method _self_init() {
-        $!event_type := 'Instrument::Event::Class::instantiate';
-
-        my $class_hash := Q:PIR { %r = new ['Hash'] };
-        self.data($class_hash);
-
-        $!probe_obj := Instrument::Probe.new();
-        $!probe_obj.data(self);
-
-        $!probe_obj.inspect('new');
-        $!probe_obj.callback(pir::get_global__PS('callback'));
-    };
-
-    method inspect ($class) {
-        pir::set_p_k_ic($!class_hash, $class, 1);
-    };
-
-    sub callback ($op, $instr_obj, $probe) {
-        my $class    := $op.get_arg(1);
-
-        # Check if class is to be inspected.
-        my $data := $probe.data().data();
-        if pir::set__IP($data) == 0
-        || pir::exists_i_p_k__IPP($data, $class) {
-            my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
-            $data.push($class);
-            $data.push($op);
-            $data.push($instr_obj);
-
-            Instrument::Event::_raise_event('Instrument::Event::Class::instantiate', $data);
-        }
-    };
-};
-
-=begin
-=item Instrument::Event::Class:callmethod
-
-Raises an event whenever a class method is called.
-
-TODO: Similarly, how about calling from C? Hold off until InstrumentPMC is done.
-
-=cut
-=end
-
-class Instrument::Event::Class::callmethod is Instrument::Event {
-
-    method _self_init() {
-        $!event_type := 'Instrument::Event::Class::callmethod';
-
-        $!probe_obj := Instrument::Probe.new();
-
-        $!probe_obj.inspect('callmethod');
-        $!probe_obj.inspect('callmethodcc');
-        $!probe_obj.callback(pir::get_global__PS('callback'));
-    };
-
-    sub callback ($op, $instr_obj) {
-        my $method    := $op.get_arg(1);
-
-        my $data := Q:PIR { %r = new ['ResizablePMCArray'] };
-        $data.push($method);
-        $data.push($op);
-        $data.push($instr_obj);
-
-        Instrument::Event::_raise_event('Instrument::Event::Class::callmethod', $data);
     };
 };
 
@@ -181,12 +100,7 @@ class Instrument::Event::GC is Instrument::Event {
             for @hooks {
                 $gc.insert_hook($_);
 
-                my $tokens := pir::split__PSS('_', $_);
-                my $group  := $tokens[0];
-                if $group ne 'allocate' && $group ne  'reallocate' && $group ne 'free' {
-                    $group := 'administration';
-                }
-
+                my $group := $gc.get_hook_group($_).shift();
                 my $event := 'GC::' ~ $group ~ '::' ~ $_;
 
                 # Register the callback.
@@ -218,12 +132,7 @@ class Instrument::Event::GC is Instrument::Event {
             for @hooks {
                 $gc.remove_hook($_);
 
-                my $tokens := pir::split__PSS('_', $_);
-                my $group  := $tokens[0];
-                if $group ne 'allocate' && $group ne  'reallocate' && $group ne 'free' {
-                    $group := 'administration';
-                }
-
+                my $group := $gc.get_hook_group($_).shift();
                 my $event := 'GC::' ~ $group ~ '::' ~ $_;
 
                 # Register the callback.
