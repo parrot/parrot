@@ -222,7 +222,8 @@ src/dynpmc/instrumentgc$(O): src/dynpmc/instrumentgc.c $(DYNPMC_H_FILES) \
 src/dynpmc/instrumentgc.c: src/dynpmc/instrumentgc.dump
 	$(PMC2CC) src/dynpmc/instrumentgc.pmc
 
-src/dynpmc/instrumentgc.dump: src/dynpmc/instrumentgc.pmc vtable.dump $(CLASS_O_FILES)
+src/dynpmc/instrumentgc.dump: src/dynpmc/instrumentgc.pmc vtable.dump $(CLASS_O_FILES) \
+    src/dynpmc/instrumentstubbase.dump
 	$(PMC2CD) src/dynpmc/instrumentgc.pmc
 
 src/dynpmc/pmc_instrumentop.h : src/dynpmc/instrumentop.c
@@ -244,5 +245,6 @@ src/dynpmc/instrumentvtable$(O): src/dynpmc/instrumentvtable.c $(DYNPMC_H_FILES)
 src/dynpmc/instrumentvtable.c: src/dynpmc/instrumentvtable.dump
 	$(PMC2CC) src/dynpmc/instrumentvtable.pmc
 
-src/dynpmc/instrumentvtable.dump: src/dynpmc/instrumentvtable.pmc vtable.dump $(CLASS_O_FILES)
+src/dynpmc/instrumentvtable.dump: src/dynpmc/instrumentvtable.pmc vtable.dump $(CLASS_O_FILES) \
+    src/dynpmc/instrumentstubbase.dump
 	$(PMC2CD) src/dynpmc/instrumentvtable.pmc
