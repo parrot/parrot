@@ -482,7 +482,7 @@ bytes(SHIM_INTERP, ARGIN(const STRING *src))
 
 =item C<static UINTVAL nfg_decode_and_advance(PARROT_INTERP, String_iter *i)>
 
-Moves the string iterator C<i> to the next nfg codepoint.
+Moves the string iterator C<i> to the next codepoint.
 
 =cut
 
@@ -493,12 +493,28 @@ nfg_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(nfg_decode_and_advance)
 #if PARROT_HAS_ICU
-    const UChar32 * const s = (const UChar32 *) i->str->strstart;
-    size_t pos              = i->bytepos / sizeof (UChar32);
-    const UChar32         c = s[pos++];
-    ++i->charpos;
-    i->bytepos = pos * sizeof (UChar32);
-    return c;
+    const int32_t * const s = (const int32_t *) i->str->strstart;
+    const int32_t         c = s[i->bytepos / sizeof (UChar32)];    
+    const UINTVAL      cpos = i->charpos++;
+
+    if (c >= 0) {
+        /* regular codepoint, return it. */
+        i->bytepos += sizeof (int32_t);
+        return (UINTVAL) c;
+    }
+    else {
+        /* dynamic codepoint, we have to peek inside. */
+        grapheme_table *table = (grapheme_table *) i->str->extra;
+        const int offs = cpos - i->bytepos / sizeof (UChar32);
+        const int  idx = -1 - c;
+        if (offs < table->graphemes[idx].len) {
+            if (offs == table->graphemes[idx].len - 1)
+                i->bytepos += sizeof (int32_t);
+                /* Make sure we move off this grapheme if we've
+                 * traversed all of it's codepoints */
+            return (UINTVAL) table->graphemes[-1 - c].codepoints[offs];
+        }
+    }
 #else
     UNUSED(i);
     no_ICU_lib(interp);
