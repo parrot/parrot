@@ -147,15 +147,16 @@ STRING * key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_key_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -203,11 +204,11 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_set_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_key_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_key_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_key_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(key))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/key.c */
 
