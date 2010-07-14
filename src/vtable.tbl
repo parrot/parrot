@@ -274,9 +274,9 @@ PMC* inspect()
 PMC* inspect_str(STRING* what)
 
 void freeze(PMC* info)
-void thaw  (PMC* info) :write
-void thawfinish (PMC* info) :write
-void visit (PMC* info)
+void thaw(PMC* info) :write
+void thawfinish(PMC* info) :write
+void visit(PMC* info)
 
 void share()
 

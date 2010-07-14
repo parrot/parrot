@@ -261,6 +261,7 @@ TODO: Free it at destroy. Handle run-core changes.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_setup_event_func_ptrs(PARROT_INTERP)
 {
