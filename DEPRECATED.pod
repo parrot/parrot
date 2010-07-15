@@ -305,6 +305,15 @@ As of the latest PCC changes, this does nothing different from '.call'.
 
 L<https://trac.parrot.org/parrot/ticket/1624>
 
+=item :main Sub behaviour and selection. [eligible in 2.7]
+
+After deprecation parrot will use first sub marked with :main modified as main.
+Main Sub will always have to check passed arguments.
+
+L<https://trac.parrot.org/parrot/ticket/1033>
+L<https://trac.parrot.org/parrot/ticket/1704>
+L<https://trac.parrot.org/parrot/ticket/1705>
+
 =back
 
 =head1 Functions
