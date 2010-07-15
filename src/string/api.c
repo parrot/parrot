@@ -471,8 +471,10 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         else
             enc = Parrot_utf8_encoding_ptr;
 
-        a = Parrot_unicode_charset_ptr->to_charset(interp, a);
-        b = Parrot_unicode_charset_ptr->to_charset(interp, b);
+        if (a->charset != cs)
+            a = cs->to_charset(interp, a);
+        if (b->charset != cs)
+            b = cs->to_charset(interp, b);
 
         if (a->encoding != enc)
             a = enc->to_encoding(interp, a);
