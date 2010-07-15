@@ -193,7 +193,11 @@ L<http://github.com/Whiteknight/parrot-linear-algebra/blob/master/setup.pir>
 
 L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
-L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
+L<http://github.com/bacek/pir/blob/master/setup.pir>
+
+L<http://github.com/kthakore/parrotSDL/blob/master/setup.pir>
+
+L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 
 =cut
 
