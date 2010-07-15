@@ -56,7 +56,9 @@ initializer.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass Timer extends Task provides event provides invokable auto_attrs {
+pmclass Timer provides invokable auto_attrs {
+    ATTR PMC     *code;      /* The sub to execute */
+    ATTR FLOATVAL birthtime; /* When the timer was created */
     ATTR FLOATVAL duration;  /* The duration of the timer pause */
     ATTR FLOATVAL interval;  /* How often to repeat */
     ATTR INTVAL   repeat;    /* Whether to repeat:
@@ -82,13 +84,13 @@ Initializes the timer.
         PObj_custom_mark_SET(SELF);
 
         /* Set up the core struct. */
-        core_struct->type        = CONST_STRING(INTERP, "timer");
-        core_struct->codeblock   = PMCNULL;
-        core_struct->duration    = 0.0;
-        core_struct->interval    = 0.0;
-        core_struct->repeat      = 0;
-        core_struct->started     = 0;
-        core_struct->running     = 0;
+        core_struct->code      = PMCNULL;
+        core_struct->birthtime = 0.0;
+        core_struct->duration  = 0.0;
+        core_struct->interval  = 0.0;
+        core_struct->repeat    = 0;
+        core_struct->started   = 0;
+        core_struct->running   = 0;
     }
 
 /*
@@ -149,13 +151,15 @@ Create a copy of the timer, resetting status, id, and birthtime.
 */
 
     VTABLE PMC *clone() {
-        PMC * const copy = SUPER();
+        PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+
         Parrot_Timer_attributes * const new_struct = PARROT_TIMER(copy);
         Parrot_Timer_attributes * const old_struct = PARROT_TIMER(SELF);
 
         new_struct->duration  = old_struct->duration;
         new_struct->interval  = old_struct->interval;
         new_struct->repeat    = old_struct->repeat;
+        new_struct->code      = old_struct->code;
 
         return copy;
     }
@@ -203,7 +207,7 @@ Returns the PMC associated with C<key>.
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         if (key == PARROT_TIMER_HANDLER) {
             const Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
-            return core_struct->codeblock;
+            return core_struct->code;
         }
 
         return PMCNULL;
@@ -285,7 +289,7 @@ Sets the PMC associated with C<key> to C<*value>.
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         if (key == PARROT_TIMER_HANDLER) {
-            SET_ATTR_codeblock(INTERP, SELF, value);
+            SET_ATTR_code(INTERP, SELF, value);
         }
     }
 
@@ -327,8 +331,8 @@ Invoke the codeblock and schedule any repeats.
         }
         else {
             /* This is the timer triggering. */
-            if (!PMC_IS_NULL(timer->codeblock)) {
-                Parrot_pcc_invoke_sub_from_c_args(interp, timer->codeblock, "->");
+            if (!PMC_IS_NULL(timer->code)) {
+                Parrot_pcc_invoke_sub_from_c_args(interp, timer->code, "->");
             }
 
             /* Repeat semantics as documented. */
@@ -376,6 +380,23 @@ Sets the floating-point value associated with C<key> to C<value>.
                     key);
         }
     }
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        if (PARROT_TIMER(SELF)) {
+            Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->code);
+        }
+    }
+
 }
 
 /*

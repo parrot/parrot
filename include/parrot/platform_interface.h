@@ -55,6 +55,7 @@ void *mem_realloc_executable(void *, size_t, size_t);
 
 void Parrot_sleep(unsigned int seconds);
 void Parrot_usleep(unsigned int microseconds);
+void Parrot_floatval_sleep(FLOATVAL time);
 INTVAL Parrot_intval_time(void);
 FLOATVAL Parrot_floatval_time(void);
 

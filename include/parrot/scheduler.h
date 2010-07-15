@@ -21,16 +21,6 @@
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_cx_begin_execution(PARROT_INTERP,
     ARGMOD(PMC *main),
     ARGMOD(PMC *argv))
@@ -54,45 +44,9 @@ void Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
         FUNC_MODIFIES(*scheduler);
 
 PARROT_EXPORT
-INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP,
-    ARGIN(STRING *handler_type))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-INTVAL Parrot_cx_count_handlers_typed(PARROT_INTERP,
-    ARGIN(STRING *handler_type))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_cx_delete_handler_local(PARROT_INTERP,
-    ARGIN(STRING *handler_type))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_cx_delete_handler_typed(PARROT_INTERP,
-    ARGIN(STRING *handler_type))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
@@ -174,12 +128,6 @@ void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
-#define ASSERT_ARGS_Parrot_cx_add_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handler))
-#define ASSERT_ARGS_Parrot_cx_add_handler_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handler))
 #define ASSERT_ARGS_Parrot_cx_begin_execution __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(main) \
@@ -190,32 +138,9 @@ void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #define ASSERT_ARGS_Parrot_cx_check_alarms __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
-#define ASSERT_ARGS_Parrot_cx_count_handlers_local \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handler_type))
-#define ASSERT_ARGS_Parrot_cx_count_handlers_typed \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handler_type))
-#define ASSERT_ARGS_Parrot_cx_delete_handler_local \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handler_type))
-#define ASSERT_ARGS_Parrot_cx_delete_handler_typed \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handler_type))
 #define ASSERT_ARGS_Parrot_cx_delete_suspend_for_gc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_cx_find_handler_for_task \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(task))
-#define ASSERT_ARGS_Parrot_cx_find_handler_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(task))
 #define ASSERT_ARGS_Parrot_cx_handle_tasks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler) \

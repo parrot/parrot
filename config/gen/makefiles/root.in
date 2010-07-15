@@ -446,7 +446,7 @@ INTERP_O_FILES = \
     src/exit$(O) \
     src/extend$(O) \
     src/extend_vtable$(O) \
-	src/alarm$(O) \
+    src/alarm$(O) \
     src/gc/alloc_memory$(O) \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
@@ -484,6 +484,7 @@ INTERP_O_FILES = \
     src/runcore/cores$(O) \
     src/runcore/profiling$(O) \
     src/scheduler$(O) \
+    src/events$(O) \
     src/spf_render$(O) \
     src/spf_vtable$(O) \
     src/string/primitives$(O) \
@@ -688,6 +689,7 @@ STR_FILES = \
     src/runcore/main.str \
     src/runcore/profiling.str \
     src/scheduler.str \
+    src/events.str \
     src/spf_render.str \
     src/spf_vtable.str \
     src/string/api.str \
@@ -916,6 +918,8 @@ src/scheduler$(O) : $(PARROT_H_HEADERS) src/scheduler.str src/scheduler.c \
 	include/pmc/pmc_timer.h \
 	$(INC_DIR)/scheduler_private.h \
 	$(INC_DIR)/runcore_api.h
+
+src/events$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h
 
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
 	$(INC_DIR)/alarm.h

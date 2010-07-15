@@ -10,21 +10,21 @@ use Parrot::Test tests => 3;
 
 =head1 NAME
 
-t/pmc/task.t - Concurrent Task
+t/pmc/event.t - Concurrent Event
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/task.t
+    % prove t/pmc/event.t
 
 =head1 DESCRIPTION
 
-Tests the task PMC used by the concurrency scheduler.
+Tests the event PMC used by the concurrency scheduler.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
+pir_output_is( <<'CODE', <<'OUT', "create an event and set attributes" );
   .sub main :main
-    $P0 = new ['Task']
+    $P0 = new ['Event']
     $P1 = getattribute $P0, 'status'
     print $P1
     print "\n"
@@ -79,7 +79,7 @@ event
 1.1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
+pir_output_is( <<'CODE', <<'OUT', 'create an event and set attributes in init' );
   .sub main :main
     .local pmc data
     data = new ['Hash']
@@ -104,7 +104,7 @@ pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
     $P2 = 1.1
     data['birthtime'] = $P2
 
-    $P0 = new ['Task'], data
+    $P0 = new ['Event'], data
 
     $P3 = getattribute $P0, 'status'
     say $P3
@@ -130,9 +130,9 @@ event
 1.1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );
+pir_output_is( <<'CODE', <<'OUT', "freeze and thaw an event" );
   .sub main :main
-    $P0 = new ['Task']
+    $P0 = new ['Event']
 
     $P2 = new ['String']
     $P2 = "inprocess"

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 5;
 use Parrot::Config;
 
 =head1 NAME
@@ -176,29 +176,6 @@ ok 2
 ok 3
 OUT
 }
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
-    .local pmc pmc1
-    pmc1 = new ['Timer']
-    .local int bool1
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "event"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
-.end
-CODE
-0
-1
-0
-OUTPUT
 
 # Local Variables:
 #   mode: cperl
