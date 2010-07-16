@@ -366,7 +366,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
 
 #if PARROT_HAS_ICU
     if (s->encoding == Parrot_nfg_encoding_ptr)
-        result->extra = clone_grapheme_table(interp, s->extra);
+        result->extra = clone_grapheme_table(interp, (grapheme_table *) s->extra);
 #endif /* PARROT_HAS_ICU */
 
     return result;
@@ -503,15 +503,16 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
 #if PARROT_HAS_ICU
     if (enc == Parrot_nfg_encoding_ptr) {
         if (a->extra != NULL) {
-            dest->extra = clone_grapheme_table(interp, a->extra);
+            dest->extra = clone_grapheme_table(interp, (grapheme_table *) a->extra);
             if (b->extra != NULL) {
-                dest->extra = grow_grapheme_table(interp, a->extra,
+                dest->extra = grow_grapheme_table(interp, (grapheme_table *) a->extra,
                                                   ((grapheme_table *)b->extra)->used);
-                merge_tables_and_fixup_substring(interp, dest, b->extra, a->strlen, b->strlen);
+                merge_tables_and_fixup_substring(interp, dest, (grapheme_table *) b->extra,
+                                                 a->strlen, b->strlen);
             }
         }
         else {
-            dest->extra = clone_grapheme_table(interp, b->extra);
+            dest->extra = clone_grapheme_table(interp, (grapheme_table *) b->extra);
         }
     }
 #endif /* PARROT_HAS_ICU */
@@ -1235,7 +1236,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
 #if PARROT_HAS_ICU
     /* Clone grapheme table, if appropiate */
     if (dest->encoding == Parrot_nfg_encoding_ptr)
-        dest->extra = clone_grapheme_table(interp, src->extra);
+        dest->extra = clone_grapheme_table(interp, (grapheme_table *) src->extra);
 #endif /* PARROT_HAS_ICU */
 
     /* Clear COW flag. We own buffer */
@@ -1259,9 +1260,9 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
 
 #if PARROT_HAS_ICU
     if (dest->encoding == Parrot_nfg_encoding_ptr && rep->extra != NULL) {
-        dest->extra = grow_grapheme_table(interp, dest->extra,
+        dest->extra = grow_grapheme_table(interp, (grapheme_table *) dest->extra,
                                           ((grapheme_table *)rep->extra)->used);
-        merge_tables_and_fixup_substring(interp, dest, rep->extra,
+        merge_tables_and_fixup_substring(interp, dest, (grapheme_table *) rep->extra,
                                          start_byte / sizeof (UChar32), rep->strlen);
     }
 #endif /* PARROT_HAS_ICU */

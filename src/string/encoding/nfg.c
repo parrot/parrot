@@ -232,7 +232,8 @@ nfg_encode(PARROT_INTERP, STRING *dest, UINTVAL index, STRING *src,
 
         if (hash != 0xffff) {
             nfg_encode(interp, dest, index, src, offs, len, graphemes + 1);
-            buf[--index] = add_grapheme_from_substr(interp, dest->extra, src, aux, offs-aux, hash);
+            buf[--index] = add_grapheme_from_substr(interp, (grapheme_table *)dest->extra,
+                                                    src, aux, offs-aux, hash);
             return;
         }
         offs++;
@@ -507,13 +508,14 @@ nfg_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
         grapheme_table *table = (grapheme_table *) i->str->extra;
         const int offs = cpos - i->bytepos / sizeof (UChar32);
         const int  idx = -1 - c;
-        if (offs < table->graphemes[idx].len) {
-            if (offs == table->graphemes[idx].len - 1)
-                i->bytepos += sizeof (int32_t);
-                /* Make sure we move off this grapheme if we've
-                 * traversed all of it's codepoints */
-            return (UINTVAL) table->graphemes[-1 - c].codepoints[offs];
-        }
+
+        PARROT_ASSERT(offs < table->graphemes[idx].len);
+
+        if (offs == table->graphemes[idx].len - 1)
+            i->bytepos += sizeof (int32_t);
+            /* Make sure we move off this grapheme if we've
+            * traversed all of it's codepoints */
+        return (UINTVAL) table->graphemes[-1 - c].codepoints[offs];
     }
 #else
     UNUSED(i);
