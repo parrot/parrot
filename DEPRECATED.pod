@@ -307,8 +307,20 @@ L<https://trac.parrot.org/parrot/ticket/1624>
 
 =item :main Sub behaviour and selection. [eligible in 2.7]
 
-After deprecation parrot will use first sub marked with :main modified as main.
-Main Sub will always have to check passed arguments.
+Currently, if no :main sub is found, the first .sub in a file is used as
+main. Also, arguments are passed to the main sub regardless of the .param
+declarations in that sub.
+
+After this change, if no sub is marked with :main, an exception will be
+raised. Multiple :main declarations will be still be allowed, and all but the
+first will be ignored.
+
+This change will also force all subs, including :main, the have their
+arguments checked - to get the default :main behavior, just add:
+
+ .param pmc args :slurpy
+
+To handle an arbitrary number (inc. none) of arguments.
 
 L<https://trac.parrot.org/parrot/ticket/1033>
 L<https://trac.parrot.org/parrot/ticket/1704>
