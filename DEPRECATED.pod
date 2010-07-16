@@ -315,12 +315,12 @@ After this change, if no sub is marked with :main, an exception will be
 raised. Multiple :main declarations will be still be allowed, and all but the
 first will be ignored.
 
-This change will also force all subs, including :main, the have their
-arguments checked - to get the default :main behavior, just add:
+This change will also force all subs, including :main, to have their
+arguments checked - to allow an arbitrary number of arguments, have
+this be the only .param declaration in the sub.
 
  .param pmc args :slurpy
 
-To handle an arbitrary number (inc. none) of arguments.
 
 L<https://trac.parrot.org/parrot/ticket/1033>
 L<https://trac.parrot.org/parrot/ticket/1704>
