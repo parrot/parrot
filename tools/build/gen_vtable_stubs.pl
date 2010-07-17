@@ -72,6 +72,7 @@ while(<$vtable_fh>) {
             push @{$groups{$annotation}}, $data[1];
             push @groups, $annotation;
         }
+        push @{$groups{'all'}}, $data[1];
         push @{$groups{$cur_group}}, $data[1];
         push @data, \@groups;
 

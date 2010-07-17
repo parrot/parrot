@@ -403,6 +403,71 @@ void setup_gc_common_hashes(PARROT_INTERP) {
 
     temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "finalize_gc_system"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "destroy_child_interp"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "do_gc_mark"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "compact_string_pool"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "mark_special"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "pmc_needs_early_collection"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "init_pool"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_pmc_header"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "free_pmc_header"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_string_header"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "free_string_header"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_bufferlike_header"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "free_bufferlike_header"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_pmc_attributes"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "free_pmc_attributes"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_string_storage"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "reallocate_string_storage"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_buffer_storage"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "reallocate_buffer_storage"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_fixed_size_storage"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "free_fixed_size_storage"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_memory_chunk"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "reallocate_memory_chunk"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "allocate_memory_chunk_with_interior_pointers"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "reallocate_memory_chunk_with_interior_pointers"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "free_memory_chunk"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "block_mark"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "unblock_mark"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "block_sweep"));
+    VTABLE_push_string(interp, temp,
+                       CONST_STRING(interp, "unblock_sweep"));
+    parrot_hash_put(interp, gc_group_items,
+                    CONST_STRING(interp, "all"),
+                    temp);
+
+    temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "reallocate_string_storage"));
     VTABLE_push_string(interp, temp,
                        CONST_STRING(interp, "reallocate_buffer_storage"));
@@ -1013,6 +1078,12 @@ PMC*  stub_allocate_pmc_header(Parrot_Interp interp, UINTVAL flags) {
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              sizeof (PMC));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1070,6 +1141,12 @@ STRING*  stub_allocate_string_header(Parrot_Interp interp, UINTVAL flags) {
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              sizeof (STRING));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1127,6 +1204,12 @@ Buffer*  stub_allocate_bufferlike_header(Parrot_Interp interp, size_t size) {
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              sizeof (Buffer));
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1187,6 +1270,12 @@ void*  stub_allocate_pmc_attributes(Parrot_Interp interp, PMC* stub_var1) {
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              VTABLE_get_pmc_keyed_int(supervisor, params, 0)->vtable->attr_size);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1246,6 +1335,12 @@ void  stub_allocate_string_storage(Parrot_Interp interp, STRING* str, size_t siz
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              size);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1277,6 +1372,12 @@ void  stub_reallocate_string_storage(Parrot_Interp interp, STRING* str, size_t s
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              size);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
 
@@ -1308,6 +1409,12 @@ void  stub_allocate_buffer_storage(Parrot_Interp interp, Buffer* buffer, size_t 
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              nsize);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1339,6 +1446,12 @@ void  stub_reallocate_buffer_storage(Parrot_Interp interp, Buffer* buffer, size_
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              newsize);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
 
@@ -1368,6 +1481,12 @@ void*  stub_allocate_fixed_size_storage(Parrot_Interp interp, size_t size) {
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              size);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1428,6 +1547,12 @@ void*  stub_allocate_memory_chunk(Parrot_Interp interp, size_t size) {
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              size);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1460,6 +1585,12 @@ void*  stub_reallocate_memory_chunk(Parrot_Interp interp, void* data, size_t new
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              newsize);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
 
@@ -1489,6 +1620,12 @@ void*  stub_allocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, s
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              size);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "allocate"), event_data);
 
@@ -1525,6 +1662,12 @@ void*  stub_reallocate_memory_chunk_with_interior_pointers(Parrot_Interp interp,
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              newsize);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
 
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "reallocate"), event_data);
 

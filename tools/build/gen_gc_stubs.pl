@@ -36,7 +36,8 @@ die "Could not open $source_file!" if !$source_fh;
 flock($dynpmc_fh, LOCK_EX) or die "Cannot lock $dynpmc_file!";
 flock($source_fh, LOCK_EX) or die "Cannot lock $source_file!";
 
-my(%groups, @entries, @prototypes, @stubs);
+my(%groups, @entries, @prototypes, @stubs, %stub_memory_sizes);
+init_stub_memory_sizes(\%stub_memory_sizes);
 
 # Read the whole file.
 my $contents = join('', map { chomp;$_; } <$source_fh>);
@@ -79,6 +80,7 @@ foreach (split /\s*;\s*/, $subsystem) {
             push(@{$groups{'administration'}}, $data[1]);
             push @data, 'administration';
         }
+        push @{$groups{'all'}}, $data[1];
 
         push @prototypes, gen_prototype(@data);
         push @stubs, gen_stub(@data);
@@ -220,6 +222,9 @@ POINTER
         }
     }
 
+    # For allocations and reallocations, expose the size of the allocation.
+    my $alloc = $stub_memory_sizes{$name} || '';
+
     return <<STUB;
 $ret stub_$name($params) {
     GC_Subsystem *gc_orig    = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
@@ -240,7 +245,7 @@ $instr_params
     VTABLE_set_pmc_keyed_str(supervisor, event_data,
         CONST_STRING(supervisor, "parameters"),
         params);
-
+$alloc
     raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "$group"), event_data);
 
     return$ret_last;
@@ -366,6 +371,39 @@ sub fix_params {
     }
 
     return join(', ', @param_list);
+}
+
+sub init_stub_memory_sizes {
+    my $ref = shift;
+
+    my %sources = (
+        'allocate_pmc_header'         => 'sizeof (PMC)',
+        'allocate_string_header'      => 'sizeof (STRING)',
+        'allocate_bufferlike_header'  => 'sizeof (Buffer)',
+        'allocate_pmc_attributes'     => 'VTABLE_get_pmc_keyed_int(supervisor, params, 0)->vtable->attr_size',
+        'allocate_string_storage'     => 'size',
+        'allocate_buffer_storage'     => 'nsize',
+        'allocate_fixed_size_storage' => 'size',
+        'allocate_memory_chunk'       => 'size',
+        'allocate_memory_chunk_with_interior_pointers' => 'size',
+        'reallocate_string_storage'   => 'size',
+        'reallocate_buffer_storage'   => 'newsize',
+        'reallocate_memory_chunk'     => 'newsize',
+        'reallocate_memory_chunk_with_interior_pointers' => 'newsize'
+    );
+
+    my $key;
+    for $key (keys %sources) {
+        my $source = $sources{$key};
+        $ref->{$key} = <<SIZE;
+    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
+    VTABLE_set_integer_native(supervisor, temp,
+                              $source);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data,
+                            CONST_STRING(supervisor, "size"),
+                            temp);
+SIZE
+    }
 }
 
 # Local Variables:
