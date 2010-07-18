@@ -29,6 +29,7 @@ pmclass Task provides invokable auto_attrs {
     ATTR Parrot_Interp interp;    /* The interpreter that created the task. */
     ATTR PMC          *code;      /* An (optional) code for the task. */
     ATTR PMC          *data;      /* Additional data for the task. */
+    ATTR INTVAL        killed;    /* Dead tasks don't get run. */
 
 /*
 
@@ -51,6 +52,7 @@ Initialize a concurrency task object.
         core_struct->code      = PMCNULL;
         core_struct->data      = PMCNULL;
         core_struct->interp    = INTERP;
+        core_struct->killed    = 0;
     }
 
 /*
@@ -85,31 +87,34 @@ An interpreter in which to execute this task.
 
     VTABLE void init_pmc(PMC *data) {
         PMC         *elem;
-        Parrot_Task_attributes *core_struct;
-
-        if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Task initializer must be a Hash");
+        Parrot_Task_attributes *core_struct = PARROT_TASK(SELF);
 
         SELF.init();
 
-        core_struct = (Parrot_Task_attributes *) PMC_data(SELF);
+        if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Sub"))) {
+            core_struct->code = data;
+        }
+        else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
+            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
+            if (! PMC_IS_NULL(elem))
+                core_struct->birthtime = VTABLE_get_number(INTERP, elem);
 
-        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
-        if (! PMC_IS_NULL(elem))
-            core_struct->birthtime = VTABLE_get_number(INTERP, elem);
+            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
+            if (! PMC_IS_NULL(elem))
+                core_struct->code = elem;
 
-        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-        if (! PMC_IS_NULL(elem))
-            core_struct->code = elem;
+            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
+            if (! PMC_IS_NULL(elem))
+                core_struct->data = elem;
 
-        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
-        if (! PMC_IS_NULL(elem))
-            core_struct->data = elem;
-
-        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
-        if (! PMC_IS_NULL(elem))
-            core_struct->interp = elem;
+            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
+            if (! PMC_IS_NULL(elem))
+                core_struct->interp = elem;
+        }
+        else {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Task initializer must be a Hash or Sub");
+        }
     }
 
 /*
@@ -127,6 +132,9 @@ code as the first argument.
 
     VTABLE opcode_t *invoke(void *next) {
         Parrot_Task_attributes *const task = PARROT_TASK(SELF);
+
+        if (task->killed)
+            return (opcode_t*) 0;
 
         if (PMC_IS_NULL(task->code))
             return (opcode_t*) next;
@@ -174,6 +182,7 @@ Gets the value of an attribute for this task.
 =cut
 
 */
+
     VTABLE PMC *get_attr_str(STRING *name) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         PMC *value;
@@ -336,6 +345,53 @@ Called after the task has been thawed.
         UNUSED(core_struct); /* Do nothing */
     }
 
+/*
+
+=back
+
+=head2 Methdods
+
+=over 4
+
+=item METHOD send(PMC *message)
+
+Send a message to this task.
+
+=cut
+
+*/
+
+    METHOD send(PMC *message) {
+        fprintf(stderr, "Task#send not implemented.\n");
+    }
+
+/*
+
+=item METHOD wait()
+
+Block until this task ends.
+
+=cut
+
+*/
+
+    METHOD wait() {
+        fprintf(stderr, "Task#wait not implemented.\n");
+    }
+
+/*
+
+=item METHOD kill()
+
+Kill this task.
+
+=cut
+
+*/
+
+    METHOD kill() {
+        fprintf(stderr, "Task#kill not implemented.\n");
+    }
 }
 
 /*

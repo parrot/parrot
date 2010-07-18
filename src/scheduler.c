@@ -147,10 +147,9 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
 /*
 
-=item C<opcode_t* Parrot_cx_check_tasks(PARROT_INTERP, opcode_t* next)>
+=item C<opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP, opcode_t* next)>
 
-If a wake request has been received or an OS timer has expired
-then deal with that.
+Does the scheduler need to wake up and do anything? If so, do that now.
 
 =cut
 
@@ -158,15 +157,15 @@ then deal with that.
 
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-Parrot_cx_check_tasks(PARROT_INTERP, ARGIN(opcode_t* next))
+Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t* next))
 {
-    ASSERT_ARGS(Parrot_cx_check_tasks)
+    ASSERT_ARGS(Parrot_cx_check_scheduler)
     PMC *scheduler = interp->scheduler;
 
     if  (Parrot_alarm_check(&(interp->last_alarm))
           || SCHEDULER_wake_requested_TEST(scheduler)) {
         SCHEDULER_wake_requested_CLEAR(scheduler);
-        return Parrot_cx_handle_tasks(interp, scheduler, next);
+        return Parrot_cx_run_scheduler(interp, scheduler, next);
     }
 
     return next;
@@ -174,8 +173,8 @@ Parrot_cx_check_tasks(PARROT_INTERP, ARGIN(opcode_t* next))
 
 /*
 
-=item C<opcode_t* Parrot_cx_handle_tasks(PARROT_INTERP, PMC *scheduler, opcode_t
-*next)>
+=item C<opcode_t* Parrot_cx_run_scheduler(PARROT_INTERP, PMC *scheduler,
+opcode_t *next)>
 
 Checks to see if any tasks need to be scheduled or if the current task
 needs to be pre-empted.
@@ -187,9 +186,9 @@ needs to be pre-empted.
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
 opcode_t*
-Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
+Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
 {
-    ASSERT_ARGS(Parrot_cx_handle_tasks)
+    ASSERT_ARGS(Parrot_cx_run_scheduler)
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
@@ -200,49 +199,10 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *ne
         /* Exiting the runloop to swap tasks doesn't play
            nice with nested runloops */
         if (interp->current_runloop_level <= 1)
-            return Parrot_cx_reschedule(interp, scheduler, next);
+            return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
     return next;
-
-#ifdef PARROT_CX_BUILD_OLD_STUFF
-    Parrot_cx_refresh_task_list(interp, scheduler);
-
-    while (VTABLE_get_integer(interp, scheduler) > 0) {
-        PMC * const task = VTABLE_pop_pmc(interp, scheduler);
-        if (!PMC_IS_NULL(task)) {
-            PMC    * const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
-            STRING * const type     = VTABLE_get_string(interp, type_pmc);
-
-            if (Parrot_str_equal(interp, type, CONST_STRING(interp, "callback"))) {
-                Parrot_cx_invoke_callback(interp, task);
-            }
-            else if (Parrot_str_equal(interp, type, CONST_STRING(interp, "timer"))) {
-                Parrot_cx_timer_invoke(interp, task);
-            }
-            else if (Parrot_str_equal(interp, type, CONST_STRING(interp, "event"))) {
-                PMC * const handler = Parrot_cx_find_handler_for_task(interp, task);
-                if (!PMC_IS_NULL(handler)) {
-                    PMC * const handler_sub = VTABLE_get_attr_str(interp, handler, CONST_STRING(interp, "code"));
-                    Parrot_pcc_invoke_sub_from_c_args(interp, handler_sub,
-                            "PP->", handler, task);
-                }
-            }
-            else {
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "Unknown task type '%Ss'.\n", type);
-            }
-
-            Parrot_cx_delete_task(interp, task);
-        }
-
-        /* If the scheduler was flagged to terminate, make sure you process all
-         * tasks. */
-        if (SCHEDULER_terminate_requested_TEST(scheduler))
-            Parrot_cx_refresh_task_list(interp, scheduler);
-
-    } /* end of pending tasks */
-#endif
 }
 
 /*
@@ -297,7 +257,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 }
 
 /*
-=item C<opcode_t* Parrot_cx_reschedule(PARROT_INTERP, PMC *scheduler, opcode_t
+=item C<opcode_t* Parrot_cx_preempt_task(PARROT_INTERP, PMC *scheduler, opcode_t
 *next)>
 
 Pre-empt the current task. It goes on the foot of the task queue,
@@ -308,9 +268,9 @@ and then we jump all the way back to the task scheduling loop.
 
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-Parrot_cx_reschedule(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
+Parrot_cx_preempt_task(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
 {
-    ASSERT_ARGS(Parrot_cx_reschedule)
+    ASSERT_ARGS(Parrot_cx_preempt_task)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
 
     PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
@@ -385,6 +345,12 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
+
+/*
+    if (!VTABLE_isa(interp, subclass, CONST_S TRING(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot schedule stuff other than Tasks.\n");
+*/
 
     VTABLE_push_pmc(interp, sched->task_queue, task);
 }

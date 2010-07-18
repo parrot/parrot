@@ -23,6 +23,48 @@ to the appropriate handler asynchronously.
 
 /* HEADERIZER HFILE: include/parrot/events.h */
 
+
+
+#ifdef PARROT_CX_BUILD_OLD_STUFF
+    Parrot_cx_refresh_task_list(interp, scheduler);
+
+    while (VTABLE_get_integer(interp, scheduler) > 0) {
+        PMC * const task = VTABLE_pop_pmc(interp, scheduler);
+        if (!PMC_IS_NULL(task)) {
+            PMC    * const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
+            STRING * const type     = VTABLE_get_string(interp, type_pmc);
+
+            if (Parrot_str_equal(interp, type, CONST_STRING(interp, "callback"))) {
+                Parrot_cx_invoke_callback(interp, task);
+            }
+            else if (Parrot_str_equal(interp, type, CONST_STRING(interp, "timer"))) {
+                Parrot_cx_timer_invoke(interp, task);
+            }
+            else if (Parrot_str_equal(interp, type, CONST_STRING(interp, "event"))) {
+                PMC * const handler = Parrot_cx_find_handler_for_task(interp, task);
+                if (!PMC_IS_NULL(handler)) {
+                    PMC * const handler_sub = VTABLE_get_attr_str(interp, handler, CONST_STRING(interp, "code"));
+                    Parrot_pcc_invoke_sub_from_c_args(interp, handler_sub,
+                            "PP->", handler, task);
+                }
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Unknown task type '%Ss'.\n", type);
+            }
+
+            Parrot_cx_delete_task(interp, task);
+        }
+
+        /* If the scheduler was flagged to terminate, make sure you process all
+         * tasks. */
+        if (SCHEDULER_terminate_requested_TEST(scheduler))
+            Parrot_cx_refresh_task_list(interp, scheduler);
+
+    } /* end of pending tasks */
+#endif
+
+
 /*
 
 =item C<void Parrot_cx_add_handler_local(PARROT_INTERP, PMC *handler)>

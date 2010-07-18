@@ -14182,7 +14182,7 @@ opcode_t *
 Parrot_check_events(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t *next = cur_opcode + 1;
-    next = Parrot_cx_check_tasks(interp, next);return (opcode_t *)next;   /* force this being a branch op */
+    next = Parrot_cx_check_scheduler(interp, next);return (opcode_t *)next;   /* force this being a branch op */
 }
 
 opcode_t *
@@ -14231,14 +14231,14 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_branch_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if(Parrot_cx_check_tasks(interp, cur_opcode + IREG(1)) == 0)
+    if(Parrot_cx_check_scheduler(interp, cur_opcode + IREG(1)) == 0)
         return 0;return (opcode_t *)cur_opcode + IREG(1);
 }
 
 opcode_t *
 Parrot_branch_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if(Parrot_cx_check_tasks(interp, cur_opcode + cur_opcode[1]) == 0)
+    if(Parrot_cx_check_scheduler(interp, cur_opcode + cur_opcode[1]) == 0)
         return 0;return (opcode_t *)cur_opcode + cur_opcode[1];
 }
 

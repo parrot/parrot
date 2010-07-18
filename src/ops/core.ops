@@ -97,7 +97,7 @@ inline op noop() :base_core {
 
 inline op check_events() :base_core :flow {
     opcode_t *next = expr NEXT();
-    next = Parrot_cx_check_tasks(interp, next);
+    next = Parrot_cx_check_scheduler(interp, next);
     goto ADDRESS(next);   /* force this being a branch op */
 }
 
@@ -153,7 +153,7 @@ Branch forward or backward by the amount in $1.
 =cut
 
 inline op branch(in LABEL) :base_loop :flow {
-    if(Parrot_cx_check_tasks(interp, cur_opcode + $1) == 0)
+    if(Parrot_cx_check_scheduler(interp, cur_opcode + $1) == 0)
         return 0;
     goto OFFSET($1);
 }
