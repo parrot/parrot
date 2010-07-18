@@ -118,8 +118,7 @@ sub transform_input {
 
     my $formatter = Parrot::Docs::PodToHtml->new();
 
-    my $outfile = File::Spec->catfile($target_dir, $input);
-    $outfile =~ s/\.[^.]*$/.html/;
+    my $outfile = File::Spec->catfile($target_dir, $input) . '.html';
 
     my $dir = File::Path::make_path(File::Basename::dirname($outfile));
 
