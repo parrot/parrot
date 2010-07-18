@@ -305,6 +305,27 @@ As of the latest PCC changes, this does nothing different from '.call'.
 
 L<https://trac.parrot.org/parrot/ticket/1624>
 
+=item :main Sub behaviour and selection. [eligible in 2.7]
+
+Currently, if no :main sub is found, the first .sub in a file is used as
+main. Also, arguments are passed to the main sub regardless of the .param
+declarations in that sub.
+
+After this change, if no sub is marked with :main, an exception will be
+raised. Multiple :main declarations will be still be allowed, and all but the
+first will be ignored.
+
+This change will also force all subs, including :main, to have their
+arguments checked - to allow an arbitrary number of arguments, have
+this be the only .param declaration in the sub.
+
+ .param pmc args :slurpy
+
+
+L<https://trac.parrot.org/parrot/ticket/1033>
+L<https://trac.parrot.org/parrot/ticket/1704>
+L<https://trac.parrot.org/parrot/ticket/1705>
+
 =back
 
 =head1 Functions
@@ -406,13 +427,22 @@ use a different detection mechanism or eliminate it altogether.
 
 L<https://trac.parrot.org/parrot/ticket/463>
 
-=item PAST::Val node generation [eligible in 1.5]
+=item PAST::Val node generation [eligible in 1.5] 
 
-The PAST::Compiler may generate the code for PAST::Val nodes
-(i.e., constants) at the beginning of the block (Parrot sub) instead
-of the location where they occur in the PAST tree.
+The PAST::Compiler may generate the code for PAST::Val nodes 
+(i.e., constants) at the beginning of the block (Parrot sub) instead 
+of the location where they occur in the PAST tree. 
 
-L<https://trac.parrot.org/parrot/ticket/868>
+L<https://trac.parrot.org/parrot/ticket/868> 
+
+=item Meta-model implementation used by PCT [eligible in 2.7]
+
+PCT is set to switch to a new meta-model implementation for its classes
+and objects. This will most likely only affect those who rely on the
+interface of what is returned from .HOW, or rely on PCT objects exhibiting
+various other peculiarities of the P6object implementation. (Even when that
+is the case, the HOW API will not be changing too drastically, so for most
+PCT users there should be little to no upheavel.)
 
 =back
 

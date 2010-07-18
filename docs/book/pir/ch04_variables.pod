@@ -182,7 +182,7 @@ it's true and the second argument otherwise:
 
   $P0 = or $P1, $P2
 
-=end PIR_FRAGMENT_INVALID[
+=end PIR_FRAGMENT_INVALID
 
 Both C<and> and C<or> are short-circuiting ops. If they can determine what
 value to return from the first argument, they'll never evaluate the second.
