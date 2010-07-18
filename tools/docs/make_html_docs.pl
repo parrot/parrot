@@ -118,6 +118,10 @@ sub transform_input {
 
     my $formatter = Parrot::Docs::PodToHtml->new();
 
+    # Errata is currently noisy; e.g. complains about U<> even after
+    # formatting it as expected. skip it until we can properly quiet it down.
+    $formatter->no_errata_section(1);
+
     my $outfile = File::Spec->catfile($target_dir, $input) . '.html';
 
     my $dir = File::Path::make_path(File::Basename::dirname($outfile));
