@@ -77,8 +77,11 @@ sub do_beginning {
     my $title = $self->{'Title'};
     esc($title);
 
+    my $dirCount = ( $self->{source_filename} =~ tr{/}{/} );
+    my $resources_URL = join('/', (('..') x ++$dirCount)) . '/resources';
+
     print { $self->{'output_fh'} }
-        Parrot::Docs::HTMLPage->header( $title, $self->{NAV_BAR}, $self->{RESOURCES_URL} );
+        Parrot::Docs::HTMLPage->header( $title, $self->{NAV_BAR}, $resources_URL );
 
     $self->version_tag_comment;
 
