@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot - Running
+docs/running.pod - Running
 
 =head1 VERSION
 

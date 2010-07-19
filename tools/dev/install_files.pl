@@ -4,7 +4,7 @@
 # $Id$
 ################################################################################
 
-=head1 TITLE
+=head1 NAME
 
 tools/dev/install_files.pl - Copy files to their correct locations
 

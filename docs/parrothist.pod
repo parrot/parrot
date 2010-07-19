@@ -1,6 +1,6 @@
 =head1 NAME
 
-parrothist - Parrot Release History
+docs/parrothist.pod - Parrot Release History
 
 =head1 DESCRIPTION
 
