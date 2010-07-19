@@ -72,7 +72,7 @@ void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task))
+void Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -85,7 +85,7 @@ opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
+void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -155,12 +155,12 @@ void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
     , PARROT_ASSERT_ARG(alarm))
 #define ASSERT_ARGS_Parrot_cx_schedule_immediate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(task))
+    , PARROT_ASSERT_ARG(task_or_sub))
 #define ASSERT_ARGS_Parrot_cx_schedule_sleep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_schedule_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(task))
+    , PARROT_ASSERT_ARG(task_or_sub))
 #define ASSERT_ARGS_Parrot_cx_send_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(messagetype))
@@ -197,7 +197,7 @@ typedef enum {
     PARROT_TIMER_HANDLER,
     PARROT_TIMER_MAX,
     PARROT_ALARM_TIME,
-    PARROT_ALARM_SUB
+    PARROT_ALARM_TASK
 } parrot_timer_enum_t;
 /* &end_gen */
 

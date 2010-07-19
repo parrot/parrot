@@ -66,19 +66,12 @@ Initalize the concurrency scheduler for the interpreter.
 
 */
 
-static int interp_count = 0;
-
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_init_scheduler)
 
     interp->quantum_done = Parrot_floatval_time() + PARROT_TASK_SWITCH_QUANTUM;
-
-    if (interp_count++ > 1) {
-        fprintf(stderr, "More than one interp?\n");
-        exit(0);
-    }
 
     if (!interp->parent_interpreter) {
         PMC *scheduler;
@@ -246,13 +239,18 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     if (task_count > 0) {
         FLOATVAL  time_now = Parrot_floatval_time();
-        PMC      *task     = VTABLE_shift_pmc(interp, sched->task_queue);
         opcode_t *dest;
+
+        interp->current_task = VTABLE_shift_pmc(interp, sched->task_queue);
+
+        if (!VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Found a non-Task in the task queue.\n");
 
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
 
-        Parrot_pcc_invoke_sub_from_c_args(interp, task, "->");
+        Parrot_pcc_invoke_sub_from_c_args(interp, interp->current_task, "->");
     }
 }
 
@@ -273,12 +271,21 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *ne
     ASSERT_ARGS(Parrot_cx_preempt_task)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
 
+    PMC *task = interp->current_task;
+    Parrot_Task_attributes *tdata = PARROT_TASK(task);
+
     PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
     VTABLE_set_pointer(interp, cont, next);
 
-    if (!PMC_IS_NULL(cont))
-          VTABLE_push_pmc(interp, sched->task_queue, cont);
+    if (PMC_IS_NULL(task) || !VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Attempt to pre-empt invalid interp->current_task.\n");
 
+    tdata->code = cont;
+
+    VTABLE_push_pmc(interp, sched->task_queue, task);
+
+    interp->current_task = PMCNULL;
     return (opcode_t*) 0;
 }
 
@@ -324,7 +331,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC *task)>
+=item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC *task_or_sub)>
 
 Add a task to to the task queue for execution.
 
@@ -337,27 +344,36 @@ called from within the interpreter's runloop.
 
 PARROT_EXPORT
 void
-Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
+Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_task)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+    PMC *task = PMCNULL;
 
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-/*
-    if (!VTABLE_isa(interp, subclass, CONST_S TRING(interp, "Task")))
+    if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task"))) {
+        task = task_or_sub;
+    }
+    else if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Sub"))) {
+        Parrot_Task_attributes *tdata;
+        task  = Parrot_pmc_new(interp, enum_class_Task);
+        tdata = PARROT_TASK(task);
+        tdata->code = task_or_sub;
+    }
+    else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Cannot schedule stuff other than Tasks.\n");
-*/
+            "Can only schedule Tasks and Subs.\n");
+    }
 
     VTABLE_push_pmc(interp, sched->task_queue, task);
 }
 
 /*
 
-=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *task)>
+=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *task_or_sub)>
 
 Add a task to the task queue for immediate execution.
 
@@ -367,10 +383,26 @@ Add a task to the task queue for immediate execution.
 
 PARROT_EXPORT
 void
-Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task))
+Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_immediate)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+    PMC *task;
+
+    if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task"))) {
+        task = task_or_sub;
+    }
+    else if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Sub"))) {
+        Parrot_Task_attributes *tdata;
+        task  = Parrot_pmc_new(interp, enum_class_Task);
+        tdata = PARROT_TASK(task);
+        tdata->code = task_or_sub;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Can only schedule Tasks and Subs.\n");
+    }
+
     VTABLE_unshift_pmc(interp, sched->task_queue, task);
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
@@ -580,7 +612,7 @@ Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
         if (alarm_time < now_time) {
             Parrot_Alarm_attributes *data = PARROT_ALARM(alarm);
-            Parrot_cx_schedule_immediate(interp, data->alarm_sub);
+            Parrot_cx_schedule_immediate(interp, data->alarm_task);
         }
         else {
             Parrot_alarm_set(alarm_time);
@@ -628,11 +660,16 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     PMC *alarm = Parrot_pmc_new(interp, enum_class_Alarm);
     Parrot_Alarm_attributes *adata = PARROT_ALARM(alarm);
 
+    PMC *task = interp->current_task;
+    Parrot_Task_attributes *tdata = PARROT_TASK(task);
+
     PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
     VTABLE_set_pointer(interp, cont, next);
 
+    tdata->code = cont;
+
     adata->alarm_time = done_time;
-    adata->alarm_sub  = cont;
+    adata->alarm_task = task;
     VTABLE_invoke(interp, alarm, 0);
 
     return (opcode_t*) 0;

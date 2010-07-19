@@ -195,8 +195,9 @@ Parrot_gc_trace_root(PARROT_INTERP,
     /* mark the root_namespace */
     Parrot_gc_mark_PMC_alive(interp, interp->root_namespace);
 
-    /* mark the concurrency scheduler */
+    /* mark the concurrency scheduler and current task */
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
+    Parrot_gc_mark_PMC_alive(interp, interp->current_task);
 
     /* s. packfile.c */
     mark_const_subs(interp);

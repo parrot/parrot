@@ -51,6 +51,7 @@ initializer.
 */
 
 #include "parrot/scheduler_private.h"
+#include "pmc/pmc_task.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -310,6 +311,8 @@ Invoke the codeblock and schedule any repeats.
         Parrot_Timer_attributes *const timer = PARROT_TIMER(SELF);
         FLOATVAL now_time;
         PMC* alarm;
+        PMC* task;
+        Parrot_Task_attributes *tdata;
 
         /* If the timer has been cancelled, we're done */
         if (timer->running == 0)
@@ -322,12 +325,17 @@ Invoke the codeblock and schedule any repeats.
 
             now_time = Parrot_floatval_time();
 
+            task = Parrot_pmc_new(INTERP, enum_class_Task);
+            tdata = PARROT_TASK(task);
+            tdata->code = SELF;
+
             alarm = Parrot_pmc_new(INTERP, enum_class_Alarm);
             VTABLE_set_number_keyed_int(INTERP, alarm, PARROT_ALARM_TIME,
                                         now_time + timer->duration);
-            VTABLE_set_pmc_keyed_int(INTERP, alarm, PARROT_ALARM_SUB, SELF);
-            next = VTABLE_invoke(INTERP, alarm, next);
 
+
+            VTABLE_set_pmc_keyed_int(INTERP, alarm, PARROT_ALARM_TASK, task);
+            next = VTABLE_invoke(INTERP, alarm, next);
         }
         else {
             /* This is the timer triggering. */
@@ -342,10 +350,14 @@ Invoke the codeblock and schedule any repeats.
 
                 now_time = Parrot_floatval_time();
 
+                task = Parrot_pmc_new(INTERP, enum_class_Task);
+                tdata = PARROT_TASK(task);
+                tdata->code = SELF;
+
                 alarm = Parrot_pmc_new(INTERP, enum_class_Alarm);
                 VTABLE_set_number_keyed_int(INTERP, alarm, PARROT_ALARM_TIME,
                                             now_time + timer->interval);
-                VTABLE_set_pmc_keyed_int(INTERP, alarm, PARROT_ALARM_SUB, SELF);
+                VTABLE_set_pmc_keyed_int(INTERP, alarm, PARROT_ALARM_TASK, task);
                 next = VTABLE_invoke(INTERP, alarm, next);
             }
         }

@@ -271,6 +271,7 @@ struct parrot_interp_t {
 
     UINTVAL          last_alarm;              /* has an alarm triggered? */
     FLOATVAL         quantum_done;            /* expiration of current quantum */
+    PMC             *current_task;
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

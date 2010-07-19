@@ -35,7 +35,7 @@ Sometime after N_time, P_sub will be called exactly once.
 
 pmclass Alarm provides invokable auto_attrs {
     ATTR FLOATVAL alarm_time;
-    ATTR PMC     *alarm_sub;
+    ATTR PMC     *alarm_task;
 
 /*
 
@@ -50,7 +50,7 @@ Initializes the alarm.
     VTABLE void init() {
         Parrot_Alarm_attributes *data = PARROT_ALARM(SELF);
         data->alarm_time = 0.0;
-        data->alarm_sub  = PMCNULL;
+        data->alarm_task = PMCNULL;
 
         PObj_custom_mark_SET(SELF);
     }
@@ -72,7 +72,7 @@ Create a copy of the alarm.
         Parrot_Alarm_attributes *old_struct = PARROT_ALARM(SELF);
 
         new_struct->alarm_time = old_struct->alarm_time;
-        new_struct->alarm_sub  = old_struct->alarm_sub;
+        new_struct->alarm_task  = old_struct->alarm_task;
 
         return copy;
     }
@@ -88,9 +88,9 @@ Returns the PMC associated with C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        if (key == PARROT_ALARM_SUB) {
+        if (key == PARROT_ALARM_TASK) {
             const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
-            return data->alarm_sub;
+            return data->alarm_task;
         }
 
         return PMCNULL;
@@ -141,8 +141,8 @@ Sets the PMC associated with C<key> to C<*value>.
 */
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        if (key == PARROT_ALARM_SUB) {
-            SET_ATTR_alarm_sub(INTERP, SELF, value);
+        if (key == PARROT_ALARM_TASK) {
+            SET_ATTR_alarm_task(INTERP, SELF, value);
         }
     }
 
@@ -185,13 +185,13 @@ Required functions for GC and Freeze / Thaw.
 
     VTABLE void mark() {
         PMC *sub;
-        GET_ATTR_alarm_sub(INTERP, SELF, sub);
+        GET_ATTR_alarm_task(INTERP, SELF, sub);
         Parrot_gc_mark_PMC_alive(INTERP, sub);
     }
 
     VTABLE void visit(PMC *info) {
         PMC *sub;
-        GET_ATTR_alarm_sub(INTERP, SELF, sub);
+        GET_ATTR_alarm_task(INTERP, SELF, sub);
         VISIT_PMC(INTERP, info, sub);
         SUPER(info);
     }

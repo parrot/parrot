@@ -71,7 +71,7 @@ good:
 
     $P1 = new 'Alarm'
     $P1[.PARROT_ALARM_TIME] = when
-    $P1[.PARROT_ALARM_SUB]  = proc
+    $P1[.PARROT_ALARM_TASK] = proc
 
     $P1()
 .end
