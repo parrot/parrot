@@ -1253,7 +1253,7 @@ Perform a match for protoregex C<name>.
     rx = shift rx_it
     rxaddr = get_addr rx
     $P0 = mcalled[rxaddr]
-    unless null $P0 goto token_next
+    unless null $P0 goto cand_loop
     result = self.rx()
     mcalled[rxaddr] = mcalled
     if result goto done
