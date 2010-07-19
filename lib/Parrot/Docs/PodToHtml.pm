@@ -84,7 +84,7 @@ sub do_beginning {
             $title =~ s/^.*?&#45;\s*//;
         }
     }
- 
+
     my $dirCount = ( $self->{source_filename} =~ tr{/}{/} );
     my $resources_URL = join('/', (('..') x ++$dirCount)) . '/resources';
 
