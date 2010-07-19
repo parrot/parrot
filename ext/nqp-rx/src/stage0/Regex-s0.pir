@@ -42,7 +42,7 @@ grammars.
     load_bytecode 'P6object.pbc'
     .local pmc p6meta
     p6meta = new 'P6metaclass'
-    $P0 = p6meta.'new_class'('Regex::Cursor', 'attr'=>'$!target $!from $!pos $!match $!names $!debug @!bstack @!cstack @!caparray')
+    $P0 = p6meta.'new_class'('Regex::Cursor', 'attr'=>'$!target $!from $!pos $!match $!names $!debug @!bstack @!cstack @!caparray &!regex')
     $P0 = box 0
     set_global '$!generation', $P0
     $P0 = new ['Boolean']
@@ -232,6 +232,20 @@ If C<regex> is omitted, then use the C<TOP> rule for the grammar.
 .end
 
 
+=item next()
+
+Return the next match from a successful Cursor.
+
+=cut
+
+.sub 'next' :method
+    .local pmc cur, match
+    cur = self.'!cursor_next'()
+    match = cur.'MATCH'()
+    .return (match)
+.end
+
+
 =item pos()
 
 Return the cursor's current position.
@@ -319,6 +333,10 @@ provided, then the new cursor has the same type as lang.
     parrotclass = getattribute $P0, 'parrotclass'
     cur = new parrotclass
 
+    .local pmc regex
+    regex = getattribute self, '&!regex'
+    unless null regex goto cursor_restart
+
     .local pmc from, target, debug
 
     from = getattribute self, '$!pos'
@@ -330,7 +348,30 @@ provided, then the new cursor has the same type as lang.
     debug = getattribute self, '$!debug'
     setattribute cur, '$!debug', debug
 
-    .return (cur, from, target)
+    .return (cur, from, target, 0)
+
+  cursor_restart:
+    .local pmc pos, cstack, bstack
+    from   = getattribute self, '$!from'
+    target = getattribute self, '$!target'
+    debug  = getattribute self, '$!debug'
+    cstack = getattribute self, '@!cstack'
+    bstack = getattribute self, '@!bstack'
+    pos    = box CURSOR_FAIL
+
+    setattribute cur, '$!from', from
+    setattribute cur, '$!pos', pos 
+    setattribute cur, '$!target', target
+    setattribute cur, '$!debug', debug
+    if null cstack goto cstack_done
+    cstack = clone cstack
+    setattribute cur, '@!cstack', cstack
+  cstack_done:
+    if null bstack goto bstack_done
+    bstack = clone bstack
+    setattribute cur, '@!bstack', bstack
+  bstack_done:
+    .return (cur, from, target, 1)
 .end
 
 
@@ -373,6 +414,38 @@ with a "real" Match object when requested.
     self.'!reduce'(name)
   done:
     .return (self)
+.end
+
+
+=item !cursor_backtrack()
+
+Configure this cursor for backtracking via C<!cursor_next>.
+
+=cut
+
+.sub '!cursor_backtrack' :method
+    $P0 = getinterp
+    $P1 = $P0['sub';1]
+    setattribute self, '&!regex', $P1
+.end
+
+
+=item !cursor_next()
+
+Continue a regex match from where the current cursor left off.
+
+=cut
+
+.sub '!cursor_next' :method
+    .local pmc regex, cur
+    regex = getattribute self, '&!regex'
+    if null regex goto fail
+    cur = self.regex()
+    .return (cur)
+  fail:
+    cur = self.'!cursor_start'()
+    cur.'!cursor_fail'()
+    .return (cur)
 .end
 
 
@@ -2434,13 +2507,15 @@ Return the POST representation of the regex AST rooted by C<node>.
     goto iter_loop
   iter_done:
 
-    .local pmc startlabel, donelabel, faillabel
+    .local pmc startlabel, donelabel, faillabel, restartlabel
     $S0 = concat prefix, 'start'
     startlabel = self.'post_new'('Label', 'result'=>$S0)
     $S0 = concat prefix, 'done'
     donelabel = self.'post_new'('Label', 'result'=>$S0)
     $S0 = concat prefix, 'fail'
     faillabel = self.'post_new'('Label', 'result'=>$S0)
+    $S0 = concat prefix, 'restart'
+    restartlabel = self.'post_new'('Label', 'result'=>$S0)
     reghash['fail'] = faillabel
 
     # If capnames is available, it's a hash where each key is the
@@ -2490,9 +2565,8 @@ Return the POST representation of the regex AST rooted by C<node>.
     concat $S0, pos
     concat $S0, ', '
     concat $S0, tgt
-    concat $S0, ')'
+    concat $S0, ', $I10)'
     ops.'push_pirop'('callmethod', '"!cursor_start"', 'self', 'result'=>$S0)
-    self.'!cursorop'(ops, '!cursor_debug', 0, '"START "', regexname_esc)
     unless caparray goto caparray_skip
     self.'!cursorop'(ops, '!cursor_caparray', 0, caparray :flat)
   caparray_skip:
@@ -2518,9 +2592,13 @@ Return the POST representation of the regex AST rooted by C<node>.
     ops.'push_pirop'('sub', off, pos, 1, 'result'=>off)
     ops.'push_pirop'('substr', tgt, tgt, off, 'result'=>tgt)
     ops.'push'(startlabel)
+    ops.'push_pirop'('eq', '$I10', 1, restartlabel)
+    self.'!cursorop'(ops, '!cursor_debug', 0, '"START "', regexname_esc)
 
     $P0 = self.'post_regex'(node)
     ops.'push'($P0)
+    ops.'push'(restartlabel)
+    self.'!cursorop'(ops, '!cursor_debug', 0, '"NEXT "', regexname_esc)
     ops.'push'(faillabel)
     self.'!cursorop'(ops, '!mark_fail', 4, rep, pos, '$I10', '$P10', 0)
     ops.'push_pirop'('lt', pos, CURSOR_FAIL, donelabel)
@@ -3160,6 +3238,13 @@ second child of this node.
     ops.'push_pirop'('inline', 'inline'=>'  # rx pass')
     self.'!cursorop'(ops, '!cursor_pass', 0, pos, regexname)
     self.'!cursorop'(ops, '!cursor_debug', 0, '"PASS  "', regexname, '" at pos="', pos)
+
+    .local string backtrack
+    backtrack = node.'backtrack'()
+    if backtrack == 'r' goto backtrack_done
+    self.'!cursorop'(ops, '!cursor_backtrack', 0)
+  backtrack_done:
+
     ops.'push_pirop'('return', cur)
     .return (ops)
 .end
@@ -3231,8 +3316,8 @@ second child of this node.
     .local pmc cur, pos, rep, fail
     (cur, pos, rep, fail) = self.'!rxregs'('cur pos rep fail')
 
-    .local string qname
-    .local pmc ops, q1label, q2label, btreg, cpost
+    .local string qname, btreg
+    .local pmc ops, q1label, q2label, cpost
     $S0 = concat 'rxquant', backtrack
     qname = self.'unique'($S0)
     ops = self.'post_new'('Ops', 'node'=>node)
@@ -3263,8 +3348,7 @@ second child of this node.
   if backtrack == 'f' goto frugal
 
   greedy:
-    btreg = self.'uniquereg'('I')
-    ops.'push_pirop'('set_addr', btreg, q2label)
+    btreg = '$I10'
     .local int needmark
     .local string peekcut
     needmark = needrep
@@ -3275,14 +3359,17 @@ second child of this node.
   greedy_1:
     if min == 0 goto greedy_2
     unless needmark goto greedy_loop
+    ops.'push_pirop'('set_addr', btreg, q2label)
     self.'!cursorop'(ops, '!mark_push', 0, 0, CURSOR_FAIL, btreg)
     goto greedy_loop
   greedy_2:
+    ops.'push_pirop'('set_addr', btreg, q2label)
     self.'!cursorop'(ops, '!mark_push', 0, 0, pos, btreg)
   greedy_loop:
     ops.'push'(q1label)
     ops.'push'(cpost)
     unless needmark goto greedy_3
+    ops.'push_pirop'('set_addr', btreg, q2label)
     self.'!cursorop'(ops, peekcut, 1, rep, btreg)
     unless needrep goto greedy_3
     ops.'push_pirop'('inc', rep)
@@ -3291,6 +3378,7 @@ second child of this node.
     ops.'push_pirop'('ge', rep, max, q2label)
   greedy_4:
     unless max != 1 goto greedy_5
+    ops.'push_pirop'('set_addr', btreg, q2label)
     self.'!cursorop'(ops, '!mark_push', 0, rep, pos, btreg)
     if null seppost goto greedy_4a
     ops.'push'(seppost)
@@ -3328,6 +3416,8 @@ second child of this node.
   frugal_2a:
     unless needrep goto frugal_3
     ops.'push_pirop'('set', ireg, rep)
+    unless max > 1 goto frugal_3
+    ops.'push_pirop'('ge', rep, max, fail)
   frugal_3:
     ops.'push'(cpost)
     unless needrep goto frugal_4
@@ -3336,12 +3426,10 @@ second child of this node.
     unless min > 1 goto frugal_5
     ops.'push_pirop'('lt', rep, min, q1label)
   frugal_5:
-    unless max > 1 goto frugal_6
-    ops.'push_pirop'('ge', rep, max, q2label)
   frugal_6:
     unless max != 1 goto frugal_7
     ops.'push_pirop'('set_addr', '$I10', q1label)
-    self.'!cursorop'(ops, '!mark_push', 0, ireg, pos, '$I10')
+    self.'!cursorop'(ops, '!mark_push', 0, rep, pos, '$I10')
   frugal_7:
     ops.'push'(q2label)
     .return (ops)
@@ -3460,8 +3548,9 @@ Perform a subrule call.
     negate = node.'negate'()
     testop = self.'??!!'(negate, 'if', 'unless')
 
-    .local pmc subtype
+    .local pmc subtype, backtrack
     subtype = node.'subtype'()
+    backtrack = node.'backtrack'()
 
     ops.'push_pirop'('inline', subpost, subtype, negate, 'inline'=>"  # rx subrule %0 subtype=%1 negate=%2")
 
@@ -3470,8 +3559,27 @@ Perform a subrule call.
     ops.'push_pirop'('callmethod', subpost, cur, posargs :flat, namedargs :flat, 'result'=>'$P10')
     ops.'push_pirop'(testop, '$P10', fail)
     if subtype == 'zerowidth' goto done
+    if backtrack != 'r' goto subrule_backtrack
     if subtype == 'method' goto subrule_pos
     self.'!cursorop'(ops, '!mark_push', 0, 0, CURSOR_FAIL, 0, '$P10')
+    goto subrule_named
+  subrule_backtrack:
+    .local string rxname
+    .local pmc backlabel, passlabel
+    rxname = self.'unique'('rxsubrule')
+    $S0 = concat rxname, '_back'
+    backlabel = self.'post_new'('Label', 'result'=>$S0)
+    $S0 = concat rxname, '_pass'
+    passlabel = self.'post_new'('Label', 'result'=>$S0)
+    ops.'push_pirop'('goto', passlabel)
+    ops.'push'(backlabel)
+    ops.'push_pirop'('callmethod', '"!cursor_next"', '$P10', 'result'=>'$P10')
+    ops.'push_pirop'(testop, '$P10', fail)
+    ops.'push'(passlabel)
+    ops.'push_pirop'('set_addr', '$I10', backlabel)
+    self.'!cursorop'(ops, '!mark_push', 0, 0, pos, '$I10', '$P10')
+    if subtype == 'method' goto subrule_pos
+  subrule_named:
     ops.'push'(name)
     ops.'push_pirop'('callmethod', '"!cursor_names"', '$P10', name)
   subrule_pos:
