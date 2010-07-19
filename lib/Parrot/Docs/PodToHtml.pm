@@ -74,9 +74,17 @@ sub do_beginning {
     $self->{RESOURCES_URL} = '' unless $self->{RESOURCES_URL};
     $self->{NAV_BAR}       = '' unless $self->{NAV_BAR};
 
-    my $title = $self->{'Title'};
-    esc($title);
+    my $title = esc($self->get_title());
+    # If the name of the document is IN the document title (a common pod
+    # idiom), strip it out.
 
+    if ($title =~ m/(.*?)&#45;/) {
+        # assume it's a filename if it has a dot in it.
+        if ($1 =~ m/\./) {
+            $title =~ s/^.*?&#45;\s*//;
+        }
+    }
+ 
     my $dirCount = ( $self->{source_filename} =~ tr{/}{/} );
     my $resources_URL = join('/', (('..') x ++$dirCount)) . '/resources';
 
