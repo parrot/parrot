@@ -665,6 +665,8 @@ void setup_gc_common_hashes(PARROT_INTERP) {
 }
 
 void destroy_gc_common_hashes(PARROT_INTERP) {
+    if (gc_registry == NULL) { return; }
+
     if (parrot_hash_size(interp, gc_registry) == 0) {
         parrot_hash_destroy(interp, gc_registry);
         parrot_hash_destroy(interp, gc_name_stubs);
@@ -672,6 +674,10 @@ void destroy_gc_common_hashes(PARROT_INTERP) {
         parrot_hash_destroy(interp, gc_item_groups);
 
         gc_first_run = 1;
+        gc_registry    = NULL;
+        gc_name_stubs  = NULL;
+        gc_group_items = NULL;
+        gc_item_groups = NULL;
     }
 }
 

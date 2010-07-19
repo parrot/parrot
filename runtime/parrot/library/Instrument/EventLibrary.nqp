@@ -225,6 +225,7 @@ class Instrument::Event::Class is Instrument::Event {
         };
 
         for (@!class_names) {
+
             my $class_name   := $_;
             my $class        := $!instr_obj.instrument_class($class_name);
             my $event_prefix := 'Class::' ~ $class_name ~ '::';
@@ -256,26 +257,30 @@ class Instrument::Event::Class is Instrument::Event {
 
     sub setup_load_event($instrument) {
         if !pir::defined__IP($Instrument::Event::Class::loadlib_event) {
-            # Get the callback.
-            my $callback := pir::get_global__PS("load_cb");
-
             # Define the loadlib event for this class.
             my $loadlib := Instrument::Event::Internal::loadlib.new();
-            $loadlib.callback($callback);
+            $loadlib.callback(pir::get_global__PS("load_cb"));
             $instrument.attach($loadlib);
             $Instrument::Event::Class::loadlib_event := $loadlib;
 
             # Define the load_bytecode event for this class.
             my $bytecode := Instrument::Probe.new();
             $bytecode.inspect('load_bytecode');
-            $bytecode.callback($callback);
+            $bytecode.callback(pir::get_global__PS("loadbytecode_cb"));
             $instrument.attach($bytecode);
             $Instrument::Event::Class::loadbytecode_event := $bytecode;
         }
     };
 
-    sub load_cb($arg1?, $arg2?, $arg3?) {
-        say('Load event!');
+    sub load_cb($data) {
+        reload_todos();
+    }
+
+    sub loadbytecode_cb($op, $instr, $probe) {
+        return pir::get_global__PS('reload_todos');
+    }
+
+    sub reload_todos() {
         my @list := @Instrument::Event::Class::todo;
         @Instrument::Event::Class::todo := ();
 

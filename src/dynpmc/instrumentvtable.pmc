@@ -3209,6 +3209,8 @@ void setup_vtable_common_hashes(PARROT_INTERP) {
 }
 
 void destroy_vtable_common_hashes(PARROT_INTERP) {
+    if (vtable_registry == NULL) { return; }
+
     if (parrot_hash_size(interp, vtable_registry) == 0) {
         parrot_hash_destroy(interp, vtable_registry);
         parrot_hash_destroy(interp, vtable_name_stubs);
@@ -3216,6 +3218,10 @@ void destroy_vtable_common_hashes(PARROT_INTERP) {
         parrot_hash_destroy(interp, vtable_item_groups);
 
         vtable_first_run = 1;
+        vtable_registry    = NULL;
+        vtable_name_stubs  = NULL;
+        vtable_group_items = NULL;
+        vtable_item_groups = NULL;
     }
 }
 
