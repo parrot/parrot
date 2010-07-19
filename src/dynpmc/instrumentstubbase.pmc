@@ -247,6 +247,9 @@ If name denotes a group, returns all the entries within that group.
             list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
             VTABLE_push_string(INTERP, list, name);
         }
+        else {
+            list = VTABLE_clone(INTERP, list);
+        }
 
         RETURN(PMC *list);
     }
@@ -273,6 +276,7 @@ the names of the groups that the entry given by name belongs to.
                                         "%Ss : b Unknown function, '%Ss'",
                                         VTABLE_name(INTERP, SELF), name);
         }
+        groups = VTABLE_clone(INTERP, groups);
 
         RETURN(PMC *groups);
     }

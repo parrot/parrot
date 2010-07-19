@@ -108,7 +108,6 @@ If class is not found, throw an exception.
 
         /* Find the class. */
         attr->class_index     = Parrot_pmc_get_type_str(supervised, classname);
-        attr->original_struct = supervised->vtables[attr->class_index];
 
         /* class_index must not be 0. (0 = default). */
         if (attr->class_index == 0) {
@@ -116,6 +115,7 @@ If class is not found, throw an exception.
                                         "%Ss : Class not found, '%Ss'",
                                         VTABLE_name(INTERP, SELF), classname);
         }
+        attr->original_struct = supervised->vtables[attr->class_index];
 
         /* Prepare the class's vtable for instrumentation. */
         attr->instrumented_struct = mem_gc_allocate_zeroed_typed(supervised, _vtable);
