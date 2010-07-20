@@ -70,10 +70,6 @@ sub do_beginning {
 
     return unless $self->content_seen;
 
-    # Suppress the warning in the tests.
-    $self->{RESOURCES_URL} = '' unless $self->{RESOURCES_URL};
-    $self->{NAV_BAR}       = '' unless $self->{NAV_BAR};
-
     my $title = esc($self->get_title());
     # If the name of the document is IN the document title (a common pod
     # idiom), strip it out.
@@ -86,10 +82,16 @@ sub do_beginning {
     }
 
     my $dirCount = ( $self->{source_filename} =~ tr{/}{/} );
-    my $resources_URL = join('/', (('..') x ++$dirCount)) . '/resources';
+    my $docroot = join('/', (('..') x ++$dirCount)) ;
+    my $resources_URL = $docroot . '/resources';
+    my $nav_HTML = qq{<a href="$docroot/html/index.html">Home</a>};
 
     print { $self->{'output_fh'} }
-        Parrot::Docs::HTMLPage->header( $title, $self->{NAV_BAR}, $resources_URL );
+        Parrot::Docs::HTMLPage->header(
+            $title,
+            $nav_HTML,
+            $resources_URL
+        );
 
     $self->version_tag_comment;
 
