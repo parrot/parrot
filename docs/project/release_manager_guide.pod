@@ -261,6 +261,10 @@ works well for use Perl and PerlMonks, and text for the rest.  It is not a
 bad idea to add a "highlights" section to draw attention to major new
 features, just be sure to say the same thing in both text and HTML versions.
 
+Compute the SHA1 sum of the tarball and append it to the release announcement:
+
+ $ sha1sum parrot-a.b.c.tar.gz
+
 =item 10.
 
 Update the website. You will need an account with editor rights

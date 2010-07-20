@@ -156,7 +156,7 @@ $step = test_step_constructor_and_description($conf);
         sub { $ret = $step->runstep($conf); },
         \$stdout,
         \$stderr,
-    );;
+    );
     like(
         $stdout,
         qr/No \Q$hints_file\E found/s,

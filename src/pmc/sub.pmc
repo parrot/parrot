@@ -872,7 +872,7 @@ The number of optional named arguments
                 ASSERT_SIG_PMC(sig);
 
                 for (i = 0; i < sig_length; ++i) {
-                    int sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);;
+                    int sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);
                     if (PARROT_ARG_SLURPY_ARRAY_ISSET(sig_item)){
                         if (PARROT_ARG_NAME_ISSET(sig_item))
                             sub->arg_info->named_slurpy = 1;
@@ -881,7 +881,7 @@ The number of optional named arguments
                     }
                     else if (PARROT_ARG_NAME_ISSET(sig_item)) {
                         ++i;
-                        sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);;
+                        sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);
                         if (PARROT_ARG_OPTIONAL_ISSET(sig_item))
                             ++sub->arg_info->named_optional;
                         else

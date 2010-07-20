@@ -438,7 +438,7 @@ Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
         ARGIN(PMC *classobj), ARGIN(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_find_vtable_override_for_class)
-    const Parrot_Class_attributes * const class_info = PARROT_CLASS(classobj);;
+    const Parrot_Class_attributes * const class_info = PARROT_CLASS(classobj);
     PARROT_ASSERT(PObj_is_class_TEST(classobj));
 
     return VTABLE_get_pmc_keyed_str(interp, class_info->vtable_overrides, name);
