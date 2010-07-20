@@ -43,18 +43,6 @@ deprecations specifically by including this snippet:
 
 =over 4
 
-=item Task [eligible in 2.7]
-
-For the gsoc_threads branch, the word "Task" has been stolen
-for Green Threads. If this branch is merged, the current task PMC 
-may be renamed or removed and related behavior may change.
-
-L<http://trac.parrot.org/parrot/ticket/1709>
-
-=item ParrotThread [eligible in 2.7]
-
-L<http://trac.parrot.org/parrot/ticket/1708>
-
 =item GzipHandle [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1580>
