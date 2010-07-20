@@ -62,7 +62,7 @@ Store information about the referring page so we can generate breadcrumbs.
 sub set_parent {
     my $self = shift;
     my $parent = shift;
-    my $parent_title = shift; 
+    my $parent_title = shift;
 
     return if $parent eq 'index'; # this is the root, no need to track it 2x.
 
@@ -99,7 +99,7 @@ sub do_beginning {
     my $docroot = join('/', (('..') x ++$dirCount)) ;
     my $resources_URL = $docroot . '/resources';
     my $nav_HTML = qq{<a href="$docroot/html/index.html">Home</a>};
-    if (exists $self->{parent}) { 
+    if (exists $self->{parent}) {
         $nav_HTML .= qq{ &raquo; <a href="$docroot/html/} . $self->{parent};
         $nav_HTML .= qq{.html">} . $self->{parent_title} . '</a>';
     }
