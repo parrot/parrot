@@ -163,7 +163,8 @@ Replace the statementlist rule with this:
         <stat_or_def>*
     }
 
-When you work on the action methods later, you'll also want to replace $<statement> in the action method with $<stat_or_def>
+When you work on the action methods later, you'll also want to replace $<statement> in the action
+method with $<stat_or_def>
 
 Add these rules:
 
@@ -263,8 +264,8 @@ you know for sure your parser doesn't accept input that it shouldn't.
 Now we have implemented the initial version of the Squaak grammar, it's time to
 implement the parse actions we mentioned before. The actions are written in a
 file called F<src/Squaak/Actions.pm>. If you look at the methods in this file,
-here and there you'll see that the C<ast> method being called on the match object ($/) , or rather, hash fields of
-it (like $<statement>).
+here and there you'll see that the C<ast> method being called on the match object ($/) , or rather,
+hash fields of it (like $<statement>).
 The special make function can be used to set the ast to a value.
 This means that each node in the parse tree (a Match object) can also hold its
 PAST representation. Thus we use the make function to set the PAST
@@ -331,7 +332,8 @@ out how you do such a binding).
 
 =item 5.
 
-Write the action method for stat_or_def. Simply retrieve the result object from statement and make that the result object.
+Write the action method for stat_or_def. Simply retrieve the result object from statement and make
+that the result object.
 
 =item 6.
 
@@ -432,7 +434,8 @@ Note that we set the lvalue flag on $lhs. See PDD26 for details on this flag.
 
 =item 5
 
-Write the action method for stat_or_def. Simply retrieve the result object from statement and make that the result object.
+Write the action method for stat_or_def. Simply retrieve the result object from statement and make
+that the result object.
 
  method stat_or_def {
      make $<statement>.ast;

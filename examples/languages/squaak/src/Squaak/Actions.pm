@@ -1,3 +1,5 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
 class Squaak::Actions is HLL::Actions;
 
 method begin_TOP ($/) {
@@ -21,9 +23,10 @@ method statementlist($/) {
 }
 
 method stat_or_def($/) {
-    if $<statement> { 
+    if $<statement> {
         make $<statement>.ast;
-    } else { # Must be a def
+    }
+    else { # Must be a def
         make $<sub_definition>.ast;
     }
 }

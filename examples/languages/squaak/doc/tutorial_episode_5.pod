@@ -156,7 +156,9 @@ Add this token to the grammar:
      <?>
  }
 
-It uses something we haven't seen before, <?>. The null pattern <?> always returns true without consuming any text. Tokens consisting of only <?> are frequently used to invoke additional action methods.
+It uses something we haven't seen before, <?>. The null pattern <?> always returns true without
+consuming any text. Tokens consisting of only <?> are frequently used to invoke additional action
+methods.
 
 Add this method to Actions.pm:
 
@@ -181,7 +183,8 @@ C<@?BLOCK>. This variable has a "@" sigil, meaning this is an array. The
 unshift method puts its argument on the front of the list. In a sense, you
 could think of the front of this list as the top of a stack. Later we'll see
 why this stack is necessary. This C<@?BLOCK> variable is also declared with "our", meaning it's also
-package-scoped. Since it's an array variable, it is automatically initialized with an empty ResizablePMCArray.
+package-scoped. Since it's an array variable, it is automatically initialized with an empty
+ResizablePMCArray.
 
 Now we need to modify our TOP rule to call begin_TOP.
 
@@ -191,7 +194,9 @@ Now we need to modify our TOP rule to call begin_TOP.
      [ $ || <.panic: "Syntax error"> ]
  }
 
-"<.begin_TOP>" is just like <begin_TOP>, calling the subrule begin_TOP, with one difference: The <.subrule> form does not capture. Normally, when match a subrule <foo>, $<foo> on the match object is bound to the subrule's match result. With <.foo>, $<foo> is not bound.
+"<.begin_TOP>" is just like <begin_TOP>, calling the subrule begin_TOP, with one difference: The
+<.subrule> form does not capture. Normally, when match a subrule <foo>, $<foo> on the match object
+is bound to the subrule's match result. With <.foo>, $<foo> is not bound.
 
 The parse action for begin_TOP is executed before any input
 is parsed, which is particularly suitable for any initialization actions you
@@ -270,10 +275,11 @@ invokes the new begin_TOP action at the beginning of the parse.
 The block rule, which defines a block to be a series of statements, represents
 a new scope. This rule is used in for instance if-statement
 (the then-part and else-part), while-statement (the loop body) and others.
-Add a new begin_block rule consisting of <?>; in the action for it, create a new PAST::Block and store it onto the scope stack.
+Add a new begin_block rule consisting of <?>; in the action for it, create a new PAST::Block and
+store it onto the scope stack.
 Update the rule for block so that it calls begin_block before parsing
-the statements. Update the parse action for block after parsing the statements, during which this PAST node
-is set as the result object. Make sure C<$?BLOCK> is always pointing to the
+the statements. Update the parse action for block after parsing the statements, during which this
+PAST node is set as the result object. Make sure C<$?BLOCK> is always pointing to the
 current block. In order to do this exercise correctly, you should understand
 well what the shift and unshift methods do, and why we didn't implement methods
 to push and pop, which are more appropriate words in the context of a (scope)

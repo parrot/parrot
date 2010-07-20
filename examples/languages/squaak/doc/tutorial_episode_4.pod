@@ -60,10 +60,16 @@ if-statements and throw-statements.
 The first statement we're going to implement now is the if-statement. An
 if-statement has typically three parts (but this of course depends on the
 programming language): a conditional expression, a "then" part and an "else"
-part. Implementing this in Perl 6 rules and PAST is almost trivial, but first, let's add a little infrastructure to simplify adding new statement types. Replace the statement rule with the following:
+part. Implementing this in Perl 6 rules and PAST is almost trivial, but first, let's add a little
+infrastructure to simplify adding new statement types. Replace the statement rule with the
+following:
     proto rule statement { <...> }
 
-Delete the statement method from Action.pm, and rename the assignment rule in both Grammar.pm and Actions.pm to statement:sym<assignment>. The new statement rule is a "proto" rule. A proto rule is equivalent to a normal rule whose body contains each specialization of the rule separated by the | operator. The name of a particular specialization of a proto rule is placed between the angle brackets. Within the body of the rule, it can be matched literally with <sym>.
+Delete the statement method from Action.pm, and rename the assignment rule in both Grammar.pm and
+Actions.pm to statement:sym<assignment>. The new statement rule is a "proto" rule. A proto rule is
+equivalent to a normal rule whose body contains each specialization of the rule separated by the |
+operator. The name of a particular specialization of a proto rule is placed between the angle
+brackets. Within the body of the rule, it can be matched literally with <sym>.
 
     rule statement:sym<if> {
         <sym> <EXPR> 'then' $<then>=<block>
@@ -75,12 +81,15 @@ Delete the statement method from Action.pm, and rename the assignment rule in bo
         <statement>*
     }
 
-Note that the optional else block is stored in the match object's "else" field, and the then block is stored in the match object's "then" field.
+Note that the optional else block is stored in the match object's "else" field, and the then block
+is stored in the match object's "then" field.
 If we hadn't written this $<else>= part, then <block> would have been an array,
 with block[0] the "then" part, and block[1] the optional else part. Assigning
 the optional else block to a different field, makes the action method slightly
 easier to read.
-Note that the proto declaration for statement means that the result object for  $<statement> in any rule which calls statement as a subrule will be result object for whichever statement type matched. Because of this, we can delete the statement action method.
+Note that the proto declaration for statement means that the result object for  $<statement> in any
+rule which calls statement as a subrule will be result object for whichever statement type matched.
+Because of this, we can delete the statement action method.
  The relevant action methods are shown below:
 
     method block($/) {
@@ -124,9 +133,9 @@ actions and how the whole PAST is created by the individual parse actions.
 Have another look at the action method statement:sym<if>. In the first two lines,
 we request the result objects for the conditional expression and the "then"
 block. When were these result objects created? How can we be sure they're there?
-The answer lies in the order in which the parse actions are executed. The parse action invocation usually occurs
-at the end of the rule. For this input string: "if 42 then x = 1 end" this
-implies the following order:
+The answer lies in the order in which the parse actions are executed. The parse action invocation
+usually occurs at the end of the rule. For this input string: "if 42 then x = 1 end" this implies
+the following order:
 
 =over 4
 
@@ -354,7 +363,8 @@ generated, and see if you can recognize which instructions make up the
 conditional expression, which represent the "then" block, and which represent
 the "else" block (if any).
 
-Note that this may not be the exact result produced when you try it. Sub ids, block numbers, and register numbers may differ, but it should be analogous.
+Note that this may not be the exact result produced when you try it. Sub ids, block numbers, and
+register numbers may differ, but it should be analogous.
 
   > if 1 then else end
 

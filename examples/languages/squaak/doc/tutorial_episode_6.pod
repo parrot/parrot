@@ -90,9 +90,12 @@ And we need to add it to rule stat_or_def:
      | <sub_definition>
  }
 
-Appropriately modifying the action method is simple. It's analogous to the action method for expression.
+Appropriately modifying the action method is simple. It's analogous to the action method for
+expression.
 
-"**" is the repetition specifier; "<identifier> ** ','" matches <identifier> separated by commas. Since it's in a rule and there is space between the ** and its operands, whitespace is allowed between the commas and both the preceding and following identifiers.
+"**" is the repetition specifier; "<identifier> ** ','" matches <identifier> separated by commas.
+Since it's in a rule and there is space between the ** and its operands, whitespace is allowed
+between the commas and both the preceding and following identifiers.
 
 This is rather straightforward, and the action methods for these rules are
 quite simple, as you will see. First, however, let's have a look at the rule
@@ -420,8 +423,8 @@ incrementing statement to $body.
 
         $body.push($step);
 
-The loop condition uses the isle opcode, which checks that its first operand is less than or equal to its second, and compares the loop variable
-with the maximum value that was specified.
+The loop condition uses the isle opcode, which checks that its first operand is less than or equal
+to its second, and compares the loop variable with the maximum value that was specified.
 
         ## while loop iterator <= end-expression
         my $cond := PAST::Op.new( :pirop<isle__IPP>,

@@ -124,20 +124,31 @@ NQP-rx supports this, and is used as follows:
  <EXPR>
 
 Of course, the optable must be populated with some operators that
-we need to be able to parse and it might be told what precedence and associativity they have. The easiest way to do this is by setting up precedence levels in an C<INIT> block:
+we need to be able to parse and it might be told what precedence and associativity they have. The
+easiest way to do this is by setting up precedence levels in an C<INIT> block:
 
     INIT {
         Squaak::Grammar.O(':prec<t>, :assoc<left>', '%additive');
         Squaak::Grammar.O(':prec<u>, :assoc<lefT>', '%multiplicative');
     }
 
-In this C<INIT> block, we use the C<O> method of the compiler to set up two precedence levels: one for operators like addition (named C<%additive>), and one for operators like multiplication (named C<%multiplicative>). Each of themhas a ":prec" value and an ":assoc" value. ":prec" determines the precedence. Lexicographically greater values indicate higher precedence, so C<%additive> operators, with a precedence value of "t", have lower precedence than C<%multiplicative> operators with a precedence value of "u".":assoc" defines the associativity of the operators. If C<@> is a left associative operator, then 1 @ 2 @ 3 is equivalent to (1 @ 2) @ 3. However, if C<@> is right associative, then 1 @ 2 @ 3 is equivalent to 1 @ (2 @ 3). There are other options for the associativity, but we'll discuss them as we come to them.
+In this C<INIT> block, we use the C<O> method of the compiler to set up two precedence levels: one
+for operators like addition (named C<%additive>), and one for operators like multiplication (named
+C<%multiplicative>). Each of themhas a ":prec" value and an ":assoc" value. ":prec" determines the
+precedence. Lexicographically greater values indicate higher precedence, so C<%additive> operators,
+with a precedence value of "t", have lower precedence than C<%multiplicative> operators with a
+precedence value of "u".":assoc" defines the associativity of the operators. If C<@> is a left
+associative operator, then 1 @ 2 @ 3 is equivalent to (1 @ 2) @ 3. However, if C<@> is right
+associative, then 1 @ 2 @ 3 is equivalent to 1 @ (2 @ 3). There are other options for the
+associativity, but we'll discuss them as we come to them.
 
     token infix:sym<*> { <sym> <O('%multiplicative, :pirop<mul>')> }
 
 This defines the operator C<*> (the C<infix:> is a prefix that tells the
 operator parser that this operator is an infix operator; there are other types,
-such as prefix, postfix and others). As you can see, it uses the O rule to specify that it is part of the C<%multiplicative> group of operators. The ":pirop" value specifies that the operator should compile to the C<mul> PIR opcode.
+such as prefix, postfix and others). As you can see, it uses the O rule to specify that it is part
+of the C<%multiplicative> group of operators. The ":pirop" value specifies that the operator should
+compile to the C<mul> PIR opcode.
 
 Of course, the expression parser does not just parse operators, it must also
 parse the operands. So, how do we declare the most basic entity that represents
@@ -145,7 +156,9 @@ an operand? It can be anything, from a basic integer-constant, a function call,
 or even a function definition (but adding two function definition doesn't
 really make sense, does it?). The operands are parsed in a recursive-descent
 fashion, so somewhere the parser must switch back from bottom-up
-(expression parsing) to top-down. This "switch-back" point is the proto token C<term>. This is the reason why integer constants are parsed by the rule term:sym<integer_constant>, for example, in our grammar.
+(expression parsing) to top-down. This "switch-back" point is the proto token C<term>. This is the
+reason why integer constants are parsed by the rule term:sym<integer_constant>, for example, in our
+grammar.
 
 The C<term> proto token is
 invoked every time a new operand is needed
@@ -169,7 +182,8 @@ mathematical operators are organized according to standard math rules).
  or
 
 (".." is the string concatenation operator). Besides defining an entry and exit
-point for the expression parser, you need to define precedence levels for your operators. Find the C<INIT> block in Grammar.pm below the "## Operators" comment, and replace it with this:
+point for the expression parser, you need to define precedence levels for your operators. Find the
+C<INIT> block in Grammar.pm below the "## Operators" comment, and replace it with this:
 
     INIT {
         Squaak::Grammar.O(':prec<w>, :assoc<unary>', '%unary-negate');
@@ -226,7 +240,8 @@ to true, evaluate the second child. Guess what pasttype you'd need for that!
 In the previous section, we introduced the C<pasttype> clause that you can
 specify. This means that for that operator (for instance, the C<and> operator
 we discussed), a C<PAST::Op( :pasttype('if') )> node is created. What happens
-if you don't specify a pasttype? In that case, the corresponding action method is called. Obviously, some languages have very exotic semantics for the C<+> operator,
+if you don't specify a pasttype? In that case, the corresponding action method is called. Obviously,
+some languages have very exotic semantics for the C<+> operator,
 but many languages just want to use Parrot's built-in C<add> instruction. How
 do we achieve that?
 
@@ -250,23 +265,25 @@ assigned to a newly created PMC which is stored in register C<$P12>.
 =head2 To circumfix or not to circumfix
 
 Squaak supports parenthesized expressions. Parentheses can be used to change
-the order of evaluation in an expression, just as you probably have seen in other languages. Besides infix, prefix and postfix operators, you can
-define circumfix operators, which is specified with the left and right
-delimiter. This is an ideal way to implement parenthesized expressions:
+the order of evaluation in an expression, just as you probably have seen in other languages. Besides
+infix, prefix and postfix operators, you can define circumfix operators, which is specified with the
+left and right delimiter. This is an ideal way to implement parenthesized expressions:
 
     token circumfix:sym<( )> { '(' <.ws> <EXPR> ')' }
 
     # with the action method:
     method circumfix:sym<( )> { make $<EXPR>.ast; }
 
-This rule and action method were generated for us when we ran mk_language_shell.pl; you don't need to add them to the grammar and actions yourself.
-Circumfix operators are treated as terms by the operator-precedence parser, so it will parse as we want it to automatically.
+This rule and action method were generated for us when we ran mk_language_shell.pl; you don't need
+to add them to the grammar and actions yourself. Circumfix operators are treated as terms by the
+operator-precedence parser, so it will parse as we want it to automatically.
 
 =head2 Expression parser's action method
 
 For all grammar rules we introduced, we also introduced an action method that
 is invoked after the grammar rule was done matching. What about the action
-method for EXPR? Our Squaak::Actions class inherits that from HLL::Actions. We don't have to write one.
+method for EXPR? Our Squaak::Actions class inherits that from HLL::Actions. We don't have to write
+one.
 
 =head2 What's Next?
 
@@ -296,7 +313,12 @@ you understand the difference between a "rule" and a "token".
 
 Hint: a floating-point constant should produce a value of type 'Float'.
 
-Note: in Perl 6 regexes, when matching an alternation as in a proto rule, the alternative which matches the most of the string is supposed to match. However, NQP-rx does not yet implement this. As a work-around, NQP-rx specifies that the version of a proto regex with the longest name will match. Since the part of a floating-point constant before the decimal place is the same as an integer constant, unless the token for floating-point constants has a longer name than the token for integer-constants, the latter will match and a syntax error will result.
+Note: in Perl 6 regexes, when matching an alternation as in a proto rule, the alternative which
+matches the most of the string is supposed to match. However, NQP-rx does not yet implement this. As
+a work-around, NQP-rx specifies that the version of a proto regex with the longest name will match.
+Since the part of a floating-point constant before the decimal place is the same as an integer
+constant, unless the token for floating-point constants has a longer name than the token for
+integer-constants, the latter will match and a syntax error will result.
 
 =item *
 
@@ -323,7 +345,12 @@ difference between a C<rule> and a C<token>.
 
 Hint: a floating-point constant should produce a value of type 'Float'.
 
-Note: in Perl 6 regexes, when matching an alternation as in a proto rule, the alternative which matches the most of the string is supposed to match. However, NQP-rx does not yet implement this. As a work-around, NQP-rx specifies that the version of a proto regex with the longest name will match. Since the part of a floating-point constant before the decimal place is the same as an integer constant, unless the token for floating-point constants has a longer name than the token for integer-constants, the latter will match and a syntax error will result.
+Note: in Perl 6 regexes, when matching an alternation as in a proto rule, the alternative which
+matches the most of the string is supposed to match. However, NQP-rx does not yet implement this. As
+a work-around, NQP-rx specifies that the version of a proto regex with the longest name will match.
+Since the part of a floating-point constant before the decimal place is the same as an integer
+constant, unless the token for floating-point constants has a longer name than the token for
+integer-constants, the latter will match and a syntax error will result.
 
     token term:sym<float_constant_long> { # longer to work around lack of LTM
         [

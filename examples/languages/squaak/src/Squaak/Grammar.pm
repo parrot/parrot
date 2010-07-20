@@ -1,3 +1,5 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
 =begin overview
 
 This is the grammar for Squaak in Perl 6 rules.
@@ -47,7 +49,7 @@ rule parameters {
 
 proto rule statement { <...> }
 
-rule statement:sym<assignment> { 
+rule statement:sym<assignment> {
     <primary> '=' <EXPR>
 }
 

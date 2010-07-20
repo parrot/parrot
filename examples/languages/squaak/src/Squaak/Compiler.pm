@@ -1,3 +1,5 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
 class Squaak::Compiler is HLL::Compiler;
 
 INIT {

@@ -103,7 +103,9 @@ parts:
 
 NQP is a lightweight language inspired by Perl 6 and can be used to write the
 methods that must be executed during the parsing phase, just as you can write
-actions in a Yacc/Bison input file. It also provides the regular expression engine we'll use to write our grammar. In addition to the capabilities of Perl 5's regexes, the Perl 6 regexes that NQP implements can be used to define language grammars. (Check the references for the specification.)
+actions in a Yacc/Bison input file. It also provides the regular expression engine we'll use to 
+write our grammar. In addition to the capabilities of Perl 5's regexes, the Perl 6 regexes that NQP
+ implements can be used to define language grammars. (Check the references for the specification.)
 
 =item B<P>arrot B<A>bstract B<S>yntax B<T>ree (PAST).
 
@@ -158,7 +160,9 @@ Save it the as file F<test.sq> and type:
 
  $ ./installable_squaak test.sq
 
-"installable_squaak" is a "fake-cutable" an executable that bundles the Parrot interpreter and the compiled bytecode for a program to allow treating a Parrot program as a normal executable program. This will run Parrot, specifying squaak.pbc as the file to be run by Parrot,
+"installable_squaak" is a "fake-cutable" an executable that bundles the Parrot interpreter and the
+compiled bytecode for a program to allow treating a Parrot program as a normal executable program.
+This will run Parrot, specifying squaak.pbc as the file to be run by Parrot,
 which takes a single argument: the file test.sq. If all went well, you should
 see the following output:
 
