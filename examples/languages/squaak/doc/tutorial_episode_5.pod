@@ -30,9 +30,8 @@ For each individual scope, there's a separate symbol table.
 
 Squaak has a so-called do-block statement, that is defined below.
 
- rule do_block {
-     'do' <block> 'end'
-     {*}
+ rule statement:sym<do> {
+     <sym> <block> 'end'
  }
 
 Each do-block defines a new scope; local variables declared between the C<do>
@@ -94,9 +93,8 @@ The following is the grammar rule for variable declarations. This is a type of
 statement, so I assume you know how to extend the statement rule to allow for
 variable declarations.
 
- rule variable_declaration {
-     'var' <identifier> ['=' <expression>]?
-     {*}
+ rule statement:sym<var> {
+     <sym> <identifier> ['=' <EXPR>]?
  }
 
 A local variable is declared using the C<var> keyword, and has an optional
@@ -104,9 +102,9 @@ initialization expression. If the latter is missing, the variable's value
 defaults to the undefined value called "Undef". Let's see what the parse action
 looks like:
 
- method variable_declaration($/) {
+ method statement:sym<var>($/) {
      # get the PAST for the identifier
-     my $past := $( $<identifier> );
+     my $past := $<identifier>.ast;
 
      # this is a local (it's being defined)
      $past.scope('lexical');
@@ -115,10 +113,10 @@ looks like:
      $past.isdecl(1);
 
      # check for the initialization expression
-     if $<expression> {
+     if $<EXPR> {
          # use the viviself clause to add a
          # an initialization expression
-         $past.viviself( $( $<expression>[0] );
+         $past.viviself($<EXPR>[0].ast);
      }
      else { # no initialization, default to "Undef"
          $past.viviself('Undef');
@@ -152,46 +150,25 @@ are parsed (and their parse actions are executed -- these might need to enter
 symbols in the block's symbol table), we add a few extra parse actions. Let's
 take a look at them.
 
- rule TOP {
-     {*}                              #= open
-     <statement>*
-     [ $ || <.panic: syntax error> ]
-     {*}                              #= close
+Add this token to the grammar:
+
+ token begin_TOP {
+     <?>
  }
 
-We now have two parse actions for TOP, which are differentiated by an
-additional key parameter. The first parse action is executed before any input
-is parsed, which is particularly suitable for any initialization actions you
-might need. The second action (which was already there) is executed after the
-whole input string is parsed. Now we can create a C<PAST::Block> node before
-any statements are parsed, so that when we need the current block, it's there
-(somewhere, later we'll see where exactly). Let's take a look at the parse
-action for TOP.
+It uses something we haven't seen before, <?>. The null pattern <?> always returns true without consuming any text. Tokens consisting of only <?> are frequently used to invoke additional action methods.
 
- method TOP($/, $key) {
-     our $?BLOCK;
+Add this method to Actions.pm:
+
+ method begin_TOP ($/) {
+     our $?BLOCK := PAST::Block.new(:blocktype<declaration>, :node($/),
+                                    :hll<squaak>);
      our @?BLOCK;
-
-     if $key eq 'open' {
-         $?BLOCK := PAST::Block.new( :blocktype('declaration'),
-                                     :node($/) );
-
-         @?BLOCK.unshift($?BLOCK);
-     }
-     else { # key is 'close'
-         my $past := @?BLOCK.shift();
-
-         for $<statement> {
-             $past.push( $( $_ ) );
-         }
-
-         make $past;
-     }
+     @?BLOCK.unshift($?BLOCK);
  }
 
-Let's see what's happening here. When the parse action is invoked for the first
-time (when C<$key> equals "open"), a new C<PAST::Block> node is created and
-assigned to a strange-looking (if you don't know Perl, like me. Oh wait,
+We create a new C<PAST::Block> node and
+assign it to a strange-looking (if you don't know Perl, like me. Oh wait,
 this is Perl. Never mind..) variable called C<$?BLOCK>. This variable is
 declared as "our", which means that it is a package variable. This means that
 the variable is shared by all methods in the same package (or class), and,
@@ -203,98 +180,58 @@ After that, this block is unshifted onto another funny-looking variable, called
 C<@?BLOCK>. This variable has a "@" sigil, meaning this is an array. The
 unshift method puts its argument on the front of the list. In a sense, you
 could think of the front of this list as the top of a stack. Later we'll see
-why this stack is necessary.
+why this stack is necessary. This C<@?BLOCK> variable is also declared with "our", meaning it's also
+package-scoped. Since it's an array variable, it is automatically initialized with an empty ResizablePMCArray.
 
-This C<@?BLOCK> variable is also declared with "our", meaning it's also
-package-scoped. However, as we call a method on this variable, it should have
-been already created; otherwise you'd invoke the method on an undefined
-("Undef") variable. So, this variable should have been created before the
-parsing starts. We can do this in the compiler's main program, squaak.pir.
-Before doing so, let's take a quick look at the "else" part of the parse action
+Now we need to modify our TOP rule to call begin_TOP.
+
+ rule TOP {
+     <.begin_TOP>
+     <statementlist>
+     [ $ || <.panic: "Syntax error"> ]
+ }
+
+"<.begin_TOP>" is just like <begin_TOP>, calling the subrule begin_TOP, with one difference: The <.subrule> form does not capture. Normally, when match a subrule <foo>, $<foo> on the match object is bound to the subrule's match result. With <.foo>, $<foo> is not bound.
+
+The parse action for begin_TOP is executed before any input
+is parsed, which is particularly suitable for any initialization actions you
+might need. The action for TOP is executed after the
+whole input string is parsed. Now we can create a C<PAST::Block> node before
+any statements are parsed, so that when we need the current block, it's there
+(somewhere, later we'll see where exactly). Let's take a look at the parse
+action for TOP.
+
+ method TOP($/, $key) {
+     our @?BLOCK;
+     my $past := @?BLOCK.shift();
+     $past.push($<statementlist>.ast);
+     make $past;
+ }
+
+Let's take a quick look at the updated parse action
 for TOP, which is executed after the whole input string is parsed. The
 C<PAST::Block> node is retrieved from C<@?BLOCK>, which makes sense, as it was
 created in the first part of the method and unshifted on C<@?BLOCK>. Now this
 node can be used as the final result object of TOP. So, now we've seen how to
 use the scope stack, let's have a look at its implementation.
 
-=head2 A List Class
-
-We'll implement the scope stack as a C<ResizablePMCArray> object. This is a
-built-in PMC type. However, this built-in PMC does not have any methods; in
-PIR it can only be used as an operand of the built-in shift and unshift
-instructions. In order to allow us to write this as method calls, we create a
-new subclass of ResizablePMCArray. The code below creates the new class and
-defines the methods we need.
-
- 1 .namespace []
-
- 2 .sub 'initlist' :anon :init :load
- 3   subclass $P0, 'ResizablePMCArray', 'List'
- 4   new $P1, 'List'
- 5   set_hll_global ['Squaak';'Grammar';'Actions'], '@?BLOCK', $P1
- 6 .end
-
- 7 .namespace ['List']
-
- 8 .sub 'unshift' :method
- 9   .param pmc obj
- 10   unshift self, obj
- 11 .end
-
- 12 .sub 'shift' :method
- 13   shift $P0, self
- 14   .return ($P0)
- 15 .end
-
-Well, here you have it: part of the small amount of PIR code you need to write
-for the Squaak compiler (there's some more for some built-in subroutines, more
-on that later). Let's discuss this code snippet in more detail (if you know
-PIR, you could skip this section).
-Line 1 resets the namespace to the root namespace in Parrot, so that the sub
-C<initlist> is stored in that namespace. The sub 'initlist' defined in lines
-2-6 has some flags: C<:anon> means that the sub is not stored by name in the
-namespace, implying it cannot be looked up by name. The :init flag means that
-the sub is executed before the main program (the "main" sub) is executed. The
-C<:load> flag makes sure that the sub is executed if this file was compiled and
-loaded by another file through the load_bytecode instruction. If you don't
-understand this, no worries. You can forget about it now. In any case, we know
-for sure there's a List class when we need it, because the class creation is
-done before running the actual compiler code.
-Line 3 creates a new subclass of ResizablePMCArray, called "List". This results
-in a new class object, which is left in register $P0, but it's not used after
-that.
-Line 4 creates a new List object, and stores it in register $P1. Line 5,
-stores this List object by name of C<@?BLOCK> (that name should ring a bell
-now...) in the namespace of the Actions class. The semicolons in between the
-several key strings indicate nested namespaces. So, lines 4 and 5 are important,
-because the create the @?BLOCK variable and store it in a place that can be
-accessed from the action methods in the Actions class.
-Lines 7-11 define the unshift method, which is a method in the "List" namespace.
-This means that it can be invoked as a method on a List object. As the sub is
-marked with the :method flag, the sub has an implicit first parameter called
-"self", which refers to the invocant object. The unshift method invokes
-Parrot's unshift instruction on self, passing the obj argument as the second
-operand. So, obj is unshifted onto self, which is the List object itself.
-Finally, lines 12-15 define the "shift" method, which does the opposite of
-"unshift", removing the first element and returning it to its caller.
-
 =head2 Storing Symbols
 
 Now, we set up the necessary infrastructure to store the current scope block,
 and we created a datastructure that acts as a scope stack, which we will need
-later. We'll now go back to the parse action for variable_declaration, because
+later. We'll now go back to the parse action for statement:sym<var>, because
 we didn't enter the declared variable into the current block's symbol table yet.
 We'll see how to do that now.
 First, we need to make the current block accessible from the method
-variable_declaration. We've already seen how to do that, using the "our"
+statement:sym<var>. We've already seen how to do that, using the "our"
 keyword. It doesn't really matter where in the action method we enter the
 symbol's name into the symbol table, but let's do it at the end, after the
 initialization stuff. Naturally, we're only going to enter the symbol if it's
 not there already; duplicate variable declarations (in the same scope) should
 result in an error message (using the panic method of the match object).
-The code to be added to the method variable_declaration looks then like this:
+The code to be added to the method statement:sym<var> looks then like this:
 
- method variable_declaration($/) {
+ method statement:sym<var>($/) {
      our $?BLOCK;
      # get the PAST node for identifier
      # set the scope and declaration flag
@@ -304,7 +241,7 @@ The code to be added to the method variable_declaration looks then like this:
 
      if $?BLOCK.symbol( $name ) {
          # symbol is already present
-         $/.panic("Error: symbol " ~ $name ~ " was already defined.\n");
+         $/.CURSOR.panic("Error: symbol " ~ $name ~ " was already defined.\n");
      }
      else {
          $?BLOCK.symbol( $name, :scope('lexical') );
@@ -329,13 +266,13 @@ programming language. Hope to catch you later!
 =item *
 
 In this episode, we changed the action method for the C<TOP> rule; it is now
-invoked twice, once at the beginning of the parse, once at the end of the parse.
+invokes the new begin_TOP action at the beginning of the parse.
 The block rule, which defines a block to be a series of statements, represents
 a new scope. This rule is used in for instance if-statement
 (the then-part and else-part), while-statement (the loop body) and others.
-Update the parse action for block so it is invoked twice; once before parsing
-the statements, during which a new C<PAST::Block> is created and stored onto the
-scope stack, and once after parsing the statements, during which this PAST node
+Add a new begin_block rule consisting of <?>; in the action for it, create a new PAST::Block and store it onto the scope stack.
+Update the rule for block so that it calls begin_block before parsing
+the statements. Update the parse action for block after parsing the statements, during which this PAST node
 is set as the result object. Make sure C<$?BLOCK> is always pointing to the
 current block. In order to do this exercise correctly, you should understand
 well what the shift and unshift methods do, and why we didn't implement methods
@@ -385,24 +322,35 @@ or at the back.
 I hope it's clear what I mean here... otherwise, have a look at the code,
 and try to figure out what's happening:
 
-    method block($/, $key) {
-      our $?BLOCK;
-      our @?BLOCK;
-      if $key eq 'open' {
-            $?BLOCK := PAST::Block.new(
-                        :blocktype('immediate'),
-                          :node($/) );
-           @?BLOCK.unshift($?BLOCK);
-        }
-        else {
-            my $past := @?BLOCK.shift();
-            $?BLOCK  := @?BLOCK[0];
+    # In src/Squaak/Grammar.pm
+    token begin_block {
+        <?>
+    }
 
-            for $<statement> {
-                $past.push( $( $_ ) );
-            }
-            make $past;
+    rule block {
+        <.begin_block>
+        <statement>*
+    }
+
+    # In src/Squaak/Actions.pm
+    method begin_block {
+        our $?BLOCK;
+        our @?BLOCK;
+        $?BLOCK := PAST::Block.new(:blocktype('immediate'),
+                                   :node($/));
+        @?BLOCK.unshift($?BLOCK);
+    }
+
+    method block($/, $key) {
+        our $?BLOCK;
+        our @?BLOCK;
+        my $past := @?BLOCK.shift();
+        $?BLOCK  := @?BLOCK[0];
+
+        for $<statement> {
+            $past.push($_.ast);
         }
+        make $past;
     }
 
 =cut

@@ -60,39 +60,28 @@ if-statements and throw-statements.
 The first statement we're going to implement now is the if-statement. An
 if-statement has typically three parts (but this of course depends on the
 programming language): a conditional expression, a "then" part and an "else"
-part. Implementing this in Perl 6 rules and PAST is almost trivial:
+part. Implementing this in Perl 6 rules and PAST is almost trivial, but first, let's add a little infrastructure to simplify adding new statement types. Replace the statement rule with the following:
+    proto rule statement { <...> }
 
-    rule if_statement {
-        'if' <expression> 'then' <block>
+Delete the statement method from Action.pm, and rename the assignment rule in both Grammar.pm and Actions.pm to statement:sym<assignment>. The new statement rule is a "proto" rule. A proto rule is equivalent to a normal rule whose body contains each specialization of the rule separated by the | operator. The name of a particular specialization of a proto rule is placed between the angle brackets. Within the body of the rule, it can be matched literally with <sym>.
+
+    rule statement:sym<if> {
+        <sym> <EXPR> 'then' $<then>=<block>
         ['else' $<else>=<block> ]?
         'end'
-        {*}
     }
 
     rule block {
         <statement>*
-        {*}
     }
 
-    rule statement {
-        | <assignment> {*}          #= assignment
-        | <if_statement> {*}        #= if_statement
-    }
-
-Note that the optional else block is stored in the match object's "else" field.
+Note that the optional else block is stored in the match object's "else" field, and the then block is stored in the match object's "then" field.
 If we hadn't written this $<else>= part, then <block> would have been an array,
 with block[0] the "then" part, and block[1] the optional else part. Assigning
 the optional else block to a different field, makes the action method slightly
 easier to read.
-Also note that the statement rule has been updated; a statement is now either
-an assignment or an if-statement. As a result, the action method statement now
-takes a key argument. The relevant action methods are shown below:
-
-    method statement($/, $key) {
-        # get the field stored in $key from the $/ object,
-        # and retrieve the result object from that field.
-        make $( $/{$key} );
-    }
+Note that the proto declaration for statement means that the result object for  $<statement> in any rule which calls statement as a subrule will be result object for whichever statement type matched. Because of this, we can delete the statement action method.
+ The relevant action methods are shown below:
 
     method block($/) {
         # create a new block, set its type to 'immediate',
@@ -105,19 +94,18 @@ takes a key argument. The relevant action methods are shown below:
         # for each statement, add the result
         # object to the block
         for $<statement> {
-            $past.push( $( $_ ) );
+            $past.push($_.ast);
         }
         make $past;
     }
 
-    method if_statement($/) {
-        my $cond := $( $<expression> );
-        my $then := $( $<block> );
-        my $past := PAST::Op.new( $cond, $then,
+    method statement:sym<if>($/) {
+        my $cond := $<EXPR>.ast;
+        my $past := PAST::Op.new( $cond, $<then>.ast,
                                   :pasttype('if'),
                                   :node($/) );
         if $<else> {
-            $past.push( $( $<else>[0] ) );
+            $past.push($<else>[0].ast);
         }
         make $past;
     }
@@ -133,11 +121,10 @@ with the make function.
 
 At this point it's wise to spend a few words on the make function, the parse
 actions and how the whole PAST is created by the individual parse actions.
-Have another look at the action method if_statement. In the first two lines,
+Have another look at the action method statement:sym<if>. In the first two lines,
 we request the result objects for the conditional expression and the "then"
 block. When were these result objects created? How can we be sure they're there?
-The answer lies in the order in which the parse actions are executed. The
-special "{*}" symbol that triggers a parse action invocation, is usually placed
+The answer lies in the order in which the parse actions are executed. The parse action invocation usually occurs
 at the end of the rule. For this input string: "if 42 then x = 1 end" this
 implies the following order:
 
@@ -147,9 +134,9 @@ implies the following order:
 
 =item  2. parse statement
 
-=item  3. parse if_statement
+=item  3. parse statement:sym<if>
 
-=item  4. parse expression
+=item  4. parse EXPR
 
 =item  5. parse integer
 
@@ -159,7 +146,7 @@ implies the following order:
 
 =item  8. parse statement
 
-=item  9. parse assignment
+=item  9. parse statement:sym<assignment>
 
 =item 10. parse identifier
 
@@ -179,7 +166,7 @@ implies the following order:
 
 =back
 
-As you can see, PAST nodes are created in the leafs of the parse tree first,
+As you can see, PAST nodes are created in the leaves of the parse tree first,
 so that later, action methods higher in the parse tree can retrieve them.
 
 =head2 Throwing Exceptions
@@ -188,12 +175,11 @@ The grammar rule for the "throw" statement is really quite easy, but it's useful
 to discuss the parse action, as it shows the use of generating custom PIR
 instructions. First the grammar rule:
 
-    rule throw_statement {
-        'throw' <expression>
-        {*}
+    rule statement:sym<throw> {
+        <sym> <EXPR>
     }
 
-I assume you know how to update the "statement" rule by now. The throw statement
+The throw statement
 will compile down to Parrot's "throw" instruction, which takes one argument.
 In order to generate a custom Parrot instruction, the instruction can be
 specified in the C<:pirop> attribute when creating a C<PAST::Op> node. Any child
@@ -201,16 +187,15 @@ nodes are passed as arguments to this instruction, so we need to pass the result
 object of the expression being thrown as a child of the C<PAST::Op> node
 representing the "throw" instruction.
 
-    method throw_statement($/) {
-        make PAST::Op.new( $( $<expression> ),
-                           :pirop('throw'),
+    method statement:sym<throw>($/) {
+        make PAST::Op.new( $<EXPR>.ast,
+                           :pirop('die'),
                            :node($/) );
     }
 
-
 =head2 What's Next?
 
-In this episode we implemented two more statement types of Squaak. You should
+In this episode we implemented two more Squaak statement types. You should
 get a general idea of how and when PAST nodes are created, and how they can be
 retrieved as sub (parse) trees. In the next episode we'll take a closer look at
 variable scope and subroutines.
@@ -266,31 +251,29 @@ C<PAST::Op> nodes you should create.
 
 The while-statement is straightforward:
 
- method while_statement($/) {
-     my $cond := $( $<expression> );
-     my $body := $( $<block> );
+ method statement:sym<while>($/) {
+     my $cond := $<EXPR>.ast;
+     my $body := $<block>.ast;
      make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
  }
 
 The try-statement is a bit more complex. Here are the grammar rules and
 action methods.
 
- rule try_statement {
-     'try' $<try>=<block>
+ rule statement:sym<try> {
+     <sym> $<try>=<block>
      'catch' <exception>
      $<catch>=<block>
      'end'
-     {*}
  }
 
  rule exception {
      <identifier>
-     {*}
  }
 
- method try_statement($/) {
+ method statement:sym<try>($/) {
      ## get the try block
-     my $try := $( $<try> );
+     my $try := $<try>.ast;
 
      ## create a new PAST::Stmts node for
      ## the catch block; note that no
@@ -299,12 +282,12 @@ action methods.
      ## exception object. For now this will
      ## do.
      my $catch := PAST::Stmts.new( :node($/) );
-     $catch.push( $( $<catch> ) );
+     $catch.push($<catch>.ast);
 
      ## get the exception identifier;
      ## set a declaration flag, the scope,
      ## and clear the viviself attribute.
-     my $exc := $( $<exception> );
+     my $exc := $<exception>.ast;
      $exc.isdecl(1);
      $exc.scope('lexical');
      $exc.viviself(0);
@@ -323,16 +306,9 @@ action methods.
  }
 
  method exception($/) {
-     our $?BLOCK;
-     my $past := $( $<identifier> );
-     $?BLOCK.symbol( $past.name(), :scope('lexical') );
+     my $past := $<identifier>.ast;
      make $past;
  }
-
-Instead of putting "identifier" after the "catch" keyword, we made it a
-separate rule, with its own action method. This allows us to insert the
-identifier into the symbol table of the current block (the try-block),
-before the catch block is parsed.
 
 First the PAST node for the try block is retrieved. Then, the catch block is
 retrieved, and stored into a C<PAST::Stmts> node. This is needed, so that we
@@ -378,41 +354,52 @@ generated, and see if you can recognize which instructions make up the
 conditional expression, which represent the "then" block, and which represent
 the "else" block (if any).
 
+Note that this may not be the exact result produced when you try it. Sub ids, block numbers, and register numbers may differ, but it should be analogous.
+
   > if 1 then else end
 
+  .HLL "squaak"
+
   .namespace []
-  .sub "_block16"
-    new $P18, "Integer"
-    assign $P18, 1
-
-    ## this is the condition:
-    if $P18, if_17
-
-    ## this is invoking the else-block:
-    get_global $P21, "_block19"
-    newclosure $P21, $P21
-    $P20 = $P21()
-    set $P18, $P20
-    goto if_17_end
-
-    ## this is invoking the then-block:
-    if_17:
-    get_global $P24, "_block22"
-    newclosure $P24, $P24
-    $P23 = $P24()
-    set $P18, $P23
-    if_17_end:
-    .return ($P18)
+  .sub "_block11"  :anon :subid("10_1279319328.02043")
+  .annotate 'line', 0
+      .const 'Sub' $P20 = "12_1279319328.02043" 
+      capture_lex $P20
+      .const 'Sub' $P17 = "11_1279319328.02043" 
+      capture_lex $P17
+  .annotate 'line', 1
+      set $I15, 1
+      if $I15, if_14
+      .const 'Sub' $P20 = "12_1279319328.02043" 
+      capture_lex $P20
+      $P21 = $P20()
+      set $P13, $P21
+      goto if_14_end
+    if_14:
+      .const 'Sub' $P17 = "11_1279319328.02043" 
+      capture_lex $P17
+      $P18 = $P17()
+      set $P13, $P18
+    if_14_end:
+      .return ($P13)
   .end
 
-  .namespace []
-  .sub "_block22" :outer("_block16")
-    .return ()
-  .end
+
+  .HLL "squaak"
 
   .namespace []
-  .sub "_block19" :outer("_block16")
-    .return ()
+  .sub "_block19"  :anon :subid("12_1279319328.02043") :outer("10_1279319328.02043")
+  .annotate 'line', 1
+      .return ()
+  .end
+
+
+  .HLL "squaak"
+
+  .namespace []
+  .sub "_block16"  :anon :subid("11_1279319328.02043") :outer("10_1279319328.02043")
+  .annotate 'line', 1
+      .return ()
   .end
 
 =back
