@@ -50,7 +50,7 @@ my @json_index_files = glob 'docs/index/*.json';
 foreach my $index_file (@json_index_files) {
     my $contents;
     open my $fh, '<', $index_file;
-    { local $/; $contents = <$fh>}
+    { local $/; $contents = <$fh> }
     my $section = '';
     eval {
         $section = $json->decode($contents);
@@ -102,7 +102,7 @@ foreach my $page (keys %pages) {
                 }
             }
             else {
-                transform_input($source);
+                transform_input($source, $page->{page}, $page->{title});
             }
         }
     }
@@ -110,13 +110,15 @@ foreach my $page (keys %pages) {
 
 my %generated;
 sub transform_input {
-    my $input = shift;
+    my ($input, $parent, $parent_title) = @_;
+
     if (! -f $input) {
         die "$input not found or not a regular file\n" .
             "You might need to restrict your glob specification.";
     }
 
     my $formatter = Parrot::Docs::PodToHtml->new();
+    $formatter->set_parent($parent, $parent_title);
 
     # Errata is currently noisy; e.g. complains about U<> even after
     # formatting it as expected. skip it until we can properly quiet it down.

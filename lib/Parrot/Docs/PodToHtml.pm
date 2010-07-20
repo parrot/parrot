@@ -54,6 +54,24 @@ sub new {
     return $new;
 }
 
+=item C<set_parent()>
+
+Store information about the referring page so we can generate breadcrumbs.
+
+=cut
+
+sub set_parent {
+    my $self = shift;
+    my $parent = shift;
+    my $parent_title = shift; 
+
+    return if $parent eq 'index'; # this is the root, no need to track it 2x.
+
+    $self->{parent} = $parent;
+    $self->{parent_title} = $parent_title;
+}
+
+
 =item C<do_beginning()>
 
 Reimplements the C<Pod::Simple::HTML> method to add a header to the start
@@ -85,6 +103,10 @@ sub do_beginning {
     my $docroot = join('/', (('..') x ++$dirCount)) ;
     my $resources_URL = $docroot . '/resources';
     my $nav_HTML = qq{<a href="$docroot/html/index.html">Home</a>};
+    if (exists $self->{parent}) { 
+        $nav_HTML .= qq{ &raquo; <a href="$docroot/html/} . $self->{parent};
+        $nav_HTML .= qq{.html">} . $self->{parent_title} . '</a>';
+    }
 
     print { $self->{'output_fh'} }
         Parrot::Docs::HTMLPage->header(
@@ -746,6 +768,8 @@ s/([^\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuv
 In order to avoid modifying C<Pod:Simple::HTML>, large sections of its code
 have been copied here, and then refactored and adjusted to enable various bits
 of Parrot-specific behaviour.
+
+At least, that's what POD2HTML, the original version of this file, said.
 
 =cut
 
