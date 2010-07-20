@@ -31,7 +31,6 @@ use base qw( Pod::Simple::HTML );
 our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
-#use Parrot::Distribution;
 
 =item C<new()>
 
@@ -82,22 +81,19 @@ of the document.
 sub do_beginning {
     my $self = shift;
 
-    # We have to do this because it has the side effect of setting
-    # content_seen.
-    $self->get_short_title();
-
-    return unless $self->content_seen;
-
     my $title = esc($self->get_title());
+
     # If the name of the document is IN the document title (a common pod
-    # idiom), strip it out.
+    # idiom), strip it out. We assume anything with a dot is the filename.
 
     if ($title =~ m/(.*?)&#45;/) {
-        # assume it's a filename if it has a dot in it.
         if ($1 =~ m/\./) {
             $title =~ s/^.*?&#45;\s*//;
         }
     }
+
+    # Figure out what the relative docroot will be and setup
+    # our breadcrumbs & resource paths.
 
     my $dirCount = ( $self->{source_filename} =~ tr{/}{/} );
     my $docroot = join('/', (('..') x ++$dirCount)) ;
@@ -124,7 +120,7 @@ sub do_beginning {
 
 Does the middle of the document. This splits up the long C<do_middle()>
 method in C<Pod:Simple::HTML>, calling the various C<process_*> methods
-below. This makes it easier to where the custom bits of Parrot-specific
+below. This makes it easier to see where the custom bits of Parrot-specific
 formatting have to be inserted.
 
 =cut
@@ -168,9 +164,9 @@ sub process_start_token {
     if ( $tagname eq 'L' ) {
         $self->process_link_start_token($token);
     }
-    #elsif ( $tagname eq 'F' ) {
-        #$self->process_file_start_token($token);
-    #}
+    elsif ( $tagname eq 'F' ) {
+        $self->process_file_start_token($token);
+    }
     elsif ( $tagname eq 'C' ) {
         $self->process_code_start_token($token);
     }
@@ -239,6 +235,9 @@ sub process_code_start_token {
 
     my $text = $next->text;
 
+
+    ## XXX re-enable this
+
     #if ( $text =~ /^Parrot::/o ) {
 
         #my $href = $self->href_for_perl_module($text);
@@ -264,14 +263,16 @@ path and that file contains POD, then a link will be made to that file's
 documentation file.
 
 =cut
-##
-##sub process_file_start_token {
-    ##my $self    = shift;
-    ##my $token   = shift;
-    ##my $tagname = $token->tagname;
-    ##my $next    = $self->get_token;
-##
-##
+
+
+sub process_file_start_token {
+    my $self    = shift;
+    my $token   = shift;
+    my $tagname = $token->tagname;
+    my $next    = $self->get_token;
+
+    ## XXX re-enable this.
+
     ##if ( $next->type eq 'text' ) {
         ##my $text = $next->text;
         ##my $dist = Parrot::Distribution->new;
@@ -299,10 +300,10 @@ documentation file.
         ##}
     ##}
     ##else {
-        ##$self->unget_token($next);
-        ##print { $self->{'output_fh'} } $self->{'Tagmap'}{$tagname};
+        $self->unget_token($next);
+        print { $self->{'output_fh'} } $self->{'Tagmap'}{$tagname};
     ##}
-##}
+}
 
 =item C<process_item_text_or_head_start_token($token)>
 
@@ -543,6 +544,8 @@ sub resolve_pod_page_link {
     my $to      = shift;
     my $section = shift;
 
+    ## XXX re-enable this
+
     #if ( $to =~ /^Parrot::/o ) {
         #my $href = $self->href_for_perl_module($to);
 
@@ -584,6 +587,8 @@ sub href_for_perl_module {
 
     my $path = $self->append_html_suffix( $dist->relative_path($file) );
 
+    ## XXX re-enable this
+
     # This is the docs file for the module.
     ## $file = $self->{TARGET}->file_with_relative_path($path);
 
@@ -624,47 +629,6 @@ sub html_for_file {
 
     return $string;
 }
-
-=item C<write_html($source, $target, $rel_path, $item)>
-
-Writes an HTML version of the file specified by C<$rel_path> in
-C<$source> to the equivalent location in C<$target>.
-
-=cut
-
-## sub write_html {
-    ## my $self     = shift;
-    ## my $source   = shift;
-    ## my $target   = shift;
-    ## my $rel_path = shift;
-    ## my $item     = shift;
-    ## my $file     = $source->file_with_relative_path($rel_path);
-##
-    ## return unless $file->contains_pod;
-##
-    ## $self->{TARGET} = $target;
-##
-    ## # Use our own method for consistency.
-    ## $self->{'Title'} = $file->title;
-##
-    ## $rel_path = $self->append_html_suffix($rel_path);
-##
-    ## my $docs_file = $target->file_with_relative_path($rel_path);
-##
-    ## $self->{DOCS_FILE} = $docs_file;
-##
-    ## $rel_path = $self->href_path( $docs_file->parent->relative_path( $target->parent_path ) );
-##
-    ## my $name = $target->name;
-##
-    ## # This is a cheat because we know that all top-level sections
-    ## # have their indexes in the root directory - but it works.
-##
-    ## $self->{NAV_BAR}       = $item->html_navigation("$rel_path/$name");
-    ## $self->{RESOURCES_URL} = "$rel_path/resources";
-##
-    ## $docs_file->write( $self->html_for_file($file) );
-## }
 
 =item C<append_html_suffix($path)>
 
