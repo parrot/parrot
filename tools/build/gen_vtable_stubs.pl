@@ -221,7 +221,7 @@ POINTER
     foreach $group (@{$groups}) {
         $group = lc $group;
         $events .= <<EVENT;
-    raise_vtable_event(supervisor, interp, pmc, data,
+    raise_vtable_event(supervisor, interp, instr_vt, pmc, data,
                    CONST_STRING(supervisor, "$group"),
                    CONST_STRING(supervisor, "$name"));
 EVENT
@@ -234,7 +234,7 @@ $ret stub_$name($params) {
     void *orig_vtable;
     Parrot_Interp supervisor;
     PMC *temp;
-    PMC *params = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC *params;
 $ret_dec
     instr_vt = (PMC *) parrot_hash_get(interp, vtable_registry, pmc->vtable);
 
@@ -242,7 +242,7 @@ $ret_dec
     GETATTR_InstrumentVtable_supervisor(interp, instr_vt, supervisor);
 
    $ret_ret ((_vtable *)orig_vtable)->$name($param_list_flat);
-
+    params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
 $instr_params
 
     data = Parrot_pmc_new(supervisor, enum_class_Hash);

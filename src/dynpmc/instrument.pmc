@@ -563,13 +563,26 @@ Creates a new InstrumentVtable instance if there is none currently associated.
             class_instr = VTABLE_get_pmc_keyed_str(INTERP, attr->instrument_classes, classname);
         }
         else {
-            class_type  = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentVtable"));
+            class_type  = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentClass"));
             class_instr = Parrot_pmc_new_init(INTERP, class_type, SELF);
 
             () = PCCINVOKE(INTERP, class_instr, "attach_to_class", STRING *classname);
 
             VTABLE_set_pmc_keyed_str(INTERP, attr->instrument_classes, classname, class_instr);
         }
+
+        RETURN(PMC *class_instr);
+    }
+
+    METHOD instrument_object(PMC *classname) {
+        Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
+        INTVAL  class_type;
+        PMC    *class_instr;
+
+        class_type  = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentObject"));
+        class_instr = Parrot_pmc_new_init(INTERP, class_type, SELF);
+
+        () = PCCINVOKE(INTERP, class_instr, "attach_to_object", PMC *classname);
 
         RETURN(PMC *class_instr);
     }

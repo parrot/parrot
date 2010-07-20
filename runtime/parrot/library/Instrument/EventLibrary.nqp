@@ -145,9 +145,9 @@ class Instrument::Event::GC is Instrument::Event {
 };
 
 # Incomplete.
-# Inspect VTABLE.
-# Inspect methods.
-# Must handle dynloaded libraries.
+# Inspect VTABLE. (Should be done for vtable overrides too)
+# Inspect methods. (I think it works. Need tests to find out)
+# Must handle dynloaded libraries.(Done)
 class Instrument::Event::Class is Instrument::Event {
     has @!class_names;
     has @!vtable_probes;
@@ -205,6 +205,15 @@ class Instrument::Event::Class is Instrument::Event {
                 }
             }
 
+            # Register the method probes.
+            my $method_prefix := $event_prefix ~ 'method::';
+            for @!method_probes {
+                $class.insert_method_hook($_);
+
+                my $event := $method_prefix ~ $_;
+                $dispatcher.register($event, $!callback);
+            }
+
             CATCH {
                 # Something was not found.
                 # Push this probe to the todo list.
@@ -225,12 +234,11 @@ class Instrument::Event::Class is Instrument::Event {
         };
 
         for (@!class_names) {
-
             my $class_name   := $_;
             my $class        := $!instr_obj.instrument_class($class_name);
             my $event_prefix := 'Class::' ~ $class_name ~ '::';
 
-            # Register the vtable probes.
+            # Deregister the vtable probes.
             my $vtable_prefix := $event_prefix ~ 'vtable::';
             for @!vtable_probes {
                 my @hooks := $class.get_hook_list($_);
@@ -242,6 +250,15 @@ class Instrument::Event::Class is Instrument::Event {
                     my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
                     $dispatcher.deregister($event, $!callback);
                 }
+            }
+
+            # Deregister the method probes.
+            my $method_prefix := $event_prefix ~ 'method::';
+            for @!method_probes {
+                $class.remove_method_hook($_);
+
+                my $event := $method_prefix ~ $_;
+                $dispatcher.register($event, $!callback);
             }
 
             CATCH {
@@ -288,7 +305,7 @@ class Instrument::Event::Class is Instrument::Event {
             $_.disable();
             $_.enable();
         }
-    }
+    };
 };
 
 # vim: ft=perl6 expandtab shiftwidth=4:

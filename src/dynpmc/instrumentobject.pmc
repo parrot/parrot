@@ -1,0 +1,90 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/instrumentobject.pmc - Interface to instrument a class instance.
+
+=head1 DESCRIPTION
+
+C<InstrumentObject> allows any PMC instance to be instrumented on a
+per object basis.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "pmc_instrument.h"
+
+extern
+void setup_vtable_individual_hashes(PARROT_INTERP, Hash *orig_hash, Hash *instr_hash,
+                                    _vtable *vt_orig, _vtable *vt_instr);
+
+pmclass InstrumentObject auto_attrs dynpmc group instrument_group extends InstrumentClass {
+
+/*
+
+=item C<void attach_to_class(STRING *classname)>
+
+Overrides the PARENT's method and throws an exception as
+we are instrumenting an object, not a class.
+
+=cut
+
+*/
+
+    METHOD attach_to_class(STRING *classname) {
+        /* Instrumenting an object, not a class. */
+        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                    "Attach %Ss to an object using 'attach_to_object' instead.",
+                                   VTABLE_name(INTERP, SELF));
+    }
+
+/*
+
+=item C<void attach_to_object(PMC *object)>
+
+Prepares the object for instrumentation.
+
+=cut
+
+*/
+
+    METHOD attach_to_object(PMC *object) {
+        Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
+        Parrot_Interp supervised;
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+
+        attr->class_name          = VTABLE_name(INTERP, object);
+        attr->instrumented_struct = mem_gc_allocate_zeroed_typed(supervised, _vtable);
+        attr->original_struct     = object->vtable;
+        mem_copy_n_typed(attr->instrumented_struct, attr->original_struct, 1, _vtable);
+        object->vtable = (_vtable *) attr->instrumented_struct;
+
+        parrot_hash_put(INTERP, attr->registry, attr->instrumented_struct, SELF);
+
+        setup_vtable_individual_hashes(INTERP, attr->name_original, attr->name_offset,
+                                       (_vtable *) attr->original_struct,
+                                       (_vtable *) attr->instrumented_struct);
+    }
+}
+
+/*
+
+=back
+
+*/
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

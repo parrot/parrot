@@ -1,0 +1,164 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/instrumentclass.pmc - Interface to instrument a class's methods.
+
+=head1 DESCRIPTION
+
+C<InstrumentClass> extends InstrumentVtable and provides methods to
+instrument a class's methods. Generally methods are invokables, so
+to know when a method is called, simply instrumenting the invoke vtable
+entry of the method is enough.
+
+=head2 TODO
+
+1. Documentation.
+2. Figure out how to access the params.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "pmc_instrument.h"
+
+pmclass InstrumentClass auto_attrs dynpmc group instrument_group extends InstrumentVtable {
+    ATTR PMC *instrumented_methods;
+
+/*
+
+=item C<void init_pmc(PMC *instrument)>
+
+Perform a partial initialization. The remaining attributes are initialised
+upon calling 'attach_to_class' in PARENT.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *instrument) {
+        Parrot_InstrumentClass_attributes * const attr = PARROT_INSTRUMENTCLASS(SELF);
+        SUPER(instrument);
+
+        attr->instrumented_methods = Parrot_pmc_new(INTERP, enum_class_Hash);
+    }
+
+/*
+
+=item C<PMC* get_method_list()>
+
+Returns a list of methods in the class that InstrumentClass is attached to.
+
+=cut
+
+*/
+
+    METHOD get_method_list() {
+        Parrot_InstrumentClass_attributes * const attr = PARROT_INSTRUMENTCLASS(SELF);
+        PMC *_class;
+        PMC *methods;
+        Parrot_Interp supervised;
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+
+        _class  = Parrot_oo_get_class_str(supervised, attr->class_name);
+        methods = VTABLE_inspect_str(supervised, _class, CONST_STRING(INTERP, "methods"));
+
+        RETURN(PMC *methods);
+    }
+
+/*
+
+=item C<void insert_method_hook(STRING *method)>
+
+Instruments the method by the given name to raise an event when it
+is called.
+
+=cut
+
+*/
+
+    METHOD insert_method_hook(STRING *method) {
+        Parrot_InstrumentClass_attributes * const attr = PARROT_INSTRUMENTCLASS(SELF);
+        PMC *_class, *methods, *method_sub;
+        PMC *instr_obj, *rename, *rename_hash;
+        STRING *invoke;
+         Parrot_Interp supervised;
+
+        invoke = CONST_STRING(INTERP, "invoke");
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+
+        _class  = Parrot_oo_get_class_str(supervised, attr->class_name);
+        (PMC *methods) = PCCINVOKE(INTERP, _class, "methods");
+        method_sub     = VTABLE_get_pmc_keyed_str(INTERP, methods, method);
+
+        (PMC *instr_obj) =
+            PCCINVOKE(INTERP, attr->instrument, "instrument_object", PMC *method_sub);
+
+        /* Instrument its invoke vtable entry. */
+        () = PCCINVOKE(INTERP, instr_obj, "insert_hook", STRING *invoke);
+
+        /* Add an entry into the rename_hash attribute so that when an event
+           is raised, the event properly named. */
+        rename = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+        VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "Class"));
+        VTABLE_push_string(INTERP, rename , attr->class_name);
+        VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "method"));
+        VTABLE_push_string(INTERP, rename , method);
+
+        GETATTR_InstrumentVtable_rename_hash(INTERP, instr_obj, rename_hash);
+        VTABLE_set_pmc_keyed_str(INTERP, rename_hash, invoke, rename);
+    }
+
+/*
+
+=item C<void remove_method_hook(STRING *method)>
+
+Removes the instrumentation of the given method.
+
+=cut
+
+*/
+
+    METHOD remove_method_hook(STRING *method) {
+        /*
+        TODO: NYI
+        */
+    }
+
+/*
+
+=item C<PMC* get_method_instrumented_list()>
+
+Returns a list of methods that has active instrumentation.
+
+=cut
+
+*/
+
+    METHOD get_method_instrumented_list() {
+        /*
+        TODO: NYI
+        */
+    }
+}
+
+/*
+
+=back
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
