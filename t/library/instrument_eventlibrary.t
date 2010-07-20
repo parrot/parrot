@@ -30,7 +30,7 @@ Class::* is not complete. Holding off until InstrumentPMC is done.
     # Load the Instrument library.
     load_bytecode 'Instrument/InstrumentLib.pbc'
 
-    plan(4)
+    plan(9)
 
     test_loadlib()
     test_gc()
