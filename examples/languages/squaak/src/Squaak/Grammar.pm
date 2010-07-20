@@ -193,8 +193,8 @@ token infix:sym<+>  { <sym> <O('%additive, :pirop<add>')> }
 token infix:sym<->  { <sym> <O('%additive, :pirop<sub>')> }
 token infix:sym<..> { <sym> <O('%additive, :pirop<concat>')> }
 
-token infix:sym«<» { <sym> <O('%relational, :pirop<isle iPP>')> }
-token infix:sym«<=» { <sym> <O('%relational, :pirop<islt iPP>')> }
+token infix:sym«<» { <sym> <O('%relational, :pirop<islt iPP>')> }
+token infix:sym«<=» { <sym> <O('%relational, :pirop<isle iPP>')> }
 token infix:sym«>» { <sym> <O('%relational, :pirop<isgt iPP>')> }
 token infix:sym«>=» { <sym> <O('%relational, :pirop<isge iPP>')> }
 token infix:sym«==» { <sym> <O('%relational, :pirop<iseq iPP>')> }

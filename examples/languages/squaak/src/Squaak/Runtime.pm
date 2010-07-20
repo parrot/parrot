@@ -17,5 +17,5 @@
 
 sub print(*@args) {
     pir::say(pir::join('', @args));
-    null;
+    pir::return();
 }
