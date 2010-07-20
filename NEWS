@@ -4,6 +4,8 @@ New in 2.6.0
 - Platforms
   + The Fedora package 'parrot-devel' install the files for syntax-highlighting
     and automatic indenting for the vim editor.
+- Documentation
+  + Updated the Squaak tutorial to use modern NQP-rx and PCT.
 
 New in 2.5.0
 - Core
