@@ -33,8 +33,10 @@ static int get_op(PARROT_INTERP, const char * name, int full);
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
+#include "parrot/events.h"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_parrotlibrary.h"
+
 
 
  /* Signed shift operator that is compatible with PMC shifts.  This is
@@ -60,15 +62,17 @@ static int get_op(PARROT_INTERP, const char * name, int full);
 #  include <unicode/uchar.h>
 #endif
 
+#include "pmc/pmc_task.h"
 
 
-INTVAL core_numops = 1084;
+
+INTVAL core_numops = 1087;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1084] = {
+static op_func_t core_op_func_table[1087] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -1152,6 +1156,9 @@ static op_func_t core_op_func_table[1084] = {
   Parrot_find_codepoint_i_sc,                        /*   1080 */
   Parrot_finalize_p,                                 /*   1081 */
   Parrot_finalize_pc,                                /*   1082 */
+  Parrot_recv_p,                                     /*   1083 */
+  Parrot_wait_p,                                     /*   1084 */
+  Parrot_wait_pc,                                    /*   1085 */
 
   NULL /* NULL function pointer */
 };
@@ -1162,7 +1169,7 @@ static op_func_t core_op_func_table[1084] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1084] = {
+static op_info_t core_op_info_table[1087] = {
   { /* 0 */
     /* type PARROT_INLINE_OP, */
     "end",
@@ -14159,6 +14166,42 @@ static op_info_t core_op_info_table[1084] = {
     { PARROT_ARGDIR_IN },
     { 0 }
   },
+  { /* 1083 */
+    /* type PARROT_FUNCTION_OP, */
+    "recv",
+    "recv_p",
+    "Parrot_recv_p",
+    /* "",  body */
+    0,
+    2,
+    { PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT },
+    { 0 }
+  },
+  { /* 1084 */
+    /* type PARROT_FUNCTION_OP, */
+    "wait",
+    "wait_p",
+    "Parrot_wait_p",
+    /* "",  body */
+    0,
+    2,
+    { PARROT_ARG_P },
+    { PARROT_ARGDIR_IN },
+    { 0 }
+  },
+  { /* 1085 */
+    /* type PARROT_FUNCTION_OP, */
+    "wait",
+    "wait_pc",
+    "Parrot_wait_pc",
+    /* "",  body */
+    0,
+    2,
+    { PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN },
+    { 0 }
+  },
 
 };
 
@@ -25009,6 +25052,50 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
 
 return (opcode_t *)cur_opcode + 2;}
 
+opcode_t *
+Parrot_recv_p(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    opcode_t *const dest = cur_opcode + 2;
+    PREG(1) = PMCNULL;
+
+return (opcode_t *)cur_opcode + 2;}
+
+opcode_t *
+Parrot_wait_p(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    opcode_t *const next = cur_opcode + 2;
+    PMC *task = PREG(1);
+    PMC *cur_task;
+    Parrot_Task_attributes *tdata;
+
+    if (!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Argument to wait op must be a Task.\n");
+
+    cur_task = Parrot_cx_stop_task(interp, next);
+    tdata    = PARROT_TASK(task);
+    VTABLE_push_pmc(interp, tdata->waiters, cur_task);return (opcode_t *)0;
+
+return (opcode_t *)cur_opcode + 2;}
+
+opcode_t *
+Parrot_wait_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    opcode_t *const next = cur_opcode + 2;
+    PMC *task = CONST(1)->u.key;
+    PMC *cur_task;
+    Parrot_Task_attributes *tdata;
+
+    if (!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Argument to wait op must be a Task.\n");
+
+    cur_task = Parrot_cx_stop_task(interp, next);
+    tdata    = PARROT_TASK(task);
+    VTABLE_push_pmc(interp, tdata->waiters, cur_task);return (opcode_t *)0;
+
+return (opcode_t *)cur_opcode + 2;}
+
 
 /*
 ** op lib descriptor:
@@ -25022,7 +25109,7 @@ static op_lib_t core_op_lib = {
   2,    /* major_version */
   5,    /* minor_version */
   0,    /* patch_version */
-  1083,             /* op_count */
+  1086,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 

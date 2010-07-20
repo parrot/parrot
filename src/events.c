@@ -58,8 +58,8 @@ to the appropriate handler asynchronously.
 
         /* If the scheduler was flagged to terminate, make sure you process all
          * tasks. */
-        if (SCHEDULER_terminate_requested_TEST(scheduler))
-            Parrot_cx_refresh_task_list(interp, scheduler);
+        /* if (SCHEDULER_terminate_requested_TEST(scheduler))
+           Parrot_cx_refresh_task_list(interp, scheduler); */
 
     } /* end of pending tasks */
 #endif

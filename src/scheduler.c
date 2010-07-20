@@ -255,6 +255,36 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 }
 
 /*
+=item C<PMC* Parrot_cx_stop_task(PARROT_INTERP, opcode_t *next)>
+
+Stop the current task and pack it up into a PMC what can be used to resume later.
+
+=cut
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
+{
+    ASSERT_ARGS(Parrot_cx_stop_task)
+
+    PMC *task = interp->current_task;
+    Parrot_Task_attributes *tdata = PARROT_TASK(task);
+
+    PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
+    VTABLE_set_pointer(interp, cont, next);
+
+    if (PMC_IS_NULL(task) || !VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Attempt to stop invalid interp->current_task.\n");
+
+    tdata->code = cont;
+    TASK_in_preempt_SET(task);
+
+    return task;
+}
+
+/*
 =item C<opcode_t* Parrot_cx_preempt_task(PARROT_INTERP, PMC *scheduler, opcode_t
 *next)>
 
@@ -271,18 +301,7 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *ne
     ASSERT_ARGS(Parrot_cx_preempt_task)
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
 
-    PMC *task = interp->current_task;
-    Parrot_Task_attributes *tdata = PARROT_TASK(task);
-
-    PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
-    VTABLE_set_pointer(interp, cont, next);
-
-    if (PMC_IS_NULL(task) || !VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Attempt to pre-empt invalid interp->current_task.\n");
-
-    tdata->code = cont;
-
+    PMC* task = Parrot_cx_stop_task(interp, next);
     VTABLE_push_pmc(interp, sched->task_queue, task);
 
     interp->current_task = PMCNULL;

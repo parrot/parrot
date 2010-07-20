@@ -64,7 +64,7 @@ Initialize an event object.
         core_struct->interp      = INTERP;
 
         /* Make sure the flag is cleared by default */
-        TASK_terminate_runloop_CLEAR(SELF);
+        /* TASK_terminate_runloop_CLEAR(SELF); */
 
     }
 

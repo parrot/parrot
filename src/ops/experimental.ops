@@ -9,6 +9,8 @@ BEGIN_OPS_PREAMBLE
 #  include <unicode/uchar.h>
 #endif
 
+#include "pmc/pmc_task.h"
+
 END_OPS_PREAMBLE
 
 =head1 NAME
@@ -414,6 +416,39 @@ op finalize(in PMC) {
     }
 }
 
+=item B<recv>(out PMC)
+
+Recieve a message sent to the current task.
+
+=cut
+
+op recv(out PMC) {
+    opcode_t *const dest = expr NEXT();
+    $1 = PMCNULL;
+}
+
+=item B<wait>(in PMC)
+
+Block and wait for a task to complete.
+
+=cut
+
+op wait(in PMC) {
+    opcode_t *const next = expr NEXT();
+    PMC *task = $1;
+    PMC *cur_task;
+    Parrot_Task_attributes *tdata;
+
+    if (!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Argument to wait op must be a Task.\n");
+
+    cur_task = Parrot_cx_stop_task(interp, next);
+    tdata    = PARROT_TASK(task);
+    VTABLE_push_pmc(interp, tdata->waiters, cur_task);
+
+    goto ADDRESS(0);
+}
 
 =back
 

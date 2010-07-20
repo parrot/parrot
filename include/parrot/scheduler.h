@@ -128,6 +128,11 @@ void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_Parrot_cx_begin_execution __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(main) \
@@ -182,8 +187,12 @@ void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #define ASSERT_ARGS_Parrot_cx_runloop_wake __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
+#define ASSERT_ARGS_Parrot_cx_stop_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(next))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/scheduler.c */
+
 
 /* Timer PMC interface constants */
 /* &gen_from_enum(timer.pasm) */

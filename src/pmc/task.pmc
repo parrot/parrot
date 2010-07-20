@@ -30,6 +30,8 @@ pmclass Task provides invokable auto_attrs {
     ATTR PMC          *code;      /* An (optional) code for the task. */
     ATTR PMC          *data;      /* Additional data for the task. */
     ATTR INTVAL        killed;    /* Dead tasks don't get run. */
+    ATTR PMC          *mailbox;   /* List of incoming messages. */
+    ATTR PMC          *waiters;   /* Tasks waiting on this one. */
 
 /*
 
@@ -53,6 +55,11 @@ Initialize a concurrency task object.
         core_struct->data      = PMCNULL;
         core_struct->interp    = INTERP;
         core_struct->killed    = 0;
+        core_struct->mailbox   = Parrot_pmc_new(interp, enum_class_PMCList);
+        core_struct->waiters   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+
+        /* By default, a task is not being pre-empted */
+        TASK_in_preempt_CLEAR(SELF);
     }
 
 /*
@@ -74,10 +81,6 @@ An C<invokable> PMC related to this task.
 =item C<data>
 
 Some data that will be passed to C<code> when invoked.
-
-=item C<interp>
-
-An interpreter in which to execute this task.
 
 =back
 
@@ -106,10 +109,6 @@ An interpreter in which to execute this task.
             elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
             if (! PMC_IS_NULL(elem))
                 core_struct->data = elem;
-
-            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
-            if (! PMC_IS_NULL(elem))
-                core_struct->interp = elem;
         }
         else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -133,17 +132,27 @@ code as the first argument.
     VTABLE opcode_t *invoke(void *next) {
         Parrot_Task_attributes *const task = PARROT_TASK(SELF);
 
-        if (task->killed)
-            return (opcode_t*) 0;
+        /* If a task is pre-empted, this will be set again. */
+        TASK_in_preempt_CLEAR(SELF);
 
-        if (PMC_IS_NULL(task->code))
-            return (opcode_t*) next;
-
-        if (PMC_IS_NULL(task->data)) {
-            Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "->");
+        if (!(task->killed || PMC_IS_NULL(task->code))) {
+            if (PMC_IS_NULL(task->data)) {
+                Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "->");
+            }
+            else {
+                Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "P->", task->data);
+            }
         }
-        else {
-            Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "P->", task->data);
+
+        if (!TASK_in_preempt_TEST(SELF)) {
+            /* The task is done, schedule any waiters. */
+            int i;
+            int n = VTABLE_get_integer(interp, task->waiters);
+
+            for (i = 0; i < n; ++i) {
+                PMC *wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
+                Parrot_cx_schedule_task(interp, wtask);
+            }
         }
 
         return (opcode_t*) next;
@@ -272,6 +281,8 @@ Mark any referenced strings and PMCs.
 
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->code);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->data);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->mailbox);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->waiters);
         }
     }
 
@@ -291,6 +302,8 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
         /* 1) visit code block */
         VISIT_PMC_ATTR(INTERP, info, SELF, Task, code);
         VISIT_PMC_ATTR(INTERP, info, SELF, Task, data);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Task, mailbox);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Task, waiters);
     }
 
 /*
@@ -362,21 +375,8 @@ Send a message to this task.
 */
 
     METHOD send(PMC *message) {
-        fprintf(stderr, "Task#send not implemented.\n");
-    }
-
-/*
-
-=item METHOD wait()
-
-Block until this task ends.
-
-=cut
-
-*/
-
-    METHOD wait() {
-        fprintf(stderr, "Task#wait not implemented.\n");
+        Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
+        VTABLE_push_pmc(interp, tdata->mailbox, message);
     }
 
 /*
@@ -390,7 +390,8 @@ Kill this task.
 */
 
     METHOD kill() {
-        fprintf(stderr, "Task#kill not implemented.\n");
+        Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
+        tdata->killed = 1;
     }
 }
 
