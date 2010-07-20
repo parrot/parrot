@@ -302,7 +302,7 @@ method postfix_expression:sym<index>($/) {
 }
 
 method postfix_expression:sym<key>($/) {
-    my $key := $<expression>.ast;
+    my $key := $<EXPR>.ast;
 
     make PAST::Var.new( $key, :scope('keyed'),
                               :vivibase('Hash'),
