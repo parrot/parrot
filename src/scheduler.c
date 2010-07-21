@@ -104,7 +104,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     ASSERT_ARGS(Parrot_cx_begin_execution)
     PMC *scheduler = interp->scheduler;
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
-    INTVAL task_count = 1;
+    INTVAL task_count  = 1;
 
     PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes *tdata = PARROT_TASK(main_task);
@@ -135,6 +135,11 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
             }
         }
     } while (task_count > 0);
+
+    task_count = VTABLE_get_integer(interp, sched->all_tasks);
+    if (task_count > 0)
+        Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                    "Exiting with %d active tasks.\n", task_count);
 }
 
 

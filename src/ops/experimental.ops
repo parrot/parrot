@@ -9,6 +9,7 @@ BEGIN_OPS_PREAMBLE
 #  include <unicode/uchar.h>
 #endif
 
+#include "parrot/scheduler_private.h"
 #include "pmc/pmc_task.h"
 
 END_OPS_PREAMBLE
@@ -420,11 +421,25 @@ op finalize(in PMC) {
 
 Recieve a message sent to the current task.
 
+If there is no waiting message, block and wait.
+
 =cut
 
 op recv(out PMC) {
     opcode_t *const dest = expr NEXT();
-    $1 = PMCNULL;
+    PMC *cur_task = interp->current_task;
+    Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
+    int msg_count = VTABLE_get_integer(interp, tdata->mailbox);
+
+    if (msg_count > 0) {
+        $1 = VTABLE_shift_pmc(interp, tdata->mailbox);
+        goto ADDRESS(dest);
+    }
+    else {
+        TASK_recv_block_SET(interp->current_task);
+        (void) Parrot_cx_stop_task(interp, cur_opcode);
+        goto ADDRESS(0);
+    }
 }
 
 =item B<wait>(in PMC)
@@ -449,6 +464,20 @@ op wait(in PMC) {
 
     goto ADDRESS(0);
 }
+
+=item B<pass>()
+
+Pass the rest of the current quantum and schedule the next
+task in the task queue.
+
+=cut
+
+op pass() {
+    opcode_t *const next = expr NEXT();
+    opcode_t *const addr = Parrot_cx_preempt_task(interp, interp->scheduler, next);
+    goto ADDRESS(addr);
+}
+
 
 =back
 

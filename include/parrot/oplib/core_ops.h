@@ -1108,6 +1108,7 @@
  opcode_t * Parrot_recv_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_wait_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_wait_pc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_pass(opcode_t *, PARROT_INTERP);
 
 
 #endif /* PARROT_OPLIB_CORE_OPS_H_GUARD */

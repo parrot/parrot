@@ -47,12 +47,11 @@ void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value);
 /*
  * Task private flags
  *
- * in_preempt - This flag is set if the runloop is ending because the current
- *              task has been pre-empted. When the runloop ends because a task
- *              is done, this flag is not set.
  */
 typedef enum {
-    TASK_in_preempt_FLAG = PObj_private0_FLAG
+    TASK_active_FLAG     = PObj_private0_FLAG,
+    TASK_in_preempt_FLAG = PObj_private1_FLAG,
+    TASK_recv_block_FLAG = PObj_private2_FLAG
 } task_flags_enum;
 
 #define TASK_get_FLAGS(o) (PObj_get_FLAGS(o))
@@ -60,10 +59,22 @@ typedef enum {
 #define TASK_flag_SET(flag, o) (TASK_get_FLAGS(o) |= TASK_ ## flag ## _FLAG)
 #define TASK_flag_CLEAR(flag, o) (TASK_get_FLAGS(o) &= ~(UINTVAL)(TASK_ ## flag ## _FLAG))
 
-/* Mark a task to terminate the scheduler runloop */
+/* Flag is set if the task has been started and has not finished */
+#define TASK_active_TEST(o)  TASK_flag_TEST(active, o)
+#define TASK_active_SET(o)   TASK_flag_SET(active, o)
+#define TASK_active_CLEAR(o) TASK_flag_CLEAR(active, o)
+
+/* Flag is set iff the runloop is ending because the current task has
+ * been pre-empted but is not yet done running */
 #define TASK_in_preempt_TEST(o)  TASK_flag_TEST(in_preempt, o)
 #define TASK_in_preempt_SET(o)   TASK_flag_SET(in_preempt, o)
 #define TASK_in_preempt_CLEAR(o) TASK_flag_CLEAR(in_preempt, o)
+
+/* Flag is set if the task is blocked in a recv call. */
+#define TASK_recv_block_TEST(o)  TASK_flag_TEST(recv_block, o)
+#define TASK_recv_block_SET(o)   TASK_flag_SET(recv_block, o)
+#define TASK_recv_block_CLEAR(o) TASK_flag_CLEAR(recv_block, o)
+
 
 #endif /* PARROT_SCHEDULER_PRIVATE_H_GUARD */
 

@@ -62,17 +62,18 @@ static int get_op(PARROT_INTERP, const char * name, int full);
 #  include <unicode/uchar.h>
 #endif
 
+#include "parrot/scheduler_private.h"
 #include "pmc/pmc_task.h"
 
 
 
-INTVAL core_numops = 1087;
+INTVAL core_numops = 1088;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1087] = {
+static op_func_t core_op_func_table[1088] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -1159,6 +1160,7 @@ static op_func_t core_op_func_table[1087] = {
   Parrot_recv_p,                                     /*   1083 */
   Parrot_wait_p,                                     /*   1084 */
   Parrot_wait_pc,                                    /*   1085 */
+  Parrot_pass,                                       /*   1086 */
 
   NULL /* NULL function pointer */
 };
@@ -1169,7 +1171,7 @@ static op_func_t core_op_func_table[1087] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1087] = {
+static op_info_t core_op_info_table[1088] = {
   { /* 0 */
     /* type PARROT_INLINE_OP, */
     "end",
@@ -14202,6 +14204,18 @@ static op_info_t core_op_info_table[1087] = {
     { PARROT_ARGDIR_IN },
     { 0 }
   },
+  { /* 1086 */
+    /* type PARROT_FUNCTION_OP, */
+    "pass",
+    "pass",
+    "Parrot_pass",
+    /* "",  body */
+    0,
+    1,
+    { (arg_type_t) 0 },
+    { (arg_dir_t) 0 },
+    { 0 }
+  },
 
 };
 
@@ -25056,7 +25070,17 @@ opcode_t *
 Parrot_recv_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t *const dest = cur_opcode + 2;
-    PREG(1) = PMCNULL;
+    PMC *cur_task = interp->current_task;
+    Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
+    int msg_count = VTABLE_get_integer(interp, tdata->mailbox);
+
+    if (msg_count > 0) {
+        PREG(1) = VTABLE_shift_pmc(interp, tdata->mailbox);return (opcode_t *)dest;
+    }
+    else {
+        TASK_recv_block_SET(interp->current_task);
+        (void) Parrot_cx_stop_task(interp, cur_opcode);return (opcode_t *)0;
+    }
 
 return (opcode_t *)cur_opcode + 2;}
 
@@ -25096,6 +25120,14 @@ Parrot_wait_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
 
 return (opcode_t *)cur_opcode + 2;}
 
+opcode_t *
+Parrot_pass(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    opcode_t *const next = cur_opcode + 1;
+    opcode_t *const addr = Parrot_cx_preempt_task(interp, interp->scheduler, next);return (opcode_t *)addr;
+
+return (opcode_t *)cur_opcode + 1;}
+
 
 /*
 ** op lib descriptor:
@@ -25109,7 +25141,7 @@ static op_lib_t core_op_lib = {
   2,    /* major_version */
   5,    /* minor_version */
   0,    /* patch_version */
-  1086,             /* op_count */
+  1087,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 

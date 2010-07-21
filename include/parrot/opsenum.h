@@ -1102,6 +1102,7 @@ enum OPS_ENUM {
     enum_ops_recv_p                        = 1083,
     enum_ops_wait_p                        = 1084,
     enum_ops_wait_pc                       = 1085,
+    enum_ops_pass                          = 1086,
 };
 
 

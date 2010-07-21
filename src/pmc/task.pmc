@@ -19,19 +19,21 @@ The Task PMC represents a concurrent running "green thread".
 */
 
 #include "parrot/scheduler_private.h"
+#include "pmc/pmc_scheduler.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
 pmclass Task provides invokable auto_attrs {
-    ATTR FLOATVAL      birthtime; /* The creation time stamp of the task. */
-    ATTR Parrot_Interp interp;    /* The interpreter that created the task. */
-    ATTR PMC          *code;      /* An (optional) code for the task. */
-    ATTR PMC          *data;      /* Additional data for the task. */
-    ATTR INTVAL        killed;    /* Dead tasks don't get run. */
-    ATTR PMC          *mailbox;   /* List of incoming messages. */
-    ATTR PMC          *waiters;   /* Tasks waiting on this one. */
+    ATTR UINTVAL       id;        /* Unique identifier for this task */
+    ATTR FLOATVAL      birthtime; /* The creation time stamp of the task */
+    ATTR Parrot_Interp interp;    /* The interpreter that created the task */
+    ATTR PMC          *code;      /* An (optional) code for the task */
+    ATTR PMC          *data;      /* Additional data for the task */
+    ATTR INTVAL        killed;    /* Dead tasks don't get run */
+    ATTR PMC          *mailbox;   /* List of incoming messages */
+    ATTR PMC          *waiters;   /* Tasks waiting on this one */
 
 /*
 
@@ -44,7 +46,8 @@ Initialize a concurrency task object.
 */
 
     VTABLE void init() {
-        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes *const core_struct = PARROT_TASK(SELF);
+        Parrot_Scheduler_attributes  *sched_data  = PARROT_SCHEDULER(interp->scheduler);
 
         /* Set flags for custom GC mark. */
         PObj_custom_mark_SET(SELF);
@@ -58,8 +61,15 @@ Initialize a concurrency task object.
         core_struct->mailbox   = Parrot_pmc_new(interp, enum_class_PMCList);
         core_struct->waiters   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
-        /* By default, a task is not being pre-empted */
+        /* Assign a unique ID */
+        /* TODO: Fix collisions. */
+        core_struct->id = sched_data->next_task_id;
+        sched_data->next_task_id += 1;
+
+        /* By default, all flags are clear. */
+        TASK_active_CLEAR(SELF);
         TASK_in_preempt_CLEAR(SELF);
+        TASK_recv_block_CLEAR(SELF);
     }
 
 /*
@@ -130,12 +140,21 @@ code as the first argument.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_Task_attributes *const task = PARROT_TASK(SELF);
+        Parrot_Task_attributes *const task  = PARROT_TASK(SELF);
+        Parrot_Scheduler_attributes  *sdata = PARROT_SCHEDULER(interp->scheduler);
+        PMC *active_tasks = sdata->all_tasks;
 
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
 
         if (!(task->killed || PMC_IS_NULL(task->code))) {
+            /* Add the task to the set of active Tasks */
+            PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, task_id, task->id);
+            VTABLE_set_pmc_keyed(interp, active_tasks, task_id, SELF);
+            TASK_active_SET(SELF);
+
+            /* Actually run the task */
             if (PMC_IS_NULL(task->data)) {
                 Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "->");
             }
@@ -145,9 +164,17 @@ code as the first argument.
         }
 
         if (!TASK_in_preempt_TEST(SELF)) {
-            /* The task is done, schedule any waiters. */
-            int i;
-            int n = VTABLE_get_integer(interp, task->waiters);
+            /* The task is done. */
+            /* Remove it from the set of active Tasks */
+
+            int i, n;
+            PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, task_id, task->id);
+            TASK_active_CLEAR(SELF);
+            VTABLE_delete_keyed(interp, active_tasks, task_id);
+
+            /* schedule any waiters. */
+            n = VTABLE_get_integer(interp, task->waiters);
 
             for (i = 0; i < n; ++i) {
                 PMC *wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
@@ -377,6 +404,11 @@ Send a message to this task.
     METHOD send(PMC *message) {
         Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
         VTABLE_push_pmc(interp, tdata->mailbox, message);
+
+        if (TASK_recv_block_TEST(SELF)) {
+            TASK_recv_block_CLEAR(SELF);
+            Parrot_cx_schedule_task(interp, SELF);
+        }
     }
 
 /*
