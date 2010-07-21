@@ -467,7 +467,7 @@ L<http://trac.parrot.org/parrot/ticket/1337>
 
 L<https://trac.parrot.org/parrot/ticket/1598>
 
-=item LWP, HTTP::Message & URI [experimental]
+=item LWP, HTTP::Message, URI & URI::Escape [experimental]
 
 L<http://trac.parrot.org/parrot/ticket/1637>
 

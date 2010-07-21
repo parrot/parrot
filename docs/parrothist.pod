@@ -111,4 +111,6 @@ Starred release numbers indicate supported releases.
  Whiteknight 2.4.0          2010-May-18     "Sulfer Crest"
  Gerd        2.5.0          2010-Jun-15     "Cheops"
 
+ coke        2.6.0 *        2010-Jul-20     "Red-rumped"
+
 =cut

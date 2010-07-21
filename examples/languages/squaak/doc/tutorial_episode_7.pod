@@ -13,7 +13,7 @@ expressions.
 =head2 Operators, precedence and parse trees
 
 We will first briefly introduce the problem with recursive-descent parsers
-(which parsers generated with the PCT are) when parsing expressions. Consider
+(which parsers generated with NQP are) when parsing expressions. Consider
 the following mini-grammar, which is a very basic calculator.
 
  rule TOP {
@@ -116,29 +116,39 @@ into account. However, it's been about 6 years that I did this in a CS class,
 and I don't remember the particular details. If you really want to know, check
 out the links at the end of the previous section. It's actually worth checking
 out. For now, I'll just assume you know what the problem is, so that I'll
-introduce the solution for PCT-based compilers immediately.
+introduce the solution for NQP-based compilers immediately.
 At some point when parsing your input, you might encounter an expression. At
 this point, we'd like the parser to switch from top-down to bottom-up parsing.
-The Parrot Grammar Engine supports this, and is used as follows:
+NQP-rx supports this, and is used as follows:
 
- rule expression is optable { ... }
+ <EXPR>
 
-Note that we used the word C<expression> here, but you can name it anything.
-This declares that, whenever you need an expression, the bottom-up parser is
-activated. Of course, this "optable" must be populated with some operators that
-we need to be able to parse. This can be done by declaring operators as follows:
+Of course, the optable must be populated with some operators that
+we need to be able to parse and it might be told what precedence and associativity they have. The
+easiest way to do this is by setting up precedence levels in an C<INIT> block:
 
- proto 'infix:*' is tighter('infix:+') { ... }
+    INIT {
+        Squaak::Grammar.O(':prec<t>, :assoc<left>', '%additive');
+        Squaak::Grammar.O(':prec<u>, :assoc<lefT>', '%multiplicative');
+    }
+
+In this C<INIT> block, we use the C<O> method of the compiler to set up two precedence levels: one
+for operators like addition (named C<%additive>), and one for operators like multiplication (named
+C<%multiplicative>). Each of themhas a ":prec" value and an ":assoc" value. ":prec" determines the
+precedence. Lexicographically greater values indicate higher precedence, so C<%additive> operators,
+with a precedence value of "t", have lower precedence than C<%multiplicative> operators with a
+precedence value of "u".":assoc" defines the associativity of the operators. If C<@> is a left
+associative operator, then 1 @ 2 @ 3 is equivalent to (1 @ 2) @ 3. However, if C<@> is right
+associative, then 1 @ 2 @ 3 is equivalent to 1 @ (2 @ 3). There are other options for the
+associativity, but we'll discuss them as we come to them.
+
+    token infix:sym<*> { <sym> <O('%multiplicative, :pirop<mul>')> }
 
 This defines the operator C<*> (the C<infix:> is a prefix that tells the
 operator parser that this operator is an infix operator; there are other types,
-such as prefix, postfix and others). The C<is tighter> clause tells that the
-C<*> operator has a higher precedence than the C<+> operator. As you could have
-guessed, there are other clauses to declare equivalent precedence (C<is equiv>)
-and lower precedence (C<is looser>).It is very important to spell all clauses,
-such as C<is equiv> correctly (for instance, not C<is equil>), otherwise you
-might get some cryptic error message when trying to run your compiler. See the
-references section for the optable guide, that has more details on this.
+such as prefix, postfix and others). As you can see, it uses the O rule to specify that it is part
+of the C<%multiplicative> group of operators. The ":pirop" value specifies that the operator should
+compile to the C<mul> PIR opcode.
 
 Of course, the expression parser does not just parse operators, it must also
 parse the operands. So, how do we declare the most basic entity that represents
@@ -146,19 +156,12 @@ an operand? It can be anything, from a basic integer-constant, a function call,
 or even a function definition (but adding two function definition doesn't
 really make sense, does it?). The operands are parsed in a recursive-descent
 fashion, so somewhere the parser must switch back from bottom-up
-(expression parsing) to top-down. To declare this "switch-back" point, write:
+(expression parsing) to top-down. This "switch-back" point is the proto token C<term>. This is the
+reason why integer constants are parsed by the rule term:sym<integer_constant>, for example, in our
+grammar.
 
- proto 'term:' is tighter('prefix:-') is parsed(&term) { ... }
-
-The name C<term:> is a built-in name of the operator bottom-up parser; it is
-invoked every time a new operand is needed. The C<is parsed> clause tells the
-parser that C<term> (which accidentally looks like C<term:>, but you could also
-have named it anything else) parses the operands.
-
-Note: it is very important to add a C<is tighter> clause to the declaration of
-the C<term:> rule. Otherwise your expression parser will not work! My knowledge
-here is a bit limited, but I usually define it as C<is tighter> relative to the
-tightest operator defined.
+The C<term> proto token is
+invoked every time a new operand is needed
 
 =head2 Squaak Operators
 
@@ -179,25 +182,30 @@ mathematical operators are organized according to standard math rules).
  or
 
 (".." is the string concatenation operator). Besides defining an entry and exit
-point for the expression parser, you need to define some operator as a reference
-point, so that other operators' precedence can be defined relative to that
-reference point. My personal preference is to declare the operator with the
-lowest precedence as the reference point. This can be done like this:
+point for the expression parser, you need to define precedence levels for your operators. Find the
+C<INIT> block in Grammar.pm below the "## Operators" comment, and replace it with this:
 
- proto 'infix:or' is precedence('1') { ... }
+    INIT {
+        Squaak::Grammar.O(':prec<w>, :assoc<unary>', '%unary-negate');
+        Squaak::Grammar.O(':prec<v>, :assoc<unary>', '%unary-not');
+        Squaak::Grammar.O(':prec<u>, :assoc<left>',  '%multiplicative');
+        Squaak::Grammar.O(':prec<t>, :assoc<left>',  '%additive');
+        Squaak::Grammar.O(':prec<s>, :assoc<left>',  '%relational');
+        Squaak::Grammar.O(':prec<r>, :assoc<left>',  '%conjunction');
+        Squaak::Grammar.O(':prec<q>, :assoc<left>',  '%disjunction');
+    }
 
-Now, other operators can be defined:
+Now, we need to define the actual operators:
 
- proto 'infix:and'  is tighter('infix:or')   { ... }
- proto 'infix:<'    is tighter('infix:and')  { ... }
- proto 'infix:+'    is tighter('infix:<')    { ... }
- proto 'infix:*'    is tighter('infix:+')    { ... }
- proto 'prefix:not' is tighter('infix:*')    { ... }
- proto 'prefix:-'   is tighter('prefix:not') { ... }
+    token infix:sym<or> { <sym> <O('%disjunction, :pasttype<unless>')> }
+    token infix:sym<and> { <sym> <O('%conjunction, :pasttype<if>')> }
+    token infix:sym«<» { <sym> <O('%relational, :pirop<islt>')> }
+    token infix:sym<+> { <sym> <O('%additive, :pirop<add>')> }
+    token infix:sym<*> { <sym> <O('%multiplicative, :pirop<mul>')> }
+    token prefix:sym<not> { <sym> <O('%unary-not, :pirop<isfalse>')> }
+    token prefix:sym<-> { <sym> <O('%unary-negate, :pirop<neg>')> }
 
 Note that some operators are missing. See the exercises section for this.
-For more details on the use of the optable, check out
-F<docs/pct/pct_optable_guide.pod> in the Parrot repository.
 
 =head2 Short-circuiting logical operators
 
@@ -216,9 +224,9 @@ first child is always evaluated, and if true, the second child
 (the C<then> block) is evaluated (remember, the third child -- the C<else>
 clause -- is optional). It would be great to be able to implement the and
 operator using a C<PAST::Op( :pasttype('if') )> node. Well, you can, using
-the C<is pasttype> clause! Here's how:
+the ":pasttype" option! Here's how:
 
- proto 'infix:and' is tighter('infix:or') is pasttype('if') { ... }
+    token infix:sym<and> { <sym> <O('%conjunction, :pasttype<if>')> }
 
 So what about the or operator? When evaluating an or-expression, the first
 operand is evaluated. If it evaluates to true, then there's no need to evaluate
@@ -232,12 +240,8 @@ to true, evaluate the second child. Guess what pasttype you'd need for that!
 In the previous section, we introduced the C<pasttype> clause that you can
 specify. This means that for that operator (for instance, the C<and> operator
 we discussed), a C<PAST::Op( :pasttype('if') )> node is created. What happens
-if you don't specify a pasttype? In that case a default C<PAST::Op> node is
-created, and the default pasttype is C<call>. In other words, a C<PAST::Op>
-node is created that calls the declared operator. For instance, the C<infix:+>
-operator results in a call to the subroutine "infix:+". This means you'll need
-to implement subroutines for each operator. Now, that's a bit of a shame.
-Obviously, some languages have very exotic semantics for the C<+> operator,
+if you don't specify a pasttype? In that case, the corresponding action method is called. Obviously,
+some languages have very exotic semantics for the C<+> operator,
 but many languages just want to use Parrot's built-in C<add> instruction. How
 do we achieve that?
 
@@ -247,20 +251,13 @@ should be generated. Instead of generating a subroutine invocation with the
 operands as arguments, it will generate the specified instruction with the
 operator's operands as arguments. Neat huh? Let's look at an example:
 
- proto 'infix:+' is tighter('infix:<') is pirop('n_add') { ... }
+    token infix:sym<+> { <sym> <O('%additive, :pirop<add>')> }
 
-This specifies to use the C<n_add> instruction, which tells Parrot to create a
-new result object instead of changing one of the operands. Why not just the
-C<add> instruction (which takes two operands, updating the first), you might
-think. Well, if you leave out this C<is pirop> stuff, this will be generated:
+This specifies to use the C<add> instruction, which tells Parrot to create a
+new result object instead of changing one of the operands. PCT
+just emits the following for this:
 
- $P12 = "infix:+"($P10, $P11)
-
-You see, three registers are involved. As we mentioned before, PCT does not do
-any optimizations. Therefore, instead of the generated instruction above, it
-just emit the following:
-
- n_add $P12, $P10, $P11
+ add $P12, $P10, $P11
 
 which means that the PMCs in registers C<$P10> and C<$P11> are added, and
 assigned to a newly created PMC which is stored in register C<$P12>.
@@ -268,71 +265,25 @@ assigned to a newly created PMC which is stored in register C<$P12>.
 =head2 To circumfix or not to circumfix
 
 Squaak supports parenthesized expressions. Parentheses can be used to change
-the order of evaluation in an expression, just as you're probably have seen
-this in other languages. Besides infix, prefix and postfix operators, you can
-define circumfix operators, which is specified with the left and right
-delimiter. This is an ideal way to implement parenthesized expressions:
+the order of evaluation in an expression, just as you probably have seen in other languages. Besides
+infix, prefix and postfix operators, you can define circumfix operators, which is specified with the
+left and right delimiter. This is an ideal way to implement parenthesized expressions:
 
- proto 'circumfix:( )' is looser('infix:+') is pirop('set') { ... }
+    token circumfix:sym<( )> { '(' <.ws> <EXPR> ')' }
 
-By default, a subroutine invocation will be generated for each operator,
-in this case a call to C<circumfix:( )>. However, we are merely interested in
-the expression that has been parenthesized. The subroutine would merely return
-the expression. Instead, we can use the pirop attribute to specify what PIR
-operation should be generated; in this case that is the C<set> operation, which
-sets one register to the contents of another. This solution works fine, except
-that C<set> instructions are a bit of a waste. What happens is, the contents of
-some register is just copied to another register, which is then used in further
-code generation. This C<set> instruction might as well be optimized away.
-Currently, there are no optimizations implemented in the PCT.
+    # with the action method:
+    method circumfix:sym<( )> { make $<EXPR>.ast; }
 
-There is an alternative solution for adding grammar rules for the parenthesized
-expressions, by adding it as an alternative of term. The grammar rule term then
-ends up as:
-
- rule term {
-     | <float_constant> {*}     #= float_constant
-     | <integer_constant> {*}   #= integer_constant
-     | <string_constant&gt {*}  #= string_constant
-     | <primary> {*}            #= primary
-     | '(' <expression> ')' {*} #= expression
- }
-
-Of course, although we save one generated instruction, the parser will be
-slightly more inefficient, for reasons that we discussed at the beginning of
-this episode. Of course, you are free to decide for yourself how to implement
-this; this section just explains both methods. At some point, optimizations
-will be implemented in the PCT. I suspect "useless" instructions (such as the
-C<set> instruction we just saw) will then be removed.
+This rule and action method were generated for us when we ran mk_language_shell.pl; you don't need
+to add them to the grammar and actions yourself. Circumfix operators are treated as terms by the
+operator-precedence parser, so it will parse as we want it to automatically.
 
 =head2 Expression parser's action method
 
 For all grammar rules we introduced, we also introduced an action method that
 is invoked after the grammar rule was done matching. What about the action
-method for the optable? Naturally, there must be some actions to be executed.
-Well, there is, but to be frank, I cannot explain it to you. Every time I
-needed the action method for an optable, I just copied it from an existing
-actions file. Of course, the action method's name should match the name of the
-optable (the rule that has the "is optable" clause). So, here goes:
-
- method expression($/, $key) {
-     if ($key eq 'end') {
-         make $($<expr>);
-     }
-     else {
-         my $past := PAST::Op.new( :name($<type>),
-                                   :pasttype($<top><pasttype>),
-                                   :pirop($<top><pirop>),
-                                   :lvalue($<top><lvalue>),
-                                   :node($/) );
-
-         for @($/) {
-             $past.push( $($_) );
-         }
-
-         make $past;
-     }
- }
+method for EXPR? Our Squaak::Actions class inherits that from HLL::Actions. We don't have to write
+one.
 
 =head2 What's Next?
 
@@ -360,21 +311,14 @@ at least one digit followed by a dot and any number of digits. Examples are:
 There may be no whitespace between the individual digits and the dot. Make sure
 you understand the difference between a "rule" and a "token".
 
-Hint: currently, the Parrot Grammar Engine (PGE), the component that "executes"
-the regular expressions (your grammar rules), matches alternative subrules in
-order. This means that this won't work:
+Hint: a floating-point constant should produce a value of type 'Float'.
 
- rule term {
-     | <integer_constant>
-     | <float_constant>
-     ...
- }
-
-because when giving the input C<42.0>, C<42> will be matched by
-<integer_constant>, and the dot and "0" will remain. Therefore, put the
-<float_constant> alternative in rule term before <integer_constant>.
-At some point, PGE will support I<longest-token matching>, so that this issue
-will disappear.
+Note: in Perl 6 regexes, when matching an alternation as in a proto rule, the alternative which
+matches the most of the string is supposed to match. However, NQP-rx does not yet implement this. As
+a work-around, NQP-rx specifies that the version of a proto regex with the longest name will match.
+Since the part of a floating-point constant before the decimal place is the same as an integer
+constant, unless the token for floating-point constants has a longer name than the token for
+integer-constants, the latter will match and a syntax error will result.
 
 =item *
 
@@ -399,12 +343,25 @@ number of digits. Examples are: 42.0, 1., .0001. There may be no whitespace
 between the individual digits and the dot. Make sure you understand the
 difference between a C<rule> and a C<token>.
 
-    token float_constant {
+Hint: a floating-point constant should produce a value of type 'Float'.
+
+Note: in Perl 6 regexes, when matching an alternation as in a proto rule, the alternative which
+matches the most of the string is supposed to match. However, NQP-rx does not yet implement this. As
+a work-around, NQP-rx specifies that the version of a proto regex with the longest name will match.
+Since the part of a floating-point constant before the decimal place is the same as an integer
+constant, unless the token for floating-point constants has a longer name than the token for
+integer-constants, the latter will match and a syntax error will result.
+
+    token term:sym<float_constant_long> { # longer to work around lack of LTM
         [
         | \d+ '.' \d*
         | \d* '.' \d+
         ]
-        {*}
+    }
+
+    # with action method:
+    method term:sym<float_constant_long>($/) { # name worksaround lack of LTM
+        make PAST::Val.new(:value(+$/), :returns<Float>);
     }
 
 =item 2
@@ -412,43 +369,38 @@ difference between a C<rule> and a C<token>.
 For sake of completeness (and easy copy-paste for you), here's the list of
 operator declarations as I wrote them for Squaak:
 
-    rule expression    is optable              { ... }
+    INIT {
+        Squaak::Grammar.O(':prec<w>, :assoc<unary>', '%unary-negate');
+        Squaak::Grammar.O(':prec<v>, :assoc<unary>', '%unary-not');
+        Squaak::Grammar.O(':prec<u>, :assoc<left>',  '%multiplicative');
+        Squaak::Grammar.O(':prec<t>, :assoc<left>',  '%additive');
+        Squaak::Grammar.O(':prec<s>, :assoc<left>',  '%relational');
+        Squaak::Grammar.O(':prec<r>, :assoc<left>',  '%conjunction');
+        Squaak::Grammar.O(':prec<q>, :assoc<left>',  '%disjunction');
+    }
 
-    proto 'infix:or'   is precedence('1')
-                       is pasttype('unless')   { ... }
-    proto 'infix:and'  is tighter('infix:or')
-                       is pasttype('if')       { ... }
+    token circumfix:sym<( )> { '(' <.ws> <EXPR> ')' }
 
-    proto 'infix:<'    is tighter('infix:and') { ... }
-    proto 'infix:<='   is equiv('infix:<')     { ... }
-    proto 'infix:>'    is equiv('infix:<')     { ... }
-    proto 'infix:>='   is equiv('infix:<')     { ... }
-    proto 'infix:=='   is equiv('infix:<')     { ... }
-    proto 'infix:!='   is equiv('infix:<')     { ... }
+    token prefix:sym<-> { <sym> <O('%unary-negate, :pirop<neg>')> }
+    token prefix:sym<not> { <sym> <O('%unary-not, :pirop<isfalse>')> }
 
-    proto 'infix:+'    is tighter('infix:<')
-                       is pirop('n_add')       { ... }
-    proto 'infix:-'    is equiv('infix:+')
-                       is pirop('n_sub')       { ... }
+    token infix:sym<*>  { <sym> <O('%multiplicative, :pirop<mul>')> }
+    token infix:sym<%>  { <sym> <O('%multiplicative, :pirop<mod>')> }
+    token infix:sym</>  { <sym> <O('%multiplicative, :pirop<div>')> }
 
-    proto 'infix:..'   is equiv('infix:+')
-                       is pirop('n_concat')    { ... }
+    token infix:sym<+>  { <sym> <O('%additive, :pirop<add>')> }
+    token infix:sym<->  { <sym> <O('%additive, :pirop<sub>')> }
+    token infix:sym<..> { <sym> <O('%additive, :pirop<concat>')> }
 
-    proto 'infix:*'    is tighter('infix:+')
-                       is pirop('n_mul')       { ... }
-    proto 'infix:%'    is equiv('infix:*')
-                       is pirop('n_mod')       { ... }
-    proto 'infix:/'    is equiv('infix:*')
-                       is pirop('n_div')       { ... }
+    token infix:sym«<» { <sym> <O('%relational, :pirop<isle iPP>')> }
+    token infix:sym«<=» { <sym> <O('%relational, :pirop<islt iPP>')> }
+    token infix:sym«>» { <sym> <O('%relational, :pirop<isgt iPP>')> }
+    token infix:sym«>=» { <sym> <O('%relational, :pirop<isge iPP>')> }
+    token infix:sym«==» { <sym> <O('%relational, :pirop<iseq iPP>')> }
+    token infix:sym«!=» { <sym> <O('%relational, :pirop<isne iPP>')> }
 
-    proto 'prefix:not' is tighter('infix:*')
-                       is pirop('not')       { ... }
-    proto 'prefix:-'   is tighter('prefix:not')
-                       is pirop('neg')       { ... }
-
-    proto 'term:'      is tighter('prefix:-')
-                       is parsed(&term)        { ... }
-
+    token infix:sym<and> { <sym> <O('%conjunction, :pasttype<if>')> }
+    token infix:sym<or> { <sym> <O('%disjunction, :pasttype<unless>')> }
 
 =back
 
