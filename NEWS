@@ -4,6 +4,8 @@ New in 2.6.0
 - Core
   + Plug some memory leaks
   + As always, bug fixes and some optimizations
+- Runtime
+  + added (experimental) URI::Escape 
 - Testing
   + Improved test coverage of core parrot
 - Documentation
