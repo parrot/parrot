@@ -79,6 +79,7 @@ div#mainbody {
 div#footer {
 	background: #121A28;
 	text-align: center;
+    color: white;
         padding-top: 1px;
         padding-bottom: 10px;
 }
