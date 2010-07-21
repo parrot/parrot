@@ -17,5 +17,5 @@
     "wiki.bugday"      : "bug_day_2010_08_14",
 
     "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.6.0/",
-    "subversion.root"  : "http://subversion.apache.org/",
+    "subversion.root"  : "http://subversion.apache.org/"
 }
