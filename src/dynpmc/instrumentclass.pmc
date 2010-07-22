@@ -62,7 +62,8 @@ Returns a list of methods in the class that InstrumentClass is attached to.
     METHOD get_method_list() {
         Parrot_InstrumentClass_attributes * const attr = PARROT_INSTRUMENTCLASS(SELF);
         PMC *_class;
-        PMC *methods;
+        PMC *methods, *method_list;
+        PMC *iter;
         Parrot_Interp supervised;
 
         GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
@@ -70,7 +71,17 @@ Returns a list of methods in the class that InstrumentClass is attached to.
         _class  = Parrot_oo_get_class_str(supervised, attr->class_name);
         methods = VTABLE_inspect_str(supervised, _class, CONST_STRING(INTERP, "methods"));
 
-        RETURN(PMC *methods);
+        method_list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+        iter        = VTABLE_get_iter(supervised, methods);
+
+        while(VTABLE_get_bool(supervised, iter)) {
+            PMC *key;
+
+            key = VTABLE_shift_pmc(supervised, iter);
+            VTABLE_push_pmc(INTERP, method_list, key);
+        }
+
+        RETURN(PMC *method_list);
     }
 
 /*
@@ -89,7 +100,8 @@ is called.
         PMC *_class, *methods, *method_sub;
         PMC *instr_obj, *rename, *rename_hash;
         STRING *invoke;
-         Parrot_Interp supervised;
+        INTVAL count;
+        Parrot_Interp supervised;
 
         invoke = CONST_STRING(INTERP, "invoke");
 
@@ -99,22 +111,38 @@ is called.
         (PMC *methods) = PCCINVOKE(INTERP, _class, "methods");
         method_sub     = VTABLE_get_pmc_keyed_str(INTERP, methods, method);
 
-        (PMC *instr_obj) =
-            PCCINVOKE(INTERP, attr->instrument, "instrument_object", PMC *method_sub);
+        /* Ensure that method exists. */
+        if (PMC_IS_NULL(method_sub)) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Class %Ss does not have a method named %Ss.",
+                                        attr->class_name, method);
+        }
 
-        /* Instrument its invoke vtable entry. */
-        () = PCCINVOKE(INTERP, instr_obj, "insert_hook", STRING *invoke);
+        /* Check the count for this method. */
+        count = VTABLE_get_integer_keyed_str(INTERP, attr->instrumented_methods, method);
+        if (count == 0) {
+            /* Method was not instrumented before. */
+            (PMC *instr_obj) =
+                PCCINVOKE(INTERP, attr->instrument, "instrument_object", PMC *method_sub);
 
-        /* Add an entry into the rename_hash attribute so that when an event
-           is raised, the event properly named. */
-        rename = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
-        VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "Class"));
-        VTABLE_push_string(INTERP, rename , attr->class_name);
-        VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "method"));
-        VTABLE_push_string(INTERP, rename , method);
+            /* Instrument its invoke vtable entry. */
+            () = PCCINVOKE(INTERP, instr_obj, "insert_hook", STRING *invoke);
 
-        GETATTR_InstrumentVtable_rename_hash(INTERP, instr_obj, rename_hash);
-        VTABLE_set_pmc_keyed_str(INTERP, rename_hash, invoke, rename);
+            /* Add an entry into the rename_hash attribute so that when an event
+               is raised, the event properly named. */
+            rename = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+            VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "Class"));
+            VTABLE_push_string(INTERP, rename , attr->class_name);
+            VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "method"));
+            VTABLE_push_string(INTERP, rename , method);
+
+            GETATTR_InstrumentVtable_rename_hash(INTERP, instr_obj, rename_hash);
+            VTABLE_set_pmc_keyed_str(INTERP, rename_hash, invoke, rename);
+        }
+
+        /* Update count. */
+        count++;
+        VTABLE_set_integer_keyed_str(INTERP, attr->instrumented_methods, method, count);
     }
 
 /*
@@ -128,14 +156,54 @@ Removes the instrumentation of the given method.
 */
 
     METHOD remove_method_hook(STRING *method) {
-        /*
-        TODO: NYI
-        */
+        Parrot_InstrumentClass_attributes * const attr = PARROT_INSTRUMENTCLASS(SELF);
+        PMC *_class, *methods, *method_sub;
+        PMC *instr_obj, *rename_hash;
+        STRING *invoke;
+        INTVAL count;
+        Parrot_Interp supervised;
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+
+        _class  = Parrot_oo_get_class_str(supervised, attr->class_name);
+        (PMC *methods) = PCCINVOKE(INTERP, _class, "methods");
+        method_sub     = VTABLE_get_pmc_keyed_str(INTERP, methods, method);
+
+        /* Ensure that method exists. */
+        if (PMC_IS_NULL(method_sub)) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Class %Ss does not have a method named %Ss.",
+                                        attr->class_name, method);
+        }
+
+        /* Check the count for this method. */
+        count = VTABLE_get_integer_keyed_str(INTERP, attr->instrumented_methods, method);
+        if (count == 0) {
+            /* Not instrumented before. */
+        }
+        else if (count == 1) {
+            /* Remove the instrumentation. */
+            invoke = CONST_STRING(INTERP, "invoke");
+
+            /* The InstrumentObject instance for the override can
+               be obtained from the registry using the vtable pointer. */
+            instr_obj = (PMC *) parrot_hash_get(INTERP, attr->registry, method_sub->vtable);
+
+            /* Instrument its invoke vtable entry. */
+            () = PCCINVOKE(INTERP, instr_obj, "remove_hook", STRING *invoke);
+
+            GETATTR_InstrumentVtable_rename_hash(INTERP, instr_obj, rename_hash);
+            VTABLE_delete_keyed_str(INTERP, rename_hash, invoke);
+        }
+
+        /* Update count. */
+        count--;
+        VTABLE_set_integer_keyed_str(INTERP, attr->instrumented_methods, method, count);
     }
 
 /*
 
-=item C<PMC* get_method_instrumented_list()>
+=item C<PMC* get_instrumented_method_list()>
 
 Returns a list of methods that has active instrumentation.
 
@@ -143,10 +211,26 @@ Returns a list of methods that has active instrumentation.
 
 */
 
-    METHOD get_method_instrumented_list() {
-        /*
-        TODO: NYI
-        */
+    METHOD get_instrumented_method_list() {
+        Parrot_InstrumentClass_attributes * const attr = PARROT_INSTRUMENTCLASS(SELF);
+        PMC *list, *iter;
+
+        list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+
+        iter = VTABLE_get_iter(INTERP, attr->instrumented_methods);
+        while (VTABLE_get_bool(INTERP, iter)) {
+            PMC *key;
+            INTVAL count;
+
+            key = VTABLE_shift_pmc(INTERP, iter);
+            count = VTABLE_get_integer_keyed(INTERP, attr->instrumented_methods, key);
+
+            if(count > 0) {
+                VTABLE_push_pmc(INTERP, list, key);
+            }
+        }
+
+        RETURN(PMC *list);
     }
 }
 

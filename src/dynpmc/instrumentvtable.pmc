@@ -49,6 +49,7 @@ pmclass InstrumentVtable auto_attrs dynpmc group instrument_group extends Instru
     ATTR STRING        *class_name;
     ATTR Parrot_Interp  supervisor;
     ATTR PMC           *rename_hash;
+    ATTR PMC           *vtable_overrides;
 
 /*
 
@@ -67,8 +68,9 @@ upon calling 'attach_to_class'.
 
         /* Initialise the attributes.
            Other attributes are deferred to after attaching to a class. */
-        attr->supervisor  = INTERP;
-        attr->rename_hash = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->supervisor       = INTERP;
+        attr->rename_hash      = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
 
         /* Initialise the static hashes. */
         setup_vtable_common_hashes(INTERP);
@@ -156,7 +158,6 @@ If name denotes a group, inserts stubs for all functions in that group.
     METHOD insert_hook(STRING *name) {
         Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
         PMC *_class;
-        PMC *override;
         Parrot_Interp supervised;
         PMC *list;
         PMC *iter;
@@ -177,6 +178,7 @@ If name denotes a group, inserts stubs for all functions in that group.
             count = VTABLE_get_integer_keyed_str(INTERP, attr->hook_count, item);
             if (count == 0) {
                 /* Look for a vtable override. */
+                PMC *override;
                 override = Parrot_oo_find_vtable_override_for_class(supervised, _class, name);
 
                 if (PMC_IS_NULL(override)) {
@@ -228,6 +230,89 @@ If name denotes a group, inserts stubs for all functions in that group.
             VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
         }
     }
+
+/*
+
+=item C<void remove_hook(STRING *name)>
+
+Removes the stub function for the given entry given by name.
+If name denotes a group, removes stubs for all functions in that group.
+
+=cut
+
+*/
+
+    METHOD remove_hook(STRING *name) {
+        Parrot_InstrumentVtable_attributes * const attr = PARROT_INSTRUMENTVTABLE(SELF);
+        PMC *list;
+        PMC *iter;
+        PMC *_class;
+        Parrot_Interp supervised;
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+        _class   = Parrot_oo_get_class_str(supervised, attr->class_name);
+
+        (PMC *list) = PCCINVOKE(INTERP, SELF, "get_hook_list", STRING *name);
+
+        iter = VTABLE_get_iter(INTERP, list);
+        while (VTABLE_get_bool(INTERP, iter)) {
+            INTVAL count;
+            PMC *item_pmc = VTABLE_shift_pmc(INTERP, iter);
+            STRING *item  = VTABLE_get_string(INTERP, item_pmc);
+            size_t **entry, *func;
+
+            /* Only remove the stub if request count == 1 => Last request. */
+            count = VTABLE_get_integer_keyed_str(INTERP, attr->hook_count, item);
+            if (count <= 0) {
+                /* Tried to remove 1 time too many. */
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : Unknown function, '%Ss'",
+                                                VTABLE_name(INTERP, SELF), item);
+            }
+            else if (count == 1) {
+                /* Look for a vtable override. */
+                PMC *override;
+                override = Parrot_oo_find_vtable_override_for_class(supervised, _class, name);
+
+                if(PMC_IS_NULL(override)) {
+                    /* No override. */
+                    /* Simply replace the stub with the original entry. */
+                    entry = (size_t **) parrot_hash_get(INTERP, attr->name_offset, item);
+                    func  = (size_t *)  parrot_hash_get(INTERP, attr->name_original, item);
+                    if (entry == NULL || func == NULL) {
+                        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                    "%Ss : Unknown function, '%Ss'",
+                                                    VTABLE_name(INTERP, SELF), item);
+                    }
+                    *entry = func;
+                }
+                else {
+                    /* It appears that there is a vtable override.
+                       Remove the instrumentation of the override's invoke
+                       vtable entry. */
+                    PMC *instr_obj, *rename, *rename_hash, *group;
+                    STRING *invoke;
+
+                    invoke = CONST_STRING(INTERP, "invoke");
+
+                    /* The InstrumentObject instance for the override can
+                       be obtained from the registry using the vtable pointer. */
+                    instr_obj = (PMC *) parrot_hash_get(INTERP, attr->registry, override->vtable);
+
+                    /* Instrument its invoke vtable entry. */
+                    () = PCCINVOKE(INTERP, instr_obj, "remove_hook", STRING *invoke);
+
+                    GETATTR_InstrumentVtable_rename_hash(INTERP, instr_obj, rename_hash);
+                    VTABLE_delete_keyed_str(INTERP, rename_hash, invoke);
+                }
+            }
+
+            /* Update the count. */
+            count--;
+            VTABLE_set_integer_keyed_str(INTERP, attr->hook_count, item, count);
+        }
+    }
+
 }
 
 /*
