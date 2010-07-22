@@ -77,13 +77,25 @@ for subroutine definitions:
      'sub' <identifier> <parameters>
      <statement>*
      'end'
-     {*}
  }
 
  rule parameters {
-     '(' [<identifier> [',' <identifier>]* ]? ')'
-     {*}
+     '(' [<identifier> ** ',']? ')'
  }
+
+And we need to add it to rule stat_or_def:
+
+ rule stat_or_def {
+     | <statement>
+     | <sub_definition>
+ }
+
+Appropriately modifying the action method is simple. It's analogous to the action method for
+expression.
+
+"**" is the repetition specifier; "<identifier> ** ','" matches <identifier> separated by commas.
+Since it's in a rule and there is space between the ** and its operands, whitespace is allowed
+between the commas and both the preceding and following identifiers.
 
 This is rather straightforward, and the action methods for these rules are
 quite simple, as you will see. First, however, let's have a look at the rule
@@ -112,7 +124,7 @@ symbols right in time. Let's look at the action methods.
 
      # now add all parameters to this block
      for $<identifier> {
-         my $param := $( $_ );
+         my $param := $_.ast;
          $param.scope('parameter');
          $past.push($param);
 
@@ -128,23 +140,23 @@ symbols right in time. Let's look at the action methods.
  }
 
  method sub_definition($/) {
-     our $?BLOCK;
-     our @?BLOCK;
-     my $past := $( $<parameters> );
-     my $name := $( $<identifier> );
+      our $?BLOCK;
+      our @?BLOCK;
+      my $past := $<parameters>.ast;
+      my $name := $<identifier>.ast;
 
-     # set the sub's name
-     $past.name( $name.name() );
+      # set the sub's name
+      $past.name($name.name);
 
-     # add all statements to the sub's body
-     for $<statement> {
-         $past.push( $( $_ ) );
-     }
+      # add all statements to the sub's body
+      for $<statement> {
+          $past.push($_.ast);
+      }
 
-     # and remove the block from the scope stack and restore the current block
-     @?BLOCK.shift();
-     $?BLOCK := @?BLOCK[0];
-     make $past;
+      # and remove the block from the scope stack and restore the current block
+      @?BLOCK.shift();
+      $?BLOCK := @?BLOCK[0];
+      make $past;
  }
 
 First, let's check out the parse action for parameters. First, a new
@@ -178,26 +190,29 @@ Episode 5, we already gave some tips on how to create the PAST nodes for a
 subroutine invocation. In this section, we'll give a complete description.
 First we'll introduce the grammar rules.
 
- rule sub_call {
+ rule statement:sym<sub_call> {
      <primary> <arguments>
-     {*}
+ }
+
+ rule arguments {
+     '(' [<EXPR> ** ',']? ')'
  }
 
 Not only allows this to invoke subroutines by their name, you can also store
 the subroutines in an array or hash field, and invoke them from there. Let's
 take a look at the action method, which is really quite straightforward.
 
- method sub_call($/) {
-     my $invocant := $( $<primary> );
-     my $past     := $( $<arguments> );
+ method statement:sym<sub_call>($/) {
+     my $invocant := $<primary>.ast;
+     my $past     := $<arguments>.ast;
      $past.unshift($invocant);
      make $past;
  }
 
  method arguments($/) {
      my $past := PAST::Op.new( :pasttype('call'), :node($/) );
-     for $<expression> {
-         $past.push( $( $_ ) );
+     for $<EXPR> {
+         $past.push($_.ast);
      }
      make $past;
  }
@@ -260,20 +275,17 @@ First, let us look at the BNF of the for-statement:
 
 It's pretty easy to convert this to Perl 6 rules:
 
-    rule for_statement {
-        'for' <for_init> ',' <expression> <step>?
+    rule statement:sym<for> {
+        <sym> <for_init> ',' <EXPR> <step>?
         'do' <statement>* 'end'
-        {*}
     }
 
     rule step {
-        ',' <expression>
-        {*}
+        ',' <EXPR>
     }
 
     rule for_init {
-        'var' <identifier> '=' <expression>
-        {*}
+        'var' <identifier> '=' <EXPR>
     }
 
 Pretty easy huh? Let's take a look at the semantics. A for-loop is just
@@ -323,12 +335,12 @@ which is local to the for-statement. Let's check out the rule for for_init:
                                     :node($/) );
         @?BLOCK.unshift($?BLOCK);
 
-        my $iter := $( $<identifier> );
+        my $iter := $<identifier>.ast;
         ## set a flag that this identifier is being declared
         $iter.isdecl(1);
         $iter.scope('lexical');
         ## the identifier is initialized with this expression
-        $iter.viviself( $( $<expression> ) );
+        $iter.viviself( $<EXPR>.ast );
 
         ## enter the loop variable into the symbol table.
         $?BLOCK.symbol($iter.name(), :scope('lexical'));
@@ -339,16 +351,22 @@ which is local to the for-statement. Let's check out the rule for for_init:
 So, just as we created a new C<PAST::Block> for the subroutine in the action
 method for parameters, we create a new C<PAST::Block> for the for-statement in
 the action method that defines the loop variable. (Guess why we made for-init
-a subrule, and didn't put in "C<var> <ident&gt = <expression>" in the rule of
+a subrule, and didn't put in "C<var> <ident&gt = <EXPR>" in the rule of
 for-statement). This block is the place to live for the loop variable. The
 loop variable is declared, initialized using the viviself attribute, and
 entered into the new block's symbol table. Note that after creating the new
 C<PAST::Block> object, we put it onto the stack scope.
 
+The action method for step is simple:
+
+    method step($/) {
+        make $<EXPR>.ast;
+    }
+
 Now, the action method for the for statement is quite long, so I'll just
 embed my comments, which makes reading it easier.
 
-    method for_statement($/) {
+    method statement:sym<for>($/) {
         our $?BLOCK;
         our @?BLOCK;
 
@@ -356,7 +374,7 @@ First, get the result object of the for statement initialization rule; this
 is the C<PAST::Var> object, representing the declaration and initialization
 of the loop variable.
 
-        my $init := $( $<for_init> );
+        my $init := $<for_init>.ast;
 
 Then, create a new node for the loop variable. Yes, another one (besides the
 one that is currently contained in the C<PAST::Block>). This one is used when
@@ -381,7 +399,7 @@ statement PAST nodes onto it.
         my $body := @?BLOCK.shift();
         $?BLOCK  := @?BLOCK[0];
         for $<statement> {
-            $body.push($($_));
+            $body.push($_.ast);
         }
 
 If there was a step, we use that value; otherwise, we use assume a default
@@ -392,8 +410,9 @@ exercise to the reader.
 
         my $step;
         if $<step> {
-            my $stepsize := $( $<step>[0] );
-            $step := PAST::Op.new( $iter, $stepsize, :pirop('add'), :node($/) );
+            my $stepsize := $<step>[0].ast;
+            $step := PAST::Op.new( $iter, $stepsize,
+                                   :pirop('add__OP+'), :node($/) );
         }
         else { ## default is increment by 1
             $step := PAST::Op.new( $iter, :pirop('inc'), :node($/) );
@@ -404,13 +423,13 @@ incrementing statement to $body.
 
         $body.push($step);
 
-The loop condition uses the "<=" operator, and compares the loop variable
-with the maximum value that was specified.
+The loop condition uses the isle opcode, which checks that its first operand is less than or equal
+to its second, and compares the loop variable with the maximum value that was specified.
 
         ## while loop iterator <= end-expression
-        my $cond := PAST::Op.new( $iter,
-                                  $( $<expression> ),
-                                  :name('infix:<=') );
+        my $cond := PAST::Op.new( :pirop<isle__IPP>,
+                                  $iter,
+                                  $<EXPR>.ast );
 
 Now we have the PAST for the loop condition and the loop body, so now create
 a PAST to represent the (while) loop.

@@ -305,6 +305,27 @@ As of the latest PCC changes, this does nothing different from '.call'.
 
 L<https://trac.parrot.org/parrot/ticket/1624>
 
+=item :main Sub behaviour and selection. [eligible in 2.7]
+
+Currently, if no :main sub is found, the first .sub in a file is used as
+main. Also, arguments are passed to the main sub regardless of the .param
+declarations in that sub.
+
+After this change, if no sub is marked with :main, an exception will be
+raised. Multiple :main declarations will be still be allowed, and all but the
+first will be ignored.
+
+This change will also force all subs, including :main, to have their
+arguments checked - to allow an arbitrary number of arguments, have
+this be the only .param declaration in the sub.
+
+ .param pmc args :slurpy
+
+
+L<https://trac.parrot.org/parrot/ticket/1033>
+L<https://trac.parrot.org/parrot/ticket/1704>
+L<https://trac.parrot.org/parrot/ticket/1705>
+
 =back
 
 =head1 Functions
@@ -446,7 +467,7 @@ L<http://trac.parrot.org/parrot/ticket/1337>
 
 L<https://trac.parrot.org/parrot/ticket/1598>
 
-=item LWP, HTTP::Message & URI [experimental]
+=item LWP, HTTP::Message, URI & URI::Escape [experimental]
 
 L<http://trac.parrot.org/parrot/ticket/1637>
 
