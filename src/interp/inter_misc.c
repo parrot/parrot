@@ -281,6 +281,9 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
       case CURRENT_LEXPAD:
         result = Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
         break;
+      case CURRENT_TASK:
+        result = interp->current_task;
+        break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");

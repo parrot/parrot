@@ -83,6 +83,7 @@ typedef enum {
     CURRENT_CONT,
     CURRENT_OBJECT,
     CURRENT_LEXPAD,
+    CURRENT_TASK,
 
     /* interpinfo_s constants */
     EXECUTABLE_FULLNAME,
