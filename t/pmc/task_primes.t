@@ -13,116 +13,101 @@ is now a Parrot test.
 
 .sub main
     .include 'test_more.pir'
-    .local pmc Res
+    .local pmc nt, tt
 
-    $P0 = get_global 'test_results'
-    Res = new 'Task', $P0
-    schedule Res
-    set_global 'Res', Res
+    $P0 = get_global 'test_sub'
+    tt  = new 'Task', $P0
+    schedule tt
+    set_global 'test_task', tt
 
-    got_prime(2)
-    $P0 = make_prime_checker(2)
+    plan(1)
+    
+    nt = make_checker()
 
-    $I0 = 1
-
-next_num:
+    $I0 = 2
+loop:
+    send_int(nt, $I0)
+    $P0 = recv
     $I0 = $I0 + 1
+    if $I0 < 100 goto loop
 
-    $P0.'send'($I0)
-    $P1 = recv
-
-    if $I0 < 20 goto next_num
-    wait Res
+    send_int(tt, 0)
+    wait tt
 .end
 
-.sub test_results
-    plan(8)
+.sub test_sub
+    .local int sum
+    sum = 0
 
+loop:
     $P0 = recv
-    is($P0, 2, "2 is prime")
-
-    $P0 = recv
-    is($P0, 3, "3 is prime")
-
-    $P0 = recv
-    is($P0, 5, "5 is prime")
-
-    $P0 = recv
-    is($P0, 7, "7 is prime")
-
-    $P0 = recv
-    is($P0, 11, "11 is prime")
-
-    $P0 = recv
-    is($P0, 13, "13 is prime")
-
-    $P0 = recv
-    is($P0, 17, "17 is prime")
-
-    $P0 = recv
-    is($P0, 19, "19 is prime")
+    $I0 = $P0
+    if $I0 == 0 goto done
+    sum = sum + $I0
+    goto loop
+    
+done:
+    is(sum, 1060, "found first 25 primes")
 .end
 
-.sub got_prime
-    .param int p
+.sub send_int
+    .param pmc t
+    .param pmc i
     $P0 = new 'Integer'
-    $P0 = p
-    $P1 = get_global 'Res'
-    $P1.'send'($P0)
+    $P0 = i
+    t.'send'($P0)
 .end
 
-.sub make_prime_checker
-    .param int n
-    .local pmc cur_task, new_task, check_prime, args
+.sub make_checker
+    .local pmc cp, ct
 
-    check_prime = get_global 'check_prime'
-    cur_task    = interpinfo .INTERPINFO_CURRENT_TASK
-
-    args = new 'FixedPMCArray', 2
-    args[0] = n
-    args[1] = cur_task
+    cp = get_global 'check_prime'
+    ct = interpinfo .INTERPINFO_CURRENT_TASK
     
     $P0 = new 'Hash'
-    $P0['code'] = check_prime
-    $P0['data'] = args
+    $P0['code'] = cp
+    $P0['data'] = ct
 
-    new_task = new 'Task', $P0
-    schedule new_task
-    .return(new_task)
+    $P1 = new 'Task', $P0
+    schedule $P1
+    .return($P1)
 .end
 
 .sub check_prime
-    .param pmc args
-    .local pmc pt, nt
-    .local int N, Nsq
+    .param pmc pt
+    .local pmc nt, M, tt
+    .local int N, x
 
-    N  = args[0]
-    pt = args[1]
+    tt = get_global 'test_task'
+    N = 0
+
+next_msg:
+    M = recv
+    x = M
     
-    Nsq = N * N
+    if N >= 2 goto check_x
+    N = x
+    send_int(tt, x)
+    goto send_reply
+
+check_x:
+    $I0 = x % N
+    if $I0 != 0 goto maybe_prime
+    goto send_reply
     
-next_x:
-    $P0 = recv
-    $I0 = $P0
-
-    $I1 = $I0 % N
-    if $I1 == 0 goto done
-
-    if $I0 >= Nsq goto check_next
-    got_prime($I0)
-
-    unless null nt goto done
-    nt = make_prime_checker($I0)
-    goto done
+maybe_prime:
+    unless null nt goto ship_it
+    nt = make_checker()
     
-check_next:
-    nt.'send'($P0)
-    $P0 = recv
+ship_it:
+    nt.'send'(M)
+    M = recv
 
-done:
-    pt.'send'($P0)
-    goto next_x
+send_reply:
+    pt.'send'(M)
+    goto next_msg
 .end
+
 
 # Local Variables:
 #   mode: pir
