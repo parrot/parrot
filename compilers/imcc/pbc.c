@@ -1465,7 +1465,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         if (unit->vtable_name) {
             vtable_name = Parrot_str_new(interp, unit->vtable_name + 1,
                     strlen(unit->vtable_name) - 2);
-            UNIT_FREE_CHAR(unit->method_name);
+            UNIT_FREE_CHAR(unit->vtable_name);
         }
         else
             vtable_name = sub->name;

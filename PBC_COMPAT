@@ -28,21 +28,8 @@
 
 # please insert tab separated entries at the top of the list
 
-6.21	2010.06.09	NotFound	add ByteBuffer PMC
-6.20	2010.05.29	plobsing	eliminate unused fixup type 'label'
-6.19	2010.05.27	plobsing	removed numerous core ops (TT #449)
-6.18	2010.05.25	cotto	removed ops.num
-6.17	2010.05.20	NotFound	store encoding of string constants
-6.16	2010.05.18	plobsing	move freeze/thaw adjacent to visit
-6.15	2010.05.06	bacek	add StringBuilder PMC
-6.14	2010.05.03	coke	remove popaction, pushmark, pushaction ops.
-6.13	2010.05.03	coke	move File/OS pmcs to src/dynpmc
-6.12	2010.05.02	plobsing	store constant PMC strings as top level constant strings    
-6.11	2010.04.29	tewk	remove ParrotRunningThread
-6.10	2010.04.29	NotFound	packfiledebug.pmc
-6.9	2010.04.27	bacek	remove deprecated in-place string ops (bitwise, charset, case change)
-6.8	2010.04.27	bacek	remove deprecated in-place substr ops
-6.7	2010.04.22	coke	remove RetContinuation PMC
+8.0	2010.07.20	coke	released 2.6.0
+7.0	2010.04.20	gerd	released 2.3.0 (version # added ex post facto, as all previous version #s were published)
 6.6	2010.04.17	bacek	add replace op
 6.5	2010.03.09	cotto	remove cpu_ret op
 6.4	2010.03.02	cotto	remove prederef__ and reserved

@@ -28,6 +28,7 @@ basic flags are:
     +         PMC, int register, num register, or numeric constant
     ~         PMC, string register, or string constant
     :         argument (same as '*'), possibly with :named or :flat
+    0-9       use the nth input operand as the output result of this operation
 
 These flags are used to describe signatures and desired return
 types for various operations.  For example, if an opcode is

@@ -541,7 +541,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *add_int(INTVAL value, PMC* dest) {
-        dest = STATICSELF.clone();;
+        dest = STATICSELF.clone();
         rat_add_integer(INTERP, dest, (int) value);
         return dest;
     }

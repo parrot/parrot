@@ -583,15 +583,6 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
 
         /* Regular arguments just set the value */
         switch (type) {
-          case 'I':
-            VTABLE_push_integer(interp, call_object, va_arg(*args, INTVAL));
-            break;
-          case 'N':
-            VTABLE_push_float(interp, call_object, va_arg(*args, FLOATVAL));
-            break;
-          case 'S':
-            VTABLE_push_string(interp, call_object, va_arg(*args, STRING *));
-            break;
           case 'P':
             {
                 const INTVAL type_lookahead = sig[i+1];
@@ -617,6 +608,15 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
                             : clone_key_arg(interp, pmc_arg));
                 break;
             }
+          case 'S':
+            VTABLE_push_string(interp, call_object, va_arg(*args, STRING *));
+            break;
+          case 'I':
+            VTABLE_push_integer(interp, call_object, va_arg(*args, INTVAL));
+            break;
+          case 'N':
+            VTABLE_push_float(interp, call_object, va_arg(*args, FLOATVAL));
+            break;
           case '-':
             return call_object;
             break;

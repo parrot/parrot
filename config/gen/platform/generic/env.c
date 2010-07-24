@@ -74,13 +74,13 @@ UnSet Environment vars
 void
 Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 {
-    char * const name = Parrot_str_to_cstring(interp, str_name);
 #ifdef PARROT_HAS_UNSETENV
+    char * const name = Parrot_str_to_cstring(interp, str_name);
     unsetenv(name);
-#else
-    Parrot_setenv(name, "");
-#endif
     Parrot_str_free_cstring(name);
+#else
+    Parrot_setenv(interp, str_name, Parrot_str_new(interp, "", 0));
+#endif
 }
 
 /*

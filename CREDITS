@@ -129,8 +129,7 @@ D: Keeps us running
 E: ask@develooper.com
 
 N: Audrey Tang
-U: audreyt
-U: autrijus
+U: au
 E: audreyt@audreyt.org
 D: Pugs, a Perl6->Parrot implementation.
 
@@ -1046,7 +1045,8 @@ N: Will "Coke" Coleda
 U: coke
 A: wcoleda
 E: will@coleda.com
-D: Tcl language (partcl), APL, website, various languages/ upkeep, misc.
+D: Tcl HLL implementation (partcl), APL, website,
+D: Release Manager, PaFo board member, curmudgeon
 
 N: Zach Lipton
 
