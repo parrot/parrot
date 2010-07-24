@@ -608,6 +608,34 @@ Instrument_runcore_runops(PARROT_INTERP, Parrot_runcore_t *runcore, opcode_t *pc
     /* Detect any dynlib loading, for example during load_bytecode. */
     detect_loadlib(interp);
 
+    /* Refresh the probes. */
+    {
+        PMC *iter, *probes;
+        STRING *enable, *disable, *attr_enabled;
+
+        enable  = CONST_STRING(supervisor, "enable");
+        disable = CONST_STRING(supervisor, "disable");
+        attr_enabled = CONST_STRING(supervisor, "$!is_enabled");
+
+        GETATTR_Instrument_probes(supervisor, core->supervisor_pmc, probes);
+        iter = VTABLE_get_iter(supervisor, probes);
+
+        while (VTABLE_get_bool(supervisor, iter)) {
+            PMC *key, *obj, *enabled;
+            key = VTABLE_shift_pmc(supervisor, iter);
+            obj = VTABLE_get_pmc_keyed(supervisor, probes, key);
+
+            /* If this probe is disabled, ignore. */
+            enabled = VTABLE_get_attr_str(supervisor, obj, attr_enabled);
+            if (!VTABLE_get_integer(supervisor, enabled)) {
+                continue;
+            }
+
+            Parrot_pcc_invoke_method_from_c_args(supervisor, obj, disable, "->");
+            Parrot_pcc_invoke_method_from_c_args(supervisor, obj, enable,  "->");
+        }
+    }
+
     /* Setup an exception handler to handle exits and unhandled exceptions. */
     if (setjmp(exc_handler.resume)) {
         /* Check for exit or unhandled exception. */

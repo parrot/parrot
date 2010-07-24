@@ -258,7 +258,7 @@ class Instrument::Event::Class is Instrument::Event {
                 $class.remove_method_hook($_);
 
                 my $event := $method_prefix ~ $_;
-                $dispatcher.register($event, $!callback);
+                $dispatcher.deregister($event, $!callback);
             }
 
             CATCH {
@@ -266,7 +266,6 @@ class Instrument::Event::Class is Instrument::Event {
                 # We are trying to disable a hook that wasn't inserted.
                 # TODO: Ensure that the exception came from a place that we are expecting.
                 #       Otherwise rethrow. (How to do that in NQP?)
-                say("Disable: " ~ $!);
             }
         }
 

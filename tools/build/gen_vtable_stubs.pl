@@ -241,7 +241,6 @@ $ret_dec
     GETATTR_InstrumentVtable_original_struct(interp, instr_vt, orig_vtable);
     GETATTR_InstrumentVtable_supervisor(interp, instr_vt, supervisor);
 
-   $ret_ret ((_vtable *)orig_vtable)->$name($param_list_flat);
     params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
 $instr_params
 
@@ -251,6 +250,8 @@ $instr_params
         params);
 
 $events
+
+   $ret_ret ((_vtable *)orig_vtable)->$name($param_list_flat);
     return$ret_last;
 }
 

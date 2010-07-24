@@ -92,6 +92,9 @@ Marks internal data structures as live to the gc.
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
 
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->hook_count);
+
+        parrot_mark_hash(INTERP, attr->group_items);
+        parrot_mark_hash(INTERP, attr->item_groups);
     }
 
 /*

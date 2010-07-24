@@ -74,7 +74,7 @@ Returns a list of methods in the class that InstrumentClass is attached to.
         method_list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
         iter        = VTABLE_get_iter(supervised, methods);
 
-        while(VTABLE_get_bool(supervised, iter)) {
+        while (VTABLE_get_bool(supervised, iter)) {
             PMC *key;
 
             key = VTABLE_shift_pmc(supervised, iter);
@@ -225,7 +225,7 @@ Returns a list of methods that has active instrumentation.
             key = VTABLE_shift_pmc(INTERP, iter);
             count = VTABLE_get_integer_keyed(INTERP, attr->instrumented_methods, key);
 
-            if(count > 0) {
+            if (count > 0) {
                 VTABLE_push_pmc(INTERP, list, key);
             }
         }
