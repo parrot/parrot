@@ -53,15 +53,6 @@ INTVAL ascii_cs_rindex(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * ascii_get_graphemes(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
 STRING * charset_cvt_ascii_to_binary(PARROT_INTERP,
     ARGIN(const STRING *src))
         __attribute__nonnull__(1)
@@ -99,9 +90,6 @@ void Parrot_charset_ascii_init(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
     , PARROT_ASSERT_ARG(search_string))
-#define ASSERT_ARGS_ascii_get_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_charset_cvt_ascii_to_binary __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))

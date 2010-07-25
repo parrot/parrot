@@ -71,14 +71,6 @@ static UINTVAL get_byte(PARROT_INTERP,
     SHIM(UINTVAL offset))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING * get_bytes(PARROT_INTERP,
-    SHIM(const STRING *src),
-    SHIM(UINTVAL offset),
-    SHIM(UINTVAL count))
-        __attribute__nonnull__(1);
-
 static UINTVAL get_codepoint(PARROT_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset)
@@ -158,8 +150,6 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(typetable))
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -412,30 +402,6 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
     no_ICU_lib(interp);
 #endif
 }
-
-/*
-
-=item C<static STRING * get_bytes(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Returns the bytes in string C<src> at position C<offset> and length C<count>.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_bytes(PARROT_INTERP, SHIM(const STRING *src), SHIM(UINTVAL offset),
-        SHIM(UINTVAL count))
-{
-    ASSERT_ARGS(get_bytes)
-    Parrot_ex_throw_from_c_args(interp, NULL,
-        EXCEPTION_UNIMPLEMENTED,
-        "No get_bytes for NFG");
-}
-
 
 /*
 
@@ -728,7 +694,6 @@ Parrot_encoding_nfg_init(PARROT_INTERP)
         get_byte,
         set_byte,
         get_codepoints,
-        get_bytes,
         codepoints,
         bytes,
         iter_init,

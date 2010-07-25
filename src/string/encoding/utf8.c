@@ -49,14 +49,6 @@ static UINTVAL get_byte(SHIM_INTERP,
     UINTVAL offset)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-static STRING * get_bytes(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static UINTVAL get_codepoint(PARROT_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset)
@@ -142,9 +134,6 @@ static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -704,35 +693,6 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
 
 /*
 
-=item C<static STRING * get_bytes(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Returns the bytes in string C<src> at position C<offset> and length C<count>.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_bytes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(get_bytes)
-    STRING * const return_string = Parrot_str_copy(interp, src);
-
-    return_string->strstart = (char *)return_string->strstart + offset ;
-    return_string->bufused = count;
-
-    return_string->strlen = count;
-    return_string->hashval = 0;
-
-    return return_string;
-}
-
-
-
-/*
-
 =item C<static UINTVAL codepoints(PARROT_INTERP, const STRING *src)>
 
 Returns the number of codepoints in string C<src>.
@@ -821,7 +781,6 @@ Parrot_encoding_utf8_init(PARROT_INTERP)
         get_byte,
         set_byte,
         get_codepoints,
-        get_bytes,
         codepoints,
         bytes,
         iter_init,

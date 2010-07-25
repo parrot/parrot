@@ -20,7 +20,6 @@ typedef UINTVAL  (*encoding_get_codepoint_t)(PARROT_INTERP, ARGIN(const STRING *
 typedef UINTVAL  (*encoding_get_byte_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset);
 typedef void     (*encoding_set_byte_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
 typedef STRING * (*encoding_get_codepoints_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
-typedef STRING * (*encoding_get_bytes_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
 typedef UINTVAL  (*encoding_codepoints_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef UINTVAL  (*encoding_bytes_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef UINTVAL  (*encoding_find_cclass_t)(PARROT_INTERP, ARGIN(const STRING *s), ARGIN(const INTVAL *typetable), INTVAL flags, UINTVAL offset, UINTVAL count);
@@ -41,7 +40,6 @@ struct _encoding {
     encoding_get_byte_t                 get_byte;
     encoding_set_byte_t                 set_byte;
     encoding_get_codepoints_t           get_codepoints;
-    encoding_get_bytes_t                get_bytes;
     encoding_codepoints_t               codepoints;
     encoding_bytes_t                    bytes;
     encoding_iter_init_t                iter_init;
@@ -204,8 +202,6 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     ((src)->encoding)->set_byte((i), (src), (offset), (value))
 #define ENCODING_GET_CODEPOINTS(i, src, offset, count) \
     ((src)->encoding)->get_codepoints((i), (src), (offset), (count))
-#define ENCODING_GET_BYTES(i, src, offset, count) \
-    ((src)->encoding)->get_bytes((i), (src), (offset), (count))
 #define ENCODING_CODEPOINTS(i, src) \
     ((src)->encoding)->codepoints((i), (src))
 #define ENCODING_BYTES(i, src) \
