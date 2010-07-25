@@ -269,23 +269,18 @@ compose(PARROT_INTERP, ARGIN(const STRING *src))
     STRING *dest;
     int src_len, dest_len;
     UErrorCode err;
-    /*
-       U_STABLE int32_t U_EXPORT2
-       unorm_normalize(const UChar *source, int32_t sourceLength,
-       UNormalizationMode mode, int32_t options,
-       UChar *result, int32_t resultLength,
-       UErrorCode *status);
-       */
+
+    /* Early return. NFG is as composed as it gets. */
+    if (src->encoding == Parrot_nfg_encoding_ptr)
+        return Parrot_str_clone(interp, src);
+
     dest_len = src_len = src->strlen;
     dest     = Parrot_str_new_init(interp, NULL, src_len * sizeof (UChar),
             src->encoding, src->charset, 0);
 
     err      = U_ZERO_ERROR;
     dest_len = unorm_normalize((UChar *)src->strstart, src_len,
-            UNORM_DEFAULT,      /* default is NFC */
-            0,                  /* options 0 default - no specific icu
-                                 * version */
-            (UChar *)dest->strstart, dest_len, &err);
+            UNORM_NFC, 0, (UChar *)dest->strstart, dest_len, &err);
 
     dest->bufused = dest_len * sizeof (UChar);
 
@@ -293,10 +288,7 @@ compose(PARROT_INTERP, ARGIN(const STRING *src))
         err = U_ZERO_ERROR;
         Parrot_gc_reallocate_string_storage(interp, dest, dest->bufused);
         dest_len = unorm_normalize((UChar *)src->strstart, src_len,
-                UNORM_DEFAULT,      /* default is NFC */
-                0,                  /* options 0 default - no specific
-                                     * icu version */
-                (UChar *)dest->strstart, dest_len, &err);
+                UNORM_NFC, 0, (UChar *)dest->strstart, dest_len, &err);
         PARROT_ASSERT(U_SUCCESS(err));
         dest->bufused = dest_len * sizeof (UChar);
     }

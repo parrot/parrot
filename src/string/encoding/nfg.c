@@ -582,7 +582,7 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
             src[2] = 0;
 
             /* Delegate composition to ICU. */
-            dst_len = unorm_normalize(src, -1 , UNORM_DEFAULT, 0,
+            dst_len = unorm_normalize(src, -1 , UNORM_NFC, 0,
                                       dst, dst_len, &err);
 
             if (U_SUCCESS(err)) {
