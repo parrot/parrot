@@ -29,11 +29,6 @@ char * str_dup_remove_quotes(ARGIN(const char *old))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 Parrot_UInt4 string_unescape_one(PARROT_INTERP,
     ARGMOD(UINTVAL *offset),
     ARGIN(const STRING *string))
@@ -45,9 +40,6 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_char_digit_value __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_str_dup_remove_quotes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(old))
-#define ASSERT_ARGS_string_set_data_directory __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dir))
 #define ASSERT_ARGS_string_unescape_one __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(offset) \
