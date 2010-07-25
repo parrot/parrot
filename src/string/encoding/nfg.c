@@ -461,7 +461,7 @@ nfg_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
     ASSERT_ARGS(nfg_decode_and_advance)
 #if PARROT_HAS_ICU
     const int32_t * const s = (const int32_t *) i->str->strstart;
-    const int32_t         c = s[i->bytepos / sizeof (UChar32)];    
+    const int32_t         c = s[i->bytepos / sizeof (UChar32)];
     const UINTVAL      cpos = i->charpos++;
 
     if (c >= 0) {
