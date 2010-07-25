@@ -254,15 +254,6 @@ struct _charset {
 #define CHARSET_COMPUTE_HASH(interp, source, seed) ((source)->charset)->compute_hash((interp), (source), (seed))
 #define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((source)->charset)->preferred_encoding
 
-#define CHARSET_TO_ENCODING(interp, source) ((source)->encoding)->to_encoding((interp), (source))
-#define CHARSET_COPY_TO_ENCODING(interp, source) ((source)->encoding)->copy_to_encoding((interp), (source))
-#define CHARSET_GET_CODEPOINT(interp, source, offset) ((source)->encoding)->get_codepoint((interp), (source), (offset))
-#define CHARSET_GET_BYTE(interp, source, offset) ((source)->encoding)->get_byte((interp), (source), (offset))
-#define CHARSET_SET_BYTE(interp, source, offset, value) ((source)->encoding)->set_byte((interp), (source), (offset), (value))
-#define CHARSET_CODEPOINTS(interp, source) ((source)->encoding)->codepoints((interp), (source))
-#define CHARSET_BYTES(interp, source) ((source)->encoding)->bytes((interp), (source))
-
-
 #endif /* PARROT_CHARSET_H_GUARD */
 
 /*

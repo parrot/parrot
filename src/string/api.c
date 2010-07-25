@@ -794,7 +794,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
-            s->strlen = CHARSET_CODEPOINTS(interp, s);
+            s->strlen = ENCODING_CODEPOINTS(interp, s);
 
         return s;
     }
@@ -807,7 +807,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
-            s->strlen = CHARSET_CODEPOINTS(interp, s);
+            s->strlen = ENCODING_CODEPOINTS(interp, s);
     }
     else
         s->strlen = s->bufused = 0;
@@ -865,7 +865,7 @@ Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_str_indexed)
     ASSERT_STRING_SANITY(s);
-    return (INTVAL)CHARSET_GET_CODEPOINT(interp, s, idx);
+    return (INTVAL)ENCODING_GET_CODEPOINT(interp, s, idx);
 }
 
 
@@ -1272,7 +1272,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
             (char *)src->strstart + end_byte,
             src->bufused - end_byte);
 
-    dest->strlen  = CHARSET_CODEPOINTS(interp, dest);
+    dest->strlen  = ENCODING_CODEPOINTS(interp, dest);
     dest->hashval = 0;
 
     return dest;
@@ -2836,7 +2836,7 @@ Parrot_str_unescape(PARROT_INTERP,
 
     /* Force validating the string */
     if (encoding != result->encoding)
-        result->strlen = CHARSET_CODEPOINTS(interp, result);
+        result->strlen = ENCODING_CODEPOINTS(interp, result);
 
     if (!CHARSET_VALIDATE(interp, result))
         Parrot_ex_throw_from_c_args(interp, NULL,
@@ -3300,7 +3300,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     }
 
     res->bufused  = pos - res->strstart;
-    res->strlen = CHARSET_CODEPOINTS(interp, res);
+    res->strlen = ENCODING_CODEPOINTS(interp, res);
 
     Parrot_gc_free_fixed_size_storage(interp, ar_len * sizeof (STRING *),
         chunks);
