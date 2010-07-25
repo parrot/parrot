@@ -79,14 +79,6 @@ static INTVAL find_not_cclass(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
-static STRING * get_graphemes(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static INTVAL is_cclass(PARROT_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
@@ -153,9 +145,6 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_get_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -198,27 +187,6 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
     Parrot_ex_throw_from_c_args(interp, NULL, (err), (str))
 
 #define UNIMPL EXCEPTION(EXCEPTION_UNIMPLEMENTED, "unimplemented unicode")
-
-
-/*
-
-=item C<static STRING * get_graphemes(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Gets the graphemes from STRING C<src> starting at C<offset>. Gets
-C<count> graphemes total.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_graphemes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(get_graphemes)
-    return ENCODING_GET_CODEPOINTS(interp, src, offset, count);
-}
 
 
 /*
@@ -1045,7 +1013,6 @@ Parrot_charset_unicode_init(PARROT_INTERP)
     CHARSET * const      return_set = Parrot_new_charset(interp);
     static const CHARSET base_set   = {
         "unicode",
-        get_graphemes,
         to_charset,
         compose,
         decompose,

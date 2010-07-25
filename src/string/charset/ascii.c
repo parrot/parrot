@@ -165,27 +165,6 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<STRING * ascii_get_graphemes(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Retrieves the graphemes for the STRING C<src>, starting at
-C<offset> and ending at C<offset + count>.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-ascii_get_graphemes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(ascii_get_graphemes)
-    return ENCODING_GET_BYTES(interp, src, offset, count);
-}
-
-/*
-
 =item C<static STRING * to_ascii(PARROT_INTERP, const STRING *src)>
 
 Attempts to convert STRING C<src> to ASCII in STRING C<dest>. Throws
@@ -802,7 +781,6 @@ Parrot_charset_ascii_init(PARROT_INTERP)
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "ascii",
-        ascii_get_graphemes,
         to_charset,
         compose,
         decompose,

@@ -29,7 +29,6 @@ PARROT_DATA CHARSET *Parrot_ascii_charset_ptr;
 #define PARROT_BINARY_CHARSET Parrot_binary_charset_ptr
 #define PARROT_UNICODE_CHARSET Parrot_unicode_charset_ptr
 
-typedef STRING * (*charset_get_graphemes_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
 typedef STRING * (*charset_to_charset_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*charset_from_unicode_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*charset_compose_t)(PARROT_INTERP, ARGIN(const STRING *src));
@@ -214,7 +213,6 @@ void Parrot_register_charset_converter(PARROT_INTERP,
 
 struct _charset {
     const char *name;
-    charset_get_graphemes_t get_graphemes;
     charset_to_charset_t to_charset;
     charset_compose_t compose;
     charset_decompose_t decompose;
@@ -261,8 +259,6 @@ struct _charset {
 #define CHARSET_GET_CODEPOINT(interp, source, offset) ((source)->encoding)->get_codepoint((interp), (source), (offset))
 #define CHARSET_GET_BYTE(interp, source, offset) ((source)->encoding)->get_byte((interp), (source), (offset))
 #define CHARSET_SET_BYTE(interp, source, offset, value) ((source)->encoding)->set_byte((interp), (source), (offset), (value))
-#define CHARSET_GET_CODEPOINTS(interp, source, offset, count) ((source)->encoding)->get_codepoints((interp), (source), (offset), (count))
-#define CHARSET_GET_BYTES(interp, source, offset, count) ((source)->encoding)->get_bytes((interp), (source), (offset), (count))
 #define CHARSET_CODEPOINTS(interp, source) ((source)->encoding)->codepoints((interp), (source))
 #define CHARSET_BYTES(interp, source) ((source)->encoding)->bytes((interp), (source))
 

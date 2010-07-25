@@ -1132,7 +1132,7 @@ Parrot_str_substr(PARROT_INTERP,
     if (true_length > (src->strlen - true_offset))
         true_length = (UINTVAL)(src->strlen - true_offset);
 
-    return CHARSET_GET_CODEPOINTS(interp, src, true_offset, true_length);
+    return ENCODING_GET_CODEPOINTS(interp, src, true_offset, true_length);
 }
 
 
