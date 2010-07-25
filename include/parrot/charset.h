@@ -234,7 +234,6 @@ struct _charset {
     const ENCODING *preferred_encoding;
 };
 
-#define CHARSET_GET_GRAPEMES(interp, source, offset, count) ((source)->charset)->get_graphemes((interp), (source), (offset), (count))
 #define CHARSET_TO_UNICODE(interp, source, dest) ((source)->charset)->to_unicode((interp), (source), (dest))
 #define CHARSET_COMPOSE(interp, source) ((source)->charset)->compose((interp), (source))
 #define CHARSET_DECOMPOSE(interp, source) ((source)->charset)->decompose((interp), (source))
