@@ -65,6 +65,10 @@ sub runstep {
     open( my $OUT, ">", $gen_pm )
         or die "Can't open $gen_pm: $!";
 
+    # escape spaces in current directory
+    my $cwd = cwd();
+    $cwd =~ s{ }{\\ }g;
+
     my $pkg = __PACKAGE__;
     print {$OUT} <<"END";
 # ex: set ro:
@@ -117,7 +121,8 @@ END
                         die "type of '$k' is not supported : $type\n";
                     }
                     # String
-                    $v =~ s/(["\\])/\\$1/g;
+                    # escape unescaped double quotes
+                    $v =~ s/(?<!\\)"/\\"/g;
                     $v =~ s/\n/\\n/g;
                     my $charset = q{};
                     if ($v =~ /[^[:ascii:]]/) {
@@ -131,7 +136,7 @@ END
                 }
             }
         }
-        elsif (s/\@PWD\@/cwd/e) {
+        elsif (s/\@PWD\@/$cwd/) {
             print {$OUT} $_;
         }
         else {
