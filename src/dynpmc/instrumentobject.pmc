@@ -87,7 +87,8 @@ Prepares the object for instrumentation.
     }
 }
 
-static
+/*
+ static
 opcode_t *
 stub_object_invoke(PARROT_INTERP, PMC *pmc, opcode_t *dest) {
     PMC *instr_vt, *data;
@@ -122,6 +123,7 @@ stub_object_invoke(PARROT_INTERP, PMC *pmc, opcode_t *dest) {
     ret = ((_vtable *)orig_vtable)->invoke(interp, pmc, next);
     return ret;
 }
+ */
 
 /*
 
