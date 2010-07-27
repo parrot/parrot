@@ -587,7 +587,6 @@ nfg_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 #endif
 }
 
-#if PARROT_HAS_ICU
 /*
 
 =item C<static size_t nfg_hash(PARROT_INTERP, const STRING *s, size_t hashval)>
@@ -602,6 +601,7 @@ static size_t
 nfg_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(nfg_hash)
+#if PARROT_HAS_ICU
     const UChar32 *pos = (const UChar32*) s->strstart;
     UINTVAL len = s->strlen;
     UNUSED(interp);
@@ -612,8 +612,12 @@ nfg_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
     }
 
     return hashval;
-}
+#else
+    UNUSED(s);
+    UNUSED(hashval);
+    no_ICU_lib(interp);
 #endif
+}
 
 /*
 
@@ -698,11 +702,7 @@ Parrot_encoding_nfg_init(PARROT_INTERP)
         bytes,
         iter_init,
         find_cclass,
-#if PARROT_HAS_ICU
         nfg_hash
-#else
-        NULL
-#endif
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "nfg", return_encoding);
