@@ -142,6 +142,10 @@ If class is not found, throw an exception.
         setup_vtable_individual_hashes(INTERP, attr->name_original, attr->name_offset,
                                        (_vtable *) attr->original_struct,
                                        (_vtable *) attr->instrumented_struct);
+
+        /* Update the event_prefix attribute. */
+        VTABLE_push_string(INTERP, attr->event_prefix, CONST_STRING(INTERP, "Class"));
+        VTABLE_push_string(INTERP, attr->event_prefix, classname);
     }
 
 /*
@@ -212,9 +216,7 @@ If name denotes a group, inserts stubs for all functions in that group.
                     /* Add an entry into the rename_hash attribute so that when an event
                        is raised, the event properly named. */
                     group  = (PMC *) parrot_hash_get(INTERP, attr->item_groups, name);
-                    rename = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
-                    VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "Class"));
-                    VTABLE_push_string(INTERP, rename , attr->class_name);
+                    rename = VTABLE_clone(INTERP, attr->event_prefix);
                     VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "vtable"));
                     VTABLE_push_string(INTERP, rename ,
                                        VTABLE_get_string_keyed_int(INTERP, group, 0));
@@ -334,9 +336,11 @@ void raise_vtable_event(PARROT_INTERP, Parrot_Interp supervised,
         event_arr = VTABLE_get_pmc_keyed_str(interp, rename_hash, type);
     }
     else {
-        event_arr = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-        VTABLE_push_string(interp, event_arr, CONST_STRING(interp, "Class"));
-        VTABLE_push_string(interp, event_arr, pmc->vtable->whoami);
+        PMC *prefix;
+
+        GETATTR_InstrumentVtable_event_prefix(interp, pmc, prefix);
+
+        event_arr = VTABLE_clone(interp, prefix);
         VTABLE_push_string(interp, event_arr, CONST_STRING(interp, "vtable"));
         VTABLE_push_string(interp, event_arr, group);
         VTABLE_push_string(interp, event_arr, type);

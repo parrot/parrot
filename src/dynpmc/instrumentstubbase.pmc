@@ -24,6 +24,7 @@ InstrumentStubBase serves as the base class for both of them.
 pmclass InstrumentStubBase auto_attrs dynpmc group instrument_group {
     ATTR PMC  *instrument;          /* Reference to the Instrument object, for various purposes. */
     ATTR PMC  *hook_count;          /* Keeps track of hook requests for a particular entry. */
+    ATTR PMC  *event_prefix;        /* Prefix to put in front of the event. */
     ATTR Hash *name_stubs;          /* Mapping item name with the corresponding stub entry. */
     ATTR Hash *name_original;       /* Mapping item name with the original item entry. */
     ATTR Hash *name_offset;         /* Mapping item name with the pointer address in the struct. */
@@ -73,6 +74,7 @@ Initialises the common attributes.
         attr->item_groups         = NULL;
         attr->original_struct     = NULL;
         attr->instrumented_struct = NULL;
+        attr->event_prefix        = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 
         /* Set custom mark and destroy. */
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -92,6 +94,7 @@ Marks internal data structures as live to the gc.
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
 
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->hook_count);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->event_prefix);
 
         parrot_mark_hash(INTERP, attr->group_items);
         parrot_mark_hash(INTERP, attr->item_groups);

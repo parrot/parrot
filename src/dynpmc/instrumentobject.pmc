@@ -58,6 +58,7 @@ Prepares the object for instrumentation.
     METHOD attach_to_object(PMC *object) {
         Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
         Parrot_Interp supervised;
+        STRING *addr;
 
         GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
 
@@ -72,7 +73,54 @@ Prepares the object for instrumentation.
         setup_vtable_individual_hashes(INTERP, attr->name_original, attr->name_offset,
                                        (_vtable *) attr->original_struct,
                                        (_vtable *) attr->instrumented_struct);
+
+        /* Update the event_prefix attribute. */
+        (STRING *addr) = PCCINVOKE(INTERP, SELF, "get_address");
+        VTABLE_push_string(INTERP, attr->event_prefix, CONST_STRING(INTERP, "Object"));
+        VTABLE_push_string(INTERP, attr->event_prefix, addr);
     }
+
+    METHOD get_address() {
+        STRING *addr;
+        addr = Parrot_sprintf_c(INTERP, "%p", SELF);
+        RETURN(STRING *addr);
+    }
+}
+
+static
+opcode_t *
+stub_object_invoke(PARROT_INTERP, PMC *pmc, opcode_t *dest) {
+    PMC *instr_vt, *data;
+    void *orig_vtable;
+    Parrot_Interp supervisor;
+    PMC *temp;
+    PMC *params;
+    opcode_t* ret;
+
+    instr_vt = (PMC *) parrot_hash_get(interp, vtable_registry, pmc->vtable);
+
+    GETATTR_InstrumentVtable_original_struct(interp, instr_vt, orig_vtable);
+    GETATTR_InstrumentVtable_supervisor(interp, instr_vt, supervisor);
+
+    params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
+    VTABLE_push_pmc(supervisor, params, pmc);
+    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
+    VTABLE_set_pointer(supervisor, temp, next);
+    VTABLE_push_pmc(supervisor, params, temp);
+
+
+    data = Parrot_pmc_new(supervisor, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(supervisor, data,
+        CONST_STRING(supervisor, "parameters"),
+        params);
+
+    raise_vtable_event(supervisor, interp, instr_vt, pmc, data,
+                   CONST_STRING(supervisor, "main"),
+                   CONST_STRING(supervisor, "invoke"));
+
+
+    ret = ((_vtable *)orig_vtable)->invoke(interp, pmc, next);
+    return ret;
 }
 
 /*

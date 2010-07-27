@@ -130,9 +130,7 @@ is called.
 
             /* Add an entry into the rename_hash attribute so that when an event
                is raised, the event properly named. */
-            rename = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
-            VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "Class"));
-            VTABLE_push_string(INTERP, rename , attr->class_name);
+            rename = VTABLE_clone(INTERP, attr->event_prefix);
             VTABLE_push_string(INTERP, rename , CONST_STRING(INTERP, "method"));
             VTABLE_push_string(INTERP, rename , method);
 
@@ -180,6 +178,9 @@ Removes the instrumentation of the given method.
         count = VTABLE_get_integer_keyed_str(INTERP, attr->instrumented_methods, method);
         if (count == 0) {
             /* Not instrumented before. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : No hook for method '%Ss' to remove.",
+                                                VTABLE_name(INTERP, SELF), method);
         }
         else if (count == 1) {
             /* Remove the instrumentation. */
