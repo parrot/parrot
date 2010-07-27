@@ -28,12 +28,6 @@ INTVAL ascii_compare(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_PURE_FUNCTION
-size_t ascii_compute_hash(SHIM_INTERP,
-    ARGIN(const STRING *src),
-    size_t seed)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 INTVAL ascii_cs_index(PARROT_INTERP,
     ARGIN(const STRING *src),
@@ -80,8 +74,6 @@ void Parrot_charset_ascii_init(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
-#define ASSERT_ARGS_ascii_compute_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
