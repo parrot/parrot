@@ -17,7 +17,7 @@ a variety of keys and values.
 
 =cut
 
-.const int TESTS = 47
+.const int TESTS = 51
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -45,6 +45,16 @@ a variety of keys and values.
     .local pmc capt
 
     capt = new ['Capture']
+
+    $I0 = elements capt
+    is($I0, 0, 'elements on empty Capture')
+    $N0 = capt[0]
+    is($N0, 0, 'get_number_keyed_int on empty Capture')
+    $I0 = capt[0]
+    is($I0, 0, 'get_integer_keyed_int on empty Capture')
+    $S0 = capt[0]
+    is($S0, '', 'get_string_keyed_int on empty Capture')
+    
 
     capt[0] = 0
     capt[1] = 1.5
