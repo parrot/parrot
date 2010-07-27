@@ -736,35 +736,6 @@ find_not_cclass(PARROT_INTERP,
 
 /*
 
-=item C<size_t ascii_compute_hash(PARROT_INTERP, const STRING *src, size_t
-seed)>
-
-Computes the hash of STRING C<src> starting with seed value
-C<seed>.
-
-=cut
-
-*/
-
-PARROT_PURE_FUNCTION
-size_t
-ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t seed)
-{
-    ASSERT_ARGS(ascii_compute_hash)
-    size_t hashval = seed;
-    const char *buffptr = (const char *)src->strstart;
-    UINTVAL len = src->strlen;
-
-    PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);
-    while (len--) {
-        hashval += hashval << 5;
-        hashval += *buffptr++;
-    }
-    return hashval;
-}
-
-/*
-
 =item C<void Parrot_charset_ascii_init(PARROT_INTERP)>
 
 Initialize the ASCII charset but registering all the necessary
@@ -798,7 +769,6 @@ Parrot_charset_ascii_init(PARROT_INTERP)
         find_cclass,
         find_not_cclass,
         string_from_codepoint,
-        ascii_compute_hash,
         NULL
     };
 

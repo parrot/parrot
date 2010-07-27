@@ -516,7 +516,6 @@ Parrot_charset_binary_init(PARROT_INTERP)
         find_cclass,
         find_not_cclass,
         string_from_codepoint,
-        ascii_compute_hash,
         NULL
     };
 

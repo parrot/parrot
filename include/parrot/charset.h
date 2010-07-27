@@ -63,7 +63,6 @@ typedef INTVAL   (*charset_find_newline_t)(PARROT_INTERP, ARGIN(const STRING *sr
 typedef INTVAL   (*charset_find_not_newline_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset);
 typedef INTVAL   (*charset_find_word_boundary_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset);
 typedef STRING * (*charset_string_from_codepoint_t)(PARROT_INTERP, UINTVAL codepoint);
-typedef size_t   (*charset_compute_hash_t)(PARROT_INTERP, ARGIN(const STRING *src), size_t seed);
 
 typedef STRING * (*charset_converter_t)(PARROT_INTERP, ARGIN(const STRING *src));
 
@@ -230,7 +229,6 @@ struct _charset {
     charset_find_cclass_t find_cclass;
     charset_find_not_cclass_t find_not_cclass;
     charset_string_from_codepoint_t string_from_codepoint;
-    charset_compute_hash_t compute_hash;
     const ENCODING *preferred_encoding;
 };
 
@@ -250,7 +248,6 @@ struct _charset {
 #define CHARSET_IS_CCLASS(interp, flags, source, offset) ((source)->charset)->is_cclass((interp), (flags), (source), (offset))
 #define CHARSET_FIND_CCLASS(interp, flags, source, offset, count) ((source)->charset)->find_cclass((interp), (flags), (source), (offset), (count))
 #define CHARSET_FIND_NOT_CCLASS(interp, flags, source, offset, count) ((source)->charset)->find_not_cclass((interp), (flags), (source), (offset), (count))
-#define CHARSET_COMPUTE_HASH(interp, source, seed) ((source)->charset)->compute_hash((interp), (source), (seed))
 #define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((source)->charset)->preferred_encoding
 
 #endif /* PARROT_CHARSET_H_GUARD */

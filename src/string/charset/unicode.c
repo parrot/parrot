@@ -38,12 +38,6 @@ static STRING* compose(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static size_t compute_hash(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    size_t seed)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static INTVAL cs_rindex(PARROT_INTERP,
     SHIM(const STRING *src),
     SHIM(const STRING *search_string),
@@ -125,9 +119,6 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_compute_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cs_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -963,38 +954,6 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
     return dest;
 }
 
-
-/*
-
-=item C<static size_t compute_hash(PARROT_INTERP, const STRING *src, size_t
-seed)>
-
-Computes the hash of the given STRING C<src> with starting seed value C<seed>.
-
-=cut
-
-*/
-
-static size_t
-compute_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
-{
-    ASSERT_ARGS(compute_hash)
-    String_iter iter;
-    UINTVAL     offs;
-    size_t      hashval = seed;
-
-    ENCODING_ITER_INIT(interp, src, &iter);
-
-    for (offs = 0; offs < src->strlen; ++offs) {
-        const UINTVAL c = iter.get_and_advance(interp, &iter);
-        hashval += hashval << 5;
-        hashval += c;
-    }
-
-    return hashval;
-}
-
-
 /*
 
 =item C<void Parrot_charset_unicode_init(PARROT_INTERP)>
@@ -1030,7 +989,6 @@ Parrot_charset_unicode_init(PARROT_INTERP)
         find_cclass,
         find_not_cclass,
         string_from_codepoint,
-        compute_hash,
         NULL
     };
 
