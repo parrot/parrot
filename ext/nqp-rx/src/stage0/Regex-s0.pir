@@ -135,6 +135,7 @@ for the Cursor if one hasn't been created yet.
   caparray_int:
     $I0 = subname
     match[$I0] = arr
+    goto caparray_loop
   caparray_done:
 
     # If it's not a successful match, or if there are
