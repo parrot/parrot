@@ -819,18 +819,20 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
     opcode_t i;
 
     for (i = 0; i < ct->const_count; ++i) {
-        PMC    * pmc;
-        STRING * string;
         switch (constants[i]->type) {
           case PFC_PMC:
           case PFC_KEY:
-            pmc = constants[i]->u.key;
+          {
+            PMC * const pmc = constants[i]->u.key;
             Parrot_gc_mark_PMC_alive(interp, pmc);
             break;
+          }
           case PFC_STRING:
-            string = constants[i]->u.string;
+          {
+            STRING * const string = constants[i]->u.string;
             Parrot_gc_mark_STRING_alive(interp, string);
             break;
+           }
           default:
             /* Do nothing. */
             break;
@@ -884,18 +886,18 @@ void
 mark_const_subs(PARROT_INTERP)
 {
     ASSERT_ARGS(mark_const_subs)
-    PackFile_Directory *dir;
 
     PackFile * const self = interp->initial_pf;
 
     if (!self)
         return;
+    else {
+        /* locate top level dir */
+        PackFile_Directory * const dir = &self->directory;
 
-    /* locate top level dir */
-    dir = &self->directory;
-
-    /* iterate over all dir/segs */
-    PackFile_map_segments(interp, dir, find_const_iter, NULL);
+        /* iterate over all dir/segs */
+        PackFile_map_segments(interp, dir, find_const_iter, NULL);
+    }
 }
 
 
