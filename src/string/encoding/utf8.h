@@ -19,8 +19,15 @@
 void Parrot_encoding_utf8_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+size_t utf_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_Parrot_encoding_utf8_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_utf_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/encoding/utf8.c */
 

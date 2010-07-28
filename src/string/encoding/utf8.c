@@ -759,6 +759,35 @@ iter_init(SHIM_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 
 /*
 
+=item C<size_t utf_hash(PARROT_INTERP, const STRING *src, size_t seed)>
+
+Computes the hash of the given STRING C<src> with starting seed value C<seed>.
+
+=cut
+
+*/
+
+size_t
+utf_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
+{
+    ASSERT_ARGS(utf_hash)
+    String_iter iter;
+    UINTVAL     offs;
+    size_t      hashval = seed;
+
+    ENCODING_ITER_INIT(interp, src, &iter);
+
+    for (offs = 0; offs < src->strlen; ++offs) {
+        const UINTVAL c = iter.get_and_advance(interp, &iter);
+        hashval += hashval << 5;
+        hashval += c;
+    }
+
+    return hashval;
+}
+
+/*
+
 =item C<void Parrot_encoding_utf8_init(PARROT_INTERP)>
 
 Initializes the UTF-8 encoding.
@@ -785,7 +814,7 @@ Parrot_encoding_utf8_init(PARROT_INTERP)
         bytes,
         iter_init,
         find_cclass,
-        NULL
+        utf_hash
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "utf8", return_encoding);

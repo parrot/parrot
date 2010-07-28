@@ -20,6 +20,7 @@ UTF-16 encoding with the help of the ICU library.
 
 #include "parrot/parrot.h"
 #include "../unicode.h"
+#include "utf8.h"
 
 /* HEADERIZER HFILE: src/string/encoding/utf16.h */
 
@@ -558,7 +559,7 @@ Parrot_encoding_utf16_init(PARROT_INTERP)
         bytes,
         iter_init,
         find_cclass,
-        NULL
+        utf_hash
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "utf16", return_encoding);
