@@ -77,10 +77,9 @@ for (0 ... 10000) {
     $longcode .= "\$I0 = \$I0 + 1234\n";
 }
 $longcode .= ".end";
-TODO: {
-    local $TODO = "not quite fixed yet";
-dump_output_like( $longcode, "pir",  qr/BYTECODE.*_DB.*=>/, "large pir program doesn't mess up pbc_dump");
-}
+
+dump_output_like( $longcode, "pir",  qr/BYTECODE.*_DB.*=>/,
+    "large pir program doesn't mess up pbc_dump");
 
 =head1 HELPER SUBROUTINES
 

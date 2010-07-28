@@ -856,6 +856,9 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
                                ARGIN_NULLOK(void *user_data))
 {
     ASSERT_ARGS(find_const_iter)
+
+    Parrot_gc_mark_STRING_alive(interp, seg->name);
+
     if (seg->type == PF_DIR_SEG)
         PackFile_map_segments(interp, (const PackFile_Directory *)seg,
                 find_const_iter, user_data);
