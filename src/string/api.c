@@ -2384,17 +2384,10 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 
     if (s->encoding->hash)
         hashval = ENCODING_HASH(interp, s, hashval);
+    else if (s->charset->compute_hash)
+        hashval = CHARSET_COMPUTE_HASH(interp, s, hashval);
     else {
-        /* ZZZZZ workaround for something not setting up encodings right */
-        ASSERT_STRING_SANITY(s);
-
-        ENCODING_ITER_INIT(interp, s, &iter);
-
-        for (offs = 0; offs < s->strlen; ++offs) {
-            const UINTVAL c = iter.get_and_advance(interp, &iter);
-            hashval += hashval << 5;
-            hashval += c;
-        }
+        exit_fatal(1, "String subsystem not properly initialized");
     }
 
     s->hashval = hashval;

@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,9 +23,9 @@ Tests the ExceptionHandler PMC.
     .include 'test_more.pir'
 
     # If test exited with "bad plan" MyHandlerCan.can_handle wasn't invoked.
-    plan(11)
+    plan(15)
 
-    .local pmc eh
+    .local pmc eh, eh2
     eh = new ['ExceptionHandler']
     ok(1, 'Instantiated ExceptionHandler')
 
@@ -34,11 +34,21 @@ Tests the ExceptionHandler PMC.
     eh.'max_severity'(.EXCEPT_WARNING)
     push_eh eh
 
-    eh = new ['ExceptionHandler']
-    set_addr eh, error_handler_one
-    eh.'min_severity'(.EXCEPT_ERROR)
-    eh.'max_severity'(.EXCEPT_FATAL)
-    push_eh eh
+    eh2 = new ['ExceptionHandler']
+    set_addr eh2, error_handler_one
+    eh2.'min_severity'(.EXCEPT_ERROR)
+    eh2.'max_severity'(.EXCEPT_FATAL)
+    push_eh eh2
+
+    .local int i
+    i = eh.'min_severity'()
+    is(i, .EXCEPT_NORMAL, 'get min_severity - 1')
+    i = eh.'max_severity'()
+    is(i, .EXCEPT_WARNING, 'get max_severity - 1')
+    i = eh2.'min_severity'()
+    is(i, .EXCEPT_ERROR, 'get min_severity - 2')
+    i = eh2.'max_severity'()
+    is(i, .EXCEPT_FATAL, 'get max_severity - 2')
 
     $P0 = new ['Exception']
     $P0['severity'] = .EXCEPT_NORMAL

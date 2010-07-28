@@ -2476,6 +2476,12 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
 		--output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
+#
+# remove the following two lines commited in r48180 which cause this to be re-generated
+# every time the all target is invoked - see TT #1719
+#
+#	$(NCI_THUNK_GEN) --core --loader-name=Parrot_nci_load_extra_thunks --no-warn-dups \
+#		--output=src/nci/extra_thunks.c <src/nci/extra_thunks.nci
 
 ## SUFFIX OVERRIDE
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \

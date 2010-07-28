@@ -45,7 +45,7 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 6;
+    plan tests => 7;
 }
 
 dump_output_like( <<PIR, "pir", [qr/FIXUP_t/, qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
@@ -71,6 +71,15 @@ dump_output_like( <<PIR, "pir", qr/BYTECODE_t.*=>.*\[.*offs.*op_count.*itype.*id
     \$I0 = 42
 .end
 PIR
+
+my $longcode = ".sub main :main\n";
+for (0 ... 10000) {
+    $longcode .= "\$I0 = \$I0 + 1234\n";
+}
+$longcode .= ".end";
+
+dump_output_like( $longcode, "pir",  qr/BYTECODE.*_DB.*=>/,
+    "large pir program doesn't mess up pbc_dump");
 
 =head1 HELPER SUBROUTINES
 
