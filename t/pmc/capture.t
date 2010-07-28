@@ -54,7 +54,6 @@ a variety of keys and values.
     is($I0, 0, 'get_integer_keyed_int on empty Capture')
     $S0 = capt[0]
     is($S0, '', 'get_string_keyed_int on empty Capture')
-    
 
     capt[0] = 0
     capt[1] = 1.5
