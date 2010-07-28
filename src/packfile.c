@@ -1719,7 +1719,6 @@ PackFile_Segment_new_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
     PackFile_Segment * const          seg = (f)(interp, pf, name, add);
 
     segment_init(interp, seg, pf, name);
-    Parrot_pmc_gc_register(interp, (PMC*) name);
     seg->type = type;
 
     if (add)
@@ -1816,7 +1815,6 @@ PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     const PackFile_Segment_destroy_func_t f =
         self->pf->PackFuncs[self->type].destroy;
 
-    Parrot_pmc_gc_unregister(interp, (PMC*) self->name);
     if (f)
         (f)(interp, self);
 
