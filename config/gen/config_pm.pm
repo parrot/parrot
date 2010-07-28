@@ -121,6 +121,8 @@ END
                         die "type of '$k' is not supported : $type\n";
                     }
                     # String
+                    $v =~ s/\\/\\\\/g;
+                    $v =~ s/\\\\"/\\"/g;
                     # escape unescaped double quotes
                     $v =~ s/(?<!\\)"/\\"/g;
                     $v =~ s/\n/\\n/g;
