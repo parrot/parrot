@@ -2384,8 +2384,6 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 
     if (s->encoding->hash)
         hashval = ENCODING_HASH(interp, s, hashval);
-    else if (s->charset->compute_hash)
-        hashval = CHARSET_COMPUTE_HASH(interp, s, hashval);
     else {
         exit_fatal(1, "String subsystem not properly initialized");
     }
