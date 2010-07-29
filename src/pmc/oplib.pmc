@@ -99,8 +99,12 @@ pmclass OpLib singleton {
         }
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL elements() {
         return INTERP->op_lib->op_count;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return STATICSELF.elements();
     }
 
     METHOD op_family(STRING *shortname)

@@ -12,10 +12,13 @@ t/pmc/oplib.t - OpLib PMC
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(5)
+    plan(7)
     new_oplib()
+    check_elements()
     get_end()
     get_no_opcode()
     family_end()
@@ -26,6 +29,29 @@ t/pmc/oplib.t - OpLib PMC
     $P0 = new ['OpLib']
     $I0 = isnull $P0
     nok($I0, "new OpLib")
+.end
+
+.sub check_elements
+    .local pmc oplib, op, eh
+    .local int n, i
+    oplib = new ['OpLib']
+    n = elements oplib
+    i = n - 1
+    op = oplib[i]
+    i = isnull op
+    is(i, 0, 'last opcode exists')
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    set_addr eh, catch
+    push_eh eh
+    op = oplib[n]
+    nok(1, 'out of bounds opcode number should throw')
+    goto end
+  catch:
+    finalize eh
+    pop_eh
+    ok(1, 'out of bounds opcode number throws')
+  end:
 .end
 
 .sub get_end
