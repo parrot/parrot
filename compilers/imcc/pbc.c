@@ -147,7 +147,7 @@ static void fixup_globals(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t get_codesize(PARROT_INTERP,
+static size_t get_code_size(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
     ARGOUT(size_t *src_lines))
         __attribute__nonnull__(1)
@@ -257,7 +257,7 @@ static void verify_signature(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_fixup_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_get_codesize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_get_code_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(src_lines))
@@ -630,7 +630,7 @@ store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 
 /*
 
-=item C<static size_t get_codesize(PARROT_INTERP, const IMC_Unit *unit, size_t
+=item C<static size_t get_code_size(PARROT_INTERP, const IMC_Unit *unit, size_t
 *src_lines)>
 
 Stores globals for later fixup, returning the code size in number of ops.
@@ -641,9 +641,9 @@ Stores globals for later fixup, returning the code size in number of ops.
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lines))
+get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lines))
 {
-    ASSERT_ARGS(get_codesize)
+    ASSERT_ARGS(get_code_size)
     Instruction *ins = unit->instructions;
     size_t       code_size;
 
@@ -669,7 +669,7 @@ get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_line
         else if (ins->opname && *ins->opname) {
             (*src_lines)++;
             if (ins->opnum < 0)
-                IMCC_fatal(interp, 1, "get_codesize: "
+                IMCC_fatal(interp, 1, "get_code_size: "
                         "no opnum ins#%d %I\n",
                         ins->index, ins);
 
@@ -685,7 +685,7 @@ get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_line
             code_size += ins->opsize;
         }
         else if (ins->opsize)
-            IMCC_fatal(interp, 1, "get_codesize: "
+            IMCC_fatal(interp, 1, "get_code_size: "
                     "non instruction with size found\n");
     }
 
@@ -2233,42 +2233,42 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
-        size_t       ins_size;
-        const size_t oldsize   = get_old_size(interp,
+        size_t       ins_size, seg_size;
+        const size_t old_size  = get_old_size(interp,
                                     &IMCC_INFO(interp)->ins_line);
-        const size_t code_size = get_codesize(interp, unit, &ins_size);
-        const size_t bytes     = (oldsize + code_size) * sizeof (opcode_t);
+        const size_t code_size = get_code_size(interp, unit, &ins_size);
+        const size_t bytes     = (old_size + code_size) * sizeof (opcode_t);
 
-        IMCC_debug(interp, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
-                code_size, oldsize);
+        IMCC_debug(interp, DEBUG_PBC, "code_size(ops) %d  old_size %d\n",
+                code_size, old_size);
 
         constant_folding(interp, unit);
         store_sub_size(interp, code_size, ins_size);
 
         /* allocate code */
-        interp->code->base.data       = (opcode_t *)
+        interp->code->base.data = (opcode_t *)
             mem_sys_realloc(interp->code->base.data, bytes);
 
         /* reallocating this removes its mmaped-ness; needs encapsulation */
         interp->code->base.pf->is_mmap_ped = 0;
 
-        interp->code->base.size       = oldsize + code_size;
+        interp->code->base.size = old_size + code_size;
 
-        IMCC_INFO(interp)->pc  = (opcode_t *)interp->code->base.data + oldsize;
-        IMCC_INFO(interp)->npc = 0;
+        IMCC_INFO(interp)->pc   = (opcode_t *)interp->code->base.data + old_size;
+        IMCC_INFO(interp)->npc  = 0;
 
         /* FIXME length and multiple subs */
-        IMCC_INFO(interp)->debug_seg  = Parrot_new_debug_seg(interp,
-            interp->code,
-            (size_t)IMCC_INFO(interp)->ins_line + ins_size + 1);
+        seg_size = (size_t)IMCC_INFO(interp)->ins_line + ins_size + 1;
+        IMCC_INFO(interp)->debug_seg  = 
+            Parrot_new_debug_seg(interp, interp->code, seg_size);
 
         Parrot_debug_add_mapping(interp, IMCC_INFO(interp)->debug_seg,
-            IMCC_INFO(interp)->ins_line, unit->file);
+            old_size, unit->file);
 
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
-            add_const_pmc_sub(interp, ins->symregs[0], oldsize,
-                              oldsize + code_size);
+            add_const_pmc_sub(interp, ins->symregs[0], old_size,
+                              old_size + code_size);
         }
         else {
             /* need a dummy to hold register usage */
@@ -2276,7 +2276,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             r->type          = VT_PCC_SUB;
             r->pcc_sub       = mem_gc_allocate_zeroed_typed(interp, pcc_sub_t);
 
-            add_const_pmc_sub(interp, r, oldsize, oldsize + code_size);
+            add_const_pmc_sub(interp, r, old_size, old_size + code_size);
         }
     }
 
