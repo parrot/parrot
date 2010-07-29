@@ -425,7 +425,7 @@ find out how you do such a binding).
 
  method assignment($/) {
      my $lhs := $<primary>.ast;
-     my $rhs := $<expression>.ast;
+     my $rhs := $<EXPR>.ast;
      $lhs.lvalue(1);
      make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
  }
