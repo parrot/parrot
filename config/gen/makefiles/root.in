@@ -1281,7 +1281,8 @@ src/gc/gc_ms$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_ms.c
 
 src/gc/gc_inf$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_inf.c
 
-src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
+src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c \
+	src/string/grapheme.h
 
 src/gc/alloc_resources$(O) : $(PARROT_H_HEADERS) \
 	src/gc/gc_private.h src/gc/alloc_resources.c
@@ -1311,7 +1312,7 @@ src/sub$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
 	include/pmc/pmc_sub.h include/pmc/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
-	src/string/private_cstring.h src/string/api.c
+	src/string/grapheme.h src/string/private_cstring.h src/string/api.c
 
 src/string/primitives$(O) : $(PARROT_H_HEADERS) src/string/primitives.c
 
@@ -1528,7 +1529,9 @@ src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
 src/string/encoding$(O) : $(PARROT_H_HEADERS) src/string/encoding.c
 
-src/string/encoding/nfg$(O) : $(PARROT_H_HEADERS) src/string/grapheme.h src/string/grapheme.c
+src/string/grapheme$(O) : $(PARROT_H_HEADERS) src/string/grapheme.h src/string/grapheme.c
+
+src/string/encoding/nfg$(O) : $(PARROT_H_HEADERS) src/string/grapheme.h
 
 src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
 	src/string/encoding/fixed_8.h \
@@ -1537,7 +1540,6 @@ src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
 	src/string/encoding/ucs2.h \
 	src/string/encoding/ucs4.h \
 	src/string/encoding/nfg.h \
-	src/string/grapheme.h \
 	src/string/charset/ascii.h \
 	src/string/charset/binary.h \
 	src/string/charset/iso-8859-1.h \
