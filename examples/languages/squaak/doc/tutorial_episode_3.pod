@@ -437,7 +437,7 @@ Note that we set the lvalue flag on $lhs. See PDD26 for details on this flag.
 Write the action method for stat_or_def. Simply retrieve the result object from statement and make
 that the result object.
 
- method stat_or_def {
+ method stat_or_def($/) {
      make $<statement>.ast;
  }
 
