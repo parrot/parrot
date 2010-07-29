@@ -17906,7 +17906,7 @@ Parrot_fdiv_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
             "Divide by zero");return (opcode_t *)handler;
     }
 
-    f  = floor(IREG(1) / den);
+    f  = floor(((FLOATVAL)IREG(1)) / den);
     IREG(1) = (INTVAL)f;
 
 return (opcode_t *)cur_opcode + 3;}
@@ -17923,7 +17923,7 @@ Parrot_fdiv_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
             "Divide by zero");return (opcode_t *)handler;
     }
 
-    f  = floor(IREG(1) / den);
+    f  = floor(((FLOATVAL)IREG(1)) / den);
     IREG(1) = (INTVAL)f;
 
 return (opcode_t *)cur_opcode + 3;}
@@ -18001,7 +18001,7 @@ Parrot_fdiv_i_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
             "Divide by zero");return (opcode_t *)handler;
     }
 
-    f  = floor(IREG(2) / den);
+    f  = floor((FLOATVAL)IREG(2) / den);
     IREG(1) = (INTVAL)f;
 
 return (opcode_t *)cur_opcode + 4;}
@@ -18018,7 +18018,7 @@ Parrot_fdiv_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
             "Divide by zero");return (opcode_t *)handler;
     }
 
-    f  = floor(cur_opcode[2] / den);
+    f  = floor((FLOATVAL)cur_opcode[2] / den);
     IREG(1) = (INTVAL)f;
 
 return (opcode_t *)cur_opcode + 4;}
@@ -18035,7 +18035,7 @@ Parrot_fdiv_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
             "Divide by zero");return (opcode_t *)handler;
     }
 
-    f  = floor(IREG(2) / den);
+    f  = floor((FLOATVAL)IREG(2) / den);
     IREG(1) = (INTVAL)f;
 
 return (opcode_t *)cur_opcode + 4;}
@@ -25017,7 +25017,7 @@ static op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  5,    /* minor_version */
+  6,    /* minor_version */
   0,    /* patch_version */
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
