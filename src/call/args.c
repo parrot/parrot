@@ -750,16 +750,14 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     INTVAL  param_index     = 0;
     INTVAL  arg_index       = 0;
     INTVAL  named_count     = 0;
-    INTVAL  err_check       = 0;
     INTVAL  param_count;
     INTVAL  positional_args;
+    /* Check if we should be throwing errors. This is configured separately
+     * for parameters and return values. */
+    const INTVAL err_check  = PARROT_ERRORS_test(interp, direction);
 
     GETATTR_FixedIntegerArray_size(interp, raw_sig, param_count);
 
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, direction))
-        err_check = 1;
 
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
