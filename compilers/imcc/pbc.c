@@ -2259,7 +2259,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         /* FIXME length and multiple subs */
         seg_size = (size_t)IMCC_INFO(interp)->ins_line + ins_size + 1;
-        IMCC_INFO(interp)->debug_seg  = 
+        IMCC_INFO(interp)->debug_seg  =
             Parrot_new_debug_seg(interp, interp->code, seg_size);
 
         Parrot_debug_add_mapping(interp, IMCC_INFO(interp)->debug_seg,
