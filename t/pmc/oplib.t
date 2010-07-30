@@ -16,11 +16,12 @@ t/pmc/oplib.t - OpLib PMC
 
 .sub main :main
     .include 'test_more.pir'
-    plan(7)
+    plan(10)
     new_oplib()
     check_elements()
-    get_end()
-    get_no_opcode()
+    getint_end()
+    getint_no_opcode()
+    getop_end()
     family_end()
     family_no_opcode()
 .end
@@ -54,7 +55,7 @@ t/pmc/oplib.t - OpLib PMC
   end:
 .end
 
-.sub get_end
+.sub getint_end
     $P0 = new ['OpLib']
     # Assumption: we'll always have an end opcode.
     $I1 = $P0['end']
@@ -62,11 +63,32 @@ t/pmc/oplib.t - OpLib PMC
     ok($I0, "got end opcode")
 .end
 
-.sub get_no_opcode
+.sub getint_no_opcode
     $P0 = new ['OpLib']
     $I1 = $P0['hopeweneverhaveopcodesnamedlikethis']
     $I0 = iseq $I1, -1
     ok($I0, "get non existent opcode fails")
+.end
+
+.sub getop_end
+    .local pmc oplib, op, op2, name
+    oplib = new ['OpLib']
+    # Assumption: we'll always have an end opcode.
+
+    # Using a string constant
+    op = oplib['end']
+    $I0 = isnull op
+    is($I0, 0, "got end opcode data")
+
+    # Using a String PMC
+    name = new ['String']
+    name = 'end'
+    op2 = oplib[name]
+    $I0 = isnull op2
+    is($I0, 0, "got end opcode data keyed pmc")
+
+    $I0 = issame op, op2
+    ok($I0, "got same result from both ways")
 .end
 
 .sub family_end
