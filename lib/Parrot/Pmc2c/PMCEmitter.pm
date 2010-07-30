@@ -139,8 +139,8 @@ EOH
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
-    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, PMC* mro);\n");
-    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, Hash* isa);\n");
+    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro));\n");
+    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa));\n");
 
 
     $self->gen_attributes;
