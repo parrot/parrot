@@ -458,7 +458,7 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 
         if (!PMC_IS_NULL(meth)) {
             /* preserve current_object */
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->", object);
+            Parrot_ext_call(interp, meth, "Pi->", object);
         }
     }
 }
@@ -487,8 +487,7 @@ initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
         meth = Parrot_oo_find_vtable_override_for_class(interp, parent, name);
 
         if (!PMC_IS_NULL(meth))
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth,
-                    "PiP->", object, init);
+            Parrot_ext_call(interp, meth, "PiP->", object, init);
     }
 }
 
