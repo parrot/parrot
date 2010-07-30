@@ -822,7 +822,7 @@ sub get_mro_func {
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* Parrot_${classname}_get_mro(PARROT_INTERP, PMC* mro) {
+PMC* Parrot_${classname}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro)) {
     if (PMC_IS_NULL(mro)) {
         mro = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     }
@@ -863,7 +863,7 @@ sub get_isa_func {
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Hash* Parrot_${classname}_get_isa(PARROT_INTERP, Hash* isa) {
+Hash* Parrot_${classname}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa)) {
 EOC
 
     if ($get_isa ne '') {
