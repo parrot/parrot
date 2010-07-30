@@ -515,7 +515,7 @@ thread_func(ARGIN_NULLOK(void *arg))
         Parrot_ex_add_c_handler(interp, &jump_point);
         Parrot_unblock_GC_mark(interp);
         Parrot_unblock_GC_sweep(interp);
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "Pf->P", sub_arg, &ret_val);
+        Parrot_ext_call(interp, sub_pmc, "Pf->P", sub_arg, &ret_val);
     }
 
     /* thread is finito */
