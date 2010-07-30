@@ -89,7 +89,7 @@ pmclass OpLib singleton {
     }
 
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
-        if ((UINTVAL)value > INTERP->op_lib->op_count)
+        if ((UINTVAL)value >= INTERP->op_lib->op_count)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "OpLib: Opcode index %d out of bounds", value);
         else {
@@ -99,8 +99,12 @@ pmclass OpLib singleton {
         }
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL elements() {
         return INTERP->op_lib->op_count;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return STATICSELF.elements();
     }
 
     METHOD op_family(STRING *shortname)

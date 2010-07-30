@@ -22,17 +22,21 @@ These are the vtable functions for the Capture PMC.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-#define CAPTURE_array_CREATE(i, obj) \
+#define CAPTURE_array_CREATE(i, obj, arr) \
     do { \
-        GETATTR_Capture_array((i), (obj), array); \
-        if (!array) \
-            SETATTR_Capture_array((i), (obj), Parrot_pmc_new((i), enum_class_ResizablePMCArray)); \
+        GETATTR_Capture_array((i), (obj), (arr)); \
+        if (!(arr)) { \
+            (arr) = Parrot_pmc_new((i), enum_class_ResizablePMCArray); \
+            SETATTR_Capture_array((i), (obj), (arr)); \
+        } \
     } while (0)
-#define CAPTURE_hash_CREATE(i, obj) \
+#define CAPTURE_hash_CREATE(i, obj, hsh) \
     do { \
-        GETATTR_Capture_hash((i), (obj), hash); \
-        if (!hash) \
-            SETATTR_Capture_hash((i), (obj),  Parrot_pmc_new((i), enum_class_Hash)); \
+        GETATTR_Capture_hash((i), (obj), (hsh)); \
+        if (!(hsh)) { \
+            (hsh) = Parrot_pmc_new((i), enum_class_Hash); \
+            SETATTR_Capture_hash((i), (obj), (hsh)); \
+        } \
     } while (0)
 
 pmclass Capture auto_attrs {
@@ -97,32 +101,28 @@ Sets a value in the array component of the Capture.
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_number_keyed_int(INTERP, array, key, value);
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_integer_keyed_int(INTERP, array, key, value);
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_pmc_keyed_int(INTERP, array, key, value);
     }
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_string_keyed_int(INTERP, array, key, value);
     }
 
@@ -215,72 +215,56 @@ Unshift a value onto the array component of the Capture.
     VTABLE void push_float(FLOATVAL value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_float(INTERP, array, value);
     }
 
     VTABLE void push_integer(INTVAL value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_integer(INTERP, array, value);
     }
 
     VTABLE void push_pmc(PMC *value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_pmc(INTERP, array, value);
     }
 
     VTABLE void push_string(STRING *value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_string(INTERP, array, value);
     }
 
     VTABLE void unshift_float(FLOATVAL value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_float(INTERP, array, value);
     }
 
     VTABLE void unshift_integer(INTVAL value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_integer(INTERP, array, value);
     }
 
     VTABLE void unshift_pmc(PMC *value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_pmc(INTERP, array, value);
     }
 
     VTABLE void unshift_string(STRING *value) {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_string(INTERP, array, value);
     }
 
@@ -313,72 +297,56 @@ Shift a value from the array component of the Capture.
     VTABLE FLOATVAL pop_float() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_float(INTERP, array);
     }
 
     VTABLE INTVAL pop_integer() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_integer(INTERP, array);
     }
 
     VTABLE PMC *pop_pmc() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_pmc(INTERP, array);
     }
 
     VTABLE STRING *pop_string() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_string(INTERP, array);
     }
 
     VTABLE FLOATVAL shift_float() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_float(INTERP, array);
     }
 
     VTABLE INTVAL shift_integer() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_integer(INTERP, array);
     }
 
     VTABLE PMC *shift_pmc() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_pmc(INTERP, array);
     }
 
     VTABLE STRING *shift_string() {
         PMC *array;
 
-        CAPTURE_array_CREATE(INTERP, SELF);
-        GET_ATTR_array(INTERP, SELF, array);
-
+        CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_string(INTERP, array);
     }
 
@@ -465,36 +433,28 @@ Sets a value in the hash component of the Capture.
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_number_keyed(INTERP, hash, key, value);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_integer_keyed(INTERP, hash, key, value);
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_pmc_keyed(INTERP, hash, key, value);
     }
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_string_keyed(INTERP, hash, key, value);
     }
 
@@ -577,36 +537,28 @@ Sets a value in the hash component of the Capture.
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_number_keyed_str(INTERP, hash, key, value);
     }
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_integer_keyed_str(INTERP, hash, key, value);
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_pmc_keyed_str(INTERP, hash, key, value);
     }
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
         PMC *hash;
 
-        CAPTURE_hash_CREATE(INTERP, SELF);
-        GET_ATTR_hash(INTERP, SELF, hash);
-
+        CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_string_keyed_str(INTERP, hash, key, value);
     }
 
@@ -859,9 +811,7 @@ Mark the array.
             capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
         }
 
-        CAPTURE_array_CREATE(INTERP, capt);
-        GET_ATTR_array(INTERP, capt, array);
-
+        CAPTURE_array_CREATE(INTERP, capt, array);
         RETURN(PMC *array);
     }
 
@@ -878,8 +828,7 @@ Mark the array.
             capt                     = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
         }
 
-        CAPTURE_hash_CREATE(INTERP, capt);
-        GET_ATTR_hash(INTERP, capt, hash);
+        CAPTURE_hash_CREATE(INTERP, capt, hash);
 
         RETURN(PMC *hash);
     }

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -69,6 +69,14 @@ sub runstep {
     my $cwd = cwd();
     $cwd =~ s{ }{\\ }g;
 
+    # Build directory can have non ascii characters
+    # Maybe not the better fix, but allows keep working on the issue.
+    # See TT #1717
+    my $cwdcharset = q{};
+    if ($cwd =~ /[^[:ascii:]]/) {
+        $cwdcharset = 'binary:';
+    }
+
     my $pkg = __PACKAGE__;
     print {$OUT} <<"END";
 # ex: set ro:
@@ -121,6 +129,8 @@ END
                         die "type of '$k' is not supported : $type\n";
                     }
                     # String
+                    $v =~ s/\\/\\\\/g;
+                    $v =~ s/\\\\"/\\"/g;
                     # escape unescaped double quotes
                     $v =~ s/(?<!\\)"/\\"/g;
                     $v =~ s/\n/\\n/g;
@@ -136,7 +146,7 @@ END
                 }
             }
         }
-        elsif (s/\@PWD\@/$cwd/) {
+        elsif (s/\"\@PWD\@\"/$cwdcharset\"$cwd\"/) {
             print {$OUT} $_;
         }
         else {

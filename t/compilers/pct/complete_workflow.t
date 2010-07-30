@@ -306,6 +306,7 @@ sub test_pct
     # Do not assume that . is in $PATH
     # places to look for things
     my $BUILD_DIR     = $PConfig{build_dir};
+    my $BD_CHARSET    = $BUILD_DIR =~ /[^[:ascii:]]/ ? "binary:" : q{};
     my $TEST_DIR      = "$BUILD_DIR/t/compilers/pct";
     my $PARROT        = "$BUILD_DIR/parrot$PConfig{exe}";
     my $PGE_LIBRARY   = "$BUILD_DIR/runtime/parrot/library/PGE";
@@ -334,7 +335,7 @@ sub test_pct
     .local pmc args
     args = new 'ResizableStringArray'
     push args, "test_program"
-    push args, "$TEST_DIR/complete_workflow_sample_input.txt"
+    push args, $BD_CHARSET"$TEST_DIR/complete_workflow_sample_input.txt"
 
     \$P0 = new ['PCT'; 'HLLCompiler']
     \$P0.'language'('TestGrammar')

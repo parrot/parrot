@@ -987,18 +987,9 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
-src/parrot_debugger$(O) : $(INC_DIR)/embed.h \
-	src/parrot_debugger.c \
-	$(INC_DIR)/runcore_api.h \
-	compilers/imcc/imc.h $(PARROT_H_HEADERS) compilers/imcc/parser.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/imcparser.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h
+src/parrot_debugger$(O) : $(PARROT_H_HEADERS) src/parrot_debugger.c \
+	$(INC_DIR)/embed.h \
+	$(INC_DIR)/runcore_api.h
 
 $(PDB) : src/parrot_debugger$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \

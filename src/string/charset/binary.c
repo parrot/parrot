@@ -37,16 +37,6 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
-static INTVAL cs_index(SHIM_INTERP,
-    SHIM(const STRING *src),
-    SHIM(const STRING *search_string),
-    SHIM(UINTVAL offset));
-
-static INTVAL cs_rindex(SHIM_INTERP,
-    SHIM(const STRING *src),
-    SHIM(const STRING *search_string),
-    SHIM(UINTVAL offset));
-
 PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
@@ -107,8 +97,6 @@ static UINTVAL validate(SHIM_INTERP, SHIM(const STRING *src));
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_cs_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_decompose __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -346,46 +334,6 @@ compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_index(PARROT_INTERP, const STRING *src, const STRING
-*search_string, UINTVAL offset)>
-
-Returns -1. It makes no sense to try and search for a substring in
-raw binary data.
-
-=cut
-
-*/
-
-static INTVAL
-cs_index(SHIM_INTERP, SHIM(const STRING *src),
-        SHIM(const STRING *search_string), SHIM(UINTVAL offset))
-{
-    ASSERT_ARGS(cs_index)
-    return -1;
-}
-
-/*
-
-=item C<static INTVAL cs_rindex(PARROT_INTERP, const STRING *src, const STRING
-*search_string, UINTVAL offset)>
-
-Returns -1. It makes no sense to search for the last substring match
-in raw binary data.
-
-=cut
-
-*/
-
-static INTVAL
-cs_rindex(SHIM_INTERP, SHIM(const STRING *src),
-        SHIM(const STRING *search_string), SHIM(UINTVAL offset))
-{
-    ASSERT_ARGS(cs_rindex)
-    return -1;
-}
-
-/*
-
 =item C<static UINTVAL validate(PARROT_INTERP, const STRING *src)>
 
 Returns 1. All sequential data is valid binary data.
@@ -509,8 +457,8 @@ Parrot_charset_binary_init(PARROT_INTERP)
         downcase_first,
         titlecase_first,
         compare,
-        cs_index,
-        cs_rindex,
+        ascii_cs_index,
+        ascii_cs_rindex,
         validate,
         is_cclass,
         find_cclass,
