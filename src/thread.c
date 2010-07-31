@@ -19,6 +19,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/atomic.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_sub.h"

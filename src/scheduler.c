@@ -17,6 +17,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/scheduler_private.h"
 #include "parrot/runcore_api.h"
 

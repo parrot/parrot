@@ -21,6 +21,7 @@ Opcode helper functions that don't really fit elsewhere.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "pmc/pmc_nci.h"
 
 typedef unsigned short _rand_buf[3];

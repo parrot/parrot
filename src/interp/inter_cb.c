@@ -25,6 +25,7 @@ the C-library.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "pmc/pmc_parrotinterpreter.h"
 #include "inter_cb.str"
 
