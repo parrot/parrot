@@ -818,9 +818,7 @@ will be used in lieu of this one.)
     $I0 = 1
 
   end:
-    $P0 = new ['Boolean']
-    assign $P0, $I0
-    .return ($P0)
+    .return ($I0)
 .end
 
 
