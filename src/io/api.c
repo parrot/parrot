@@ -146,10 +146,6 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         SETATTR_FileHandle_mode(interp, new_filehandle, mode);
         Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
     }
-    else if (new_filehandle->vtable->base_type == enum_class_StringHandle) {
-        SETATTR_StringHandle_flags(interp, pmc, flags);
-        filehandle = pmc;
-    }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, new_filehandle, CONST_STRING(interp, "open"), "SS->P", path, mode, &filehandle);
     return filehandle;
