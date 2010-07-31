@@ -1,3 +1,17 @@
+parrot (2.6.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/parrot-devel.install.in:
+    - Applied patch from Matt Kraai to install new NQP supporting
+      libraries and install new Opcode generation tool ops2c and
+      supporting library opsc.pbc.
+  * debian/patches:
+    - Added 04_fix_opsc_man.patch, added README for new ops2c
+      binary.
+  * debian/rules:
+    - Generate manpage from the ops2c README file.
+
+ -- Allison Randal <allison@parrot.org>  Sat, 31 Jul 2010 18:32:07 +0100
+
 parrot (2.3.0-1) unstable; urgency=low
   * New upstream release
   * debian/patches:
