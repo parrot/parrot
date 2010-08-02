@@ -133,8 +133,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 
     flags = Parrot_io_parse_open_flags(interp, mode);
     if (new_filehandle->vtable->base_type == typenum) {
-        /* TODO: StringHandle may have a null path, but a filehandle really
-           shouldn't allow that. */
+        /* TODO: a filehandle shouldn't allow a NULL path. */
         PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
         filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
         if (PMC_IS_NULL(filehandle))
