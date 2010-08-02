@@ -255,7 +255,10 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
-        const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
+        STRING *stringhandle;
+        INTVAL status;
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+        status = STRING_IS_NULL(stringhandle);
         RETURN(INTVAL status);
     }
 
