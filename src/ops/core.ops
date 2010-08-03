@@ -105,6 +105,10 @@ inline op check_events() :base_core :flow {
 
 inline op check_events__() :internal :flow {
     opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, _this,
+        EXCEPTION_INVALID_OPERATION,
+        "check_events__ opcode doesn't do anything useful.");
+    goto ADDRESS(handler);
     /* Restore op_func_table. */
     disable_event_checking(interp);
     /* Parrot_cx_handle_tasks(interp, interp->scheduler); */

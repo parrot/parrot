@@ -1,0 +1,25 @@
+# $Id$
+
+=head1 Purpose
+
+This is a list of things that have changed in this branch. These
+things may or may not require notices and a deprication cycle before
+this branch can be merged.
+
+=head1 ITEMS
+
+=head1 Events
+
+Events have been removed. This primarily means the old Task PMC. They
+were never fully implemented to begin with, and the behavior can be
+created in applications using (new) Tasks, message passing, and multiple
+dispatch.
+
+=head1 ParrotThread
+
+ParrotThread is gone. If you want threads, you'll have to schedule some
+Task PMCs.
+
+=head1 
+
+=cut

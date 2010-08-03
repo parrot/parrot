@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -555,7 +555,7 @@ throw_shift_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_shift_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-            "PMCList: Can't shift from an empty array!");
+            "PMCList: Can't shift from an empty list!");
 }
 
 PARROT_DOES_NOT_RETURN
@@ -564,7 +564,7 @@ throw_pop_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_pop_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-            "PMCList: Can't pop from an empty array!");
+            "PMCList: Can't pop from an empty list!");
 }
 
 /*

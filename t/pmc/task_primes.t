@@ -31,23 +31,40 @@ loop:
     $I0 = $I0 + 1
     if $I0 < 100 goto loop
 
-    send_int(tt, 0)
-    wait tt
+    $P0.'send'($I0)
+    $P1 = receive
+
+    if $I0 < 20 goto next_num
+    wait Res
 .end
 
 .sub test_sub
     .local int sum
     sum = 0
 
-loop:
-    $P0 = recv
-    $I0 = $P0
-    if $I0 == 0 goto done
-    sum = sum + $I0
-    goto loop
-    
-done:
-    is(sum, 1060, "found first 25 primes")
+    $P0 = receive
+    is($P0, 2, "2 is prime")
+
+    $P0 = receive
+    is($P0, 3, "3 is prime")
+
+    $P0 = receive
+    is($P0, 5, "5 is prime")
+
+    $P0 = receive
+    is($P0, 7, "7 is prime")
+
+    $P0 = receive
+    is($P0, 11, "11 is prime")
+
+    $P0 = receive
+    is($P0, 13, "13 is prime")
+
+    $P0 = receive
+    is($P0, 17, "17 is prime")
+
+    $P0 = receive
+    is($P0, 19, "19 is prime")
 .end
 
 .sub send_int
@@ -85,23 +102,20 @@ next_msg:
     M = recv
     x = M
     
-    if N >= 2 goto check_x
-    N = x
-    send_int(tt, x)
-    goto send_reply
+    Nsq = N * N
+    
+next_x:
+    $P0 = receive
+    $I0 = $P0
 
 check_x:
     $I0 = x % N
     if $I0 != 0 goto maybe_prime
     goto send_reply
     
-maybe_prime:
-    unless null nt goto ship_it
-    nt = make_checker()
-    
-ship_it:
-    nt.'send'(M)
-    M = recv
+check_next:
+    nt.'send'($P0)
+    $P0 = receive
 
 send_reply:
     pt.'send'(M)

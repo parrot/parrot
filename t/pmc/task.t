@@ -82,14 +82,14 @@
 .end
 
 .sub recv_msg1
-    $P0 = recv
+    $P0 = receive
     $P1 = new 'String'
     $P1 = "Hai 1"
     is($P0, $P1, "Got message after block")
 .end
 
 .sub recv_msg2
-    $P0 = recv
+    $P0 = receive
     $P1 = new 'String'
     $P1 = "Hai 2"
     is($P0, $P1, "Got existing message")

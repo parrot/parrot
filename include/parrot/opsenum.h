@@ -1099,7 +1099,7 @@ enum OPS_ENUM {
     enum_ops_find_codepoint_i_sc           = 1080,
     enum_ops_finalize_p                    = 1081,
     enum_ops_finalize_pc                   = 1082,
-    enum_ops_recv_p                        = 1083,
+    enum_ops_receive_p                     = 1083,
     enum_ops_wait_p                        = 1084,
     enum_ops_wait_pc                       = 1085,
     enum_ops_pass                          = 1086,

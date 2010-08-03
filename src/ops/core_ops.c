@@ -62,6 +62,7 @@ static int get_op(PARROT_INTERP, const char * name, int full);
 #  include <unicode/uchar.h>
 #endif
 
+/* Chandon TODO: Should not have private header here */
 #include "parrot/scheduler_private.h"
 #include "pmc/pmc_task.h"
 
@@ -1157,7 +1158,7 @@ static op_func_t core_op_func_table[1088] = {
   Parrot_find_codepoint_i_sc,                        /*   1080 */
   Parrot_finalize_p,                                 /*   1081 */
   Parrot_finalize_pc,                                /*   1082 */
-  Parrot_recv_p,                                     /*   1083 */
+  Parrot_receive_p,                                  /*   1083 */
   Parrot_wait_p,                                     /*   1084 */
   Parrot_wait_pc,                                    /*   1085 */
   Parrot_pass,                                       /*   1086 */
@@ -14170,9 +14171,9 @@ static op_info_t core_op_info_table[1088] = {
   },
   { /* 1083 */
     /* type PARROT_FUNCTION_OP, */
-    "recv",
-    "recv_p",
-    "Parrot_recv_p",
+    "receive",
+    "receive_p",
+    "Parrot_receive_p",
     /* "",  body */
     0,
     2,
@@ -14246,6 +14247,9 @@ opcode_t *
 Parrot_check_events__(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, _this,
+        EXCEPTION_INVALID_OPERATION,
+        "check_events__ opcode doesn't do anything useful.");return (opcode_t *)handler;
     /* Restore op_func_table. */
     disable_event_checking(interp);return (opcode_t *)_this;   /* force this being a branch op */
 }
@@ -25067,7 +25071,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
-Parrot_recv_p(opcode_t *cur_opcode, PARROT_INTERP)  {
+Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t *const dest = cur_opcode + 2;
     PMC *cur_task = interp->current_task;
@@ -25139,7 +25143,7 @@ static op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  5,    /* minor_version */
+  6,    /* minor_version */
   0,    /* patch_version */
   1087,             /* op_count */
   core_op_info_table,       /* op_info_table */

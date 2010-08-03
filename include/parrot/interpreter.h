@@ -259,7 +259,6 @@ struct parrot_interp_t {
     STRING     **const_cstring_table;         /* CONST_STRING(x) items */
     Hash        *const_cstring_hash;          /* cache of const_string items */
 
-    struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
@@ -271,7 +270,11 @@ struct parrot_interp_t {
 
     UINTVAL          last_alarm;              /* has an alarm triggered? */
     FLOATVAL         quantum_done;            /* expiration of current quantum */
-    PMC             *current_task;
+    PMC             *current_task;            /* there's always one running task */
+
+    PMC             *thread_pool;             /* All threads assigned to this interp */
+    INTVAL           blocked_count;           /* Number of threads currently blocked */
+    Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

@@ -3159,10 +3159,14 @@ static PackFile_Constant **
 find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
 {
     ASSERT_ARGS(find_constants)
+
+#ifdef UNUSED_THREAD_CODE
     if (!n_interpreters
     ||  !interp->thread_data
     ||  interp->thread_data->tid == 0)
+#endif
         return ct->constants;
+#ifdef UNUSED_THREAD_CODE
     else {
         Hash               *tables;
         PackFile_Constant **new_consts;
@@ -3193,6 +3197,7 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
 
         return new_consts;
     }
+#endif
 }
 
 

@@ -292,7 +292,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* all sys running, init the event and signal stuff
      * the first or "master" interpreter is handling events and signals
      */
-    interp->task_queue  = NULL;
     interp->thread_data = NULL;
 
     Parrot_cx_init_scheduler(interp);

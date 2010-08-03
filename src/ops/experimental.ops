@@ -9,6 +9,7 @@ BEGIN_OPS_PREAMBLE
 #  include <unicode/uchar.h>
 #endif
 
+/* Chandon TODO: Should not have private header here */
 #include "parrot/scheduler_private.h"
 #include "pmc/pmc_task.h"
 
@@ -417,7 +418,7 @@ op finalize(in PMC) {
     }
 }
 
-=item B<recv>(out PMC)
+=item B<receive>(out PMC)
 
 Recieve a message sent to the current task.
 
@@ -425,7 +426,7 @@ If there is no waiting message, block and wait.
 
 =cut
 
-op recv(out PMC) {
+op receive(out PMC) {
     opcode_t *const dest = expr NEXT();
     PMC *cur_task = interp->current_task;
     Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
