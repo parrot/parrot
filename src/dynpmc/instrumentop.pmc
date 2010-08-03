@@ -22,6 +22,8 @@ information about the current executing op.
 #include "parrot/parrot.h"
 #include "parrot/opsenum.h"
 
+#include "pmc_instrument.h"
+
 pmclass InstrumentOp auto_attrs dynpmc group instrument_group {
     ATTR Parrot_Interp  interp; /* Interpreter to get op values from. */
     ATTR opcode_t      *pc;     /* Current progam counter of interp above. */
@@ -51,10 +53,10 @@ Initializes the pmc, setting the interp to the given value and pc to NULL.
 
 */
 
-    VTABLE void init_pmc(PMC *interp_pmc) {
+    VTABLE void init_pmc(PMC *instrument) {
         Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
 
-        attr->interp = (Parrot_Interp) VTABLE_get_pointer(INTERP, interp_pmc);
+        GETATTR_Instrument_supervised(INTERP, instrument, attr->interp);
         attr->pc     = NULL;
     }
 
