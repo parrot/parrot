@@ -51,8 +51,8 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         FUNC_MODIFIES(*hash);
 
 static UINTVAL get_hash_val(PARROT_INTERP,
-    ARGIN(Hash *hash),
-    ARGIN_NULLOK(void *key))
+    ARGIN(const Hash *hash),
+    ARGIN_NULLOK(const void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -165,7 +165,8 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
 
 /*
 
-=item C<static UINTVAL get_hash_val(PARROT_INTERP, Hash *hash, void *key)>
+=item C<static UINTVAL get_hash_val(PARROT_INTERP, const Hash *hash, const void
+*key)>
 
 An inlinable helper function to avoid the overhead of calling key_hash_STRING()
 when there's already a calculated hash value for the STRING key.
@@ -175,11 +176,11 @@ when there's already a calculated hash value for the STRING key.
 */
 
 static UINTVAL
-get_hash_val(PARROT_INTERP, ARGIN(Hash *hash), ARGIN_NULLOK(void *key))
+get_hash_val(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *key))
 {
     ASSERT_ARGS(get_hash_val)
-    if (hash->hash_val == key_hash_STRING) {
-        STRING *s = (STRING *)key;
+    if (hash->hash_val == (hash_hash_key_fn)key_hash_STRING) {
+        const STRING * const s = (const STRING *)key;
         if (s->hashval)
             return s->hashval;
     }
