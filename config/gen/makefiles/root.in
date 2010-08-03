@@ -1130,10 +1130,10 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_R
 
 $(LIBRARY_DIR)/Instrument/InstrumentLib.pbc: $(LIBRARY_DIR)/Instrument/Instrument.pbc \
 	$(LIBRARY_DIR)/Instrument/Base.pbc $(LIBRARY_DIR)/Instrument/Probe.pbc \
-	$(LIBRARY_DIR)/Instrument/EventLibrary.pbc $(LIBRARY_DIR)/Instrument/Event.pbc
+	$(LIBRARY_DIR)/Instrument/Event.pbc $(LIBRARY_DIR)/Instrument/EventLibrary.pbc
 	$(PBC_MERGE) -o $@ $(LIBRARY_DIR)/Instrument/Instrument.pbc \
 	$(LIBRARY_DIR)/Instrument/Base.pbc $(LIBRARY_DIR)/Instrument/Probe.pbc \
-	$(LIBRARY_DIR)/Instrument/EventLibrary.pbc $(LIBRARY_DIR)/Instrument/Event.pbc
+	$(LIBRARY_DIR)/Instrument/Event.pbc $(LIBRARY_DIR)/Instrument/EventLibrary.pbc
 
 $(LIBRARY_DIR)/Instrument/Base.pir: $(LIBRARY_DIR)/Instrument/Base.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/Base.nqp > $@
