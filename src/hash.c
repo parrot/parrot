@@ -1291,7 +1291,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
 
     /* if the fast search didn't work, try the normal hashing search */
     {
-        const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
+        const UINTVAL hashval = get_hash_val(interp, hash, key);
         HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
 
         while (bucket) {
