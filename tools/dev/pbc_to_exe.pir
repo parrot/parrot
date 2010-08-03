@@ -255,7 +255,7 @@ MAIN
   read_done:
     ifh.'close'()
 
-    push codestring, "\n};\n\nconst int bytecode_size = "
+    push codestring, "\n};\n\nconst size_t bytecode_size = "
     $S0 = size
     push codestring, $S0
     push codestring, ";\n"
@@ -353,7 +353,7 @@ END_OF_FUNCTION
 
     push codestring, '"'
     push codestring, "\n;\n\n"
-    push codestring, "const int bytecode_size = "
+    push codestring, "const size_t bytecode_size = "
     $S0 = size
     push codestring, $S0
     push codestring, ";\n"
