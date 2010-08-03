@@ -1,0 +1,713 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/instrumentruncore.pmc - InstrumentRuncore
+
+=head1 DESCRIPTION
+
+Provides a way to instrument the runcore, thus allowing
+hooks into the execution of the ops.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/embed.h"
+#include "parrot/runcore_api.h"
+#include "parrot/opsenum.h"
+
+#include "pmc_instrument.h"
+
+#include "instrument_private.h"
+#include "instrument_extern.h"
+
+/*
+ * Extend the runcore_t struct to include a reference
+ *  to the supervisor interpreter.
+ */
+
+typedef struct instrument_runcore_t {
+    STRING                  *name;
+    int                      id;
+    oplib_init_f             opinit;
+    runcore_runops_fn_type   runops;
+    runcore_destroy_fn_type  destroy;
+    runcore_prepare_fn_type  prepare_run;
+    INTVAL                   flags;
+
+    /* End of common members */
+    INTVAL                    has_ended;
+    Parrot_Interp             supervisor_interp;
+    PMC                      *instrument_rc;
+} instrument_runcore_t;
+
+/* Probe helpers. */
+void          runcore_probes_setup(PARROT_INTERP, PMC *runcore);
+void          runcore_probes_refresh_tables(PARROT_INTERP, PMC *runcore);
+probe_list_t* runcore_probes_get_probes(PARROT_INTERP, PMC *runcore, INTVAL op_num);
+probe_list_t* runcore_probes_fire_probes(PARROT_INTERP, PMC *runcore,
+                                         opcode_t *pc, probe_list_t *callbacks);
+
+/* Runcore helpers. */
+void          runcore_runcore_setup(PARROT_INTERP, PMC *runcore);
+opcode_t*     runcore_runcore_runops(PARROT_INTERP, Parrot_runcore_t *core_ptr, opcode_t *pc);
+
+/* Misc helpers */
+void   runcore_library_update(PARROT_INTERP, PMC *runcore);
+void   runcore_vtable_fixup(PARROT_INTERP, PMC *runcore);
+void   runcore_optable_fixup(PARROT_INTERP, PMC *runcore);
+INTVAL runcore_does_loading(opcode_t *pc);
+
+pmclass InstrumentRuncore auto_attrs dynpmc group instrument_group {
+    ATTR PMC                  *instrument;
+    ATTR PMC                  *dynlibs;
+    ATTR struct probe_list_t **op_hooks;
+    ATTR INTVAL                op_hooks_size;
+    ATTR struct probe_list_t  *op_catchall;
+
+/*
+
+=item C<void init()>
+
+Throws an exception since this class should be instantiated using init_pmc instead.
+
+=item C<void init_pmc(PMC *instrument)>
+
+Initialises the PMC and prepares the supervised interpreter
+for running under supervision.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        /* Not supposed to be init on its own. */
+        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                    "%Ss should be instantiated with an Instrument instance.",
+                                    VTABLE_name(INTERP, SELF));
+    }
+
+    VTABLE void init_pmc(PMC *instrument) {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+
+        attr->instrument    = instrument;
+        attr->dynlibs       = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->op_hooks      = NULL;
+        attr->op_hooks_size = 0;
+        attr->op_catchall   = NULL;
+
+        /* Instrument the runcore. */
+        runcore_runcore_setup(INTERP, SELF);
+
+        /* Set up the op probe tables. */
+        runcore_probes_setup(INTERP, SELF);
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks internal data structures as live to the gc.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->dynlibs);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Cleans up after the PMC.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        INTVAL i;
+
+        /* Delete the linked list entries. */
+        for (i = 0; i < attr->op_hooks_size; i++) {
+            if (attr->op_hooks[i] != NULL) {
+                probe_list_delete_list(INTERP, attr->op_hooks[i]);
+            }
+        }
+        mem_gc_free(INTERP, attr->op_hooks);
+        probe_list_delete_list(INTERP, attr->op_catchall);
+    }
+
+/*
+
+=item C<void *insert_op_hooks(PMC *probe, INTVAL op_num)>
+
+Insert a hook for the given op number.
+
+=cut
+
+*/
+
+    METHOD insert_op_hook(PMC *probe, INTVAL op_num) {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+
+        if (op_num >= attr->op_hooks_size) {
+            /* Invalid op num */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "Invalid op number %d.", op_num);
+        }
+
+        if (attr->op_hooks[op_num] == NULL) {
+            attr->op_hooks[op_num] = probe_list_create_list(INTERP);
+        }
+
+        probe_list_push(INTERP, attr->op_hooks[op_num], probe);
+    }
+
+/*
+
+=item C<void *remove_op_hooks(PMC *probe, INTVAL op_num)>
+
+Removes a hook for the given op number.
+
+=cut
+
+*/
+
+    METHOD remove_op_hook(PMC *probe, INTVAL op_num) {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        probe_node_t *node;
+
+        if (op_num >= attr->op_hooks_size) {
+            /* Invalid op num */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "Invalid op number %d.", op_num);
+        }
+
+        if (attr->op_hooks[op_num] != NULL) {
+            node = probe_list_find(INTERP, attr->op_hooks[op_num], probe);
+            probe_list_remove(INTERP, attr->op_hooks[op_num], node);
+        }
+
+        if (node == NULL) {
+            /* Callback was not found. */
+            PMC *id = VTABLE_get_attr_str(INTERP, probe, CONST_STRING(INTERP, "$!identifier"));
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Probe '%Ss' not found in 'remove_op_hook'",
+                                        VTABLE_get_string(INTERP, id));
+        }
+    }
+
+/*
+=item C<INTVAL count_op_hooks(INTVAL op_num)>
+
+Returns the number of enabled op hooks for the given op number.
+
+=cut
+*/
+
+    METHOD count_op_hooks(INTVAL op_num) {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        probe_list_t         *list = attr->op_hooks[op_num];
+        INTVAL               count = (list == NULL) ? 0: list->count;
+
+        RETURN(INTVAL count);
+    }
+
+/*
+=item C<void *insert_op_catchall(PMC *probe)>
+
+Register a catchall op callback
+
+=cut
+*/
+
+    METHOD insert_op_catchall(PMC *probe) {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        probe_list_push(INTERP, attr->op_catchall, probe);
+    }
+
+/*
+=item C<void *remove_op_catchall(PMC *probe)>
+
+Deregister a catchall op callback
+
+=cut
+*/
+
+    METHOD remove_op_catchall(PMC *probe) {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        probe_node_t  *node = NULL;
+
+        node = probe_list_find(INTERP, attr->op_catchall, probe);
+
+        if (node == NULL) {
+            /* Callback was not found. */
+            PMC *id = VTABLE_get_attr_str(INTERP, probe, CONST_STRING(INTERP, "$!identifier"));
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Probe '%S' not found in 'remove_op_catchall'",
+                                        VTABLE_get_string(INTERP, id));
+        }
+
+        probe_list_remove(INTERP, attr->op_catchall, node);
+    }
+
+/*
+=item C<INTVAL count_op_catchalls()>
+
+Returns the number of enabled op catchall probes.
+
+=cut
+*/
+
+    METHOD count_op_catchalls() {
+        Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        probe_list_t         *list = attr->op_catchall;
+        INTVAL               count = (list == NULL) ? 0: list->count;
+
+        RETURN(INTVAL count);
+    }
+}
+
+/*
+
+=item C<void runcore_probes_setup(PARROT_INTERP, PMC *runcore)>
+
+Initialises the attributes op_hooks and op_catchall for the given
+InstrumentRuncore instance.
+
+For internal use only.
+
+=cut
+
+*/
+void
+runcore_probes_setup(PARROT_INTERP, PMC *runcore) {
+    probe_list_t **hooks;
+    probe_list_t  *catchall;
+    INTVAL         count;
+    PMC           *instrument;
+    Parrot_Interp  supervised;
+
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+    GETATTR_Instrument_supervised(interp, instrument, supervised);
+
+    count    = supervised->op_count;
+    hooks    = mem_gc_allocate_n_zeroed_typed(interp, count, probe_list_t *);
+    catchall = probe_list_create_list(interp);
+
+    SETATTR_InstrumentRuncore_op_hooks(interp, runcore, hooks);
+    SETATTR_InstrumentRuncore_op_catchall(interp, runcore, catchall);
+    SETATTR_InstrumentRuncore_op_hooks_size(interp, runcore, count);
+}
+
+/*
+
+=item C<void runcore_probes_refresh_tables(PARROT_INTERP, PMC *runcore)>
+
+Whenever the core op tables are updated, due to the loading of dynops,
+the op_hooks table must also be updated. This function will do the
+necessary updates.
+
+For internal use only.
+
+=cut
+
+*/
+
+void
+runcore_probes_refresh_tables(PARROT_INTERP, PMC *runcore) {
+    PMC           *instrument;
+    probe_list_t **hooks;
+    INTVAL         new_size, old_size;
+    Parrot_Interp  supervised;
+
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+    GETATTR_InstrumentRuncore_op_hooks(interp, runcore, hooks);
+    GETATTR_InstrumentRuncore_op_hooks_size(interp, runcore, old_size);
+    GETATTR_Instrument_supervised(interp, instrument, supervised);
+
+    new_size = supervised->op_count;
+
+    if (new_size > old_size) {
+        /* Reallocate the op_hooks table. */
+        hooks = mem_gc_realloc_n_typed_zeroed(interp, hooks, new_size, old_size, probe_list_t *);
+        SETATTR_InstrumentRuncore_op_hooks(interp, runcore, hooks);
+        SETATTR_InstrumentRuncore_op_hooks_size(interp, runcore, new_size);
+    }
+}
+
+/*
+
+=item C<probe_list_t* runcore_probes_get_probes(PARROT_INTERP, PMC *runcore, INTVAL op_num)>
+
+Returns the list of probes applicable to the given op number.
+This list will contain the catchall op hooks + op hooks specific to
+the op given.
+
+For internal use only.
+
+=cut
+
+*/
+
+probe_list_t*
+runcore_probes_get_probes(PARROT_INTERP, PMC *runcore, INTVAL op_num) {
+    probe_list_t  *list;
+    probe_list_t **hooks;
+    probe_list_t  *catchall;
+
+    GETATTR_InstrumentRuncore_op_hooks(interp, runcore, hooks);
+    GETATTR_InstrumentRuncore_op_catchall(interp, runcore, catchall);
+
+    list = probe_list_create_list(interp);
+
+    probe_list_append(interp, list, catchall);
+    probe_list_append(interp, list, hooks[op_num]);
+
+    return list;
+}
+
+/*
+
+=item C<probe_list_t* runcore_probes_fire_probes(PARROT_INTERP, PMC *runcore,
+opcode_t *pc, probe_list_t *callbacks))>
+
+Given a list of probes, set up the InstrumentOp instance and pass
+it to fire_callbacks for calls.
+
+For internal use only.
+
+=cut
+
+*/
+
+probe_list_t*
+runcore_probes_fire_probes(PARROT_INTERP, PMC *runcore, opcode_t *pc, probe_list_t *callbacks) {
+    PMC   *op, *instrument, *interp_pmc;
+    INTVAL op_type;
+
+
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+
+    op_type    = Parrot_pmc_get_type_str(interp, CONST_STRING(interp, "InstrumentOp"));
+    op         = Parrot_pmc_new_init(interp, op_type, instrument);
+
+    VTABLE_set_pointer(interp, op, pc);
+
+    return fire_callbacks(interp, callbacks, op, instrument);
+}
+
+/*
+
+=item C<void runcore_runcore_setup(PARROT_INTERP, PMC *runcore)>
+
+Changes the supervised interpreter's runcore entry to the
+Instrument runcore.
+
+For internal use only.
+
+=cut
+
+*/
+
+void runcore_runcore_setup(PARROT_INTERP, PMC *runcore) {
+    PMC                  *instrument;
+    Parrot_Interp         supervised;
+    instrument_runcore_t *core;
+
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+    GETATTR_Instrument_supervised(interp, instrument, supervised);
+
+    core = mem_gc_allocate_zeroed_typed(interp, instrument_runcore_t);
+
+    Parrot_set_run_core(interp, PARROT_SLOW_CORE);
+    mem_copy_n_typed(core, supervised->run_core, 1, Parrot_runcore_t);
+
+    core->instrument_rc     = runcore;
+    core->supervisor_interp = interp;
+    core->has_ended         = 0;
+    core->name              = CONST_STRING(supervised, "instrument");
+    core->runops            = runcore_runcore_runops;
+    core->prepare_run       = NULL;
+    core->destroy           = NULL;
+
+    PARROT_RUNCORE_FUNC_TABLE_SET((Parrot_runcore_t *) core);
+    Parrot_runcore_register(supervised, (Parrot_runcore_t *) core);
+    Parrot_runcore_switch(supervised, core->name);
+}
+
+/*
+
+=item C<opcode_t* runcore_runcore_runops(PARROT_INTERP, Parrot_runcore_t *core_ptr, opcode_t *pc)>
+
+Executes the op starting from the op pointed to by pc.
+As each op executes, run the op hooks as necessary.
+
+For internal use only.
+
+=cut
+
+*/
+
+opcode_t* runcore_runcore_runops(PARROT_INTERP, Parrot_runcore_t *core_ptr, opcode_t *pc) {
+    instrument_runcore_t *core;
+    Parrot_Interp         supervisor;
+    PMC                  *runcore;
+    Parrot_runloop        exc_handler;
+
+    core       = (instrument_runcore_t *) core_ptr;
+    runcore    = core->instrument_rc;
+    supervisor = core->supervisor_interp;
+
+    runcore_library_update(supervisor, runcore);
+
+    /* Setup exception handler to handle exits and unhandled exceptions. */
+    if(setjmp(exc_handler.resume)) {
+        /* Return if the exit op is called. */
+        if(*pc == enum_ops_exit_i
+        || *pc == enum_ops_exit_ic) {
+            core->has_ended = 1;
+            return pc;
+        }
+
+        /* Rethrow otherwise. */
+        Parrot_ex_rethrow_from_c(interp, exc_handler.exception);
+    }
+    Parrot_ex_add_c_handler(interp, &exc_handler);
+
+    /* Runloop */
+    while (pc && !(core->has_ended)) {
+        probe_list_t *callbacks, *recalls, *ignore;
+        opcode_t *pc_copy = pc;
+
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
+
+        /* Get the list of callbacks to call and execute the op. */
+        callbacks = runcore_probes_get_probes(supervisor, runcore, *pc);
+        recalls   = runcore_probes_fire_probes(supervisor, runcore, pc, callbacks);
+        DO_OP(pc, interp);
+        ignore    = runcore_probes_fire_probes(supervisor, runcore, pc_copy, recalls);
+        probe_list_delete_list(supervisor, ignore);
+
+        /* On loading a dynlib or bytecode, we need to update a few things. */
+        if (runcore_does_loading(pc_copy)) {
+            runcore_library_update(supervisor, runcore);
+        }
+
+        /* Force events */
+        Parrot_cx_handle_tasks(interp, interp->scheduler);
+        Parrot_cx_handle_tasks(supervisor, supervisor->scheduler);
+    }
+
+    return pc;
+}
+
+/*
+
+=item C<void runcore_library_update(PARROT_INTERP, PMC *runcore)>
+
+Keeps track of the dynamic libraries loaded by the supervised interpreter.
+Upon detection of a newly loaded library, raises an Internal::loadlib::libname
+event.
+
+For internal use only.
+
+=cut
+
+*/
+
+void runcore_library_update(PARROT_INTERP, PMC *runcore) {
+    PMC           *instrument;
+    Parrot_Interp  supervised;
+    PMC           *cur_dynlibs, *old_dynlibs;
+    INTVAL         cur_count, old_count;
+
+    STRING *refresh = CONST_STRING(interp, "refresh_probes");
+
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+    GETATTR_InstrumentRuncore_dynlibs(interp, runcore, old_dynlibs);
+    GETATTR_Instrument_supervised(interp, instrument, supervised);
+
+    cur_dynlibs = VTABLE_get_pmc_keyed_int(supervised, supervised->iglobals, IGLOBALS_DYN_LIBS);
+
+    /* Check for new dynlibs by comparing the counts. */
+    old_count = VTABLE_get_integer(interp, old_dynlibs);
+    cur_count = VTABLE_get_integer(supervised, cur_dynlibs);
+
+    runcore_optable_fixup(interp, runcore);
+    runcore_vtable_fixup(interp, runcore);
+
+    if (old_count != cur_count) {
+        PMC *iter;
+
+        /* Look for the new dynlibs and raise an event about them. */
+        iter = VTABLE_get_iter(supervised, cur_dynlibs);
+        while (VTABLE_get_bool(supervised, iter)) {
+            PMC *key;
+
+            key = VTABLE_shift_pmc(supervised, iter);
+
+            if (!VTABLE_exists_keyed(interp, old_dynlibs, key)) {
+                /* New lib detected. */
+                PMC *lib, *task_data, *recall;
+                STRING *event;
+
+                lib       = VTABLE_get_pmc_keyed(supervised, cur_dynlibs, key);
+                task_data = Parrot_pmc_new(interp, enum_class_Hash);
+
+                VTABLE_set_pmc_keyed_str(interp, task_data, CONST_STRING(interp, "library"), lib);
+                event = Parrot_sprintf_c(interp, "Internal::loadlib::%Ss",
+                                         VTABLE_name(supervised, lib));
+
+                /* Fire the event and discard the list returned. */
+                Parrot_pcc_invoke_method_from_c_args(interp, instrument,
+                    CONST_STRING(interp, "raise_event"),
+                    "SP->P", event, task_data, &recall);
+                probe_list_delete_list(interp, (probe_list_t *) VTABLE_get_pointer(interp, recall));
+
+                /* Add lib to the old dynlib hash */
+                VTABLE_set_pmc_keyed(interp, old_dynlibs, key, lib);
+            }
+        }
+    }
+
+    /* Refresh the probes. */
+    Parrot_pcc_invoke_method_from_c_args(interp, instrument, refresh, "->");
+}
+
+/*
+
+=item C<void runcore_vtable_fixup(PARROT_INTERP, PMC *runcore) >
+
+Keep the vtables in the child and parent in sync.
+
+For internal use only.
+
+=cut
+
+*/
+
+void runcore_vtable_fixup(PARROT_INTERP, PMC *runcore) {
+    INTVAL i;
+    PMC           *instrument;
+    Parrot_Interp  supervised, dest, src;
+
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+    GETATTR_Instrument_supervised(interp, instrument, supervised);
+
+    /* Dest is the one with the smaller vtable. */
+    if (interp->n_vtable_max > supervised->n_vtable_max) {
+        dest = supervised;
+        src  = interp;
+    }
+    else {
+        dest = interp;
+        src  = supervised;
+    }
+
+    /* Extend dest's vtable if needed. */
+    if (dest->n_vtable_alloced < src->n_vtable_max) {
+        INTVAL new_size;
+        new_size = src->n_vtable_max + 16;
+        dest->vtables = mem_gc_realloc_n_typed_zeroed(dest, dest->vtables,
+                                                      new_size, dest->n_vtable_alloced,
+                                                      VTABLE *);
+        dest->n_vtable_alloced = new_size;
+    }
+
+    /* Copy over the new vtable entries. */
+    for (i = dest->n_vtable_max; i < src->n_vtable_max; i++) {
+        dest->vtables[i] = src->vtables[i];
+    }
+
+    dest->n_vtable_max = src->n_vtable_max;
+}
+
+/*
+
+=item C<void runcore_optable_fixup(PARROT_INTERP, PMC *runcore) >
+
+Whenever a dynop library is loaded, the op table references
+are highly likely to change. Detect these changes and update
+the op table references in the supervising interpreter.
+
+For internal use only.
+
+=cut
+
+*/
+
+void runcore_optable_fixup(PARROT_INTERP, PMC *runcore) {
+    op_lib_t *core_lib;
+
+    /* Reset interp's optables if needed. */
+    core_lib = interp->run_core->opinit(interp, 1);
+    if (interp->op_count != core_lib->op_count) {
+        interp->op_count      = core_lib->op_count;
+        interp->op_info_table = core_lib->op_info_table;
+        interp->op_func_table = core_lib->op_func_table;
+
+        /* Remove dest's evc_func_table */
+        if (interp->evc_func_table != NULL) {
+            mem_gc_free(interp, interp->evc_func_table);
+
+            interp->evc_func_table  = NULL;
+            interp->save_func_table = NULL;
+
+            Parrot_setup_event_func_ptrs(interp);
+        }
+
+        /* Refresh the op_hook tables */
+        runcore_probes_refresh_tables(interp, runcore);
+    }
+}
+
+/*
+
+=item C<INTVAL runcore_does_loading(opcode_t *pc) >
+
+Returns true if the op pointed to by pc is one that
+either loads a dynlib or bytecode.
+
+For internal use only.
+
+=cut
+
+*/
+
+INTVAL runcore_does_loading(opcode_t *pc) {
+    return (*pc == enum_ops_loadlib_p_s
+         || *pc == enum_ops_loadlib_p_sc
+         || *pc == enum_ops_loadlib_p_s_p
+         || *pc == enum_ops_loadlib_p_sc_p
+         || *pc == enum_ops_loadlib_p_s_pc
+         || *pc == enum_ops_loadlib_p_sc_pc
+         || *pc == enum_ops_load_bytecode_s
+         || *pc == enum_ops_load_bytecode_sc);
+}
+
+/*
+
+=back
+
+*/
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

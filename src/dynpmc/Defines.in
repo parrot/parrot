@@ -28,7 +28,9 @@ DYNPMC_INSTRUMENT = \
     src/dynpmc/instrumentop.pmc \
     src/dynpmc/instrumentvtable.pmc \
     src/dynpmc/instrumentclass.pmc \
-    src/dynpmc/instrumentobject.pmc
+    src/dynpmc/instrumentobject.pmc \
+    src/dynpmc/instrumentinvokable.pmc \
+    src/dynpmc/instrumentruncore.pmc
 
 DYNPMC_INSTRUMENT_OBJS = \
     src/dynpmc/instrument$(O) \
@@ -37,7 +39,9 @@ DYNPMC_INSTRUMENT_OBJS = \
     src/dynpmc/instrumentop$(O) \
     src/dynpmc/instrumentvtable$(O) \
     src/dynpmc/instrumentclass$(O) \
-    src/dynpmc/instrumentobject$(O)
+    src/dynpmc/instrumentobject$(O) \
+    src/dynpmc/instrumentinvokable$(O) \
+    src/dynpmc/instrumentruncore$(O)
 
 DYNPMC_H_FILES = \
     include/parrot/caches.h \
