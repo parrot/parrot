@@ -12,11 +12,21 @@ t/pmc/oplib.t - OpLib PMC
 
 =cut
 
+# Hardcoded assumptions for tests:
+# * We have an op called end
+# * It has no arguments
+# * Is the only member of its familiy
+.const string TESTED_OP = 'end'
+.const int TESTED_OP_ELEMS = 0
+.const int TESTED_OP_FAMILIY_ELEMS = 1
+# Never have an op with this name:
+.const string TESTED_NOSUCHOP = 'hopeweneverhaveopcodesnamedlikethis'
+
 .include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
-    plan(11)
+    plan(12)
     new_oplib()
     check_elements()
     getint_end()
@@ -57,15 +67,14 @@ t/pmc/oplib.t - OpLib PMC
 
 .sub getint_end
     $P0 = new ['OpLib']
-    # Assumption: we'll always have an end opcode.
-    $I1 = $P0['end']
+    $I1 = $P0[TESTED_OP]
     $I0 = isne $I1, -1
     ok($I0, "got end opcode")
 .end
 
 .sub getint_no_opcode
     $P0 = new ['OpLib']
-    $I1 = $P0['hopeweneverhaveopcodesnamedlikethis']
+    $I1 = $P0[TESTED_NOSUCHOP]
     $I0 = iseq $I1, -1
     ok($I0, "get non existent opcode fails")
 .end
@@ -73,16 +82,18 @@ t/pmc/oplib.t - OpLib PMC
 .sub getop_end
     .local pmc oplib, op, op2, name
     oplib = new ['OpLib']
-    # Assumption: we'll always have an end opcode.
 
     # Using a string constant
-    op = oplib['end']
+    op = oplib[TESTED_OP]
     $I0 = isnull op
     is($I0, 0, "got end opcode data")
 
+    $I0 = elements op
+    is($I0, TESTED_OP_ELEMS, "the opcode tested has the expected lenght")
+
     # Using a String PMC
     name = new ['String']
-    name = 'end'
+    name = TESTED_OP
     op2 = oplib[name]
     $I0 = isnull op2
     is($I0, 0, "got end opcode data keyed pmc")
@@ -97,19 +108,18 @@ t/pmc/oplib.t - OpLib PMC
 
 .sub family_end
     $P0 = new ['OpLib']
-    # Assumption: we'll always have an end opcode.
-    $P1 = $P0.'op_family'('end')
+    $P1 = $P0.'op_family'(TESTED_OP)
     $I0 = isnull $P1
     dec $I0
     unless $I0 goto done
     $I0 = elements $P1
 done:
-    is($I0, 1, "'end' family is not null and has 1 element")
+    is($I0, TESTED_OP_FAMILIY_ELEMS, "'end' family is not null and has 1 element")
 .end
 
 .sub family_no_opcode
     $P0 = new ['OpLib']
-    $P1 = $P0.'op_family'('hopeweneverhaveopcodesnamedlikethis')
+    $P1 = $P0.'op_family'(TESTED_NOSUCHOP)
     $I0 = isnull $P1
     ok($I0, "non existent opcode family is null")
 .end
