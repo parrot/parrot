@@ -1,5 +1,5 @@
 #
-# spec file for package parrot (Version 2.2.0)
+# spec file for package parrot (Version 2.5.0)
 #
 # Copyright (c) 2010 SUSE LINUX Products GmbH, Nuernberg, Germany.
 #
@@ -18,9 +18,9 @@
 
 
 Name:           parrot
-Version:        2.2.0
-Release:        1.10
-%define pversion 2_2_0
+Version:        2.5.0
+Release:        14.3
+%define pversion 2_5_0
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -205,6 +205,29 @@ rm -rf $RPM_BUILD_ROOT
 %{_usrsrc}/parrot
 
 %changelog
+* Fri Jun 18 2010 mls@suse.de
+- update to parrot-2.5.0
+  * Added ByteBuffer PMC to allow direct byte manipulation
+  * Modified some PMC vtable functions to reduce complexity, simplifying coverage.
+  * Modified PAST to generate symbolic PASM constants in PIR output.
+  * General STRING API cleanups
+  * Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
+  * Added proper support for multisubs and multimethods in nqp-rx
+* Thu May 20 2010 mls@suse.de
+- update to parrot-2.4.0
+  * STRINGs are now immutable.
+  * use STRINGNULL instead of NULL when working with strings
+  * Fixed storage of methods in the NameSpace PMC
+  * Added :nsentry flag to force method to be stored in the NameSpace
+  * Added StringBuilder and PackfileDebug PMCs
+  * Added experimental opcodes find_codepoint and unroll
+* Thu Apr 22 2010 mls@suse.de
+- update to parrot-2.3.0
+  * dlopen improved, loadlib opcode added
+  * Calling conventions are now much more consistent, and follows natural
+    semantics of handling arguments and return values
+  * Datatype STRINGNULL for a single Null STRING added
+- work around i586 compiler bug
 * Wed Mar 17 2010 mls@suse.de
 - update to parrot-2.2.0
   * Most internal allocations now use the GC

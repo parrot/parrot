@@ -20,6 +20,7 @@ This file implements the Parrot embedding interface.
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
@@ -729,7 +730,7 @@ set_current_sub(PARROT_INTERP)
     for (i = 0; i < ft->fixup_count; ++i) {
         if (ft->fixups[i].type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i].offset;
-            PMC    * const sub_pmc = ct->constants[ci]->u.key;
+            PMC    * const sub_pmc = ct->constants[ci].u.key;
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
@@ -876,7 +877,7 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
     Parrot_io_fprintf(interp, output, "=head1 Constant-table\n\n");
 
     for (i = 0; i < numconstants; ++i) {
-        const PackFile_Constant * const c = interp->code->const_table->constants[i];
+        const PackFile_Constant * const c = &interp->code->const_table->constants[i];
 
         switch (c->type) {
           case PFC_NUMBER:
@@ -1023,7 +1024,7 @@ Parrot_disassemble(PARROT_INTERP,
                 const int filename_const_offset =
                     interp->code->debugs->mappings[curr_mapping].filename;
                 Parrot_io_fprintf(interp, output, "# Current Source Filename '%Ss'\n",
-                        interp->code->const_table->constants[filename_const_offset]->u.string);
+                        interp->code->const_table->constants[filename_const_offset].u.string);
                 ++curr_mapping;
             }
         }

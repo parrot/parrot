@@ -92,7 +92,6 @@ Set pointer to underlying PackFile_ConstTable
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         const PackFile_ConstTable * const table =
                 (const PackFile_ConstTable *)(pointer);
-        const PackFile_Constant * val;
         opcode_t i;
 
         /* Preallocate required amount of memory */
@@ -100,7 +99,7 @@ Set pointer to underlying PackFile_ConstTable
         VTABLE_set_integer_native(INTERP, attrs->types, table->const_count);
 
         for (i = 0; i < table->const_count; ++i) {
-            val = table->constants[i];
+            const PackFile_Constant * val = &table->constants[i];
             switch (val->type) {
               case PFC_NONE:
                 break;
@@ -141,10 +140,10 @@ Set pointer to underlying PackFile_ConstTable
         /* Copy all constanst with respect of type */
         pftable->const_count = VTABLE_get_integer(INTERP, attrs->constants);
         pftable->constants   = mem_gc_allocate_n_typed(INTERP,
-                pftable->const_count, PackFile_Constant*);
+                pftable->const_count, PackFile_Constant);
 
         for (i = 0; i < pftable->const_count; ++i) {
-            PackFile_Constant * const value = PackFile_Constant_new(INTERP);
+            PackFile_Constant * const value = &pftable->constants[i];
             value->type = VTABLE_get_integer_keyed_int(INTERP, attrs->types, i);
             switch (value->type) {
               case PFC_NONE:
@@ -167,8 +166,6 @@ Set pointer to underlying PackFile_ConstTable
                         EXCEPTION_MALFORMED_PACKFILE,
                         "Unknown PackFile constant type: %d", value->type);
             }
-
-            pftable->constants[i] = value;
         }
 
         return pftable;

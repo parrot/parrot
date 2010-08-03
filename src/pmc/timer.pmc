@@ -340,7 +340,7 @@ Invoke the codeblock and schedule any repeats.
         else {
             /* This is the timer triggering. */
             if (!PMC_IS_NULL(timer->code)) {
-                Parrot_pcc_invoke_sub_from_c_args(interp, timer->code, "->");
+                Parrot_ext_call(interp, timer->code, "->");
             }
 
             /* Repeat semantics as documented. */

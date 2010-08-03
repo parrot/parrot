@@ -279,8 +279,7 @@ Returns the fully qualified name of the object's class.
 
         if (!PMC_IS_NULL(method)) {
             STRING *result = NULL;
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, method, "Pi->S",
-                    SELF, &result);
+            Parrot_ext_call(INTERP, method, "Pi->S", SELF, &result);
             return result;
         }
         else
@@ -329,8 +328,7 @@ of the given name walking up the inheritance tree.
 
         if (!PMC_IS_NULL(method)) {
             PMC *result = PMCNULL;
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, method, "PiS->P",
-                    SELF, name, &result);
+            Parrot_ext_call(INTERP, method, "PiS->P", SELF, name, &result);
             return result;
         }
 
@@ -394,8 +392,7 @@ of the given name walking up the inheritance tree.
                 VTABLE_get_class(INTERP, SELF), vtable_meth_name);
 
         if (!PMC_IS_NULL(method)) {
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, method, "PiSP->",
-                SELF, name, value);
+            Parrot_ext_call(INTERP, method, "PiSP->", SELF, name, value);
             return;
         }
 
@@ -478,8 +475,7 @@ Queries this object's class to find the method with the given name.
 
                 if (!PMC_IS_NULL(method)) {
                     PMC *result = PMCNULL;
-                    Parrot_pcc_invoke_sub_from_c_args(INTERP, method,
-                            "PiS->P", SELF, name, &result);
+                    Parrot_ext_call(INTERP, method, "PiS->P", SELF, name, &result);
 
                     /* break out to the CACHE IF FOUND code */
                     method = result;
@@ -538,8 +534,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
 
             if (!PMC_IS_NULL(meth)) {
                 INTVAL result;
-                Parrot_pcc_invoke_sub_from_c_args(INTERP, meth, "Pi->I",
-                     SELF, &result);
+                Parrot_ext_call(INTERP, meth, "Pi->I", SELF, &result);
                 return result;
 
             }
@@ -577,8 +572,7 @@ Get the class PMC representing the class that this object is an instance of.
 
         if (!PMC_IS_NULL(method)) {
             PMC *result;
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, method, "Pi->P",
-                    SELF, &result);
+            Parrot_ext_call(INTERP, method, "Pi->P", SELF, &result);
             return result;
         }
 
@@ -606,8 +600,7 @@ Get the namespace PMC associated with the class that this object is an instance 
 
         if (!PMC_IS_NULL(method)) {
             PMC *result;
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, method, "Pi->P",
-                    SELF, &result);
+            Parrot_ext_call(INTERP, method, "Pi->P", SELF, &result);
             return result;
         }
 
@@ -698,8 +691,7 @@ Returns whether the object's class does the role with name C<*role_name>.
 
             if (!PMC_IS_NULL(method)) {
                 INTVAL result;
-                Parrot_pcc_invoke_sub_from_c_args(INTERP, method,
-                        "PiS->I", SELF, role_name, &result);
+                Parrot_ext_call(INTERP, method, "PiS->I", SELF, role_name, &result);
                 if (result)
                     return 1;
             }
@@ -826,8 +818,7 @@ Creates a clone of the object.
 
         if (!PMC_IS_NULL(meth)) {
             PMC *result;
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, meth, "Pi->P",
-                 SELF, &result);
+            Parrot_ext_call(INTERP, meth, "Pi->P", SELF, &result);
             return result;
         }
 
@@ -975,8 +966,7 @@ Changes the PMC to a PMC of a new type
              Parrot_oo_find_vtable_override(INTERP, classobj, meth_name);
 
         if (!PMC_IS_NULL(method))
-            Parrot_pcc_invoke_sub_from_c_args(INTERP, method, "PiP->",
-                    SELF, type);
+            Parrot_ext_call(INTERP, method, "PiP->", SELF, type);
         else
             SUPER(type);
     }

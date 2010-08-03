@@ -207,11 +207,7 @@ the call signature, with the best matching candidate as the 0th element.
 
 =item Parrot_mmd_invoke
 
-Make a multiple dispatch call. Similar in syntax to C<Parrot_PCCINVOKE>, but
-doesn't separate out the invocant before the signature since the call can have
-multiple invocants. A significant part of the code from C<Parrot_PCCINVOKE>
-can be factored out to helper routines used by both C<Parrot_PCCINVOKE> and
-C<Parrot_mmd_invoke>.
+Make a multiple dispatch call.
 
   void
   Parrot_mmd_invoke(PARROT_INTERP, NOTNULL(STRING *sub_name),

@@ -156,10 +156,10 @@ code as the first argument.
 
             /* Actually run the task */
             if (PMC_IS_NULL(task->data)) {
-                Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "->");
+                Parrot_ext_call(interp, task->code, "->");
             }
             else {
-                Parrot_pcc_invoke_sub_from_c_args(interp, task->code, "P->", task->data);
+                Parrot_ext_call(interp, task->code, "P->", task->data);
             }
         }
 

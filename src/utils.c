@@ -21,6 +21,7 @@ Opcode helper functions that don't really fit elsewhere.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "pmc/pmc_nci.h"
 
 typedef unsigned short _rand_buf[3];
@@ -930,7 +931,7 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
         return f(interp, a, b);
     }
 
-    Parrot_pcc_invoke_sub_from_c_args(interp, cmp, "PP->I", a, b, &result);
+    Parrot_ext_call(interp, cmp, "PP->I", a, b, &result);
     return result;
 }
 

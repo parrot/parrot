@@ -1,3 +1,4 @@
+usr/bin/ops2c
 usr/bin/parrot_debugger
 usr/bin/pbc_disassemble
 usr/bin/pbc_dump
@@ -6,7 +7,6 @@ usr/bin/pbc_to_exe
 usr/bin/parrot_config
 usr/bin/parrot-nqp
 usr/lib/parrot/@VERSION@/tools/*
-usr/lib/parrot/@VERSION@/languages/nqp/*
 usr/lib/parrot/@VERSION@/languages/pct/*
 usr/lib/parrot/@VERSION@/library/HLL.pbc
 usr/lib/parrot/@VERSION@/library/Regex.pbc
@@ -18,6 +18,8 @@ usr/lib/parrot/@VERSION@/library/Protoobject.pbc
 usr/lib/parrot/@VERSION@/library/Parrot/Exception.pbc
 usr/lib/parrot/@VERSION@/library/config.pir
 usr/lib/parrot/@VERSION@/library/config.pbc
+usr/lib/parrot/@VERSION@/library/nqp-setting.pbc
+usr/lib/parrot/@VERSION@/library/opsc.pbc
 usr/lib/parrot/@VERSION@/languages/pge/*
 usr/lib/parrot/@VERSION@/library/PGE.pbc
 usr/lib/parrot/@VERSION@/library/PGE/*

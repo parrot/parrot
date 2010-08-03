@@ -17,6 +17,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/scheduler_private.h"
 #include "parrot/runcore_api.h"
 #include "parrot/alarm.h"
@@ -255,7 +256,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
 
-        Parrot_pcc_invoke_sub_from_c_args(interp, interp->current_task, "->");
+        Parrot_ext_call(interp, interp->current_task, "->");
     }
 }
 

@@ -45,7 +45,7 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 6;
+    plan tests => 8;
 }
 
 dump_output_like( <<PIR, "pir", [qr/FIXUP_t/, qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
@@ -71,6 +71,53 @@ dump_output_like( <<PIR, "pir", qr/BYTECODE_t.*=>.*\[.*offs.*op_count.*itype.*id
     \$I0 = 42
 .end
 PIR
+
+my $longcode = ".sub main :main\n";
+for (0 ... 10000) {
+    $longcode .= "\$I0 = \$I0 + 1234\n";
+}
+$longcode .= ".end";
+
+dump_output_like( $longcode, "pir",  qr/BYTECODE.*_DB.*=>/,
+    "large pir program doesn't mess up pbc_dump");
+
+open my $INC1, '>', "inc_a.pir";
+print $INC1 <<'EOF';
+.sub does :vtable
+    .param string provides
+.end
+EOF
+close $INC1;
+
+open my $INC2, '>', "inc_b.pir";
+print $INC2 <<'EOF';
+.namespace [ 'TclConst' ]
+.sub class_init :anon :load
+    $P0 = get_class 'String'
+.end
+EOF
+close $INC2;
+
+open my $INC3, '>', "inc_c.pir";
+print $INC3 <<'EOF';
+.namespace [ 'TclDict' ]
+.sub class_init :anon :load
+    say "wut"
+.end
+EOF
+close $INC3;
+
+#test known-good hard-coded values.  These values come from looking at
+#pbc_dump's #output and sanity checking with the locations of the various subs.
+dump_output_like( <<PIR, "pir", qr/BYTECODE.*_DB.*OFFSET => 0,.*OFFSET => 7.*OFFSET => 13/ms, 'debug segments contain accurate offsets');
+.include 'inc_a.pir'
+.include 'inc_b.pir'
+.include 'inc_c.pir'
+PIR
+
+unlink('inc_a.pir');
+unlink('inc_b.pir');
+unlink('inc_c.pir');
 
 =head1 HELPER SUBROUTINES
 

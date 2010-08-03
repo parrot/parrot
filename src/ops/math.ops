@@ -299,7 +299,7 @@ inline op fdiv(inout INT, in INT) :base_core {
         goto ADDRESS(handler);
     }
 
-    f  = floor($1 / den);
+    f  = floor(((FLOATVAL)$1) / den);
     $1 = (INTVAL)f;
 }
 
@@ -337,7 +337,7 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
         goto ADDRESS(handler);
     }
 
-    f  = floor($2 / den);
+    f  = floor((FLOATVAL)$2 / den);
     $1 = (INTVAL)f;
 }
 

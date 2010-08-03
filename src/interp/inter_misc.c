@@ -224,22 +224,8 @@ interpinfo(PARROT_INTERP, INTVAL what)
         ret = Parrot_gc_impatient_pmcs(interp);
         break;
       case CURRENT_RUNCORE:
-        {
-            STRING *name = interp->run_core->name;
-
-            if (Parrot_str_equal(interp, name, CONST_STRING(interp, "slow")))
-                return PARROT_SLOW_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fast")))
-                return PARROT_FAST_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch")))
-                return PARROT_EXEC_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
-                return PARROT_GC_DEBUG_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "debugger")))
-                return PARROT_DEBUGGER_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "profiling")))
-                return PARROT_PROFILING_CORE;
-        }
+        ret = interp->run_core->id;
+        break;
       default:        /* or a warning only? */
         ret = -1;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,

@@ -71,7 +71,7 @@ clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
                     if (e->type == enum_fixup_sub) {
                         opcode_t  ci             = e->offset;
 
-                        ct->constants[ci]->u.key = NULL;
+                        ct->constants[ci].u.key = NULL;
                         e->type                  = 0;
                     }
                 }
@@ -106,7 +106,7 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
                         opcode_t ci = e->offset;
 
                         if (n++ == idx)
-                            return ct->constants[ci]->u.key;
+                            return ct->constants[ci].u.key;
                     }
                 }
             }
@@ -138,7 +138,7 @@ mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 
                     if (e->type == enum_fixup_sub) {
                         opcode_t  ci  = e->offset;
-                        PMC      *sub = ct->constants[ci]->u.key;
+                        PMC      *sub = ct->constants[ci].u.key;
 
                         Parrot_gc_mark_PMC_alive(interp, sub);
                     }

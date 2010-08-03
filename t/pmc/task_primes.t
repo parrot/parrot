@@ -20,22 +20,22 @@ is now a Parrot test.
     schedule tt
     set_global 'test_task', tt
 
-    plan(1)
+    plan(8)
     
     nt = make_checker()
 
     $I0 = 2
 loop:
     send_int(nt, $I0)
-    $P0 = recv
+    $P0 = receive
     $I0 = $I0 + 1
     if $I0 < 100 goto loop
 
-    $P0.'send'($I0)
+    nt.'send'($I0)
     $P1 = receive
 
-    if $I0 < 20 goto next_num
-    wait Res
+    if $I0 < 20 goto loop
+    wait tt
 .end
 
 .sub test_sub
@@ -92,32 +92,44 @@ loop:
 
 .sub check_prime
     .param pmc pt
-    .local pmc nt, M, tt
+    .local pmc nt, tt, M
     .local int N, x
-
+    
     tt = get_global 'test_task'
+  
     N = 0
-
+    
 next_msg:
-    M = recv
+    M = receive
     x = M
-    
-    Nsq = N * N
-    
-next_x:
-    $P0 = receive
-    $I0 = $P0
+
+    # The first number we get is the prime
+    # that this task will be checking.
+    if N >= 2 goto check_x
+    N = x
+    send_int(tt, x)
+    goto send_reply
 
 check_x:
     $I0 = x % N
     if $I0 != 0 goto maybe_prime
     goto send_reply
-    
-check_next:
-    nt.'send'($P0)
-    $P0 = receive
+
+maybe_prime:
+    # Make sure there's a next task in the
+    # chain to send to.
+    unless null nt goto ship_it
+    nt = make_checker()
+
+ship_it:
+    # More syncrhonous message passing to the
+    # next task.
+    nt.'send'(M)
+    M = receive
 
 send_reply:
+    # And the reply for the previous task
+    # that's waiting on us.
     pt.'send'(M)
     goto next_msg
 .end

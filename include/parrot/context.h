@@ -105,7 +105,7 @@ PMC* Parrot_pcc_get_caller_ctx_func(SHIM_INTERP, ARGIN(PMC *ctx))
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-struct PackFile_Constant ** Parrot_pcc_get_constants_func(SHIM_INTERP,
+struct PackFile_Constant * Parrot_pcc_get_constants_func(SHIM_INTERP,
     ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
@@ -220,7 +220,7 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void Parrot_pcc_set_constants_func(SHIM_INTERP,
     ARGIN(PMC *ctx),
-    ARGIN_NULLOK(struct PackFile_Constant **constants))
+    ARGIN_NULLOK(struct PackFile_Constant *constants))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -452,10 +452,10 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_get_signature(i, c) (CONTEXT_STRUCT(c)->current_sig)
 #  define Parrot_pcc_set_signature(i, c, value) (CONTEXT_STRUCT(c)->current_sig = (value))
 
-#  define Parrot_pcc_get_int_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.integer)
-#  define Parrot_pcc_get_num_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.number)
-#  define Parrot_pcc_get_string_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.string)
-#  define Parrot_pcc_get_pmc_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)]->u.key)
+#  define Parrot_pcc_get_int_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.integer)
+#  define Parrot_pcc_get_num_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.number)
+#  define Parrot_pcc_get_string_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.string)
+#  define Parrot_pcc_get_pmc_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.key)
 
 #  define Parrot_pcc_get_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth)
 #  define Parrot_pcc_dec_recursion_depth(i, c) (--CONTEXT_STRUCT(c)->recursion_depth)
