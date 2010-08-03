@@ -3770,61 +3770,6 @@ const_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 /*
 
-=back
-
-=head2 PackFile Constant Structure Functions
-
-=over 4
-
-=item C<PackFile_Constant * PackFile_Constant_new(PARROT_INTERP)>
-
-Allocates a new empty PackFile Constant.
-
-This is only here so we can make a new one and then do an unpack.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PackFile_Constant *
-PackFile_Constant_new(PARROT_INTERP)
-{
-    ASSERT_ARGS(PackFile_Constant_new)
-    PackFile_Constant * const self = mem_gc_allocate_typed(interp,
-            PackFile_Constant);
-
-    self->type = PFC_NONE;
-
-    return self;
-}
-
-
-/*
-
-=item C<void PackFile_Constant_destroy(PARROT_INTERP, PackFile_Constant *self)>
-
-Deletes the C<PackFile_Constant> C<self>.
-
-Don't delete C<PMC>s or C<STRING>s.  The GC will claim them.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_Constant_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile_Constant *self))
-{
-    ASSERT_ARGS(PackFile_Constant_destroy)
-    mem_gc_free(interp, self);
-}
-
-
-/*
-
 =item C<size_t PackFile_Constant_pack_size(PARROT_INTERP, const
 PackFile_Constant *self, const PackFile_ConstTable *ct)>
 

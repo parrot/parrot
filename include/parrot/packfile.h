@@ -514,18 +514,6 @@ PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void PackFile_Constant_destroy(PARROT_INTERP,
-    ARGMOD_NULLOK(PackFile_Constant *self))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PackFile_Constant * PackFile_Constant_new(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t PackFile_Constant_pack_size(PARROT_INTERP,
     ARGIN(const PackFile_Constant *self),
@@ -879,10 +867,6 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_PackFile_Constant_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_PackFile_Constant_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Constant_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
