@@ -20,13 +20,15 @@ per object basis.
 */
 
 #include "pmc_instrument.h"
+#include "pmc/pmc_class.h"
+#include "pmc/pmc_object.h"
 
 extern
 void setup_vtable_individual_hashes(PARROT_INTERP, Hash *orig_hash, Hash *instr_hash,
                                     _vtable *vt_orig, _vtable *vt_instr);
 
 pmclass InstrumentObject auto_attrs dynpmc group instrument_group extends InstrumentClass {
-
+    ATTR PMC *object;
 /*
 
 =item C<void attach_to_class(STRING *classname)>
@@ -58,10 +60,12 @@ Prepares the object for instrumentation.
     METHOD attach_to_object(PMC *object) {
         Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
         Parrot_Interp supervised;
+        PMC *_class;
         STRING *addr;
 
         GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
 
+        attr->object              = object;
         attr->class_name          = VTABLE_name(INTERP, object);
         attr->instrumented_struct = mem_gc_allocate_zeroed_typed(supervised, _vtable);
         attr->original_struct     = object->vtable;
@@ -78,52 +82,145 @@ Prepares the object for instrumentation.
         (STRING *addr) = PCCINVOKE(INTERP, SELF, "get_address");
         VTABLE_push_string(INTERP, attr->event_prefix, CONST_STRING(INTERP, "Object"));
         VTABLE_push_string(INTERP, attr->event_prefix, addr);
+
+        /* Create a copy of the class. */
+        _class = VTABLE_clone(supervised, VTABLE_get_class(supervised, object));
+        {
+            Parrot_Object_attributes * const obj = PARROT_OBJECT(object);
+            obj->_class = _class;
+        }
     }
 
+/*
+
+=item C<void insert_method_hook(STRING *method)>
+
+Instruments the method by the given name to raise an event when it
+is called.
+
+=cut
+
+*/
+
+    METHOD insert_method_hook(STRING *method) {
+        Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
+        PMC *_class, *methods, *method_sub;
+        PMC *instr_obj, *rename, *rename_hash;
+        STRING *invoke;
+        INTVAL count;
+        Parrot_Interp supervised;
+
+        invoke = CONST_STRING(INTERP, "invoke");
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+
+        _class  = VTABLE_get_class(supervised, attr->object);
+        GETATTR_Class_methods(supervised, _class, methods);
+        method_sub     = VTABLE_get_pmc_keyed_str(supervised, methods, method);
+
+        /* Ensure that method exists. */
+        if (PMC_IS_NULL(method_sub)) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Class %Ss does not have a method named %Ss.",
+                                        attr->class_name, method);
+        }
+
+        /* Check the count for this method. */
+        count = VTABLE_get_integer_keyed_str(INTERP, attr->instrumented_methods, method);
+        if (count == 0) {
+            /* Method was not instrumented before. */
+            PMC *invokable, *event;
+            INTVAL type;
+
+            type     = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentInvokable"));
+            invokable= Parrot_pmc_new_init(INTERP, type, attr->instrument);
+
+            event    = VTABLE_clone(INTERP, attr->event_prefix);
+            VTABLE_push_string(INTERP, event, CONST_STRING(INTERP, "method"));
+            VTABLE_push_string(INTERP, event, method);
+
+            () = PCCINVOKE(INTERP, invokable, "set_event", PMC *event);
+
+            VTABLE_set_pointer(INTERP, invokable, method_sub);
+
+            VTABLE_set_pmc_keyed_str(supervised, methods, method, invokable);
+        }
+
+        /* Update count. */
+        count++;
+        VTABLE_set_integer_keyed_str(INTERP, attr->instrumented_methods, method, count);
+    }
+
+    /*
+
+=item C<void remove_method_hook(STRING *method)>
+
+Removes the instrumentation of the given method.
+
+=cut
+
+*/
+
+    METHOD remove_method_hook(STRING *method) {
+        Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
+        PMC *_class, *methods, *method_sub;
+        PMC *instr_obj, *rename_hash;
+        STRING *invoke;
+        INTVAL count;
+        Parrot_Interp supervised;
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+
+        _class  = VTABLE_get_class(supervised, attr->object);
+        GETATTR_Class_methods(supervised, _class, methods);
+        method_sub     = VTABLE_get_pmc_keyed_str(supervised, methods, method);
+
+        /* Ensure that method exists. */
+        if (PMC_IS_NULL(method_sub)) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                        "Class %Ss does not have a method named %Ss.",
+                                        attr->class_name, method);
+        }
+
+        /* Check the count for this method. */
+        count = VTABLE_get_integer_keyed_str(INTERP, attr->instrumented_methods, method);
+        if (count == 0) {
+            /* Not instrumented before. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                                "%Ss : No hook for method '%Ss' to remove.",
+                                                VTABLE_name(INTERP, SELF), method);
+        }
+        else if (count == 1) {
+            /* Remove the instrumentation. */
+            PMC *orig_method_sub;
+
+            orig_method_sub = (PMC *) VTABLE_get_pointer(INTERP, method_sub);
+            VTABLE_set_pmc_keyed_str(supervised, methods, method, orig_method_sub);
+        }
+
+        /* Update count. */
+        count--;
+        VTABLE_set_integer_keyed_str(INTERP, attr->instrumented_methods, method, count);
+    }
+
+/*
+
+=item C<STRING* get_address()>
+
+Instruments the method by the given name to raise an event when it
+is called.
+
+=cut
+
+*/
+
     METHOD get_address() {
+        Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
         STRING *addr;
-        addr = Parrot_sprintf_c(INTERP, "%p", SELF);
+        addr = Parrot_sprintf_c(INTERP, "%p", attr->object);
         RETURN(STRING *addr);
     }
 }
-
-/*
- static
-opcode_t *
-stub_object_invoke(PARROT_INTERP, PMC *pmc, opcode_t *dest) {
-    PMC *instr_vt, *data;
-    void *orig_vtable;
-    Parrot_Interp supervisor;
-    PMC *temp;
-    PMC *params;
-    opcode_t* ret;
-
-    instr_vt = (PMC *) parrot_hash_get(interp, vtable_registry, pmc->vtable);
-
-    GETATTR_InstrumentVtable_original_struct(interp, instr_vt, orig_vtable);
-    GETATTR_InstrumentVtable_supervisor(interp, instr_vt, supervisor);
-
-    params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
-    VTABLE_push_pmc(supervisor, params, pmc);
-    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, temp, next);
-    VTABLE_push_pmc(supervisor, params, temp);
-
-
-    data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, data,
-        CONST_STRING(supervisor, "parameters"),
-        params);
-
-    raise_vtable_event(supervisor, interp, instr_vt, pmc, data,
-                   CONST_STRING(supervisor, "main"),
-                   CONST_STRING(supervisor, "invoke"));
-
-
-    ret = ((_vtable *)orig_vtable)->invoke(interp, pmc, next);
-    return ret;
-}
- */
 
 /*
 

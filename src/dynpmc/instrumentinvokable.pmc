@@ -1,0 +1,260 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id: instrumentobject.pmc 48183 2010-07-27 06:49:44Z khairul $
+
+=head1 NAME
+
+src/dynpmc/instrumentinvokable.pmc - InstrumentInvokable
+
+=head1 DESCRIPTION
+
+InstrumentInvokable is used internally to serve as an
+intermediary for invokables. This is used in InstrumentClass
+and InstrumentObject to intercept the method and vtable override
+calls.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "pmc_instrument.h"
+
+#include "instrument_private.h"
+#include "instrument_extern.h"
+
+pmclass InstrumentInvokable auto_attrs dynpmc group instrument_group {
+    ATTR PMC    *invokable;
+    ATTR PMC    *instrument;
+    ATTR STRING *event;
+    ATTR Parrot_Interp interp;
+
+/*
+
+=item C<void init_pmc(PMC *instrument)>
+
+Initialises the attributes.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *instrument) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+
+        attr->invokable  = PMCNULL;
+        attr->event      = CONST_STRING(INTERP, "");
+        attr->instrument = instrument;
+        attr->interp     = INTERP;
+    }
+
+/*
+
+=item C<opcode_t* invoke (void *next)>
+
+When invoked, raises an event with the data holding the call context
+instance. To get another event when the invokable has done executing,
+return an invokable when the first event is raised.
+
+=cut
+
+*/
+
+    VTABLE opcode_t* invoke (void *next) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        Parrot_Interp supervised;
+        Parrot_Context_info info;
+        PMC *task_hash, *task, *data, *recall;
+        PMC *instrument;
+        STRING *event;
+        opcode_t *ret;
+
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+        INTERP     = attr->interp;
+        instrument = attr->instrument;
+        event      = attr->event;
+
+        data = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "call_sig"),
+                                 CURRENT_CONTEXT(supervised));
+
+        (PMC *recall) = PCCINVOKE(INTERP, instrument, "raise_event", STRING *event, PMC *data);
+        ret = VTABLE_invoke(supervised, attr->invokable, next);
+        (PMC *recall) = PCCINVOKE(INTERP, instrument, "raise_event",
+                                  STRING *event, PMC *data, PMC *recall);
+        probe_list_delete_list(INTERP, (probe_list_t *)VTABLE_get_pointer(INTERP, recall));
+
+        return ret;
+    }
+
+/*
+
+=item C<void set_pointer(void *invokable)>
+
+Sets the invokable to invoke when the vtable invoke is called.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *invokable) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        attr->invokable = (PMC *) invokable;
+    }
+
+/*
+
+=item C<void* get_pointer()>
+
+Returns the invokable PMC that was attached to this instance.
+
+=cut
+
+*/
+
+    VTABLE void* get_pointer() {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        return attr->invokable;
+    }
+
+/*
+
+=item C<STRING* name()>
+
+Returns the name of the invokable PMC that was attached to this instance.
+
+=cut
+
+*/
+
+    VTABLE STRING* name() {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        Parrot_Interp supervised;
+        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+        return VTABLE_name(supervised, attr->invokable);
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns the string representation of the
+invokable PMC that was attached to this instance.
+
+=cut
+
+*/
+
+    VTABLE STRING* get_string() {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        return VTABLE_get_string(INTERP, attr->invokable);
+    }
+
+/*
+
+=item C<INTVAL isa(STRING *isa)>
+=item C<INTVAL isa_pmc(PMC *isa)>
+
+Pass through the isa call to the invokable.
+
+=cut
+
+*/
+
+    VTABLE INTVAL isa(STRING *isa) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        return VTABLE_isa(INTERP, attr->invokable, isa);
+    }
+
+    VTABLE INTVAL isa_pmc(PMC *isa) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        return VTABLE_isa_pmc(INTERP, attr->invokable, isa);
+    }
+
+/*
+
+=item C<PMC* clone()>
+
+Pass through the clone call to the invokable.
+
+=cut
+
+*/
+
+    VTABLE PMC* clone() {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        return VTABLE_clone(INTERP, attr->invokable);
+    }
+
+/*
+
+=item C<void thaw(PMC *info)>
+
+Thaws the InstrumentInvokable instance and the invokable
+out of the given ImageIO instance.
+
+=cut
+
+*/
+
+    VTABLE void thaw(PMC *info) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+
+        attr->invokable  = (PMC *) VTABLE_shift_integer(INTERP, info);
+        attr->instrument = (PMC *) VTABLE_shift_integer(INTERP, info);
+        attr->interp     = (Parrot_Interp) VTABLE_shift_integer(INTERP, info);
+        attr->event      = VTABLE_shift_string(INTERP, info);
+
+        VTABLE_thaw(INTERP, attr->invokable, info);
+    }
+
+/*
+
+=item C<void thaw(PMC *info)>
+
+Freezes the InstrumentInvokable instance and the invokable
+into the given ImageIO instance.
+
+=cut
+
+*/
+
+     VTABLE void freeze(PMC *info) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+
+        VTABLE_push_integer(INTERP, info, (INTVAL) attr->invokable);
+        VTABLE_push_integer(INTERP, info, (INTVAL) attr->instrument);
+        VTABLE_push_integer(INTERP, info, (INTVAL) attr->interp);
+        VTABLE_push_string(INTERP, info, attr->event);
+
+        VTABLE_freeze(INTERP, attr->invokable, info);
+     }
+
+/*
+
+=item C<void set_event(PMC *event)>
+
+Given an array of event tokens, eq ['Class','Eg','method','foo'],
+joins the array together to form the event to be raised whenever
+this instance is invoked.
+
+=cut
+
+*/
+
+    METHOD set_event (PMC *event) {
+        Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
+        attr->event = Parrot_str_join(INTERP, CONST_STRING(INTERP, "::"), event);
+    }
+}
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
