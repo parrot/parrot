@@ -216,7 +216,8 @@ PROG1
     # Test that a singular function was instrumented.
     # Record the function name.
     $P0 = get_global '%test_gc_res'
-    $S0 = data['type']
+    $P1 = data['event']
+    $S0 = $P1.'pop'()
     $P0['Sc 1: Called']   = 1
     $P0['Sc 1: Function'] = $S0
 .end
@@ -229,9 +230,9 @@ PROG1
     # Test that a group function was instrumented.
     # Ensure that the function is of type allocate.
     $P0 = get_global '%test_gc_res'
-    $S0 = data['type']
-    $P1 = split '_', $S0
-    $S1 = $P1[0]
+    $P1 = data['event']
+    $S0 = $P1.'pop'() # gc function name
+    $S1 = $P1.'pop'() # group
     $I1 = iseq $S1, 'allocate'
     $I2 = $P0['Sc 2: Function Ok?']
     $I3 = and $I1, $I2
