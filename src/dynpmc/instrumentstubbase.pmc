@@ -159,7 +159,7 @@ If name denotes a group, inserts stubs for all functions in that group.
                 func  = (size_t *)  parrot_hash_get(INTERP, attr->name_stubs, item);
                 if (entry == NULL || func == NULL) {
                     Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                                "%Ss : c Unknown function, '%Ss'",
+                                                "%Ss : Unknown function, '%Ss'",
                                                 VTABLE_name(INTERP, SELF), item);
                 }
                 *entry = func;
@@ -246,7 +246,7 @@ If name denotes a group, returns all the entries within that group.
             check = (size_t *) parrot_hash_get(INTERP, attr->name_stubs, name);
             if (check == NULL) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                                "%Ss : a Unknown function, '%Ss'",
+                                                "%Ss : Unknown function, '%Ss'",
                                                 VTABLE_name(INTERP, SELF), name);
             }
 
@@ -262,10 +262,9 @@ If name denotes a group, returns all the entries within that group.
 
 /*
 
-=item C<PMC* get_hook_group(STRING *name)>
+=item C<STRING* get_hook_group(STRING *name)>
 
-Returns a ResizableStringArray PMC filled with
-the names of the groups that the entry given by name belongs to.
+Returns the name of the groups that the entry given by name belongs to.
 
 =cut
 
@@ -273,18 +272,17 @@ the names of the groups that the entry given by name belongs to.
 
     METHOD get_hook_group(STRING *name) {
         Parrot_InstrumentStubBase_attributes * const attr = PARROT_INSTRUMENTSTUBBASE(SELF);
-        PMC *groups;
+        STRING *group;
 
-        groups = (PMC *) parrot_hash_get(INTERP, attr->item_groups, name);
-        if(PMC_IS_NULL(groups)) {
+        group = (STRING *) parrot_hash_get(INTERP, attr->item_groups, name);
+        if(STRING_IS_NULL(group)) {
             /* Should not happen. All items should have a group mapping. */
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                        "%Ss : b Unknown function, '%Ss'",
+                                        "%Ss : a Unknown function, '%Ss'",
                                         VTABLE_name(INTERP, SELF), name);
         }
-        groups = VTABLE_clone(INTERP, groups);
 
-        RETURN(PMC *groups);
+        RETURN(STRING *group);
     }
 
 /*
