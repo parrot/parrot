@@ -631,7 +631,6 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
     hash->entries = 0;
 
     for (entry_index = 0; entry_index < num_entries; ++entry_index) {
-        HashBucket *b;
         void       *key;
 
         switch (key_type) {
