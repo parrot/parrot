@@ -602,11 +602,13 @@ Removes and returns an integer from the start of the image.
 */
 
     VTABLE INTVAL shift_integer() {
-        const opcode_t *pos = GET_VISIT_CURSOR(SELF);
-        /* something is likely wrong if the packfile is NULL */
-        const INTVAL    i   = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf,
-                                (const opcode_t **)&pos);
-        SET_VISIT_CURSOR(SELF, (char *)pos);
+        /* inlining PF_fetch_integer speeds up PBC thawing measurably */
+        const PackFile      *pf     = PARROT_IMAGEIO(SELF)->pf;
+        const opcode_t      *pos    = GET_VISIT_CURSOR(SELF);
+        const unsigned char *stream = (const unsigned char *)pos;
+        const INTVAL         i      = pf->fetch_iv(stream);
+
+        SET_VISIT_CURSOR(SELF, (const char *)pos + pf->header->wordsize);
         BYTECODE_SHIFT_OK(SELF);
         return i;
     }
