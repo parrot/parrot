@@ -246,12 +246,9 @@ PMC*
 Parrot_thaw_pbc(PARROT_INTERP, ARGIN(STRING *image), ARGIN(PackFile_ConstTable *pf))
 {
     ASSERT_ARGS(Parrot_thaw_pbc)
-    PMC *pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    PMC *info;
+    PMC *info = Parrot_pmc_new(interp, enum_class_ImageIO);
 
-    VTABLE_set_pointer(interp, pf_pmc, pf);
-
-    info = Parrot_pmc_new_init(interp, enum_class_ImageIO, pf_pmc);
+    VTABLE_set_pointer(interp, info, pf);
 
     VTABLE_set_string_native(interp, info, image);
     return VTABLE_get_pmc(interp, info);
