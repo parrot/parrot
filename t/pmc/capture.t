@@ -17,7 +17,7 @@ a variety of keys and values.
 
 =cut
 
-.const int TESTS = 51
+.const int TESTS = 53
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -25,6 +25,7 @@ a variety of keys and values.
     plan(TESTS)
 
     test_new_capture()
+    empty_capture_tests()
     basic_capture_tests()
     test_defined_delete_exists()
     test_hash_list()
@@ -41,19 +42,33 @@ a variety of keys and values.
     ok(1, 'new Capture')
 .end
 
-.sub 'basic_capture_tests'
+.sub 'empty_capture_tests'
     .local pmc capt
 
     capt = new ['Capture']
 
     $I0 = elements capt
     is($I0, 0, 'elements on empty Capture')
+
     $N0 = capt[0]
-    is($N0, 0, 'get_number_keyed_int on empty Capture')
+    is($N0, 0.0, 'get_number_keyed_int on empty Capture')
     $I0 = capt[0]
     is($I0, 0, 'get_integer_keyed_int on empty Capture')
     $S0 = capt[0]
     is($S0, '', 'get_string_keyed_int on empty Capture')
+
+    $N0 = capt['nothing']
+    is($N0, 0.0, 'get_number_keyed on empty Capture')
+
+    $S0 = capt
+    $S1 = 'get_string on empty Capture - ' . $S0
+    substring($S0, 'Capture[', $S1)
+.end
+
+.sub 'basic_capture_tests'
+    .local pmc capt
+
+    capt = new ['Capture']
 
     capt[0] = 0
     capt[1] = 1.5

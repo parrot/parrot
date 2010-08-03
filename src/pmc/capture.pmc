@@ -479,9 +479,10 @@ Retrieves a value from the hash component of the Capture.
 
         GET_ATTR_hash(INTERP, SELF, hash);
 
-        if (!hash)
+        if (!hash) {
+            /*abort();*/
             return 0.0;
-
+        }
         return VTABLE_get_number_keyed(INTERP, hash, key);
     }
 
