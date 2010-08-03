@@ -177,6 +177,7 @@ when there's already a calculated hash value for the STRING key.
 static UINTVAL
 get_hash_val(PARROT_INTERP, ARGIN(Hash *hash), ARGIN_NULLOK(void *key))
 {
+    ASSERT_ARGS(get_hash_val)
     if (hash->hash_val == key_hash_STRING) {
         STRING *s = (STRING *)key;
         if (s->hashval)

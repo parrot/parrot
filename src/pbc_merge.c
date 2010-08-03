@@ -374,7 +374,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_merge_constants)
-    PackFile_Constant   **constants = mem_gc_allocate_typed(interp, PackFile_Constant *);
+    PackFile_Constant   *constants = mem_gc_allocate_typed(interp, PackFile_Constant);
 
     opcode_t cursor           = 0;
     opcode_t output_const_num = 0;
@@ -411,14 +411,13 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         /* Allocate space for the constant list, provided we have some. */
         if (in_seg->const_count > 0)
             constants = mem_gc_realloc_n_typed(interp, constants,
-                    cursor + in_seg->const_count, PackFile_Constant*);
+                    cursor + in_seg->const_count, PackFile_Constant);
 
         /* Loop over the constants and copy them to the output PBC. */
         for (j = 0; j < in_seg->const_count; ++j) {
-            /* Get the entry and allocate space for copy. */
-            PackFile_Constant *cur_entry = in_seg->constants[j];
-            PackFile_Constant *copy      = mem_gc_allocate_typed(interp,
-                    PackFile_Constant);
+            /* Get the entry and the copy. */
+            PackFile_Constant *cur_entry = &in_seg->constants[j];
+            PackFile_Constant *copy      = &constants[cursor];
             STRUCT_COPY(copy, cur_entry);
 
             /* If it's a sub PMC, need to deal with offsets. */
@@ -442,8 +441,6 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             ++input_const_num;
             ++output_const_num;
 
-            /* Slot it into the list. */
-            constants[cursor] = copy;
             ++cursor;
         }
     }
@@ -677,7 +674,7 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 op_num == PARROT_OP_get_params_pc  ||
                 op_num == PARROT_OP_set_returns_pc) {
             /* Get the signature. */
-            PMC * const sig = bc->const_table->constants[op_ptr[1]]->u.key;
+            PMC * const sig = bc->const_table->constants[op_ptr[1]].u.key;
 
             /* Loop over the arguments to locate any that need a fixup. */
             const int sig_items = VTABLE_elements(interp, sig);

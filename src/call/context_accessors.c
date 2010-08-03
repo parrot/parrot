@@ -49,11 +49,11 @@ Parrot_pcc_get_context_struct_func(SHIM_INTERP, ARGIN_NULLOK(PMC *ctx))
 
 /*
 
-=item C<struct PackFile_Constant ** Parrot_pcc_get_constants_func(PARROT_INTERP,
+=item C<struct PackFile_Constant * Parrot_pcc_get_constants_func(PARROT_INTERP,
 PMC *ctx)>
 
 =item C<void Parrot_pcc_set_constants_func(PARROT_INTERP, PMC *ctx, struct
-PackFile_Constant **constants)>
+PackFile_Constant *constants)>
 
 Get/set constants from context.
 
@@ -64,7 +64,7 @@ Get/set constants from context.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-struct PackFile_Constant **
+struct PackFile_Constant *
 Parrot_pcc_get_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_constants_func)
@@ -75,7 +75,7 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void
 Parrot_pcc_set_constants_func(SHIM_INTERP, ARGIN(PMC *ctx),
-        ARGIN_NULLOK(struct PackFile_Constant **constants))
+        ARGIN_NULLOK(struct PackFile_Constant *constants))
 {
     ASSERT_ARGS(Parrot_pcc_set_constants_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
@@ -681,8 +681,8 @@ Parrot_pcc_get_int_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_int_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(c->constants[idx]->type == 'i');
-    return c->constants[idx]->u.integer;
+    PARROT_ASSERT(c->constants[idx].type == 'i');
+    return c->constants[idx].u.integer;
 }
 
 PARROT_EXPORT
@@ -693,8 +693,8 @@ Parrot_pcc_get_num_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_num_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(c->constants[idx]->type == 'n');
-    return c->constants[idx]->u.number;
+    PARROT_ASSERT(c->constants[idx].type == 'n');
+    return c->constants[idx].u.number;
 }
 
 PARROT_EXPORT
@@ -705,8 +705,8 @@ Parrot_pcc_get_string_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_string_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(c->constants[idx]->type == 's');
-    return c->constants[idx]->u.string;
+    PARROT_ASSERT(c->constants[idx].type == 's');
+    return c->constants[idx].u.string;
 }
 
 PARROT_EXPORT
@@ -717,9 +717,9 @@ Parrot_pcc_get_pmc_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_pmc_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT((c->constants[idx]->type == 'k')
-            || (c->constants[idx]->type == 'p'));
-    return c->constants[idx]->u.key;
+    PARROT_ASSERT((c->constants[idx].type == 'k')
+            || (c->constants[idx].type == 'p'));
+    return c->constants[idx].u.key;
 }
 
 /*

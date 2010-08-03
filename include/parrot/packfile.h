@@ -261,7 +261,7 @@ typedef struct PackFile_FixupTable {
 typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
     opcode_t                   const_count;
-    PackFile_Constant        **constants;
+    PackFile_Constant         *constants;
     PackFile_ByteCode         *code;  /* where this segment belongs to */
 
     PMC                       *string_hash; /* Hash for lookup strings and numbers */

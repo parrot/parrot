@@ -69,7 +69,7 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 
     for (i = 0; i < self->const_count; ++i) {
         Parrot_io_printf(interp, "    # %x:\n", (long)i);
-        PackFile_Constant_dump(interp, self, self->constants[i]);
+        PackFile_Constant_dump(interp, self, &self->constants[i]);
     }
 }
 
@@ -209,7 +209,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     Parrot_io_printf(interp, "        TYPE        => NUMBER\n");
                     ct_index = PackFile_find_in_const(interp, ct, key, PFC_NUMBER);
                     Parrot_io_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
-                    detail = ct->constants[ct_index];
+                    detail = &ct->constants[ct_index];
                     Parrot_io_printf(interp, "        DATA        => %ld\n", detail->u.number);
                     Parrot_io_printf(interp, "       },\n");
                 }
@@ -222,7 +222,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     Parrot_io_printf(interp, "        TYPE        => STRING\n");
                     ct_index = PackFile_find_in_const(interp, ct, key, PFC_STRING);
                     Parrot_io_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
-                    detail = ct->constants[ct_index];
+                    detail = &ct->constants[ct_index];
                     Parrot_io_printf(interp, "        DATA        => '%Ss'\n",
                               detail->u.string);
                     Parrot_io_printf(interp, "       },\n");

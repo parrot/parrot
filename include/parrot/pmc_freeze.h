@@ -155,7 +155,7 @@ PMC * Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
+PMC * Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

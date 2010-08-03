@@ -174,7 +174,7 @@ Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<PMC* Parrot_thaw(PARROT_INTERP, STRING *image)>
+=item C<PMC * Parrot_thaw(PARROT_INTERP, STRING *image)>
 
 Thaws a PMC.  Called from the C<thaw> opcode.
 

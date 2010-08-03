@@ -863,7 +863,7 @@ The number of optional named arguments
             /* If the first instruction is a get_params... */
             if (*pc == PARROT_OP_get_params_pc) {
                 /* Get the signature (the next thing in the bytecode). */
-                PMC * const sig = PF_CONST(sub->seg, *(++pc))->u.key;
+                PMC * const sig = PF_CONST(sub->seg, *(++pc)).u.key;
 
                 /* Iterate over the signature and compute argument counts. */
                 const INTVAL sig_length = VTABLE_elements(INTERP, sig);

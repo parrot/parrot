@@ -352,14 +352,11 @@ add_const_table(PARROT_INTERP)
     const size_t oldcount = interp->code->const_table->const_count;
     const size_t newcount = oldcount + 1;
 
-    /* Allocate a new constant */
-    PackFile_Constant *new_constant = PackFile_Constant_new(interp);
-
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants) {
         interp->code->const_table->constants =
             mem_gc_realloc_n_typed_zeroed(interp, interp->code->const_table->constants,
-                newcount, oldcount, PackFile_Constant *);
+                newcount, oldcount, PackFile_Constant);
     }
     else {
         /* initialize rlookup cache */
@@ -369,10 +366,9 @@ add_const_table(PARROT_INTERP)
             (hash_comp_fn)STRING_compare_distinct_cs_enc;
 
         interp->code->const_table->constants =
-            mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant *);
+            mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant);
     }
 
-    interp->code->const_table->constants[oldcount] = new_constant;
     interp->code->const_table->const_count         = newcount;
 
     return oldcount;
@@ -394,7 +390,7 @@ add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(add_const_table_pmc)
     const int newitem = add_const_table(interp);
-    PackFile_Constant * const constant = interp->code->const_table->constants[newitem];
+    PackFile_Constant * const constant = &interp->code->const_table->constants[newitem];
 
     constant->type  = PFC_PMC;
     constant->u.key = pmc;
@@ -418,7 +414,7 @@ add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(add_const_table_key)
     const int newitem = add_const_table(interp);
-    PackFile_Constant * const constant = interp->code->const_table->constants[newitem];
+    PackFile_Constant * const constant = &interp->code->const_table->constants[newitem];
 
     constant->type  = PFC_KEY;
     constant->u.key = key;
@@ -1062,7 +1058,7 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
     /* otherwise... */
     {
         int                k        = add_const_table(interp);
-        PackFile_Constant *constant = table->constants[k];
+        PackFile_Constant *constant = &table->constants[k];
         constant->type              = PFC_STRING;
         constant->u.string          = s;
 
@@ -1091,7 +1087,7 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
     const int      k = add_const_table(interp);
     STRING * const s = Parrot_str_new(interp, buf, 0);
 
-    PackFile_Constant * const constant = interp->code->const_table->constants[k];
+    PackFile_Constant * const constant = &interp->code->const_table->constants[k];
 
     constant->type     = PFC_NUMBER;
     constant->u.number = Parrot_str_to_num(interp, s);
@@ -1136,7 +1132,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         r = pcc_sub->multi[i];
 
         if (r->set == 'S') {
-            STRING * const type_name = ct->constants[r->color]->u.string;
+            STRING * const type_name = ct->constants[r->color].u.string;
             const INTVAL type_num    = Parrot_pmc_get_type_str(interp, type_name);
 
             if (type_num == enum_type_undef) {
@@ -1149,7 +1145,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         }
         else {
             PARROT_ASSERT(r->set == 'K');
-            sig_pmc = ct->constants[r->color]->u.key;
+            sig_pmc = ct->constants[r->color].u.key;
         }
 
         VTABLE_set_pmc_keyed_int(interp, multi_sig, i, sig_pmc);
@@ -1180,10 +1176,10 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
                int need_lex)
 {
     ASSERT_ARGS(create_lexinfo)
-    PMC                *lex_info    = NULL;
-    SymHash            *hsh         = &unit->hash;
-    PackFile_Constant **constants   = interp->code->const_table->constants;
-    const INTVAL        lex_info_id = Parrot_get_ctx_HLL_type(interp,
+    PMC               *lex_info    = NULL;
+    SymHash           *hsh         = &unit->hash;
+    PackFile_Constant *constants   = interp->code->const_table->constants;
+    const INTVAL       lex_info_id = Parrot_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
     unsigned int        i;
 
@@ -1208,7 +1204,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
                     Parrot_Sub_attributes *sub;
                     PARROT_ASSERT(k >= 0);
 
-                    lex_name = constants[k]->u.string;
+                    lex_name = constants[k].u.string;
                     PARROT_ASSERT(PObj_is_string_TEST(lex_name));
 
                     PMC_get_sub(interp, sub_pmc, sub);
@@ -1403,7 +1399,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     Sub_comp_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
 
     r->color  = add_const_str(interp, IMCC_string_from_reg(interp, r));
-    sub->name = ct->constants[r->color]->u.string;
+    sub->name = ct->constants[r->color].u.string;
 
     /* If the unit has no subid, set the subid to match the name. */
     if (!unit->subid)
@@ -1420,18 +1416,18 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             IMCC_string_from_reg(interp, unit->subid));
     }
 
-    sub->subid = ct->constants[unit->subid->color]->u.string;
+    sub->subid = ct->constants[unit->subid->color].u.string;
     ns_pmc     = NULL;
 
     if (ns_const >= 0 && ns_const < ct->const_count) {
-        switch (ct->constants[ns_const]->type) {
+        switch (ct->constants[ns_const].type) {
           case PFC_KEY:
-            ns_pmc = ct->constants[ns_const]->u.key;
+            ns_pmc = ct->constants[ns_const].u.key;
             break;
           case PFC_STRING:
             ns_pmc = Parrot_pmc_new_constant(interp, enum_class_String);
             VTABLE_set_string_native(interp, ns_pmc,
-                ct->constants[ns_const]->u.string);
+                ct->constants[ns_const].u.string);
             break;
           default:
             break;
@@ -1524,8 +1520,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     /* store the sub */
     {
-        const int            k          = add_const_table(interp);
-        PackFile_Constant   * const pfc = ct->constants[k];
+        const int                   k = add_const_table(interp);
+        PackFile_Constant * const pfc = &ct->constants[k];
 
         pfc->type     = PFC_PMC;
         pfc->u.key    = sub_pmc;
@@ -2150,7 +2146,7 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
 {
     ASSERT_ARGS(verify_signature)
     PMC    *changed_sig    = NULL;
-    PMC    * const sig_arr = interp->code->const_table->constants[pc[-1]]->u.key;
+    PMC    * const sig_arr = interp->code->const_table->constants[pc[-1]].u.key;
     int     needed         = 0;
     int     no_consts      = (ins->opnum == PARROT_OP_get_results_pc
                            || ins->opnum == PARROT_OP_get_params_pc);

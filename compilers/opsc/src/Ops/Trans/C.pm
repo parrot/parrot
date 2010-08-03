@@ -25,10 +25,10 @@ method new() {
         :ki("IREG(NUM)"),
 
         :ic("cur_opcode[NUM]"),
-        :nc("CONST(NUM)->u.number"),
-        :pc("CONST(NUM)->u.key"),
-        :sc("CONST(NUM)->u.string"),
-        :kc("CONST(NUM)->u.key"),
+        :nc("CONST(NUM).u.number"),
+        :pc("CONST(NUM).u.key"),
+        :sc("CONST(NUM).u.string"),
+        :kc("CONST(NUM).u.key"),
         :kic("cur_opcode[NUM]")
     );
 

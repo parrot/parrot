@@ -307,7 +307,7 @@ void Parrot_pcc_split_signature_string(
     ||  *(pc) == PARROT_OP_get_results_pc    \
     ||  *(pc) == PARROT_OP_get_params_pc     \
     ||  *(pc) == PARROT_OP_set_returns_pc) { \
-        PMC * const sig = (seg)->const_table->constants[(pc)[1]]->u.key; \
+        PMC * const sig = (seg)->const_table->constants[(pc)[1]].u.key; \
         (n) += VTABLE_elements((interp), sig); \
     } \
 } while (0)
