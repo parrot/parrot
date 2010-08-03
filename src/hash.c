@@ -50,6 +50,12 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
+static UINTVAL get_hash_val(PARROT_INTERP,
+    ARGIN(Hash *hash),
+    ARGIN_NULLOK(void *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGMOD(PMC *info))
@@ -103,6 +109,9 @@ static int pointer_compare(SHIM_INTERP,
 #define ASSERT_ARGS_expand_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
+#define ASSERT_ARGS_get_hash_val __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
@@ -151,6 +160,30 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
         return s->hashval;
 
     return Parrot_str_to_hashval(interp, s);
+}
+
+
+/*
+
+=item C<static UINTVAL get_hash_val(PARROT_INTERP, Hash *hash, void *key)>
+
+An inlinable helper function to avoid the overhead of calling key_hash_STRING()
+when there's already a calculated hash value for the STRING key.
+
+=cut
+
+*/
+
+static UINTVAL
+get_hash_val(PARROT_INTERP, ARGIN(Hash *hash), ARGIN_NULLOK(void *key))
+{
+    if (hash->hash_val == key_hash_STRING) {
+        STRING *s = (STRING *)key;
+        if (s->hashval)
+            return s->hashval;
+    }
+
+    return (hash->hash_val)(interp, key, hash->seed);
 }
 
 
@@ -1339,7 +1372,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(parrot_hash_put)
-    const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
+    const UINTVAL hashval = get_hash_val(interp, hash, key);
     HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
 
     /* When the hash is constant, check that the key and value are also
