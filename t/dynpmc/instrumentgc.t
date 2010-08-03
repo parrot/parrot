@@ -360,12 +360,15 @@ PROG
     is($S0, 'main', 'Event: Sub ok.')
 
     # Test type.
-    $S0 = data['type']
-    is($S0, 'do_gc_mark', 'Event: Type ok.')
+    $P10 = data['event']
+    $S0  = join '::', $P10
+    is($S0, 'GC::administration::do_gc_mark', 'Event: Type ok.')
 .end
 
 .sub sample_notification_callback
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     .local pmc results
     results = get_global '%!notifications'
@@ -378,8 +381,8 @@ PROG
     results['file']  = $S0
     $S0 = data['sub']
     results['sub']   = $S0
-    $S0 = data['type']
-    results['type']  = $S0
+    $P0 = data['event']
+    results['event']  = $P0
 
 .end
 

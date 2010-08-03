@@ -112,6 +112,8 @@ PROG2
 
 .sub test_loadlib_callback
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     # data['library'] is the library name.
     $P0 = get_global '%test_loadlib_res'
@@ -150,7 +152,6 @@ PROG1
     fh.'open'('t/library/instrument_eventlibrary-gc.pir', 'w')
     fh.'puts'(program)
     fh.'close'()
-
 
     # Setup the test.
     $P0 = new ['Hash']
@@ -209,6 +210,8 @@ PROG1
 
 .sub test_gc_scenario_1
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     # Test that a singular function was instrumented.
     # Record the function name.
@@ -220,6 +223,8 @@ PROG1
 
 .sub test_gc_scenario_2
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     # Test that a group function was instrumented.
     # Ensure that the function is of type allocate.
@@ -237,6 +242,8 @@ PROG1
 
 .sub test_gc_scenario_3
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     # Since the probe was disabled, this should not be called.
     $P0 = get_global '%test_gc_res'

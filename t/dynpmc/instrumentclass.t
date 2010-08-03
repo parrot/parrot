@@ -232,6 +232,8 @@ PROG
 
 .sub test_notification_cb
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     $P0 = get_global '%notification'
 

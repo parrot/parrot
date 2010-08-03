@@ -64,12 +64,13 @@ Tests the low level interface provided by instrument.pmc.
 
 .sub 'test_insert_and_remove_op_hook'
     # Plan: Test insertion and removal of hooks.
-    .local pmc instr
+    .local pmc instr, instrument
     .local pmc probe1, probe2
 
-    probe1 = new ['MockProbe']
-    probe2 = new ['MockProbe']
-    instr  = new ['Instrument']
+    probe1     = new ['MockProbe']
+    probe2     = new ['MockProbe']
+    instrument = new ['Instrument']
+    instr      = instrument['runcore']
 
     # Test insert and remove 1 hook on existing op (op 0 = noop).
     instr.'insert_op_hook'(probe1, 0)
@@ -135,12 +136,13 @@ Tests the low level interface provided by instrument.pmc.
 
 .sub 'test_insert_and_remove_op_catchall'
     # Plan: Test insertion and removal of catchall probes.
-    .local pmc instr
+    .local pmc instr, instrument
     .local pmc probe1, probe2
 
     probe1 = new ['MockProbe']
     probe2 = new ['MockProbe']
-    instr  = new ['Instrument']
+    instrument = new ['Instrument']
+    instr      = instrument['runcore']
 
     # Test insert and remove 1 catchall.
     instr.'insert_op_catchall'(probe1)

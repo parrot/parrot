@@ -122,8 +122,8 @@ PROG
     args = new ['ResizableStringArray']
     push args, 't/library/instrument_probe-dynop.pir'
 
-    probe_class = get_hll_global ['Instrument'], 'Probe'
-    probe       = probe_class.'new'()
+    instr = new ['Instrument']
+    probe = instr.'instrument_op'()
     probe.'inspect'('read_s_p_ic')
 
     # At this point, the dynop does not exist.
@@ -140,7 +140,6 @@ PROG
 
     # Attach it to the instrument, run the dynop test file.
     # Then recheck the counts.
-    instr = new ['Instrument']
     instr.'attach'(probe)
     instr.'run'('t/library/instrument_probe-dynop.pir', args)
 
@@ -191,14 +190,15 @@ PROG
     args = new ['ResizableStringArray']
     push args, 't/library/instrument_probe-2-op.pir'
 
+    instr = new ['Instrument']
+
     # Exception handler to catch exit.
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.CONTROL_ERROR, .CONTROL_EXIT)
     eh.'min_severity'(.EXCEPT_NORMAL)
     eh.'max_severity'(.EXCEPT_EXIT)
 
-    probe_class = get_hll_global ['Instrument'], 'Probe'
-    probe       = probe_class.'new'()
+    probe       = instr.'instrument_op'()
 
     # Test pass by name.
     probe.'callback'('generic_callback')
@@ -245,7 +245,6 @@ PROG
     probe.'callback'('test_callback_callback')
     probe.'inspect'('say_sc')
 
-    instr = new ['Instrument']
     instr.'attach'(probe)
     instr.'run'('t/library/instrument_probe-2-op.pir', args)
 .end
@@ -280,15 +279,14 @@ PROG
     args = new ['ResizableStringArray']
     push args, 't/library/instrument_probe-2-op.pir'
 
-    probe_class = get_hll_global ['Instrument'], 'Probe'
-    probe       = probe_class.'new'()
+    instr = new ['Instrument']
+    probe = instr.'instrument_op'()
 
     # We only want the callback to be called once.
     # So set it to inspect end.
     probe.'inspect'('end')
     probe.'callback'('test_enable_callback')
 
-    instr = new ['Instrument']
     instr.'attach'(probe)
 
     # On attach, the probe is enabled.
@@ -312,15 +310,14 @@ PROG
     $P0 = box 0
     set_global "$test_disable_fail", $P0
 
-    probe_class = get_hll_global ['Instrument'], 'Probe'
-    probe       = probe_class.'new'()
+    instr = new ['Instrument']
+    probe = instr.'instrument_op'()
 
     # We only want the callback to be called once.
     # So set it to inspect end.
     probe.'inspect'('end')
     probe.'callback'('test_disable_callback')
 
-    instr = new ['Instrument']
     instr.'attach'(probe)
 
     # On attach, the probe is enabled.

@@ -27,7 +27,7 @@ any instrumentation on this object will only affect this object.
     # Load the Instrument library.
     load_bytecode 'Instrument/InstrumentLib.pbc'
 
-    plan(0)
+    plan(6)
 
     setup()
     test_notification()
@@ -79,30 +79,32 @@ PROG
     # Test if notifications is raised only for the object that is instrumented.
     # Check:
     # 1. Event is raised.
-    # 2. The event is of type Class::Class_Name::method::Method_Name
+    # 2. The event is of type Object::address::method::Method_Name
+    # 3. The class event still fires.
     $P0 = new ['Instrument']
-
-    $P1 = get_hll_global ['Instrument'], 'Probe'
-    $P2 = $P1.'new'()
+    $P2 = $P0.'instrument_op'()
 
     $P2.'catchall'(1)
     $P2.'callback'('test_notification_probe_cb')
-
     $P0.'attach'($P2)
+
+    $P4 = get_hll_global ['Instrument';'Event'], 'Class'
+    $P5 = $P4.'new'()
+
+    $P5.'inspect_class'('TestClass')
+    $P5.'inspect_method'('test')
+    $P5.'callback'('test_notification_class_cb')
+    $P0.'attach'($P5)
 
     $P3 = new ['ResizableStringArray']
     push $P3, 't/dynpmc/instrumentobject-test1.pir'
     $S0 = $P3[0]
 
     # Prepare the globals.
-    $P4 = new ['Hash']
-    set_global '%notification', $P4
-
-    # TODO: Added this to see what events were raised. Remove when done.
-    $P8 = $P0['eventdispatcher']
-    $P9 = get_global 'event_dumper'
-    $P8.'register'('Class', $P9)
-    $P8.'register'('Object', $P9)
+    $P6 = new ['Hash']
+    set_global '%notification', $P6
+    $P7 = box 0
+    set_global '$class_event', $P7
 
     $P0.'run'($S0, $P3)
 
@@ -138,15 +140,15 @@ PROG
     $S1  = $P12
     is($S0, $S1, 'Event: Event ok')
 
+    # Check that the class event still fires.
+    $P12 = get_global '$class_event'
+    $I0  = $P12
+    is($I0, 1, 'Event: Class event still fires.')
 .end
 
-.sub event_dumper
-    .param pmc data
-
-    $S0 = data['event']
-
-    print 'Event: '
-    say $S0
+.sub test_notification_class_cb
+    $P0 = get_global '$class_event'
+    $P0 = 1
 .end
 
 .sub test_notification_probe_cb
@@ -160,10 +162,10 @@ PROG
     #  and instrument the object.
     $S0 = op.'family'()
     if $S0 == 'new' goto INSTRUMENT
-
     .return()
 
     INSTRUMENT:
+
       $P0 = get_global 'test_notification_probe_instrument_obj'
       .return($P0)
 .end
@@ -180,10 +182,12 @@ PROG
 
     # Get the object.
     $P0 = op.'get_arg'(0)
-    $P1 = instr.'instrument_object'($P0)
 
-    # Instrument the method.
-    $P1.'insert_method_hook'('test')
+    # Instrument the object.
+    $P1  = instr.'instrument_object'($P0)
+    $P1.'inspect_method'('test')
+    $P1.'callback'('test_notification_cb')
+    instr.'attach'($P1)
 
     # Build up the event string.
     $P2 = new ['ResizableStringArray']
@@ -196,15 +200,13 @@ PROG
 
     $P9 = box $S0
     set_global '$notification_object', $P9
-
-    # Register the event.
-    $P3 = instr['eventdispatcher']
-    $P4 = get_global 'test_notification_cb'
-    $P3.'register'($S1, $P4)
 .end
 
 .sub test_notification_cb
     .param pmc data
+    .param pmc instr
+    .param pmc probe
+
     $P0 = get_global '%notification'
 
     $P0['called'] = 1

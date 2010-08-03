@@ -64,19 +64,19 @@ PROG
     # Test a single opcode.
     .local pmc instr, probe, probe_class, args
 
+    instr = new ['Instrument']
+
     # Set up the program args.
     args = new ['ResizableStringArray']
     args.'push'('t/dynpmc/instrumentop-test1.pir')
 
     # Create a catchall probe.
-    probe_class = get_hll_global ['Instrument'], 'Probe'
-    probe = probe_class.'new'()
+    probe = instr.'instrument_op'()
     probe.'inspect'('say_sc')
     probe.'callback'('test_one_op_callback')
 
     # Create the Instrument instance and run it
     #  against t/dynpmc/instrumentop-test1.pir.
-    instr = new ['Instrument']
     instr.'attach'(probe)
     instr.'run'('t/dynpmc/instrumentop-test1.pir', args)
 .end
