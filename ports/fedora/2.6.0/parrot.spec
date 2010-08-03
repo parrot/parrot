@@ -1,21 +1,13 @@
 Name:           parrot
-Version:        2.5.0
-Release:        1%{?dist}
+Version:        2.6.0
+Release:        2%{?dist}
 Summary:        a virtual machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
 
-Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/%{version}/parrot-%{version}.tar.gz
+Source0:        ftp://ftp.parrot.org/pub/parrot/releases/stable/%{version}/parrot-%{version}.tar.gz
 Source1:        %{name}.desk.in.tar.gz
-
-Patch0:         parrot.patch
-#
-# see for upstream:       https://trac.parrot.org/parrot/ticket/509
-# patched file:           lib/Parrot/Install.pm
-# is to have the symlink:    libparrot.so  ->  libparrot.so.%{version}
-# Without this %{_libdir}/libparrot.so would not be a symbolic link to
-# %{_libdir}/libparrot.so.%{version}  
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
@@ -50,7 +42,7 @@ BuildArch:      noarch
 Summary:        Parrot Virtual Machine development headers and libraries
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkgconfig
+Requires:       pkgconfig, vim-common
 
 #--
 
@@ -93,7 +85,6 @@ Parrot Virtual Machine development files for building languages.
 
 %prep
 %setup -q
-%patch0 -p0
 
 
 cat << \EOF > %{name}-prov
@@ -152,6 +143,14 @@ rm -rf $RPM_BUILD_ROOT
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
 
 make install DESTDIR=$RPM_BUILD_ROOT
+
+# Generate several files for syntax-highlighting and automatic indenting.
+# First they are installed in BUILD-directory with make and after that
+# they needed to be copied to the RPM_BUILD_ROOT.
+(  cd editor; 
+   make vim-install VIM_DIR=.%{_datadir}/vim/vimfiles \
+                    SKELETON=%{_datadir}/vim/vimfiles;
+   cp -r ./usr $RPM_BUILD_ROOT                                )
 
 # Creating man-pages
 %{__install} -d $RPM_BUILD_ROOT%{_mandir}/man1
@@ -261,7 +260,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files docs
 %defattr(-,root,root,-)
-%doc docs examples
+%doc docs examples LICENSE
 %{_datadir}/applications/parrot_html.desktop
 %{_datadir}/applications/parrot_pdf.desktop
 
@@ -288,6 +287,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/pbc_to_exe.1.gz
 %{_mandir}/man1/pbc_dump.1.gz
 %{_mandir}/man1/parrot-nqp.1.gz
+%{_datadir}/vim/vimfiles/skeleton.pir
+%{_datadir}/vim/vimfiles/plugin/parrot.vim
+%{_datadir}/vim/vimfiles/syntax/*
+%{_datadir}/vim/vimfiles/indent/pir.vim
 
 %files tools
 %defattr(-,root,root,-)
@@ -298,6 +301,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jul 21 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.6.0-2
+- updated to 2.6.0
+- add vim files for syntax-highlighting and automatic indenting
+- so requires "vim-common" is added
+- add LICENSE file to docs-subpackage
+
 * Fri Jun 18 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.5.0-1
 - updated to 2.5.0
 - add the ops2c binary
@@ -355,7 +364,6 @@ rm -rf $RPM_BUILD_ROOT
 - Update to 0.5.3.
 
 * Sat Mar 10 2007 Steven Pritchard <steve@kspei.com> 0.4.9-1
-- Update to 0.4.9.
 - BuildRequires ncurses-devel.
 - For some reason now I need to force -lm too.
 - Remove some files/directories that shouldn't be included.

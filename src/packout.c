@@ -166,7 +166,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     for (i = 0; i < n_constants; ++i) {
         /* only constants up to the current one will be valid on unpack */
         self->const_count = i;
-        size += PackFile_Constant_pack_size(interp, self->constants[i], self);
+        size += PackFile_Constant_pack_size(interp, &self->constants[i], self);
     }
 
     self->const_count = i;
@@ -208,7 +208,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     for (i = 0; i < n_constants; ++i) {
         /* only constants up to the current one will be valid on unpack */
         self->const_count = i;
-        cursor = PackFile_Constant_pack(interp, self, self->constants[i], cursor);
+        cursor = PackFile_Constant_pack(interp, self, &self->constants[i], cursor);
     }
 
     self->const_count = n_constants;
@@ -283,7 +283,7 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
     }
 
     for (i = 0; i < ct->const_count; ++i) {
-        PackFile_Constant *constant = ct->constants[i];
+        PackFile_Constant *constant = &ct->constants[i];
 
         switch (type) {
           case PFC_STRING:

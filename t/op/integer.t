@@ -16,7 +16,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 150
+.const int TESTS = 152
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -30,6 +30,7 @@ Tests the use of Parrot integer registers.
     test_sub()
     test_mul()
     test_div()
+    test_fdiv()
     test_mod()
     mod_negative_zero_rest()
     test_eq()
@@ -274,6 +275,18 @@ Tests the use of Parrot integer registers.
 
     $I1 = 120 / 12
     is($I1, 10, 'div_i_ic_ic')
+.end
+
+.sub 'test_fdiv'
+    $I0 = 9
+    $I1 = -4
+    fdiv $I0, $I1
+    is($I0, -3, 'fdiv_i_i with negative divisor')
+
+    $I0 = 9
+    $I1 = -4
+    $I2 = fdiv $I0, $I1
+    is($I2, -3, 'fdiv_i_i_i with negative divisor')
 .end
 
 .sub 'test_mod'

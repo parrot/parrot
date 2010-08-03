@@ -275,10 +275,11 @@ sub _get_special {
         src/vtable.tbl                                  [devel]src
         tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]
-        tools/dev/mk_language_shell.pl                  [devel]
         tools/dev/create_language.pl                    [devel]
-        tools/dev/pbc_to_exe.pir                        [devel]
         tools/dev/gen_makefile.pl                       [devel]
+        tools/dev/mk_language_shell.pl                  [devel]
+        tools/dev/pbc_to_exe.pir                        [devel]
+        tools/dev/pprof2cg.pl                           [devel]
         tools/dev/reconfigure.pl                        [devel]
     );
 

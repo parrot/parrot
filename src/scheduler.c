@@ -17,6 +17,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/scheduler_private.h"
 #include "parrot/runcore_api.h"
 
@@ -141,8 +142,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
                 PMC * const handler = Parrot_cx_find_handler_for_task(interp, task);
                 if (!PMC_IS_NULL(handler)) {
                     PMC * const handler_sub = VTABLE_get_attr_str(interp, handler, CONST_STRING(interp, "code"));
-                    Parrot_pcc_invoke_sub_from_c_args(interp, handler_sub,
-                            "PP->", handler, task);
+                    Parrot_ext_call(interp, handler_sub, "PP->", handler, task);
                 }
             }
             else {
@@ -952,8 +952,7 @@ Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
                     Parrot_floatval_time());
 #endif
     if (!PMC_IS_NULL(timer_struct->codeblock)) {
-        Parrot_pcc_invoke_sub_from_c_args(interp,
-                timer_struct->codeblock, "->");
+        Parrot_ext_call(interp, timer_struct->codeblock, "->");
     }
 }
 

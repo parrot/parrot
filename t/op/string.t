@@ -989,7 +989,7 @@ WHILE:
     set $S0, binary:"Parrot"
     set $S1, binary:"rot"
     index $I1, $S0, $S1
-    is( $I1, "-1", 'binary - binary' )
+    is( $I1, 3, 'binary - binary' )
 .end
 
 .sub negative_index_bug_35959

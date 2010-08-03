@@ -447,7 +447,7 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC      *current_sig;           /* temporary CallContext PMC for active call */
 
     /* deref the constants - we need it all the time */
-    ATTR struct PackFile_Constant **constants;
+    ATTR struct PackFile_Constant *constants;
 
     ATTR INTVAL                 current_HLL;     /* see also src/hll.c */
 

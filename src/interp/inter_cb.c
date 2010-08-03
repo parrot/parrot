@@ -25,6 +25,7 @@ the C-library.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "pmc/pmc_parrotinterpreter.h"
 #include "inter_cb.str"
 
@@ -350,8 +351,7 @@ case_I:
     pasm_sig[2] = '-';
     pasm_sig[3] = '>';  /* no return value supported yet */
     pasm_sig[4] = '\0';
-    Parrot_pcc_invoke_sub_from_c_args(interp, sub, pasm_sig,
-            user_data, param);
+    Parrot_ext_call(interp, sub, pasm_sig, user_data, param);
 }
 /*
 

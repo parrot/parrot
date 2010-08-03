@@ -12,6 +12,8 @@ t/pmc/opcode.t - Opcode PMC
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
     plan(1)
@@ -19,12 +21,18 @@ t/pmc/opcode.t - Opcode PMC
 .end
 
 .sub cannot_create_directly
-    push_eh cannot_create
+    .local pmc eh, ex
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_label eh, cannot_create
+    push_eh eh
     $P0 = new ['Opcode']
     ok(0, "shouldn't be able to create new opcode")
     goto create_end
   cannot_create:
-    ok(1)
+    .get_results(ex)
+    $S0 = ex['message']
+    ok(1,  $S0)
   create_end:
 .end
 

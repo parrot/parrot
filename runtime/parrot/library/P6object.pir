@@ -86,6 +86,12 @@ C<P6object> and C<P6metaclass>.
     $P2.'register'($P0)
     $P3 = $P2.'register'($P1)
     setattribute $P3, 'protoobject', $P3
+
+    $P0 = new ['Boolean']
+    set_hll_global ['P6protoobject'], 'False', $P0
+    $P0 = new ['Boolean']
+    assign $P0, 1
+    set_hll_global ['P6protoobject'], 'True', $P0
 .end
 
 
@@ -794,32 +800,29 @@ will be used in lieu of this one.)
 
     # Perl6Object (legacy) and Mu accept anything.
     $S0 = parrotclass
-    if $S0 == 'Perl6Object' goto accept_anyway
-    if $S0 == 'Mu' goto accept_anyway
+    if $S0 == 'Perl6Object' goto accept
+    if $S0 == 'Mu' goto accept
 
     # Otherwise, just try a normal check.
     $I0 = can topic, 'HOW'
-    unless $I0 goto end
+    unless $I0 goto reject
     topicwhat = topic.'WHAT'()
     $I0 = isa topicwhat, parrotclass
-    if $I0 goto end
+    if $I0 goto accept
     $I0 = does topic, parrotclass
-    if $I0 goto end
+    if $I0 goto accept
 
     # If this fails, and we want Any, and it's something form outside
     # of the Perl 6 world, we'd best just accept it.
-    unless $S0 == 'Any' goto end
+    unless $S0 == 'Any' goto reject
     $I0 = isa topicwhat, 'Mu'
-    unless $I0 goto accept_anyway
-    $I0 = 0
-    goto end
+    unless $I0 goto accept
+  reject:
+    $P0 = get_global 'False'
+    .return ($P0)
 
-  accept_anyway:
-    $I0 = 1
-
-  end:
-    $P0 = new ['Boolean']
-    assign $P0, $I0
+  accept:
+    $P0 = get_global 'True'
     .return ($P0)
 .end
 
