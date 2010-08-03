@@ -520,7 +520,7 @@ Pushes the integer C<v> onto the end of the image.
 */
 
     VTABLE void push_integer(INTVAL v) {
-        const const size_t len = PF_size_integer() * sizeof (opcode_t);
+        const size_t len = PF_size_integer() * sizeof (opcode_t);
         ensure_buffer_size(INTERP, SELF, len);
         SET_VISIT_CURSOR(SELF,
             (char *)PF_store_integer(GET_VISIT_CURSOR(SELF), v));
