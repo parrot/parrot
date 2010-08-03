@@ -36,6 +36,13 @@ die "Could not open $source_file!" if !$source_fh;
 flock($dynpmc_fh, LOCK_EX) or die "Cannot lock $dynpmc_file!";
 flock($source_fh, LOCK_EX) or die "Cannot lock $source_file!";
 
+my %param_type = (
+    'PMC*'     => 'P',
+    'INTVAL'   => 'I',
+    'FLOATVAL' => 'F',
+    'STRING*'  => 'S'
+);
+
 my(%groups, @entries, @prototypes, @stubs, %stub_memory_sizes);
 init_stub_memory_sizes(\%stub_memory_sizes);
 
@@ -56,6 +63,7 @@ foreach (split /\s*;\s*/, $subsystem) {
     if(/^\s*(.*)\s*\(\*(.+)\)\s*\((.*)\)$/) {
         my @data = ($1, $2, $3);
         $data[2] = fix_params($data[2]);
+        @data    = map { chomp;$_; } @data;
 
         # Ignore is_blocked_mark, is_blocked_sweep, get_gc_info.
         next if $data[1] eq 'is_blocked_mark'
@@ -152,14 +160,15 @@ PROTOTYPE
 }
 
 sub gen_stub {
-    my($ret, $name, $params, $group) = @_;
+    my($ret, $name, $args, $group) = @_;
 
     # Process the parameter list.
+    my @param_formats = ();
     my @param_types = ();
     my @param_names = ();
     my $param;
     my $param_count = 0;
-    foreach $param (split /\s*,\s*/, $params) {
+    foreach $param (split /\s*,\s*/, $args) {
         $param_count++;
         chomp $param;
 
@@ -169,12 +178,14 @@ sub gen_stub {
         if($param eq 'PARROT_INTERP') {
             push @param_types, 'Parrot_Interp';
             push @param_names, 'interp';
+            push @param_formats, 'V';
             next;
         }
         elsif($param_count == 1) {
             my @tokens = split(/\s+/, $param);
             push @param_types, $tokens[0];
             push @param_names, 'interp';
+            push @param_formats, 'V';
             next;
         }
 
@@ -184,71 +195,58 @@ sub gen_stub {
         if(scalar(@tokens) > 2) {
             push @param_names, pop(@tokens);
             push @param_types, join(' ', @tokens);
+            push @param_formats, 'V';
         }
         else {
             push @param_types, $tokens[0];
             push @param_names, $tokens[1];
+            push @param_formats, ($param_type{$tokens[0]} || 'V');
         }
     }
-
-    my $param_list_flat = (scalar(@param_names)) ? join(', ', @param_names) : '';
+    my $param_format = join('', @param_formats);
+    my $param_flat = (scalar(@param_names)) ? join(', ', @param_names) : '';
     $param_count = 0;
-    $params = join(', ', map { $_.' '.$param_names[$param_count++] } @param_types);
+    $args = join(', ', map { $_.' '.$param_names[$param_count++] } @param_types);
 
-    my($ret_dec, $ret_ret, $ret_last) = ('','','');
-    if ($ret !~ /^\s*void\s*$/) {
-        $ret_dec  = '    '.$ret.' ret;'."\n";
-        $ret_ret  = ' ret =';
-        $ret_last = ' ret';
-    }
+    # Prepare the return value.
+    my($ret_declaration, $ret_receive, $ret_return, $ret_pack) = ('', '', '', '');
+    if($ret !~ /^\s*void\s*$/) {
+        $ret_declaration = "\n    $ret ret;\n    PMC *ret_pack;";
+        $ret_receive     = "ret = ";
+        $ret_return      = "\n    return ret;";
 
-    # Prepare to pass the parameter list to instrument.
-    my $instr_params = '';
-    for(my $i = 1; $i < @param_types; $i++) {
-        if($param_types[$i] eq 'size_t' || $param_types[$i] eq 'UINTVAL') {
-            $instr_params .= <<INTEGER;
-    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
-    VTABLE_set_integer_native(supervisor, temp, $param_names[$i]);
-    VTABLE_push_pmc(supervisor, params, temp);
-INTEGER
-        }
-        else {
-            # Assume pointer.
-            $instr_params .= <<POINTER;
-    temp = Parrot_pmc_new(supervisor, enum_class_Pointer);
-    VTABLE_set_pointer(supervisor, temp, $param_names[$i]);
-    VTABLE_push_pmc(supervisor, params, temp);
-POINTER
-        }
+        my $type = ($param_type{$ret} || 'V');
+        $ret_pack = "\n".<<PACK;
+    ret_pack = instrument_pack_params(supervisor, "$type", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, data, CONST_STRING(supervisor, "return"), ret_pack);
+PACK
     }
 
     # For allocations and reallocations, expose the size of the allocation.
     my $alloc = $stub_memory_sizes{$name} || '';
+    my $event = 'GC::'.$group.'::'.$name;
 
     return <<STUB;
-$ret stub_$name($params) {
-    GC_Subsystem *gc_orig    = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp supervisor = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+$ret stub_$name($args) {
+    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
+    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
+    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
+    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
+    STRING *raise_event, *event;$ret_declaration
 
-    PMC *event_data;
-    PMC *temp;
-    PMC *params = Parrot_pmc_new(supervisor, enum_class_ResizablePMCArray);
-$ret_dec
-
-   $ret_ret gc_orig->$name($param_list_flat);
-
-$instr_params
+    params     = instrument_pack_params(supervisor, "$param_format", $param_flat);
     event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_string_keyed_str(supervisor, event_data,
-        CONST_STRING(supervisor, "type"),
-        CONST_STRING(supervisor, "$name"));
-    VTABLE_set_pmc_keyed_str(supervisor, event_data,
-        CONST_STRING(supervisor, "parameters"),
-        params);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
 $alloc
-    raise_gc_event(supervisor, interp, CONST_STRING(supervisor, "$group"), event_data);
-
-    return$ret_last;
+    event       = CONST_STRING(supervisor, "$event");
+    raise_event = CONST_STRING(supervisor, "raise_event");
+    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
+    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
+                                         "SP->P", event, event_data, &recall);
+    $ret_receive(gc_orig->$name($param_flat));
+    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
+                                         "SPP->P", event, event_data, recall, &recall);
+    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));$ret_return
 }
 
 STUB
@@ -328,17 +326,14 @@ POST
 }
 
 sub gen_mapping_item_groups {
-my @entries = @_;
+    my @entries = @_;
     return join("\n", map {
         my $name = @{$_}[1];
         my $group = @{$_}[3];
         my $stub = <<STUB;
-    temp = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-    VTABLE_push_string(interp, temp,
-                       CONST_STRING(interp, "$group"));
     parrot_hash_put(interp, gc_item_groups,
         CONST_STRING(interp, "$name"),
-        temp);
+        CONST_STRING(interp, "$group"));
 STUB
         chomp $stub;
         $stub;
@@ -396,12 +391,8 @@ sub init_stub_memory_sizes {
     for $key (keys %sources) {
         my $source = $sources{$key};
         $ref->{$key} = <<SIZE;
-    temp = Parrot_pmc_new(supervisor, enum_class_Integer);
-    VTABLE_set_integer_native(supervisor, temp,
-                              $source);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data,
-                            CONST_STRING(supervisor, "size"),
-                            temp);
+    VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
+        $source);
 SIZE
     }
 }
