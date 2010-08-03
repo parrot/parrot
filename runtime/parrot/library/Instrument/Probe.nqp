@@ -35,10 +35,9 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
 
 class Instrument::Probe is Instrument::Base {
     has $!is_catchall;
+    has $!rc_obj;
     has @!oplist;
     has @!op_todo_list;
-    our $loadlib_evt;
-    our @loadlib_probelist := ();
 
 =begin
 
@@ -154,30 +153,16 @@ eg,
             for @list {
                 self.inspect($_);
             }
-
-            # If there is still a op_todo_list,
-            #  set up an event handler to update.
-            if +@!op_todo_list != 0 {
-                @Instrument::Probe::loadlib_probelist.push(self);
-
-                if !pir::defined__IP($Instrument::Probe::loadlib_evt) {
-                    my $callback := pir::get_global__PS('loadlib_callback');
-                    $Instrument::Probe::loadlib_evt := Instrument::Event::Internal::loadlib.new();
-                    $Instrument::Probe::loadlib_evt.callback($callback);
-                    $Instrument::Probe::loadlib_evt.data(self);
-                    $!instr_obj.attach($Instrument::Probe::loadlib_evt);
-                }
-            }
         }
 
         if !$!is_enabled {
             if $!is_catchall {
                 # Attach a catchall hook.
-                $!instr_obj.insert_op_catchall(self);
+                $!rc_obj.insert_op_catchall(self);
             } else {
                 # Attach a hook to each op in @!oplist.
                 for @!oplist {
-                    $!instr_obj.insert_op_hook(self, $_);
+                    $!rc_obj.insert_op_hook(self, $_);
                 }
             }
 
@@ -207,11 +192,11 @@ You can dynamically attach and remove hooks dynamically.
         if $!is_enabled {
             if $!is_catchall {
                 # Attach a catchall hook.
-                $!instr_obj.remove_op_catchall(self);
+                $!rc_obj.remove_op_catchall(self);
             } else {
                 # Attach a hook to each op in @!oplist.
                 for @!oplist {
-                    $!instr_obj.remove_op_hook(self, $_);
+                    $!rc_obj.remove_op_hook(self, $_);
                 }
             }
 
@@ -241,18 +226,6 @@ Returns the list of items passed to inspect
 
     method get_op_todo_list () {
         @!op_todo_list;
-    }
-
-    # Internal helper: Callback for loadlib events registered when the probe has
-    #                  any outstanding ops in @!op_todo_list.
-    sub loadlib_callback ($data) {
-        # Simply disable and reenable the probe.
-        my @list                              := @Instrument::Probe::loadlib_probelist;
-        @Instrument::Probe::loadlib_probelist := ();
-        for @list {
-            $_.disable();
-            $_.enable();
-        }
     }
 };
 

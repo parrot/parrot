@@ -186,9 +186,9 @@ PROG
     ## Scenario 4: Insert a group of hooks.
     $P1 = new ['InstrumentVtable'], $P0
     $P1.'attach_to_class'('Sub')
-    $P1.'insert_hook'('write')
+    $P1.'insert_hook'('math')
     $P2 = $P1.'get_instrumented_list'()
-    $P3 = $P1.'get_hook_list'('write')
+    $P3 = $P1.'get_hook_list'('math')
 
     $I0 = $P2
     $I1 = $P3
@@ -232,8 +232,8 @@ PROG
     ## Scenario 3: Remove a group of hooks.
     $P1 = new ['InstrumentVtable'], $P0
     $P1.'attach_to_class'('Sub')
-    $P1.'insert_hook'('write')
-    $P1.'remove_hook'('write')
+    $P1.'insert_hook'('math')
+    $P1.'remove_hook'('math')
     $P2 = $P1.'get_instrumented_list'()
 
     $I0 = $P2
@@ -309,11 +309,13 @@ PROG
     # Test event.
     $P10 = $P9['event']
     $S0  = join '::', $P10
-    is($S0, 'Class::TestClass::vtable::core::init', 'Event: Event ok')
+    is($S0, 'Class::TestClass::vtable::main::init', 'Event: Event ok')
 .end
 
 .sub test_notification_cb
     .param pmc data
+    .param pmc instr
+    .param pmc probe
 
     $P0 = get_global '%notification'
     $P0['called'] = 1

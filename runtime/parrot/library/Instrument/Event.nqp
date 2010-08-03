@@ -5,11 +5,11 @@
 =begin
 
 =head1 NAME
-    
+
 runtime/parrot/library/Instrument/Event.nqp - Abstract class for the Instruments library
 
 =head1 SYNOPSIS
-    
+
     Abstract class for the Instruments library.
     Provides event specific methods.
 
@@ -65,13 +65,8 @@ Registers callbacks with the EventDispatcher Object in the Instrument dynpmc.
             $!instr_obj.attach($!probe_obj);
         }
 
-        my $dispatcher := Q:PIR {
-            $P0 = getattribute self, '$!instr_obj'
-            %r  = $P0['eventdispatcher']
-        };
-
         if pir::defined__IP($!callback) {
-            $dispatcher.register($!event_type, $!callback);
+            $!instr_obj.register_eventhandler($!event_type, self);
         }
     };
 

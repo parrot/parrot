@@ -87,10 +87,6 @@ class Instrument::Event::GC is Instrument::Event {
             $P0 = getattribute self, '$!instr_obj'
             %r  = $P0['gc']
         };
-        my $dispatcher := Q:PIR {
-            $P0 = getattribute self, '$!instr_obj'
-            %r  = $P0['eventdispatcher']
-        };
 
         # For each item in $!probe_list, insert the gc hook
         #  and register the event handler.
@@ -100,11 +96,11 @@ class Instrument::Event::GC is Instrument::Event {
             for @hooks {
                 $gc.insert_hook($_);
 
-                my $group := $gc.get_hook_group($_).shift();
+                my $group := $gc.get_hook_group($_);
                 my $event := 'GC::' ~ $group ~ '::' ~ $_;
 
                 # Register the callback.
-                $dispatcher.register($event, $!callback);
+                $!instr_obj.register_eventhandler($event, self);
             }
         }
 
@@ -119,10 +115,6 @@ class Instrument::Event::GC is Instrument::Event {
             $P0 = getattribute self, '$!instr_obj'
             %r  = $P0['gc']
         };
-        my $dispatcher := Q:PIR {
-            $P0 = getattribute self, '$!instr_obj'
-            %r  = $P0['eventdispatcher']
-        };
 
         # For each item in $!probe_list, insert the gc hook
         #  and register the event handler.
@@ -132,11 +124,11 @@ class Instrument::Event::GC is Instrument::Event {
             for @hooks {
                 $gc.remove_hook($_);
 
-                my $group := $gc.get_hook_group($_).shift();
+                my $group := $gc.get_hook_group($_);
                 my $event := 'GC::' ~ $group ~ '::' ~ $_;
 
                 # Register the callback.
-                $dispatcher.deregister($event, $!callback);
+                $!instr_obj.remove_eventhandler($event, self);
             }
         }
 
@@ -152,9 +144,6 @@ class Instrument::Event::Class is Instrument::Event {
     has @!class_names;
     has @!vtable_probes;
     has @!method_probes;
-    our @todo;
-    our $loadlib_event;
-    our $loadbytecode_event;
 
     method _self_init() {
         @!class_names   := ();
@@ -180,12 +169,6 @@ class Instrument::Event::Class is Instrument::Event {
 
     method enable() {
         if $!is_enabled { return; }
-
-        my $dispatcher := Q:PIR {
-            $P0 = getattribute self, '$!instr_obj'
-            %r  = $P0['eventdispatcher']
-        };
-
         for (@!class_names) {
             my $class_name   := $_;
             my $class        := $!instr_obj.instrument_class($class_name);
@@ -195,13 +178,11 @@ class Instrument::Event::Class is Instrument::Event {
             my $vtable_prefix := $event_prefix ~ 'vtable::';
             for @!vtable_probes {
                 my @hooks := $class.get_hook_list($_);
-
                 for @hooks {
                     $class.insert_hook($_);
-                    my $group := ($class.get_hook_group($_)).shift();
-
+                    my $group := $class.get_hook_group($_);
                     my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
-                    $dispatcher.register($event, $!callback);
+                    $!instr_obj.register_eventhandler($event, self);
                 }
             }
 
@@ -211,15 +192,10 @@ class Instrument::Event::Class is Instrument::Event {
                 $class.insert_method_hook($_);
 
                 my $event := $method_prefix ~ $_;
-                $dispatcher.register($event, $!callback);
+                $!instr_obj.register_eventhandler($event, self);
             }
 
-            CATCH {
-                # Something was not found.
-                # Push this probe to the todo list.
-                @Instrument::Event::Class::todo.push(self);
-                setup_load_event($!instr_obj);
-            }
+            CATCH {}
         }
 
         $!is_enabled := 1;
@@ -227,11 +203,6 @@ class Instrument::Event::Class is Instrument::Event {
 
     method disable() {
         if !$!is_enabled { return; }
-
-        my $dispatcher := Q:PIR {
-            $P0 = getattribute self, '$!instr_obj'
-            %r  = $P0['eventdispatcher']
-        };
 
         for (@!class_names) {
             my $class_name   := $_;
@@ -245,10 +216,10 @@ class Instrument::Event::Class is Instrument::Event {
 
                 for @hooks {
                     $class.remove_hook($_);
-                    my $group := ($class.get_hook_group($_)).shift();
+                    my $group := $class.get_hook_group($_);
 
                     my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
-                    $dispatcher.deregister($event, $!callback);
+                    $!instr_obj.remove_eventhandler($event, self);
                 }
             }
 
@@ -258,7 +229,7 @@ class Instrument::Event::Class is Instrument::Event {
                 $class.remove_method_hook($_);
 
                 my $event := $method_prefix ~ $_;
-                $dispatcher.deregister($event, $!callback);
+                $!instr_obj.remove_eventhandler($event, self);
             }
 
             CATCH {
@@ -271,41 +242,54 @@ class Instrument::Event::Class is Instrument::Event {
 
         $!is_enabled := 0;
     };
-
-    sub setup_load_event($instrument) {
-        if !pir::defined__IP($Instrument::Event::Class::loadlib_event) {
-            # Define the loadlib event for this class.
-            my $loadlib := Instrument::Event::Internal::loadlib.new();
-            $loadlib.callback(pir::get_global__PS("load_cb"));
-            $instrument.attach($loadlib);
-            $Instrument::Event::Class::loadlib_event := $loadlib;
-
-            # Define the load_bytecode event for this class.
-            my $bytecode := Instrument::Probe.new();
-            $bytecode.inspect('load_bytecode');
-            $bytecode.callback(pir::get_global__PS("loadbytecode_cb"));
-            $instrument.attach($bytecode);
-            $Instrument::Event::Class::loadbytecode_event := $bytecode;
-        }
-    };
-
-    sub load_cb($data) {
-        reload_todos();
-    }
-
-    sub loadbytecode_cb($op, $instr, $probe) {
-        return pir::get_global__PS('reload_todos');
-    }
-
-    sub reload_todos() {
-        my @list := @Instrument::Event::Class::todo;
-        @Instrument::Event::Class::todo := ();
-
-        for @list {
-            $_.disable();
-            $_.enable();
-        }
-    };
 };
+
+class Instrument::Event::Object is Instrument::Event::Class {
+    has $!object;
+
+    method _self_init() {
+        #$!object           := pir::null;
+        #$!instrumented_obj := pir::null;
+        @!vtable_probes := ();
+        @!method_probes := ();
+    };
+
+    method enable () {
+        if !+$!is_enabled {
+            my $event_prefix := 'Object::' ~ $!object.get_address() ~ '::';
+
+            # Register the vtable probes.
+            my $vtable_prefix := $event_prefix ~ 'vtable::';
+            for @!vtable_probes {
+                my @hooks := $!object.get_hook_list($_);
+
+                for @hooks {
+                    $!object.insert_hook($_);
+                    my $group := ($!object.get_hook_group($_)).shift();
+
+                    my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
+                    $!instr_obj.register_eventhandler($event, self);
+                }
+            }
+
+            # Register the method probes.
+            my $method_prefix := $event_prefix ~ 'method::';
+            for @!method_probes {
+                $!object.insert_method_hook($_);
+
+                my $event := $method_prefix ~ $_;
+                $!instr_obj.register_eventhandler($event, self);
+            }
+
+            CATCH {}
+
+            $!is_enabled := 1;
+        }
+    }
+
+    method get_address() {
+        return $!object.get_address();
+    }
+}
 
 # vim: ft=perl6 expandtab shiftwidth=4:
