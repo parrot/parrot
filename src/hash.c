@@ -630,6 +630,18 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
 
     hash->entries = 0;
 
+    /* special case for great speed */
+    if (key_type   == Hash_key_type_STRING
+    &&  entry_type == enum_hash_int) {
+        for (entry_index = 0; entry_index < num_entries; ++entry_index) {
+            STRING * const key = VTABLE_shift_string(interp, info);
+            const INTVAL   i   = VTABLE_shift_integer(interp, info);
+            parrot_hash_put(interp, hash, (void *)key, (void *)i);
+        }
+
+        return;
+    }
+
     for (entry_index = 0; entry_index < num_entries; ++entry_index) {
         void       *key;
 
@@ -705,12 +717,15 @@ static void
 hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
 {
     ASSERT_ARGS(hash_freeze)
-    size_t           i;
+    const Hash_key_type    key_type   = hash->key_type;
+    const PARROT_DATA_TYPE entry_type = hash->entry_type;
+    const size_t           entries    = hash->entries;
+    size_t                 i;
 
-    for (i = 0; i < hash->entries; ++i) {
+    for (i = 0; i < entries; ++i) {
         HashBucket * const b = hash->buckets + i;
 
-        switch (hash->key_type) {
+        switch (key_type) {
           case Hash_key_type_int:
             VTABLE_push_integer(interp, info, (INTVAL)b->key);
             break;
@@ -726,7 +741,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
             break;
         }
 
-        switch (hash->entry_type) {
+        switch (entry_type) {
           case enum_hash_int:
             VTABLE_push_integer(interp, info, (INTVAL)b->value);
             break;
