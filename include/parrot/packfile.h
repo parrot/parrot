@@ -1048,9 +1048,8 @@ char * PF_fetch_cstring(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL PF_fetch_integer(
-    ARGIN_NULLOK(PackFile *pf),
-    ARGIN(const opcode_t **stream))
+INTVAL PF_fetch_integer(ARGIN(PackFile *pf), ARGIN(const opcode_t **stream))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -1138,7 +1137,8 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PF_fetch_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(stream))
+       PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(stream))
 #define ASSERT_ARGS_PF_fetch_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(stream))
 #define ASSERT_ARGS_PF_fetch_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

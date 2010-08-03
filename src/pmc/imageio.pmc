@@ -601,10 +601,11 @@ Removes and returns an integer from the start of the image.
 
 */
 
-    VTABLE INTVAL shift_integer()
-    {
+    VTABLE INTVAL shift_integer() {
         const opcode_t *pos = GET_VISIT_CURSOR(SELF);
-        INTVAL    i   = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf, &pos);
+        /* something is likely wrong if the packfile is NULL */
+        const INTVAL    i   = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf,
+                                (const opcode_t **)&pos);
         SET_VISIT_CURSOR(SELF, (char *)pos);
         BYTECODE_SHIFT_OK(SELF);
         return i;

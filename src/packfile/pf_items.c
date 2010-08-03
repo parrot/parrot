@@ -1018,20 +1018,18 @@ Fetches an C<INTVAL> from the stream, converting byteorder if needed.
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
 C<INTVAL> size in the PackFile header.
 
-When used for freeze/thaw the C<pf> argument might be NULL.
-
 =cut
 
 */
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
+PF_fetch_integer(ARGIN(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_integer)
     INTVAL i;
 
-    if (!pf || pf->fetch_iv == NULL)
+    if (!pf->fetch_iv)
         return *(*stream)++;
     i = (pf->fetch_iv)(*((const unsigned char **)stream));
     TRACE_PRINTF_VAL(("  PF_fetch_integer: 0x%x (%d) at 0x%x\n", i, i,
