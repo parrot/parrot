@@ -897,7 +897,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         while ((b = *next_p) != NULL) {
             /* rehash the bucket */
             const size_t new_loc =
-                (hash->hash_val)(interp, b->key, hash->seed) & (new_size - 1);
+                get_hash_val(interp, hash, b->key) & (new_size - 1);
 
             if (i != new_loc) {
                 *next_p         = b->next;
