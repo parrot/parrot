@@ -49,6 +49,8 @@
 #  define THREAD_CREATE_JOINABLE(t, func, arg) \
         pthread_create(&(t), NULL, (func), (arg))
 
+#  define THREAD_SELF() pthread_self()
+
 #  define JOIN(t, ret) pthread_join((t), &(ret))
 #  define DETACH(t)    pthread_detach(t)
 

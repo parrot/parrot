@@ -272,8 +272,8 @@ struct parrot_interp_t {
     FLOATVAL         quantum_done;            /* expiration of current quantum */
     PMC             *current_task;            /* there's always one running task */
 
-    PMC             *thread_pool;             /* All threads assigned to this interp */
     INTVAL           blocked_count;           /* Number of threads currently blocked */
+    INTVAL           thread_count;            /* Number of threads assigned to this interp */
     Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
 
     struct _Thread_data *thread_data;         /* thread specific items */

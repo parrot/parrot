@@ -295,6 +295,10 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->thread_data = NULL;
 
     Parrot_cx_init_scheduler(interp);
+    interp->blocked_count = 0;
+    interp->thread_count  = 1;
+    MUTEX_INIT(interp->interp_lock);
+    LOCK(interp->interp_lock);
 
 #ifdef ATEXIT_DESTROY
     /*

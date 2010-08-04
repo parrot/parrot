@@ -56,6 +56,15 @@ struct timespec {
 
 #endif /* PARROT_HAS_THREADS */
 
+
+#define THREAD_BLOCK(interp) \
+    do { (interp)->blocked_count += 1; \
+        UNLOCK((interp)->interp_lock); } while (0)
+
+#define THREAD_UNBLOCK(interp) \
+    do { LOCK((interp)->interp_lock); \
+        (interp)->blocked_count -= 1; } while (0)
+
 #ifndef YIELD
 #  define YIELD
 #endif /* YIELD */

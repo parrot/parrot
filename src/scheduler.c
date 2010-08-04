@@ -109,16 +109,52 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
     PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes *tdata = PARROT_TASK(main_task);
+
     tdata->code = main;
     tdata->data = argv;
 
     Parrot_cx_schedule_task(interp, main_task);
 
-    do {
-        Parrot_cx_next_task(interp, scheduler);
+    UNLOCK(interp->interp_lock);
+
+    Parrot_cx_outer_runloop(interp);
+
+    task_count = VTABLE_get_integer(interp, sched->all_tasks);
+    if (task_count > 0)
+        Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                    "Exiting with %d active tasks.\n", task_count);
+}
+
+/*
+
+=item C<void Parrot_cx_outer_runloop(PARROT_INTERP)>
+
+This is the core loop performed by each active OS thread, looking for Tasks
+to run and running them.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_cx_outer_runloop(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_cx_outer_runloop)
+    PMC* scheduler = interp->scheduler;
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    INTVAL task_count;
+
+    for (;;) {
+        LOCK(interp->interp_lock);
+
         task_count = VTABLE_get_integer(interp, sched->task_queue);
 
-        if (task_count == 0) {
+        if (task_count > 0) {
+            /* Yay! Do some work. */
+            Parrot_cx_next_task(interp, scheduler);
+        }
+        else {
             INTVAL alarm_count = VTABLE_get_integer(interp, sched->alarms);
 
             if (alarm_count > 0) {
@@ -128,21 +164,52 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
                 FLOATVAL sleep_time = now_time - alarm_time;
                 VTABLE_unshift_pmc(interp, sched->alarms, alarm);
 
-                if (sleep_time > 0.0)
+                if (sleep_time > 0.0) {
+                    THREAD_BLOCK(interp);
                     Parrot_floatval_sleep(sleep_time);
+                    THREAD_UNBLOCK(interp);
+                }
 
                 Parrot_cx_check_alarms(interp, interp->scheduler);
-                task_count = 1;
+            }
+            else {
+                /* All done */
+                /* Chandon TODO: Reap dead threads */
+                interp->thread_count -= 1;
+                UNLOCK(interp->interp_lock);
+                return;
             }
         }
-    } while (task_count > 0);
 
-    task_count = VTABLE_get_integer(interp, sched->all_tasks);
-    if (task_count > 0)
-        Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                    "Exiting with %d active tasks.\n", task_count);
+        UNLOCK(interp->interp_lock);
+    }
 }
 
+/*
+
+=item C<void* Parrot_cx_thread_main(void *interp_ptr)>
+
+When an interpreter spawns a new worker thread, that thread starts
+here.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_cx_thread_main(ARGMOD(void *interp_ptr))
+{
+    ASSERT_ARGS(Parrot_cx_thread_main)
+    Interp* interp = (Interp*) interp_ptr;
+
+    LOCK(interp->interp_lock);
+    interp->thread_count += 1;
+    UNLOCK(interp->interp_lock);
+
+    Parrot_cx_outer_runloop(interp);
+    return 0;
+}
 
 /*
 
