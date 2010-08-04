@@ -335,7 +335,10 @@ when the stage corresponding to target has been reached.
     $P1.'print'("Stage '")
     $P1.'print'(stagename)
     $P1.'print'("': ")
-    $P1.'print'($N2)
+    $P2 = new ['ResizablePMCArray']
+    push $P2, $N2
+    $S0 = sprintf "%.3f", $P2
+    $P1.'print'($S0)
     $P1.'print'(" sec\n")
     if target == stagename goto have_result
     goto stagestats_loop
