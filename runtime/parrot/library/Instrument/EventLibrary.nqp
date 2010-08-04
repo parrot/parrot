@@ -232,12 +232,7 @@ class Instrument::Event::Class is Instrument::Event {
                 $!instr_obj.remove_eventhandler($event, self);
             }
 
-            CATCH {
-                # Ignore the exception.
-                # We are trying to disable a hook that wasn't inserted.
-                # TODO: Ensure that the exception came from a place that we are expecting.
-                #       Otherwise rethrow. (How to do that in NQP?)
-            }
+            CATCH {}
         }
 
         $!is_enabled := 0;
@@ -248,8 +243,6 @@ class Instrument::Event::Object is Instrument::Event::Class {
     has $!object;
 
     method _self_init() {
-        #$!object           := pir::null;
-        #$!instrumented_obj := pir::null;
         @!vtable_probes := ();
         @!method_probes := ();
     };
@@ -265,7 +258,7 @@ class Instrument::Event::Object is Instrument::Event::Class {
 
                 for @hooks {
                     $!object.insert_hook($_);
-                    my $group := ($!object.get_hook_group($_)).shift();
+                    my $group := $!object.get_hook_group($_);
 
                     my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
                     $!instr_obj.register_eventhandler($event, self);
@@ -284,6 +277,39 @@ class Instrument::Event::Object is Instrument::Event::Class {
             CATCH {}
 
             $!is_enabled := 1;
+        }
+    }
+
+    method disable () {
+        if +$!is_enabled {
+            my $event_prefix := 'Object::' ~ $!object.get_address() ~ '::';
+
+            # Register the vtable probes.
+            my $vtable_prefix := $event_prefix ~ 'vtable::';
+            for @!vtable_probes {
+                my @hooks := $!object.get_hook_list($_);
+
+                for @hooks {
+                    $!object.remove_hook($_);
+                    my $group := $!object.get_hook_group($_);
+
+                    my $event :=  $vtable_prefix ~ $group ~ '::' ~ $_;
+                    $!instr_obj.remove_eventhandler($event, self);
+                }
+            }
+
+            # Register the method probes.
+            my $method_prefix := $event_prefix ~ 'method::';
+            for @!method_probes {
+                $!object.remove_method_hook($_);
+
+                my $event := $method_prefix ~ $_;
+                $!instr_obj.remove_eventhandler($event, self);
+            }
+
+            CATCH {}
+
+            $!is_enabled := 0;
         }
     }
 
