@@ -1457,28 +1457,21 @@ void
 parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
     ASSERT_ARGS(parrot_hash_delete)
-    HashBucket   *bucket;
-    HashBucket   *prev    = NULL;
-    const hash_comp_fn compare = hash->compare;
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed) & hash->mask;
-
-    for (bucket = hash->bucket_indices[hashval]; bucket; bucket = bucket->next) {
-        if ((compare)(interp, key, bucket->key) == 0) {
-
-            if (prev)
-                prev->next = bucket->next;
-            else
-                hash->bucket_indices[hashval] = bucket->next;
-
-            --hash->entries;
-            bucket->next    = hash->free_list;
-            bucket->key     = NULL;
-            hash->free_list = bucket;
-
-            return;
+    HashBucket   **prev   = &hash->bucket_indices[hashval];
+    if (*prev) {
+        const hash_comp_fn compare = hash->compare;
+        for ( ; *prev; prev = &(*prev)->next) {
+            HashBucket *current = *prev;
+            if ((compare)(interp, key, current->key) == 0) {
+                *prev = current->next;
+                --hash->entries;
+                current->next    = hash->free_list;
+                current->key     = NULL;
+                hash->free_list = current;
+                return;
+            }
         }
-
-        prev = bucket;
     }
 }
 
