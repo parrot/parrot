@@ -1189,6 +1189,104 @@ PF_size_number(void)
 
 /*
 
+=item C<STRING * PF_fetch_buf(PARROT_INTERP, PackFile *pf, const opcode_t
+**cursor)>
+
+Fetches a buffer (fixed_8 encoded temporary C<STRING>) from bytecode.
+
+Opcode format is:
+
+    opcode_t size
+    * data
+
+When used for freeze/thaw, the C<pf> argument might be C<NULL>.
+
+The returned buffer points to the underlying packfile. It should be used and
+discarded immediately to avoid things changing underneath you.
+
+=cut
+
+*/
+
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+PF_fetch_buf(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **cursor))
+{
+    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
+    size_t  size       = PF_fetch_opcode(pf, cursor);
+    STRING *s          = Parrot_str_new_init(interp, (const char *)*cursor, size,
+                            Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr,
+                            PObj_external_FLAG);
+    *((const unsigned char **)(cursor)) += ROUND_UP_B(size, wordsize);
+    return s;
+}
+
+
+/*
+
+=item C<opcode_t* PF_store_buf(opcode_t *cursor, const STRING *s)>
+
+Write a buffer (fixed_8 encoded, binary string) to the opcode stream. These
+are encoded more compactly and read more efficiently than normal strings, but
+have limitations (see C<PF_fetch_buf>).
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t*
+PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
+{
+    const int  wordsize = sizeof (opcode_t);
+
+    PARROT_ASSERT(s->encoding == Parrot_fixed_8_encoding_ptr);
+    PARROT_ASSERT(s->charset  == Parrot_binary_charset_ptr);
+
+    *cursor++ = s->bufused;
+
+    if (s->strstart) {
+        char *charcursor = (char *) cursor;
+        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+        charcursor += s->bufused;
+
+        /* Pad up to wordsize boundary. */
+        while ((charcursor - (char *)cursor) % wordsize)
+            *charcursor++ = 0;
+
+        cursor += (charcursor - (char *)cursor) / wordsize;
+    }
+
+    return cursor;
+}
+
+
+/*
+
+=item C<size_t PF_size_buf(const STRING *s)>
+
+Reports the stored size of a buffer in C<opcode_t> units.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+size_t
+PF_size_buf(ARGIN(const STRING *s))
+{
+    if (STRING_IS_NULL(s))
+        return 1;
+    else
+        return PF_size_strlen(s->bufused) - 1;
+}
+
+
+/*
+
 =item C<STRING * PF_fetch_string(PARROT_INTERP, PackFile *pf, const opcode_t
 **cursor)>
 
