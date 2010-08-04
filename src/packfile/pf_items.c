@@ -1214,6 +1214,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 PF_fetch_buf(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **cursor))
 {
+    ASSERT_ARGS(PF_fetch_buf)
     const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
     size_t  size       = PF_fetch_opcode(pf, cursor);
     STRING *s          = Parrot_str_new_init(interp, (const char *)*cursor, size,
@@ -1241,6 +1242,7 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 {
+    ASSERT_ARGS(PF_store_buf)
     const int  wordsize = sizeof (opcode_t);
 
     PARROT_ASSERT(s->encoding == Parrot_fixed_8_encoding_ptr);
@@ -1278,6 +1280,7 @@ PARROT_PURE_FUNCTION
 size_t
 PF_size_buf(ARGIN(const STRING *s))
 {
+    ASSERT_ARGS(PF_size_buf)
     if (STRING_IS_NULL(s))
         return 1;
     else
