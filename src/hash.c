@@ -29,7 +29,6 @@ C<< hash->buckets >> bucket store points to this region.
 
 /* the number of entries above which it's faster to hash the hashval instead of
  * looping over the used HashBuckets directly */
-#define SMALL_HASH_SIZE  4
 #define INITIAL_BUCKETS  8
 
 /* HEADERIZER HFILE: include/parrot/hash.h */
@@ -1290,20 +1289,6 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
 
     if (hash->entries <= 0)
         return NULL;
-
-    /* a very fast search for very small hashes */
-    if (hash->entries <= SMALL_HASH_SIZE) {
-        const UINTVAL  entries = hash->entries;
-        UINTVAL        i;
-
-        for (i = 0; i < entries; ++i) {
-            HashBucket * const bucket = hash->buckets + i;
-
-            /* the hash->compare cost is too high for this fast path */
-            if (bucket->key == key)
-                return bucket;
-        }
-    }
 
     /* if the fast search didn't work, try the normal hashing search */
     {
