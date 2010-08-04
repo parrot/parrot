@@ -66,20 +66,21 @@ return an invokable when the first event is raised.
     VTABLE opcode_t* invoke (void *next) {
         Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
         Parrot_Interp supervised;
-        Parrot_Context_info info;
-        PMC *task_hash, *task, *data, *recall;
-        PMC *instrument;
+        PMC *task_hash, *task, *data, *recall, *signature;
+        PMC *instrument, *invocant;
         STRING *event;
         opcode_t *ret;
 
-        GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
+        signature  = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
+        invocant   = Parrot_pcc_get_object(INTERP, signature);
+        supervised = INTERP;
         INTERP     = attr->interp;
         instrument = attr->instrument;
         event      = attr->event;
 
         data = Parrot_pmc_new(INTERP, enum_class_Hash);
-        VTABLE_set_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "call_sig"),
-                                 CURRENT_CONTEXT(supervised));
+        VTABLE_set_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "call_sig"), signature);
+        VTABLE_set_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "invocant"), invocant);
 
         (PMC *recall) = PCCINVOKE(INTERP, instrument, "raise_event", STRING *event, PMC *data);
         ret = VTABLE_invoke(supervised, attr->invokable, next);
@@ -186,7 +187,7 @@ Pass through the clone call to the invokable.
 
     VTABLE PMC* clone() {
         Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
-        return VTABLE_clone(INTERP, attr->invokable);
+        return SUPER();
     }
 
 /*
