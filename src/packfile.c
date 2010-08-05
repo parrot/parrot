@@ -731,7 +731,8 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
       case PBC_IMMEDIATE:
         /* run IMMEDIATE sub */
         if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
-            void *lo_var_ptr = interp->lo_var_ptr;
+            /* Chandon TODO: Remove irrelevent lo_var_ptr comments */
+            void *lo_var_ptr = interp->thread_table->threads[0].lo_var_ptr;
             PMC  *result;
 
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
@@ -740,7 +741,9 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             /* reset initial flag so MAIN detection works
              * and reset lo_var_ptr to prev */
             interp->resume_flag = RESUME_INITIAL;
-            interp->lo_var_ptr  = lo_var_ptr;
+
+            interp->thread_table->threads[0].lo_var_ptr = lo_var_ptr;
+
             return result;
         }
         break;

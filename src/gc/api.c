@@ -92,6 +92,7 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #define GC_C_SOURCE
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
+#include "parrot/threads.h"
 #include "gc_private.h"
 
 /* HEADERIZER HFILE: include/parrot/gc_api.h */
@@ -229,7 +230,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->lo_var_ptr                    = stacktop;
+    interp->thread_table->threads[0].lo_var_ptr = stacktop;
 
     /*Call appropriate initialization function for GC subsystem*/
     switch (interp->gc_sys->sys_type) {

@@ -25,6 +25,7 @@ This file implements the Parrot embedding interface.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
+#include "parrot/threads.h"
 
 #include "../compilers/imcc/imc.h"
 
@@ -114,7 +115,7 @@ void
 Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 {
     ASSERT_ARGS(Parrot_init_stacktop)
-    interp->lo_var_ptr = stack_top;
+    interp->thread_table->threads[0].lo_var_ptr = stack_top;
     init_world_once(interp);
 }
 
@@ -841,7 +842,13 @@ Parrot_debug(PARROT_INTERP, ARGIN(Parrot_Interp debugger), ARGIN(Parrot_Opcode *
     interp               = pdb->debugee;
     interp->pdb          = pdb;
     */
-    debugger->lo_var_ptr = interp->lo_var_ptr;
+
+    /* Chandon FIXME: What's this? How should it work? */
+    /* debugger->lo_var_ptr = interp->lo_var_ptr; */
+
+    fprintf(stderr, "Debugger is broken.\n");
+    exit(1);
+
 
     PDB_disassemble(interp, NULL);
 

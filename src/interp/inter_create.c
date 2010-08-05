@@ -26,6 +26,7 @@ Create or destroy a Parrot interpreter
 #include "pmc/pmc_callcontext.h"
 #include "../gc/gc_private.h"
 #include "inter_create.str"
+#include "parrot/threads.h"
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -123,8 +124,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* Get an empty interpreter from system memory */
     interp = mem_internal_allocate_zeroed_typed(Interp);
 
-    interp->lo_var_ptr = NULL;
-
     /* the last interpreter (w/o) parent has to cleanup globals
      * so remember parent if any */
     if (parent)
@@ -188,6 +187,9 @@ Parrot_Interp
 initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 {
     ASSERT_ARGS(initialize_interpreter)
+
+    /* Need threads table to init gc */
+    Parrot_threads_init(interp);
 
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, stacktop);
@@ -294,11 +296,8 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
      */
     interp->thread_data = NULL;
 
-    Parrot_cx_init_scheduler(interp);
-    interp->blocked_count = 0;
-    interp->thread_count  = 1;
     MUTEX_INIT(interp->interp_lock);
-    LOCK(interp->interp_lock);
+    Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
     /*

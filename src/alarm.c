@@ -58,6 +58,8 @@ posix_alarm_init(void)
 {
     ASSERT_ARGS(posix_alarm_init)
 
+    sigset_t mask;
+
     struct sigaction sa;
     sa.sa_handler = Parrot_alarm_callback;
     sa.sa_flags   = SA_RESTART;
@@ -66,6 +68,8 @@ posix_alarm_init(void)
         perror("sigaction failed in Parrot_timers_init");
         exit(EXIT_FAILURE);
     }
+
+    Parrot_alarm_unmask(NULL);
 
     alarm_init = 1;
 }
@@ -111,6 +115,37 @@ posix_alarm_set(FLOATVAL wait)
     }
 }
 
+/*
+
+=item C<void Parrot_alarm_mask(PARROT_INTERP)>
+
+=item C<void Parrot_alarm_unmask(PARROT_INTERP)>
+
+These block or unblock the signal for alarms. Any thread with signals
+unblocked should avoid waiting on a lock or condition variable.
+
+=cut
+
+*/
+
+
+void
+Parrot_alarm_mask(SHIM_INTERP)
+{
+    ASSERT_ARGS(Parrot_alarm_mask)
+    sigset_t mask;
+    sigaddset(&mask, SIGALRM);
+    pthread_sigmask(SIG_BLOCK, &mask, 0);
+}
+
+void
+Parrot_alarm_unmask(SHIM_INTERP)
+{
+    ASSERT_ARGS(Parrot_alarm_unmask)
+    sigset_t mask;
+    sigaddset(&mask, SIGALRM);
+    pthread_sigmask(SIG_UNBLOCK, &mask, 0);
+}
 
 /*
 

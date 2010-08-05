@@ -385,6 +385,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/thread.h \
+	$(INC_DIR)/threads.h \
 	$(INC_DIR)/scheduler.h \
 	$(INC_DIR)/longopt.h \
 	$(INC_DIR)/oo.h \
@@ -490,6 +491,7 @@ INTERP_O_FILES = \
     src/string/primitives$(O) \
     src/sub$(O) \
     src/thread$(O) \
+    src/threads$(O) \
     src/runcore/trace$(O) \
     src/utils$(O) \
     src/vtables$(O) \
@@ -1327,6 +1329,8 @@ src/thread$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/thread.c \
 	include/pmc/pmc_sub.h \
 	include/pmc/pmc_parrotinterpreter.h \
 	$(INC_DIR)/runcore_api.h
+
+src/threads$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/threads.c
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \

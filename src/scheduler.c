@@ -22,6 +22,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "parrot/runcore_api.h"
 #include "parrot/alarm.h"
 #include "parrot/scheduler.h"
+#include "parrot/threads.h"
 
 #include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_task.h"
@@ -105,6 +106,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     ASSERT_ARGS(Parrot_cx_begin_execution)
     PMC *scheduler = interp->scheduler;
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    INTVAL alarm_count, blocked_count;
     INTVAL task_count  = 1;
 
     PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
@@ -115,9 +117,22 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
     Parrot_cx_schedule_task(interp, main_task);
 
-    UNLOCK(interp->interp_lock);
+    Parrot_threads_spawn(interp);
 
-    Parrot_cx_outer_runloop(interp);
+    do {
+        Parrot_cx_check_alarms(interp, interp->scheduler);
+        Parrot_threads_wakeup(interp);
+
+        UNLOCK_INTERP(interp);
+        pause();
+        LOCK_INTERP(interp);
+
+        task_count    = VTABLE_get_integer(interp, sched->task_queue);
+        alarm_count   = VTABLE_get_integer(interp, sched->alarms);
+        blocked_count = Parrot_threads_count_blocked(interp);
+    } while (task_count + alarm_count + blocked_count > 0);
+
+    Parrot_threads_reap(interp);
 
     task_count = VTABLE_get_integer(interp, sched->all_tasks);
     if (task_count > 0)
@@ -127,7 +142,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
 /*
 
-=item C<void Parrot_cx_outer_runloop(PARROT_INTERP)>
+=item C<void Parrot_cx_outer_runloop(PARROT_INTERP, INTVAL tidx)>
 
 This is the core loop performed by each active OS thread, looking for Tasks
 to run and running them.
@@ -138,7 +153,7 @@ to run and running them.
 
 PARROT_EXPORT
 void
-Parrot_cx_outer_runloop(PARROT_INTERP)
+Parrot_cx_outer_runloop(PARROT_INTERP, INTVAL tidx)
 {
     ASSERT_ARGS(Parrot_cx_outer_runloop)
     PMC* scheduler = interp->scheduler;
@@ -146,39 +161,16 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     INTVAL task_count;
 
     for (;;) {
-        LOCK(interp->interp_lock);
+        LOCK_INTERP(interp);
+        interp->active_thread = tidx;
 
         task_count = VTABLE_get_integer(interp, sched->task_queue);
 
         if (task_count > 0) {
-            /* Yay! Do some work. */
             Parrot_cx_next_task(interp, scheduler);
         }
         else {
-            INTVAL alarm_count = VTABLE_get_integer(interp, sched->alarms);
-
-            if (alarm_count > 0) {
-                PMC     *alarm      = VTABLE_shift_pmc(interp, sched->alarms);
-                FLOATVAL alarm_time = VTABLE_get_number(interp, alarm);
-                FLOATVAL now_time   = Parrot_floatval_time();
-                FLOATVAL sleep_time = now_time - alarm_time;
-                VTABLE_unshift_pmc(interp, sched->alarms, alarm);
-
-                if (sleep_time > 0.0) {
-                    THREAD_BLOCK(interp);
-                    Parrot_floatval_sleep(sleep_time);
-                    THREAD_UNBLOCK(interp);
-                }
-
-                Parrot_cx_check_alarms(interp, interp->scheduler);
-            }
-            else {
-                /* All done */
-                /* Chandon TODO: Reap dead threads */
-                interp->thread_count -= 1;
-                UNLOCK(interp->interp_lock);
-                return;
-            }
+            Parrot_threads_idle(interp, tidx);
         }
 
         UNLOCK(interp->interp_lock);
@@ -187,28 +179,39 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 
 /*
 
-=item C<void* Parrot_cx_thread_main(void *interp_ptr)>
+=item C<void Parrot_cx_next_task(PARROT_INTERP, PMC *scheduler)>
 
-When an interpreter spawns a new worker thread, that thread starts
-here.
+Run the task at the head of the task queue until it ends or is
+pre-empted.
 
 =cut
 
 */
 
-PARROT_CAN_RETURN_NULL
-void*
-Parrot_cx_thread_main(ARGMOD(void *interp_ptr))
+void
+Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_thread_main)
-    Interp* interp = (Interp*) interp_ptr;
+    ASSERT_ARGS(Parrot_cx_next_task)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    INTVAL task_count;
 
-    LOCK(interp->interp_lock);
-    interp->thread_count += 1;
-    UNLOCK(interp->interp_lock);
+    task_count = VTABLE_get_integer(interp, sched->task_queue);
 
-    Parrot_cx_outer_runloop(interp);
-    return 0;
+    if (task_count > 0) {
+        FLOATVAL  time_now = Parrot_floatval_time();
+        opcode_t *dest;
+
+        interp->current_task = VTABLE_shift_pmc(interp, sched->task_queue);
+
+        if (!VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Found a non-Task in the task queue.\n");
+
+        interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
+        Parrot_alarm_set(interp->quantum_done);
+
+        Parrot_ext_call(interp, interp->current_task, "->");
+    }
 }
 
 /*
@@ -290,41 +293,6 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     if (time_now >= interp->quantum_done)
         SCHEDULER_resched_requested_SET(scheduler);
-}
-
-/*
-=item C<void Parrot_cx_next_task(PARROT_INTERP, PMC *scheduler)>
-
-Run the task at the head of the task queue until it ends or is
-pre-empted.
-
-=cut
-*/
-
-void
-Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
-{
-    ASSERT_ARGS(Parrot_cx_next_task)
-    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
-    INTVAL task_count;
-
-    task_count = VTABLE_get_integer(interp, sched->task_queue);
-
-    if (task_count > 0) {
-        FLOATVAL  time_now = Parrot_floatval_time();
-        opcode_t *dest;
-
-        interp->current_task = VTABLE_shift_pmc(interp, sched->task_queue);
-
-        if (!VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Found a non-Task in the task queue.\n");
-
-        interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
-        Parrot_alarm_set(interp->quantum_done);
-
-        Parrot_ext_call(interp, interp->current_task, "->");
-    }
 }
 
 /*
@@ -762,7 +730,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 
     adata->alarm_time = done_time;
     adata->alarm_task = task;
-    VTABLE_invoke(interp, alarm, 0);
+    (void) VTABLE_invoke(interp, alarm, 0);
 
     return (opcode_t*) 0;
 }

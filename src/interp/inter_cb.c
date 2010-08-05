@@ -267,8 +267,8 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
          */
         PMC *callback = Parrot_pmc_new(interp, enum_class_Callback);
         Parrot_Callback_attributes *cb_data = PARROT_CALLBACK(callback);
-        cb_data->user_data     = user_data;
-        cb_data->external_data = external_data;
+        cb_data->user_data     = (PMC*) user_data;
+        cb_data->external_data = (PMC*) external_data;
 
         Parrot_cx_schedule_immediate(interp, callback);
     }

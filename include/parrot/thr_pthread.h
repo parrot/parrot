@@ -50,6 +50,7 @@
         pthread_create(&(t), NULL, (func), (arg))
 
 #  define THREAD_SELF() pthread_self()
+#  define THREAD_EQUAL(t1, t2) pthread_equal((t1), (t2))
 
 #  define JOIN(t, ret) pthread_join((t), &(ret))
 #  define DETACH(t)    pthread_detach(t)

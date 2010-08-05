@@ -141,6 +141,7 @@ typedef struct warnings_t {
 struct _imc_info_t;
 
 
+struct Thread_table;    /* in threads.h */
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
@@ -223,9 +224,6 @@ struct parrot_interp_t {
 
     PMC * dynamic_env;                        /* Dynamic environment stack */
 
-    void *lo_var_ptr;                         /* Pointer to memory on runops
-                                               * system stack */
-
     Interp *parent_interpreter;
 
     /* per interpreter global vars */
@@ -272,9 +270,9 @@ struct parrot_interp_t {
     FLOATVAL         quantum_done;            /* expiration of current quantum */
     PMC             *current_task;            /* there's always one running task */
 
-    INTVAL           blocked_count;           /* Number of threads currently blocked */
-    INTVAL           thread_count;            /* Number of threads assigned to this interp */
     Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
+    INTVAL           active_thread;           /* Index of the active thread in thread_table */
+    struct Thread_table *thread_table;         /* Array of this interpreter's threads */
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

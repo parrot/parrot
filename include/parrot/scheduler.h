@@ -49,7 +49,7 @@ PMC * Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_cx_outer_runloop(PARROT_INTERP)
+void Parrot_cx_outer_runloop(PARROT_INTERP, INTVAL tidx)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -137,11 +137,6 @@ PMC* Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CAN_RETURN_NULL
-void* Parrot_cx_thread_main(ARGMOD(void *interp_ptr))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*interp_ptr);
-
 #define ASSERT_ARGS_Parrot_cx_begin_execution __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(main) \
@@ -201,8 +196,6 @@ void* Parrot_cx_thread_main(ARGMOD(void *interp_ptr))
 #define ASSERT_ARGS_Parrot_cx_stop_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(next))
-#define ASSERT_ARGS_Parrot_cx_thread_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_ptr))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/scheduler.c */
 
