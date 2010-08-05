@@ -573,10 +573,9 @@ Parrot_pmc_new_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
     PMC *const classobj = interp->vtables[base_type]->pmc_class;
 
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
-        PMC * const initial =
-          Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
-        VTABLE_set_integer_native(interp, initial, init);
-        return VTABLE_instantiate(interp, classobj, initial);
+        PMC * const obj = VTABLE_instantiate(interp, classobj, PMCNULL);
+        VTABLE_set_integer_native(interp, obj, init);
+        return obj;
     }
     else {
         PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
