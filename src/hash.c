@@ -1446,7 +1446,7 @@ parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
     HashBucket   **prev   = &hash->bucket_indices[hashval];
     if (*prev) {
         const hash_comp_fn compare = hash->compare;
-        for ( ; *prev; prev = &(*prev)->next) {
+        for (; *prev; prev = &(*prev)->next) {
             HashBucket *current = *prev;
             if ((compare)(interp, key, current->key) == 0) {
                 *prev = current->next;
