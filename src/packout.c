@@ -361,9 +361,9 @@ PackFile_Constant_pack(PARROT_INTERP,
         break;
 
       case PFC_PMC:
-        key = self->u.key;      /* the (Sub) PMC */
-        image = Parrot_freeze_pbc(interp, key, const_table);
-        cursor = PF_store_string(cursor, image);
+        key    = self->u.key;      /* the (Sub) PMC */
+        image  = Parrot_freeze_pbc(interp, key, const_table);
+        cursor = PF_store_buf(cursor, image);
         break;
 
       case PFC_KEY:

@@ -58,8 +58,6 @@ posix_alarm_init(void)
 {
     ASSERT_ARGS(posix_alarm_init)
 
-    sigset_t mask;
-
     struct sigaction sa;
     sa.sa_handler = Parrot_alarm_callback;
     sa.sa_flags   = SA_RESTART;

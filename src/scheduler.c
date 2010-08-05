@@ -151,7 +151,6 @@ to run and running them.
 
 */
 
-PARROT_EXPORT
 void
 Parrot_cx_outer_runloop(PARROT_INTERP, INTVAL tidx)
 {
@@ -303,6 +302,7 @@ Stop the current task and pack it up into a PMC what can be used to resume later
 =cut
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
@@ -379,7 +379,6 @@ Schedule an event to terminate the scheduler runloop.
 
 */
 
-PARROT_EXPORT
 void
 Parrot_cx_runloop_end(PARROT_INTERP)
 {
@@ -633,7 +632,6 @@ Schedule an alarm.
 
 */
 
-PARROT_EXPORT
 void
 Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
 {

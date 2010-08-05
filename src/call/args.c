@@ -758,7 +758,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
     GETATTR_FixedIntegerArray_size(interp, raw_sig, param_count);
 
-
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
         if (param_count > 0 && err_check)
@@ -818,6 +817,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
          * arguments into an array.*/
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
             PMC *collect_positional;
+            int  j;
 
             /* Can't handle named slurpy here, go to named argument handling */
             if (param_flags & PARROT_ARG_NAME)
@@ -828,11 +828,12 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     EXCEPTION_INVALID_OPERATION,
                     "named parameters must follow all positional parameters");
 
-            collect_positional = Parrot_pmc_new(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
+            collect_positional = Parrot_pmc_new_init_int(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
+                positional_args - arg_index);
 
-            for (; arg_index < positional_args; ++arg_index) {
-                VTABLE_push_pmc(interp, collect_positional,
+            for (j = 0; arg_index < positional_args; ++arg_index) {
+                VTABLE_set_pmc_keyed_int(interp, collect_positional, j++,
                     VTABLE_get_pmc_keyed_int(interp, call_object, arg_index));
             }
 

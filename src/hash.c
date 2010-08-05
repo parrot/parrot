@@ -29,8 +29,7 @@ C<< hash->buckets >> bucket store points to this region.
 
 /* the number of entries above which it's faster to hash the hashval instead of
  * looping over the used HashBuckets directly */
-#define SMALL_HASH_SIZE  4
-#define INITIAL_BUCKETS  4
+#define INITIAL_BUCKETS  8
 
 /* HEADERIZER HFILE: include/parrot/hash.h */
 
@@ -1291,31 +1290,18 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
     if (hash->entries <= 0)
         return NULL;
 
-    /* a very fast search for very small hashes */
-    if (hash->entries <= SMALL_HASH_SIZE) {
-        const UINTVAL  entries = hash->entries;
-        UINTVAL        i;
-
-        for (i = 0; i < entries; ++i) {
-            HashBucket * const bucket = hash->buckets + i;
-
-            /* the hash->compare cost is too high for this fast path */
-            if (bucket->key == key)
-                return bucket;
-        }
-    }
-
     /* if the fast search didn't work, try the normal hashing search */
     {
         const UINTVAL hashval = get_hash_val(interp, hash, key);
         HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
+        const hash_comp_fn compare = hash->compare;
 
         while (bucket) {
             /* key equality is always a match, so it's worth checking */
             if (bucket->key == key
 
             /* ... but the slower comparison is more accurate */
-            || ((hash->compare)(interp, key, bucket->key) == 0))
+            || ((compare)(interp, key, bucket->key) == 0))
                 return bucket;
             bucket = bucket->next;
         }
@@ -1390,6 +1376,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     ASSERT_ARGS(parrot_hash_put)
     const UINTVAL hashval = get_hash_val(interp, hash, key);
     HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
+    const hash_comp_fn compare = hash->compare;
 
     /* When the hash is constant, check that the key and value are also
      * constant. */
@@ -1409,7 +1396,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     /* See if we have an existing value for this key */
     while (bucket) {
         /* store hash_val or not */
-        if ((hash->compare)(interp, key, bucket->key) == 0)
+        if ((compare)(interp, key, bucket->key) == 0)
             break;
         bucket = bucket->next;
     }
@@ -1455,27 +1442,21 @@ void
 parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
     ASSERT_ARGS(parrot_hash_delete)
-    HashBucket   *bucket;
-    HashBucket   *prev    = NULL;
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed) & hash->mask;
-
-    for (bucket = hash->bucket_indices[hashval]; bucket; bucket = bucket->next) {
-        if ((hash->compare)(interp, key, bucket->key) == 0) {
-
-            if (prev)
-                prev->next = bucket->next;
-            else
-                hash->bucket_indices[hashval] = bucket->next;
-
-            --hash->entries;
-            bucket->next    = hash->free_list;
-            bucket->key     = NULL;
-            hash->free_list = bucket;
-
-            return;
+    HashBucket   **prev   = &hash->bucket_indices[hashval];
+    if (*prev) {
+        const hash_comp_fn compare = hash->compare;
+        for (; *prev; prev = &(*prev)->next) {
+            HashBucket *current = *prev;
+            if ((compare)(interp, key, current->key) == 0) {
+                *prev = current->next;
+                --hash->entries;
+                current->next    = hash->free_list;
+                current->key     = NULL;
+                hash->free_list = current;
+                return;
+            }
         }
-
-        prev = bucket;
     }
 }
 

@@ -253,7 +253,12 @@ trace_system_stack(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
     int i, cur_idx;
 
     /* We need to trace the stack in one running thread (this thread) as
-       well as the stack in each blocked thread. */
+       well as the stack in each blocked thread. 
+
+       If a thread isn't running or in the "blocked" state, then it's waiting 
+       on something outside of any runloop, so it doesn't have any PMCs on its
+       stack.
+    */
     cur_idx = Parrot_threads_current(interp);
 
     for (i = 0; i < tbl->count; ++i) {
