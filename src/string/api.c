@@ -436,11 +436,11 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     /* If B isn't real, we just bail */
     const UINTVAL b_len = b ? Parrot_str_length(interp, b) : 0;
     if (!b_len)
-        return STRING_IS_NULL(a) ? STRINGNULL : Parrot_str_copy(interp, a);
+        return STRING_IS_NULL(a) ? STRINGNULL : Parrot_str_clone(interp, a);
 
     /* Is A real? */
     if (STRING_IS_NULL(a) || Buffer_bufstart(a) == NULL)
-        return Parrot_str_copy(interp, b);
+        return Parrot_str_clone(interp, b);
 
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
@@ -1251,46 +1251,20 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
 {
     ASSERT_ARGS(Parrot_str_chopn)
 
-    STRING * const chopped = Parrot_str_copy(interp, s);
-    UINTVAL new_length, uchar_size;
-
     if (n < 0) {
-        new_length = -n;
-        if (new_length > chopped->strlen)
-            return chopped;
-    }
-    else {
-        if (chopped->strlen > (UINTVAL)n)
-            new_length = chopped->strlen - n;
+        if (-n > s->strlen)
+            return Parrot_str_clone(interp, s);
         else
-            new_length = 0;
-    }
-
-    chopped->hashval = 0;
-
-    if (!new_length || !chopped->strlen) {
-        chopped->bufused = chopped->strlen = 0;
-        return chopped;
-    }
-
-    uchar_size      = chopped->bufused / chopped->strlen;
-    chopped->strlen = new_length;
-
-    if (chopped->encoding == Parrot_fixed_8_encoding_ptr) {
-        chopped->bufused = new_length;
-    }
-    else if (chopped->encoding == Parrot_ucs2_encoding_ptr) {
-        chopped->bufused = new_length * uchar_size;
+            return ENCODING_GET_CODEPOINTS(interp, s, -n, s->strlen + n);
     }
     else {
-        String_iter iter;
+        const INTVAL new_length = s->strlen - n;
 
-        ENCODING_ITER_INIT(interp, s, &iter);
-        iter.set_position(interp, &iter, new_length);
-        chopped->bufused = iter.bytepos;
+        if ( new_length < 0)
+            return STRINGNULL;
+
+        return ENCODING_GET_CODEPOINTS(interp, s, 0, new_length);
     }
-
-    return chopped;
 }
 
 
