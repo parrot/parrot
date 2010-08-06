@@ -11,11 +11,11 @@
 
 typedef enum {
     enum_hash_undef,
-    enum_hash_int = enum_type_INTVAL,
-    enum_hash_num = enum_type_FLOATVAL,
+    enum_hash_int    = enum_type_INTVAL,
+    enum_hash_num    = enum_type_FLOATVAL,
     enum_hash_string = enum_type_STRING,
-    enum_hash_pmc = enum_type_PMC,
-    enum_hash_ptr = enum_type_ptr
+    enum_hash_pmc    = enum_type_PMC,
+    enum_hash_ptr    = enum_type_ptr
 } HashEntryType;
 
 
@@ -23,7 +23,7 @@ typedef enum {
 typedef UINTVAL BucketIndex;
 #define INITBucketIndex ((BucketIndex)-2)
 
-#define N_BUCKETS(n) ((n) - (n)/4)
+#define N_BUCKETS(n) ((n))
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
                                      (n) * sizeof (HashBucket *))
 
@@ -373,6 +373,19 @@ Hash * parrot_create_hash(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash * parrot_create_hash_sized(PARROT_INTERP,
+    PARROT_DATA_TYPE val_type,
+    Hash_key_type hkey_type,
+    NOTNULL(hash_comp_fn compare),
+    NOTNULL(hash_hash_key_fn keyhash),
+    UINTVAL size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
 void parrot_hash_clone_prunable(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGOUT(Hash *dest),
@@ -519,6 +532,10 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(func))
 #define ASSERT_ARGS_parrot_create_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(compare) \
+    , PARROT_ASSERT_ARG(keyhash))
+#define ASSERT_ARGS_parrot_create_hash_sized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compare) \
     , PARROT_ASSERT_ARG(keyhash))
