@@ -678,8 +678,6 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
-
-    STRING * const return_string = Parrot_str_copy(interp, src);
     String_iter    iter;
     UINTVAL        start;
 
@@ -689,16 +687,12 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
         iter.set_position(interp, &iter, offset);
 
     start                   = iter.bytepos;
-    return_string->strstart = (char *)return_string->strstart + start;
 
     if (count)
         iter.set_position(interp, &iter, offset + count);
 
-    return_string->bufused  = iter.bytepos - start;
-    return_string->strlen   = count;
-    return_string->hashval  = 0;
-
-    return return_string;
+    return Parrot_str_new_init(interp, src->strstart + start, iter.bytepos - start, 
+        src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
 /*
@@ -717,15 +711,8 @@ static STRING *
 get_bytes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    STRING * const return_string = Parrot_str_copy(interp, src);
-
-    return_string->strstart = (char *)return_string->strstart + offset ;
-    return_string->bufused = count;
-
-    return_string->strlen = count;
-    return_string->hashval = 0;
-
-    return return_string;
+    return Parrot_str_new_init(interp, src->strstart + offset, count,
+        src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
 

@@ -313,27 +313,15 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
-    STRING * const return_string = Parrot_str_copy(interp, src);
-
 #if PARROT_HAS_ICU
-    return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
-    return_string->bufused = count * sizeof (UChar);
+    return Parrot_str_new_init(interp, src->strstart + offset * sizeof (UChar),
+        count * sizeof (UChar), src->encoding, src->charset, PObj_get_FLAGS(src));
 #else
-    {
-        String_iter iter;
-        UINTVAL start;
-
-        iter_init(interp, src, &iter);
-        iter.set_position(interp, &iter, offset);
-        start = iter.bytepos;
-        return_string->strstart = (char *)return_string->strstart + start;
-        iter.set_position(interp, &iter, offset + count);
-        return_string->bufused = iter.bytepos - start;
-    }
+    UNUSED(src);
+    UNUSED(offset);
+    UNUSED(count);
+    no_ICU_lib(interp);
 #endif
-    return_string->strlen = count;
-    return_string->hashval = 0;
-    return return_string;
 }
 
 /*

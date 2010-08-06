@@ -320,18 +320,9 @@ static STRING *
 get_bytes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    STRING * const return_string = Parrot_str_copy(interp, src);
 
-    return_string->encoding = src->encoding;
-    return_string->charset = src->charset;
-
-    return_string->strstart = (char *)return_string->strstart + offset ;
-    return_string->bufused = count;
-
-    return_string->strlen = count;
-    return_string->hashval = 0;
-
-    return return_string;
+    return Parrot_str_new_init(interp, src->strstart + offset, count,
+        src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
 
@@ -527,4 +518,3 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
  * End:
  * vim: expandtab shiftwidth=4:
  */
-

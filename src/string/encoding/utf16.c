@@ -379,17 +379,14 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
     ASSERT_ARGS(get_codepoints)
     String_iter iter;
     UINTVAL start;
-    STRING * const return_string = Parrot_str_copy(interp, src);
 
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
     start = iter.bytepos;
-    return_string->strstart = (char *)return_string->strstart + start ;
     iter.set_position(interp, &iter, offset + count);
-    return_string->bufused = iter.bytepos - start;
-    return_string->strlen = count;
-    return_string->hashval = 0;
-    return return_string;
+
+    return Parrot_str_new_init(interp, src->strstart + start, iter.bytepos - start,
+        src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
 
