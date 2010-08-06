@@ -373,19 +373,6 @@ Hash * parrot_create_hash(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
-Hash * parrot_create_hash_sized(PARROT_INTERP,
-    PARROT_DATA_TYPE val_type,
-    Hash_key_type hkey_type,
-    NOTNULL(hash_comp_fn compare),
-    NOTNULL(hash_hash_key_fn keyhash),
-    UINTVAL size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
 void parrot_hash_clone_prunable(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGOUT(Hash *dest),
@@ -532,10 +519,6 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(func))
 #define ASSERT_ARGS_parrot_create_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(compare) \
-    , PARROT_ASSERT_ARG(keyhash))
-#define ASSERT_ARGS_parrot_create_hash_sized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compare) \
     , PARROT_ASSERT_ARG(keyhash))
