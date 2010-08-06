@@ -383,25 +383,7 @@ STRING *
 Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
-    STRING *d;
-    const int is_movable = PObj_is_movable_TESTALL(s);
-
-    /* We set COW flag to avoid cloning buffer in compact_pool */
-
-    d = Parrot_gc_new_string_header(interp,
-        PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
-    STRUCT_COPY(d, s);
-
-    /* Now check that buffer allocated from pool and affected by compacting */
-    if (is_movable && Buffer_bufstart(s)) {
-        /* If so, mark it as shared */
-        INTVAL * const buffer_flags = Buffer_bufrefcountptr(d);
-        *buffer_flags |= Buffer_shared_FLAG;
-    }
-
-    PARROT_ASSERT(is_movable == PObj_is_movable_TESTALL(d));
-
-    return d;
+    return Parrot_str_clone(interp, s);
 }
 
 
