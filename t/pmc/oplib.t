@@ -26,7 +26,7 @@ t/pmc/oplib.t - OpLib PMC
 
 .sub main :main
     .include 'test_more.pir'
-    plan(12)
+    plan(13)
     new_oplib()
     check_elements()
     getint_end()
@@ -102,8 +102,11 @@ t/pmc/oplib.t - OpLib PMC
     ok($I0, "got same result from both ways")
 
     $I1 = op
-    $I0 = oplib['end']
+    $I0 = oplib[TESTED_OP]
     is($I0, $I1, 'opcode number from Opcode and from OpLib is the same')
+
+    $S0 = op
+    is($S0, TESTED_OP, 'name from Opcode matches name searched for')
 .end
 
 .sub family_end

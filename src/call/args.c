@@ -828,9 +828,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     EXCEPTION_INVALID_OPERATION,
                     "named parameters must follow all positional parameters");
 
-            collect_positional = Parrot_pmc_new(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
-            VTABLE_set_integer_native(interp, collect_positional,
+            collect_positional = Parrot_pmc_new_init_int(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
                 positional_args - arg_index);
 
             for (j = 0; arg_index < positional_args; ++arg_index) {

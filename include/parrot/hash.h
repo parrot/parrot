@@ -11,11 +11,11 @@
 
 typedef enum {
     enum_hash_undef,
-    enum_hash_int = enum_type_INTVAL,
-    enum_hash_num = enum_type_FLOATVAL,
+    enum_hash_int    = enum_type_INTVAL,
+    enum_hash_num    = enum_type_FLOATVAL,
     enum_hash_string = enum_type_STRING,
-    enum_hash_pmc = enum_type_PMC,
-    enum_hash_ptr = enum_type_ptr
+    enum_hash_pmc    = enum_type_PMC,
+    enum_hash_ptr    = enum_type_ptr
 } HashEntryType;
 
 
@@ -23,7 +23,7 @@ typedef enum {
 typedef UINTVAL BucketIndex;
 #define INITBucketIndex ((BucketIndex)-2)
 
-#define N_BUCKETS(n) ((n) - (n)/4)
+#define N_BUCKETS(n) ((n))
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
                                      (n) * sizeof (HashBucket *))
 
