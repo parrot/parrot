@@ -11,16 +11,13 @@ runtime/parrot/library/Instrument/Event.nqp - Abstract class for the Instruments
 =head1 SYNOPSIS
 
     Abstract class for the Instruments library.
-    Provides event specific methods.
+    Provides the interface generally used by Instrument::Event::*
 
 =cut
 
 =end
 
 class Instrument::Event is Instrument::Base {
-    has $!initialiser;
-    has $!event_type;
-    has $!probe_obj;
 
 =begin
 
@@ -61,61 +58,32 @@ Registers callbacks with the EventDispatcher Object in the Instrument dynpmc.
 =end
 
     method _on_attach () {
-        if pir::defined__IP($!probe_obj) {
-            $!instr_obj.attach($!probe_obj);
-        }
-
-        if pir::defined__IP($!callback) {
-            $!instr_obj.register_eventhandler($!event_type, self);
-        }
+        self.enable();
     };
 
 =begin
 =item enable()
 
 Make the event hooks active.
+Does nothing. Overridden in children.
 
 =cut
 =end
 
     method enable () {
-        if pir::defined__IP($!probe_obj) {
-            $!probe_obj.enable();
-        }
     };
 
 =begin
 =item disable()
 
 Remove the event hooks.
+Does nothing. Overridden in children.
 
 =cut
 =end
 
     method disable () {
-        if pir::defined__IP($!probe_obj) {
-            $!probe_obj.disable();
-        }
     };
-
-=begin
-=item _raise_event($event, $data)
-
-Helper sub that creates a Task instance and schedules it.
-
-=cut
-=end
-
-    sub _raise_event ($evt, $data) {
-        my %hash := {};
-        %hash<type>    := 'event';
-        %hash<subtype> := $evt;
-        %hash<data>    := $data;
-
-        my $task := pir::new__PSP('Task', %hash);
-
-        pir::schedule($task);
-    }
 };
 
 # vim: ft=perl6 expandtab shiftwidth=4:

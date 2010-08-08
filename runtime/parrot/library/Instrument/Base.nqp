@@ -17,6 +17,7 @@ runtime/parrot/library/Instrument/Base.nqp - Abstract class for the Instruments 
 =end
 
 class Instrument::Base {
+    has $!hook_obj;
     has $!instr_obj;
     has $!identifier;
     has $!is_enabled;
@@ -161,6 +162,13 @@ Stub method. To be implemented by child classes.
     method disable () {
         die("Method disable is unimplemented for abstract class Instrument::Base.");
     };
+
+    method refresh () {
+        if +$!is_enabled {
+            self.disable();
+            self.enable();
+        }
+    }
 
     # Helper sub: returns the Sub PMC object of a given sub name.
     sub get_sub_obj ($sub) {

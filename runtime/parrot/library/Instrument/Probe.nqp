@@ -35,7 +35,6 @@ runtime/parrot/library/Instrument/Probe.nqp - Helper class to automate inserting
 
 class Instrument::Probe is Instrument::Base {
     has $!is_catchall;
-    has $!rc_obj;
     has @!oplist;
     has @!op_todo_list;
 
@@ -158,11 +157,11 @@ eg,
         if !$!is_enabled {
             if $!is_catchall {
                 # Attach a catchall hook.
-                $!rc_obj.insert_op_catchall(self);
+                $!hook_obj.insert_op_catchall(self);
             } else {
                 # Attach a hook to each op in @!oplist.
                 for @!oplist {
-                    $!rc_obj.insert_op_hook(self, $_);
+                    $!hook_obj.insert_op_hook(self, $_);
                 }
             }
 
@@ -192,11 +191,11 @@ You can dynamically attach and remove hooks dynamically.
         if $!is_enabled {
             if $!is_catchall {
                 # Attach a catchall hook.
-                $!rc_obj.remove_op_catchall(self);
+                $!hook_obj.remove_op_catchall(self);
             } else {
                 # Attach a hook to each op in @!oplist.
                 for @!oplist {
-                    $!rc_obj.remove_op_hook(self, $_);
+                    $!hook_obj.remove_op_hook(self, $_);
                 }
             }
 
