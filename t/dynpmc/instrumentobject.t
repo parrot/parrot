@@ -27,7 +27,7 @@ any instrumentation on this object will only affect this object.
     # Load the Instrument library.
     load_bytecode 'Instrument/InstrumentLib.pbc'
 
-    plan(6)
+    plan(8)
 
     setup()
     test_notification()
@@ -42,20 +42,33 @@ any instrumentation on this object will only affect this object.
     .local string program
     program = <<'PROG'
 .sub main :main
-    $P0 = new ['TestClass'] # To instrument.
-    $P1 = new ['TestClass'] # Control, not instrumented
-    $P0.'test'()
-    $P1.'test'()
+    $P0 = new ['TestClass']  # To instrument.
+    $P1 = new ['TestClass']  # Control, not instrumented.
+    $P2 = new ['TestClass2'] # Test inheritance.
+
+    $P0.'test'(10)
+    $P1.'test'(20)
+    $P2.'test'(30)
+
+    $P0 = 100
+    $P1 = 200
+    $P2 = 300
 .end
 
 .namespace ['TestClass']
 .sub '' :anon :init :load
-    $P0 = newclass ['TestClass']
+    $P0 = subclass ['Integer'], ['TestClass']
 .end
 
 # Test methods.
 .sub test :method
+    .param int foo
     # Do nothing.
+.end
+
+.namespace ['TestClass2']
+.sub '' :anon :init :load
+    $P0 = subclass ['TestClass'], ['TestClass2']
 .end
 
 PROG
@@ -81,6 +94,8 @@ PROG
     # 1. Event is raised.
     # 2. The event is of type Object::address::method::Method_Name
     # 3. The class event still fires.
+    # 4. When a subclass's instance invokes parent's method, it also fires.
+    # 5. Vtable instrumentation on the object only applies to the object itself.
     $P0 = new ['Instrument']
     $P2 = $P0.'instrument_op'()
 
@@ -88,10 +103,7 @@ PROG
     $P2.'callback'('test_notification_probe_cb')
     $P0.'attach'($P2)
 
-    $P4 = get_hll_global ['Instrument';'Event'], 'Class'
-    $P5 = $P4.'new'()
-
-    $P5.'inspect_class'('TestClass')
+    $P5 = $P0.'instrument_class'('TestClass')
     $P5.'inspect_method'('test')
     $P5.'callback'('test_notification_class_cb')
     $P0.'attach'($P5)
@@ -103,8 +115,10 @@ PROG
     # Prepare the globals.
     $P6 = new ['Hash']
     set_global '%notification', $P6
-    $P7 = box 0
-    set_global '$class_event', $P7
+    $P7 = new ['Hash']
+    set_global '%class_event', $P7
+    $P8 = box 0
+    set_global '$object_vtable', $P8
 
     $P0.'run'($S0, $P3)
 
@@ -118,7 +132,7 @@ PROG
 
     # Test line.
     $I0 = $P9['line']
-    is($I0, 4, 'Event: Line ok.')
+    is($I0, 6, 'Event: Line ok.')
 
     # Test file.
     $S0 = $P9['file']
@@ -141,14 +155,30 @@ PROG
     is($S0, $S1, 'Event: Event ok')
 
     # Check that the class event still fires.
-    $P12 = get_global '$class_event'
-    $I0  = $P12
-    is($I0, 1, 'Event: Class event still fires.')
+    $P12 = get_global '%class_event'
+    $I0  = $P12['TestClass']
+    is($I0, 2, 'Event: Class method event for TestClass fires as expected.')
+    $I0  = $P12['TestClass2']
+    is($I0, 1, 'Event: Class method event for TestClass2 fires as expected.')
+
+    # Check that the vtable event is only called once.
+    $P12 = get_global '$object_vtable'
+    $I0 = $P12
+    is($I0, 1, 'Event: Vtable event for object fires as expected.')
 .end
 
 .sub test_notification_class_cb
-    $P0 = get_global '$class_event'
-    $P0 = 1
+    .param pmc data
+    .param pmc instr
+    .param pmc probe
+
+    $P1 = data['invocant']
+    $S0 = typeof $P1
+
+    $P0 = get_global '%class_event'
+    $I0 = $P0[$S0]
+    inc $I0
+    $P0[$S0] = $I0
 .end
 
 .sub test_notification_probe_cb
@@ -189,6 +219,11 @@ PROG
     $P1.'callback'('test_notification_cb')
     instr.'attach'($P1)
 
+    $P2 = instr.'instrument_object'($P0)
+    $P2.'inspect_vtable'('set_integer_native')
+    $P2.'callback'('test_vtable_notification_cb')
+    instr.'attach'($P2)
+
     # Build up the event string.
     $P2 = new ['ResizableStringArray']
     $S0 = $P1.'get_address'()
@@ -224,74 +259,9 @@ PROG
     $P0['sub']    = $S0
 .end
 
-
-## Helper: Find an item in the list.
-.sub find_in_list
-    .param pmc list
-    .param pmc item
-
-    $I0 = list
-
-    TOP:
-        dec $I0
-        unless $I0 >= 0 goto END
-
-        $P0 = list[$I0]
-        if $P0 == item goto FOUND
-
-        goto TOP
-    END:
-
-    # Not found.
-    .return(0)
-
-    FOUND:
-    .return(1)
-.end
-
-# Helper sub: Check if 2 sets with unique items are the same.
-.sub is_same_set
-    .param pmc arr1
-    .param pmc arr2
-    .local pmc hash
-
-    $I0 = arr1
-    $I1 = arr2
-    if $I0 != $I1 goto NO
-
-    hash = new ['Hash']
-
-    # Build the comparison hash
-    $I3 = 0
-    INSERT_LOOP:
-      if $I3 >= $I0 goto END_INSERT_LOOP
-
-      $S0       = arr1[$I3]
-      hash[$S0] = 1
-
-      inc $I3
-      goto INSERT_LOOP
-    END_INSERT_LOOP:
-
-    # Check the contents of arr2
-    $I3 = 0
-    CHECK_LOOP:
-      if $I3 >= $I0 goto END_CHECK_LOOP
-
-      $S0 = arr2[$I3]
-      $I4 = exists hash[$S0]
-
-      if $I4 == 0 goto NO
-
-      inc $I3
-      goto CHECK_LOOP
-    END_CHECK_LOOP:
-
-    YES:
-      .return(1)
-
-    NO:
-      .return(0)
+.sub test_vtable_notification_cb
+    $P0 = get_global '$object_vtable'
+    inc $P0
 .end
 
 # Local Variables:

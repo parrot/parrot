@@ -25,11 +25,13 @@ Q:PIR {
 my @args := pir::getinterp__p()[2];
 @args.shift();
 
-my $probe := Instrument::Probe.new();
+my $instr := pir::new__PS('Instrument');
+
+my $probe := $instr.instrument_op();
 $probe.catchall(1);
 $probe.callback('tracer');
 
-my $instr := pir::new__PS('Instrument');
+
 $instr.attach($probe);
 $instr.run(@args[0], @args);
 

@@ -318,15 +318,14 @@ PROG
 .end
 
 .sub test_sample_notification
-    .local pmc instr, gc_event, args, gc_class
+    .local pmc instr, gc_event, args
 
     $S0  = 't/dynpmc/instrumentgc-test1.pir'
     args = new ['ResizableStringArray']
     push args, $S0
 
-    gc_class = get_hll_global ['Instrument';'Event'], 'GC'
-    gc_event = gc_class.'new'()
     instr    = new ['Instrument']
+    gc_event = instr.'instrument_gc'()
 
     # Set up the globals.
     $P0 = new ['Hash']

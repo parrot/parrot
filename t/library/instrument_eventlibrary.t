@@ -30,7 +30,7 @@ Class::* is not complete. Holding off until InstrumentPMC is done.
     # Load the Instrument library.
     load_bytecode 'Instrument/InstrumentLib.pbc'
 
-    plan(9)
+    plan(10)
 
     test_loadlib()
     test_gc()
@@ -39,7 +39,7 @@ Class::* is not complete. Holding off until InstrumentPMC is done.
 .end
 
 .sub test_loadlib
-    .local pmc fh, os, event, instr, args
+    .local pmc fh, os, event, instr, args, spec
     .local string program1, program2
 
     # Dynlib loading has 4 scenarios.
@@ -79,6 +79,8 @@ PROG2
     # Run the test.
     $P0 = new ['Hash']
     set_global '%test_loadlib_res', $P0
+    $P0 = new ['String']
+    set_global '$test_loadlib_specific', $P0
     args = new ['ResizableStringArray']
     push args, 't/library/instrument_eventlibrary-loadlib-2.pir'
 
@@ -86,8 +88,13 @@ PROG2
     event = $P1.'new'()
     event.'callback'('test_loadlib_callback')
 
+    spec = $P1.'new'()
+    spec.'inspect'('file')
+    spec.'callback'('test_loadlib_specific_cb')
+
     instr = new ['Instrument']
     instr.'attach'(event)
+    instr.'attach'(spec)
     instr.'run'('t/library/instrument_eventlibrary-loadlib-1.pir', args)
 
     # Check the result.
@@ -104,6 +111,10 @@ PROG2
     $I0 = $P0['file']
     is($I0, 1, 'Loadlib: Scenario 4 ok.')
 
+    $P0 = get_global '$test_loadlib_specific'
+    $S0 = $P0
+    is($S0, 'file', 'Loadlib: Specific library ok.')
+
     # Cleanup.
     os = new ['OS']
     os.'rm'('t/library/instrument_eventlibrary-loadlib-1.pir')
@@ -119,6 +130,16 @@ PROG2
     $P0 = get_global '%test_loadlib_res'
     $S0 = data['library']
     $P0[$S0] = 1
+.end
+
+.sub test_loadlib_specific_cb
+    .param pmc data
+    .param pmc instr
+    .param pmc probe
+
+    $P0 = get_global '$test_loadlib_specific'
+    $P0 = data['library']
+    set_global '$test_loadlib_specific', $P0
 .end
 
 .sub test_gc
@@ -162,20 +183,19 @@ PROG1
     instr = new ['Instrument']
 
     # Scenario 1.
-    $P1 = get_hll_global ['Instrument';'Event'], 'GC'
-    $P2 = $P1.'new'()
+    $P2 = instr.'instrument_gc'()
     $P2.'callback'('test_gc_scenario_1')
     $P2.'inspect'('do_gc_mark')
     instr.'attach'($P2)
 
     # Scenario 2.
-    $P3 = $P1.'new'()
+    $P3 = instr.'instrument_gc'()
     $P3.'callback'('test_gc_scenario_2')
     $P3.'inspect'('allocate')
     instr.'attach'($P3)
 
     # Scenario 3.
-    $P4 = $P1.'new'()
+    $P4 = instr.'instrument_gc'()
     $P4.'callback'('test_gc_scenario_3')
     $P4.'inspect'('free')
     instr.'attach'($P4)

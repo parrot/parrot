@@ -27,12 +27,17 @@ testing method-related methods of InstrumentClass.
     # Load the Instrument library.
     load_bytecode 'Instrument/InstrumentLib.pbc'
 
-    plan(13)
+    plan(39)
 
     setup()
+    test_creation()
+    test_attaching()
     test_insertion()
     test_removal()
-    test_notification()
+    test_notification_vtable()
+    test_insertion()
+    test_removal()
+    test_notification_methods()
     cleanup()
 
     .return()
@@ -46,11 +51,17 @@ testing method-related methods of InstrumentClass.
 .sub main :main
     $P0 = new ['TestClass']
     $P0.'test'()
+    $I0 = isa $P0, 'TestClass'
 .end
 
 .namespace ['TestClass']
 .sub '' :anon :init :load
     $P0 = newclass ['TestClass']
+.end
+
+# Test override.
+.sub init :vtable :method
+    # Do nothing.
 .end
 
 # Test methods.
@@ -75,6 +86,170 @@ PROG
     os.'rm'('t/dynpmc/instrumentclass-test1.pir')
 .end
 
+.sub test_creation
+    # InstrumentClass is supposed to be instantiated with
+    # an Instrument instance.
+    # Check:
+    # 1. init throws an exception.
+    # 2. init_pmc initialises without any exception.
+    $P0 = new ['Instrument']
+
+    ## Scenario 1: Call init.
+
+    # Set up exception handler.
+    $P1 = new ['ExceptionHandler']
+    set_addr $P1, INIT_OK
+    push_eh $P1
+
+    $P2 = new ['InstrumentClass']
+
+    ok(0, 'Creation: Init did not throw exception.')
+
+    goto INIT_END
+
+    INIT_OK:
+      ok(1, 'Creation: Init threw exception.')
+    INIT_END:
+
+    ## Scenario 2: Call init_pmc.
+    $P3 = new ['InstrumentClass'], $P0
+    $I0 = isa $P3, 'InstrumentClass'
+    is($I0, 1, 'Creation: init_pmc successful.')
+.end
+
+.sub test_attaching
+    # Test attaching an InstrumentClass instance to a class.
+    # Check:
+    # 1. Attaching to an exisiting class is fine.
+    $P0 = new ['Instrument']
+
+    ## Scenario 1: Attach to an existing class (Sub)
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    ok(1, 'Attach: Existing class ok.')
+.end
+
+.sub test_insertion
+    # Test inserting a hook into the vtables of a class.
+    # Check:
+    # 1. Insert 1 hook and check that there is 1 hook in the hook list.
+    # 2. Insert 1 hook twice and check that there is only 1 entry in the hook list.
+    # 3. Insert 2 different hooks and check that there are 2 entries in the hook list.
+    # 4. Insert a hook group and check that the hook list matches that in the group.
+    #    (Group is obtained by querying the get_hook_list method.)
+    $P0 = new ['Instrument']
+
+    ## Scenario 1: Insert 1 hook.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('init')
+    $P2 = $P1.'get_instrumented_list'()
+
+    $I0 = $P2
+    $S0 = $P2[0]
+    is($I0, 1, 'Insert: 1: Count ok.')
+    is($S0, 'init', 'Insert: 1: Name ok.')
+
+    ## Scenario 2: Insert 1 hook twice.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('init')
+    $P1.'insert_hook'('init')
+    $P2 = $P1.'get_instrumented_list'()
+
+    $I0 = $P2
+    $S0 = $P2[0]
+    is($I0, 1, 'Insert: 2: Count ok.')
+    is($S0, 'init', 'Insert: 2: Name ok.')
+
+    ## Scenario 3: Insert 2 different hooks.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('init')
+    $P1.'insert_hook'('init_pmc')
+    $P2 = $P1.'get_instrumented_list'()
+
+    $I0 = $P2
+    $I1 = find_in_list($P2, 'init')
+    $I2 = find_in_list($P2, 'init_pmc')
+    $I3 = $I1 + $I2
+    is($I0, 2, 'Insert: 3: Count ok.')
+    is($I3, 2, 'Insert: 3: Name ok.')
+
+    ## Scenario 4: Insert a group of hooks.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('math')
+    $P2 = $P1.'get_instrumented_list'()
+    $P3 = $P1.'get_hook_list'('math')
+
+    $I0 = $P2
+    $I1 = $P3
+    $I2 = is_same_set($P2, $P3)
+    is($I0, $I1, 'Insert: 4: Count ok.')
+    is($I2, 1, 'Insert: 4: Group ok.')
+.end
+
+.sub test_removal
+    # Test removal of inserted hooks into the vtable of a class.
+    # Check:
+    # 1. Removal of an inserted hook.
+    # 2. A hook inserted twice and removed once will still be active.
+    # 3. Removing a group of hooks.
+    # 4. Removing a non-existent hook will throw an exception.
+    $P0 = new ['Instrument']
+
+    ## Scenario 1: Remove a single hook.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('init')
+    $P1.'remove_hook'('init')
+    $P2 = $P1.'get_instrumented_list'()
+
+    $I0 = $P2
+    is($I0, 0, 'Remove: 1: Count ok.')
+
+    ## Scenario 2: Remove a hook inserted twice.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('init')
+    $P1.'insert_hook'('init')
+    $P1.'remove_hook'('init')
+    $P2 = $P1.'get_instrumented_list'()
+
+    $I0 = $P2
+    $S0 = $P2[0]
+    is($I0, 1, 'Remove: 2: Count ok.')
+    is($S0, 'init', 'Remove: 2: Name ok.')
+
+    ## Scenario 3: Remove a group of hooks.
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'insert_hook'('math')
+    $P1.'remove_hook'('math')
+    $P2 = $P1.'get_instrumented_list'()
+
+    $I0 = $P2
+    is($I0, 0, 'Remove: 3: Count ok.')
+
+    ## Scenario 4: Remove a non-existent hook.
+    $P2 = new ['ExceptionHandler']
+    set_addr $P2, ATTACH_OK
+    push_eh $P2
+
+    $P1 = new ['InstrumentClass'], $P0
+    $P1.'attach_to_class'('Sub')
+    $P1.'remove_hook'('init')
+
+    ok(0, 'Remove: 4: Removing a non-existent hook did not throw exception.')
+
+    goto ATTACH_END
+
+    ATTACH_OK:
+      ok(1, 'Remove: 4: Removing a non-existent hook threw exception.')
+    ATTACH_END:
+.end
+
 .sub test_insertion
     # Test insertion a method hook.
     # ResizablePMCArray has a push method.
@@ -85,6 +260,7 @@ PROG
 
     ## Scenario 1: Insert a method hook.
     $P1 = $P0.'instrument_class'('ResizablePMCArray')
+    $P1 = getattribute $P1, '$!hook_obj'
 
     $P1.'insert_method_hook'('push')
     $P2 = $P1.'get_instrumented_method_list'()
@@ -119,6 +295,7 @@ PROG
     # 4. Try to remove a non-existent hook throws exception.
     $P0 = new ['Instrument']
     $P1 = $P0.'instrument_class'('ResizablePMCArray')
+    $P1 = getattribute $P1, '$!hook_obj'
 
     ## Scenario 1: Insert once and remove once.
     $P1.'insert_method_hook'('push')
@@ -177,17 +354,66 @@ PROG
     NON_EXIST_END:
 .end
 
-.sub test_notification
+.sub test_notification_vtable
+    # Test that notifications work, a class that is defined/loaded at runtime
+    #  is instrumented and also vtable overrides work.
+    # In short, TestClass is only defined at runtime, has vtable overrides,
+    #  and this tests all of it.
+    # Uses Instrument::Event::Class.
+    # Check:
+    # 1. The event is raised.
+    $P0 = new ['Instrument']
+    $P2 = $P0.'instrument_class'('TestClass')
+    $P2.'inspect_vtable'('init')
+    $P2.'callback'('test_notification_cb')
+
+    $P0.'attach'($P2)
+
+    # Set the arg list.
+    $S0  = 't/dynpmc/instrumentvtable-test1.pir'
+    $P3 = new ['ResizableStringArray']
+    push $P3, $S0
+
+    # Prepare the globals.
+    $P4 = new ['Hash']
+    set_global '%notification', $P4
+
+    $P0.'run'($S0, $P3)
+
+    # Check that the callback was called.
+    # Check that the event was fired.
+    $P9 = get_global '%notification'
+
+    # Event fired.
+    $I0 = $P9['called']
+    is($I0, 1, 'Vtable: Event fired.')
+
+    # Test line.
+    $I0 = $P9['line']
+    is($I0, 2, 'Vtable: Line ok.')
+
+    # Test file.
+    $S0 = $P9['file']
+    is($S0, 't/dynpmc/instrumentvtable-test1.pir', 'Vtable: File ok.')
+
+    # Test sub.
+    $S0 = $P9['sub']
+    is($S0, 'main', 'Vtable: Sub ok.')
+
+    # Test event.
+    $P10 = $P9['event']
+    $S0  = join '::', $P10
+    is($S0, 'Class::TestClass::vtable::main::init', 'Vtable: Event ok')
+.end
+
+.sub test_notification_methods
     # Test if notification is raised after a method is instrumented.
     # Check:
     # 1. Event is raised.
     # 2. The event is of type Class::Class_Name::method::Method_Name
     $P0 = new ['Instrument']
 
-    $P1 = get_hll_global ['Instrument';'Event'], 'Class'
-    $P2 = $P1.'new'()
-
-    $P2.'inspect_class'('TestClass')
+    $P2 = $P0.'instrument_class'('TestClass')
     $P2.'inspect_method'('test')
     $P2.'callback'('test_notification_cb')
 
@@ -209,24 +435,24 @@ PROG
 
     # Event fired.
     $I0 = $P9['called']
-    is($I0, 1, 'Event: Event fired.')
+    is($I0, 1, 'Method: Event fired.')
 
     # Test line.
     $I0 = $P9['line']
-    is($I0, 3, 'Event: Line ok.')
+    is($I0, 3, 'Method: Line ok.')
 
     # Test file.
     $S0 = $P9['file']
-    is($S0, 't/dynpmc/instrumentclass-test1.pir', 'Event: File ok.')
+    is($S0, 't/dynpmc/instrumentclass-test1.pir', 'Method: File ok.')
 
     # Test sub.
     $S0 = $P9['sub']
-    is($S0, 'main', 'Event: Sub ok.')
+    is($S0, 'main', 'Method: Sub ok.')
 
     # Test event.
     $P10 = $P9['event']
     $S0  = join '::', $P10
-    is($S0, 'Class::TestClass::method::test', 'Event: Event ok')
+    is($S0, 'Class::TestClass::method::test', 'Method: Event ok')
 
 .end
 
