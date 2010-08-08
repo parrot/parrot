@@ -26,7 +26,6 @@ DYNPMC_INSTRUMENT = \
     src/dynpmc/instrumentstubbase.pmc \
     src/dynpmc/instrumentgc.pmc \
     src/dynpmc/instrumentop.pmc \
-    src/dynpmc/instrumentvtable.pmc \
     src/dynpmc/instrumentclass.pmc \
     src/dynpmc/instrumentobject.pmc \
     src/dynpmc/instrumentinvokable.pmc \
@@ -37,7 +36,6 @@ DYNPMC_INSTRUMENT_OBJS = \
     src/dynpmc/instrumentstubbase$(O) \
     src/dynpmc/instrumentgc$(O) \
     src/dynpmc/instrumentop$(O) \
-    src/dynpmc/instrumentvtable$(O) \
     src/dynpmc/instrumentclass$(O) \
     src/dynpmc/instrumentobject$(O) \
     src/dynpmc/instrumentinvokable$(O) \
