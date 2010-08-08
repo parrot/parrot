@@ -40,7 +40,8 @@ my %param_type = (
     'PMC*'     => 'P',
     'INTVAL'   => 'I',
     'FLOATVAL' => 'F',
-    'STRING*'  => 'S'
+    'STRING*'  => 'S',
+    'size_t'   => 'I'
 );
 
 my(%groups, @entries, @prototypes, @stubs, %stub_memory_sizes);
@@ -211,15 +212,16 @@ sub gen_stub {
     # Prepare the return value.
     my($ret_declaration, $ret_receive, $ret_return, $ret_pack) = ('', '', '', '');
     if($ret !~ /^\s*void\s*$/) {
-        $ret_declaration = "\n    $ret ret;\n    PMC *ret_pack;";
+        $ret_declaration = "\n    $ret ret; PMC *ret_pack;";
         $ret_receive     = "ret = ";
         $ret_return      = "\n    return ret;";
 
         my $type = ($param_type{$ret} || 'V');
         $ret_pack = "\n".<<PACK;
     ret_pack = instrument_pack_params(supervisor, "$type", ret);
-    VTABLE_set_pmc_keyed_str(supervisor, data, CONST_STRING(supervisor, "return"), ret_pack);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
 PACK
+        chomp $ret_pack;
     }
 
     # For allocations and reallocations, expose the size of the allocation.
@@ -227,26 +229,13 @@ PACK
     my $event = 'GC::'.$group.'::'.$name;
 
     return <<STUB;
-$ret stub_$name($args) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;$ret_declaration
-
-    params     = instrument_pack_params(supervisor, "$param_format", $param_flat);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-$alloc
-    event       = CONST_STRING(supervisor, "$event");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
-    $ret_receive(gc_orig->$name($param_flat));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));$ret_return
+$ret stub_$name($args) {$ret_declaration
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "$param_format", $param_flat);
+    event  = CONST_STRING(supervisor, "$event");$alloc
+    GC_STUB_CALL_PRE;
+    $ret_receive(gc_orig->$name($param_flat));$ret_pack
+    GC_STUB_CALL_POST;$ret_return
 }
 
 STUB
@@ -375,7 +364,8 @@ sub init_stub_memory_sizes {
         'allocate_pmc_header'         => 'sizeof (PMC)',
         'allocate_string_header'      => 'sizeof (STRING)',
         'allocate_bufferlike_header'  => 'sizeof (Buffer)',
-        'allocate_pmc_attributes'     => 'VTABLE_get_pmc_keyed_int(supervisor, params, 0)->vtable->attr_size',
+        'allocate_pmc_attributes'     => 'VTABLE_get_pmc_keyed_int(supervisor, params, 0)'.
+                                         '->vtable->attr_size',
         'allocate_string_storage'     => 'size',
         'allocate_buffer_storage'     => 'nsize',
         'allocate_fixed_size_storage' => 'size',
@@ -390,10 +380,11 @@ sub init_stub_memory_sizes {
     my $key;
     for $key (keys %sources) {
         my $source = $sources{$key};
-        $ref->{$key} = <<SIZE;
+        $ref->{$key} = "\n".<<SIZE;
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         $source);
 SIZE
+        chomp $ref->{$key};
     }
 }
 

@@ -33,7 +33,7 @@ my %param_type = (
     'STRING*'  => 'S'
 );
 
-my $dynpmc_file = 'src/dynpmc/instrumentvtable.pmc';
+my $dynpmc_file = 'src/dynpmc/instrumentclass.pmc';
 my $dynpmc_fh = IO::File->new($dynpmc_file, O_RDWR | O_CREAT);
 
 die "Could not open $dynpmc_file!" if !$dynpmc_fh;
@@ -142,7 +142,7 @@ sub gen_stub {
     # Prepare the return value.
     my($ret_declaration, $ret_receive, $ret_return, $ret_pack) = ('', '', '', '');
     if($ret ne 'void') {
-        $ret_declaration = "\n    $ret ret;\n    PMC *ret_pack;";
+        $ret_declaration = "\n    $ret ret; PMC *ret_pack;";
         $ret_receive     = "ret = ";
         $ret_return      = "\n    return ret;";
 
@@ -151,6 +151,7 @@ sub gen_stub {
     ret_pack = instrument_pack_params(supervisor, "$type", ret);
     VTABLE_set_pmc_keyed_str(supervisor, data, CONST_STRING(supervisor, "return"), ret_pack);
 PACK
+        chomp $ret_pack;
     }
 
     # Prepare the event string to be appended to the the event prefix.
@@ -159,33 +160,15 @@ PACK
     # Return the generated stub.
     return <<CODE;
 static
-$ret stub_$name(PARROT_INTERP, PMC *pmc$args) {
-    PMC *instrument, *instrumentvt, *params, *data, *event_array, *recall;
-    Parrot_Interp supervisor;
-    STRING *raise_event, *event;
-    void *orig_vtable;$ret_declaration
-
-    instrumentvt = (PMC *) parrot_hash_get(interp, vtable_registry, pmc->vtable);
-    GETATTR_InstrumentVtable_original_struct(interp, instrumentvt, orig_vtable);
-    GETATTR_InstrumentVtable_supervisor(interp, instrumentvt, supervisor);
-    GETATTR_InstrumentVtable_event_prefix(interp, instrumentvt, event_array);
-
+$ret stub_$name(PARROT_INTERP, PMC *pmc$args) {$ret_declaration
+    VTABLE_STUB_VARS;
+    VTABLE_STUB_SETUP;
     params = instrument_pack_params(supervisor, "$param_format", $param_flat);
-    data   = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, data, CONST_STRING(supervisor, "parameters"), params);
-
-    event_array = VTABLE_clone(supervisor, event_array);
     VTABLE_push_string(supervisor, event_array,
                        CONST_STRING(supervisor, "$event_entry"));
-
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    event       = Parrot_str_join(supervisor, CONST_STRING(supervisor, "::"), event_array);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event, "SP->P",
-        event, data, &recall);
+    VTABLE_STUB_CALL_PRE;
     $ret_receive((_vtable *)orig_vtable)->$name(interp, $param_flat);$ret_pack
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event, "SPP->P",
-        event, data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));$ret_return
+    VTABLE_STUB_CALL_POST;$ret_return
 }
 
 CODE

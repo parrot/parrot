@@ -75,6 +75,28 @@ size_t (*get_gc_info)(PARROT_INTERP, Interpinfo_enum);
 } InstrumentGC_Subsystem;
 /* END OF GENERATED CODE */
 
+/* Macros for generated stubs */
+#define GC_STUB_VARS \
+    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original; \
+    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor; \
+    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc; \
+    PMC *instrument, *recall, *event_data, *temp, *params, *event_array; \
+    STRING *raise_event, *event; \
+    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
+
+#define GC_STUB_CALL_PRE \
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, \
+                             CONST_STRING(supervisor, "parameters"),params); \
+    raise_event = CONST_STRING(supervisor, "raise_event"); \
+    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument); \
+    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event, \
+                                         "SP->P", event, event_data, &recall);
+
+#define GC_STUB_CALL_POST \
+    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event, \
+                                         "SPP->P", event, event_data, recall, &recall); \
+    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+
 /* Prototypes for helper functions. */
 void setup_gc_common_hashes(PARROT_INTERP);
 void destroy_gc_common_hashes(PARROT_INTERP);
@@ -740,716 +762,335 @@ void setup_gc_individual_hashes(PARROT_INTERP, Hash *orig_hash, Hash *instr_hash
 
 /* BEGIN gc stubs */
 void  stub_finalize_gc_system(Parrot_Interp interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "V", interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::finalize_gc_system");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "V", interp);
+    event  = CONST_STRING(supervisor, "GC::administration::finalize_gc_system");
+    GC_STUB_CALL_PRE;
     (gc_orig->finalize_gc_system(interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_destroy_child_interp(Interp* interp, Interp* child_interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, child_interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::destroy_child_interp");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VV", interp, child_interp);
+    event  = CONST_STRING(supervisor, "GC::administration::destroy_child_interp");
+    GC_STUB_CALL_PRE;
     (gc_orig->destroy_child_interp(interp, child_interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_do_gc_mark(Parrot_Interp interp, UINTVAL flags) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, flags);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::do_gc_mark");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VV", interp, flags);
+    event  = CONST_STRING(supervisor, "GC::administration::do_gc_mark");
+    GC_STUB_CALL_PRE;
     (gc_orig->do_gc_mark(interp, flags));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_compact_string_pool(Parrot_Interp interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "V", interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::compact_string_pool");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "V", interp);
+    event  = CONST_STRING(supervisor, "GC::administration::compact_string_pool");
+    GC_STUB_CALL_PRE;
     (gc_orig->compact_string_pool(interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_mark_special(Parrot_Interp interp, PMC* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VP", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::mark_special");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VP", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::administration::mark_special");
+    GC_STUB_CALL_PRE;
     (gc_orig->mark_special(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_pmc_needs_early_collection(Parrot_Interp interp, PMC* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VP", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::pmc_needs_early_collection");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VP", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::administration::pmc_needs_early_collection");
+    GC_STUB_CALL_PRE;
     (gc_orig->pmc_needs_early_collection(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_init_pool(Parrot_Interp interp, struct Fixed_Size_Pool* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::init_pool");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VV", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::administration::init_pool");
+    GC_STUB_CALL_PRE;
     (gc_orig->init_pool(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 PMC*  stub_allocate_pmc_header(Parrot_Interp interp, UINTVAL flags) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    PMC*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, flags);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    PMC*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VV", interp, flags);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_pmc_header");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         sizeof (PMC));
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_pmc_header");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_pmc_header(interp, flags));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void  stub_free_pmc_header(Parrot_Interp interp, PMC* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VP", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::free::free_pmc_header");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VP", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::free::free_pmc_header");
+    GC_STUB_CALL_PRE;
     (gc_orig->free_pmc_header(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 STRING*  stub_allocate_string_header(Parrot_Interp interp, UINTVAL flags) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    STRING*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, flags);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    STRING*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VV", interp, flags);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_string_header");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         sizeof (STRING));
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_string_header");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_string_header(interp, flags));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void  stub_free_string_header(Parrot_Interp interp, STRING* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VS", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::free::free_string_header");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VS", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::free::free_string_header");
+    GC_STUB_CALL_PRE;
     (gc_orig->free_string_header(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 Buffer*  stub_allocate_bufferlike_header(Parrot_Interp interp, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    Buffer*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    Buffer*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VI", interp, size);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_bufferlike_header");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         sizeof (Buffer));
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_bufferlike_header");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_bufferlike_header(interp, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void  stub_free_bufferlike_header(Parrot_Interp interp, Buffer* stub_var1, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VVV", interp, stub_var1, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::free::free_bufferlike_header");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VVI", interp, stub_var1, size);
+    event  = CONST_STRING(supervisor, "GC::free::free_bufferlike_header");
+    GC_STUB_CALL_PRE;
     (gc_orig->free_bufferlike_header(interp, stub_var1, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void*  stub_allocate_pmc_attributes(Parrot_Interp interp, PMC* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    void*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VP", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    void*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VP", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_pmc_attributes");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         VTABLE_get_pmc_keyed_int(supervisor, params, 0)->vtable->attr_size);
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_pmc_attributes");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_pmc_attributes(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void  stub_free_pmc_attributes(Parrot_Interp interp, PMC* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VP", interp, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::free::free_pmc_attributes");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VP", interp, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::free::free_pmc_attributes");
+    GC_STUB_CALL_PRE;
     (gc_orig->free_pmc_attributes(interp, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_allocate_string_storage(Parrot_Interp interp, STRING* str, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VSV", interp, str, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VSI", interp, str, size);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_string_storage");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         size);
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_string_storage");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     (gc_orig->allocate_string_storage(interp, str, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_reallocate_string_storage(Parrot_Interp interp, STRING* str, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VSV", interp, str, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VSI", interp, str, size);
+    event  = CONST_STRING(supervisor, "GC::reallocate::reallocate_string_storage");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         size);
-
-    event       = CONST_STRING(supervisor, "GC::reallocate::reallocate_string_storage");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     (gc_orig->reallocate_string_storage(interp, str, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_allocate_buffer_storage(Parrot_Interp interp, Buffer* buffer, size_t nsize) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VVV", interp, buffer, nsize);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VVI", interp, buffer, nsize);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_buffer_storage");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         nsize);
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_buffer_storage");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     (gc_orig->allocate_buffer_storage(interp, buffer, nsize));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_reallocate_buffer_storage(Parrot_Interp interp, Buffer* buffer, size_t newsize) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VVV", interp, buffer, newsize);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VVI", interp, buffer, newsize);
+    event  = CONST_STRING(supervisor, "GC::reallocate::reallocate_buffer_storage");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         newsize);
-
-    event       = CONST_STRING(supervisor, "GC::reallocate::reallocate_buffer_storage");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     (gc_orig->reallocate_buffer_storage(interp, buffer, newsize));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void*  stub_allocate_fixed_size_storage(Parrot_Interp interp, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    void*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    void*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VI", interp, size);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_fixed_size_storage");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         size);
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_fixed_size_storage");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_fixed_size_storage(interp, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void  stub_free_fixed_size_storage(Parrot_Interp interp, size_t size, void* stub_var1) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VVV", interp, size, stub_var1);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::free::free_fixed_size_storage");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VIV", interp, size, stub_var1);
+    event  = CONST_STRING(supervisor, "GC::free::free_fixed_size_storage");
+    GC_STUB_CALL_PRE;
     (gc_orig->free_fixed_size_storage(interp, size, stub_var1));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void*  stub_allocate_memory_chunk(Parrot_Interp interp, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    void*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    void*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VI", interp, size);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_memory_chunk");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         size);
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_memory_chunk");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_memory_chunk(interp, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void*  stub_reallocate_memory_chunk(Parrot_Interp interp, void* data, size_t newsize) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    void*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VVV", interp, data, newsize);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    void*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VVI", interp, data, newsize);
+    event  = CONST_STRING(supervisor, "GC::reallocate::reallocate_memory_chunk");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         newsize);
-
-    event       = CONST_STRING(supervisor, "GC::reallocate::reallocate_memory_chunk");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->reallocate_memory_chunk(interp, data, newsize));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void*  stub_allocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, size_t size) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    void*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, size);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    void*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VI", interp, size);
+    event  = CONST_STRING(supervisor, "GC::allocate::allocate_memory_chunk_with_interior_pointers");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         size);
-
-    event       = CONST_STRING(supervisor, "GC::allocate::allocate_memory_chunk_with_interior_pointers");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->allocate_memory_chunk_with_interior_pointers(interp, size));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void*  stub_reallocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, void* data, size_t oldsize, size_t newsize) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-    void*  ret;
-    PMC *ret_pack;
-
-    params     = instrument_pack_params(supervisor, "VVVV", interp, data, oldsize, newsize);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
+    void*  ret; PMC *ret_pack;
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VVII", interp, data, oldsize, newsize);
+    event  = CONST_STRING(supervisor, "GC::reallocate::reallocate_memory_chunk_with_interior_pointers");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         newsize);
-
-    event       = CONST_STRING(supervisor, "GC::reallocate::reallocate_memory_chunk_with_interior_pointers");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_CALL_PRE;
     ret = (gc_orig->reallocate_memory_chunk_with_interior_pointers(interp, data, oldsize, newsize));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    ret_pack = instrument_pack_params(supervisor, "V", ret);
+    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "return"), ret_pack);
+    GC_STUB_CALL_POST;
     return ret;
 }
 
 void  stub_free_memory_chunk(Parrot_Interp interp, void* data) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "VV", interp, data);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::free::free_memory_chunk");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "VV", interp, data);
+    event  = CONST_STRING(supervisor, "GC::free::free_memory_chunk");
+    GC_STUB_CALL_PRE;
     (gc_orig->free_memory_chunk(interp, data));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_block_mark(Parrot_Interp interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "V", interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::block_mark");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "V", interp);
+    event  = CONST_STRING(supervisor, "GC::administration::block_mark");
+    GC_STUB_CALL_PRE;
     (gc_orig->block_mark(interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_unblock_mark(Parrot_Interp interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "V", interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::unblock_mark");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "V", interp);
+    event  = CONST_STRING(supervisor, "GC::administration::unblock_mark");
+    GC_STUB_CALL_PRE;
     (gc_orig->unblock_mark(interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_block_sweep(Parrot_Interp interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "V", interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::block_sweep");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "V", interp);
+    event  = CONST_STRING(supervisor, "GC::administration::block_sweep");
+    GC_STUB_CALL_PRE;
     (gc_orig->block_sweep(interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 void  stub_unblock_sweep(Parrot_Interp interp) {
-    GC_Subsystem  *gc_orig      = ((InstrumentGC_Subsystem *) interp->gc_sys)->original;
-    Parrot_Interp  supervisor   = ((InstrumentGC_Subsystem *) interp->gc_sys)->supervisor;
-    PMC           *instrumentgc = ((InstrumentGC_Subsystem *) interp->gc_sys)->instrument_gc;
-    PMC *instrument, *recall, *event_data, *temp, *params, *event_array;
-    STRING *raise_event, *event;
-
-    params     = instrument_pack_params(supervisor, "V", interp);
-    event_data = Parrot_pmc_new(supervisor, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "parameters"),params);
-
-    event       = CONST_STRING(supervisor, "GC::administration::unblock_sweep");
-    raise_event = CONST_STRING(supervisor, "raise_event");
-    GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument);
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SP->P", event, event_data, &recall);
+    GC_STUB_VARS;
+    params = instrument_pack_params(supervisor, "V", interp);
+    event  = CONST_STRING(supervisor, "GC::administration::unblock_sweep");
+    GC_STUB_CALL_PRE;
     (gc_orig->unblock_sweep(interp));
-    Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event,
-                                         "SPP->P", event, event_data, recall, &recall);
-    probe_list_delete_list(supervisor, (probe_list_t *)VTABLE_get_pointer(supervisor, recall));
+    GC_STUB_CALL_POST;
 }
 
 /* END gc stubs */
