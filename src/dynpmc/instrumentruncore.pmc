@@ -23,6 +23,8 @@ hooks into the execution of the ops.
 #include "parrot/runcore_api.h"
 #include "parrot/opsenum.h"
 
+#include "pmc/pmc_class.h"
+
 #include "pmc_instrument.h"
 
 #include "instrument_private.h"
@@ -68,6 +70,7 @@ INTVAL runcore_does_loading(opcode_t *pc);
 pmclass InstrumentRuncore auto_attrs dynpmc group instrument_group {
     ATTR PMC                  *instrument;
     ATTR PMC                  *dynlibs;
+    ATTR PMC                  *op;
     ATTR struct probe_list_t **op_hooks;
     ATTR INTVAL                op_hooks_size;
     ATTR struct probe_list_t  *op_catchall;
@@ -96,9 +99,11 @@ for running under supervision.
 
     VTABLE void init_pmc(PMC *instrument) {
         Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
+        INTVAL op_type = Parrot_pmc_get_type_str(INTERP, CONST_STRING(INTERP, "InstrumentOp"));
 
         attr->instrument    = instrument;
         attr->dynlibs       = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attr->op            = Parrot_pmc_new_init(INTERP, op_type, attr->instrument);
         attr->op_hooks      = NULL;
         attr->op_hooks_size = 0;
         attr->op_catchall   = NULL;
@@ -108,6 +113,9 @@ for running under supervision.
 
         /* Set up the op probe tables. */
         runcore_probes_setup(INTERP, SELF);
+
+        /* Fixup the vtables. */
+        runcore_vtable_fixup(INTERP, SELF);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -125,6 +133,7 @@ Marks internal data structures as live to the gc.
     VTABLE void mark() {
         Parrot_InstrumentRuncore_attributes * const attr = PARROT_INSTRUMENTRUNCORE(SELF);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->dynlibs);
+        Parrot_gc_mark_PMC_alive_fun(INTERP, attr->op);
     }
 
 /*
@@ -396,14 +405,9 @@ For internal use only.
 probe_list_t*
 runcore_probes_fire_probes(PARROT_INTERP, PMC *runcore, opcode_t *pc, probe_list_t *callbacks) {
     PMC   *op, *instrument, *interp_pmc;
-    INTVAL op_type;
-
 
     GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
-
-    op_type    = Parrot_pmc_get_type_str(interp, CONST_STRING(interp, "InstrumentOp"));
-    op         = Parrot_pmc_new_init(interp, op_type, instrument);
-
+    GETATTR_InstrumentRuncore_op(interp, runcore, op);
     VTABLE_set_pointer(interp, op, pc);
 
     return fire_callbacks(interp, callbacks, op, instrument);
@@ -474,9 +478,9 @@ opcode_t* runcore_runcore_runops(PARROT_INTERP, Parrot_runcore_t *core_ptr, opco
     runcore_library_update(supervisor, runcore);
 
     /* Setup exception handler to handle exits and unhandled exceptions. */
-    if(setjmp(exc_handler.resume)) {
+    if (setjmp(exc_handler.resume)) {
         /* Return if the exit op is called. */
-        if(*pc == enum_ops_exit_i
+        if (*pc == enum_ops_exit_i
         || *pc == enum_ops_exit_ic) {
             core->has_ended = 1;
             return pc;
@@ -569,7 +573,7 @@ void runcore_library_update(PARROT_INTERP, PMC *runcore) {
 
                 VTABLE_set_pmc_keyed_str(interp, task_data, CONST_STRING(interp, "library"), lib);
                 event = Parrot_sprintf_c(interp, "Internal::loadlib::%Ss",
-                                         VTABLE_name(supervised, lib));
+                                         VTABLE_get_string(supervised, lib));
 
                 /* Fire the event and discard the list returned. */
                 Parrot_pcc_invoke_method_from_c_args(interp, instrument,
@@ -604,35 +608,8 @@ void runcore_vtable_fixup(PARROT_INTERP, PMC *runcore) {
     PMC           *instrument;
     Parrot_Interp  supervised, dest, src;
 
-    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
-    GETATTR_Instrument_supervised(interp, instrument, supervised);
-
-    /* Dest is the one with the smaller vtable. */
-    if (interp->n_vtable_max > supervised->n_vtable_max) {
-        dest = supervised;
-        src  = interp;
-    }
-    else {
-        dest = interp;
-        src  = supervised;
-    }
-
-    /* Extend dest's vtable if needed. */
-    if (dest->n_vtable_alloced < src->n_vtable_max) {
-        INTVAL new_size;
-        new_size = src->n_vtable_max + 16;
-        dest->vtables = mem_gc_realloc_n_typed_zeroed(dest, dest->vtables,
-                                                      new_size, dest->n_vtable_alloced,
-                                                      VTABLE *);
-        dest->n_vtable_alloced = new_size;
-    }
-
-    /* Copy over the new vtable entries. */
-    for (i = dest->n_vtable_max; i < src->n_vtable_max; i++) {
-        dest->vtables[i] = src->vtables[i];
-    }
-
-    dest->n_vtable_max = src->n_vtable_max;
+    /* Do nothing. */
+    return;
 }
 
 /*

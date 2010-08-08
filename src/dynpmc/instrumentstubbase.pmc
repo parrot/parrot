@@ -97,7 +97,6 @@ Marks internal data structures as live to the gc.
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->event_prefix);
 
         parrot_mark_hash(INTERP, attr->group_items);
-        parrot_mark_hash(INTERP, attr->item_groups);
     }
 
 /*
@@ -275,7 +274,7 @@ Returns the name of the groups that the entry given by name belongs to.
         STRING *group;
 
         group = (STRING *) parrot_hash_get(INTERP, attr->item_groups, name);
-        if(STRING_IS_NULL(group)) {
+        if (STRING_IS_NULL(group)) {
             /* Should not happen. All items should have a group mapping. */
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                                         "%Ss : a Unknown function, '%Ss'",

@@ -29,6 +29,7 @@ void setup_vtable_individual_hashes(PARROT_INTERP, Hash *orig_hash, Hash *instr_
 
 pmclass InstrumentObject auto_attrs dynpmc group instrument_group extends InstrumentClass {
     ATTR PMC *object;
+
 /*
 
 =item C<void attach_to_class(STRING *classname)>
@@ -60,7 +61,6 @@ Prepares the object for instrumentation.
     METHOD attach_to_object(PMC *object) {
         Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
         Parrot_Interp supervised;
-        PMC *_class;
         STRING *addr;
 
         GETATTR_Instrument_supervised(INTERP, attr->instrument, supervised);
@@ -84,11 +84,63 @@ Prepares the object for instrumentation.
         VTABLE_push_string(INTERP, attr->event_prefix, addr);
 
         /* Create a copy of the class. */
-        _class = VTABLE_clone(supervised, VTABLE_get_class(supervised, object));
         {
             Parrot_Object_attributes * const obj = PARROT_OBJECT(object);
+            PMC *_class, *orig_class, *orig_ns;
+            STRING *orig_name;
+
+            orig_class = VTABLE_get_class(supervised, object);
+            GETATTR_Class__namespace(supervised, orig_class, orig_ns);
+            GETATTR_Class_name(supervised, orig_class, orig_name);
+
+            _class = VTABLE_clone(supervised, orig_class);
+            SETATTR_Class__namespace(supervised, _class, orig_ns);
+            SETATTR_Class_name(supervised, _class, orig_name);
+
             obj->_class = _class;
         }
+
+        /* Make sure the object has the custom destroy flag set. */
+        PObj_custom_destroy_SET(object);
+    }
+
+/*
+
+=item C<void detach_from_object()>
+
+Each InstrumentObject instance has an associated
+Instrument::Event::ObjectDestroy instance attached to it.
+When the instrumented object is destroyed, the associated event
+instance will then call this method, allowing cleanup of the
+destroyed object in the internal data structures of Instrument.
+
+For internal use only.
+
+=cut
+
+*/
+
+    METHOD detach_from_object() {
+        Parrot_InstrumentObject_attributes * const attr = PARROT_INSTRUMENTOBJECT(SELF);
+        Hash *instrument_objects;
+
+        GETATTR_Instrument_instrument_objects(INTERP, attr->instrument, instrument_objects);
+        parrot_hash_delete(INTERP, instrument_objects, attr->object);
+        attr->object = NULL;
+    }
+
+/*
+
+=item C<void _instrument_vtable()>
+
+Overrides parent's method, doing nothing in this instance.
+
+=cut
+
+*/
+
+    METHOD _instrument_vtable() {
+        /* Do nothing. */
     }
 
 /*
@@ -221,6 +273,7 @@ is called.
         RETURN(STRING *addr);
     }
 }
+
 
 /*
 

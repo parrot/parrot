@@ -207,6 +207,23 @@ Returns the current relative pc value.
 
 /*
 
+=item C<STRING pc_address()>
+
+Returns the pc address as a string.
+
+=cut
+
+*/
+
+    METHOD pc_address() {
+        Parrot_InstrumentOp_attributes * const attr = PARROT_INSTRUMENTOP(SELF);
+        STRING* pc_rel = Parrot_sprintf_c(INTERP, "%p", attr->pc);
+
+        RETURN(STRING* pc_rel);
+    }
+
+/*
+
 =item C<PMC* get_arg(INTVAL arg_index, INTVAL raw :optional)>
 
 Returns the argument as interpreted according to its type at the given index.

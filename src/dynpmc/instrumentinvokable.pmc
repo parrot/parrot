@@ -63,7 +63,7 @@ return an invokable when the first event is raised.
 
 */
 
-    VTABLE opcode_t* invoke (void *next) {
+    VTABLE opcode_t* invoke(void *next) {
         Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
         Parrot_Interp supervised;
         PMC *task_hash, *task, *data, *recall, *signature;
@@ -246,7 +246,7 @@ this instance is invoked.
 
 */
 
-    METHOD set_event (PMC *event) {
+    METHOD set_event(PMC *event) {
         Parrot_InstrumentInvokable_attributes * const attr = PARROT_INSTRUMENTINVOKABLE(SELF);
         attr->event = Parrot_str_join(INTERP, CONST_STRING(INTERP, "::"), event);
     }
