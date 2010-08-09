@@ -110,10 +110,6 @@ A C<Sub> or descendant PMC related to this task.
 
 An interpreter in which to execute this task.
 
-=item C<data>
-
-Additional data for the task.
-
 =back
 
 =cut
@@ -172,9 +168,7 @@ Additional data for the task.
             core_struct->birthtime = 0.0;
 
         core_struct->codeblock = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-        core_struct->data      = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
-
-        core_struct->interp = (Parrot_Interp)VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
+        core_struct->interp = (Parrot_Interp)VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
     }
 
 /*
@@ -238,9 +232,6 @@ Gets the value of an attribute for this task.
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
             value = Parrot_pmc_new(INTERP, enum_class_Float);
             VTABLE_set_number_native(INTERP, value, core_struct->birthtime);
-        }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "data"))) {
-            value = core_struct->data;
         }
         else {
             value = PMCNULL;
