@@ -32,7 +32,7 @@ pin/unpin
 .include 'stringinfo.pasm'
 .include 'interpinfo.pasm'
 
-.const int TESTS = 7
+.const int TESTS = 6
 
 .sub _main :main
     .include 'test_more.pir'
@@ -54,21 +54,15 @@ pin/unpin
 
     $S1 = "Hello, world"
     $S0 = $S1
-    $I0 = stringinfo $S0, .STRINGINFO_STRSTART
-    $I1 = stringinfo $S1, .STRINGINFO_STRSTART
+    $I0 = stringinfo $S0, .STRINGINFO_BUFSTART
+    $I1 = stringinfo $S1, .STRINGINFO_BUFSTART
     is($I0, $I1, "stringinfo - test STRSTART can see COW in action")
 
     $I0 = stringinfo $S0, .STRINGINFO_HEADER
     $I1 = stringinfo $S1, .STRINGINFO_HEADER
     is($I0, $I1, "stringinfo - STRHEADER on full COW strings keeps same value")
-
     $S2 = substr $S0, 7
     is($S2, "world", "sanity check")
-    $I4 = stringinfo $S0, .STRINGINFO_STRSTART
-    $I2 = stringinfo $S2, .STRINGINFO_STRSTART
-    $I3 = $I2 - $I4
-    is($I3, 7, "stringinfo - STRSTART can see COW in action")
-
     $I2 = stringinfo $S2, .STRINGINFO_HEADER
     isnt($I0, $I2, "stringinfo - STRHEADER on different COW strings same value")
 .end
@@ -99,7 +93,7 @@ pin/unpin
     null $S8
     null $S9
 
-    init = stringinfo $S6, .STRINGINFO_STRSTART
+    init = stringinfo $S6, .STRINGINFO_BUFSTART
 
     $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
   loop1:
@@ -107,7 +101,7 @@ pin/unpin
     $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     eq $I0, $I1, loop1
 
-    before = stringinfo $S6, .STRINGINFO_STRSTART
+    before = stringinfo $S6, .STRINGINFO_BUFSTART
     unpin $S6
 
     $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
@@ -116,7 +110,7 @@ pin/unpin
     $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     eq $I0, $I1, loop1
 
-    after = stringinfo $S6, .STRINGINFO_STRSTART
+    after = stringinfo $S6, .STRINGINFO_BUFSTART
 
     is( init, before, "pin/collect didn't change memory address" )
     $I0 = cmp after, before
@@ -134,12 +128,6 @@ pin/unpin
     say $S0
     ok( $I0, "location of string changed by unpin/collect" )
 .end
-
-#.constant STRINGINFO_STRSTART	2
-#.constant STRINGINFO_BUFLEN	3
-#.constant STRINGINFO_FLAGS	4
-#.constant STRINGINFO_BUFUSED	5
-#.constant STRINGINFO_STRLEN	6
 
 # Local Variables:
 #   mode: pir
