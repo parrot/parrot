@@ -261,7 +261,6 @@ Parrot's internal strings (C<STRING>s) have the following structure:
 	Parrot_UInt flags;
 	void *     _bufstart;
 	size_t     _buflen;
-	char       *strstart;
 	UINTVAL     bufused;
 	UINTVAL     strlen;
 	UINTVAL     hashval;
@@ -320,13 +319,6 @@ The charset structure specifies the character set (by index number and by
 name) and provides functions for transcoding to and from that character set.
 
 =back
-
-{{DEPRECATION NOTE: the enum C<parrot_string_representation_t> will be removed
-from the parrot string structure. It's been commented out for years.}}
-
-{{DEPRECATION NOTE: the C<char *> pointer C<strstart> will be removed. It
-complicates the entire string subsystem for a tiny optimization on substring
-operations, and offset math is messy with encodings that aren't byte-based.}}
 
 =head4 Conversions between normalization form, encoding, and charset
 
