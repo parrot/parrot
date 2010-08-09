@@ -98,8 +98,10 @@ Cleans up after the PMC.
 
     VTABLE void destroy() {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
-        parrot_hash_destroy(INTERP, attr->event_handlers);
         Parrot_destroy(attr->supervised);
+        parrot_hash_destroy(INTERP, attr->event_handlers);
+        parrot_hash_destroy(INTERP, attr->instrument_classes);
+        parrot_hash_destroy(INTERP, attr->instrument_objects);
     }
 
 /*
@@ -119,6 +121,7 @@ Marks internal data structures as live to the gc.
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->probes);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->instrument_gc);
         Parrot_gc_mark_PMC_alive_fun(INTERP, attr->instrument_rc);
+        parrot_mark_hash(INTERP, attr->event_handlers);
         parrot_mark_hash(INTERP, attr->instrument_classes);
         parrot_mark_hash(INTERP, attr->instrument_objects);
     }
@@ -452,11 +455,15 @@ Whenever the event is raised, the handler is called as well.
     METHOD register_eventhandler(STRING *event, PMC *handler) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         probe_list_t *list;
+        PMC *ptr;
 
-        list = (probe_list_t *) parrot_hash_get(INTERP, attr->event_handlers, event);
+        ptr  = (PMC *) parrot_hash_get(INTERP, attr->event_handlers, event);
+        list = (!PMC_IS_NULL(ptr)) ? (probe_list_t *) VTABLE_get_pointer(INTERP, ptr):NULL;
         if (list == NULL) {
             list = probe_list_create_list(INTERP);
-            parrot_hash_put(INTERP, attr->event_handlers, event, list);
+            ptr  = Parrot_pmc_new(INTERP, enum_class_Pointer);
+            VTABLE_set_pointer(INTERP, ptr, list);
+            parrot_hash_put(INTERP, attr->event_handlers, event, ptr);
         }
 
         probe_list_push(INTERP, list, handler);
@@ -474,8 +481,10 @@ handler from being called when the event is raised.
     METHOD remove_eventhandler(STRING *event, PMC *handler) {
         Parrot_Instrument_attributes * const attr = PARROT_INSTRUMENT(SELF);
         probe_list_t *list;
+        PMC *ptr;
 
-        list  = (probe_list_t *) parrot_hash_get(INTERP, attr->event_handlers, event);
+        ptr  = (PMC *) parrot_hash_get(INTERP, attr->event_handlers, event);
+        list = (!PMC_IS_NULL(ptr)) ? (probe_list_t *) VTABLE_get_pointer(INTERP, ptr):NULL;
         if (list != NULL) {
             probe_node_t *entry;
             entry = probe_list_find(INTERP, list, handler);
@@ -523,11 +532,13 @@ invokable, which can then be passed back to raise_event to be recalled.
             while (VTABLE_get_bool(INTERP, iter)) {
                 STRING *key;
                 probe_list_t *to_add;
+                PMC *ptr;
 
                 VTABLE_push_pmc(INTERP, cur_event, VTABLE_shift_pmc(INTERP, iter));
                 key = Parrot_str_join(INTERP, const_colons, cur_event);
 
-                to_add = (probe_list_t *) parrot_hash_get(INTERP, attr->event_handlers, key);
+                ptr    = (PMC *) parrot_hash_get(INTERP, attr->event_handlers, key);
+                to_add = (!PMC_IS_NULL(ptr)) ? (probe_list_t *)VTABLE_get_pointer(INTERP, ptr):NULL;
                 probe_list_append(INTERP, cur_list, to_add);
             }
 
