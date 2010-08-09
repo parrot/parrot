@@ -609,15 +609,9 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
     UNUSED(interp);
 #endif
 
-    /* we can't perform the math all the time, because
-        * strstart might be in unallocated memory */
     if (PObj_is_COWable_TEST(old_buf)) {
         flags = Buffer_bufrefcountptr(old_buf);
         old_block = Buffer_pool(old_buf);
-
-        if (PObj_is_string_TEST(old_buf)) {
-            offset = (ptrdiff_t)((STRING *)old_buf)->strstart -
-                (ptrdiff_t)Buffer_bufstart(old_buf);
         }
     }
 
@@ -635,13 +629,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
         /* Now make sure we point to where the other guy does */
         Buffer_bufstart(old_buf) = Buffer_bufstart(hdr);
-
-        /* And if we're a string, update strstart */
-        /* Somewhat of a hack, but if we get per-pool
-            * collections, it should help ease the pain */
-        if (PObj_is_string_TEST(old_buf))
-            ((STRING *)old_buf)->strstart =
-                (char *)Buffer_bufstart(old_buf) + offset;
     }
     else {
         new_pool_ptr = aligned_mem(old_buf, new_pool_ptr);
@@ -652,6 +639,7 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
         /* If we're shared */
         if (flags && (*flags & Buffer_shared_FLAG)) {
+            // Hmm. Can this be removed now?
             PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
 
             /* Let the old buffer know how to find us */
@@ -667,10 +655,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
         /* Remember new pool inside */
         *Buffer_poolptr(old_buf) = pool;
-
-        if (PObj_is_string_TEST(old_buf))
-            ((STRING *)old_buf)->strstart =
-                    (char *)Buffer_bufstart(old_buf) + offset;
 
         new_pool_ptr += Buffer_buflen(old_buf);
     }
@@ -1064,13 +1048,6 @@ check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
 
     if (PObj_external_TEST(pobj) || PObj_sysmem_TEST(pobj)) {
         /*buffer does not come from the memory pool*/
-        if (PObj_is_string_TEST(pobj)) {
-            PARROT_ASSERT(((STRING *) pobj)->strstart >=
-                (char *) Buffer_bufstart(pobj));
-            PARROT_ASSERT(((STRING *) pobj)->strstart +
-                ((STRING *) pobj)->strlen <=
-                (char *) Buffer_bufstart(pobj) + Buffer_buflen(pobj));
-        }
         return;
     }
 
@@ -1081,13 +1058,6 @@ check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
         if ((char *)bufstart >= cur_block->start &&
             (char *)Buffer_bufstart(pobj) +
             Buffer_buflen(pobj) < cur_block->start + cur_block->size) {
-            if (PObj_is_string_TEST(pobj)) {
-                PARROT_ASSERT(((STRING *)pobj)->strstart >=
-                    (char *)Buffer_bufstart(pobj));
-                PARROT_ASSERT(((STRING *)pobj)->strstart +
-                    ((STRING *)pobj)->strlen <= (char *)Buffer_bufstart(pobj) +
-                    Buffer_buflen(pobj));
-            }
             return;
         }
         cur_block = cur_block->prev;
