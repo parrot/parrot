@@ -1241,7 +1241,7 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
     else {
         const INTVAL new_length = s->strlen - n;
 
-        if ( new_length < 0)
+        if (new_length < 0)
             return STRINGNULL;
 
         return ENCODING_GET_CODEPOINTS(interp, s, 0, new_length);
