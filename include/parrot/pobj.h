@@ -73,7 +73,6 @@ struct parrot_string_t {
     Parrot_UInt flags;
     void *     _bufstart;
     size_t     _buflen;
-    char       *strstart;
     UINTVAL     bufused;
     UINTVAL     strlen;
     UINTVAL     hashval; /* cached hash value computation */
