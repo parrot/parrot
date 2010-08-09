@@ -370,7 +370,7 @@ PROG
     $P0.'attach'($P2)
 
     # Set the arg list.
-    $S0  = 't/dynpmc/instrumentvtable-test1.pir'
+    $S0  = 't/dynpmc/instrumentclass-test1.pir'
     $P3 = new ['ResizableStringArray']
     push $P3, $S0
 
@@ -394,7 +394,7 @@ PROG
 
     # Test file.
     $S0 = $P9['file']
-    is($S0, 't/dynpmc/instrumentvtable-test1.pir', 'Vtable: File ok.')
+    is($S0, 't/dynpmc/instrumentclass-test1.pir', 'Vtable: File ok.')
 
     # Test sub.
     $S0 = $P9['sub']
