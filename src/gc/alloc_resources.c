@@ -612,7 +612,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
     if (PObj_is_COWable_TEST(old_buf)) {
         flags = Buffer_bufrefcountptr(old_buf);
         old_block = Buffer_pool(old_buf);
-        }
     }
 
     /* buffer has already been moved; just change the header */

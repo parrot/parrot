@@ -1019,8 +1019,8 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
         /* copy s into dest num times */
         UINTVAL length = s->bufused;
         UINTVAL i;
-        char *             destpos = Buffer_bufstart(dest);
-        const char * const srcpos  = Buffer_bufstart(s);
+        char *             destpos = (char *)Buffer_bufstart(dest);
+        const char * const srcpos  = (char *)Buffer_bufstart(s);
         for (i = 0; i < num; ++i) {
             mem_sys_memcopy(destpos, srcpos, length);
             destpos += length;
@@ -2891,7 +2891,7 @@ Parrot_str_cstring(SHIM_INTERP, ARGIN(const STRING *str))
 {
     ASSERT_ARGS(Parrot_str_cstring)
     /* TODO handle NULL and friends */
-    return Buffer_bufstart(str);
+    return (char *)Buffer_bufstart(str);
 }
 
 
@@ -3170,7 +3170,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     res->encoding = j->encoding;
 
     /* Iterate over chunks and append it to res */
-    pos = Buffer_bufstart(res);
+    pos = (char *) Buffer_bufstart(res);
 
     /* Copy first chunk */
     s = chunks[0];
@@ -3192,10 +3192,10 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         pos += next->bufused;
 
         /* We can consume all buffer and pos will be next-after-end of buffer */
-        PARROT_ASSERT(pos <= Buffer_bufstart(res) + Buffer_buflen(res) + 1);
+        PARROT_ASSERT(pos <= (char *)Buffer_bufstart(res) + Buffer_buflen(res) + 1);
     }
 
-    res->bufused  = pos - Buffer_bufstart(res);
+    res->bufused  = pos - (char *)Buffer_bufstart(res);
     res->strlen = CHARSET_CODEPOINTS(interp, res);
 
     Parrot_gc_free_fixed_size_storage(interp, ar_len * sizeof (STRING *),
