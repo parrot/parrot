@@ -367,8 +367,8 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
           case STRINGINFO_HEADER:
             $1 = PTR2UINTVAL($2);
             break;
-          case STRINGINFO_STRSTART:
-            $1 = PTR2UINTVAL($2->strstart);
+          case STRINGINFO_BUFSTART:
+            $1 = PTR2UINTVAL(Buffer_bufstart($2));
             break;
           case STRINGINFO_BUFLEN:
             $1 = Buffer_buflen($2);

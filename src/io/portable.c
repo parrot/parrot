@@ -303,12 +303,12 @@ Parrot_io_peek_portable(PARROT_INTERP,
     STRING * const s     = Parrot_io_make_string(interp, buf, 1);
 
     /* read the next byte into the buffer */
-    const size_t   bytes = fread(s->strstart, 1, 1, fptr);
+    const size_t   bytes = fread(Buffer_bufstart(s), 1, 1, fptr);
 
     /* if we got anything from the stream, push it back on */
     if (bytes) {
         s->bufused = s->strlen = 1;
-        ungetc(*(char *)s->strstart, fptr);
+        ungetc(*(char *)Buffer_bufstart(s), fptr);
     }
     else
         s->bufused = s->strlen = 1;
@@ -406,7 +406,7 @@ size_t
 Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_portable)
-    const void * const buffer = s->strstart;
+    const void * const buffer = Buffer_bufstart(s);
     return fwrite(buffer, 1, s->bufused,
                   (FILE *)Parrot_io_get_os_handle(interp, filehandle));
 }

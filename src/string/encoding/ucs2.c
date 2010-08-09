@@ -220,7 +220,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_codepoint)
 #if PARROT_HAS_ICU
-    const UChar * const s = (const UChar*) src->strstart;
+    const UChar * const s = (const UChar*) Buffer_bufstart(src);
     UNUSED(interp);
     return s[offset];
 #else
@@ -314,7 +314,7 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
 {
     ASSERT_ARGS(get_codepoints)
 #if PARROT_HAS_ICU
-    return Parrot_str_new_init(interp, src->strstart + offset * sizeof (UChar),
+    return Parrot_str_new_init(interp, Buffer_bufstart(src) + offset * sizeof (UChar),
         count * sizeof (UChar), src->encoding, src->charset, PObj_get_FLAGS(src));
 #else
     UNUSED(src);
@@ -404,7 +404,7 @@ ucs2_decode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i))
     ASSERT_ARGS(ucs2_decode_and_advance)
 
 #if PARROT_HAS_ICU
-    const UChar * const s = (const UChar*) i->str->strstart;
+    const UChar * const s = (const UChar*) Buffer_bufstart(i->str);
     size_t pos = i->bytepos / sizeof (UChar);
 
     /* TODO either make sure that we don't go past end or use SAFE
@@ -442,7 +442,7 @@ ucs2_encode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL c)
     ASSERT_ARGS(ucs2_encode_and_advance)
 
 #if PARROT_HAS_ICU
-    UChar    *s = (UChar*) i->str->strstart;
+    UChar    *s = (UChar*) Buffer_bufstart(i->str);
     UINTVAL pos = i->bytepos / sizeof (UChar);
     s[pos++]    = (UChar)c;
     ++i->charpos;
@@ -472,7 +472,7 @@ ucs2_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(ucs2_hash)
 #if PARROT_HAS_ICU
-    const UChar *pos = (const UChar*) s->strstart;
+    const UChar *pos = (const UChar*) Buffer_bufstart(s);
     UINTVAL len = s->strlen;
     UNUSED(interp);
 

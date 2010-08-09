@@ -300,10 +300,10 @@ for writing to disc and later loading via C<load_bytecode>.
                                          aligned_size);
         res->strlen  = res->bufused = size;
 
-        if ((size_t)(res->strstart) & 0xf) {
-            char *adr     = res->strstart;
+        if ((size_t)(Buffer_bufstart(res)) & 0xf) {
+            char *adr     = Buffer_bufstart(res);
             adr          += 16 - ((size_t)adr & 0xf);
-            res->strstart = adr;
+            Buffer_bufstart(res) = adr;
         }
 
         /* We block GC while doing the packing, since GC run during a pack
@@ -312,7 +312,7 @@ for writing to disc and later loading via C<load_bytecode>.
            for example of the problem (note on line that
            segfaults, it is *cursor that is pointing to dealloced memory). */
         Parrot_block_GC_mark(INTERP);
-        PackFile_pack(INTERP, pf, (opcode_t *)res->strstart);
+        PackFile_pack(INTERP, pf, (opcode_t *)Buffer_bufstart(res));
         Parrot_unblock_GC_mark(INTERP);
 
         /* now remove all segments from directory again and destroy
@@ -368,7 +368,7 @@ Unarchives the code.
         SUPER(info);
         pf = PackFile_new(INTERP, 0);
 
-        if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
+        if (!PackFile_unpack(INTERP, pf, (opcode_t *)Buffer_bufstart(packed),
                 packed->strlen))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "couldn't unpack packfile");

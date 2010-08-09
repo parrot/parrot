@@ -1158,7 +1158,7 @@ size)>
 
 Allocate the STRING's buffer memory to the given size. The allocated
 buffer maybe slightly bigger than the given C<size>. This function
-sets also C<< str->strstart >> to the new buffer location, C<< str->bufused >>
+sets also C<< str->_bufstart >> to the new buffer location, C<< str->bufused >>
 is B<not> changed.
 
 =cut
@@ -1188,7 +1188,7 @@ gc_ms_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
     mem      = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem     += sizeof (void *);
 
-    Buffer_bufstart(str) = str->strstart = mem;
+    Buffer_bufstart(str) = mem;
     Buffer_buflen(str)   = new_size - sizeof (void *);
 
     /* Save pool used to allocate into buffer header */
@@ -1201,7 +1201,7 @@ gc_ms_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
 size_t newsize)>
 
 Reallocate the STRING's buffer memory to the given size. The allocated
-buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
+buffer will not shrink. This function sets also C<str-E<gt>_bufstart> to the
 new buffer location, C<str-E<gt>bufused> is B<not> changed.
 
 =cut
@@ -1262,10 +1262,8 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     PARROT_ASSERT(Buffer_pool(str));
     Buffer_pool(str)->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(str));
 
-    /* copy mem from strstart, *not* bufstart */
-    oldmem             = str->strstart;
+    oldmem               = Buffer_bufstart(str);
     Buffer_bufstart(str) = (void *)mem;
-    str->strstart      = mem;
     Buffer_buflen(str)   = new_size - sizeof (void *);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down

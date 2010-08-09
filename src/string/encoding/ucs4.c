@@ -203,7 +203,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         UINTVAL len = Parrot_str_length(interp, src);
         STRING *res = Parrot_str_new_init(interp, NULL, len * sizeof (UChar32),
                            Parrot_ucs4_encoding_ptr, Parrot_unicode_charset_ptr, 0);
-        UChar32 *buf = (UChar32 *) res->strstart;
+        UChar32 *buf = (UChar32 *) Buffer_bufstart(res);
         UINTVAL offs;
         for (offs = 0; offs < len; offs++){
             buf[offs] = src->encoding->get_codepoint(interp, src, offs);
@@ -236,7 +236,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_codepoint)
 #if PARROT_HAS_ICU
-    const UChar32 * const s = (const UChar32*) src->strstart;
+    const UChar32 * const s = (const UChar32*) Buffer_bufstart(src);
     UNUSED(interp);
     return s[offset];
 #else
@@ -336,7 +336,7 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
 {
     ASSERT_ARGS(get_codepoints)
 #if PARROT_HAS_ICU
-    return Parrot_str_new_init(interp, (char*)src->strstart + offset * sizeof (UChar32),
+    return Parrot_str_new_init(interp, (char*)Buffer_bufstart(src) + offset * sizeof (UChar32),
                                count * sizeof (UChar32), src->encoding, src->charset, 0);
 #else
     UNUSED(src);
@@ -427,7 +427,7 @@ ucs4_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(ucs4_decode_and_advance)
 #if PARROT_HAS_ICU
-    const UChar32 * const s = (const UChar32 *) i->str->strstart;
+    const UChar32 * const s = (const UChar32 *) Buffer_bufstart(i->str);
     size_t pos              = i->bytepos / sizeof (UChar32);
     const UChar32         c = s[pos++];
     ++i->charpos;
@@ -456,7 +456,7 @@ ucs4_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(ucs4_encode_and_advance)
 #if PARROT_HAS_ICU
-    UChar32 *s   = (UChar32 *) i->str->strstart;
+    UChar32 *s   = (UChar32 *) Buffer_bufstart(i->str);
     size_t   pos = i->bytepos / sizeof (UChar32);
     s[pos++] = (UChar32) c;
     ++i->charpos;
@@ -482,7 +482,7 @@ static size_t
 ucs4_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(ucs4_hash)
-    const UChar32 *pos = (const UChar32*) s->strstart;
+    const UChar32 *pos = (const UChar32*) Buffer_bufstart(s);
     UINTVAL len = s->strlen;
     UNUSED(interp);
 

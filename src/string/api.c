@@ -360,7 +360,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     Parrot_gc_allocate_string_storage(interp, result, alloc_size);
 
     /* and copy it over */
-    mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
+    mem_sys_memcopy(Buffer_bufstart(result), Buffer_bufstart(s), alloc_size);
 
     return result;
 }
@@ -461,11 +461,11 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     dest->charset  = cs;
 
     /* Copy A first */
-    mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
+    mem_sys_memcopy(Buffer_bufstart(dest), Buffer_bufstart(a), a->bufused);
 
     /* Tack B on the end of A */
-    mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + a->bufused),
-            b->strstart, b->bufused);
+    mem_sys_memcopy((void *)((ptrcast_t)Buffer_bufstart(dest) + a->bufused),
+            Buffer_bufstart(b), b->bufused);
 
     dest->bufused = a->bufused + b->bufused;
     dest->strlen  = a->strlen + b_len;
@@ -527,7 +527,6 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL 
     STRING * const result   = Parrot_gc_new_string_header(interp, 0);
     Buffer_bufstart(result) = Buffer_bufstart(buffer);
     Buffer_buflen(result)   = Buffer_buflen(buffer);
-    result->strstart        = (char *)Buffer_bufstart(result);
     result->bufused         = len;
     result->strlen          = len;
     result->encoding        = Parrot_fixed_8_encoding_ptr;
@@ -739,7 +738,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
            it was safe by setting PObj_external_FLAG.
            (The cast is necessary to pacify TenDRA's tcc.)
            */
-        Buffer_bufstart(s) = s->strstart = PARROT_const_cast(char *, buffer);
+        Buffer_bufstart(s) = PARROT_const_cast(void *, buffer);
         Buffer_buflen(s)   = s->bufused  = len;
 
         if (encoding == Parrot_fixed_8_encoding_ptr)
@@ -753,7 +752,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     Parrot_gc_allocate_string_storage(interp, s, len);
 
     if (buffer) {
-        mem_sys_memcopy(s->strstart, buffer, len);
+        mem_sys_memcopy(Buffer_bufstart(s), buffer, len);
         s->bufused = len;
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
@@ -1020,8 +1019,8 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
         /* copy s into dest num times */
         UINTVAL length = s->bufused;
         UINTVAL i;
-        char *             destpos = dest->strstart;
-        const char * const srcpos  = s->strstart;
+        char *             destpos = Buffer_bufstart(dest);
+        const char * const srcpos  = Buffer_bufstart(s);
         for (i = 0; i < num; ++i) {
             mem_sys_memcopy(destpos, srcpos, length);
             destpos += length;
@@ -1197,15 +1196,15 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     dest->bufused = buf_size;
 
     /* Copy begin of string */
-    mem_sys_memcopy(dest->strstart, src->strstart, start_byte);
+    mem_sys_memcopy(Buffer_bufstart(dest), Buffer_bufstart(src), start_byte);
 
     /* Copy the replacement in */
-    mem_sys_memcopy((char *)dest->strstart + start_byte, rep->strstart,
+    mem_sys_memcopy((char *)Buffer_bufstart(dest) + start_byte, Buffer_bufstart(rep),
             rep->bufused);
 
     /* Copy the end of old string */
-    mem_sys_memcopy((char *)dest->strstart + start_byte + rep->bufused,
-            (char *)src->strstart + end_byte,
+    mem_sys_memcopy((char *)Buffer_bufstart(dest) + start_byte + rep->bufused,
+            (char *)Buffer_bufstart(src) + end_byte,
             src->bufused - end_byte);
 
     dest->strlen  = CHARSET_CODEPOINTS(interp, dest);
@@ -1344,7 +1343,7 @@ Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(con
         return 1;
 
     /* COWed strings */
-    else if ((s1->strstart == s2->strstart) && (s1->bufused == s2->bufused))
+    else if ((Buffer_bufstart(s1) == Buffer_bufstart(s2)) && (s1->bufused == s2->bufused))
         return 1;
 
     /*
@@ -1412,9 +1411,9 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #endif
 
     { /* bitwise AND the strings */
-        const Parrot_UInt1 *curr1 = (Parrot_UInt1 *)s1->strstart;
-        const Parrot_UInt1 *curr2 = (Parrot_UInt1 *)s2->strstart;
-        Parrot_UInt1       *dp    = (Parrot_UInt1 *)res->strstart;
+        const Parrot_UInt1 *curr1 = (Parrot_UInt1 *)Buffer_bufstart(s1);
+        const Parrot_UInt1 *curr2 = (Parrot_UInt1 *)Buffer_bufstart(s2);
+        Parrot_UInt1       *dp    = (Parrot_UInt1 *)Buffer_bufstart(res);
         size_t              len   = minlen;
 
         while (len--)
@@ -1437,15 +1436,15 @@ do { \
     size_t       _index; \
  \
     if (!STRING_IS_NULL(s1)) { \
-        curr1   = (type1 *)(s1)->strstart; \
+        curr1   = (type1 *)Buffer_bufstart(s1); \
         length1 = (s1)->strlen; \
     } \
     if (!STRING_IS_NULL(s2)) { \
-        curr2   = (type2 *)(s2)->strstart; \
+        curr2   = (type2 *)Buffer_bufstart(s2); \
         length2 = (s2)->strlen; \
     } \
  \
-    dp = (restype *)(res)->strstart; \
+    dp = (restype *)Buffer_bufstart(res); \
     _index = 0; \
  \
     for (; _index < (maxlen) ; ++curr1, ++curr2, ++dp, ++_index) { \
@@ -1472,15 +1471,15 @@ do { \
     size_t       _index; \
  \
     if (!STRING_IS_NULL(s1)) { \
-        curr1   = (type1 *)(s1)->strstart; \
+        curr1   = (type1 *)Buffer_bufstart(s1); \
         length1 = (s1)->strlen; \
     } \
     if (!STRING_IS_NULL(s2)) { \
-        curr2   = (type2 *)(s2)->strstart; \
+        curr2   = (type2 *)Buffer_bufstart(s2); \
         length2 = (s2)->strlen; \
     } \
  \
-    dp = (restype *)(res)->strstart; \
+    dp = (restype *)Buffer_bufstart(res); \
     _index = 0; \
  \
     for (; _index < (maxlen) ; ++curr1, ++curr2, ++dp, ++_index) { \
@@ -1632,9 +1631,9 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #define BITWISE_NOT_STRING(type, s, res) \
 do { \
     if (!STRING_IS_NULL(s) && !STRING_IS_NULL(res)) { \
-        const type   *curr   = (type *)(s)->strstart; \
+        const type   *curr   = (type *)Buffer_bufstart(s); \
         size_t        length = (s)->strlen; \
-        Parrot_UInt1 *dp     = (Parrot_UInt1 *)(res)->strstart; \
+        Parrot_UInt1 *dp     = (Parrot_UInt1 *)Buffer_bufstart(res); \
  \
         for (; length ; --length, ++dp, ++curr) \
             *dp = 0xFF & ~ *curr; \
@@ -2165,7 +2164,7 @@ string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
         return NULL;
     else {
         char * const p = (char*)mem_internal_allocate(s->bufused + 1);
-        memcpy(p, s->strstart, s->bufused);
+        memcpy(p, Buffer_bufstart(s), s->bufused);
         p[s->bufused] = '\0';
         return p;
     }
@@ -2214,7 +2213,6 @@ Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
 
     mem_sys_memcopy(memory, Buffer_bufstart(s), size);
     Buffer_bufstart(s) = memory;
-    s->strstart        = memory;
 
     /* Mark the memory as both from the system and immobile */
     PObj_sysmem_SET(s);
@@ -2374,7 +2372,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
     /* more work TODO */
     ENCODING_ITER_INIT(interp, src, &iter);
-    dp = (unsigned char *)result->strstart;
+    dp = (unsigned char *)Buffer_bufstart(result);
 
     for (i = 0; len > 0; --len) {
         UINTVAL c = iter.get_and_advance(interp, &iter);
@@ -2385,7 +2383,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
                 charlen += len * 2 + 16;
                 Parrot_gc_reallocate_string_storage(interp, result, charlen);
                 /* start can change */
-                dp = (unsigned char *)result->strstart;
+                dp = (unsigned char *)Buffer_bufstart(result);
             }
             switch (c) {
               case '\\':
@@ -2448,7 +2446,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
         /* and usable len */
         charlen = Buffer_buflen(result);
-        dp      = (unsigned char *)result->strstart;
+        dp      = (unsigned char *)Buffer_bufstart(result);
 
         PARROT_ASSERT(i <= charlen);
     }
@@ -2709,7 +2707,7 @@ Parrot_str_unescape(PARROT_INTERP,
     encoding->iter_init(interp, result, &iter);
 
     for (offs = d = 0; offs < clength; ++offs) {
-        r = (Parrot_UInt4)((unsigned char *)result->strstart)[offs];
+        r = (Parrot_UInt4)((unsigned char *)Buffer_bufstart(result))[offs];
 
         /* There cannot be any NULs within this string.  */
         PARROT_ASSERT(r != '\0');
@@ -2893,7 +2891,7 @@ Parrot_str_cstring(SHIM_INTERP, ARGIN(const STRING *str))
 {
     ASSERT_ARGS(Parrot_str_cstring)
     /* TODO handle NULL and friends */
-    return str->strstart;
+    return Buffer_bufstart(str);
 }
 
 
@@ -3172,12 +3170,12 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     res->encoding = j->encoding;
 
     /* Iterate over chunks and append it to res */
-    pos = res->strstart;
+    pos = Buffer_bufstart(res);
 
     /* Copy first chunk */
     s = chunks[0];
     if (!STRING_IS_NULL(s)) {
-        mem_sys_memcopy(pos, s->strstart, s->bufused);
+        mem_sys_memcopy(pos, Buffer_bufstart(s), s->bufused);
         pos += s->bufused;
     }
 
@@ -3187,17 +3185,17 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         if (STRING_IS_NULL(next))
             continue;
 
-        mem_sys_memcopy(pos, j->strstart, j->bufused);
+        mem_sys_memcopy(pos, Buffer_bufstart(j), j->bufused);
         pos += j->bufused;
 
-        mem_sys_memcopy(pos, next->strstart, next->bufused);
+        mem_sys_memcopy(pos, Buffer_bufstart(next), next->bufused);
         pos += next->bufused;
 
         /* We can consume all buffer and pos will be next-after-end of buffer */
-        PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);
+        PARROT_ASSERT(pos <= Buffer_bufstart(res) + Buffer_buflen(res) + 1);
     }
 
-    res->bufused  = pos - res->strstart;
+    res->bufused  = pos - Buffer_bufstart(res);
     res->strlen = CHARSET_CODEPOINTS(interp, res);
 
     Parrot_gc_free_fixed_size_storage(interp, ar_len * sizeof (STRING *),

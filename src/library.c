@@ -342,7 +342,7 @@ static int
 is_abs_path(ARGIN(const STRING *file))
 {
     ASSERT_ARGS(is_abs_path)
-    const char * const file_name = (const char *)file->strstart;
+    const char * const file_name = (const char *)Buffer_bufstart(file);
     if (file->strlen <= 1)
         return 0;
     PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
@@ -385,7 +385,7 @@ cnv_to_win32_filesep(ARGMOD(STRING *path))
     PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
 
-    cnv = path->strstart;
+    cnv = Buffer_bufstart(path);
     while ((cnv = strchr(cnv, path_separator)) != NULL)
         *cnv = win32_path_separator;
 }
@@ -753,7 +753,7 @@ successful, returns a C-string allocated with C<Parrot_str_to_cstring> or
 NULL otherwise.  Remember to free the string with C<Parrot_str_free_cstring()>.
 
 If successful, the returned STRING is 0-terminated so that
-C<result-E<gt>strstart> is usable as B<const char*> c-string for C library
+C<result-E<gt>_bufstart> is usable as B<const char*> c-string for C library
 functions like fopen(3).  This is the preferred API function.
 
 The C<enum_runtime_ft type> is one or more of the types defined in

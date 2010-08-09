@@ -400,7 +400,7 @@ static UINTVAL
 utf8_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(utf8_decode_and_advance)
-    const utf8_t *u8ptr = (utf8_t *)((char *)i->str->strstart + i->bytepos);
+    const utf8_t *u8ptr = (utf8_t *)((char *)Buffer_bufstart(i->str) + i->bytepos);
     UINTVAL c = *u8ptr;
 
     if (UTF8_IS_START(c)) {
@@ -451,7 +451,7 @@ utf8_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(utf8_encode_and_advance)
     const STRING * const s = i->str;
-    unsigned char * const pos = (unsigned char *)s->strstart + i->bytepos;
+    unsigned char * const pos = (unsigned char *)Buffer_bufstart(s) + i->bytepos;
     unsigned char * const new_pos = (unsigned char *)utf8_encode(interp, pos, c);
 
     i->bytepos += (new_pos - pos);
@@ -476,7 +476,7 @@ static void
 utf8_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL pos)
 {
     ASSERT_ARGS(utf8_set_position)
-    const utf8_t *u8ptr = (const utf8_t *)i->str->strstart;
+    const utf8_t *u8ptr = (const utf8_t *)Buffer_bufstart(i->str);
 
     /* start from last known charpos, if we can */
     if (i->charpos <= pos) {
@@ -491,7 +491,7 @@ utf8_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL pos)
     while (pos-- > 0)
         u8ptr += UTF8SKIP(u8ptr);
 
-    i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
+    i->bytepos = (const char *)u8ptr - (const char *)Buffer_bufstart(i->str);
 }
 
 
@@ -533,11 +533,11 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         return result;
 
     Parrot_gc_allocate_string_storage(interp, result, src_len);
-    p = (unsigned char *)result->strstart;
+    p = (unsigned char *)Buffer_bufstart(result);
 
     if (src->charset == Parrot_ascii_charset_ptr) {
         for (dest_len = 0; dest_len < src_len; ++dest_len) {
-            p[dest_len] = ((unsigned char*)src->strstart)[dest_len];
+            p[dest_len] = ((unsigned char*)Buffer_bufstart(src))[dest_len];
         }
         result->bufused = dest_len;
     }
@@ -556,7 +556,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                 dest_len += need;
                 result->bufused = dest_pos;
                 Parrot_gc_reallocate_string_storage(interp, result, dest_len);
-                p = (unsigned char *)result->strstart;
+                p = (unsigned char *)Buffer_bufstart(result);
             }
 
             pos = p + dest_pos;
@@ -584,7 +584,7 @@ static UINTVAL
 get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_codepoint)
-    const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
+    const utf8_t * const start = (const utf8_t *)utf8_skip_forward(Buffer_bufstart(src), offset);
     return utf8_decode(interp, start);
 }
 
@@ -625,7 +625,7 @@ static UINTVAL
 get_byte(SHIM_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_byte)
-    unsigned char *contents = (unsigned char *)src->strstart;
+    unsigned char *contents = (unsigned char *)Buffer_bufstart(src);
     if (offset >= src->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
                 "get_byte past the end of the buffer (%i of %i)",
@@ -657,7 +657,7 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *src),
         Parrot_ex_throw_from_c_args(interp, NULL, 0,
             "set_byte past the end of the buffer");
 
-    contents = (unsigned char *)src->strstart;
+    contents = (unsigned char *)Buffer_bufstart(src);
     contents[offset] = (unsigned char)byte;
 }
 
@@ -691,7 +691,7 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
     if (count)
         iter.set_position(interp, &iter, offset + count);
 
-    return Parrot_str_new_init(interp, src->strstart + start, iter.bytepos - start, 
+    return Parrot_str_new_init(interp, Buffer_bufstart(src) + start, iter.bytepos - start, 
         src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
@@ -711,7 +711,7 @@ static STRING *
 get_bytes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    return Parrot_str_new_init(interp, src->strstart + offset, count,
+    return Parrot_str_new_init(interp, Buffer_bufstart(src) + offset, count,
         src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 

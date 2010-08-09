@@ -98,13 +98,13 @@ Point to a real STRING
 
 =item 3
 
-Point to a fake STRING with (strstart, bufused) holding the *buffer
+Point to a fake STRING with (_bufstart, bufused) holding the *buffer
 information.
 
 =back
 
 In the third case, the buffer or STRING must be able to hold the required
-amount of data. For cases 1 and 2, a NULL C<strstart> tells this function to
+amount of data. For cases 1 and 2, a NULL C<_bufstart> tells this function to
 allocate the STRING memory.
 
 =cut

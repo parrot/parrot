@@ -330,7 +330,7 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
     if (!result->strlen)
         return result;
 
-    buffer = (unsigned char *)result->strstart;
+    buffer = (unsigned char *)Buffer_bufstart(result);
     for (offset = 0; offset < result->strlen; ++offset) {
         unsigned int c = buffer[offset]; /* XXX use encoding ? */
         if (c >= 0xe0 && c != 0xf7)
@@ -366,7 +366,7 @@ downcase(PARROT_INTERP, ARGIN(const STRING *src))
     if (!result->strlen)
         return result;
 
-    buffer = (unsigned char *)result->strstart;
+    buffer = (unsigned char *)Buffer_bufstart(result);
     for (offset = 0; offset < result->strlen; ++offset) {
         unsigned int c = buffer[offset];
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
@@ -403,7 +403,7 @@ titlecase(PARROT_INTERP, ARGIN(const STRING *src))
     if (!result->strlen)
         return result;
 
-    buffer = (unsigned char *)result->strstart;
+    buffer = (unsigned char *)Buffer_bufstart(result);
     c = buffer[0];
     if (c >= 0xe0 && c != 0xf7)
         c &= ~0x20;
@@ -446,7 +446,7 @@ upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     if (!result->strlen)
         return result;
 
-    buffer = (unsigned char *)result->strstart;
+    buffer = (unsigned char *)Buffer_bufstart(result);
     c = buffer[0];
     if (c >= 0xe0 && c != 0xf7)
         c &= ~0x20;
@@ -480,7 +480,7 @@ downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     if (!result->strlen)
         return result;
 
-    buffer = (unsigned char *)result->strstart;
+    buffer = (unsigned char *)Buffer_bufstart(result);
     c = buffer[0];
     if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
         c &= ~0x20;

@@ -1250,9 +1250,9 @@ PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
     *cursor++ = s->bufused;
 
-    if (s->strstart) {
+    if (Buffer_bufstart(s)) {
         char *charcursor = (char *) cursor;
-        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+        mem_sys_memcopy(charcursor, Buffer_bufstart(s), s->bufused);
         charcursor += s->bufused;
 
         /* Pad up to wordsize boundary. */
@@ -1354,7 +1354,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
-                      s->strstart, OFFS(pf, *cursor)));
+                      Buffer_bufstart(s), OFFS(pf, *cursor)));
 
     TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d\n",
                         (const char *)*cursor + size, size, wordsize));
@@ -1422,8 +1422,8 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
      * characters to ensure padding.  */
     charcursor = (char *)cursor;
 
-    if (s->strstart) {
-        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+    if (Buffer_bufstart(s)) {
+        mem_sys_memcopy(charcursor, Buffer_bufstart(s), s->bufused);
         charcursor += s->bufused;
         /* Pad up to sizeof (opcode_t) boundary. */
         while ((unsigned long) (charcursor - (char *) cursor) % sizeof (opcode_t)) {

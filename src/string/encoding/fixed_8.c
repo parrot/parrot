@@ -218,7 +218,7 @@ find_cclass(SHIM_INTERP, ARGIN(const STRING *s), ARGIN(const INTVAL *typetable),
 INTVAL flags, UINTVAL pos, UINTVAL end)
 {
     ASSERT_ARGS(find_cclass)
-    const unsigned char *contents = (const unsigned char *)s->strstart;
+    const unsigned char *contents = (const unsigned char *)Buffer_bufstart(s);
     for (; pos < end; ++pos) {
         if ((typetable[contents[pos]] & flags) != 0) {
             return pos;
@@ -243,7 +243,7 @@ static UINTVAL
 get_byte(SHIM_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_byte)
-    const unsigned char *contents = (const unsigned char *)src->strstart;
+    const unsigned char *contents = (const unsigned char *)Buffer_bufstart(src);
 
     if (offset >= src->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -276,7 +276,7 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL byte)
         Parrot_ex_throw_from_c_args(interp, NULL, 0,
             "set_byte past the end of the buffer");
 
-    contents = (unsigned char *)src->strstart;
+    contents = (unsigned char *)Buffer_bufstart(src);
     contents[offset] = (unsigned char)byte;
 }
 
@@ -327,7 +327,7 @@ get_bytes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count
     dst->charset  = src->charset;
     dst->bufused  = dst->strlen = count;
     Parrot_gc_allocate_string_storage(interp, dst, count);
-    mem_sys_memcopy(dst->strstart, src->strstart + offset, count);
+    mem_sys_memcopy(Buffer_bufstart(dst), Buffer_bufstart(src) + offset, count);
     return dst;
 }
 
@@ -467,7 +467,7 @@ static size_t
 fixed_8_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(fixed_8_hash)
-    const unsigned char *pos = (const unsigned char *)s->strstart;
+    const unsigned char *pos = (const unsigned char *)Buffer_bufstart(s);
     UINTVAL        len = s->strlen;
 
     while (len--) {

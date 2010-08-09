@@ -329,7 +329,7 @@ compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
     if (l_len != r_len)
         return l_len - r_len;
 
-    return memcmp(lhs->strstart, rhs->strstart, l_len);
+    return memcmp(Buffer_bufstart(lhs), Buffer_bufstart(rhs), l_len);
 }
 
 /*

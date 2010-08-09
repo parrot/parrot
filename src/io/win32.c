@@ -485,7 +485,7 @@ Parrot_io_write_win32(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING 
     ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
     DWORD err;
-    void * const buffer = s->strstart;
+    void * const buffer = Buffer_bufstart(s);
     DWORD len = (DWORD) s->bufused;
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
 

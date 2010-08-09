@@ -343,7 +343,7 @@ gc_inf_allocate_string_storage(SHIM_INTERP, ARGMOD(STRING *str), size_t size)
     if (size > 0) {
         char * const mem = (char *)mem_internal_allocate(size);
 
-        Buffer_bufstart(str) = str->strstart = mem;
+        Buffer_bufstart(str) = mem;
     }
     else {
         Buffer_bufstart(str) = NULL;
@@ -356,7 +356,7 @@ gc_inf_reallocate_string_storage(SHIM_INTERP, ARGMOD(STRING *str), size_t size)
     ASSERT_ARGS(gc_inf_reallocate_string_storage)
     char * const mem     = (char *)mem_internal_realloc(Buffer_bufstart(str), size);
 
-    Buffer_bufstart(str) = str->strstart = mem;
+    Buffer_bufstart(str) = mem;
     Buffer_buflen(str)   = size;
 }
 

@@ -379,7 +379,7 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: STRING allocation failed!\n");
 
-    string->strstart        = NULL;
+    Buffer_bufstart(string) = NULL;
     PObj_get_FLAGS(string) |=
         flags | PObj_is_string_FLAG | PObj_is_COWable_FLAG | PObj_live_FLAG;
 
@@ -496,7 +496,7 @@ size_t size)>
 
 Allocate the STRING's buffer memory to the given size. The allocated
 buffer maybe slightly bigger than the given C<size>. This function
-sets also C<< str->strstart >> to the new buffer location, C<< str->bufused >>
+sets also C<< str->_bufstart >> to the new buffer location, C<< str->bufused >>
 is B<not> changed.
 
 =cut
@@ -517,7 +517,7 @@ Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
 size_t newsize)>
 
 Reallocate the STRING's buffer memory to the given size. The allocated
-buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
+buffer will not shrink. This function sets also C<str-E<gt>_bufstart> to the
 new buffer location, C<str-E<gt>bufused> is B<not> changed.
 
 =cut

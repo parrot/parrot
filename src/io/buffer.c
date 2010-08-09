@@ -297,7 +297,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     s       = *buf;
     len     = s->bufused;
-    out_buf = (unsigned char *)s->strstart;
+    out_buf = (unsigned char *)Buffer_bufstart(s);
 
     /* read Data from buffer */
     if (buffer_flags & PIO_BF_READBUF) {
@@ -429,7 +429,7 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     }
 
     /* if we got any data, then copy out the next byte */
-    memmove(s->strstart, buffer_next, len);
+    memmove(Buffer_bufstart(s), buffer_next, len);
     s->bufused = s->strlen = len;
 
     return len;
@@ -498,14 +498,14 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         if (buffer_next == buffer_end) {
             len = buffer_end - buf_start;
             if (s->bufused < l) {
-                if (s->strstart) {
+                if (Buffer_bufstart(s)) {
                     Parrot_gc_reallocate_string_storage(interp, s, l);
                 }
                 else {
                     Parrot_gc_allocate_string_storage(interp, s, l);
                 }
             }
-            out_buf = (unsigned char*)s->strstart + s->strlen;
+            out_buf = (unsigned char*)Buffer_bufstart(s) + s->strlen;
             memcpy(out_buf, buf_start, len);
             s->strlen = s->bufused = l;
             if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
@@ -517,14 +517,14 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         }
     }
     if (s->bufused < l) {
-        if (s->strstart) {
+        if (Buffer_bufstart(s)) {
             Parrot_gc_reallocate_string_storage(interp, s, l);
         }
         else {
             Parrot_gc_allocate_string_storage(interp, s, l);
         }
     }
-    out_buf = (unsigned char*)s->strstart + s->strlen;
+    out_buf = (unsigned char*)Buffer_bufstart(s) + s->strlen;
     len = buffer_next - buf_start;
     memcpy(out_buf, buf_start, len);
     s->strlen = s->bufused = l;
@@ -586,7 +586,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
 
     if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
         /* scan from end, it's likely that EOL is at end of string */
-        const char *p = (char*)(s->strstart) + len - 1;
+        const char *p = (char*)(Buffer_bufstart(s)) + len - 1;
         size_t      i;
 
         for (i = 0; i < len; ++i, --p) {
@@ -623,7 +623,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
         buffer_flags |= PIO_BF_WRITEBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
-        memmove(buffer_next, s->strstart, len);
+        memmove(buffer_next, Buffer_bufstart(s), len);
         buffer_next += len;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
         Parrot_io_set_file_position(interp, filehandle, (len +
@@ -637,7 +637,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
         /* Fill remainder, flush, then try to buffer more */
-        memmove(buffer_next, s->strstart, avail);
+        memmove(buffer_next, Buffer_bufstart(s), avail);
         buffer_next += avail;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
         Parrot_io_set_file_position(interp, filehandle, (avail +
@@ -648,7 +648,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
         buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-        memmove(buffer_start, (s->strstart + avail), diff);
+        memmove(buffer_start, (Buffer_bufstart(s) + avail), diff);
 
         buffer_next += diff;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);

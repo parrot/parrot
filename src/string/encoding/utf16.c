@@ -208,18 +208,18 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     }
 #if PARROT_HAS_ICU
     Parrot_gc_allocate_string_storage(interp, result, sizeof (UChar) * src_len);
-    p = (UChar *)result->strstart;
+    p = (UChar *)Buffer_bufstart(result);
 
     if (src->charset == Parrot_iso_8859_1_charset_ptr ||
             src->charset == Parrot_ascii_charset_ptr) {
         for (dest_len = 0; dest_len < (int)src->strlen; ++dest_len) {
-            p[dest_len] = (UChar)((unsigned char*)src->strstart)[dest_len];
+            p[dest_len] = (UChar)((unsigned char*)Buffer_bufstart(src))[dest_len];
         }
     }
     else {
         err = U_ZERO_ERROR;
         u_strFromUTF8(p, src_len,
-                &dest_len, src->strstart, src->bufused, &err);
+                &dest_len, Buffer_bufstart(src), src->bufused, &err);
         if (!U_SUCCESS(err)) {
             /*
              * have to resize - required len in UChars is in dest_len
@@ -227,9 +227,9 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
             result->bufused = dest_len * sizeof (UChar);
             Parrot_gc_reallocate_string_storage(interp, result,
                                      sizeof (UChar) * dest_len);
-            p = (UChar *)result->strstart;
+            p = (UChar *)Buffer_bufstart(result);
             u_strFromUTF8(p, dest_len,
-                    &dest_len, src->strstart, src->bufused, &err);
+                    &dest_len, Buffer_bufstart(src), src->bufused, &err);
             PARROT_ASSERT(U_SUCCESS(err));
         }
     }
@@ -264,7 +264,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_codepoint)
 #if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) src->strstart;
+    const UChar * const s = (UChar*) Buffer_bufstart(src);
     UINTVAL c, pos;
     UNUSED(interp);
 
@@ -324,7 +324,7 @@ static UINTVAL
 get_byte(SHIM_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_byte)
-    const unsigned char * const contents = (unsigned char *)src->strstart;
+    const unsigned char * const contents = (unsigned char *)Buffer_bufstart(src);
     if (offset >= src->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
                 "get_byte past the end of the buffer (%i of %i)",
@@ -355,7 +355,7 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL byte)
         Parrot_ex_throw_from_c_args(interp, NULL, 0,
             "set_byte past the end of the buffer");
 
-    contents = (unsigned char *)src->strstart;
+    contents = (unsigned char *)Buffer_bufstart(src);
     contents[offset] = (unsigned char)byte;
 }
 
@@ -385,7 +385,7 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
     start = iter.bytepos;
     iter.set_position(interp, &iter, offset + count);
 
-    return Parrot_str_new_init(interp, src->strstart + start, iter.bytepos - start,
+    return Parrot_str_new_init(interp, Buffer_bufstart(src) + start, iter.bytepos - start,
         src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
@@ -474,7 +474,7 @@ static UINTVAL
 utf16_decode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(utf16_decode_and_advance)
-    const UChar * const s = (const UChar*) i->str->strstart;
+    const UChar * const s = (const UChar*) Buffer_bufstart(i->str);
     UINTVAL pos = i->bytepos / sizeof (UChar);
     UINTVAL c;
 
@@ -503,7 +503,7 @@ static void
 utf16_encode_and_advance(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(utf16_encode_and_advance)
-    UChar * const s = (UChar*) i->str->strstart;
+    UChar * const s = (UChar*) Buffer_bufstart(i->str);
     UINTVAL pos = i->bytepos / sizeof (UChar);
     U16_APPEND_UNSAFE(s, pos, c);
     ++i->charpos;
@@ -525,7 +525,7 @@ static void
 utf16_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
     ASSERT_ARGS(utf16_set_position)
-    UChar * const s = (UChar*) i->str->strstart;
+    UChar * const s = (UChar*) Buffer_bufstart(i->str);
     UINTVAL pos;
     pos = 0;
     U16_FWD_N_UNSAFE(s, pos, n);

@@ -61,7 +61,7 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     while (iter.bytepos < s->bufused) {
         if (iter.bytepos + 4 > s->bufused) {
-            const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart +
+            const utf8_t *u8ptr = (utf8_t *)((char *)Buffer_bufstart(s) +
                     iter.bytepos);
             const UINTVAL c = *u8ptr;
 

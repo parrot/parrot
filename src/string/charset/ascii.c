@@ -208,7 +208,7 @@ to_ascii(PARROT_INTERP, ARGIN(const STRING *src))
     /* the string can't grow. Just clone it */
     STRING * const dest = Parrot_str_clone(interp, src);
 
-    p = (unsigned char *)dest->strstart;
+    p = (unsigned char *)Buffer_bufstart(dest);
     ENCODING_ITER_INIT(interp, src, &iter);
     for (offs = 0; offs < len; ++offs) {
         const UINTVAL c = iter.get_and_advance(interp, &iter);
@@ -313,7 +313,7 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
     const UINTVAL n = src->strlen;
 
     if (n) {
-        char * const buffer = result->strstart;
+        char * const buffer = Buffer_bufstart(result);
         UINTVAL offset;
 
         for (offset = 0; offset < n; ++offset) {
@@ -343,7 +343,7 @@ downcase(PARROT_INTERP, ARGIN(const STRING *src))
     const UINTVAL n      = src->strlen;
 
     if (n) {
-        char * const buffer = result->strstart;
+        char * const buffer = Buffer_bufstart(result);
         UINTVAL offset;
 
         for (offset = 0; offset < n; ++offset) {
@@ -375,7 +375,7 @@ titlecase(PARROT_INTERP, ARGIN(const STRING *src))
     const UINTVAL n      = src->strlen;
 
     if (n) {
-        char * const buffer = result->strstart;
+        char * const buffer = Buffer_bufstart(result);
         UINTVAL offset;
 
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
@@ -406,7 +406,7 @@ upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen > 0) {
-        char * const buffer = result->strstart;
+        char * const buffer = Buffer_bufstart(result);
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
     }
 
@@ -432,7 +432,7 @@ downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen > 0) {
-        char * const buffer = result->strstart;
+        char * const buffer = Buffer_bufstart(result);
         buffer[0] = (char)tolower((unsigned char)buffer[0]);
     }
 
@@ -458,7 +458,7 @@ titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen > 0) {
-        char * const buffer = result->strstart;
+        char * const buffer = Buffer_bufstart(result);
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
     }
 
@@ -488,7 +488,7 @@ ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
     String_iter iter;
 
     if (lhs->encoding == rhs->encoding) {
-        const int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
+        const int ret_val = memcmp(Buffer_bufstart(lhs), Buffer_bufstart(rhs), min_len);
         if (ret_val)
             return ret_val < 0 ? -1 : 1;
     }
@@ -773,7 +773,7 @@ ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t seed)
 {
     ASSERT_ARGS(ascii_compute_hash)
     size_t hashval = seed;
-    const char *buffptr = (const char *)src->strstart;
+    const char *buffptr = (const char *)Buffer_bufstart(src);
     UINTVAL len = src->strlen;
 
     PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);

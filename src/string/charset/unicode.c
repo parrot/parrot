@@ -280,22 +280,22 @@ compose(PARROT_INTERP, ARGIN(const STRING *src))
             src->encoding, src->charset, 0);
 
     err      = U_ZERO_ERROR;
-    dest_len = unorm_normalize((UChar *)src->strstart, src_len,
+    dest_len = unorm_normalize((UChar *)Buffer_bufstart(src), src_len,
             UNORM_DEFAULT,      /* default is NFC */
             0,                  /* options 0 default - no specific icu
                                  * version */
-            (UChar *)dest->strstart, dest_len, &err);
+            (UChar *)Buffer_bufstart(dest), dest_len, &err);
 
     dest->bufused = dest_len * sizeof (UChar);
 
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_gc_reallocate_string_storage(interp, dest, dest->bufused);
-        dest_len = unorm_normalize((UChar *)src->strstart, src_len,
+        dest_len = unorm_normalize((UChar *)Buffer_bufstart(src), src_len,
                 UNORM_DEFAULT,      /* default is NFC */
                 0,                  /* options 0 default - no specific
                                      * icu version */
-                (UChar *)dest->strstart, dest_len, &err);
+                (UChar *)Buffer_bufstart(dest), dest_len, &err);
         PARROT_ASSERT(U_SUCCESS(err));
         dest->bufused = dest_len * sizeof (UChar);
     }
@@ -392,7 +392,7 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
      *  TODO downcase, titlecase
      */
     needed = u_strToUpper(NULL, 0,
-            (UChar *)res->strstart, src_len,
+            (UChar *)Buffer_bufstart(res), src_len,
             NULL,       /* locale = default */
             &err);
 
@@ -402,8 +402,8 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
     }
 
     err      = U_ZERO_ERROR;
-    dest_len = u_strToUpper((UChar *)res->strstart, dest_len,
-            (UChar *)res->strstart, src_len,
+    dest_len = u_strToUpper((UChar *)Buffer_bufstart(res), dest_len,
+            (UChar *)Buffer_bufstart(res), src_len,
             NULL,       /* locale = default */
             &err);
     PARROT_ASSERT(U_SUCCESS(err));
@@ -469,8 +469,8 @@ u_strToLower(UChar *dest, int32_t destCapacity,
      */
     err      = U_ZERO_ERROR;
     src_len  = res->bufused / sizeof (UChar);
-    dest_len = u_strToLower((UChar *)res->strstart, src_len,
-            (UChar *)res->strstart, src_len,
+    dest_len = u_strToLower((UChar *)Buffer_bufstart(res), src_len,
+            (UChar *)Buffer_bufstart(res), src_len,
             NULL,       /* locale = default */
             &err);
     res->bufused = dest_len * sizeof (UChar);
@@ -478,8 +478,8 @@ u_strToLower(UChar *dest, int32_t destCapacity,
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_gc_reallocate_string_storage(interp, res, res->bufused);
-        dest_len = u_strToLower((UChar *)res->strstart, dest_len,
-                (UChar *)res->strstart, src_len,
+        dest_len = u_strToLower((UChar *)Buffer_bufstart(res), dest_len,
+                (UChar *)Buffer_bufstart(res), src_len,
                 NULL,       /* locale = default */
                 &err);
         PARROT_ASSERT(U_SUCCESS(err));
@@ -540,8 +540,8 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 
     err      = U_ZERO_ERROR;
     src_len  = res->bufused / sizeof (UChar);
-    dest_len = u_strToTitle((UChar *)res->strstart, src_len,
-            (UChar *)res->strstart, src_len,
+    dest_len = u_strToTitle((UChar *)Buffer_bufstart(res), src_len,
+            (UChar *)Buffer_bufstart(res), src_len,
             NULL,       /* default titleiter */
             NULL,       /* locale = default */
             &err);
@@ -550,8 +550,8 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_gc_reallocate_string_storage(interp, res, res->bufused);
-        dest_len = u_strToTitle((UChar *)res->strstart, dest_len,
-                (UChar *)res->strstart, src_len,
+        dest_len = u_strToTitle((UChar *)Buffer_bufstart(res), dest_len,
+                (UChar *)Buffer_bufstart(res), src_len,
                 NULL, NULL,
                 &err);
         PARROT_ASSERT(U_SUCCESS(err));

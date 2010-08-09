@@ -596,9 +596,9 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
     ASSERT_ARGS(Parrot_byte_index)
-    const char * const str_start  = base->strstart;
+    const char * const str_start  = Buffer_bufstart(base);
     const INTVAL       str_len    = base->strlen;
-    const char * const search_str = search->strstart;
+    const char * const search_str = Buffer_bufstart(search);
     const INTVAL       search_len = search->strlen;
     const char        *str_pos    = str_start + start_offset;
     INTVAL             len_remain = str_len   - start_offset;
@@ -646,7 +646,7 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 {
     ASSERT_ARGS(Parrot_byte_rindex)
     const INTVAL searchlen          = search->strlen;
-    const char * const search_start = (const char *)(search->strstart);
+    const char * const search_start = (const char *)(Buffer_bufstart(search));
     UINTVAL max_possible_offset     = (base->strlen - search->strlen);
     INTVAL current_offset;
 
@@ -655,7 +655,7 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 
     for (current_offset = max_possible_offset; current_offset >= 0;
             current_offset--) {
-        const char * const base_start = (char *)(base->strstart) + current_offset;
+        const char * const base_start = (char *)(Buffer_bufstart(base)) + current_offset;
         if (memcmp(base_start, search_start, searchlen) == 0) {
             return current_offset;
         }

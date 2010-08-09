@@ -67,7 +67,7 @@ Initializes the StringBuilder with initial size of buffer.
         buffer->charset   = Parrot_default_charset_ptr;
         /* We need all string flags here because we use this buffer in substr_str */
         buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
-        Buffer_bufstart(buffer)t = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
+        Buffer_bufstart(buffer) = mem_gc_allocate_n_typed(INTERP,
                 initial_size, char);
         Buffer_buflen(buffer) = initial_size;
 
@@ -147,7 +147,7 @@ Append string to current buffer.
             STRUCT_COPY(buffer, new_buffer);
             buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
 
-            Buffer_bufstart(buffer) = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
+            Buffer_bufstart(buffer) = mem_gc_allocate_n_typed(INTERP,
                                                     Buffer_buflen(new_buffer), char);
             mem_sys_memcopy(Buffer_bufstart(buffer), Buffer_bufstart(new_buffer),
                 Buffer_buflen(new_buffer));
@@ -163,14 +163,14 @@ Append string to current buffer.
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer)) {
             /* Parrot_unicode_charset_ptr can produce NULL buffer */
-            Buffer_bufstart(buffer) = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
+            Buffer_bufstart(buffer) = mem_gc_realloc_n_typed(INTERP,
                 Buffer_bufstart(buffer), total_size, char);
             Buffer_buflen(buffer)   = total_size;
         }
 
         /* Tack s on the end of buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart + buffer->bufused),
-                s->strstart, s->bufused);
+        mem_sys_memcopy((void *)((ptrcast_t)Buffer_bufstart(buffer) + buffer->bufused),
+                Buffer_bufstart(s), s->bufused);
 
         /* Update buffer */
         buffer->bufused += s->bufused;
@@ -225,14 +225,14 @@ Set content of buffer to passed string or PMC
 
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer)) {
-            Buffer_bufstart(buffer) = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
+            Buffer_bufstart(buffer) = mem_gc_realloc_n_typed(INTERP,
                     Buffer_bufstart(buffer), total_size, char);
             Buffer_buflen(buffer)   = total_size;
         }
 
         /* Tack s on the buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart),
-                s->strstart, s->bufused);
+        mem_sys_memcopy((void *)((ptrcast_t)Buffer_bufstart(buffer)),
+                Buffer_bufstart(s), s->bufused);
 
         /* Update buffer */
         buffer->bufused  = s->bufused;

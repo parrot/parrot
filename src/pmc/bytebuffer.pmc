@@ -153,7 +153,7 @@ Resize the buffer to the given value.
                     if (size > 0) {
                         STRING * source;
                         GET_ATTR_source(INTERP, SELF, source);
-                        memcpy(content, source->strstart, copysize);
+                        memcpy(content, Buffer_bufstart(source), copysize);
                     }
                     SET_ATTR_source(INTERP, SELF, STRINGNULL);
                 }
@@ -192,7 +192,7 @@ Reset the buffer with the content of the string.
         }
         SET_ATTR_source(INTERP, SELF, new_string);
         SET_ATTR_size(INTERP, SELF, Parrot_str_byte_length(INTERP, new_string));
-        SET_ATTR_content(INTERP, SELF, (unsigned char *)new_string->strstart);
+        SET_ATTR_content(INTERP, SELF, (unsigned char *)Buffer_bufstart(new_string));
     }
 
 /*
@@ -243,7 +243,7 @@ is out of current size.
                     INTVAL srclen = Parrot_str_byte_length(INTERP, source);
                     if (srclen < copysize)
                         copysize = srclen;
-                    memcpy(content, source->strstart, copysize);
+                    memcpy(content, Buffer_bufstart(source), copysize);
                     SET_ATTR_source(INTERP, SELF, STRINGNULL);
                 }
             }

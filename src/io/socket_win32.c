@@ -247,7 +247,7 @@ AGAIN:
     /*
      * Ignore encoding issues for now.
      */
-    if ((error = send((int)io->os_handle, (char *)s->strstart + byteswrote,
+    if ((error = send((int)io->os_handle, (char *)Buffer_bufstart(s) + byteswrote,
                     bytes, 0)) >= 0) {
         byteswrote += error;
         bytes -= error;
