@@ -681,18 +681,12 @@ free_buffer(SHIM_INTERP,
     if (mem_pool) {
         /* Update Memory_Block usage */
         if (PObj_is_movable_TESTALL(b)) {
-            INTVAL *buffer_flags = Buffer_bufrefcountptr(b);
-
             /* Mask low 2 bits used for flags */
             Memory_Block * block = Buffer_pool(b);
 
             PARROT_ASSERT(block);
 
-            /* We can have shared buffers. Don't count them (yet) */
-            if (!(*buffer_flags & Buffer_shared_FLAG)) {
-                block->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(b));
-            }
-
+            block->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(b));
         }
     }
 

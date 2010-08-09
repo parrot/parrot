@@ -23,11 +23,6 @@
 
 typedef struct parrot_string_t STRING;
 
-typedef enum Forward_flag {
-    Buffer_moved_FLAG   = 1 << 0,
-    Buffer_shared_FLAG  = 1 << 1
-} Forward_flags;
-
 /* String iterator */
 typedef struct string_iterator_t {
     const STRING *str;

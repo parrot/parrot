@@ -1255,9 +1255,6 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     /* We must not reallocate non-movable buffers! */
     PARROT_ASSERT(PObj_is_movable_TESTALL(str));
 
-    /* We must not reallocate shared buffers! */
-    PARROT_ASSERT(!(*Buffer_bufrefcountptr(str) & Buffer_shared_FLAG));
-
     /* Decrease usage */
     PARROT_ASSERT(Buffer_pool(str));
     Buffer_pool(str)->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(str));

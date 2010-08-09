@@ -598,10 +598,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
         ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_ptr))
 {
     ASSERT_ARGS(move_one_buffer)
-
-    INTVAL       *flags     = NULL;
-    ptrdiff_t     offset    = 0;
-    Memory_Block *old_block = NULL;
 #if RESOURCE_DEBUG
     if (Buffer_buflen(old_buf) >= RESOURCE_DEBUG_SIZE)
         debug_print_buf(interp, old_buf);
@@ -609,54 +605,18 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
     UNUSED(interp);
 #endif
 
-    if (PObj_is_COWable_TEST(old_buf)) {
-        flags = Buffer_bufrefcountptr(old_buf);
-        old_block = Buffer_pool(old_buf);
-    }
+    new_pool_ptr = aligned_mem(old_buf, new_pool_ptr);
 
-    /* buffer has already been moved; just change the header */
-    if (flags && (*flags & Buffer_shared_FLAG)
-              && (*flags & Buffer_moved_FLAG)) {
-        /* Find out who else references our data */
-        Buffer * const hdr = *((Buffer **)Buffer_bufstart(old_buf));
+    /* Copy our memory to the new pool */
+    memcpy(new_pool_ptr, Buffer_bufstart(old_buf),
+        Buffer_buflen(old_buf));
 
-        PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
+    Buffer_bufstart(old_buf) = new_pool_ptr;
 
-        /* Make sure they know that we own it too */
-        /* Set Buffer_shared_FLAG in new buffer */
-        *Buffer_bufrefcountptr(hdr) |= Buffer_shared_FLAG;
+    /* Remember new pool inside */
+    *Buffer_poolptr(old_buf) = pool;
 
-        /* Now make sure we point to where the other guy does */
-        Buffer_bufstart(old_buf) = Buffer_bufstart(hdr);
-    }
-    else {
-        new_pool_ptr = aligned_mem(old_buf, new_pool_ptr);
-
-        /* Copy our memory to the new pool */
-        memcpy(new_pool_ptr, Buffer_bufstart(old_buf),
-                                Buffer_buflen(old_buf));
-
-        /* If we're shared */
-        if (flags && (*flags & Buffer_shared_FLAG)) {
-            // Hmm. Can this be removed now?
-            PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
-
-            /* Let the old buffer know how to find us */
-            *((Buffer **)Buffer_bufstart(old_buf)) = old_buf;
-
-            /* Finally, let the tail know that we've moved, so
-                * that any other references can know to look for
-                * us and not re-copy */
-            *flags |= Buffer_moved_FLAG;
-        }
-
-        Buffer_bufstart(old_buf) = new_pool_ptr;
-
-        /* Remember new pool inside */
-        *Buffer_poolptr(old_buf) = pool;
-
-        new_pool_ptr += Buffer_buflen(old_buf);
-    }
+    new_pool_ptr += Buffer_buflen(old_buf);
 
     return new_pool_ptr;
 }
