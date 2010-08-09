@@ -21814,8 +21814,8 @@ Parrot_stringinfo_i_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
           case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(SREG(2));
             break;
-          case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL(SREG(2)->strstart);
+          case STRINGINFO_BUFSTART:
+            IREG(1) = PTR2UINTVAL(Buffer_bufstart(SREG(2)));
             break;
           case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(SREG(2));
@@ -21850,8 +21850,8 @@ Parrot_stringinfo_i_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
           case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(CONST(2).u.string);
             break;
-          case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL(CONST(2).u.string->strstart);
+          case STRINGINFO_BUFSTART:
+            IREG(1) = PTR2UINTVAL(Buffer_bufstart(CONST(2).u.string));
             break;
           case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(CONST(2).u.string);
@@ -21886,8 +21886,8 @@ Parrot_stringinfo_i_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
           case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(SREG(2));
             break;
-          case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL(SREG(2)->strstart);
+          case STRINGINFO_BUFSTART:
+            IREG(1) = PTR2UINTVAL(Buffer_bufstart(SREG(2)));
             break;
           case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(SREG(2));
@@ -21922,8 +21922,8 @@ Parrot_stringinfo_i_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
           case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(CONST(2).u.string);
             break;
-          case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL(CONST(2).u.string->strstart);
+          case STRINGINFO_BUFSTART:
+            IREG(1) = PTR2UINTVAL(Buffer_bufstart(CONST(2).u.string));
             break;
           case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(CONST(2).u.string);

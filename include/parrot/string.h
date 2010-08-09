@@ -46,7 +46,7 @@ typedef struct string_iterator_t {
 /* &gen_from_def(stringinfo.pasm) */
 
 #define STRINGINFO_HEADER   1
-#define STRINGINFO_STRSTART 2
+#define STRINGINFO_BUFSTART 2
 #define STRINGINFO_BUFLEN   3
 #define STRINGINFO_FLAGS    4
 #define STRINGINFO_BUFUSED  5
