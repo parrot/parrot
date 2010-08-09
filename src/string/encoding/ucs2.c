@@ -78,8 +78,8 @@ static UINTVAL get_codepoint(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
+    ARGIN(const STRING *s),
+    UINTVAL offs,
     UINTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -144,7 +144,7 @@ static void ucs2_set_position(SHIM_INTERP,
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
@@ -297,8 +297,8 @@ set_byte(PARROT_INTERP, SHIM(const STRING *src), SHIM(UINTVAL offset),
 
 /*
 
-=item C<static STRING * get_codepoints(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
+=item C<static STRING * get_codepoints(PARROT_INTERP, const STRING *s, UINTVAL
+offs, UINTVAL count)>
 
 Returns the codepoints in string C<src> at position C<offset> and length
 C<count>.
@@ -310,14 +310,14 @@ C<count>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
+get_codepoints(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL offs, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
 #if PARROT_HAS_ICU
-    return Parrot_str_new_init(interp, Buffer_bufstart(src) + offset * sizeof (UChar),
-        count * sizeof (UChar), src->encoding, src->charset, PObj_get_FLAGS(src));
+    return Parrot_str_new_init(interp, (char *)Buffer_bufstart(s) + offs * sizeof (UChar),
+        count * sizeof (UChar), s->encoding, s->charset, PObj_get_FLAGS(s));
 #else
-    UNUSED(src);
+    UNUSED(s);
     UNUSED(offset);
     UNUSED(count);
     no_ICU_lib(interp);

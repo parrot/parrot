@@ -301,7 +301,7 @@ for writing to disc and later loading via C<load_bytecode>.
         res->strlen  = res->bufused = size;
 
         if ((size_t)(Buffer_bufstart(res)) & 0xf) {
-            char *adr     = Buffer_bufstart(res);
+            char *adr     = (char *) Buffer_bufstart(res);
             adr          += 16 - ((size_t)adr & 0xf);
             Buffer_bufstart(res) = adr;
         }

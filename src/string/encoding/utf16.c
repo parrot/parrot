@@ -219,7 +219,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     else {
         err = U_ZERO_ERROR;
         u_strFromUTF8(p, src_len,
-                &dest_len, Buffer_bufstart(src), src->bufused, &err);
+                &dest_len, (char *) Buffer_bufstart(src), src->bufused, &err);
         if (!U_SUCCESS(err)) {
             /*
              * have to resize - required len in UChars is in dest_len
@@ -229,7 +229,7 @@ to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                                      sizeof (UChar) * dest_len);
             p = (UChar *)Buffer_bufstart(result);
             u_strFromUTF8(p, dest_len,
-                    &dest_len, Buffer_bufstart(src), src->bufused, &err);
+                    &dest_len, (char *) Buffer_bufstart(src), src->bufused, &err);
             PARROT_ASSERT(U_SUCCESS(err));
         }
     }
@@ -385,8 +385,8 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
     start = iter.bytepos;
     iter.set_position(interp, &iter, offset + count);
 
-    return Parrot_str_new_init(interp, Buffer_bufstart(src) + start, iter.bytepos - start,
-        src->encoding, src->charset, PObj_get_FLAGS(src));
+    return Parrot_str_new_init(interp, (char *)Buffer_bufstart(src) + start,
+        iter.bytepos - start, src->encoding, src->charset, PObj_get_FLAGS(src));
 }
 
 

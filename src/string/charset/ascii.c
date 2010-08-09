@@ -313,7 +313,7 @@ upcase(PARROT_INTERP, ARGIN(const STRING *src))
     const UINTVAL n = src->strlen;
 
     if (n) {
-        char * const buffer = Buffer_bufstart(result);
+        char * const buffer = (char * const) Buffer_bufstart(result);
         UINTVAL offset;
 
         for (offset = 0; offset < n; ++offset) {
@@ -343,7 +343,7 @@ downcase(PARROT_INTERP, ARGIN(const STRING *src))
     const UINTVAL n      = src->strlen;
 
     if (n) {
-        char * const buffer = Buffer_bufstart(result);
+        char * const buffer = (char * const) Buffer_bufstart(result);
         UINTVAL offset;
 
         for (offset = 0; offset < n; ++offset) {
@@ -375,7 +375,7 @@ titlecase(PARROT_INTERP, ARGIN(const STRING *src))
     const UINTVAL n      = src->strlen;
 
     if (n) {
-        char * const buffer = Buffer_bufstart(result);
+        char * const buffer = (char * const) Buffer_bufstart(result);
         UINTVAL offset;
 
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
@@ -406,7 +406,7 @@ upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen > 0) {
-        char * const buffer = Buffer_bufstart(result);
+        char * const buffer = (char * const) Buffer_bufstart(result);
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
     }
 
@@ -432,7 +432,7 @@ downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen > 0) {
-        char * const buffer = Buffer_bufstart(result);
+        char * const buffer = (char * const) Buffer_bufstart(result);
         buffer[0] = (char)tolower((unsigned char)buffer[0]);
     }
 
@@ -458,7 +458,7 @@ titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen > 0) {
-        char * const buffer = Buffer_bufstart(result);
+        char * const buffer = (char * const) Buffer_bufstart(result);
         buffer[0] = (char)toupper((unsigned char)buffer[0]);
     }
 

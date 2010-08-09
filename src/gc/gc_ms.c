@@ -1213,9 +1213,9 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     size_t newsize)
 {
     ASSERT_ARGS(gc_ms_reallocate_string_storage)
-    size_t copysize;
-    char *mem, *oldmem;
-    size_t new_size, needed, old_size;
+    char *mem;
+    void *oldmem;
+    size_t copysize, new_size, needed, old_size;
 
     Variable_Size_Pool * const pool =
         PObj_constant_TEST(str)

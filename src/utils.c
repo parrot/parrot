@@ -596,9 +596,9 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
     ASSERT_ARGS(Parrot_byte_index)
-    const char * const str_start  = Buffer_bufstart(base);
+    const char * const str_start  = (const char * const) Buffer_bufstart(base);
     const INTVAL       str_len    = base->strlen;
-    const char * const search_str = Buffer_bufstart(search);
+    const char * const search_str = (const char * const) Buffer_bufstart(search);
     const INTVAL       search_len = search->strlen;
     const char        *str_pos    = str_start + start_offset;
     INTVAL             len_remain = str_len   - start_offset;

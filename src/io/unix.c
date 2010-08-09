@@ -556,7 +556,7 @@ Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *
 {
     ASSERT_ARGS(Parrot_io_write_unix)
     const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const char * const buffer = Buffer_bufstart(s);
+    const char * const buffer = (const char * const) Buffer_bufstart(s);
     const char * ptr          = buffer;
 
     size_t to_write = s->bufused;

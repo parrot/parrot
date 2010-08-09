@@ -738,7 +738,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
            it was safe by setting PObj_external_FLAG.
            (The cast is necessary to pacify TenDRA's tcc.)
            */
-        Buffer_bufstart(s) = PARROT_const_cast(void *, buffer);
+        Buffer_bufstart(s) = PARROT_const_cast(char *, buffer);
         Buffer_buflen(s)   = s->bufused  = len;
 
         if (encoding == Parrot_fixed_8_encoding_ptr)
