@@ -745,8 +745,6 @@ Removes and returns a reference to a pmc from the start of the image.
         PARROT_IMAGEIO(SELF)->what   = VISIT_THAW_NORMAL;
         PARROT_IMAGEIO(SELF)->buffer = (Buffer *)image;
 
-        PARROT_ASSERT(image->_bufstart == image->strstart);
-
         SET_VISIT_CURSOR(SELF,
             (const char *)Buffer_bufstart(PARROT_IMAGEIO(SELF)->buffer));
         PARROT_IMAGEIO(SELF)->input_length = image->strlen;
