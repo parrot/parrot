@@ -67,9 +67,9 @@ Initializes the StringBuilder with initial size of buffer.
         buffer->charset   = Parrot_default_charset_ptr;
         /* We need all string flags here because we use this buffer in substr_str */
         buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
-        buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
+        Buffer_bufstart(buffer)t = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
                 initial_size, char);
-        buffer->_buflen   = initial_size;
+        Buffer_buflen(buffer) = initial_size;
 
         SET_ATTR_buffer(INTERP, SELF, buffer);
 
@@ -90,8 +90,8 @@ Free the buffer on destruction.
         if (PMC_data(SELF)) {
             STRING *buffer;
             GET_ATTR_buffer(INTERP, SELF, buffer);
-            if (buffer->_bufstart)
-                mem_gc_free(INTERP, buffer->_bufstart);
+            if (Buffer_bufstart(buffer))
+                mem_gc_free(INTERP, Buffer_bufstart(buffer));
             mem_gc_free(INTERP, buffer);
         }
     }
@@ -143,13 +143,14 @@ Append string to current buffer.
 
             /* Create new temporary string */
             STRING * const new_buffer = Parrot_unicode_charset_ptr->to_charset(interp, buffer);
-            mem_gc_free(INTERP, buffer->_bufstart);
+            mem_gc_free(INTERP, Buffer_bufstart(buffer));
             STRUCT_COPY(buffer, new_buffer);
             buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
 
-            buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
-                                                    new_buffer->_buflen, char);
-            mem_sys_memcopy(buffer->_bufstart, new_buffer->_bufstart, new_buffer->_buflen);
+            Buffer_bufstart(buffer) = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
+                                                    Buffer_buflen(new_buffer), char);
+            mem_sys_memcopy(Buffer_bufstart(buffer), Buffer_bufstart(new_buffer),
+                Buffer_buflen(new_buffer));
 
             SET_ATTR_buffer(INTERP, SELF, buffer);
 
@@ -162,9 +163,9 @@ Append string to current buffer.
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer)) {
             /* Parrot_unicode_charset_ptr can produce NULL buffer */
-            buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
-                buffer->_bufstart, total_size, char);
-            buffer->_buflen   = total_size;
+            Buffer_bufstart(buffer) = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
+                Buffer_bufstart(buffer), total_size, char);
+            Buffer_buflen(buffer)   = total_size;
         }
 
         /* Tack s on the end of buffer */
@@ -224,9 +225,9 @@ Set content of buffer to passed string or PMC
 
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer)) {
-            buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
-                    buffer->_bufstart, total_size, char);
-            buffer->_buflen   = total_size;
+            Buffer_bufstart(buffer) = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
+                    Buffer_bufstart(buffer), total_size, char);
+            Buffer_buflen(buffer)   = total_size;
         }
 
         /* Tack s on the buffer */
