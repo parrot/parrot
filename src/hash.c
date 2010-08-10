@@ -508,23 +508,20 @@ static void
 parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_keys)
-    UINTVAL entries = hash->entries;
-    UINTVAL found   = 0;
-    INTVAL  i;
+    const UINTVAL entries = hash->entries;
+    UINTVAL found = 0;
+    UINTVAL i;
 
-    for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+    HashBucket *bucket = hash->buckets;
 
-        while (bucket) {
-            if (++found > entries)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Detected hash corruption at hash %p entries %d",
-                    hash, (int)entries);
+    for (i= 0; i <= hash->mask; ++i, ++bucket) {
+        if (bucket->key){
 
             PARROT_ASSERT(bucket->key);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
-            bucket = bucket->next;
+            if (++found >= entries)
+                break;
         }
     }
 }
@@ -545,22 +542,19 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_values)
     const UINTVAL entries = hash->entries;
-    UINTVAL found   = 0;
-    INTVAL  i;
+    UINTVAL found = 0;
+    UINTVAL i;
 
-    for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+    HashBucket *bucket = hash->buckets;
 
-        while (bucket) {
-            if (++found > entries)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "Detected hash corruption at hash %p entries %d",
-                        hash, (int)entries);
+    for (i= 0; i <= hash->mask; ++i, ++bucket) {
+        if (bucket->key){
 
             PARROT_ASSERT(bucket->value);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
-            bucket = bucket->next;
+            if (++found >= entries)
+                break;
         }
     }
 }
@@ -580,29 +574,24 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_both)
     const UINTVAL entries = hash->entries;
-    UINTVAL found   = 0;
-    INTVAL  i;
+    UINTVAL found = 0;
+    UINTVAL i;
 
-    for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+    HashBucket *bucket = hash->buckets;
 
-        while (bucket) {
-            if (++found > entries)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "Detected hash corruption at hash %p entries %d",
-                        hash, (int)entries);
-
+    for (i= 0; i <= hash->mask; ++i, ++bucket) {
+        if (bucket->key){
             PARROT_ASSERT(bucket->key);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
             PARROT_ASSERT(bucket->value);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
-            bucket = bucket->next;
+            if (++found >= entries)
+                break;
         }
     }
 }
-
 
 /*
 
