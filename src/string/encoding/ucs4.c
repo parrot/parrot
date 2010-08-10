@@ -336,17 +336,25 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
 {
     ASSERT_ARGS(get_codepoints)
 #if PARROT_HAS_ICU
-    const UINTVAL flags = PObj_get_FLAGS(src) & ~PObj_external_FLAG;
+    const UINTVAL flags = PObj_get_FLAGS(src) & ~PObj_constant_FLAG;
     STRING * const dst  = Parrot_gc_new_string_header(interp, flags);
 
     dst->encoding = src->encoding;
     dst->charset  = src->charset;
     dst->strlen   = count;
     dst->bufused  = count * sizeof (UChar32);
-    Parrot_gc_allocate_string_storage(interp, dst, count);
-    mem_sys_memcopy(Buffer_bufstart(dst),
-                    Buffer_bufstart(src) + offset * sizeof (UChar32),
-                    count * sizeof (UChar32));
+
+    if (!(flags & PObj_external_FLAG)){
+        Parrot_gc_allocate_string_storage(interp, dst, count);
+        mem_sys_memcopy(Buffer_bufstart(dst),
+                        Buffer_bufstart(src) + offset * sizeof (UChar32),
+                        count * sizeof (UChar32));
+    }
+    else {
+         Buffer_bufstart(dst) = Buffer_bufstart(src) + offset * sizeof (UChar32);
+         Buffer_buflen(dst)   = 0;
+    }
+
     return dst;
 #else
     UNUSED(src);

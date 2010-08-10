@@ -320,14 +320,22 @@ static STRING *
 get_bytes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    const UINTVAL flags = PObj_get_FLAGS(src) & ~PObj_external_FLAG;
+    const UINTVAL flags = PObj_get_FLAGS(src) & ~PObj_constant_FLAG;
     STRING * const dst  = Parrot_gc_new_string_header(interp, flags);
 
     dst->encoding = src->encoding;
     dst->charset  = src->charset;
     dst->bufused  = dst->strlen = count;
-    Parrot_gc_allocate_string_storage(interp, dst, count);
-    mem_sys_memcopy(Buffer_bufstart(dst), Buffer_bufstart(src) + offset, count);
+
+    if (!(flags & PObj_external_FLAG)){
+        Parrot_gc_allocate_string_storage(interp, dst, count);
+        mem_sys_memcopy(Buffer_bufstart(dst), Buffer_bufstart(src) + offset, count);
+    }
+    else {
+         Buffer_bufstart(dst) = Buffer_bufstart(src) + offset;
+         Buffer_buflen(dst)   = 0;
+    }
+
     return dst;
 }
 

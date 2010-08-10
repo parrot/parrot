@@ -678,7 +678,7 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
-    const UINTVAL flags = PObj_get_FLAGS(src) & ~PObj_external_FLAG;
+    const UINTVAL flags = PObj_get_FLAGS(src) & ~PObj_constant_FLAG;
     STRING * const dst  = Parrot_gc_new_string_header(interp, flags);
     String_iter    iter;
     UINTVAL        start, size;
@@ -689,8 +689,14 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL 
     iter.set_position(interp, &iter, offset + count);
     size = iter.bytepos - start;
 
-    Parrot_gc_allocate_string_storage(interp, dst, size);
-    mem_sys_memcopy(Buffer_bufstart(dst), Buffer_bufstart(src) + start, size);
+    if (!(flags & PObj_external_FLAG)){
+        Parrot_gc_allocate_string_storage(interp, dst, size);
+        mem_sys_memcopy(Buffer_bufstart(dst), Buffer_bufstart(src) + start, size);
+    }
+    else {
+        Buffer_bufstart(dst) = Buffer_bufstart(src) + start;
+        Buffer_buflen(dst)   = 0;
+    }
 
     dst->encoding = src->encoding;
     dst->charset  = src->charset;
