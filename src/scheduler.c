@@ -85,6 +85,9 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
         scheduler = VTABLE_share_ro(interp, scheduler);
 
         interp->scheduler = scheduler;
+
+        /* Make sure the program can handle alarm signals */
+        Parrot_alarm_init();
     }
 }
 
@@ -121,7 +124,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
     do {
         Parrot_cx_check_alarms(interp, interp->scheduler);
-        Parrot_threads_wakeup(interp);
+        (void) Parrot_threads_next_to_run(interp, 0);
 
         UNLOCK_INTERP(interp);
         pause();
@@ -129,7 +132,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
         task_count    = VTABLE_get_integer(interp, sched->task_queue);
         alarm_count   = VTABLE_get_integer(interp, sched->alarms);
-        blocked_count = Parrot_threads_count_blocked(interp);
+        blocked_count = Parrot_threads_count_active(interp);
     } while (task_count + alarm_count + blocked_count > 0);
 
     Parrot_threads_reap(interp);
@@ -138,42 +141,6 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     if (task_count > 0)
         Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                     "Exiting with %d active tasks.\n", task_count);
-}
-
-/*
-
-=item C<void Parrot_cx_outer_runloop(PARROT_INTERP, INTVAL tidx)>
-
-This is the core loop performed by each active OS thread, looking for Tasks
-to run and running them.
-
-=cut
-
-*/
-
-void
-Parrot_cx_outer_runloop(PARROT_INTERP, INTVAL tidx)
-{
-    ASSERT_ARGS(Parrot_cx_outer_runloop)
-    PMC* scheduler = interp->scheduler;
-    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
-    INTVAL task_count;
-
-    for (;;) {
-        LOCK_INTERP(interp);
-        interp->active_thread = tidx;
-
-        task_count = VTABLE_get_integer(interp, sched->task_queue);
-
-        if (task_count > 0) {
-            Parrot_cx_next_task(interp, scheduler);
-        }
-        else {
-            Parrot_threads_idle(interp, tidx);
-        }
-
-        UNLOCK(interp->interp_lock);
-    }
 }
 
 /*
@@ -210,6 +177,9 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
         Parrot_alarm_set(interp->quantum_done);
 
         Parrot_ext_call(interp, interp->current_task, "->");
+    } 
+    else {
+        Parrot_alarm_now();
     }
 }
 
@@ -230,8 +200,13 @@ Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t* next))
     ASSERT_ARGS(Parrot_cx_check_scheduler)
     PMC *scheduler = interp->scheduler;
 
-    if  (Parrot_alarm_check(&(interp->last_alarm))
-          || SCHEDULER_wake_requested_TEST(scheduler)) {
+    if (Parrot_threads_check_and_reset(interp)) {
+        SCHEDULER_wake_requested_SET(scheduler);
+        SCHEDULER_resched_requested_SET(scheduler);
+    }
+
+    if (Parrot_alarm_check(&(interp->last_alarm))
+        || SCHEDULER_wake_requested_TEST(scheduler)) {
         SCHEDULER_wake_requested_CLEAR(scheduler);
         return Parrot_cx_run_scheduler(interp, scheduler, next);
     }
@@ -257,6 +232,7 @@ opcode_t*
 Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
+    INTVAL tid = interp->active_thread;
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
@@ -264,10 +240,16 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *n
     if (SCHEDULER_resched_requested_TEST(scheduler)) {
         SCHEDULER_resched_requested_CLEAR(scheduler);
 
-        /* Exiting the runloop to swap tasks doesn't play
-           nice with nested runloops */
-        if (interp->current_runloop_level <= 1)
+        /* A task switch will only work in the outer runloop of a fully
+           booted Parrot. In a Parrot that hasn't called begin_execution,
+           or in a nested runloop, we silently ignore task switches. */
+        if (interp->current_task && interp->current_runloop_level <= 1)
             return Parrot_cx_preempt_task(interp, scheduler, next);
+
+#ifdef ARBITRARY_DEBUG_STATEMENT
+        fprintf(stderr, "Should have exited runloop. Didn't (%lx, %ld)\n",
+                interp->current_task, interp->current_runloop_level);
+#endif
     }
 
     return next;

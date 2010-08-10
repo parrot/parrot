@@ -25,7 +25,6 @@ Start Parrot
 #include "parrot/imcc.h"
 #include "parrot/longopt.h"
 #include "parrot/runcore_api.h"
-#include "parrot/alarm.h"
 #include "pmc/pmc_callcontext.h"
 
 /* For gc_sys_type_enum */

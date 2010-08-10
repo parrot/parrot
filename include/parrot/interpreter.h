@@ -132,6 +132,8 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/multidispatch.h"
 #include "parrot/call.h"
 
+#include "parrot/atomic.h"
+
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
@@ -272,7 +274,10 @@ struct parrot_interp_t {
 
     Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
     INTVAL           active_thread;           /* Index of the active thread in thread_table */
-    struct Thread_table *thread_table;         /* Array of this interpreter's threads */
+
+    struct Thread_table  *thread_table;       /* Array of this interpreter's threads */
+    Parrot_atomic_integer thread_signal;      /* Flag. Set if threads need rescheduling */
+    Parrot_mutex          thread_lock;        /* Lock for the thread_table */
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

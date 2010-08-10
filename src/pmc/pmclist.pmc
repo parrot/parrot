@@ -38,6 +38,9 @@ static void throw_shift_empty(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value);
+
+
 /* It's a doubly linked list */
 typedef struct PMC_List_Item {
     PMC *data;

@@ -31,6 +31,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "pmc/pmc_filehandle.h"
+#include "parrot/threads.h"
 
 #ifdef PIO_OS_UNIX
 
@@ -515,7 +516,12 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     void * const buffer = Buffer_bufstart(s);
 
     for (;;) {
-        const int bytes = read(file_descriptor, buffer, len);
+        int bytes;
+        INTVAL tid;
+
+        BLOCK_THREAD_ON(interp,
+            bytes = read(file_descriptor, buffer, len));
+
         if (bytes > 0) {
             s->bufused = s->strlen = bytes;
             return bytes;

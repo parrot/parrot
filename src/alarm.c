@@ -15,7 +15,6 @@ src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 
 /* Some per-process state */
 static volatile UINTVAL  alarm_serial = 0;
-static volatile UINTVAL  alarm_init   = 0;
 static volatile FLOATVAL alarm_set_to = 0.0;
 
 /* This file relies on POSIX. Probably need two other versions of it:
@@ -30,9 +29,7 @@ static volatile FLOATVAL alarm_set_to = 0.0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void posix_alarm_init(void);
 static void posix_alarm_set(FLOATVAL wait);
-#define ASSERT_ARGS_posix_alarm_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_posix_alarm_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -42,7 +39,7 @@ static void posix_alarm_set(FLOATVAL wait);
 
 =over 4
 
-=item C<static void posix_alarm_init(void)>
+=item C<void Parrot_alarm_init(void)>
 
 Initialize the alarm queue. This function should only be called from the initial
 pthread. Any other pthreads should make sure to mask out SIGALRM.
@@ -53,10 +50,10 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 void Parrot_alarm_callback(SHIM(int sig_number));
 
-static void
-posix_alarm_init(void)
+void
+Parrot_alarm_init(void)
 {
-    ASSERT_ARGS(posix_alarm_init)
+    ASSERT_ARGS(Parrot_alarm_init)
 
     struct sigaction sa;
     sa.sa_handler = Parrot_alarm_callback;
@@ -68,8 +65,6 @@ posix_alarm_init(void)
     }
 
     Parrot_alarm_unmask(NULL);
-
-    alarm_init = 1;
 }
 
 /*
@@ -90,9 +85,6 @@ posix_alarm_set(FLOATVAL wait)
     const int MIL = 1000000;
     struct itimerval itmr;
     int sec, usec;
-
-    if (!alarm_init)
-        posix_alarm_init();
 
     sec  = (int) wait;
     usec = (int) ((wait - sec) * MIL);
@@ -218,6 +210,23 @@ Parrot_alarm_set(FLOATVAL when)
 
     alarm_set_to = when;
     posix_alarm_set(when - now);
+}
+
+/*
+
+=item C<void Parrot_alarm_now(void)>
+
+Trigger an alarm wakeup.
+
+=cut
+
+*/
+
+void
+Parrot_alarm_now(void)
+{
+    ASSERT_ARGS(Parrot_alarm_now)
+    kill(getpid(), SIGALRM);
 }
 
 /*

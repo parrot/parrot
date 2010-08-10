@@ -296,7 +296,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
      */
     interp->thread_data = NULL;
 
-    MUTEX_INIT(interp->interp_lock);
     Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
@@ -355,6 +354,10 @@ void
 Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_really_destroy)
+
+    /* Chandon TODO: Restore this functionality */
+    return;
+
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
