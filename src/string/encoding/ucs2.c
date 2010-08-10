@@ -327,8 +327,8 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL offs, UINTVAL coun
             count * sizeof (UChar));
     }
     else {
-         Buffer_bufstart(dst) = Buffer_bufstart(s) + offs * sizeof (UChar);
-         Buffer_buflen(dst)   = 0;
+        Buffer_bufstart(dst) = Buffer_bufstart(s) + offs * sizeof (UChar);
+        Buffer_buflen(dst)   = 0;
     }
 
     return dst;

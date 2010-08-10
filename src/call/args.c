@@ -816,29 +816,29 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* If the parameter is slurpy, collect all remaining positional
          * arguments into an array.*/
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
-            PMC *collect_positional;
-            int  j;
-
             /* Can't handle named slurpy here, go to named argument handling */
-            if (param_flags & PARROT_ARG_NAME)
-                break;
+            if (!(param_flags & PARROT_ARG_NAME)) {
+                PMC *collect_positional;
+                int  j;
+                INTVAL num_positionals = positional_args - arg_index;
+                if (num_positionals < 0)
+                    num_positionals = 0;
+                if (named_count > 0)
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "named parameters must follow all positional parameters");
 
-            if (named_count > 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "named parameters must follow all positional parameters");
+                collect_positional = Parrot_pmc_new_init_int(interp,
+                    Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
+                    num_positionals);
 
-            collect_positional = Parrot_pmc_new_init_int(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
-                positional_args - arg_index);
+                for (j = 0; arg_index < positional_args; ++arg_index)
+                    VTABLE_set_pmc_keyed_int(interp, collect_positional, j++,
+                        VTABLE_get_pmc_keyed_int(interp, call_object, arg_index));
 
-            for (j = 0; arg_index < positional_args; ++arg_index) {
-                VTABLE_set_pmc_keyed_int(interp, collect_positional, j++,
-                    VTABLE_get_pmc_keyed_int(interp, call_object, arg_index));
+                *accessor->pmc(interp, arg_info, param_index) = collect_positional;
+                ++param_index;
             }
-
-            *accessor->pmc(interp, arg_info, param_index) = collect_positional;
-            ++param_index;
             break; /* Terminate the positional arg loop. */
         }
 
