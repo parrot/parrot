@@ -177,7 +177,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
         Parrot_alarm_set(interp->quantum_done);
 
         Parrot_ext_call(interp, interp->current_task, "->");
-    } 
+    }
     else {
         Parrot_alarm_now();
     }
