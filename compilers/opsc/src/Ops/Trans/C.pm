@@ -282,7 +282,7 @@ static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
 static size_t hash_str(const char *str);
-static void store_op(PARROT_INTERP, op_info_t *info, int full);
+static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, int full);
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -314,9 +314,8 @@ size_t hash_str(ARGIN(const char *str))
     return key;
 }
 
-static void store_op(PARROT_INTERP, op_info_t *info, int full)
+static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, int full)
 {
-    HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
 
@@ -342,29 +341,30 @@ static int get_op(PARROT_INTERP, const char * name, int full)
 
 static void hop_init(PARROT_INTERP)
 {
-    size_t i;
     op_info_t * const info = [[BS]]op_lib.op_info_table;
+
+    /* allocate the storage all in one chunk
+     * yes, this is profligate, but we can tighten it later */
+    HOP *hops =
+        mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
+
+    size_t i;
+
     /* store full names */
     for (i = 0; i < [[BS]]op_lib.op_count; i++)
-        store_op(interp, info + i, 1);
+        store_op(interp, info + i, hops++, 1);
+
     /* plus one short name */
     for (i = 0; i < [[BS]]op_lib.op_count; i++)
         if (get_op(interp, info[i].name, 0) == -1)
-            store_op(interp, info + i, 0);
+            store_op(interp, info + i, hops++, 0);
 }
 
 static void hop_deinit(PARROT_INTERP)
 {
     if (hop) {
-        size_t i;
-        for (i = 0; i < OP_HASH_SIZE; i++) {
-            HOP *p = hop[i];
-            while (p) {
-                HOP * const next = p->next;
-                mem_gc_free(interp, p);
-                p = next;
-            }
-        }
+        HOP *p = hop[0];
+        mem_gc_free(interp, p);
         mem_sys_free(hop);
         hop = NULL;
     }
