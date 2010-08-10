@@ -314,11 +314,20 @@ get_codepoints(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL offs, UINTVAL coun
 {
     ASSERT_ARGS(get_codepoints)
 #if PARROT_HAS_ICU
-    return Parrot_str_new_init(interp, (char *)Buffer_bufstart(s) + offs * sizeof (UChar),
-        count * sizeof (UChar), s->encoding, s->charset, PObj_get_FLAGS(s));
+    const UINTVAL flags = PObj_get_FLAGS(s) & ~PObj_external_FLAG;
+    STRING * const dst  = Parrot_gc_new_string_header(interp, flags);
+
+    dst->encoding = s->encoding;
+    dst->charset  = s->charset;
+    dst->strlen   = count;
+    dst->bufused  = count * sizeof (UChar);
+    Parrot_gc_allocate_string_storage(interp, dst, count);
+    mem_sys_memcopy(Buffer_bufstart(dst), Buffer_bufstart(s) + offs * sizeof (UChar),
+       count * sizeof (UChar));
+    return dst;
 #else
     UNUSED(s);
-    UNUSED(offset);
+    UNUSED(offs);
     UNUSED(count);
     no_ICU_lib(interp);
 #endif
