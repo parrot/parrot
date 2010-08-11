@@ -700,7 +700,7 @@ Returns the PMC value for the element at C<*key>.
         /* special case the most likely key type, for speed */
         key = hash->key_type == Hash_key_type_STRING
             ? key
-            : hash_key_from_string(INTERP, hash, key);
+            : (STRING *)hash_key_from_string(INTERP, hash, key);
 
         b = parrot_hash_get_bucket(INTERP, hash, key);
 
