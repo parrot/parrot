@@ -459,7 +459,7 @@ ARGIN(opcode_t *pc))
             pprof_data[PPROF_DATA_TIME] = op_time;
         }
         pprof_data[PPROF_DATA_LINE]   = preop_line;
-        pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA)(interp->op_info_table)[*preop_pc].name;
+        pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA)(interp->code->op_info_table)[*preop_pc]->name;
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
     }
 

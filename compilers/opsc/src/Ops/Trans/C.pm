@@ -180,6 +180,7 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
 |);
 
     my $index := 0;
+    my $op_lib_ref := '&' ~ $emitter.bs() ~ 'op_lib';
 
     for $emitter.ops_file.ops -> $op {
         my $type := sprintf( "PARROT_%s_OP", uc($op.type ?? 'INLINE' !! 'FUNCTION') );
@@ -218,7 +219,8 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
     $arg_count,
     $arg_types,
     $arg_dirs,
-    $labels
+    $labels,
+    $op_lib_ref
   | ~ '},
 ',
             );

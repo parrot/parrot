@@ -37,15 +37,17 @@ t/pmc/oplib.t - OpLib PMC
 .end
 
 .sub new_oplib
-    $P0 = new ['OpLib']
-    $I0 = isnull $P0
+    $P0 = box "core_ops"
+    $P1 = new ['OpLib'], $P0
+    $I0 = isnull $P1
     nok($I0, "new OpLib")
 .end
 
 .sub check_elements
     .local pmc oplib, op, eh
     .local int n, i
-    oplib = new ['OpLib']
+    $P0 = box "core_ops"
+    oplib = new ['OpLib'], $P0
     n = elements oplib
     i = n - 1
     op = oplib[i]
@@ -66,14 +68,16 @@ t/pmc/oplib.t - OpLib PMC
 .end
 
 .sub getint_end
-    $P0 = new ['OpLib']
+    $P0 = box 'core_ops'
+    $P0 = new ['OpLib'], $P0
     $I1 = $P0[TESTED_OP]
     $I0 = isne $I1, -1
     ok($I0, "got end opcode")
 .end
 
 .sub getint_no_opcode
-    $P0 = new ['OpLib']
+    $P0 = box 'core_ops'
+    $P0 = new ['OpLib'], $P0
     $I1 = $P0[TESTED_NOSUCHOP]
     $I0 = iseq $I1, -1
     ok($I0, "get non existent opcode fails")
@@ -81,7 +85,8 @@ t/pmc/oplib.t - OpLib PMC
 
 .sub getop_end
     .local pmc oplib, op, op2, name
-    oplib = new ['OpLib']
+    $P0 = box 'core_ops'
+    oplib = new ['OpLib'], $P0
 
     # Using a string constant
     op = oplib[TESTED_OP]
@@ -99,7 +104,8 @@ t/pmc/oplib.t - OpLib PMC
     is($I0, 0, "got end opcode data keyed pmc")
 
     $I0 = issame op, op2
-    ok($I0, "got same result from both ways")
+    $S0 = "Implement cacheing, Opcode.is_same, or change comparison"
+    todo($I0, "got same result from both ways", $S0)
 
     $I1 = op
     $I0 = oplib[TESTED_OP]
@@ -110,7 +116,8 @@ t/pmc/oplib.t - OpLib PMC
 .end
 
 .sub family_end
-    $P0 = new ['OpLib']
+    $P0 = box 'core_ops'
+    $P0 = new ['OpLib'], $P0
     $P1 = $P0.'op_family'(TESTED_OP)
     $I0 = isnull $P1
     dec $I0
@@ -121,7 +128,8 @@ done:
 .end
 
 .sub family_no_opcode
-    $P0 = new ['OpLib']
+    $P0 = box 'core_ops'
+    $P0 = new ['OpLib'], $P0
     $P1 = $P0.'op_family'(TESTED_NOSUCHOP)
     $I0 = isnull $P1
     ok($I0, "non existent opcode family is null")

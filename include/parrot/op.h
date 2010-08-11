@@ -67,16 +67,19 @@ typedef opcode_t *(*op_func_t)(opcode_t *, PARROT_INTERP);
 */
 
 typedef struct op_info_t {
-    const char    *name;
-    const char    *full_name;
-    const char    *func_name;
-    unsigned short jump;
-    short          op_count;                /* Includes opcode as one arg */
-    arg_type_t     types[PARROT_MAX_ARGS];  /* arg_type_t, 0 = 1st arg */
-    arg_dir_t      dirs[PARROT_MAX_ARGS];   /* arg_dir_t   0 = 1st arg */
-    char           labels[PARROT_MAX_ARGS]; /* 0/1         0 = 1st arg */
+    const char      *name;
+    const char      *full_name;
+    const char      *func_name;
+    unsigned short   jump;
+    short            op_count;                /* Includes opcode as one arg */
+    arg_type_t       types[PARROT_MAX_ARGS];  /* arg_type_t, 0 = 1st arg */
+    arg_dir_t        dirs[PARROT_MAX_ARGS];   /* arg_dir_t   0 = 1st arg */
+    char             labels[PARROT_MAX_ARGS]; /* 0/1         0 = 1st arg */
+    struct op_lib_t *lib;
 } op_info_t;
 
+#define OPCODE_IS(interp, seg, opnum, global_opnum) \
+    ((seg)->op_func_table[(opnum)] == (interp)->op_func_table[(global_opnum)])
 
 #endif /* PARROT_OP_H_GUARD */
 

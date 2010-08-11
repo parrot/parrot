@@ -471,7 +471,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
             tmp = INS(interp, unit, "returncc", NULL, regs, 0, 0, 0);
         }
 
-        IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
+        IMCC_debug(interp, DEBUG_IMC, "add sub ret - %d\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
 }

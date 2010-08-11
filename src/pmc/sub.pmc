@@ -871,7 +871,8 @@ The number of optional named arguments
                     Parrot_sub_arginfo);
 
             /* If the first instruction is a get_params... */
-            if (*pc == PARROT_OP_get_params_pc) {
+            if (sub->seg->op_func_table[*pc]
+                == interp->op_func_table[PARROT_OP_get_params_pc]) {
                 /* Get the signature (the next thing in the bytecode). */
                 PMC * const sig = PF_CONST(sub->seg, *(++pc)).u.key;
 

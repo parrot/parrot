@@ -1079,16 +1079,23 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
 {
     ASSERT_ARGS(Parrot_run_native)
     PackFile * const pf = PackFile_new(interp, 0);
-    static opcode_t program_code[2];
+    static opcode_t program_code[2] = {
+        0, /* enternative */
+        1  /* end */
+    };
 
-    program_code[0] = interp->op_lib->op_code(interp, "enternative", 0);
-    program_code[1] = 0; /* end */
+    static op_func_t op_func_table[2];
+    op_func_table[0] = interp->op_func_table[ interp->op_lib->op_code(interp, "enternative", 0) ];
+    op_func_table[1] = interp->op_func_table[ interp->op_lib->op_code(interp, "end", 0) ];
+
 
     pf->cur_cs = (PackFile_ByteCode *)
         (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interp, pf,
                 Parrot_str_new_constant(interp, "code"), 1);
-    pf->cur_cs->base.data = program_code;
-    pf->cur_cs->base.size = 2;
+    pf->cur_cs->base.data     = program_code;
+    pf->cur_cs->base.size     = 2;
+    pf->cur_cs->op_func_table = op_func_table;
+    /* TODO fill out cur_cs with op_mapping */
 
     Parrot_pbc_load(interp, pf);
 
