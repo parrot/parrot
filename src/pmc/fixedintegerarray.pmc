@@ -34,6 +34,16 @@ static int auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static int auxcmpfunc(const INTVAL *i, const INTVAL *j)>
+
+
+
+=cut
+
+*/
+
 PARROT_PURE_FUNCTION
 static int
 auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
