@@ -64,7 +64,7 @@ static INTVAL autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -284,12 +284,12 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
 {
     ASSERT_ARGS(autobox_pmc)
     PMC *result = PMCNULL;
 
-    switch (CELL_TYPE_MASK(cell)) {
+    switch (type) {
       case INTCELL:
         result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_Integer));
         VTABLE_set_integer_native(interp, result, CELL_INT(cell));
@@ -1036,7 +1036,7 @@ return current Namespace
         Pcc_cell *cells;
         PMC      *retval;
         const INTVAL size = STATICSELF.elements();
-        INTVAL    i;
+        INTVAL    i, type;
 
         if (size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -1044,7 +1044,8 @@ return current Namespace
                 "Cannot shift PMC from empty CallContext");
 
         GET_ATTR_positionals(INTERP, SELF, cells);
-        retval = autobox_pmc(INTERP, &cells[0]);
+        type   = CELL_TYPE_MASK(&cells[0]);
+        retval = autobox_pmc(INTERP, &cells[0], type);
 
         for (i = 1; i < size; ++i)
             cells[i - 1] = cells[i];
@@ -1112,14 +1113,17 @@ return current Namespace
 
     VTABLE PMC * get_pmc_keyed_int(INTVAL key) {
         Pcc_cell *cells;
-        INTVAL    num_pos;
+        INTVAL    num_pos, type;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
             return PMCNULL;
 
         GET_ATTR_positionals(INTERP, SELF, cells);
-        return autobox_pmc(INTERP, &cells[key]);
+        type = CELL_TYPE_MASK(&cells[key]);
+        if (type == PMCCELL)
+            return CELL_PMC(&cells[key]);
+        return autobox_pmc(INTERP, &cells[key], type);
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
@@ -1328,8 +1332,12 @@ return current Namespace
             void     * const k    = hash_key_from_string(INTERP, hash, key);
             Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
-            if (cell)
-                return autobox_pmc(INTERP, cell);
+            if (cell) {
+                INTVAL type = CELL_TYPE_MASK(cell);
+                if (type == PMCCELL)
+                    return CELL_PMC(cell);
+                return autobox_pmc(INTERP, cell, type);
+            }
         }
 
         return PMCNULL;
@@ -1384,8 +1392,12 @@ return current Namespace
             void     * const k    = hash_key_from_pmc(INTERP, hash, key);
             Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
-            if (cell)
-                return autobox_pmc(INTERP, cell);
+            if (cell) {
+                INTVAL type = CELL_TYPE_MASK(cell);
+                if (type == PMCCELL)
+                    return CELL_PMC(cell);
+                return autobox_pmc(INTERP, cell, type);
+            }
         }
 
         return PMCNULL;
