@@ -16,7 +16,7 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
 
 =cut
 
-.const int TESTS = 105
+.const int TESTS = 106
 
 .loadlib 'deprecated_ops'
 
@@ -31,6 +31,7 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     test_exchange_n()
     test_clears()
     test_exchange_s()
+    test_clearp()
 .end
 
 .sub 'test_exchange_i'
@@ -273,6 +274,34 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     set $S2, "String #2"
     exchange $S2, $S2
     is( $S2, "String #2", 'exchange' )
+.end
+
+.sub test_clearp
+    $P0 = new ['Integer']
+    $P1 = new ['Integer']
+    $P2 = new ['Integer']
+    $P3 = new ['Integer']
+    $P4 = new ['Integer']
+    $P5 = new ['Integer']
+    $P6 = new ['Integer']
+    $P7 = new ['Integer']
+    $P8 = new ['Integer']
+    $P9 = new ['Integer']
+    clearp
+    $I0 = 0
+    unless_null $P0, result
+    unless_null $P1, result
+    unless_null $P2, result
+    unless_null $P3, result
+    unless_null $P4, result
+    unless_null $P5, result
+    unless_null $P6, result
+    unless_null $P7, result
+    unless_null $P8, result
+    unless_null $P9, result
+    $I0 = 1
+  result:
+    is($I0, 1, 'clearp')
 .end
 
 # Local Variables:
