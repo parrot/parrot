@@ -179,7 +179,10 @@ get_hash_val(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *ke
 {
     ASSERT_ARGS(get_hash_val)
     if (hash->hash_val == (hash_hash_key_fn)key_hash_STRING) {
-        const STRING * const s = (const STRING *)key;
+        /* Must be non-const because str_to_hashval caches the result
+         * in the STRING struct */
+        DECL_CONST_CAST;
+        STRING * const s = (STRING *)PARROT_const_cast(void *, key);
         if (s->hashval)
             return s->hashval;
         return Parrot_str_to_hashval(interp, s);
