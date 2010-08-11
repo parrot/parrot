@@ -121,7 +121,6 @@ sub diagnosis {
 }
 
 __DATA__
-src/dynpmc/rational.pmc
 src/pmc/bigint.pmc
 src/pmc/bignum.pmc
 src/pmc/callcontext.pmc
