@@ -278,6 +278,8 @@ typedef struct hop {
     op_info_t * info;
     struct hop *next;
 } HOP;
+
+static HOP *hop_buckets;
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
@@ -345,7 +347,7 @@ static void hop_init(PARROT_INTERP)
 
     /* allocate the storage all in one chunk
      * yes, this is profligate, but we can tighten it later */
-    HOP *hops =
+    HOP *hops = hop_buckets =
         mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
 
     size_t i;
@@ -362,12 +364,13 @@ static void hop_init(PARROT_INTERP)
 
 static void hop_deinit(PARROT_INTERP)
 {
-    if (hop) {
-        HOP *p = hop[0];
-        mem_gc_free(interp, p);
+    if (hop)
         mem_sys_free(hop);
-        hop = NULL;
-    }
+    if (hop_buckets)
+        mem_gc_free(interp, hop_buckets);
+
+    hop         = NULL;
+    hop_buckets = NULL;
 }|;
 
     $fh.print(subst($res, /'[[' BS ']]'/, $emitter.bs, :global));
