@@ -26138,7 +26138,7 @@ static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
 static size_t hash_str(const char *str);
-static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, int full);
+static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, const char *name);
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -26170,30 +26170,34 @@ size_t hash_str(ARGIN(const char *str))
     return key;
 }
 
-static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, int full)
-{
-    const size_t hidx =
-        hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
 
-    p->info   = info;
-    p->next   = hop[hidx];
-    hop[hidx] = p;
+static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, const char *name)
+{
+    const size_t hidx = hash_str(name) % OP_HASH_SIZE;
+
+    p->info           = info;
+    p->next           = hop[hidx];
+    hop[hidx]         = p;
 }
 
-static int get_op(PARROT_INTERP, const char * name, int full)
+static int get_op(PARROT_INTERP, const char *name, int full)
 {
-    const HOP * p;
+    const HOP   *p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
+
     if (!hop) {
         hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE,HOP *);
         hop_init(interp);
     }
+
     for (p = hop[hidx]; p; p = p->next) {
-        if(STREQ(name, full ? p->info->full_name : p->info->name))
+        if (STREQ(name, full ? p->info->full_name : p->info->name))
             return p->info - core_op_lib.op_info_table;
     }
+
     return -1;
 }
+
 
 static void hop_init(PARROT_INTERP)
 {
@@ -26207,13 +26211,13 @@ static void hop_init(PARROT_INTERP)
     size_t i;
 
     /* store full names */
-    for (i = 0; i < core_op_lib.op_count; i++)
-        store_op(interp, info + i, hops++, 1);
+    for (i = 0; i < core_op_lib.op_count; i++) {
+        store_op(interp, info + i, hops++, info[i].full_name);
 
-    /* plus one short name */
-    for (i = 0; i < core_op_lib.op_count; i++)
-        if (get_op(interp, info[i].name, 0) == -1)
-            store_op(interp, info + i, hops++, 0);
+        /* plus one short name */
+        if (i && info[i - 1].name != info[i].name)
+            store_op(interp, info + i, hops++, info[i].name);
+    }
 }
 
 static void hop_deinit(PARROT_INTERP)
