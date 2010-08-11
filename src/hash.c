@@ -182,6 +182,7 @@ get_hash_val(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *ke
         const STRING * const s = (const STRING *)key;
         if (s->hashval)
             return s->hashval;
+        return Parrot_str_to_hashval(interp, s);
     }
 
     return (hash->hash_val)(interp, key, hash->seed);
