@@ -68,14 +68,14 @@ static void init_role_from_hash(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* 
-   
+/*
+
 =item C<static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)>
 
 Takes a hash and initializes the role based on it.
 
 =cut
- 
+
 */
 
 static void
