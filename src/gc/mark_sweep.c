@@ -425,7 +425,6 @@ Parrot_add_to_free_list(SHIM_INTERP,
 
     pool->total_objects += num_objects;
     object = (void *)arena->start_objects;
-#if GC_USE_LAZY_ALLOCATOR
     /* Don't move anything onto the free list. Set the pointers and do it
        lazily when we allocate. */
     {
@@ -434,14 +433,7 @@ Parrot_add_to_free_list(SHIM_INTERP,
         pool->newlast = (void*)((char*)object + total_size);
         arena->used = 0;
     }
-#else
-    /* Move all the new objects into the free list */
-    arena->used          = num_objects;
-    for (i = 0; i < num_objects; ++i) {
-        pool->add_free_object(interp, pool, object);
-        object = (void *)((char *)object + pool->object_size);
-    }
-#endif
+
     pool->num_free_objects += num_objects;
 }
 
@@ -609,12 +601,10 @@ new_fixed_size_obj_pool(size_t object_size, size_t objects_per_alloc)
     pool->last_Arena        = NULL;
     pool->free_list         = NULL;
     pool->mem_pool          = NULL;
-    pool->object_size       = object_size;
-    pool->objects_per_alloc = objects_per_alloc;
-#if GC_USE_LAZY_ALLOCATOR
     pool->newfree           = NULL;
     pool->newlast           = NULL;
-#endif
+    pool->object_size       = object_size;
+    pool->objects_per_alloc = objects_per_alloc;
 
     return pool;
 }
