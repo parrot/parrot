@@ -1027,8 +1027,6 @@ parrot_new_intval_hash(PARROT_INTERP)
 Hash_key_type hkey_type, hash_comp_fn compare, hash_hash_key_fn keyhash)>
 
 Creates and initializes a hash.  Function pointers determine its behaviors.
-The container passed in is the address of the hash PMC that is using it.  The
-hash and the PMC point to each other.
 
 Memory from this function must be freed.
 
@@ -1059,7 +1057,6 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
     hash->seed       = interp->hash_seed;
     hash->mask       = INITIAL_BUCKETS - 1;
     hash->entries    = 0;
-    hash->container  = PMCNULL;
 
     bp = (HashBucket *)((char *)alloc + sizeof (Hash));
     hash->free_list = NULL;
@@ -1366,21 +1363,6 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     const UINTVAL hashval = get_hash_val(interp, hash, key);
     HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
     const hash_comp_fn compare = hash->compare;
-
-    /* When the hash is constant, check that the key and value are also
-     * constant. */
-    if (!PMC_IS_NULL(hash->container)
-    &&   PObj_constant_TEST(hash->container)) {
-        if (hash->key_type == Hash_key_type_STRING
-        && !PObj_constant_TEST((PObj *)key))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Used non-constant key in constant hash.");
-            if (((hash->entry_type == enum_type_PMC)
-            ||   (hash->entry_type == enum_type_STRING))
-            &&   !PObj_constant_TEST((PObj *)value))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Used non-constant value in constant hash.");
-    }
 
     /* See if we have an existing value for this key */
     while (bucket) {
