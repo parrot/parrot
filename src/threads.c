@@ -161,7 +161,7 @@ Parrot_threads_outer_runloop(PARROT_INTERP, INTVAL tidx)
         if (next_thread == tidx && task_count > 0) {
             Parrot_cx_next_task(interp, scheduler);
         } else {
-            /* Wake up the main thread to check if we're done before 
+            /* Wake up the main thread to check if we're done before
                going idle. */
             Parrot_alarm_now();
             Parrot_threads_idle(interp, tidx);
@@ -175,7 +175,7 @@ Parrot_threads_outer_runloop(PARROT_INTERP, INTVAL tidx)
 
 =item C<void Parrot_threads_block(PARROT_INTERP, INTVAL *tidx)>
 
-The current thread is about to block. Make sure there's another thread ready 
+The current thread is about to block. Make sure there's another thread ready
 to do work once we release the interpreter lock.
 
 Use macros BLOCK_THREAD and UNBLOCK_THREAD rather than
@@ -202,7 +202,7 @@ Parrot_threads_block(PARROT_INTERP, ARGOUT(INTVAL *tidx))
     tbl->threads[*tidx].hi_var_ptr = &next;
     THREAD_STATE_CLEAR(interp, *tidx, RUNNABLE);
     THREAD_STATE_SET(interp, *tidx, SCAN_STACK);
-    
+
     /* Maybe spawn more threads */
     have_runnable = 0;
     for (i = 1; i < tbl->count; ++i) {
@@ -376,7 +376,7 @@ Parrot_threads_reap(PARROT_INTERP)
 
             tbl->threads[i].state = 0;
             COND_DESTROY(tbl->threads[i].cvar);
-            
+
             tbl->count -= 1;
         }
 
@@ -386,7 +386,7 @@ Parrot_threads_reap(PARROT_INTERP)
         /* Shrink that table */
         tbl->size /= 2;
         tbl->threads = (Thread_info*) realloc(
-            tbl->threads, sizeof(Thread_info) * tbl->size);        
+            tbl->threads, sizeof(Thread_info) * tbl->size);
     }
 
     UNLOCK(interp->thread_lock);
@@ -526,7 +526,7 @@ Parrot_threads_next_to_run(PARROT_INTERP, INTVAL cur_idx)
     /* Otherwise there's a runnable thread, run the first one. */
     for (i = 1; i < tbl->count; ++i) {
         if (THREAD_STATE_TEST(interp, i, RUNNABLE)) {
-            COND_SIGNAL(tbl->threads[i].cvar);            
+            COND_SIGNAL(tbl->threads[i].cvar);
             UNLOCK(interp->thread_lock);
             return i;
         }
