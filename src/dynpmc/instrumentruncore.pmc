@@ -551,7 +551,6 @@ void runcore_library_update(PARROT_INTERP, PMC *runcore) {
     cur_count = VTABLE_get_integer(supervised, cur_dynlibs);
 
     runcore_optable_fixup(interp, runcore);
-    runcore_vtable_fixup(interp, runcore);
 
     if (old_count != cur_count) {
         PMC *iter;
@@ -595,7 +594,13 @@ void runcore_library_update(PARROT_INTERP, PMC *runcore) {
 
 =item C<void runcore_vtable_fixup(PARROT_INTERP, PMC *runcore) >
 
-Keep the vtables in the child and parent in sync.
+The supervising interpreter may need to inject certain PMCs into
+the child to keep sane. An example will be the OS dynpmc. This pmc
+is a singleton, and is used by NQP. Failure to keep the vtable numbers
+between the supervisor and the child interpreter in this case will lead
+to errors. As such, this function will inject in the singleton pmcs loaded
+by the instrument script and also other PMCs required, such as
+InstrumentInvokable.
 
 For internal use only.
 
@@ -604,11 +609,40 @@ For internal use only.
 */
 
 void runcore_vtable_fixup(PARROT_INTERP, PMC *runcore) {
-    INTVAL i;
     PMC           *instrument;
-    Parrot_Interp  supervised, dest, src;
+    Parrot_Interp  supervised;
+    INTVAL        start, max, i, index, invokable;
 
-    /* Do nothing. */
+    GETATTR_InstrumentRuncore_instrument(interp, runcore, instrument);
+    GETATTR_Instrument_supervised(interp, instrument, supervised);
+
+    /* Copy over the singleton pmcs only.
+       Fill up the gaps in the vtable with dummies.
+       Also need to inject in InstrumentInvokable. */
+    invokable = Parrot_pmc_get_type_str(interp, CONST_STRING(interp, "InstrumentInvokable"));
+    start = supervised->n_vtable_max;
+    max   = interp->n_vtable_max;
+    index = 0;
+    for (i = start; i < max; i++) {
+        _vtable *cur;
+
+        cur = interp->vtables[i];
+        if (cur->flags & VTABLE_PMC_IS_SINGLETON
+         || i == invokable) {
+            STRING *name;
+
+            name                   = interp->vtables[i]->whoami;
+            Parrot_pmc_register_new_type(supervised, name);
+            supervised->vtables[i] = Parrot_clone_vtable(supervised, interp->vtables[i]);
+        }
+        else {
+            STRING *dummy;
+
+            dummy = Parrot_sprintf_c(interp, "_InstrumentDummy-%d", index++);
+            Parrot_pmc_register_new_type(supervised, dummy);
+        }
+    }
+
     return;
 }
 
@@ -665,14 +699,14 @@ For internal use only.
 */
 
 INTVAL runcore_does_loading(opcode_t *pc) {
-    return (*pc == enum_ops_loadlib_p_s
-         || *pc == enum_ops_loadlib_p_sc
-         || *pc == enum_ops_loadlib_p_s_p
-         || *pc == enum_ops_loadlib_p_sc_p
-         || *pc == enum_ops_loadlib_p_s_pc
-         || *pc == enum_ops_loadlib_p_sc_pc
-         || *pc == enum_ops_load_bytecode_s
-         || *pc == enum_ops_load_bytecode_sc);
+    INTVAL op = *pc;
+    return (op == enum_ops_loadlib_p_s
+         || op == enum_ops_loadlib_p_sc
+         || op == enum_ops_loadlib_p_s_p
+         || op == enum_ops_loadlib_p_sc_p
+         || op == enum_ops_loadlib_p_s_pc
+         || op == enum_ops_loadlib_p_sc_pc
+         || op == enum_ops_load_bytecode_s);
 }
 
 /*
