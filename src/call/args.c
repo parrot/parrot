@@ -1368,10 +1368,30 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
     const char *x;
     INTVAL      flags = 0;
     INTVAL      set   = 0;
+    INTVAL      count = 0;
+
+    for (x = signature; *x; ++x) {
+        if (*x == '-')
+            break;
+        switch (*x) {
+            case 'I': count++; break;
+            case 'N': count++; break;
+            case 'S': count++; break;
+            case 'P': count++; break;
+            default: break;
+        }
+    }
 
     if (PMC_IS_NULL(*arg_flags))
-        *arg_flags = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
-    current_array = *arg_flags;
+        current_array = *arg_flags
+                      = Parrot_pmc_new_init_int(interp,
+                            enum_class_ResizableIntegerArray, count);
+    else {
+        current_array = *arg_flags;
+        VTABLE_set_integer_native(interp, current_array, count);
+    }
+
+    count = 0;
 
     for (x = signature; *x != '\0'; ++x) {
 
@@ -1384,7 +1404,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
             /* Starting a new argument, so store the previous argument,
              * if there was one. */
             if (set) {
-                VTABLE_push_integer(interp, current_array, flags);
+                VTABLE_set_integer_keyed_int(interp, current_array, count++, flags);
                 set = 0;
             }
 
@@ -1421,7 +1441,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
 
     /* Store the final argument, if there was one. */
     if (set)
-        VTABLE_push_integer(interp, current_array, flags);
+        VTABLE_set_integer_keyed_int(interp, current_array, count, flags);
 }
 
 /*
