@@ -64,7 +64,8 @@ static void int_check_divide_zero(PARROT_INTERP, INTVAL value)
 
 /*
 
-=item C<static void complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value)>
+=item C<static void complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL
+*im, STRING *value)>
 
 Parses the string in C<value> to produce a complex number, represented
 by the real (C<*re>) and imaginary (C<*im>) parts. Raises an exception
@@ -245,8 +246,6 @@ complex_parse_string(PARROT_INTERP,
 
 =item C<static void int_check_divide_zero(PARROT_INTERP, INTVAL value)>
 
-
-
 =cut
 
 */
@@ -265,8 +264,6 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
 
 =item C<static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)>
 
-
-
 =cut
 
 */
@@ -284,8 +281,6 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
 /*
 
 =item C<static void complex_check_divide_zero(PARROT_INTERP, PMC *value)>
-
-
 
 =cut
 

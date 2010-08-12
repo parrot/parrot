@@ -388,8 +388,6 @@ static void int_check_divide_zero(PARROT_INTERP, INTVAL value)
 
 =item C<static void bigint_init(PARROT_INTERP, PMC *self)>
 
-
-
 =cut
 
 */
@@ -407,8 +405,6 @@ bigint_init(PARROT_INTERP, ARGIN(PMC *self))
 /*
 
 =item C<static void bigint_clear(PARROT_INTERP, PMC *self)>
-
-
 
 =cut
 
@@ -428,8 +424,6 @@ bigint_clear(PARROT_INTERP, ARGIN(PMC *self))
 /*
 
 =item C<static void bigint_set(PARROT_INTERP, PMC *dest, PMC *src)>
-
-
 
 =cut
 
@@ -491,9 +485,8 @@ bigint_set_double(PARROT_INTERP, ARGMOD(PMC *self), double value)
 
 /*
 
-=item C<static void bigint_set_str(PARROT_INTERP, PMC *self, const char *value, int base)>
-
-
+=item C<static void bigint_set_str(PARROT_INTERP, PMC *self, const char *value,
+int base)>
 
 =cut
 
@@ -512,8 +505,6 @@ bigint_set_str(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(const char *value), int b
 /*
 
 =item C<static BIGINT* bigint_get_self(PARROT_INTERP, PMC *self)>
-
-
 
 =cut
 
@@ -535,8 +526,6 @@ bigint_get_self(PARROT_INTERP, ARGIN(PMC *self))
 
 =item C<static void bigint_set_self(PARROT_INTERP, PMC *self, BIGINT *value)>
 
-
-
 =cut
 
 */
@@ -554,8 +543,6 @@ bigint_set_self(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(BIGINT *value))
 /*
 
 =item C<static long bigint_get_long(PARROT_INTERP, PMC *self)>
-
-
 
 =cut
 
@@ -579,7 +566,6 @@ bigint_get_long(PARROT_INTERP, ARGIN(PMC *self))
 
 =item C<static int bigint_get_bool(PARROT_INTERP, PMC *self)>
 
-
 =cut
 
 */
@@ -601,7 +587,6 @@ bigint_get_bool(PARROT_INTERP, ARGIN(PMC *self))
 /*
 
 =item C<static char * bigint_get_string(PARROT_INTERP, PMC *self, int base)>
-
 
 =cut
 
@@ -628,7 +613,6 @@ bigint_get_string(PARROT_INTERP, ARGIN(PMC *self), int base)
 
 =item C<static double bigint_get_double(PARROT_INTERP, PMC *self)>
 
-
 =cut
 
 */
@@ -647,9 +631,8 @@ bigint_get_double(PARROT_INTERP, ARGIN(PMC *self))
 
 /*
 
-=item C<static void bigint_add_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest)>
-
-
+=item C<static void bigint_add_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
 =cut
 
@@ -669,10 +652,8 @@ bigint_add_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 /*
 
-=item C<static void bigint_add_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)>
-
-
-
+=item C<static void bigint_add_bigint_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =cut
 
@@ -694,9 +675,8 @@ bigint_add_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 /*
 
-=item C<static void bigint_sub_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest)>
-
-
+=item C<static void bigint_sub_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
 =cut
 
@@ -739,9 +719,8 @@ bigint_sub_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 /*
 
-=item C<static void bigint_mul_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest)>
-
-
+=item C<static void bigint_mul_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
 =cut
 
@@ -761,9 +740,8 @@ bigint_mul_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 /*
 
-=item C<static void bigint_mul_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)>
-
-
+=item C<static void bigint_mul_bigint_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =cut
 
@@ -782,9 +760,8 @@ bigint_mul_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 /*
 
-=item C<static void bigint_pow_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)>
-
-
+=item C<static void bigint_pow_bigint_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =cut
 
@@ -805,7 +782,6 @@ bigint_pow_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 =item C<static void int_check_divide_zero(PARROT_INTERP, INTVAL value)>
 
-
 =cut
 
 */
@@ -821,7 +797,6 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
 /*
 
 =item C<static void bigint_check_divide_zero(PARROT_INTERP, PMC *value)>
-
 
 =cut
 
@@ -842,9 +817,8 @@ bigint_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
 
 /*
 
-=item C<static void bigint_div_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest)>
-
-
+=item C<static void bigint_div_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
 =cut
 
@@ -866,9 +840,8 @@ bigint_div_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 /*
 
-=item C<static void bigint_div_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)>
-
-
+=item C<static void bigint_div_bigint_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =cut
 
@@ -895,9 +868,8 @@ bigint_div_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 /*
 
-=item C<static void bigint_fdiv_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest)>
-
-
+=item C<static void bigint_fdiv_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
 =cut
 
@@ -918,9 +890,8 @@ bigint_fdiv_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *value), ARGMOD(P
 
 /*
 
-=item C<static void bigint_fdiv_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)>
-
-
+=item C<static void bigint_fdiv_bigint_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =cut
 
@@ -946,8 +917,8 @@ bigint_fdiv_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC
 
 /*
 
-=item C<static void bigint_mod_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest)>
-
+=item C<static void bigint_mod_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
 =cut
 
@@ -968,9 +939,8 @@ bigint_mod_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *value), ARGMOD(PM
 
 /*
 
-=item C<static void bigint_mod_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)>
-
-
+=item C<static void bigint_mod_bigint_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =cut
 
@@ -997,7 +967,6 @@ bigint_mod_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 =item C<static INTVAL bigint_cmp(PARROT_INTERP, PMC *self, PMC *value)>
 
-
 =cut
 
 */
@@ -1018,8 +987,6 @@ bigint_cmp(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value))
 
 =item C<static INTVAL bigint_cmp_int(PARROT_INTERP, PMC *self, INTVAL value)>
 
-
-
 =cut
 
 */
@@ -1039,8 +1006,6 @@ bigint_cmp_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value)
 
 =item C<static void bigint_abs(PARROT_INTERP, PMC *self, PMC *dest)>
 
-
-
 =cut
 
 */
@@ -1059,8 +1024,6 @@ bigint_abs(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest))
 /*
 
 =item C<static void bigint_neg(PARROT_INTERP, PMC *self, PMC *dest)>
-
-
 
 =cut
 

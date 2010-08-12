@@ -49,8 +49,6 @@ static void stop_GC(ARGMOD(Interp *parent), ARGMOD(Interp *thread))
 
 =item C<static void stop_GC(Interp *parent, Interp *thread)>
 
-
-
 =cut
 
 */
