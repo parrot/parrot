@@ -394,9 +394,7 @@ PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_really_destroy(PARROT_INTERP,
-    NULLOK(int exit_code),
-    SHIM(void *arg))
+void Parrot_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

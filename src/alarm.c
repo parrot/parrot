@@ -56,6 +56,7 @@ Parrot_alarm_init(void)
     ASSERT_ARGS(Parrot_alarm_init)
 
     struct sigaction sa;
+    memset(&sa, 0, sizeof (struct sigaction));
     sa.sa_handler = Parrot_alarm_callback;
     sa.sa_flags   = SA_RESTART;
 
@@ -124,6 +125,7 @@ Parrot_alarm_mask(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_alarm_mask)
     sigset_t mask;
+    sigemptyset(&mask);
     sigaddset(&mask, SIGALRM);
     pthread_sigmask(SIG_BLOCK, &mask, 0);
 }
@@ -133,6 +135,7 @@ Parrot_alarm_unmask(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_alarm_unmask)
     sigset_t mask;
+    sigemptyset(&mask);
     sigaddset(&mask, SIGALRM);
     pthread_sigmask(SIG_UNBLOCK, &mask, 0);
 }

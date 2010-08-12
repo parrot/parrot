@@ -26,10 +26,9 @@ These functions transparently manage OS threads in the Parrot interpreter.
 
 /*
 
-=item C<void* Parrot_cx_thread_main(void *interp_ptr)>
+=item C<void Parrot_threads_init(PARROT_INTERP)>
 
-When an interpreter spawns a new worker thread, that thread starts
-here.
+Initialize the interpreter to support worker threads.
 
 =cut
 
@@ -67,6 +66,29 @@ Parrot_threads_init(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_threads_cleanup(PARROT_INTERP)>
+
+Clean up the threads stuff in this interpreter.
+
+=cut
+
+*/
+
+void
+Parrot_threads_cleanup(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_threads_cleanup)
+
+    Thread_table *tbl = interp->thread_table;
+
+    COND_DESTROY(tbl->threads[0].cvar);
+    free(tbl->threads);
+
+    free(interp->thread_table);
+}
+
+/*
+
 =item C<void* Parrot_threads_main(void *args_ptr)>
 
 When an interpreter spawns a new worker thread, that thread starts
@@ -95,6 +117,7 @@ Parrot_threads_main(ARGMOD(void *args_ptr))
     UNLOCK(interp->thread_lock);
 
     Parrot_threads_outer_runloop(interp, tidx);
+
     return 0;
 }
 
@@ -362,7 +385,8 @@ Parrot_threads_reap(PARROT_INTERP)
     if (i < (long)tbl->size / 3) {
         /* Shrink that table */
         tbl->size /= 2;
-        tbl->threads = (Thread_info*) realloc(tbl, sizeof(Thread_info) * tbl->size);        
+        tbl->threads = (Thread_info*) realloc(
+            tbl->threads, sizeof(Thread_info) * tbl->size);        
     }
 
     UNLOCK(interp->thread_lock);

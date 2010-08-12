@@ -72,6 +72,9 @@ void Parrot_threads_block(PARROT_INTERP, ARGOUT(INTVAL *tidx))
 INTVAL Parrot_threads_check_and_reset(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_threads_cleanup(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 INTVAL Parrot_threads_count_active(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -116,6 +119,8 @@ void Parrot_threads_unblock(PARROT_INTERP, ARGIN(INTVAL *tidx_ptr))
     , PARROT_ASSERT_ARG(tidx))
 #define ASSERT_ARGS_Parrot_threads_check_and_reset \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_threads_cleanup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_threads_count_active __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

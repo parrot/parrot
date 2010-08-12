@@ -30,7 +30,7 @@ $pir->print(<<'EOF');
     pass
 
     say "ok 2 - main task sleeping"
-    sleep 0.2
+    sleep 0.3
     say "ok 4 - main task back"
 
     spintask.'kill'()
@@ -57,6 +57,8 @@ good:
     $I0 = 0
 spin_more:
     $I0 = $I0 + 1
+    $I1 = $I0 % 4096
+    if $I1 != 0 goto spin_more
     goto spin_more
 .end
 
@@ -66,8 +68,8 @@ my $pir_file = $pir->filename;
 
 open my $run, "|perl ${\$pir->filename} ${\$tmp->filename}";
 
-sleep(0.1);
+sleep(0.05);
 $run->print("grumblecake\n");
-sleep(0.3);
+sleep(0.2);
 
 close($run);

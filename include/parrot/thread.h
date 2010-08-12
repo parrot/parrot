@@ -40,6 +40,8 @@
 #  define CLEANUP_PUSH(f, a)
 #  define CLEANUP_POP(a)
 
+#  define THREAD_EXIT(s) exit(s)
+
 #  define Parrot_mutex int
 #  define Parrot_cond int
 #  define Parrot_thread int

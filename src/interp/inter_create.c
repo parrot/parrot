@@ -344,21 +344,19 @@ Parrot_destroy(PARROT_INTERP)
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
-Note that C<exit_code> is ignored.
-
 =cut
 
 */
 
 void
-Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
+Parrot_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_really_destroy)
 
-    /* Chandon TODO: Restore this functionality */
-    return;
-
     /* wait for threads to complete if needed; terminate the event loop */
+    Parrot_threads_reap(interp);
+    Parrot_threads_cleanup(interp);
+
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
         pt_join_threads(interp);
