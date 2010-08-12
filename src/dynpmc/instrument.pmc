@@ -374,7 +374,7 @@ If none exists in cache, create a new instance and return it.
             key_append(INTERP, dest_key, key_new_cstring(INTERP, "Event"));
             key_append(INTERP, dest_key, key_new_cstring(INTERP, "ObjectDestroy"));
 
-            dest_type = Parrot_pmc_get_type(INTERP,dest_key);
+            dest_type = Parrot_pmc_get_type(INTERP, dest_key);
             dest_obj  = Parrot_pmc_new(INTERP, dest_type);
             Parrot_pcc_invoke_method_from_c_args(INTERP, dest_obj, new_str, "->P", &dest_obj);
 
@@ -682,7 +682,7 @@ PMC *instrument_pack_params(PARROT_INTERP, const char *format, ...) {
     va_start(args, format);
     ret = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
-    for(cur = format; *cur != '\0'; cur++) {
+    for (cur = format; *cur != '\0'; cur++) {
         /* P : PMC
            I : integer
            F : floatval
@@ -868,7 +868,7 @@ void probe_list_append(PARROT_INTERP, probe_list_t *dest, probe_list_t *src) {
     probe_node_t *cur, *dup;
     if (src == NULL || dest == NULL) { return; }
 
-    for(cur = src->head; cur != NULL; cur = cur->next) {
+    for (cur = src->head; cur != NULL; cur = cur->next) {
         probe_list_push(interp, dest, cur->list_obj);
         dest->count++;
     }

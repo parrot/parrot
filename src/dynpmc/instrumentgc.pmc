@@ -56,7 +56,8 @@ void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, void *);
 void* (*allocate_memory_chunk)(PARROT_INTERP, size_t size);
 void* (*reallocate_memory_chunk)(PARROT_INTERP, void *data, size_t newsize);
 void* (*allocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, size_t size);
-void* (*reallocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, void *data,            size_t oldsize, size_t newsize);
+void* (*reallocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, void *data,
+                                                        size_t oldsize, size_t newsize);
 void (*free_memory_chunk)(PARROT_INTERP, void *data);
 void (*block_mark)(PARROT_INTERP);
 void (*unblock_mark)(PARROT_INTERP);
@@ -86,7 +87,7 @@ size_t (*get_gc_info)(PARROT_INTERP, Interpinfo_enum);
 
 #define GC_STUB_CALL_PRE \
     VTABLE_set_pmc_keyed_str(supervisor, event_data, \
-                             CONST_STRING(supervisor, "parameters"),params); \
+                             CONST_STRING(supervisor, "parameters"), params); \
     raise_event = CONST_STRING(supervisor, "raise_event"); \
     GETATTR_InstrumentGC_instrument(supervisor, instrumentgc, instrument); \
     Parrot_pcc_invoke_method_from_c_args(supervisor, instrument, raise_event, \
@@ -202,7 +203,8 @@ void  stub_free_fixed_size_storage(PARROT_INTERP, size_t size, void*  stub_var1)
 void*  stub_allocate_memory_chunk(PARROT_INTERP, size_t size);
 void*  stub_reallocate_memory_chunk(PARROT_INTERP, void* data, size_t newsize);
 void*  stub_allocate_memory_chunk_with_interior_pointers(PARROT_INTERP, size_t size);
-void*  stub_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void* data, size_t oldsize, size_t newsize);
+void*  stub_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void* data,
+                                                           size_t oldsize, size_t newsize);
 void  stub_free_memory_chunk(PARROT_INTERP, void* data);
 void  stub_block_mark(PARROT_INTERP);
 void  stub_unblock_mark(PARROT_INTERP);
@@ -1033,11 +1035,13 @@ void*  stub_allocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, s
     return ret;
 }
 
-void*  stub_reallocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, void* data, size_t oldsize, size_t newsize) {
+void*  stub_reallocate_memory_chunk_with_interior_pointers(Parrot_Interp interp, void* data,
+                                                           size_t oldsize, size_t newsize) {
     void*  ret; PMC *ret_pack;
     GC_STUB_VARS;
     params = instrument_pack_params(supervisor, "VVII", interp, data, oldsize, newsize);
-    event  = CONST_STRING(supervisor, "GC::reallocate::reallocate_memory_chunk_with_interior_pointers");
+    event  = CONST_STRING(supervisor,
+                          "GC::reallocate::reallocate_memory_chunk_with_interior_pointers");
     VTABLE_set_integer_keyed_str(supervisor, event_data, CONST_STRING(supervisor, "size"),
         newsize);
     GC_STUB_CALL_PRE;

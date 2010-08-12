@@ -1,6 +1,6 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id: instrumentvtable.t 48171 2010-07-24 16:24:39Z khairul $
+# $Id$
 
 =head1 NAME
 

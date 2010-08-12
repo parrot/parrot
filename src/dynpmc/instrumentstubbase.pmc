@@ -315,7 +315,7 @@ the names of the entries that has been instrumented.
 }
 
 /*
- * Local Variables:
+ * Local variables:
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4:
