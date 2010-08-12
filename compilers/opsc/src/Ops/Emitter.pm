@@ -217,6 +217,9 @@ method _emit_source_preamble($fh) {
 
 {self.trans.defines(self)}
 
+/* XXX should be static, but C++ doesn't want to play ball */
+extern op_lib_t {self.bs}op_lib;
+
 |);
 
     $fh.print(self.ops_file.preamble);
@@ -230,9 +233,10 @@ method _emit_op_lib_descriptor($fh) {
 ** op lib descriptor:
 */
 
-static op_lib_t | ~ self.bs ~ q|op_lib = {| ~ qq|
-  "{self.base}",               /* name */
-  "{self.suffix}",             /* suffix */
+/* XXX should be static, but C++ doesn't want to play ball */
+op_lib_t | ~ self.bs ~ q|op_lib = {| ~ qq|
+  "{self.base}_ops",                /* name */
+  "{self.suffix}",                  /* suffix */
   $core_type,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   {self.ops_file.version_major},    /* major_version */

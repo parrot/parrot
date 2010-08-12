@@ -62,9 +62,6 @@ struct _hash {
     /* alloced - 1 */
     UINTVAL mask;
 
-    /* The owner PMC */
-    PMC *container;
-
     /* The type of key object this hash uses */
     Hash_key_type key_type;
 

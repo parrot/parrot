@@ -179,9 +179,13 @@ get_hash_val(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *ke
 {
     ASSERT_ARGS(get_hash_val)
     if (hash->hash_val == (hash_hash_key_fn)key_hash_STRING) {
-        const STRING * const s = (const STRING *)key;
+        /* Must be non-const because str_to_hashval caches the result
+         * in the STRING struct */
+        DECL_CONST_CAST;
+        STRING * const s = (STRING *)PARROT_const_cast(void *, key);
         if (s->hashval)
             return s->hashval;
+        return Parrot_str_to_hashval(interp, s);
     }
 
     return (hash->hash_val)(interp, key, hash->seed);
@@ -508,23 +512,20 @@ static void
 parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_keys)
-    UINTVAL entries = hash->entries;
-    UINTVAL found   = 0;
-    INTVAL  i;
+    const UINTVAL entries = hash->entries;
+    UINTVAL found = 0;
+    UINTVAL i;
 
-    for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+    HashBucket *bucket = hash->buckets;
 
-        while (bucket) {
-            if (++found > entries)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Detected hash corruption at hash %p entries %d",
-                    hash, (int)entries);
+    for (i= 0; i <= hash->mask; ++i, ++bucket) {
+        if (bucket->key){
 
             PARROT_ASSERT(bucket->key);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
-            bucket = bucket->next;
+            if (++found >= entries)
+                break;
         }
     }
 }
@@ -545,22 +546,19 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_values)
     const UINTVAL entries = hash->entries;
-    UINTVAL found   = 0;
-    INTVAL  i;
+    UINTVAL found = 0;
+    UINTVAL i;
 
-    for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+    HashBucket *bucket = hash->buckets;
 
-        while (bucket) {
-            if (++found > entries)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "Detected hash corruption at hash %p entries %d",
-                        hash, (int)entries);
+    for (i= 0; i <= hash->mask; ++i, ++bucket) {
+        if (bucket->key){
 
             PARROT_ASSERT(bucket->value);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
-            bucket = bucket->next;
+            if (++found >= entries)
+                break;
         }
     }
 }
@@ -580,29 +578,24 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_both)
     const UINTVAL entries = hash->entries;
-    UINTVAL found   = 0;
-    INTVAL  i;
+    UINTVAL found = 0;
+    UINTVAL i;
 
-    for (i = hash->mask; i >= 0; --i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+    HashBucket *bucket = hash->buckets;
 
-        while (bucket) {
-            if (++found > entries)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "Detected hash corruption at hash %p entries %d",
-                        hash, (int)entries);
-
+    for (i= 0; i <= hash->mask; ++i, ++bucket) {
+        if (bucket->key){
             PARROT_ASSERT(bucket->key);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
             PARROT_ASSERT(bucket->value);
             Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
-            bucket = bucket->next;
+            if (++found >= entries)
+                break;
         }
     }
 }
-
 
 /*
 
@@ -1038,8 +1031,6 @@ parrot_new_intval_hash(PARROT_INTERP)
 Hash_key_type hkey_type, hash_comp_fn compare, hash_hash_key_fn keyhash)>
 
 Creates and initializes a hash.  Function pointers determine its behaviors.
-The container passed in is the address of the hash PMC that is using it.  The
-hash and the PMC point to each other.
 
 Memory from this function must be freed.
 
@@ -1070,7 +1061,6 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
     hash->seed       = interp->hash_seed;
     hash->mask       = INITIAL_BUCKETS - 1;
     hash->entries    = 0;
-    hash->container  = PMCNULL;
 
     bp = (HashBucket *)((char *)alloc + sizeof (Hash));
     hash->free_list = NULL;
@@ -1377,21 +1367,6 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     const UINTVAL hashval = get_hash_val(interp, hash, key);
     HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
     const hash_comp_fn compare = hash->compare;
-
-    /* When the hash is constant, check that the key and value are also
-     * constant. */
-    if (!PMC_IS_NULL(hash->container)
-    &&   PObj_constant_TEST(hash->container)) {
-        if (hash->key_type == Hash_key_type_STRING
-        && !PObj_constant_TEST((PObj *)key))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Used non-constant key in constant hash.");
-            if (((hash->entry_type == enum_type_PMC)
-            ||   (hash->entry_type == enum_type_STRING))
-            &&   !PObj_constant_TEST((PObj *)value))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Used non-constant value in constant hash.");
-    }
 
     /* See if we have an existing value for this key */
     while (bucket) {

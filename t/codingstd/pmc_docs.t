@@ -121,7 +121,6 @@ sub diagnosis {
 }
 
 __DATA__
-src/dynpmc/rational.pmc
 src/pmc/bigint.pmc
 src/pmc/bignum.pmc
 src/pmc/callcontext.pmc
@@ -130,7 +129,6 @@ src/pmc/complex.pmc
 src/pmc/coroutine.pmc
 src/pmc/eval.pmc
 src/pmc/fixedintegerarray.pmc
-src/pmc/hashiterator.pmc
 src/pmc/imageio.pmc
 src/pmc/imageiosize.pmc
 src/pmc/integer.pmc
@@ -140,7 +138,6 @@ src/pmc/null.pmc
 src/pmc/object.pmc
 src/pmc/orderedhash.pmc
 src/pmc/packfile.pmc
-src/pmc/role.pmc
 src/pmc/sub.pmc
 src/pmc/threadinterpreter.pmc
 src/pmc/unmanagedstruct.pmc

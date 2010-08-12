@@ -97,6 +97,7 @@ imc_compile_all_units(PARROT_INTERP)
     }
 
     IMCC_INFO(interp)->imc_units = NULL;
+    IMCC_INFO(interp)->cur_unit  = NULL;
     IMCC_INFO(interp)->last_unit = NULL;
 }
 

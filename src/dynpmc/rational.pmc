@@ -46,7 +46,7 @@ Currently C<rational.pmc> only has some C<static> functions for code sharing.
 
 /*
 
-=item * static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base)
+=item C<static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base)>
 
 Returns a string representation of a Rational-PMC to a certain base.
 
@@ -66,7 +66,7 @@ static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
 
 /*
 
-=item * static void rat_add_integer(PARROT_INTERP, PMC *self, int value)
+=item C<static void rat_add_integer(PARROT_INTERP, PMC *self, int value)>
 
 Adds an integer "value" to a Rational-PMC inplace.
 
@@ -87,7 +87,7 @@ static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item * static void rat_add_float(PARROT_INTERP, PMC *self, double value)
+=item C<static void rat_add_float(PARROT_INTERP, PMC *self, double value)>
 
 Adds a float "value" to a Rational-PMC in-place. "value" is first conveted to a
 rational using GMPs mpq_set_d-function. This is meant to be exact.
@@ -110,7 +110,7 @@ static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
 
 /*
 
-=item * static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value)
+=item C<static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value)>
 
 Multiplys a Rational-PMC with an integer "value" in-place.
 
@@ -127,7 +127,7 @@ static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item * static void rat_multiply_float(PARROT_INTERP, PMC *self, double value)
+=item C<static void rat_multiply_float(PARROT_INTERP, PMC *self, double value)>
 
 Multiplies a Rational-PMC with a float "value" in-place.
 
@@ -149,7 +149,7 @@ static void rat_multiply_float(PARROT_INTERP, PMC *self, double value) {
 
 /*
 
-=item * static void rat_divide_integer(PARROT_INTERP, PMC *self, int value)
+=item C<static void rat_divide_integer(PARROT_INTERP, PMC *self, int value)>
 
 Divides a Rational-PMC through an integer "value" in-place.
 
@@ -171,7 +171,7 @@ static void rat_divide_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item * static void rat_divide_float(PARROT_INTERP, PMC *self, double value)
+=item C<static void rat_divide_float(PARROT_INTERP, PMC *self, double value)>
 
 Divides a Rational-PMC through a float "value" in-place.
 

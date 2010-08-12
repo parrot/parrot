@@ -263,16 +263,32 @@ typedef struct PackFile_ConstTable {
     opcode_t                   const_count;
     PackFile_Constant         *constants;
     PackFile_ByteCode         *code;  /* where this segment belongs to */
-
     PMC                       *string_hash; /* Hash for lookup strings and numbers */
 } PackFile_ConstTable;
 
+typedef struct PackFile_ByteCode_OpMappingEntry {
+    op_lib_t *lib;       /* library for this entry */
+    opcode_t  n_ops;     /* number of ops used */
+    opcode_t *lib_ops;   /* indices of ops within the library */
+    opcode_t *table_ops; /* indices of ops within the op table */
+} PackFile_ByteCode_OpMappingEntry;
+
+typedef struct PackFile_ByteCode_OpMapping {
+    opcode_t                          n_libs; /* number of library entries */
+    PackFile_ByteCode_OpMappingEntry *libs;   /* opcode libraries used by this segment */
+} PackFile_ByteCode_OpMapping;
+
 struct PackFile_ByteCode {
-    PackFile_Segment       base;
-    struct PackFile_Debug *debugs;
-    PackFile_ConstTable   *const_table;
-    PackFile_FixupTable   *fixups;
-    struct PackFile_Annotations *annotations;
+    PackFile_Segment              base;
+    struct PackFile_Debug        *debugs;
+    PackFile_ConstTable          *const_table;
+    PackFile_FixupTable          *fixups;
+    struct PackFile_Annotations  *annotations;
+    PackFile_ByteCode_OpMapping   op_mapping;      /* opcode mapping information */
+    size_t                        op_count;        /* number of ops in the func table */
+    op_func_t                    *op_func_table;   /* opcode dispatch table */
+    op_func_t                    *save_func_table; /* for when we hijack op_func_table */
+    op_info_t                   **op_info_table;
 };
 
 typedef struct PackFile_DebugFilenameMapping {

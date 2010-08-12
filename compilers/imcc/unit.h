@@ -69,8 +69,8 @@ struct IMC_Unit {
     char             *vtable_name;      /* vtable name, if any */
     char             *method_name;      /* method name, if any */
     char             *ns_entry_name;    /* ns entry name, if any */
-    char             *instance_of;      /* PMC or class this is an instance of
-                                         * if any */
+    char             *instance_of;      /* PMC or class this is an instance of if any */
+    INTVAL            hll_id;           /* HLL ID for this sub */
     SymReg           *subid;            /* Unique subroutine id */
 
     struct            imcc_ostat ostat;

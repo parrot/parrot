@@ -33,6 +33,16 @@ static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void print_sub_name(PARROT_INTERP, PMC *sub)>
+
+
+
+=cut
+
+*/
+
 static void
 print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 {
@@ -861,7 +871,8 @@ The number of optional named arguments
                     Parrot_sub_arginfo);
 
             /* If the first instruction is a get_params... */
-            if (*pc == PARROT_OP_get_params_pc) {
+            if (sub->seg->op_func_table[*pc]
+                == interp->op_func_table[PARROT_OP_get_params_pc]) {
                 /* Get the signature (the next thing in the bytecode). */
                 PMC * const sig = PF_CONST(sub->seg, *(++pc)).u.key;
 
@@ -1144,7 +1155,10 @@ slurpy arguments).
 
 (Experimental) Returns Sub flags.
 
+=back
+
 =cut
+
 */
     METHOD comp_flags() {
         Parrot_Sub_attributes  *sub;

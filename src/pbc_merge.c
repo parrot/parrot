@@ -64,6 +64,16 @@ PARROT_DOES_NOT_RETURN
 static void help(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void pbc_fixup_bytecode(PARROT_INTERP,
+    ARGMOD(pbc_merge_input **inputs),
+    int num_inputs,
+    ARGMOD(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*inputs)
+        FUNC_MODIFIES(*bc);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_begin(PARROT_INTERP,
@@ -98,16 +108,6 @@ static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*inputs)
         FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
-
-static void pbc_merge_ctpointers(PARROT_INTERP,
-    ARGMOD(pbc_merge_input **inputs),
-    int num_inputs,
-    ARGMOD(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*inputs)
         FUNC_MODIFIES(*bc);
 
 static void pbc_merge_debugs(PARROT_INTERP,
@@ -149,6 +149,10 @@ static void pbc_merge_write(PARROT_INTERP,
 
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(inputs) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
@@ -160,10 +164,6 @@ static void pbc_merge_write(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
     , PARROT_ASSERT_ARG(pf) \
-    , PARROT_ASSERT_ARG(bc))
-#define ASSERT_ARGS_pbc_merge_ctpointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(inputs) \
     , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_pbc_merge_debugs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -601,7 +601,6 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     /* Create merged debug segment. Replace created data and mappings
        with merged ones we have created. */
     debug_seg = Parrot_new_debug_seg(interp, bc, num_lines);
-    PackFile_add_segment(interp, &pf->directory, (PackFile_Segment*)debug_seg);
     mem_gc_free(interp, debug_seg->base.data);
     debug_seg->base.data    = lines;
     mem_gc_free(interp, debug_seg->mappings);
@@ -610,23 +609,90 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     debug_seg->num_mappings = num_mappings;
 }
 
+
+static opcode_t
+bytecode_remap_op(PARROT_INTERP, PackFile *pf, opcode_t op) {
+    int i;
+    op_info_t         *info    = pf->cur_cs->op_info_table[op];
+    op_lib_t          *lib     = info->lib;
+    op_func_t         op_func  = pf->cur_cs->op_func_table[op];
+    PackFile_ByteCode *bc      = interp->code;
+    PackFile_ByteCode_OpMappingEntry *om;
+
+    for (i = 0; i < bc->op_mapping.n_libs; i++) {
+        if (lib == bc->op_mapping.libs[i].lib) {
+            om = &bc->op_mapping.libs[i];
+            goto found_lib;
+        }
+    }
+
+    /* library not yet mapped */
+    bc->op_mapping.n_libs++;
+    bc->op_mapping.libs = mem_gc_realloc_n_typed_zeroed(interp, bc->op_mapping.libs,
+                            bc->op_mapping.n_libs, bc->op_mapping.n_libs - 1,
+                            PackFile_ByteCode_OpMappingEntry);
+
+    /* initialize a new lib entry */
+    om            = &bc->op_mapping.libs[bc->op_mapping.n_libs - 1];
+    om->lib       = lib;
+    om->n_ops     = 0;
+    om->lib_ops   = mem_gc_allocate_n_zeroed_typed(interp, 0, opcode_t);
+    om->table_ops = mem_gc_allocate_n_zeroed_typed(interp, 0, opcode_t);
+
+  found_lib:
+    for (i = 0; i < om->n_ops; i++) {
+        if (bc->op_func_table[om->table_ops[i]] == op_func)
+            return om->table_ops[i];
+    }
+
+    /* op not yet mapped */
+    bc->op_count++;
+    bc->op_func_table =
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_func_table, bc->op_count, bc->op_count,
+                                        op_func_t);
+    bc->op_func_table[bc->op_count - 1] = op_func;
+    bc->op_info_table =
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_info_table, bc->op_count, bc->op_count,
+                                        op_info_t *);
+    bc->op_info_table[bc->op_count - 1] = info;
+
+    /* initialize new op mapping */
+    om->n_ops++;
+
+    om->lib_ops =
+        mem_gc_realloc_n_typed_zeroed(interp, om->lib_ops, om->n_ops, om->n_ops - 1, opcode_t);
+    for (i = 0; i < lib->op_count; i++) {
+        if (lib->op_func_table[i] == op_func) {
+            om->lib_ops[om->n_ops - 1] = i;
+            break;
+        }
+    }
+    PARROT_ASSERT(om->lib_ops[om->n_ops - 1] || !i);
+
+    om->table_ops =
+        mem_gc_realloc_n_typed_zeroed(interp, om->table_ops, om->n_ops, om->n_ops - 1, opcode_t);
+    om->table_ops[om->n_ops - 1] = bc->op_count - 1;
+
+    return bc->op_count - 1;
+}
+
 /*
 
-=item C<static void pbc_merge_ctpointers(PARROT_INTERP, pbc_merge_input
-**inputs, int num_inputs, PackFile_ByteCode *bc)>
+=item C<static void pbc_fixup_bytecode(PARROT_INTERP, pbc_merge_input **inputs,
+int num_inputs, PackFile_ByteCode *bc)>
 
-This function corrects the pointers into the constants table found in the
-bytecode.
+Fixup bytecode. This includes correcting pointers into the constant table
+and updating the ops mapping.
 
 =cut
 
 */
 
 static void
-pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
+pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_ctpointers)
+    ASSERT_ARGS(pbc_fixup_bytecode)
     int        cur_arg;
     opcode_t  *op_ptr;
     opcode_t  *ops       = bc->base.data;
@@ -637,15 +703,16 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     while (cur_op < (opcode_t)bc->base.size) {
         op_info_t *op;
         opcode_t   op_num;
+        op_func_t  op_func;
 
         /* Keep track of the current input file. */
         if (cur_input + 1 < num_inputs &&
             cur_op >= inputs[cur_input + 1]->code_start)
             ++cur_input;
 
-        /* Get info about this op and jump over it. */
-        op_num = ops[cur_op];
-        op     = &interp->op_info_table[op_num];
+        /* Get info about this op, remap it, and jump over it. */
+        op_num = ops[cur_op] = bytecode_remap_op(interp, inputs[cur_input]->pf, ops[cur_op]);
+        op     = bc->op_info_table[op_num];
         op_ptr = ops + cur_op;
         ++cur_op;
 
@@ -669,10 +736,11 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         }
 
         /* Handle special case variable argument opcodes. */
-        if (op_num == PARROT_OP_set_args_pc    ||
-                op_num == PARROT_OP_get_results_pc ||
-                op_num == PARROT_OP_get_params_pc  ||
-                op_num == PARROT_OP_set_returns_pc) {
+        op_func = interp->code->op_func_table[op_num];
+        if (op_func == interp->op_func_table[PARROT_OP_set_args_pc]    ||
+            op_func == interp->op_func_table[PARROT_OP_get_results_pc] ||
+            op_func == interp->op_func_table[PARROT_OP_get_params_pc]  ||
+            op_func == interp->op_func_table[PARROT_OP_set_returns_pc]) {
             /* Get the signature. */
             PMC * const sig = bc->const_table->constants[op_ptr[1]].u.key;
 
@@ -739,7 +807,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     }
 
     /* Merge the various stuff. */
-    bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
+    bc = interp->code = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
     UNUSED(ct);
 
@@ -747,7 +815,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
-    pbc_merge_ctpointers(interp, inputs, num_inputs, bc);
+    pbc_fixup_bytecode(interp, inputs, num_inputs, bc);
 
     for (i = 0; i < num_inputs; ++i) {
         mem_gc_free(interp, inputs[i]->const_map);

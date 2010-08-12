@@ -563,9 +563,9 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(Parrot_pcc_build_call_from_varargs)
-    PMC         * arg_flags         = PMCNULL;
-    PMC         * call_object;
-    INTVAL       i                  = 0;
+    PMC         *call_object;
+    PMC         *arg_flags    = PMCNULL;
+    INTVAL       i            = 0;
 
     if (PMC_IS_NULL(signature))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
@@ -1364,10 +1364,10 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
         ARGMOD(PMC **arg_flags))
 {
     ASSERT_ARGS(parse_signature_string)
-    PMC *current_array;
+    PMC        *current_array;
     const char *x;
-    INTVAL flags = 0;
-    INTVAL set = 0;
+    INTVAL      flags = 0;
+    INTVAL      set   = 0;
 
     if (PMC_IS_NULL(*arg_flags))
         *arg_flags = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
