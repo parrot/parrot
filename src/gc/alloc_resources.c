@@ -75,6 +75,14 @@ static void fix_pmc_syncs(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest_interp);
 
+static void free_mem_block(
+     ARGMOD(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Block *block))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools)
+        FUNC_MODIFIES(*block);
+
 static void free_memory_pool(ARGFREE(Variable_Size_Pool *pool));
 static void free_old_mem_blocks(
      ARGMOD(Memory_Pools *mem_pools),
@@ -166,6 +174,9 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest_interp) \
     , PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_free_mem_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(block))
 #define ASSERT_ARGS_free_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_free_old_mem_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem_pools) \
@@ -491,6 +502,10 @@ compact_pool(PARROT_INTERP,
                     /* Skip mostly full blocks, think of them as pre-compacted */
                     if (!is_block_almost_full(old_block))
                         cur_spot = move_one_buffer(interp, new_block, b, cur_spot);
+
+                    /* If that was the last buffer on this block, free it */
+                    if (old_block->freed + old_block->free == old_block->size)
+                        free_mem_block(mem_pools, old_block);
                 }
 
                 b = (Buffer *)((char *)b + object_size);
@@ -508,8 +523,6 @@ compact_pool(PARROT_INTERP,
     /* How much is free. That's the total size minus the amount we used */
     new_block->free = new_block->size - (cur_spot - new_block->start);
     mem_pools->memory_collected +=      (cur_spot - new_block->start);
-
-    free_old_mem_blocks(mem_pools, pool, new_block, total_size);
 
     --mem_pools->gc_sweep_block_level;
 }
@@ -601,6 +614,9 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
     UNUSED(interp);
 #endif
 
+    /* Mark the memory as free in the old pool */
+    Buffer_pool(old_buf)->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(old_buf));
+ 
     new_pool_ptr = aligned_mem(old_buf, new_pool_ptr);
 
     /* Copy our memory to the new pool */
@@ -609,9 +625,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
     Buffer_bufstart(old_buf) = new_pool_ptr;
 
-    /* Mark the memory as free in the old pool */
-    Buffer_pool(old_buf)->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(old_buf));
- 
     /* Remember new pool inside */
     *Buffer_poolptr(old_buf) = pool;
 
@@ -676,6 +689,37 @@ free_old_mem_blocks(
     prev_block->prev = NULL;
 
     pool->total_allocated        = new_block->size;
+}
+
+/*
+
+=item C<static void free_mem_block( Memory_Pools *mem_pools, Memory_Block
+*block)>
+
+Free a memory block.
+
+=cut
+
+*/
+
+static void
+free_mem_block(
+        ARGMOD(Memory_Pools *mem_pools),
+        ARGMOD(Memory_Block *block))
+{
+    ASSERT_ARGS(free_mem_block)
+
+    /* Unlink the block from list */
+    if (block->prev)
+        block->prev->next = block->next;
+    if (block->next)
+        block->next->prev = block->prev;
+
+    /* Note that we don't have it any more */
+    mem_pools->memory_allocated -= block->size;
+
+    /* Free the whole block. */
+    mem_internal_free(block);
 }
 
 /*
