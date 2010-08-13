@@ -23,7 +23,6 @@ Functions to manage non-PObj memory, including strings and buffers.
 #include "gc_private.h"
 
 
-#define RECLAMATION_FACTOR 0.20
 #define WE_WANT_EVER_GROWING_ALLOCATIONS 0
 
 /* show allocated blocks on stderr */
@@ -673,8 +672,6 @@ free_old_mem_blocks(
     prev_block->prev = NULL;
 
     pool->total_allocated        = new_block->size;
-    pool->guaranteed_reclaimable = 0;
-    pool->possibly_reclaimable   = 0;
 }
 
 /*
@@ -751,9 +748,6 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
     pool->compact                = compact;
     pool->minimum_block_size     = min_block;
     pool->total_allocated        = 0;
-    pool->guaranteed_reclaimable = 0;
-    pool->possibly_reclaimable   = 0;
-    pool->reclaim_factor         = RECLAMATION_FACTOR;
 
     return pool;
 }
@@ -820,13 +814,8 @@ merge_pools(ARGMOD(Variable_Size_Pool *dest), ARGMOD(Variable_Size_Pool *source)
         cur_block = next_block;
     }
 
-    dest->guaranteed_reclaimable += source->guaranteed_reclaimable;
-    dest->possibly_reclaimable   += source->possibly_reclaimable;
-
     source->top_block              = NULL;
     source->total_allocated        = 0;
-    source->possibly_reclaimable   = 0;
-    source->guaranteed_reclaimable = 0;
 }
 
 /*
