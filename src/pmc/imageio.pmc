@@ -423,7 +423,7 @@ Destroys the PMC.
 
 */
     VTABLE void destroy() {
-        if (!PObj_flag_TEST(private2, SELF))
+        if (!PObj_flag_TEST(private2, SELF) && PARROT_IMAGEIO(SELF)->pf)
             PackFile_destroy(INTERP, PARROT_IMAGEIO(SELF)->pf);
         PARROT_IMAGEIO(SELF)->pf = NULL;
     }
