@@ -249,6 +249,10 @@ These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
+=item errorson, errorsoff operations [eligible in 2.7]
+
+The C<.PARROT_ERRORS_GLOBAL_FLAG> flag will be eliminated. It is not used by Parrot.
+
 =back
 
 =head1 Bytecode
