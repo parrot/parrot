@@ -488,6 +488,7 @@ compact_pool(PARROT_INTERP,
                 if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     Memory_Block *old_block = Buffer_pool(b);
 
+                    /* Skip mostly full blocks, think of them as pre-compacted */
                     if (!is_block_almost_full(old_block))
                         cur_spot = move_one_buffer(interp, new_block, b, cur_spot);
                 }
@@ -608,6 +609,9 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
     Buffer_bufstart(old_buf) = new_pool_ptr;
 
+    /* Mark the memory as free in the old pool */
+    Buffer_pool(old_buf)->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(old_buf));
+ 
     /* Remember new pool inside */
     *Buffer_poolptr(old_buf) = pool;
 
