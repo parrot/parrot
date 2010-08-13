@@ -500,12 +500,13 @@ compact_pool(PARROT_INTERP,
                     Memory_Block *old_block = Buffer_pool(b);
 
                     /* Skip mostly full blocks, think of them as pre-compacted */
-                    if (!is_block_almost_full(old_block))
+                    if (!is_block_almost_full(old_block)) {
                         cur_spot = move_one_buffer(interp, new_block, b, cur_spot);
 
-                    /* If that was the last buffer on this block, free it */
-                    if (old_block->freed + old_block->free == old_block->size)
-                        free_mem_block(mem_pools, old_block);
+                        /* If that was the last buffer on this block, free it */
+                        if (old_block->freed + old_block->free == old_block->size)
+                            free_mem_block(mem_pools, old_block);
+                    }
                 }
 
                 b = (Buffer *)((char *)b + object_size);
