@@ -671,7 +671,6 @@ free_buffer(SHIM_INTERP,
     if (mem_pool) {
         /* Update Memory_Block usage */
         if (PObj_is_movable_TESTALL(b)) {
-            /* Mask low 2 bits used for flags */
             Memory_Block * block = Buffer_pool(b);
 
             PARROT_ASSERT(block);
