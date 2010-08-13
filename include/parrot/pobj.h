@@ -57,8 +57,7 @@ obj->bufstart   ->  +------------------+
    casts. */
 #define Buffer_alloc_offset sizeof (void*)
 #define Buffer_bufallocstart(b)  ((char *)Buffer_bufstart(b) - Buffer_alloc_offset)
-#define Buffer_bufrefcountptr(b) ((INTVAL *)Buffer_bufallocstart(b))
-#define Buffer_pool(b) ((Memory_Block *)( *(INTVAL*)(Buffer_bufallocstart(b)) & ~3 ))
+#define Buffer_pool(b) ((Memory_Block *)( *(INTVAL*)(Buffer_bufallocstart(b))))
 #define Buffer_poolptr(b) ((Memory_Block **)Buffer_bufallocstart(b))
 
 
