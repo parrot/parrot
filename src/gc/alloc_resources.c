@@ -334,13 +334,6 @@ mem_allocate(PARROT_INTERP,
         if (!mem_pools->gc_mark_block_level
         &&   mem_pools->mem_allocs_since_last_collect) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
-
-            if (interp->gc_sys->sys_type != INF) {
-                /* Compact the pool if allowed and worthwhile */
-                if (pool->compact)
-                   (*pool->compact) (interp, mem_pools, pool);
-            }
-
         }
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536 * 16)
