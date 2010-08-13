@@ -285,6 +285,10 @@ CODE
 OUTPUT
 test_test($desc);
 
+#
+# incorporate changes in Test::Builder after Version 0.94
+#
+if ($Test::Builder::VERSION <= eval '0.94') {
 $desc = 'pir_error_output_like: todo';
 $line = line_num(+22);
 my $location;
@@ -319,6 +323,34 @@ if($Test::Builder::VERSION == 0.84) {
     test_test(title => $desc, skip_err => 1);
 }
 else {
+    test_test($desc);
+}
+}  #end of test for Test::Builder 0.94 or before
+#
+# Test for TEST::Builder after Version 0.94
+#
+else {
+$line = line_num(+14);
+my $location = "at $0 line $line";
+$desc = 'pir_output_like: todo';
+test_out("not ok 1 - $desc # TODO foo");
+$err = <<"EOUT";
+#   Failed (TODO) test '$desc'
+#   $location.
+#                   'foo
+# '
+#     doesn't match '/bar/
+# '
+EOUT
+chomp $err;
+test_out($err);
+pir_output_like( <<'CODE', <<"OUTPUT", $desc, todo => 'foo' );
+.sub 'test' :main
+    print "foo\n"
+.end
+CODE
+/bar/
+OUTPUT
     test_test($desc);
 }
 
