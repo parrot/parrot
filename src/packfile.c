@@ -25,15 +25,18 @@ about the structure of the frozen bytecode.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/packfile.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-#include "parrot/packfile.h"
+#include "parrot/dynext.h"
 #include "parrot/runcore_api.h"
 #include "../compilers/imcc/imc.h"
 #include "packfile.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_parrotlibrary.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -52,6 +55,31 @@ static PackFile_Segment * byte_code_new(PARROT_INTERP,
     SHIM(STRING *name),
     SHIM(int add))
         __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t * byte_code_pack(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *self),
+    ARGOUT(opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self)
+        FUNC_MODIFIES(*cursor);
+
+static size_t byte_code_packed_size(SHIM_INTERP,
+    ARGIN(PackFile_Segment *self))
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const opcode_t * byte_code_unpack(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *self),
+    ARGIN(const opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 static void clone_constant(PARROT_INTERP,
     ARGIN(PackFile_Constant *old_const),
@@ -353,6 +381,16 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_byte_code_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_byte_code_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_byte_code_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_byte_code_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_clone_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(old_const) \
@@ -1629,7 +1667,8 @@ static void
 pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pf_register_standard_funcs)
-    PackFile_funcs dirf = {
+
+    static const PackFile_funcs dirf = {
         directory_new,
         directory_destroy,
         directory_packed_size,
@@ -1638,7 +1677,7 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         directory_dump
     };
 
-    PackFile_funcs defaultf = {
+    static const PackFile_funcs defaultf = {
         PackFile_Segment_new,
         (PackFile_Segment_destroy_func_t)     NULLfunc,
         (PackFile_Segment_packed_size_func_t) NULLfunc,
@@ -1647,7 +1686,7 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         default_dump
     };
 
-    PackFile_funcs fixupf = {
+    static const PackFile_funcs fixupf = {
         fixup_new,
         fixup_destroy,
         fixup_packed_size,
@@ -1656,7 +1695,7 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         default_dump
     };
 
-    PackFile_funcs constf = {
+    static const PackFile_funcs constf = {
         const_new,
         const_destroy,
         PackFile_ConstTable_pack_size,
@@ -1665,16 +1704,16 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         default_dump
     };
 
-    PackFile_funcs bytef = {
+    static const PackFile_funcs bytef = {
         byte_code_new,
         byte_code_destroy,
-        (PackFile_Segment_packed_size_func_t) NULLfunc,
-        (PackFile_Segment_pack_func_t)        NULLfunc,
-        (PackFile_Segment_unpack_func_t)      NULLfunc,
+        byte_code_packed_size,
+        byte_code_pack,
+        byte_code_unpack,
         default_dump
     };
 
-    const PackFile_funcs debugf = {
+    static const PackFile_funcs debugf = {
         pf_debug_new,
         pf_debug_destroy,
         pf_debug_packed_size,
@@ -1683,7 +1722,7 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         pf_debug_dump
     };
 
-    const PackFile_funcs annotationf = {
+    static const PackFile_funcs annotationf = {
         PackFile_Annotations_new,
         PackFile_Annotations_destroy,
         PackFile_Annotations_packed_size,
@@ -2592,9 +2631,19 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     ASSERT_ARGS(byte_code_destroy)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
 
-    byte_code->fixups      = NULL;
-    byte_code->const_table = NULL;
-    byte_code->debugs      = NULL;
+    if (byte_code->op_func_table)
+        mem_gc_free(interp, byte_code->op_func_table);
+    if (byte_code->op_info_table)
+        mem_gc_free(interp, byte_code->op_info_table);
+    if (byte_code->op_mapping.libs)
+        mem_gc_free(interp, byte_code->op_mapping.libs);
+
+    byte_code->fixups          = NULL;
+    byte_code->const_table     = NULL;
+    byte_code->debugs          = NULL;
+    byte_code->op_mapping.libs = NULL;
+    byte_code->op_func_table   = NULL;
+    byte_code->op_info_table   = NULL;
 }
 
 
@@ -2620,6 +2669,206 @@ byte_code_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int ad
     return (PackFile_Segment *) byte_code;
 }
 
+/*
+
+=item C<static size_t byte_code_packed_size(PARROT_INTERP, PackFile_Segment
+*self)>
+
+Computes the size in multiples of C<opcode_t> required to store the passed
+C<PackFile_ByteCode>.
+
+=cut
+
+*/
+
+static size_t
+byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
+{
+    ASSERT_ARGS(byte_code_packed_size)
+    PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
+    size_t size;
+    int i;
+
+    size = 2; /* op_count + n_libs */
+
+    for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
+        PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
+
+        /* dynoplib data */
+        size += PF_size_cstring(entry->lib->name);
+        size += 3; /* major + minor + patch */
+
+        /* op entries */
+        size += 1;                /* n_ops */
+        size += entry->n_ops * 2; /* lib_ops and table_ops */
+    }
+
+    return size;
+}
+
+/*
+
+=item C<static opcode_t * byte_code_pack(PARROT_INTERP, PackFile_Segment *self,
+opcode_t *cursor)>
+
+Stores the passed C<PackFile_ByteCode> segment in bytecode.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+byte_code_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+{
+    ASSERT_ARGS(byte_code_pack)
+    PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
+    int i, j;
+
+    *cursor++ = byte_code->op_count;
+    *cursor++ = byte_code->op_mapping.n_libs;
+
+    for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
+        PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
+
+        /* dynoplib data */
+        cursor    = PF_store_cstring(cursor, entry->lib->name);
+        *cursor++ = entry->lib->major_version;
+        *cursor++ = entry->lib->minor_version;
+        *cursor++ = entry->lib->patch_version;
+
+        /* op entries */
+        *cursor++ = entry->n_ops;
+        for (j = 0; j < entry->n_ops; j++) {
+            *cursor++ = entry->table_ops[j];
+            *cursor++ = entry->lib_ops[j];
+        }
+    }
+
+    return cursor;
+}
+
+/*
+
+=item C<static const opcode_t * byte_code_unpack(PARROT_INTERP, PackFile_Segment
+*self, const opcode_t *cursor)>
+
+Unpacks a bytecode segment into the passed C<PackFile_ByteCode>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const opcode_t *
+byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
+{
+    ASSERT_ARGS(byte_code_unpack)
+    PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
+    int i;
+    int total_ops = 0;
+
+    byte_code->op_count          = PF_fetch_opcode(self->pf, &cursor);
+    byte_code->op_func_table     = mem_gc_allocate_n_zeroed_typed(interp,
+                                        byte_code->op_count, op_func_t);
+    byte_code->op_info_table     = mem_gc_allocate_n_zeroed_typed(interp,
+                                        byte_code->op_count, op_info_t *);
+
+
+    byte_code->op_mapping.n_libs = PF_fetch_opcode(self->pf, &cursor);
+    byte_code->op_mapping.libs   = mem_gc_allocate_n_zeroed_typed(interp,
+                                    byte_code->op_mapping.n_libs,
+                                    PackFile_ByteCode_OpMappingEntry);
+
+    for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
+        PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
+
+        /* dynoplib data */
+        {
+            char * const    lib_name = PF_fetch_cstring(interp, self->pf, &cursor);
+            const opcode_t  major    = PF_fetch_opcode(self->pf, &cursor);
+            const opcode_t  minor    = PF_fetch_opcode(self->pf, &cursor);
+            const opcode_t  patch    = PF_fetch_opcode(self->pf, &cursor);
+
+            /* XXX
+             * broken encapsulation => should make this data easier to access somehow
+             */
+            if (STREQ(lib_name, PARROT_CORE_OPLIB_NAME)) {
+                entry->lib = PARROT_CORE_OPLIB_INIT(interp, 1);
+            }
+            else {
+                PMC *lib_pmc = Parrot_load_lib(interp,
+                                                Parrot_str_new(interp, lib_name, 0),
+                                                NULL);
+                typedef op_lib_t *(*oplib_init_t)(PARROT_INTERP, long init);
+                void *oplib_init;
+                oplib_init_t oplib_init_f;
+                if (!VTABLE_get_bool(interp, lib_pmc))
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                        "Could not load oplib `%s'", lib_name);
+                GETATTR_ParrotLibrary_oplib_init(interp, lib_pmc, oplib_init);
+                oplib_init_f = (oplib_init_t)D2FPTR(oplib_init);
+                entry->lib = oplib_init_f(interp, 1);
+            }
+
+
+            mem_gc_free(interp, lib_name);
+
+            if (entry->lib->major_version != major
+            ||  entry->lib->minor_version != minor
+            ||  entry->lib->patch_version != patch)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                    "Incompatible versions of `%s' oplib. Found %d.%d.%d but loaded %d.%d.%d",
+                    entry->lib->name, major, minor, patch, entry->lib->major_version,
+                    entry->lib->minor_version, entry->lib->patch_version);
+        }
+
+        /* op entries */
+        {
+            int       j;
+            total_ops += entry->n_ops = PF_fetch_opcode(self->pf, &cursor);
+
+            entry->table_ops = mem_gc_allocate_n_zeroed_typed(interp,
+                                    entry->n_ops, opcode_t);
+            entry->lib_ops   = mem_gc_allocate_n_zeroed_typed(interp,
+                                    entry->n_ops, opcode_t);
+
+            for (j = 0; j < entry->n_ops; j++) {
+                opcode_t idx = PF_fetch_opcode(self->pf, &cursor);
+                opcode_t op  = PF_fetch_opcode(self->pf, &cursor);
+
+                if (0 > op || op >= entry->lib->op_count)
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                        "opcode index out of bounds on library `%s'. Found %d, expected 0 to %d.",
+                        entry->lib->name, op, entry->lib->op_count - 1);
+
+                if (0 > idx || idx >= byte_code->op_count)
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                        "op table index out of bounds for entry from library `%s'."
+                        " Found %d, expected 0 to %d",
+                        entry->lib->name, idx, byte_code->op_count - 1);
+
+                if (byte_code->op_func_table[idx])
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                        "duplicate entries in optable");
+
+                entry->table_ops[j]           = idx;
+                entry->lib_ops[j]             = op;
+                byte_code->op_func_table[idx] = entry->lib->op_func_table[op];
+                byte_code->op_info_table[idx] = &entry->lib->op_info_table[op];
+            }
+        }
+    }
+
+    if (total_ops != byte_code->op_count)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "wrong number of ops decoded for optable. Decoded %d, but expected %d",
+            total_ops, byte_code->op_count);
+
+    return cursor;
+}
 
 /*
 

@@ -297,7 +297,7 @@ trace_op_dump(PARROT_INTERP,
 {
     ASSERT_ARGS(trace_op_dump)
     Interp    * const debugger = debugger_or_interp(interp);
-    op_info_t * const info     = &interp->op_info_table[*pc];
+    op_info_t * const info     = interp->code->op_info_table[*pc];
     PMC *sig                   = PMCNULL;
     INTVAL n                   = info->op_count;
     INTVAL s                   = 1;

@@ -826,7 +826,7 @@ emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
         (emitters[emitter]).new_sub(interp, param, unit);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        IMCC_debug(interp, DEBUG_IMC, "emit %I\n", ins);
+        IMCC_debug(interp, DEBUG_IMC, "emit %d\n", ins);
         (emitters[emitter]).emit(interp, param, unit, ins);
     }
 

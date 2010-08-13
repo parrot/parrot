@@ -831,7 +831,6 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
     ASSERT_ARGS(Parrot_gc_get_attributes_from_pool)
     PMC_Attribute_Free_List *item;
 
-#if GC_USE_LAZY_ALLOCATOR
     if (pool->free_list) {
         item            = pool->free_list;
         pool->free_list = item->next;
@@ -847,12 +846,6 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
         Parrot_gc_allocate_new_attributes_arena(pool);
         return Parrot_gc_get_attributes_from_pool(interp, pool);
     }
-#else
-    if (pool->free_list == NULL)
-        Parrot_gc_allocate_new_attributes_arena(pool);
-    item            = pool->free_list;
-    pool->free_list = item->next;
-#endif
 
     --pool->num_free_objects;
     return (void *)item;
@@ -878,18 +871,8 @@ Parrot_gc_allocate_new_attributes_arena(ARGMOD(PMC_Attribute_Pool *pool))
     pool->top_arena = new_arena;
     next            = (PMC_Attribute_Free_List *)(new_arena + 1);
 
-#if GC_USE_LAZY_ALLOCATOR
     pool->newfree   = next;
     pool->newlast   = (PMC_Attribute_Free_List *)((char *)next + item_space);
-#else
-    pool->free_list = next;
-    for (i = 0; i < num_items; ++i) {
-        list        = next;
-        list->next  = (PMC_Attribute_Free_List *)((char *)list + item_size);
-        next        = list->next;
-    }
-    list->next      = pool->free_list;
-#endif
 
     pool->num_free_objects += num_items;
     pool->total_objects    += num_items;
@@ -987,18 +970,12 @@ gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms_allocate_pmc_attributes)
     const size_t attr_size = pmc->vtable->attr_size;
-#if GC_USE_FIXED_SIZE_ALLOCATOR
     PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
             interp->mem_pools, attr_size);
     void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
     memset(attrs, 0, attr_size);
     PMC_data(pmc) = attrs;
     return attrs;
-#else
-    void * const data =  gc_ms_allocate_memory_chunk(attr_size);
-    PMC_data(pmc) = data;
-    return data;
-#endif
 }
 
 /*
@@ -1017,17 +994,11 @@ gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     void * const data = PMC_data(pmc);
 
     if (data) {
-
-#if GC_USE_FIXED_SIZE_ALLOCATOR
         const size_t attr_size = pmc->vtable->attr_size;
         const size_t item_size = attr_size < sizeof (void *) ? sizeof (void *) : attr_size;
         PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
         const size_t idx = item_size - sizeof (void *);
         gc_ms_free_attributes_from_pool(pools[idx], data);
-#else
-        gc_ms_free_memory_chunk(intepr, PMC_data(pmc));
-        PMC_data(pmc) = NULL;
-#endif
     }
 }
 
@@ -1534,14 +1505,9 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
        If gc is disabled, then we must check the free list directly. */
-#if GC_USE_LAZY_ALLOCATOR
     if ((!pool->free_list || pool->num_free_objects < pool->replenish_level)
         && !pool->newfree)
         (*pool->alloc_objects) (interp, interp->mem_pools, pool);
-#else
-    if (!pool->free_list || pool->num_free_objects < pool->replenish_level)
-    (*pool->alloc_objects) (interp, interp->mem_pools, pool);
-#endif
 }
 
 /*
@@ -1596,8 +1562,6 @@ gc_ms_get_free_object(PARROT_INTERP,
     PObj *ptr;
     PObj *free_list = (PObj *)pool->free_list;
 
-#if GC_USE_LAZY_ALLOCATOR
-
   HAVE_FREE:
     if (free_list) {
         ptr             = free_list;
@@ -1619,16 +1583,6 @@ gc_ms_get_free_object(PARROT_INTERP,
         free_list = (PObj *)pool->free_list;
         goto HAVE_FREE;
     }
-#else
-    /* if we don't have any objects */
-    if (!free_list) {
-        (*pool->more_objects)(interp, mem_pools, pool);
-        free_list = (PObj *)pool->free_list;
-    }
-
-    ptr             = free_list;
-    pool->free_list = ((GC_MS_PObj_Wrapper*)ptr)->next_ptr;
-#endif
 
     --pool->num_free_objects;
 

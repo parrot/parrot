@@ -642,6 +642,10 @@ D: Patchmonster & release manager emeritus (0.0.13 - 0.4.5)
 E: lt@toetsch.at
 S: Herrnbaumgarten, Austria
 
+N: Luben Karavelov
+U: luben
+E: luben@unixsol.org
+
 N: Luca Barbato
 D: fix to make installable
 E: lu_zero@gentoo.org

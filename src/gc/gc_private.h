@@ -60,12 +60,6 @@ extern void *flush_reg_store(void);
 #define GC_ATTRIB_POOLS_HEADROOM 8
 #define GC_FIXED_SIZE_POOL_SIZE 4096
 
-/* Use the lazy allocator. Since it amortizes arena allocation costs, turn
-   this on at the same time that you increase the size of allocated arenas.
-   increase *_HEADERS_PER_ALLOC and GC_FIXED_SIZE_POOL_SIZE to be large
-   enough to satisfy most startup costs. */
-#define GC_USE_LAZY_ALLOCATOR 1
-
 /* Set to 1 if we want to use the fixed-size allocator. Set to 0 if we want
    to allocate these things using mem_sys_allocate instead */
 #define GC_USE_FIXED_SIZE_ALLOCATOR 1
@@ -209,12 +203,10 @@ typedef struct PMC_Attribute_Pool {
     size_t total_objects;
     size_t objects_per_alloc;
     size_t num_free_objects;
-    PMC_Attribute_Free_List * free_list;
-    PMC_Attribute_Arena     * top_arena;
-#if GC_USE_LAZY_ALLOCATOR
-    PMC_Attribute_Free_List * newfree;
-    PMC_Attribute_Free_List * newlast;
-#endif
+    PMC_Attribute_Arena     *top_arena;
+    PMC_Attribute_Free_List *free_list;
+    PMC_Attribute_Free_List *newfree;
+    PMC_Attribute_Free_List *newlast;
 } PMC_Attribute_Pool;
 
 /* Tracked resource pool */
@@ -255,11 +247,8 @@ typedef struct Fixed_Size_Pool {
     } gc_private;
     */
 
-#if GC_USE_LAZY_ALLOCATOR
     void *newfree;
     void *newlast;
-#endif
-
 } Fixed_Size_Pool;
 
 typedef struct Memory_Pools {

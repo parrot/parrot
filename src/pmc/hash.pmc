@@ -78,7 +78,6 @@ Free hash structure.
             (Parrot_Hash_attributes *) PMC_data(SELF);
 
         attr->hash            = parrot_new_hash(INTERP);
-        attr->hash->container = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -91,7 +90,6 @@ Free hash structure.
                 Hash_key_type_STRING,
                 STRING_compare,
                 (hash_hash_key_fn)key_hash_STRING);
-        attr->hash->container = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -150,7 +148,6 @@ Use C<ptr> as this PMC's Hash*.
         Hash * const new_hash = (Hash *)ptr;
 
         PARROT_HASH(SELF)->hash = new_hash;
-        new_hash->container     = SELF;
 
         if (old_hash)
             parrot_hash_destroy(INTERP, old_hash);
@@ -206,7 +203,6 @@ NB: this method will destroy all old data!
 
 
         PARROT_HASH(SELF)->hash = new_hash;
-        new_hash->container     = SELF;
 
         if (old_hash)
             parrot_hash_destroy(INTERP, old_hash);
@@ -269,7 +265,6 @@ NB: this method will destroy all old data!
         }
 
         PARROT_HASH(SELF)->hash = new_hash;
-        new_hash->container     = SELF;
 
         if (old_hash)
             parrot_hash_destroy(INTERP, old_hash);
@@ -456,6 +451,12 @@ Returns the integer value for the element at C<*key>.
         PMC    *box;
         HashBucket *b;
 
+        if (PObj_constant_TEST(SELF)
+        && !PObj_constant_TEST((PObj *)key))
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Used non-constant PMC key in constant hash.");
+
         if (!nextkey) {
             parrot_hash_put(INTERP, hash, keystr,
                     hash_value_from_int(INTERP, hash, value));
@@ -491,6 +492,13 @@ Returns the integer value for the element at C<*key>.
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
         Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if (PObj_constant_TEST(SELF)
+        && !PObj_constant_TEST((PObj *)key))
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Used non-constant key in constant hash.");
+
         parrot_hash_put(INTERP, hash, hash_key_from_string(INTERP, hash, key),
                 hash_value_from_int(INTERP, hash, value));
     }
@@ -636,6 +644,17 @@ Returns the string value for the element at C<*key>.
         PMC    *box;
         HashBucket *b;
 
+        if (PObj_constant_TEST(SELF)){
+            if (!PObj_constant_TEST((PObj *)key))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC key in constant hash.");
+            if (!PObj_constant_TEST((PObj *)value))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant STRING value in constant hash.");
+        }
+
         if (!nextkey) {
             parrot_hash_put(INTERP, hash, keystr,
                     hash_value_from_string(INTERP, hash, value));
@@ -665,6 +684,18 @@ Returns the string value for the element at C<*key>.
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
         Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if (PObj_constant_TEST(SELF)){
+            if (!PObj_constant_TEST((PObj *)key))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant STRING key in constant hash.");
+            if (!PObj_constant_TEST((PObj *)value))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant STRING value in constant hash.");
+        }
+
         parrot_hash_put(INTERP, hash,
                 hash_key_from_string(INTERP, hash, key),
                 hash_value_from_string(INTERP, hash, value));
@@ -672,6 +703,13 @@ Returns the string value for the element at C<*key>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if ((PObj_constant_TEST(SELF))
+        && (!PObj_constant_TEST((PObj *)value)))
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Used non-constant STRING value in constant hash.");
+
         parrot_hash_put(INTERP, hash,
                 hash_key_from_int(INTERP, hash, key),
                 hash_value_from_string(INTERP, hash, value));
@@ -697,12 +735,12 @@ Returns the PMC value for the element at C<*key>.
 
         GET_ATTR_hash(INTERP, SELF, hash);
 
-        /* special case the most key type, for speed */
-        if (hash->key_type == Hash_key_type_STRING)
-            b = parrot_hash_get_bucket(INTERP, hash, key);
-        else
-            b = parrot_hash_get_bucket(INTERP, hash,
-                hash_key_from_string(INTERP, hash, key));
+        /* special case the most likely key type, for speed */
+        key = hash->key_type == Hash_key_type_STRING
+            ? key
+            : (STRING *)hash_key_from_string(INTERP, hash, key);
+
+        b = parrot_hash_get_bucket(INTERP, hash, key);
 
         if (!b)
             return PMCNULL;
@@ -762,6 +800,11 @@ Returns the PMC value for the element at C<*key>.
         PMC    *box            = PMCNULL;
         HashBucket *b;
 
+        if (PObj_constant_TEST(SELF)
+        && !PObj_constant_TEST((PObj *)key))
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Used non-constant PMC key in constant hash.");
 
         if (!nextkey) {
             PMC * const val = get_number_pmc(INTERP, value);
@@ -793,6 +836,12 @@ Sets C<value> as the value for C<*key>.
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
         PMC * const val  = get_number_pmc(INTERP, value);
 
+        if (PObj_constant_TEST(SELF)
+        && !PObj_constant_TEST((PObj *)key))
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Used non-constant STRING key in constant hash.");
+
         parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, val);
     }
 
@@ -810,6 +859,18 @@ Sets C<value> as the value for C<*key>.
         PMC    * const nextkey = key_next(INTERP, key);
         PMC    *box;
         HashBucket *b;
+
+        if (PObj_constant_TEST(SELF)) {
+            if (!PObj_constant_TEST((PObj *)key))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC key in constant hash.");
+
+            if (!PObj_constant_TEST((PObj *)value))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC value in constant hash.");
+        }
 
         if (!nextkey) {
             parrot_hash_put(INTERP, hash, keystr, value);
@@ -842,6 +903,19 @@ Sets C<*value> as the value for C<*key>.
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if (PObj_constant_TEST(SELF)) {
+            if (!PObj_constant_TEST((PObj *)key))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant STRING key in constant hash.");
+
+            if (!PObj_constant_TEST((PObj *)value))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant STRING value in constant hash.");
+        }
+
         parrot_hash_put(INTERP, hash, hash_key_from_string(INTERP, hash, key),
                 hash_value_from_pmc(INTERP, hash, value));
     }
@@ -1163,7 +1237,6 @@ Used to unarchive the hash.
             PARROT_ASSERT((INTVAL)hash->key_type == k_type);
             PARROT_ASSERT(hash->entry_type       == v_type);
 
-            hash->container = SELF;
             hash->entries   = elems;
         }
     }

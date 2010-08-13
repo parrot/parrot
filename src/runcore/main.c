@@ -520,9 +520,11 @@ void
 disable_event_checking(PARROT_INTERP)
 {
     ASSERT_ARGS(disable_event_checking)
+    PackFile_ByteCode *cs = interp->code;
     /* restore func table */
-    PARROT_ASSERT(interp->save_func_table);
-    notify_func_table(interp, interp->save_func_table, 0);
+    PARROT_ASSERT(cs->save_func_table);
+    cs->op_func_table   = cs->save_func_table;
+    cs->save_func_table = NULL;
 }
 
 
@@ -546,8 +548,12 @@ void
 enable_event_checking(PARROT_INTERP)
 {
     ASSERT_ARGS(enable_event_checking)
-    /* put table in place */
-    notify_func_table(interp, interp->evc_func_table, 1);
+    PackFile_ByteCode *cs = interp->code;
+    /* only save if we're not already event checking */
+    if (cs->save_func_table == NULL)
+        cs->save_func_table = cs->op_func_table;
+    /* put evc table in place */
+    cs->op_func_table   = interp->evc_func_table;
 }
 
 

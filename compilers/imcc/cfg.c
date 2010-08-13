@@ -463,7 +463,7 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(interp, unit, from, unit->bb_list[r->first_ins->bbindex]);
     else {
-        IMCC_debug(interp, DEBUG_CFG, "register branch %I ", from->end);
+        IMCC_debug(interp, DEBUG_CFG, "register branch %d ", from->end);
         for (ins = from->end; ins; ins = ins->prev) {
             if ((ins->type & ITBRANCH)
             &&   STREQ(ins->opname, "set_addr")
