@@ -327,14 +327,10 @@ mem_allocate(PARROT_INTERP,
 
             if (interp->gc_sys->sys_type != INF) {
                 /* Compact the pool if allowed and worthwhile */
-                if (pool->compact) {
-                    /* don't bother reclaiming if it's only a small amount */
-                    if ((pool->possibly_reclaimable * pool->reclaim_factor +
-                         pool->guaranteed_reclaimable) > size) {
-                        (*pool->compact) (interp, mem_pools, pool);
-                    }
-                }
+                if (pool->compact)
+                   (*pool->compact) (interp, mem_pools, pool);
             }
+
         }
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536 * 16)
