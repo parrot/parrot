@@ -453,15 +453,18 @@ compact_pool(PARROT_INTERP,
     if (mem_pools->gc_sweep_block_level)
         return;
 
+    /* Snag a block big enough for everything */
+    total_size = pad_pool_size(pool);
+
+    if (total_size)
+        return;
+
     ++mem_pools->gc_sweep_block_level;
 
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
     ++mem_pools->gc_collect_runs;
-
-    /* Snag a block big enough for everything */
-    total_size = pad_pool_size(pool);
 
     alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
@@ -529,6 +532,9 @@ Calculate the size of the new pool. The currently used size equals the total
 size minus the reclaimable size. Add a minimum block to the current amount, so
 we can avoid having to allocate it in the future.
 
+Returns 0 if all blocks below the top block are almost full. In this case
+compacting is not needed.
+
 TODO - Big blocks
 
 Currently all available blocks are compacted into one new
@@ -553,20 +559,28 @@ static UINTVAL
 pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(pad_pool_size)
-    Memory_Block *cur_block = pool->top_block;
+    Memory_Block *cur_block = pool->top_block->prev;
 
     UINTVAL total_size   = 0;
 #if RESOURCE_DEBUG
-    size_t  total_blocks = 0;
+    size_t  total_blocks = 1;
 #endif
 
     while (cur_block) {
-        total_size += cur_block->size - cur_block->freed - cur_block->free;
+        if (!is_block_almost_full(cur_block))
+            total_size += cur_block->size - cur_block->freed - cur_block->free;
         cur_block   = cur_block->prev;
 #if RESOURCE_DEBUG
         ++total_blocks;
 #endif
     }
+
+    if (total_size == 0)
+        return 0;
+
+    cur_block = pool->top_block;
+    if (!is_block_almost_full(cur_block))
+        total_size += cur_block->size - cur_block->freed - cur_block->free;
 
     /* this makes for ever increasing allocations but fewer collect runs */
 #if WE_WANT_EVER_GROWING_ALLOCATIONS
@@ -732,7 +746,7 @@ static int
 is_block_almost_full(ARGIN(const Memory_Block *block))
 {
     ASSERT_ARGS(is_block_almost_full)
-    return (block->free + block->freed) < block->size * 0.2;
+    return 5 * (block->free + block->freed) < block->size;
 }
 
 /*
