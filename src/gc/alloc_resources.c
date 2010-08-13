@@ -676,12 +676,7 @@ free_old_mem_blocks(
     /* Terminate list */
     prev_block->prev = NULL;
 
-
-    /* ANR: I suspect this should be set to new_block->size, instead of passing
-     * in the raw value of total_size, because alloc_new_block pads the size of
-     * the new block under certain conditions. Leaving it unmodified for now,
-     * so this refactor has no functionality changes, only code cleanups.*/
-    pool->total_allocated        = total_size;
+    pool->total_allocated        = new_block->size;
     pool->guaranteed_reclaimable = 0;
     pool->possibly_reclaimable   = 0;
 }
