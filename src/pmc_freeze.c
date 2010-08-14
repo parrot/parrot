@@ -79,13 +79,11 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
 {
     ASSERT_ARGS(Parrot_freeze_pbc)
     PMC *visitor;
-    PMC * const pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     DECL_CONST_CAST;
 
-    VTABLE_set_pointer(interp, pf_pmc,
+    visitor  = Parrot_pmc_new(interp, enum_class_ImageIO);
+    VTABLE_set_pointer(interp, visitor,
         PARROT_const_cast(void *, (const void *)pf));
-
-    visitor  = Parrot_pmc_new_init(interp, enum_class_ImageIO, pf_pmc);
     VTABLE_set_pmc(interp, visitor, pmc);
 
     return VTABLE_get_string(interp, visitor);

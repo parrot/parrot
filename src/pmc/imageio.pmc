@@ -384,32 +384,8 @@ Initializes the PMC.
             Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
 
         PObj_flag_CLEAR(private1, SELF);
-        PObj_flag_CLEAR(private2, SELF);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
-
-
-/*
-
-=item C<void init_pmc(PMC *pmc)>
-
-Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
-
-=cut
-
-*/
-    VTABLE void init_pmc(PMC *pmc) {
-        PARROT_IMAGEIO(SELF)->seen   = PMCNULL;
-        PARROT_IMAGEIO(SELF)->pf     = PackFile_new(INTERP, 0);
-        PARROT_IMAGEIO(SELF)->pf_ct  =
-            (PackFile_ConstTable *)VTABLE_get_pointer(INTERP, pmc);
-        PARROT_IMAGEIO(SELF)->todo   =
-            Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-
-        PObj_flag_SET(private1, SELF);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 
@@ -423,8 +399,7 @@ Destroys the PMC.
 
 */
     VTABLE void destroy() {
-        if (!PObj_flag_TEST(private2, SELF) && PARROT_IMAGEIO(SELF)->pf)
-            PackFile_destroy(INTERP, PARROT_IMAGEIO(SELF)->pf);
+        PackFile_destroy(INTERP, PARROT_IMAGEIO(SELF)->pf);
         PARROT_IMAGEIO(SELF)->pf = NULL;
     }
 
@@ -718,18 +693,18 @@ Removes and returns a reference to a pmc from the start of the image.
 
     VTABLE void set_pmc(PMC *p)
     {
-        const UINTVAL header_length =
-            GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
-
         PARROT_IMAGEIO(SELF)->what  = VISIT_FREEZE_NORMAL;
 
         create_buffer(INTERP, p, SELF);
         if (PObj_flag_TEST(private1, SELF)) {
-            PObj_flag_SET(private2, SELF);
             PARROT_IMAGEIO(SELF)->pf = PARROT_IMAGEIO(SELF)->pf_ct->base.pf;
         }
         else {
-            PARROT_IMAGEIO(SELF)->pf   = PackFile_new(INTERP, 0);
+            const UINTVAL header_length =
+                GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+
+            PARROT_IMAGEIO(SELF)->pf = PackFile_new(INTERP, 0);
+            PObj_custom_destroy_SET(SELF);
 
             ensure_buffer_size(INTERP, SELF, header_length);
             mem_sys_memcopy(GET_VISIT_CURSOR(SELF),
@@ -747,9 +722,6 @@ Removes and returns a reference to a pmc from the start of the image.
 
     VTABLE void set_string_native(STRING *image) {
         PMC          *unused;
-        const UINTVAL header_length =
-             GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
-
         PARROT_IMAGEIO(SELF)->what   = VISIT_THAW_NORMAL;
         PARROT_IMAGEIO(SELF)->buffer = (Buffer *)image;
 
@@ -760,13 +732,15 @@ Removes and returns a reference to a pmc from the start of the image.
         PARROT_IMAGEIO(SELF)->input_length = image->strlen;
 
         if (PObj_flag_TEST(private1, SELF)) {
-            PObj_flag_SET(private2, SELF);
             PARROT_IMAGEIO(SELF)->pf = PARROT_IMAGEIO(SELF)->pf_ct->base.pf;
         }
         else {
+            const UINTVAL header_length =
+                 GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
             int unpacked_length;
 
             PARROT_IMAGEIO(SELF)->pf   = PackFile_new(INTERP, 0);
+            PObj_custom_destroy_SET(SELF);
 
             PARROT_IMAGEIO(SELF)->pf->options |= PFOPT_PMC_FREEZE_ONLY;
             unpacked_length = PackFile_unpack(INTERP, PARROT_IMAGEIO(SELF)->pf,
