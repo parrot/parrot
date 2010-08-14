@@ -788,7 +788,7 @@ initialize_fixed_size_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
 /*
 
 =item C<int header_pools_iterate_callback(PARROT_INTERP, Memory_Pools
-*mem_pools, int flag, void *arg, pool_iter_fn func)>
+*mem_pools, int flag, void *arg, const pool_iter_fn func)>
 
 Iterates through header pools, invoking the given callback function on each
 pool in the list matching the given criteria. Determines which pools to iterate
@@ -830,7 +830,7 @@ int
 header_pools_iterate_callback(PARROT_INTERP,
         ARGMOD(Memory_Pools *mem_pools),
         int flag, ARGIN_NULLOK(void *arg),
-        NOTNULL(pool_iter_fn func))
+        NOTNULL(const pool_iter_fn func))
 {
     ASSERT_ARGS(header_pools_iterate_callback)
 
