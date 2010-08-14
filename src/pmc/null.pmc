@@ -32,6 +32,16 @@ static void null_pmc_access(PARROT_INTERP, int index)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void null_pmc_access(PARROT_INTERP, int index)>
+
+
+
+=cut
+
+*/
+
 PARROT_DOES_NOT_RETURN
 static void
 null_pmc_access(PARROT_INTERP, int index)
