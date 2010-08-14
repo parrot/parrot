@@ -110,7 +110,7 @@ Marks the hash as live.
 
     VTABLE void mark() {
         Hash * const hash = (Hash *)SELF.get_pointer();
-        if (hash != NULL)
+        if (hash && hash->entries)
             parrot_mark_hash(INTERP, hash);
     }
 
