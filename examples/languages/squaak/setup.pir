@@ -23,29 +23,6 @@ No Configure step, no Makefile generated.
     $S0 = shift args
     load_bytecode 'distutils.pbc'
 
-    .local int reqsvn
-    $P0 = new 'FileHandle'
-    $P0.'open'('PARROT_REVISION', 'r')
-    $S0 = $P0.'readline'()
-    reqsvn = $S0
-    $P0.'close'()
-
-    .local pmc config
-    config = get_config()
-    $I0 = config['revision']
-    unless $I0 goto L1
-    unless reqsvn > $I0 goto L1
-    $S1 = "Parrot revision r"
-    $S0 = reqsvn
-    $S1 .= $S0
-    $S1 .= " required (currently r"
-    $S0 = $I0
-    $S1 .= $S0
-    $S1 .= ")\n"
-    print $S1
-    end
-  L1:
-
     $P0 = new 'Hash'
     $P0['name'] = 'Squaak'
     $P0['abstract'] = 'the Squaak compiler'
