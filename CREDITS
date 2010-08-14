@@ -152,6 +152,102 @@ N: Bernhard Schmalhofer
 U: bernhard
 D: Eclectus, Scheme on Parrot
 D: Parrot m4
+D: Pipp, PHP on Parrot
+D: HQ9plus
+D: Release manager for Parrot 0.6.0, Parrot 0.6.4, and Parrot 1.8.0
+E: Bernhard.Schmalhofer@gmx.de
+
+N: Bob Diertens
+D: patch regarding macro argument expansion
+
+N: Bob Kuo
+D: Convert some perl tests to PIR
+E: bobjkuo@gmail.com
+U: bubaflub
+
+N: Bob Rogers
+D: Random small bug fixes, including one for the linguine bug.
+E: rogers-perl6@rgrjr.dyndns.org
+U: rgrjr
+
+N: Bob Wilkinson
+D: Numerous document typos.
+E: bob@fourtheye.org
+
+N: Brad Bowman
+D: pod fixes
+
+N: Brad Gilbert
+D: Add test for sysinfo op.
+E: b2gills@gmail.com
+
+N: Bram Geron
+D: IMCC documentation update
+E: bgeron@gmail.com
+
+U: brentdax
+N: Brent Royal-Gordon
+D: Configure, Parrot_sprintf, embedding, early regex engine.
+D: Early contributions under the name Brent Dax.
+E: brent@brentdax.com
+W: http://www.brentdax.com/
+
+U: bdwheele
+N: Brian Wheeler
+E: bdwheele@indiana.edu
+
+U: brianwisti
+N: Brian Wisti
+E: brian.wisti@gmail.com
+D: PIR Test demonstrating that $I1 and $I01 are different variables
+
+N: Bruce Gray
+U: util
+E: bruce.gray@acm.org
+D: Improvements to Config, Build, and Test sub-systems.
+D: Cage cleaning, codingstd, warnings, and doc corrections.
+D: Win32 platform fixes.
+S: Auburn, AL, USA
+
+N: Bryan C. Warnock
+D: The First Perl 6 Summarizer
+D: Little things here and there in pre-Parrot days.
+D: And, yes, {sigh}, *that* Warnock.
+E: bwarnock@raba.com
+
+N: Carl Masak
+E: cmasak@gmail.com
+U: masak
+
+N: Charles Reiss
+U: creiss
+E: creiss@cc.gatech.edu
+
+N: Chip Salzenberg
+D: Release manager emeritus (0.4.6-0.4.7)
+D: Architect emeritus (0.1.2-0.4.5)
+U: chip
+E: chip@pobox.com
+
+N: Chris Davaz
+D: Rakudo builtins
+E: cdavaz@gmail.com
+
+N: Chris Dolan
+U: cdolan
+D: TAP language author, Parrot Bug fixes and Rakudo patches
+E: cdolan@cpan.org
+
+N: Chris Fields (cjfields)
+D: Rakudo patches
+
+N: Christoph Otto a.k.a. cotto
+U: cotto
+D: Patch for key flags in pdd08
+D: Range check in Env PMC
+A: christoph_googleacct@mksig.org
+A: christop...@mksig.org
+A: Christoph Otto
 D: Pipp, Lorito taskmaster
 E: christoph@mksig.org
 
