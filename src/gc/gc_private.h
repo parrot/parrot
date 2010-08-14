@@ -283,6 +283,12 @@ typedef struct Memory_Pools {
                                    * memory for headers or
                                    * internal structures or
                                    * anything */
+    size_t  memory_used;              /* The total amount of
+                                       * memory used for
+                                       * buffers and headers */
+    size_t  mem_used_last_collect;    /* The total amount of
+                                       * memory used after
+                                       * the last GC run */
     UINTVAL memory_collected;     /* Total amount of memory copied
                                      during collection */
     UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */

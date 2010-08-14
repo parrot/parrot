@@ -321,8 +321,11 @@ mem_allocate(PARROT_INTERP,
          * TODO pass required allocation size to the GC system,
          *      so that collection can be skipped if needed
          */
+        size_t new_mem = mem_pools->memory_used -
+                         mem_pools->mem_used_last_collect;
         if (!mem_pools->gc_mark_block_level
-        &&   mem_pools->mem_allocs_since_last_collect) {
+            && new_mem > (mem_pools->mem_used_last_collect >> 1)
+            && new_mem > GC_SIZE_THRESHOLD) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
             if (interp->gc_sys->sys_type != INF) {
@@ -360,6 +363,7 @@ mem_allocate(PARROT_INTERP,
     return_val             = pool->top_block->top;
     pool->top_block->top  += size;
     pool->top_block->free -= size;
+    mem_pools->memory_used += size;
 
     return return_val;
 }
@@ -454,15 +458,19 @@ compact_pool(PARROT_INTERP,
     if (mem_pools->gc_sweep_block_level)
         return;
 
+    ++mem_pools->gc_collect_runs;
+
+    /* Snag a block big enough for everything */
+    total_size = pad_pool_size(pool);
+
+    if (total_size == 0)
+        return;
+
     ++mem_pools->gc_sweep_block_level;
 
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
-    ++mem_pools->gc_collect_runs;
-
-    /* Snag a block big enough for everything */
-    total_size = pad_pool_size(pool);
 
     alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
@@ -512,6 +520,7 @@ compact_pool(PARROT_INTERP,
     /* How much is free. That's the total size minus the amount we used */
     new_block->free = new_block->size - (cur_spot - new_block->start);
     mem_pools->memory_collected +=      (cur_spot - new_block->start);
+    mem_pools->memory_used      +=      (cur_spot - new_block->start);
 
     free_old_mem_blocks(mem_pools, pool, new_block, total_size);
 
@@ -525,6 +534,9 @@ compact_pool(PARROT_INTERP,
 Calculate the size of the new pool. The currently used size equals the total
 size minus the reclaimable size. Add a minimum block to the current amount, so
 we can avoid having to allocate it in the future.
+
+Returns 0 if all blocks below the top block are almost full. In this case
+compacting is not needed.
 
 TODO - Big blocks
 
@@ -550,20 +562,28 @@ static UINTVAL
 pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(pad_pool_size)
-    Memory_Block *cur_block = pool->top_block;
+    Memory_Block *cur_block = pool->top_block->prev;
 
     UINTVAL total_size   = 0;
 #if RESOURCE_DEBUG
-    size_t  total_blocks = 0;
+    size_t  total_blocks = 1;
 #endif
 
     while (cur_block) {
-        total_size += cur_block->size - cur_block->freed - cur_block->free;
+        if (!is_block_almost_full(cur_block))
+            total_size += cur_block->size - cur_block->freed - cur_block->free;
         cur_block   = cur_block->prev;
 #if RESOURCE_DEBUG
         ++total_blocks;
 #endif
     }
+
+    if (total_size == 0)
+        return 0;
+
+    cur_block = pool->top_block;
+    if (!is_block_almost_full(cur_block))
+        total_size += cur_block->size - cur_block->freed - cur_block->free;
 
     /* this makes for ever increasing allocations but fewer collect runs */
 #if WE_WANT_EVER_GROWING_ALLOCATIONS
@@ -719,6 +739,8 @@ free_old_mem_blocks(
         else {
             /* Note that we don't have it any more */
             mem_pools->memory_allocated -= cur_block->size;
+            mem_pools->memory_used -=
+                cur_block->size - cur_block->free - cur_block->freed;
 
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */
@@ -759,7 +781,7 @@ static int
 is_block_almost_full(ARGIN(const Memory_Block *block))
 {
     ASSERT_ARGS(is_block_almost_full)
-    return (block->free + block->freed) < block->size * 0.2;
+    return 5 * (block->free + block->freed) < block->size;
 }
 
 /*
