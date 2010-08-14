@@ -71,6 +71,7 @@ extern void *flush_reg_store(void);
    larger then sizeof(PObj), thus creating overflow. However PObjs are never
    used by themselves, things like PMCs and STRINGs are cast to PObj in the
    GC, so we should have plenty of space. */
+
 typedef struct GC_MS_PObj_Wrapper {
     size_t flags;
     struct GC_MS_PObj_Wrapper * next_ptr;
@@ -158,88 +159,117 @@ typedef struct GC_Subsystem {
      */
 } GC_Subsystem;
 
-typedef struct Memory_Block {
-    size_t free;
-    size_t size;
-    struct Memory_Block *prev;
-    struct Memory_Block *next;
-    char *start;
-    char *top;
+/* This header structure describes a block of memory that is part of a
+   variable-size pool. The allocatable memory follows the header. */
 
-    /* Amount of freed memory. Used in compact_pool */
-    size_t freed;
+typedef struct Memory_Block {
+    size_t free;                /* Remaining free space. */
+    size_t size;                /* Size of memory. */
+    struct Memory_Block *prev;  /* Pointer to previous block. */
+    struct Memory_Block *next;  /* Pointer to next block. */
+    char *start;                /* Pointer to start of memory. */
+    char *top;                  /* Pointer to free space in memory. */
+    size_t freed;               /* Amount of freed memory.
+                                   Used in compact_pool */
 } Memory_Block;
 
+/* This structure describes a variable-size memory pool. Various such pools
+   hang off the Memory_Pools root structure. */
+
 typedef struct Variable_Size_Pool {
-    Memory_Block *top_block;
-    void (*compact)(PARROT_INTERP, struct Memory_Pools *, struct Variable_Size_Pool *);
-    size_t minimum_block_size;
-    size_t total_allocated; /* total bytes allocated to this pool */
-    size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
-    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
-                                      * (above plus COW-freed bytes) */
-    FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
+    Memory_Block *top_block;            /* Pointer to most recent memory block. */
+                                        /* Pool compactor, or NULL. */
+    void (*compact)(PARROT_INTERP, struct Memory_Pools *,
+                                   struct Variable_Size_Pool *);
+    size_t minimum_block_size;          /* Minimum allocation size, to
+                                           prevent fragmentation. */
+    size_t total_allocated;             /* Total bytes allocated to this pool. */
+    size_t guaranteed_reclaimable;      /* Bytes that can definitely be reclaimed. */
+    size_t possibly_reclaimable;        /* Bytes that can possibly be reclaimed
+                                           (above plus COW-freed bytes). */
+    FLOATVAL reclaim_factor;            /* Minimum percentage we will reclaim. */
 } Variable_Size_Pool;
 
+/* This header structure describes an arena: a block of memory that is part of a
+   fixed-sized pool. The arena has enough memory for 'total_objects' objects
+   of a particular size specified in the pool. */
+
 typedef struct Fixed_Size_Arena {
-    size_t                     used;
-    size_t                     total_objects;
-    struct Fixed_Size_Arena *prev;
-    struct Fixed_Size_Arena *next;
-    void                      *start_objects;
+    size_t                   used;          /* Number of objects slots used. */
+    size_t                   total_objects; /* Total number of object slots. */
+    struct Fixed_Size_Arena *prev;          /* Pointer to previous arena. */
+    struct Fixed_Size_Arena *next;          /* Pointer to next arena. */
+    void                    *start_objects; /* Pointer to arena memory. */
 } Fixed_Size_Arena;
 
+/* This simple header structure describes a free PMC attribute object.
+   A list of them hang off the PMC attribute pool. */
+
 typedef struct PMC_Attribute_Free_List {
-    struct PMC_Attribute_Free_List * next;
+    struct PMC_Attribute_Free_List * next; /* Pointer to next free object. */
 } PMC_Attribute_Free_List;
 
+/* This header structure describes a PMC attribute arena: A block of memory
+   that is part of a PMC attribute pool. The allocatable memory follows
+   this header. */
+
 typedef struct PMC_Attribute_Arena {
-    struct PMC_Attribute_Arena * next;
-    struct PMC_Attribute_Arena * prev;
+    struct PMC_Attribute_Arena * next;  /* Pointer to next arena. */
+    struct PMC_Attribute_Arena * prev;  /* Pointer to previous arena. */
 } PMC_Attribute_Arena;
 
+/* This structure describes a PMC attribute pool. A vector of them hang
+   off the Memory_Pools root structure. */
+
 typedef struct PMC_Attribute_Pool {
-    size_t attr_size;
-    size_t total_objects;
-    size_t objects_per_alloc;
-    size_t num_free_objects;
-    PMC_Attribute_Arena     *top_arena;
-    PMC_Attribute_Free_List *free_list;
-    PMC_Attribute_Free_List *newfree;
-    PMC_Attribute_Free_List *newlast;
+    size_t attr_size;                    /* Size of attribute object. */
+    size_t total_objects;                /* Total objects in the pool. */
+    size_t objects_per_alloc;            /* Number of object slots to allocate. */
+    size_t num_free_objects;             /* Number of objects on the free list. */
+    PMC_Attribute_Free_List * free_list; /* List of free object slots, or NULL. */
+    PMC_Attribute_Arena     * top_arena; /* Pointer to most recent arena. */
+    PMC_Attribute_Free_List * newfree;   /* Pointer to next object slot in
+                                            latest arena, or NULL (slots weren't
+                                            put on free list). */
+    PMC_Attribute_Free_List * newlast;   /* High water mark in arena. */
+
 } PMC_Attribute_Pool;
 
-/* Tracked resource pool */
+/* This structure describes a fixed-size memory pool. Various such pools
+   hang off the Memory_Pools root structure. */
+
 typedef struct Fixed_Size_Pool {
 
-    struct Variable_Size_Pool *mem_pool;
-   /* Size in bytes of an individual pool item. This size may include
-    * a GC-system specific GC header. */
-    size_t object_size;
+    struct Variable_Size_Pool *mem_pool; /* Pointer to associated variable-size
+                                            pool, or NULL. */
+    size_t object_size;                 /* Size in bytes of an individual pool
+                                           object. This size may include
+                                           a GC system-specific GC header. */
 
-    size_t start_arena_memory;
-    size_t end_arena_memory;
+    size_t start_arena_memory;          /* Address of the lowest arena. */
+    size_t end_arena_memory;            /* And the highest one. */
 
-    Fixed_Size_Arena *last_Arena;
-    GC_MS_PObj_Wrapper * free_list;
-    size_t num_free_objects;    /* number of resources in the free pool */
-    size_t total_objects;
+    Fixed_Size_Arena *last_Arena;       /* Pointer to most recent arena. */
+    GC_MS_PObj_Wrapper * free_list;     /* List of free object slots, or NULL. */
+    size_t num_free_objects;            /* Number of objects on the free list. */
+    size_t total_objects;               /* Total objects in the pool. */
 
-    PARROT_OBSERVER const char *name;
+    PARROT_OBSERVER const char *name;   /* Name of pool. */
 
-    size_t objects_per_alloc;
+    size_t objects_per_alloc;           /* Number of object slots to allocate. */
 
-    int skip;
-    size_t replenish_level;
+    int skip;                           /* How often to skip full GC
+                                           (see gc_skip_type_enum). */
+    size_t replenish_level;             /* Replenish pool when free object slots
+                                           goes below this level. */
 
-    add_free_object_fn_type     add_free_object; /* adds a free object to
-                                                    the pool's free list  */
-    get_free_object_fn_type     get_free_object; /* gets and removes a free
-                                                    object from the pool's
-                                                    free list */
-    alloc_objects_fn_type       alloc_objects;  /* allocates more objects */
-    alloc_objects_fn_type       more_objects;
-    gc_object_fn_type           gc_object;
+    add_free_object_fn_type add_free_object; /* Adds a free object to
+                                                the pool's free list  */
+    get_free_object_fn_type get_free_object; /* Gets and removes a free object
+                                                from the pool's free list. */
+    alloc_objects_fn_type   alloc_objects;   /* Allocates an arena for objects. */
+    alloc_objects_fn_type   more_objects;    /* Obtain more free objects. */
+    gc_object_fn_type       gc_object;       /* GCs object during sweep. */
 
     /* Contains GC system-specific data structures ... unused at the moment,
      * but this is where it should go when we need it ...
@@ -247,24 +277,37 @@ typedef struct Fixed_Size_Pool {
     } gc_private;
     */
 
-    void *newfree;
-    void *newlast;
+    void *newfree;    /* Pointer to next object slot in
+                         latest arena, or NULL (slots weren't
+                         put on free list). */
+    void *newlast;    /* High water mark in arena. */
+
 } Fixed_Size_Pool;
 
+/* This structure acts as the root for all the various memory pools:
+   variable-sized, fixed-size, and PMC attributes. It also contains
+   various GC-related items. It hangs off the Interp structure. */
+
 typedef struct Memory_Pools {
-    Variable_Size_Pool  *memory_pool;
-    Variable_Size_Pool  *constant_string_pool;
-    Fixed_Size_Pool     *string_header_pool;
-    Fixed_Size_Pool     *pmc_pool;
-    Fixed_Size_Pool     *constant_pmc_pool;
-    Fixed_Size_Pool     *constant_string_header_pool;
-    Fixed_Size_Pool    **sized_header_pools;
-    size_t               num_sized;
+    /* Pointers to pools */
+    Variable_Size_Pool  *memory_pool;           /* General memory pool. */
+    Variable_Size_Pool  *constant_string_pool;  /* Constant string pool (not
+                                                   compacted). */
+    Fixed_Size_Pool     *string_header_pool;    /* String header pool. */
+    Fixed_Size_Pool     *pmc_pool;              /* PMC object pool. */
+    Fixed_Size_Pool     *constant_pmc_pool;     /* And one for constant PMCs. */
+    Fixed_Size_Pool     *constant_string_header_pool; /* And a constant string
+                                                         header pool. */
 
-    PMC_Attribute_Pool **attrib_pools;
-    size_t               num_attribs;
+    Fixed_Size_Pool    **sized_header_pools;    /* Vector of pools for other
+                                                  fixed-size headers. */
+    size_t               num_sized;             /* Length of that vector. */
 
-    /** statistics for GC **/
+    PMC_Attribute_Pool **attrib_pools;          /* Vector of pools for PMC
+                                                   attributes. */
+    size_t               num_attribs;           /* Length of that vector. */
+
+    /* statistics for GC */
     size_t  gc_mark_runs;       /* Number of times we've done a mark run */
     size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
     size_t  gc_collect_runs;    /* Number of times we've done a memory
@@ -277,11 +320,9 @@ typedef struct Memory_Pools {
                                                  * blocks allocated from
                                                  * the system since the last
                                                  * GC run */
-    size_t  memory_allocated;     /* The total amount of
-                                   * allocatable memory
-                                   * allocated. Doesn't count
-                                   * memory for headers or
-                                   * internal structures or
+    size_t  memory_allocated;     /* The total amount of allocatable memory
+                                   * allocated. Doesn't count memory for
+                                   * headers or internal structures or
                                    * anything */
     size_t  memory_used;              /* The total amount of
                                        * memory used for
@@ -306,7 +347,7 @@ typedef struct Memory_Pools {
                                      requests are there? */
 
     /* private data for the GC subsystem */
-    void *gc_private;           /* gc subsystem data */
+    void *gc_private;             /* GC subsystem data */
 } Memory_Pools;
 
 /* HEADERIZER BEGIN: src/gc/system.c */

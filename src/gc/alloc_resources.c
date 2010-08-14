@@ -281,18 +281,8 @@ for details.
 - reduce alignment to a reasonable value i.e. MALLOC_ALIGNMENT
   aka 2*sizeof (size_t) or just 8 (TODO make a config hint)
 
-Buffer memory layout:
-
-                    +-------------------+
-                    | flags # GC header |
-  obj->bufstart  -> +-------------------+
-                    |  data             |
-                    v                   v
-
- * if PObj_is_COWable is set, then we have space for flags.
-
- * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above
- * obj->buflen is the usable length excluding the optional GC part.
+See pobj.h for a discussion of the Buffer descriptor and the buffer itself,
+including its header.
 
 =cut
 
@@ -632,7 +622,7 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
     /* we can't perform the math all the time, because
         * strstart might be in unallocated memory */
     if (PObj_is_COWable_TEST(old_buf)) {
-        flags = Buffer_bufrefcountptr(old_buf);
+        flags = Buffer_bufflagsptr(old_buf);
         old_block = Buffer_pool(old_buf);
 
         if (PObj_is_string_TEST(old_buf)) {
@@ -651,7 +641,7 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
         /* Make sure they know that we own it too */
         /* Set Buffer_shared_FLAG in new buffer */
-        *Buffer_bufrefcountptr(hdr) |= Buffer_shared_FLAG;
+        *Buffer_bufflagsptr(hdr) |= Buffer_shared_FLAG;
 
         /* Now make sure we point to where the other guy does */
         Buffer_bufstart(old_buf) = Buffer_bufstart(hdr);

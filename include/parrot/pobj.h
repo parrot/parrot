@@ -7,7 +7,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
- *  References: memory_internals.pod
+ *  References: memory_internals.pod (out of date as of 8/2010).
  */
 
 #ifndef PARROT_POBJ_H_GUARD
@@ -15,51 +15,65 @@
 
 #include "parrot/config.h"
 
-/* Parrot Object - base class for all others */
+/* This is the base Parrot object structure. Every object begins with
+   this slot, then has additional slots as required. */
+
 typedef struct pobj_t {
-    Parrot_UInt flags;
+    Parrot_UInt flags;                  /* Lots of flags (see below). */
 } PObj;
+
+/* This is a buffer header object, "inheriting" from PObj. */
 
 typedef struct buffer_t {
     Parrot_UInt flags;
-    void *     _bufstart;
-    size_t     _buflen;
+    void *     _bufstart;               /* Pointer to start of buffer data
+                                           (not buffer prolog). */
+    size_t     _buflen;                 /* Length of buffer data. */
 } Buffer;
+
+/* Use these macros to access the two buffer header slots. */
 
 #define Buffer_bufstart(buffer)    (buffer)->_bufstart
 #define Buffer_buflen(buffer)      (buffer)->_buflen
 
-/* See src/gc/alloc_resources.c. the basic idea is that buffer memory is
-   set up as follows:
-                    +-----------------+
-                    |  ref_count   |f |    # GC header
-  obj->bufstart  -> +-----------------+
-                    |  data           |
-                    v                 v
+/* A buffer header object points to a buffer in a Memory_Block.
+   The buffer includes a prolog, but _bufstart points to the data
+   portion. Here is how it works:
 
-The actual set-up is more involved because of padding.  obj->bufstart must
-be suitably aligned. The start of the memory region (as returned by malloc())
-is suitably aligned for any use.  If, for example, malloc() returns
-objects aligned on 8-byte boundaries, and obj->bufstart is also aligned
-on 8-byte boundaries, then there should be 4 bytes of padding.
+    Buffer header                         buffer
+   +-------------------+                 +------------------------+
+   |       flags       |                 |  (possible padding)    | }
+   +-------------------+                 +---------------------+--+  > prolog
+   |      _bufstart    | ------+         |    *Memory_Block    |fl| }
+   +-------------------+       |         +---------------------+--+
+   |      _buflen      |       +-------> |    data portion        |
+   +-------------------+                 |                        |
+                                         ~                        ~
+                                         |                        |
+                                         +------------------------+
 
-ptr from malloc ->  +------------------+
-                      [other blocks?]  |
-                    | INTVAL ref_count |
-obj->bufstart   ->  +------------------+
-                    |     data         |
-                    v                  v
-
+   The buffer prolog consists of possible padding and a pointer to the
+   Memory_Block containing the buffer. There are two flags in the low-order
+   bits of the pointer (see string.h). Padding is only required if the
+   alignment of the data portion is higher than that of a pointer.
+   This was not the case as of 8/2010.
 */
 
-/* Given a pointer to the buffer, find the ref_count and the actual start of
-   the allocated space. Setting ref_count is clunky because we avoid lvalue
-   casts. */
-#define Buffer_alloc_offset sizeof (void*)
-#define Buffer_bufallocstart(b)  ((char *)Buffer_bufstart(b) - Buffer_alloc_offset)
-#define Buffer_bufrefcountptr(b) ((INTVAL *)Buffer_bufallocstart(b))
-#define Buffer_pool(b) ((Memory_Block *)( *(INTVAL*)(Buffer_bufallocstart(b)) & ~3 ))
-#define Buffer_poolptr(b) ((Memory_Block **)Buffer_bufallocstart(b))
+/* These macros let us address the prolog of a buffer. */
+
+#define Buffer_prolog_offset (sizeof (void*))
+#define Buffer_bufprolog(b) ((char *)Buffer_bufstart(b) - Buffer_prolog_offset) 
+
+/* This macro gives us the address of the buffer prolog treated as
+   a pointer to the flags. */
+
+#define Buffer_bufflagsptr(b) ((INTVAL *)Buffer_bufprolog(b))
+
+/* These macros give us the Memory_Block pointer and pointer-pointer,
+   eliminating the flags. */
+
+#define Buffer_pool(b) ((Memory_Block *)( *(INTVAL*)(Buffer_bufprolog(b)) & ~3 ))
+#define Buffer_poolptr(b) ((Memory_Block **)Buffer_bufprolog(b))
 
 
 typedef enum {
@@ -69,28 +83,33 @@ typedef enum {
     enum_stringrep_four    = 4
 } parrot_string_representation_t;
 
+/* Here is the Parrot string header object, "inheriting" from Buffer. */
+
 struct parrot_string_t {
     Parrot_UInt flags;
     void *     _bufstart;
     size_t     _buflen;
-    char       *strstart;
-    UINTVAL     bufused;
-    UINTVAL     strlen;
-    UINTVAL     hashval; /* cached hash value computation */
+    char       *strstart;               /* Pointer to start of string
+                                           (not necessarily at _bufstart). */
+    UINTVAL     bufused;                /* Length of string in bytes. */
+    UINTVAL     strlen;                 /* Length of string in characters. */
+    UINTVAL     hashval;                /* Cached hash value. */
 
     /*    parrot_string_representation_t representation;*/
-    const struct _encoding *encoding;
-    const struct _charset  *charset;
+    const struct _encoding *encoding;   /* Pointer to encoding structure. */
+    const struct _charset  *charset;    /* Pointer to charset structure. */
 };
 
-/* note that cache and flags are isomorphic with Buffer and PObj */
+/* Here is the Parrot PMC object, "inheriting" from PObj. */
+
 struct PMC {
-    Parrot_UInt     flags;
-    VTABLE         *vtable;
-    DPOINTER       *data;
-
-    PMC *_metadata;      /* properties */
+    Parrot_UInt    flags;
+    VTABLE         *vtable;             /* Pointer to vtable. */
+    DPOINTER       *data;               /* Pointer to attribute structure. */
+    PMC            *_metadata;          /* Pointer to metadata PMC. */
 };
+
+/* Use these macros to access the data and metadata. */
 
 #define PMC_data(pmc)                   (pmc)->data
 #define PMC_data_typed(pmc, type) (type)(pmc)->data

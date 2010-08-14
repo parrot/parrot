@@ -395,7 +395,7 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
     /* Now check that buffer allocated from pool and affected by compacting */
     if (is_movable && Buffer_bufstart(s)) {
         /* If so, mark it as shared */
-        INTVAL * const buffer_flags = Buffer_bufrefcountptr(d);
+        INTVAL * const buffer_flags = Buffer_bufflagsptr(d);
         *buffer_flags |= Buffer_shared_FLAG;
     }
 
