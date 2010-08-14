@@ -62,7 +62,7 @@ typedef struct buffer_t {
 /* These macros let us address the prolog of a buffer. */
 
 #define Buffer_prolog_offset (sizeof (void*))
-#define Buffer_bufprolog(b) ((char *)Buffer_bufstart(b) - Buffer_prolog_offset) 
+#define Buffer_bufprolog(b) ((char *)Buffer_bufstart(b) - Buffer_prolog_offset)
 
 /* This macro gives us the address of the buffer prolog treated as
    a pointer to the flags. */
