@@ -129,7 +129,6 @@ src/pmc/complex.pmc
 src/pmc/coroutine.pmc
 src/pmc/eval.pmc
 src/pmc/imageio.pmc
-src/pmc/integer.pmc
 src/pmc/namespace.pmc
 src/pmc/nci.pmc
 src/pmc/null.pmc
