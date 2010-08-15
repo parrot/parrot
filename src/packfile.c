@@ -4154,15 +4154,12 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     ASSERT_ARGS(PackFile_Constant_unpack_pmc)
     PackFile * const pf   = constt->base.pf;
     STRING          *_sub = CONST_STRING(interp, "Sub");
-    STRING          *image;
     PMC             *pmc;
 
     /* thawing the PMC needs the real packfile in place */
     PackFile_ByteCode * const cs_save = interp->code;
     interp->code                      = pf->cur_cs;
-    image                             = PF_fetch_buf(interp, pf, &cursor);
-
-    pmc         = Parrot_thaw_pbc(interp, image, constt);
+    pmc                               = Parrot_thaw_pbc(interp, constt, &cursor);
 
     /* place item in const_table */
     self->type  = PFC_PMC;

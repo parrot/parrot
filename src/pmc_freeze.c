@@ -62,8 +62,8 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<STRING * Parrot_freeze_pbc(PARROT_INTERP, PMC *pmc, const
-PackFile_ConstTable *pf)>
+=item C<opcode_t * Parrot_freeze_pbc(PARROT_INTERP, PMC *pmc, const
+PackFile_ConstTable *pf, opcode_t *cursor)>
 
 Freezes a PMC to a PackFile.
 
@@ -74,11 +74,13 @@ Freezes a PMC to a PackFile.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING *
-Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
+opcode_t *
+Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
+    ARGIN(opcode_t *cursor))
 {
     ASSERT_ARGS(Parrot_freeze_pbc)
-    PMC *visitor;
+    PMC    *visitor;
+    STRING *image;
     DECL_CONST_CAST;
 
     visitor  = Parrot_pmc_new(interp, enum_class_ImageIO);
@@ -86,7 +88,10 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
         PARROT_const_cast(void *, (const void *)pf));
     VTABLE_set_pmc(interp, visitor, pmc);
 
-    return VTABLE_get_string(interp, visitor);
+    image  = VTABLE_get_string(interp, visitor);
+    cursor = PF_store_buf(cursor, image);
+
+    return cursor;
 }
 
 
@@ -228,8 +233,8 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 
 /*
 
-=item C<PMC* Parrot_thaw_pbc(PARROT_INTERP, STRING *image, PackFile_ConstTable
-*pf)>
+=item C<PMC* Parrot_thaw_pbc(PARROT_INTERP, PackFile_ConstTable *ct, const
+opcode_t **cursor)>
 
 Thaw a pmc frozen by Parrot_freeze_pbc.
 
@@ -241,13 +246,13 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_thaw_pbc(PARROT_INTERP, ARGIN(STRING *image), ARGIN(PackFile_ConstTable *pf))
+Parrot_thaw_pbc(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGMOD(const opcode_t **cursor))
 {
     ASSERT_ARGS(Parrot_thaw_pbc)
-    PMC *info = Parrot_pmc_new(interp, enum_class_ImageIO);
-
-    VTABLE_set_pointer(interp, info, pf);
-
+    PackFile * const pf = ct->base.pf;
+    STRING *image       = PF_fetch_buf(interp, pf, cursor);
+    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIO);
+    VTABLE_set_pointer(interp, info, ct);
     VTABLE_set_string_native(interp, info, image);
     return VTABLE_get_pmc(interp, info);
 }
