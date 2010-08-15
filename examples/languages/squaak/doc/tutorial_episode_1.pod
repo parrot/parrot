@@ -53,14 +53,14 @@ covered in this tutorial.
 
 =head2 Squaak: A Simple Language
 
-The case study language is named Squaak. For that language we will be implementing on Parrot
-a full-fledged compiler that can compile a program from source into
-Parrot Byte Code (PBC) or run a Squaak program immediately. The compiler can
-also be used as a command-line interpreter for Squaak.
+The case study language is named Squaak. We will be implementing on Parrot
+a full-fledged compiler that can compile a Squaak program from source into
+Parrot Intermediate Representation (PIR) or run a Squaak program immediately.
+The compiler can also be used as an interactive interpreter, REPL, for Squaak.
 
-Squaak demonstrates some common
-language constructs, but at the same time is lacking some other, seemingly
-simple, features. For instance, our language will not have return, break or
+Squaak demonstrates some common language constructs,
+but is lacking some other, seemingly simple, features.
+For instance, our language will have no return, break or
 continue statements (or equivalents in your favorite syntax).
 
 Squaak has the following features:
