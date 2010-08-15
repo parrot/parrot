@@ -43,6 +43,18 @@ static PMC* upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void maybe_throw_overflow_error(PARROT_INTERP)>
+
+Checks to see if the interpreter is set to throw an exception on overflow.
+
+If so, throw the exception, otherwise ignore.
+
+=cut
+
+*/
+
 static void
 maybe_throw_overflow_error(PARROT_INTERP)
 {
@@ -55,6 +67,16 @@ maybe_throw_overflow_error(PARROT_INTERP)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
             "Integer overflow");
 }
+
+/*
+
+=item C<static PMC* upgrade_self_to_bignum(PARROT_INTERP, PMC *self)>
+
+Returns a pointer of *self upgraded to a bignum
+
+=cut
+
+*/
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
