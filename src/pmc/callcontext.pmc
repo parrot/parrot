@@ -154,7 +154,8 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 
 /*
 
-=item C<static void ensure_positionals_storage(PARROT_INTERP, PMC *self, INTVAL size)>
+=item C<static void ensure_positionals_storage(PARROT_INTERP, PMC *self, INTVAL
+size)>
 
 
 
@@ -178,8 +179,8 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 
 /*
 
-=item C<static void ensure_positionals_storage_ap(
-    PARROT_INTERP, PMC *self, INTVAL size, INTVAL allocated_positionals)>
+=item C<static void ensure_positionals_storage_ap(PARROT_INTERP, PMC *self,
+INTVAL size, INTVAL allocated_positionals)>
 
 
 
