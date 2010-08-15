@@ -133,7 +133,6 @@ src/pmc/nci.pmc
 src/pmc/null.pmc
 src/pmc/object.pmc
 src/pmc/orderedhash.pmc
-src/pmc/packfile.pmc
 src/pmc/sub.pmc
 src/pmc/threadinterpreter.pmc
 src/pmc/unmanagedstruct.pmc
