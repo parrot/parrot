@@ -311,7 +311,7 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
 }
- 
+
 /*
 
 =item C<static void init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)>
