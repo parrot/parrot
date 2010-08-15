@@ -54,7 +54,8 @@ static void mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 
 /*
 
-=item C<static void clear_fixups(PARROT_INTERP, const Parrot_Sub_attributes *sub_data)>
+=item C<static void clear_fixups(PARROT_INTERP, const Parrot_Sub_attributes
+*sub_data)>
 
 
 
