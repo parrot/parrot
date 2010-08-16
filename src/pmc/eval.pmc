@@ -52,6 +52,17 @@ static void mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void clear_fixups(PARROT_INTERP, const Parrot_Sub_attributes
+*sub_data)>
+
+
+
+=cut
+
+*/
+
 static void
 clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
 {
@@ -79,6 +90,16 @@ clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
         }
     }
 }
+
+/*
+
+=item C<static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)>
+
+
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -115,6 +136,16 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 
     return PMCNULL;
 }
+
+/*
+
+=item C<static void mark_subs(PARROT_INTERP, PMC *self)>
+
+
+
+=cut
+
+*/
 
 static void
 mark_subs(PARROT_INTERP, ARGIN(PMC *self))

@@ -249,6 +249,10 @@ These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
+=item errorson, errorsoff operations [eligible in 2.10]
+
+The C<.PARROT_ERRORS_GLOBAL_FLAG> flag will be eliminated. It is not used by Parrot.
+
 =back
 
 =head1 Bytecode
@@ -343,12 +347,6 @@ All C API functions that aren't currently named according to the
 functions will be kept in the ticket at:
 
 L<https://trac.parrot.org/parrot/ticket/443>
-
-=item C<Parrot_find_global_s> and C<Parrot_store_global_s>
-
-This function is not used or tested anywhere.
-
-http://trac.parrot.org/parrot/ticket/1660
 
 =item PMC Attributes Allocation Functions [experimental]
 

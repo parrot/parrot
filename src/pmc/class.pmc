@@ -187,6 +187,16 @@ static int pointer_compare(SHIM_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
+
+
+
+=cut
+
+*/
+
 static int
 pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a),
     ARGIN_NULLOK(const void *b))
@@ -195,12 +205,34 @@ pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a),
     return a != b;
 }
 
+/*
+
+=item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t
+seed)>
+
+
+
+=cut
+
+*/
+
 static size_t
 key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
     ASSERT_ARGS(key_hash_pointer)
     return ((size_t) value ^ seed);
 }
+
+/*
+
+=item C<static int cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC
+*attrib_index, PMC *cache, int cur_index)>
+
+
+
+=cut
+
+*/
 
 static int
 cache_class_attribs(PARROT_INTERP,
@@ -241,8 +273,17 @@ cache_class_attribs(PARROT_INTERP,
     return cur_index;
 }
 
-/* This function builds the attribute index (table to map class name and
- * attribute name to an index) for the current class. */
+/*
+
+=item C<static void build_attrib_index(PARROT_INTERP, PMC *self)>
+
+This function builds the attribute index (table to map class name and
+attribute name to an index) for the current class.
+
+=cut
+
+*/
+
 static void
 build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
 {
@@ -272,7 +313,16 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     _class->attrib_cache = cache;
 }
 
-/* Takes a hash and initializes the class based on it. */
+/*
+
+=item C<static void init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)>
+
+Takes a hash and initializes the class based on it.
+
+=cut
+
+*/
+
 static void
 init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 {
@@ -434,6 +484,17 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
     Parrot_oo_extract_methods_from_namespace(interp, self, _class->_namespace);
 }
 
+/*
+
+=item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC
+*all_parents)>
+
+
+
+=cut
+
+*/
+
 static void
 initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 {
@@ -463,6 +524,17 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
     }
 }
 
+/*
+
+=item C<static void initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC
+*all_parents, PMC *init)>
+
+
+
+=cut
+
+*/
+
 static void
 initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
         ARGIN(PMC *all_parents), ARGIN(PMC *init))
@@ -491,10 +563,19 @@ initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
     }
 }
 
-/* This function makes and caches the name of this class, returning the string
- * directly.  VTABLE_isa() uses the name without copying it, for efficiency
- * reasons, as it does not modify the STRING.  VTABLE_get_string() makes a copy
- * of the STRING, so its callers are free to modify it. */
+/*
+
+=item C<static STRING * make_class_name(PARROT_INTERP, PMC *SELF)>
+
+This function makes and caches the name of this class, returning the string
+directly.  C<VTABLE_isa()> uses the name without copying it, for efficiency
+reasons, as it does not modify the STRING.  C<VTABLE_get_string()> makes a
+copy of the STRING, so its callers are free to modify it.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
@@ -525,11 +606,19 @@ make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
     return _class->name;
 }
 
-/* calculates the C3 method resolution order for this class. C3 is the
- * name of an algorithm used to calculate the method resolution order
- * (MRO) to use in a system with multiple inheritance. For more information
- * see the documentation associated with C<Parrot_ComputeMRO_C3>.
- */
+/*
+
+=item C<static void calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)>
+
+Calculates the C3 method resolution order for this class. C3 is the name of an
+algorithm used to calculate the method resolution order (MRO) to use in a
+system with multiple inheritance. For more information see the documentation
+associated with C<Parrot_ComputeMRO_C3>.
+
+=cut
+
+*/
+
 static void
 calculate_mro(PARROT_INTERP, ARGIN(PMC *SELF), INTVAL num_parents)
 {

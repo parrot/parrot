@@ -121,6 +121,7 @@ Tests Parrot string registers and operations.
     test_find_encoding()
     test_assign()
     assign_and_globber()
+    split_on_null_string()
     split_on_empty_string()
     split_on_non_empty_string()
     test_join()
@@ -1386,6 +1387,28 @@ WHILE:
     assign  $S4, "Parrot"
     is( $S4, "Parrot", 'assign & globber' )
     is( $S5, "JAPH", 'assign & globber' )
+.end
+
+.sub split_on_null_string
+    .local string s, delim
+    .local pmc p
+    .local int i
+    null s
+    null delim
+    split p, s, delim
+    i = isnull p
+    is(i, 1, 'split on null string and delim')
+
+    s = 'foo'
+    split p, s, delim
+    i = isnull p
+    is(i, 1, 'split on null delim')
+
+    null s
+    delim = 'bar'
+    split p, s, delim
+    i = isnull p
+    is(i, 1, 'split on null string')
 .end
 
 .sub split_on_empty_string

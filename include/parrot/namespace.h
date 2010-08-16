@@ -19,14 +19,6 @@
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_global_s(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *str_key),
-    ARGIN_NULLOK(STRING *globalname))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 PMC * Parrot_ns_find_current_namespace_global(PARROT_INTERP,
     ARGIN_NULLOK(STRING *globalname))
         __attribute__nonnull__(1);
@@ -138,15 +130,6 @@ void Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_EXPORT
-void Parrot_store_global_s(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *str_key),
-    ARGIN_NULLOK(STRING *globalname),
-    ARGIN_NULLOK(PMC *val))
-        __attribute__nonnull__(1);
-
-#define ASSERT_ARGS_Parrot_find_global_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_ns_find_current_namespace_global \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -192,8 +175,6 @@ void Parrot_store_global_s(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_ns_store_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
-#define ASSERT_ARGS_Parrot_store_global_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/namespace.c */
 

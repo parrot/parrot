@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -26,6 +26,7 @@ These are the vtable functions for the Capture PMC.
     do { \
         GETATTR_Capture_array((i), (obj), (arr)); \
         if (!(arr)) { \
+            PObj_custom_mark_SET(obj); \
             (arr) = Parrot_pmc_new((i), enum_class_ResizablePMCArray); \
             SETATTR_Capture_array((i), (obj), (arr)); \
         } \
@@ -34,6 +35,7 @@ These are the vtable functions for the Capture PMC.
     do { \
         GETATTR_Capture_hash((i), (obj), (hsh)); \
         if (!(hsh)) { \
+            PObj_custom_mark_SET(obj); \
             (hsh) = Parrot_pmc_new((i), enum_class_Hash); \
             SETATTR_Capture_hash((i), (obj), (hsh)); \
         } \
@@ -42,20 +44,6 @@ These are the vtable functions for the Capture PMC.
 pmclass Capture auto_attrs {
     ATTR PMC    *array;
     ATTR PMC    *hash;
-
-/*
-
-=item C<void init()>
-
-Initializes the Capture instance.
-
-=cut
-
-*/
-
-    VTABLE void init() {
-        PObj_custom_mark_SET(SELF);
-    }
 
 /*
 
@@ -72,12 +60,16 @@ Creates an identical copy of the Capture.
         PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         GET_ATTR_array(INTERP, SELF, array);
         GET_ATTR_hash(INTERP, SELF, hash);
-        if (array)
-             array = VTABLE_clone(INTERP, array);
-        if (hash)
-             hash = VTABLE_clone(INTERP, hash);
-        SET_ATTR_array(INTERP, dest, array);
-        SET_ATTR_hash(INTERP, dest, hash);
+        if (!PMC_IS_NULL(array)) {
+            PObj_custom_mark_SET(dest);
+            array = VTABLE_clone(INTERP, array);
+            SET_ATTR_array(INTERP, dest, array);
+        }
+        if (!PMC_IS_NULL(hash)) {
+            PObj_custom_mark_SET(dest);
+            hash = VTABLE_clone(INTERP, hash);
+            SET_ATTR_hash(INTERP, dest, hash);
+        }
 
         return dest;
     }

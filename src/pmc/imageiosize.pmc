@@ -43,8 +43,6 @@ static void visit_todo_list_freeze(PARROT_INTERP,
 
 =item C<static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info)>
 
-
-
 =back
 
 =cut
@@ -305,8 +303,10 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
     VTABLE void set_pmc(PMC *p)
     {
-        UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
-        PARROT_IMAGEIOSIZE(SELF)->size += header_length;
+        if (!PObj_flag_TEST(private1, SELF)) {
+            UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+            PARROT_IMAGEIOSIZE(SELF)->size += header_length;
+        }
 
         visit_todo_list_freeze(INTERP, p, SELF);
         Parrot_visit_loop_visit(INTERP, SELF);

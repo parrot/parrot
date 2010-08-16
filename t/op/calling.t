@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 98;
+use Parrot::Test tests => 99;
 
 =head1 NAME
 
@@ -2552,6 +2552,48 @@ main
 foo
 bar
 done
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "handling of slurpy after optional, TT #1733" );
+
+# Lua calling convention scheme
+
+# f() has 2 known parameters
+.sub 'f'
+    .param pmc p1 :optional
+    .param int has_p1 :opt_flag
+    .param pmc p2 :optional
+    .param int has_p2 :opt_flag
+    .param pmc extra :slurpy
+    unless has_p1 goto L1
+    say p1
+    unless has_p2 goto L1
+    say p2
+    $P0 = iter extra
+  L2:
+    unless $P0 goto L1
+    $P1 = shift $P0
+    say $P1
+    goto L2
+  L1:
+.end
+
+.sub 'main' :main
+    $P1 = box "p1"
+    $P2 = box "p2"
+    $P3 = box "p3"
+    f($P1, $P2, $P3)
+    f($P1, $P2)
+    f($P1)
+.end
+
+CODE
+p1
+p2
+p3
+p1
+p2
+p1
 OUTPUT
 
 # Local Variables:

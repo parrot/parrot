@@ -30,7 +30,7 @@ are complex programs, and implementing a language can be very difficult.
 
 The Facts: 1) Parrot is suitable for running virtually any dynamic language
 known, but before doing so, compilers must be written, and 2) writing compilers
-is rather difficult.
+from scratch is rather difficult.
 
 =head2 The Parrot Compiler Toolkit
 
@@ -42,24 +42,28 @@ hands, would you?), the same is true for constructing a compiler. The PCT was
 designed to do just that: provide powerful tools to make writing a compiler for
 Parrot childishly easy.
 
-This tutorial will introduce the PCT by demonstrating the ease with which a
-(simple) language can be implemented for Parrot. The case study language is not
-as complex as a real-world language, but this tutorial is written to whet your
-appetite and show the power of the PCT. This tutorial will also present some
+This tutorial introduces the PCT by showing how a simple case study language is
+implemented for Parrot. The sample language is not
+as complex as a real-world language, but is interesting enough to whet your
+appetite and show the power of the PCT.
+
+This tutorial also presents some
 exercises which you can explore in order to learn more details of the PCT not
 covered in this tutorial.
 
 =head2 Squaak: A Simple Language
 
-The case study language, named Squaak, that we will be implementing on Parrot
-will be a full-fledged compiler that can compile a program from source into
-Parrot Intermediate Representation (PIR) (or run the PIR immediately). It can
-also be used as a command-line interpreter. Squaak demonstrates some common
-language constructs, but at the same time is lacking some other, seemingly
-simple features. For instance, our language will not have return, break or
+The case study language is named Squaak. We will be implementing on Parrot
+a full-fledged compiler that can compile a Squaak program from source into
+Parrot Intermediate Representation (PIR) or run a Squaak program immediately.
+The compiler can also be used as an interactive interpreter, REPL, for Squaak.
+
+Squaak demonstrates some common language constructs,
+but is lacking some other, seemingly simple, features.
+For instance, our language will have no return, break or
 continue statements (or equivalents in your favorite syntax).
 
-Squaak will have the following features:
+Squaak has the following features:
 
 =over 4
 
@@ -92,20 +96,19 @@ Most notable are:
 
 =back
 
-=head2 The Compiler Tools
+=head2 The Tools
 
-The Parrot Compiler Tools we'll use to implement Squaak consist of the following
-parts:
+The Parrot Compiler Toolkit consists of the following tools:
 
 =over 4
 
 =item B<N>ot B<Q>uite B<P>erl (6) (NQP-rx).
 
-NQP is a lightweight language inspired by Perl 6 and can be used to write the
+NQP is a lightweight language inspired by Perl 6 which can be used to write the
 methods that must be executed during the parsing phase, just as you can write
-actions in a Yacc/Bison input file. It also provides the regular expression engine we'll use to 
+actions in a Yacc/Bison input file. It also provides the regular expression engine we'll use to
 write our grammar. In addition to the capabilities of Perl 5's regexes, the Perl 6 regexes that NQP
- implements can be used to define language grammars. (Check the references for the specification.)
+implements can be used to define language grammars. (Check the references for the specification.)
 
 =item B<P>arrot B<A>bstract B<S>yntax B<T>ree (PAST).
 
@@ -121,30 +124,33 @@ This class is the compiler driver for any PCT-based compiler.
 =head2 Getting Started
 
 For this tutorial, it is assumed you have successfully compiled parrot
-(and maybe even run the test suite). If, after reading this tutorial, you feel like
-contributing to one of these languages, you can check out the mailing list or
+(and maybe even run the test suite).
+
+If, after reading this tutorial, you feel like
+contributing to one of the already implemented languages, you can check out the mailing list or
 join IRC (see the references section for details).
 
-The languages subdirectory is the right spot to put our language implementation.
-Parrot comes with a special shell script to generate the necessary files for a
-language implementation. In order to generate these files for our language,
-type (assuming you're in Parrot's root directory):
+Parrot comes with a Perl 5  script that generates the necessary files for a
+language implementation. In order to generate these files for our sample language,
+go the Parrot's root directory and type:
 
  $ perl tools/dev/mk_language_shell.pl Squaak ~/src/squaak
 
 (Note: if you're on Windows, you should use backslashes.) This will generate the
-files in a directory F<~/src/squaak>, and use the name Squaak as the language's
-name.
+files in the directory F<~/src/squaak>. The name of the language will be Squaak.
 
 After this, go to the directory F<~/src/squaak> and type:
 
  $ parrot setup.pir test
 
-This will compile the generated files and run the test suite. If you want more
+This will compile the grammar and the actions and run the test suite.
+For running F<setup.pir> you can either use an installed parrot executable
+from your distribution or the one you have just compiled.
+
+If you want more
 information on what files are being generated, please check out the references
 at the end of this episode or read the documentation included in the file
-F<mk_language_shell.pl>. For that you can use an installed parrot executable
-from your distribution or one you have just compiled.
+F<tools/dev/mk_language_shell.pl>.
 
 Note that we didn't write a single line of code, and already we have the basic
 infrastructure in place to get us started. Of course, the generated compiler
@@ -267,7 +273,8 @@ F<compilers/pct/src/PCT/HLLCompiler.pir>.
 
 =item * Perl 6/NQP rules syntax: Synopsis 5 at http://perlcabal.org/syn/S05.html or http://svn.pugscode.org/pugs/docs/Perl6/Spec/S05-regex.pod
 
-=back
+=item * List of HLL projects: http://trac.parrot.org/parrot/wiki/Languages
 
+=back
 
 =cut

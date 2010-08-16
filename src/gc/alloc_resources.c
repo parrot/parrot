@@ -291,18 +291,8 @@ for details.
 - reduce alignment to a reasonable value i.e. MALLOC_ALIGNMENT
   aka 2*sizeof (size_t) or just 8 (TODO make a config hint)
 
-Buffer memory layout:
-
-                    +-------------------+
-                    | flags # GC header |
-  obj->bufstart  -> +-------------------+
-                    |  data             |
-                    v                   v
-
- * if PObj_is_COWable is set, then we have space for flags.
-
- * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above
- * obj->buflen is the usable length excluding the optional GC part.
+See pobj.h for a discussion of the Buffer descriptor and the buffer itself,
+including its header.
 
 =cut
 
@@ -331,8 +321,11 @@ mem_allocate(PARROT_INTERP,
          * TODO pass required allocation size to the GC system,
          *      so that collection can be skipped if needed
          */
+        size_t new_mem = mem_pools->memory_used -
+                         mem_pools->mem_used_last_collect;
         if (!mem_pools->gc_mark_block_level
-        &&   mem_pools->mem_allocs_since_last_collect) {
+            && new_mem > (mem_pools->mem_used_last_collect >> 1)
+            && new_mem > GC_SIZE_THRESHOLD) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
         }
         if (pool->top_block->free < size) {
@@ -359,6 +352,7 @@ mem_allocate(PARROT_INTERP,
     return_val             = pool->top_block->top;
     pool->top_block->top  += size;
     pool->top_block->free -= size;
+    mem_pools->memory_used += size;
 
     return return_val;
 }
@@ -453,6 +447,8 @@ compact_pool(PARROT_INTERP,
     if (mem_pools->gc_sweep_block_level)
         return;
 
+    ++mem_pools->gc_collect_runs;
+
     /* Snag a block big enough for everything */
     total_size = pad_pool_size(pool);
 
@@ -464,7 +460,6 @@ compact_pool(PARROT_INTERP,
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
-    ++mem_pools->gc_collect_runs;
 
     alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
@@ -520,6 +515,7 @@ compact_pool(PARROT_INTERP,
     /* How much is free. That's the total size minus the amount we used */
     new_block->free = new_block->size - (cur_spot - new_block->start);
     mem_pools->memory_collected +=      (cur_spot - new_block->start);
+    mem_pools->memory_used      +=      (cur_spot - new_block->start);
 
     --mem_pools->gc_sweep_block_level;
 }
@@ -682,6 +678,8 @@ free_old_mem_blocks(
         else {
             /* Note that we don't have it any more */
             mem_pools->memory_allocated -= cur_block->size;
+            mem_pools->memory_used -=
+                cur_block->size - cur_block->free - cur_block->freed;
 
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */

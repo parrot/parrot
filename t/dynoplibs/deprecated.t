@@ -16,7 +16,7 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
 
 =cut
 
-.const int TESTS = 106
+.const int TESTS = 13
 
 .loadlib 'deprecated_ops'
 
@@ -38,12 +38,12 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     $I10 = 10
     $I20 = 20
     exchange $I10, $I20
-    is($I10, 20, 'exchange - first operand ok')
-    is($I20, 10, 'exchange - second operand ok')
+    is($I10, 20, 'exchange i - first operand ok')
+    is($I20, 10, 'exchange i - second operand ok')
 
     $I30 = 30
     exchange $I30, $I30
-    is($I30, 30, 'exchange - reflexive')
+    is($I30, 30, 'exchange i - reflexive')
 .end
 
 
@@ -83,38 +83,44 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
 
     cleari
 
-    is($I0, 0, 'cleari - $I0 cleared')
-    is($I1, 0, 'cleari - $I1 cleared')
-    is($I2, 0, 'cleari - $I2 cleared')
-    is($I3, 0, 'cleari - $I3 cleared')
-    is($I4, 0, 'cleari - $I4 cleared')
-    is($I5, 0, 'cleari - $I5 cleared')
-    is($I6, 0, 'cleari - $I6 cleared')
-    is($I7, 0, 'cleari - $I7 cleared')
-    is($I8, 0, 'cleari - $I8 cleared')
-    is($I9, 0, 'cleari - $I9 cleared')
-    is($I10, 0, 'cleari - $I10 cleared')
-    is($I11, 0, 'cleari - $I11 cleared')
-    is($I12, 0, 'cleari - $I12 cleared')
-    is($I13, 0, 'cleari - $I13 cleared')
-    is($I14, 0, 'cleari - $I14 cleared')
-    is($I15, 0, 'cleari - $I15 cleared')
-    is($I16, 0, 'cleari - $I16 cleared')
-    is($I17, 0, 'cleari - $I17 cleared')
-    is($I18, 0, 'cleari - $I18 cleared')
-    is($I19, 0, 'cleari - $I19 cleared')
-    is($I20, 0, 'cleari - $I20 cleared')
-    is($I21, 0, 'cleari - $I21 cleared')
-    is($I22, 0, 'cleari - $I22 cleared')
-    is($I23, 0, 'cleari - $I23 cleared')
-    is($I24, 0, 'cleari - $I24 cleared')
-    is($I25, 0, 'cleari - $I25 cleared')
-    is($I26, 0, 'cleari - $I26 cleared')
-    is($I27, 0, 'cleari - $I27 cleared')
-    is($I28, 0, 'cleari - $I28 cleared')
-    is($I29, 0, 'cleari - $I29 cleared')
-    is($I30, 0, 'cleari - $I30 cleared')
-    is($I31, 0, 'cleari - $I31 cleared')
+    $S0 = 'NO'
+
+    ne $I0, 0, result
+    ne $I1, 0, result
+    ne $I2, 0, result
+    ne $I3, 0, result
+    ne $I4, 0, result
+    ne $I5, 0, result
+    ne $I6, 0, result
+    ne $I7, 0, result
+    ne $I8, 0, result
+    ne $I9, 0, result
+    ne $I10, 0, result
+    ne $I11, 0, result
+    ne $I12, 0, result
+    ne $I13, 0, result
+    ne $I14, 0, result
+    ne $I15, 0, result
+    ne $I16, 0, result
+    ne $I17, 0, result
+    ne $I18, 0, result
+    ne $I19, 0, result
+    ne $I20, 0, result
+    ne $I21, 0, result
+    ne $I22, 0, result
+    ne $I23, 0, result
+    ne $I24, 0, result
+    ne $I25, 0, result
+    ne $I26, 0, result
+    ne $I27, 0, result
+    ne $I28, 0, result
+    ne $I29, 0, result
+    ne $I30, 0, result
+    ne $I31, 0, result
+
+    $S0 = 'YES'
+  result:
+    is($S0, 'YES', 'cleari')
 .end
 
 .sub test_clearn
@@ -151,49 +157,56 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     set     $N30, 547972.0
     set     $N31, 547972.0
     clearn
-    is( $N0, "0", 'clearn' )
-    is( $N1, "0", 'clearn' )
-    is( $N2, "0", 'clearn' )
-    is( $N3, "0", 'clearn' )
-    is( $N4, "0", 'clearn' )
-    is( $N5, "0", 'clearn' )
-    is( $N6, "0", 'clearn' )
-    is( $N7, "0", 'clearn' )
-    is( $N8, "0", 'clearn' )
-    is( $N9, "0", 'clearn' )
-    is( $N10, "0", 'clearn' )
-    is( $N11, "0", 'clearn' )
-    is( $N12, "0", 'clearn' )
-    is( $N13, "0", 'clearn' )
-    is( $N14, "0", 'clearn' )
-    is( $N15, "0", 'clearn' )
-    is( $N16, "0", 'clearn' )
-    is( $N17, "0", 'clearn' )
-    is( $N18, "0", 'clearn' )
-    is( $N19, "0", 'clearn' )
-    is( $N20, "0", 'clearn' )
-    is( $N21, "0", 'clearn' )
-    is( $N22, "0", 'clearn' )
-    is( $N23, "0", 'clearn' )
-    is( $N24, "0", 'clearn' )
-    is( $N25, "0", 'clearn' )
-    is( $N26, "0", 'clearn' )
-    is( $N27, "0", 'clearn' )
-    is( $N28, "0", 'clearn' )
-    is( $N29, "0", 'clearn' )
-    is( $N30, "0", 'clearn' )
-    is( $N31, "0", 'clearn' )
+
+    $I0 = 0
+
+    ne $N0, 0.0, result
+    ne $N1, 0.0, result
+    ne $N2, 0.0, result
+    ne $N3, 0.0, result
+    ne $N4, 0.0, result
+    ne $N5, 0.0, result
+    ne $N6, 0.0, result
+    ne $N7, 0.0, result
+    ne $N8, 0.0, result
+    ne $N9, 0.0, result
+    ne $N10, 0.0, result
+    ne $N11, 0.0, result
+    ne $N12, 0.0, result
+    ne $N13, 0.0, result
+    ne $N14, 0.0, result
+    ne $N15, 0.0, result
+    ne $N16, 0.0, result
+    ne $N17, 0.0, result
+    ne $N18, 0.0, result
+    ne $N19, 0.0, result
+    ne $N20, 0.0, result
+    ne $N21, 0.0, result
+    ne $N22, 0.0, result
+    ne $N23, 0.0, result
+    ne $N24, 0.0, result
+    ne $N25, 0.0, result
+    ne $N26, 0.0, result
+    ne $N27, 0.0, result
+    ne $N28, 0.0, result
+    ne $N29, 0.0, result
+    ne $N30, 0.0, result
+    ne $N31, 0.0, result
+
+    $I0 = 1
+  result:
+    is($I0, 1, 'clearn')
 .end
 
 .sub test_exchange_n
     set $N1, 1.234560
     set $N2, 9.876540
     exchange $N1, $N2
-    is( $N1, "9.87654", 'exchange' )
-    is( $N2, "1.23456", 'exchange' )
+    is( $N1, "9.87654", 'exchange n' )
+    is( $N2, "1.23456", 'exchange n' )
     set $N3, -100.200300
     exchange $N3, $N3
-    is( $N3, "-100.2003", 'exchange' )
+    is( $N3, "-100.2003", 'exchange n' )
 .end
 
 .sub test_clears
@@ -230,50 +243,57 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     set $S30, "BOO 30"
     set $S31, "BOO 31"
     clears
-    is( $S0, "", '' )
-    is( $S1, "", '' )
-    is( $S2, "", '' )
-    is( $S3, "", '' )
-    is( $S4, "", '' )
-    is( $S5, "", '' )
-    is( $S6, "", '' )
-    is( $S7, "", '' )
-    is( $S8, "", '' )
-    is( $S9, "", '' )
-    is( $S10, "", '' )
-    is( $S11, "", '' )
-    is( $S12, "", '' )
-    is( $S13, "", '' )
-    is( $S14, "", '' )
-    is( $S15, "", '' )
-    is( $S16, "", '' )
-    is( $S17, "", '' )
-    is( $S18, "", '' )
-    is( $S19, "", '' )
-    is( $S20, "", '' )
-    is( $S21, "", '' )
-    is( $S22, "", '' )
-    is( $S23, "", '' )
-    is( $S24, "", '' )
-    is( $S25, "", '' )
-    is( $S26, "", '' )
-    is( $S27, "", '' )
-    is( $S28, "", '' )
-    is( $S29, "", '' )
-    is( $S30, "", '' )
-    is( $S31, "", '' )
+
+    $I0 = 0
+
+    unless_null $S0, result
+    unless_null $S1, result
+    unless_null $S2, result
+    unless_null $S3, result
+    unless_null $S4, result
+    unless_null $S5, result
+    unless_null $S6, result
+    unless_null $S7, result
+    unless_null $S8, result
+    unless_null $S9, result
+    unless_null $S10, result
+    unless_null $S11, result
+    unless_null $S12, result
+    unless_null $S13, result
+    unless_null $S14, result
+    unless_null $S15, result
+    unless_null $S16, result
+    unless_null $S17, result
+    unless_null $S18, result
+    unless_null $S19, result
+    unless_null $S20, result
+    unless_null $S21, result
+    unless_null $S22, result
+    unless_null $S23, result
+    unless_null $S24, result
+    unless_null $S25, result
+    unless_null $S26, result
+    unless_null $S27, result
+    unless_null $S28, result
+    unless_null $S29, result
+    unless_null $S30, result
+    unless_null $S31, result
+
+    $I0 = 1
+  result:
+    is($I0, 1, 'clears')
 .end
 
 .sub test_exchange_s
     set $S0, "String #0"
     set $S1, "String #1"
     exchange $S0, $S1
-    is( $S0, "String #1", 'exchange' )
-    is( $S1, "String #0", 'exchange' )
+    is( $S0, "String #1", 'exchange s' )
+    is( $S1, "String #0", 'exchange s' )
 
     set $S2, "String #2"
     exchange $S2, $S2
-    is( $S2, "String #2", 'exchange' )
+    is( $S2, "String #2", 'exchange s' )
 .end
 
 .sub test_clearp

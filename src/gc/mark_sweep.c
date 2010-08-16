@@ -32,11 +32,13 @@ throughout the rest of Parrot.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void free_buffer(SHIM_INTERP,
-    SHIM(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Buffer *b))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
@@ -78,7 +80,8 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools);
 
 #define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -655,7 +658,7 @@ reuse later.
 
 static void
 free_buffer(SHIM_INTERP,
-        SHIM(Memory_Pools *mem_pools),
+        ARGMOD(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGMOD(Buffer *b))
 {
@@ -781,7 +784,7 @@ initialize_fixed_size_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
 /*
 
 =item C<int header_pools_iterate_callback(PARROT_INTERP, Memory_Pools
-*mem_pools, int flag, void *arg, pool_iter_fn func)>
+*mem_pools, int flag, void *arg, const pool_iter_fn func)>
 
 Iterates through header pools, invoking the given callback function on each
 pool in the list matching the given criteria. Determines which pools to iterate
@@ -823,7 +826,7 @@ int
 header_pools_iterate_callback(PARROT_INTERP,
         ARGMOD(Memory_Pools *mem_pools),
         int flag, ARGIN_NULLOK(void *arg),
-        NOTNULL(pool_iter_fn func))
+        NOTNULL(const pool_iter_fn func))
 {
     ASSERT_ARGS(header_pools_iterate_callback)
 

@@ -11,10 +11,6 @@ src/pmc/fixedintegerarray.pmc - fixed size array for integers only
 This class, FixedIntegerArray, implements an array of fixed size which stores
 INTVALs.  It uses Integer PMCs for all of the conversions.
 
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -34,23 +30,6 @@ static int auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/*
-
-=item C<static int auxcmpfunc(const INTVAL *i, const INTVAL *j)>
-
-
-
-=cut
-
-*/
-
-PARROT_PURE_FUNCTION
-static int
-auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
-{
-    ASSERT_ARGS(auxcmpfunc)
-    return *i - *j;
-}
 
 pmclass FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL   size;  /* number of INTVALs stored in this array */
@@ -58,9 +37,7 @@ pmclass FixedIntegerArray auto_attrs provides array {
 
 /*
 
-=back
-
-=head2 Methods
+=head2 Vtable functions
 
 =over 4
 
@@ -521,25 +498,6 @@ Sets the string value of the element at index C<key> to C<value>.
         SELF.set_pmc_keyed_int(k, value);
     }
 
-    METHOD sort(PMC *cmp_func :optional) {
-        UINTVAL n;
-        INTVAL  size;
-
-        GET_ATTR_size(INTERP, SELF, size);
-        n = (UINTVAL)size;
-
-        if (n > 1) {
-            INTVAL *int_array;
-            GET_ATTR_int_array(INTERP, SELF, int_array);
-            if (PMC_IS_NULL(cmp_func))
-                qsort(int_array, n, sizeof (INTVAL),
-                        (int (*)(const void *, const void*))auxcmpfunc);
-            else
-                Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
-        }
-        RETURN(PMC *SELF);
-    }
-
 /*
 
 =item C<INTVAL is_equal(PMC *value)>
@@ -643,6 +601,66 @@ Used to unarchive the array.
                 int_array[i] = VTABLE_shift_integer(INTERP, info);
         }
     }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<PMC *sort()>
+
+Sort the array and return self.
+
+=cut
+
+*/
+
+    METHOD sort(PMC *cmp_func :optional) {
+        UINTVAL n;
+        INTVAL  size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        n = (UINTVAL)size;
+
+        if (n > 1) {
+            INTVAL *int_array;
+            GET_ATTR_int_array(INTERP, SELF, int_array);
+            if (PMC_IS_NULL(cmp_func))
+                qsort(int_array, n, sizeof (INTVAL),
+                        (int (*)(const void *, const void*))auxcmpfunc);
+            else
+                Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
+        }
+        RETURN(PMC *SELF);
+    }
+
+}
+
+/*
+
+=back
+
+=head2 Auxiliary functions
+
+=over 4
+
+=item C<static int auxcmpfunc(const INTVAL *i, const INTVAL *j)>
+
+INTVAL compare function for qsort usage.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+static int
+auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
+{
+    ASSERT_ARGS(auxcmpfunc)
+    return *i - *j;
 }
 
 /*

@@ -152,6 +152,17 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void ensure_positionals_storage(PARROT_INTERP, PMC *self, INTVAL
+size)>
+
+
+
+=cut
+
+*/
+
 static void
 ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 {
@@ -165,6 +176,17 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 
     ensure_positionals_storage_ap(interp, self, size, allocated_positionals);
 }
+
+/*
+
+=item C<static void ensure_positionals_storage_ap(PARROT_INTERP, PMC *self,
+INTVAL size, INTVAL allocated_positionals)>
+
+
+
+=cut
+
+*/
 
 static void
 ensure_positionals_storage_ap(PARROT_INTERP,
@@ -201,6 +223,16 @@ ensure_positionals_storage_ap(PARROT_INTERP,
     SETATTR_CallContext_positionals(interp, self, new_array);
 }
 
+/*
+
+=item C<static Pcc_cell* get_cell_at(PARROT_INTERP, PMC *self, INTVAL key)>
+
+
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static Pcc_cell*
 get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
@@ -211,6 +243,16 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
     GETATTR_CallContext_positionals(interp, self, cells);
     return &cells[key];
 }
+
+/*
+
+=item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
+
+
+
+=cut
+
+*/
 
 static INTVAL
 autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
@@ -235,6 +277,16 @@ autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     return 0;
 }
 
+/*
+
+=item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
+
+
+
+=cut
+
+*/
+
 static FLOATVAL
 autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
@@ -257,6 +309,16 @@ autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     /* exception */
     return 0.0;
 }
+
+/*
+
+=item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
+
+
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
@@ -281,6 +343,16 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     /* exception */
     return NULL;
 }
+
+/*
+
+=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
+
+
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -312,6 +384,16 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
     return result;
 }
 
+/*
+
+=item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
+
+
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static Hash *
 get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
@@ -334,6 +416,16 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
     return hash;
 }
 
+/*
+
+=item C<static void mark_cell(PARROT_INTERP, Pcc_cell *c)>
+
+
+
+=cut
+
+*/
+
 static void
 mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 {
@@ -355,6 +447,16 @@ mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 
 }
 
+/*
+
+=item C<static void mark_positionals(PARROT_INTERP, PMC *self)>
+
+
+
+=cut
+
+*/
+
 static void
 mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 {
@@ -373,6 +475,16 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
     }
 }
 
+/*
+
+=item C<static void mark_hash(PARROT_INTERP, Hash *h)>
+
+
+
+=cut
+
+*/
+
 /* don't look now, but here goes encapsulation.... */
 static void
 mark_hash(PARROT_INTERP, ARGIN(Hash *h))
@@ -390,6 +502,16 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
         }
     }
 }
+
+/*
+
+=item C<static PMC * get_named_names(PARROT_INTERP, PMC *SELF)>
+
+
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 static PMC *

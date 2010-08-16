@@ -248,7 +248,7 @@ D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
 A: Christoph Otto
-D: Pipp
+D: Pipp, Lorito taskmaster
 E: christoph@mksig.org
 
 N: chromatic
@@ -816,7 +816,9 @@ E: pmichaud@pobox.com
 
 N: Paul C. Anagnostopoulos
 U: Paul_the_Greek
-D: Memory management
+A: Paul C. Anagnostopoulos
+E: paul@windfall.com
+D: Improving memory management documentation
 
 N: Paul Cochrane
 U: paultcochrane
