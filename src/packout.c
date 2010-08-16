@@ -346,7 +346,6 @@ PackFile_Constant_pack(PARROT_INTERP,
     ASSERT_ARGS(PackFile_Constant_pack)
     PMC *key;
     size_t i;
-    STRING *image;
 
     *cursor++ = self->type;
 
