@@ -19,7 +19,7 @@ Tests the cmp_str_at opcode.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(14)
+    plan(16)
 
     test_cmp_str_at_i_s_sc_ic_ic()
 .end
@@ -67,6 +67,15 @@ Tests the cmp_str_at opcode.
 
     $I0 = cmp_str_at $S0, 'xy', 3, 3
     is( $I0, -1, "2nd argument is short" )
+
+    $I0 = cmp_str_at $S0, '', 0, 0
+    is( $I0, 0, "2nd argument is empty" )
+
+    $I0 = cmp_str_at $S0, 'my def = Integer', 0, 16
+    is( $I0, -1, "2nd argument is longer" )
+
+    $I0 = cmp_str_at $S0, 'my def = Integer', 15, 1
+    is( $I0, -1, "offset out of bounds of first string" )
 .end
 
 # Local Variables:

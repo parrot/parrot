@@ -1350,6 +1350,12 @@ Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a),
 {
     ASSERT_ARGS(Parrot_str_compare_offset)
 
+    if (offset > a->strlen)
+        return -1;
+
+    if (offset + length > a->strlen)
+        length = offset - a->strlen;
+
     if (a->encoding == b->encoding)
         return memcmp(a->strstart + offset, b->strstart, length);
 
