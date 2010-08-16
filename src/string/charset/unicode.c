@@ -28,7 +28,8 @@ This file implements the charset functions for unicode data
 
 static INTVAL compare(PARROT_INTERP,
     ARGIN(const STRING *lhs),
-    ARGIN(const STRING *rhs))
+    ARGIN(const STRING *rhs),
+    INTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -637,17 +638,19 @@ titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
 /*
 
 =item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING
-*rhs)>
+*rhs, INTVAL offset)>
 
 Compares two STRINGs, C<lhs> and C<rhs>. Returns -1 if C<lhs> < C<rhs>. Returns
-0 if C<lhs> = C<rhs>. Returns 1 if C<lhs> > C<rhs>.
+0 if C<lhs> = C<rhs>. Returns 1 if C<lhs> > C<rhs>.  The offset represents the
+number of characters from the start of lhs from which to begin the comparsion.
 
 =cut
 
 */
 
 static INTVAL
-compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
+compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs),
+        INTVAL offset)
 {
     ASSERT_ARGS(compare)
     String_iter l_iter, r_iter;
@@ -657,12 +660,12 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
     ENCODING_ITER_INIT(interp, lhs, &l_iter);
     ENCODING_ITER_INIT(interp, rhs, &r_iter);
 
-    l_len = lhs->strlen;
-    r_len = rhs->strlen;
+    l_len   = lhs->strlen - offset;
+    r_len   = rhs->strlen;
 
     min_len = l_len > r_len ? r_len : l_len;
 
-    for (offs = 0; offs < min_len; ++offs) {
+    for (offs = offset; offs < min_len; ++offs) {
         cl = l_iter.get_and_advance(interp, &l_iter);
         cr = r_iter.get_and_advance(interp, &r_iter);
 

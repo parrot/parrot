@@ -95,6 +95,16 @@ INTVAL Parrot_str_compare(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_str_compare_offset(PARROT_INTERP,
+    ARGIN(const STRING *a),
+    INTVAL offset,
+    ARGIN(const STRING *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING * Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
         __attribute__nonnull__(1);
@@ -515,6 +525,10 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_str_compare_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(a) \
+    , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_Parrot_str_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_concat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -40,7 +40,7 @@ typedef STRING * (*charset_titlecase_t)(PARROT_INTERP, ARGIN(const STRING *src))
 typedef STRING * (*charset_upcase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*charset_downcase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*charset_titlecase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
-typedef INTVAL   (*charset_compare_t)(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs));
+typedef INTVAL   (*charset_compare_t)(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs), INTVAL offset);
 typedef INTVAL   (*charset_index_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), UINTVAL offset);
 typedef INTVAL   (*charset_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), UINTVAL offset);
 typedef UINTVAL  (*charset_validate_t)(PARROT_INTERP, ARGIN(const STRING *src));
@@ -246,7 +246,8 @@ struct _charset {
 #define CHARSET_UPCASE_FIRST(interp, source) ((source)->charset)->upcase_first((interp), (source))
 #define CHARSET_DOWNCASE_FIRST(interp, source) ((source)->charset)->downcase_first((interp), (source))
 #define CHARSET_TITLECASE_FIRST(interp, source) ((source)->charset)->titlecase_first((interp), (source))
-#define CHARSET_COMPARE(interp, lhs, rhs) ((const CHARSET *)(lhs)->charset)->compare((interp), (lhs), (rhs))
+#define CHARSET_COMPARE(interp, lhs, rhs) ((const CHARSET *)(lhs)->charset)->compare((interp), (lhs), (rhs), 0)
+#define CHARSET_COMPARE_OFFSET(interp, lhs, rhs, offset) ((const CHARSET *)(lhs)->charset)->compare((interp), (lhs), (rhs), offset)
 #define CHARSET_INDEX(interp, source, search, offset) ((source)->charset)->index((interp), (source), (search), (offset))
 #define CHARSET_RINDEX(interp, source, search, offset) ((source)->charset)->rindex((interp), (source), (search), (offset))
 #define CHARSET_VALIDATE(interp, source) ((source)->charset)->validate((interp), (source))

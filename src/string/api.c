@@ -1326,6 +1326,44 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
     return CHARSET_COMPARE(interp, s1, s2);
 }
 
+/*
+
+=item C<INTVAL Parrot_str_compare_offset(PARROT_INTERP, const STRING *a, INTVAL
+offset, const STRING *b)>
+
+Compares two strings to each other.  If s1 is less than s2, returns -1.  If the
+strings are equal, returns 0.  If s1 is greater than s2, returns 2.  This
+comparison uses the character set collation order of the strings for
+comparison.  Any given offset (a positive value) will start the comparison that
+many characters from the start of s1.
+
+=cut
+
+*/
+
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a), INTVAL offset,
+    ARGIN(const STRING *b))
+{
+    ASSERT_ARGS(Parrot_str_compare_offset)
+
+    /* do these make sense? */
+    if (STRING_IS_NULL(b))
+        return a && (a->strlen != 0);
+
+    if (STRING_IS_NULL(a))
+        return -(b->strlen != 0);
+
+    ASSERT_STRING_SANITY(a);
+    ASSERT_STRING_SANITY(b);
+
+    /* XXX: sanitize offset */
+    return CHARSET_COMPARE_OFFSET(interp, a, b, offset);
+}
+
 
 /*
 

@@ -468,10 +468,11 @@ titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 /*
 
 =item C<INTVAL ascii_compare(PARROT_INTERP, const STRING *lhs, const STRING
-*rhs)>
+*rhs, INTVAL offset)>
 
-Compares two strings as ASCII strings. If STRING C<lhs> > C<rhs>, returns
-1. If C<lhs> == C<rhs> returns 0. If STRING C<lhs> < C<rhs>, returns  -1.
+Compares two strings as ASCII strings. If STRING C<lhs> > C<rhs>, returns 1. If
+C<lhs> == C<rhs> returns 0. If STRING C<lhs> < C<rhs>, returns -1.  The offset
+represents the number of characters into lhs to start the comparison.
 
 =cut
 
@@ -479,35 +480,39 @@ Compares two strings as ASCII strings. If STRING C<lhs> > C<rhs>, returns
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
+ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs),
+    INTVAL offset)
 {
     ASSERT_ARGS(ascii_compare)
-    const UINTVAL l_len = lhs->strlen;
-    const UINTVAL r_len = rhs->strlen;
+    const UINTVAL l_len   = lhs->strlen;
+    const UINTVAL r_len   = rhs->strlen;
     const UINTVAL min_len = l_len > r_len ? r_len : l_len;
+
     String_iter iter;
 
     if (lhs->encoding == rhs->encoding) {
-        const int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
+        const int ret_val = memcmp(lhs->strstart + offset,
+                                   rhs->strstart, min_len);
         if (ret_val)
             return ret_val < 0 ? -1 : 1;
     }
     else {
         UINTVAL offs;
         ENCODING_ITER_INIT(interp, rhs, &iter);
-        for (offs = 0; offs < min_len; ++offs) {
+        for (offs = offset; offs < min_len; ++offs) {
             const UINTVAL cl = ENCODING_GET_BYTE(interp, lhs, offs);
             const UINTVAL cr = iter.get_and_advance(interp, &iter);
             if (cl != cr)
                 return cl < cr ? -1 : 1;
         }
     }
-    if (l_len < r_len) {
+
+    if (l_len < r_len)
         return -1;
-    }
-    if (l_len > r_len) {
+
+    if (l_len > r_len)
         return 1;
-    }
+
     return 0;
 }
 

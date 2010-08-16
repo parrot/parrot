@@ -29,7 +29,8 @@ This file implements the charset functions for binary data
 
 static INTVAL compare(SHIM_INTERP,
     ARGIN(const STRING *lhs),
-    ARGIN(const STRING *rhs))
+    ARGIN(const STRING *rhs),
+    INTVAL offset)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -312,24 +313,27 @@ titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
 /*
 
 =item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING
-*rhs)>
+*rhs, INTVAL offset)>
 
-Compare the two buffers, first by size, then with memcmp.
+Compare the two buffers, first by size, then with memcmp.  The offset
+represents the number of bytes within lhs to start the comparison.
 
 =cut
 
 */
 
 static INTVAL
-compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
+compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs),
+        INTVAL offset)
 {
     ASSERT_ARGS(compare)
-    const UINTVAL l_len = lhs->strlen;
+    const UINTVAL l_len = lhs->strlen - offset;
     const UINTVAL r_len = rhs->strlen;
+
     if (l_len != r_len)
         return l_len - r_len;
 
-    return memcmp(lhs->strstart, rhs->strstart, l_len);
+    return memcmp(lhs->strstart + offset, rhs->strstart, l_len);
 }
 
 /*
