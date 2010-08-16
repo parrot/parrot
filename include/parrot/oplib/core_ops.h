@@ -1105,6 +1105,14 @@
  opcode_t * Parrot_find_codepoint_i_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_finalize_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_finalize_pc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_s_s_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_sc_s_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_s_sc_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_sc_sc_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_s_s_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_sc_s_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_s_sc_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_substr_eq_at_i_sc_sc_ic(opcode_t *, PARROT_INTERP);
 
 
 #endif /* PARROT_OPLIB_CORE_OPS_H_GUARD */

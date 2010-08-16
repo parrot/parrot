@@ -415,6 +415,14 @@ op finalize(in PMC) {
 }
 
 
+=item B<substr_eq_at>(out INT, in STR, in STR, in INT)
+
+=cut
+
+op substr_eq_at(out INT, in STR, in STR, in INT) {
+    $1 = Parrot_str_compare_offset(interp, $2, $4, $3);
+}
+
 =back
 
 =head1 COPYRIGHT

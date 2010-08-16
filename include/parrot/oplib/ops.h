@@ -1099,7 +1099,15 @@ typedef enum {
     PARROT_OP_find_codepoint_i_s,              /* 1079 */
     PARROT_OP_find_codepoint_i_sc,             /* 1080 */
     PARROT_OP_finalize_p,                      /* 1081 */
-    PARROT_OP_finalize_pc                      /* 1082 */
+    PARROT_OP_finalize_pc,                     /* 1082 */
+    PARROT_OP_substr_eq_at_i_s_s_i,            /* 1083 */
+    PARROT_OP_substr_eq_at_i_sc_s_i,           /* 1084 */
+    PARROT_OP_substr_eq_at_i_s_sc_i,           /* 1085 */
+    PARROT_OP_substr_eq_at_i_sc_sc_i,          /* 1086 */
+    PARROT_OP_substr_eq_at_i_s_s_ic,           /* 1087 */
+    PARROT_OP_substr_eq_at_i_sc_s_ic,          /* 1088 */
+    PARROT_OP_substr_eq_at_i_s_sc_ic,          /* 1089 */
+    PARROT_OP_substr_eq_at_i_sc_sc_ic          /* 1090 */
 
 } parrot_opcode_enums;
 

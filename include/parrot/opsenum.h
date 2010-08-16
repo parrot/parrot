@@ -1099,6 +1099,14 @@ enum OPS_ENUM {
     enum_ops_find_codepoint_i_sc           = 1080,
     enum_ops_finalize_p                    = 1081,
     enum_ops_finalize_pc                   = 1082,
+    enum_ops_substr_eq_at_i_s_s_i          = 1083,
+    enum_ops_substr_eq_at_i_sc_s_i         = 1084,
+    enum_ops_substr_eq_at_i_s_sc_i         = 1085,
+    enum_ops_substr_eq_at_i_sc_sc_i        = 1086,
+    enum_ops_substr_eq_at_i_s_s_ic         = 1087,
+    enum_ops_substr_eq_at_i_sc_s_ic        = 1088,
+    enum_ops_substr_eq_at_i_s_sc_ic        = 1089,
+    enum_ops_substr_eq_at_i_sc_sc_ic       = 1090,
 };
 
 
