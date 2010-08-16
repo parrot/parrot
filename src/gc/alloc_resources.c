@@ -452,7 +452,7 @@ compact_pool(PARROT_INTERP,
     /* Snag a block big enough for everything */
     total_size = pad_pool_size(pool);
 
-    if (total_size)
+    if (total_size == 0)
         return;
 
     ++mem_pools->gc_sweep_block_level;
