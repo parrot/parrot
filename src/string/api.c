@@ -1328,8 +1328,8 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
 
 /*
 
-=item C<INTVAL Parrot_str_compare_offset(PARROT_INTERP, const STRING *a, const
-STRING *b, INTVAL offset, INTVAL length)>
+=item C<INTVAL Parrot_str_compare_offset(PARROT_INTERP, STRING *a, STRING *b,
+INTVAL offset, INTVAL length)>
 
 Compares two strings to each other.  If s1 is less than s2, returns -1.  If the
 strings are equal, returns 0.  If s1 is greater than s2, returns 2.  This
@@ -1345,8 +1345,8 @@ many characters from the start of s1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a),
-    ARGIN(const STRING *b), INTVAL offset, INTVAL length)
+Parrot_str_compare_offset(PARROT_INTERP, ARGIN(STRING *a),
+    ARGIN(STRING *b), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(Parrot_str_compare_offset)
 
@@ -1358,19 +1358,27 @@ Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a),
 
     if (a->encoding == b->encoding)
         return memcmp(a->strstart + offset, b->strstart, length);
+    else {
+        /* HEY!  Look over there!  You don't see this!
+         * Stack-allocated STRINGs might be safer anyhow. */
+        char   *a_strstart = a->strstart;
+        UINTVAL a_strlen   = a->strlen;
+        UINTVAL b_strlen   = b->strlen;
+        INTVAL  ret_val    = 0;
 
-    /* do these make sense? */
-    if (STRING_IS_NULL(b))
-        return a && (a->strlen != 0);
+        a->strstart += offset;
+        a->strlen   -= offset;
+        a->strlen    = a->strlen > (UINTVAL)length ? length : a->strlen;
+        b->strlen    = b->strlen > (UINTVAL)length ? length : b->strlen;
 
-    if (STRING_IS_NULL(a))
-        return -(b->strlen != 0);
+        ret_val      = CHARSET_COMPARE(interp, a, b);
 
-    ASSERT_STRING_SANITY(a);
-    ASSERT_STRING_SANITY(b);
+        a->strstart  = a_strstart;
+        a->strlen    = a_strlen;
+        b->strlen    = b->strlen;
 
-    /* XXX: sanitize offset, make length work */
-    return CHARSET_COMPARE_OFFSET(interp, a, b, offset);
+        return ret_val;
+    }
 }
 
 

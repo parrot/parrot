@@ -96,8 +96,8 @@ INTVAL Parrot_str_compare(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_str_compare_offset(PARROT_INTERP,
-    ARGIN(const STRING *a),
-    ARGIN(const STRING *b),
+    ARGIN(STRING *a),
+    ARGIN(STRING *b),
     INTVAL offset,
     INTVAL length)
         __attribute__nonnull__(1)
