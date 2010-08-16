@@ -1100,14 +1100,22 @@ typedef enum {
     PARROT_OP_find_codepoint_i_sc,             /* 1080 */
     PARROT_OP_finalize_p,                      /* 1081 */
     PARROT_OP_finalize_pc,                     /* 1082 */
-    PARROT_OP_substr_eq_at_i_s_s_i,            /* 1083 */
-    PARROT_OP_substr_eq_at_i_sc_s_i,           /* 1084 */
-    PARROT_OP_substr_eq_at_i_s_sc_i,           /* 1085 */
-    PARROT_OP_substr_eq_at_i_sc_sc_i,          /* 1086 */
-    PARROT_OP_substr_eq_at_i_s_s_ic,           /* 1087 */
-    PARROT_OP_substr_eq_at_i_sc_s_ic,          /* 1088 */
-    PARROT_OP_substr_eq_at_i_s_sc_ic,          /* 1089 */
-    PARROT_OP_substr_eq_at_i_sc_sc_ic          /* 1090 */
+    PARROT_OP_cmp_str_at_i_s_s_i_i,            /* 1083 */
+    PARROT_OP_cmp_str_at_i_sc_s_i_i,           /* 1084 */
+    PARROT_OP_cmp_str_at_i_s_sc_i_i,           /* 1085 */
+    PARROT_OP_cmp_str_at_i_sc_sc_i_i,          /* 1086 */
+    PARROT_OP_cmp_str_at_i_s_s_ic_i,           /* 1087 */
+    PARROT_OP_cmp_str_at_i_sc_s_ic_i,          /* 1088 */
+    PARROT_OP_cmp_str_at_i_s_sc_ic_i,          /* 1089 */
+    PARROT_OP_cmp_str_at_i_sc_sc_ic_i,         /* 1090 */
+    PARROT_OP_cmp_str_at_i_s_s_i_ic,           /* 1091 */
+    PARROT_OP_cmp_str_at_i_sc_s_i_ic,          /* 1092 */
+    PARROT_OP_cmp_str_at_i_s_sc_i_ic,          /* 1093 */
+    PARROT_OP_cmp_str_at_i_sc_sc_i_ic,         /* 1094 */
+    PARROT_OP_cmp_str_at_i_s_s_ic_ic,          /* 1095 */
+    PARROT_OP_cmp_str_at_i_sc_s_ic_ic,         /* 1096 */
+    PARROT_OP_cmp_str_at_i_s_sc_ic_ic,         /* 1097 */
+    PARROT_OP_cmp_str_at_i_sc_sc_ic_ic         /* 1098 */
 
 } parrot_opcode_enums;
 

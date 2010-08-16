@@ -415,16 +415,16 @@ op finalize(in PMC) {
 }
 
 
-=item B<substr_eq_at>(out INT, in STR, in STR, in INT)
+=item B<cmp_str_at>(out INT, in STR, in STR, in INT, in INT)
 
 A C<cmp>-style string comparison, where the first argument is a substring
-of $2, beginning at offset $4, for the length of $3. The second argument
+of $2, beginning at offset $4, for the length of $5. The second argument
 is $3 with no modifications.
 
 =cut
 
-op substr_eq_at(out INT, in STR, in STR, in INT) {
-    $1 = Parrot_str_compare_offset(interp, $2, $4, $3);
+op cmp_str_at(out INT, in STR, in STR, in INT, in INT) {
+    $1 = Parrot_str_compare_offset(interp, $2, $3, $4);
 }
 
 =back
