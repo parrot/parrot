@@ -1328,8 +1328,8 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
 
 /*
 
-=item C<INTVAL Parrot_str_compare_offset(PARROT_INTERP, const STRING *a, INTVAL
-offset, const STRING *b)>
+=item C<INTVAL Parrot_str_compare_offset(PARROT_INTERP, const STRING *a, const
+STRING *b, INTVAL offset, INTVAL length)>
 
 Compares two strings to each other.  If s1 is less than s2, returns -1.  If the
 strings are equal, returns 0.  If s1 is greater than s2, returns 2.  This
@@ -1345,8 +1345,8 @@ many characters from the start of s1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a), INTVAL offset,
-    ARGIN(const STRING *b))
+Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a),
+    ARGIN(const STRING *b), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(Parrot_str_compare_offset)
 

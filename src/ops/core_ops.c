@@ -26319,112 +26319,112 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_cmp_str_at_i_s_s_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_s_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_sc_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_sc_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_s_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_s_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_sc_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_sc_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_s_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_s_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_sc_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_sc_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, IREG(4));
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, IREG(4), IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_s_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), SREG(3), cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_s_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, SREG(3), cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_s_sc_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, SREG(2), CONST(3).u.string, cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 
 opcode_t *
 Parrot_cmp_str_at_i_sc_sc_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, cur_opcode[4]);
+    IREG(1) = Parrot_str_compare_offset(interp, CONST(2).u.string, CONST(3).u.string, cur_opcode[4], IREG(5));
 
 return (opcode_t *)cur_opcode + 6;}
 

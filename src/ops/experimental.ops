@@ -424,7 +424,7 @@ is $3 with no modifications.
 =cut
 
 op cmp_str_at(out INT, in STR, in STR, in INT, in INT) {
-    $1 = Parrot_str_compare_offset(interp, $2, $3, $4);
+    $1 = Parrot_str_compare_offset(interp, $2, $3, $4, $5);
 }
 
 =back
