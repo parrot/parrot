@@ -3165,7 +3165,7 @@ second child of this node.
     ops.'push_pirop'('inline', subtype, $S0, 'inline'=>'  # rx literal %0 %1')
     ops.'push'(lpost)
 
-    .local int litlen
+    .local string litlen
     if litconst goto litlen_const
     litlen = '$I10'
     ops.'push_pirop'('length', '$I10', lpost)
@@ -3182,12 +3182,23 @@ second child of this node.
 
     # compute string to be matched and fail if mismatch
     ops.'push_pirop'('sub', '$I11', pos, off)
+    if ignorecase goto literal_ignorecase
+    if litlen == "1" goto literal_1
+    ops.'push_pirop'('cmp_str_at', '$I11', tgt, lpost, '$I11', litlen)
+    ops.'push_pirop'('ne', '$I11', 0, fail)
+    goto literal_pass
+  literal_1:
+    $S0 = lpast
+    $I0 = ord $S0
+    ops.'push_pirop'('ord', '$I11', tgt, '$I11')
+    ops.'push_pirop'('ne', '$I11', $I0, fail)
+    goto literal_pass
+  literal_ignorecase:
     ops.'push_pirop'('substr', '$S10', tgt, '$I11', litlen)
-    unless ignorecase goto literal_test
     ops.'push_pirop'('downcase', '$S10', '$S10')
-  literal_test:
     ops.'push_pirop'('ne', '$S10', lpost, fail)
 
+  literal_pass:
     # increase position by literal length and move on
     ops.'push_pirop'('add', pos, litlen)
   done:
