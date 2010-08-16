@@ -191,8 +191,6 @@ static int pointer_compare(SHIM_INTERP,
 
 =item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
 
-
-
 =cut
 
 */
@@ -210,8 +208,6 @@ pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a),
 =item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t
 seed)>
 
-
-
 =cut
 
 */
@@ -227,8 +223,6 @@ key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 =item C<static int cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC
 *attrib_index, PMC *cache, int cur_index)>
-
-
 
 =cut
 
@@ -489,8 +483,6 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 =item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC
 *all_parents)>
 
-
-
 =cut
 
 */
@@ -528,8 +520,6 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 
 =item C<static void initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC
 *all_parents, PMC *init)>
-
-
 
 =cut
 

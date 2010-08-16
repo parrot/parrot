@@ -127,8 +127,6 @@ static PMC * visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 
 =item C<static opcode_t * GET_VISIT_CURSOR(const PMC *pmc)>
 
-
-
 =cut
 
 */
@@ -150,8 +148,6 @@ GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
 
 =item C<static void SET_VISIT_CURSOR(PMC *pmc, const char *cursor)>
 
-
-
 =cut
 
 */
@@ -170,8 +166,6 @@ SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
 /*
 
 =item C<static void INC_VISIT_CURSOR(PMC *pmc, UINTVAL inc)>
-
-
 
 =cut
 
@@ -194,8 +188,6 @@ INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
 /*
 
 =item C<static void create_buffer(PARROT_INTERP, PMC *pmc, PMC *info)>
-
-
 
 =cut
 
@@ -270,8 +262,6 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 
 =item C<static INTVAL INFO_HAS_DATA(const PMC *io)>
 
-
-
 =cut
 
 */
@@ -289,8 +279,6 @@ INFO_HAS_DATA(ARGIN(const PMC *io))
 /*
 
 =item C<static PMC* id_list_get(PARROT_INTERP, const PMC *io, UINTVAL id)>
-
-
 
 =cut
 
@@ -310,8 +298,6 @@ id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id)
 /*
 
 =item C<static PMC * visit_todo_list_thaw(PARROT_INTERP, PMC* info)>
-
-
 
 =cut
 
@@ -371,8 +357,6 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 /*
 
 =item C<static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info)>
-
-
 
 =cut
 

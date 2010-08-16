@@ -157,8 +157,6 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 =item C<static void ensure_positionals_storage(PARROT_INTERP, PMC *self, INTVAL
 size)>
 
-
-
 =cut
 
 */
@@ -181,8 +179,6 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 
 =item C<static void ensure_positionals_storage_ap(PARROT_INTERP, PMC *self,
 INTVAL size, INTVAL allocated_positionals)>
-
-
 
 =cut
 
@@ -227,8 +223,6 @@ ensure_positionals_storage_ap(PARROT_INTERP,
 
 =item C<static Pcc_cell* get_cell_at(PARROT_INTERP, PMC *self, INTVAL key)>
 
-
-
 =cut
 
 */
@@ -247,8 +241,6 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 /*
 
 =item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
-
-
 
 =cut
 
@@ -281,8 +273,6 @@ autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 
 =item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
 
-
-
 =cut
 
 */
@@ -313,8 +303,6 @@ autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 /*
 
 =item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
-
-
 
 =cut
 
@@ -347,8 +335,6 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 /*
 
 =item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
-
-
 
 =cut
 
@@ -388,8 +374,6 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
 
 =item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
 
-
-
 =cut
 
 */
@@ -420,8 +404,6 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
 
 =item C<static void mark_cell(PARROT_INTERP, Pcc_cell *c)>
 
-
-
 =cut
 
 */
@@ -451,8 +433,6 @@ mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 
 =item C<static void mark_positionals(PARROT_INTERP, PMC *self)>
 
-
-
 =cut
 
 */
@@ -479,8 +459,6 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 
 =item C<static void mark_hash(PARROT_INTERP, Hash *h)>
 
-
-
 =cut
 
 */
@@ -506,8 +484,6 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 /*
 
 =item C<static PMC * get_named_names(PARROT_INTERP, PMC *SELF)>
-
-
 
 =cut
 
