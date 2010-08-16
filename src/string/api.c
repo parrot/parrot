@@ -1350,6 +1350,9 @@ Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a),
 {
     ASSERT_ARGS(Parrot_str_compare_offset)
 
+    if (a->encoding == b->encoding)
+        return memcmp(a->strstart + offset, b->strstart, length);
+
     /* do these make sense? */
     if (STRING_IS_NULL(b))
         return a && (a->strlen != 0);
@@ -1360,7 +1363,7 @@ Parrot_str_compare_offset(PARROT_INTERP, ARGIN(const STRING *a),
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
 
-    /* XXX: sanitize offset */
+    /* XXX: sanitize offset, make length work */
     return CHARSET_COMPARE_OFFSET(interp, a, b, offset);
 }
 
