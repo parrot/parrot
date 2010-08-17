@@ -85,6 +85,16 @@ static INTVAL get_attrib_index_keyed(PARROT_INTERP,
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
 
+/*
+
+=item C<static INTVAL get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)>
+
+
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
 get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
@@ -138,10 +148,17 @@ get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
     return -1;
 }
 
+/*
 
-/* This variation bypasses the cache and finds the index of a particular
- * parent's attribute in an object's attribute store and returns it. Returns -1
- * if the attribute does not exist. */
+=item C<static INTVAL get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)>
+
+This variation bypasses the cache and finds the index of a particular
+parent's attribute in an object's attribute store and returns it.
+Returns C<-1> if the attribute does not exist.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
@@ -176,6 +193,15 @@ get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(S
     return -1;
 }
 
+/*
+
+=item C<static PMC * find_cached(PARROT_INTERP, PMC *_class, STRING *name)>
+
+
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -192,6 +218,15 @@ find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
     return VTABLE_get_pmc_keyed_str(interp, cache, name);
 }
 
+/*
+
+=item C<static void cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC *method)>
+
+
+
+=cut
+
+*/
 
 static void
 cache_method(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name),
