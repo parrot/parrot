@@ -98,6 +98,18 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void add_to_class(PARROT_INTERP,
+    Parrot_NameSpace_attributes *nsinfo, PMC *classobj,
+    STRING *key, PMC *value)>
+
+
+
+=cut
+
+*/
+
 static void
 add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
         ARGMOD_NULLOK(PMC *classobj), ARGIN(STRING *key), ARGIN(PMC *value))
@@ -119,6 +131,16 @@ add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
         VTABLE_set_pmc_keyed_str(interp, nsinfo->methods, key, value);
     }
 }
+
+/*
+
+=item C<static int ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)>
+
+
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -181,6 +203,16 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
     return stored;
 }
 
+/*
+
+=item C<static int maybe_add_sub_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)>
+
+
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static int
 maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
@@ -197,6 +229,16 @@ maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 
     return 0;
 }
+
+/*
+
+=item C<static void add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)>
+
+
+
+=cut
+
+*/
 
 static void
 add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
@@ -215,6 +257,16 @@ add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         add_to_class(interp, nsinfo, classobj, key, value);
     }
 }
+
+/*
+
+=item C<static void add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)>
+
+
+
+=cut
+
+*/
 
 static void
 add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
