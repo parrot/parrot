@@ -1,6 +1,8 @@
+# $Id$
+
 =head1 TITLE
 
-Stream::Base - Stream library base class
+Stream;Coroutine - Stream library coroutine class
 
 =head1 VERSION
 
@@ -25,17 +27,17 @@ TBD
     .local pmc coro
     .local int i
 
-    $P0 = get_class "Stream::Coroutine"
+    $P0 = get_class ['Stream'; 'Coroutine']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    get_class base, "Stream::Base"
-    subclass coro, base, "Stream::Coroutine"
+    get_class base, ['Stream'; 'Base']
+    subclass coro, base, ['Stream'; 'Coroutine']
 END:
 .end
 
-.namespace ["Stream::Coroutine"]
+.namespace ['Stream'; 'Coroutine']
 
 =item source."rawRead"() (B<internal>)
 
@@ -68,7 +70,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

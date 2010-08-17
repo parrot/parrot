@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 .namespace ['CGI'; 'QueryHash']
@@ -69,9 +69,11 @@ Get parameters for POST method.
         .local int len
         content_length  = my_env['CONTENT_LENGTH']
         len             = content_length
-        in              = getstdin
-        query           = read in, len
-        close in
+        $P0             = getinterp
+        .include 'stdio.pasm'
+        in              = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+        query           = in.'read'(len)
+        in.'close'()
         #_dumper( query, 'queryPOST:' )
         query_hash = parse( query )
 
@@ -93,7 +95,7 @@ Split into a hash.
     unless query goto END
 
     .local pmc query_hash, items, items_tmp_1, items_tmp_2
-    .local string query, kv, k, v, item_tmp_1, item_tmp_2, last_chars_of_k
+    .local string kv, k, v, item_tmp_1, item_tmp_2, last_chars_of_k
     .local int i, j, n, o, len_of_k
 
     query_hash      = new 'Hash'
@@ -143,7 +145,7 @@ set_val:
         # TODO: This should be an array
         v_array = new 'Hash'
         v_array[0] = v
-        substr k, -2, 2, ''
+        k = replace k, -2, 2, ''
         query_hash[k] = v_array
         branch next_item
 v_isnt_array:
@@ -203,7 +205,7 @@ END:
 .sub hex_to_int
     .param pmc hex
 
-    .return hex.'to_int'(16)
+    .tailcall hex.'to_int'(16)
 .end
 
 =back

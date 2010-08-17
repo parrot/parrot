@@ -1,7 +1,0 @@
-$Id$
-
-HQ9plus is a non turing-complete language.
-Type 'make test' and take a look at the test scripts in 't'.
-
-See http://en.wikipedia.org/wiki/HQ9+ and
-http://www.esolangs.org/wiki/HQ9_Plus for details.

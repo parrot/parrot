@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 006-bad_step.t
 
@@ -15,7 +15,7 @@ use Parrot::Configure::Options qw( process_options );
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},

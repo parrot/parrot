@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ use Parrot::Configure::Utils qw( :inter capture_output check_progs );
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether make is installed};
+    $data{description} = q{Is make installed};
     $data{result}      = q{};
     return \%data;
 }
@@ -38,14 +38,31 @@ sub runstep {
     # undef means we don't have GNU make... default to not having it
     $conf->data->set( gmake_version => undef );
 
+    my $candidates;
+    if ( $^O eq 'cygwin') {
+        # On Cygwin prefer make over nmake.
+        $candidates = ['gmake', 'make'];
+    }
+    elsif ($conf->option_or_data('cc') =~ /cl(\.exe)?$/i) {
+        # Windows, Visual C++, prefer nmake
+        # This test should use something more stable than the compiler
+        # executable name.  'msvcversion' might be good, but is determined
+        # after this check.
+        $candidates = [ 'nmake', 'mingw32-make', 'gmake', 'make' ];
+    }
+    else {
+        # Default
+        $candidates = ['gmake', 'mingw32-make', 'nmake', 'make'];
+    }
+
     my $prog;
 
     # check the candidates for a 'make' program in this order:
     # environment ; option ; probe ; ask ; default
-    # first pick wins. On cygwin prefer make over nmake.
+    # first pick wins.
     $prog ||= $ENV{ uc($util) };
     $prog ||= $conf->options->get($util);
-    $prog ||= check_progs( $^O eq 'cygwin' ? ['gmake', 'make'] : ['gmake', 'mingw32-make', 'nmake', 'make'], $verbose );
+    $prog ||= check_progs( $candidates, $verbose );
     if ( !$prog ) {
         $prog = ( $conf->options->get('ask') )
             ? prompt( $prompt, $prog ? $prog : $conf->data->get($util) )
@@ -59,7 +76,7 @@ sub runstep {
         $self->set_result('yes');
     }
     else {
-        $prog = check_progs( [ 'gmake', 'mingw32-make', 'nmake', 'make' ], $verbose );
+        $prog = check_progs( $candidates, $verbose );
 
         unless ($prog) {
 
@@ -103,7 +120,7 @@ sub _set_make_c {
         # get the default value
         my $make_c = $conf->data->get('make_c');
 
-        # RT#43171 this is an ugly hack
+        # TT #1049: this is an ugly hack
         # replace the value for $(MAKE) with the actual path or we'll end up
         # with a variable that recursively refers to itself
         $make_c =~ s/\$\(MAKE\)/$prog/;

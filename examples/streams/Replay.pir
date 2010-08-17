@@ -1,11 +1,14 @@
+# Copyright (C) 2004-2009, Parrot Foundation.
+# $Id$
+
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Writer.pir"
-    load_bytecode "library/Stream/Replay.pir"
+    load_bytecode 'Stream/Writer.pbc'
+    load_bytecode 'Stream/Replay.pbc'
 
-    stream = new "Stream::Writer"
-    $P0 = global "_reader"
+    stream = new ['Stream'; 'Writer']
+    $P0 = get_global "_reader"
     assign stream, $P0
 
     stream."write"( "1" )
@@ -25,7 +28,7 @@
     .local pmc stream3
     .local string str
 
-    stream1 = new "Stream::Replay"
+    stream1 = new ['Stream'; 'Replay']
     assign stream1, self
 
     print "reader start\n"

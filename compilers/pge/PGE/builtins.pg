@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
+
 grammar PGE::Grammar;
 
 token name { <ident> [ \:\: <ident> ]* }

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,6 +13,9 @@ You're already on the right track. This FAQ should help you find everything you
 need to become an active member of the Parrot community. Just look through the
 questions below and read the ones that apply to you.
 
+More current information is also available at
+L<https://trac.parrot.org/parrot/wiki/NewParrotDeveloperGuide>.
+
 =head2 Where can I get Parrot?
 
 =over 4
@@ -22,44 +25,33 @@ questions below and read the ones that apply to you.
 There is a web interface to the subversion repository, in case you just want to
 browse the source.
 
-L<http://svn.perl.org/viewcvs/parrot/>
+L<https://trac.parrot.org/parrot/browser>
 
 =item *
 
-The easiest solution is to grab the most recent snapshot of the Parrot SVN
-repository. It's a tar-gzipped download of a recent checkout of Parrot, updated
-every six hours. You can find it here:
+The easiest solution is to grab the latest monthly development release. You can
+find it here:
 
-L<http://svn.perl.org/snapshots/parrot/parrot-latest.tar.gz>
-
-=item *
-
-Even better is the option to use SVN, which gets you the very latest copy of
-the Parrot distribution. The procedure for this is:
-
-    svn checkout https://svn.perl.org/parrot/trunk parrot
+L<http://www.parrot.org/release/current>
 
 =item *
 
-If you're one of those rsync folks, you can access the repository with:
+An even better option is to use SVN, which gets you the very latest copy of the
+Parrot distribution. The procedure for this is:
 
-C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
+    svn checkout https://svn.parrot.org/parrot/trunk parrot
 
 =item *
 
 If you're using git-svn, you should check out just the latest version. First:
 
-C<svn info https://svn.perl.org/parrot>
-
-Note the current revision. Then:
-
-C<< git svn clone -s -r <revision> https://svn.perl.org/parrot >>
+C<< git svn clone -s -r HEAD https://svn.parrot.org/parrot >>
 
 =back
 
 The above instructions are also on the Parrot website:
 
-L<http://www.parrotcode.org/source.html>
+L<http://www.parrot.org/download>
 
 =head2 Now that I've got Parrot, what do I do?
 
@@ -81,7 +73,7 @@ Run C<make> to compile everything and build parrot.
 
 =item 3
 
-Run C<make test> to run the test suite and verify that everything works on 
+Run C<make test> to run the test suite and verify that everything works on
 your system.
 
 =back
@@ -149,31 +141,31 @@ opposed to a verbatim translation of code.
 =head2 Where can I find the main developer mailing list?
 
 Most of the Parrot-related development discussion occurs on the
-parrot-porters (aka perl6-internals) mailing list. There are a variety
-of interfaces to the list:
+parrot-dev (previously known as parrot-porters and perl6-internals) mailing
+list. There are a variety of interfaces to the list:
 
 =over 4
 
 =item * Developer Mailing List Interface (subscribing, unsubscribing, etc)
 
-L<http://lists.perl.org/showlist.cgi?name=perl6-internals>
+L<http://lists.parrot.org/mailman/listinfo/parrot-dev>
 
 =item * Parrot NNTP Interface
 
-L<news://nntp.perl.org/perl.perl6.internals>
+L<nntp://news.gmane.org/gmane.comp.compilers.parrot.devel>
 
-L<http://nntp.x.perl.org/group/perl.perl6.internals>
+=item * Parrot Archives, RSS
 
-=item * Parrot Archives, RSS 
+L<http://groups.google.com/group/parrot-dev> provides archives, search,
+and RSS feeds.
 
-L<http://groups.google.com/group/perl.perl6.internals/about> provides
-archives, search, and RSS feeds.
+L<http://news.gmane.org/gmane.comp.compilers.parrot.devel>
 
-L<http://www.nntp.perl.org/group/perl.perl6.internals>
+L<http://lists.parrot.org/pipermail/parrot-dev/>
 
 =back
 
-In addition, there is a mailing list which logs all commits to the Parrot SVN 
+In addition, there is a mailing list which logs all commits to the Parrot SVN
 repository. If you're interested in Parrot development, you might find it very
 helpful to subscribe and keep up on changes that people are making.
 
@@ -181,19 +173,19 @@ helpful to subscribe and keep up on changes that people are making.
 
 =item * Mailing List Interface (subscribing, unsubscribing, etc)
 
-L<http://lists.perl.org/showlist.cgi?name=cvs-parrot>
+L<http://lists.parrot.org/mailman/listinfo/parrot-commits>
 
 =item * Parrot Commits NNTP Interface
 
-L<news://nntp.perl.org/perl.cvs.parrot>
+L<...>
 
-L<http://nntp.x.perl.org/group/perl.cvs.parrot>
+L<...>
 
 =item * Commit List Archives, RSS
 
-L<http://groups.google.com/group/perl.cvs.parrot/about>
+L<...>
 
-L<http://www.nntp.perl.org/group/perl.cvs.parrot>
+L<http://lists.parrot.org/pipermail/parrot-commits/>
 
 =back
 
@@ -203,59 +195,20 @@ L<http://www.nntp.perl.org/group/perl.cvs.parrot>
 The mailing list is the main resource for Parrot development. However, there
 is an IRC channel which you may find useful if your problem is better solved
 with real-time discussion.  Visit the channel #parrot on the IRC
-server L<irc.perl.org>.  Alternative IRC servers are
+server L<irc.parrot.org>.  Alternative IRC servers are
 L<irc.rhizomatic.net> and L<irc.pobox.com>.
 
 
 
 =head2 I've developed a patch. What should I do with it?
 
-There's a lot of traffic that goes through the mailing list, and it's quite 
-possible that if you send patches directly to the mailing list, they will get 
-lost in the mailboxes of those with commit access.
-
-As such, a better solution would be to submit your patch to RT, the request 
-tracker system that maintains bugs and patches for the Parrot project. To 
-visit RT, go here:
-
-L<https://rt.perl.org/rt3/>
-
-Or if you want to submit a patch, send an email to
-C<parrotbug@parrotcode.org> with the moniker [PATCH] (including the brackets)
-at the start of the subject so that it can be appropriately tagged in the RT
-system. Please note that you do B<not> have to CC C<parrot-porters@perl.org>
-when reporting a bug. The RT system will correctly handle that on its own.
-
-A listing of the pending patches can be found here:
-
-L<http://www.parrotcode.org/openpatches>
-
-
+See F<docs/submissions.pod> for details.
 
 =head2 I've found a bug, what now?
 
-Well, if you know enough about the bug that you can fix the problem, please do
-so. Then you can create a patch and submit it to the list, with a better chance
-of your bug getting attention. If you're not able to solve it on your own,
-we're still interested in seeing what the problem is, and hopefully helping to
-resolve it. To report a bug, email C<parrotbug@parrotcode.org> with a brief
-description of your bug in the subject. For more information about the bug
-management system, see the previous question.
-
-
+See F<docs/submissions.pod> for details.
 
 =head2 What other useful resources are there for developers?
 
-There are several other useful resources that can be found via:
-
-L<http://www.parrotcode.org/resources>
-
-=over 4
-
-=item * Parrot Wiki
-
-Located at:
-
-L<http://www.parrotcode.org/wiki>
-
-=back
+A number of other useful resources that can be found via on the Parrot
+wiki, located at L<http://trac.parrot.org/parrot/wiki>.

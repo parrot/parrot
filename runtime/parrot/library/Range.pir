@@ -1,3 +1,6 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Range
 
 Based on the Range object described in S03:
@@ -5,7 +8,7 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
 
 =cut
 
-.HLL 'parrot', ''
+.HLL 'parrot'
 .namespace [ 'Range' ]
 
 =head1 macros
@@ -13,9 +16,9 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
 =cut
 
 .macro exhausted_check()
-  .local pmc exhausted
-  exhausted = getattribute self, 'exhausted'
-  unless exhausted goto .$more
+  .local pmc exhausted_check
+  exhausted_check = getattribute self, 'exhausted'
+  unless exhausted_check goto .$more
   .local pmc exception
   exception = new 'Exception'
   exception[0] = 'Exhausted Range'
@@ -45,9 +48,6 @@ Create the class, with attributes, when this PBC is loaded.
   addattribute $P1, 'by'
   addattribute $P1, 'exhausted'
 .end
-
-# RT#42430
-# :method is only specified here so we can get 'self'
 
 =head1 :vtable
 
@@ -131,7 +131,7 @@ Return the min and max attributes as a 2 element list.
 =cut
 
 .sub get_minmax :method
-  $P1 = new 'Array'
+  $P1 = new 'ResizablePMCArray'
   $P1 = 2
   .local pmc min, max
   min = self.'get_min'()
@@ -152,7 +152,7 @@ Throw an exception if we're out of values.
 .sub 'shift' :vtable('shift_pmc') :method
   .exhausted_check()
 
-  .local pmc exhausted, from, to, by
+  .local pmc from, to, by
   from = getattribute self, 'from'
   to   = getattribute self, 'to'
   by   = getattribute self, 'by'
@@ -171,9 +171,6 @@ exhaust:
 done:
   .return (from)
 .end
-
-# RT#42430
-# :method is only specified on the shift_* vtables for self.
 
 # Wrappers for the shift_pmc vtable - rely on autoboxing.
 .sub 'shift_integer' :vtable :method
@@ -222,9 +219,6 @@ exhaust:
 done:
   .return (to)
 .end
-
-# RT#42430
-# :method is only specified on the shift_* vtables for self.
 
 # Wrappers for the shift_pmc vtable - rely on autoboxing.
 .sub 'pop_integer' :vtable :method

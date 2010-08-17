@@ -1,0 +1,150 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/oplib.pmc
+
+=head1 DESCRIPTION
+
+Implements oplib VTABLEs.
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/oplib/core_ops.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass OpLib auto_attrs {
+    ATTR op_lib_t *oplib;
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "OpLib must be initialized with an oplib name");
+    }
+
+    VTABLE void init_pmc(PMC *name_pmc) {
+        STRING   *name      = VTABLE_get_string(INTERP, name_pmc);
+        char     *name_cstr = Parrot_str_to_cstring(INTERP, name);
+        op_lib_t *oplib     = NULL;
+        int       i;
+
+        if (STREQ(name_cstr, PARROT_CORE_OPLIB_NAME)) {
+            oplib = PARROT_CORE_OPLIB_INIT(INTERP, 1);
+        }
+        else {
+            for (i = 0; i < INTERP->n_libs; i++) {
+                if (STREQ(name_cstr, INTERP->all_op_libs[i]->name)) {
+                    oplib = INTERP->all_op_libs[i];
+                    break;
+                }
+            }
+        }
+
+        Parrot_str_free_cstring(name_cstr);
+
+        if (!oplib)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_LIBRARY_NOT_LOADED,
+                    "Could not find oplib `%S'", name);
+
+        SET_ATTR_oplib(INTERP, SELF, oplib);
+    }
+
+    /* Look up an opnumber given the name of the op. First we look for the
+       specific name, then the more general short name. */
+    VTABLE INTVAL get_integer_keyed_str(STRING *name) {
+        op_lib_t     *oplib;
+        char * const  cstr = Parrot_str_to_cstring(INTERP, name);
+        INTVAL        num;
+
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        num  = oplib->op_code(INTERP, cstr, 1);
+        if (num == -1)
+            num = oplib->op_code(INTERP, cstr, 0);
+
+        Parrot_str_free_cstring(cstr);
+        return num;
+    }
+
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        STRING *str_key = key_string(INTERP, key);
+        return SELF.get_integer_keyed_str(str_key);
+    }
+
+    VTABLE PMC* get_pmc_keyed_str(STRING *name) {
+        const INTVAL  num = STATICSELF.get_integer_keyed_str(name);
+        if (num == -1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "Opcode: Opcode %S not found", name);
+        return STATICSELF.get_pmc_keyed_int(num);
+    }
+
+    VTABLE PMC* get_pmc_keyed(PMC *key) {
+        STRING * const strkey = VTABLE_get_string(INTERP, key);
+        return VTABLE_get_pmc_keyed_str(INTERP, SELF, strkey);
+    }
+
+    VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        if ((UINTVAL)value >= oplib->op_count ||
+                     value <  0) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "OpLib `%s': Opcode index %d out of bounds", oplib->name, value);
+        }
+        else {
+            PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
+            VTABLE_set_integer_native(INTERP, op, value);
+            VTABLE_set_pointer(INTERP, op, &oplib->op_info_table[value]);
+            return op;
+        }
+    }
+
+    VTABLE INTVAL elements() {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        return oplib->op_count;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return STATICSELF.elements();
+    }
+
+    VTABLE INTVAL get_integer() {
+        return STATICSELF.elements();
+    }
+
+    METHOD op_family(STRING *shortname)
+    {
+        char * const sname = Parrot_str_to_cstring(INTERP, shortname);
+        op_lib_t  *oplib;
+        op_info_t *table;
+        PMC *result = PMCNULL;
+        UINTVAL i;
+
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        table = oplib->op_info_table;
+        for (i = 0; i < oplib->op_count; ++i) {
+            if (strcmp(table[i].name, sname) == 0) {
+                if (PMC_IS_NULL(result))
+                    result = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+                VTABLE_push_pmc(INTERP, result, SELF.get_pmc_keyed_int(i));
+            }
+        }
+        Parrot_str_free_cstring(sname);
+        RETURN(PMC *result);
+    }
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

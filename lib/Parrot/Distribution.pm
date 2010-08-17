@@ -1,9 +1,9 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-Parrot::Distribution - Parrot Distribution Directory
+Parrot::Distribution - Info on the Parrot Distribution
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,9 @@ use warnings;
 use ExtUtils::Manifest;
 use File::Spec;
 
+use lib qw( lib );
+use Parrot::BuildUtil ();
+
 use base 'Parrot::Docs::Directory';
 
 =item C<new()>
@@ -50,51 +53,52 @@ Raises an exception if the distribution root is not found.
 
 =cut
 
-## i'm a singleton
-my $dist;
+{
+    my $dist; ## i'm a singleton
 
-sub new {
-    my ($class) = @_;
+    sub new {
+        my ($class) = @_;
 
-    return $dist if defined $dist;
+        return $dist if defined $dist;
 
-    my $self = bless {}, $class;
+        my $self = bless {}, $class;
 
-    return $self->_initialize;
-}
+        return $self->_initialize;
+    }
 
-sub _initialize {
-    my ($self) = @_;
+    sub _initialize {
+        my ($self) = @_;
 
-    my $file = 'README';
-    my $path = '.';
+        my $file = 'README';
+        my $path = '.';
 
-    while ( $self = $self->SUPER::new($path) ) {
-        if (    $self->file_exists_with_name($file)
-            and $self->file_with_name($file)->read =~ m/^This is Parrot/os )
-        {
-            $dist = $self;
-            last;
+        while ( $self = $self->SUPER::new($path) ) {
+            if (    $self->file_exists_with_name($file)
+                and $self->file_with_name($file)->read =~ m/^This is Parrot/os )
+            {
+                $dist = $self;
+                last;
+            }
+
+            $path = $self->parent_path();
         }
 
-        $path = $self->parent_path();
+        # non-object call syntax since $self is undefined
+        _croak( undef, "Failed to find Parrot distribution root\n" )
+            unless $self;
+
+        if ( defined $dist ) {
+            $self->_dist_files(
+                [
+                    sort keys %{
+                        ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) )
+                        },
+                ]
+            );
+        }
+
+        return $self;
     }
-
-    # non-object call syntax since $self is undefined
-    _croak( undef, "Failed to find Parrot distribution root\n" )
-        unless $self;
-
-    if ( defined $dist ) {
-        $self->_dist_files(
-            [
-                sort keys %{
-                    ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) )
-                    },
-            ]
-        );
-    }
-
-    return $self;
 }
 
 sub _croak {
@@ -134,45 +138,59 @@ BEGIN {
 
 =item C<is_git_co()>
 
-=item C<c_source_file_directories()>
+Check the type of checkout.
 
 =item C<c_header_file_directories()>
 
-=item C<pmc_source_file_directories()>
-
-=item C<yacc_source_file_directories()>
+=item C<c_source_file_directories()>
 
 =item C<lex_source_file_directories()>
 
 =item C<ops_source_file_directories()>
 
+=item C<perl_source_file_directories()>
+
+=item C<pir_source_file_directories()>
+
+=item C<pmc_source_file_directories()>
+
+=item C<yacc_source_file_directories()>
+
 Returns the directories which contain source files of the appropriate filetype.
 
-=item C<c_source_file_with_name($name)>
+=item C<c_header_file_with_name()>
 
-=item C<c_header_file_with_name($name)>
+=item C<c_source_file_with_name()>
 
-=item C<pmc_source_file_with_name($name)>
+=item C<lex_source_file_with_name()>
 
-=item C<yacc_source_file_with_name($name)>
+=item C<ops_source_file_with_name()>
 
-=item C<lex_source_file_with_name($name)>
+=item C<perl_source_file_with_name()>
 
-=item C<ops_source_file_with_name($name)>
+=item C<pir_source_file_with_name()>
+
+=item C<pmc_source_file_with_name()>
+
+=item C<yacc_source_file_with_name()>
 
 Returns the source file with the specified name and of the appropriate filetype.
 
-=item C<c_source_files()>
-
 =item C<c_header_files()>
 
-=item C<pmc_source_files()>
-
-=item C<yacc_source_files()>
+=item C<c_source_files()>
 
 =item C<lex_source_files()>
 
 =item C<ops_source_files()>
+
+=item C<perl_source_files()>
+
+=item C<pir_source_files()>
+
+=item C<pmc_source_files()>
+
+=item C<yacc_source_files()>
 
 Returns a sorted list of the source files listed within the MANIFEST of
 Parrot.  Returns a list of Parrot::IO::File objects of the appropriate filetype.
@@ -184,15 +202,15 @@ BEGIN {
         source => {
             c   => { file_exts => ['c'] },
             pmc => { file_exts => ['pmc'] },
-            pir => { file_exts => ['pir', 't'] },
+            pir => { file_exts => ['pir', 'pasm', 't'] },
             ops => { file_exts => ['ops'] },
             lex => {
                 file_exts   => ['l'],
-                except_dirs => [qw{ languages/lisp examples/library }],
+                except_dirs => [qw{ examples/library }],
             },
             yacc => { file_exts => ['y'] },
             perl => {
-                file_exts   => [ 'pl', 'pm', 'in', 't' ],
+                file_exts   => [ 'pl', 'pm', 't' ],
                 shebang     => qr/^#!\s*perl/,
                 shebang_ext => qr/.t$/,
             },
@@ -214,7 +232,7 @@ BEGIN {
                 ? @{ $file_class{$class}{$type}{except_dirs} }
                 : ();
             my $method = join '_' => $type, $class;
-            my $filter_ext = join '|' => map { "\\.${_}\$" } @exts;
+            my $filter_ext = join '|' => map { "\\.${_}\$|_${_}\\.in\$" } @exts;
             my $filter_dir = join
                 '|' => map { qr{\b$_\b} }
                 map { quotemeta($_) } @ignore_dirs,
@@ -230,14 +248,15 @@ BEGIN {
                 # and make a hash out of the directories
                 my %dirs =
                     map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
-                    grep { m|(?i)(?:$filter_ext)| } $self->_dist_files;
+                    grep { m/(?i)(?:$filter_ext)/ } $self->_dist_files;
 
                 # Filter out ignored directories
                 # and return the results
-                return sort
+                my @dirs = sort
                     map  { $self->directory_with_name($_) }
-                    grep { !m|(?:$filter_dir)| }
+                    grep { !m/(?:$filter_dir)/ }
                     keys %dirs;
+                return @dirs;
             };
 
             *{ $method . '_file_with_name' } = sub {
@@ -262,7 +281,7 @@ BEGIN {
                     }
                 }
 
-                print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found: ' . $name . "\n";
+                print '# WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found: ' . $name . "\n";
                 return;
             };
 
@@ -272,9 +291,11 @@ BEGIN {
                 # Look through the list of distribution files
                 # for files ending in the proper extension(s)
                 # and return a sorted list of filenames
-                return sort
+                my @files = sort
                     map  { $self->file_with_name($_) }
-                    grep { m|(?i)(?:$filter_ext)| } $self->_dist_files;
+                    grep { m/(?i)(?:$filter_ext)/ }
+                    $self->_dist_files;
+                return @files;
             };
         }
     }
@@ -298,6 +319,24 @@ Returns true if this is a git checkout of Parrot.
 
 sub is_git_co {
     return shift->directory_exists_with_name('.git');
+}
+
+=item C<get_make_language_files()>
+
+Returns the Make language source files within Parrot.
+
+=cut
+
+sub get_make_language_files {
+    my ($self) = @_;
+
+    # Look through the list of distribution files
+    # and return a sorted list of filenames
+    my @files = sort
+        map  { $self->file_with_name($_) }
+        grep { m{[/\\]makefiles[/\\][a-z]+\.in$} }
+        $self->_dist_files;
+    return @files;
 }
 
 =item C<get_c_language_files()>
@@ -332,9 +371,7 @@ sub get_c_language_files {
         $self->c_header_files,
         $self->pmc_source_files,
         $self->yacc_source_files,
-
-        #$self->lex_source_files,
-        map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
+        $self->lex_source_files,
         $self->ops_source_files,
     );
 
@@ -345,9 +382,6 @@ sub get_c_language_files {
     }
 
     return @c_language_files;
-
-    # RT #43691: lex_source_files() collects lisp files as well.
-    # RT #50046: pir_source_files() fails to collect PIR .t files.
 }
 
 =item C<is_c_exemption()>
@@ -368,21 +402,24 @@ This is to exclude automatically generated C-language files Parrot might have.
             config/auto/cpu/i386/memcpy_mmx_in.c
             config/auto/cpu/i386/memcpy_sse.c
             config/auto/cpu/i386/memcpy_sse_in.c
+            config/gen/config_h/feature_h.in
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
             compilers/imcc/imcparser.h
-            compilers/pirc/new/main.c
-            compilers/pirc/new/pir.l
-            compilers/pirc/new/pir.y
-            compilers/pirc/new/pasm.l
-            compilers/pirc/new/pasm.y
-            compilers/pirc/new/pircompiler.h
-            compilers/pirc/new/pirlexer.c
-            compilers/pirc/new/pirlexer.h
-            compilers/pirc/new/pirparser.c
-            compilers/pirc/new/pirparser.h
-            compilers/pirc/new/pircompunit.c
-            compilers/pirc/new/pircompunit.h
+            compilers/pirc/src/main.c
+            compilers/pirc/src/pir.l
+            compilers/pirc/src/pir.y
+            compilers/pirc/src/pasm.l
+            compilers/pirc/src/pasm.y
+            compilers/pirc/src/pircompiler.h
+            compilers/pirc/src/pirlexer.c
+            compilers/pirc/src/pirlexer.h
+            compilers/pirc/src/pirparser.c
+            compilers/pirc/src/pirparser.h
+            compilers/pirc/src/pircompunit.c
+            compilers/pirc/src/pircompunit.h
+            compilers/pirc/src/hdocprep.l
+            compilers/pirc/src/hdocprep.c
             compilers/pirc/macro/lexer.h
             compilers/pirc/macro/macro.h
             compilers/pirc/macro/macro.l
@@ -391,12 +428,13 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/pirc/macro/macrolexer.h
             compilers/pirc/macro/macroparser.c
             compilers/pirc/macro/macroparser.h
-            compilers/pirc/heredoc/hdocprep.l
-            compilers/pirc/heredoc/hdocprep.c
-            languages/cola/lexer.c
-            languages/cola/parser.c
-            languages/cola/parser.h
-            src/malloc.c
+            include/parrot/config.h
+            include/parrot/has_header.h
+            include/parrot/oplib/core_ops.h
+            include/parrot/oplib/ops.h
+            include/parrot/opsenum.h
+            src/gc/malloc.c
+            src/ops/core_ops.c
             } unless @exemptions;
 
         my $path = -f $file ? $file : $file->path;
@@ -414,8 +452,6 @@ Returns the Perl language source files within Parrot.  Namely:
 =item Perl source files C<*.pl>
 
 =item Perl module files C<*.pm>
-
-=item .in files C<*.in>
 
 =item test files C<*.t>
 
@@ -470,16 +506,15 @@ sub get_perl_exemption_regexp {
 
     my $parrot_dir = $self->path();
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
-        languages/regex/lib/Regex/Grammar.pm
-        languages/pipp/src/pct/actions.pm
-        languages/hq9plus/src/parser/actions.pm
         compilers/nqp/
+        compilers/ncigen/src/parser/actions.pm
+        examples/sdl/
+        examples/languages/squaak/src/parser/actions.pm
         lib/Digest/Perl/
         lib/File/
         lib/IO/
         lib/Pod/
-        lib/SmartLink.pm
-        examples/sdl/
+        ext/
     };
 
     my $regex = join '|', map { quotemeta $_ } @paths;
@@ -503,10 +538,11 @@ sub is_perl {
 
     # modules and perl scripts should always be tested..
     return 1 if $filename =~ /\.(?:pm|pl)$/;
+    return 1 if $filename =~ /_(?:pm|pl)\.in$/;
 
-    # test files (.t) and configure (.in) files might need testing.
+    # test files (.t) might need testing.
     # ignore everything else.
-    return 0 unless $filename !~ /\.(?:t|in)$/;
+    return 0 if $filename !~ /\.t$/;
 
     # Now let's check to see if there's a perl shebang.
 
@@ -534,12 +570,26 @@ sub get_pir_language_files {
     # make sure we're picking up pir files (i.e. look for the shebang line)
     my @pir_files;
     for my $file ( $self->pir_source_files ) {
+        next if $self->is_pir_exemption($file);
         push @pir_files, $file
             if $self->is_pir( $file->path );
     }
 
     return @pir_files;
 }
+
+=item C<is_pir_exemption()>
+
+Determines if the given filename is an exemption to being in the PIR source.
+This is to exclude automatically generated PIR-language files Parrot might have.
+
+=cut
+
+sub is_pir_exemption {
+    my ( $self, $file ) = @_;
+    return $file->path =~ m{/ext/};
+}
+
 
 =item C<is_pir()>
 
@@ -556,11 +606,12 @@ sub is_pir {
     return 0 unless -f $filename;
 
     # .pir files should always be tested
-    return 1 if $filename =~ /\.pir$/;
+    return 1 if $filename =~ /\.(?:pir|pasm)$/;
+    return 1 if $filename =~ /_(?:pir|pasm)\.in$/;
 
     # test files (.t) files might need testing.
     # ignore everything else.
-    return 0 unless $filename !~ /\.t$/;
+    return 0 if $filename !~ /\.t$/;
 
     # Now let's check to see if there's a plain parrot shebang.
     open my $file_handle, '<', $filename
@@ -568,7 +619,7 @@ sub is_pir {
     my $line = <$file_handle>;
     close $file_handle;
 
-    if ( $line && $line =~ /^#!.*parrot/ ) {
+    if ( $line && $line =~ /^#!.*parrot(?:\s|$)/ ) {
         # something that specifies a pir or pbc is probably a HLL, skip it
         return 0 if $line =~ /\.(?:pir|pbc)/;
         return 1;
@@ -613,21 +664,7 @@ sub perl_script_file_directories {
     my $self = shift;
 
     return map $self->directory_with_name($_) => 'compilers/imcc',
-        'editor', 'examples/benchmarks', 'examples/mops', 'languages',
-        map( "languages/$_" => qw<
-            APL/tools
-            BASIC/compiler BASIC/interpreter
-            WMLScript/build
-            dotnet dotnet/build dotnet/tools
-            lua
-            m4/tools
-            pipp
-            python
-            regex
-            scheme scheme/Scheme
-            tcl/tools
-            urm
-            > ),
+        'editor', 'examples/benchmarks', 'examples/mops',
         map( "tools/$_" => qw<build dev docs util> ),;
 }
 
@@ -668,33 +705,6 @@ sub perl_module_file_directories {
             auto/cpu/sun4 auto/cpu/x86_64
             gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter> ),
         'ext/Parrot-Embed/lib/Parrot',
-        map( "languages/$_" => qw<
-            APL/t
-            BASIC/compiler
-            HQ9plus/lib/Parrot/Test
-            WMLScript/build/SRM WMLScript/t/Parrot/Test
-            bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
-            dotnet/build/SRM dotnet/t
-            jako/lib/Jako
-            jako/lib/Jako/Construct
-            lua/Lua lua/t/Parrot/Test
-            m4/lib/Parrot/Test m4/lib/Parrot/Test/M4
-            parrot_compiler/lib/Parrot/Test
-            perl6/t/01-sanity
-            pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp
-            pugs/t
-            regex/lib
-            scheme scheme/Scheme
-            tcl/lib/Parrot/Test
-            urm/lib/URM
-            > ),
-        map( "languages/jako/lib/Jako/Construct/$_" => qw<
-            Block Block/Conditional Block/Loop Declaration
-            Expression Expression/Value Statement Type
-            > ),
-        map( "languages/regex/lib/$_" => qw<
-            Parrot/Test Regex Regex/CodeGen Regex/Ops Regex/Parse
-            > ),
         map( "lib/$_" => qw<
             Class Digest/Perl File Parrot Parse Pod Pod/Simple Test Text
             > ),
@@ -774,7 +784,7 @@ sub generated_files {
     my $self = shift;
 
     my $generated = ExtUtils::Manifest::maniread('MANIFEST.generated');
-    my $path      = $dist->path();
+    my $path      = $self->path();
 
     return {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }

@@ -1,14 +1,12 @@
 #!perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More;
 use Parrot::Test tests => 1;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -35,13 +33,13 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 # Set up expected output for examples
 
 # cannot test the exact result, just adding one method somewhere
-# changes all. Also namespaces are hashes. While we preserve
-# insert order, we do not gurantee any specific order.
-# test the name of the 2 toplevel names,  parrot is using
+# changes all. Also namespaces are hashes.  And we do not gurantee any specific
+# order of keys.  test the name of the 2 toplevel names,  parrot is using
 my %expected = (
     'namespace_dump.pir' => << 'END_EXPECTED',
-/^parrot.*
-^__parrot_core/sm
+/(?:^parrot.*
+^MULTI\s=>\sMULTI)|(?:^MULTI\s=>\sMULTI.*
+^parrot.*)/sm
 END_EXPECTED
 );
 

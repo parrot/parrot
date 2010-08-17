@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 5;
 use Parrot::Config;
 
 =head1 NAME
@@ -31,14 +31,6 @@ F<t/examples/pir.t>
 
 # Set up expected output for examples
 my %expected = (
-    'bsr_ret.pasm' => << 'END_EXPECTED',
-Main
-TestSub
-NestSub
-TestSub: Ret from NestSub
-Main: Return from TestSub
-END_EXPECTED
-
     'coroutine.pasm' => << 'END_EXPECTED',
 Calling 1st co-routine
 Entry
@@ -48,19 +40,6 @@ Calling 2nd co-routine
 Entry
 Resumed
 Done
-END_EXPECTED
-
-    'jsr_ret.pasm' => << 'END_EXPECTED',
-Example of the jump op.
-
-Jumping to subroutine SUB_1.
-Entered subroutine SUB_1.
-Returning from subroutine SUB_1.
-Returned from subroutine SUB_1.
-Jumping to subroutine SUB_2.
-Entered subroutine SUB_2.
-Returning from subroutine SUB_2.
-Returned from subroutine SUB_2.
 END_EXPECTED
 
     'pasm_sub1.pasm' => << 'END_EXPECTED',

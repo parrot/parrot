@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -22,24 +22,22 @@ Tests the I/O Iterator PMC described in PDD22.
 
 =cut
 
-# RT#46849 create helper functions to put data in an i/o pmc
-
 # L<PDD22/I\/O Iterator PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P99 = 1 # RT#46847 replace with io object
-    $P0 = new 'Iterator', $P99
-    say "ok 1 - $P0 = new 'Iterator', $P1"
+    $P99 = 1 # TT #1242 replace with io object
+    $P0 = iter $P99
+    say "ok 1 - $P0 = iter $P1"
 .end
 CODE
-ok 1 - $P0 = new 'Iterator', $P1
+ok 1 - $P0 = iter $P1
 OUT
 
 # L<PDD22/I\/O Iterator PMC API/=item shift>
 pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P99 = 1 # RT#46847 replace with io object
-    $P0 = new 'Iterator', $P99
+    $P99 = 1 # TT #1242 replace with io object
+    $P0 = iter $P99
 
     $S0 = shift $P0
 
@@ -48,7 +46,7 @@ pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented' );
   ok_1:
     say 'ok 1 - $S0 = shift $P1 # success'
 
-    # RT#46851 test more return values, including end of file
+    # TT #1206  test more return values, including end of file
 .end
 CODE
 ok 1 - $I0 = shift $P1 # success
@@ -57,8 +55,8 @@ OUT
 # L<PDD22/I\/O Iterator PMC API/=item get_bool (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P99 = 1 # RT#46847 replace with io object
-    $P0 = new 'Iterator', $P99
+    $P99 = 1 # TT #1242 replace with io object
+    $P0 = iter $P99
 
     # empty i/o object
     unless $P0 goto ok_1
@@ -66,7 +64,7 @@ pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemen
   ok_1:
     say 'ok 1 - $P0 # empty i/o object returns false'
 
-    # RT#46853 setup i/o object with two lines
+    # TT #1242 setup i/o object with two lines
     if $P0 got ok_2
     print 'not '
   ok_2:

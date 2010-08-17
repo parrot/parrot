@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ use ExtUtils::Manifest qw(manicheck);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Checking MANIFEST};
+    $data{description} = q{Check MANIFEST};
     $data{result}      = q{};
     return \%data;
 }

@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004-2010, Parrot Foundation.
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
  */
 
 /*
@@ -38,7 +38,7 @@ as we are just having one timer.
 */
 
 void
-start_sys_timer_ms(void *handle, int ms)
+start_sys_timer_ms(SHIM(void *handle), int ms)
 {
     struct itimerval its;
     memset(&its, 0, sizeof (its));
@@ -77,7 +77,7 @@ given timer handle.
 */
 
 int
-get_sys_timer_ms(void *handle)
+get_sys_timer_ms(SHIM(void *handle))
 {
     struct itimerval ots;
     getitimer(ITIMER_REAL, &ots);
@@ -98,7 +98,7 @@ The returned handle is passed to the other timer functions.
 void *
 new_sys_timer_ms(void)
 {
-    return 0;
+    return NULL;
 }
 
 #else

@@ -1,13 +1,14 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
-
+use Cwd;
+use File::Spec::Functions;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Distribution;
-use Test::More tests => 1;
+use Test::More            tests => 1;
 
 =head1 NAME
 
@@ -34,29 +35,45 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
+my $cwd  = getcwd(); # cwd() has some bugs when parent directory is a symbolic link
 
-my $skip_files = $DIST->generated_files();
-my @c_files    = $DIST->get_c_language_files();
-my @perl_files = $DIST->get_perl_language_files();
-my @all_files  = ( @c_files, @perl_files );
+# Certain files, for various reasons, cannot have an
+# SVN Id tag.  We exclude them from examination by this test.
 
-my @files = @ARGV ? @ARGV : @all_files;
+my %known_exceptions = map {
+        $_ => 1,
+        ( catdir( $cwd, $_ ) ) => 1,
+    } (
+        catfile(qw/ examples pir quine_ord.pir/),
+        catfile(qw/ examples streams FileLines.pir/),
+        catfile(qw/ examples streams ParrotIO.pir/),
+    );
+
+my @files = grep { ! $known_exceptions{$_} }
+    ( @ARGV
+        ? <@ARGV>
+        : map { $_->path } (
+            $DIST->get_c_language_files(),
+            $DIST->get_make_language_files(),
+            $DIST->get_perl_language_files(),
+            $DIST->get_pir_language_files(),
+        )
+);
+
 my @no_id_files;
-
-my $id_line = '\$Id.*\$';
 
 foreach my $file (@files) {
 
-    # if we have command line arguments, the file is the full path
-    # otherwise, use the relevant Parrot:: path method
-    my $path = @ARGV ? $file : $file->path;
+    my $buf = $DIST->slurp($file);
 
-    next if exists $skip_files->{$path};
-
-    my $buf = $DIST->slurp($path);
-
-    if ( $buf !~ m{$id_line}m ) {
-        push @no_id_files, $path;
+    if ( $buf !~ m/\$Id
+                   (?:
+                    \$       # unexpanded tag, for git-svn users or for new files
+                    |
+                    :.*\$    # expanded tag, colon required
+                   )
+                  /xm ) {
+        push @no_id_files, $file;
         next;
     }
 }

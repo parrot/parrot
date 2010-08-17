@@ -1,18 +1,21 @@
+# Copyright (C) 2008-2009, Parrot Foundation.
+# $Id$
+
 .sub __library_data_dumper_onload :load
     .local pmc yd_class
-    yd_class = get_class "YAML::Dumper"
+    yd_class = get_class ['YAML'; 'Dumper']
     if null yd_class goto load_library
 
     goto END
 
   load_library:
-        load_bytecode "library/YAML/Dumper/Default.pir"
-        newclass $P0, "YAML::Dumper"
+        load_bytecode 'YAML/Dumper/Default.pbc'
+        newclass $P0, ['YAML'; 'Dumper']
 END:
     .return ()
 .end
 
-.namespace ["YAML::Dumper"]
+.namespace ['YAML'; 'Dumper']
 
 .sub yaml :method
     .param pmc dump
@@ -33,7 +36,7 @@ no_def_name:
     .local pmc ydd_class
 
     push_eh ERROR2
-        ydd_class = get_class "YAML::Dumper::Default"
+        ydd_class = get_class ['YAML'; 'Dumper'; 'Default']
         style     = ydd_class."new"()
     pop_eh
 
@@ -48,14 +51,15 @@ no_def_name:
     .return ( 1 )
 
 ERROR2:
-    print "can not find class YAML::Dumper::Default!\n"
+    pop_eh
+    print "can not find class ['YAML'; 'Dumper'; 'Default']!\n"
     end
     .return ( 0 )
 ERROR:
     print "Syntax:\n"
-    print "YAML::Dumper::yaml( pmc )\n"
-    print "YAML::Dumper::yaml( pmc, name )\n"
-    print "YAML::Dumper::yaml( pmc, name, indent )\n"
+    print "yaml( pmc )\n"
+    print "yaml( pmc, name )\n"
+    print "yaml( pmc, name, indent )\n"
     .return ( 0 )
 .end
 

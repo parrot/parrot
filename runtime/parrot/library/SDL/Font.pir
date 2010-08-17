@@ -8,11 +8,11 @@ SDL::Font - Parrot class representing fonts in Parrot SDL
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/SDL/Font.pir'
+    load_bytecode 'SDL/Font.pir'
 
     # create a new SDL::Font object
     .local pmc font
-    font = new 'SDL::Font'
+    font = new ['SDL'; 'Font']
 
     font.'init'( 'font_file'  => 'myfont.ttf', 'point_size' => 48 )
 
@@ -35,16 +35,16 @@ All SDL::Font objects have the following methods:
 
 =cut
 
-.namespace [ 'SDL::Font' ]
+.namespace [ 'SDL'; 'Font' ]
 
 .sub _sdl_init :load
     .local pmc init_ttf
-    init_ttf = find_global 'SDL', '_init_ttf'
+    init_ttf = get_hll_global ['SDL'], '_init_ttf'
     init_ttf()
 
     .local pmc   font_class
 
-    newclass     font_class, 'SDL::Font'
+    newclass     font_class, ['SDL'; 'Font']
     addattribute font_class, 'font'
     addattribute font_class, 'size'
 
@@ -65,7 +65,7 @@ drawn, in pixels.
     .param int    font_size :named( 'point_size' )
 
     .local pmc OpenFont
-    OpenFont = find_global 'SDL::NCI::TTF', 'OpenFont'
+    OpenFont = get_hll_global ['SDL'; 'NCI'; 'TTF'], 'OpenFont'
 
     .local pmc font
     font = OpenFont( font_name, font_size )
@@ -106,7 +106,7 @@ Whew.
     h = font_surface.'height'()
 
     .local pmc rect
-    rect = new 'SDL::Rect'
+    rect = new ['SDL'; 'Rect']
 
     rect.'init'( 'x' => 0, 'y' => 0, 'height' => h, 'width' => w )
 
@@ -133,17 +133,32 @@ C<SDL::Surface> containing the rendered font.
     font = self.'font'()
 
     .local pmc font_surface
-    font_surface = new 'SDL::Surface'
+    font_surface = new ['SDL'; 'Surface']
     font_surface.'init'( 'height' => 0, 'width' => 0 )
 
-    .local pmc RenderText_Solid
-    find_global RenderText_Solid, 'SDL::NCI::TTF', 'RenderText_Solid'
+# RNH use RenderUTF8 in preference to RenderText by default
+    .local pmc RenderUTF8_Solid
+    get_hll_global RenderUTF8_Solid, ['SDL'; 'NCI'; 'TTF'], 'RenderUTF8_Solid'
 
-    .local pmc color
-    color = color_pmc.'color'()
+    .local int color
+# RNH font routine takes color in the order rgb rather than bgr used by surface.pir hence cannot rely on color.get_integer
+    .local int component
+    .local pmc colors
+    colors = color_pmc.'color'()
+
+    component = colors['b']
+    component <<= 16
+    color = component
+
+    component = colors['g']
+    component <<= 8
+    color += component
+
+    component = colors['r']
+    color += component
 
     .local pmc font_surface_struct
-    font_surface_struct = RenderText_Solid( font, text, color )
+    font_surface_struct = RenderUTF8_Solid( font, text, color )
     font_surface.'wrap_surface'( font_surface_struct )
 
     .return( font_surface )
@@ -200,7 +215,7 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

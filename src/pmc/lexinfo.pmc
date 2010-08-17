@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, The Perl Foundation.
+Copyright (C) 2008-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -18,18 +18,18 @@ These are the vtable functions for the lexinfo PMC.
 
 */
 
-#include "parrot/parrot.h"
+#include "pmc/pmc_hash.h"
 
-/* included manually to prevent breaking C++ builds -- see RT #56534*/
-#include "pmc_hash.h"
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 /*
  * LexInfo contains a constant Hash with constant string
- * keys and integer indices - no marking and no pmc_ext
- * needed (except for freeze/thaw
+ * keys and integer indices
  */
 
-pmclass LexInfo need_ext provides hash no_ro {
+pmclass LexInfo extends Hash  provides hash no_ro auto_attrs {
 
 /*
 
@@ -51,42 +51,21 @@ subroutine.
     void class_init() {
 
         /* there is no pmclass const_pmc flag yet */
-        if (pass == 1)
-            interp->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
+        INTERP->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
 
     }
 
     VTABLE void init() {
-        real_exception(INTERP, NULL, INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Cannot create a LexInfo PMC without an initializer");
     }
 
     VTABLE void init_pmc(PMC *sub) {
         PARROT_ASSERT(PObj_constant_TEST(SELF));
-        PMC_pmc_val(SELF) = sub;
 
-        parrot_new_pmc_hash_x(SELF,
-            (PARROT_DATA_TYPE)enum_hash_int,
-            Hash_key_type_STRING,
-            (hash_comp_fn)string_equal,     /* STRING compare */
-            (hash_hash_key_fn)string_hash); /*        hash    */
-
-        PObj_active_destroy_SET(SELF);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Frees any malloced memory held by this PMC.
-
-=cut
-
-*/
-
-    void destroy() {
-        if (PMC_struct_val(SELF))
-            parrot_hash_destroy(INTERP, (Hash *)PMC_struct_val(SELF));
+        /* Set value type to INTVAL */
+        SELF.init_int((INTVAL)enum_type_INTVAL);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -96,29 +75,64 @@ Frees any malloced memory held by this PMC.
 Declare a lexical variable that is an alias for a PMC register.  The PIR
 compiler calls this method in response to a ".lex STRING, PREG" directive.
 
-=item C<INTVAL elements()>
-
-Returns the number of elements in the LexInfo hash.
-
 =cut
 
 */
 
     METHOD declare_lex_preg(STRING *name, INTVAL preg) {
-        parrot_hash_put(INTERP, (Hash*)PMC_struct_val(SELF), name, (void*)preg);
+        VTABLE_set_integer_keyed_str(INTERP, SELF, name, preg);
     }
 
-    VTABLE INTVAL elements() {
-        return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
+
+/*
+
+=item C<PMC *inspect_str(STRING *what)>
+
+Introspects this LexInfo structure. The only valid introspection key is
+C<symbols>, which gets an array of the names of the symbols in this lexpad.
+
+=cut
+
+*/
+
+    VTABLE PMC *inspect_str(STRING *what) {
+        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "symbols"))) {
+            PMC * const result    = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+            const Hash *hash      = (Hash *)SELF.get_pointer();
+            const UINTVAL entries = hash->entries;
+
+            UINTVAL found   = 0;
+            INTVAL  i;
+
+            for (i = hash->mask; i >= 0; --i) {
+                HashBucket *bucket = hash->bucket_indices[i];
+                while (bucket) {
+                    if (++found > entries)
+                        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                            "Detected corruption at LexInfo hash %p entries %d",
+                            hash, (int)entries);
+
+                    PARROT_ASSERT(bucket->key);
+                    VTABLE_push_string(INTERP, result, (STRING *)bucket->key);
+
+                    bucket = bucket->next;
+                }
+            }
+
+            return result;
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unknown introspection value '%S'", what);
     }
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Freeze/thaw interface used during freeze/thaw of the Sub PMC.
 The implementation of the Hash PMC is called.
@@ -127,38 +141,24 @@ The implementation of the Hash PMC is called.
 
 */
 
-    VTABLE void visit(visit_info *info) {
-        Parrot_Hash_visit(INTERP, SELF, info);
-    }
 
-    VTABLE void freeze(visit_info *info) {
-        Parrot_Hash_freeze(INTERP, SELF, info);
-    }
+    VTABLE void thaw(PMC *info) {
+        const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
+        const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
+        const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
+        Hash        *hash;
 
-    VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+        UNUSED(k_type);
+        UNUSED(v_type);
 
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL elems  = VTABLE_shift_integer(INTERP, io);
-            const INTVAL k_type = VTABLE_shift_integer(INTERP, io);
-            const INTVAL v_type = VTABLE_shift_integer(INTERP, io);
-            Hash        *hash;
+        PARROT_ASSERT(v_type == enum_hash_int);
+        /* TODO make a better interface for hash creation
+         * TODO create hash with needed types in the first place
+         */
 
-            UNUSED(k_type);
-            UNUSED(v_type);
-
-            PARROT_ASSERT(v_type == enum_hash_int);
-            /* TODO make a better interface for hash creation
-             * TODO create hash with needed types in the first place
-             */
-
-            SELF.init_pmc(NULL);
-            hash          = (Hash *)PMC_struct_val(SELF);
-            hash->entries = elems;
-        }
-        else {
-            SUPER(info);
-        }
+        SELF.init_pmc(NULL);
+        hash          = (Hash *)SELF.get_pointer();
+        hash->entries = elems;
     }
 }
 

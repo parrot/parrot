@@ -8,13 +8,13 @@ SDL::Sprite - Parrot class representing sprites in Parrot SDL
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/SDL/Sprite.pir'
+    load_bytecode 'SDL/Sprite.pir'
 
     # ... load a new SDL::Image into image
 
     # create a new SDL::Sprite object
     .local pmc sprite
-    sprite = new 'SDL::Sprite'
+    sprite = new ['SDL'; 'Sprite']
 
     # set the sprite's arguments
     sprite.'init'( 'surface'  => image, 'source_x' =>     0, 'source_y' =>     0, 'dest_x'   =>   270, 'dest_y'   =>   212, 'bgcolor'  => black )
@@ -43,12 +43,12 @@ A SDL::Sprite object has the following methods:
 
 =cut
 
-.namespace [ 'SDL::Sprite' ]
+.namespace [ 'SDL'; 'Sprite' ]
 
 .sub _initialize :load
 
     .local   pmc sprite_class
-    newclass     sprite_class, 'SDL::Sprite'
+    newclass     sprite_class, ['SDL'; 'Sprite']
 
     addattribute sprite_class, 'surface'
     addattribute sprite_class, 'source_rect'
@@ -143,14 +143,14 @@ set_height:
 done:
     # first the source rectangle
     .local pmc source_rect
-    source_rect = new 'SDL::Rect'
+    source_rect = new ['SDL'; 'Rect']
     source_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
 
     setattribute self, 'source_rect', source_rect
 
     # now the dest rectangle
     .local pmc rect
-    rect = new 'SDL::Rect'
+    rect = new ['SDL'; 'Rect']
     rect.'init'( 'x' => dest_x, 'y' => dest_y )
 
     setattribute self, 'rect', rect
@@ -158,7 +158,7 @@ done:
 
     # and now the previous rect
     .local pmc prev_rect
-    prev_rect = new 'SDL::Rect'
+    prev_rect = new ['SDL'; 'Rect']
     prev_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
 
     setattribute self, 'prev_rect', prev_rect
@@ -170,13 +170,13 @@ done:
 
     # the drawn rect
     .local pmc drawn_rect
-    drawn_rect = new 'SDL::Rect'
+    drawn_rect = new ['SDL'; 'Rect']
     drawn_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
     setattribute self, 'drawn_rect', drawn_rect
 
     # the undrawn rect
     .local pmc undrawn_rect
-    undrawn_rect = new 'SDL::Rect'
+    undrawn_rect = new ['SDL'; 'Rect']
     undrawn_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
     setattribute self, 'undrawn_rect', undrawn_rect
 
@@ -518,7 +518,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

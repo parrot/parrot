@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,9 +23,7 @@ See L<http://www.parrotblog.org/2008/03/targeting-parrot-vm.html>.
 
 =head2 How do I embed source locations in my code for debugging?
 
-Use C<#line 42 "file.pir"> for this. Note that this command must be in the first
-column; there must not be any leading space, otherwise the command is treated
-as a comment (due to the C<#> character).
+Use C<.line 42 "file.pir"> for this.
 
 =head1 Subroutines
 
@@ -33,54 +31,89 @@ as a comment (due to the C<#> character).
 
 This looks like a function call in many HLLs:
 
+=begin PIR_FRAGMENT
+
    $P0( $P1, $P2, $P3 )
 
+=end PIR_FRAGMENT
+
 where $P0 is the function object, and $P1, $P2, and $P3 are its
-parameters. You can also use a function's label in place of the
-object:
+parameters. You can also use a function's name in place of the
+object, as long as it's in the same namespace.
+
+=begin PIR_FRAGMENT
 
    somefunctionlabel( $P1, $P2, $P3 )
 
+=end PIR_FRAGMENT
+
 You can also get return value(s):
+
+=begin PIR_FRAGMENT
 
   ($P1,$P2) = $P0( $P1, $P2, $P3 )
 
+=end PIR_FRAGMENT
+
 If the function name might collide with a Parrot opcode, quote it:
 
+=begin PIR_FRAGMENT
+
+   .local int i
    i = 'new'(42)
 
+=end PIR_FRAGMENT
+
 You can also use the full PCC for these calls. See
-L<docs/draft/pdd19_pir.pod/Parameter Passing and Getting Flags> and other
-quesitons below for more information.
+L<docs/pdd19_pir.pod/Parameter Passing and Getting Flags> and other
+questions below for more information.
 
 =head2 How do I generate a method call in PIR?
 
 Similar to function calls, just append C<.> and the method name to the object.
 You should quote a literal method name to avoid confusion.
 
+=begin PIR_FRAGMENT
+
+  .local pmc ret_val, some_obj, arg
   ret_val = some_obj.'some_meth'(arg)
+
+=end PIR_FRAGMENT
 
 The method name may also be a string variable representing a method name:
 
+=begin PIR_FRAGMENT
+
   .local string m
+  .local pmc curses_obj
   m = 'bold'
   curses_obj.m()
+
+=end PIR_FRAGMENT
 
 =head2 How do I locate or create a subroutine object?
 
 There are several ways to achieve this, depending on the location of
 the subroutine.
 
-If the sub is in the same compilation unit use a Sub constant:
+If the sub is in the same file use a Sub constant:
 
-  .const .Sub foo = 'foo'
-  ...
+=begin PIR_FRAGMENT
+
+  .const 'Sub' foo = 'foo'
+  # ...
   foo()
+
+=end PIR_FRAGMENT
 
 A more dynamic way is:
 
+=begin PIR_FRAGMENT
+
   .local pmc foo
   foo = find_name 'foo'
+
+=end PIR_FRAGMENT
 
 This searches for a subroutine 'foo' in the current lexical pad, in
 the current namespace, in the global, and in the builtin namespace in
@@ -90,7 +123,12 @@ compiler can't figure out, where the function is.
 If the subroutine is in a different namespace, use the
 C<get_hll_global> or C<get_root_global> opcodes:
 
+=begin PIR_FRAGMENT
+
+  .local pmc foo
   foo = get_root_global ['Foo'], 'foo'
+
+=end PIR_FRAGMENT
 
 This fetches the sub C<foo> in the C<Foo> namespace.
 
@@ -101,33 +139,47 @@ Therefore you need to perform two steps.
 First use one of the above ways to locate the Sub object.
 Then use the op C<newclosure> to capture the environment.
 
+=begin PIR_FRAGMENT
+
   .local pmc coro
   coro = find_name 'my_coro'
   coro = newclosure coro
 
+=end PIR_FRAGMENT
+
 Any subroutine that contains a C<.yield> directive is automatically
 created as a Coroutine PMC:
 
+=begin PIR
+
   .sub my_coro             # automagically a Coroutine PMC
-     ...
+     .param pmc result
+     #...
      .yield (result)
-     ...
+     #...
   .end
 
+=end PIR
 
 =head2 How do I generate a tail call in PIR?
 
+=begin PIR
+
   .sub foo
-      # do something
-      .return bar(42)           # tail call sub bar
+      # ...
+      .tailcall bar(42)           # tail call sub bar
   .end
 
   .sub bar
-      # ...
+      .param int answer
+      inc answer
+      .return(answer)
   .end
 
+=end PIR
+
 The sub C<bar> will return to the caller of C<foo>. (Warning! This fails
-in some cases. XXX Find the RT ticket and reference it here.) 
+in some cases. XXX Find the Trac ticket and reference it here.)
 
 =head2 How do I generate a sub call with a variable-length parameter
 list in PIR?
@@ -135,26 +187,38 @@ list in PIR?
 If you have a variable amounts of arguments in an array, you can
 pass all items of that array with the C<:flat> directive.
 
+=begin PIR_FRAGMENT
+
+  .local pmc ar, foo
   ar = new 'ResizablePMCArray'
   push ar, "arg 1\n"
   push ar, "arg 2\n"
-  ...
+  #...
   foo(ar :flat)
-  ...
+  #...
+
+=end PIR_FRAGMENT
 
 =head2 How to I retrieve the contents of a variable-length parameter
 list being passed to me?
 
 Use a slurpy array:
 
+=begin PIR
+
   .sub mysub
     .param pmc argv      :slurpy
     .local int argc
     argc = argv
-    ...
+    #...
+  .end
+
+=end PIR
 
 If you have a few fixed parameters too, you can use a slurpy array
 to get the rest of the arguments
+
+=begin PIR
 
   .sub mysub
     .param pmc arg0
@@ -162,11 +226,16 @@ to get the rest of the arguments
     .param pmc varargs   :slurpy
     .local int num_varargs
     num_varargs = varargs
-    ...
+    # ...
+  .end
+
+=end PIR
 
 =head2 How do I pass optional arguments?
 
 Use the C<:optional> and C<:opt_flag> pragmas:
+
+=begin PIR
 
   .sub foo
      .param pmc arg1       :optional
@@ -175,56 +244,61 @@ Use the C<:optional> and C<:opt_flag> pragmas:
      .param int has_arg2   :opt_flag
 
      if has_arg1 goto got_arg1
-     ...
+     #...
+  .end
+
+=end PIR
 
 =head2 How do I create nested subroutines?
 
-Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details: look for
-C<:outer>.
-
-XXX Fix L syntax here.
+Please refer to
+L<docs/pdds/pdd20_lexical_vars.pod/Nested Subroutines Have Outies; the ":outer" attribute>
+for details.
 
 =head1 Variables
 
 =head2 How do I fetch a variable from the global namespace?
 
-There are two possible ways.  Either use the special PIR syntax:
+Use the C<get_root_global> or C<get_hll_global> op:
 
-    $P0 = global 'name_of_the_global'
-
-or the C<get_root_global> or C<get_hll_global> op:
+=begin PIR_FRAGMENT
 
     get_hll_global $P0, ['name'; 'space'], 'name_of_the_global'
     get_hll_global $P1, 'name_of_the_global'
+
+=end PIR_FRAGMENT
 
 =head2 How can I delete a global?
 
 You can retrieve the namespace hash and use the C<delete> opcode.
 
+=begin PIR
+
     .sub main :main
-	$P0 = new 'Integer'
-	$P0 = 42
-	set_hll_global 'foo', $P0
-	set_hll_global ['Bar'], 'baz', $P0
-	show_baz()
-	.local pmc ns, Bar_ns
-	ns = get_hll_namespace
-	delete ns['foo']              # delete from top level
-	Bar_ns = ns['Bar']            # get Bar namespace
-	delete Bar_ns['baz']
-	show_baz()
+    $P0 = new 'Integer'
+    $P0 = 42
+    set_hll_global 'foo', $P0
+    set_hll_global ['Bar'], 'baz', $P0
+    show_baz()
+    .local pmc ns, Bar_ns
+    ns = get_hll_namespace
+    delete ns['foo']              # delete from top level
+    Bar_ns = ns['Bar']            # get Bar namespace
+    delete Bar_ns['baz']
+    show_baz()
     .end
     .sub show_baz
-	$P0 = get_hll_global ['Bar'], 'baz'
-	print "'baz' is "
-	if null $P0 goto is_null
-	print $P0
-	print ".\n"
-	.return ()
-    is_null: 
-	print "null.\n"
+    $P0 = get_hll_global ['Bar'], 'baz'
+    print "'baz' is "
+    if null $P0 goto is_null
+    print $P0
+    print ".\n"
+    .return ()
+    is_null:
+    print "null.\n"
     .end
 
+=end PIR
 
 =head2 How do I use lexical pads to have both a function scope and a
 global scope?
@@ -241,15 +315,23 @@ a PMCNULL with the C<null> opcode.)
 
 Use C<find_name>:
 
+=begin PIR_FRAGMENT
+
     $P0 = find_name '$x'
     find_name $P0, 'foo'    # same thing
+
+=end PIR_FRAGMENT
 
 This will find the name C<foo> in the lexical, global, or builtin namespace, in
 that order, and store it in C<$P0>.
 
 =head2 How do I fetch a variable from the current lexical pad?
 
+=begin PIR_FRAGMENT
+
     find_lex $P0, 'foo'
+
+=end PIR_FRAGMENT
 
 or much better, if possible just use the variable defined along with
 the C<.lex> definition of C<foo>.
@@ -258,7 +340,11 @@ the C<.lex> definition of C<foo>.
 
 That is still the same:
 
+=begin PIR_FRAGMENT
+
     find_lex $P0, 'foo'
+
+=end PIR_FRAGMENT
 
 This finds a C<foo> variable at any B<outer> depth starting from the top.
 
@@ -282,19 +368,29 @@ XXX
 
 With the C<newclass> op:
 
+=begin PIR_FRAGMENT
+
     newclass $P0, 'Animal'
+
+=end PIR_FRAGMENT
 
 =head2 How do I add instance variables/attributes?
 
 Each class knows which attributes its objects can have. You can add attributes
 to a class (not to individual objects) like so:
 
+=begin PIR_FRAGMENT
+
     addattribute $P0, 'legs'
+
+=end PIR_FRAGMENT
 
 =head2 How do I add instance methods to a class?
 
 Methods are declared as functions in the class namespace with the C<:method>
 keyword appended to the function declaration:
+
+=begin PIR
 
   .namespace [ 'Animal' ]
 
@@ -302,10 +398,14 @@ keyword appended to the function declaration:
      print "slow and steady\n"
   .end
 
+=end PIR
+
 =head2 How do I override a vtable on a class?
 
 As with methods, but note the new keyword. The vtable name specified B<must>
 be an existing vtable slot.
+
+=begin PIR
 
   .namespace [ 'NearlyPi' ]
 
@@ -313,22 +413,27 @@ be an existing vtable slot.
      .return ('three and a half')
   .end
 
+=end PIR
+
 Now, given an instance of NearlyPi in $P0
+
+=begin PIR_FRAGMENT
 
   $S0 = $P0
   say $S0  # prints 'three and a half'
+
+=end PIR_FRAGMENT
 
 =head2 How do I access attributes?
 
 You can access attributes by a short name:
 
+=begin PIR_FRAGMENT_INVALID
+
   $P0 = getattribute self, 'legs'
   assign $P0, 4                   # set attribute's value
 
-or by a fully qualified name: XXX This is long dead.
-
-  $P0 = getattribute self, "Animal\0legs"
-  assign $P0, 4                   # set attribute's value
+=end PIR_FRAGMENT_INVALID
 
 =head2 When should I use properties vs. attributes?
 
@@ -341,12 +446,20 @@ You first have to get the class PMC of the class you want to subclass.
 Either you use the PMC returned by the C<newclass> op if you created
 the class, or use the C<get_class> op:
 
+=begin PIR_FRAGMENT
+
     get_class $P0, 'Animal'
+
+=end PIR_FRAGMENT
 
 Then you can use the C<subclass> op to create a new class that is a
 subclass of this class:
 
+=begin PIR_FRAGMENT
+
     subclass $P1, $P0, 'Dog'
+
+=end PIR_FRAGMENT
 
 This stores the newly created class PMC in $P1.
 
@@ -362,38 +475,60 @@ example.
 If you have a class PMC (created with C<newclass> or by C<subclass>),
 you can add more parent classes to it with the C<addparent> op:
 
+=begin PIR_FRAGMENT
+
     get_class $P1, 'Dog'
     subclass $P2, $P1, 'SmallDog'
     get_class $P3, 'Pet'
     addparent $P2, $P3  # make "SmallDog" also a "Pet"
 
+=end PIR_FRAGMENT
+
 =head2 How can I specify the constructor of a class?
 
 Just override the init vtable for that class.
 
-    newclass $P0, 'Dog'         # create a class named Dog
-    # ...
+=begin PIR
+
+    .sub _ :main
+      newclass $P0, 'Dog'         # create a class named Dog
+    .end
 
     .namespace ['Dog']
 
     .sub init :vtable
       # ...
+    .end
+
+=end PIR
 
 Or you can specify the constructor method by setting the BUILD
 property of the class PMC:
+
+=begin PIR_FRAGMENT
 
     newclass $P0, 'Dog'         # create a class named Dog
     new $P1, 'String'           # create a string
     set $P1, 'initialise'       # set it to the name of the constructor method
     setprop $P0, 'BUILD', $P1   # set the BUILD property
 
+=end PIR_FRAGMENT
+
 =head2 How do I instantiate a class?
 
 You can do so either with the class name:
 
+=begin PIR_FRAGMENT
+
     new $P0, 'Dog'
 
+=end PIR_FRAGMENT
+
 or with the class object:
+
+=begin PIR_FRAGMENT_INVALID
+
+    .loadlib 'io_ops'
 
     $P1 = get_class 'Dog'   # find the 'Dog' class
     unless null $P1 goto have_dog_class
@@ -401,6 +536,8 @@ or with the class object:
     .return ()
   have_dog_class:
     new $P0, $P1    # creates a Dog object and stores it in register $P0
+
+=end PIR_FRAGMENT_INVALID
 
 The chief difference is that using a string constant will produce the
 specific error "Class 'Dog' not found" if that happens to be the case;
@@ -414,13 +551,16 @@ You can pass only a single argument to a constructor.  By convention,
 a hash PMC is passed to the constructor that contains the arguments as
 key/value pairs:
 
+=begin PIR_FRAGMENT
+
     new $P0, 'Hash'
     set $P0['greeting'], 'hello'
     set $P0['size'], 1.23
 
-    find_type $I0, 'Alien'
-    new $P1, $I0, $P0           # create an Alien object and pass
+    new $P1, 'Alien', $P0       # create an Alien object and pass
                                 # the hash to the constructor
+
+=end PIR_FRAGMENT
 
 =head2 How do I add module/class methods?
 
@@ -436,48 +576,92 @@ XXX
 
 The easiest way is the perl-like
 
+=begin PIR_FRAGMENT
+
     die 'Eeeek!'
+
+=end PIR_FRAGMENT
 
 You can also explicitly create an exception object and throw it:
 
+=begin PIR_FRAGMENT
+
     $P0 = new 'Exception'
-    $P0['_message'] = 'Eeek'
+    $P0 = 'something happened'
+    throw $P0
+
+=end PIR_FRAGMENT
 
 =head2 How do I catch an exception in PIR?
 
 Use C<push_eh> to push an exception handler onto the stack. End the set of
-instructions that might throw the exception you're intrested in with 
+instructions that might throw the exception you're interested in with
 C<pop_eh>.
+
+=begin PIR_FRAGMENT
 
     push_eh handler
       die 'whoops'  # or any other code that might throw an exception...
     pop_eh
-    ... # ok
+    # ok
 
-An exception handler is called with two arguments: the exception and its
-extracted message for your convenience.
+=end PIR_FRAGMENT
+
+An exception handler is called with one argument, which is the exception object.
+The message of the exception can be easily extracted, as follows:
+
+=begin PIR_FRAGMENT
 
   handler: # exception
-    .get_results ($P0, $S0)
+    .get_results ($P0)
     print 'Exception caught:'
+    $S0 = $P0['message']
     say $S0
-    ...
+
+=end PIR_FRAGMENT
 
 =head2 How do I let exceptions from C<exit> pass through my handler?
 
 Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
 
+=begin PIR_FRAGMENT
+
   .include 'except_severity.pasm'
-  ...
+  # ...
   handler:
-    .get_results ($P0, $S0)
-    $I0 = $P0[2]
+    .get_results ($P0)
+    $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto handle_exit
     say 'Exception caught!'
-    ...
+    # ...
 
-  handle_exit
+  handle_exit:
     rethrow $P0 # let the next handler deal with it.
+
+=end PIR_FRAGMENT
+
+Exception example:
+
+=begin PIR_FRAGMENT
+
+    push_eh handler
+    $P0 = new 'Exception'
+    $P0 = 'something happened'
+    throw $P0
+    pop_eh
+    exit 0
+
+  handler:
+    .local pmc exception
+    .local string message
+    .get_results (exception)
+    print 'Exception: '
+    message = exception['message']
+    print message
+    print "\n"
+    exit 1
+
+=end PIR_FRAGMENT
 
 =head1 C Extensions
 
@@ -487,47 +671,14 @@ Parrot supports dynamic PMCs, loadable at runtime, to allow compiler writers
 to extend Parrot with additional types. For more information about writing
 PMCs, see L<tools/build/pmc2c.pl> and L<docs/pmc.pod>.
 
-To build dynamic PMCs, add something like the following to your Makefile:
-
-  PERL     = /usr/bin/perl
-  PMCBUILD = $(PERL) /path/to/parrot/tools/build/dynpmc.pl
-  DESTDIR  = /path/to/parrot/runtime/parrot/dynext
-  LOAD_EXT = .so
-
-  PMCDIR    = pmc
-  PMCS      = MyInteger MyFloat MyString MyObject
-  PMC_FILES = MyInteger.pmc MyFloat.pmc MyString.pmc MyObject.pmc
-
-  dynpmcs : $(PMC_FILES)
-      @cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
-      @cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
-      @cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
-      @cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+See L<src/dynpmc/Makefile> for an example of how to build your dynamic
+PMCS.
 
 =head2 How do I add another op to Parrot?
 
 Parrot supports dynamic op libraries. These allow for ops specific to one
 language to be used without having to place them into the Parrot core itself.
 For examples of dynamic op libraries, see L<src/dynoplibs>.
-
-To build dynamic op libraries, add something like the following to your
-makefile:
-
-  PERL     = /usr/bin/perl
-  OPSBUILD = $(PERL) /path/to/parrot/tools/build/dynops.pl
-  DESTDIR  = /path/to/parrot/runtime/parrot/dynext
-  LOAD_EXT = .so
-
-  OPSDIR    = ops
-  OPLIBS    = myops
-  OPS_FILES = myops.ops
-
-  dynops : $(OPS_FILES)
-      @cd $(OPSDIR) && $(BUILD) generate $(OPLIBS)
-      @cd $(OPSDIR) && $(BUILD) compile $(OPLIBS)
-      @cd $(OPSDIR) && $(BUILD) linklibs $(OPLIBS)
-      @cd $(OPSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(OPLIBS)
-
 
 =head2 How do I use the Native Calling Interface (NCI)?
 
@@ -554,6 +705,8 @@ to do a DLL export specification of the NCI function:
 Then, after having compiled the file as a shared library, the PIR code looks
 like this:
 
+=begin PIR
+
   .sub main :main
      .local pmc lib, func
 
@@ -569,14 +722,20 @@ like this:
 
   .end
 
+=end PIR
+
 If you embedded a Parrot in your C file and you want to invoke another function
 in that same C file, you should pass a null string to loadlib. Do that as follows:
+
+=begin PIR_FRAGMENT
 
  .local pmc lib
  .local string libname
  null libname
 
  lib = loadlib libname
+
+=end PIR_FRAGMENT
 
 Under Linux, the .c file must then be linked with the -export-dynamic option.
 
@@ -586,11 +745,17 @@ Under Linux, the .c file must then be linked with the -export-dynamic option.
 
 Create a new C<Env> PMC and access it like a hash.
 
+=begin PIR_FRAGMENT
+
     .local pmc e
     e = new 'Env'
     $P0 = e['USER']      # lt
 
+=end PIR_FRAGMENT
+
 =head2 How can I access Parrot's configuration?
+
+=begin PIR_FRAGMENT
 
     .include 'iglobals.pasm'
     .local pmc interp, cfg
@@ -598,26 +763,9 @@ Create a new C<Env> PMC and access it like a hash.
     cfg = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = cfg['VERSION']    # "0.3.0"
 
+=end PIR_FRAGMENT
+
 See F<config_lib.pasm> for all the keys in the config hash - or iterate over
 the config hash.
 
-=head1 Languages
-
-=head2 What files do I need to modify to add my new language compiler?
-
-Aside from the files in your new language directory, you must modify
-
-    CREDITS
-    MANIFEST
-    config/gen/languages.pm
-    config/gen/makefiles/languages.in
-    languages/LANGUAGES.STATUS.pod
-
-Inside your language dir, you may consider adding the following:
-
-    LICENSE
-    MAINTAINER
-    README
-    STATUS
-
-Look to existing languages for some examples.
+=cut

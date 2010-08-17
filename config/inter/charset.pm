@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ use Parrot::Configure::Utils ':inter';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining what charset files should be compiled in};
+    $data{description} = q{Which charset files should be compiled in};
     $data{result}      = q{};
     return \%data;
 }
@@ -34,7 +34,7 @@ sub _init {
 my @charsets_defaults =
     defined( $ENV{TEST_CHARSET} )
     ? $ENV{TEST_CHARSET}
-    : sort map { basename($_) } glob "./src/charset/*.c";
+    : sort map { basename($_) } glob "./src/string/charset/*.c";
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -68,15 +68,14 @@ E_NOTE
     foreach my $charset ( split( /\s+/, $charset_list ) ) {
         $charset =~ s/\.c$//;
         $TEMP_charset_build .= <<END
-src/charset/$charset\$(O): src/charset/$charset.h src/charset/ascii.h src/charset/$charset.c \$(NONGEN_HEADERS)
+src/string/charset/$charset\$(O): src/string/charset/$charset.h src/string/charset/ascii.h src/string/charset/$charset.c src/string/charset/tables.h \$(NONGEN_HEADERS)
 
 
 END
     }
 
     # build list of libraries for link line in Makefile
-    my $slash = $conf->data->get('slash');
-    $TEMP_charset_o =~ s/^| / src${slash}charset${slash}/g;
+    $TEMP_charset_o =~ s{^| }{ src/string/charset/}g;
 
     $conf->data->set(
         charset            => $charset_list,

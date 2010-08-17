@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
 use lib qw( lib );
-use Test::More tests =>  6;
+use Test::More tests =>  5;
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ class.
 
 =cut
 
-BEGIN { use_ok('Parrot::Configure::Step'); }
+BEGIN { use Parrot::Configure::Step; }
 
 package Test::Parrot::Configure::Step;
 

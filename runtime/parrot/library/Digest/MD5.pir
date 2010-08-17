@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # Parrot MD5 library; Nick Glencross <nickg@glencros.demon.co.uk>
@@ -12,13 +13,13 @@ MD5.pir - calculates MD5 checksums
 
 =head1 SYNOPSIS
 
-  load_bytecode "Digest/MD5.pir"
+  load_bytecode "Digest/MD5.pbc"
   $P0 = _md5sum("foo")
   _md5_print($P0)
 
 or
 
-  load_bytecode "Digest/MD5.pir"
+  load_bytecode "Digest/MD5.pbc"
   $P0 = _md5sum("bar")
   $S0 = _md5_hex($P0)
 
@@ -48,18 +49,22 @@ consumption which should be resolved soon.
 
 =cut
 
+.HLL 'parrot'
+
+.loadlib 'bit_ops'
+
 ###########################################################################
 # Export function entries to globals
 
 .sub onload :load
 
     .local pmc f
-    f = find_global "Digest", "_md5sum"
-    global "_md5sum"    = f
-    f = find_global "Digest", "_md5_hex"
-    global "_md5_hex"   = f
-    f = find_global "Digest", "_md5_print"
-    global "_md5_print" = f
+    f = get_hll_global ['Digest'], '_md5sum'
+    set_global "_md5sum", f
+    f = get_hll_global ['Digest'], '_md5_hex'
+    set_global "_md5_hex", f
+    f = get_hll_global ['Digest'], '_md5_print'
+    set_global "_md5_print", f
 .end
 
 ###########################################################################

@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005, Parrot Foundation.
 # $Id$
 
 package init::hints::hpux;
@@ -10,7 +10,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
 

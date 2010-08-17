@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -72,6 +72,27 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say with a temporary number register' );
 .end
 CODE
 1.414
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'say and print with a number register' );
+.sub main
+    $N0 = 3.14159
+    say $N0
+    print $N0
+    print "\n"
+.end
+CODE
+3.14159
+3.14159
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'say with PMCNULL argument' );
+.sub 'main'
+    null $P0
+    say $P0
+.end
+CODE
+/Null PMC in say/
 OUTPUT
 
 # Local Variables:

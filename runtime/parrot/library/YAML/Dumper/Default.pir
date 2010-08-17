@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 YAML::Dumper::Default - The default output module of YAML::Dumper.
@@ -18,19 +20,19 @@ This module provides the default output style of C<YAML::Dumper>.
 
 .sub __library_data_dumper_default_onload :load
     .local pmc ydb_class
-    ydb_class = get_class "YAML::Dumper::Default"
+    ydb_class = get_class ['YAML'; 'Dumper'; 'Default']
     if null ydb_class goto create_ydb
     goto END
 
   create_ydb:
-    load_bytecode "library/YAML/Dumper/Base.pir"
-    get_class $P0, "YAML::Dumper::Base"
-    subclass $P0, $P0, "YAML::Dumper::Default"
+    load_bytecode 'YAML/Dumper/Base.pbc'
+    get_class $P0, ['YAML'; 'Dumper'; 'Base']
+    subclass $P0, $P0, ['YAML'; 'Dumper'; 'Default']
 END:
     .return ()
 .end
 
-.namespace ["YAML::Dumper::Default"]
+.namespace ['YAML'; 'Dumper'; 'Default']
 
 =head1 METHODS
 
@@ -118,7 +120,7 @@ Dumps a 'generic' Hash.
 .sub genericHash :method
     .param string name
     .param pmc hash
-    .local pmc iter
+    .local pmc it
     .local string key
     .local pmc val
     .local pmc keys
@@ -131,13 +133,12 @@ Dumps a 'generic' Hash.
     print " {"
 
     new keys, "ResizablePMCArray"
-    new iter, "Iterator", hash
-    set iter, 0
+    it = iter hash
 
   iter_loop:
-    unless iter, iter_end
+    unless it, iter_end
 
-    shift key, iter
+    shift key, it
     push keys, key
     branch iter_loop
 
@@ -445,7 +446,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

@@ -1,7 +1,7 @@
 #! perl
 package Foo;
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -24,7 +24,7 @@ package main;
 my $a = Foo->new(7);
 my $b = Foo->new(6);
 my $r;
-for my $i ( 1 .. 500_000 ) { $r = $a * $b }
+for my $i ( 1 .. 50_000 ) { $r = $a * $b }
 print "$r\n";
 
 # Local Variables:

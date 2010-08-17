@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,14 +24,14 @@ Arena holds and manages a set number of items of a single size and shape.
 
 =over 4
 
-=item* GC
+=item * GC
 
 Garbage collector. A garbage collector is a system that finds memory objects
 that are not being used by the system, and frees them automatically. Garbage
 collection is broken into two distinct phases: the I<mark phase> that searches
 for unreferenced objects, and the I<sweep phase> that frees all dead objects.
 
-=item* DOD
+=item * DOD
 
 Dead object detection, a deprecated term that refers to the I<mark phase>
 of the garbage collector.
@@ -51,31 +51,31 @@ A overall layout of the interpreter's memory management looks like so:
 
     typedef struct Interp {
         ...
-        struct Arenas *arena_base;
+        struct Memory_Pools *mem_pools;
         ...
     } Interp;
 
 All object-like things that get allocated during the execution of parrot
-bytecode are managed from the C<arena_base> member of the interpreter
+bytecode are managed from the C<mem_pools> member of the interpreter
 structure.
 
-=head1 Arenas
+=head1 Memory Pools
 
-C<struct Arenas> holds pointers to a variety of different kinds of managed
+C<struct Memory_Pools> holds pointers to a variety of different kinds of managed
 memory. A simplification looks similar to this:
 
-    typedef struct Arenas {
-        struct Memory_Pool *memory_pool;
+    typedef struct Memory_Pools {
+        struct Var_Size_Pool *memory_pool;
         ...
-        struct Small_Object_Pool * header_pool;
-        struct Small_Object_Pool ** sized_pools;
-    } Arenas;
+        struct Fixed_Size_Pool * header_pool;
+        struct Fixed_Size_Pool ** sized_pools;
+    } Memory_Pools;
 
 C<memory_pool> and C<header_pool> are variable and fixed sized pool pointers
-respectively. These are just two examples, there are other C<Memory_Pool>s
-and C<Small_Object_Pool>s in the Parrot system. Pools of type
-C<struct Memory_Pool> are for variable-size objects, such as constant string
-buffers. Pools of type C<struct Small_Object_Pool> are for fixed-size objects
+respectively. These are just two examples, there are other C<Var_Size_Pool>s
+and C<Fixed_Size_Pool>s in the Parrot system. Pools of type
+C<struct Var_Size_Pool> are for variable-size objects, such as constant string
+buffers. Pools of type C<struct Fixed_Size_Pool> are for fixed-size objects
 such as headers or PMCs.
 
 =head1 Fixed sized items
@@ -96,7 +96,7 @@ requires the garbage collector to supply 4 additional function pointers: a
 function to allocate a new arena for the pool, a function to find more items
 (possibly through running the garbage collector, or allocating objects
 otherwise), a function to add an unused item to the free list, and a function
-to retreive a new free item from the pool.
+to retrieve a new free item from the pool.
 
 Every pool maintains a list of unused items within the pool, called the
 C<free_list> When there is need for a new object it is taken off the free
@@ -117,44 +117,36 @@ longer being used.
 =head2 General structure of a buffer-like item
 
     struct parrot_object_t {
-        UnionVal cache;
         unsigned flags;
         ...
     } PObj;
 
-This does not totally reflect the current implementation, but is the spirit of
-the abstraction of current objects. The C<UnionVal cache> field is a C<union>
-that contains a variety of pointer and data configurations. The flags field
-may contain a series of flags which indicate the type, status, configuration,
-and special requirements of each item. Buffers, C<PMC>s, and C<PObj>s all
-have these basic fields in common, although they also contain a variety of
-other data fields, depending on type.
+The flags field may contain a series of flags which indicate the type, status,
+configuration, and special requirements of each item. C<Buffer>s, C<PMC>s, and
+C<PObj>s all have this basic field in common.
+
+C<PMC>s and C<Buffer>s each have an additional field which contain a pointer
+to a block of data.
 
 =head2 GC-related PObj flags
 
-Only three flags need to be checked during a DOD run: C<PObj_live_FLAG>,
+Only three flags need to be checked during a mark run: C<PObj_live_FLAG>,
 C<PObj_on_free_list_FLAG>, and C<PObj_is_special_PMC_FLAG>.  Normally these
 flags are stored in C<PObj-E<gt>flags>, meaning that each PMC must be accessed
-during the DOD run.
-
-An alternative approach is to store the DOD-Flags together somewhere, such as
-in the individual arenas, as a packed array of bits. This approach, called
-cardmarking, should be indicated by defining the preprocessor variable
-C<ARENA_DOD_FLAGS> to 1.
+during the mark run.
 
 F<pobj.h> provides macros to facilitate referencing individual object flags:
-C<DOD_flag_SET>, C<DOD_flag_CLEAR> and C<DOD_flag_TEST>. They make up a
-portable way of manipulating the DOD-relevant object flags.
+C<gc_flag_SET>, C<gc_flag_CLEAR> and C<gc_flag_TEST>. They make up a portable
+way of manipulating the GC-relevant object flags.
 
 =head1 Variable sized items
 
-Variable-sized items do not exist by themselves, they are always preceeded by
-a buffer structure that contains information about them. These buffer
-structures are described above, and the C<UnionVal cache> item typically
-points to the memory block that contains the data. The variable-sized data
-items are managed in two different pools: the C<memory_pool>, which contains
-a general mish-mash of data types, and the C<constant_string_pool> which
-contains immutable string buffers used by programs running on Parrot.
+Variable-sized items do not exist by themselves, they are always wrapped by
+a buffer structure that contains a pointer to the data information about them.
+The variable-sized data items are managed in two different pools: the
+C<memory_pool>, which contains a general mish-mash of data types, and the
+C<constant_string_pool> which contains immutable string buffers used by
+programs running on Parrot.
 
 Here, different memory allocation schemes jump in:
 
@@ -175,7 +167,7 @@ a new block is added to the memory pool.
 This also implies that buffers are moved around during their life. Users of
 these buffers are therefore not allowed to hold pointers to buffers over pieces
 of code that might trigger a GC run, like C<Parrot_allocate()> or
-C<string_compare()>.
+C<Parrot_str_compare()>.
 
 =head2 Defragmenting allocator
 
@@ -186,11 +178,11 @@ provide this, such as the glibc malloc based on Doug Lea's allocator.
 
 Using this allocator, all variable sized items are just allocated via a plain
 C<malloc()> call, or resized with C<realloc()>, and after they lose their
-existence (ie when DOD detects that the managing buffer header is no longer in
-use) they are C<free()>ed. That's all. The underlying allocator collects these
-pieces, coalesces them if possible to form bigger pieces, and then puts them on
-free lists, sorted by size.  Eventually, when a new allocation request arrives,
-it may give them back to Parrot.
+existence (ie when the mark phase detects that the managing buffer header is no
+longer in use) they are C<free()>ed. That's all. The underlying allocator
+collects these pieces, coalesces them if possible to form bigger pieces, and
+then puts them on free lists, sorted by size.  Eventually, when a new
+allocation request arrives, it may give them back to Parrot.
 
 So here, the variable length C<memory_pool> is unused. You can consider this
 pool to live inside the allocator. Buffers allocated this way don't move
@@ -219,20 +211,16 @@ rendering COW to a noop, nor are you allowed to free this same string more then
 once. Both allocation schemes therefore use a part of the allocated string to
 do this bookkeeping.
 
-Copying GC uses a C<Buffer_Tail> after the end of the actual variable length
-string and marks such COW strings with C<TAIL_moved> and stores the new address
-in the buffer header, so other users of this string can be updated to reuse the
-same string (RT#47764 one or all other users?).
-
-The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During DOD
-all dead users increment the refcount, living users set it to an huge value.
-When freeing the buffer, the string is only freed if the refcount reaches zero.
+The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During the
+mark phase all dead users increment the refcount, living users set it to an
+huge value.  When freeing the buffer, the string is only freed if the refcount
+reaches zero.
 
 =head1 Simplified Figure
 
-                             +--------+
-      +------------------<---| Arenas |<-----------+
-      |                      +--------+-->--+      |
+                         +--------------+
+      +--------------<---| Memory Pools |<---------+
+      |                  +--------------+---+      |
       |                                     |      |
       |         +------+    +-----------+   |  +=============+
       |         | S0   |<---| Registers |<--)--| Interpreter |
@@ -246,8 +234,8 @@ When freeing the buffer, the string is only freed if the refcount reaches zero.
  +-------+  |   | Buffer 2 |    | ..String...  |<--| Block 2 |
  | .     |  |   +----------+    +--------------+   +---------+
  +-------+  |   | ...      |        ^    ^         | ...     |
- Small Obj  |   +----------+        |    |         +---------+
- Pool       +-->| Buffer N |--------+----+         Memory Pool
+Fixed Size  |   +----------+        |    |         +---------+
+   Pool     +-->| Buffer N |--------+----+        Var Size Pool
                 +----------+
                  Buffer          Memory Block
 
@@ -258,9 +246,9 @@ filled in.
 
 =head1 FILES
 
-smallobject.[ch], headers.c, resources.[ch], res_lea.c, dod.c, string.[ch],
-pobj.h. Other garbage collector implementations may use separate files as
-well.
+src/gc/api.c, src/gc/gc_private.h, pobj.h, mark_sweep.[ch],
+alloc_resources.[ch], string.[ch]. Other garbage collector
+implementations may use separate files as well.
 
 =head1 BUGS
 
@@ -269,10 +257,8 @@ date - thanks.
 
 =head1 AUTHOR
 
-Leopold Tötsch C<lt@toetsch.at>
+Leopold TÃ¶tsch C<lt@toetsch.at>
 
 =head1 VERSION
 
 0.1.1 June 2008
-
-

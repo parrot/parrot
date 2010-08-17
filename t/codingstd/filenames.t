@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -44,7 +44,7 @@ Filenames are restricted to the characters C<a-zA-Z0-9_-.>
 
 =item Filenames length restriction
 
-Filenames are restricted to 32 characters.  Test currently "todoed".
+Filenames are restricted to 32 characters.
 
 =back
 
@@ -59,8 +59,15 @@ Paul Cochrane <paultcochrane at gmail dot com>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my $manifest = maniread('MANIFEST');
-my @files = @ARGV ? @ARGV : sort keys %$manifest;
+my @files;
+if (@ARGV){
+    @files = <@ARGV>;
+}
+else {
+    my $manifest = maniread('MANIFEST');
+    # Give ports a little more leeway
+    @files = grep {! /^ports/} sort keys %$manifest;
+}
 my ( @multi_dots, @strange_chars, @too_long );
 
 foreach my $file ( @files ) {
@@ -93,7 +100,7 @@ ok( !@strange_chars, 'Portable characters in filenames' )
         . @strange_chars . " files:\n@strange_chars" );
 
 ok( !@too_long, 'Filenames length' )
-    or diag( "Filename with with more than 32 chars found in "
+    or diag( "Filename with more than 32 chars found in "
         . @too_long . " files:\n@too_long" );
 
 # Local Variables:

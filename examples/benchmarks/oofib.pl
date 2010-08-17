@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -33,7 +33,7 @@ sub fibB {
 
 package main;
 
-my $N = shift || 28;
+my $N = shift || 24;
 
 my $b = B->new();
 

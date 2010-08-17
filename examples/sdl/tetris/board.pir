@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 board.pir - a tetris board class.
@@ -15,14 +17,14 @@ board.pir - a tetris board class.
 
 =cut
 
-.include "library/dumper.pir"
-
 .namespace ["Tetris::Board"]
+.loadlib 'math_ops'
 
 .sub __onload :load
     $P0 = get_class "Tetris::Board"
     unless null $P0 goto END
 
+    load_bytecode "dumper.pbc"
     load_bytecode "examples/sdl/tetris/boarddata.pir"
     load_bytecode "examples/sdl/tetris/blocks.pir"
     get_class $P0, "Tetris::BoardData"
@@ -37,7 +39,7 @@ END:
 
 =head1 METHODS
 
-A Board object has the folloging methods:
+A Board object has the following methods:
 
 =over 4
 
@@ -191,8 +193,8 @@ This method returns nothing.
     .local int width
     .local int size
 
-    $I0 = typeof block
-    if $I0 == .Undef goto END
+    $S0 = typeof block
+    if $S0 == "Undef" goto END
 
     # assign the board to the block
     block."setBoard"( self )
@@ -646,7 +648,7 @@ NO_CLEAR_CACHE:
     rect["y"] = ypos
     rect["width"] = xp
     rect["height"] = yp
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = palette[15]
     surface."fill_rect"( temp, color )
 NO_FIELDBACKGROUND:
@@ -680,7 +682,7 @@ LOOPx:
     rect["y"] = yp
     rect["width"] = $I0
     rect["height"] = $I0
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
 
     $I0 = self[i]
     $I1 = cache[i]
@@ -732,7 +734,7 @@ LOOPend:
     rect["y"] = yp
     rect["width"] = w
     rect["height"] = h
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = palette[15]
     surface."fill_rect"( temp, color )
     inc xp
@@ -743,7 +745,7 @@ LOOPend:
     rect["y"] = yp
     rect["width"] = w
     rect["height"] = h
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = palette[0]
     surface."fill_rect"( temp, color )
     getprop temp, "nextblock", self
@@ -756,7 +758,7 @@ SKIP_NEXTBLOCK:
 
 Has to be called at frequent intervals.
 
-Returns 1 if a redraw is necessay, 0 otherwise.
+Returns 1 if a redraw is necessary, 0 otherwise.
 
 =cut
 
@@ -876,7 +878,7 @@ TDB
     .local pmc blocks
     .local pmc ret
 
-    blocks = find_global "Tetris::Block", "blocks"
+    blocks = get_hll_global [ "Tetris::Block" ], "blocks"
 
     if id != -1 goto OK
 
@@ -884,8 +886,7 @@ TDB
     $I0 = blocks
 
     # get a random block id
-    $P0 = new 'Random'
-    $N0 = $P0
+    rand $N0
     $N0 = $N0 * $I0
     id = $N0
 
@@ -905,7 +906,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

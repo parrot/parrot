@@ -1,0 +1,25 @@
+/*
+ * $Id$
+ * Copyright (C) 2009, Parrot Foundation.
+ */
+
+/*
+ * Sample Foo2 class used to verify dynamic loading and
+ * proper inheritance - for testing only
+ */
+
+pmclass Foo2 dynpmc group foo_group provides scalar extends Foo auto_attrs {
+
+    VTABLE INTVAL get_integer() {
+        INTVAL i = SUPER();
+        return i + 1;
+    }
+}
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -1,10 +1,25 @@
-@testheaders@
+/*
+Copyright (C) 2002-2009, Parrot Foundation.
+$Id$
+
+*/
+
+@TEMP_testheaders@
 
 /* Don't want stdio influencing our ability to include headers. Some day soon
    we won't be using stdio  */
 #include <stdio.h>
 
-int main (int argc, char* argv[]) {
-    printf("@testheader@ OK\n");
+int
+main(int argc, char* argv[])
+{
+    printf("@TEMP_testheader@ OK\n");
     return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

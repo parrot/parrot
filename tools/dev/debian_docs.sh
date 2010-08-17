@@ -1,5 +1,5 @@
 #! /bin/sh
-# 		debian_docs.sh 	Specified in RT #49274
+# 		debian_docs.sh
 
 
 # A script to generate the file ports/debian/parrot-doc.docs 

@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 47;
 use Parrot::Config;
 
 =head1 NAME
@@ -263,68 +263,20 @@ abc
 iso-8859-1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i" );
-    set S1, "abc"
-    find_charset I0, "iso-8859-1"
-    trans_charset S1, I0
-    print S1
-    print "\n"
-    charset I0, S1
-    charsetname S2, I0
-    print S2
-    print "\n"
-    end
-CODE
-abc
-iso-8859-1
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_charset_s_s_i - lossy" );
     set S1, iso-8859-1:"abcä"
     find_charset I0, "ascii"
-    trans_charset S1, I0
+    trans_charset S2, S1, I0
     print "never\n"
     end
 CODE
 /lossy conversion to ascii/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i - same" );
-    set S1, ascii:"abc"
-    find_charset I0, "ascii"
-    trans_charset S1, I0
-    print S1
-    print "\n"
-    charset I0, S1
-    charsetname S2, I0
-    print S2
-    print "\n"
-    end
-CODE
-abc
-ascii
-OUTPUT
-
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to binary" );
     set S0, iso-8859-1:"abc"
     find_charset I0, "binary"
     trans_charset S1, S0, I0
-    print S1
-    print "\n"
-    charset I0, S1
-    charsetname S2, I0
-    print S2
-    print "\n"
-    end
-CODE
-abc
-binary
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i iso-8859-1 to binary" );
-    set S1, iso-8859-1:"abc"
-    find_charset I0, "binary"
-    trans_charset S1, I0
     print S1
     print "\n"
     charset I0, S1
@@ -353,42 +305,10 @@ abc
 binary
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to binary" );
-    set S1, ascii:"abc"
-    find_charset I0, "binary"
-    trans_charset S1, I0
-    print S1
-    print "\n"
-    charset I0, S1
-    charsetname S2, I0
-    print S2
-    print "\n"
-    end
-CODE
-abc
-binary
-OUTPUT
-
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to iso-8859-1" );
     set S0, ascii:"abc"
     find_charset I0, "iso-8859-1"
     trans_charset S1, S0, I0
-    print S1
-    print "\n"
-    charset I0, S1
-    charsetname S2, I0
-    print S2
-    print "\n"
-    end
-CODE
-abc
-iso-8859-1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to iso-8859-1" );
-    set S1, ascii:"abc"
-    find_charset I0, "iso-8859-1"
-    trans_charset S1, I0
     print S1
     print "\n"
     charset I0, S1
@@ -489,39 +409,49 @@ abcdefg
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 16 ) unless $PConfig{has_icu};
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
-    set S0, iso-8859-1:"TÖTSCH"
-    find_charset I0, "unicode"
-    trans_charset S1, S0, I0
-    downcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    skip( 'no ICU lib', 17 ) unless $PConfig{has_icu};
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
+.sub main :main
+    set $S0, iso-8859-1:"TÖTSCH"
+    find_charset $I0, "unicode"
+    trans_charset $S1, $S0, $I0
+    $S1 = downcase $S1
+    getstdout $P0           # need to convert back to utf8
+    $P0.'encoding'("utf8")  # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 t\xc3\xb6tsch
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase, trans_charset_s_i" );
+    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase, trans_charset_s_s_i" );
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
-    downcase S1
+    downcase S1, S1
     find_charset I0, "iso-8859-1"
-    trans_charset S1, I0
+    trans_charset S1, S1, I0
     print S1
     print "\n"
     end
 CODE
 t\xf6tsch
 OUTPUT
+
+    pasm_error_output_like( <<'CODE', <<"OUTPUT", "negative encoding number" );
+    trans_encoding S2, 'foo', -1
+    end
+CODE
+/encoding #-1 not found/
+OUTPUT
+
     pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase - transcharset" );
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
-    downcase S1
+    downcase S1, S1
     find_encoding I0, "utf8"
     trans_encoding S2, S1, I0
     print S2
@@ -558,7 +488,7 @@ OUTPUT
     set S0, iso-8859-1:"TTÖÖ"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
-    chopn S1, 2
+    chopn S1, S1, 2
     print S1
     print ' '
     length I0, S1
@@ -643,7 +573,8 @@ OUTPUT
     trans_charset S1, S0, I0
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
-    substr S2, S1, 1, 1, "oe"
+    substr  S2, S1, 1, 1
+    replace S1, S1, 1, 1, "oe"
     find_encoding I0, "utf8"
     trans_encoding S2, S2, I0
     trans_encoding S1, S1, I0
@@ -661,7 +592,7 @@ OUTPUT
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
-    downcase S1
+    downcase S1, S1
     set S2, iso-8859-1:"öt"
     index I0, S1, S2
     print I0
@@ -675,7 +606,7 @@ OUTPUT
     set S0, iso-8859-1:"TÖTSCH"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
-    downcase S1
+    downcase S1, S1
     set S2, iso-8859-1:"öt"
     index I0, S1, S2
     print I0
@@ -690,28 +621,32 @@ CODE
 6
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase" );
-    set S0, iso-8859-1:"tötsch"
-    find_charset I0, "unicode"
-    trans_charset S1, S0, I0
-    upcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase" );
+.sub main :main
+    set $S0, iso-8859-1:"tötsch"
+    find_charset $I0, "unicode"
+    trans_charset $S1, $S0, $I0
+    upcase $S1, $S1
+    getstdout $P0         # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 T\x{c3}\x{96}TSCH
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char" );
-    set S1, unicode:"hacek j \u01f0"
-    upcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char" );
+.sub main :main
+    set $S1, unicode:"hacek j \u01f0"
+    upcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 HACEK J J\xcc\x8c
 OUTPUT
@@ -732,54 +667,60 @@ OUTPUT
     # (gdb) x /8h src->strstart
     # 0x844fb60:      0x005f  0x005f  0x005f  0x004a  0x030c  0x0031  0x0032  0x0000
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?" );
-    set S1, unicode:"___\u01f0123"
-    upcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?" );
+.sub main :main
+    set $S1, unicode:"___\u01f0123"
+    upcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 ___J\xcc\x8c123
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase" );
-    set S0, iso-8859-1:"tötsch leo"
-    find_charset I0, "unicode"
-    trans_charset S1, S0, I0
-    titlecase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase" );
+.sub main :main
+    set $S0, iso-8859-1:"tötsch leo"
+    find_charset $I0, "unicode"
+    trans_charset $S1, $S0, $I0
+    titlecase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 T\x{c3}\x{b6}tsch Leo
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
-    set S1, unicode:"___\u01f0___"
-    length I0, S1
-    upcase S1        # decompose J+hacek
-    length I1, S1    # 1 longer
-    downcase S1      # j+hacek
-    length I2, S1
-    compose S1, S1
-    length I3, S1    # back at original string
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
+.sub main :main
+    set $S1, unicode:"___\u01f0___"
+    length $I0, $S1
+    upcase $S1, $S1    # decompose J+hacek
+    length $I1, $S1    # 1 longer
+    downcase $S1, $S1  # j+hacek
+    length $I2, $S1
+    compose $S1, $S1
+    length $I3, $S1        # back at original string
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
-    print I0
+    print $I0
     print ' '
-    print I1
+    print $I1
     print ' '
-    print I2
+    print $I2
     print ' '
-    print I3
+    print $I3
     print "\n"
     end
+.end
 CODE
 ___\x{c7}\x{b0}___
 7 8 8 7
@@ -825,6 +766,16 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
     end
 CODE
 \u2001\u2002\u2003\u2004\x{e01ef}\u0114
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'escape unicode w/ literal 0' );
+.sub 'main'
+    $S0 = unicode:"x/\u0445\u0440\u0435\u043d\u044c_09-10.txt"
+    $S1 = escape $S0
+    say $S1
+.end
+CODE
+x/\u0445\u0440\u0435\u043d\u044c_09-10.txt
 OUTPUT
 
 # Local Variables:

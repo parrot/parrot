@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -19,7 +19,38 @@ really slowing down the bytecode execution.
 
 */
 
-#include "parrot/parrot.h"
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void null_pmc_access(PARROT_INTERP, int index)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_null_pmc_access __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static void null_pmc_access(PARROT_INTERP, int index)>
+
+
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+null_pmc_access(PARROT_INTERP, int index)
+{
+    ASSERT_ARGS(null_pmc_access)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+            "Null PMC access in %s()",
+            Parrot_get_vtable_name(interp, index));
+}
 
 pmclass Null singleton {
 
@@ -34,20 +65,53 @@ Overrides the default to do nothing.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
     }
 
-    PARROT_CAN_RETURN_NULL
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PMCNULL;
     }
 
     VTABLE void set_pointer(void *p) {
+        UNUSED(INTERP)
         PMCNULL = (PMC *)p;
     }
 
     VTABLE INTVAL does(STRING *what) {
+        UNUSED(INTERP)
+        UNUSED(what)
         /* XXX maybe a hack to get TGE running again */
         return 0;
+    }
+
+/*
+
+=item C<INTVAL is_same(PMC *value)>
+
+Returns true if value is also a null PMC, false otherwise.
+
+=cut
+
+*/
+    VTABLE INTVAL is_same(PMC *value) {
+        return PMC_IS_NULL(value);
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+=cut
+
+Gives a more informative message than the automaticaaly generated version.
+
+*/
+
+    VTABLE PMC *find_method(STRING *method_name) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_NULL_REG_ACCESS,
+                "Null PMC access in find_method('%Ss')",
+                method_name);
     }
 
 }

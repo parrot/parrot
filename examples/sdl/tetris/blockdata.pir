@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blockdata.pir - a tetris block data class
@@ -245,7 +247,7 @@ ERR:
     print $I0
     print ")!\n"
     $P0 = new 'Exception'
-    $P0["_message"] = "out of bounds!"
+    $P0 = "out of bounds!"
     throw $P0
 .end
 
@@ -270,7 +272,7 @@ ERR:
     print $I0
     print ")!\n"
     $P0 = new 'Exception'
-    $P0["_message"] = "out of bounds!"
+    $P0 = "out of bounds!"
     throw $P0
 .end
 
@@ -284,7 +286,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

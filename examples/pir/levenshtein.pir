@@ -1,10 +1,11 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
 #
 # Levenshtein distance
 #
 # implementation based on http://www.merriampark.com/ld.htm
 # First implementation by Alberto Simoes (ambs <at> cpan.org)
 #
-# $Id$
 
 # .sub main :main
 #         $S1 = "purl"

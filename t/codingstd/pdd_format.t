@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,24 +7,21 @@ use warnings;
 
 use Test::More tests =>  1;
 use Carp;
-use Cwd;
 use Tie::File;
 
-my $cwd = cwd();
-my @pdddirs = (
-    qq{$cwd/docs/pdds},
-    qq{$cwd/docs/pdds/draft},
+my @pdddirs = qw(
+    ./docs/pdds
+    ./docs/pdds/draft
 );
 
 my @pddfiles = ();
 foreach my $dir (@pdddirs) {
-    my @pdds;
-    opendir my $DIRH, $dir
-        or croak "Unable to open directory handle: $!";
-    @pdds = map { qq|$dir/$_| } grep { m/^pdd\d{2,}_.*\.pod$/ }
-        readdir $DIRH;
-    closedir $DIRH or croak "Unable to close directory handle: $!";
-    @pddfiles = (@pddfiles, @pdds);
+    die "Directory '$dir' is not found, or not a directory" if not -d $dir;
+
+    my @pdds = glob "$dir/pdd*.pod"
+        or warn "No PDD files found in directory '$dir'";
+
+    push @pddfiles, @pdds;
 }
 
 my @diagnostics = ();
@@ -35,31 +32,24 @@ foreach my $pdd (@pddfiles) {
     }
 }
 
-my $errmsg = q{};
-if ( @diagnostics ) {
-    $errmsg = join ("\n" => @diagnostics) . "\n";
+for my $msg (@diagnostics) {
+    diag($msg);
 }
-
-$errmsg ? fail( qq{\n$errmsg} )
-        : pass( q{All PDDs are formatted correctly} );
+cmp_ok( scalar(@diagnostics), '==', 0, 'PDDs are formatted correctly' );
 
 sub check_pdd_formatting {
     my $pdd = shift;
-    my $base = $pdd;
-    if ($pdd =~ m{((draft/)?[^/]+)$}) {
-        $base = $1;
-    }
+
     my $diag = q{};
     my @toolong = ();
     my @sections_needed = qw(
-        NAME
-        VERSION
-        ABSTRACT
-        DESCRIPTION
-        IMPLEMENTATION
-        REFERENCES
+        Version
+        Abstract
+        Description
+        Implementation
+        References
     );
-    my %sections_seen = map { $_, 0 } @sections_needed;
+    my %sections_seen;
     my @lines;
     tie @lines, 'Tie::File', $pdd
         or croak "Unable to tie to $pdd: $!";
@@ -67,24 +57,24 @@ sub check_pdd_formatting {
         if (
             ( length( $lines[$i] ) > 78 )
             and
-            ( $lines[$i] !~ m/(^(?:L?<)?http|\$Id:\s+)/ ) 
+            ( $lines[$i] !~ m/^(?:F|L)<|<http|\$Id:\s+/ )
         ) {
             push @toolong, ($i + 1);
         }
-        foreach my $need ( @sections_needed ) {
-            $sections_seen{$need}++ if $lines[$i] =~ m{^=head1\s+$need};
+        if ( $lines[$i] =~ m{^=head2\s+(.+?)\s*$} ) {
+            $sections_seen{$1}++;
         }
     }
     untie @lines or croak "Unable to untie from $pdd: $!";
     if ( @toolong ) {
         $diag .=
-            qq{$base has } .
+            qq{$pdd has } .
             scalar(@toolong) .
             qq{ lines > 78 chars:  @toolong\n};
     }
-    foreach my $need ( keys %sections_seen ) {
+    foreach my $need (@sections_needed) {
         if ( ! $sections_seen{$need} ) {
-            $diag .= qq{$base lacks 'head1' $need section\n};
+            $diag .= qq{$pdd lacks 'head2' $need section\n};
         }
     }
     return $diag;

@@ -1,0 +1,24 @@
+The book will have the following chapters.
+
+1) Overview
+2) Getting Started
+3) Parrot Intermediate Representation (PIR)
+4) Compiler Tools (PCT)
+5) Grammar Engine (PGE)
+6) Grammar Actions (NQP)
+7) Dynamic C-level Objects (PMCs)
+8) Dynamic Opcodes
+9) Parrot Assembly Language (PASM)
+10) Instruction Reference
+11) Directive Reference
+12) Operator Reference
+Appendix A) Glossary
+Appendix B) Patch Submission
+Appendix C) Command-Line Options
+Appendix D) Build Options
+Appendix E) Source Code
+
+
+Top-level headings in each chapter (the chapter title) are level 1 headings.
+All sub-headings in the chapter are level 2 and below. All chapter files should
+contain the VIM suffix (which is a codingstd for all of the Parrot repo).

@@ -1,0 +1,345 @@
+/*
+Copyright (C) 2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/socket.pmc - Socket PMC
+
+=head1 DESCRIPTION
+
+The Socket PMC performs network I/O operations.
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "../src/io/io_private.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Socket extends Handle provides socket auto_attrs {
+    ATTR PMC *local;           /* Local addr                   */
+    ATTR PMC *remote;          /* Remote addr                  */
+
+/*
+
+=item C<void init()>
+
+Initializes a newly created Socket object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_Socket_attributes *data_struct =
+                (Parrot_Socket_attributes *) PMC_data(SELF);
+
+        data_struct->local  = PMCNULL;
+        data_struct->remote = PMCNULL;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Create a copy of the socket handle.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC * copy = SUPER();
+        Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
+        Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
+
+        data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
+        data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
+
+        return SELF;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark active socket handle data as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_Socket_attributes * const data = PARROT_SOCKET(SELF);
+
+        if (data) {
+            Parrot_gc_mark_PMC_alive(INTERP, data->local);
+            Parrot_gc_mark_PMC_alive(INTERP, data->remote);
+        }
+    }
+/*
+
+=item C<void destroy()>
+
+Free structures.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        if (PARROT_SOCKET(SELF)) {
+            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+
+            if (data_struct->os_handle != PIO_INVALID_HANDLE)
+                Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
+            data_struct->os_handle = PIO_INVALID_HANDLE;
+        }
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether the Socket is currently open.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        return !Parrot_io_socket_is_closed(SELF);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<socket(INTVAL fam, INTVAL type, INTVAL proto)>
+
+=cut
+
+*/
+
+
+    METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
+        if (Parrot_io_socket(INTERP, SELF, fam, type, proto) < 0)
+            RETURN(PMC * PMCNULL);
+        RETURN(PMC * SELF);
+    }
+
+/*
+
+=item C<poll(INTVAL which, INTVAL sec, INTVAL usec)>
+
+Watches the socket for C<sec> seconds and C<usec> milliseconds.  C<which>
+is a bitmask representing the states you want to watch for.  Or together 1
+for readable, two for writeable, and four for exceptions.
+
+=cut
+
+*/
+
+
+    METHOD poll(INTVAL which, INTVAL sec, INTVAL usec) {
+        INTVAL poll = Parrot_io_poll(INTERP, SELF, which, sec, usec);
+        RETURN(INTVAL poll);
+    }
+
+/*
+
+=item C<sockaddr(STRING * address, INTVAL port)>
+
+C<sockaddr> returns an object representing a socket address, generated
+from a port number (integer) and an address (string).
+
+=cut
+
+*/
+
+    METHOD sockaddr(STRING * address, INTVAL port) {
+        PMC * res = Parrot_io_sockaddr_in(INTERP, address, port);
+        RETURN(PMC * res);
+    }
+
+/*
+
+=item C<connect(PMC * address)>
+
+Connects a socket object to an address.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the socket operation is
+complete, it invokes the callback, passing it a status object and the
+socket object it was called on. [If you want notification when a connect
+operation is completed, you probably want to do something with that
+connected socket object.]
+
+=cut
+
+*/
+
+    METHOD connect(PMC * address) {
+        INTVAL res = Parrot_io_connect(INTERP, SELF, address);
+        RETURN(INTVAL res);
+    }
+
+/*
+
+=item C<close()>
+
+Close a socket.
+
+=cut
+
+*/
+
+    METHOD close() {
+        INTVAL result = -1;
+        if (PARROT_SOCKET(SELF)) {
+            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+
+            if (data_struct->os_handle != PIO_INVALID_HANDLE)
+                result = Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
+            data_struct->os_handle = PIO_INVALID_HANDLE;
+        }
+        RETURN(INTVAL result);
+    }
+
+/*
+
+=item C<recv()>
+
+Receives a message from a connected socket object. It returns
+the message in a string.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the recv operation is
+complete, it invokes the callback, passing it a status object and a
+string containing the received message.
+
+=cut
+
+*/
+
+    METHOD recv() {
+        STRING * result;
+        INTVAL read = Parrot_io_recv(INTERP, SELF, &result);
+        RETURN(STRING * result);
+    }
+
+/*
+
+=item C<send(STRING *buf)>
+
+Sends a message string to a connected socket object.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the send operation is
+complete, it invokes the callback, passing it a status object.
+
+=cut
+
+*/
+
+    METHOD send(STRING *buf) {
+        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        RETURN(INTVAL res);
+    }
+
+/*
+
+=item C<bind(PMC *host)>
+
+C<bind> binds a socket object to the port and address specified by an
+address object (the packed result of C<sockaddr>).
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the bind operation is
+complete, it invokes the callback, passing it a status object and the
+socket object it was called on. [If you want notification when a bind
+operation is completed, you probably want to do something with that
+bound socket object.]
+
+=cut
+
+*/
+
+    METHOD bind(PMC *host) {
+        INTVAL res = Parrot_io_bind(INTERP, SELF, host);
+        RETURN(INTVAL res);
+    }
+
+/*
+
+=item C<listen(INTVAL backlog)>
+
+C<listen> specifies that a socket object is willing to accept incoming
+connections. The integer argument gives the maximum size of the queue
+for pending connections.
+
+There is no asynchronous version. C<listen> marks a set of attributes on
+the socket object.
+
+=cut
+
+*/
+
+    METHOD listen(INTVAL backlog) {
+        INTVAL res = Parrot_io_listen(INTERP, SELF, backlog);
+        RETURN(INTVAL res);
+    }
+
+/*
+
+=item C<accept()>
+
+C<accept> accepts a new connection on a given socket object, and returns
+a newly created socket object for the connection.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the accept operation
+receives a new connection, it invokes the callback, passing it a status
+object and a newly created socket object for the connection. [While the
+synchronous C<accept> has to be called repeatedly in a loop (once for
+each connection received), the asynchronous version is only called once,
+but continues to send new connection events until the socket is closed.]
+
+=cut
+
+*/
+
+    METHOD accept() {
+        PMC * res = Parrot_io_accept(INTERP, SELF);
+        RETURN(PMC * res);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+} /* end pmclass */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

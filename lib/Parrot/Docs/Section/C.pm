@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -130,7 +130,7 @@ sub new {
             $self->c_item(
 'Parrot Interpreter: Callback Function Handling; Creation and Destruction; Misc functions; Run Ops and Methods.',
                 'pairs'   => ['interpreter'],
-                'sources' => [ 'inter_cb', 'inter_create', 'inter_misc', 'inter_run' ],
+                'sources' => [ 'inter_cb', 'inter_create', 'inter_misc' ],
                 'headers' => ['interp_guts']
             ),
             $self->c_pair_item( '', 'exit' ),
@@ -159,7 +159,6 @@ sub new {
             '',
             $self->c_pair_item( '', 'datatypes' ),
             $self->c_pair_item( '', 'hash' ),
-            $self->c_pair_item( '', 'intlist' ),
             $self->c_pair_item( '', 'list' ),
         ),
         $self->new_group(
@@ -178,18 +177,18 @@ sub new {
             '',
             $self->c_item(
                 '',
-                'pairs'   => [ 'string_primitives', 'string' ],
-                'headers' => ['string_funcs']
+                'sources' => [ 'string/primitives', 'string/api' ],
+                'headers' => [ 'string', 'string_funcs', 'string_primitives' ]
             ),
-            $self->c_item( 'String encodings', 'contents' => ['src/encodings'] ),
-            $self->c_item( 'String charset',   'contents' => ['src/charset'] ),
+            $self->c_item( 'String encodings', 'contents' => ['src/string/encoding'] ),
+            $self->c_item( 'String charset',   'contents' => ['src/string/charset'] ),
             $self->c_item(
                 'Miscellaneous, <code>sprintf</code> and utility functions.',
                 'pairs'   => ['misc'],
                 'sources' => [ 'spf_render', 'spf_vtable', 'utils' ]
             ),
         ),
-        $self->new_group( 'Multi-methods', '', $self->c_pair_item( '', 'mmd' ), ),
+        $self->new_group( 'Multi-methods', '', $self->c_pair_item( '', 'multidispatch' ), ),
         $self->new_group( 'Extensions',    '', $self->c_pair_item( '', 'extend' ), ),
         $self->new_group(
             'JIT', '',
@@ -219,24 +218,17 @@ sub new {
             'Threads', '',
             $self->c_pair_item( '', 'thread' ),
             $self->c_header_item( '', 'thr_pthread' ),
-            $self->c_pair_item( '', 'tsq' ),
         ),
         $self->new_group(
             'Exceptions', '',
-            $self->c_pair_item( '', 'exceptions' ), $self->c_pair_item( '', 'events' ),
+            $self->c_pair_item( '', 'exceptions' )
         ),
         $self->new_group(
             'Memory', '',
             $self->c_pair_item( '', 'memory' ),
             $self->c_source_item( '', 'malloc' ),
             $self->c_source_item( '', 'malloc-trace' ),
-            $self->c_item(
-                '',
-                'pairs'   => ['resources'],
-                'sources' => ['res_lea']
-            ),
-            $self->c_pair_item( '', 'smallobject' ),
-            $self->c_pair_item( '', 'headers' ),
+            $self->c_source_item( '', 'mark_sweep' ),
         ),
         $self->new_group(
             'Garbage Collection',

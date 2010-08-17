@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 eventhandler.pir - a tetris event handler class
@@ -11,7 +13,7 @@ eventhandler.pir - a tetris event handler class
     unless null $P0 goto END
     load_bytecode "library/SDL/EventHandler.pir"
 
-    get_class $P0, "SDL::EventHandler"
+    get_class $P0, ['SDL'; 'EventHandler']
     subclass $P0, $P0, "Tetris::EventHandler"
     $P1 = new 'String'
     $P1 = "BUILD"
@@ -39,9 +41,8 @@ END:
 
     app = self."app"()
     app."setTimer"( 0 )
-    $P0 = find_global "SDL::Event", "disptach_event"
-    invokecc $P0
-    ret = I5
+    $P0 = get_hll_global ['SDL'; 'Event'], "disptach_event"
+    ret = $P0()
     app."setTimer"( 1 )
     .return (ret)
 .end
@@ -153,7 +154,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

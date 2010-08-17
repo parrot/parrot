@@ -3,37 +3,39 @@
 PortSystem              1.0
 
 name			parrot
-version			0.5.2
+version			1.1.0
 categories		lang devel
-maintainers             bfulgham coleda.com:will
-description		Open source virtual machine
+maintainers		bfulgham coleda.com:will
+description		Open source virtual machine (for Perl6 et al.)
 long_description	\
         Parrot is a virtual machine designed to efficiently compile and \
         execute bytecode for dynamic languages. Parrot currently hosts a \
         variety of language implementations in various stages of completion, \
         including Tcl, Javascript, Ruby, Lua, Scheme, PHP, Python, Perl 6, \
-        and a .NET bytecode translator.
+        and a .NET bytecode translator. This package includes the development \
+        tools required to build languages on top of parrot. 
 
 platforms		darwin
-homepage		http://www.parrotcode.org/
-master_sites		http://www.cpan.org/authors/id/R/RG/RGRJR/
+homepage		http://www.parrot.org/
+set release_type	devel ;# parrot nomenclature, not macport
+master_sites		ftp://ftp.parrot.org/pub/parrot/releases/${release_type}/${version}/
 
-checksums		md5 0a87f7e5437315f67c0848c5cb2b6d0b
+checksums           md5     bf31fd2313b105ba356921318efd3993 \
+                    sha1    5f18ddf92f588135a741e52618fbc456ba56cf34 \
+                    rmd160  a329c698442ec73412ac886da59f188c0ff1e080
 
-depends_build		bin:perl:perl5.8
-depends_lib			port:gmp port:icu
+
+depends_build		bin:perl:perl5
+depends_lib		port:gmp port:icu
 
 configure.cmd		perl Configure.pl
 configure.pre_args	--prefix=${prefix}/lib/parrot
-# build static to avoid runtime lib issues for now
-configure.args		--optimize --parrot_is_shared=0
+configure.args		--optimize
 
-# install target is temporarily disabled as it might conflict with development
-# users of a port should have no such trouble, however.
-destroot.target         reallyinstall
+destroot.target         install-dev
 
 build.type		gnu
-build.target		
+build.target
 
 test.run		yes
 test.target		test
@@ -43,12 +45,37 @@ destroot.destdir	 PREFIX=${destroot}${prefix}/lib/parrot
 post-destroot {
 	set bindir	${destroot}${prefix}/bin
 	set docdir      ${destroot}${prefix}/share/doc/${name}
-	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/parrot"
+
+        # It would be nice if the install linked properly, but for
+        # now, update the link information manually post install to
+        # use the install dir instead of the build dir.
+ 
+        set old_path "${workpath}/parrot-${version}/blib/lib/libparrot.dylib"
+        set new_path "${prefix}/lib/parrot/lib/libparrot.${version}.dylib"
+
+        set executables {
+            parrot parrot_config parrot_debugger
+            pbc_disassemble pbc_merge pbc_to_exe pbc_dump
+        }
+
+        foreach exe $executables { 
+            # fixup the library path
+	    system "cd ${prefix}/lib/parrot/bin && \
+                install_name_tool -change \"$old_path\" \"$new_path\" ${exe}"
+
+            # install into the common area.
+            system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/${exe}"
+        }
+
+        set dynamic_extensions {
+           digest_group libglutcb rational dynlexpad libnci_test subproxy
+        } 
+
+        foreach lib $dynamic_extensions {
+            # fixup the library path
+	    system "cd ${prefix}/lib/parrot/lib/${version}/dynext && \
+                install_name_tool -change \"$old_path\" \"$new_path\" ${lib}.bundle"
+        }
 
 	xinstall -m 755 -d ${docdir}
-}
-
-platform darwin 8 {
-	configure.args-append --cc=/usr/bin/gcc-4.0 --link=/usr/bin/gcc-4.0 \
-		--ld=/usr/bin/gcc-4.0 --cxx=/usr/bin/g++-4.0
 }

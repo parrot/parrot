@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -54,9 +54,7 @@ noarg:
     r2 = _fib(n2)
     n = r1 + r2
 ret:
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 =head1 SEE ALSO

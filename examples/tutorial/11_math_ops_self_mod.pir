@@ -1,7 +1,11 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Math Operations (continued)
 
-The second common form of math operation takes one argument and performs the
-operation on the result, modifying it in place.
+There is a second common form of math operations. This form takes
+one argument and performs the operation on the result, modifying it in
+place.
 
 =cut
 
@@ -12,7 +16,7 @@ operation on the result, modifying it in place.
     say $I0
 
     $N0 = 22.44
-    $N0 /= 0
+    $N0 /= 4
     say $N0
 
 .end

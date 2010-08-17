@@ -1,5 +1,5 @@
 /* parrot.h
- *  Copyright (C) 2001-2008, The Perl Foundation.
+ *  Copyright (C) 2001-2009, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -17,6 +17,8 @@
 
 #ifndef PARROT_PARROT_H_GUARD
 #define PARROT_PARROT_H_GUARD
+
+#include "parrot/core_types.h"
 
 #if defined(INSIDE_GLOBAL_SETUP)
 #  define VAR_SCOPE
@@ -100,10 +102,6 @@
 typedef jmp_buf Parrot_jump_buff;
 #endif /* PARROT_HAS_HEADER_SETJMP */
 
-#ifdef PARROT_HAS_HEADER_PTHREAD
-#  include <pthread.h>
-#endif /* PARROT_HAS_HEADER_PTHREAD */
-
 #ifdef PARROT_HAS_HEADER_LIMITS
 #  include <limits.h>
 #endif /* PARROT_HAS_HEADER_LIMITS */
@@ -111,14 +109,7 @@ typedef jmp_buf Parrot_jump_buff;
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
 
-#define OPCODE_TYPE_PERL 0x5045524c
-#define OPCODE_TYPE_PYTHON 0x5045524b
-#define OPCODE_TYPE_JAVA 4871757
-#define OPCODE_TYPE_MSNET 0x2e4e4554
-
-typedef struct PMC PMC;
 typedef void STRING_FUNCS;
-typedef void BIGNUM;
 typedef struct parrot_interp_t Interp;
 
 /* weird architectures might need this, s. C-FAQ 5.17
@@ -140,33 +131,19 @@ typedef struct parrot_interp_t Interp;
     A. D. Aug. 6, 2002.
 */
 #if PTR_SIZE == INTVAL_SIZE
-#  define INTVAL2PTR(any, d)    (any)(d)
-#  define UINTVAL2PTR(any, d)    (any)(d)
+#  define INTVAL2PTR(any, d)    ((any)(d))
+#  define UINTVAL2PTR(any, d)    ((any)(d))
 #else
 #  if PTR_SIZE == LONG_SIZE
-#    define INTVAL2PTR(any, d)    (any)(unsigned long)(d)
-#    define UINTVAL2PTR(any, d)    (any)(unsigned long)(d)
+#    define INTVAL2PTR(any, d)    ((any)(unsigned long)(d))
+#    define UINTVAL2PTR(any, d)    ((any)(unsigned long)(d))
 #  else
-#    define INTVAL2PTR(any, d)    (any)(unsigned int)(d)
-#    define UINTVAL2PTR(any, d)    (any)(unsigned int)(d)
+#    define INTVAL2PTR(any, d)    ((any)(unsigned int)(d))
+#    define UINTVAL2PTR(any, d)    ((any)(unsigned int)(d))
 #  endif /* PTR_SIZE == LONG_SIZE */
 #endif /* PTR_SIZE == INTVAL_SIZE */
 #define PTR2INTVAL(p)    INTVAL2PTR(INTVAL, (p))
 #define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL, (p))
-
-/* Use similar macros for casting between pointers and opcode_t.
-   (We can't assume that sizeof (opcode_t) == sizeof (intval).
-*/
-#if (OPCODE_T_SIZE == PTR_SIZE)
-#  define OPCODE_T2PTR(any, d)    (any)(d)
-#else
-#  if PTR_SIZE == LONG_SIZE
-#    define OPCODE_T2PTR(any, d)    (any)(unsigned long)(d)
-#  else
-#    define OPCODE_T2PTR(any, d)    (any)(unsigned int)(d)
-#  endif /* PTR_SIZE == LONG_SIZE */
-#endif /* OPCODE_T_SIZE == PTR_SIZE */
-#define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t, (p))
 
 /*
  * some compilers don't like lvalue casts, so macroize them
@@ -267,6 +244,7 @@ typedef void (*funcptr_t)(void);
 #define LOCALEDIR  "."
 
 typedef struct _hash Hash;
+typedef struct PackFile_ByteCode PackFile_ByteCode;
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"
@@ -281,47 +259,34 @@ typedef struct _hash Hash;
 #include "parrot/string.h"
 #include "parrot/string_primitives.h"
 #include "parrot/hash.h"
-#include "parrot/list.h"
 #include "parrot/pmc_freeze.h"
 #include "parrot/vtable.h"
-#include "parrot/stacks.h"
-#include "parrot/register.h"
+#include "parrot/context.h"
 #include "parrot/exceptions.h"
 #include "parrot/warnings.h"
 #include "parrot/memory.h"
-#include "parrot/pic.h"
 #include "parrot/packfile.h"
 #include "parrot/io.h"
 #include "parrot/op.h"
 #include "parrot/pmc.h"
-#include "parrot/events.h"
-#include "parrot/intlist.h"
-#include "parrot/smallobject.h"
-#include "parrot/headers.h"
-#include "parrot/dod.h"
-#include "parrot/resources.h"
+#include "parrot/gc_api.h"
 #include "parrot/string_funcs.h"
 #include "parrot/misc.h"
-#include "parrot/debug.h"
 #include "parrot/sub.h"
-#include "parrot/inter_call.h"
+#include "parrot/call.h"
 #include "parrot/key.h"
 #include "parrot/exit.h"
 #include "parrot/nci.h"
 #include "parrot/thread.h"
 #include "parrot/scheduler.h"
-#include "parrot/tsq.h"
 #include "parrot/longopt.h"
 #include "parrot/oo.h"
 #include "parrot/vtables.h"
-#include "parrot/mmd.h"
+#include "parrot/multidispatch.h"
 #include "parrot/library.h"
-#include "parrot/builtin.h"
-#include "parrot/global.h"
+#include "parrot/namespace.h"
 #include "parrot/stat.h"
-#include "parrot/slice.h"
 #include "parrot/hll.h"
-#include "parrot/stm/backend.h"
 #include "parrot/pbcversion.h"
 
 #endif /* PARROT_PARROT_H_GUARD */

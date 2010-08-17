@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+include /usr/share/quilt/quilt.make
+
 CFLAGS = -Wall -g
 VERSION = $(shell cat VERSION)
 SOVERSION = $(VERSION)
@@ -10,34 +12,51 @@ else
 	CFLAGS += -O2
 endif
 
-debian/control: debian/control.in VERSION
-	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' $< > $@
+CONTROL_FILES = \
+  debian/control.in \
+  debian/parrot.install.in \
+  debian/parrot-minimal.install.in \
+  debian/parrot-doc.install.in \
+  debian/parrot-devel.install.in \
+  debian/libparrot.install.in \
+  debian/libparrot-dev.install.in
 
-configure: debian/control configure-stamp
-configure-stamp:
+debian-control-stamp: $(CONTROL_FILES) VERSION
+	for infile in $(CONTROL_FILES); do \
+	    outfile=`echo $$infile | sed "s/\.in$$//"`; \
+	    sed -e "s/@VERSION@/$(VERSION)/g" \
+	        -e "s/@SOVERSION@/$(SOVERSION)/g" \
+	            <$$infile >$$outfile; \
+	done
+	touch $@
+
+configure: configure-stamp
+configure-stamp: debian-control-stamp $(QUILT_STAMPFN)
 	dh_testdir
-	perl Configure.pl --prefix=/usr --optimize
+	perl Configure.pl --prefix=/usr --disable-rpath
 	touch configure-stamp
 
 build: build-stamp
 
 build-stamp: configure-stamp 
 	dh_testdir
-	$(MAKE) installable
+	$(MAKE) installable LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}`pwd`/blib/lib
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config debian/parrot-config.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdump.c debian/pdump.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/disassemble.c debian/disassemble.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdb.c debian/parrot-debugger.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_info.c debian/pbc_info.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" tools/util/parrot-config.pir debian/parrot_config.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_dump.c debian/pbc_dump.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_disassemble.c debian/pbc_disassemble.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/parrot_debugger.c debian/parrot_debugger.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_merge.c debian/pbc_merge.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" tools/dev/pbc_to_exe.pir debian/pbc_to_exe.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" ext/nqp-rx/parrot-nqp.pod debian/parrot-nqp.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" compilers/opsc/README.pod debian/ops2c.1
 	touch build-stamp
 
-clean:
+clean: debian-control-stamp unpatch
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o src/main.o ext/Parrot-Embed/Makefile.PL languages/PIR/Makefile languages/perl5/Makefile languages/pynie/Makefile runtime/parrot/include/signal.pasm test.c test.ldo
-	-$(MAKE) realclean
+	rm -f build-stamp configure-stamp debian-control-stamp debian/parrot.1 debian/parrot_config.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/main.o installable_pbc_to_exe ext/Parrot-Embed/Makefile.PL test.c test.ldo
+	[ ! -f Makefile ] || $(MAKE) distclean
 	dh_clean 
 
 debian/libparrot$(SOVERSION).install: debian/libparrot.install VERSION
@@ -47,13 +66,11 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
-	$(MAKE) reallyinstall DESTDIR=$(CURDIR)/debian/tmp
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}`pwd`/blib/lib
+	$(MAKE) install-doc DESTDIR=$(CURDIR)/debian/tmp
 	dh_installdirs
 	find $(CURDIR)/debian/tmp -type f
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
-	install -m644 src/null_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
-	install -m644 src/parrot_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
 
 
 # Build architecture-independent files here.
@@ -61,7 +78,6 @@ binary-indep: build install
 	dh_testdir -i 
 	dh_testroot -i
 	dh_installchangelogs -i ChangeLog
-	dh_installman -plibparrot-dev debian/parrot-config.1
 	dh_installdocs -i
 	dh_link -plibparrot-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
 	dh_compress -pparrot-doc -X.pod
@@ -77,14 +93,15 @@ binary-arch: build install
 	dh_testdir -a
 	dh_testroot -a
 	dh_installchangelogs -a ChangeLog
-	dh_installman -pparrot debian/parrot.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1
+	dh_installman -pparrot-minimal debian/parrot.1
+	dh_installman -pparrot-devel debian/parrot_debugger.1 debian/pbc_disassemble.1 debian/pbc_dump.1 debian/pbc_merge.1 debian/parrot_config.1 debian/pbc_to_exe.1 debian/parrot-nqp.1 debian/ops2c.1
 	dh_installdocs -a
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
-	dh_installdeb -a
 	dh_makeshlibs -plibparrot$(SOVERSION)
 	dh_shlibdeps -a -Llibparrot$(SOVERSION) -l$(CURDIR)/debian/libparrot$(SOVERSION)/usr/lib
+	dh_installdeb -a
 	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a

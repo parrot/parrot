@@ -1,0 +1,306 @@
+=pod
+
+=head1 Command-Line Options
+
+Z<CHP-13-SECT-4>
+
+X<command-line options (Parrot)>
+X<Parrot;command-line options>
+X<running.pod file>
+Since Parrot is both an assembler and a bytecode interpreter, it
+has options to control both behaviors. Some options may have changed
+by the time you read this, especially options related to debugging and
+optimization. The document F<imcc/docs/running.pod> should
+have the latest details. Or just run F<parrot --help>.
+
+=head2 General Usage
+
+Z<CHP-13-SECT-4.1>
+
+  parrot [options] file [arguments]
+
+The R<file> is either an F<.pir> or F<.pasm> source file or a
+Parrot bytecode file. Parrot creates an C<Array> object to hold the
+command-line R<arguments> and stores it in C<P5> on program start.
+
+=head2 Assembler Options
+
+Z<CHP-13-SECT-4.2>
+
+=over 4
+
+=item -a, --pasm
+
+X<Parrot;assembler options>
+Assume PASM input on C<stdin>. When Parrot runs a source file with a
+F<.pasm> extension, it parses the file as pure PASM code. This switch
+turns on PASM parsing (instead of the default PIR parsing) when a
+source file is read from C<stdin>.
+
+=item -c,--pbc
+
+Assume PBC file on C<stdin>. When Parrot runs a bytecode file with a
+F<.pbc> extension, it immediately executes the file. This option tells
+Parrot to immediately execute a bytecode file piped in on C<stdin>.
+
+=item -d,--debug [R<hexbits>]
+
+Turn on debugging output. The C<-d> switch takes an optional argument,
+which is a hex value of debug bits. The individual bits are shown in
+Table 11-3. When R<hexbits> isn't specified,
+the default debugging level is 0001. If R<hexbits> is separated
+from the C<-d> switch by whitespace, it has to start with a number.
+
+=begin table picture Debug bits
+
+Z<CHP-13-TABLE-3>
+
+=headrow
+
+=row
+
+=cell Description
+
+=cell Debug bit
+
+=bodyrows
+
+=row
+
+=cell DEBUG_PARROT
+
+=cell 0001
+
+=row
+
+=cell DEBUG_LEXER
+
+=cell 0002
+
+=row
+
+=cell DEBUG_PARSER
+
+=cell 0004
+
+=row
+
+=cell DEBUG_IMC
+
+=cell 0008
+
+=row
+
+=cell DEBUG_CFG
+
+=cell 0010
+
+=row
+
+=cell DEBUG_OPT1
+
+=cell 0020
+
+=row
+
+=cell DEBUG_OPT2
+
+=cell 0040
+
+=row
+
+=cell DEBUG_PBC
+
+=cell 1000
+
+=row
+
+=cell DEBUG_PBC_CONST
+
+=cell 2000
+
+=row
+
+=cell DEBUG_PBC_FIXUP
+
+=cell 4000
+
+=end table
+
+X<Parrot;debugging bits>
+X<debugging bits (Parrot)>
+To produce a huge output on C<stderr>, turn on all the debugging bits:
+
+  $ parrot -d 0ffff ...
+
+
+=item --help-debug
+
+Show debug option bits.
+
+=item -h,--help
+
+Print a short summary of options to C<stdout> and exit.
+
+=item -o R<outputfile>
+
+Act like an assembler. With this switch Parrot won't run code unless
+it's combined with the C<-r> switch. If the name of R<outputfile> ends
+with a F<.pbc> extension, Parrot writes a Parrot bytecode file. If
+R<outputfile> ends with a F<.pasm> extension, Parrot writes a PASM
+source file, even if the input file was also PASM. This can be handy
+to check various optimizations when you run Parrot with the C<-Op>
+switch.
+
+=item -r,--run-pbc
+
+Immediately execute bytecode. This is the default unless C<-o> is
+present. The combination of C<-r> C<-o> C<output.pbc> writes a
+bytecode file and executes the generated PBC.
+
+=item -v,--verbose
+
+One C<-v> switch (C<imcc> C<-v>) shows which files are worked on and
+prints a summary of register usage and optimization statistics. Two
+C<-v> switches (C<imcc> C<-v> C<-v>) also prints a line for each
+individual processing step.
+
+=item -y,--yydebug
+
+Turn on C<yydebug> for F<yacc>/F<bison>.
+
+=item -E,--pre-process-only
+
+Show output of macro expansions and quit.
+
+=item -V,--version
+
+Print the program version to C<stdout> and exit.
+
+=item -Ox
+
+Turn on optimizations. The flags currently implemented are shown in
+Table 11-4.
+
+X<Parrot;optimizations>
+X<optimizations (Parrot)>
+
+=begin table picture Optimizations
+
+Z<CHP-13-TABLE-4>
+
+=headrow
+
+=row
+
+=cell Flag
+
+=cell Meaning
+
+=bodyrows
+
+=row
+
+=cell C<-O0>
+
+=cell No optimization (default).
+
+=row
+
+=cell C<-O1>
+
+=cell Optimizations without life info (e.g. branches and constants).
+
+=row
+
+=cell C<-O2>
+
+=cell Optimizations with life info.
+
+=row
+
+=cell C<-Oc>
+
+=cell Optimize function call sequence.
+
+=row
+
+=cell C<-Op>
+
+=cell Rearrange PASM registers with the most-used first.
+
+=end table
+
+=back
+
+=head2 Runcore Options
+
+Z<CHP-13-SECT-4.3>
+
+X<Parrot;bytecode interpreter options>
+X<bytecode interpreter options (Parrot)>
+X<computed goto core>
+X<fast core>
+The interpreter options are mainly for selecting which run-time core to
+use for interpreting bytecode. The current default is the I<computed
+goto core> if it's available. Otherwise the I<fast core> is used.
+
+=over 4
+
+=item -R slow
+
+Run with the I<slow core>
+
+=item -R bounds
+
+Activate bounds checking. This also runs with the I<slow core> as a
+side effect.
+
+=item -R fast
+
+Run with the I<fast core>.
+
+=item -R gcdebug
+
+Performs a full GC run before every op dispatch
+(good for debugging GC problems)
+
+=item -p,--profile
+
+Activate profiling. This prints a summary of opcode usage and
+execution times after the program stops. It also runs within the
+I<slow core>.
+
+=item -t,--trace
+
+Trace execution. This also turns on the I<slow core>.
+
+=item -w,--warnings
+
+Turn on warnings.
+
+=item -G,--no-gc
+
+Turn off GC. This is for debugging only.
+
+=item -.,--wait
+
+Wait for a keypress before running.
+
+=item --leak-test,--destroy-at-end
+
+Cleanup up allocated memory when the final interpreter is destroyed.
+C<Parrot> destroys created interpreters (e.g. threads) on exit  but
+doesn't normally free all memory for the last terminating interpreter,
+since the operating system will do this anyway. This can create false
+positives when C<Parrot> is run with a memory leak detector. To prevent
+this, use this option.
+
+=back
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

@@ -1,17 +1,19 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-=head1 NAME
+=head1 [DRAFT] PDD 11: Extending
 
-docs/pdds/pdd11_extending.pod - The Parrot Extension System
-
-=head1 ABSTRACT
+=head2 Abstract
 
 The extension API for Parrot is a simple, somewhat abstract, interface to
 Parrot for code written in C or other compiled languages. It provides about
 the same level of access to Parrot  that bytecode programs have.
 
-=head1 DESCRIPTION
+=head2 Version
+
+$Revision$
+
+=head2 Description
 
 The API presents to C programs roughly the same interface presented to
 bytecode programs--that is, a C extension can see everything that a bytecode
@@ -32,9 +34,9 @@ B<Note:> The extension API has not yet been completely specified. New
 functions may be added, and those described below may change or be removed.
 You have been warned...
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 API - Group 1: Internals-unaware functions
+=head3 API - Group 1: Internals-unaware functions
 
 These functions are the ones that are largely unaware of the structure and
 architecture of Parrot. They deal mainly in data as abstract entities, and
@@ -42,7 +44,7 @@ Parrot itself as a black box that, at best, can make subroutine or method
 calls. This is sufficient for many extensions which act as black box
 processing units and in turn treat Parrot itself as a black box.
 
-=head3 PMC access functions
+=head4 PMC access functions
 
 The following functions are for storing and retrieving data inside PMCs. Note
 that use of the _keyed functions with non-aggregate PMCs will generally just
@@ -71,13 +73,13 @@ that hold pointers to arbitrary data.
 A keyed version of C<Parrot_PMC_get_pointer>. Returns the pointer value of
 whatever is stored at the element of the PMC indexed by C<key>.
 
-=item C<Parrot_PMC_get_intval(interp, pmc)>
+=item C<Parrot_PMC_get_integer(interp, pmc)>
 
 Returns the integer value of the PMC.
 
-=item C<Parrot_PMC_get_intval_intkey(interp, pmc, Parrot_Int key)>
+=item C<Parrot_PMC_get_integer_keyed_int(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_intval>. Returns the integer value of
+A keyed version of C<Parrot_PMC_get_integer>. Returns the integer value of
 whatever is stored at the element of the PMC indexed by C<key>.
 
 =item C<Parrot_PMC_get_numval(interp, pmc)>
@@ -200,9 +202,45 @@ Keyed version of C<Parrot_PMC_set_cstringn>. Converts the first C<length>
 characters of C<value> to a Parrot_String and assigns the resulting string to
 the PMC stored at element <key> of the passed-in PMC.
 
+=item C<Parrot_PMC_push_float( interp, Parrot_PMC pmc, Parrot_Float value )>
+
+Push a float onto an aggregate PMC, such as a ResizablePMCArray.
+Returns void.
+
+=item C<Parrot_PMC_push_integer( interp, Parrot_PMC pmc, Parrot_Int value )>
+
+Push a integer onto an aggregate PMC, such as a ResizableIntegerArray.
+Returns void.
+
+=item C<Parrot_PMC_push_pmc( interp, Parrot_PMC pmc, Parrot_PMC value )>
+
+Push a PMC value onto an aggregate PMC, such as a ResizablePMCArray.
+Returns void.
+
+=item C<Parrot_PMC_push_string( interp, Parrot_PMC pmc, Parrot_String value )>
+
+Push a Parrot_String onto an aggregate PMC, such as a ResizableStringArray.
+Returns void.
+
+=item C<Parrot_PMC_pop_float( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_Float off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_integer( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_Int off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_pmc( interp, Parrot_PMC pmc )>
+
+Pop a PMC off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_string( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_String off of an aggregate PMC and returns it.
+
 =back
 
-=head3 Creation and destruction
+=head4 Creation and destruction
 
 Functions used to create and destroy PMCs, Parrot_Strings, etc.
 
@@ -260,38 +298,28 @@ Parrot.
 
 =item C<Parrot_register_pmc(interp, pmc)>
 
-Add a reference to the PMC to the interpreter's DOD registry. This prevents
-PMCs known only to extensions from getting destroyed during  DOD runs.
+Add a reference to the PMC to the interpreter's GC registry. This prevents
+PMCs known only to extensions from getting destroyed during GC runs.
 
 =item C<Parrot_unregister_pmc(interp, pmc)>
 
-Remove a reference to the PMC from the interpreter's DOD registry.  If the
-reference count reaches zero, the PMC will be destroyed during the  next DOD
+Remove a reference to the PMC from the interpreter's GC registry.  If the
+reference count reaches zero, the PMC will be destroyed during the next GC
 run.
 
 =back
 
-=head3 Subroutine and method calls
+=head4 Subroutine and method calls
 
 Functions to call Parrot subroutines and methods
 
 =over 4
 
-=item C<Parrot_call_sub(interp, Parrot_PMC sub, Parrot_Int argcount, ...)>
-
-Calls a Parrot subroutine, with C<argcount> PMC parameters. This function sets
-up Parrot's registers in line with the Parrot calling conventions; see
-L<pdd03_calling_conventions.pod> for more details.
-
-=item C<Parrot_call_method(interp,
-Parrot_PMC sub, Parrot_String method, Parrot_Int argcount, ...)>
-
-Calls a Parrot method named C<method> with C<argcount> PMC parameters. NB.
-This is not yet implemented and may change.
+    TODO: Add new call functions here
 
 =back
 
-=head2 API - Group 2: Internals aware
+=head3 API - Group 2: Internals aware
 
 The internals-aware functions are for those extensions that need to query or
 alter the state of Parrot's internals in some way.
@@ -325,49 +353,14 @@ Return the value of a PMC register.
 
 =back
 
-=head1 ATTACHMENTS
-
-None.
-
-=head1 FOOTNOTES
-
-None.
-
-=head1 REFERENCES
+=head2 References
 
 F<docs/glossary.pod>
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer:
-    Class: Internals
-    PDD Number: 11
-    Version: 1.0
-    Status: Developing
-    Last Modified: February 20, 2004
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=back
-
 =cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

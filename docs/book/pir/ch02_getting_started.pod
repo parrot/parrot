@@ -1,0 +1,78 @@
+=pod
+
+=head1 Getting Started
+
+The simplest way to install Parrot is to use a pre-compiled binary for your
+operating system or distribution. Packages are available for many systems,
+including Debian, Ubuntu, Fedora, Mandriva, FreeBSD, Cygwin, and MacPorts. The
+Parrot website lists all known packages.N<U<http://www.parrot.org/download>> A
+binary installer for Windows is also available from the Parrot Win32
+project on SourceForge.N<U<http://parrotwin32.sourceforge.net/>> 
+If packages aren't available on your system, you can download a source
+tarball for the latest supported
+release from U<http://www.parrot.org/release/supported>.
+
+You need a C compiler and a make utility to build Parrot from source code --
+usually C<gcc> and C<make>, but Parrot can build with standard compiler
+toolchains on different operating systems.  Perl 5.8 is also a prerequiste for
+configuring and building Parrot.
+
+X<compiling>
+If you have these dependencies installed, build the core virtual machine and
+compiler toolkit and run the standard test suite with the commands:
+
+  $ perl Configure.pl
+  $ make
+  $ make test
+
+X<installation>
+By default, Parrot installs to directories F<bin/>, F<lib/>, and
+F<include/> under F</usr/local>. If you have privileges to
+write to these directories, install Parrot with:
+
+  $ make install
+
+To install Parrot in a different location, use the C<--prefix> option to
+F<Configure.pl>:
+
+    $ perl Configure.pl --prefix=/home/me/parrot
+
+Setting the prefix to F</home/me/parrot> installs the Parrot executable
+in F</home/me/parrot/bin/parrot>.
+
+If you intend to develop a language on Parrot, install the Parrot
+developer tools as well:
+
+  $ make install-dev
+
+X<.pir files>
+Once you've installed Parrot, create a test file called
+F<news.pir>.N<Files containing PIR code use the F<.pir> extension.>
+
+=begin PIR
+
+  .sub 'news'
+    say "Here is the news for Parrots."
+  .end
+
+=end PIR
+
+Now run this file with:
+
+  $ parrot news.pir
+
+which will print:
+
+  Here is the news for Parrots.
+
+=cut
+
+X<tutorial>
+The Parrot source distribution includes copious examples in its F<examples/>
+directory.  In particular, a PIR tutorial is available in
+F<examples/tutorial/>.
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

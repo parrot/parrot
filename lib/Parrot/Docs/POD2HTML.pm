@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -33,6 +33,28 @@ use base qw( Pod::Simple::HTML );
 our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
+use Parrot::Distribution;
+
+=item C<new()>
+
+Extend C<Pod::Simple::HTML> method to accept PIR and PASM sections that
+contain example code, which will be put into a <pre> HTML element.
+
+=cut
+
+sub new {
+    my $new = shift->SUPER::new(@_);
+
+    $new->accept_targets(qw(
+        PIR PASM PIR_FRAGMENT
+        PIR_INVALID PIR_TODO
+        PASM_INVALID PASM_TODO
+        PIR_FRAGMENT_INVALID
+    ));
+    delete(@{$new->{'Tagmap'}}{'Data','/Data'});
+
+    return $new;
+}
 
 =item C<do_beginning()>
 
@@ -125,6 +147,9 @@ sub process_start_token {
     elsif ( $tagname eq 'Data' ) {
         $self->process_data_start_token($token);
     }
+    elsif ( $tagname eq 'for' ) {
+        $self->process_for_start_token($token);
+    }
     else {
         $self->process_other_start_token($token);
     }
@@ -183,9 +208,6 @@ sub process_code_start_token {
 
     if ( $text =~ /^Parrot::/o ) {
 
-        # RT#43715 - C<Perl::Module> should really be L<Perl::Module>
-        # but this will do until the docs are changed.
-
         my $href = $self->href_for_perl_module($text);
 
         esc($text);
@@ -195,9 +217,6 @@ sub process_code_start_token {
         }
     }
     else {
-
-        # Tidy up the C reference *s.
-        $text =~ s|\b\s*\*\s+\b| \*|gs;
 
         esc($text);
     }
@@ -312,7 +331,29 @@ sub process_data_start_token {
         return;
     }
 
-    printf { $self->{'output_fh'} } "\n" . $next->text . "\n";
+    if  ($self->{IN_CODE_BLOCK}) {
+        print { $self->{'output_fh'} } $next->text;
+    }
+    else {
+        print { $self->{'output_fh'} } "\n" . $next->text . "\n";
+    }
+}
+
+=item C<process_for_start_token($token)>
+
+Processes a for start token.
+
+=cut
+
+sub process_for_start_token {
+    my $self  = shift;
+    my $token = shift;
+    my $target = $token->attr("target");
+
+    if ($target =~ m/^(PIR|PASM)/) {
+        print { $self->{'output_fh'} } '<pre>';
+        $self->{IN_CODE_BLOCK} = 1;
+    }
 }
 
 =item C<process_other_start_token($token)>
@@ -360,13 +401,6 @@ sub process_end_token {
         $tagname = 'Para_item'
             if @{ $self->{STACK} } and $self->{STACK}->[-1] eq 'text';
     }
-    elsif ( $tagname =~ /head[12]/o ) {
-
-        # Put the up arrow on the end of a heading.
-        # The space is needed on the front.
-        print { $self->{'output_fh'} }
-            " <a href='#_top'><img alt='^' border=0 src='$self->{RESOURCES_URL}/up.gif'></a>";
-    }
     elsif ( $tagname eq 'C' ) {
 
         # See the note in process_code_start_token() above.
@@ -374,6 +408,10 @@ sub process_end_token {
     }
     elsif ( $tagname eq 'item-text' ) {
         $self->{IN_ITEM_TEXT} = 0;
+    }
+    elsif ( $tagname eq 'for' ) {
+        print { $self->{'output_fh'} } '</pre>' if $self->{IN_CODE_BLOCK};
+        $self->{IN_CODE_BLOCK} = 0;
     }
 
     print { $self->{'output_fh'} } $self->{'Tagmap'}{"/$tagname"} || return;
@@ -690,9 +728,9 @@ s/([^\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuv
 
 =head1 HISTORY
 
-In order to avoid modifying C<Pod:Simple::HTLM> large sections of its code
-have been copied here, and then refactored and adjusted to enable various
-bits of Parrot-specific behaviour.
+In order to avoid modifying C<Pod:Simple::HTML>, large sections of its code
+have been copied here, and then refactored and adjusted to enable various bits
+of Parrot-specific behaviour.
 
 =cut
 

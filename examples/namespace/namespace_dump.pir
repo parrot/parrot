@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
+
 #
 # dump all namespaces and the contents recursively
 #
@@ -34,15 +37,16 @@ lp:
     print $P1
     print "\n"
 no_sym:
-    $I0 = typeof $P0
-    if $I0 != .NCI goto no_nci
+    $I0 = isa $P0, 'NCI'
+    unless $I0 goto no_nci
     $P0 = new 'String'
     $P0 = "NCI"
 no_nci:
     print spac
     print $S0
     print " => "
-    if $I0 != .MultiSub goto no_multi
+    $I0 = isa $P0, 'MultiSub'
+    unless $I0 goto no_multi
     $I1 = lev + 1
     print " Multi [\n"
     dump_multi($P0, $I1)
@@ -52,7 +56,8 @@ no_nci:
 no_multi:
     print $P0
     print "\n"
-    if $I0 != .NameSpace goto no_ns
+    $I0 = isa $P0, 'NameSpace'
+    unless $I0 goto no_ns
     $I1 = lev + 1
     dump($P0, $I1)
 no_ns:
@@ -70,21 +75,23 @@ ex:
     null i
     $I2 = lev * 4
     spac = repeat " ", $I2
+
 loop:
     print spac
     $P0 = multi[i]
     $P1 = $P0."get_multisig"()
+    if null $P1 goto next_loop
     m = elements $P1
     j = 0
 lp2:
     $I0 = $P1[j]
-    typeof $S0, $I0
-    print $S0
+    print $I0
     print " "
     inc j
     if j < m goto lp2
 
     print "\n"
+next_loop:
     inc i
     if i < n goto loop
 .end

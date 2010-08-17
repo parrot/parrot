@@ -39,10 +39,11 @@ newly created C<Exception>.
     .param pmc args            :slurpy
     .local pmc ex
     .local string message
-    ex = new 'Exception'
+    ex      = new 'Exception'
     if null args goto end
+
     message = join '', args
-    ex['_message'] = message
+    ex      = message
   end:
     .return (ex)
 .end
@@ -55,7 +56,7 @@ Patrick R. Michaud <pmichaud@pobox.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007-2008, The Perl Foundation.
+Copyright (C) 2007-2008, Parrot Foundation.
 
 =cut
 

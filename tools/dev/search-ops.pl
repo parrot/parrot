@@ -1,5 +1,5 @@
 # perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 use strict;
 use warnings;
@@ -43,7 +43,11 @@ exit 0;
 
 =head1 NAME
 
-tools/dev/search-ops.pl - Get descriptions of ops codes
+tools/dev/search-ops.pl
+
+=head1 DESCRIPTION
+
+Command-line tool to get descriptions of ops codes.
 
 =head1 USAGE
 

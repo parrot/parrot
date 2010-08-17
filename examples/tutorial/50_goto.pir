@@ -1,6 +1,12 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1
 
-Demonstrate the simplest form of control flow, 'goto' a label.
+The unconditional jump is the simplest of all flow control devices in any
+language, and PIR is no exception. Using the C<goto> command, control flow
+can jump to any location with a label. Labels are named just like named
+variables, except they have a colon C<:> at the end.
 
 =cut
 

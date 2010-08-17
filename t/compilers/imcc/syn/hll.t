@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -11,8 +11,15 @@ use Parrot::Test tests => 2;
 
 pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using PMC)" );
 
-.HLL 'misc', ''
-.HLL_map 'ResizablePMCArray', 'ResizableStringArray'
+.HLL 'misc'
+.sub anon :anon :init
+  .local pmc interp
+  .local pmc rpa,rsa
+  interp = getinterp
+  rpa = get_class 'ResizablePMCArray'
+  rsa = get_class 'ResizableStringArray'
+  interp.'hll_map'(rpa,rsa)
+.end
 
 .sub main :main
   elm('a','b','c')
@@ -32,14 +39,29 @@ CODE
 ResizableStringArray
 OUT
 
+$ENV{TEST_PROG_ARGS} ||= '';
+
+SKIP: {
+
+skip('use of :immediate for this test does not work with --run-pbc', 1)
+  if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
+
 pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using object)" );
 
 .sub setup :anon :immediate
  $P0 = subclass 'ResizablePMCArray', 'Stack'
 .end
 
-.HLL 'misc', ''
-.HLL_map 'ResizablePMCArray', 'Stack'
+.HLL 'misc'
+.sub anon :anon :init
+  .local pmc interp
+  .local pmc rpa,stack
+  interp = getinterp
+  rpa = get_class 'ResizablePMCArray'
+  stack = get_class 'Stack'
+  interp.'hll_map'(rpa,stack)
+.end
+
 
 .sub main :main
   elm('a','b','c')
@@ -58,3 +80,11 @@ CODE
 3
 Stack
 OUT
+}
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

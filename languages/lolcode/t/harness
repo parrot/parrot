@@ -1,8 +1,0 @@
-#! perl
-
-# $Id$
-
-use FindBin;
-use lib qw( . lib ../lib ../../lib );
-use Parrot::Test::Harness language => 'lolcode', compiler => 'lolcode.pbc';
-

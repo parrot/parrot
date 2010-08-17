@@ -1,3 +1,6 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Config::JSON
 
 Provides a simple wrapper to read and write JSON config files.
@@ -20,25 +23,25 @@ If the data is not valid, an exception will be thrown.
 
     # Slurp in the file
     .local string text
-    .local pmc pio
+    .local pmc fh
 
-    pio = open filename, '<'
-    if pio goto slurp_file
+    fh = new ['FileHandle']
+    fh.'open'(filename, 'r')
+    if fh goto slurp_file
     $P0 = new 'Exception'
-    $S0 = concat "can't open file: ", filename
-    $P0['_message'] = $S0
+    $S0 = concat "Can't open file: ", filename
+    $P0 = $S0
     throw $P0
 
   slurp_file:
-    text = pio.'slurp'(filename)
+    text = fh.'readall'()
 
-    # convert the text to an object and return it.
-    load_bytecode 'compilers/json/JSON.pbc'
-
-    .local pmc JSON, config
-    JSON = compreg "JSON"
-
-    .return JSON(text)
+    # Convert the text to an object and return it.
+    .local pmc json, code
+    load_language 'data_json'
+    json = compreg 'data_json'
+    code = json.'compile'(text)
+    .tailcall code()
 .end
 
 =head2 WriteConfig(config, filename, ?:compact)
@@ -68,16 +71,18 @@ the rendered JSON will not be formatted. The default is false.
     expanded = not compact
 
     # render the object as a string.
+    load_bytecode 'JSON.pbc'
     .local string output
     output = _json( config, expanded )
 
     # write out the file..
-    $P1 = open filename, '>'
+    $P1 = new ['FileHandle']
+    $P1.'open'(filename, 'w')
     print $P1, output
-    close $P1
+    print $P1, "\n"
+    $P1.'close'()
 
 .end
-.include 'library/JSON.pir'
 
 # Local Variables:
 #   mode: pir

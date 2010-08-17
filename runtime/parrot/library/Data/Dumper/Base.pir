@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Data::Dumper::Base - style baseclass
@@ -26,12 +28,12 @@ A Data::Dumper::Base object has the following methods:
 
 .sub __library_data_dumper_base_onload :load
     .local pmc ddb_class
-    ddb_class = get_class "Data::Dumper::Base"
+    ddb_class = get_class ['Data'; 'Dumper'; 'Base']
     if null ddb_class goto create_ddb
     goto END
 
   create_ddb:
-    newclass $P0, "Data::Dumper::Base"
+    newclass $P0, ['Data'; 'Dumper'; 'Base']
     addattribute $P0, "dumper"
     addattribute $P0, "level"
     addattribute $P0, "indention"
@@ -41,7 +43,7 @@ END:
     .return ()
 .end
 
-.namespace ["Data::Dumper::Base"]
+.namespace ['Data'; 'Dumper'; 'Base']
 
 =item style."prepare"( dumper, indent )
 
@@ -266,7 +268,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

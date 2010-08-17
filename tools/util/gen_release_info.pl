@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -17,9 +17,9 @@ suitable for graphs, charts, and reports.
 =cut
 
 
-my $repo_url = 'http://svn.perl.org/parrot/tags';
+my $repo_url = 'https://svn.parrot.org/parrot/tags';
 
-##  ceate a release information data structure
+##  create a release information data structure
 my $r = {
     map { $_->{number} => $_ }
     map { m{^(RELEASE_)(.*)/}

@@ -1,5 +1,5 @@
-#! parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,13 +16,14 @@ Tests the ParrotThread PMC.
 
 =cut
 
-.sub main :main
-    .include 'include/test_more.pir'
+.sub 'main' :main
+    .include 'test_more.pir'
 
     plan(1)
 
-    new P0, 'ParrotThread'
-    ok(1, 'Instantiated .ParrotThread')
+    new $P0, ['ParrotThread']
+    ok(1, 'Instantiated a ParrotThread PMC')
+
 .end
 
 # Local Variables:

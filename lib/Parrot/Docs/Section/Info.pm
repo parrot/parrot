@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -53,7 +53,6 @@ sub new {
                 'Instructions for Parrot in a Win32 environment.', 'README_win32.pod'
             ),
             $self->new_item( 'This file lists what\'s new in each version.', 'NEWS' ),
-            $self->new_item( 'A plan for Parrot.',                           'docs/ROADMAP.pod' ),
             $self->new_item( 'Where to find or put things that need doing in Parrot.', 'TODO' ),
             $self->new_item(
 'This is a description of the steps someone should follow when they have to prepare a new version for release.',

@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 PGE/Util.pir - useful rules for working with PGE grammars
@@ -11,13 +14,14 @@ parsing tasks using PGE.
 
 =cut
 
-.namespace [ 'PGE::Util' ]
+.namespace [ 'PGE';'Util' ]
 
 .include 'cclass.pasm'
 
 .sub "__onload" :load
-    .local pmc base
-    $P0 = subclass 'PGE::Grammar', 'PGE::Util'
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PGE::Util', 'parent'=>'PGE::Grammar')
     .return ()
 .end
 
@@ -35,13 +39,13 @@ of the match.
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc iter
+    .local pmc it
     .local string message
     message = ''
-    iter = new 'Iterator', list
+    it = iter list
   iter_loop:
-    unless iter goto iter_end
-    $S0 = shift iter
+    unless it goto iter_end
+    $S0 = shift it
     message .= $S0
     goto iter_loop
   iter_end:
@@ -59,7 +63,7 @@ of the match.
     .local int lines
     .local pmc line_number
     #  FIXME: use 'line_number' method instead?
-    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    line_number = get_hll_global ['PGE';'Util'], 'line_number'
     (lines) = mob.line_number(pos)
     inc lines
     message .= ' at line '
@@ -78,7 +82,7 @@ of the match.
 
   throw_message:
     $P0 = new 'Exception'
-    $P0['_message'] = message
+    $P0 = message
     throw $P0
 
     mob.'to'(-3)
@@ -96,13 +100,13 @@ Emits the list of messages to stderr.
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc iter
+    .local pmc it
     .local string message
     message = ''
-    iter = new 'Iterator', list
+    it = iter list
   iter_loop:
-    unless iter goto iter_end
-    $S0 = shift iter
+    unless it goto iter_end
+    $S0 = shift it
     message .= $S0
     goto iter_loop
   iter_end:
@@ -120,7 +124,7 @@ Emits the list of messages to stderr.
     .local int lines
     .local pmc line_number
     #  FIXME: use 'line_number' method instead?
-    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    line_number = get_hll_global ['PGE';'Util'], 'line_number'
     (lines) = mob.line_number(pos)
     inc lines
     message .= ' at line '
@@ -128,7 +132,10 @@ Emits the list of messages to stderr.
     message .= $S0
     message .= "\n"
   emit_message:
-    printerr message
+    $P0 = getinterp
+    .include 'stdio.pasm'
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'(message)
 
     mob.'to'(pos)
     .return (mob)
@@ -156,7 +163,7 @@ string is treated as '0'.
   have_pos:
 
     # count newlines to the current position of the parse
-    .local int pos, npos, lines
+    .local int npos, lines
     .local string target
     $P99 = getattribute match, '$.target'
     target = $P99
@@ -204,11 +211,11 @@ split_loop:
     unless match goto split_end
 
     ##  save substring up to current match
-    $I0 = match.from()
+    $I0 = match.'from'()
     $I0 -= pos
     $S0 = substr str, pos, $I0
     push result, $S0
-    pos = match.to()
+    pos = match.'to'()
 
     .local pmc captures
     captures = match.'list'()

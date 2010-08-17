@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -47,19 +47,19 @@ ex:
 # utils
 .sub 'load_libs'
     # load the necessary libraries
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Rect.pir"
-    load_bytecode "library/SDL/Color.pir"
-    load_bytecode "library/SDL/EventHandler.pir"
-    load_bytecode "library/SDL/Event.pir"
-    load_bytecode "library/Getopt/Obj.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Rect.pir"
+    load_bytecode "SDL/Color.pir"
+    load_bytecode "SDL/EventHandler.pir"
+    load_bytecode "SDL/Event.pir"
+    load_bytecode "Getopt/Obj.pir"
 .end
 
 # cmd line processing
 .sub 'get_opts'
     .param pmc argv
     .local pmc opts, getopts
-    getopts = new 'Getopt::Obj'
+    getopts = new ['Getopt';'Obj']
     push getopts, "quit|q"
     push getopts, "threads"
     $S0 = shift argv
@@ -72,7 +72,7 @@ ex:
     .param pmc opts
     # create an SDL::App subclass
     .local pmc app, cl
-    cl = subclass 'SDL::App', 'Mandel'
+    cl = subclass ['SDL'; 'App'], 'Mandel'
     addattribute cl, 'xstart'
     addattribute cl, 'ystart'
     addattribute cl, 'xend'
@@ -96,7 +96,7 @@ ex:
 .sub __init :method
     .local int w, h
     .local num scale, xstart, ystart
-    # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
+    # mandelbrot set is width [-2, 0.25] height [ -1, 1]
     # round up, scale *200
     xstart = -2.0
     ystart = -1.0
@@ -128,7 +128,7 @@ ex:
 
     # create an SDL::Rect representing the entire main screen
     .local pmc rect
-    rect = new 'SDL::Rect'
+    rect = new ['SDL'; 'Rect']
     rect.'init'( 'height' => h, 'width' => w, 'x' => 0, 'y' => 0 )
     setattribute self, 'rect', rect
 
@@ -251,14 +251,14 @@ get:
     .local int h2
     h2 = h / 2
     thr = new 'ParrotThread'
-    .const .Sub raw_calc_f = 'raw_calc'
+    .const 'Sub' raw_calc_f = 'raw_calc'
     .include 'cloneflags.pasm'
     .local int flags
     flags  = .PARROT_CLONE_CODE
     flags |= .PARROT_CLONE_CLASSES
     thr.'run'(flags, raw_calc_f, h2, h, args)
     raw_calc(0, h2, args)
-    thr.join()
+    thr.'join'()
     main_screen.'unlock'()
     .return()
 plain:
@@ -397,11 +397,11 @@ done:
 # init event system
 .sub 'init_events' :method
     .local pmc event, args, event_handler
-    event = new 'SDL::Event'
+    event = new ['SDL'; 'Event']
     event.'init'()
     setattribute self, 'event', event
 
-    $P0 = subclass 'SDL::EventHandler', ['Mandel'; 'EventHandler']
+    $P0 = subclass ['SDL'; 'EventHandler'], ['Mandel'; 'EventHandler']
     event_handler = new ['Mandel'; 'EventHandler']
     event_handler.'init'(self)	# XXX unused
     setattribute self, 'event_handler', event_handler
@@ -444,7 +444,7 @@ loop_r:
 loop_g:
     b = 0
 loop_b:
-    col = new 'SDL::Color'
+    col = new ['SDL'; 'Color']
     col.'init'( 'r' => r, 'g' => g, 'b' => b )
     push palette, col
     b += 36
@@ -453,7 +453,7 @@ loop_b:
     if g <= 255 goto loop_g
     r += 36
     if r <= 255 goto loop_r
-    .const .Sub by_bright = "bright"
+    .const 'Sub' by_bright = "bright"
     palette.'sort'(by_bright)
     .return (palette)
 .end
@@ -555,19 +555,17 @@ Plain runcore and unoptimized parrot:
 
 Optimized build
 
-  [2] plain runcore 64 bit                    3.0s
-  [2] -C    runcore 64 bit                    1.5s
-  [2] plain runcore 32 bit                    3.6s
-  [2] -C    runcore 32 bit                    1.6s
-  [1] -j                                      1.1s
-  [2] -j                                      0.8s
-  [3] -j                                      0.5s
+  [2] plain  runcore 64 bit                  3.0s
+  [2] plain  runcore 32 bit                  3.6s
+  [1] -R jit                                 1.1s
+  [2] -R jit                                 0.8s
+  [3] -R jit                                 0.5s
 
 =head1 SEE ALSO
 
 L<http://en.wikipedia.org/wiki/Mandelbrot_set>
 
-If you want faster mandelbrot with iteractive zooming use Xaos:
+If you want faster mandelbrot with interactive zooming use Xaos:
 
 L<http://xaos.sourceforge.net/english.php>
 

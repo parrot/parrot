@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blue_rect.pir - draw a blue rectangle with the SDL Parrot bindings
@@ -13,13 +15,13 @@ To run this file, run the following command from the Parrot directory:
 
 .sub _main :main
     # first load the necessary libraries
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Rect.pir"
-    load_bytecode "library/SDL/Color.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Rect.pir"
+    load_bytecode "SDL/Color.pir"
 
     # create an SDL::App object
     .local pmc app
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
     app.'init'( 'height' => 480, 'width' => 640, 'bpp' => 32, 'flags' => 1 )
 
     # fetch the SDL::Surface representing the main window
@@ -28,12 +30,12 @@ To run this file, run the following command from the Parrot directory:
 
     # create an SDL::Rect object
     .local pmc rect
-    new rect, 'SDL::Rect'
+    new rect, ['SDL'; 'Rect']
     rect.'init'( 'height' => 100, 'width'  => 100, 'x' => 270, 'y' => 190 )
 
     # create an SDL::Color object
     .local pmc color
-    new color, 'SDL::Color'
+    new color, ['SDL'; 'Color']
     color.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
 
     # draw the rectangle to the surface and update it
@@ -54,7 +56,7 @@ chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 
 =head1 COPYRIGHt
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

@@ -1,5 +1,5 @@
 #! ./parrot
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -21,15 +21,15 @@ module, L<runtime/parrot/library/Crow.pir>.
 
 
 .sub 'main' :main
-    .param pmc    args
+    .param pmc args
 
-    load_bytecode 'Crow.pir' # TODO s/pir/pbc/
+    load_bytecode 'Crow.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace ['Crow']
     exports = split ' ', 'get_news get_args process'
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     .local pmc opts
     opts = get_args(args)
@@ -43,8 +43,10 @@ module, L<runtime/parrot/library/Crow.pir>.
 
     .local string template, type
     type = opts['type']
-    'infix://='(type, 'text')
+    if type != '' goto got_type
+    type = 'text'
 
+got_type:
     template = 'get_template'(templates, type)
 
     .local pmc data
@@ -73,13 +75,13 @@ module, L<runtime/parrot/library/Crow.pir>.
 .sub 'get_json'
     .param string filename
 
-    load_bytecode 'Config/JSON.pir'
+    load_bytecode 'Config/JSON.pbc'
 
      .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Config';'JSON' ]
     exports = split ' ', 'ReadConfig'
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     .local pmc result
     result = ReadConfig(filename)
@@ -95,25 +97,6 @@ module, L<runtime/parrot/library/Crow.pir>.
     $S0 = concat type, '.text'
     $S1 = templates[$S0]
     .return ($S1)
-.end
-
-
-.sub 'infix://='
-    .param pmc    a
-    .param pmc    b
-
-    if null a goto agg_undefined
-    $I0 = defined a
-    if $I0 goto return
-    assign a, b
-
-  return:
-    .return ()
-
-  agg_undefined:
-    $P0 = new 'Exception'
-    $P0['_message'] = "cannot assign to Null PMC!"
-    throw $P0
 .end
 
 

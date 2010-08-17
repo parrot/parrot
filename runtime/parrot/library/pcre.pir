@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -7,16 +7,19 @@ pcre.pir - user interface to Perl-Compatible Regular Expression library
 
 =head1 SYNOPSIS
 
-    load_bytecode 'library/pcre.pir'
-    lib = pcre_init()
+    load_bytecode 'pcre.pbc'
 
-    func = find_global 'PCRE', 'compile'
+    .local pmc func, lib
+    func = get_hll_global ['PCRE'], 'init'
+    lib = func()
+
+    func = get_hll_global ['PCRE'], 'compile'
     ( regex, error, errptr )= func( pat, options )
 
-    func = find_global 'PCRE', 'match'
+    func = get_hll_global ['PCRE'], 'match'
     ( ok, result )= func( regex, string, start, options )
 
-    func = find_global 'PCRE', 'dollar'
+    func = get_hll_global ['PCRE'], 'dollar'
     match = func( string, ok, result, i )
 
 =head1 DESCRIPTION
@@ -37,28 +40,44 @@ The NCI interface is contained in libpcre.pir.
 
 =item sub init()
 
-Intialize the pcre library. The library handle is returned as a PMC
+Initialize the pcre library. The library handle is returned as a PMC
 and is additionally stored as global 'PCRE', 'lib'.
 
 =cut
 
+.loadlib 'sys_ops'
+.include "sysinfo.pasm"
+
 .sub init
     .local pmc libpcre
     .local pmc pcre_function
-    .local pmc config
     .local string osname
     .local int loaded
 
-    config = _config()
-    osname = config['osname']
+    osname = sysinfo .SYSINFO_PARROT_OS
 
     if 'MSWin32' == osname goto LIB_WIN32
     if 'cygwin'  == osname goto LIB_CYGWIN
 
 LIB_DEFAULT:
+# Plain name
     loadlib libpcre, 'libpcre'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
+# Shared object name
+    loadlib libpcre, 'libpcre.so'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+# soname of recent versions
+    loadlib libpcre, 'libpcre.so.3'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+
+    # See TT #578
+    loadlib libpcre, 'libpcre.so.0'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+
     branch LIB_FAILED
 
 LIB_WIN32:
@@ -79,31 +98,31 @@ LIB_CYGWIN:
     branch LIB_FAILED
 
 LIB_LOADED:
-    store_global 'PCRE', 'lib', libpcre
+    set_hll_global ['PCRE'], 'lib', libpcre
 
-    load_bytecode 'library/libpcre.pir'
+    load_bytecode 'libpcre.pbc'
 
     # pcre *pcre_compile(const char *pattern, int options,
     #            const char **errptr, int *erroffset,
     #            const unsigned char *tableptr
     dlfunc pcre_function, libpcre, 'pcre_compile', 'ptiB3P'
-    store_global 'PCRE::NCI', 'PCRE_compile', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_compile', pcre_function
 
     #int pcre_exec(const pcre *code, const pcre_extra *extra,
     #        const char *subject, int length, int startoffset,
     #        int options, int *ovector, int ovecsize);
     dlfunc pcre_function, libpcre, 'pcre_exec', 'ipPtiiipi'
-    store_global 'PCRE::NCI', 'PCRE_exec', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_exec', pcre_function
 
     #int pcre_copy_substring(const char *subject, int *ovector,
     #        int stringcount, int stringnumber, char *buffer,
     #        int buffersize);
     dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
-    store_global 'PCRE::NCI', 'PCRE_copy_substring', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_copy_substring', pcre_function
 
     # const char *pcre_version(void);
     dlfunc pcre_function, libpcre, 'pcre_version', 't'
-    store_global 'PCRE::NCI', 'PCRE_version', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_version', pcre_function
 
     .return( libpcre )
 
@@ -124,7 +143,7 @@ Returns pmc B<regex>, string B<error> and int B<errptr>.
     .param int options
     .local pmc pcre_function
 
-    pcre_function= find_global 'PCRE::NCI', 'compile'
+    pcre_function= get_hll_global ['PCRE'; 'NCI'], 'compile'
 
     .local pmc regex
     .local string error
@@ -152,7 +171,7 @@ in pmc B<result>.
     .param int options
     .local pmc pcre_function
 
-    pcre_function= find_global 'PCRE::NCI', 'exec'
+    pcre_function= get_hll_global ['PCRE'; 'NCI'], 'exec'
 
     .local int ok
     .local pmc res
@@ -177,7 +196,7 @@ Returns the match.
     .param int n
     .local pmc pcre_function
 
-    pcre_function= find_global 'PCRE::NCI', 'result'
+    pcre_function= get_hll_global ['PCRE'; 'NCI'], 'result'
 
     .local string matched
 
@@ -194,7 +213,7 @@ Returns the match.
 .sub version
     .local pmc pcre_function
 
-    pcre_function= find_global 'PCRE::NCI', 'PCRE_version'
+    pcre_function = get_hll_global ['PCRE'; 'NCI'], 'PCRE_version'
 
     .local string ver
 
@@ -202,8 +221,6 @@ Returns the match.
 
     .return( ver )
 .end
-
-.include "library/config.pir"
 
 =back
 

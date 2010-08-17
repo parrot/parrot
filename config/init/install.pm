@@ -1,9 +1,9 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-config/init/install.pm - autoconf compatabile installation paths
+config/init/install.pm - autoconf compatible installation paths
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Setting up installation paths};
+    $data{description} = q{Set up installation paths};
     $data{result}      = q{};
     return \%data;
 }
@@ -29,11 +29,24 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $prefix = $conf->options->get('prefix') || "/usr/local";
+    my $prefix = $conf->options->get('prefix') || ($^O eq 'MSWin32' ? "C:/Parrot" : "/usr/local");
     $prefix =~ s{/\z}{};
     my $ep = $conf->options->get('exec-prefix');
     $ep =~ s{/\z}{} if defined $ep;
     my $eprefix = $ep ? $ep : $prefix;
+
+    # Install in versioned subdirectories, "/usr/lib/parrot/1.5.0/...". Skip
+    # the "/parrot" or "/1.5.0" subdirectories if these are included in the
+    # prefix.
+    my $versiondir = '';
+    unless ($prefix =~ /parrot/) {
+        $versiondir .= '/parrot';
+    }
+    my $version = $conf->option_or_data('VERSION');
+    if ($version && $prefix !~ /$version/) {
+        $versiondir .= "/$version";
+        $versiondir .= $conf->option_or_data('DEVEL');
+    }
 
     #  --bindir=DIR           user executables [EPREFIX/bin]
     my $bindir = assign_dir( $conf, 'bindir', $eprefix, '/bin' );
@@ -71,10 +84,12 @@ sub runstep {
     #  --mandir=DIR           man documentation [PREFIX/man]
     my $mandir = assign_dir( $conf, 'mandir', $prefix, '/man' );
 
+    #  --srcdir=DIR           source code files PREFIX/src]
+    my $srcdir = assign_dir( $conf, 'srcdir', $prefix, '/src' );
+
     $conf->data->set(
         prefix         => $prefix,
         exec_prefix    => $eprefix,
-        bin_dir        => $bindir,           # deprecated
         bindir         => $bindir,
         sbindir        => $sbindir,
         libexecdir     => $libexecdir,
@@ -83,15 +98,15 @@ sub runstep {
         sharedstatedir => $sharedstatedir,
         localstatedir  => $localstatedir,
         libdir         => $libdir,
-        lib_dir        => $libdir,           # deprecated
         includedir     => $includedir,
-        include_dir    => $includedir,       # deprecated
         oldincludedir  => $oldincludedir,
         infodir        => $infodir,
         mandir         => $mandir,
+        srcdir         => $srcdir,
 
         # parrot internal use only
-        doc_dir => $datadir . "/doc/parrot",
+        docdir         => $datadir . "/doc",
+        versiondir     => $versiondir,
     );
 
     return 1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2009, Parrot Foundation.
  * $Id$
  */
 
@@ -24,24 +24,26 @@ handle info/error/warning messages from imcc
 */
 
 #include "imc.h"
+#include "parrot/io.h"
 
 /* HEADERIZER HFILE: compilers/imcc/debug.h */
 
 /*
 
-=item C<void IMCC_fatal>
+=item C<void IMCC_fatal(PARROT_INTERP, int code, const char *fmt, ...)>
 
-RT#48260: Not yet documented!!!
+Prints out a fatal error message from IMCC and throws an
+IMCC_FATAL_EXCEPTION.
 
 =cut
 
 */
 
-PARROT_API
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 {
+    ASSERT_ARGS(IMCC_fatal)
     va_list ap;
 
     va_start(ap, fmt);
@@ -52,19 +54,19 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fataly>
+=item C<void IMCC_fataly(PARROT_INTERP, int code, const char *fmt, ...)>
 
-RT#48260: Not yet documented!!!
+Throws an IMCC_FATALY_EXCEPTION.
 
 =cut
 
 */
 
-PARROT_API
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 {
+    ASSERT_ARGS(IMCC_fataly)
     va_list ap;
 
     va_start(ap, fmt);
@@ -75,128 +77,106 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fatal_standalone>
+=item C<void IMCC_fatal_standalone(PARROT_INTERP, int code, const char *fmt,
+...)>
 
-RT#48260: Not yet documented!!!
+Prints an error message from IMCC and exits Parrot. This is not a
+recoverable exception but a forced exit.
 
 =cut
 
 */
 
-PARROT_API
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 {
+    ASSERT_ARGS(IMCC_fatal_standalone)
     va_list ap;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
     Parrot_exit(interp, code);
 }
 
 /*
 
-=item C<void IMCC_fataly_standalone>
+=item C<void IMCC_warning(PARROT_INTERP, const char *fmt, ...)>
 
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
-{
-
-    va_list ap;
-
-    va_start(ap, fmt);
-    fprintf(stderr, "error:imcc:");
-    imcc_vfprintf(interp, stderr, fmt, ap);
-    va_end(ap);
-    IMCC_print_inc(interp);
-    Parrot_exit(interp, code);
-}
-
-/*
-
-=item C<void IMCC_warning>
-
-RT#48260: Not yet documented!!!
+Prints a warning message, but does not throw an exception and does not
+cause Parrot to exit.
 
 =cut
 
 */
 
-PARROT_API
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
+    ASSERT_ARGS(IMCC_warning)
     va_list ap;
     if (IMCC_INFO(interp)->imcc_warn)
         return;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
 }
 
 /*
 
-=item C<void IMCC_info>
+=item C<void IMCC_info(PARROT_INTERP, int level, const char *fmt, ...)>
 
-RT#48260: Not yet documented!!!
+Prints some information, if the level of the information is higher
+then IMCC's verbose mode.
 
 =cut
 
 */
 
-PARROT_API
 void
 IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
+    ASSERT_ARGS(IMCC_info)
     va_list ap;
 
     if (level > IMCC_INFO(interp)->verbose)
         return;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
 }
 
 /*
 
-=item C<void IMCC_debug>
+=item C<void IMCC_debug(PARROT_INTERP, int level, const char *fmt, ...)>
 
-RT#48260: Not yet documented!!!
+Prints a debug message, if IMCC's debug mode is turned on.
 
 =cut
 
 */
 
-PARROT_API
 void
 IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
+    ASSERT_ARGS(IMCC_debug)
     va_list ap;
 
     if (!(level & IMCC_INFO(interp)->debug))
         return;
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
 }
 
 /*
 
-=item C<void dump_instructions>
+=item C<void dump_instructions(PARROT_INTERP, const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Dumps the current instruction status of IMCC
 
 =cut
 
@@ -205,19 +185,22 @@ RT#48260: Not yet documented!!!
 void
 dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(dump_instructions)
     const Instruction *ins;
-    int pc;
+    int                pc;
 
-    fprintf(stderr,
+    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
-    fprintf(stderr,
+    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
+
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
         const Basic_block * const bb = unit->bb_list[ins->bbindex];
 
         if (bb) {
-             fprintf(stderr, "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
+            Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, (ins->type & ~ITEXT), ins->opnum,
                      ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
@@ -226,17 +209,19 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
              fprintf(stderr, "\t");
         }
 
-        imcc_fprintf(interp, stderr, "%I\n", ins);
+        Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "%s\n", ins->opname);
+        ins_print(interp, Parrot_io_STDERR(interp), ins);
         pc += ins->opsize;
     }
-    fprintf(stderr, "\n");
+
+    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "\n");
 }
 
 /*
 
-=item C<void dump_cfg>
+=item C<void dump_cfg(const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Dumps the current IMCC config data.
 
 =cut
 
@@ -245,6 +230,7 @@ RT#48260: Not yet documented!!!
 void
 dump_cfg(ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(dump_cfg)
     unsigned int i;
     Edge *e;
 
@@ -273,9 +259,9 @@ dump_cfg(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_loops>
+=item C<void dump_loops(const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Dumps the current loops in the IMC_Unit C<unit>.
 
 =cut
 
@@ -284,6 +270,7 @@ RT#48260: Not yet documented!!!
 void
 dump_loops(ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(dump_loops)
     int i;
     Loop_info ** loop_info = unit->loop_info;
 
@@ -319,9 +306,9 @@ dump_loops(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_labels>
+=item C<void dump_labels(const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Dumps the list of labels in IMC_Unit C<unit>.
 
 =cut
 
@@ -330,8 +317,9 @@ RT#48260: Not yet documented!!!
 void
 dump_labels(ARGIN(const IMC_Unit *unit))
 {
-    int i;
+    ASSERT_ARGS(dump_labels)
     const SymHash * const hsh = &unit->hash;
+    unsigned int          i;
 
     fprintf(stderr, "Labels\n");
     fprintf(stderr, "name\tpos\tlast ref\n"
@@ -343,8 +331,8 @@ dump_labels(ARGIN(const IMC_Unit *unit))
             if (r && (r->type & VTADDRESS))
                 fprintf(stderr, "%s\t%d\t%d\n",
                         r->name,
-                        r->first_ins ? r->first_ins->index : -1,
-                        r->last_ins ? r->last_ins->index : -1);
+                        r->first_ins ? (int)r->first_ins->index : -1,
+                        r->last_ins  ? (int)r->last_ins->index  : -1);
         }
     }
     fprintf(stderr, "\n");
@@ -352,9 +340,9 @@ dump_labels(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_symreg>
+=item C<void dump_symreg(const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Dumps a list of the symbolic registers in IMC_Unit C<unit>
 
 =cut
 
@@ -363,26 +351,28 @@ RT#48260: Not yet documented!!!
 void
 dump_symreg(ARGIN(const IMC_Unit *unit))
 {
-    int i;
-    SymReg** const reglist = unit->reglist;
+    ASSERT_ARGS(dump_symreg)
+    unsigned int i;
+    SymReg ** const reglist = unit->reglist;
 
     if (!reglist)
         return;
+
     fprintf(stderr,
             "\nSymbols:"
             "\n----------------------------------------------\n");
     fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \t"
             "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
+
     for (i = 0; i < unit->n_symbols; i++) {
         const SymReg * const r = reglist[i];
         if (!REG_NEEDS_ALLOC(r))
             continue;
         if (!r->first_ins)
             continue;
-        fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%lx\n",
+        fprintf(stderr, "%s \t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%lx\n",
                 r->name,
-                r->usage & U_NON_VOLATILE ? 'P' : ' ',
                 r->first_ins->index, r->last_ins->index,
                 r->first_ins->bbindex, r->last_ins->bbindex,
                 r->set,
@@ -392,128 +382,13 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
                 (UINTVAL)r->usage);
     }
     fprintf(stderr, "\n");
-    dump_liveness_status(unit);
 }
 
 /*
 
-=item C<void dump_liveness_status>
+=item C<void dump_dominators(const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-void
-dump_liveness_status(ARGIN(const IMC_Unit *unit))
-{
-    int i;
-    SymReg** const reglist = unit->reglist;
-
-    fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
-    for (i = 0; i < unit->n_symbols; i++) {
-        const SymReg * const r = reglist[i];
-        if (REG_NEEDS_ALLOC(r))
-            dump_liveness_status_var(unit, r);
-    }
-    fprintf(stderr, "\n");
-
-}
-
-
-/*
-
-=item C<void dump_liveness_status_var>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-void
-dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
-{
-    fprintf(stderr, "\nSymbol %s:", r->name);
-    if (r->life_info) {
-        unsigned int i;
-
-        for (i = 0; i<unit->n_basic_blocks; i++) {
-            const Life_range * const l = r->life_info[i];
-
-            if (l->flags & LF_lv_all)
-                fprintf(stderr, "\n\t%i:ALL\t", i);
-            else if (l->flags & LF_lv_inside)
-                fprintf(stderr, "\n\t%i:INSIDE", i);
-
-            if (l->flags & LF_lv_in)
-                fprintf(stderr, "\n\t%i: IN\t", i);
-            else if (l->flags & LF_lv_out)
-                fprintf(stderr, "\n\t%i: OUT\t", i);
-            else if (l->first_ins)
-                fprintf(stderr, "\n\t%i: INS\t", i);
-
-            if (l->flags & LF_use)
-                fprintf(stderr, "u ");
-            else if (l->flags & LF_def)
-                fprintf(stderr, "d ");
-            else
-                fprintf(stderr, "  ");
-
-            if (l->first_ins)
-                fprintf(stderr, "[%d, %d]\t", l->first_ins->index,
-                        l->last_ins->index);
-        }
-    }
-
-    fprintf(stderr, "\n");
-}
-
-/*
-
-=item C<void dump_interference_graph>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-void
-dump_interference_graph(ARGIN(const IMC_Unit *unit))
-{
-    int x;
-    SymReg** const reglist = unit->reglist;
-    const int n_symbols = unit->n_symbols;
-
-    fprintf(stderr, "\nDumping the Interf. graph:"
-            "\n-------------------------------\n");
-    for (x = 0; x < n_symbols; x++) {
-        if (reglist[x]->first_ins) {
-            int cnt = 0;
-            int y;
-
-            fprintf(stderr, "%s\t -> ", reglist[x]->name);
-            for (y = 0; y < n_symbols; y++) {
-                if (ig_test(x, y, n_symbols, unit->interference_graph)) {
-                    const SymReg * const r = unit->reglist[y];
-
-                    fprintf(stderr, "%s ", r->name);
-                    cnt++;
-                }
-            }
-            fprintf(stderr, "(%d)\n", cnt);
-        }
-    }
-    fprintf(stderr, "\n");
-}
-
-/*
-
-=item C<void dump_dominators>
-
-RT#48260: Not yet documented!!!
+Dumps the current list of dominators for the current IMC_Unit C<unit>.
 
 =cut
 
@@ -522,6 +397,7 @@ RT#48260: Not yet documented!!!
 void
 dump_dominators(ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(dump_dominators)
     unsigned int i;
 
     fprintf(stderr, "\nDumping the Dominators Tree:"
@@ -544,9 +420,9 @@ dump_dominators(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_dominance_frontiers>
+=item C<void dump_dominance_frontiers(const IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Dumps the list of dominance frontiers for the current IMC_Unit C<unit>.
 
 =cut
 
@@ -555,6 +431,7 @@ RT#48260: Not yet documented!!!
 void
 dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(dump_dominance_frontiers)
     unsigned int i;
 
     fprintf(stderr, "\nDumping the Dominance Frontiers:"

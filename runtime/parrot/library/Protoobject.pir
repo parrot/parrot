@@ -1,3 +1,6 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 Protoobject.pir - PIR implementation for creating protoobjects
@@ -117,11 +120,11 @@ protoobject.
     subc = subclass baseclass, name
 
     unless attrs goto done_attrs
-    .local pmc iter
-    iter = new 'Iterator', attrs
+    .local pmc it
+    it = iter attrs
   iter_loop:
-    unless iter goto done_attrs
-    $S0 = shift iter
+    unless it goto done_attrs
+    $S0 = shift it
     addattribute subc, $S0
     goto iter_loop
   done_attrs:

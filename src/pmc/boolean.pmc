@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -21,29 +21,22 @@ it doesn't morph to other types. Only its value is changed.
 
 */
 
-#include "parrot/parrot.h"
+/* HEADERIZER HFILE: none */
 
-pmclass Boolean extends Integer provides boolean provides scalar {
+pmclass Boolean extends Integer provides boolean provides scalar auto_attrs {
 
 /*
 
-=item C<PMC *instantiate(PMC *sig)>
+=item C<void init_pmc(PMC *value)>
 
-Object constructor. SELF is a Boolean Class object. Return a new
-C<bool> object according to the passed PMC value.
+Initialises SELF value according to the boolean value of the passed PMC.
 
 =cut
 
 */
-    VTABLE PMC *instantiate(PMC *sig) {
-        /* XXX other types */
-        const int argcP = REG_INT(interp, 3);
-        PMC * const res = pmc_new(interp, enum_class_Boolean);
-
-        if (argcP)
-            PMC_int_val(res) = VTABLE_get_bool(interp, REG_PMC(interp, 5));
-
-        return PMCNULL; /* TODO */
+    VTABLE void init_pmc(PMC *value) {
+        INTVAL v = PMC_IS_NULL(value) ? (INTVAL) 0 : VTABLE_get_bool(INTERP, value);
+        SELF.set_bool(v);
     }
 /*
 
@@ -71,12 +64,12 @@ Return "1" or "0".
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        PMC_int_val(SELF) = (value != 0);
+        SUPER((value != 0));
     }
 
 
     VTABLE void set_bool(INTVAL value) {
-        PMC_int_val(SELF) = (value != 0);
+        SELF.set_integer_native(value);
     }
 
 /*
@@ -90,7 +83,7 @@ Sets the value to C<value> evaluated in a boolean context.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        PMC_int_val(SELF) = !FLOAT_IS_ZERO(value);
+        SELF.set_bool(!FLOAT_IS_ZERO(value));
     }
 
 /*
@@ -104,7 +97,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        PMC_int_val(SELF) = string_bool(INTERP, value);
+        SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 }
 

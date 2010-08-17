@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro diamond" );
     subclass F, C, "F"
     addparent F, D
     mro = F.'inspect'('all_parents')
-    it = new 'Iterator', mro
+    it = iter mro
     it = 0
 loop:
     unless it goto ex
@@ -113,7 +113,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 1" );
     .local pmc mro, it, p
 
     mro = A.'inspect'('all_parents')
-    it = new 'Iterator', mro
+    it = iter mro
     it = 0
 loop:
     unless it goto ex
@@ -183,7 +183,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 2" );
     .local pmc mro, it, p
 
     mro = A.'inspect'('all_parents')
-    it = new 'Iterator', mro
+    it = iter mro
     it = 0
 loop:
     unless it goto ex
@@ -220,7 +220,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 3" );
     .local pmc mro, it, p
 
     mro = D.'inspect'('all_parents')
-    it = new 'Iterator', mro
+    it = iter mro
     it = 0
 loop:
     unless it goto ex
@@ -279,7 +279,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 4" );
     .local pmc mro, it, p
 
     mro = Vulcan.'inspect'('all_parents')
-    it = new 'Iterator', mro
+    it = iter mro
     it = 0
 loop:
     unless it goto ex

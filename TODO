@@ -1,24 +1,10 @@
 # $Id$
 
-All TODO items should be documented in RT. (https://rt.perl.org/)
+All todo items should have a corresponding trac ticket. See the current list:
 
-A listing of all TODO items is available at:
+ https://trac.parrot.org/parrot/report/9
 
- http://www.parrotcode.org/todo
+To open a new todo ticket, use
 
-To add TODOs to this list (which is powered by RT), send an email to 
-
- parrotbug@parrotcode.org
-
-Begin your subject with '[TODO]' so that the bug is automatically marked as a
-TODO ticket.  For reasons of consistency, the encouraged format of the subject
-line is:
-
- '[TODO] <subsystem/component/topic> - <summary of task>'
-
-An example of this format would be:
-
- '[TODO] IMCC - remove globals'
-
-See also docs/ROADMAP.pod
+ https://trac.parrot.org/
 

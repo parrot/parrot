@@ -1,21 +1,20 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 019-version.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 6;
 use Carp;
-use_ok('Cwd');
-use_ok('File::Copy');
-use_ok( 'File::Temp', qw| tempdir | );
+use Cwd;
+use File::Copy;
+use File::Temp qw| tempdir |;
 use lib qw( lib );
 use Parrot::BuildUtil;
 
 my $cwd = cwd();
-my $errstr;
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, "Changed to temporary directory for testing" );

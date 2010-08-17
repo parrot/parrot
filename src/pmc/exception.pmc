@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -8,64 +8,36 @@ src/pmc/exception.pmc - Exception PMC
 
 =head1 DESCRIPTION
 
-This is the exception base class.
-
-For now, this class is based on C<ResziablePMCArray>. This will change when the
-full PMC PDD is implemented.
-
-An exception object has these attributes:
+This is the exception base class. An exception object has the following
+attributes:
 
 =over 4
 
-=item 0 C<_message>
+=item C<message>
 
 Textual representation of the exception.
 
-=item 1 C<_type>
+=item C<severity>
 
-The exception type, (see F<include/parrot/exceptions.h>, F<except_type.pasm>).
-
-=item 2 C<_severity>
-
-The severity of the exception, (see F<src/exceptions.h>,
+The severity of the exception, (see F<include/parrot/exceptions.h>,
 F<except_severity.pasm>).
 
-=item 3 C<payload>
+=item C<type>
+
+The type of the exception.
+
+=item C<exit_code>
+
+The exit code of the exception. (Added temporarily, to be removed.)
+
+=item C<handled>
+
+Whether the exception has been handled. Defaults to 0, 1 for handled, -1 for a
+rethrown exception.
+
+=item C<payload>
 
 Additional data for the exception.
-
-=item 4 C<unused>
-
-=back
-
-Optional:
-
-=over 4
-
-=item 5 C<_C_file>
-
-The C code file in which the exception was raised.
-
-=item 6 C<_C_line>
-
-The line of C code on which the exception was raised.
-
-=item 7 C<_P_file>
-
-The PASM/PIR/Perl file in which the exception was raised.
-
-=item 8 C<_P_line>
-
-The line of PASM/PIR/Perl code on which the exception was raised.
-
-=item 9, 10 C<unused>
-
-Any information attached by the HL. This shouldn't start with an
-underscore (that is reserved for Parrot's internal usage. These are
-stored as properties.
-
-Note: currently, HLL information must be indexed by number. Slots 9 and 10
-are available for the HLL - This is subject to change.
 
 =back
 
@@ -77,41 +49,62 @@ These arguments can be retrieved with the C<get_results> opcode.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/exceptions.h"
+#include "pmc/pmc_sub.h"
 
-/* This finds the index of an attribute in an object's attribute store and
- * returns it. Returns -1 if the attribute does not exist. */
-static INTVAL
-get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
-{
-        if (!string_compare(interp, name, CONST_STRING(interp, "message")))
-            return 0;
+typedef enum {
+    attr_id,
+    attr_birthtime,
+    attr_message,
+    attr_payload,
+    attr_resume,
+    attr_severity,
+    attr_type,
+    attr_exit_code,
+    attr_backtrace,
+    attr_handled,
+    attr_handler_iter,
+    attr_handler_ctx,
+    attr_thrower,
+    attr_NONE = -1
+} AttrEnum;
 
-        if (!string_compare(interp, name, CONST_STRING(interp, "type")))
-            return 1;
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-        if (!string_compare(interp, name, CONST_STRING(interp, "severity")))
-            return 2;
+static AttrEnum getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-        if (!string_compare(interp, name, CONST_STRING(interp, "payload")))
-            return 3;
+#define ASSERT_ARGS_getAttrEnum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
-            return -1;
-}
+
+pmclass Exception auto_attrs {
+
+    ATTR INTVAL          id;           /* The task ID in the scheduler. */
+    ATTR FLOATVAL        birthtime;    /* The creation time stamp of the exception. */
+    ATTR STRING         *message;      /* The exception message. */
+    ATTR PMC            *payload;      /* The payload for the exception. */
+    ATTR PMC            *resume;       /* Continuation for resuming after handling the exception. */
+    ATTR INTVAL          severity;     /* The severity of the exception. */
+    ATTR INTVAL          type;         /* The type of the exception. */
+    ATTR INTVAL          exit_code;    /* The exit code of the exception. */
+    ATTR PMC            *backtrace;    /* The backtrace of an exception. */
+    ATTR INTVAL          handled;      /* Whether the exception has been handled. */
+    ATTR PMC            *handler_iter; /* An iterator of handlers (for rethrow). */
+    ATTR PMC            *handler_ctx;  /* A stored context for handler iterator. */
+    ATTR PMC            *thrower;      /* The position we were at when thrown. */
 
 /*
 
-=head2 Methods
+=head2 Vtable Functions
 
 =over 4
-
-=cut
-
-*/
-
-pmclass Exception extends ResizablePMCArray need_ext {
-
-/*
 
 =item C<void init()>
 
@@ -122,17 +115,91 @@ Initializes the exception with default values.
 */
 
     VTABLE void init() {
-        SUPER();
-        /* pre-fill 11 slots with PMCNULL */
-        SELF.set_integer_native(11);
+        /* Use custom mark */
+        PObj_custom_mark_SET(SELF);
+
+        /* Set default values */
+        SET_ATTR_message(INTERP, SELF, STRINGNULL);
+        SET_ATTR_payload(INTERP, SELF, PMCNULL);
+        SET_ATTR_resume(INTERP, SELF, PMCNULL);
+        SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
+        SET_ATTR_backtrace(INTERP, SELF, PMCNULL);
+        SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
+        SET_ATTR_handler_ctx(INTERP, SELF, PMCNULL);
+        SET_ATTR_thrower(INTERP, SELF, PMCNULL);
     }
 
 /*
 
-=item C<STRING *get_string_keyed(PMC *key)>
+=item C<void init_pmc()>
 
-Returns the Parrot string value for C<*key>. The only current recognized
-C<key> is "_message".
+Initializes the exception with supplied values.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *values) {
+        INTVAL severity_val = EXCEPT_error;
+        STRING *message_val = NULL;
+
+        const INTVAL ishash = VTABLE_isa(INTERP, values, CONST_STRING(INTERP, 'Hash'));
+
+        STATICSELF.init();
+
+        if (ishash) {
+            STRING * const severity = CONST_STRING(INTERP, "severity");
+            STRING * const message  = CONST_STRING(INTERP, "message");
+            severity_val = VTABLE_get_integer_keyed_str(INTERP, values, severity);
+            message_val = VTABLE_get_string_keyed_str(INTERP, values, message);
+        }
+        else
+            message_val  = VTABLE_get_string(INTERP, values);
+
+        /* Set up the values for the exception object. */
+
+        SET_ATTR_severity(INTERP, SELF, severity_val);
+        if (! STRING_IS_NULL(message_val))
+            SET_ATTR_message(INTERP, SELF, message_val);
+
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any active exception data as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
+        Parrot_gc_mark_STRING_alive(INTERP, core_struct->message);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->payload);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->resume);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->backtrace);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler_iter);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->thrower);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Return true.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        return 1;
+    }
+
+/*
 
 =item C<STRING *get_string()>
 
@@ -142,17 +209,54 @@ Return the exception message.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
-        STRING *s = key_string(INTERP, key);
-
-        if (!string_compare(INTERP, s, CONST_STRING(INTERP, "_message")))
-            return SELF.get_string_keyed_int(0);
-
-        return 0;
+    VTABLE STRING *get_string() {
+        STRING *message;
+        GET_ATTR_message(INTERP, SELF, message);
+        if (STRING_IS_NULL(message))
+            message = CONST_STRING(INTERP, "");
+        return message;
     }
 
-    VTABLE STRING *get_string() {
-        return SELF.get_string_keyed_int(0);
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the id of the exception.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        const Parrot_Exception_attributes * const exception = PARROT_EXCEPTION(SELF);
+        return exception->id;
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the Parrot string value for C<*key>. The only current recognized
+C<key> is "message".
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string_keyed(PMC *key) {
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        STRING *message;
+
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
+            message = SELF.get_string();
+        }
+        else {
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such string attribute '%S'", name);
+        }
+
+        return message;
     }
 
 /*
@@ -166,15 +270,63 @@ Returns the integer value for C<*key>.
 */
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        STRING *s = key_string(INTERP, key);
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        INTVAL  result = 0;
 
-        if (!string_compare(INTERP, s, CONST_STRING(INTERP, "_type")))
-            return SELF.get_integer_keyed_int(1);
+        switch (getAttrEnum(INTERP, name)) {
+          case attr_type:
+            GET_ATTR_type(INTERP, SELF, result);
+            break;
+          case attr_severity:
+            GET_ATTR_severity(INTERP, SELF, result);
+            break;
+          case attr_exit_code:
+            GET_ATTR_exit_code(INTERP, SELF, result);
+            break;
+          case attr_handled:
+            GET_ATTR_handled(INTERP, SELF, result);
+            break;
+          default:
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such integer attribute '%S'", name);
+        }
 
-        if (!string_compare(INTERP, s, CONST_STRING(INTERP, "_severity")))
-            return SELF.get_integer_keyed_int(2);
+        return result;
+    }
 
-        return 0;
+/*
+
+=item C<INTVAL get_integer_keyed_str(STRING *key)>
+
+Returns the integer value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+        INTVAL result = 0;
+        switch (getAttrEnum(INTERP, key)) {
+          case attr_type:
+            GET_ATTR_type(INTERP, SELF, result);
+            break;
+          case attr_severity:
+            GET_ATTR_severity(INTERP, SELF, result);
+            break;
+          case attr_exit_code:
+            GET_ATTR_exit_code(INTERP, SELF, result);
+            break;
+          case attr_handled:
+            GET_ATTR_handled(INTERP, SELF, result);
+            break;
+          default:
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such integer attribute '%S'", key);
+        }
+
+        return result;
     }
 
 /*
@@ -188,27 +340,54 @@ Returns the PMC value for C<*key>.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        STRING *s = key_string(INTERP, key);
-        return SELF.getprop(s);
+        STRING * const s = VTABLE_get_string(INTERP, key);
+        return SELF.get_attr_str(s);
     }
+
 
 /*
 
-=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+=item C<void set_string_native(STRING *value)>
 
-Returns the PMC value of the element at index C<key>, but ignores too
-big negative keys.
+Sets the C<message> of the Exception.
 
 =cut
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        if (key <= -PMC_int_val(SELF))
-            return PMCNULL;
-
-        return SUPER(key);
+    VTABLE void set_string_native(STRING *value) {
+        SET_ATTR_message(INTERP, SELF, value);
     }
+
+
+/*
+
+=item C<void set_integer_native(INTVAL *value)>
+
+Sets the C<id> of the Exception.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL value) {
+        SET_ATTR_id(INTERP, SELF, value);
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the birthtime of the exception.
+
+=cut
+
+*/
+
+    VTABLE void set_number_native(FLOATVAL value) {
+        SET_ATTR_birthtime(INTERP, SELF, value);
+    }
+
 
 /*
 
@@ -221,15 +400,21 @@ Sets the Parrot string value for C<*key>.
 */
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        STRING *s = key_string(INTERP, key);
+        STRING * const name = VTABLE_get_string(INTERP, key);
 
-        if (!string_compare(INTERP, s, CONST_STRING(INTERP, "_message")))
-            SELF.set_string_keyed_int(0, value);
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
+            SELF.set_string_native(value);
+        }
+        else {
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such string attribute '%S'", name);
+        }
     }
 
 /*
 
-=item C<void set_integer_keyed(PMC *key, INTVAL value) >
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
 
 Sets the integer value for C<*key>.
 
@@ -238,13 +423,56 @@ Sets the integer value for C<*key>.
 */
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        STRING *s = key_string(INTERP, key);
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        switch (getAttrEnum(INTERP, name)) {
+          case attr_type:
+            SET_ATTR_type(INTERP, SELF, value);
+            break;
+          case attr_severity:
+            SET_ATTR_severity(INTERP, SELF, value);
+            break;
+          case attr_exit_code:
+            SET_ATTR_exit_code(INTERP, SELF, value);
+            break;
+          case attr_handled:
+            SET_ATTR_handled(INTERP, SELF, value);
+            break;
+          default:
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such integer attribute '%S'", name);
+        }
+    }
 
-        if (!string_compare(INTERP, s, CONST_STRING(INTERP, "_type")))
-            SELF.set_integer_keyed_int(1, value);
+/*
 
-        if (!string_compare(INTERP, s, CONST_STRING(INTERP, "_severity")))
-            SELF.set_integer_keyed_int(2, value);
+=item C<void set_integer_keyed_str(STRING *key, INTVAL value) >
+
+Sets the integer value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+        switch (getAttrEnum(INTERP, key)) {
+          case attr_type:
+            SET_ATTR_type(INTERP, SELF, value);
+            break;
+          case attr_severity:
+            SET_ATTR_severity(INTERP, SELF, value);
+            break;
+          case attr_exit_code:
+            SET_ATTR_exit_code(INTERP, SELF, value);
+            break;
+          case attr_handled:
+            SET_ATTR_handled(INTERP, SELF, value);
+            break;
+          default:
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such integer attribute '%S'", key);
+        }
     }
 
 /*
@@ -258,23 +486,71 @@ Sets the PMC value for C<*key>.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        STRING *s = key_string(INTERP, key);
-        SELF.setprop(s, value);
+        STRING * const s = VTABLE_get_string(INTERP, key);
+        SELF.set_attr_str(s, value);
     }
+
+/*
+
+=item C<void set_pointer(void *context)>
+
+Store a context for the handler iterator.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *context) {
+        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
+
+        core_struct->handler_ctx = (PMC*)context;
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Retrieve a context stored for the handler iterator.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        const Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
+        return core_struct->handler_ctx;
+    }
+
 /*
 
 =item C<INTVAL is_equal(PMC *value)>
 
-Compare the passed in Exception with SELF. Returns True if C<SELF> isa C<value>
+Compare the passed in Exception with C<SELF>. Returns true if C<SELF> and
+C<value> are the same type, and have the same values for type, severity, and
+exit_code.
 
 =cut
 
 */
     VTABLE INTVAL is_equal(PMC *value) {
-        /* RT#46689 check parents */
-        if (value->vtable->base_type == enum_class_Exception
-        ||  VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Exception")))
-            return 1;
+        STRING * const exception_str = CONST_STRING(INTERP, "Exception");
+
+        if (value->vtable->base_type == SELF->vtable->base_type
+        &&  VTABLE_isa(INTERP, value, exception_str)) {
+            INTVAL self_compare, value_compare;
+            GET_ATTR_type(INTERP, SELF, self_compare);
+            GET_ATTR_type(INTERP, value, value_compare);
+            if (self_compare == value_compare) {
+                GET_ATTR_severity(INTERP, SELF, self_compare);
+                GET_ATTR_severity(INTERP, value, value_compare);
+                if (self_compare == value_compare) {
+                    GET_ATTR_exit_code(INTERP, SELF, self_compare);
+                    GET_ATTR_exit_code(INTERP, value, value_compare);
+                    if (self_compare == value_compare)
+                        return 1;
+                }
+            }
+        }
 
         return 0;
     }
@@ -289,14 +565,73 @@ Retrieve an attribute value for the exception object.
 
 */
     VTABLE PMC *get_attr_str(STRING *name) {
-        INTVAL index = get_attrib_index(interp, SELF, name);
+        PMC *value = PMCNULL;
 
-        /* If lookup failed, exception. */
-        if (index == -1)
-            real_exception(interp, NULL, ATTRIB_NOT_FOUND,
+        switch (getAttrEnum(INTERP, name)) {
+          case attr_type:
+            {
+            INTVAL type;
+            GET_ATTR_type(INTERP, SELF, type);
+            value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, type);
+            }
+            break;
+          case attr_severity:
+            {
+            INTVAL severity;
+            GET_ATTR_severity(INTERP, SELF, severity);
+            value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, severity);
+            }
+            break;
+          case attr_exit_code:
+            {
+            INTVAL exit_code;
+            GET_ATTR_exit_code(INTERP, SELF, exit_code);
+            value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, exit_code);
+            }
+          case attr_handled:
+            {
+            INTVAL handled;
+            GET_ATTR_handled(INTERP, SELF, handled);
+            value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, handled);
+            }
+            break;
+          case attr_message:
+            {
+            STRING *message = SELF.get_string();
+            value = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, value, message);
+            }
+            break;
+          case attr_birthtime:
+            {
+            FLOATVAL birthtime;
+            GET_ATTR_birthtime(INTERP, SELF, birthtime);
+            value = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, value, birthtime);
+            }
+            break;
+          case attr_payload:
+            GET_ATTR_payload(INTERP, SELF, value);
+            break;
+          case attr_resume:
+            GET_ATTR_resume(INTERP, SELF, value);
+            break;
+          case attr_backtrace:
+            GET_ATTR_backtrace(INTERP, SELF, value);
+            break;
+          case attr_handler_iter:
+            GET_ATTR_handler_iter(INTERP, SELF, value);
+            break;
+          case attr_NONE:
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such attribute '%S'", name);
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't get attribute '%S'", name);
+        }
 
-       return SELF.get_pmc_keyed_int(index);
+        return value;
     }
 
 /*
@@ -309,105 +644,232 @@ Set an attribute value for the exception object.
 
 */
     VTABLE void set_attr_str(STRING *name, PMC *value) {
-        INTVAL index = get_attrib_index(interp, SELF, name);
 
-        /* If lookup failed, exception. */
-        if (index == -1)
-            real_exception(interp, NULL, ATTRIB_NOT_FOUND,
+        switch (getAttrEnum(INTERP, name)) {
+          case attr_type:
+            {
+            const INTVAL type = VTABLE_get_integer(INTERP, value);
+            SET_ATTR_type(INTERP, SELF, type);
+            }
+            break;
+          case attr_severity:
+            {
+            const INTVAL severity = VTABLE_get_integer(INTERP, value);
+            SET_ATTR_severity(INTERP, SELF, severity);
+            }
+            break;
+          case attr_exit_code:
+            {
+            const INTVAL exit_code = VTABLE_get_integer(INTERP, value);
+            SET_ATTR_exit_code(INTERP, SELF, exit_code);
+            }
+            break;
+          case attr_handled:
+            {
+            const INTVAL handled = VTABLE_get_integer(INTERP, value);
+            SET_ATTR_handled(INTERP, SELF, handled);
+            }
+            break;
+          case attr_message:
+            {
+            STRING * const message = VTABLE_get_string(INTERP, value);
+            SELF.set_string_native(message);
+            }
+            break;
+          case attr_payload:
+            SET_ATTR_payload(INTERP, SELF, value);
+            break;
+          case attr_resume:
+            SET_ATTR_resume(INTERP, SELF, value);
+            break;
+          case attr_backtrace:
+            SET_ATTR_backtrace(INTERP, SELF, value);
+            break;
+          case attr_handler_iter:
+            SET_ATTR_handler_iter(INTERP, SELF, value);
+            break;
+          case attr_thrower:
+            SET_ATTR_thrower(INTERP, SELF, value);
+            break;
+          case attr_NONE:
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such attribute '%S'", name);
-
-        SELF.set_pmc_keyed_int(index, value);
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't set attribute '%S'", name);
+        }
     }
 
 /*
 
-=item C<shift_*>, C<unshift_*>, C<pop_*>, C<push_*>
+=item C<PMC *share_ro()>
 
-These methods are silently ignored.
+Set this PMC as shared.
 
 =cut
 
 */
-    VTABLE PMC *shift_pmc() {
-        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
-        return PMCNULL;
+
+    VTABLE PMC *share_ro() {
+        PMC *shared_self;
+        Parrot_Exception_attributes *shared_struct;
+
+        if (PObj_is_PMC_shared_TEST(SELF))
+            return SELF;
+
+        shared_self = pt_shared_fixup(INTERP, SELF);
+        shared_struct = PARROT_EXCEPTION(shared_self);
+
+        if (!PMC_IS_NULL(shared_struct->payload))
+            shared_struct->payload = pt_shared_fixup(INTERP, shared_struct->payload);
+
+        if (!PMC_IS_NULL(shared_struct->backtrace))
+            shared_struct->backtrace = pt_shared_fixup(INTERP, shared_struct->backtrace);
+
+        if (!PMC_IS_NULL(shared_struct->handler_iter))
+            shared_struct->handler_iter = pt_shared_fixup(INTERP, shared_struct->handler_iter);
+
+        return shared_self;
     }
 
-    VTABLE FLOATVAL shift_float() {
-        (void) SELF.shift_pmc();
-        return 0.0;
+
+/*
+
+=item C<PMC *annotations>
+
+Gets any bytecode annotations in force at the point where the exception was
+thrown. If the optional name of an annotation is specified, gets just that
+annotation. If not, returns a Hash of all of them.
+
+=cut
+
+*/
+
+    METHOD annotations(STRING *name :optional, INTVAL have_name :opt_flag) {
+        PMC *resume;
+        PMC *result = PMCNULL;
+
+        /* Get resume continuation, to find location we failed at. */
+        GET_ATTR_resume(INTERP, SELF, resume);
+        if (!PMC_IS_NULL(resume)) {
+            const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
+            if (cont->seg != NULL && cont->seg->annotations != NULL)
+                result = PackFile_Annotations_lookup(INTERP, cont->seg->annotations,
+                        cont->address - cont->seg->base.data, name);
+        }
+
+        /* If we didn't have a key specified and we found no annotations to
+         * return, should return an empty hash. */
+        if (!have_name && PMC_IS_NULL(result))
+            result = Parrot_pmc_new(INTERP, enum_class_Hash);
+
+        RETURN(PMC *result);
     }
 
-    VTABLE INTVAL shift_integer() {
-        (void) SELF.shift_pmc();
-        return 0;
+
+/*
+
+=item C<PMC *backtrace>
+
+Gets a representation of the backtrace at the point that this exception was
+thrown. Returns an array of hashes. Each array element represents a caller in
+the backtrace, the most recent caller first. The hash has two keys: C<sub>,
+which holds the PMC representing the sub, and C<annotations> which is a hash
+of the annotations at the point where the exception was thrown for the current
+sub, or for the point of the call a level deeper for the rest.
+
+=cut
+
+*/
+
+    METHOD backtrace() {
+        PMC *result = PMCNULL;
+        PMC *resume;
+
+        /* Get starting context, then loop over them. */
+        GET_ATTR_resume(INTERP, SELF, resume);
+        if (!PMC_IS_NULL(resume)) {
+            /* We have a resume continuation, so we can get the address from that. */
+            const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, CONST_STRING(INTERP, "backtrace"), "P->P", resume, &result);
+        }
+        else {
+            /* Hopefully we have a thrower set - our most epic fail fallback is
+             * to just assume the thrower is the current context. */
+            PMC *cur_ctx;
+            GET_ATTR_thrower(INTERP, SELF, cur_ctx);
+            if (PMC_IS_NULL(cur_ctx))
+                cur_ctx = CURRENT_CONTEXT(INTERP);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cur_ctx, CONST_STRING(INTERP, "backtrace"), "->P", &result);
+        }
+
+        RETURN(PMC *result);
     }
 
-    VTABLE STRING *shift_string() {
-        (void) SELF.shift_pmc();
-        return NULL;
-    }
-
-    void unshift_pmc(PMC *value) {
-        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
-    }
-
-    VTABLE void unshift_float(FLOATVAL value) {
-        SELF.unshift_pmc(NULL);
-    }
-
-    VTABLE void unshift_integer(INTVAL value) {
-        SELF.unshift_pmc(NULL);
-    }
-
-    VTABLE void unshift_string(STRING *value) {
-        SELF.unshift_pmc(NULL);
-    }
-
-    void push_pmc(PMC *value) {
-        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
-    }
-
-    VTABLE void push_float(FLOATVAL value) {
-        SELF.push_pmc(PMCNULL);
-    }
-
-    VTABLE void push_integer(INTVAL value) {
-        SELF.push_pmc(PMCNULL);
-    }
-
-    VTABLE void push_string(STRING *value) {
-        SELF.push_pmc(PMCNULL);
-    }
-
-    VTABLE PMC *pop_pmc() {
-        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
-        return PMCNULL;
-    }
-
-    VTABLE FLOATVAL pop_float() {
-        (void) SELF.pop_pmc();
-        return 0.0;
-    }
-
-    VTABLE INTVAL pop_integer() {
-        (void) SELF.pop_pmc();
-        return 0;
-    }
-
-    VTABLE STRING *pop_string() {
-        (void) SELF.pop_pmc();
-        return NULL;
-    }
-}
 
 /*
 
 =back
 
-=head1 HISTORY
+=cut
 
-Initial revision by leo 2003.07.10.
+*/
+
+}
+
+/*
+
+=head2 Auxliary functions
+
+=over 4
+
+=item C<static AttrEnum getAttrEnum(PARROT_INTERP, const STRING *name)>
+
+Gets an enumerated value corresponding to the attribute with that name.
+
+=cut
+
+*/
+
+static AttrEnum
+getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
+{
+    ASSERT_ARGS(getAttrEnum)
+
+    AttrEnum r;
+    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "birthtime")))
+        r = attr_birthtime;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "message")))
+        r = attr_message;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "payload")))
+        r = attr_payload;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "resume")))
+        r = attr_resume;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "severity")))
+        r = attr_severity;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "type")))
+        r = attr_type;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exit_code")))
+        r = attr_exit_code;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "backtrace")))
+        r = attr_backtrace;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "handled")))
+        r = attr_handled;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "handler_iter")))
+        r = attr_handler_iter;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "handler_ctx")))
+        r = attr_handler_ctx;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "thrower")))
+        r = attr_thrower;
+    else
+        r = attr_NONE;
+    return r;
+}
+
+/*
+
+=back
 
 =cut
 

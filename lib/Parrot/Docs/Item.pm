@@ -1,4 +1,4 @@
-# Copyright (C) 2004, The Perl Foundation.
+# Copyright (C) 2004, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -35,6 +35,7 @@ use warnings;
 
 use Parrot::Docs::Directory;
 use Parrot::Docs::POD2HTML;
+use Parrot::Docs::Text2HTML;
 
 =item C<new_item($text, @paths)>
 
@@ -67,12 +68,11 @@ sub new {
     my $text     = shift;
     my @contents = @_;
 
-    # RT#43713 - Items should only contain paths.
-
     die "No contents ($text).\n" unless @contents;
 
     $self = bless {
         TEXT     => $text,
+        TITLE    => $text,
         CONTENTS => \@contents,
     }, $self;
 
@@ -116,7 +116,7 @@ sub html_navigation {
     my $path   = shift;
     my $parent = $self->parent || return '';
 
-    return join ' | ', grep { length } $parent->html_navigation($path), $parent->html_link($path);
+    return join ' &raquo; ', grep { length } $parent->html_navigation($path), $parent->html_link($path);
 }
 
 =item C<write_html($source, $target, $silent)>
@@ -149,15 +149,24 @@ sub write_html {
 
     foreach my $rel_path (@rel_paths) {
         my $file      = $source->file_with_relative_path($rel_path);
-        my $formatter = Parrot::Docs::POD2HTML->new;
 
         if ( $file->contains_pod ) {
             print "\n", $rel_path unless $silent;
 
+            my $formatter = Parrot::Docs::POD2HTML->new;
+            $formatter->no_errata_section(1); # don't dump errors into HTML output
             $formatter->write_html( $source, $target, $rel_path, $self );
 
-            $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
-                $source->relative_path( $file->path ) );
+            my $title = $self->{TITLE} || $file->short_description;
+
+            if ($title) {
+                $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
+                    $title );
+            }
+            else {
+                $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
+                    $source->relative_path( $file->path ) );
+            }
 
             $index_html .= "<br>\n";
 
@@ -174,28 +183,22 @@ sub write_html {
         elsif ( $file->is_docs_link ) {
             print "\n", $rel_path unless $silent;
 
-            # Link to the actual file rather than the HTML version.
-            $index_html .= $formatter->html_link( $target->relative_path( $file->path ),
+            my $formatter = Parrot::Docs::Text2HTML->new;
+            $formatter->write_html( $source, $target, $rel_path, $self );
+
+            $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
                 $source->relative_path( $file->path ) );
 
-            $index_html .= "<br>\n";
         }
     }
 
     return '' unless $index_html;
 
-    if ( !$self->{TEXT} and @short_desc ) {
-        my $short_desc = join '. ', @short_desc;
-
-        $short_desc .= '.' unless $short_desc =~ /\.$/o;
-
-        $self->{TEXT} = $short_desc;
+    if ( $self->{DESCRIPTION} ) {
+        $index_html .= "<br>$self->{DESCRIPTION}\n";
     }
 
-    if ( $self->{TEXT} ) {
-        $index_html .= "$self->{TEXT}<br>\n";
-        $index_html = '<p>' . $index_html . "</p>\n";
-    }
+    $index_html = '<li>' . $index_html . "</li>\n";
 
     return $index_html;
 }

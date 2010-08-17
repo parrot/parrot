@@ -1,28 +1,24 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 004-configure.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 29;
 use Carp;
 use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use_ok(
-    'Parrot::Configure::Step::List', qw|
-        get_steps_list
-        |
-);
+use Parrot::Configure::Step::List qw| get_steps_list |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
 my $CC        = "/usr/bin/gcc-3.3";
 my $localargv = [ qq{--cc=$CC}, ];
-my $args      = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         mode => q{configure},
         argv => $localargv,
@@ -81,17 +77,17 @@ my $res = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration,
-you can call Parrot::Configure::Data::slurp().
+you can call Parrot::Configure::Data::get_PConfig().
 But here you are testing for that method's failure.
 REASON
 
     skip $reason, 1 if defined $res;
 
-    eval { $conf->data()->slurp(); };
+    eval { $conf->data()->get_PConfig(); };
     like(
         $@,
         qr/You cannot use --step until you have completed the full configure process/,
-"Got expected error message when using --step option and slurp() without prior completed configuration"
+"Got expected error message for --step option and get_PConfig() without prior configuration"
     );
 }
 
@@ -99,17 +95,17 @@ $res = eval "no strict; use Parrot::Config::Generated; \\%PConfig_Temp";
 SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration,
-you can call Parrot::Configure::Data::slurp_temp().
+you can call Parrot::Configure::Data::get_PConfig_Temp().
 But here you are testing for that method's failure.
 REASON
 
     skip $reason, 1 if defined $res;
 
-    eval { $conf->data()->slurp_temp(); };
+    eval { $conf->data()->get_PConfig_Temp(); };
     like(
         $@,
         qr/You cannot use --step until you have completed the full configure process/,
-"Got expected error message when using --step option and slurp_temp() without prior completed configuration"
+"Got expected error message for --step option and get_PConfig_Temp() without prior configuration"
     );
 }
 

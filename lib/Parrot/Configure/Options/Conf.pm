@@ -1,116 +1,24 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
-
 package Parrot::Configure::Options::Conf;
 
 use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
-    @valid_options
     $script
-    %options_components
     $parrot_version
     $svnid
+    print_help
+    print_version
 );
 use lib qw( lib );
 use Parrot::BuildUtil ();
-
-our @valid_options = qw{
-    ask
-    bindir
-    cage
-    cc
-    ccflags
-    ccwarn
-    cgoto
-    configure_trace
-    cxx
-    datadir
-    debugging
-    define
-    exec-prefix
-    execcapable
-    fatal
-    fatal-step
-    floatval
-    gc
-    help
-    icu-config
-    icuheaders
-    icushared
-    includedir
-    infodir
-    inline
-    intval
-    jitcapable
-    languages
-    ld
-    ldflags
-    lex
-    libdir
-    libexecdir
-    libs
-    link
-    linkflags
-    localstatedir
-    m
-    make
-    maintainer
-    mandir
-    miniparrot
-    nomanicheck
-    oldincludedir
-    opcode
-    ops
-    optimize
-    parrot_is_shared
-    pmc
-    prefix
-    profile
-    sbindir
-    sharedstatedir
-    silent
-    sysconfdir
-    test
-    verbose
-    verbose-step
-    version
-    without-gdbm
-    without-opengl
-    without-pcre
-    without-crypto
-    without-gettext
-    without-gmp
-    without-icu
-    yacc
-};
+use FindBin qw($Bin);
 
 our $script         = q{Configure.pl};
-our $parrot_version = Parrot::BuildUtil::parrot_version();
-our $svnid          = '$Id$',
-
-my %short_circuits = (
-    help    => \&print_help,
-    version => \&print_version,
-);
-
-our %options_components = (
-    'valid_options'  => \@valid_options,
-    'script'         => $script,
-    'short_circuits' => \%short_circuits,
-    'conditionals'   => \&conditional_assignments,
-);
-
-sub conditional_assignments {
-    my $argsref = shift;
-    $argsref->{debugging} = 1
-        unless ( ( exists $argsref->{debugging} ) && !$argsref->{debugging} );
-    $argsref->{maintainer} = 1
-        if defined $argsref->{lex}
-            or defined $argsref->{yacc};
-    return $argsref;
-}
+our $parrot_version = Parrot::BuildUtil::parrot_version("$Bin/../../");
+our $svnid          = '$Id$';
 
 sub print_version {
     print "Parrot Version $parrot_version Configure 2.0\n";
@@ -128,16 +36,14 @@ General Options:
    --version            Show version information
    --verbose            Output extra information
    --verbose=2          Output every setting change
-   --verbose-step=N     Set verbose for step N only
-   --verbose-step=regex Set verbose for step matching description
+   --verbose-step       Comma-delimited string of configuration steps
+                        for which output will be verbose
    --fatal              Failure of any configuration step will cause
                         Configure.pl to halt
    --fatal-step         Comma-delimited string of configuration steps
                         which upon failure cause Configure.pl to halt
    --silent             Don't be verbose, interactive or fatal
    --nomanicheck        Don't check the MANIFEST
-   --languages="list of languages"
-                        Specify a list of languages to process
 
    --ask                Have Configure ask for commonly-changed info
    --test=configure     Run tests of configuration tools before configuring
@@ -154,6 +60,7 @@ Compile Options:
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags
    --parrot_is_shared   Link parrot dynamically
+   --disable-rpath      Link without rpath (user must set LD_LIBRARY_PATH)
    --m=32               Build 32bit executable on 64-bit architecture.
    --profile            Turn on profiled compile (gcc only for now)
    --cage               [CAGE] compile includes many additional warnings
@@ -171,6 +78,8 @@ Compile Options:
    --make=(make tool)   Use the given make utility
    --yacc=(parser)      Use the given parser generator
 
+   --no-line-directives Disable creation of C #line directives
+
    --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
 
 Parrot Options:
@@ -179,20 +88,22 @@ Parrot Options:
    --floatval=(type)    Use the given type for FLOATVAL
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
-   --pmc=(files)        Use the given PMC files
 
-   --cgoto=0            Don't build cgoto core - recommended when short of mem
    --jitcapable         Use JIT
    --execcapable        Use JIT to emit a native executable
-   --gc=(type)          Determine the type of garbage collection
-                        type=(gc|libc|malloc|malloc-trace) default is gc
+   --without-threads    Build parrot without thread support
+   --buildframes        Dynamically build NCI call frames
+   --without-extra-nci-thunks
+                        Build parrot without unnecessary
+                        statically compiled NCI call frames
 
 External Library Options:
 
+   --without-gettext    Build parrot without gettext support
    --without-gmp        Build parrot without GMP support
-   --without-gdbm       Build parrot without GDBM support
    --without-opengl     Build parrot without OpenGL support (GL/GLU/GLUT)
-   --without-crypto     Build parrot without crypto support (libssl)
+   --without-pcre       Build parrot without pcre support
+   --without-zlib       Build parrot without zlib support
 
 ICU Options:
 
@@ -217,7 +128,6 @@ Other Options (may not be implemented):
 
    --maintainer         Create imcc's parser and lexer files. Needs a working
                         parser and lexer.
-   --miniparrot         Build parrot assuming only pure ANSI C is available
 
 Install Options:
 
@@ -246,12 +156,94 @@ Install Options:
     --oldincludedir=DIR   C header files for non-gcc [/usr/include]
     --infodir=DIR         info documentation [PREFIX/info]
     --mandir=DIR          man documentation [PREFIX/man]
+    --pkgconfigdir=DIR    subdirectory of <libdir> for pkgconfig
+                              [<libdir>/pkgconfig/<version>]
 
 EOT
     return 1;
 }
 
 1;
+
+#################### DOCUMENTATION ####################
+
+=head1 NAME
+
+Parrot::Configure::Options::Conf - Functionality shared by all Parrot
+configuration options processing modes
+
+=head1 SYNOPSIS
+
+    use Parrot::Configure::Options::Conf qw(
+        $script
+        $parrot_version
+        $svnid
+        print_help
+        print_version
+     );
+
+=head1 DESCRIPTION
+
+Parrot::Configure::Options::Conf exports on demand certain variables and
+subroutines used in other packages which implement different modes of
+configuration options processing.  Currently, these packages are:
+
+=over 4
+
+=item * Parrot::Configure:Options::Conf::CLI
+
+... for the command-line interface to F<Configure.pl>; and
+
+=item * Parrot::Configure::Options::Conf::File
+
+... for the configuration-file interface to that same program.
+
+=back
+
+=head1 EXPORTED VARIABLES
+
+Three variables are exported on demand.
+
+=head2 C<$script>
+
+Defaults to string 'Configure.pl', but may be overridden for testing purposes.
+
+=head2 C<$parrot_version>
+
+String which is return value of C<Parrot::BuildUtil::parrot_version()>; may be
+overridden for testing purposes.
+
+=head2 C<$svnid>
+
+String holding a standard Subversion 'Id' tag; may be
+overridden for testing purposes.
+
+=head1 EXPORTED SUBROUTINES
+
+Two subroutines are exported on demand.
+
+=head2 C<print_help()>
+
+Help message printed when C<perl Configure.pl --help>  is called.  Takes no
+arguments; prints to STDOUT; implicitly returns true value upon success.
+
+=head2 C<print_version()>
+
+Version number printed when C<perl Configure.pl --version>  is called.  Takes
+no arguments; prints to STDOUT; implicitly returns true value upon success.
+
+=head1 NOTES
+
+The functionality in this package originally appeared in F<Configure.pl>.  It
+was transferred here and refactored by James E Keenan.
+
+=head1 SEE ALSO
+
+F<Configure.pl>. Parrot::Configure::Options::Conf.
+Parrot::Configure::Options::Reconf.  Parrot::Configure::Options::Conf::CLI.
+Parrot::Configure::Options::Conf::File.
+
+=cut
 
 # Local Variables:
 #   mode: cperl

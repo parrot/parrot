@@ -1,6 +1,6 @@
 # This line will be printed by ./parrot examples/pir/readline.t
 
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -19,6 +19,7 @@ received the buffer is printed and the program is terminated.
 =cut
 
 .include 'cclass.pasm'
+.loadlib 'io_ops'
 
 .sub "example" :main
         .local pmc stdin
@@ -29,12 +30,12 @@ received the buffer is printed and the program is terminated.
 
 AGAIN:
 	line = readline stdin
-	I1 = length line
-	if I1 <= 1 goto MAINLOOP
+	$I1 = length line
+	if $I1 <= 1 goto MAINLOOP
 	# test for multi-char newlines
-	if I1 >=3 goto CONCAT
-	I2 = is_cclass .CCLASS_NEWLINE, line, 0
-	if I2, MAINLOOP
+	if $I1 >=3 goto CONCAT
+	$I2 = is_cclass .CCLASS_NEWLINE, line, 0
+	if $I2, MAINLOOP
 
 CONCAT:
 	concat buffer, line

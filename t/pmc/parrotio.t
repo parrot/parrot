@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -10,7 +10,7 @@ use Parrot::Test tests => 6;
 
 =head1 NAME
 
-t/pmc/parrotio.t - test the ParrotIO PMC
+t/pmc/parrotio.t - test the FileHandle PMC
 
 =head1 SYNOPSIS
 
@@ -18,24 +18,24 @@ t/pmc/parrotio.t - test the ParrotIO PMC
 
 =head1 DESCRIPTION
 
-Tests the ParrotIO PMC.
+Tests the FileHandle PMC.
 
 =cut
 
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, 'ParrotIO'
-    say "ok 1 - $P0 = new 'ParrotIO'"
+    new $P0, ['FileHandle']
+    say "ok 1 - $P0 = new ['FileHandle']"
 .end
 CODE
-ok 1 - $P0 = new 'ParrotIO'
+ok 1 - $P0 = new ['FileHandle']
 OUT
 
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'ParrotIO'
+    $P0 = new ['FileHandle']
     $P0.open('README')
     say 'ok 1 - $P0.open($S1)'
 
@@ -78,18 +78,16 @@ ok 5 - $P0.open($S1)      # with bad file
 ok 6 - $P0.open($S1, $S2) # new file, write mode succeeds
 OUT
 
-# RT#46827 test open file, close file, delete file, reopen previously opened stream
-
-# RT#46829 cleanup 'new_file' in previous test; which is todo'd, so the
-# file isn't even being *generated* yet.
+# should be in the PIR code
+unlink 'new_file';
 
 SKIP: {
     skip 'no asynch calls yet' => 1;
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
-    $P1 = # RT#46831 create a callback here
-    $P0 = new 'ParrotIO'
+    $P1 = # TT #1204 create a callback here
+    $P0 = new ['FileHandle']
 
     $P0.open('README')
     say 'ok 1 - $P0.open($S1)'
@@ -123,7 +121,7 @@ pir_output_is(
     .local pmc chomp
                chomp = get_global ['String';'Utils'], 'chomp'
 
-    $P0 = new 'ParrotIO'
+    $P0 = new ['FileHandle']
     $P0.open('README')
 
     $S0 = $P0.read(14) # bytes
@@ -141,7 +139,7 @@ pir_output_is(
     $P0.print(123)
     $P0.print(456.789)
     $P0.print("squawk\n")
-    $P1 = new 'Integer'
+    $P1 = new ['Integer']
     $P1 = 42
     $P0.print($P1)
     say 'ok 3 - $P0.print(${I,N,S,P}1)'
@@ -168,16 +166,14 @@ ok 4 - $S0 = $P1.readline($I2)
 ok 5 - $S0 = $P1.readline($I2) # again on same stream
 OUT
 
-# RT#46833 test reading/writing code points once supported
+# TT #1204 test reading long chunks, eof, and across newlines
 
-# RT#46835 test reading long chunks, eof, and across newlines
-
-# RT#46837 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
+# TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'ParrotIO'
+    $P0 = new ['FileHandle']
 
     $S0 = $P0.record_separator()
     if $S0 == "\n" goto ok_1
@@ -215,7 +211,7 @@ pir_output_is( <<'CODE', <<'OUT', 'buffer_type', todo => 'not yet implemented' )
 .sub 'test' :main
     .include 'io_buffer_types.pasm'
 
-    $P0 = new 'ParrotIO'
+    $P0 = new ['FileHandle']
 
     $P0.buffer_type('unbuffered')
     $I0 = $P0.buffer_type()
@@ -268,16 +264,16 @@ ok 5 - $I0 = $P1.buffer_type() # PIO_FULLBUF
 ok 6 - $S0 = $P1.buffer_type() # PIO_FULLBUF
 OUT
 
-# RT#46839 test effects of buffer_type, not just set/get
+# TT #1204 test effects of buffer_type, not just set/get
 
-# RT#46841
+# TT #1177
 # L<PDD22/I\/O PMC API/=item buffer_size>
 # NOTES: try setting positive, zero, negative int
 # perform print and read ops
 # change buffer size while it contains data
 # try with all 'buffer_type' modes
 
-# RT#46843
+# TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
 

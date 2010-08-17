@@ -1,0 +1,47 @@
+/*
+  Copyright (C) 2001-2005, Parrot Foundation.
+  $Id$
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#ifdef WIN32
+#  include <windows.h>
+#endif
+
+int
+main(int argc, char *argv[])
+{
+    mpz_t prime;
+    char *s; int y;
+
+#ifdef WIN32
+    /* This is a workaround for http://rt.perl.org/rt3/Ticket/Display.html?id=50212
+     * Strawberry Perl builds GMP with SSE2 instructions, which some older classes of
+     * x86 processor can't handle.  This pops up an error dialog and waits for the user
+     * to click before proceeding with the rest of configure.
+     * This call disables that; copied from win32's Parrot_platform_init_code().
+     */
+    SetErrorMode(SEM_NOGPFAULTERRORBOX);
+#endif
+
+    /* Calculate the 13th Mersenne prime 2^521 - 1 */
+    mpz_init(prime);
+    mpz_ui_pow_ui(prime, 2, 521);
+    mpz_sub_ui(prime, prime, 1);
+
+    y = mpz_fits_slong_p(prime);
+
+    s = mpz_get_str(NULL, 10, prime);
+    printf("%s %d\n", s, y);
+    free(s);
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

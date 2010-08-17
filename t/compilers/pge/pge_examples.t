@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2006, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -12,11 +12,15 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/library/pge_examples.t - Parrot Grammar Engine tests of examples
+t/library/pge_examples.t
 
 =head1 SYNOPSIS
 
     % prove t/compilers/pge/pge_examples.t
+
+=head1 DESCRIPTION
+
+Parrot Grammar Engine tests of examples
 
 =cut
 
@@ -97,7 +101,7 @@ END_FASTA
     # print code
 
     .local pmc fasta_rule
-    fasta_rule = get_global ['Bio::Fasta'], "databank"
+    fasta_rule = get_global ['Bio';'Fasta'], "databank"
     .local pmc match
     ( match ) = fasta_rule( fasta )
 

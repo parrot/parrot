@@ -24,7 +24,7 @@ This library declares the following constants:
 
 =cut
 
-.namespace [ 'SDL::Constants' ]
+.namespace [ 'SDL'; 'Constants' ]
 
 .sub _initialize :load
 
@@ -45,9 +45,9 @@ For example, C<8> corresponds to C<backspace>.
 .sub _load_key_names
 	.local pmc key_names
 
-	key_names = new 'SArray'
+	key_names = new 'FixedPMCArray'
 	key_names = 323
-	store_global 'SDL::Constants', 'key_names', key_names
+	set_hll_global ['SDL'; 'Constants'], 'key_names', key_names
 
 	# list created with:
 	# $ cat /usr/include/SDL/SDL_keysym.h |
@@ -301,7 +301,7 @@ Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

@@ -1,10 +1,14 @@
-#!./parrot 
-# Copyright (C) 2001-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-t/library/string_utils.t  -- Tests for String/Utils.pbc
+t/library/string_utils.t
+
+=head1 DESCRIPTION
+
+Tests for String/Utils.pbc
 
 =head1 SYNOPSIS
 
@@ -15,7 +19,7 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
 .const string TESTS = '29'
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
 
     .local pmc test       # the test harness object.
                test = new [ 'Test'; 'Builder' ]

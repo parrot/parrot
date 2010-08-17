@@ -1,4 +1,4 @@
-# Copyright 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -11,32 +11,34 @@ version 0.1
 
 =head1 SYNOPSIS
 
-    ...
+    load_bytecode "dumper.pbc"
+
     # dump the P0 register
-    yaml( P0 )
+    yaml( $P0 )
 
     # dump the P0 register, with "name"
-    yaml( P0, "name" )
-    ...
-
-    END
-    .include "library/yaml_dumper.pir"
+    yaml( $P0, "name" )
 
 
 =head1 DESCRIPTION
 
-    PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
+PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
 
 =cut
 
 # first method prints usage information
-.sub __library_dumper_onload
-    print "usage:"
-    print "\tload_bytecode \"library/YAML/Dumper.pir\"\n"
-    print "\t...\n"
-    print "\tnew yaml, \"YAML::Dumper\"\n"
-    print "\tyaml.\"yaml\"( foo, \"foo\" )\n\n"
-    end
+.sub __library_yaml_dumper_print_usage
+    say "# usage:"
+    say ".sub main"
+    say "    load_bytecode 'YAML/Dumper.pbc'"
+    say ''
+    say "    .local pmc foo, yaml_dumper"
+    say "    foo         = new 'ResizablePMCArray'"
+    say "    yaml_dumper =  new ['YAML'; 'Dumper']"
+    say ''
+    say "    yaml_dumper.'yaml'( foo, 'foo' )"
+    say ".end"
+    say ''
 .end
 
 .include "errors.pasm"
@@ -71,7 +73,7 @@ B<Note:> This function currently returns nothing. It should return
 the dumped data as a string, like Perl's Data::Dumper. Instead,
 everything is printed out using C<print>.
 
-B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.pir)
+B<Note: #2> Hash keys are now sorted using C<_sort()> (sort.pir)
 
 =cut
 
@@ -97,7 +99,7 @@ ex:
 
 =item _register_dumper( id, sub )
 
-Registers a dumper for new PMC type. B<UNIMPLEMENTED>
+Registers a dumper for new PMC type. B<EXCEPTION_UNIMPLEMENTED>
 But see B<method __dump> below.
 
 =over 4
@@ -146,29 +148,29 @@ Returns the global dumper instance used by the non object interface.
     .local pmc yd_class
     .local int is_defined
 
-    get_class yd_class, "YAML::Dumper"
+    get_class yd_class, ['YAML'; 'Dumper']
     if null yd_class goto load_yd_pir
     goto TYPE_OK
 
   load_yd_pir:
-    load_bytecode "library/YAML/Dumper.pir"
-    get_class yd_class, "YAML::Dumper"
+    load_bytecode "YAML/Dumper.pbc"
+    get_class yd_class, ['YAML'; 'Dumper']
     if null yd_class goto no_class
     goto TYPE_OK
 
   no_class:
-    print "fatal error: failure while loading library/YAML/Dumper.pir\n"
+    print "fatal error: failure while loading YAML/Dumper.pbc\n"
     end
 TYPE_OK:
 
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    find_global self, "YAML::Dumper", "global"
+    self = get_global ['YAML'; 'Dumper'], 'global'
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
 create_type:
-    new self, "YAML::Dumper"
-    store_global "YAML::Dumper", "global", self
+    new self, ['YAML'; 'Dumper']
+    set_global ['YAML'; 'Dumper'], 'global', self
 
 END:
     .return( self )
@@ -182,11 +184,8 @@ Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
 Please send patches and suggestions to the Perl 6 Internals mailing list.
 
-=head1 COPYRIGHT
-
-Copyright (C) 2004-2008, The Perl Foundation.
-
 =cut
+
 
 # Local Variables:
 #   mode: pir

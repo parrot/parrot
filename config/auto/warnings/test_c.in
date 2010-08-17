@@ -1,26 +1,22 @@
 /*
- * figure out if the compiler supports attributes.
- * see parrot/compiler.h for attribute value definitions.
- */
+Copyright (C) 2007-2009, Parrot Foundation.
+$Id$
+
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "parrot/compiler.h"
 
 /* as long as the file compiles, everything is okay */
 int
-main()
+main(void)
 {
     return EXIT_SUCCESS;
 }
 
-
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
- * vim: expandtab shiftwidth=4 ft=c:
+ * vim: expandtab shiftwidth=4:
  */

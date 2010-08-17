@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -33,7 +33,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $keywords = join '|' => sort { length $a cmp length $b } qw/
+my $keywords = join '|' => sort { length $a <=> length $b } qw/
     auto      double    int       struct    INTVAL
     break     else      long      switch    UINTVAL
     case      enum      register  typedef   FLOATVAL
@@ -44,7 +44,7 @@ my $keywords = join '|' => sort { length $a cmp length $b } qw/
     do        if        static    while     size_t
     /;
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my @files = @ARGV ? <@ARGV> : $DIST->get_c_language_files();
 check_parens(@files);
 
 exit;
@@ -90,8 +90,9 @@ sub check_parens {
 
         my @lines = split( /\n/, $buf );
         for my $line (@lines) {
-            next if $line =~ m{#\s*define};    # skip #defines
-            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }xo ) {
+            # skip #defines and typedefs
+            next if $line =~ m{(?:(#\s*define|^\s*typedef))};
+            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( ) ) }xo ) {
                 my $paren = $1;
 
                 # ops use the same names as some C keywords, so skip

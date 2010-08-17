@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2007, Parrot Foundation.
  */
 
 #ifndef PARROT_WARNINGS_H_GUARD
@@ -35,19 +35,13 @@ typedef enum {
 
 /* &end_gen */
 
-#define PARROT_WARNINGS_on(interp, flag) do { \
-    CONTEXT((interp))->warns |= (flag); } while (0)
-#define PARROT_WARNINGS_off(interp, flag) do { \
-    CONTEXT((interp))->warns &= ~(flag); } while (0)
-#define PARROT_WARNINGS_test(interp, flag)  \
-    (CONTEXT((interp))->warns & (flag))
+#define PARROT_WARNINGS_on(interp, flag)   Parrot_pcc_warnings_on((interp), (interp)->ctx, (flag))
+#define PARROT_WARNINGS_off(interp, flag)  Parrot_pcc_warnings_off((interp), (interp)->ctx, (flag))
+#define PARROT_WARNINGS_test(interp, flag) Parrot_pcc_warnings_test((interp), (interp)->ctx, (flag))
 
-#define PARROT_ERRORS_on(interp, flag) do { \
-    CONTEXT((interp))->errors |= (flag); } while (0)
-#define PARROT_ERRORS_off(interp, flag) do { \
-    CONTEXT((interp))->errors &= ~(flag); } while (0)
-#define PARROT_ERRORS_test(interp, flag)  \
-    (CONTEXT((interp))->errors & (flag))
+#define PARROT_ERRORS_on(interp, flag)   Parrot_pcc_errors_on((interp), (interp)->ctx, (flag))
+#define PARROT_ERRORS_off(interp, flag)  Parrot_pcc_errors_off((interp), (interp)->ctx, (flag))
+#define PARROT_ERRORS_test(interp, flag) Parrot_pcc_errors_test((interp), (interp)->ctx, (flag))
 
 #if defined(PARROT_IN_CORE)
 
@@ -56,18 +50,33 @@ typedef enum {
 /* HEADERIZER BEGIN: src/warnings.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
-INTVAL Parrot_warn(PARROT_INTERP,
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+INTVAL /*@alt void@*/
+Parrot_warn(PARROT_INTERP,
     INTVAL warnclass,
     ARGIN(const char *message),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
+void Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_warn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(message))
+#define ASSERT_ARGS_Parrot_warn_deprecated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(message))
+#define ASSERT_ARGS_print_pbc_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/warnings.c */
 

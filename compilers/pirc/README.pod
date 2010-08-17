@@ -1,160 +1,370 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-README.txt - Readme file for pirc/new compiler, a fresh implementation of
-the PIR language using Bison and Flex.
-
-=head1 AUTHOR
-
-kjs
+README.txt - Readme file for PIRC compiler.
 
 =head1 DESCRIPTION
 
-pirc/new is a fresh implementation of the PIR language. Maintaining the
-current default implementation (IMCC) is a bit of a pain, and it contains
-a lot of "XXX" and "TODO" and other kludge alerts. Eventually, this should
-be fixed.
-
-PIRC is not finished yet. A lot of work is needed on the back-end
-before it can generate Parrot Byte Code files (PBC).
-
-Note that pirc/new refers to a Lex/Yacc based implementation, while
-'pirc' refers to the hand-written recursive-descent implementation,
-to be found in pirc/src directory.
-
-The current set-up is a three-phase compiler:
+PIRC is a fresh implementation of the PIR language using Bison and Flex.
+Its main features are:
 
 =over 4
 
-=item * Heredoc pre-processor
+=item * thread-safety, so it is reentrant.
 
-The heredoc pre-processor takes the input, and converts all heredoc strings
-into normal strings. So, the following:
+=item * strength reduction, implemented in the parser.
 
- .sub main
-    foo(<<'HI', <<'BYE')
- hi there!
-HI
- bye for now!
-BYE
+=item * constant folding, implemented in the parser.
 
- .end
+=item * checks for proper use of op arguments in PIR syntax (disallowing, e.g.: $S0 = print)
 
-is converted into:
+=item * allow multiple heredocs in subroutine invocations (like: foo(<<'A', <<'B', <<'C') )
 
- .sub main
-    foo(" hi there!\n", " bye for now!\n\n")
- .end
-
-Currently there is a small issue with the 2nd and later heredoc arguments; they
-seem to get one newline character too many.
-
-The heredoc pre-processor needs to know about POD comments, because the POD comment
-may contain a heredoc string, which should not be processed, as it is a comment.
-For that purpose, all comments (POD and line comments) are stripped in this phase.
-
-The Heredoc pre-processor is located in B<compilers/pirc/heredoc>.
-
-=item * Macro pre-processor
-
-The macro pre-processor takes the output of the heredoc pre-processor, and
-handles all macro definitions and expansions. The C<.include> directive is handled
-here too. The output of the macro pre-processor is (in case of uses of the C<.include>
-directive) one long big file with "pure" PIR code.
-
-The macro pre-processor is located in B<compilers/pirc/macro>.
-
-=item * PIR parser
-
-The third pass is done by the PIR parser, which takes the "pure" PIR code
-from the macro pre-processor. Currently, it's only a parser, but a future
-extension could be to generate PASM code from the PIR input. This way, it's
-easy to see what ops are actually executed when running the PIR file.
-
-The PIR parser is located in B<compilers/pirc/new>.
+=item * register usage optimization
 
 =back
 
-The new implementation also has some unique features with respect to IMCC:
+=head2 Compiling and Running
+
+=head3 Windows using Microsoft Visual Studio
+
+To compile PIRC on windows using MSVC:
+
+   nmake
+
+When running PIRC, it needs the shared library C<libparrot>; an easy way to do
+this is copy C<libparrot.dll> in the Parrot root directory to C<compilers/pirc/src>.
+
+Running PIRC is as easy as:
+
+ pirc test.pir
+
+See 'pirc -h' for help.
+
+=head3 Linux using GCC
+
+The Makefile should work fine on Linux:
+
+ cd compilers/pirc && make
+
+When running PIRC, it needs the shared library C<libparrot>; in order to let
+PIRC find it, set the path as follows:
+
+ export LD_LIBRARY_PATH=../../../blib/lib
+
+Running is as easy as:
+
+ ./pirc test.pir
+
+=head2 Overview
+
+The new Bison/Flex based implementation of the PIR compiler is designed
+as a two-stage compiler:
 
 =over 4
 
-=item * Multiple heredoc arguments
+=item 1. Heredoc preprocessor
 
-In pirc/new (a new name is yet to be defined) it is allowed to use multiple
-heredocs as function arguments, like so:
-
-   ...
-   foo(<<'HI', <<'BYE')
-
-   ...
- HI
-
-   ...
- BYE
-
-=item * Heredoc arguments for macro expansions
-
-As the heredoc pre-processor handles the input before the macro pre-processor,
-it is now possible to expand macros specifying heredoc arguments, like so:
-
- .macro foo(a)
-   print .a
- .end
-
- .sub main
-   .foo(<<'HI')
-  Hello world!
-HI
- .end
-
-
-=item * Reentrant
-
-The generated lexer and parser are fully re-entrant. (It does need to be tested, though).
-
-=item * Comments!
-
-The code is provided with comments, so you can actually understand what it does.
-
-=item * Pre-processing option
-
-Although IMCC does define the option '-E', it is not really working correctly.
-pirc has two pre-processing options: 1) running the heredoc parser only, 2) running
-both the heredoc and macro processors. The output of option 2 is the code that will
-be given to the PIR compiler.
-
-=item * Grammar cleanup
-
-This is a nice opportunity to clean up the grammar of the PIR language. Hacking on
-IMCC's grammar is possible, but not for the faint of heart.
+=item 2. PIR compiler
 
 =back
+
+=head2 Heredoc preprocessing
+
+The heredoc preprocessor takes the input as written by the PIR programmer,
+and flattens out all heredoc strings. An example is shown below to illustrate
+this concept:
+
+The following input:
+
+ .sub main
+   $S0 = <<'EOS'
+ This is a heredoc string
+   divided
+     over
+       five
+         lines.
+ EOS
+ .end
+
+is transformed into:
+
+ .sub
+   $S0 = "This is a heredoc string\n  divided\n    over\n      five\n        lines.\n"
+ .end
+
+In order to allow C<.include>d file to have heredoc strings, the heredoc preprocessor
+also handles the C<.include> directive, even though logically this is a macro function.
+See the discussion below for how the C<.include> directive works.
+
+=head2 PIR compilers
+
+The PIR compiler parses the output of the heredoc preprocessor. PIRC's lexer also
+handles macros.
+
+The macro layer basically implements text replacements. The following directives are handled:
+
+=over 4
+
+=item C<.macro>
+
+=item C<.macro_const>
+
+=item C<.macro_local>
+
+=item C<.macro_label>
+
+=back
+
+=head3 C<.include>
+
+The C<.include> directive takes a string argument, which is the name of a file. The
+contents of this file are inserted at the point where the C<.include> directive
+is written. To illustrate this, consider the following example:
+
+ main.pir:
+ ========================
+ .sub main
+   print "hi\n"
+   foo()
+ .end
+
+ .include "lib.pir"
+ ========================
+
+ lib.pir:
+ ========================
+ .sub foo
+   print "foo\n"
+ .end
+ ========================
+
+This will result in the following output:
+
+ .sub main
+   print "hi\n"
+   foo()
+ .end
+
+ .sub foo
+   print "foo\n"
+ .end
+
+
+=head3 C<.macro>
+
+The macro directive starts a macro definition. The macro preprocessor
+implements the expansion of macros. For instance, given the following input:
+
+ .macro say(msg)
+   print .msg
+   print "\n"
+ .endm
+
+ .sub main
+   .say("hi there!")
+ .end
+
+will result in this output:
+
+ .sub main
+   print "hi there!"
+   print "\n"
+ .end
+
+=head3 C<.macro_const>
+
+The C<.macro_const> directive is similar to the C<.macro> directive, except
+that a C<.macro_const> is just a simplified C<.macro>; it merely gives a name
+to some constant:
+
+ .macro_const PI 3.14
+
+ .sub main
+   print "PI is approximately: "
+   print .PI
+   print "\n"
+ .end
+
+This will result in the output:
+
+ .sub main
+   print "PI is approximately: "
+   print 3.14
+   print "\n"
+ .end
+
+
+=head3 PIR compiler
+
+As Parrot instructions are polymorphic, the PIR compiler is responsible for
+selecting the right variant of the instruction. The selection is based on the
+types of the operands. For instance:
+
+ set $I0, 42
+
+will select the C<set_i_ic> instruction: this is the C<set> instruction, taking
+an integer (i) result operand and an integer constant (ic) operand. Other examples
+are:
+
+ $P0[1] = 42           --> set_p_kic_ic # kic = key integer constant
+ $I0 = $P0["hi"]       --> set_i_p_kc   # kc = key constant from constant table
+ $P1 = new "Hash"      --> new_p_sc     # sc = string constant
+
+=head3 Constant folding
+
+Expressions that can be evaluated at compile-time are pre-evaluated, saving
+calculations during runtime. Some constant-folding is required, as Parrot
+depends on this. For instance:
+
+ add $I0, 1, 2
+
+is not a valid Parrot instruction; there is no C<add_i_ic_ic> instruction.
+Instead, this will be translated to:
+
+ set $I0, 3
+
+which, as was explained earlier, will select the C<set_i_ic> instruction.
+
+The conditional branch instructions are also pre-evaluated, if possible. For
+instance, consider the following statement:
+
+ if 1 < 2 goto L1
+
+It is clear during compile time, that 1 is smaller than 2; so instead of
+evaluating this during runtime, we know for sure that the branch to label
+C<L1> will be made, effectively replacing the above statement by:
+
+ goto L1
+
+Likewise, if it's clear that certain instructions don't have any effect,
+they can be removed altogether:
+
+ if 1 > 2 goto L1        --> nop  # nop is no opcode.
+ $I0 = $I0 + 0           --> nop
+
+Another type of optimization is the selection of (slightly) more efficient
+variants of instructions. For instance, consider the following instruction:
+
+ $I0 = $I0 + $I1
+
+which is actually syntactic sugar for:
+
+ add $I0, $I0, $I1
+
+In C one would write (ignoring the fact that $I0 and $I0 are not a valid C
+identifiers):
+
+ $I0 += $I1
+
+which is in fact valid PIR as well. When the PIR parser sees an instruction
+of this form, it will automatically select the variant with 2 operands
+instead of the 3-operand variant. So:
+
+ add $I0, $I0, $1    # $I0 is an out operand
+
+will be optimized, as if you had written:
+
+ add $I0, $I1        # $I0 is an in/out operand
+
+The PIR parser can do even more improvements, if it sees opportunity to do so.
+Consider the following statement:
+
+ $I0 = $I0 + 1
+
+or, in Parrot assembly syntax:
+
+ add $I0, $I0, 1
+
+Again, in C one would write (again ignoring the valid identifier issue): C<$I0++>,
+or in other words, C<incrementing> the given identifier. Parrot has C<inc> and C<dec>
+instructions built-in as well, so that the above statement C<$I0 = $I0 + 1> can be
+optimized to:
+
+ inc $I0
+
+=head3 Vanilla Register Allocator
+
+The PIR compiler implements a vanilla register allocator. This means that each
+declared C<.local> or C<.param> symbol, and each PIR register ($Px, $Sx, $Ix, $Nx)
+is assigned a unique PASM register, that is associated with the original symbol
+or PIR register throughout the subroutine.
+
+PIRC has a register optimizer, which can optimize the register usage. Run PIRC
+with the C<-r> option to activate this. The register optimizer is implemented
+using a Linear Scan Register allocator.
+
+The implementation of the vanilla register allocator is done in the PIR symbol
+management module (C<pirsymbol.c>).
+
+=head2 Register optimizer
+
+PIRC has a register optimizer, which uses a Linear Scan Register algorithm.
+For each symbolic register, a live-interval object is created, which has
+an I<start> and I<end> point, indicating the first and last usage of that
+symbolic register in the sub. The register optimizer figures out when
+symbolic registers don't overlap, in which case they can use the same
+register (assuming they're of the same type).
+
+=head2 Status
+
+Bytecode generation is done, but there is the occasional bug. These
+are reported in trac.parrot.org.
+
+
+=head1 IMPLEMENTATION
+
+The directory compilers/pirc has a number of subdirectories:
+
+=over 4
+
+=item doc - contains documentation.
+
+=item heredoc - contains the implementation of the heredoc preprocessor. This is now
+integrated with pirc/src. It now only has a driver program to build a stand-alone
+heredoc preprocessor.
+
+=item src - contains the Bison/Flex implementation of PIRC
+
+=item t - for tests. Tests input is fed into Parrot after compilation,
+which will run the code.
+
+=item macro - contains the old implementation of the macro preprocessor. This is now
+integrated with pirc/src. These files are kept as a reference until the macro
+preprocessor in pirc/src is completed.
+
+=back
+
+=head1 MAKING CHANGES
+
+If you want to make changes to the lexer of parser files, you will need the Flex
+and/or Bison programs. There are ports available for Windows, but I don't know
+whether they're any good. I use Cygwin's tools.
+
+=head2 Updating the lexer
+
+The heredoc preprocessor is implemented in C<hdocprep.l>, and can be regenerated
+using:
+
+   cd compilers/pirc/src
+   flex hdocprep.l
+
+PIRC's normal lexer is implemented in C<pir.l>, and can be regenerated using:
+
+   cd compilers/pirc/src
+   flex pir.l
+
+=head2 Updating the parser
+
+The parser is implemented in C<pir.y>, and can be regenerated using:
+
+   cd compilers/pirc/src
+   bison pir.y
 
 =head1 NOTES
 
-=head2 Usage
-
-Currently the different compilers/pre-processors are located in different directories.
-The different pre-processors are invoked from the main driver in pirc.c. The latter
-assumes all three processors are compiled, as the following executables:
-
- heredoc pre-processor: hdocprep
- macro pre-processor:   macroparser
-
-Running a file through the whole PIR compiler is then done as follows:
-
- $ ./pirc test.pir
-
-When you want to run the heredoc pre-processor only, do this:
-
- $ ./pirc -H test.pir
-
-When you want to pre-process the file only (heredoc + macro parsing), do this:
-
- $ ./pirc -E test.pir
 
 =head2 Cygwin processable lexer spec.
 
@@ -174,43 +384,7 @@ Then make sure to overwrite the supplied flex binary.
 =head1 BUGS
 
 Having a look at this implementation would be greatly appreciated, and any resulting
-feedback even more :-)
-
-=over 4
-
-=item * All, except the first heredoc argument, contains 1 newline character too many.
-Heredoc parsing is a bit complex, and there might be many other issues.
-
-=item * Memory management needs to be improved.
-
-=item * Braced macro argument handling needs a lot of testing.
-
-=back
-
-=head1 REPLACING IMCC WITH PIRC
-
-Eventually, either IMCC needs to be fixed rigorously, or, rewritten altogether.
-PIRC is an attempt to do the latter. The following things need to be considered
-when replacing IMCC with PIRC:
-
-=over 4
-
-=item * is_op
-
-PIRC needs a function to decide whether an identifier is an instruction. IMCC
-uses a function is_op that does this. For this to work, libparrot must be
-linked in, and I'm having trouble doing this.
-
-=item * register allocation
-
-IMCC has a register allocator, but I doubt whether it can be re-used by PIRC.
-The whole back-end of IMCC probably needs to be redesigned.
-
-=item * bytecode generation
-
-There must be a proper bytecode API for PIRC to use.
-
-=back
+feedback even more :-). Please post bug reports in trac.parrot.org.
 
 
 =head1 SEE ALSO
@@ -221,13 +395,13 @@ See also:
 
 =item * C<languages/PIR> for a PGE based implementation.
 
-=item * C<compilers/pirc>, a hand-written, recursive-descent PIR parser.
-
 =item * C<compilers/imcc>, the current I<standard> PIR implementation.
 
 =item * C<docs/imcc/syntax.pod> for a description of PIR syntax.
 
 =item * C<docs/imcc/> for more documentation about the PIR language.
+
+=item * C<docs/pdds/pdd19_pir.pod> for the PIR design document.
 
 =back
 

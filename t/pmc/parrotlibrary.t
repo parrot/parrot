@@ -1,5 +1,5 @@
-#! parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -17,12 +17,12 @@ Tests the ParrotLibrary PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new P0, 'ParrotLibrary'
-    ok(1, 'Instantiated .ParrotLibrary')
+    new $P0, ['ParrotLibrary']
+    ok(1, 'Instantiated a ParrotLibrary PMC')
 .end
 
 # Local Variables:

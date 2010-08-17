@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 .namespace ['String';'Utils']
@@ -53,7 +53,7 @@ and return in C<$S0>. If C<$S2> is not specified, the default C<\n> is used.
     $I0 = strl - sepl
     $I1 = index res, sep, $I0
     unless $I1 == $I0 goto return
-    chopn res, sepl
+    res = chopn res, sepl
     goto chomp
 
   return:
@@ -130,7 +130,7 @@ according to C<radix>.
     $S0 = "Invalid radix: "
     concat $S0, radix
     $P0 = new 'Exception'
-    $P0['_message'] = $S0
+    $P0 = $S0
     throw $P0
     .return (0, 0)
 .end
@@ -193,7 +193,7 @@ conversion.
     $S0 .= $S1
     $S0 .= "'"
     $P0 = new 'Exception'
-    $P0['_message'] = $S0
+    $P0 = $S0
     throw $P0
     .return ('', 0)
 .end

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2003, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -26,8 +26,7 @@ of primes and the last one found.
 
 /*
 
-=item C<int
-main(int argc, char *argv[])>
+=item C<int main(int argc, char *argv[])>
 
 Main function to run the example.
 
@@ -38,24 +37,24 @@ Main function to run the example.
 int
 main(int argc, char *argv[])
 {
-        int i=0, max=10000;
-        int i6 = 0;
-        int i7;
+    int i=0, max=500;
+    int i6 = 0;
+    int i7;
 
-        while (1) {
-                if (isprime1(i)) {
-                        i7 = i;
-                        i6++;
-                }
-                i++;
-                if (i==max){
-                        break;
-                }
+    while (1) {
+        if (isprime1(i)) {
+            i7 = i;
+            i6++;
         }
+        i++;
+        if (i==max) {
+             break;
+        }
+    }
 
-        printf("N primes calculated to %d is %d\nlast is: %d\n", max, i6, i7);
+    printf("N primes calculated to %d is %d\nlast is: %d\n", max, i6, i7);
 
-        return 0;
+    return 0;
 }
 
 /*
@@ -70,18 +69,18 @@ Determines if the input number is a prime.
 
 int isprime1(int input)
 {
-        int n;
+    int n;
 
-        if (input < 1) {
-                return 0;
-        }
-        n = input - 1;
+    if (input < 1) {
+        return 0;
+    }
+    n = input - 1;
 
-        while (n > 1){
-                if (input%n == 0) return 0;
-                n--;
-        }
-        return 1;
+    while (n > 1) {
+        if (input%n == 0) return 0;
+        n--;
+    }
+    return 1;
 }
 
 /*

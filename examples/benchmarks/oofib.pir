@@ -1,3 +1,4 @@
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 .sub bench :main
@@ -6,11 +7,14 @@
     argc = argv
     .local pmc N
     N = new 'Integer'
-    N = 28
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0
+    goto begin
 noarg:
+    N = 24
+begin:
+
     .local num start
     time start
 
@@ -42,77 +46,64 @@ noarg:
 .namespace ["A"]
 
 .sub fib :method
-    .param pmc n
+    .param int n
     if n >= 2 goto rec
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 rec:
-    .local pmc n1
-    .local pmc n2
-    .local pmc r1
-    .local pmc r2
-    n1 = new 'Integer'
-    n2 = new 'Integer'
-    n1 = n - 1
-    n2 = n - 2
-    r1 = self."fibA"(n1)
-    r2 = self."fibB"(n2)
-    n = new 'Integer'
+    .local int prev
+    .local int r1
+    prev = n
+    dec prev
+    r1 = self."fibA"(prev)
+
+    dec prev
+    .local int r2
+    r2 = self."fibB"(prev)
+
     n = r1 + r2
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 .sub fibA :method
-    .param pmc n
+    .param int n
     if n >= 2 goto rec
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 rec:
-    .local pmc n1
-    .local pmc n2
-    .local pmc r1
-    .local pmc r2
-    n1 = new 'Integer'
-    n2 = new 'Integer'
-    n1 = n - 1
-    n2 = n - 2
-    r1 = self."fib"(n1)
-    r2 = self."fibB"(n2)
-    n = new 'Integer'
+    .local int prev
+    prev = n
+
+    dec prev
+    .local int r1
+    r1 = self."fib"(prev)
+
+    dec prev
+    .local int r2
+    r2 = self."fibB"(prev)
+
     n = r1 + r2
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 .namespace ["B"]
 
 .sub fibB :method
-    .param pmc n
+    .param int n
     if n >= 2 goto rec
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 rec:
-    .local pmc n1
-    .local pmc n2
-    .local pmc r1
-    .local pmc r2
-    n1 = new 'Integer'
-    n2 = new 'Integer'
-    n1 = n - 1
-    n2 = n - 2
-    r1 = self."fib"(n1)
-    r2 = self."fibA"(n2)
-    n = new 'Integer'
+    .local int prev
+    prev = n
+
+    dec prev
+    .local int r1
+    r1 = self."fib"(prev)
+
+    dec prev
+    .local int r2
+    r2 = self."fibA"(prev)
+
     n = r1 + r2
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 # Local Variables:

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -25,7 +25,7 @@ Tests the Object PMC.
 
 pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, 'Object'
+    new $P0, ['Object']
     print "ok 1\n"
 .end
 CODE
@@ -84,7 +84,7 @@ pir_error_output_like( <<'CODE', <<'OUT', ':vtable with bad name' );
     .return("monkey")
 .end
 CODE
-/'not_in_the_vtable' is not a v-table method, but was used with :vtable/
+/'not_in_the_vtable' is not a vtable, but was used with :vtable/
 OUT
 
 # '
@@ -132,17 +132,16 @@ OUT
 
 # '
 
-# :vtable inheritance; RT #40626
 pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance from core classes' );
 .sub main :main
     $P0 = subclass 'Hash', 'Foo'
     $P0 = subclass 'Hash', 'Bar'
 
-    $P1 = new 'Foo'
+    $P1 = new ['Foo']
     $S1 = $P1
     say $S1
 
-    $P1 = new 'Bar'
+    $P1 = new ['Bar']
     $S1 = $P1
     say $S1
 .end
@@ -169,9 +168,9 @@ OUT
 pir_output_is(
     <<'CODE', <<'OUT', 'assign opcode in inherited classes' );
 .sub main :main
-    $P1 = new 'ResizablePMCArray'
+    $P1 = new ['ResizablePMCArray']
     push $P1, 3
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     assign $P2, $P1
     $I0 = elements $P2
     print $I0
@@ -191,7 +190,7 @@ CODE
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'RT#41733 - Execution ends after returning from invoke' );
+pir_output_is( <<'CODE', <<'OUT', 'Execution ends after returning from invoke' );
 .namespace ['Foo']
 
 .sub invoke :vtable
@@ -201,8 +200,8 @@ say "you invoked me!"
 
 .sub main :main
 $P0 = newclass "Foo"
-$P1 = new "Foo"
-$P1()
+$P1 = new ['Foo']
+$P1($P1)   # pass the object it"self"
 say "got here"
 .end
 CODE
@@ -223,8 +222,8 @@ pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 
 .sub main :main
   $P0 = newclass "Foo"
-  $P1 = new "Foo"
-  $I0 = $P1(2)
+  $P1 = new ['Foo']
+  $I0 = $P1($P1, 2) # pass the object it"self"
   print $I0
   print "\n"
 .end
@@ -233,7 +232,7 @@ CODE
 3
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'RT#41732' );
+pir_error_output_like( <<'CODE', <<'OUT', 'handle too few positional arguments' );
 .namespace ['Foo']
 
 .sub invoke :vtable
@@ -243,11 +242,11 @@ pir_error_output_like( <<'CODE', <<'OUT', 'RT#41732' );
 
 .sub main :main
     $P0 = newclass "Foo"
-    $P1 = new "Foo"
+    $P1 = new ['Foo']
     $P1()
 .end
 CODE
-/1 params expected/
+/too few positional arguments/
 OUT
 
 # '

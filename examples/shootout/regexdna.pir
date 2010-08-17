@@ -1,6 +1,9 @@
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
+
 .sub main :main
 	load_bytecode "PGE.pbc"
-	.local pmc p6rule_compile, rulesub, match, variants, variants_p5, iub, iter, matches, capt
+	.local pmc p6rule_compile, rulesub, match, variants, variants_p5, iub, it, matches, capt
 	.local string pattern, chunk, seq, key, replacement
 	.local int readlen, chunklen, seqlen, finallen, i, varnum, count
 	p6rule_compile = compreg "PGE::Perl6Regex"
@@ -58,11 +61,14 @@
 	############################################
 	# Read in the file
 beginwhile:
-	chunk = read 65535
-	chunklen = length chunk
+        $P0      = getinterp
+        .include 'stdio.pasm'
+        $P1      = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+        chunk    = $P1.'read'(65535)
+        chunklen = length chunk
 	unless chunklen goto endwhile
 	# They don't say you have to match case insenitive...
-	downcase chunk
+	chunk = downcase chunk
 	seq .= chunk
 	goto beginwhile
 endwhile:
@@ -81,7 +87,7 @@ stripfind:
 	$I0 = $P0."from"()
 	$I1 = $P0."to"()
 	$I1 -= $I0
-	substr seq, $I0, $I1, ''
+	seq = replace seq, $I0, $I1, ''
 	goto stripfind
 endstripfind:
 	seqlen = length seq
@@ -118,12 +124,12 @@ endfor:
 	#####################################################
 	# Final replace to make the sequence a p5 style regex
 	.include "iterator.pasm"
-	iter = new 'Iterator', iub
-	set iter, .ITERATE_FROM_START
+	it = iter iub
+	set it, .ITERATE_FROM_START
 	matches = new 'ResizablePMCArray'
 iter_loop:
-	unless iter goto iter_end
-	key = shift iter
+	unless it goto iter_end
+	key = shift it
 	replacement = iub[key]
 	# Ok, using a regex to match a single fixed character is probably excessive
 	# But it's what's wanted...
@@ -137,7 +143,7 @@ iter_loop:
 #	$I0 = $P0."from"()
 #	$I1 = $P0."to"()
 #	$I1 -= $I0
-#	substr seq, $I0, $I1, replacement
+#	seq = replace seq, $I0, $I1, replacement
 #	goto switchfind
 #endswitchfind:
 
@@ -161,7 +167,7 @@ switchloop:
 	$P0 = pop matches
 	$I0 = $P0[0]
 	$I1 = $P0[1]
-	substr seq, $I0, $I1, replacement
+	seq = replace seq, $I0, $I1, replacement
 	goto switchloop
 endswitchloop:
 #############################################

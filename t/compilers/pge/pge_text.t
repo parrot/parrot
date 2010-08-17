@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -30,46 +30,47 @@ pir_output_is( <<'CODE', <<'OUT', "bracketed" );
     .local pmc bracketed
 
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pir'
+    load_bytecode 'PGE/Text.pbc'
 
-    bracketed = get_global ['PGE::Text'], "bracketed"
-
+    bracketed = get_global ['PGE';'Text'], "bracketed"
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
     $S0 = "{ nested { and } okay, () and <>,  escaped \\}'s } okay"
     $P0 = bracketed($S0)
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "{ nested \n{ and } okay, \n() and <>, escaped \\}'s } okay"
     $P0 = bracketed($S0)
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "{ nested { and } okay,  unbalanced ( and < , escaped \\}'s } okay"
     $P0 = bracketed($S0, "{}")
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "{ unmatched nested { not okay, nor ( and < } not okay"
     $P0 = bracketed($S0, "{}")
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "{ unbalanced nested [ even with } and ] to match not okay"
     $P0 = bracketed($S0, "{}[]")
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "<a quoted \">\" unbalanced right bracket> okay"
     $P0 = bracketed($S0, "<\">")
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "<quoted \">\" unbalanced of two quotes (`>>>\"\"\">>>>`)> okay"
     $P0 = bracketed($S0, "<\"`>")
-    bsr result
+    local_branch jmpstack,  result
     $S0 = "<a misquoted '>' bracket ends string>"
     $P0 = bracketed($S0, "<\"`>")
-    bsr result
+    local_branch jmpstack,  result
     .return ()
 
   result:
     if $P0 goto succeed
     print "failed\n"
-    ret
+    local_return jmpstack
   succeed:
     $I0 = $P0."to"()
     $S1 = substr $S0, $I0
     print $S1
     print "\n"
-    ret
+    local_return jmpstack
 .end
 CODE
  okay

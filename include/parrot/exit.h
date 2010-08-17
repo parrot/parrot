@@ -1,5 +1,5 @@
 /* exit.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -27,18 +27,24 @@ typedef struct _handler_node_t {
 /* HEADERIZER BEGIN: src/exit.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_exit(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_on_exit(PARROT_INTERP,
-    NOTNULL(exit_handler_f function),
+    ARGIN(exit_handler_f function),
     ARGIN_NULLOK(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_on_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(function))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exit.c */
 

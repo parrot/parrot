@@ -1,16 +1,18 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-=head1 NAME
+=head1 [DRAFT] PDD 16: Native Call Interface (NCI)
 
-docs/pdds/pdd16_native_call.pod - NCI conventions and definitions
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
 
-=head1 DESCRIPTION
+=head2 Version
+
+$Revision$
+
+=head2 Description
 
 The NCI is designed to allow Parrot to interface to I<most> of the functions
 in a C library without having to write any C code for that interface. It
@@ -34,20 +36,20 @@ parseable anyway, and there is no generic way to query a function for its
 signature) the signature must be passed in when the linkage between the C
 function and parrot is made.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Function signatures
+=head3 Function signatures
 
-The following list are the valid letters in the function signatures for
-Parrot's NCI. Note that only letters and numbers are valid, and each letter
-represents a single parameter passed into the NCI. Note that the letters are
+The following list are the valid symbols in the function signatures for
+Parrot's NCI. Note that only letters and numbers are valid, and each symbol
+represents a single parameter passed into the NCI. Note that the symbols are
 case-sensitive, and must be within the base 7-bit ASCII character set.
 
 At some point punctuation may be used as modifiers on the function
 parameters, in which case each parameter may be represented by multiple
-letters.
+symbols.
 
-In I<no> case should the signature letters be separated by whitespace. This
+In I<no> case should the signature symbols be separated by whitespace. This
 restriction may be lifted in the future, but for now remains as an avenue
 for adding additional functionality.
 
@@ -57,9 +59,7 @@ for adding additional functionality.
 
 Void. As a return type it indicates that there I<is> no return type.
 
-As a parameter it indicates that there are no parameters (this use is now
-deprecated - use an empty parameter string to indicate that there are no
-parameters). Can't be mixed with other parameter types.
+Not valid as a parameter type.
 
 =item c
 
@@ -94,25 +94,24 @@ A PMC register.
 
 =item p
 
-PMC thingie. A generic pointer, taken from or stuck into a PMC's data
-pointer.  If this is a return type, parrot will create a new UnManagedStruct
-PMC type, which is just a generic "pointer to some damn thing or other" PMC
-type which Parrot does I<no> management of.
+PMC thingie. A generic pointer, taken from a PMC by using its
+get_pointer vtable function, or NULL for a PMCNULL.
+If this is a return type and the value is NULL, PMCNULL is returned,
+otherwise parrot will create a new UnManagedStruct PMC type, which
+is just a generic "pointer to something" PMC type which Parrot does
+I<no> management of.
 
 =item 2
 
-A pointer to a short, taken from an P register of an int-like PMC. On return
-from NCI, the PMC_int_val will hold the new value.
+A pointer to a short, taken from an P register of an int-like PMC.
 
 =item 3
 
-A pointer to an int, taken from an P register of an int-like PMC. On return
-from NCI, the PMC_int_val will hold the new value.
+A pointer to an int, taken from an P register of an int-like PMC.
 
 =item 4
 
-A pointer to a long, taken from an P register of an int-like PMC. On return
-from NCI, the PMC_int_val will hold the new value.
+A pointer to a long, taken from an P register of an int-like PMC.
 
 =item t
 
@@ -128,7 +127,7 @@ explanation in the L<callbacks> section.
 
 Note that not all types are valid as return types.
 
-=head2 Example NCI call
+=head3 Example NCI call
 
 This section describes the simplest example for NCI possible. To every NCI
 invocation, there are two parts: the native function to be invoked, and the
@@ -169,7 +168,7 @@ like this:
   .end
 
 
-=head2 Callbacks
+=head3 Callbacks
 
 Some libraries, particularly ones implementing more complex functionality such
 as databases or GUIs, want callbacks, that is ways to call a function under
@@ -240,20 +239,26 @@ Register the callback
 When the callback function is invoked by the external library, the function
 itself should look like:
 
+=begin PIR
+
   .sub _my_callback
     .param pmc my_data
     .param pmc library_data   # type depends on signature
     # Do something with the passed in data
   .end
 
+=end PIR
+
 Parrot itself handles all the nasty bits involved in collecting up the
 interpreter pointer, creating the wrapping PMCs, stuffing data various places,
 and generally dealing with the bookkeeping.
 
-=head2 Example Callback
+=head3 Example Callback
 
 This section contains an example to register a callback function and have
 it call back into Parrot.
+
+=begin PIR
 
   .sub main
 
@@ -285,6 +290,8 @@ it call back into Parrot.
     print "Foo callback\n"
   .end
 
+=end PIR
+
 The C code contains the function to be invoked through NCI. In the function
 C<sayhello> a function call is done to a Parrot subroutine. The C<sayhello>
 function gets a reference to this callback function, so its signature needs
@@ -310,48 +317,20 @@ to be known.
   }
 
 The file containing this C code should be compiled as a shared library
-(specifying the C<include> directory so C<<parrot/parrot.h>> can be found.)
+(specifying the C<include> directory so F<parrot/parrot.h> can be found.)
 
-=head1 REFERENCES
+=head2 References
 
-L<pdd06_pasm.pod>
+F<pdd06_pasm.pod>
 
-=head1 SEE ALSO
+=head2 See Also
 
-L<t/pmc/nci.t>, L<src/nci_test.c>
+F<t/pmc/nci.t>, F<src/nci_test.c>
 
-=head1 VERSION
+=cut
 
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 16
-    Version: 1.3
-    Status: Developing
-    Last Modified: Feb 26, 2007
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item version 1.3
-
-Updated with example for callbacks
-
-=item version 1.2
-
-Updated with basic example for NCI.
-
-=item version 1.1
-
-Changed callback section to reflect current status.
-
-=item version 1
-
-None. First version
-
-=back
-
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

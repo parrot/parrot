@@ -1,0 +1,63 @@
+##   captures
+(a.)..(..)		zzzabcdefzzz	y			basic match
+(a.)..(..)		zzzabcdefzzz	/mob: <abcdef @ 3>/	basic $0
+(a.)..(..)		zzzabcdefzzz	/mob 0: <ab @ 3>/	basic $1
+(a.)..(..)		zzzabcdefzzz	/mob 1: <ef @ 7>/	basic $2
+(a(b(c))(d))		abcd		y			nested match
+(a(b(c))(d))		abcd		/mob: <abcd @ 0>/	nested match
+(a(b(c))(d))		abcd		/mob 0: <abcd @ 0>/	nested match
+(a(b(c))(d))		abcd		/mob 0 0: <bc @ 1>/	nested match
+(a(b(c))(d))		abcd		/mob 0 0 0: <c @ 2>/	nested match
+(a(b(c))(d))		abcd		/mob 0 1: <d @ 3>/	nested match
+((\w+)+)		abcd		/mob: <abcd @ 0>/	nested match
+((\w+)+)		abcd		/mob 0: <abcd @ 0>/	nested match
+((\w+)+)		abcd		/mob 0 0 0: <abcd @ 0>/	nested match
+((\w+)+)	ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz	/mob: <ABCD/	nested match
+((\w+)+)	ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz	/mob 0: <ABCD/	nested match
+((\w+)+)	ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz	/mob 0 0 0: <ABCD/	nested match
+(a) [ (bc) (d) | .* (ef) ] .* (g)	abcdefg	/mob 0: <a @ 0>/	alt subpattern before group
+(a) [ (bc) (d) | .* (ef) ] .* (g)	abcdefg	/mob 1: <bc @ 1>/	alt subpattern in group
+(a) [ (bc) (d) | .* (ef) ] .* (g)	abcdefg	/mob 2: <d @ 3>/	alt subpattern in group
+(a) [ (bc) (d) | .* (ef) ] .* (g)	abcdefg	/mob 3: <g @ 6>/	alt subpattern after group
+(a) [ (bc) (x) | .* (ef) ] .* (g)	abcdefg	/mob 1: <ef @ 4>/	2nd alt subpattern in group
+(a) [ (bc) (x) | .* (ef) ] .* (g)	abcdefg	/mob 3: <g @ 6>/	2nd alt subpattern after group
+( (.) )*				abc	/mob 0 1 0: <b @ 1>/	nested repeated captures
+[ (.) ]*				abc	/mob 0 1: <b @ 1>/	nested repeated captures
+( [.] )*				abc	/mob 0 1: <b @ 1>/	nested repeated captures
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 0: <a @ 0>/	numbered aliases $1
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 1: <b @ 1>/	numbered aliases $2
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 7: <c @ 2>/	numbered aliases $7
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 8: <d @ 3>/	numbered aliases $8
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 4: <e @ 4>/	numbered aliases $4
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 1: <abc @ 0>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 2: <a @ 0>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 3: <b @ 1>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 4: <c @ 2>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
+# todo :pugs<feature>
+:s $<key>=[\w+] \= $<val>=[\S+]	 abc = 123	/mob<key>: <abc @ 1>/	named capture
+# todo :pugs<feature>
+:s $<key>=[\w+] \= $<val>=[\S+]	 abc = 123	/mob<val>: <123 @ 7>/	named capture
+# todo :pugs<feature>
+:s (\w+) $<foo>=(\w+) (\w+)		abc def ghi	/mob<foo>: <def @ 4>/	mixing named and unnamed capture
+# todo :pugs<feature>
+:s (\w+) $<foo>=(\w+) (\w+)		abc def ghi	/mob 1: <ghi @ 8>/	mixing named and unnamed capture
+# todo :pugs<feature>
+<alpha> [ \- <alpha> ]?			abc def ghi	/mob<alpha> 0: <a @ 0>/	multiple subrule captures in same scope
+# todo :pugs<feature>
+[(.)$0]+				bookkeeper	y			backreference
+# todo :pugs<feature>
+(\w+) <+ws> $0				hello hello	y			backreference at end of string
+# todo :pugs<feature>
+[(.)$0]+				bookkeeper	/mob 0 0: <o @ 1>/	backref $1
+# todo :pugs<feature>
+[(.)$0]+				bookkeeper	/mob 0 1: <k @ 3>/	backref $1
+# todo :pugs<feature>
+[(.)$0]+				bookkeeper	/mob 0 2: <e @ 5>/	backref $1
+# todo :pugs<feature>
+(.)*x					123x		/mob: <123x @ 0>/	repeated dot capture
+
+$<key>=<alpha>				12ab34		/mob<key>: <a @ 2>/	alias capture
+<key=alpha>				12ab34		/mob<key>: <a @ 2>/	alias capture
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

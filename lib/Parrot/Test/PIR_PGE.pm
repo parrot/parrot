@@ -1,6 +1,6 @@
 # $Id$
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 
 package Parrot::Test::PIR_PGE;
 
@@ -8,13 +8,16 @@ use strict;
 use warnings;
 
 use File::Basename;
+use File::Spec ();
 
 =head1 NAME
 
 Parrot::Test::PIR_PGE -- testing routines for languages/PIR
 
+=head1 DESCRIPTION
+
 This is largely a copy of Parrot::Test::Punie, which is also a copy
-of something...
+of something ...
 
 This module is named PIR_PGE, because PIR is a "reserved" name,
 for internal use only.

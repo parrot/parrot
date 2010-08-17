@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 
 # $Id$
 
@@ -23,10 +23,8 @@ C<Parrot::Pmc2c> is used by F<tools/build/pmc2c.pl> to generate C code from PMC 
 package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
-use Parrot::Pmc2c::Emitter;
-use Parrot::Pmc2c::UtilFunctions
-    qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
-use Parrot::Pmc2c::PCCMETHOD;
+use Parrot::Pmc2c::Emitter ();
+use Parrot::Pmc2c::PCCMETHOD ();
 
 =item C<generate_body($pmc)>
 
@@ -49,7 +47,7 @@ sub generate_body {
         $self->rewrite_nci_method($pmc);
     }
 
-    $emit->( ( $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ') . $self->decl( $pmc, 'CFILE' ) );
+    $emit->( $self->decl( $pmc, 'CFILE' ) );
     $emit->("{\n");
     $emit->($body);
     $emit->("}\n");
@@ -65,9 +63,8 @@ sub generate_body {
 
 sub generate_headers {
     my ( $self, $pmc ) = @_;
-    my $hout = "";
 
-    $hout .= $self->decl( $pmc, 'HEADER' );
+    my $hout = $self->decl( $pmc, 'HEADER' );
 
     if ( $self->mmds ) {
         for my $mmd ( @{ $self->mmds } ) {
@@ -92,8 +89,7 @@ sub decl {
     my $ret     = $self->return_type;
     my $meth    = $self->name;
     my $args    = $self->parameters;
-    my $ro      = $pmc->flag('is_ro') ? '' : '';
-    my $decs    = $self->decorators;
+    my $decs    = join( $/, @{$self->decorators}, '' );
 
     # convert 'type*' to 'type *' per PDD07
     $ret =~ s/^(.*)\s*(\*)$/$1 $2/;
@@ -102,86 +98,21 @@ sub decl {
     $args = ", $args" if $args =~ /\S/;
     $args =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
 
-    my ( $decorators, $export, $extern, $newl, $semi, $interp, $pmcvar );
-    $decorators = join($/, @$decs, '');
+    my ( $extern, $newl, $semi );
     if ( $for_header eq 'HEADER' ) {
-        $export = $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
-        $extern = "";
-        $newl   = " ";
-        $semi   = ";";
-        $interp = $pmcvar = "";
+        $newl   = ' ';
+        $semi   = ';';
     }
     else {
-        $export = "";
-        $extern = "";
         $newl   = "\n";
-        $semi   = "";
-        $interp = 'interp';
-        $pmcvar = 'pmc';
+        $semi   = '';
     }
+    my $pmcarg = 'PMC *_self';
+    $pmcarg    = "SHIM($pmcarg)" if $self->pmc_unused;
 
     return <<"EOC";
-$decorators$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC *$pmcvar$args)$semi
+static $decs $ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, $pmcarg$args)$semi
 EOC
-}
-
-=item C<proto($type,$parameters)>
-
-Determines the prototype (argument signature) for a method body
-(see F<src/call_list>).
-
-=cut
-
-my %calltype = (
-    "char"     => "c",
-    "short"    => "s",
-    "char"     => "c",
-    "short"    => "s",
-    "int"      => "i",
-    "INTVAL"   => "I",
-    "float"    => "f",
-    "FLOATVAL" => "N",
-    "double"   => "d",
-    "STRING*"  => "S",
-    "STRING *" => "S",
-    "char*"    => "t",
-    "char *"   => "t",
-    "PMC*"     => "P",
-    "PMC *"    => "P",
-    "short*"   => "2",
-    "short *"  => "2",
-    "int*"     => "3",
-    "int *"    => "3",
-    "long*"    => "4",
-    "long *"   => "4",
-    "void"     => "v",
-    "void*"    => "b",
-    "void *"   => "b",
-    "void**"   => "B",
-    "void **"  => "B",
-
-    #"BIGNUM*" => "???" # RT#43731
-    #"BIGNUM *"=> "???" # RT#43731
-);
-
-sub proto {
-    my ( $type, $parameters ) = @_;
-
-    # reduce to a comma separated set of types
-    $parameters =~ s/\w+(,|$)/,/g;
-    $parameters =~ s/ //g;
-
-    # type method(interp, self, parameters...)
-    my $ret = $calltype{ $type or "void" };
-    $ret .= "JO" . join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
-
-    # RT#43733
-    # scan src/call_list.txt if the generated signature is available
-
-    # RT#43735 report errors for "?"
-    # --leo
-
-    return $ret;
 }
 
 =item C<rewrite_nci_method($self, $pmc )>
@@ -199,27 +130,17 @@ sub rewrite_nci_method {
     # Rewrite SELF.other_method(args...)
     $body->subst(
         qr{
-    \bSELF\b         # Macro: SELF
+      \bSELF\b       # Macro: SELF
       \.(\w+)        # other_method
       \(\s*(.*?)\)   # capture argument list
       }x,
-        sub { "pmc->real_self->vtable->$1(" . full_arguments( $2, 'pmc->real_self' ) . ')' }
-    );
-
-    # Rewrite SELF.other_method(args...)
-    $body->subst(
-        qr{
-    \bSELF\b         # Macro: SELF
-      \.(\w+)        # other_method
-      \(\s*(.*?)\)   # capture argument list
-      }x,
-        sub { "pmc->vtable->$1(" . full_arguments($2) . ')' }
+        sub { "_self->vtable->$1(" . full_arguments($2) . ')' }
     );
 
     # Rewrite STATICSELF.other_method(args...)
     $body->subst(
         qr{
-      \bSTATICSELF\b          # Macro STATICSELF
+      \bSTATICSELF\b    # Macro STATICSELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
       }x,
@@ -230,8 +151,8 @@ sub rewrite_nci_method {
         }
     );
 
-    # Rewrite SELF -> pmc, INTERP -> interp
-    $body->subst( qr{\bSELF\b},   sub { 'pmc' } );
+    # Rewrite SELF -> _self, INTERP -> interp
+    $body->subst( qr{\bSELF\b},   sub { '_self' } );
     $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
 
     # Rewrite GET_ATTR, SET_ATTR with typename
@@ -242,7 +163,7 @@ sub rewrite_nci_method {
 =item C<rewrite_vtable_method($self, $pmc, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
-vtable method bodies (see F<tools/build/pmc2c.pl>).
+vtable function bodies (see F<tools/build/pmc2c.pl>).
 
 =cut
 
@@ -259,17 +180,8 @@ sub rewrite_vtable_method {
     # Some MMD variants don't have a super mapping.
     if ($super) {
         my $supertype = "enum_class_$super";
-        die "$pmcname defines unknown vtable method '$name'\n" unless defined $super_table->{$name};
+        die "$pmcname defines unknown vtable function '$name'\n" unless defined $super_table->{$name};
         my $supermethod = "Parrot_" . $super_table->{$name} . "_$name";
-
-        # Rewrite DYNSUPER(args)
-        $body->subst(
-            qr{
-            \bDYNSUPER\b      # Macro: DYNSUPER
-            \(\s*(.*?)\)      # capture argument list
-          }x,
-            sub { "interp->vtables[$supertype].$name(" . full_arguments($1) . ')' }
-        );
 
         # Rewrite OtherClass.SUPER(args...)
         $body->subst(
@@ -278,7 +190,7 @@ sub rewrite_vtable_method {
             \.SUPER\b         # Macro: SUPER
             \(\s*(.*?)\)      # capture argument list
           }x,
-            sub { "Parrot_${1}_$name(" . full_arguments($2) . ')' }
+            sub { "interp->vtables[enum_class_${1}]->$name(" . full_arguments($2) . ')' }
         );
 
         # Rewrite SUPER(args...)
@@ -287,7 +199,16 @@ sub rewrite_vtable_method {
             \bSUPER\b         # Macro: SUPER
             \(\s*(.*?)\)      # capture argument list
           }x,
-            sub { "$supermethod(" . full_arguments($1) . ')' }
+            sub {
+              if ($pmc->is_dynamic($super)) {
+                return "Parrot_" . $super .
+                  "_get_vtable(interp)->$name(" . full_arguments($1) .
+                  ')';
+              }
+              else {
+                return "interp->vtables[$supertype]->$name(" . full_arguments($1) . ')';
+              }
+            }
         );
     }
 
@@ -298,7 +219,7 @@ sub rewrite_vtable_method {
         \.(\w+)        # other_method
         \(\s*(.*?)\)   # capture argument list
       }x,
-        sub { "pmc->vtable->$1(" . full_arguments($2) . ')' }
+        sub { "_self->vtable->$1(" . full_arguments($2) . ')' }
     );
 
     # Rewrite SELF(args...). See comments above.
@@ -307,7 +228,7 @@ sub rewrite_vtable_method {
         \bSELF\b       # Macro: SELF
         \(\s*(.*?)\)   # capture argument list
       }x,
-        sub { "pmc->vtable->$name(" . full_arguments($1) . ')' }
+        sub { "_self->vtable->$name(" . full_arguments($1) . ')' }
     );
 
     # Rewrite OtherClass.SELF.other_method(args...)
@@ -383,8 +304,8 @@ sub rewrite_vtable_method {
         }
     );
 
-    # Rewrite SELF -> pmc, INTERP -> interp
-    $body->subst( qr{\bSELF\b},   sub { 'pmc' } );
+    # Rewrite SELF -> _self, INTERP -> interp
+    $body->subst( qr{\bSELF\b},   sub { '_self' } );
     $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
 
     # Rewrite GET_ATTR, SET_ATTR with typename

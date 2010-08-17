@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 tgc.pir - The TGE rules compiler
@@ -22,13 +25,15 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
 =cut
 
+.include 'stdio.pasm'
+
 .sub "main" :main
     .param pmc args
     .local string prog
     .local string infile, outfile
 
     load_bytecode "TGE.pbc"
-    load_bytecode "Getopt/Obj.pir"
+    load_bytecode "Getopt/Obj.pbc"
 
     # Grab program name for error reporting
     prog = shift args
@@ -43,7 +48,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
     # Process command line options
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     getopts."notOptStop"(1)
     push getopts, "output|o=s"
     push getopts, "help|h"
@@ -61,39 +66,50 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
     if ck_output goto OUTPUT_FILE
 
   OUTPUT_STDOUT:
-    outfh = getstdout
+    $P0 = getinterp
+    outfh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     goto OUTPUT_DONE
 
   OUTPUT_FILE:
     outfile = opts['output']
-    outfh = open outfile, '>'
+    outfh = new ['FileHandle']
+    outfh.'open'(outfile, 'w')
     unless outfh goto ERR_NO_OUTFILE
 
   OUTPUT_DONE:
 
     # Read grammar file and compile here
     .local pmc infh
-    infh = open infile, "<"
+    infh = new ['FileHandle']
+    infh.'open'(infile, 'r')
     unless infh goto ERR_NO_INFILE
 
     .local string source
-    source = read infh, 65535
-    close infh
+    source = infh.'read'(65535)
+    infh.'close'()
 
     .local pmc grammar
-    grammar = new 'TGE::Compiler'
+    grammar = new ['TGE';'Compiler']
 
     .local string compiled_source
     compiled_source = grammar.'precompile'(source, infile)
     print outfh, compiled_source
+    unless ck_output goto END
+
+    # Close the output file and check result
+    $I0 = outfh.'close'()
+    unless $I0 goto END
+    die 'Error: close output failed'
 
   goto END
 
   USAGE:
-    printerr "Usage: "
-    printerr prog
-    printerr " [OPTIONS] FILE\n"
-    printerr <<"OPTIONS"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Usage: ")
+    $P1.'print'(prog)
+    $P1.'print'(" [OPTIONS] FILE\n")
+    $P1.'print'(<<"OPTIONS")
  Options:
   --output=OUTFILE  -- redirect output to OUTFILE
   --help            -- print this message
@@ -101,19 +117,25 @@ OPTIONS
     exit 1
 
   ERR_TOO_FEW_ARGS:
-    printerr "Error: too few arguments\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Error: too few arguments\n\n")
     goto USAGE
 
   ERR_NO_INFILE:
-    printerr "Error: file not found: "
-    printerr infile
-    printerr "\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Error: file not found: ")
+    $P1.'print'(infile)
+    $P1.'print'("\n\n")
     goto USAGE
 
   ERR_NO_OUTFILE:
-    printerr "Error: file not found: "
-    printerr outfile
-    printerr "\n\n"
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Error: file not found: ")
+    $P1.'print'(outfile)
+    $P1.'print'("\n\n")
     goto USAGE
 
   END:

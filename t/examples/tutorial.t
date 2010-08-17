@@ -1,14 +1,14 @@
 #!perl
-# Copyright (C) 2007-2008 The Perl Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
+use ExtUtils::Manifest qw(maniread);
 use Test::More;
-use Parrot::Test tests => 35;
-use Parrot::Config;
+use Parrot::Test;
 
 =head1 NAME
 
@@ -22,17 +22,16 @@ t/examples/tutorial.t - Test examples in F<examples/tutorial>
 
 Test the examples in F<examples/tutorial>.
 
-=head1 SEE ALSO
-
-F<t/examples/pir.t>
-
-=head1 AUTHORS
-
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
-
-Colin Kuskie - <ckuskie@sterling.net>
-
 =cut
+
+my $manifest = maniread('MANIFEST');
+my %files;
+foreach my $file (keys %$manifest) {
+  next unless $file =~ m{examples/tutorial/.*pir$};
+  $files{$file}=undef;
+}
+
+plan tests => scalar keys %files;
 
 # Set up expected output for examples
 my %expected = (
@@ -45,7 +44,7 @@ END_EXPECTED
 
     '02_local_var.pir' => << 'END_EXPECTED',
 42
-3.141590
+3.14159
 Hello
 Ford
 END_EXPECTED
@@ -62,7 +61,17 @@ END_EXPECTED
 
     '10_math_ops.pir' => << 'END_EXPECTED',
 7
-5.200000
+5.2
+END_EXPECTED
+
+    '11_math_ops_self_mod.pir' => << 'END_EXPECTED',
+6
+5.61
+END_EXPECTED
+
+    '12_math_ops_pasm.pir' => << 'END_EXPECTED',
+5
+121
 END_EXPECTED
 
     '13_logical_ops.pir' => << 'END_EXPECTED',
@@ -88,8 +97,8 @@ END_EXPECTED
 bc
 bc
 abcde
-bc
 aXYZde
+abcde
 END_EXPECTED
 
     '24_string_ops_clone.pir' => << 'END_EXPECTED',
@@ -135,18 +144,15 @@ before branch
 after branch
 END_EXPECTED
 
-##
-## Output for when the test is not marked as "todo" anymore.
-##
-    #    '51_if_unless.pir' => << 'END_EXPECTED',
-    #before if
-    #after if
-    #
-    #before unless
-    #is printed
-    #after unless
-    #-0.0 was false
-    #END_EXPECTED
+    '51_if_unless.pir' => << 'END_EXPECTED',
+before if
+after if
+
+before unless
+is printed
+after unless
+-0.0 was false
+END_EXPECTED
 
     '52_if_compare.pir' => << 'END_EXPECTED',
 before if
@@ -195,10 +201,6 @@ Hello
 5
 END_EXPECTED
 
-    '80_closure.pir' => << 'END_EXPECTED',
-27
-END_EXPECTED
-
     '81_continuation.pir' => << 'END_EXPECTED',
 got argument: 4
 continuation called
@@ -218,51 +220,34 @@ END_EXPECTED
 ok 1 - first test
 ok 2 - second test
 ok 3 #skip skipped test
-ok 4 # TODO 42
+ok 4 # TODO todo test
 END_EXPECTED
 
 );
 
-my %skips = ();
-
-while ( my ( $example, $expected ) = each %expected ) {
-    my $skip = $skips{$example};
-    if ($skip) {
-        my ( $cond, $reason ) = @{$skip};
-        if ( eval "$cond" ) {
-            Test::More->builder->skip("$example $reason");
-            next;
-        }
+# note any todos. if the sub returns undef or isn't present, the
+# test will be run.
+my %todo = (
+    '51_if_unless.pir' => sub {
+        'Failing on Win32' if $^O =~ /Win32/;
     }
-    example_output_is( "examples/tutorial/$example", $expected );
-}
+);
 
-TODO:
-{
-    local $TODO = 'some examples not passing yet';
-    fail('11_math_ops_self_mod.pir');
-    fail('12_math_ops_pasm.pir');
-}
-
-my @TODO_35 = ();
-if ($^O =~ /Win32/) {
-    @TODO_35 = ( todo => 'Failing on Win32' );
-}
-example_output_is( "examples/tutorial/51_if_unless.pir", << 'END_EXPECTED', @TODO_35 );
-before if
-after if
-
-before unless
-is printed
-after unless
--0.0 was false
-END_EXPECTED
-
-# cleanup
-{
-
-    # The example '40_file_ops.pir' leave a temporary file.
-    unlink '40_file_ops_data.txt';
+foreach my $tutorial (sort keys %files) {
+    my $file = $tutorial;
+    $file =~ s{.*/}{};
+    my @todo = ();
+    if (exists $expected{$file}) {
+        my $expected = $expected{$file};
+        if (exists $todo{$file}) {
+            my $reason = $todo{$file}->();
+            @todo = (todo => $reason) if defined $reason;
+        }
+        example_output_is( $tutorial, $expected, @todo );
+    }
+    else {
+        fail($tutorial);
+    }
 }
 
 # Local Variables:

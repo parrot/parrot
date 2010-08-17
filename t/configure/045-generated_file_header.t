@@ -1,19 +1,19 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
-use_ok( 'File::Temp', qw| tempfile | );
+use File::Temp qw| tempfile |;
 use lib qw( lib );
 use Parrot::BuildUtil;
 
 {
     my $header;
-    my ( $filename, $style ) = ( 'foobar', 'APL' );
+    my ( $filename, $style ) = ( 'foobar', 'SPAF' );
     eval { $header = Parrot::BuildUtil::generated_file_header( $filename, $style ); };
     like(
         $@,

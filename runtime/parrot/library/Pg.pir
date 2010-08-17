@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ Pg.pir - OO interface to libpq
 =head1 SYNOPSIS
 
   .local pmc pg, con, res
-  pg = get_class 'Pg'
+  pg = new 'Pg'
   con = pg.'connectdb'('dbname = db')
   res = con.'exec'('SELECT * from tab')
   n = res.'ntuples'()
@@ -40,11 +40,12 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 ## TODO generate includes from libpq-fe.h
 ## .include 'postgres.pasm'
 
+.HLL 'parrot'
 .const int CONNECTION_OK = 0
 
 .sub __load :load
     .local pmc cl
-    load_bytecode "postgres.pir"         # TODO .pbc
+    load_bytecode 'postgres.pbc'
     cl = newclass 'Pg'       # Pg connection constructor
 
     # XXX the hasa 'con' is suboptimal
@@ -61,7 +62,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 
 =item con = Pg::connectdb('var=val var=val ...')
 
-A class method that returns a new connection object.
+A method that returns a new connection object.
 
 =back
 
@@ -191,7 +192,7 @@ Execute the SQL command and return a Pg;Result object.
     con = getattribute self, 'con'
     exec = get_root_global ['parrot';'Pg'], 'PQexec'
     res = exec(con, cmd)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 .include "datatypes.pasm"
@@ -237,7 +238,7 @@ done:
     (n, vals) = mk_struct(values)
     # we don't handle binary
     res = exec(con, cmd, n, nil, vals, nil, nil, 0)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 =item res = con.'prepare'(name, query, nparams)
@@ -255,7 +256,7 @@ Prepare a query for execution with B<execPrepared>
     f = get_root_global ['parrot';'Pg'], 'PQprepare'
     nil = new 'ManagedStruct'
     res = f(con, name, query, nparams, nil)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 =item res = con.'execPrepared'(name, val, ...)
@@ -274,7 +275,7 @@ Execute a prepared query.
     nil = new 'ManagedStruct'
     (n, vals) = mk_struct(values)
     res = f(con, name, n, vals, nil, nil, 0)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 =item $P0 = con.'setNoticeReceiver'(cb, arg)
@@ -348,7 +349,7 @@ Return the status of the result.
 
 =item res.'clear'()
 
-Clear the result structure. You don't have to explicitely call this
+Clear the result structure. You don't have to explicitly call this
 method. If a result object is no longer alive, the GC will call
 __finalize(), which wil clear the object.
 

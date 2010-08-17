@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2008, The Perl Foundation.
+ * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_IO_H_GUARD

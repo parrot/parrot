@@ -56,7 +56,7 @@ based on blue_rect.pir by chromatic (chromatic at wgz dot org).
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2007, Parrot Foundation.
 
 =cut
 

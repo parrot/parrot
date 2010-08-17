@@ -1,4 +1,0 @@
-# print the character 'h' and a newline
-# .hi prints h as a sideeffect, i is a dummy argument
-# r prints a newline
-`r`.hi

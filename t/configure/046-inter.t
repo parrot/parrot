@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 046-inter.t
 
@@ -16,7 +16,7 @@ use Tie::Filehandle::Preempt::Stdin;
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},
@@ -66,8 +66,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-046-inter.t - test Parrot::Configure::_run_this_step() with regard to configuration steps that prompt for user input
-
+046-inter.t - test Parrot::Configure::_run_this_step()
 =head1 SYNOPSIS
 
     % prove t/configure/046-inter.t
@@ -75,6 +74,9 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
+
+This file tests Parrot::Configure::_run_this_step() with regard to
+configuration steps that prompt for user input.
 
 =head1 AUTHOR
 

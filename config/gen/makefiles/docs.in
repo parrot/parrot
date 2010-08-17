@@ -1,22 +1,25 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 # Setup of some commands
-PERL   = @perl@
-RM_F   = @rm_f@
-MKPATH = @mkpath@
-CHMOD  = @chmod@
-PERLDOC = @perldoc@
+PERL    = @perl@
+CHMOD   = @chmod@
+MKPATH  = @mkpath@
+TOUCH   = @touch@
+RM_F    = @rm_f@
+RM_RF   = @rm_rf@
+PERLDOC_BIN = @perldoc@
+VERSION = @VERSION@@DEVEL@
 
 # long list of .pod files
-POD = @pod@
+POD = @TEMP_pod@
 
 #
 # Targets
 #
 
 # The default target
-all: doc-prep packfile-c.pod $(POD)
+all: packfile-c.pod $(POD)
 
 # This is a listing of all targets, that are meant to be called by users
 # Most of them are proxied in the root makefile parrot/Makefile
@@ -31,19 +34,51 @@ help :
 	@echo "  html-clean:        Remove the generated HTML documentation."
 	@echo ""
 
+$(POD): doc-prep
+
 doc-prep:
 	$(MKPATH) ops
+	$(TOUCH) doc-prep
 
 packfile-c.pod: ../src/packfile.c
-#CONDITIONED_LINE(new_perldoc):	perldoc -ud packfile-c.pod ../src/packfile.c 
-#INVERSE_CONDITIONED_LINE(new_perldoc):	perldoc -u ../src/packfile.c > packfile-c.pod
+#IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile.c
+#ELSE:	$(PERLDOC_BIN) -u ../src/packfile.c > packfile-c.pod
 
 clean:
-	$(RM_F) packfile-c.pod $(POD)
+	$(RM_F) packfile-c.pod $(POD) doc-prep
 
-html:
-	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent
+html: all
+	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
+
+# The pdf target is to generate a parrot PDF document.
+# If you are missing the command 'pdflatex' then you have first to install a
+# LaTeX distribution with it. For Windows and UNIX downloads are for example
+# available from: http://miktex.org, http://tug.org/texlive or
+# http://www.ctan.org
+pdf: ../tools/docs/filename_and_chapter.pl
+	$(MKPATH) build/modified_pod
+	$(PERL) ../tools/docs/filename_and_chapter.pl
+	cd build && pdflatex parrot-book.tex && pdflatex parrot-book.tex
+
+#pdf-release: build/parrot-book.pdf
+#	cp build/parrot-book.pdf build/parrot-book-$$(date +"%Y.%m").pdf
+
+pdf-clean:
+	$(RM_RF) build
 
 html-clean:
-	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new()->delete_html_docs()"
+	$(RM_RF) html
 
+htmlhelp: html
+#IF(win32):	cd .. && $(PERL) tools/docs/mk_chm.pl
+#IF(win32):	-cd html && hhc parrot.hhp
+
+htmlhelp-clean:
+#IF(win32):	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"
+
+@TEMP_pod_build@
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

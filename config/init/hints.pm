@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Loading platform and local hints files};
+    $data{description} = q{Load platform and local hints files};
     $data{result}      = q{};
     return \%data;
 }
@@ -31,17 +31,21 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-    print "\n[ " if $verbose;
+    $conf->debug("\n[ ");
 
     my $hints_used = 0;
+    my $hints_file;
 
-    my $osname = lc( $conf->data->get_p5('OSNAME') );
-    my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
+    my $osname = lc( $conf->data->get('OSNAME_provisional') );
+    $osname = 'linux' if ($osname eq 'gnukfreebsd');
+
+    my $hints_file_name = $conf->options->get('hintsfile') || $osname ;
+    $hints_file = catfile('config', 'init', 'hints', "$hints_file_name.pm");
+
     if ( -f $hints_file ) {
-        my $hints_pkg = "init::hints::" . $osname;
+        my $hints_pkg = "init::hints::" . $hints_file_name;
 
-        print "$hints_pkg " if $verbose;
+        $conf->debug("$hints_pkg ");
 
         eval "use $hints_pkg";
         die $@ if $@;
@@ -52,7 +56,7 @@ sub runstep {
         $hints_used++;
 
         $hints_pkg = "init::hints::local";
-        print "$hints_pkg " if $verbose;
+        $conf->debug("$hints_pkg ");
         eval "use $hints_pkg";
 
         unless ($@) {
@@ -61,14 +65,14 @@ sub runstep {
         }
     }
     else {
-        print "No $hints_file found.  " if $verbose;
+        $conf->debug("No $hints_file found.  ");
     }
 
-    if ( $hints_used == 0 and $verbose ) {
-        print "(no hints) ";
+    if ( $hints_used == 0 ) {
+        $conf->debug("(no hints) ");
     }
 
-    print "]" if $verbose;
+    $conf->debug("]");
 
     return 1;
 }

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Builder::TestPlan - class representing the current Test::Builder test plan
@@ -71,7 +73,7 @@ Both classes support the following methods.
 .sub 'header' :method
     .local pmc plan
     plan = getattribute self, 'plan'
-    .return plan.'header'()
+    .tailcall plan.'header'()
 .end
 
 .sub 'footer' :method
@@ -79,7 +81,7 @@ Both classes support the following methods.
 
     .local pmc plan
     plan = getattribute self, 'plan'
-    .return plan.'footer'( ran )
+    .tailcall plan.'footer'( ran )
 .end
 
 .namespace [ 'Test'; 'Builder'; 'ActivePlan' ]
@@ -118,7 +120,7 @@ Test::Builder::NullPlan object, do not pass the hash.
   NO_EXPECTATION:
     .local pmc plan_exception
     plan_exception = new 'Exception'
-    set   plan_exception['_message'], 'Invalid or missing plan!'
+    plan_exception = 'Invalid or missing plan!'
     throw plan_exception
 
   SET_ATTRIBUTES:
@@ -240,7 +242,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2008, The Perl Foundation.
+Copyright (C) 2005-2008, Parrot Foundation.
 
 =cut
 

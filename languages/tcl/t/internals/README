@@ -1,3 +1,0 @@
-Testss in this directory are for internal functions (that is, in the
-'_Tcl' private namespace) that are necessary for partcl to function,
-but aren't expected to be used by users of the language itself.

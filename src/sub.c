@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -21,262 +21,35 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "sub.str"
+#include "pmc/pmc_sub.h"
+#include "pmc/pmc_continuation.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 
+
 /*
 
-=item C<void mark_context>
+=item C<void mark_context_start(void)>
 
-Marks the context C<*ctx>.
+Indicate that a new round of context marking is about to take place.
 
 =cut
 
 */
+
+static int context_gc_mark = 0;
 
 void
-mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
+mark_context_start(void)
 {
-    PObj *obj;
-    int   i;
-
-    obj = (PObj *)ctx->current_sub;
-    if (obj)
-        pobject_lives(interp, obj);
-
-    obj = (PObj *)ctx->current_object;
-    if (obj)
-        pobject_lives(interp, obj);
-
-    /* the current continuation in the interpreter has
-     * to be marked too in the call sequence currently
-     * as e.g. a MMD search could need resources
-     * and GC the continuation
-     */
-    obj = (PObj *)interp->current_cont;
-    if (obj && obj != (PObj *)NEED_CONTINUATION)
-        pobject_lives(interp, obj);
-
-    obj = (PObj *)ctx->current_cont;
-    if (obj && !PObj_live_TEST(obj))
-        pobject_lives(interp, obj);
-
-    if (ctx->caller_ctx)
-        mark_context(interp, ctx->caller_ctx);
-
-    obj = (PObj *)ctx->current_namespace;
-    if (obj)
-        pobject_lives(interp, obj);
-
-    obj = (PObj *)ctx->lex_pad;
-    if (obj)
-        pobject_lives(interp, obj);
-
-    if (!ctx->n_regs_used)
-        return;
-
-    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
-        obj = (PObj *)CTX_REG_PMC(ctx, i);
-        if (obj)
-            pobject_lives(interp, obj);
-    }
-
-    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        obj = (PObj *)CTX_REG_STR(ctx, i);
-        if (obj)
-            pobject_lives(interp, obj);
-    }
+    ASSERT_ARGS(mark_context_start)
+    if (++context_gc_mark == 0) context_gc_mark = 1;
 }
+
 
 /*
 
-=item C<Parrot_sub * new_sub>
-
-Returns a new C<Parrot_sub>.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
-new_sub(PARROT_INTERP)
-{
-    /* Using system memory until I figure out GC issues */
-    Parrot_sub * const newsub = mem_allocate_zeroed_typed(Parrot_sub);
-    newsub->seg               = interp->code;
-    return newsub;
-}
-
-/*
-
-=item C<Parrot_sub * new_closure>
-
-Returns a new C<Parrot_sub> with its own sctatchpad.
-
-XXX: Need to document semantics in detail.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
-new_closure(PARROT_INTERP)
-{
-    Parrot_sub * const newsub = new_sub(interp);
-    return newsub;
-}
-
-/*
-
-=item C<Parrot_cont * new_continuation>
-
-Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
-current interpreter context.  If C<to> is C<NULL>, then the C<to_ctx> is set
-to the current context.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_cont *
-new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
-{
-    Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
-    Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp);
-
-    cc->to_ctx        = to_ctx;
-    cc->from_ctx      = CONTEXT(interp);
-    cc->dynamic_state = NULL;
-    cc->runloop_id    = 0;
-    CONTEXT(interp)->ref_count++;
-    if (to) {
-        cc->seg = to->seg;
-        cc->address = to->address;
-    }
-    else {
-        cc->seg     = interp->code;
-        cc->address = NULL;
-    }
-    cc->current_results = to_ctx->current_results;
-    return cc;
-}
-
-/*
-
-=item C<Parrot_cont * new_ret_continuation>
-
-Returns a new C<Parrot_cont> pointing to the current context.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_cont *
-new_ret_continuation(PARROT_INTERP)
-{
-    Parrot_cont * const cc = mem_allocate_typed(Parrot_cont);
-
-    cc->to_ctx          = CONTEXT(interp);
-    cc->from_ctx        = NULL;    /* filled in during a call */
-    cc->dynamic_state   = NULL;
-    cc->runloop_id      = 0;
-    cc->seg             = interp->code;
-    cc->current_results = NULL;
-    cc->address         = NULL;
-    return cc;
-}
-
-/*
-
-=item C<Parrot_coro * new_coroutine>
-
-Returns a new C<Parrot_coro>.
-
-XXX: Need to document semantics in detail.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_coro *
-new_coroutine(PARROT_INTERP)
-{
-    Parrot_coro * const co = mem_allocate_zeroed_typed(Parrot_coro);
-
-    co->seg                = interp->code;
-    co->ctx                = NULL;
-    co->dynamic_state      = NULL;
-
-    return co;
-}
-
-/*
-
-=item C<PMC * new_ret_continuation_pmc>
-
-Returns a new C<RetContinuation> PMC. Uses one from the cache,
-if possible; otherwise, creates a new one.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC *
-new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
-{
-    PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
-    VTABLE_set_pointer(interp, continuation, address);
-    return continuation;
-}
-
-/*
-
-=item C<void invalidate_retc_context>
-
-Make true Continuations from all RetContinuations up the call chain.
-
-=cut
-
-*/
-
-void
-invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
-{
-    Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
-
-    Parrot_set_context_threshold(interp, ctx);
-    while (1) {
-        /*
-         * We  stop if we encounter a true continuation, because
-         * if one were created, everything up the chain would have been
-         * invalidated earlier.
-         */
-        if (cont->vtable != interp->vtables[enum_class_RetContinuation])
-            break;
-        cont->vtable = interp->vtables[enum_class_Continuation];
-        ctx->ref_count++;
-        cont = ctx->current_cont;
-        ctx  = PMC_cont(cont)->from_ctx;
-    }
-
-}
-
-/*
-
-=item C<STRING* Parrot_full_sub_name>
+=item C<STRING* Parrot_full_sub_name(PARROT_INTERP, PMC* sub_pmc)>
 
 Return namespace, name, and location of subroutine.
 
@@ -284,29 +57,45 @@ Return namespace, name, and location of subroutine.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
+Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 {
-    if (sub && VTABLE_defined(interp, sub)) {
-        Parrot_sub * const s = PMC_sub(sub);
+    ASSERT_ARGS(Parrot_full_sub_name)
+    if (sub_pmc && VTABLE_defined(interp, sub_pmc)) {
+        Parrot_Sub_attributes *sub;
 
-        if (PMC_IS_NULL(s->namespace_stash)) {
-            return s->name;
+        PMC_get_sub(interp, sub_pmc, sub);
+
+        if (PMC_IS_NULL(sub->namespace_stash)) {
+            return sub->name;
         }
         else {
             PMC    *ns_array;
-            STRING *j = CONST_STRING(interp, ";");
+            STRING * const semicolon = CONST_STRING(interp, ";");
             STRING *res;
 
-            Parrot_block_GC_mark(interp);
-            ns_array = Parrot_ns_get_name(interp, s->namespace_stash);
-            if (s->name)
-                VTABLE_push_string(interp, ns_array, s->name);
+            /*
+             * When running with -t4, the invoke done in
+             * Parrot_ns_get_name stomps on settings in interp; we
+             * have to save these and restore them to avoid affecting
+             * the running program.
+             */
+            PMC      * const saved_ccont       = interp->current_cont;
 
-            res = string_join(interp, j, ns_array);
+            Parrot_block_GC_mark(interp);
+
+            ns_array = Parrot_ns_get_name(interp, sub->namespace_stash);
+
+            /* Restore stuff that might have got overwritten */
+            interp->current_cont      = saved_ccont;
+
+            if (sub->name)
+                VTABLE_push_string(interp, ns_array, sub->name);
+
+            res = Parrot_str_join(interp, semicolon, ns_array);
             Parrot_unblock_GC_mark(interp);
             return res;
         }
@@ -316,7 +105,8 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 
 /*
 
-=item C<int Parrot_Context_get_info>
+=item C<int Parrot_Context_get_info(PARROT_INTERP, PMC *ctx, Parrot_Context_info
+*info)>
 
 Takes pointers to a context and its information table.
 Populates the table and returns 0 or 1. XXX needs explanation
@@ -326,13 +116,15 @@ Used by Parrot_Context_infostr.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
-Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
-                    ARGOUT(Parrot_Context_info *info))
+Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
+    ARGOUT(Parrot_Context_info *info))
 {
-    Parrot_sub *sub;
-    DECL_CONST_CAST;
+    ASSERT_ARGS(Parrot_Context_get_info)
+    PMC                   *subpmc;
+    Parrot_Sub_attributes *sub;
+    opcode_t              *pc;
 
     /* set file/line/pc defaults */
     info->file     = CONST_STRING(interp, "(unknown file)");
@@ -342,42 +134,46 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
     info->subname  = NULL;
     info->fullname = NULL;
 
+    subpmc = Parrot_pcc_get_sub(interp, ctx);
+
     /* is the current sub of the specified context valid? */
-    if (PMC_IS_NULL(ctx->current_sub)) {
-        info->subname  = string_from_cstring(interp, "???", 3);
+    if (PMC_IS_NULL(subpmc)) {
+        info->subname  = Parrot_str_new(interp, "???", 3);
         info->nsname   = info->subname;
-        info->fullname = string_from_cstring(interp, "??? :: ???", 10);
+        info->fullname = Parrot_str_new(interp, "??? :: ???", 10);
         info->pc       = -1;
         return 0;
     }
 
     /* fetch Parrot_sub of the current sub in the given context */
-    if (!VTABLE_isa(interp, ctx->current_sub, CONST_STRING(interp, "Sub")))
+    if (!VTABLE_isa(interp, subpmc, CONST_STRING(interp, "Sub")))
         return 1;
 
-    sub = PMC_sub(ctx->current_sub);
+    PMC_get_sub(interp, subpmc, sub);
     /* set the sub name */
     info->subname = sub->name;
 
     /* set the namespace name and fullname of the sub */
     if (PMC_IS_NULL(sub->namespace_name)) {
-        info->nsname = string_from_literal(interp, "");
+        info->nsname   = CONST_STRING(interp, "");
         info->fullname = info->subname;
     }
     else {
         info->nsname   = VTABLE_get_string(interp, sub->namespace_name);
-        info->fullname = Parrot_full_sub_name(interp, ctx->current_sub);
+        info->fullname = Parrot_full_sub_name(interp, subpmc);
     }
 
+    pc = Parrot_pcc_get_pc(interp, ctx);
+
     /* return here if there is no current pc */
-    if (ctx->current_pc == NULL)
+    if (!pc)
         return 1;
 
     /* calculate the current pc */
-    info->pc = ctx->current_pc - sub->seg->base.data;
+    info->pc = pc - sub->seg->base.data;
 
     /* determine the current source file/line */
-    if (ctx->current_pc) {
+    if (pc) {
         const size_t offs = info->pc;
         size_t i, n;
         opcode_t *pc = sub->seg->base.data;
@@ -385,8 +181,8 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
 
         if (!debug)
             return 0;
-        for (i = n = 0; n < sub->seg->base.size; i++) {
-            op_info_t * const op_info = &interp->op_info_table[*pc];
+        for (i = n = 0; n < sub->seg->base.size; ++i) {
+            op_info_t * const op_info = sub->seg->op_info_table[*pc];
             opcode_t var_args = 0;
 
             if (i >= debug->base.size)
@@ -402,12 +198,96 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
             pc += op_info->op_count + var_args;
         }
     }
+
     return 1;
+}
+
+
+/*
+
+=item C<INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP, PMC *subpmc, opcode_t
+*pc)>
+
+Given a PMC sub and the current opcode, returns the corresponding PIR line
+number.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULLOK(opcode_t *pc))
+{
+    ASSERT_ARGS(Parrot_Sub_get_line_from_pc)
+    Parrot_Sub_attributes *sub;
+    opcode_t              *base_pc, *debug_ops;
+    size_t                 i, op, current_annotation, debug_size;
+
+    if (!subpmc || !pc)
+        return -1;
+
+    PMC_get_sub(interp, subpmc, sub);
+
+    debug_ops          = sub->seg->debugs->base.data;
+    debug_size         = sub->seg->debugs->base.size;
+    base_pc            = sub->seg->base.data;
+    current_annotation = pc - base_pc;
+
+    for (i = op = 0; op < debug_size; ++i) {
+        op_info_t * const op_info  = interp->code->op_info_table[*base_pc];
+        opcode_t          var_args = 0;
+
+        if (i >= debug_size)
+            return -1;
+
+        if (op >= current_annotation)
+            return debug_ops[i];
+
+        ADD_OP_VAR_PART(interp, sub->seg, base_pc, var_args);
+        op      += op_info->op_count + var_args;
+        base_pc += op_info->op_count + var_args;
+    }
+
+    return -1;
+}
+
+
+/*
+
+=item C<STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP, PMC *subpmc,
+opcode_t *pc)>
+
+Given a PMC sub and the current opcode, returns the corresponding PIR file
+name.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_Sub_get_filename_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc),
+        ARGIN_NULLOK(opcode_t *pc))
+{
+    ASSERT_ARGS(Parrot_Sub_get_filename_from_pc)
+    Parrot_Sub_attributes *sub;
+    PackFile_Debug        *debug;
+    int                    position;
+
+    if (!subpmc || !pc)
+        return CONST_STRING(interp, "unknown file");
+
+    PMC_get_sub(interp, subpmc, sub);
+
+    debug    = sub->seg->debugs;
+    position = pc - sub->seg->base.data;
+
+    return Parrot_debug_pc_to_filename(interp, debug, position);
 }
 
 /*
 
-=item C<STRING* Parrot_Context_infostr>
+=item C<STRING* Parrot_Context_infostr(PARROT_INTERP, PMC *ctx)>
 
 Formats context information for display.  Takes a context pointer and
 returns a pointer to the text.  Used in debug.c and warnings.c
@@ -416,22 +296,21 @@ returns a pointer to the text.  Used in debug.c and warnings.c
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
+Parrot_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
 {
+    ASSERT_ARGS(Parrot_Context_infostr)
     Parrot_Context_info info;
     STRING             *res = NULL;
-    const char * const  msg = (CONTEXT(interp) == ctx)
+    const char * const  msg = (CURRENT_CONTEXT(interp) == ctx)
         ? "current instr.:"
         : "called from Sub";
 
     Parrot_block_GC_mark(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
-        static const char unknown_file[] = "(unknown file)";
-        DECL_CONST_CAST;
 
         res = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%Ss:%d)", msg,
@@ -444,7 +323,7 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
 
 /*
 
-=item C<PMC* Parrot_find_pad>
+=item C<PMC* Parrot_find_pad(PARROT_INTERP, STRING *lex_name, PMC *ctx)>
 
 Locate the LexPad containing the given name. Return NULL on failure.
 
@@ -455,38 +334,115 @@ Locate the LexPad containing the given name. Return NULL on failure.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
-Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const parrot_context_t *ctx))
+Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
 {
+    ASSERT_ARGS(Parrot_find_pad)
     while (1) {
-        PMC                    * const lex_pad = ctx->lex_pad;
-        const parrot_context_t * const outer   = ctx->outer_ctx;
+        PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
+        PMC * outer         = Parrot_pcc_get_outer_ctx(interp, ctx);
 
-        if (!outer)
+        if (PMC_IS_NULL(outer))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
             if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))
                 return lex_pad;
 
-#if CTX_LEAK_DEBUG
-        if (outer == ctx) {
-            /* This is a bug; a context can never be its own :outer context.
-             * Detecting it avoids an unbounded loop, which is difficult to
-             * debug, though we'd rather not pay the cost of detection in a
-             * production release.
-             */
-            real_exception(interp, NULL, INVALID_OPERATION,
-                           "Bug:  Context %p :outer points back to itself.",
-                           ctx);
-        }
-#endif
         ctx = outer;
     }
 }
 
+
 /*
 
-=item C<PMC* parrot_new_closure>
+=item C<PMC* Parrot_find_dynamic_pad(PARROT_INTERP, STRING *lex_name, PMC *ctx)>
+
+Locate the LexPad containing the given C<lex_name> in C<ctx> and
+its caller pads.  Return PMCNULL on failure.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC*
+Parrot_find_dynamic_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_find_dynamic_pad)
+    while (1) {
+        PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
+        PMC * caller        = Parrot_pcc_get_caller_ctx(interp, ctx);
+
+        if (PMC_IS_NULL(caller))
+            return lex_pad;
+
+        if (!PMC_IS_NULL(lex_pad))
+            if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))
+                return lex_pad;
+
+        ctx = caller;
+    }
+}
+
+
+/*
+
+=item C<void Parrot_capture_lex(PARROT_INTERP, PMC *sub_pmc)>
+
+Capture the current lexical environment of a sub.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
+{
+    ASSERT_ARGS(Parrot_capture_lex)
+    PMC            * const ctx          = CURRENT_CONTEXT(interp);
+    Parrot_Sub_attributes *current_sub;
+    Parrot_Sub_attributes *sub;
+
+    PMC_get_sub(interp, Parrot_pcc_get_sub(interp, ctx), current_sub);
+
+    /* MultiSub gets special treatment */
+    if (VTABLE_isa(interp, sub_pmc, CONST_STRING(interp, "MultiSub"))) {
+
+        PMC * const iter = VTABLE_get_iter(interp, sub_pmc);
+
+        while (VTABLE_get_bool(interp, iter)) {
+
+            PMC        * const child_pmc = VTABLE_shift_pmc(interp, iter);
+            Parrot_Sub_attributes *child_sub, *child_outer_sub;
+
+            PMC_get_sub(interp, child_pmc, child_sub);
+
+            if (!PMC_IS_NULL(child_sub->outer_sub)) {
+                PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
+                if (Parrot_str_equal(interp, current_sub->subid,
+                                      child_outer_sub->subid)) {
+                    child_sub->outer_ctx = ctx;
+                }
+            }
+        }
+        return;
+    }
+
+    /* the sub_pmc has to have an outer_sub that is the caller */
+    PMC_get_sub(interp, sub_pmc, sub);
+    if (PMC_IS_NULL(sub->outer_sub))
+        return;
+
+    /* set the sub's outer context to the current context */
+    sub->outer_ctx = ctx;
+}
+
+
+/*
+
+=item C<PMC* parrot_new_closure(PARROT_INTERP, PMC *sub_pmc)>
 
 Used where? XXX
 
@@ -499,223 +455,109 @@ Returns a pointer to the closure, (or throws exceptions if invalid).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
 parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
-    PMC *cont;
-
-    PMC        * const clos_pmc = VTABLE_clone(interp, sub_pmc);
-    Parrot_sub * const sub      = PMC_sub(sub_pmc);
-    Parrot_sub * const clos     = PMC_sub(clos_pmc);
-
-    /* the given sub_pmc has to have an :outer(sub) that is this subroutine */
-    Parrot_Context * const ctx  = CONTEXT(interp);
-
-    if (PMC_IS_NULL(sub->outer_sub))
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "'%Ss' isn't a closure (no :outer)", sub->name);
-
-    /* if (sub->outer_sub != ctx->current_sub) - fails if outer
-     * is a closure too e.g. test 'closure 4' */
-    if (0 == string_equal(interp, (PMC_sub(ctx->current_sub))->name, sub->name))
-        real_exception(interp, NULL, INVALID_OPERATION,
-            "'%Ss' isn't the :outer of '%Ss')",
-            (PMC_sub(ctx->current_sub))->name, sub->name);
-
-    cont            = ctx->current_cont;
-
-    /* mark clos_pmc as having been created by newclosure. */
-    SUB_FLAG_flag_SET(NEWCLOSURE, clos_pmc);
-
-    /* preserve this frame by converting the continuation */
-    cont->vtable    = interp->vtables[enum_class_Continuation];
-
-    /* remember this (the :outer) ctx in the closure */
-    clos->outer_ctx = ctx;
-
-    /* the closure refs now this context too */
-    ctx->ref_count++;
-
-#if CTX_LEAK_DEBUG
-    if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG))
-        fprintf(stderr, "[alloc closure  %p, outer_ctx %p, ref_count=%d]\n",
-                (void *)clos_pmc, (void *)ctx, (int) ctx->ref_count);
-#endif
-
+    ASSERT_ARGS(parrot_new_closure)
+    PMC * const clos_pmc = VTABLE_clone(interp, sub_pmc);
+    Parrot_capture_lex(interp, clos_pmc);
     return clos_pmc;
 }
 
 
 /*
 
-=item C<void Parrot_continuation_runloop_check>
-
-Verifies that the Parrot_cont contained in the current PMC is not trying to
-jump runloops.  Don't call this for a RetContinuation; that's what it's
-supposed to do.
-
-*/
-
-void
-Parrot_continuation_runloop_check(PARROT_INTERP, ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
-{
-
-    /* it's ok to exit to "runloop 0"; there is no such
-       runloop, but the only continuation that thinks it came from runloop 0 is
-       for the return from the initial sub call. */
-
-    if (interp->current_runloop_id != cc->runloop_id
-    && cc->runloop_id              != 0)
-        fprintf(stderr, "[oops; continuation %p of type %d "
-                "is trying to jump from runloop %d to runloop %d]\n",
-                (void *)pmc, (int)pmc->vtable->base_type,
-                interp->current_runloop_id, cc->runloop_id);
-}
-
-
-/*
-
-=item C<void Parrot_continuation_check>
+=item C<void Parrot_continuation_check(PARROT_INTERP, const PMC *pmc)>
 
 Verifies that the provided continuation is sane.
 
+=cut
+
 */
 
 void
-Parrot_continuation_check(PARROT_INTERP, ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
+Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
-    Stack_Chunk_t    *stack_target = cc->dynamic_state;
-    parrot_context_t *to_ctx       = cc->to_ctx;
-    parrot_context_t *from_ctx     = CONTEXT(interp);
-
-#if CTX_LEAK_DEBUG
-    if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG))
-        fprintf(stderr,
-                "[invoke cont    %p, to_ctx %p, from_ctx %p (refs %d)]\n",
-                (void *)pmc, (void *)to_ctx, (void *)from_ctx, (int)from_ctx->ref_count);
-#endif
-    if (!to_ctx)
-        real_exception(interp, NULL, INVALID_OPERATION,
+    ASSERT_ARGS(Parrot_continuation_check)
+    PMC * const to_ctx       = PARROT_CONTINUATION(pmc)->to_ctx;
+    if (PMC_IS_NULL(to_ctx))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                        "Continuation invoked after deactivation.");
-    if (!stack_target)
-        real_exception(interp, NULL, INVALID_OPERATION,
-                       "Continuation invoked without initialization.");
 }
-
 
 /*
 
-=item C<void Parrot_continuation_rewind_environment>
+=item C<void Parrot_continuation_rewind_environment(PARROT_INTERP, PMC *pmc)>
 
 Restores the appropriate context for the continuation.
+
+=cut
 
 */
 
 void
-Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc),
-        ARGIN(Parrot_cont *cc))
+Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    int               stack_delta              =  0;
-    int               exception_continuation_p = -1;
-    parrot_context_t *to_ctx                   = cc->to_ctx;
-    Stack_Chunk_t    *stack_target             = cc->dynamic_state;
-    Stack_Chunk_t    *corresponding_target;
+    ASSERT_ARGS(Parrot_continuation_rewind_environment)
 
-    /* Rewind the dynamic environment. */
-    if (interp->dynamic_env != stack_target) {
-        /* compute the "stack delta", which is a measure of how much
-           unwinding we have to do.  if negative, we have to pop that many
-           entries; if positive, we are going back up the stack.
-           [bug: this is not true rewinding.  -- rgr, 30-Sep-06.]
-        */
-        stack_delta
-            = ((int) stack_height(interp, stack_target) -
-               (int) stack_height(interp, interp->dynamic_env));
-    }
-
-    /* descend down the target stack until we get to the same depth. */
-    corresponding_target = stack_target;
-
-    while (stack_delta > 0) {
-        corresponding_target = corresponding_target->prev;
-        stack_delta--;
-    }
-
-    /* both stacks are now at the same depth.  pop from both until we reach
-       their common ancestor. */
-    while (interp->dynamic_env != corresponding_target) {
-        PMC           *cleanup_sub = NULL;
-        Stack_Entry_t *e;
-
-        if (! interp->dynamic_env)
-            real_exception(interp, NULL, 1, "Control stack damaged");
-
-        e = stack_entry(interp, interp->dynamic_env, 0);
-
-        if (!e)
-            real_exception(interp, NULL, 1, "Control stack damaged");
-
-        if (e->entry_type == STACK_ENTRY_ACTION) {
-            /*
-             * Disable automatic cleanup routine execution in stack_pop so
-             * that we can run the action subroutine manually.  This is
-             * because we have to run the sub AFTER it has been popped, lest
-             * a new error in the sub cause an infinite loop when invoking
-             * an error handler.
-             */
-            cleanup_sub = UVal_pmc(e->entry);
-            e->cleanup  = STACK_CLEANUP_NULL;
-        }
-
-        (void)stack_pop(interp, &interp->dynamic_env,
-                        NULL, NO_STACK_ENTRY_TYPE);
-
-        /* Now it's safe to run. */
-        if (cleanup_sub) {
-            if (exception_continuation_p == -1)
-                exception_continuation_p =
-                    VTABLE_isa(interp, pmc, CONST_STRING(interp, "Exception_Handler"));
-            Parrot_runops_fromc_args(interp, cleanup_sub,
-                                     "vI", exception_continuation_p);
-        }
-
-        /* Keep corresponding_target in sync.  If stack_delta is negative,
-         * then dynamic_env is still above it; otherwise, we must step
-         * corresponding_target backwards as well. */
-        if (stack_delta < 0)
-            stack_delta++;
-        else {
-            Stack_Chunk_t *prev  = corresponding_target->prev;
-            (void)stack_pop(interp, &corresponding_target, NULL,
-                    NO_STACK_ENTRY_TYPE);
-            corresponding_target = prev;
-        }
-    }
-
-    /* run back up the target stack to our destination.  [when we support
-       dynamic binding (e.g.), we will have to traverse back up, and will
-       therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
-    interp->dynamic_env->refcount--;
-    interp->dynamic_env = stack_target;
+    PMC * const to_ctx = PARROT_CONTINUATION(pmc)->to_ctx;
+    PMC * const sig    = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
-        PMC *sub = to_ctx->current_sub;
+        PMC * const sub = Parrot_pcc_get_sub(interp, to_ctx);
 
-        PIO_eprintf(interp, "# Back in sub '%Ss', env %p\n",
+        Parrot_io_eprintf(interp, "# Back in sub '%Ss', env %p\n",
                     Parrot_full_sub_name(interp, sub),
                     interp->dynamic_env);
     }
 
     /* set context */
-    CONTEXT(interp)      = to_ctx;
-    interp->ctx.bp       = to_ctx->bp;
-    interp->ctx.bp_ps    = to_ctx->bp_ps;
+    CURRENT_CONTEXT(interp) = to_ctx;
+    Parrot_pcc_set_signature(interp, to_ctx, sig);
+}
+
+
+/*
+
+=item C<void * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC *subclass)>
+
+Gets a Parrot_sub structure from something that isn't a Sub PMC, but rather a
+subclass.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+void *
+Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
+    ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
+
+    /* Ensure we really do have a subclass of sub. */
+    if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
+        PMC *key, *sub_pmc;
+
+        /* If it's actually a PMC still, probably does the same structure
+         * underneath. */
+        if (!PObj_is_object_TEST(subclass)) {
+            return PARROT_SUB(subclass);
+        }
+
+        /* Get the Sub PMC itself. */
+        key = Parrot_pmc_new(interp, enum_class_String);
+        VTABLE_set_string_native(interp, key, CONST_STRING(interp, "Sub"));
+        sub_pmc = VTABLE_get_attr_keyed(interp, subclass, key, CONST_STRING(interp, "proxy"));
+        if (sub_pmc->vtable->base_type == enum_class_Sub) {
+            return PARROT_SUB(sub_pmc);
+        }
+    }
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Attempting to do sub operation on non-Sub.");
 }
 
 /*
@@ -725,10 +567,6 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc),
 =head1 SEE ALSO
 
 F<include/parrot/sub.h>.
-
-=head1 HISTORY
-
-Initial version by Melvin on 2002/06/6.
 
 =cut
 

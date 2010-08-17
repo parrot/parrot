@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -45,21 +45,27 @@ sub new {
             'Configuration',
             '',
             $self->new_item( '', 'tools/dev/as2c.pl' ),
-            $self->new_item( '', 'tools/dev/cc_flags.pl' ),
-            $self->new_item( '', 'tools/build/nativecall.pl' ),
-            $self->new_item( '', 'tools/build/jit2c.pl' ),
             $self->new_item( '', 'tools/build/vtable_h.pl' ),
             $self->new_item( '', 'tools/build/vtable_extend.pl' ),
         ),
         $self->new_group(
-            'Bytecode', '',
-            $self->new_item( '', 'tools/dev/pbc_header.pl' ),
+            'Building',
+            '',
+            $self->new_item( '', 'docs/configuration.pod' ),
+            $self->new_item( '', 'tools/build/c2str.pl' ),
+            $self->new_item( '', 'tools/build/parrot_config_c.pl' ),
+            $self->new_item( '', 'tools/build/pmc2c.pl' ),
+            $self->new_item( '', 'tools/dev/install_files.pl' ),
+            $self->new_item( '', 'tools/dev/mk_manifest_and_skip.pl' ),
+            $self->new_item( '', 'tools/dev/symlink.pl' ),
+            $self->new_item( '', 'tools/dev/mk_native_pbc' ),
         ),
         $self->new_group(
-            'QA',
+            'Testing',
             '',
             $self->new_item( '', 'parrotbug' ),
             $self->new_item( '', 'tools/dev/manicheck.pl' ),
+            $self->new_item( '', 'docs/tests.pod' ),
         ),
         $self->new_group(
             'Documentation',
@@ -68,22 +74,6 @@ sub new {
             $self->new_item( '', 'tools/dev/parrot_coverage.pl' ),
             $self->new_item( '', 'tools/docs/write_docs.pl' ),
         ),
-        $self->new_group(
-            'Building',
-            '',
-            $self->new_item( '', 'tools/build/c2str.pl' ),
-            $self->new_item( '', 'tools/build/dynoplibs.pl' ),
-            $self->new_item( '', 'tools/build/dynpmc.pl' ),
-            $self->new_item( '', 'tools/build/ops2c.pl' ),
-            $self->new_item( '', 'tools/build/ops2pm.pl' ),
-            $self->new_item( '', 'tools/build/parrot_config_c.pl' ),
-            $self->new_item( '', 'tools/build/pmc2c.pl' ),
-            $self->new_item( '', 'tools/dev/install_files.pl' ),
-            $self->new_item( '', 'tools/dev/mk_manifest_and_skip.pl' ),
-            $self->new_item( '', 'tools/dev/rebuild_miniparrot.pl' ),
-            $self->new_item( '', 'tools/dev/symlink.pl' ),
-        ),
-        $self->new_group( 'Testing', '', $self->new_item( '', 'tools/dev/mk_native_pbc' ), ),
         $self->new_group(
             'Benchmarking', '',
             $self->new_item( '', 'tools/dev/bench_op.pir' ),
@@ -96,13 +86,13 @@ sub new {
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
             $self->new_item( '', 'tools/dev/nm.pl' ),
             $self->new_item( '', 'tools/util/ncidef2pasm.pl' ),
-            $self->new_item( '', 'tools/util/smokeserv-README.pod' ),
+            $self->new_item( '', 'tools/dev/pbc_header.pl' ),
         ),
         $self->new_group(
-            'Possibly obsolete',
+            'Debugging',
             '',
-            $self->new_item( '', 'tools/dev/gen_charset_tables.pl' ),
-            $self->new_item( '', 'tools/dev/rebuild_miniparrot.pl' ),
+            $self->new_item( 'Debugging Tools', 'docs/debug.pod'),
+            $self->new_item( 'Parrot Debugger', 'docs/debugger.pod'),
         ),
     );
 }

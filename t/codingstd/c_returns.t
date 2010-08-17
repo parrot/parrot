@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -11,15 +11,15 @@ use Parrot::Distribution;
 
 =head1 NAME
 
-t/codingstd/returns.t - checks for possible use of C<return (foo);> from functions
+t/codingstd/c_returns.t - checks for possible use of C<return (foo);> from functions
 
 =head1 SYNOPSIS
 
     # test all files
-    % prove t/codingstd/returns.t
+    % prove t/codingstd/c_returns.t
 
     # test specific files
-    % perl t/codingstd/returns.t src/foo.c include/parrot/bar.h
+    % perl t/codingstd/c_returns.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,8 @@ than C<return (foo);>
 =head1 NOTES
 
 This test was hacked from the C<check_returns> sub in
-C<tools/dev/check_source_standards.pl>
+C<tools/dev/check_source_standards.pl>, which is no longer part of the Parrot
+distribution.
 
 =head1 SEE ALSO
 
@@ -38,7 +39,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my @files = @ARGV ? <@ARGV> : $DIST->get_c_language_files();
 my @paren_return;
 
 foreach my $file (@files) {

@@ -1,0 +1,225 @@
+/*
+ * $Id$
+** obscure.ops
+*/
+
+BEGIN_OPS_PREAMBLE
+
+#include <math.h>
+
+END_OPS_PREAMBLE
+
+=head1 NAME
+
+obscure.ops - Obscure Mathematical Opcodes
+
+=cut
+
+=head1 DESCRIPTION
+
+Parrot's library of obscure mathematical ops. These turn common
+trig expressions into a single op.
+
+To use this library of ops, add this directive to your PIR:
+
+ .loadlib 'obscure_ops'
+
+=cut
+
+
+###############################################################################
+
+=head2 Obscure trigonometric operations
+
+Reference:
+
+    Abramowitz, M. and Stegum, C. A. (Eds.). Handbook of Mathematical
+    Functions with Formulas, Graphs, and Mathematical Tables, 9th printing.
+    New York: Dover, p. 78, 1972.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<covers>(out NUM, in NUM)
+
+Set $1 to the coversine (in radians) of $2.
+
+=cut
+
+inline op covers(out NUM, in NUM) :advanced_math {
+    $1 = 1.0 - sin($2);
+}
+
+
+########################################
+
+=item B<exsec>(out NUM, in NUM)
+
+Set $1 to the exsecant of $2 (given in radians).
+
+=cut
+
+
+inline op exsec(out NUM, in NUM) :advanced_math {
+    $1 = (1.0 / cos($2)) - 1.0;
+}
+
+
+########################################
+
+=item B<hav>(out NUM, in NUM)
+
+Set $1 to the haversine (in radians) of $2.
+
+=cut
+
+inline op hav(out NUM, in NUM) {
+    $1 = 0.5 * (1.0 - cos($2));
+}
+
+
+########################################
+
+=item B<vers>(out NUM, in NUM)
+
+Set $1 to the versine (in radians) of $2.
+
+=cut
+
+inline op vers(out NUM, in NUM) :advanced_math {
+    $1 = 1.0 - cos($2);
+}
+
+########################################
+
+=item B<gcd>(out INT, in INT, in INT)
+
+Greatest Common divisor of $2 and $3.
+
+=cut
+
+inline op gcd(out INT, in INT, in INT) :advanced_math {
+    INTVAL p = 0;
+    INTVAL a = $2 < 0 ? -$2 : $2;
+    INTVAL b = $3 < 0 ? -$3 : $3;
+
+    if (a==0) { $1=b; goto NEXT(); }
+    if (b==0) { $1=a; goto NEXT(); }
+
+    while (!((a | b) & 1)) {
+        a>>=1;
+        b>>=1;
+        p++;
+    }
+
+    while (a>0) {
+        if (!(a & 1)) a>>=1;
+        else if (!(b & 1)) b>>=1;
+        else if (a<b)      b = (b-a)>>1;
+        else               a = (a-b)>>1;
+    }
+
+    $1 = b<<p;
+}
+
+
+########################################
+
+=item B<lcm>(out INT, in INT, in INT)
+
+Least Common Multiple of $2 and $3
+
+=cut
+
+inline op lcm(out INT, in INT, in INT) :advanced_math {
+    INTVAL gcd = 0;
+    INTVAL p = 0;
+    INTVAL a = $2 < 0 ? -$2 : $2;
+    INTVAL b = $3 < 0 ? -$3 : $3;
+    INTVAL saved_var1 = a, saved_var2 = b;
+
+    if (a==0 || b==0) { $1=0; goto NEXT(); }
+
+    while (!((a | b) & 1)) {
+        a>>=1;
+        b>>=1;
+        p++;
+    }
+
+    while (a>0) {
+        if (!(a & 1)) a>>=1;
+        else if (!(b & 1)) b>>=1;
+        else if (a<b)      b = (b-a)>>1;
+        else               a = (a-b)>>1;
+    }
+
+    gcd = b<<p;
+    saved_var1 /= gcd;
+    $1 = saved_var1*saved_var2;
+}
+
+########################################
+
+=item B<fact>(out INT, in INT)
+
+=item B<fact>(out NUM, in INT)
+
+Factorial, n!. Calculates the product of 1 to N.
+
+=cut
+
+inline op fact(out INT, in INT) :advanced_math {
+    /* Coercing a negative to a UINT can get pretty ugly
+     * in this situation. */
+    INTVAL i = $2;
+    UINTVAL q = 1;
+    while (i>0) {
+        q = q*i;
+        i--;
+    }
+    $1 = q;
+}
+
+inline op fact(out NUM, in INT) :advanced_math {
+    /* Coercing a negative to a UINT can get pretty ugly
+     * in this situation. */
+    INTVAL i = $2;
+    FLOATVAL q = 1;
+    while (i>0) {
+        q = q*i;
+        i--;
+    }
+    $1 = q;
+}
+
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2009, Parrot Foundation.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

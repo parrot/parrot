@@ -36,7 +36,7 @@ token action {
 }
 
 token type {
-    [ '::' ]? \w+ [ '::' \w+ ]*
+    [ '::' | ';' ]? \w+ [ ['::' | ';'] \w+ ]*
 }
 
 token name { \w+ }

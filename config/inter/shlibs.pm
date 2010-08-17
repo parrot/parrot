@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -29,7 +29,7 @@ use Parrot::Configure::Utils ':inter';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining flags for building shared libraries};
+    $data{description} = q{Determine flags for building shared libraries};
     $data{result}      = q{};
     return \%data;
 }

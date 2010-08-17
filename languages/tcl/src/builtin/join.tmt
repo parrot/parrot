@@ -1,6 +1,0 @@
-[join list:list ?joinString= ?]
-
-$S0 = $joinString
-$S0 = join $S0, $list
-$R  = new 'TclString'
-$R  = $S0

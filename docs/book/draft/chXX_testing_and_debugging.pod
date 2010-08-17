@@ -1,0 +1,128 @@
+=pod
+
+=head0 Testing and Debugging
+
+Z<CHP-7>
+
+Programming languages and the virtual machines on which they run are just
+one small part of the total programming ecosystem. Programmers require not
+just development tools, but also maintenance and management tools. Critical
+to development and maintenance of code are comprehensive testing tools and
+code debugging tools. Luckily, Parrot supports both. This chapter is going
+to discuss the testing frameworks available for HLLs written on Parrot,
+and the Parrot debugger which can be used for live debugging of software
+written in any of the HLLs that Parrot supports.
+
+=head1 Writing Tests
+
+Z<CHP-7-SECT-1>
+
+X<testing Parrot>
+Parrot is volunteer-driven, and contributions from new users are always
+welcome. Contributing tests is a good place for a new developer to start.
+You don't have to understand the code behind a PASM opcodeN<Or PIR
+instruction, or whatever.> to test it, you only have to understand
+the desired behavior. If you're working on some code and it doesn't do
+what the documentation claims, you can isolate the problem in a test or
+series of tests and send them to the bug tracking system. There's a
+good chance the problem will be fixed before the next release. Writing
+tests makes it a lot easier for the developer to know when they've solved
+your problem--it's solved when your tests pass. It also prevents that
+problem from appearing again, because it's checked every time anyone
+runs C<make> C<test>. As you move along, you'll want to write tests
+for every bug you fix or new feature you add.
+
+X<Test::Builder>
+X<Parrot::Test module>
+The Perl 5 testing framework is at the core of Parrot tests,
+particularly F<Test::Builder>. Parrot's F<Parrot::Test> module is an
+interface to F<Test::Builder> and implements the extra features needed
+for testing Parrot, like the fact that PASM and PIR code has to be
+compiled to bytecode before it runs. F<Parrot::Test> handles the
+compilation and running of the test code, and collects the output for
+verification.
+
+The main Parrot tests are in the top-level F<t/> directory of the
+Parrot source tree. F<t/op> contains tests for basic opcodes and
+F<t/pmc> has tests for PMCs. The names of the test files indicate the
+functionality tested, like F<integer.t>, F<number.t>, and F<string.t>.
+Part of the F<make test> target is the command F<perl t/harness>,
+which runs all the F<.t> files in the subdirectories under F</t>. You
+can run individual test files by passing their names to the F<harness>
+script:
+
+  $ perl t/harness t/op/string.t t/op/integer.t
+
+X<set opcode (PASM);test example>
+Here's a simple example that tests the C<set> opcode with integer
+registers, taken from F<t/op/integer.t>:
+
+  output_is(E<lt>E<lt>CODE, E<lt>E<lt>OUTPUT, "set_i");
+      set     I0, 42
+      set     I1, I0
+      print   I1
+      print   "\\n"
+      end
+  CODE
+  42
+  OUTPUT
+
+The code here sets integer register C<I0> to the value 42, sets C<I1>
+to the value of C<I0>, and then prints the value in C<I1>. The test
+passes if the value printed was 42, and fails otherwise.
+
+The C<output_is> subroutine takes three strings: the code to run, the
+expected output, and a description of the test. The first two strings
+can be quite long, so the convention is to use Perl 5 here-documents.
+If you look into the code section, you'll see that the literal C<\n>
+has to be escaped as C<\\n>. Many tests use the non-interpolating
+(C<E<lt>E<lt>'CODE>') form of here-document to avoid that problem. The
+description can be any text.  In this case, it's the fully qualified
+name of the C<set> opcode for integer registers, but it could have
+been "set a native integer register."
+
+If you look up at the top of F<integer.t>, you'll see the line:
+
+  use Parrot::Test tests => 38;
+
+(although the actual number may be larger if more tests have been added
+since this book went to press).
+
+The C<use> line for the F<Parrot::Test> module imports a set of
+subroutines into the test file, including C<output_is>. The end of the
+line gives the number of tests contained in the file.
+
+The C<output_is> subroutine looks for an exact match between the
+expected result and the actual output of the code. When the test
+result can't be compared exactly, you want C<output_like> instead. It
+takes a Perl 5 regular expression for the expected output:
+
+  output_like(<<'CODE', <<'OUTPUT', "testing for text match");
+  ...
+  CODE
+  /^Output is some \d+ number\n$/
+  OUTPUT
+
+F<Parrot::Test> also exports C<output_isnt>, which tests that the
+actual output of the code I<doesn't> match a particular value.
+
+There are a few guidelines to follow when you're writing a test for a
+new opcode or checking that an existing opcode has full test coverage.
+Tests should cover the opcode's standard operation, corner cases, and
+illegal input. The first tests should always cover the basic
+functionality of an opcode. Further tests can cover more complex
+operations and the interactions between opcodes. If the test program
+is complex or obscure, it helps to add comments. Tests should be
+self-contained to make it easy to identify where and why a test is
+failing.
+
+=head1 The Parrot Debugger
+
+Z<CHP-7-SECT-2>
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

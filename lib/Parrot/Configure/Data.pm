@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 =pod
@@ -125,7 +125,7 @@ sub get {
     return @$c{@_};
 }
 
-=item * C<set($key => $val, ...)>
+=item * C<< set($key => $val, ...) >>
 
 =over 4
 
@@ -171,7 +171,7 @@ sub set {
     return $self;
 }
 
-=item * C<add($delim, $key => $val, ...)>
+=item * C<< add($delim, $key => $val, ...) >>
 
 =over 4
 
@@ -236,7 +236,7 @@ sub keys {
     return keys %{ $self->{c} };
 }
 
-=item * C<slurp()>
+=item * C<get_PConfig()>
 
 =over 4
 
@@ -256,7 +256,7 @@ Reference to hash holding main Parrot::Configure data structure.
 
 =cut
 
-sub slurp {
+sub get_PConfig {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG;
 no strict;
@@ -270,7 +270,7 @@ EVAL_CONFIG
     $self->{c} = $res;
 }
 
-=item * C<slurp_temp()>
+=item * C<get_PConfig_Temp()>
 
 =over 4
 
@@ -292,7 +292,7 @@ structure holding temporary data.
 
 =cut
 
-sub slurp_temp {
+sub get_PConfig_Temp {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG_TEMP;
 no strict;
@@ -588,7 +588,7 @@ sub get_p5 {
     return @$p5{@_};
 }
 
-=item * C<set_p5($key => $val, ...)>
+=item * C<< set_p5($key => $val, ...) >>
 
 =over 4
 

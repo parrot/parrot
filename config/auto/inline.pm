@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your compiler supports inline};
+    $data{description} = q{Does your compiler support inline};
     $data{result}      = q{};
     return \%data;
 }
@@ -51,7 +51,7 @@ sub _first_probe_for_inline {
     my $self = shift;
     my $conf = shift;
     my $test;
-    $conf->cc_gen('config/auto/inline/test_1.in');
+    $conf->cc_gen('config/auto/inline/test1_c.in');
     eval { $conf->cc_build(); };
     if ( !$@ ) {
         $test = $conf->cc_run();
@@ -66,7 +66,7 @@ sub _second_probe_for_inline {
     my $conf = shift;
     my $test = shift;
     if ( !$test ) {
-        $conf->cc_gen('config/auto/inline/test_2.in');
+        $conf->cc_gen('config/auto/inline/test2_c.in');
         eval { $conf->cc_build(); };
         if ( !$@ ) {
             $test = $conf->cc_run();
@@ -79,13 +79,12 @@ sub _second_probe_for_inline {
 
 sub _evaluate_inline {
     my ($self, $conf, $test) = @_;
-    my $verbose = $conf->options->get(qw(verbose));
     if ($test) {
-        print " ($test) " if $verbose;
+        $conf->debug(" ($test) ");
         $self->set_result('yes');
     }
     else {
-        print " no " if $verbose;
+        $conf->debug(" no ");
         $self->set_result('no');
         $test = '';
     }

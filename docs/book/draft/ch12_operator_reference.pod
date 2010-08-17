@@ -1,0 +1,299 @@
+=pod
+
+=head1 PIR Operator Reference
+
+Z<CHP-13-SECT-3>
+
+X<PIR (Parrot intermediate representation);quick reference;instructions>
+This section is a quick reference to PIR instructions. For more details
+and the latest changes, see F<imcc/docs/syntax.pod> or dive into the
+source code in F<imcc/imcc.l> and F<imcc/imcc.y>.
+
+=head3 =
+
+X<= (equal sign);= (assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL>
+
+Assign a value to a particular register, temporary register, or named
+variable.
+
+=head3 +, +=
+
+X<+ (plus sign);+ (addition);instruction (PIR)>
+X<+ (plus sign);+= (addition assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL> + R<VAL>
+  R<DEST> += R<VAL>
+
+Add two numbers or PMCs.
+
+=head3 -, -=
+
+X<- (hyphen);- (subtraction);instruction (PIR)>
+X<- (hyphen);-= (subtraction assignment);instruction (PIR)>
+X<- (hyphen);- (negation);instruction (PIR)>
+
+  R<DEST> = R<VAL1> - R<VAL2>
+  R<DEST> -= R<VAL1>
+  R<DEST> = - R<VAL>
+
+Subtract R<VAL1> from R<VAL2>. The unary "C<->" negates a number.
+
+=head3 *, *=
+
+X<* (asterisk);* (multiplication);instruction (PIR)>
+X<* (asterisk);*= (multiplication assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL> * R<VAL>
+  R<DEST> *= R<VAL>
+
+Multiply two numbers or PMCs.
+
+=head3 /, /=
+
+X</ (slash);/ (division);instruction (PIR)>
+X</ (slash);/= (division assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL1> / R<VAL2>
+  R<DEST> /= R<VAL1>
+
+Divide R<VAL1> by R<VAL2>.
+
+=head3 **
+
+X<* (asterisk);** (exponentiation);instruction (PIR)>
+
+  R<DEST> = R<VAL1> ** R<VAL2>
+
+Raise R<VAL1> to the power of R<VAL2>.
+
+=head3 %, %=
+
+X<% (percent sign);% (modulus);instruction (PIR)>
+X<% (percent sign);%= (modulus assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL1> % R<VAL2>
+  R<DEST> %= R<VAL1>
+
+Divide R<VAL1> by R<VAL2> and return the (C<mod>) remainder.
+
+=head3 ., .=
+
+X<. (dot);. (concatenation) instruction (PIR)>
+X<. (dot);.= (concatenation assignment) instruction (PIR)>
+
+  R<DEST> = R<VAL> . R<VAL>
+  R<DEST> .= R<VAL>
+
+Concatenate two strings. The concat operator must be surrounded by
+whitespace.
+
+=head3 E<lt>
+
+X<E<lt> (left angle bracket);E<lt> (less than);instruction (PIR)>
+
+  if R<VAL1> E<lt> R<VAL2> goto R<LABEL>
+
+Conditionally branch to a label if R<VAL1> is less than R<VAL2>.
+
+=head3 E<lt>=
+
+X<E<lt> (left angle bracket);E<lt>= (less than or equal);instruction (PIR)>
+
+  if R<VAL1> E<lt>= R<VAL2> goto R<LABEL>
+
+Conditionally branch to a label if R<VAL1> is less than or equal to
+R<VAL2>.
+
+=head3 E<gt>
+
+X<E<gt> (right angle bracket);E<gt> (greater than);instruction (PIR)>
+
+  if R<VAL1> E<gt> R<VAL2> goto R<LABEL>
+
+Conditionally branch to a label if R<VAL1> is greater than R<VAL2>.
+
+=head3 E<gt>=
+
+X<E<gt> (right angle bracket);E<gt>= (greater than or equal);instruction (PIR)>
+
+  if R<VAL1> E<gt>= R<VAL2> goto R<LABEL>
+
+Conditionally branch to a label if R<VAL1> is greater than or equal to
+R<VAL2>.
+
+=head3 ==
+
+X<= (equal sign);== (equality);instruction (PIR)>
+
+  if R<VAL1> == R<VAL2> goto R<LABEL>
+
+Conditionally branch to a label if R<VAL1> is equal to R<VAL2>.
+
+=head3 !=
+
+X<! (bang);!= (not equal);instruction (PIR)>
+
+  if R<VAL1> != R<VAL2> goto R<LABEL>
+
+Conditionally branch to a label if R<VAL1> is not equal to R<VAL2>.
+
+=head3 &&
+
+X<& (ampersand);&& (logical AND);instruction (PIR)>
+
+  R<DEST> = R<VAL1> && R<VAL2>
+
+Logical AND. Return R<VAL1> if it's false, otherwise return R<VAL2>.
+
+=head3 ||
+
+X<| (pipe);|| (logical OR);instruction (PIR)>
+
+  R<DEST> = R<VAL1> || R<VAL2>
+
+Logical OR. Return R<VAL1> if it's true, otherwise return R<VAL2>.
+
+=head3 ~~
+
+X<~ (tilde);~~ (logical XOR) instruction (PIR)>
+
+  R<DEST> = R<VAL1> ~~ R<VAL2>
+
+Logical XOR. If R<VAL1> is true and R<VAL2> is false, return R<VAL1>.
+If R<VAL1> is false and R<VAL2> is true, return R<VAL2>. Otherwise,
+return a false value.
+
+=head3 !
+
+X<! (bang);! (not);instruction (PIR)>
+
+  R<DEST> = ! R<VAL>
+
+Logical NOT. Return a true value if R<VAL> is false.
+
+=head3 &, &=
+
+X<& (ampersand);& (bitwise AND) instruction (PIR)>
+X<& (ampersand);&= (bitwise AND assignment) instruction (PIR)>
+
+  R<DEST> = R<VAL> & R<VAL>
+  R<DEST> &= R<VAL>
+
+Bitwise AND on two values.
+
+=head3 |, |=
+
+X<| (pipe);| (bitwise AND) instruction (PIR)>
+X<| (pipe);|= (bitwise AND assignment) instruction (PIR)>
+
+  R<DEST> = R<VAL> | R<VAL>
+  R<DEST> |= R<VAL>
+
+Bitwise OR on two values.
+
+=head3 ~, ~=
+
+X<~ (tilde);~ (bitwise XOR) instruction (PIR)>
+X<~ (tilde);~= (bitwise XOR assignment) instruction (PIR)>
+
+  R<DEST> = R<VAL> ~ R<VAL>
+  R<DEST> ~= R<VAL>
+  R<DEST> = ~ R<VAL>
+
+Bitwise XOR on two values. The unary form is a bitwise NOT on a value.
+
+=head3 E<lt>E<lt>, E<lt>E<lt>=
+
+X<E<lt> (left angle bracket);E<lt>E<lt> (bitwise left shift);instruction (PIR)>
+X<E<lt> (left angle bracket);E<lt>E<lt>= (bitwise left shift assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL1> E<lt>E<lt> R<VAL2>
+  R<DEST> E<lt>E<lt>= R<VAL2>
+
+Bitwise shift R<VAL1> left by R<VAL2> number of bits.
+
+=head3 E<gt>E<gt>, E<gt>E<gt>=
+
+X<E<gt> (right angle bracket);E<gt>E<gt> (bitwise right shift);instruction (PIR)>
+X<E<gt> (right angle bracket);E<gt>E<gt>= (bitwise right shift assignment);instruction (PIR)>
+
+  R<DEST> = R<VAL1> E<gt>E<gt> R<VAL2>
+  R<DEST> E<gt>E<gt>= R<VAL2>
+
+Bitwise shift R<VAL1> right by R<VAL2> number of bits.
+
+=head3 E<gt>E<gt>E<gt>, E<gt>E<gt>E<gt>=
+
+X<E<gt> (right angle bracket);E<gt>E<gt>E<gt> (logical right shift) instruction (PIR)>
+X<E<gt> (right angle bracket);E<gt>E<gt>E<gt>= (logical right shift assignment) instruction (PIR)>
+
+  R<DEST> = R<VAL1> E<gt>E<gt>E<gt> R<VAL2>
+  R<DEST> E<gt>E<gt>E<gt>= R<VAL2>
+
+Logically shift R<VAL1> right by R<VAL2> number of bits.
+
+=head3 [  ]
+
+X<[] (brackets);indexed access to PMC (PIR)>
+
+  R<DEST> = R<PMC> [ R<KEY> ]
+  R<PMC> [ R<KEY> ] = R<VAL>
+
+Indexed access to a PMC and indexed assignment to a PMC.
+
+  DEST = STRING [ OFFSET ]
+  STRING [ OFFSET ]  = VAL
+
+Access a one-character substring on a string, starting at a particular
+offset, or assign to that substring.
+
+=head3 call
+
+X<call instruction (PIR)>
+
+  call R<NAME>
+
+Call the named subroutine (a C<.sub> label).
+
+=head3 global
+
+X<global instruction (PIR)>
+
+  R<DEST> = global R<NAME>
+  global R<NAME> = R<VAL>
+
+Access a global variable for read or write.
+
+=head3 goto
+
+X<goto command (PIR)>
+
+  goto R<NAME>
+
+Jump to the named identifier (label or subroutine name).
+
+=head3 if
+
+X<if (conditional);instruction (PIR)>
+
+  if R<EXPR> goto R<NAME>
+
+If the value or expression evaluates as true, jump to the named
+identifier.
+
+=head3 unless
+
+X<unless (conditional);instruction (PIR)>
+
+  unless R<VAL> goto R<NAME>
+
+Unless the value evaluates as true, jump to the named identifier.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005, Parrot Foundation.
 # $Id$
 
 package init::hinits::irix;
@@ -21,21 +21,18 @@ sub runstep {
     $conf->data->set( ccflags => $ccflags );
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
     $conf->data->set( libs => $libs );
 
     my $cc   = $conf->data->get('cc');
-    my $cxx  = $conf->data->get('cxx');
     my $ld   = $conf->data->get('ld');
     my $link = $conf->data->get('link');
     if ( $cc =~ /cc -64/ ) {
-        $cxx  = 'CC -64';
         $ld   = 'CC -64';
         $link = 'CC -64';
         $conf->data->set(
-            cxx  => $cxx,
             ld   => $ld,
             link => $link,
         );

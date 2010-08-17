@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -17,13 +17,7 @@ Tests the metamodel for the OO implementation.
 =cut
 
 .sub _main :main
-    load_bytecode 'library/Test/More.pir'
-
-    .local pmc exports, curr_namespace, test_namespace
-    curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "plan ok is isa_ok skip todo"
-    test_namespace.export_to(curr_namespace, exports)
+    .include 'test_more.pir'
 
     plan( 12 )
 
@@ -33,9 +27,9 @@ Tests the metamodel for the OO implementation.
 
     class = new "Class", init_args1
     isa_ok(class, "Class", "created class isa Class")
-    $P1 = class.name()
+    $P1 = class.'name'()
     is($P1, "Dog", "created a new class via Class")
-    $P1 = class.name()
+    $P1 = class.'name'()
     is($P1, "Dog", "Class accessor doesn't destroy value")
 
     class.'add_attribute'('bark')
@@ -52,7 +46,7 @@ Tests the metamodel for the OO implementation.
     $P1 = attributes['tail']
     $S1 = $P1['type']
     $I0 = iseq $S1, 'Str'
-    todo($I0, "tail attribute has a type", "not implemented")
+    todo($I0, "tail attribute has a type", "not implemented: TT #1618")
 #    is($S1,'Str', "tail attribute has a type")
     goto end_tail_attrib_test
   no_tail_attribute:
@@ -71,9 +65,9 @@ Tests the metamodel for the OO implementation.
     unless $I0 goto FAILTAIL
     is($P1, "long", "tail attribute has expected value")
     goto NEXTTAIL
-FAILTAIL:	
+FAILTAIL:
     fail("no attribute")
-NEXTTAIL:	
+NEXTTAIL:
 
     $P1 = getattribute $P0, "bark"
     $I0 = defined $P1
@@ -81,15 +75,19 @@ NEXTTAIL:
     unless $I0 goto FAIL
     is($P1, "Wooof", "bark attribute has expected value")
     goto NEXT
-FAIL:	
+FAIL:
     fail("no attribute")
-NEXT:	
+NEXT:
 
-    todo(0, "new opcode makes working objects", "not implemented")
-#    $P0 = new "Dog"
-#    $I0 = defined $P0
-#    isa_ok($P0, "Dog", "new opcode makes working objects")
+    $P0 = new "Dog"
+    $I0 = defined $P0
+    isa_ok($P0, "Dog", "new opcode makes working objects")
 
+.end
+
+.sub fail
+    .param string desc
+    'ok'(0, desc)
 .end
 
 .namespace['Dog']
@@ -109,13 +107,12 @@ get_attr:
 .sub init_pmc :vtable :method
     .param pmc init_args
   # Iterate over the constructor arguments, calling the accessor for each
-    .local pmc iter
-    iter = new 'Iterator', init_args
-    iter = 0
+    .local pmc it
+    it = iter init_args
   iter_loop:
-    unless iter goto iter_end
-    $S1 = shift iter
-    $P1 = iter[$S1]
+    unless it goto iter_end
+    $S1 = shift it
+    $P1 = it[$S1]
     self.$S1($P1)
     goto iter_loop
   iter_end:
@@ -125,7 +122,7 @@ get_attr:
   .param pmc bark :optional
   .param int got_bark :opt_flag
   .local pmc rv
-  rv = self._accessor( "bark", bark, got_bark )
+  rv = self.'_accessor'( "bark", bark, got_bark )
   .return(rv)
 .end
 
@@ -133,7 +130,7 @@ get_attr:
   .param pmc tail :optional
   .param int got_tail :opt_flag
   .local pmc rv
-  rv = self._accessor( "tail", tail, got_tail )
+  rv = self.'_accessor'( "tail", tail, got_tail )
   .return(rv)
 .end
 

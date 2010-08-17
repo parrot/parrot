@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 /*
@@ -43,7 +43,7 @@ unused labels and dead_code_remove() to remove unreachable code
 cfg_optimize may be called multiple times during the construction of the
 CFG depending on whether or not it finds anything to optimize.
 
-RT#46277: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
+subst_constants ... rewrite e.g. add_i_ic_ic
 
 optimizer
 ---------
@@ -51,13 +51,13 @@ optimizer
 runs with CFG and life info
 
 used_once ... deletes assignments, when LHS is unused
-loop_optimization ... pulls invariants out of loops
-RT#46279 e.g. constant_propagation
+
+constant_propagation
 
 post_optimizer: currently pcc_optimize in pcc.c
 ---------------
 
-runs after register alloocation
+runs after register allocation
 
 e.g. eliminate new Px .PerlUndef because Px where different before
 
@@ -73,25 +73,12 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 #include "imc.h"
 #include "pbc.h"
 #include "optimizer.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: compilers/imcc/optimizer.h */
 
-
-/* buggy - turned off */
-#define  DO_LOOP_OPTIMIZATION 0
-
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_WARN_UNUSED_RESULT
-static int _is_ins_save(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *check_ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -149,17 +136,6 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
-static int is_ins_save(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -176,58 +152,49 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+#define ASSERT_ARGS_branch_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_branch_cond_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_branch_cond_loop_swap __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(branch) \
+    , PARROT_ASSERT_ARG(start) \
+    , PARROT_ASSERT_ARG(cond))
+#define ASSERT_ARGS_branch_reorg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_constant_propagation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_dead_code_remove __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_eval_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(op) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_if_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_strength_reduce __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_unused_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_used_once __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#if DO_LOOP_OPTIMIZATION
-int loop_optimization(Interp *, IMC_Unit *);
-
-PARROT_WARN_UNUSED_RESULT
-int _is_ins_save(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *check_ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-int is_ins_save(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
-PARROT_WARN_UNUSED_RESULT
-int max_loop_depth(ARGIN(const IMC_Unit *unit))
-        __attribute__nonnull__(1);
-
-int is_invariant(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Basic_block * find_outer(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Basic_block *blk))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-
-#endif
-
 /*
 
-=item C<int pre_optimize>
+=item C<int pre_optimize(PARROT_INTERP, IMC_Unit *unit)>
 
 Handles optimizations occuring before the construction of the CFG.
 
@@ -238,11 +205,11 @@ Handles optimizations occuring before the construction of the CFG.
 int
 pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(pre_optimize)
     int changed = 0;
 
     if (IMCC_INFO(interp)->optimizer_level & OPT_PRE) {
         IMCC_info(interp, 2, "pre_optimize\n");
-        /* RT#46281 integrate all in one pass */
         changed += strength_reduce(interp, unit);
         if (!IMCC_INFO(interp)->dont_optimize)
             changed += if_branch(interp, unit);
@@ -252,7 +219,7 @@ pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int cfg_optimize>
+=item C<int cfg_optimize(PARROT_INTERP, IMC_Unit *unit)>
 
 Handles optimizations occuring during the construction of the CFG.
 Returns TRUE if any optimization was performed. Otherwise, returns
@@ -266,6 +233,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(cfg_optimize)
     if (IMCC_INFO(interp)->dont_optimize)
         return 0;
     if (IMCC_INFO(interp)->optimizer_level & OPT_PRE) {
@@ -276,7 +244,6 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             return 1;
         if (branch_reorg(interp, unit))
             return 1;
-        /* RT#46283 cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interp, unit))
             return 1;
         if (dead_code_remove(interp, unit))
@@ -287,9 +254,11 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int optimize>
+=item C<int optimize(PARROT_INTERP, IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+Runs after the CFG is built and handles constant propogation.
+
+used_once ... deletes assignments, when LHS is unused
 
 =cut
 
@@ -298,23 +267,20 @@ RT#48260: Not yet documented!!!
 int
 optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(optimize)
     int any = 0;
     if (IMCC_INFO(interp)->optimizer_level & OPT_CFG) {
         IMCC_info(interp, 2, "optimize\n");
         any = constant_propagation(interp, unit);
         if (used_once(interp, unit))
             return 1;
-#if DO_LOOP_OPTIMIZATION
-        if (loop_optimization(interp, unit))
-            return 1;
-#endif
     }
     return any;
 }
 
 /*
 
-=item C<const char * get_neg_op>
+=item C<const char * get_neg_op(const char *op, int *n)>
 
 Get negated form of operator. If no negated form is known, return NULL.
 
@@ -327,9 +293,10 @@ PARROT_CAN_RETURN_NULL
 const char *
 get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
 {
-    static const struct br_pairs {
-        const char * const op;
-        const char * const nop;
+    ASSERT_ARGS(get_neg_op)
+    PARROT_OBSERVER static const struct br_pairs {
+        PARROT_OBSERVER const char * const op;
+        PARROT_OBSERVER const char * const nop;
         int n;
     } br_pairs[] = {
         { "if", "unless", 2 },
@@ -353,7 +320,7 @@ get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
  */
 /*
 
-=item C<static int if_branch>
+=item C<static int if_branch(PARROT_INTERP, IMC_Unit *unit)>
 
 Convert if/branch/label constructs of the form:
 
@@ -372,6 +339,7 @@ to the simpler negated form:
 static int
 if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(if_branch)
     Instruction *ins, *last;
     int reg, changed = 0;
 
@@ -395,15 +363,15 @@ if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 IMCC_debug(interp, DEBUG_OPT1, "if_branch %s ... %s\n",
                         last->opname, br_dest->name);
                 /* find the negated op (e.g if->unless, ne->eq ... */
-                if ((neg_op = get_neg_op(last->opname, &args)) != 0) {
+                if ((neg_op = get_neg_op(last->opname, &args)) != NULL) {
                     Instruction * tmp;
                     last->symregs[reg] = go;
-                    tmp = INS(interp, unit, (char*)neg_op, "",
+                    tmp = INS(interp, unit, neg_op, "",
                               last->symregs, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
-                    free(last->opname);
-                    last->opname = str_dup(tmp->opname);
+                    mem_sys_free(last->opname);
+                    last->opname = mem_sys_strdup(tmp->opname);
                     free_ins(tmp);
 
                     /* delete branch */
@@ -422,7 +390,7 @@ if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int strength_reduce>
+=item C<static int strength_reduce(PARROT_INTERP, IMC_Unit *unit)>
 
 strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y
 
@@ -436,6 +404,7 @@ guaranteed that one operand is non constant if opsize == 4
 static int
 strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(strength_reduce)
     Instruction *ins, *tmp;
     SymReg *r;
     int changes = 0;
@@ -492,12 +461,12 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 ins->opnum == PARROT_OP_mul_n_nc_n) &&
              (ins->symregs[0] == ins->symregs[1] ||
               ins->symregs[0] == ins->symregs[2]))) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             if (ins->symregs[0] == ins->symregs[1]) {
                 ins->symregs[1] = ins->symregs[2];
             }
             tmp = INS(interp, unit, ins->opname, "", ins->symregs, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -528,7 +497,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 ins->opnum == PARROT_OP_div_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_nc) &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             ins = delete_ins(unit, ins);
             if (ins)
                 ins = ins->prev ? ins->prev : unit->instructions;
@@ -550,7 +519,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
           || ((ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             --ins->symregs[1]->use_count;
             if (ins->opnum == PARROT_OP_add_i_ic ||
                 ins->opnum == PARROT_OP_add_n_nc)
@@ -558,7 +527,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             else
                 tmp = INS(interp, unit, "dec", "", ins->symregs, 1, 0, 0);
             subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             ins = tmp;
             changes = 1;
             continue;
@@ -601,7 +570,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                       atof(ins->symregs[2]->name) == 1.0)
           || (ins->opnum == PARROT_OP_mul_n_nc_n &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             if (ins->symregs[1]->type == VTCONST) {
                 --ins->symregs[1]->use_count;
                 ins->symregs[1] = ins->symregs[2];
@@ -610,7 +579,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 --ins->symregs[2]->use_count;
             }
             tmp = INS(interp, unit, "set", "", ins->symregs, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -631,14 +600,14 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
           || ((ins->opnum == PARROT_OP_mul_n_nc_n ||
                 ins->opnum == PARROT_OP_mul_n_nc) &&
                 (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)))) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             r = mk_const(interp, "0", ins->symregs[0]->set);
             --ins->symregs[1]->use_count;
             if (ins->opsize == 4)
                 --ins->symregs[2]->use_count;
             ins->symregs[1] = r;
             tmp = INS(interp, unit, "set", "", ins->symregs, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -652,11 +621,11 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
           || (ins->opnum == PARROT_OP_set_n_nc &&
              (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)) &&
               ins->symregs[1]->name[0] != '-')) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             --ins->symregs[1]->use_count;
             tmp = INS(interp, unit, "null", "", ins->symregs, 1, 0, 0);
             subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             ins = tmp;
             changes = 1;
             continue;
@@ -667,7 +636,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int constant_propagation>
+=item C<static int constant_propagation(PARROT_INTERP, IMC_Unit *unit)>
 
 Does conservative constant propagation.
 This code will not propagate constants past labels or saves,
@@ -680,12 +649,12 @@ even though sometimes it may be safe.
 static int
 constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    Instruction *ins, *ins2, *tmp, *prev;
-    int i;
+    ASSERT_ARGS(constant_propagation)
+    Instruction *ins;
     SymReg *c, *o;
     int any = 0;
 
-    o = c = NULL; /* silence compiler uninit warning */
+    o = c = NULL; /* silence compiler uninit warning, but XXX better to handle flow well */
 
     IMCC_info(interp, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
@@ -705,9 +674,12 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                before it gets to us */
 
         if (found) {
+            Instruction *ins2;
+
             IMCC_debug(interp, DEBUG_OPT2,
-                    "propagating constant %I => \n", ins);
+                    "propagating constant %d => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
+                int i;
                 if (ins2->bbindex != ins->bbindex)
                     /* restrict to within a basic block */
                     goto next_constant;
@@ -718,23 +690,25 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         if (instruction_writes(ins2, ins2->symregs[i]))
                             goto next_constant;
                         else if (instruction_reads(ins2, ins2->symregs[i])) {
+                            Instruction *tmp;
                             SymReg *old;
+
                             IMCC_debug(interp, DEBUG_OPT2,
-                                    "\tpropagating into %I register %i",
+                                    "\tpropagating into %d register %i",
                                     ins2, i);
                             old = ins2->symregs[i];
                             ins2->symregs[i] = c;
-       /* first we try subst_constants for e.g. if 10 < 5 goto next*/
+                /* first we try subst_constants for e.g. if 10 < 5 goto next*/
                             tmp = IMCC_subst_constants(interp,
                                 unit, ins2->opname, ins2->symregs, ins2->opsize,
                                 &found);
                             if (found) {
-                                prev = ins2->prev;
+                                const Instruction * const prev = ins2->prev;
                                 if (prev) {
                                     subst_ins(unit, ins2, tmp, 1);
                                     any = 1;
                                     IMCC_debug(interp, DEBUG_OPT2,
-                                            " reduced to %I\n", tmp);
+                                            " reduced to %d\n", tmp);
                                     ins2 = prev->next;
                                 }
                             }
@@ -752,7 +726,7 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                                     ins2->opnum = op;
                                     any = 1;
                                     IMCC_debug(interp, DEBUG_OPT2,
-                                            " -> %I\n", ins2);
+                                            " -> %d\n", ins2);
                                 }
                             }
                         }
@@ -769,7 +743,8 @@ next_constant:;
 
 /*
 
-=item C<Instruction * IMCC_subst_constants_umix>
+=item C<Instruction * IMCC_subst_constants_umix(PARROT_INTERP, IMC_Unit *unit,
+const char *name, SymReg **r, int n)>
 
 rewrite e.g. add_n_ic => add_n_nc
 
@@ -783,8 +758,9 @@ Instruction *
 IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n)
 {
+    ASSERT_ARGS(IMCC_subst_constants_umix)
     Instruction *tmp;
-    const char * const ops[] = {
+    PARROT_OBSERVER const char * const ops[] = {
         "abs", "add", "div", "mul", "sub", "fdiv"
     };
     size_t i;
@@ -801,7 +777,7 @@ IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const cha
             strcpy(b, r[1]->name);
             r[1] = mk_const(interp, b, 'N');
             tmp = INS(interp, unit, name, "", r, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
         }
     }
     return tmp;
@@ -809,7 +785,8 @@ IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const cha
 
 /*
 
-=item C<static int eval_ins>
+=item C<static int eval_ins(PARROT_INTERP, const char *op, size_t ops, SymReg
+**r)>
 
 Run one parrot instruction, registers are filled with the
 according constants. If an exception occurs, return -1, aborting
@@ -823,12 +800,13 @@ PARROT_WARN_UNUSED_RESULT
 static int
 eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 {
+    ASSERT_ARGS(eval_ins)
     opcode_t eval[4], *pc;
     int opnum;
     int i;
     op_info_t *op_info;
 
-    opnum = interp->op_lib->op_code(op, 1);
+    opnum = interp->op_lib->op_code(interp, op, 1);
     if (opnum < 0)
         IMCC_fatal(interp, 1, "eval_ins: op '%s' not found\n", op);
     op_info = interp->op_info_table + opnum;
@@ -836,48 +814,49 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
     eval[0] = opnum;
     for (i = 0; i < op_info->op_count - 1; i++) {
         switch (op_info->types[i]) {
-            case PARROT_ARG_IC:
-                PARROT_ASSERT(i && ops == (unsigned int)i);
-                /* set branch offset to zero */
-                eval[i + 1] = 0;
-                break;
-            case PARROT_ARG_I:
-            case PARROT_ARG_N:
-            case PARROT_ARG_S:
-                eval[i + 1] = i;        /* regs used are I0, I1, I2 */
-                if (ops <= 2 || i) { /* fill source regs */
-                    switch (r[i]->set) {
-                        case 'I':
-                            REG_INT(interp, i) = IMCC_int_from_reg(interp, r[i]);
-                            break;
-                        case 'N':
-                            {
-                            STRING * const s = string_from_cstring(interp, r[i]->name, 0);
-                            REG_NUM(interp, i) = string_to_num(interp, s);
-                            }
-                            break;
-                        case 'S':
-                            REG_STR(interp, i) = IMCC_string_from_reg(interp, r[i]);
-                            break;
-                        default:
-                            break;
+          case PARROT_ARG_IC:
+            PARROT_ASSERT(i && ops == (unsigned int)i);
+            /* set branch offset to zero */
+            eval[i + 1] = 0;
+            break;
+          case PARROT_ARG_I:
+          case PARROT_ARG_N:
+          case PARROT_ARG_S:
+            eval[i + 1] = i;        /* regs used are I0, I1, I2 */
+            if (ops <= 2 || i) { /* fill source regs */
+                SymReg *r_ = r[i]->type & VT_CONSTP ? r[i]->reg : r[i];
+                switch (r[i]->set) {
+                  case 'I':
+                    REG_INT(interp, i) = IMCC_int_from_reg(interp, r_);
+                    break;
+                  case 'N':
+                    {
+                        STRING * const s = Parrot_str_new(interp, r_->name, 0);
+                        REG_NUM(interp, i) = Parrot_str_to_num(interp, s);
                     }
+                    break;
+                  case 'S':
+                    REG_STR(interp, i) = IMCC_string_from_reg(interp, r_);
+                    break;
+                  default:
+                    break;
                 }
-                break;
-            default:
-                IMCC_fatal(interp, 1, "eval_ins"
-                        "invalid arg #%d for op '%s' not found\n",
-                        i, op);
+            }
+            break;
+          default:
+            IMCC_fatal(interp, 1, "eval_ins"
+                    "invalid arg #%d for op '%s' not found\n",
+                    i, op);
         }
     }
 
     /* eval the opcode */
-    new_internal_exception(interp);
-    if (setjmp(interp->exceptions->destination))
+    new_runloop_jump_point(interp);
+    if (setjmp(interp->current_runloop->resume))
         return -1;
 
     pc = (interp->op_func_table[opnum]) (eval, interp);
-    free_internal_exception(interp);
+    free_runloop_jump_point(interp);
     /* the returned pc is either incremented by op_count or is eval,
      * as the branch offset is 0 - return true if it branched
      */
@@ -887,7 +866,8 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 
 /*
 
-=item C<Instruction * IMCC_subst_constants>
+=item C<Instruction * IMCC_subst_constants(PARROT_INTERP, IMC_Unit *unit, const
+char *name, SymReg **r, int n, int *ok)>
 
 rewrite e.g. add_n_nc_nc => set_n_nc
              abs_i_ic    => set_i_ic
@@ -904,8 +884,9 @@ Instruction *
 IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, ARGOUT(int *ok))
 {
+    ASSERT_ARGS(IMCC_subst_constants)
     Instruction *tmp;
-    const char * const ops[] = {
+    PARROT_OBSERVER const char * const ops[] = {
         "add", "sub", "mul", "div", "fdiv", "pow",
         "cmod", "mod", "atan",
         "shr", "shl", "lsr",
@@ -915,38 +896,48 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         "and", "or", "xor",
         "iseq", "isne", "islt", "isle", "isgt", "isge", "cmp", "concat"
     };
-    const char * const ops2[] = {
+    PARROT_OBSERVER const char * const ops2[] = {
         "abs", "neg", "not", "fact", "sqrt", "ceil", "floor"
         "acos", "asec", "asin",
         "atan", "cos", "cosh", "exp", "ln", "log10", "log2", "sec",
         "sech", "sin", "sinh", "tan", "tanh", "fact"
     };
-    const char * const ops3[] = {
+    PARROT_OBSERVER const char * const ops3[] = {
         "eq", "ne", "gt", "ge", "lt", "le"
     };
-    const char * const ops4[] = {
+    PARROT_OBSERVER const char * const ops4[] = {
         "if", "unless"
     };
 
     size_t i;
-    char fmt[64], op[20];
+    const char *fmt;
+    char op[20];
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
 
-    /* construct a FLOATVAL_FMT with needed precision */
-    switch (NUMVAL_SIZE) {
-        case 8:
-            strcpy(fmt, "%0.16g");
-            break;
-        case 12:
-            strcpy(fmt, "%0.18Lg");
-            break;
-        default:
-            IMCC_warning(interp, "subs_constants",
-                    "used default FLOATVAL_FMT\n");
-            strcpy(fmt, FLOATVAL_FMT);
-            break;
-    }
+    /* construct a FLOATVAL_FMT with needed precision.
+      TT #308  XXX Should use Configure.pl to figure these out,
+      but it's not clear just what is needed.
+      The value of '16' for NUMVAL_SIZE == 8 was one larger than the
+      default FLOATVAL_FMT of '15' determined by Configure.pl.  The
+      reason for this difference, if there is one, should be documented.
+      The values of.18Lg and .31Lg are guesses.
+    */
+#if NUMVAL_SIZE == 8
+    fmt = "%0.16g";
+#elif NUMVAL_SIZE == 12
+    fmt = "%0.18Lg";
+#elif NUMVAL_SIZE == 16
+    fmt = "%0.31Lg";
+#else
+    fmt = FLOATVAL_FMT;
+    /* Since it's not clear why this is needed, it's not clear what to
+       do if it's an unknown case.
+    */
+    IMCC_fatal(interp, 0,
+       "IMCC_subst_constants:  unexpected NUMVAL_SIZE = %d\n",
+       NUMVAL_SIZE);
+#endif
 
     tmp = NULL;
     found = 0;
@@ -969,14 +960,16 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         /*
          * abs_i_ic ...
          */
-        if (n == 3 &&
-                r[1]->type & (VTCONST|VT_CONSTP) &&
-                STREQ(name, ops2[i])) {
-            found = 3;
-            snprintf(op, sizeof (op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
-                    tolower((unsigned char)r[1]->set));
-            debug_fmt = "opt %s_x_xc => ";
-            break;
+        if (n == 3) {
+            PARROT_ASSERT(r[1]);
+            if (r[1]->type & (VTCONST|VT_CONSTP) &&
+                    STREQ(name, ops2[i])) {
+                found = 3;
+                snprintf(op, sizeof (op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
+                        tolower((unsigned char)r[1]->set));
+                debug_fmt = "opt %s_x_xc => ";
+                break;
+            }
         }
     }
     for (i = 0; !found && i < N_ELEMENTS(ops3); i++) {
@@ -1013,6 +1006,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         return NULL;
     }
 
+    /* XXX We can get to this point with debug_fmt = NULL */
     IMCC_debug(interp, DEBUG_OPT1, debug_fmt, name);
     /* we construct a parrot instruction
      * here and let parrot do the calculation in a
@@ -1021,7 +1015,8 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
      */
     branched = eval_ins(interp, op, found, r);
     if (branched == -1) {
-         /* Don't set ok (See RT #43048 for info) */
+         /* Don't set ok
+          * (See http://rt.perl.org/rt3/Ticket/Display.html?id=43048 for info) */
          return NULL;
     }
     /*
@@ -1047,26 +1042,32 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
          */
         char b[128];
         switch (r[0]->set) {
-            case 'I':
-                snprintf(b, sizeof (b), INTVAL_FMT, REG_INT(interp, 0));
-                r[1] = mk_const(interp, b, r[0]->set);
-                break;
-            case 'N':
-                snprintf(b, sizeof (b), fmt, REG_NUM(interp, 0));
-                r[1] = mk_const(interp, b, r[0]->set);
-                break;
-            case 'S':
-                r[1] = mk_const(interp, string_to_cstring(interp,
-                        REG_STR(interp, 0)), r[0]->set);
-                snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
-                break;
-            default:
-                break;
+          case 'I':
+            snprintf(b, sizeof (b), INTVAL_FMT, REG_INT(interp, 0));
+            r[1] = mk_const(interp, b, r[0]->set);
+            break;
+          case 'N':
+            snprintf(b, sizeof (b), fmt, REG_NUM(interp, 0));
+            r[1] = mk_const(interp, b, r[0]->set);
+            break;
+          case 'S':
+          {
+            char * const name = Parrot_str_to_cstring(interp, REG_STR(interp, 0));
+
+            r[1] = mk_const(interp, name, r[0]->set);
+
+            snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
+            Parrot_str_free_cstring(name);
+
+            break;
+          }
+          default:
+            break;
         }
         tmp = INS(interp, unit, "set", "", r, 2, 0, 0);
     }
     if (tmp) {
-        IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+        IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
     }
     *ok = 1;
     return tmp;
@@ -1077,7 +1078,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
 
 /*
 
-=item C<static int branch_branch>
+=item C<static int branch_branch(PARROT_INTERP, IMC_Unit *unit)>
 
 if I0 goto L1  => if IO goto L2
 ...
@@ -1094,6 +1095,7 @@ FALSE.
 static int
 branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(branch_branch)
     Instruction *ins;
     int changed = 0;
 
@@ -1114,13 +1116,13 @@ branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         !STREQ(next->symregs[0]->name, get_branch_reg(ins)->name)) {
                     const int regno = get_branch_regno(ins);
                     IMCC_debug(interp, DEBUG_OPT1,
-                            "found branch to branch '%s' %I\n",
+                            "found branch to branch '%s' %d\n",
                             r->first_ins->symregs[0]->name, next);
                     unit->ostat.branch_branch++;
-                    if (regno < 0) {
-                        real_exception(interp, NULL, 1,
-                                "Register number determination failed in branch_branch()");
-                    }
+                    if (regno < 0)
+                        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                            "Register number determination failed in branch_branch()");
+
                     ins->symregs[regno] = next->symregs[0];
                     changed = 1;
                 }
@@ -1132,7 +1134,7 @@ branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int branch_reorg>
+=item C<static int branch_reorg(PARROT_INTERP, IMC_Unit *unit)>
 
 branch L2  => ...
 L1:           branch L4
@@ -1154,8 +1156,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(branch_reorg)
     unsigned int i;
-    int          changed = 0;
+    int changed = 0;
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -1164,18 +1167,22 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         /* if basic block ends with unconditional jump */
         if ((ins->type & IF_goto) && STREQ(ins->opname, "branch")) {
             SymReg * const r = get_sym(interp, ins->symregs[0]->name);
+
             if (r && (r->type & VTADDRESS) && r->first_ins) {
-                Edge *edge;
+                Edge               *edge;
                 Instruction * const start = r->first_ins;
-                int found = 0;
+                int                 found = 0;
+
                 for (edge = unit->bb_list[start->bbindex]->pred_list;
-                        edge; edge = edge->pred_next)
-                {
+                     edge;
+                     edge = edge->pred_next) {
+
                     if (edge->from->index == start->bbindex - 1) {
                         found = 1;
                         break;
                     }
                 }
+
                 /* if target block is not reached by falling into it
                  * from another block */
                 if (!found) {
@@ -1196,12 +1203,15 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         start->prev->next = end->next;
                         if (end->next)
                             end->next->prev = start->prev;
-                        end->next = ins->next;
-                        ins->next = start;
+
+                        end->next   = ins->next;
+                        ins->next   = start;
                         start->prev = ins;
+
                         IMCC_debug(interp, DEBUG_OPT1,
-                                "found branch to reorganize '%s' %I\n",
+                                "found branch to reorganize '%s' %d\n",
                                 r->first_ins->symregs[0]->name, ins);
+
                         /* unconditional jump can be eliminated */
                         unit->ostat.deleted_ins++;
                         ins = delete_ins(unit, ins);
@@ -1211,14 +1221,19 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             }
         }
     }
+
     return changed;
 }
 
 /*
 
-=item C<static int branch_cond_loop_swap>
+=item C<static int branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit,
+Instruction *branch, Instruction *start, Instruction *cond)>
 
-RT#48260: Not yet documented!!!
+Converts conditional loops to post-test
+
+Returns TRUE if any optimizations were performed. Otherwise, returns
+FALSE.
 
 =cut
 
@@ -1229,6 +1244,7 @@ static int
 branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *branch),
         ARGMOD(Instruction *start), ARGMOD(Instruction *cond))
 {
+    ASSERT_ARGS(branch_cond_loop_swap)
     int changed = 0;
     int args;
     const char * const neg_op = get_neg_op(cond->opname, &args);
@@ -1240,7 +1256,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
 
         for (count = 1; count != 999; ++count) {
             snprintf(label, size, "%s_post%d", branch->symregs[0]->name, count);
-            if (get_sym(interp, label) == 0) {
+            if (get_sym(interp, label) == NULL) {
                 found = 1;
                 break;
             }
@@ -1271,10 +1287,10 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
             }
 
             reg_index = get_branch_regno(cond);
-            if (reg_index < 0) {
-                real_exception(interp, NULL, 1,
-                        "Negative branch register address detected");
-            }
+            if (reg_index < 0)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Negative branch register address detected");
+
             regs[reg_index] = mk_label_address(interp, label);
             tmp = INS(interp, unit, (const char*)neg_op, "", regs, args, 0, 0);
 
@@ -1287,7 +1303,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
             changed = 1;
         }
 
-        free(label);
+        mem_sys_free(label);
     }
 
     return changed;
@@ -1295,7 +1311,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
 
 /*
 
-=item C<static int branch_cond_loop>
+=item C<static int branch_cond_loop(PARROT_INTERP, IMC_Unit *unit)>
 
 start:           => start:
 if cond goto end    if cond goto end
@@ -1318,6 +1334,7 @@ FALSE.
 static int
 branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(branch_cond_loop)
     Instruction *ins, *cond, *start, *prev;
     int changed = 0, found;
 
@@ -1375,9 +1392,9 @@ branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int unused_label>
+=item C<static int unused_label(PARROT_INTERP, IMC_Unit *unit)>
 
-Removes unused labels. A label is unused if ... [RT#46287: finish this].
+Removes unused labels.
 
 Returns TRUE if any optimizations were performed. Otherwise, returns
 FALSE.
@@ -1390,9 +1407,10 @@ PARROT_WARN_UNUSED_RESULT
 static int
 unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int          used;
+    ASSERT_ARGS(unused_label)
     unsigned int i;
-    int          changed = 0;
+    int used;
+    int changed = 0;
 
     IMCC_info(interp, 2, "\tunused_label\n");
     for (i = 1; i < unit->n_basic_blocks; i++) {
@@ -1400,8 +1418,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
             const SymReg * const lab = ins->symregs[0];
             used = 0;
-            if (IMCC_INFO(interp)->has_compile)
-                used = 1;
+
             if (!lab->first_ins)
                 continue;
 #if 1
@@ -1409,14 +1426,14 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 used = 1;
 #else
             else {
-                Instruction *ins2;
                 int j;
-                SymReg * addr;
                 for (j=0; unit->bb_list[j]; j++) {
                     /* a branch can be the first ins in a block
                      * (if prev ins was a label)
-                     * or the last ins in a block
-                     */
+                     * or the last ins in a block */
+                    Instruction *ins2;
+                    SymReg      *addr;
+
                     ins2 = unit->bb_list[j]->start;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
@@ -1452,9 +1469,11 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int dead_code_remove>
+=item C<static int dead_code_remove(PARROT_INTERP, IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+dead code elimination
+... unreachable blocks
+... unreachable instructions
 
 =cut
 
@@ -1463,6 +1482,7 @@ RT#48260: Not yet documented!!!
 static int
 dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(dead_code_remove)
     unsigned int i;
     int changed = 0;
     Instruction *ins, *last;
@@ -1481,12 +1501,13 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             continue;
         /* this block isn't entered from anywhere */
         if (!bb->pred_list) {
-            const int bbi = bb->index;
+            const unsigned int bbi = bb->index;
             IMCC_debug(interp, DEBUG_OPT1,
                        "found dead block %d\n", bb->index);
+
             for (ins = bb->start; ins && ins->bbindex == bbi;) {
                 IMCC_debug(interp, DEBUG_OPT1,
-                        "\tins deleted (dead block) %I\n", ins);
+                        "\tins deleted (dead block) %d\n", ins);
                 ins = delete_ins(unit, ins);
                 unit->ostat.deleted_ins++;
                 changed++;
@@ -1494,19 +1515,22 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         }
     }
 
+
     /* Unreachable instructions */
 
-    for (last = unit->instructions, ins=last->next;
+    for (last = unit->instructions, ins = last->next;
          last && ins;
          ins = ins->next) {
+
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
             STREQ(last->opname, "branch")) {
             IMCC_debug(interp, DEBUG_OPT1,
-                    "unreachable ins deleted (after branch) %I\n", ins);
+                    "unreachable ins deleted (after branch) %d\n", ins);
             ins = delete_ins(unit, ins);
             unit->ostat.deleted_ins++;
             changed++;
         }
+
         /*
          *   branch L1     => --
          * L1: ...            L1:
@@ -1514,7 +1538,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 STREQ(last->opname, "branch") &&
                 STREQ(last->symregs[0]->name, ins->symregs[0]->name)) {
-            IMCC_debug(interp, DEBUG_OPT1, "dead branch deleted %I\n", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "dead branch deleted %d\n", ins);
             ins = delete_ins(unit, last);
             unit->ostat.deleted_ins++;
             changed++;
@@ -1529,9 +1553,9 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 /* optimizations with CFG & life info built */
 /*
 
-=item C<static int used_once>
+=item C<static int used_once(PARROT_INTERP, IMC_Unit *unit)>
 
-RT#48260: Not yet documented!!!
+used_once ... deletes assignments, when LHS is unused
 
 =cut
 
@@ -1540,6 +1564,7 @@ RT#48260: Not yet documented!!!
 static int
 used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(used_once)
     Instruction *ins;
     int opt = 0;
 
@@ -1547,9 +1572,15 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if (ins->symregs) {
             SymReg * const r = ins->symregs[0];
             if (r && (r->use_count == 1 && r->lhs_use_count == 1)) {
-                IMCC_debug(interp, DEBUG_OPT2, "used once '%I' deleted\n", ins);
+                IMCC_debug(interp, DEBUG_OPT2, "used once '%d' deleted\n", ins);
                 ins = delete_ins(unit, ins);
-                ins = ins->prev ? ins->prev : unit->instructions;
+
+                /* find previous instruction or first instruction of this CU
+                 * ... but only the latter if it wasn't deleted */
+                ins = ins->prev
+                    ? ins->prev
+                    : opt ? unit->instructions : NULL;
+
                 unit->ostat.deleted_ins++;
                 unit->ostat.used_once++;
                 opt++;
@@ -1558,363 +1589,6 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     }
     return opt;
 }
-
-#if DO_LOOP_OPTIMIZATION
-
-static int reason;
-enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
-
-/*
-
-=item C<static int _is_ins_save>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-_is_ins_save(ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *check_ins),
-        ARGIN(const SymReg *r), int what)
-{
-    Instruction *ins;
-    int bb;
-    int use_count, lhs_use_count;
-    int i, in_use;
-    int new_bl=-1, set_bl=-1;
-
-    /* now check all instructions where r is used */
-
-    /* we give up fast ;-) */
-    switch (what) {
-        case CHK_INV_NEW:
-        case CHK_INV_SET:
-            if (r->set == 'P' && r->lhs_use_count != 2)
-                return reason=1, 0;
-            if (r->set != 'P' && r->lhs_use_count != 1)
-                return reason=2, 0;
-            break;
-        case CHK_CLONE:
-            if (r->set == 'P' && r->lhs_use_count != 2)
-                return reason=1, 0;
-            break;
-        default:
-            break;
-    }
-
-    use_count = r->use_count;
-    lhs_use_count = r->lhs_use_count;
-    for (bb = 0; bb < unit->n_basic_blocks; bb++) {
-        const Life_range * const lr = r->life_info[bb];
-
-        for (ins = lr->first_ins; ins; ins = ins->next) {
-            int nregs;
-            /* finished with this range */
-            if (!lr->last_ins->next || ins == lr->last_ins->next)
-                break;
-            for (i = in_use = 0; ins->symregs[i]; i++)
-                if (ins->symregs[i] == r) {
-                    in_use++;
-                }
-            nregs = i;
-            if (!in_use)
-                continue;
-
-            /* var is in use in this ins */
-            use_count--;
-            if (instruction_writes(ins, r)) {
-                lhs_use_count--;
-                if (STREQ(ins->opname, "new"))
-                    new_bl=bb;
-                if (STREQ(ins->opname, ""))
-                    set_bl=bb;
-            }
-            /* this is the instruction, to check, it's safe */
-            if (check_ins == ins)
-                continue;
-
-            /* now look for dangerous ops */
-            if (STREQ(ins->opname, "find_global"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "store_global"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "push"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "pop"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "clone"))
-                return reason=4, 0;
-            /* indexed set/get ??? RT#46289, as index is ok */
-            if (0 && STREQ(ins->opname, "set") && nregs != 2)
-                return reason=5, 0;
-            /*
-             * set P, P  - dangerous?
-             */
-            if (ins->type & ITALIAS)
-                return reason=6, 0;
-            /* we saw all occurencies of reg, so fine */
-            if (lhs_use_count == 0 && use_count == 0) {
-                if (what == CHK_INV_SET && new_bl != set_bl)
-                    return 0;
-                return 1;
-            }
-        }
-        /* we have finished this life range */
-    } /* for bb */
-    return what == CHK_CLONE ? 1 : (reason=10, 0);
-}
-
-/*
-
-=item C<static int is_ins_save>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-is_ins_save(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins),
-        ARGIN(const SymReg *r), int what)
-{
-    int save;
-
-    reason = 0;
-    save = _is_ins_save(unit, ins, r, what);
-    if (!save && reason)
-        IMCC_debug(interp, DEBUG_OPT2,
-                   "ins not save var %s reason %d %I\n",
-                r->name, reason, ins);
-    return save;
-}
-
-/*
-
-=item C<int max_loop_depth>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-int
-max_loop_depth(ARGIN(const IMC_Unit *unit))
-{
-    int i;
-    int d = 0;
-
-    for (i = 0; i < unit->n_basic_blocks; i++)
-        if (unit->bb_list[i]->loop_depth > d)
-            d = unit->bb_list[i]->loop_depth;
-    return d;
-}
-
-/*
-
-=item C<int is_invariant>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-int
-is_invariant(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins))
-{
-    int ok = 0;
-    int what = 0;
-
-    if (STREQ(ins->opname, "new")) {
-        ok = 1;
-        what = CHK_INV_NEW;
-    }
-    /* only, if once assigned and not changed */
-    else if (STREQ(ins->opname, "set") &&
-            !(ins->symregs[0]->usage & U_KEYED) &&
-            ins->symregs[1]->type & VTCONST) {
-        ok = 1;
-        what = CHK_INV_SET;
-    }
-    if (ok)
-        return is_ins_save(interp, unit, ins, ins->symregs[0], what);
-    return 0;
-}
-
-#  define MOVE_INS_1_BL
-#  ifdef MOVE_INS_1_BL
-/*
-
-=item C<Basic_block * find_outer>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Basic_block *
-find_outer(ARGIN(const IMC_Unit *unit), ARGIN(const Basic_block *blk))
-{
-    int i;
-    Loop_info ** const loop_info = unit->loop_info;
-    const int          bb        = blk->index;
-    int                i         = unit->n_loops - 1;
-
-    /* loops are sorted depth last */
-    for (; i >= 0; i--) {
-        Loop_info * const info = loop_info[i];
-        if (set_contains(info->loop, bb)) {
-            const int preheader = info->preheader;
-            if (preheader >= 0)
-                return unit->bb_list[preheader];
-        }
-    }
-    return NULL;
-}
-#  endif
-
-/*
-
-=item C<int move_ins_out>
-
-move the instruction ins before loop in bb
-
-=cut
-
-*/
-
-int
-move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
-        ARGMOD(Instruction **ins), ARGIN(const Basic_block *bb))
-{
-    Basic_block *pred;
-    Instruction * next, *out;
-
-    /* check loop_info, where this loop started
-     * actually, this moves instruction to block 0 */
-#  ifdef MOVE_INS_1_BL
-    pred = find_outer(unit, bb);
-#  else
-    UNUSED(bb);
-    pred = unit->bb_list[0];
-#  endif
-    if (!pred) {
-        IMCC_debug(interp, DEBUG_OPT2, "outer loop not found (CFG?)\n");
-        return 0;
-    }
-    out = pred->end;
-    next = (*ins)->next;
-    (*ins)->bbindex = pred->index;
-    IMCC_debug(interp, DEBUG_OPT2, "inserting it in blk %d after %I\n",
-            pred->index, out);
-    *ins = move_ins(unit, *ins, out);
-    if (0 && (DEBUG_OPT2 & IMCC_INFO(interp)->debug)) {
-        char buf[256];
-        SymReg * regs[IMCC_MAX_REGS];
-        Instruction * tmp;
-
-        regs[0] = 0;
-        snprintf(buf, sizeof (buf), "# Invar moved: %s", out->next->op);
-        tmp = INS(interp, unit, "", buf, regs, 0, 0, 0);
-        insert_ins(unit, (*ins)->prev, tmp);
-    }
-    ostat.invariants_moved++;
-    /* RT#46291 CFG is changed here, which also means
-     * that the life_info is wrong now
-     * so, currently we calc CFG and life again */
-    return 1;
-}
-
-/*
-
-=item C<int loop_one>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-int
-loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
-{
-    Basic_block * const bb = unit->bb_list[bnr];
-    Instruction *ins;
-    int changed = 0;
-
-    if (bnr == 0) {
-        IMCC_warning(interp, "loop_one", "wrong loop depth in block 0\n");
-        return 0;
-    }
-    IMCC_debug(interp, DEBUG_OPT2, "loop_one blk %d\n", bnr);
-    for (ins = bb->start ; ins ; ins = ins->next) {
-        reason = 0;
-        if (is_invariant(interp, unit, ins)) {
-            IMCC_debug(interp, DEBUG_OPT2, "found invariant %I\n", ins);
-            if (move_ins_out(interp, unit, &ins, bb)) {
-                changed++;
-                ins = ins->prev;
-            }
-        }
-        if (ins == bb->end)
-            break;
-    }
-    return changed;
-
-}
-
-/*
-
-=item C<int loop_optimization>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-int
-loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
-{
-    int l;
-    int changed = 0;
-    static int prev_depth;
-
-    const int loop_depth = prev_depth ? prev_depth : max_loop_depth(unit);
-
-    /* work from inside out */
-    IMCC_debug(interp, DEBUG_OPT2, "loop_optimization\n");
-    for (l = loop_depth; l > 0; l--) {
-        int bb;
-
-        IMCC_debug(interp, DEBUG_OPT2, "loop_depth %d\n", l);
-        for (bb = 0; bb < unit->n_basic_blocks; bb++)
-            if (unit->bb_list[bb]->loop_depth == l) {
-                changed |= loop_one(interp, unit, bb);
-            }
-        /* currently e.g. mandel.p6 breaks, if not only the most
-         * inner loop is changed, but outer loops too */
-        if (changed) {
-            prev_depth = l-1;
-            IMCC_debug(interp, DEBUG_OPT2, "after loop_opt\n");
-            if (IMCC_INFO(interp)->debug>1)
-                dump_instructions(interp, unit);
-            return changed;
-        }
-    }
-    prev_depth = 0;
-    return 0;
-}
-#endif
 
 /*
 

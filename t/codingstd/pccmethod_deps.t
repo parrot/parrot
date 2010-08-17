@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -33,7 +33,7 @@ sub contains_pccmethod {
 
     local $_;
     while (<$fh>) {
-        next unless /PCCMETHOD/;
+        next unless /METHOD/;
         return 1;
     }
 

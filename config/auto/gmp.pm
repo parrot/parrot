@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2004, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -32,7 +32,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your platform supports GMP};
+    $data{description} = q{Does your platform support GMP};
     $data{result}      = q{};
     $data{cc_run_expected} =
 "6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0\n";
@@ -43,12 +43,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-gmp
-        |
-    );
+    my $without = $conf->options->get( qw| without-gmp | );
 
     if ($without) {
         $conf->data->set( has_gmp => 0 );
@@ -56,46 +51,36 @@ sub runstep {
         return 1;
     }
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
+    my $osname = $conf->data->get('osname');
 
-    my $osname    = $conf->data->get_p5('OSNAME');
-
-    $self->_add_to_libs( {
+    my $extra_libs = $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
-        cc              => $cc,
+        cc              => $conf->data->get('cc'),
         win32_nongcc    => 'gmp.lib',
         default         => '-lgmp',
     } );
 
-    # On OS X check the presence of the gmp header in the standard
-    # Fink location.
-    $self->_handle_darwin_for_fink($conf, $osname, 'gmp.h');
-    $self->_handle_darwin_for_macports($conf, $osname, 'gmp.h');
-
-    $conf->cc_gen('config/auto/gmp/gmp.in');
-    eval { $conf->cc_build(); };
+    $conf->cc_gen('config/auto/gmp/gmp_c.in');
+    eval { $conf->cc_build( q{}, $extra_libs); };
     my $has_gmp = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp, $verbose );
+        $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp );
     }
-    unless ($has_gmp) {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
+    if ($has_gmp) {
+        $conf->data->add( ' ', libs => $extra_libs );
     }
+    $self->set_result($has_gmp ? 'yes' : 'no');
 
     return 1;
 }
 
 sub _evaluate_cc_run {
-    my ($self, $conf, $test, $has_gmp, $verbose) = @_;
+    my ($self, $conf, $test, $has_gmp) = @_;
     if ( $test eq $self->{cc_run_expected} ) {
         $has_gmp = 1;
-        print " (yes) " if $verbose;
+        $conf->debug(" (yes) ");
         $self->set_result('yes');
 
         $conf->data->set(

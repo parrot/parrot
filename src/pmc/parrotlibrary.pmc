@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -9,10 +9,6 @@ src/pmc/parrotlibrary.pmc - Dynamic Library
 =head1 DESCRIPTION
 
 Class for holding info about a dynamic library.
-
-     PMC data
-     PMC_struct_val(SELF)   oplib init function
-     PMC_data(SELF)         DLL handle
 
 Properties:
 
@@ -32,9 +28,16 @@ a ParrotLibrary PMC.
 
 */
 
-#include "parrot/parrot.h"
+#define PMC_dlhandle(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->dl_handle
+#define PMC_oplib_init(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->oplib_init
 
-pmclass ParrotLibrary need_ext provides library {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass ParrotLibrary auto_attrs provides library {
+    ATTR void * dl_handle;  /* DLL handle */
+    ATTR void * oplib_init; /* oplib init function */
 
 /*
 
@@ -47,8 +50,7 @@ Initializes the library with a C<NULL> oplib init function.
 */
 
     VTABLE void init() {
-        PObj_active_destroy_SET(SELF);
-        PMC_struct_val(SELF) = NULL;
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -62,8 +64,9 @@ Destroys the library, closing the shared library.
 */
 
     VTABLE void destroy() {
-        if (PMC_data(SELF))
-            Parrot_dlclose(PMC_data(SELF));
+        void *dl_handle = PMC_dlhandle(SELF);
+        if (dl_handle)
+            Parrot_dlclose(dl_handle);
     }
 
 
@@ -78,9 +81,9 @@ Creates and returns a clone of the library.
 */
 
     VTABLE PMC *clone() {
-        PMC *dest            = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PMC_struct_val(dest) = PMC_struct_val(SELF);
-        PMC_data(dest)       = PMC_data(SELF);
+        PMC * const dest     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_oplib_init(dest) = PMC_oplib_init(SELF);
+        PMC_dlhandle(dest)   = PMC_dlhandle(SELF);
 
         if (PMC_metadata(SELF))
             PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
@@ -99,7 +102,7 @@ Returns whether a library has been successfully loaded.
 */
 
     VTABLE INTVAL get_bool() {
-        return (PMC_data(SELF) != NULL);
+        return (PMC_dlhandle(SELF) != NULL);
     }
 
 /*
@@ -113,10 +116,24 @@ Returns the name of the loaded library.
 */
 
     VTABLE STRING *get_string() {
-        STRING *key  = CONST_STRING(INTERP, "_filename");
-        PMC    *prop = VTABLE_getprop(INTERP, SELF, key);
+        STRING * const key  = CONST_STRING(INTERP, "_filename");
+        PMC    * const prop = VTABLE_getprop(INTERP, SELF, key);
 
         return VTABLE_get_string(INTERP, prop);
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Get the pointer to the shared library handle.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        return PMC_dlhandle(SELF);
     }
 
 /*
@@ -130,7 +147,7 @@ Set the pointer to the shared library handle.
 */
 
     VTABLE void set_pointer(void *handle) {
-        PMC_data(SELF) = handle;
+        PMC_dlhandle(SELF) = handle;
     }
 }
 

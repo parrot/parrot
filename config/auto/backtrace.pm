@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether libc has the backtrace* functions};
+    $data{description} = q{Does libc have the backtrace* functions};
     $data{result}      = q{};
     return \%data;
 }
@@ -56,12 +56,26 @@ sub _probe_for_backtrace {
     return $anyerror;
 }
 
+sub _probe_for_dlinfo {
+    my $conf = shift;
+    $conf->cc_gen("config/auto/backtrace/test_dlinfo_c.in");
+
+    # If the program compiles, the Dl_info struct is available
+
+    eval { $conf->cc_compile(); };
+    my $anyerror = $@;
+    $conf->cc_clean();
+    return $anyerror;
+}
+
 sub _evaluate_backtrace {
     my ($self, $conf, $anyerror) = @_;
     if ( $anyerror ) {
         $self->set_result("no");
     }
     else {
+        my $dlinfoerror = _probe_for_dlinfo($conf);
+        $conf->data->set ( PARROT_HAS_DLINFO => 1 ) unless $anyerror;
         $conf->data->set( backtrace => 1 );
         $self->set_result("yes");
     }

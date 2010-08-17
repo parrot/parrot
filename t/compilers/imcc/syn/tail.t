@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -15,16 +15,17 @@ use Parrot::Test tests => 6;
 $ENV{TEST_PROG_ARGS} = '-Oc';
 
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
+
 .sub _main :main
     $P1 = new 'Integer'
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub f = "_floor"
-    .const .Sub c = "_funcall"
+    .const 'Sub' f = "_floor"
+    .const 'Sub' c = "_funcall"
     set_args "0,0,0", f, $P1, $P2
-    get_results "0,0", $P3, $P4
     invokecc c
+    get_results "0,0", $P3, $P4
     print "_floor returned "
     print 2      # TODO argcP
     print " values, "
@@ -32,10 +33,10 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     print " and "
     print $P4
     print ".\n"
-    .const .Sub s = "_fib_step"
+    .const 'Sub' s = "_fib_step"
     set_args "0,0,0", s, $P1, $P2
-    get_results "0,0,0", $P3, $P4, $P5
     invokecc c
+    get_results "0,0,0", $P3, $P4, $P5
     print "_fib_step returned "
     print 3    # TODO argcP
     print " values, "
@@ -55,7 +56,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     $I33 = defined function
     if $I33 goto doit
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 doit:
     set_args "0x20", argv
@@ -102,8 +103,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub f = "_floor"
-    .const .Sub s = "_fib_step"
+    .const 'Sub' f = "_floor"
+    .const 'Sub' s = "_fib_step"
     ($P3, $P4) = _funcall(f, $P1, $P2)
     print "_floor returned "
     print 2
@@ -132,9 +133,9 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position
     $I33 = defined function
     unless $I33 goto bad_func
 doit:
-    .return function(argv :flat)
+    .tailcall function(argv :flat)
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 .end
 
@@ -177,8 +178,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub f = "_floor"
-    .const .Sub s = "_fib_step"
+    .const 'Sub' f = "_floor"
+    .const 'Sub' s = "_fib_step"
     ($P3, $P4) = _funcall(f, $P1, $P2)
     print "_floor returned "
     print 2
@@ -207,10 +208,10 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return
     $I33 = defined function
     if $I33 goto doit
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 doit:
-    .return function(argv :flat)
+    .tailcall function(argv :flat)
 .end
 
 ## Return quotient and remainder as two integers.
@@ -236,9 +237,9 @@ doit:
     $P1 = new 'Integer'
     $P1 = arg1 + arg2
     .begin_return
-    .return $P1
-    .return arg1
-    .return arg2
+    .set_return $P1
+    .set_return arg1
+    .set_return arg2
     .end_return
 .end
 CODE
@@ -256,7 +257,7 @@ pir_output_is( <<'CODE', <<'OUT', ":flatten in .return" );
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub s = "_fib_step"
+    .const 'Sub' s = "_fib_step"
     ($P3, $P4, $P5) = _funcall(s, $P1, $P2)
     print "_fib_step returned "
     print 3
@@ -283,7 +284,7 @@ doit:
         print " results]\n"
     .return ($P35 :flat)
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 .end
 
@@ -308,7 +309,7 @@ pir_output_is( <<'CODE', <<'OUT', "new tail call syntax" );
 .end
 
 .sub foo
-    .return bar()
+    .tailcall bar()
     print "never\n"
 .end
 
@@ -340,7 +341,7 @@ pir_output_is( <<'CODE', <<'OUT', "new tail method call syntax" );
     n = getattribute self, [ "Foo" ], "n"
     dec n
     unless n goto done
-    .return self."go"()
+    .tailcall self."go"()
 done:
 .end
 

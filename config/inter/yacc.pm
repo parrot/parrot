@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -25,7 +25,7 @@ use Parrot::Configure::Utils qw( :inter capture_output check_progs );
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether yacc is installed};
+    $data{description} = q{Is yacc installed};
     $data{result}      = q{};
     return \%data;
 }

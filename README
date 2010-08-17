@@ -1,7 +1,7 @@
-This is Parrot, version 0.6.4
+This is Parrot, version 2.6.0
 ------------------------------
 
-Parrot is Copyright (C) 2001-2008, The Perl Foundation.
+Parrot is Copyright (C) 2001-2010, Parrot Foundation.
 
 $Id$
 
@@ -14,20 +14,17 @@ For more details, see the full text of the license in the file LICENSE.
 PREREQUISITES
 -------------
 
-You need a C compiler, a linker and a make program of course. If you will be
-linking with the ICU library you have to download and install it before
-configuring Parrot.
+You need a C compiler, a linker, and a make program of course.
 
-Get it from http://www-306.ibm.com/software/globalization/icu/downloads.jsp
+If you will be linking with the ICU library you have to download and install it
+before configuring Parrot. Get it from http://site.icu-project.org/download
 
-You also need Perl 5.8.0 or newer to run various configure and build scripts.
+You also need Perl 5.8.4 or newer, and Storable 2.12 or newer
+for running various configure and build scripts.
 
 For most of the platforms that we are supporting initially, Parrot should build
-out of the box.  The list of targeted platforms can be found in PLATFORMS.
-
-The current configure system is primitive, as it's only
-a temporary solution. It will be happy with most any answers
-you decide to feed it. Garbage In, Garbage Out.
+out of the box. docs/parrot.pod lists the core platforms. PLATFORMS provides
+reports on the platforms on which Parrot has been built and tested.
 
 INSTRUCTIONS
 ------------
@@ -58,27 +55,15 @@ module, platform files and many Makefiles.
 
 The file "myconfig" has an overview of configure settings.
 
-Next, run make:
-
-For UNIX like systems that come with its own make, 'gmake' should be
-used.  (On most Linux systems, this is the default make.)
-
-On windows systems, 'nmake' is used
-
-On other systems, just try 'make'
+Next, run make. (Configure.pl will tell you which version of make it
+recommends for your system.)
 
 Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
 (or something compatible with it).
 
-NOTE: If you have trouble linking parrot, this *may* be due to a pre-existing
-parrot version installed via 'make install'. Until this issue is resolved,
-you may have to delete the installed version of parrot before building a new
-one. Our apologies.
-
-You can test parrot by running
-
-    make test         (or nmake test or gmake test)
+You can test Parrot by running "make test". You can run the tests in parallel
+with "make TEST_JOBS=3 test".
 
 You can run the full test suite with
 
@@ -87,16 +72,14 @@ You can run the full test suite with
 Note: PLATFORMS contains notes about whether test failures are expected
 on your system.
 
-On some systems you can install parrot:
+You can install Parrot with:
 
     make install
 
-This installs a bunch of files in /usr/local. The parrot executable is in
-/usr/local/bin.   Please note that this feature is currently experimental.
+By default, this installs in /usr/local, with the Parrot executable in
+/usr/local/bin. If you want to install Parrot into another location use:
 
-If you want to install Parrot into a non-standard location use:
-
-    perl Configure.pl --prefix=/Users/foo/parrot-0.6.4
+    perl Configure.pl --prefix=/home/joe/bird
     make install
 
 But please note that dynamic libs will not be found for non-standard
@@ -109,14 +92,6 @@ files with the command:
 
     perldoc -F docs/intro.pod
 
-NOTES
------
-
-On some older computers with little RAM, the computed-goto dispatch core
-(ops/core_ops_cg.c) may take a while to compile or may fail to compile at all.
-You can pass a flag to Configure.pl (--cgoto=0) to disable the computed-goto
-core, at a slight cost in runtime speed.
-
 CHANGES
 -------
 
@@ -126,29 +101,24 @@ previous versions, please see NEWS.
 MAILING LISTS
 -------------
 
-The mailing list for parrot is parrot-porters.  Subscribe by sending mail to
-parrot-porters-subscribe@perl.org. It is archived at
-http://www.nntp.perl.org/group/perl.perl6.internals
-and available via NNTP at nntp://nntp.perl.org/perl.perl6.internals
+The Parrot user mailing list is parrot-users@lists.parrot.org. Subscribe by
+filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-users .
+The list is archived at http://lists.parrot.org/pipermail/parrot-users/ .
 
-You can also read the list via Google Groups at
-http://groups-beta.google.com/group/perl.perl6.internals
+For development discussions see the information in docs/gettingstarted.pod.
 
 FEEDBACK, PATCHES, etc.
-_______________________
+-----------------------
 
-See F<docs/submissions.pod> for more information on reporting bugs and
+See docs/submissions.pod for more information on reporting bugs and
 submitting patches.
 
 WEB SITES
 ---------
 
-The following web sites have all the Parrot information you need:
-    http://www.parrotcode.org/
-    http://www.perlfoundation.org/parrot/
-    http://dev.perl.org/perl6/
-    http://bugs6.perl.org/perl6/
-    http://pugscode.org/
+The following web sites have all the information you need about Parrot:
+    http://www.parrot.org/
+    http://trac.parrot.org/
 
 Have fun,
    The Parrot Team.

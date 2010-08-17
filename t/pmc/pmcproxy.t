@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2007-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -22,307 +16,207 @@ Tests the PMCProxy PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'new' );
-.sub 'test' :main
-    new $P0, 'PMCProxy'
-    say "ok 1 - $P0 = new 'PMCProxy'"
+.sub main :main
+    .include 'test_more.pir'
+    plan(45)
 
-    $I0 = isa $P0, 'PMCProxy'
-    if $I0 goto ok_2
-    print 'not '
-  ok_2:
-    say "ok 2 - isa $P0, 'PMCProxy'"
+    new_tests()
+    get_class_tests()
+    name_and_namespace_tests()
+    method_introspection_tests()
+    new_creates_pmc()
+    add_pmcproxy_as_parent()
+    non_vtable_method_override()
+    vtable_method_override()
+    self_calls_overridden_methods()
+    get_class_and_typeof_return_same_pmcproxy()
 .end
-CODE
-ok 1 - $P0 = new 'PMCProxy'
-ok 2 - isa $P0, 'PMCProxy'
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'get_class gives back Proxy PMC' );
-.sub 'test' :main
-push_eh nok_1
-    $P0 = get_class 'NameSpace'
-    pop_eh
-    goto ok_1
-nok_1:
-    print "not "
-ok_1:
-    print "ok 1 - get_class returned something\n"
+.sub new_tests
+    new $P0, ['PMCProxy']
+    ok(1, "new PMCProxy didn't explode")
+    isa_ok($P0, "PMCProxy")
 
-    $I0 = isa $P0, 'PMCProxy'
-    if $I0 goto ok_2
-    print 'not '
-  ok_2:
-    say "ok 2 - isa $P0, 'PMCProxy'"
+    $I0 = isa $P0, 'Foo'
+    is($I0, 0, "non-default isa on PMCProxy works")
 .end
-CODE
-ok 1 - get_class returned something
-ok 2 - isa $P0, 'PMCProxy'
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'Proxy PMC supplies name, namespace' );
-.sub 'test' :main
-push_eh nok_1
+
+.sub get_class_tests
+    .local int is_ok
     $P0 = get_class 'NameSpace'
-    pop_eh
-    goto ok_1
-nok_1:
-    print "not "
-ok_1:
-    print "ok 1 - get_class returned something\n"
+    ok(1, "get_class returned something")
+    isa_ok($P0, "PMCProxy")
+.end
 
+
+.sub name_and_namespace_tests
+    $P0 = get_class 'NameSpace'
+    ok(1, "get_class returned something")
     $S1 = $P0.'name'()
-    print $S1
-    print "\n"
-    print "ok 2 - got name\n"
+    is($S1, 'NameSpace', 'got name')
 
     $P1 = $P0.'get_namespace'()
-    $S1 = $P1
-    print $S1
-    print "\n"
-    print "ok 3 - got namespace\n"
+    is($P1, 'NameSpace', 'got namespace')
 .end
-CODE
-ok 1 - get_class returned something
-NameSpace
-ok 2 - got name
-NameSpace
-ok 3 - got namespace
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'Proxy PMC allows introspection of methods' );
-.sub 'test' :main
-push_eh nok_1
+
+.sub method_introspection_tests
     $P0 = get_class 'NameSpace'
-    pop_eh
-    goto ok_1
-nok_1:
-    print "not "
-ok_1:
-    print "ok 1 - get_class returned something\n"
+    ok(1, "get_class returned something")
 
     $P1 = $P0.'methods'()
-    print "ok 2 - got methods\n"
+    ok(1, "got methods")
 
     $I0 = exists $P1['export_to']
-    if $I0 goto ok_3
-    print "not "
-ok_3:
-    print "ok 3 - export_to method in the list\n"
+    is($I0, 1, "export_to method in the list")
 
     $I0 = exists $P1['get_name']
-    if $I0 goto ok_4
-    print "not "
-ok_4:
-    print "ok 4 - get_name method in the list\n"
+    is($I0, 1, "get_name method in the list")
 .end
-CODE
-ok 1 - get_class returned something
-ok 2 - got methods
-ok 3 - export_to method in the list
-ok 4 - get_name method in the list
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', '.new() creates a PMC' );
-.sub 'test' :main
-push_eh nok_1
+
+.sub new_creates_pmc
     $P0 = get_class 'ResizablePMCArray'
-    pop_eh
-    goto ok_1
-nok_1:
-    print "not "
-ok_1:
-    print "ok 1 - get_class returned something\n"
+    ok(1, "get_class returned something")
 
     $P1 = $P0.'new'()
-    print "ok 2 - created a PMC\n"
-
-    $I0 = isa $P1, 'ResizablePMCArray'
-    if $I0 goto ok_3
-    print "not "
-ok_3:
-    print "ok 3 - created the Right Thing\n"
+    ok(1, "created a PMC")
+    isa_ok($P1, 'ResizablePMCArray', 'created the Right Thing')
 .end
-CODE
-ok 1 - get_class returned something
-ok 2 - created a PMC
-ok 3 - created the Right Thing
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'can add_parent a ProxyPMC in a PDD15 class' );
-.sub 'test' :main
-    $P0 = new 'Class'
-    print "ok 1 - created a PDD15 class\n"
+
+.sub add_pmcproxy_as_parent
+    $P0 = new ['Class']
+    ok(1, 'created a PDD15 class')
 
     $P1 = get_class 'Hash'
-    print "ok 2 - got the PMCProxy for Hash\n"
+    ok(1, 'got the PMCProxy for Hash')
 
     addparent $P0, $P1
-    print "ok 3 - added Hash's PMCProxy as a parent of the PDD15 class\n"
+    ok(1, "added Hash's PMCProxy as a parent of the PDD15 class")
 
     $P2 = $P0.'new'()
-    print "ok 4 - instantiated the class\n"
+    ok(1, 'instantiated the class')
 .end
-CODE
-ok 1 - created a PDD15 class
-ok 2 - got the PMCProxy for Hash
-ok 3 - added Hash's PMCProxy as a parent of the PDD15 class
-ok 4 - instantiated the class
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'can call and override non-vtable methods of the PMC' );
-.sub 'test' :main
-    $P0 = new 'Class'
-    print "ok 1 - created a PDD15 class\n"
+
+.sub non_vtable_method_override
+    $P0 = new ['Class']
+    ok(1, 'ok 1 - created a PDD15 class')
 
     $P1 = get_class 'Class'
-    print "ok 2 - got the PMCProxy for Class\n"
+    ok(1, 'got the PMCProxy for Class')
 
     addparent $P0, $P1
-    print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
+    ok(1, "added Class's PMCProxy as a parent of the PDD15 class")
 
-    # We'll override the add_role method.
-    $P2 = get_global 'no_add_role'
+    #We'll override the add_role method.
+    $P2 = get_global 'no_add_role_non_vtable'
     $P0.'add_method'('add_role', $P2)
 
     $P2 = $P0.'new'()
-    print "ok 4 - instantiated the class\n"
+    ok(1, 'instantiated the class')
 
     $P2.'add_attribute'('foo')
-    print "ok 5 - called the add_attribute method of the PMC parent\n"
+    ok(1, 'called the add_attribute method of the PMC parent')
 
-    $P3 = new 'Role'
+    $P3 = new ['Role']
     $P2.'add_role'($P3)
-    print "ok 6 - overridden add_role method called\n"
+    ok(1, 'done with method call overridding')
 .end
-.sub no_add_role
-    print "No, you can't add a role!\n"
-.end
-CODE
-ok 1 - created a PDD15 class
-ok 2 - got the PMCProxy for Class
-ok 3 - added Class's PMCProxy as a parent of the PDD15 class
-ok 4 - instantiated the class
-ok 5 - called the add_attribute method of the PMC parent
-No, you can't add a role!
-ok 6 - overridden add_role method called
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'can call and override vtable methods of the PMC' );
-.sub 'test' :main
-    $P0 = new 'Class'
-    print "ok 1 - created a PDD15 class\n"
+.sub no_add_role_non_vtable
+    #XXX: If this fails to be overridden, the only indicator will be
+    #that the wrong number of tests ran.  It'd be better if a test tested that
+    #this sub was called.  The same applies to vtable_method_override.
+    ok(1, 'overridden add_role method called')
+.end
+
+
+.sub vtable_method_override
+    $P0 = new ['Class']
+    ok(1, 'created a PDD15 class')
 
     $P1 = get_class 'Class'
-    print "ok 2 - got the PMCProxy for Class\n"
+    ok(1, 'got the PMCProxy for Class')
 
     addparent $P0, $P1
-    print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
+    ok(1, "added Class's PMCProxy as a parent of the PDD15 class")
 
-    # We will override the add_role vtable method.
+    #We will override the add_role vtable
     $P2 = get_global 'no_add_role'
-    $P0.'add_method'('add_role', $P2, 'vtable' => 1)
-    print "ok 4 - overridden a vtable method\n"
+    $P0.'add_vtable_override'('add_role', $P2)
+    ok(1, 'overrode a vtable')
 
     $P2 = $P0.'new'()
-    print "ok 5 - instantiated the class\n"
+    ok(1, 'instantiated the class')
 
     addattribute $P2, 'foo'
-    print "ok 6 - called the add_attribute v-table method of the PMC parent\n"
+    ok(1, 'called the add_attribute v-table method of the PMC parent')
 
     $P3 = inspect $P2, "attributes"
     $I0 = elements $P3
-    if $I0 == 1 goto ok_7
-    print "not "
-ok_7:
-    print "ok 7 - the attribute was actually added\n"
+    is($I0, 1, "the attribute was actually added")
 
-    $P3 = new 'Role'
+    $P3 = new ['Role']
     addrole $P2, $P3
-    print "ok 8 - overridden add_role v-table method called\n"
+    ok(1, 'done with vtable override test')
 .end
-.sub no_add_role
-    print "No, you can't add a role by v-table either!\n"
+.sub no_add_role_vtable
+    ok(1, 'overridden add_role v-table method called')
 .end
-CODE
-ok 1 - created a PDD15 class
-ok 2 - got the PMCProxy for Class
-ok 3 - added Class's PMCProxy as a parent of the PDD15 class
-ok 4 - overridden a vtable method
-ok 5 - instantiated the class
-ok 6 - called the add_attribute v-table method of the PMC parent
-ok 7 - the attribute was actually added
-No, you can't add a role by v-table either!
-ok 8 - overridden add_role v-table method called
-OUT
 
-pir_output_is(
-    <<'CODE', <<'OUT', 'SELF in a PMC will call methods overridden in high level classes' );
-.sub 'test' :main
-    $P0 = new 'Class'
-    print "ok 1 - created a PDD15 class\n"
+
+.sub self_calls_overridden_methods
+    $P0 = new ['Class']
+    ok(1, 'created a PDD15 class')
 
     $P1 = get_class 'Class'
-    print "ok 2 - got the PMCProxy for Class\n"
+    ok(1, 'got the PMCProxy for Class')
 
     addparent $P0, $P1
-    print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
+    ok(1, "added Class's PMCProxy as a parent of the PDD15 class")
 
-    # We will override the inspect_str vtable method.
+    #We will override the inspect_str vtable
     $P2 = get_global 'always42'
-    $P0.'add_method'('inspect_str', $P2, 'vtable' => 1)
-    print "ok 4 - overridden inspect_str method\n"
+    $P0.'add_vtable_override'('inspect_str', $P2)
+    ok(1, 'overrode inspect_str method')
 
     $P2 = $P0.'new'()
-    print "ok 5 - instantiated the class\n"
+    ok(1, 'instantiated the class')
 
-    $P3 = $P2.inspect('methods')
-    print $P3
-    print "\nok 6 - Called non-overridden method, which called overridden vtable method\n"
+    $P3 = $P2.'inspect'('methods')
+    is($P3, 42, "the magic overriding sub was called")
+    ok(1, 'Called non-overridden method, which called overridden vtable')
 .end
-.sub always42 :method
+.sub always42 :method :nsentry('always42')
     .param string what
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
     .return($P0)
 .end
-CODE
-ok 1 - created a PDD15 class
-ok 2 - got the PMCProxy for Class
-ok 3 - added Class's PMCProxy as a parent of the PDD15 class
-ok 4 - overridden inspect_str method
-ok 5 - instantiated the class
-42
-ok 6 - Called non-overridden method, which called overridden vtable method
-OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'get_class and typeof should return the same PMCProxy - RT #56816');
-.sub 'main' :main
+
+.sub get_class_and_typeof_return_same_pmcproxy
     $P0 = get_class 'Integer'
     $P1 = new $P0
     $P2 = typeof $P1
 
     $I0 = issame $P0, $P2
-    say $I0                  # should be 1
+    is($I0, 1, "PMCs made with 'new' and 'typeof' are the same")
 
     $P3 = typeof $P1
     $P4 = typeof $P1
 
     $I0 = issame $P3, $P4
-    say $I0                  # should be 1
-    say $P3
-    say $P4
+    is($I0, 1, "PMCs have the same types")
+    is($P3, "Integer", "P3 is an Integer")
+    is($P4, "Integer", "P4 is also an Integer")
 .end
-CODE
-1
-1
-Integer
-Integer
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

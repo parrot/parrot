@@ -1,5 +1,5 @@
-# Copyright (C) 2008, The Perl Foundation.
-# $Id $
+# Copyright (C) 2008, Parrot Foundation.
+# $Id$
 
 
 =head1 NAME
@@ -10,14 +10,13 @@ config/auto/opengl.pm - Probe for OpenGL, GLU, and GLUT libraries
 =head1 DESCRIPTION
 
 Determines whether the platform supports OpenGL, GLU and GLUT.  The optimal
-result at this time is to find OpenGL 2.1, GLU 1.3, and GLUT API version 4.
+result at this time is to find OpenGL 3.2, GLU 1.3, and GLUT API version 4.
 
 You will typically need to install the headers and libraries required for
 compiling OpenGL/GLU/GLUT applications as a separate step in addition to
 the base development tools for your platform.  The following sections detail
 the steps needed to add OpenGL support for each platform for which we have
 received this information -- details for additional platforms are welcome!
-
 
 =head2 Mac OS X
 
@@ -86,8 +85,13 @@ F<nvidia-devel> (?)
 
 =head2 Windows
 
-On Windows, Parrot supports three different compiler environments, each of
-which has different requirements for OpenGL support:
+On Windows, Parrot supports four different compiler environments, each of
+which has different requirements for OpenGL support.  Generally you should not
+attempt to mix the Cygwin variants (installing some X OpenGL libs and some
+w32api OpenGL libs) as this will almost certainly result in runtime errors
+like this one:
+
+    freeglut ERROR: Function <glutDisplayFunc> called without first calling 'glutInit'.
 
 
 =head3 MSVC
@@ -107,12 +111,27 @@ F<GLUT for Win32> (L<http://www.xmission.com/~nate/glut.html>)
 
 =head3 MinGW
 
- XXXX: No details yet
+GLUT 3.7.6,
+see L<http://www.transmissionzero.co.uk/computing/using-glut-with-mingw/>.
 
 
-=head3 cygwin
+=head3 Cygwin/X
 
- XXXX: No details yet
+Requires an X server and F<libglut-devel>, F<libGL-devel>, F<libGLU-devel>,
+F<freeglut> and its dependencies.
+
+This is tried first.
+
+
+=head3 Cygwin/w32api
+
+Requires the F<opengl> and F<w32api> packages.
+
+Cygwin/w32api for native opengl support is only tried if
+F</usr/include/GL> does not exist.  The problem is that the OpenGL header files
+are used to create the OpenGL function list, and not the libraries themselves.
+If the F</usr/include/GL> headers are found these are used, even if the w32api
+GLUT libraries are defined.
 
 
 =cut
@@ -131,7 +150,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your platform supports OpenGL};
+    $data{description} = q{Does your platform support OpenGL};
     $data{result}      = q{};
     return \%data;
 }
@@ -139,75 +158,58 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-opengl
-        |
-    );
+    my $without = $conf->options->get( qw| without-opengl | );
 
-    if ($without) {
-        $conf->data->set( has_opengl => 0 );
-        $self->set_result('no');
-        return 1;
-    }
+    return $self->_handle_no_opengl($conf) if $without;
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
+    my $osname = $conf->data->get('osname');
 
-    my $osname = $conf->data->get_p5('OSNAME');
-
-    $self->_add_to_libs( {
-        conf            => $conf,
-        osname          => $osname,
-        cc              => $cc,
-        win32_gcc       => '-lglut32 -lglu32 -lopengl32',
-        win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',
-        darwin          => '-framework OpenGL -framework GLUT',
-        default         => '-lglut -lGLU -lGL',
+    my $extra_libs = $self->_select_lib( {
+            conf            => $conf,
+            osname          => $osname,
+            cc              => $conf->data->get('cc'),
+            ($^O eq 'cygwin') ?  # Cygwin/X is used when /usr/include/GL is found
+             (-d '/usr/include/GL'
+                ? (cygwin => '-lglut -L/usr/X11R6/lib -lGLU -lGL')
+                : (cygwin => '-lglut32 -lglu32 -lopengl32'))
+             : (),
+            win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+            win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',
+            darwin          => '-framework OpenGL -framework GLUT',
+            default         => '-lglut -lGLU -lGL',
     } );
 
-    # On OS X check the presence of the OpenGL headers in the standard
-    # Fink/macports locations.
-    # Mindlessly morphed from readline ... may need to be fixed
-    $self->_handle_darwin_for_fink    ($conf, $osname, 'GL/glut.h');
-    $self->_handle_darwin_for_macports($conf, $osname, 'GL/glut.h');
-
-    $conf->cc_gen('config/auto/opengl/opengl.in');
+    $conf->cc_gen('config/auto/opengl/opengl_c.in');
     my $has_glut = 0;
-    eval { $conf->cc_build() };
-    if ( !$@ ) {
+    eval { $conf->cc_build( q{}, $extra_libs ) };
+    if ( $@ ) {
+        return $self->_handle_no_opengl($conf);
+    }
+    else {
         my $test = $conf->cc_run();
-        $has_glut = _handle_glut($conf, $self->_evaluate_cc_run($test, $verbose));
+        return _handle_glut($conf, $extra_libs, $self->_evaluate_cc_run($conf, $test));
     }
-    unless ($has_glut) {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-    }
-
-    return 1;
 }
 
 sub _evaluate_cc_run {
-    my ($self, $test, $verbose) = @_;
+    my ($self, $conf, $test) = @_;
     my ($glut_api_version, $glut_brand) = split ' ', $test;
 
-    print " (yes, $glut_brand API version $glut_api_version) " if $verbose;
+    $conf->debug(" (yes, $glut_brand API version $glut_api_version) ");
     $self->set_result("yes, $glut_brand $glut_api_version");
 
     return ($glut_api_version, $glut_brand);
 }
 
 sub _handle_glut {
-    my ($conf, $glut_api_version, $glut_brand) = @_;
+    my ($conf, $libs, $glut_api_version, $glut_brand) = @_;
 
     $conf->data->set(
         # Completely cargo culted
         opengl     => 'define',
         has_opengl => 1,
         HAS_OPENGL => 1,
+        opengl_lib => $libs,
 
         glut       => 'define',
         glut_brand => $glut_brand,
@@ -217,6 +219,24 @@ sub _handle_glut {
 
     return 1;
 }
+
+sub _handle_no_opengl {
+    my ($self, $conf) = @_;
+
+    $conf->data->set(
+        has_opengl => 0,
+        HAS_OPENGL => 0,
+        opengl_lib => '',
+
+        has_glut   => 0,
+        HAS_GLUT   => 0,
+    );
+
+    $self->set_result('no');
+
+    return 1;
+}
+
 
 1;
 

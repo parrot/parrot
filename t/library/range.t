@@ -1,5 +1,5 @@
-#! parrot
-# Copyright (C) 2007-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -17,8 +17,8 @@ Tests the Range class.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
-    load_bytecode 'Range.pir'
+    .include 'test_more.pir'
+    load_bytecode 'Range.pbc'
 
     plan(78)
 

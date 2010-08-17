@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::Combiner - combines different streams to a single stream.
+Stream;Combiner - combines different streams to a single stream.
 
 =head1 VERSION
 
@@ -29,13 +29,13 @@ TBD
     .local pmc base
     .local pmc comb
 
-    $P0 = get_class 'Stream::Combiner'
+    $P0 = get_class ['Stream'; 'Combiner']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    get_class base, "Stream::Base"
-    subclass comb, base, "Stream::Combiner"
+    get_class base, ['Stream'; 'Base']
+    subclass comb, base, ['Stream'; 'Combiner']
 
     addattribute comb, "combiner"
 END:
@@ -52,11 +52,11 @@ END:
 
 .include "iterator.pasm"
 
-.namespace ["Stream::Combiner"]
+.namespace ['Stream'; 'Combiner']
 
 .sub init :vtable :method
 
-    .const .Sub temp = "_default_combiner"
+    .const 'Sub' temp = "_default_combiner"
     self."combiner"( temp )
 
     temp = new 'ResizablePMCArray'
@@ -118,8 +118,7 @@ Returns 1 if all assigned sources are connected, 0 otherwise.
     if i == 0 goto NOT_CONNECTED
 
     # create an iterator for the sources
-    new sources, 'Iterator', sources
-    set sources, .ITERATE_FROM_START
+    sources = iter sources
 
 LOOP:
     # stream is connected if no sources are left
@@ -162,8 +161,7 @@ Reads from all assigned sources and calls the combiner.
     if i == 0 goto END_OF_STREAM
 
     # create an iterator for the sources
-    new sources, 'Iterator', sources
-    set sources, .ITERATE_FROM_START
+    sources = iter sources
 
     # create the string array
     new args, 'ResizableStringArray'
@@ -204,7 +202,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

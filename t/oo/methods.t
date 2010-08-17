@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2007 - 2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -22,98 +16,142 @@ Tests features related to the creation, addition, and execution of OO methods.
 
 =cut
 
-my $external_lib = "method_library.pir";
-my $filehandle;
-open $filehandle, '>', "$external_lib" or die "Can't write $external_lib";
-print $filehandle <<'EOF';
-    .namespace ['Foo']
+.const string library_file = "method_library.pir"
 
+.sub main :main
+    .include 'test_more.pir'
+
+    create_library()
+
+    plan(6)
+
+    loading_methods_from_file()
+    loading_methods_from_eval()
+    overridden_find_method()
+
+    overridden_core_pmc()
+
+    try_delete_library()
+
+.end
+
+.sub create_library
+    .local pmc file
+
+    file = new ['FileHandle']
+    file.'open'(library_file, 'w')
+
+    $S0 = <<'END'
+    .namespace['Foo']
     .sub 'bar_method' :method
-        say 'in bar_method'
+        .return (1)
     .end
-EOF
-close $filehandle;
+END
 
-pir_output_is( <<'CODE', <<'OUT', 'loading a set of methods from a file' );
-.sub 'main' :main
+    print file, $S0
+    file.'close'()
+
+.end
+
+.sub try_delete_library
+    .local pmc os
+    $P0 = loadlib 'os'
+    unless $P0 goto no_os
+    os = new 'OS'
+    os.'rm'(library_file)
+    .return ()
+
+  no_os:
+    $S1 = concat "WARNING: could not delete test file `", library_file
+    $S1 = concat $S1, "' because the OS PMC is unavailable"
+    diag($S1)
+.end
+
+.sub loading_methods_from_file
     $P0 = newclass 'Foo'
     $P1 = new 'Foo'
-    $P1.'foo_method'()
+    $I0 = $P1.'foo_method'()
+    ok ($I0, 'calling foo_method')
 
-    load_bytecode 'method_library.pir'
+    load_bytecode library_file
     $P1 = new 'Foo'
-    $P1.'bar_method'()
+    $I0 = $P1.'bar_method'()
+    ok ($I0, 'calling bar_method')
+    $P0 = null
 .end
 
 .namespace ['Foo']
 .sub 'foo_method' :method
-    say 'in foo_method'
+    .return (1)
 .end
-CODE
-in foo_method
-in bar_method
-OUT
+.namespace []
 
-unlink $external_lib;
+.sub loading_methods_from_eval
+    $P0 = newclass 'Bar'
+    $P1 = new 'Bar'
 
-pir_output_is( <<'CODE', <<'OUT', "loading a set of methods from eval'd code" );
-.sub 'main' :main
-    $P0 = newclass 'Foo'
-    $P1 = new 'Foo'
-    $P1.'foo_method'()
+    $I0 = $P1.'foo_method'()
+    ok ($I0, 'calling foo_method')
 
     $S2 = <<'END'
-        .namespace ['Foo']
+        .namespace ['Bar']
         .sub 'bar_method' :method
-            say 'in bar_method'
+            .return (1)
         .end
 END
     $P2 = compreg 'PIR'
     $P2($S2)
 
-    $P1 = new 'Foo'
-    $P1.'bar_method'()
+    $P1 = new 'Bar'
+    $I0 = $P1.'bar_method'()
+    ok ($I0, 'calling bar_method')
 .end
 
-.namespace ['Foo']
+.namespace ['Bar']
 .sub 'foo_method' :method
-    say 'in foo_method'
+    .return (1)
 .end
-CODE
-in foo_method
-in bar_method
-OUT
+.namespace []
 
-pir_output_is( <<'CODE', <<'OUT', "overridden find_method() should not eat passed-in args (RT #48134)" );
-.sub 'main' :main
+.sub overridden_find_method
     $P0 = newclass 'Obj'
     $P2 = new 'Obj'
-    $P2.'some_method'(42)
+    $I0 = $P2.'some_method'(42)
+    is ($I0, 42, 'calling overriden method')
 .end
 
 .namespace ['Obj']
 
 .sub 'meth' :method
     .param pmc a
-    say a
+    .return (a)
 .end
 
 .sub 'find_method' :vtable :method
     .param string meth_name
 
-    say meth_name
-
-    .const .Sub meth = 'meth'
+    .const 'Sub' meth = 'meth'
     .return (meth)
 .end
-CODE
-some_method
-42
-OUT
+
+.namespace []
+
+.sub 'overridden_core_pmc'
+    .local string msg
+    msg = "able to invoke overridden method on core PMC (TT #1596)"
+    $P0 = new 'ResizablePMCArray'
+    $I0 = $P0.'foo'()
+    is($I0, 1, msg)
+    .return()
+.end
+
+.namespace ['ResizablePMCArray']
+.sub 'foo' :method
+    .return(1)
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

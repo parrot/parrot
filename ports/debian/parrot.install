@@ -1,6 +1,0 @@
-usr/bin/parrot
-usr/bin/disassemble
-usr/bin/pbc_info
-usr/bin/pbc_merge
-usr/bin/pdump
-usr/lib/parrot/*

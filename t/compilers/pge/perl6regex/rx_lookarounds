@@ -28,12 +28,14 @@ $ <after ^a>		a		y				lookbehind <after>
 <+[a..z]>+		az		y				metasyntax with leading + (<+...>)
 <+alpha>+		az		y				metasyntax with leading + (<+...>)
 
-<null>			''		y		null pattern (<null>)
-^ <null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<null>: < @ 0>/	null pattern (<null>)
-<null> $	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<null>: < @ 65>/	null pattern (<null>)
-abc <null> def	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y			null pattern (<null>)
-x | y | <null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y			null pattern (<null>)
-x | y | <?null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y			null pattern (<null>)
+<?>			''		y		null pattern (<?>)
+^ <?>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y	null pattern (<?>)
+<?> $		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y	null pattern (<?>)
+abc <?> def	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y	null pattern (<?>)
+x | y | <?>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y	null pattern (<?>)
+x | y | <?>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y	null pattern (<?>)
+
+abc <!> def	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	n	fail pattern <!>
 
 a[b}		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/rule error/	mismatched close
 

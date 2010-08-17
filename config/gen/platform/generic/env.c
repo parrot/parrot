@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -26,18 +26,19 @@ Environment manipulation stuff
 
 /*
 
-=item C<void
-Parrot_setenv(const char *name, const char *value)>
+=item C<void Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)>
 
-RT#48260: Not yet documented!!!
+Set up Environment vars
 
 =cut
 
 */
 
 void
-Parrot_setenv(const char *name, const char *value)
+Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 {
+    char * const name  = Parrot_str_to_cstring(interp, str_name);
+    char * const value = Parrot_str_to_cstring(interp, str_value);
 #ifdef PARROT_HAS_SETENV
     setenv(name, value, 1);
 #else
@@ -55,48 +56,50 @@ Parrot_setenv(const char *name, const char *value)
     strcpy(envs + name_len + 1, value);
 
     putenv(envs);
-
-    /* The buffer is intentionally not freed! */
 #endif
+    Parrot_str_free_cstring(name);
+    Parrot_str_free_cstring(value);
 }
 
 /*
 
-=item C<void
-Parrot_unsetenv(const char *name)>
+=item C<void Parrot_unsetenv(PARROT_INTERP, STRING *str_name)>
 
-RT#48260: Not yet documented!!!
+UnSet Environment vars
 
 =cut
 
 */
 
 void
-Parrot_unsetenv(const char *name)
+Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 {
 #ifdef PARROT_HAS_UNSETENV
+    char * const name = Parrot_str_to_cstring(interp, str_name);
     unsetenv(name);
+    Parrot_str_free_cstring(name);
 #else
-    Parrot_setenv(name, "");
+    Parrot_setenv(interp, str_name, Parrot_str_new(interp, "", 0));
 #endif
 }
 
 /*
 
-=item C<char *
-Parrot_getenv(const char *name, int *free_it)>
+=item C<char * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
 
-RT#48260: Not yet documented!!!
+Get Environment vars
 
 =cut
 
 */
 
 char *
-Parrot_getenv(const char *name, int *free_it)
+Parrot_getenv(PARROT_INTERP, STRING *str_name)
 {
-    *free_it = 0;
-    return getenv(name);
+    char * const name  = Parrot_str_to_cstring(interp, str_name);
+    char        *value = getenv(name);
+    Parrot_str_free_cstring(name);
+    return value;
 }
 
 /*

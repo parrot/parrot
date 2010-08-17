@@ -1,9 +1,13 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
 t/configure/testlib/inter/theta.pm - Module used in configuration tests
+
+=head1 DESCRIPTION
+
+Nonsense module used only in testing the configuration system.
 
 =cut
 

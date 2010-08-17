@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,8 +20,9 @@ use base qw(Parrot::Configure::Step);
 
 use Config;
 use FindBin;    # see build_dir
-use Parrot::Configure::Step;
 use Parrot::BuildUtil;
+use Parrot::Configure::Step;
+use Parrot::Harness::DefaultTests ();
 use Cwd qw(abs_path);
 use File::Spec;
 
@@ -29,7 +30,7 @@ use File::Spec;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Setting up Configure's default values};
+    $data{description} = q{Set Configure's default values};
     $data{result}      = q{};
     return \%data;
 }
@@ -45,7 +46,11 @@ sub runstep {
     # the corresponding values in the Parrot::Configure object.  In
     # order to provide access to the original values from Perl 5
     # %Config, we grab those settings we need now and store them in
-    # special keys within the Parrot::Configure object.
+    # special keys within the Parrot::Configure object.  We label these keys
+    # '_provisional' to alert users that these should only be used during
+    # configuration and testing of configuration steps.  They should not be
+    # used during Parrot's build, nor should they be used in 'make test'.
+    #
     # This is a multi-stage process.
 
     # Stage 1:
@@ -53,13 +58,13 @@ sub runstep {
         archname
         ccflags
         d_socklen_t
-        longsize
         optimize
-        sig_name
         scriptdirexp
-        use64bitint
+        sig_name
+        sPRIgldbl
+        sPRIgldbl
     | ) {
-        $conf->data->set_p5( $orig => $Config{$orig} );
+        $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
     }
 
     # Stage 2 (anticipating needs of config/auto/headers.pm):
@@ -70,33 +75,36 @@ sub runstep {
     # Stage 3 (Along similar lines, look up values from Perl 5 special
     # variables and stash them for later lookups.  Name them according
     # to their 'use English' names as documented in 'perlvar'.)
-    $conf->data->set_p5( OSNAME => $^O );
+    $conf->data->set( OSNAME_provisional => $^O );
 
+    my $ccdlflags = $Config{ccdlflags};
+    $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
+
+    # escape spaces in build directory
+    my $build_dir =  abs_path($FindBin::Bin);
+    $build_dir    =~ s{ }{\\ }g;
+
+    my $cc_option = $conf->options->get('cc');
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
-        build_dir => abs_path($FindBin::Bin),
+        build_dir => $build_dir,
+        configured_from_file =>
+            $conf->options->get('configured_from_file') || '',
+        configuration_steps => ( join q{ } => $conf->get_list_of_steps() ),
 
         # Compiler -- used to turn .c files into object files.
         # (Usually cc or cl, or something like that.)
-        cc      => $Config{cc},
-        ccflags => $Config{ccflags},
-        ccwarn  => exists( $Config{ccwarn} ) ? $Config{ccwarn} : '',
+        cc      => $cc_option ? $cc_option : $Config{cc},
+        # If we specify a compiler, we can't use existing ccflags.
+        ccflags => $cc_option ? ''         : $Config{ccflags},
+        ccwarn  => '',
 
         # Flags used to indicate this object file is to be compiled
         # with position-independent code suitable for dynamic loading.
         cc_shared => $Config{cccdlflags},    # e.g. -fpic for GNU cc.
-
-        # C++ compiler -- used to compile parts of ICU.  ICU's configure
-        # will try to find a suitable compiler, but it prefers GNU c++ over
-        # a system c++, which might not be appropriate.  This setting
-        # allows you to override ICU's guess, but is otherwise currently
-        # unset.  Ultimately, it should be set to whatever ICU figures
-        # out, or parrot should look for it and always tell ICU what to
-        # use.
-        cxx => 'c++',
 
         # Linker, used to link object files (plus libraries) into
         # an executable.  It is usually $cc on Unix-ish systems.
@@ -109,7 +117,7 @@ sub runstep {
         # Linker Flags to have this binary work with the shared and dynamically
         # loadable libraries we're building.  On HP-UX, for example, we need to
         # allow dynamic libraries to access the binary's symbols
-        link_dynamic => $Config{ccdlflags},    # e.g. -Wl,-E on HP-UX
+        link_dynamic => $ccdlflags,    # e.g. -Wl,-E on HP-UX
 
         # ld: Tool used to build shared libraries and dynamically loadable
         # modules. Often $cc on Unix-ish systems, but apparently sometimes
@@ -128,7 +136,7 @@ sub runstep {
 
         libs => $Config{libs},
 
-        cc_inc     => "-I./include",
+        cc_inc     => "-I./include -I./include/pmc",
         cc_debug   => '-g',
         link_debug => '',
 
@@ -176,13 +184,18 @@ sub runstep {
         libparrot_soname => '',
 
         perl      => $^X,
-        perl_inc  => $self->find_perl_headers(),
         test_prog => 'parrot',
+
+        # some utilities in Makefile
+        cat       => '$(PERL) -MExtUtils::Command -e cat',
+        chmod     => '$(PERL) -MExtUtils::Command -e chmod',
+        cp        => '$(PERL) -MExtUtils::Command -e cp',
+        mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
+        mv        => '$(PERL) -MExtUtils::Command -e mv',
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
-        mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
-        chmod     => '$(PERL) -MExtUtils::Command -e ExtUtils::Command::chmod',
+
         ar        => $Config{ar},
         ar_flags  => 'cr',
 
@@ -197,9 +210,6 @@ sub runstep {
         make_set_make => $Config{make_set_make},
         make_and      => '&&',
 
-        # for cygwin
-        cygchkdll => '',
-
         # make_c: Command to emulate GNU make's C<-C directory> option:  chdir
         # to C<directory> before executing $(MAKE)
         make_c => '$(PERL) -e \'chdir shift @ARGV; system q{$(MAKE)}, @ARGV; exit $$? >> 8;\'',
@@ -208,8 +218,6 @@ sub runstep {
         platform_asm => 0,
         as           => 'as',    # assembler
 
-        cp    => '$(PERL) -MExtUtils::Command -e cp',
-        mv    => '$(PERL) -MExtUtils::Command -e mv',
         lns   => $Config{lns},                          # soft link
         slash => '/',
 
@@ -232,12 +240,17 @@ sub runstep {
         # Extra flags needed for libnci_test.so
         ncilib_link_extra => '',
 
+        # Flag determines if pmc2c.pl and ops2c.pl also
+        # generate #line directives. These can confuse
+        # debugging internals.
+        no_lines_flag => $conf->options->get('no-line-directives') ? '--no-lines' : '',
+
+        tempdir => File::Spec->tmpdir,
+
+        PKGCONFIG_DIR => $conf->options->get('pkgconfigdir') || '',
     );
 
-    # add profiling if needed
-    # RT#41497 gcc syntax
-    # we should have this in the hints files e.g. cc_profile
-    # RT#41496 move profiling to it's own step
+    # TT #855:  Profiling options are too specific to GCC
     if ( $conf->options->get('profile') ) {
         $conf->data->set(
             cc_debug => " -pg ",
@@ -245,19 +258,24 @@ sub runstep {
         );
     }
 
+    $conf->data->set( clock_best => "" );
+
     $conf->data->set( 'archname', $Config{archname});
+
+    $conf->data->set( has_extra_nci_thunks => 1 );
+    $conf->data->set( HAS_EXTRA_NCI_THUNKS => 1 );
+    if ( $conf->options->get( 'without-extra-nci-thunks' ) ) {
+        $conf->data->set( has_extra_nci_thunks => 0 );
+        $conf->data->set( HAS_EXTRA_NCI_THUNKS => 0 );
+    }
+
     # adjust archname, cc and libs for e.g. --m=32
-    # RT#41499 this is maybe gcc only
-    # RT#41500 adjust lib install-path /lib64 vs. lib
     # remember corrected archname - jit.pm was using $Config('archname')
     _64_bit_adjustments($conf);
 
-    return 1;
-}
+    _set_default_tests($conf);
 
-sub find_perl_headers {
-    my $self = shift;
-    return File::Spec->catdir( $Config::Config{archlib}, 'CORE' );
+    return 1;
 }
 
 sub _64_bit_adjustments {
@@ -269,7 +287,7 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            for my $cc qw(cc cxx link ld) {
+            for my $cc qw(cc link ld) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }
 
@@ -283,6 +301,20 @@ sub _64_bit_adjustments {
         $conf->data->set( 'archname', $archname );
     }
     return 1;
+}
+
+sub _set_default_tests {
+    my $conf = shift;
+    $conf->data->set( 'runcore_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::runcore_tests ) );
+    $conf->data->set( 'core_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::core_tests ) );
+    $conf->data->set( 'library_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::library_tests ) );
+    $conf->data->set( 'configure_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::configure_tests ) );
+    $conf->data->set( 'developing_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::developing_tests ) );
 }
 
 1;

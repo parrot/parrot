@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 31;
 use Carp;
 use Cwd;
 use File::Basename qw(basename dirname);
@@ -15,12 +15,10 @@ use lib qw( lib t/configure/testlib );
 use IO::CaptureOutput qw | capture |;
 use Tie::Filehandle::Preempt::Stdin;
 
-BEGIN { use_ok('Parrot::Configure::Utils') }
+BEGIN { use Parrot::Configure::Utils; }
 
 Parrot::Configure::Utils->import(@Parrot::Configure::Utils::EXPORT_OK);
 can_ok( __PACKAGE__, @Parrot::Configure::Utils::EXPORT_OK );
-
-# RT#44455 add verbose tests with some Test::Warn like mechanism
 
 my $cwd = cwd();
 my ( @prompts, $object, $cc, $nonexistent, $command );
@@ -55,7 +53,7 @@ untie *STDIN;
 
 # file_checksum(), not exported
 
-$nonexistent = q{foobar};
+$nonexistent = $$;
 eval { my $sum = Parrot::Configure::Utils::file_checksum($nonexistent); };
 like(
     $@, qr/Can't open $nonexistent/,    #'
@@ -141,7 +139,10 @@ like(
 
 {
     my %tf_params = ( UNLINK => 1, );
-    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    $tf_params{SUFFIX} = '.exe' if (
+        ( $^O eq 'MSWin32' ) ||
+        ( $^O eq 'cygwin'  )
+    );
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname($fname);
@@ -153,7 +154,10 @@ like(
 
 {
     my %tf_params = ( UNLINK => 1, );
-    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    $tf_params{SUFFIX} = '.exe' if (
+        ( $^O eq 'MSWin32' ) ||
+        ( $^O eq 'cygwin'  )
+    );
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname($fname);
@@ -175,7 +179,10 @@ like(
 
 {
     my %tf_params = ( UNLINK => 1, );
-    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    $tf_params{SUFFIX} = '.exe' if (
+        ( $^O eq 'MSWin32' ) ||
+        ( $^O eq 'cygwin'  )
+    );
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname($fname);

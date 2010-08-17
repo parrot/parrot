@@ -1,0 +1,20 @@
+/*
+  Copyright (C) 2009, Parrot Foundation.
+  $Id$
+*/
+
+#include <stdio.h>
+
+int
+main(int argc, char* argv[])
+{
+    printf("%.0f", -0.0);
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

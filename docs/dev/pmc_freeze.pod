@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -58,10 +58,10 @@ destroyed in an appropriate order. This is also called on interpreter shutdown.
 
 =item mark
 
-Mark all objects as being live by calling B<pobject_lives> called from DOD.
+Mark all objects as being live by calling B<Parrot_gc_mark_PObj_alive> called from GC.
 While the functionality is the same, it will not be implemented on top of this
 general scheme for performance reasons. This leads to some code duplication,
-but DOD is run permanently and deserves all the speed it can get.
+but GC is run permanently and deserves all the speed it can get.
 
 =back
 
@@ -79,34 +79,17 @@ The basic scheme of operation looks like this:
 =head2 The visit_info structure
 
 This structure holds all necessary information and function pointers specific
-to the desired functionality. It gets passed on to all vtable methods and
+to the desired functionality. It gets passed on to all vtable functions and
 callback functions.
 
-=head2 Working loops
-
-These are labeled B<visit_loop_*>. There are currently two schemes to handle
-the B<todo_list>.
+=head2 Working loop
 
 =over 4
-
-=item next_for_GC
-
-All PMCs that can contain other PMCs have the B<next_for_GC> pointer in the
-PMC's extended data area. The B<todo_list> gets built by appending (or        
-prepending) the current PMC to a B<mark_ptr>, which then points to the current
-PMC, forming a linked list of items.
-
-This pointer is also used during DOD's B<mark()> functionality, so that DOD has
-to be turned off during operations using this scheme.
-
-As the B<next_for_GC> pointer is inside the PMC, this scheme isn't thread-safe
-at low-level, because shared PMCs also would share this pointer, so that there
-can be only one operation at a time.
 
 =item todo list
 
 A B<List> called B<todo> holds items still to be worked on. This method is
-slower and consumes more resources, but doesn't interfere with DOD runs and is
+slower and consumes more resources, but doesn't interfere with GC runs and is
 thread-safe.
 
 =back
@@ -116,10 +99,7 @@ thread-safe.
 This is done by a callback function inside the B<visit_info> structure called
 B<visit_pmc_now>. It gets called initially to put the first item on the list
 and is called thereafter from all PMCs for contained PMCs inside the B<visit>
-vtable method.
-
-There is another callback B<visit_pmc_later> which adds PMCs to the todo list
-for later processing, but doesn't do any action on these immediately.
+vtable function.
 
 
 =head2 The visit() vtable
@@ -154,60 +134,25 @@ this PMC. While this is straight forward, it consumes 16 bytes per PMC (plus
 overhead, 32-bit system assumed). Hash lookups also take a considerable
 amount of time.
 
-=item B<next_for_GC>
-
-The pointer used for the B<todo_list> handling itself can serve as a marker
-that this item was already processed. There are some issues with this though:
-Plain scalars (not being able to contain other PMCs) don't have a
-B<next_for_GC> pointer. This is an optimization reducing the size of scalars
-and increasing performance considerably.
-
-Second, the B<next_for_GC> pointers have to be cleared beforehand. DOD uses
-only a nibble-sized flag area located inside the PMCs arena to manage, if a PMC
-was seen already by checking the live bit. The B<next_for_GC> pointer is just
-set and never cleared to avoid touching a PMCs memory and polluting caches when
-possible.
-
-Finally, generating a PMC's B<id> isn't as simple as just incrementing a
-counter used with the B<seen> hash approach.
-
-=item PMC B<id>s
-
-We could of course use the PMC's address as its own B<id>, since we know it is
-unique. However, this is suboptimal for thawing.  To manage duplicates during
-B<thaw> we basically need a mapping B<PMC_in_image =E<gt>
-newly_constructed_PMC>. When now the B<PMC_in_image> (the B<id>) is the
-address, we have to use a hash again, for B<thaw()> with all the negative
-impact on resources and speed.
-
-So both schemes are using small B<id> values and the seen handling inside
-B<thaw> is done via a list lookup, which is a lot faster and takes less
-resources.
-
-The B<seen> hash approach just has a counter for PMC B<id>s, the B<next_for_GC>
-approach calculates the B<id> from the address of the PMC in its arena, again
-yielding a small and unique number. The two low bits of PMC B<id>s are used as
-flags.
-
 =back
 
 =head2 The actual action
 
 So after all we finally arrived at the point to actually perform the desired
 functionality. First the PMC-specific part is done inside F<pmc_freeze.c> then
-the specific vtable method B<freeze>, B<thaw>, whatever, is called, again via a
-function pointer called B<visit_action>.
+the specific vtable function B<freeze>, B<thaw>, whatever, is called, again
+via a function pointer called B<visit_action>.
 
 =head1 Freeze and thaw
 
 As stated PMCs are currently processed inside the core, PMC-specific parts are
-done by calling the PMCs vtable method. This parts could of course be moved to
+done by calling the PMCs vtable function. This parts could of course be moved to
 F<default.pmc> too, so that it's simpler to override the functionality.
 
 =head2 Serializer interface
 
 During initialization the B<visit_info>s B<image_io> data pointer is filled
-with an object having B<vtable> methods that remarkably look like a PMCs
+with an object having B<vtable> functions that remarkably look like a PMCs
 vtable. So B<io-E<gt>vtable-E<gt>push_integer> spits out an INTVAL to the
 frozen B<image>, while B<shift_integer> gets an INTVAL from the frozen stream.
 
@@ -290,4 +235,3 @@ Leopold Toetsch C<lt@toetsch.at>
 =cut
 
 # vim: expandtab shiftwidth=2 tw=70:
-

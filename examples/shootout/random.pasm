@@ -1,4 +1,6 @@
-#!./parrot -j
+#!./parrot -R jit
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
 #
 # random.pasm N         (N = 900000 for shootout)
 # by Joshua Isom
@@ -8,6 +10,7 @@
 # N2 is the argument for gen_random
 # N3 is the return from gen_random
 main:
+    new P10, 'ResizableIntegerArray'
     get_params "0", P0
     elements I0, P0
     eq I0, 2, hasargs
@@ -21,7 +24,7 @@ argsdone:
     unless I1, ex
     set N2, 100.0
 while_1:
-    bsr gen_random
+    local_branch P10, gen_random
     dec I1
     if I1, while_1
     new P0, 'FixedFloatArray'
@@ -43,5 +46,10 @@ gen_random:
     set N1, I0
     mul N3, N2, N1
     div N3, .IM
-    ret
+    local_return P10
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

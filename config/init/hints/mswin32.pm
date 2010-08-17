@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 package init::hints::mswin32;
@@ -13,16 +13,18 @@ sub runstep {
     my $libs      = $conf->option_or_data('libs');
     my $ccflags   = $conf->option_or_data('ccflags');
     my $cc        = $conf->option_or_data('cc');
+    my $share_ext = $conf->option_or_data('share_ext');
+    my $version   = $conf->option_or_data('VERSION');
 
     # Later in the Parrot::Configure::runsteps() process,
     # inter::progs will merge the command-line overrides with the defaults.
     # We do one bit of its work early here, because we need the result now.
     $cc = $conf->options->get('cc') if defined $conf->options->get('cc');
 
-    my $is_msvc  = grep { $cc eq $_ } (qw(cl cl.exe));
-    my $is_intel = grep { $cc eq $_ } (qw(icl icl.exe));
-    my $is_mingw = grep { $cc eq $_ } (qw(gcc gcc.exe));
-    my $is_bcc   = grep { $cc eq $_ } (qw(bcc32 bcc32.exe));
+    my $is_msvc  = $cc =~ m/\bcl(?:\.exe)?/i;
+    my $is_intel = $cc =~ m/\bicl(?:\.exe)?/i;
+    my $is_mingw = $cc =~ m/\bgcc(?:\.exe)?/i;
+    my $is_bcc   = $cc =~ m/\bbcc32(?:\.exe)?/i;
 
     $conf->data->set(
         win32  => 1,
@@ -37,7 +39,16 @@ sub runstep {
         $conf->data->set( build_dir => Win32::GetShortPathName($build_dir) );
     }
 
+    my $bindir = $conf->data->get('bindir');
+
+    if ( $bindir =~ /\s/ ) {
+        $conf->data->set( bindir => Win32::GetShortPathName($bindir) );
+    }
+
+    $conf->data->set( clock_best => ' ' );
+
     if ($is_msvc) {
+        my $msvcversion = $conf->data->get('msvcversion');
 
         # Check the output of cl.exe to see if it contains the
         # string 'Standard' and remove the -O1 option if it does.
@@ -46,21 +57,23 @@ sub runstep {
         # The logo gets printed to STDERR; hence the redirection.
         my $cc_output = `$cc /? 2>&1` || '';
         $ccflags =~ s/-O1 // if $cc_output =~ m/Standard/ || $cc_output =~ m{/ZI};
-        $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
+        unless ($msvcversion) { $cc_output =~ m/Version (\d+)/; $msvcversion = $1; }
+        $ccflags =~ s/-Gf/-GF/ if $msvcversion >= 13;
 
         # override perl's warnings level
         $ccflags =~ s/-W\d/-W4/;
 
         # if we want pbc_to_exe to work, need to let some versions of the
         # compiler use more memory than they normally would
-        $ccflags .= " -Zm400 " if $cc_output =~ m/Version (\d+)/ && $1 == 12;
+        $ccflags .= " -Zm1500 " if $msvcversion < 13;
 
         my $ccwarn = '';
-
         # disable certain very noisy warnings
-        $ccwarn .= "-wd4127 ";    # conditional expression is constant
-        $ccwarn .= "-wd4054 ";    # type cast from function ptr to data ptr
-        $ccwarn .= "-wd4310 ";    # cast truncates constant value
+        if ($msvcversion >= 13) {
+            $ccwarn .= "-wd4127 ";    # conditional expression is constant
+            $ccwarn .= "-wd4054 ";    # type cast from function ptr to data ptr
+            $ccwarn .= "-wd4310 ";    # cast truncates constant value
+        }
 
         $conf->data->set(
             share_ext  => '.dll',
@@ -84,11 +97,10 @@ sub runstep {
             ldflags             => '-nologo -nodefaultlib',
             libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
-            libparrot_shared    => 'libparrot$(SHARE_EXT)',
+            libparrot_shared    => "libparrot$share_ext",
             ar_flags            => '',
             ar_out              => '-out:',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
             ccflags             => $ccflags,
             ccwarn              => $ccwarn,
             has_dynamic_linking => 1,
@@ -100,9 +112,11 @@ sub runstep {
 
         # If we are building shared, need to include dynamic libparrot.lib, otherwise
         # the static libparrot.lib.
-        if ( $conf->data->get('parrot_is_shared') ) {
-            $conf->data->set( libparrot_ldflags => 'libparrot.lib' );
-        }
+        # Unclear if it's needed both for ld and link.
+        $conf->data->set( libparrot_ldflags   => "\"$build_dir\\libparrot.lib\"" );
+        $conf->data->set( libparrot_linkflags   => "\"$build_dir\\libparrot.lib\"" );
+        $conf->data->set( inst_libparrot_ldflags   => "\"$bindir\\libparrot.lib\"" );
+        $conf->data->set( inst_libparrot_linkflags   => "\"$bindir\\libparrot.lib\"" );
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
@@ -138,7 +152,6 @@ sub runstep {
             ar_flags            => '',
             ar_out              => '-out:',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
             ccflags             => $ccflags,
             ccwarn              => '',
             has_dynamic_linking => 1
@@ -185,7 +198,6 @@ sub runstep {
             ar_out   => '',
             ar_extra => '',
             slash    => '\\',
-            blib_dir => 'blib\\lib',
             make_and => "\n\t",
         );
     }
@@ -197,7 +209,6 @@ sub runstep {
             $conf->data->set(
                 a       => '.a',
                 ar      => 'ar',
-                cc      => 'gcc',
                 ccflags => '-DWIN32 ',
                 ld      => 'g++',
                 ldflags => '',
@@ -206,7 +217,6 @@ sub runstep {
                 link      => 'gcc',
                 linkflags => '',
                 o         => '.o',
-                blib_dir  => 'blib\\lib',
             );
         }
         elsif ( $make =~ /dmake/i ) {
@@ -219,6 +229,13 @@ sub runstep {
                 optimize  => '',
             );
         }
+        elsif ( $make =~ /mingw32-make/i ) {
+            ; # Vanilla Perl
+            $conf->data->set(
+                make      => 'mingw32-make',
+                make_c    => 'mingw32-make -C',
+            );
+        }
         else {
             warn "unknown configuration";
         }
@@ -228,16 +245,18 @@ sub runstep {
         }
 
         $conf->data->set(
+            cc                  => 'gcc',
             parrot_is_shared    => 1,
             has_dynamic_linking => 1,
             ld_load_flags       => '-shared ',
             ld_share_flags      => '-shared ',
-            libparrot_ldflags   => $conf->data->get('build_dir') . '/libparrot.dll',
+            libparrot_ldflags   => "\"$build_dir\\libparrot.dll\"",
+            inst_libparrot_ldflags => "\"$bindir\\libparrot.dll\"",
+            libparrot_linkflags   => "\"$build_dir\\libparrot.dll\"",
+            inst_libparrot_linkflags => "\"$bindir\\libparrot.dll\"",
             ncilib_link_extra   => 'src/libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
-            make                => 'mingw32-make',
-            make_c              => 'mingw32-make -C',
             slash               => '\\',
         );
     }

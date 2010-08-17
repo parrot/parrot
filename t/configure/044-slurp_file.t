@@ -1,14 +1,14 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 044-slurp_file.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests =>  9;
 use Carp;
-use_ok( 'File::Temp', qw| tempfile | );
+use File::Temp qw| tempfile |;
 use lib qw( lib );
 use Parrot::BuildUtil;
 
@@ -48,7 +48,7 @@ use Parrot::BuildUtil;
 }
 
 {
-    my $phony = q{foobar};
+    my $phony = $$;
     my $str;
     eval { $str = Parrot::BuildUtil::slurp_file($phony); };
     like(

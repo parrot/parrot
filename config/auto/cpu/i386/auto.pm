@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -7,10 +7,10 @@ config/auto/cpu/i386/auto.pm
 
 =head1 DESCRIPTION
 
-Test for MMX/SSE functionality. Creates these Config entries
+Test for cmpxchg ASM functionality. Creates these Config entries
 
  TEMP_generated => 'files ...'   for inclusion in platform.c or platform.h
- i386_has_mmx   => 1
+ i386_has_gcc_cmpxchg_c   => 1
 
 =cut
 
@@ -22,39 +22,19 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
-    my @files = qw( memcpy_mmx.c memcpy_sse.c );
+    my @files = qw( test_gcc_cmpxchg_c.in );
     for my $f (@files) {
-        print " $f " if $verbose;
-        my ($suffix) = $f =~ /memcpy_(\w+)/;
-        my $path_f = "config/auto/cpu/i386/$f";
-        $conf->cc_gen($path_f);
-        eval( $conf->cc_build("-DPARROT_CONFIG_TEST") );
-        if ($@) {
-            print " $@ " if $verbose;
-        }
-        else {
-            if ( $conf->cc_run() =~ /ok/ ) {
-                _handle_cc_run_ok($conf, $suffix, $path_f, $verbose);
-            }
-        }
-        $conf->cc_clean();
-    }
-
-    @files = qw( test_gcc_cmpxchg.in );
-    for my $f (@files) {
-        print " $f " if $verbose;
+        $conf->debug(" $f ");
         my ($suffix) = $f =~ /test_(\w+)/;
         my $path_f = "config/auto/cpu/i386/$f";
         $conf->cc_gen($path_f);
         eval { $conf->cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
-            print " $@ " if $verbose;
+            $conf->debug(" $@ ");
         }
         else {
             if ( $conf->cc_run() =~ /ok/ ) {
-                _handle_cc_run_ok($conf, $suffix, $path_f, $verbose);
+                _handle_cc_run_ok($conf, $suffix, $path_f);
             }
         }
         $conf->cc_clean();
@@ -63,12 +43,12 @@ sub runstep {
 }
 
 sub _handle_cc_run_ok {
-    my ($conf, $suffix, $path_f, $verbose) = @_;
+    my ($conf, $suffix, $path_f) = @_;
     $conf->data->set(
         "i386_has_$suffix" => '1',
         "HAS_i386_$suffix" => '1',
     );
-    print " (\U$suffix) " if ($verbose);
+    $conf->debug(" (\U$suffix) ");
     $conf->data->add( ' ', TEMP_generated => $path_f );
 }
 

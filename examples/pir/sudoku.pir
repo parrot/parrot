@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
 =pod
@@ -150,6 +151,9 @@ Same as parrot.
 
 .const string VERSION="0.2.3"
 
+.loadlib 'bit_ops'
+.loadlib 'io_ops'
+
 .sub _main :main
     .param pmc argv
     .local int argc
@@ -237,24 +241,24 @@ err:
     .local string line, result, c
     .local int i, len
     result = ""
-    io = open file_name, "<"
+    io = open file_name, 'r'
     $I0 = defined io
     unless $I0 goto err
 loop:
     line = readline io
     unless io goto done
-    c = line[0]
+    substr c, line, 0, 1
     if c == '#' goto loop
     len = length line
     i = 0
 lp2:
-    c = line[i]
+    substr c, line, i, 1
     if c != '.' goto no_dot
-	result .= c
+    result .= c
 no_dot:
     if c < '1' goto no_num
     if c > '9' goto no_num
-	result .= c
+    result .= c
 no_num:
     inc i
     if i < len goto lp2
@@ -280,12 +284,12 @@ err:
     # Specification of command line arguments.
     # --version, --debug, --inv=nnn, --builtin=name, --nc, --help
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     push getopts, "version"
     push getopts, "debug"
     push getopts, "pairs"
     push getopts, "inv=s"
-    push getopts, "builtin:s"	# optional
+    push getopts, "builtin:s"   # optional
     push getopts, "nc"
     push getopts, "help"
 
@@ -294,11 +298,11 @@ err:
 
     $I0 = defined opt['version']
     unless $I0 goto n_ver
-	print prog
-	print " "
-	print VERSION
-	print "\n"
-	end
+    print prog
+    print " "
+    print VERSION
+    print "\n"
+    end
 n_ver:
     $I0 = defined opt['help']
     unless $I0 goto n_help
@@ -313,7 +317,7 @@ n_ver:
 n_help:
     $I0 = defined opt['debug']
     unless $I0 goto n_deb
-	print "debugging on\n"
+    print "debugging on\n"
 n_deb:
     .return (opt)
 .end
@@ -338,7 +342,7 @@ some:
     if name goto sel_name
 
 list_names:
-    new it, 'Iterator', b
+    it = iter b
     it = .ITERATE_FROM_START
 loop:
     unless it goto fin
@@ -353,10 +357,10 @@ fin:
 sel_name:
     $I0 = exists b[name]
     if $I0 goto ok
-	printerr "no such builtin: '"
-	printerr name
-	printerr "'\n"
-	die 3, 100
+    printerr "no such builtin: '"
+    printerr name
+    printerr "'\n"
+    die 3, 100
 ok:
     $S0 = b[name]
     .return ($S0)
@@ -527,8 +531,8 @@ not_set:
 loop:
     $I0 = ord raw, i
     if $I0 != 0x2e goto not_dot
-	c =  0
-	goto set_it
+    c =  0
+    goto set_it
 not_dot:
     if $I0 < 0x30 goto err
     if $I0 > 0x39 goto err
@@ -540,7 +544,7 @@ set_it:
     .return (ar)
 err:
     printerr "ill char: '"
-    $S0 = raw[i]
+    substr $S0, raw, i, 1
     printerr $S0
     printerr "\n"
     die 3, 100
@@ -610,12 +614,12 @@ ly1:
     setattribute self, "orig", ar
     all = new 'Hash'
     setattribute self, "all", all
-    self.create_1("rows")
-    self.create_1("cols")
-    self.create_1("sqrs")
-    self.create_1("i_rows")
-    self.create_1("i_cols")
-    self.create_1("i_sqrs")
+    self.'create_1'("rows")
+    self.'create_1'("cols")
+    self.'create_1'("sqrs")
+    self.'create_1'("i_rows")
+    self.'create_1'("i_cols")
+    self.'create_1'("i_sqrs")
 
     rows = getattribute self, "rows"
     cols = getattribute self, "cols"
@@ -680,7 +684,7 @@ lx2:
     disp = getattribute self, "disp"
     $I0 = defined opt["inv"]
     unless $I0 goto no_deb
-	deb_n = opt["inv"]
+    deb_n = opt["inv"]
 no_deb:
     deb_pairs = defined opt["pairs"]
     i = 0
@@ -708,12 +712,12 @@ ok:
     c = "."
     if c1 == 0 goto nxt
         $I0 = c1 + 0x30
-	c = chr $I0
-	goto set
+    c = chr $I0
+    goto set
 nxt:
     if c2 == 0 goto set
         $I0 = c2 + 0x30
-	c = chr $I0
+    c = chr $I0
 set:
     $I0 = i % 3
     if $I0 goto sp1
@@ -759,7 +763,7 @@ intern_err:
     i = 0
     len = length ns
 lp_inv:
-    $S0 = ns[i]
+    substr $S0, ns, i, 1
     n = $S0
     print "   "
     invs = getattribute self, "i_rows"
@@ -775,9 +779,9 @@ nosp:
     $I0 = c & b
     if $I0 goto is_set
         print "."
-	goto nxt
+    goto nxt
 is_set:
-	print n
+    print n
 nxt:
     inc x
     if x < 9 goto loop
@@ -900,7 +904,7 @@ ret_0:
 .sub check_seen
     .param pmc seen
     .local pmc it
-    new it, 'Iterator', seen
+    it = iter seen
     it = .ITERATE_FROM_START
 loop:
     unless it goto ok
@@ -958,11 +962,11 @@ lpn:
     unless $I0 goto nxt_n
         i = 0
 fill:
-	$I0 = 1 << n
-	$P1 = inv[i]
-	$P1 |= $I0
-	inc i
-	if i < 9 goto fill
+    $I0 = 1 << n
+    $P1 = inv[i]
+    $P1 |= $I0
+    inc i
+    if i < 9 goto fill
 nxt_n:
     inc n
     if n <= 9 goto lpn
@@ -1112,10 +1116,10 @@ loop:
     r = self."scan"()
     if r == -1 goto err
     unless r goto done
-	$I0 = self."step"()
-	unless $I0 goto loop
-	self."display"()
-	goto loop
+    $I0 = self."step"()
+    unless $I0 goto loop
+    self."display"()
+    goto loop
 done:
     #self."sanity_check"()
     $I0 = self."verify"()
@@ -1170,7 +1174,7 @@ nd2:
     (y, x, m) = self."best_pos"()
     if m != 1 goto not_uniq
         self."set_uniq"(y, x)
-	any = 1
+    any = 1
 not_uniq:
     .return (any)
 err:
@@ -1216,7 +1220,7 @@ nxt_x:
     .param int el
     .local int i, b, A, B
     A = 0
-    i = 1	    # A, B are 1-based
+    i = 1       # A, B are 1-based
 loop:
     el >>= 1        # bits start at 1
     b = el & 1
@@ -1277,10 +1281,10 @@ loop:
     if p1 == not_B goto next
     if p2 == not_B goto next
     if p1 != A goto check_p2
-	.return (p2, x)
+    .return (p2, x)
 check_p2:
     if p2 != A goto next
-	.return (p1, x)
+    .return (p1, x)
 next:
     inc x
     if x < 9 goto loop
@@ -1305,10 +1309,10 @@ loop:
     goto next
 ok1:
     if p2 != C goto next
-	.return (1, x)
+    .return (1, x)
 ok2:
     if p1 != C goto next
-	.return (1, x)
+    .return (1, x)
 next:
     inc x
     if x < 9 goto loop
@@ -1352,82 +1356,82 @@ next:
     i_rcss = getattribute self, "i_sqrs"
     .local int sq, changed
     changed = 0
-    sq = square_of(x, y)	# TODO reuse this func
+    sq = square_of(x, y)    # TODO reuse this func
     .local int C, c
     i_rcs = i_rcss[sq]
     (C, c) = self."y_wing-pair"(i_rcs, A, B)
-    unless C goto check_row	# TODO row, col
-	# convert the square coordinate to (x, y)
-	.local int cx, cy, bx, by, has_bc
-	(cx, cy) = square_to_xy(sq, c)	# AC
-	if x == cx goto try_row
-	# check col and row at AB for a BC pair
-	i_rcss = getattribute self, "i_cols"
-	i_rcs  = i_rcss[x]
-	(has_bc, c) = self."y_wing-pair_BC"(i_rcs, B, C)
-	unless has_bc goto try_row
-	bx = x
-	by = c
-	# but B have to be in a different square too
-	$I0 = square_of(bx, by)
-	if sq == $I0 goto try_row
-	.local int start, end
-	# invalidate col x in sqr(x,y)
-	sq = square_of(x, y)
-	($I0, start) = square_to_xy(sq, 0)
-	end = start + 2
-	changed = self."y_wing_inv"(i_rcs, C, start, end)
-	# invalidate col x at BC
-	i_rcs  = i_rcss[cx]
-	sq = square_of(bx, by)
-	($I0, start) = square_to_xy(sq, 0)
-	end = start + 2
-	$I0 = self."y_wing_inv"(i_rcs, C, start, end)
-	changed |= $I0
-	goto show_debug
+    unless C goto check_row # TODO row, col
+    # convert the square coordinate to (x, y)
+    .local int cx, cy, bx, by, has_bc
+    (cx, cy) = square_to_xy(sq, c)  # AC
+    if x == cx goto try_row
+    # check col and row at AB for a BC pair
+    i_rcss = getattribute self, "i_cols"
+    i_rcs  = i_rcss[x]
+    (has_bc, c) = self."y_wing-pair_BC"(i_rcs, B, C)
+    unless has_bc goto try_row
+    bx = x
+    by = c
+    # but B have to be in a different square too
+    $I0 = square_of(bx, by)
+    if sq == $I0 goto try_row
+    .local int start, end
+    # invalidate col x in sqr(x,y)
+    sq = square_of(x, y)
+    ($I0, start) = square_to_xy(sq, 0)
+    end = start + 2
+    changed = self."y_wing_inv"(i_rcs, C, start, end)
+    # invalidate col x at BC
+    i_rcs  = i_rcss[cx]
+    sq = square_of(bx, by)
+    ($I0, start) = square_to_xy(sq, 0)
+    end = start + 2
+    $I0 = self."y_wing_inv"(i_rcs, C, start, end)
+    changed |= $I0
+    goto show_debug
     try_row:
-	if y == cy goto nope
-	i_rcss = getattribute self, "i_rows"
-	i_rcs  = i_rcss[y]
-	(has_bc, c) = self."y_wing-pair_BC"(i_rcs, B, C)
-	unless has_bc goto nope
-	bx = c
-	by = y
-	.local int start, end
-	# TODO invalidate row y too
-	i_rcs  = i_rcss[cx]
-	sq = square_of(bx, by)
-	($I0, start) = square_to_xy(sq, 0)
-	end = start + 2
-	changed = self."y_wing_inv"(i_rcs, C, start, end)
+    if y == cy goto nope
+    i_rcss = getattribute self, "i_rows"
+    i_rcs  = i_rcss[y]
+    (has_bc, c) = self."y_wing-pair_BC"(i_rcs, B, C)
+    unless has_bc goto nope
+    bx = c
+    by = y
+    .local int start, end
+    # TODO invalidate row y too
+    i_rcs  = i_rcss[cx]
+    sq = square_of(bx, by)
+    ($I0, start) = square_to_xy(sq, 0)
+    end = start + 2
+    changed = self."y_wing_inv"(i_rcs, C, start, end)
     show_debug:
-	$I0 = self."debug"()
-	unless $I0 goto ex
-	    $S0 = "CHG"
-	    if changed goto chg_ok
-	    $S0 = "noC"
-	chg_ok:
-	    print $S0
-	    print " Y-WING A "
-	    print A
-	    print " B "
-	    print B
-	    print " C "
-	    print C
-	    print " at x "
-	    print x
-	    print " y "
-	    print y
-	    print " cx "
-	    print cx
-	    print " cy "
-	    print cy
-	    print " bx "
-	    print bx
-	    print " by "
-	    say by
-	    self."display"()
-	    goto ex
+    $I0 = self."debug"()
+    unless $I0 goto ex
+        $S0 = "CHG"
+        if changed goto chg_ok
+        $S0 = "noC"
+    chg_ok:
+        print $S0
+        print " Y-WING A "
+        print A
+        print " B "
+        print B
+        print " C "
+        print C
+        print " at x "
+        print x
+        print " y "
+        print y
+        print " cx "
+        print cx
+        print " cy "
+        print cy
+        print " bx "
+        print bx
+        print " by "
+        say by
+        self."display"()
+        goto ex
 
 check_row:
     i_rcss = getattribute self, "i_rows"
@@ -1437,15 +1441,15 @@ check_row:
     cx = c
     cy = y
     unless C goto check_col
-	i_rcss = getattribute self, "i_cols"
-	i_rcs  = i_rcss[x]
-	# XXX TODO check that B is in a forced pair
-	(has_bc, by) = self."y_wing-pair_BC"(i_rcs, B, C)
-	bx = cx
-	unless has_bc goto check_col
-	i_rcs  = i_rcss[cx]
-	changed = self."y_wing_inv"(i_rcs, C, by, by)
-	if changed goto show_debug
+    i_rcss = getattribute self, "i_cols"
+    i_rcs  = i_rcss[x]
+    # XXX TODO check that B is in a forced pair
+    (has_bc, by) = self."y_wing-pair_BC"(i_rcs, B, C)
+    bx = cx
+    unless has_bc goto check_col
+    i_rcs  = i_rcss[cx]
+    changed = self."y_wing_inv"(i_rcs, C, by, by)
+    if changed goto show_debug
 
 check_col:
     # TODO
@@ -1466,7 +1470,7 @@ ex:
     unless changed goto not_A
     .return (changed)
 not_A:
-    .return self."find_C_y_wing_1"(x, y, B, A)
+    .tailcall self."find_C_y_wing_1"(x, y, B, A)
 .end
 
 # check, if we find another pair with 1 digit in common with el
@@ -1483,7 +1487,7 @@ not_A:
     # now find another pair in
     # - another *this* row, col, or square
     # - AC or BC giving another unique element C
-    .return self."find_C_y_wing"(x, y, A, B)
+    .tailcall self."find_C_y_wing"(x, y, A, B)
 .end
 
 # the quare y has a uniq digit at x - set it
@@ -1500,21 +1504,21 @@ loop:
     $I0 = 1 << n
     $I1 = b & $I0
     if $I1 goto nxt
-	sqrs = getattribute self, "sqrs"
-	sqr = sqrs[y]
-	e = sqr[x]
-	e = n
-	$I0 = self."debug"()
-	unless $I0 goto nd
-	    print "uniq sqr="
-	    print y
-	    print " x="
-	    print x
-	    print " n="
-	    print n
-	    print "\n"
-	nd:
-	.return()
+    sqrs = getattribute self, "sqrs"
+    sqr = sqrs[y]
+    e = sqr[x]
+    e = n
+    $I0 = self."debug"()
+    unless $I0 goto nd
+        print "uniq sqr="
+        print y
+        print " x="
+        print x
+        print " n="
+        print n
+        print "\n"
+    nd:
+    .return()
 nxt:
     inc n
     if n <= 9 goto loop
@@ -1546,30 +1550,30 @@ lpx:
     $I0 = 1 << n
     $I1 = c & $I0
     if $I1 goto nxt_x
-	inc b
-	xx = x
+    inc b
+    xx = x
 nxt_x:
     inc x
     if x < 9 goto lpx
 
     if b != 1 goto nxt_n
-	any = 1
-	$P0 = one[xx]
-	unless $P0 goto ok
-	if $P0 != n goto err
-	goto nxt_n
+    any = 1
+    $P0 = one[xx]
+    unless $P0 goto ok
+    if $P0 != n goto err
+    goto nxt_n
     ok:
-	$P0 = n
-	$I0 = self."debug"()
-	unless $I0 goto nxt_n
-	print "found "
-	print what
-	print " y="
-	print y
-	print " x="
-	print xx
-	print " n="
-	say n
+    $P0 = n
+    $I0 = self."debug"()
+    unless $I0 goto nxt_n
+    print "found "
+    print what
+    print " y="
+    print y
+    print " x="
+    print xx
+    print " n="
+    say n
 nxt_n:
     inc n
     if n <= 9 goto lpn
@@ -1585,7 +1589,7 @@ err:
 # 0  ... no change
 # 1  ... changes
 # this implements half of TODO item 1 (digit '7' ...)
-# scan_dbl finds both occurencies of the blocked '7' but needs more testing still
+# scan_dbl finds both occurrences of the blocked '7' but needs more testing still
 
 .sub scan_dbl :method
     .param pmc rcss
@@ -1670,7 +1674,7 @@ nxt_n:
     if b != 2 goto m02
     $I0 = bits1(m2)
     if $I0 != 3 goto m02
-    .return self.inv_dbl(i_rcss, n, m0, sx, 2, what)
+    .tailcall self.'inv_dbl'(i_rcss, n, m0, sx, 2, what)
 m02:
     if m0 != m2 goto m12
     # m0 == m2
@@ -1678,7 +1682,7 @@ m02:
     if b != 2 goto m12
     $I0 = bits1(m1)
     if $I0 != 3 goto m12
-    .return self.inv_dbl(i_rcss, n, m0, sx, 1, what)
+    .tailcall self.'inv_dbl'(i_rcss, n, m0, sx, 1, what)
 m12:
     if m1 != m2 goto ret
     # m1 == m2
@@ -1686,7 +1690,7 @@ m12:
     if b != 2 goto ret
     $I0 = bits1(m0)
     if $I0 != 3 goto ret
-    .return self.inv_dbl(i_rcss, n, m1, sx, 0, what)
+    .tailcall self.'inv_dbl'(i_rcss, n, m1, sx, 0, what)
 ret:
     .return (0)
 .end
@@ -1724,17 +1728,17 @@ not_set:
     if b < 3 goto lpb
     $I0 = self."debug"()
     unless $I0 goto nd
-	print "inv_dbl "
-	print what
-	print " n "
-	print n
-	print " msk "
-	print msk
-	print " sx "
-	print sx
-	print " sy "
-	say sy
-	self."display"()
+    print "inv_dbl "
+    print what
+    print " n "
+    print n
+    print " msk "
+    print msk
+    print " sx "
+    print sx
+    print " sy "
+    say sy
+    self."display"()
 nd:
     .return (1)
 .end
@@ -1791,15 +1795,15 @@ loop_br:
     # need to have 2 blocked and one not-filled
     if $I0 != sh goto nbr
     if nulb != sh goto nbr
-	$I0 = self."inv_row"(y, b, n)
-	any |= $I0
+    $I0 = self."inv_row"(y, b, n)
+    any |= $I0
 nbr:
     $I0 = cbl ~ 7
     $I0 &= 7
     if $I0 != sh goto nbc
     if nulc != sh goto nbc
-	$I0 = self."inv_col"(y, b, n)
-	any |= $I0
+    $I0 = self."inv_col"(y, b, n)
+    any |= $I0
 nbc:
     inc b
     if b < 3 goto loop_br
@@ -1861,26 +1865,26 @@ nxt_n:
     any = 0
     x = 0
 loop:
-    $I0 = x / 3		# skip this square
+    $I0 = x / 3     # skip this square
     if $I0 == sx goto nxt
     $P0 = rc[x]
     $I0 = $P0
     $I1 = $I0 & bb
     if $I1 goto nxt
-	any = 1
-	$P0 |= bb
+    any = 1
+    $P0 |= bb
 nxt:
     inc x
     if x < 9 goto loop
     unless any goto ret
-	$I0 = self."debug"()
-	unless $I0 goto ret
-	print "found blocked "
-	print what
-	print "="
-	print r
-	print " n="
-	say n
+    $I0 = self."debug"()
+    unless $I0 goto ret
+    print "found blocked "
+    print what
+    print "="
+    print r
+    print " n="
+    say n
 ret:
     .return (any)
 .end
@@ -1965,8 +1969,8 @@ ok:
 start:
     n = 1                       # try all numbers at best pos
 loop:
-    all = thaw state		# restore state
-    self.set_attrs(all)         # set attributes to this state
+    all = thaw state        # restore state
+    self.'set_attrs'(all)         # set attributes to this state
     sqrs = getattribute self, "sqrs"
     sqr = sqrs[y]
     e = sqr[x]
@@ -2020,8 +2024,8 @@ lpx:
     unless n goto no_min
     if n >= mb goto no_min
         mb = n
-	mx = x
-	my = y
+    mx = x
+    my = y
 no_min:
     inc x
     if x < 9 goto lpx
@@ -2112,7 +2116,7 @@ out:
     .local pmc win, f
 
     win = getattribute self, "win"
-    f = global "ncurses::mvwaddstr"
+    f = get_global "ncurses::mvwaddstr"
     f(win, r, c, s)
 .end
 
@@ -2121,7 +2125,7 @@ out:
     .local pmc win, f
 
     win = getattribute self, "win"
-    f = global "ncurses::waddstr"
+    f = get_global "ncurses::waddstr"
     f(win, s)
 .end
 
@@ -2132,14 +2136,14 @@ out:
 
     s = i
     win = getattribute self, "win"
-    f = global "ncurses::waddstr"
+    f = get_global "ncurses::waddstr"
     f(win, s)
 .end
 
 .sub "wait" :method
     .local pmc f
     .local int key
-    f = global "ncurses::getch"
+    f = get_global "ncurses::getch"
     key = f()
 .end
 
@@ -2148,16 +2152,16 @@ out:
 
 .sub nc_start
     .local pmc stdscr
-    load_bytecode "library/ncurses.pasm"
+    load_bytecode 'ncurses.pbc'
     stdscr = _init_curses()
     .return(stdscr)
 .end
 
 .sub nc_end
     .local pmc endwin, curs_set
-    curs_set = global "ncurses::curs_set"
+    curs_set = get_global "ncurses::curs_set"
     curs_set(1)
-    endwin = global "ncurses::endwin"
+    endwin = get_global "ncurses::endwin"
     endwin()
 .end
 
@@ -2171,14 +2175,14 @@ out:
     .local pmc NODELAY
     .local pmc KEYPAD
     .local pmc STDSCR
-    INITSCR     = global "ncurses::initscr"
-    START_COLOR = global "ncurses::start_color"
-    INIT_PAIR   = global "ncurses::init_pair"
-    COLOR_PAIR  = global "ncurses::COLOR_PAIR"
-    WATTRON     = global "ncurses::wattron"
-    CURS_SET    = global "ncurses::curs_set"
-    NODELAY     = global "ncurses::nodelay"
-    KEYPAD      = global "ncurses::keypad"
+    INITSCR     = get_global "ncurses::initscr"
+    START_COLOR = get_global "ncurses::start_color"
+    INIT_PAIR   = get_global "ncurses::init_pair"
+    COLOR_PAIR  = get_global "ncurses::COLOR_PAIR"
+    WATTRON     = get_global "ncurses::wattron"
+    CURS_SET    = get_global "ncurses::curs_set"
+    NODELAY     = get_global "ncurses::nodelay"
+    KEYPAD      = get_global "ncurses::keypad"
     STDSCR = INITSCR()
     START_COLOR()
     # Color pair 1, dark green fg, black background
@@ -2186,9 +2190,9 @@ out:
     $I0 = COLOR_PAIR(1)
     # We pass what's returned from COLOR_PAIR straight on
     ## WATTRON($I0)
-    CURS_SET(0)			# turn off cursor
-    ## NODELAY(STDSCR, 1)	# set nodelay mode
-    ## KEYPAD(STDSCR, 1)	# set keypad mode
+    CURS_SET(0)         # turn off cursor
+    ## NODELAY(STDSCR, 1)   # set nodelay mode
+    ## KEYPAD(STDSCR, 1)    # set keypad mode
     .return(STDSCR)
 .end
 
@@ -2401,7 +2405,7 @@ A Sudoku has 2 dimensions and 3 connected views (row, column, and
 square). There are 1-dim tests, which work for all views. 2-dim tests
 are a bit more tricky to generalize and not yet done properly.
 
-Basically: as only 2 views are independant, all these tests can
+Basically: as only 2 views are independent, all these tests can
 work on 2 of 3 views:
 
   square, row

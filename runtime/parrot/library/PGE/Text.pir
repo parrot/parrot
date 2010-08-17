@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 PGE::Text - rules for extracting delimited text sequences from strings
@@ -10,13 +13,14 @@ also.)
 
 =cut
 
-.namespace [ "PGE::Text" ]
+.namespace [ 'PGE';'Text' ]
 
 .include "cclass.pasm"
 
 .sub "__onload" :load
-    .local pmc base
-    $P0 = subclass 'PGE::Grammar', 'PGE::Text'
+    .local pmc p6meta
+    p6meta = get_hll_global 'P6metaclass'
+    p6meta.'new_class'('PGE::Text', 'parent'=>'PGE::Grammar')
 .end
 
 =head2 Available rules
@@ -46,7 +50,6 @@ of the extraction.
     .local int balanced                            # in balanced match
     .local pmc stack                               # lookket backtracking
 
-    stack = new 'ResizableStringArray'
     $P0 = get_hll_global ['PGE'], 'Match'
     (mob, pos, target) = $P0.'new'(tgt)
     from = pos
@@ -84,6 +87,7 @@ of the extraction.
     if $I0 < 0 goto end                            # no leading delim fails
     lookket = ''
     balanced = 1
+    stack = new 'ResizableStringArray'
   next:
     $S0 = substr target, pos, 1                    # check current pos
     if $S0 == '' goto fail                         # end of string -> fail

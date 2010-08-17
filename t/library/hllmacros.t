@@ -1,10 +1,10 @@
-#! parrot
-# Copyright (C) 2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
-.include 'include/hllmacros.pir'
+.include 'hllmacros.pir'
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(17)
 
@@ -38,7 +38,7 @@
     }, {
       ok (1, '.IfElse, false else')
     })
-  
+
     $I2 = 0
     .While( $I2<10, {
       inc $I2
@@ -47,7 +47,7 @@
       ok (1, '.While doing something')
     }, {
       ok (0, '.While doing something')
-    }) 
+    })
 
     .While( 1==0, {
       ok (0, 'while body should never happen')
@@ -66,12 +66,12 @@
       ok (1, '.DoWhile doing something')
     }, {
       ok (0, '.DoWhile doing something')
-    }) 
+    })
 
     $I2 = 0
     .Loop({
         .IfElse($I2==10,{
-            goto loop_done  
+            goto loop_done
         }, {
             inc $I2
         })

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 package Parrot::Configure::Step::List;
 use strict;
@@ -11,7 +11,6 @@ my @steps = qw(
     init::manifest
     init::defaults
     init::install
-    init::miniparrot
     init::hints
     init::headers
     inter::progs
@@ -21,11 +20,11 @@ my @steps = qw(
     auto::gcc
     auto::glibc
     auto::backtrace
-    auto::fink
-    auto::macports
     auto::msvc
     auto::attributes
     auto::warnings
+    auto::arch
+    auto::cpu
     init::optimize
     inter::shlibs
     inter::libparrot
@@ -34,44 +33,37 @@ my @steps = qw(
     inter::types
     auto::ops
     auto::pmc
-    auto::alignptrs
     auto::headers
     auto::sizes
     auto::byteorder
     auto::va_ptr
     auto::format
     auto::isreg
-    auto::arch
     auto::jit
-    auto::cpu
-    auto::funcptr
-    auto::cgoto
+    auto::frames
     auto::inline
     auto::gc
     auto::memalign
     auto::signal
     auto::socklen_t
+    auto::neg_0
     auto::env
-    auto::aio
+    auto::thread
     auto::gmp
     auto::readline
-    auto::gdbm
     auto::pcre
     auto::opengl
-    auto::crypto
+    auto::zlib
     auto::gettext
     auto::snprintf
     auto::perldoc
+    auto::pod2man
     auto::ctags
     auto::revision
     auto::icu
     gen::config_h
     gen::core_pmcs
-    gen::crypto
-    gen::parrot_include
     gen::opengl
-    gen::call_list
-    gen::languages
     gen::makefiles
     gen::platform
     gen::config_pm

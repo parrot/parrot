@@ -1,4 +1,4 @@
-=head1 INFORMATION
+=head1 Filehandle Object Example
 
 This small example shows the usage of C<Stream::ParrotIO>.
 
@@ -19,15 +19,15 @@ PMC to the stream with the C<assign> op.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/ParrotIO.pir"
+    load_bytecode 'Stream/ParrotIO.pbc'
 
     # create the ParrotIO stream
-    stream = new "Stream::ParrotIO"
+    stream = new ['Stream'; 'ParrotIO']
 
     # open this file
-    stream."open"( "examples/streams/ParrotIO.pir", "<" )
+    stream."open"( "examples/streams/ParrotIO.pir", 'r' )
 
-    # you can specifiy a custom block size with
+    # you can specify a custom block size with
     # stream."blockSize"( 10 )
 
     # dump the stream
@@ -44,7 +44,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

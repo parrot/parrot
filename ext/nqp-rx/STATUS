@@ -1,0 +1,70 @@
+2009-10-09:
+
+At the moment, nqp-rx is configured to build an executable called
+"p6regex", which is a Perl 6 regular expression compiler for Parrot.
+Yes, Parrot already has a Perl 6 regular expression compiler (PGE);
+this one is different in that it will be self-hosting and based on
+PAST/POST generation.
+
+Building the system is similar to building Rakudo:
+
+    $ perl Configure.pl --gen-parrot
+    $ make
+
+This builds a "p6regex" executable, which can be used to view
+the results of compiling various regular expressions.  Like Rakudo,
+p6regex accepts --target=parse, --target=past, and --target=pir, to
+see the results of compiling various regular expressions.  For example,
+
+    $ ./p6regex --target=parse
+    > abcde*f
+
+will display the parse tree for the regular expression "abcde*f".  Similarly,
+
+    $ ./p6regex --target=pir
+    > abcde*f
+
+will display the PIR subroutine generated to match the regular
+expression "abcde*f".
+
+At the moment there's not an easy command-line tool for doing matches
+against the compiled regular expression; that should be coming soon
+as nqp-rx gets a little farther along.
+
+The test suite can be run via "make test" -- because the new regex
+engine is incomplete, we expect quite a few failures (which should
+diminish as we add new features to the project).
+
+The key files for the p6regex compiler are:
+
+    src/Regex/P6Regex/Grammar.pm     # regular expression parse grammar
+    src/Regex/P6Regex/Actions.pm     # actions to create PAST from parse
+
+
+Things that work (2009-10-15, 06h16 UTC):
+
+* bare literal strings
+* quantifiers  *, +, ?, *:, +:, ?:, *?, +?, ??, *!, +!, ?!
+* dot
+* \d, \s, \w, \n, \D, \S, \W, \N
+* brackets for grouping
+* alternation (|| works, | cheats)
+* anchors ^, ^^, $, $$, <<, >>
+* backslash-quoted punctuation
+* #-comments (mostly)
+* obsolete backslash sequences \A \Z \z \Q
+* \b, \B, \e, \E, \f, \F, \h, \H, \r, \R, \t, \T, \v, \V
+* enumerated character lists <[ab0..9]>
+* character class compositions <+foo-bar+[xyz]>
+* quantified by numeric range
+* quantified by separator
+* capturing subrules
+* capturing subpatterns
+* capture aliases
+* cut rule
+* Match objects created lazily
+* built-in methods <alpha> <digit> <xdigit> <ws> <wb> etc.
+* :ignorecase
+* :sigspace
+* :ratchet
+* single-quoted literals (without quotes)

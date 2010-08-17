@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -26,6 +26,9 @@ So only the exit code can be tested.
 The returned value is actually returned from the 'waitpid' system call.
 In order to get the exit code from the spawned process, it needs to be right
 shifted by 8 bit.
+
+TT #1271: Do not rely on the existence of Perl5 here. Spawn Parrot or some
+other program which will exist on the target platform
 
 =head1 TODO
 
@@ -88,7 +91,7 @@ OUTPUT
 # test array version of spawnw
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
-        new     P0, 'Array'
+        new     P0, 'ResizablePMCArray'
         set     P0, 3
         set     P0[0], "perl"
         set     P0[1], "-e"
@@ -105,7 +108,7 @@ return code: 0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
-        new     P0, 'Array'
+        new     P0, 'ResizablePMCArray'
         set     P0, 3
         set     P0[0], "perl"
         set     P0[1], "-e"
@@ -122,7 +125,7 @@ return code: 123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
-        new     P0, 'Array'
+        new     P0, 'ResizablePMCArray'
         set     P0, 3
         set     P0[0], "perl"
         set     P0[1], "-e"

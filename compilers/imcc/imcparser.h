@@ -9,27 +9,26 @@
  */
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton interface for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -40,9 +39,10 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
+
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -52,33 +52,33 @@
    enum yytokentype {
      LOW_PREC = 258,
      PARAM = 259,
-     PRAGMA = 260,
-     N_OPERATORS = 261,
-     HLL = 262,
-     HLL_MAP = 263,
+     SOL = 260,
+     HLL = 261,
+     TK_LINE = 262,
+     TK_FILE = 263,
      GOTO = 264,
      ARG = 265,
      IF = 266,
      UNLESS = 267,
      PNULL = 268,
-     ADV_FLAT = 269,
-     ADV_SLURPY = 270,
-     ADV_OPTIONAL = 271,
-     ADV_OPT_FLAG = 272,
-     ADV_NAMED = 273,
-     ADV_ARROW = 274,
-     NEW = 275,
-     ADV_INVOCANT = 276,
-     NAMESPACE = 277,
-     ENDNAMESPACE = 278,
-     DOT_METHOD = 279,
-     SUB = 280,
-     SYM = 281,
-     LOCAL = 282,
-     LEXICAL = 283,
-     CONST = 284,
-     INC = 285,
-     DEC = 286,
+     SET_RETURN = 269,
+     SET_YIELD = 270,
+     ADV_FLAT = 271,
+     ADV_SLURPY = 272,
+     ADV_OPTIONAL = 273,
+     ADV_OPT_FLAG = 274,
+     ADV_NAMED = 275,
+     ADV_ARROW = 276,
+     ADV_INVOCANT = 277,
+     ADV_CALL_SIG = 278,
+     NAMESPACE = 279,
+     DOT_METHOD = 280,
+     SUB = 281,
+     SYM = 282,
+     LOCAL = 283,
+     LEXICAL = 284,
+     CONST = 285,
+     ANNOTATE = 286,
      GLOBAL_CONST = 287,
      PLUS_ASSIGN = 288,
      MINUS_ASSIGN = 289,
@@ -107,99 +107,98 @@
      RELOP_GTE = 312,
      RELOP_LT = 313,
      RELOP_LTE = 314,
-     GLOBAL = 315,
-     GLOBALOP = 316,
-     ADDR = 317,
-     RESULT = 318,
-     RETURN = 319,
-     YIELDT = 320,
-     GET_RESULTS = 321,
-     POW = 322,
-     SHIFT_RIGHT_U = 323,
-     LOG_AND = 324,
-     LOG_OR = 325,
-     COMMA = 326,
-     ESUB = 327,
-     DOTDOT = 328,
-     PCC_BEGIN = 329,
-     PCC_END = 330,
-     PCC_CALL = 331,
-     PCC_SUB = 332,
-     PCC_BEGIN_RETURN = 333,
-     PCC_END_RETURN = 334,
-     PCC_BEGIN_YIELD = 335,
-     PCC_END_YIELD = 336,
-     NCI_CALL = 337,
-     METH_CALL = 338,
-     INVOCANT = 339,
-     MAIN = 340,
-     LOAD = 341,
-     INIT = 342,
-     IMMEDIATE = 343,
-     POSTCOMP = 344,
-     METHOD = 345,
-     ANON = 346,
-     OUTER = 347,
-     NEED_LEX = 348,
-     MULTI = 349,
-     VTABLE_METHOD = 350,
-     LOADLIB = 351,
-     SUB_INSTANCE_OF = 352,
-     SUB_LEXID = 353,
-     UNIQUE_REG = 354,
-     LABEL = 355,
-     EMIT = 356,
-     EOM = 357,
-     IREG = 358,
-     NREG = 359,
-     SREG = 360,
-     PREG = 361,
-     IDENTIFIER = 362,
-     REG = 363,
-     MACRO = 364,
-     ENDM = 365,
-     STRINGC = 366,
-     INTC = 367,
-     FLOATC = 368,
-     USTRINGC = 369,
-     PARROT_OP = 370,
-     VAR = 371,
-     LINECOMMENT = 372,
-     FILECOMMENT = 373,
-     DOT = 374,
-     CONCAT = 375
+     RESULT = 315,
+     RETURN = 316,
+     TAILCALL = 317,
+     YIELDT = 318,
+     GET_RESULTS = 319,
+     POW = 320,
+     SHIFT_RIGHT_U = 321,
+     LOG_AND = 322,
+     LOG_OR = 323,
+     COMMA = 324,
+     ESUB = 325,
+     DOTDOT = 326,
+     PCC_BEGIN = 327,
+     PCC_END = 328,
+     PCC_CALL = 329,
+     PCC_SUB = 330,
+     PCC_BEGIN_RETURN = 331,
+     PCC_END_RETURN = 332,
+     PCC_BEGIN_YIELD = 333,
+     PCC_END_YIELD = 334,
+     NCI_CALL = 335,
+     METH_CALL = 336,
+     INVOCANT = 337,
+     MAIN = 338,
+     LOAD = 339,
+     INIT = 340,
+     IMMEDIATE = 341,
+     POSTCOMP = 342,
+     METHOD = 343,
+     ANON = 344,
+     OUTER = 345,
+     NEED_LEX = 346,
+     MULTI = 347,
+     VTABLE_METHOD = 348,
+     LOADLIB = 349,
+     SUB_INSTANCE_OF = 350,
+     SUBID = 351,
+     NS_ENTRY = 352,
+     UNIQUE_REG = 353,
+     LABEL = 354,
+     EMIT = 355,
+     EOM = 356,
+     IREG = 357,
+     NREG = 358,
+     SREG = 359,
+     PREG = 360,
+     IDENTIFIER = 361,
+     REG = 362,
+     MACRO = 363,
+     ENDM = 364,
+     STRINGC = 365,
+     INTC = 366,
+     FLOATC = 367,
+     USTRINGC = 368,
+     PARROT_OP = 369,
+     VAR = 370,
+     LINECOMMENT = 371,
+     FILECOMMENT = 372,
+     DOT = 373,
+     CONCAT = 374
    };
 #endif
 /* Tokens.  */
 #define LOW_PREC 258
 #define PARAM 259
-#define PRAGMA 260
-#define N_OPERATORS 261
-#define HLL 262
-#define HLL_MAP 263
+#define SOL 260
+#define HLL 261
+#define TK_LINE 262
+#define TK_FILE 263
 #define GOTO 264
 #define ARG 265
 #define IF 266
 #define UNLESS 267
 #define PNULL 268
-#define ADV_FLAT 269
-#define ADV_SLURPY 270
-#define ADV_OPTIONAL 271
-#define ADV_OPT_FLAG 272
-#define ADV_NAMED 273
-#define ADV_ARROW 274
-#define NEW 275
-#define ADV_INVOCANT 276
-#define NAMESPACE 277
-#define ENDNAMESPACE 278
-#define DOT_METHOD 279
-#define SUB 280
-#define SYM 281
-#define LOCAL 282
-#define LEXICAL 283
-#define CONST 284
-#define INC 285
-#define DEC 286
+#define SET_RETURN 269
+#define SET_YIELD 270
+#define ADV_FLAT 271
+#define ADV_SLURPY 272
+#define ADV_OPTIONAL 273
+#define ADV_OPT_FLAG 274
+#define ADV_NAMED 275
+#define ADV_ARROW 276
+#define ADV_INVOCANT 277
+#define ADV_CALL_SIG 278
+#define NAMESPACE 279
+#define DOT_METHOD 280
+#define SUB 281
+#define SYM 282
+#define LOCAL 283
+#define LEXICAL 284
+#define CONST 285
+#define ANNOTATE 286
 #define GLOBAL_CONST 287
 #define PLUS_ASSIGN 288
 #define MINUS_ASSIGN 289
@@ -228,88 +227,93 @@
 #define RELOP_GTE 312
 #define RELOP_LT 313
 #define RELOP_LTE 314
-#define GLOBAL 315
-#define GLOBALOP 316
-#define ADDR 317
-#define RESULT 318
-#define RETURN 319
-#define YIELDT 320
-#define GET_RESULTS 321
-#define POW 322
-#define SHIFT_RIGHT_U 323
-#define LOG_AND 324
-#define LOG_OR 325
-#define COMMA 326
-#define ESUB 327
-#define DOTDOT 328
-#define PCC_BEGIN 329
-#define PCC_END 330
-#define PCC_CALL 331
-#define PCC_SUB 332
-#define PCC_BEGIN_RETURN 333
-#define PCC_END_RETURN 334
-#define PCC_BEGIN_YIELD 335
-#define PCC_END_YIELD 336
-#define NCI_CALL 337
-#define METH_CALL 338
-#define INVOCANT 339
-#define MAIN 340
-#define LOAD 341
-#define INIT 342
-#define IMMEDIATE 343
-#define POSTCOMP 344
-#define METHOD 345
-#define ANON 346
-#define OUTER 347
-#define NEED_LEX 348
-#define MULTI 349
-#define VTABLE_METHOD 350
-#define LOADLIB 351
-#define SUB_INSTANCE_OF 352
-#define SUB_LEXID 353
-#define UNIQUE_REG 354
-#define LABEL 355
-#define EMIT 356
-#define EOM 357
-#define IREG 358
-#define NREG 359
-#define SREG 360
-#define PREG 361
-#define IDENTIFIER 362
-#define REG 363
-#define MACRO 364
-#define ENDM 365
-#define STRINGC 366
-#define INTC 367
-#define FLOATC 368
-#define USTRINGC 369
-#define PARROT_OP 370
-#define VAR 371
-#define LINECOMMENT 372
-#define FILECOMMENT 373
-#define DOT 374
-#define CONCAT 375
+#define RESULT 315
+#define RETURN 316
+#define TAILCALL 317
+#define YIELDT 318
+#define GET_RESULTS 319
+#define POW 320
+#define SHIFT_RIGHT_U 321
+#define LOG_AND 322
+#define LOG_OR 323
+#define COMMA 324
+#define ESUB 325
+#define DOTDOT 326
+#define PCC_BEGIN 327
+#define PCC_END 328
+#define PCC_CALL 329
+#define PCC_SUB 330
+#define PCC_BEGIN_RETURN 331
+#define PCC_END_RETURN 332
+#define PCC_BEGIN_YIELD 333
+#define PCC_END_YIELD 334
+#define NCI_CALL 335
+#define METH_CALL 336
+#define INVOCANT 337
+#define MAIN 338
+#define LOAD 339
+#define INIT 340
+#define IMMEDIATE 341
+#define POSTCOMP 342
+#define METHOD 343
+#define ANON 344
+#define OUTER 345
+#define NEED_LEX 346
+#define MULTI 347
+#define VTABLE_METHOD 348
+#define LOADLIB 349
+#define SUB_INSTANCE_OF 350
+#define SUBID 351
+#define NS_ENTRY 352
+#define UNIQUE_REG 353
+#define LABEL 354
+#define EMIT 355
+#define EOM 356
+#define IREG 357
+#define NREG 358
+#define SREG 359
+#define PREG 360
+#define IDENTIFIER 361
+#define REG 362
+#define MACRO 363
+#define ENDM 364
+#define STRINGC 365
+#define INTC 366
+#define FLOATC 367
+#define USTRINGC 368
+#define PARROT_OP 369
+#define VAR 370
+#define LINECOMMENT 371
+#define FILECOMMENT 372
+#define DOT 373
+#define CONCAT 374
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 611 "compilers/imcc/imcc.y"
 {
+
+/* Line 1676 of yacc.c  */
+#line 1071 "compilers/imcc/imcc.y"
+
     IdList * idlist;
     int t;
     char * s;
     SymReg * sr;
     Instruction *i;
-}
-/* Line 1489 of yacc.c.  */
-#line 297 "compilers/imcc/imcparser.h"
-	YYSTYPE;
+
+
+
+/* Line 1676 of yacc.c  */
+#line 300 "compilers/imcc/imcparser.h"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
+
 
 
 

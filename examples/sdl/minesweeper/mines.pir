@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 mines.pir - a minesweeper clone for parrot (with parrot's SDL bindings)
@@ -46,7 +48,7 @@ The main function.
     $P0["flags"]  =   5
 
     # create the SDL object
-    $P0 = new "SDL::App", $P0
+    $P0 = new ['SDL'; 'App'], $P0
     screen = $P0."surface"()
 
     # choose a "random" field
@@ -69,7 +71,7 @@ The main function.
     field.'draw'()
 
     # runloop
-    $P0 = new "SDL::Event"
+    $P0 = new ['SDL'; 'Event']
     $P1 = new "Mines::EventHandler"
     $P0."process_events"( 0.1, $P1, field )
 
@@ -90,7 +92,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

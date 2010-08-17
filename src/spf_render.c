@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -22,7 +22,6 @@ and its utility functions.
 #define IN_SPF_SYSTEM
 
 #include "parrot/parrot.h"
-#include "parrot/string_funcs.h"
 #include "spf_render.str"
 
 typedef enum {
@@ -66,19 +65,19 @@ static void gen_sprintf_call(
         FUNC_MODIFIES(*out)
         FUNC_MODIFIES(*info);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * handle_flags(PARROT_INTERP,
     ARGIN(const SpfInfo *info),
-    ARGMOD(STRING *str),
+    ARGIN(STRING *str),
     INTVAL is_int_type,
     ARGIN_NULLOK(STRING* prefix))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*str);
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* str_append_w_flags(PARROT_INTERP,
+static STRING* str_concat_w_flags(PARROT_INTERP,
     ARGOUT(STRING *dest),
     ARGIN(const SpfInfo *info),
     ARGMOD(STRING *src),
@@ -90,6 +89,18 @@ static STRING* str_append_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*src);
 
+#define ASSERT_ARGS_gen_sprintf_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(out) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_handle_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_str_concat_w_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -103,7 +114,8 @@ static STRING* str_append_w_flags(PARROT_INTERP,
 
 /*
 
-=item C<static STRING * handle_flags>
+=item C<static STRING * handle_flags(PARROT_INTERP, const SpfInfo *info, STRING
+*str, INTVAL is_int_type, STRING* prefix)>
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
@@ -111,66 +123,53 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
+handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
-    UINTVAL len = string_length(interp, str);
+    ASSERT_ARGS(handle_flags)
+    UINTVAL len = Parrot_str_byte_length(interp, str);
 
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&
                 len == 1 &&
                 string_ord(interp, str, 0) == '0') {
-            string_chopn_inplace(interp, str, len);
+            str = Parrot_str_chopn(interp, str, len);
             len = 0;
         }
         /* +, space */
         if (!len || string_ord(interp, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
                 STRING * const cs = CONST_STRING(interp, "+");
-                str = string_concat(interp, cs, str, 0);
-                len++;
+                str = Parrot_str_concat(interp, cs, str);
+                ++len;
             }
             else if (info->flags & FLAG_SPACE) {
                 STRING * const cs = CONST_STRING(interp, " ");
-                str = string_concat(interp, cs, str, 0);
-                len++;
+                str = Parrot_str_concat(interp, cs, str);
+                ++len;
             }
         }
 
         /* # 0x ... */
         if ((info->flags & FLAG_SHARP) && prefix) {
-            str = string_concat(interp, prefix, str, 0);
-            len += string_length(interp, prefix);
+            str = Parrot_str_concat(interp, prefix, str);
+            len += Parrot_str_byte_length(interp, prefix);
         }
         /* XXX sharp + fill ??? */
-
-#if 0
-        /* precision - only for floats, which is handled elsewhere */
-        if (info->flags & FLAG_PREC) {
-            info->flags |= FLAG_WIDTH;
-            if (string_ord(interp, str, 0) == '-' ||
-                    string_ord(interp, str, 0) == '+') {
-                info->width = info->prec + 1;
-            }
-            else {
-                info->width = info->prec;
-            }
-        }
-#endif
     }
     else {
         /* string precision */
         if (info->flags & FLAG_PREC && info->prec == 0) {
-            string_chopn_inplace(interp, str, len);
+            str = Parrot_str_chopn(interp, str, len);
             len = 0;
         }
-        else
-            if (info->flags & FLAG_PREC && info->prec < len) {
-                string_chopn_inplace(interp, str, -(INTVAL)(info->prec));
-                len = info->prec;
-            }
+        else if (info->flags & FLAG_PREC && info->prec < len) {
+            str = Parrot_str_chopn(interp, str, -(INTVAL)(info->prec));
+            len = info->prec;
+        }
     }
 
     if ((info->flags & FLAG_WIDTH) && info->width > len) {
@@ -178,10 +177,10 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
             ((info->flags & FLAG_ZERO) && !(info->flags & FLAG_MINUS))
                 ? CONST_STRING(interp, "0")
                 : CONST_STRING(interp, " ");
-        STRING * const fill = string_repeat(interp, filler, info->width - len, NULL);
+        STRING * const fill = Parrot_str_repeat(interp, filler, info->width - len);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
-            str = string_concat(interp, str, fill, 0);
+            str = Parrot_str_concat(interp, str, fill);
         }
         else {                  /* right-align */
             /* signed and zero padded */
@@ -190,14 +189,13 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
                     string_ord(interp, str, 0) == '+')) {
                 STRING *temp = NULL;
                 STRING *ignored;
-                ignored = string_substr(interp, str, 1, len-1, &temp, 0);
-                UNUSED(ignored);
-                string_chopn_inplace(interp, str, -1);
-                str = string_append(interp, str, fill);
-                str = string_append(interp, str, temp);
+                temp = Parrot_str_substr(interp, str, 1, len-1);
+                str = Parrot_str_chopn(interp, str, -1);
+                str = Parrot_str_concat(interp, str, fill);
+                str = Parrot_str_concat(interp, str, temp);
             }
             else {
-                str = string_concat(interp, fill, str, 0);
+                str = Parrot_str_concat(interp, fill, str);
             }
         }
     }
@@ -206,7 +204,8 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
 
 /*
 
-=item C<static STRING* str_append_w_flags>
+=item C<static STRING* str_concat_w_flags(PARROT_INTERP, STRING *dest, const
+SpfInfo *info, STRING *src, STRING *prefix)>
 
 Used by Parrot_sprintf_format.  Prepends supplied prefix for numeric
 values. (e.g. 0x for hex.)
@@ -219,17 +218,18 @@ Returns the pointer to the modified string.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
+str_concat_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
         ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))
 {
+    ASSERT_ARGS(str_concat_w_flags)
     src = handle_flags(interp, info, src, 1, prefix);
-    dest = string_append(interp, dest, src);
+    dest = Parrot_str_concat(interp, dest, src);
     return dest;
 }
 
 /*
 
-=item C<static void gen_sprintf_call>
+=item C<static void gen_sprintf_call(char *out, SpfInfo *info, int thingy)>
 
 Turn the info structure back into an sprintf format. Far from being
 pointless, this is used to call C<snprintf()> when we're confronted with
@@ -242,57 +242,61 @@ a float.
 static void
 gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
-    int i    = 0;
-    out[i++] = '%';
+    ASSERT_ARGS(gen_sprintf_call)
 
-    if (info->flags) {
-        if (info->flags & FLAG_MINUS)
-            out[i++] = '-';
+    const int flags = info->flags;
+    char *p = out;
+    *p++ = '%';
 
-        if (info->flags & FLAG_PLUS)
-            out[i++] = '+';
+    if (flags) {
+        if (flags & FLAG_MINUS)
+            *p++ = '-';
 
-        if (info->flags & FLAG_ZERO)
-            out[i++] = '0';
+        if (flags & FLAG_PLUS)
+            *p++ = '+';
 
-        if (info->flags & FLAG_SPACE)
-            out[i++] = ' ';
+        if (flags & FLAG_ZERO)
+            *p++ = '0';
 
-        if (info->flags & FLAG_SHARP)
-            out[i++] = '#';
-    }
+        if (flags & FLAG_SPACE)
+            *p++ = ' ';
 
-    if (info->flags & FLAG_WIDTH) {
-        if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1)
-            info->width = PARROT_SPRINTF_BUFFER_SIZE;
+        if (flags & FLAG_SHARP)
+            *p++ = '#';
 
-        i += sprintf(out + i, "%u", (unsigned)info->width);
-    }
+        if (flags & FLAG_WIDTH) {
+            if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1)
+                info->width = PARROT_SPRINTF_BUFFER_SIZE;
 
-    if (info->flags & FLAG_PREC) {
-        if (info->prec > PARROT_SPRINTF_MAX_PREC)
-            info->prec = PARROT_SPRINTF_MAX_PREC;
+            p += sprintf(p, "%u", (unsigned)info->width);
+        }
 
-        out[i++] = '.';
-        i       += sprintf(out + i, "%u", (unsigned)info->prec);
+        if (flags & FLAG_PREC) {
+            if (info->prec > PARROT_SPRINTF_MAX_PREC)
+                info->prec = PARROT_SPRINTF_MAX_PREC;
+
+            *p++ = '.';
+            p += sprintf(p, "%u", (unsigned)info->prec);
+        }
     }
 
     if (thingy == 'd' || thingy == 'i' ||thingy == 'u') {
         /* the u?int isa HUGEU?INTVAL aka long long
          * the 'll' modifier is specced in susv3 - hopefully all our
          * compilers support it too */
-        out[i++] = 'l';
-        out[i++] = 'l';
+        *p++ = 'l';
+        *p++ = 'l';
     }
 
-    out[i++] = (char)thingy;
-    out[i]   = 0;
+    *p++ = (char)thingy;
+    *p = '\0';
 }
 
 
 /*
 
-=item C<STRING * Parrot_sprintf_format>
+=item C<STRING * Parrot_sprintf_format(PARROT_INTERP, const STRING *pat,
+SPRINTF_OBJ *obj)>
 
 This is the engine that does all the formatting.
 
@@ -303,41 +307,40 @@ This is the engine that does all the formatting.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_sprintf_format(PARROT_INTERP,
-        ARGIN(STRING *pat), ARGIN(SPRINTF_OBJ *obj))
+Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(Parrot_sprintf_format)
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;
-    INTVAL pat_len = (INTVAL)string_length(interp, pat);
+    const INTVAL pat_len = (INTVAL)Parrot_str_byte_length(interp, pat);
+    HUGEINTVAL num;
 
     /* start with a buffer; double the pattern length to avoid realloc #1 */
-    STRING *targ = string_make_empty(interp, enum_stringrep_one, pat_len << 1);
+    STRING *targ = Parrot_str_new_noinit(interp, enum_stringrep_one, pat_len * 2);
 
     /* ts is used almost universally as an intermediate target;
-     * tc is used as a temporary buffer by uint_to_string and
+     * tc is used as a temporary buffer by Parrot_str_from_uint and
      * as a target by gen_sprintf_call.
      */
     STRING *substr = NULL;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
-    for (i = 0; i < pat_len; i++) {
+    for (i = 0; i < pat_len; ++i) {
         if (string_ord(interp, pat, i) == '%') {        /* % */
             if (len) {
-                STRING *ignored
-                    = string_substr(interp, pat, old, len, &substr, 1);
-                UNUSED(ignored);
+                substr = Parrot_str_substr(interp, pat, old, len);
                 /* XXX This shouldn't modify targ the pointer */
-                targ = string_append(interp, targ, substr);
+                targ = Parrot_str_concat(interp, targ, substr);
             }
             len = 0;
             old = i;
             if (string_ord(interp, pat, i + 1) == '%') {
                 /* skip this one, make next the first char
                  * of literal sequence, starting at old */
-                i++;
-                old++;
-                len++;
+                ++i;
+                ++old;
+                ++len;
                 continue;
             }
             else {
@@ -442,129 +445,135 @@ Parrot_sprintf_format(PARROT_INTERP,
  *  set flags--the last does all the work.
  */
 
-                for (i++; i < pat_len && info.phase != PHASE_DONE; i++) {
+                for (++i; i < pat_len && info.phase != PHASE_DONE; ++i) {
                     const INTVAL ch = string_ord(interp, pat, i);
 
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:
                         switch (ch) {
-                        case '-':
+                          case '-':
                             info.flags |= FLAG_MINUS;
                             continue;
 
-                        case '+':
+                          case '+':
                             info.flags |= FLAG_PLUS;
                             continue;
 
-                        case '0':
+                          case '0':
                             info.flags |= FLAG_ZERO;
                             continue;
 
-                        case ' ':
+                          case ' ':
                             info.flags |= FLAG_SPACE;
                             continue;
 
-                        case '#':
+                          case '#':
                             info.flags |= FLAG_SHARP;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_WIDTH;
                         }
 
 
                     /*@fallthrough@ */ case PHASE_WIDTH:
                         switch (ch) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
+                          case '0':
+                          case '1':
+                          case '2':
+                          case '3':
+                          case '4':
+                          case '5':
+                          case '6':
+                          case '7':
+                          case '8':
+                          case '9':
                             info.flags |= FLAG_WIDTH;
                             info.width *= 10;
                             info.width += ch - '0';
                             continue;
 
-                        case '*':
+                          case '*':
                             info.flags |= FLAG_WIDTH;
-                            info.width = (UINTVAL)obj->getint(interp,
-                                                      SIZE_XVAL, obj);
-                            /* fall through */
+                            num = obj->getint(interp, SIZE_XVAL, obj);
+                            if (num < 0) {
+                                info.flags |= FLAG_MINUS;
+                                info.width = -num;
+                            }
+                            else {
+                                info.width = num;
+                            }
+                            continue;
 
-                        case '.':
+                          case '.':
                             info.phase = PHASE_PREC;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_PREC;
                         }
 
 
                     /*@fallthrough@ */ case PHASE_PREC:
                         switch (ch) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
+                          case '0':
+                          case '1':
+                          case '2':
+                          case '3':
+                          case '4':
+                          case '5':
+                          case '6':
+                          case '7':
+                          case '8':
+                          case '9':
                             info.flags |= FLAG_PREC;
                             info.prec *= 10;
                             info.prec += ch - '0';
                             continue;
 
-                        case '*':
+                          case '*':
                             info.flags |= FLAG_PREC;
                             info.prec = (UINTVAL)obj->getint(interp,
                                                      SIZE_XVAL, obj);
                             info.phase = PHASE_TYPE;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_TYPE;
                         }
 
                     /*@fallthrough@ */ case PHASE_TYPE:
                         switch (ch) {
-                        case 'h':
+                          case 'h':
                             info.type = SIZE_SHORT;
                             continue;
 
-                        case 'l':
+                          case 'l':
                             info.type = SIZE_LONG;
                             continue;
 
-                        case 'L':
-                        case 'H':
+                          case 'L':
+                          case 'H':
                             info.type = SIZE_HUGE;
                             continue;
 
-                        case 'v':
+                          case 'v':
                             info.type = SIZE_XVAL;
                             continue;
 
-                        case 'O':
+                          case 'O':
                             info.type = SIZE_OPCODE;
                             continue;
 
-                        case 'P':
+                          case 'P':
                             info.type = SIZE_PMC;
                             continue;
 
-                        case 'S':
+                          case 'S':
                             info.type = SIZE_PSTR;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_TERM;
                         }
 
@@ -572,99 +581,99 @@ Parrot_sprintf_format(PARROT_INTERP,
                     /*@fallthrough@ */ case PHASE_TERM:
                         switch (ch) {
                             /* INTEGERS */
-                        case 'c':
+                          case 'c':
                             {
                             STRING * const ts = string_chr(interp,
                                  (UINTVAL)obj->getint(interp, info.type, obj));
-                            targ = str_append_w_flags(interp, targ, &info, ts, NULL);
+                            targ = str_concat_w_flags(interp, targ, &info, ts, NULL);
                             }
                             break;
 
-                        case 'o':
+                          case 'o':
                             {
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts    =
-                                uint_to_str(interp, tc, theuint, 8, 0);
+                                Parrot_str_from_uint(interp, tc, theuint, 8, 0);
                             STRING * const prefix = CONST_STRING(interp, "0");
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ        = str_append_w_flags(interp, targ,
+                            targ        = str_concat_w_flags(interp, targ,
                                             &info, ts, prefix);
                             }
                             break;
 
-                        case 'x':
+                          case 'x':
                             {
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts         =
-                                uint_to_str(interp, tc, theuint, 16, 0);
+                                Parrot_str_from_uint(interp, tc, theuint, 16, 0);
                             STRING * const prefix = CONST_STRING(interp, "0x");
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ        = str_append_w_flags(interp, targ,
+                            targ        = str_concat_w_flags(interp, targ,
                                             &info, ts, prefix);
                             }
                             break;
 
-                        case 'X':
+                          case 'X':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0X");
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
-                            STRING * const ts =
-                                uint_to_str(interp, tc, theuint, 16, 0);
-                            string_upcase_inplace(interp, ts);
+                            STRING * ts =
+                                Parrot_str_from_uint(interp, tc, theuint, 16, 0);
+                            ts = Parrot_str_upcase(interp, ts);
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ        = str_append_w_flags(interp, targ,
+                            targ        = str_concat_w_flags(interp, targ,
                                             &info, ts, prefix);
                             }
                             break;
 
-                        case 'b':
+                          case 'b':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0b");
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts =
-                                uint_to_str(interp, tc, theuint, 2, 0);
+                                Parrot_str_from_uint(interp, tc, theuint, 2, 0);
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ        = str_append_w_flags(interp, targ,
+                            targ        = str_concat_w_flags(interp, targ,
                                             &info, ts, prefix);
                             }
                             break;
 
-                        case 'B':
+                          case 'B':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0B");
                             const HUGEINTVAL theint =
                                 obj->getint(interp, info.type, obj);
                             STRING * const ts =
-                                int_to_str(interp, tc, theint, 2);
+                                Parrot_str_from_int_base(interp, tc, theint, 2);
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
-                            targ        = str_append_w_flags(interp, targ,
+                            targ        = str_concat_w_flags(interp, targ,
                                             &info, ts, prefix);
                             }
                             break;
 
-                        case 'u':
+                          case 'u':
                             {
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             sharedint = theuint;
                             }
                             goto do_sprintf;
-                        case 'd':
-                        case 'i':
+                          case 'd':
+                          case 'i':
 
                             /* EVIL: Work around bug in glibc that makes %0lld
                              * sometimes output an empty string. */
@@ -672,14 +681,14 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 info.flags &= ~FLAG_ZERO;
 
                             sharedint = obj->getint(interp, info.type, obj);
-                        do_sprintf:
+                          do_sprintf:
                             {
                             STRING *ts;
                             gen_sprintf_call(tc, &info, ch);
                             ts = cstr2pstr(tc);
                             {
                                 char * const tempstr =
-                                    string_to_cstring(interp, ts);
+                                    Parrot_str_to_cstring(interp, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -688,44 +697,56 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 /* the buffer is 4096, so no problem here */
                                 sprintf(tc, tempstr, sharedint);
 #endif
-                                string_cstring_free(tempstr);
+                                Parrot_str_free_cstring(tempstr);
                             }
-                            targ = string_append(interp, targ, cstr2pstr(tc));
+                            targ = Parrot_str_concat(interp, targ, cstr2pstr(tc));
                             }
                             break;
 
-                        case 'p':
+                          case 'p':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0x");
                             const void * const ptr =
                                 obj->getptr(interp, info.type, obj);
-                            STRING * const ts = uint_to_str(interp, tc,
-                                       (HUGEINTVAL) (size_t) ptr, 16, 0);
+                            STRING * const ts = Parrot_str_from_uint(interp, tc,
+                                       (UHUGEINTVAL) (size_t) ptr, 16, 0);
 
-                            targ = str_append_w_flags(interp, targ, &info,
+                            targ = str_concat_w_flags(interp, targ, &info,
                                     ts, prefix);
                             }
                             break;
 
                             /* FLOATS - We cheat on these and use snprintf. */
-                        case 'e':
-                        case 'E':
-                        case 'f':
-                        case 'g':
-                        case 'G':
+                          case 'e':
+                          case 'E':
+                          case 'f':
+                          case 'g':
+                          case 'G':
                             {
                             STRING *ts;
                             const HUGEFLOATVAL thefloat =
                                 obj->getfloat(interp, info.type, obj);
 
-                            /* turn -0.0 into 0.0 */
-                            gen_sprintf_call(tc, &info, ch);
-                            ts = cstr2pstr(tc);
+                            /* check for Inf and NaN values */
+                            if (thefloat == PARROT_FLOATVAL_INF_POSITIVE) {
+                                ts = cstr2pstr(PARROT_CSTRING_INF_POSITIVE);
+                            }
+                            else if (thefloat == PARROT_FLOATVAL_INF_NEGATIVE) {
+                                ts = cstr2pstr(PARROT_CSTRING_INF_NEGATIVE);
+                            }
+                            else if (thefloat != thefloat) {
+                                ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
+                            }
+                            else {
+                                /* turn -0.0 into 0.0 */
+                                gen_sprintf_call(tc, &info, ch);
+                                ts = cstr2pstr(tc);
+                            }
 
                             /* XXX lost precision if %Hg or whatever */
                             {
                                 char * const tempstr =
-                                    string_to_cstring(interp, ts);
+                                    Parrot_str_to_cstring(interp, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -735,7 +756,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 /* the buffer is 4096, so no problem here */
                                 sprintf(tc, tempstr, (double)thefloat);
 #endif
-                                string_cstring_free(tempstr);
+                                Parrot_str_free_cstring(tempstr);
                             }
 
 #ifdef WIN32
@@ -748,7 +769,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                              || ch == 'e' || ch == 'E') {
                                 const size_t tclen = strlen(tc);
                                 size_t j;
-                                for (j = 0; j < tclen; j++) {
+                                for (j = 0; j < tclen; ++j) {
                                     if ((tc[j] == 'e' || tc[j] == 'E')
                                         && (tc[j+1] == '+' || tc[j+1] == '-')
                                         && tc[j+2] == '0'
@@ -778,12 +799,12 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
 #endif /* WIN32 */
 
-                            targ = string_append(interp, targ, cstr2pstr(tc));
+                            targ = Parrot_str_concat(interp, targ, cstr2pstr(tc));
                             }
                             break;
 
                             /* STRINGS */
-                        case 'r':        /* Python repr */
+                          case 'r':        /* Python repr */
                             /* XXX the right fix is to add a getrepr entry *
                              * to SPRINTF_OBJ, but for now, getstring_pmc  *
                              * is inlined and modified to call get_repr    */
@@ -793,48 +814,51 @@ Parrot_sprintf_format(PARROT_INTERP,
                                                              ((PMC *)obj->data),
                                                              (obj->index));
 
-                                STRING *string = (VTABLE_get_repr(interp, tmp));
-                                STRING *ts     = handle_flags(interp, &info,
+                                STRING * const string = (VTABLE_get_repr(interp, tmp));
+                                STRING * const ts     = handle_flags(interp, &info,
                                                     string, 0, NULL);
-                                obj->index++;
+                                ++obj->index;
 
-                                targ = string_append(interp, targ, ts);
+                                targ = Parrot_str_concat(interp, targ, ts);
                                 break;
                             }
 
-                        case 's':
+                          case 's':
                           CASE_s:
                             {
                             STRING * const string = obj->getstring(interp,
                                                         info.type, obj);
-                            STRING * const ts     = handle_flags(interp, &info,
-                                                        string, 0, NULL);
-                            targ = string_append(interp, targ, ts);
+                            /* XXX Silently ignore? */
+                            if (!STRING_IS_NULL(string)) {
+                                STRING * const ts = handle_flags(interp,
+                                        &info, string, 0, NULL);
+                                targ = Parrot_str_concat(interp, targ, ts);
+                            }
                             }
                             break;
 
-                        default:
+                          default:
                             /* fake the old %P and %S commands */
                             if (info.type == SIZE_PMC
                              || info.type == SIZE_PSTR) {
-                                i--;
+                                --i;
                                 goto CASE_s;
                                 /* case 's' will see the SIZE_PMC or SIZE_PSTR
                                  * and assume it was %Ps (or %Ss).  Genius,
                                  * no?  */
                             }
                             else {
-                                real_exception(interp, NULL, INVALID_CHARACTER,
-                                                   "'%c' is not a valid "
-                                                   "sprintf format", ch);
+                                Parrot_ex_throw_from_c_args(interp, NULL,
+                                    EXCEPTION_INVALID_CHARACTER,
+                                    "'%c' is not a valid sprintf format", ch);
                             }
                         }
 
                         info.phase = PHASE_DONE;
                         break;
 
-                    case PHASE_DONE:
-                    default:
+                      case PHASE_DONE:
+                      default:
                         /* This is the terminating condition of the surrounding
                          * loop, so...
                          */
@@ -844,16 +868,15 @@ Parrot_sprintf_format(PARROT_INTERP,
             }
 
             old = i;
-            i--;
+            --i;
         }
         else {
-            len++;
+            ++len;
         }
     }
     if (len) {
-        STRING *ignored = string_substr(interp, pat, old, len, &substr, 1);
-        UNUSED(ignored);
-        targ = string_append(interp, targ, substr);
+        substr = Parrot_str_substr(interp, pat, old, len);
+        targ = Parrot_str_concat(interp, targ, substr);
     }
 
     return targ;

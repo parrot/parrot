@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 65;
+use Parrot::Test;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -34,8 +34,9 @@ $ENV{TEST_PROG_ARGS} ||= '';
 
 SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
-        skip( "Please make libnci_test$PConfig{load_ext}", Test::Builder->expected_tests() );
+        plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
+    plan tests => 71;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -164,14 +165,14 @@ OUTPUT
 
     # the contained structure pointer
     .local pmc nci_dlvar_double_decl
-    nci_dlvar_double_decl = new 'ResizablePMCArray'
+    nci_dlvar_double_decl = new ['ResizablePMCArray']
     push nci_dlvar_double_decl, .DATATYPE_DOUBLE
     push nci_dlvar_double_decl, 0
     push nci_dlvar_double_decl, 0
     assign nci_dlvar_double, nci_dlvar_double_decl
 
-    N2 = nci_dlvar_double[0]
-    print N2
+    $N2 = nci_dlvar_double[0]
+    print $N2
     print "\n"
 
     .local pmc nci_d
@@ -197,12 +198,12 @@ NOT_LOADED:
 .end
 CODE
 libnci_test was successfully loaded
--55555.555550
--555555.555500
--5555555.555000
--55555555.550000
--555555555.500000
--5555555555.000000
+-55555.55555
+-555555.5555
+-5555555.555
+-55555555.55
+-555555555.5
+-5555555555
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
@@ -226,14 +227,14 @@ OUTPUT
 
     # the contained structure pointer
     .local pmc nci_dlvar_float_decl
-    nci_dlvar_float_decl = new 'ResizablePMCArray'
+    nci_dlvar_float_decl = new ['ResizablePMCArray']
     push nci_dlvar_float_decl, .DATATYPE_FLOAT
     push nci_dlvar_float_decl, 0
     push nci_dlvar_float_decl, 0
     assign nci_dlvar_float, nci_dlvar_float_decl
 
-    N2 = nci_dlvar_float[0]
-    print N2
+    $N2 = nci_dlvar_float[0]
+    print $N2
     print "\n"
 
     .local pmc nci_f
@@ -259,12 +260,12 @@ NOT_LOADED:
 .end
 CODE
 libnci_test was successfully loaded
--333.000000
--3330.000000
--33300.000000
--333000.000000
--3330000.000000
--33300000.000000
+-333
+-3330
+-33300
+-333000
+-3330000
+-33300000
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register" );
@@ -313,14 +314,14 @@ OUTPUT
 
     # the contained structure pointer
     .local pmc nci_p_out_decl
-    nci_p_out_decl = new 'ResizablePMCArray'
+    nci_p_out_decl = new ['ResizablePMCArray']
     push nci_p_out_decl, .DATATYPE_INT
     push nci_p_out_decl, 0
     push nci_p_out_decl, 0
     assign nci_p_out, nci_p_out_decl
 
-    I2 = nci_p_out[0]
-    print I2
+    $I2 = nci_p_out[0]
+    print $I2
     print "\n"
 NOT_LOADED:
 .end
@@ -406,33 +407,33 @@ SKIP:
 
     # the contained structure pointer
     .local pmc nci_dlvar_int_decl
-    nci_dlvar_int_decl = new 'ResizablePMCArray'
+    nci_dlvar_int_decl = new ['ResizablePMCArray']
     push nci_dlvar_int_decl, .DATATYPE_INT
     push nci_dlvar_int_decl, 0
     push nci_dlvar_int_decl, 0
     assign nci_dlvar_int, nci_dlvar_int_decl
 
-    I2 = nci_dlvar_int[0]
-    print I2
+    $I2 = nci_dlvar_int[0]
+    print $I2
     print "\n"
 
     .local pmc nci_v
     nci_v = dlfunc libnci_test, "nci_v", "v"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
 NOT_LOADED:
 .end
@@ -452,8 +453,8 @@ OUTPUT
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
   set_args "0", 4.0
-  get_results "0", N5
   invokecc P0
+  get_results "0", N5
   ne N5, 8.0, nok_1
   print "ok 1\n"
   end
@@ -487,7 +488,7 @@ NOT_LOADED:
 .end
 CODE
 libnci_test was successfully loaded
--8.256000
+-8.256
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "get_string()" );
@@ -523,8 +524,8 @@ OUTPUT
   set N5, 12.0
   set N6, 3.0
   set_args "0,0", N5, N6
-  get_results "0", N5
   invokecc P0
+  get_results "0", N5
   ne N5, 4.0, nok_1
   print "ok 1\n"
   end
@@ -546,8 +547,8 @@ OUTPUT
   set I5, 2
   set I6, 3
   set_args "0,0", I5, I6
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
   ne I5, 6, nok_1
   print "ok 1\n"
   end
@@ -566,12 +567,12 @@ OUTPUT
   print "loaded\n"
   dlfunc P0, P1, "nci_ssc", "ssc"
   print "dlfunced\n"
-  set I5, 2
+  set I5, -2
   set I6, 3
   set_args "0,0", I5, I6
-  get_results "0", I5
   invokecc P0
-  ne I5, 6, nok_1
+  get_results "0", I5
+  ne I5, -6, nok_1
   print "ok 1\n"
   end
 nok_1: print "nok 1\n"
@@ -592,8 +593,8 @@ OUTPUT
   set I5, 6
   set I6, 7
   set_args "0,0", I5, I6
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
   ne I5, 42, nok_1
   print "ok 1\n"
   end
@@ -607,24 +608,26 @@ dlfunced
 ok 1
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
-  loadlib P1, "libnci_test"
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
+.loadlib 'io_ops'
+.sub 'main' :main
+  loadlib $P1, "libnci_test"
   printerr "loaded\n"
-  dlfunc P0, P1, "nci_it", "it"
+  dlfunc $P0, $P1, "nci_it", "it"
   printerr "dlfunced\n"
-  set S5, "ko\n"
-  set_args "0", S5
-  get_results "0", I5
-  invokecc P0
-  ne I5, 2, nok_1
+  set $S5, "ko\n"
+  set_args "0", $S5
+  invokecc $P0
+  get_results "0", $I5
+  ne $I5, 2, nok_1
   printerr "ok 2\n"
   end
 nok_1: printerr "nok 1\n"
-  printerr I5
+  printerr $I5
   printerr "\n"
   end
 nok_2: printerr "nok 2\n"
-  end
+.end
 CODE
 loaded
 dlfunced
@@ -635,21 +638,22 @@ OUTPUT
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
 
 .include "datatypes.pasm"
+.loadlib 'io_ops'
 
 .sub test :main
-  loadlib P1, "libnci_test"
+  loadlib $P1, "libnci_test"
   printerr "loaded\n"
   .local pmc nci_it
-  nci_it = dlfunc P1, "nci_it", "it"
+  nci_it = dlfunc $P1, "nci_it", "it"
   printerr "dlfunced\n"
-  ( I5 ) = nci_it( "ko" )
-  ne I5, 2, nok_1
+  ( $I5 ) = nci_it( "ko" )
+  ne $I5, 2, nok_1
   printerr "ok "
-  printerr I5
+  printerr $I5
   printerr "\n"
   end
 nok_1: printerr "nok 1\n"
-  printerr I5
+  printerr $I5
   printerr "\n"
   end
 nok_2: printerr "nok 2\n"
@@ -669,8 +673,8 @@ OUTPUT
   print "dlfunced\n"
   set S5, "ko\n"
   set_args "0", S5
-  get_results "0", S5
   invokecc P0
+  get_results "0", S5
   print S5
   end
 nok_1: print "nok 1\n"
@@ -694,8 +698,8 @@ loop:
   dlfunc P0, P1, "nci_dd", "dd"
   set N5, 77.0
   set_args "0", 4.0
-  get_results "0", N5
   invokecc P0
+  get_results "0", N5
   ne N5, 8.0, nok_1
   dec I10
   gt I10, 0, loop
@@ -721,13 +725,13 @@ OUTPUT
   clone P2, P0
   print "ok 1\n"
   set_args "0", 4.0
-  get_results "0", N5
   invokecc P0
+  get_results "0", N5
   ne N5, 8.0, nok_1
   print "ok 2\n"
   set_args "0", 4.0
-  get_results "0", N5
   invokecc P2
+  get_results "0", N5
   ne N5, 8.0, nok_1
   end
 nok_1: print "nok 1\n"
@@ -748,8 +752,8 @@ OUTPUT
   set I6, 20
   set I7, 30
   set_args "0,0,0", I5,I6,I7
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
   print I5
   print "\n"
   end
@@ -761,12 +765,12 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_i4i", "i4i"
-  new P5, 'Integer'
+  new P5, ['Integer']
   set P5, -6
   set I5, -7
   set_args "0,0", P5,I5
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
   print I5
   print "\n"
   end
@@ -780,12 +784,12 @@ OUTPUT
   dlfunc P0, P1, "nci_ii3", "ii3"
   set I5, -6
 
-  new P5, 'Integer'
+  new P5, ['Integer']
   set P5, -7
 
   set_args "0,0", I5,P5
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
 
   print I5
   print "\n"
@@ -802,8 +806,8 @@ OUTPUT
   dlfunc P0, P1, "nci_tb", "tb"
   set S5, "ko\n"
   set_args "0", S5
-  get_results "0", S5
   invokecc P0
+  get_results "0", S5
   print S5
   end
 CODE
@@ -815,8 +819,8 @@ OUTPUT
   dlfunc P0, P1, "nci_tB", "tB"
   set S5, "ko\n"
   set_args "0", S5
-  get_results "0", S5
   invokecc P0
+  get_results "0", S5
   print S5
   end
 CODE
@@ -829,12 +833,12 @@ OUTPUT
   # this test function returns a struct { int[2]; char }
   set I5, 0
   set_args "0", I5
-  get_results "0", P5
   invokecc P0
-  new P2, 'ResizablePMCArray'
+  get_results "0", P5
+  new P2, ['ResizablePMCArray']
 .include "datatypes.pasm"
   push P2, .DATATYPE_INT
-  push P2, 2	# 2 elem array
+  push P2, 2    # 2 elem array
   push P2, 0
   push P2, .DATATYPE_CHAR
   push P2, 0
@@ -861,12 +865,12 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { float[2]; double }
   set_args "0", 1
-  get_results "0", P5
   invokecc P0
-  new P2, 'ResizablePMCArray'
+  get_results "0", P5
+  new P2, ['ResizablePMCArray']
 .include "datatypes.pasm"
   push P2, .DATATYPE_FLOAT
-  push P2, 2	# 2 elem array
+  push P2, 2    # 2 elem array
   push P2, 0
   push P2, .DATATYPE_DOUBLE
   push P2, 0
@@ -883,9 +887,9 @@ OUTPUT
   print "\n"
   end
 CODE
-42.000000
-100.000000
-47.110000
+42
+100
+47.11
 OUTPUT
 
     pasm_output_like( <<'CODE', <<'OUTPUT', "nci_pi - align" );
@@ -893,9 +897,9 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; int }
   set_args "0", 2
-  get_results "0", P5
   invokecc P0
-  new P2, 'ResizablePMCArray'
+  get_results "0", P5
+  new P2, ['ResizablePMCArray']
 .include "datatypes.pasm"
   push P2, .DATATYPE_CHAR
   push P2, 0
@@ -927,9 +931,9 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char*; int }
   set_args "0", 3
-  get_results "0", P5
   invokecc P0
-  new P2, 'ResizablePMCArray'
+  get_results "0", P5
+  new P2, ['ResizablePMCArray']
 .include "datatypes.pasm"
   push P2, .DATATYPE_CSTR
   push P2, 0
@@ -955,11 +959,11 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; x->{int, double} }
   set_args "0", 4
-  get_results "0", P5
   invokecc P0
+  get_results "0", P5
 .include "datatypes.pasm"
   # the contained structure
-  new P3, 'ResizablePMCArray'
+  new P3, ['ResizablePMCArray']
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -969,9 +973,9 @@ OUTPUT
   push P3, .DATATYPE_DOUBLE
   push P3, 0
   push P3, 0
-  new P4, 'UnManagedStruct', P3
+  new P4, ['UnManagedStruct'], P3
   # outer structure
-  new P2, 'ResizablePMCArray'
+  new P2, ['ResizablePMCArray']
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -1002,15 +1006,15 @@ CODE
 10
 100
 77
-200.000000
+200
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access" );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   set_args "0", 8
-  get_results "0", P5
   invokecc P0
+  get_results "0", P5
 .include "datatypes.pasm"
   # the contained structure pointer
   new  P6, 'OrderedHash'
@@ -1020,7 +1024,7 @@ OUTPUT
   set  P6[ 'j' ], .DATATYPE_INT
   push P6, 0
   push P6, 0
-  new P7, 'UnManagedStruct', P6
+  new P7, ['UnManagedStruct'], P6
   # the contained structure
   new  P3, 'OrderedHash'
   set  P3[ 'i'  ], .DATATYPE_INT
@@ -1034,9 +1038,9 @@ OUTPUT
   setprop P1, "_struct", P7
   push P3, 0
   push P3, 0
-  new P4, 'UnManagedStruct', P3
+  new P4, ['UnManagedStruct'], P3
   # outer structure
-  new P2, 'OrderedHash'
+  new P2, ['OrderedHash']
   set  P2[ 'x'  ], .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1080,14 +1084,14 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int (*f)(char *) }
   set_args "0", 5
-  get_results "0", P5
   invokecc P0
-  new P2, 'ResizablePMCArray'
+  get_results "0", P5
+  new P2, ['ResizablePMCArray']
 .include "datatypes.pasm"
   push P2, .DATATYPE_FUNC_PTR
   # attach function signature property to this type
   set P1, P2[-1]
-  new P3, 'String'
+  new P3, ['String']
   set P3, "it"
   setprop P1, "_signature", P3
   push P2, 0
@@ -1096,8 +1100,8 @@ OUTPUT
   # now we get a callable NCI PMC
   set P0, P5[0]
   set_args "0", "hello call_back"
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
   print I5
   print "\n"
   end
@@ -1111,20 +1115,20 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int; {int; int} int }
   set_args "0", 6
-  get_results "0", P5
   invokecc P0
+  get_results "0", P5
 .include "datatypes.pasm"
   # the nested structure
-  new P3, 'ResizablePMCArray'
+  new P3, ['ResizablePMCArray']
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, 'UnManagedStruct', P3
+  new P4, ['UnManagedStruct'], P3
   # outer structure
-  new P2, 'ResizablePMCArray'
+  new P2, ['ResizablePMCArray']
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1166,20 +1170,20 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
   set_args "0", 7
-  get_results "0", P5
   invokecc P0
+  get_results "0", P5
 .include "datatypes.pasm"
   # the nested structure
-  new P3, 'ResizablePMCArray'
+  new P3, ['ResizablePMCArray']
   push P3, .DATATYPE_CHAR
   push P3, 0
   push P3, 0
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, 'UnManagedStruct', P3
+  new P4, ['UnManagedStruct'], P3
   # outer structure
-  new P2, 'ResizablePMCArray'
+  new P2, ['ResizablePMCArray']
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -1221,20 +1225,20 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
   set_args "0", 7
-  get_results "0", P5
   invokecc P0
+  get_results "0", P5
 .include "datatypes.pasm"
   # the nested structure
-  new P3, 'OrderedHash'
+  new P3, ['OrderedHash']
   set P3["i"], .DATATYPE_CHAR
   push P3, 0
   push P3, 0
   set P3["j"], .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, 'UnManagedStruct', P3
+  new P4, ['UnManagedStruct'], P3
   # outer structure
-  new P2, 'OrderedHash'
+  new P2, ['OrderedHash']
   set P2["x"], .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -1291,15 +1295,15 @@ OUTPUT
 
   # the contained structure pointer
   .local pmc nci_pi_out_decl
-  nci_pi_out_decl = new 'ResizablePMCArray'
+  nci_pi_out_decl = new ['ResizablePMCArray']
   push nci_pi_out_decl, .DATATYPE_INT
   push nci_pi_out_decl, 0
   push nci_pi_out_decl, 0
 
   # attach struct initializer
   assign nci_pi_out, nci_pi_out_decl
-  set I0, nci_pi_out[0]
-  print I0
+  set $I0, nci_pi_out[0]
+  print $I0
 NOT_LOADED:
   print "\n"
 .end
@@ -1314,39 +1318,29 @@ OUTPUT
   # this test function wants a struct
   # { double d; float f; int i; char*}
   # and returns the sum of these values
-  new P2, 'ResizablePMCArray'
+  new P2, ['ResizablePMCArray']
 .include "datatypes.pasm"
   push P2, .DATATYPE_DOUBLE
   push P2, 0
   push P2, 0
   push P2, .DATATYPE_FLOAT
-  push P2, 0	# 1 elem array
+  push P2, 0    # 1 elem array
   push P2, 0
   push P2, .DATATYPE_INT
-  push P2, 0	# 1 elem array
+  push P2, 0    # 1 elem array
   push P2, 0
   push P2, .DATATYPE_CSTR
-  push P2, 0	# 1 elem array
+  push P2, 0    # 1 elem array
   push P2, 0
-  new P5, 'ManagedStruct', P2
-  set I6, 0
-  sizeof I7, .DATATYPE_DOUBLE
-  add I6, I7
-  sizeof I7, .DATATYPE_FLOAT
-  add I6, I7
-  sizeof I7, .DATATYPE_INT
-  add I6, I7
-  sizeof I7, .DATATYPE_CSTR
-  add I6, I7
-  set P5, I6
+  new P5, ['ManagedStruct'], P2
   set P5[0], 10.0
   set P5[1], 4.0
   set P5[2], 17
   set P5[3], "hello from Parrot\x0"
   set I5, 1
   set_args "0", P5
-  get_results "0", I5
   invokecc P0
+  get_results "0", I5
   print I5
   print "\n"
   end
@@ -1355,10 +1349,35 @@ hello from Parrot
 31
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_vP" );
+    pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - null" );
+
+.include "datatypes.pasm"
+
+.sub test :main
+
+  # load library
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto FAILED
+
+  # calling a function in libnci_test
+  .local pmc nci_pi
+  dlfunc nci_pi, libnci_test, "nci_pi", "pi"
+  .local pmc result
+  result = nci_pi( 10 )
+  unless_null result, FAILED
+  print "got null"
+FAILED:
+  print "\n"
+.end
+CODE
+got null
+OUTPUT
+
+    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_vP", todo => 'Disabled to avoid linkage problems, see src/nci_test.c' );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
-  new P5, 'String'
+  new P5, ['String']
   set P5, "ok\n"
   set_args "0", P5
   invokecc P0
@@ -1372,18 +1391,18 @@ got null
 OUTPUT
 
   # Tests with callback functions
-  my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
-    ( todo => 'RT #49718, add scheduler tasks to JIT' ) : ();
+  my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
+    ( todo => 'TT #1316, add scheduler tasks to JIT' ) : ();
 
   pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM", @todo );
 
   # we need a flag if the call_back is already done
-  new P10, 'Integer'
+  new P10, ['Integer']
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
-  new P7, 'Integer'
+  new P7, ['Integer']
   set P7, 42
   new_callback P5, P6, P7, "vtU" # Z in pdd16
   print "ok 1\n"
@@ -1440,20 +1459,20 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new 'Integer'
+    cb_done = new ['Integer']
     cb_done = 0
     set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new 'Integer'
+    user_data = new ['Integer']
     user_data = 42
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vtU"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vtU"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1494,8 +1513,8 @@ ERROR:
   print "external data: "
   print s
   print "\n"
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1510,14 +1529,14 @@ OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM", @todo );
   # we need a flag if the call_back is already done
-  new P10, 'Integer'
+  new P10, ['Integer']
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
-  new P7, 'Integer'
+  new P7, ['Integer']
   set P7, 42
-  new_callback P5, P6, P7, "viU"	# Z in pdd16
+  new_callback P5, P6, P7, "viU"    # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1576,20 +1595,20 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new 'Integer'
+    cb_done = new ['Integer']
     cb_done = 0
     set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new 'Integer'
+    user_data = new ['Integer']
     user_data = 42
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vpU"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vpU"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1621,27 +1640,27 @@ ERROR:
 .end
 
 .sub _call_back
-  get_params "0,0", P5, P6
+  get_params "0,0", $P5, $P6
   print "in callback\n"
   print "user data: "
-  print P5
+  print $P5
   print "\n"
 
   # P6 is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  assign P6, P2
+  new $P2, ['ResizablePMCArray']
+  push $P2, .DATATYPE_INT
+  push $P2, 0
+  push $P2, 0
+  assign $P6, $P2
 
   # print referenced integer in libnci_test.so
-  I17 = P6[0]
+  $I17 = $P6[0]
   print "external data: "
-  print I17
+  print $I17
   print "\n"
 
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1657,14 +1676,14 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM", @todo );
 
   # we need a flag if the call_back is already done
-  new P10, 'Integer'
+  new P10, ['Integer']
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
-  new P7, 'Integer'
+  new P7, ['Integer']
   set P7, 42
-  new_callback P5, P6, P7, "vUt"	# Z in pdd16
+  new_callback P5, P6, P7, "vUt"    # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1715,14 +1734,14 @@ OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM", @todo );
   # we need a flag if the call_back is already done
-  new P10, 'Integer'
+  new P10, ['Integer']
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
-  new P7, 'Integer'
+  new P7, ['Integer']
   set P7, 42
-  new_callback P5, P6, P7, "vUi"	# Z in pdd16
+  new_callback P5, P6, P7, "vUi"    # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1778,20 +1797,20 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new 'Integer'
+    cb_done = new ['Integer']
     cb_done = 0
     set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new 'Integer'
+    user_data = new ['Integer']
     user_data = 42
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vUi"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUi"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1832,8 +1851,8 @@ ERROR:
   print "external data: "
   print i
   print "\n"
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1855,20 +1874,20 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new 'Integer'
+    cb_done = new ['Integer']
     cb_done = 0
     set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new 'Integer'
+    user_data = new ['Integer']
     user_data = 42
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUp"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1908,20 +1927,20 @@ ERROR:
   print "\n"
 
   # s is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  assign s, P2
+  new $P2, ['ResizablePMCArray']
+  push $P2, .DATATYPE_INT
+  push $P2, 0
+  push $P2, 0
+  assign s, $P2
 
   # print referenced integer in libnci_test.so
-  I17 = s[0]
+  $I17 = s[0]
   print "external data: "
-  print I17
+  print $I17
   print "\n"
 
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1945,7 +1964,7 @@ OUTPUT
     bounds 1
     # prepare user data
     .local pmc user_data
-    user_data = new 'Integer'
+    user_data = new ['Integer']
     user_data = 42
 
     # load libnci_test
@@ -1956,7 +1975,7 @@ OUTPUT
     .local pmc int_cb_D4
     int_cb_D4 = dlvar libnci_test, "int_cb_D4"
     .local pmc int_cb_D4_decl
-    int_cb_D4_decl = new 'ResizablePMCArray'
+    int_cb_D4_decl = new ['ResizablePMCArray']
     push int_cb_D4_decl, .DATATYPE_INT
     push int_cb_D4_decl, 0
     push int_cb_D4_decl, 0
@@ -1965,9 +1984,9 @@ OUTPUT
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUp"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1980,7 +1999,7 @@ OUTPUT
     int_cb_D4[0] = 1
 
     .local pmc synchronous
-    synchronous = new 'Integer'
+    synchronous = new ['Integer']
     synchronous = 1
     setprop user_data, "_synchronous", synchronous
     print "marked callback as synchronous\n"
@@ -1993,18 +2012,18 @@ OUTPUT
 .param pmc u
 .param pmc s
   # s is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  assign s, P2
+  new $P2, ['ResizablePMCArray']
+  push $P2, .DATATYPE_INT
+  push $P2, 0
+  push $P2, 0
+  assign s, $P2
 
   print "external data: "
-  I17 = s[0]
-  print I17
+  $I17 = s[0]
+  print $I17
   print "\n"
-  I17 = I17 * 10
-  s[0] = I17
+  $I17 = $I17 * 10
+  s[0] = $I17
 
   returncc
 .end
@@ -2036,7 +2055,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pip - array of structs' );
 
 .include "datatypes.pasm"
-  new P3, 'OrderedHash'
+  new P3, ['OrderedHash']
   set  P3["x"], .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -2049,16 +2068,16 @@ OUTPUT
   set  P3["h"], .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P6, 'UnManagedStruct', P3
+  new P6, ['UnManagedStruct'], P3
 
-  new P4, 'OrderedHash'
+  new P4, ['OrderedHash']
   set  P4["Rect"], .DATATYPE_STRUCT
   set P1, P4[-1]
   setprop P1, "_struct", P6
   push P4, 4
   push P4, 0
 
-  new P5, 'ManagedStruct', P4
+  new P5, ['ManagedStruct'], P4
   set P5[0;0;'x'], 100
   set P5[0;0;'y'], 110
   set P5['Rect';0;'w'], 120
@@ -2108,16 +2127,16 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
 
 .include "datatypes.pasm"
-  new P2, 'Integer'
+  new P2, ['Integer']
   set P2, 3
-  new P3, 'Integer'
+  new P3, ['Integer']
   set P3, 2
 
   loadlib P1, "libnci_test"
   set_args "0,0", P2, P3
-  get_results "0", I5
   dlfunc P0, P1, "nci_i33", "i33"
   invokecc P0
+  get_results "0", I5
 
   print "Double: "
   print P2
@@ -2134,7 +2153,7 @@ Triple: 6
 Sum: 12
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 
 .include "datatypes.pasm"
   new  P8, 'OrderedHash'
@@ -2156,16 +2175,15 @@ OUTPUT
   push P6, 0
 
   new  P5, 'ManagedStruct', P6
-  set  P9[ 'y' ], 200
+  set  P5[ 'nested'; 'y' ], 200
   set  P5[ 'x' ], 100
 
   set I0, P5[ 'x' ]
   set I1, P5[ 'nested'; 'y' ]
   print "Old X: "
-  print I0
-  print "\nOld Y: "
-  print I1
-  print "\n"
+  say I0
+  print "Old Y: "
+  say I1
 
   set_args "0,0,0", P5, 1, 2
   loadlib P1, "libnci_test"
@@ -2176,15 +2194,13 @@ OUTPUT
   set P6, P5[ 'nested' ]
   set I1, P6[ 'y' ]
   print "X: "
-  print I0
-  print "\nY: "
-  print I1
-  print "\n"
+  say I0
+  print "Y: "
+  say I1
   # extract struct
   set P6, P5[ 'nested' ]
   set I1, P6[ 'y' ]
-  print I1
-  print "\n"
+  say I1
   end
 CODE
 Old X: 100
@@ -2200,8 +2216,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_piiii", "piiii"
   set_args "0,0,0,0", 100,200,400,800
-  get_results "0", P5
   invokecc P0
+  get_results "0", P5
 
   new  P6, 'OrderedHash'
   set  P6[ 'count' ], .DATATYPE_INT
@@ -2212,7 +2228,7 @@ OUTPUT
   set  P7[ 'array' ], .DATATYPE_INT
   push P7, 0
   push P7, 0
-  new P8, 'UnManagedStruct', P7
+  new P8, ['UnManagedStruct'], P7
   # yes, the array within the struct has _4_ elements
   # but with an UnManagedStruct, you can't always know the amount beforehand
   set  P6[ 'array' ], .DATATYPE_STRUCT_PTR
@@ -2275,7 +2291,7 @@ OUTPUT
 
   # the contained structure pointer
   .local pmc product_pointer_decl
-  product_pointer_decl = new 'ResizablePMCArray'
+  product_pointer_decl = new ['ResizablePMCArray']
   push product_pointer_decl, .DATATYPE_INT
   push product_pointer_decl, 0
   push product_pointer_decl, 0
@@ -2334,33 +2350,33 @@ SKIP:
 
     # the contained structure pointer
     .local pmc nci_dlvar_int_decl
-    nci_dlvar_int_decl = new 'ResizablePMCArray'
+    nci_dlvar_int_decl = new ['ResizablePMCArray']
     push nci_dlvar_int_decl, .DATATYPE_INT
     push nci_dlvar_int_decl, 0
     push nci_dlvar_int_decl, 0
     assign nci_dlvar_int, nci_dlvar_int_decl
 
-    I2 = nci_dlvar_int[0]
-    print I2
+    $I2 = nci_dlvar_int[0]
+    print $I2
     print "\n"
 
     .local pmc nci_vv
-    nci_vv = dlfunc libnci_test, "nci_vv", "vv"
+    nci_vv = dlfunc libnci_test, "nci_vv", ""
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
 NOT_LOADED:
 .end
@@ -2460,7 +2476,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "opcode 'does'" );
 
 .sub test :main
     .local pmc pmc1
-    pmc1 = new 'ParrotLibrary'
+    pmc1 = new ['ParrotLibrary']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -2488,7 +2504,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion d <-> P" );
     .local pmc twice
     twice = dlfunc libnci_test, "nci_dd", "dd"
     .local pmc f, g
-    f = new 'Integer'
+    f = new ['Integer']
     f = 21
     g = twice( f )
     print g
@@ -2507,7 +2523,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion S <-> P" );
     .local pmc reverse
     reverse = dlfunc libnci_test, "nci_tt", "tt"
     .local pmc s, t
-    s = new 'String'
+    s = new ['String']
     s = "ko"
     t = reverse( s )
     print t
@@ -2525,18 +2541,17 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
     .local pmc mult
     mult = dlfunc libnci_test, "nci_i4i", "i4i"
     .local pmc i, j
-    i = new 'Integer'
+    i = new ['Integer']
     i = 2
     j = mult( 21, i )       # call signature is PI
-    print j
-    print "\n"
+    say j
 .end
 CODE
 42
 OUTPUT
 
 pir_output_is(
-    << 'CODE', << 'OUTPUT', 'nested structs should be independent', todo => 'RT #31292' );
+    << 'CODE', << 'OUTPUT', 'nested structs should be independent' );
 .include 'datatypes.pasm'
 
 .sub 'test' :main
@@ -2547,13 +2562,13 @@ pir_output_is(
     libnci_test = loadlib library_name
 
     .local pmc types
-    types = new 'OrderedHash'
+    types = new ['OrderedHash']
     types['y'] = .DATATYPE_INT
     push types, 0
     push types, 0
 
     .local pmc nested
-    nested = new 'ManagedStruct', types
+    nested = new ['ManagedStruct'], types
 
     .local pmc outer
     outer = make_outer_struct( nested )
@@ -2563,6 +2578,7 @@ pir_output_is(
     .local pmc nci_func
     nci_func = dlfunc libnci_test, 'nci_vpii', 'vpii'
 
+    print_values( outer )
     nci_func( outer, 1, 100 )
     print_values( outer )
 
@@ -2574,6 +2590,7 @@ pir_output_is(
     nci_func( other, 2, 200 )
 
     print_values( outer )
+    print_values( other )
 .end
 
 .sub 'print_values'
@@ -2583,17 +2600,16 @@ pir_output_is(
     x = outer['x']
     y = outer[ 'nested'; 'y' ]
     print "X: "
-    print x
-    print "\nY: "
-    print y
-    print "\n"
+    say x
+    print "Y: "
+    say y
 .end
 
 .sub 'make_outer_struct'
     .param pmc nested
 
     .local pmc types
-    types        = new 'OrderedHash'
+    types        = new ['OrderedHash']
     types[ 'x' ] = .DATATYPE_INT
     push types, 0
     push types, 0
@@ -2606,15 +2622,19 @@ pir_output_is(
     push types, 0
 
     .local pmc outer
-    outer = new 'ManagedStruct', types
+    outer = new ['ManagedStruct'], types
 
     .return( outer )
 .end
 CODE
+X: 0
+Y: 0
 X: 1
 Y: 100
 X: 1
 Y: 100
+X: 2
+Y: 200
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
@@ -2623,26 +2643,137 @@ pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
     library_name = 'libnci_test'
     .local pmc libnci_test
     libnci_test = loadlib  library_name
-    
+
     .local pmc nci_c
     nci_c = dlfunc libnci_test, "nci_c", "c"
-    $I0 = nci_c.arity()
+    $I0 = nci_c.'arity'()
     say $I0
 
     .local pmc multiply
     multiply = dlfunc libnci_test, "nci_pii", "pii"
-    $I0 = multiply.arity()
+    $I0 = multiply.'arity'()
     say $I0
 
     .local pmc nci_iiii
     nci_iiii = dlfunc libnci_test, "nci_iiii", "iiii"
-    $I0 = nci_iiii.arity()
+    $I0 = nci_iiii.'arity'()
     say $I0
 .end
 CODE
 0
 2
 3
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVi - void** out parameter" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_vVi
+    nci_vVi = dlfunc libnci_test, "nci_vVi", "vVi"
+
+    .local pmc nci_vp
+    nci_vp = dlfunc libnci_test, "nci_vp", "vp"
+
+    .local pmc opaque
+    null opaque
+    nci_vp(opaque)
+
+    opaque = new ['Pointer']
+    $I0 = 10
+    nci_vVi(opaque, $I0)
+    nci_vp(opaque)
+.end
+CODE
+got null
+got 10
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_ttt
+    nci_ttt = dlfunc libnci_test, "nci_ttt", "ttt"
+
+    $S0 = nci_ttt("Hello", "Waldo")
+    say $S0
+.end
+CODE
+Waldo, Waldo, Hello
+Waldo, Waldo, Hello
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - v_fff parameter" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_vfff
+    nci_vfff = dlfunc libnci_test, "nci_vfff", "vfff"
+
+    nci_vfff(3456.54, 10.1999, 14245.567)
+.end
+CODE
+1
+1
+1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vV - char** out parameter" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_vV
+    nci_vV = dlfunc libnci_test, "nci_vV", "vV"
+
+    .local pmc char_s_s
+    char_s_s = new ['Pointer']
+    nci_vV(char_s_s)
+    $S0 = char_s_s
+    print $S0
+.end
+CODE
+Hello bright new world
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVV - multiple char** out parameters" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_vVVV
+    nci_vVVV = dlfunc libnci_test, "nci_vVVV", "vVVV"
+
+    .local pmc char_s_s1, char_s_s2, char_s_s3
+    char_s_s1 = new ['Pointer']
+    char_s_s2 = new ['Pointer']
+    char_s_s3 = new ['Pointer']
+    nci_vVVV(char_s_s1, char_s_s2, char_s_s3)
+    $S1 = char_s_s1
+    print $S1
+    $S1 = char_s_s2
+    print $S1
+    $S1 = char_s_s3
+    print $S1
+.end
+CODE
+Hello bright new world!
+It is a beautiful day!
+Go suck a lemon.
 OUTPUT
 
 # Local Variables:

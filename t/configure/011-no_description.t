@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 011-no_description.t
 
@@ -16,7 +16,7 @@ use IO::CaptureOutput qw | capture |;
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},

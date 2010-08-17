@@ -1,17 +1,14 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-config/auto/warnings.pm - Warning flags detection
+config/auto/warnings.pm - Warning flags probing.
 
 =head1 DESCRIPTION
 
-Automagically detect what warning flags, like -Wall, -Wextra,
--Wchar-subscripts, etc., that the compiler can support.  Directly hacked
-from F<config/auto/attributes.pm>.
-
-=head1 SUBROUTINES
+Given a list of potential warnings available for a certain type of
+compiler, probe to see which of those are valid for this particular version.
 
 =over 4
 
@@ -22,24 +19,90 @@ package auto::warnings;
 use strict;
 use warnings;
 
-
 use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Utils ();
 use Parrot::BuildUtil;
 
+=item C<_init>
+
+Declare potential warnings for various compilers.  Note that the compiler
+key used here doesn't really exist in a unified way in Configure - would
+be nice if it did so we could simplify our checks in runstep().
+
+We create a data structure here that breaks out the warnings by compiler,
+using this structure:
+
+warnings:
+  gcc:
+    basic:
+      - -Warning1
+      - -Warning2
+    cage:
+      - -Warning3
+      - -Warning4
+    only:
+      - -Warning5:
+        - foo.c
+        - bar.c
+    never:
+      - -Warning6:
+        - baz.c
+        - frob.c
+    todo:
+      - -Warning7:
+        - cow.c
+        - pig.c
+  g++:
+    ...
+
+'basic' warnings are always used.
+
+'cage' warnings are added only if --cage is specified during
+Configure. This can be used to hold warnings that aren't ready to be
+added to the default run yet.
+
+'only' should be used as we add new warnings to the build, it will let
+us insure that files we know are clean for a new warning stay clean.
+
+'never' should be used when a particular file contains generated code
+(e.g. imcc) and we cannot update it to conform to the standards.
+
+'todo' functions just like never does, but it indicates that these
+files are expected to eventually be free of this warning.
+
+Note that there is no actual requirement that the 'file' be a full path
+to a .c file; the file could be "PMCS" or "OPS" or some other identifier;
+whatever the value, it will generate a Config entry prefixed with
+C<ccwarn::>, which will probably be used via @@ expansion in a makefile.
+
+It is tempting to put this into a config file, but having it in
+perl gives us the ability to dynamically setup certain warnings based
+on any criteria already discovered via Config.
+
+Order is important - some warnings are invalid unless they are specified
+after other warnings.
+
+=cut
+
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Detecting supported compiler warnings (-Wxxx)};
-    $data{result}      = q{};
 
-    # potential addition? -fvisibility=hidden
-    # Please keep these sorted by flag name, such that "-Wno-foo" is
-    # sorted as "-Wfoo", so we can turn off/on as needed.
-    my @potential_warnings = qw(
+    my $data = {
+        description => 'Detect supported compiler warnings',
+        result      => '',
+        validated   => [],
+    };
+
+    # begin gcc/g++
+    my $gcc = {};
+    my $gpp = {};
+    my $icc = {};
+
+    my @gcc_or_gpp = qw(
         -falign-functions=16
         -fvisibility=hidden
+        -funit-at-a-time
         -maccumulate-outgoing-args
         -W
         -Wall
@@ -49,6 +112,8 @@ sub _init {
         -Wchar-subscripts
         -Wcomment
         -Wdisabled-optimization
+        -Wdiv-by-zero
+        -Wenum-compare
         -Wendif-labels
         -Wextra
         -Wformat
@@ -61,17 +126,19 @@ sub _init {
         -Winit-self
         -Winline
         -Winvalid-pch
+        -Wjump-misses-init
         -Wlogical-op
         -Wmissing-braces
         -Wmissing-field-initializers
         -Wno-missing-format-attribute
         -Wmissing-include-dirs
+        -Wmultichar
         -Wpacked
         -Wparentheses
         -Wpointer-arith
+        -Wpointer-sign
         -Wreturn-type
         -Wsequence-point
-        -Wno-shadow
         -Wsign-compare
         -Wstrict-aliasing
         -Wstrict-aliasing=2
@@ -79,16 +146,21 @@ sub _init {
         -Wswitch-default
         -Wtrigraphs
         -Wundef
-        -Wunknown-pragmas
         -Wno-unused
+        -Wunknown-pragmas
         -Wvariadic-macros
         -Wwrite-strings
-        -Wnot-a-real-warning
     );
-    my @potential_warnings_no_cpp = qw(
+
+    $gcc->{'basic'} = [ @gcc_or_gpp ];
+    $gpp->{'basic'} = [ @gcc_or_gpp ];
+
+    # Add some gcc-only warnings that would break g++
+    push @{$gcc->{'basic'}}, qw(
         -Wbad-function-cast
         -Wc++-compat
         -Wdeclaration-after-statement
+        -Werror=declaration-after-statement
         -Wimplicit-function-declaration
         -Wimplicit-int
         -Wmain
@@ -100,164 +172,234 @@ sub _init {
         -Wstrict-prototypes
     );
 
-    my @cage_warnings = qw(
+    my $gcc_or_gpp_cage = [ qw(
         -std=c89
-        -Wconversion
-        -Werror-implicit-function-declaration
+        -Werror=implicit-function-declaration
         -Wformat=2
         -Wlarger-than-4096
         -Wlong-long
         -Wmissing-format-attribute
-        -Wmissing-noreturn
-        -Wno-deprecated-declarations
-        -Wno-div-by-zero
+        -Wdeprecated-declarations
         -Wno-format-extra-args
         -Wno-import
-        -Wno-multichar
-        -Wno-pointer-sign
-        -Wold-style-definition
-        -Wpadded
-        -Wredundant-decls
-        -Wswitch-enum
-        -Wsystem-headers
+        -Wsuggest-attribute=pure
+        -Wsuggest-attribute=const
         -Wunreachable-code
+        -Wunused
         -Wunused-function
         -Wunused-label
-        -Wunused-parameter
         -Wunused-value
         -Wunused-variable
-    );
+    ) ];
 
-    my @nice_to_have_but_too_noisy_for_now = qw(
-        -pedantic
-        -Wint-to-pointer-cast
+    $gcc->{'cage'} = $gcc_or_gpp_cage;
+    $gpp->{'cage'} = $gcc_or_gpp_cage;
+
+    $gcc->{'todo'} = $gpp->{'todo'} = {
+        '-Wformat-nonliteral' => [ qw(
+            src/spf_render.c
+            compilers/imcc/optimizer.c
+        ) ],
+        '-Wstrict-prototypes' => [ qw(
+            src/nci/extra_thunks.c
+            src/extra_nci_thunks.c
+        ) ],
+    };
+
+    $gcc->{'never'} = $gpp->{'never'} = {
+        '-Wformat-nonliteral' => [ qw(
+            compilers/imcc/imclexer.c
+        ) ],
+        '-Wswitch-default' => [ qw(
+            compilers/imcc/imclexer.c
+        ) ],
+        '-Wcast-qual' => [ qw(
+            compilers/imcc/imcparser.c
+        ) ],
+        '-Wlogical-op' => [ qw(
+            compilers/imcc/imcparser.c
+        ) ],
+    };
+
+    # Warning flags docs
+    # http://software.intel.com/sites/products/documentation/hpc/compilerpro/en-us/cpp/lin/compiler_c/index.htm
+
+    $icc->{'basic'} = [ qw(
+        -w2
+        -Wabi
+        -Wall
+        -Wcheck
+        -Wcomment
+        -Wdeprecated
+        -Weffc++
+        -Wextra-tokens
+        -Wformat
+        -Wformat-security
+        -Wmain
+        -Wmissing-declarations
+        -Wmissing-prototypes
+        -Wpointer-arith
+        -Wport
+        -Wreturn-type
         -Wshadow
-        -Wunused-macros
-    );
+        -Wstrict-prototypes
+        -Wuninitialized
+        -Wunknown-pragmas
+        -Wunused-function
+        -Wunused-variable
+        -Wwrite-strings
+        ),
+        # Disable some warnings and notifications that are overly noisy
+        '-diag-disable 271',  # trailing comma is nonstandard
+        '-diag-disable 981',  # operands are evaluated in unspecified order
+        '-diag-disable 1572', # floating-point equality and inequality comparisons are unreliable
+        '-diag-disable 2259', # non-pointer conversion from "typeA" to "typeB" may lose significant bits
+    ];
+    $icc->{'cage'} = [
+        # http://software.intel.com/sites/products/documentation/hpc/compilerpro/en-us/cpp/lin/compiler_c/bldaps_cls/common/bldaps_svover.htm
+        '-diag-enable sc3',
+        '-diag-enable sc-include',
+    ];
 
-    $data{potential_warnings}        = \@potential_warnings;
-    $data{potential_warnings_no_cpp} = \@potential_warnings_no_cpp;
-    $data{cage_warnings}             = \@cage_warnings;
+    $data->{'warnings'}{'gcc'} = $gcc;
+    $data->{'warnings'}{'g++'} = $gpp;
+    $data->{'warnings'}{'icc'} = $icc;
+    $data->{'warnings'}{'clang'} = $gcc;
 
-    return \%data;
+    ## end gcc/g++
+
+    return $data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-    print "\n" if $verbose;
+    $conf->debug("\n");
+
+    my $compiler = '';
     if ( defined $conf->data->get('gccversion') ) {
+        $compiler = $conf->data->get('g++') ? 'g++' : 'gcc';
+    }
+    elsif ( $conf->option_or_data('cc') =~ /icc/ ) {
+        $compiler = 'icc';
+    }
+    elsif ( $conf->option_or_data('cc') =~ /clang/ ) {
+        $compiler = 'clang';
+    }
 
-        # Dirty way of checking if compiling with c++
-        my $nocpp = index($conf->data->get('cc'), '++') < 0;
+    if ($compiler eq '') {
+        $conf->debug("We do not (yet) probe for warnings for your compiler\n");
+        $self->set_result('skipped');
+        return 1;
+    }
 
-        # add on some extra warnings if requested
-        $self->_add_cage_warnings($conf);
-        $self->_add_maintainer_warnings($conf);
+    # standard warnings.
+    my @warnings = grep {$self->valid_warning($conf, $_)}
+        @{$self->{'warnings'}{$compiler}{'basic'}};
 
-        # now try out our warnings
-        for my $maybe_warning (@{ $self->{potential_warnings} }) {
-            $self->try_warning( $conf, $maybe_warning, $verbose );
-        }
-        if ($nocpp) {
-            for my $maybe_warning (@{ $self->{potential_warnings_no_cpp} }) {
-                $self->try_warning( $conf, $maybe_warning, $verbose );
+    # --cage?
+    if ($conf->options->get('cage')) {
+        push @warnings, grep {$self->valid_warning($conf, $_)}
+            @{$self->{'warnings'}{$compiler}{'cage'}}
+    }
+
+    # -- only?
+    my %per_file;
+    if (exists $self->{'warnings'}{$compiler}{'only'}) {
+        my %only = %{$self->{'warnings'}{$compiler}{'only'}};
+        foreach my $warning (keys %only) {
+            next unless $self->valid_warning($conf, $warning);
+            foreach my $file (@{$only{$warning}}) {
+                $per_file{$file} = [ @warnings ] unless exists $per_file{$file};
+                push @{$per_file{$file}}, $warning;
             }
         }
+    }
 
-        if ($nocpp) {
-           $self->set_result("set for gcc");
-        }
-        else {
-           $self->set_result("set for g++");
+    foreach my $key (qw/todo never/) {
+        if (exists $self->{'warnings'}{$compiler}{$key}) {
+            my %dont = %{$self->{'warnings'}{$compiler}{$key}};
+            foreach my $warning (keys %dont) {
+                foreach my $file (@{$dont{$warning}}) {
+                    $per_file{$file} = [ @warnings ] unless exists $per_file{$file};
+                    @{$per_file{$file}} = grep {$warning ne $_} @{$per_file{$file}};
+                }
+            }
         }
     }
-    else {
-        print "Currently we only set warnings if using gcc as C compiler\n"
-            if $verbose;
-        $self->set_result("skipped");
+
+    $conf->data->set('ccwarn', join(' ', @warnings));
+    foreach my $file (keys %per_file) {
+        $conf->data->set("ccwarn::$file", join(' ', @{$per_file{$file}}));
     }
+
+    $self->set_result('done');
     return 1;
 }
 
-sub _add_cage_warnings {
-    my ($self, $conf) = @_;
-    push @{ $self->{potential_warnings} }, @{ $self->{cage_warnings} }
-        if $conf->options->get('cage');
-}
-
-sub _add_maintainer_warnings {
-    my ($self, $conf) = @_;
-    push @{ $self->{potential_warnings} }, '-Wlarger-than-4096'
-        if $conf->options->get('maintainer');
-}
-
-=item C<try_warning>
+=item C<valid_warning>
 
 Try a given warning to see if it is supported by the compiler.  The compiler
 is determined by the C<cc> value of the C<Parrot::Configure> object passed
 in as the first argument to the method (not counting C<$self>.  The warning
 to be checked is passed in as the second argument to the method.
 
-Returns true if the warning flag is recognised by the compiler and undef
+Returns true if the warning flag is recognized by the compiler and undef
 otherwise.
+
+Use the running set of known valid options, since some options may depend
+on previous options.
 
 =cut
 
-sub try_warning {
-    my ( $self, $conf, $warning, $verbose ) = @_;
+sub valid_warning {
+    my ( $self, $conf, $warning ) = @_;
 
+    # This should be using a temp file name.
     my $output_file = 'test.cco';
 
-    $verbose and print "trying attribute '$warning'\n";
+    $conf->debug("trying attribute '$warning'\n");
 
     my $cc = $conf->option_or_data('cc');
     $conf->cc_gen('config/auto/warnings/test_c.in');
 
     my $ccflags  = $conf->data->get('ccflags');
-    my $tryflags = "$ccflags $warning";
+    my $warnings = join(' ', @{$self->{'validated'}});
+    my $tryflags = "$ccflags $warnings $warning";
 
     my $command_line = Parrot::Configure::Utils::_build_compile_command( $cc, $tryflags );
-    $verbose and print "  ", $command_line, "\n";
+    $conf->debug("  ", $command_line, "\n");
 
     # Don't use cc_build, because failure is expected.
     my $exit_code = Parrot::Configure::Utils::_run_command(
         $command_line, $output_file, $output_file
     );
-    _set_warning($conf, $warning, $exit_code, $verbose);
 
-    return if $exit_code;
+    # Cleanup any remnants of the test compilation
+    $conf->cc_clean();
+
+    if ($exit_code) {
+        unlink $output_file or die "Unable to unlink $output_file: $!";
+        return;
+    }
 
     my $output = Parrot::BuildUtil::slurp_file($output_file);
-    return _set_ccflags($conf, $output, $tryflags, $verbose);
-}
+    unlink $output_file or die "Unable to unlink $output_file: $!";
 
-sub _set_warning {
-    my ($conf, $warning, $exit_code, $verbose) = @_;
-    $verbose and print "  exit code: $exit_code\n";
-    $conf->data->set( $warning => !$exit_code || 0 );
-}
+    $conf->debug("  output: $output\n");
 
-sub _set_ccflags {
-    my ($conf, $output, $tryflags, $verbose) = @_;
-    $verbose and print "  output: $output\n";
-
-    if ( $output !~ /error|warning|not supported/i ) {
-        $conf->data->set( ccflags => $tryflags );
-        $verbose and print "  ccflags: ", $conf->data->get("ccflags"), "\n";
+    if ( $output !~ /\berror|warning|not supported|ignoring (unknown )?option\b/i ) {
+        push @{$self->{'validated'}}, $warning;
+        $conf->debug("    valid warning: '$warning'\n");
         return 1;
     }
     else {
+        $conf->debug("  invalid warning: '$warning'\n");
         return 0;
     }
 }
 
 =back
-
-=head1 AUTHOR
-
-Paul Cochrane <paultcochrane at gmail dot com>
 
 =cut
 

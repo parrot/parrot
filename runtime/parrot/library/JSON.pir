@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 JSON.pir - PIR implementation of JSON data interchange format.
@@ -6,10 +9,10 @@ JSON.pir - PIR implementation of JSON data interchange format.
 
 Use the C<_json> method to generate a JSON representation of a PMC.
 
- .include 'library/JSON.pir'
+ load_bytecode 'JSON.pir'
  $S0 = _json( $P0 )
 
-To generate a PMC from a JSON string, see L<compilers/json/JSON.pir>.
+To generate a PMC from a JSON string, see L<compilers/data_json>.
 
 =cut
 
@@ -89,19 +92,19 @@ done_init:
     # Default to a null. We could in the future make this more
     # clever, or conditional.
 json_null:
-    .return _json_null(thing,pretty,indent)
+    .tailcall _json_null(thing,pretty,indent)
 json_string:
-    .return _json_string(thing,pretty,indent)
+    .tailcall _json_string(thing,pretty,indent)
 json_array:
-    .return _json_array(thing,pretty,indent)
+    .tailcall _json_array(thing,pretty,indent)
 json_hash:
-    .return _json_hash(thing,pretty,indent)
+    .tailcall _json_hash(thing,pretty,indent)
 json_boolean:
-    .return _json_boolean(thing,pretty,indent)
+    .tailcall _json_boolean(thing,pretty,indent)
 json_integer:
-    .return _json_number(thing,pretty,indent)
+    .tailcall _json_number(thing,pretty,indent)
 json_float:
-    .return _json_number(thing,pretty,indent)
+    .tailcall _json_number(thing,pretty,indent)
 
 .end
 
@@ -123,18 +126,15 @@ plain:
 .end
 
 .sub '_json_string'
-  .param pmc thing
+  .param string thing
   .param int pretty
   .param int indent
 
   .local string result
 
-  $S0 = thing
-  .local pmc escaper
-  escaper = find_global "Data::Escape", "String"
-  $S0 = escaper($S0,'"')
+  thing = escape thing
 
-  result = '"' . $S0
+  result = '"' . thing
   result = result . '"'
 
   unless pretty goto plain
@@ -262,20 +262,18 @@ done:
 
   .local pmc keys
   keys = new 'ResizablePMCArray'
-  .local pmc iter
-  iter = new 'Iterator', thing
-  iter = 0
+  .local pmc it
+  it = iter thing
   .local string key
 
 iter_loop:
-  unless iter, done_iter
-  shift key, iter
+  unless it, done_iter
+  shift key, it
   push keys, key
   goto iter_loop
 
 done_iter:
-  $P0 = find_global 'Data::Sort', 'simple'
-  $P0( keys )
+  keys.'sort'()
 
   .local string result,separator
 
@@ -358,9 +356,6 @@ done:
 
   .return (result)
 .end
-
-.include  'library/Data/Escape.pir'
-.include  'library/Data/Sort.pir'
 
 =back
 

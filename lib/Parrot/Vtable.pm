@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -11,9 +11,9 @@ Parrot::Vtable - Functions for manipulating vtables
 
 =head1 DESCRIPTION
 
-C<Parrot::Vtable> provides a collection of functions for manipulating
-PMC vtables. It is used by F<tools/build/jit2c.pl>, F<tools/build/pmc2c.pl>,
-F<tools/build/vtable_h.pl>, F<tools/dev/gen_class.pl>.
+C<Parrot::Vtable> provides a collection of functions for manipulating PMC
+vtables. It is used by F<tools/build/pmc2c.pl>, F<tools/build/vtable_h.pl>, and
+F<tools/dev/gen_class.pl>.
 
 =head2 Functions
 
@@ -67,7 +67,7 @@ Returns a reference to an array containing
 
   [ return_type method_name parameters section MMD_type attributes ]
 
-for each vtable method defined in C<$file>. If C<$file> is unspecified it
+for each vtable function defined in C<$file>. If C<$file> is unspecified it
 defaults to F<src/vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
 
 =cut
@@ -130,9 +130,8 @@ sub vtbl_defs {
     my $vtable = shift;
 
     my $defs = q{};
-    my $entry;
 
-    for $entry ( @{$vtable} ) {
+    for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
         my $args = join( ", ", 'PARROT_INTERP', 'PMC* pmc', split( /\s*,\s*/, $entry->[2] ) );
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
@@ -152,9 +151,8 @@ sub vtbl_struct {
     my $vtable = shift;
 
     my $struct = q{};
-    my $entry;
 
-    $struct = <<"EOF";
+    $struct = <<'EOF';
 typedef enum {
     VTABLE_IS_CONST_FLAG     = 0x001,
     VTABLE_HAS_CONST_TOO     = 0x002,
@@ -171,21 +169,26 @@ typedef struct _vtable {
     PMC    *_namespace;     /* Pointer to namespace for this class */
     INTVAL  base_type;      /* 'type' value for MMD */
     STRING *whoami;         /* Name of class this vtable is for */
-    UINTVAL flags;          /* Flags. Duh */
+    UINTVAL flags;          /* VTABLE flags (constant, is_ro, etc). */
     STRING *provides_str;   /* space-separated list of interfaces */
     Hash   *isa_hash;       /* Hash of class names */
     PMC    *pmc_class;      /* for PMCs: a PMC of that type
                                for objects: the class PMC */
     PMC    *mro;            /* array PMC of [class, parents ... ] */
+    const char *attribute_defs; /* list of PMC attributes */
     struct _vtable *ro_variant_vtable; /* A variant of this vtable with the
                                    opposite IS_READONLY flag */
     /* Vtable Functions */
 
 EOF
-    for $entry ( @{$vtable} ) {
+    for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }
+
+    $struct .= <<'EOF';
+    UINTVAL attr_size;      /* Size of the attributes struct */
+EOF
 
     $struct .= "} _vtable;\n";
 
@@ -202,11 +205,11 @@ vtable array.
 sub vtbl_macros {
     my $vtable = shift;
 
-    my $macros = <<"EOM";
+    my $macros = <<'EOM';
 
 /*
  * vtable accessor macros
- * as vtable methods might get moved around internally
+ * as vtable functions might get moved around internally
  * these macros hide the details
  */
 
@@ -221,38 +224,33 @@ EOM
     (pmc)->vtable->$entry->[1]($args)
 EOM
     }
-    $macros .= <<"EOM";
-
-/*
- * vtable method name defines for delegate
- */
-
-EOM
-    for my $entry ( @{$vtable} ) {
-        my $uc_meth = uc $entry->[1];
-        $macros .= <<"EOM";
-#define PARROT_VTABLE_${uc_meth}_METHNAME \"__$entry->[1]\"
-EOM
-
-    }
-    $macros .= <<"EOM";
-
-EOM
-
-    # finally the name mapping
+    # Slot numbers
     $macros .= <<"EOM";
 /*
  * vtable slot names
  */
+EOM
+    my $vtable_slot_num = 9;
+    for my $entry ( @{$vtable} ) {
+        my $uc_meth = uc $entry->[1];
+        $macros .= <<"EOM";
+#define PARROT_VTABLE_SLOT_${uc_meth} ${vtable_slot_num}
+EOM
+        ++$vtable_slot_num;
+    }
+
+    # finally the name mapping
+    $macros .= <<'EOM';
+
 #ifdef PARROT_IN_OBJECTS_C
 
 #define PARROT_VTABLE_LOW 9
 
-static const char * const Parrot_vtable_slot_names[] = {
+static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
     "",   /* Pointer to namespace for this class */
     "",   /* 'type' value for MMD */
     "",   /* Name of class this vtable is for */
-    "",   /* Flags. Duh */
+    "",   /* VTABLE flags (constant, is_ro, etc). */
     "",   /* space-separated list of interfaces */
     "",   /* space-separated list of classes */
     "",   /* class */
@@ -266,7 +264,7 @@ EOM
         next if ( $entry->[4] =~ /MMD_/ );
         $num_vtable_funcs++;
         $macros .= <<"EOM";
-        \"__$entry->[1]\",
+        \"$entry->[1]\",
 EOM
     }
     $macros .= <<"EOM";
@@ -276,48 +274,6 @@ EOM
 #define NUM_VTABLE_FUNCTIONS $num_vtable_funcs
 
 #endif /* PARROT_IN_OBJECTS_C */
-
-/* Need this for add, subtract, multiply, divide, mod, cmod, bitwise
-   (and, or, xor, lshift, rshift), concat, logical (and, or, xor),
-   repeat, eq, cmp */
-
-/* &gen_from_enum(mmd.pasm) */
-
-typedef enum {
-EOM
-    for my $entry ( @{$vtable} ) {
-        next unless ( $entry->[4] =~ /MMD_/ );
-        next if ( $entry->[4] =~ /_INT$/ );
-        next if ( $entry->[4] =~ /_STR$/ );
-        next if ( $entry->[4] =~ /_FLOAT$/ );
-        $macros .= <<"EOM";
-        $entry->[4],
-EOM
-    }
-    $macros .= <<"EOM";
-        MMD_USER_FIRST
-} parrot_mmd_func_enum;
-
-/* &end_gen */
-
-#ifdef PARROT_IN_OBJECTS_C
-static const char * const Parrot_mmd_func_names[] = {
-EOM
-
-    for my $entry ( @{$vtable} ) {
-        next unless ( $entry->[4] =~ /MMD_/ );
-        next if ( $entry->[4] =~ /_INT$/ );
-        next if ( $entry->[4] =~ /_STR$/ );
-        next if ( $entry->[4] =~ /_FLOAT$/ );
-        $macros .= <<"EOM";
-        \"__$entry->[1]\",
-EOM
-    }
-    $macros .= <<"EOM";
-    NULL
-};
-
-#endif /* PARROT_IN_OBJECTS_C */
 EOM
 
     $macros;
@@ -325,7 +281,7 @@ EOM
 
 =item C<vtbl_embed($vtable)>
 
-Returns the C function definitions to call the vtable methods on a PMC for the
+Returns the C function definitions to call the vtable functions on a PMC for the
 elements in the referenced vtable array.
 
 =cut
@@ -358,7 +314,7 @@ sub vtbl_embed {
 
         my $ret_type = find_type($return_type);
 
-        $protos .= sprintf "PARROT_API %s Parrot_PMC_%s( %s );\n", $ret_type, $name,
+        $protos .= sprintf "PARROT_EXPORT %s Parrot_PMC_%s( %s );\n", $ret_type, $name,
             $signature;
 
         # make sure the bare POD here doesn't appear in this module's perldoc
@@ -372,7 +328,7 @@ sub vtbl_embed {
 
     */
 
-    PARROT_API %s
+    PARROT_EXPORT %s
     Parrot_PMC_%s( %s )
     {
   END_HEADER

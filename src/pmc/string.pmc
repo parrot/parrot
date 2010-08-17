@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2008, The Perl Foundation.
+Copyright (C) 2003-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -20,9 +20,12 @@ functions in F<src/string.c>.
 
 */
 
-#include "parrot/parrot.h"
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
-pmclass String extends scalar provides string provides scalar {
+pmclass String extends scalar provides string provides scalar auto_attrs {
+    ATTR STRING * str_val;
 
 /*
 
@@ -35,30 +38,10 @@ Initializes the string.
 */
 
     VTABLE void init() {
-        PMC_str_val(SELF) = string_make_empty(INTERP, enum_stringrep_one, 0);
+        STRING * const str_val = STRINGNULL;
+        SET_ATTR_str_val(INTERP, SELF, str_val);
+
         PObj_custom_mark_SET(SELF);
-    }
-
-/*
-
-=item C<PMC new_from_string(STRING *rep)>
-
-Class method to construct a String from the string representation C<rep>.
-
-=cut
-
-*/
-    VTABLE PMC *new_from_string(STRING *rep, INTVAL flags) {
-        PMC *res;
-        const INTVAL type = SELF->vtable->base_type;
-
-        if (flags & PObj_constant_FLAG)
-            res = constant_pmc_new(INTERP, type);
-        else
-            res = pmc_new(INTERP, type);
-
-        PMC_str_val(res) = rep;
-        return res;
     }
 
 /*
@@ -72,8 +55,9 @@ Marks the string as live.
 */
 
     VTABLE void mark() {
-        if (PMC_str_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        Parrot_gc_mark_STRING_alive(INTERP, str_val);
     }
 
 /*
@@ -87,9 +71,8 @@ Creates a copy of the string.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP, VTABLE_get_string(INTERP, SELF));
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(INTERP, dest, SELF.get_string());
         return dest;
     }
 
@@ -104,8 +87,9 @@ Returns the integer representation of the string.
 */
 
     VTABLE INTVAL get_integer() {
-        STRING * const s = (STRING *)VTABLE_get_string(INTERP, SELF);
-        return string_to_int(INTERP, s);
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_to_int(INTERP, str_val);
     }
 
 /*
@@ -119,25 +103,9 @@ Returns the floating-point representation of the string.
 */
 
     VTABLE FLOATVAL get_number() {
-        STRING * const s = (STRING*) VTABLE_get_string(INTERP, SELF);
-        return string_to_num(INTERP, s);
-    }
-
-/*
-
-=item C<PMC *get_bignum()>
-
-Returns the big numbers representation of the string.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        STRING * const s   = VTABLE_get_string(INTERP, SELF);
-        PMC           *ret = pmc_new(INTERP, enum_class_BigInt);
-        VTABLE_set_string_native(INTERP, ret, s);
-        return ret;
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_to_num(INTERP, str_val);
     }
 
 /*
@@ -151,8 +119,9 @@ Returns the string itself.
 */
 
     VTABLE STRING *get_string() {
-        STRING * const s = PMC_str_val(SELF);
-        return s ? string_copy(INTERP, s) : NULL;
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return str_val;
     }
 
 /*
@@ -166,8 +135,9 @@ Returns the boolean value of the string.
 */
 
     VTABLE INTVAL get_bool() {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-        return string_bool(INTERP, s);
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_boolean(INTERP, str_val);
     }
 
 /*
@@ -183,11 +153,11 @@ Sets the value of the string to the integer C<value>.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        SELF.set_string_native(string_from_int(INTERP, value));
+        SELF.set_string_native(Parrot_str_from_int(INTERP, value));
     }
 
     VTABLE void set_bool(INTVAL value) {
-        SELF.set_string_native(string_from_int(INTERP, value));
+        SELF.set_string_native(Parrot_str_from_int(INTERP, value));
     }
 
 /*
@@ -201,7 +171,7 @@ Sets the value of the string to the floating-point C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        SELF.set_string_native(string_from_num(INTERP, value));
+        SELF.set_string_native(Parrot_str_from_num(INTERP, value));
     }
 
 
@@ -216,12 +186,19 @@ Sets the value of the string to that of the specified C<string>.
 */
 
     VTABLE void set_string_native(STRING *value) {
+        if (value == NULL)
+            value = STRINGNULL;
+
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
-             const char *copy = string_to_cstring(INTERP, value);
-             value            = const_string(INTERP, copy);
+            char * const copy = Parrot_str_to_cstring(INTERP, value);
+            value             = Parrot_str_new_init(INTERP, copy, strlen(copy),
+                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                PObj_constant_FLAG);
+            Parrot_str_free_cstring(copy);
         }
-        PMC_str_val(SELF) = value;
+
+        SET_ATTR_str_val(INTERP, SELF, value);
     }
 
 /*
@@ -235,23 +212,7 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
-    }
-
-/*
-
-=item C<VOID set_string_same(PMC *value)>
-
-Sets the value of the string to the value of
-the specified C<String> PMC.
-
-=cut
-
-*/
-
-    VTABLE void set_string_same(PMC *value) {
-        PMC_str_val(SELF) =
-            string_set(INTERP, PMC_str_val(SELF), PMC_str_val(value));
+        SET_ATTR_str_val(INTERP, SELF, value);
     }
 
 /*
@@ -270,172 +231,6 @@ the specified C<PMC>.
 
 /*
 
-=item C<PMC *bitwise_ors(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_ors_str(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_ands(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_ands_str(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_xors(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_xors_str(PMC *value, PMC *dest)>
-
-=item C<void bitwise_nots(PMC *value)>
-
-These functions perform bitwise operations on entire
-strings, and place the result in C<dest>.
-
-=item C<void i_bitwise_ors(PMC *value)>
-
-=item C<void i_bitwise_ors_str(PMC *value)>
-
-=item C<void i_bitwise_ands(PMC *value)>
-
-=item C<void i_bitwise_ands_str(PMC *value)>
-
-=item C<void i_bitwise_xors(PMC *value)>
-
-=item C<void i_bitwise_xors_str(PMC *value)>
-
-=item C<void i_bitwise_nots(PMC *value)>
-
-These functions perform bitwise operations on entire
-strings in place.
-
-=cut
-
-*/
-    VTABLE PMC *bitwise_ors(PMC *value, PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-        STRING * const v = VTABLE_get_string(INTERP, value);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_or(INTERP, s, v, NULL));
-
-        return dest;
-    }
-
-    VTABLE PMC *bitwise_ors_str(STRING *value, PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_or(INTERP, s, value, NULL));
-
-        return dest;
-    }
-
-    VTABLE void i_bitwise_ors(PMC *value) {
-        STRING        *s = VTABLE_get_string(INTERP, SELF);
-        STRING * const v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(string_bitwise_or(INTERP, s, v, &s));
-    }
-
-    VTABLE void i_bitwise_ors_str(STRING *value) {
-        STRING *s = VTABLE_get_string(INTERP, SELF);
-        SELF.set_string_native(string_bitwise_or(INTERP, s, value, &s));
-    }
-
-    VTABLE PMC *bitwise_ands(PMC *value, PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-        STRING * const v = VTABLE_get_string(INTERP, value);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_and(INTERP, s, v, NULL));
-
-        return dest;
-    }
-
-    VTABLE PMC *bitwise_ands_str(STRING *value, PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_and(INTERP, s, value, NULL));
-
-        return dest;
-    }
-
-
-    VTABLE void i_bitwise_ands(PMC *value) {
-        STRING        *s = VTABLE_get_string(INTERP, SELF);
-        STRING * const v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(string_bitwise_and(INTERP, s, v, &s));
-    }
-
-    VTABLE void i_bitwise_ands_str(STRING *value) {
-        STRING *s = VTABLE_get_string(INTERP, SELF);
-        SELF.set_string_native(string_bitwise_and(INTERP, s, value, &s));
-    }
-
-    VTABLE PMC *bitwise_xors(PMC *value, PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-        STRING * const v = VTABLE_get_string(INTERP, value);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_xor(INTERP, s, v, NULL));
-
-        return dest;
-    }
-
-    VTABLE PMC *bitwise_xors_str(STRING *value, PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_xor(INTERP, s, value, NULL));
-
-        return dest;
-    }
-
-    VTABLE void i_bitwise_xors(PMC *value) {
-        STRING        *s = VTABLE_get_string(INTERP, SELF);
-        STRING * const v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(string_bitwise_xor(INTERP, s, v, &s));
-    }
-
-    VTABLE void i_bitwise_xors_str(STRING *value) {
-        STRING *s = VTABLE_get_string(INTERP, SELF);
-        SELF.set_string_native(string_bitwise_xor(INTERP, s, value, &s));
-    }
-
-    VTABLE PMC *bitwise_nots(PMC *dest) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        VTABLE_set_string_native(INTERP, dest,
-            string_bitwise_not(INTERP, s, NULL));
-
-        return dest;
-    }
-
-    VTABLE void i_bitwise_nots() {
-        STRING *s = VTABLE_get_string(INTERP, SELF);
-        VTABLE_set_string_native(
-            INTERP, SELF, string_bitwise_not(INTERP, s, &s));
-    }
-
-/*
-
 =item C<INTVAL is_equal(PMC *value)>
 
 Compares the string with C<value>; returns true if
@@ -445,9 +240,14 @@ they match.
 
 */
     VTABLE INTVAL is_equal(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(0 == string_equal(INTERP, s, v));
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return (INTVAL)(Parrot_str_equal(INTERP, str_val, v));
+    }
+
+    MULTI INTVAL is_equal(PMC *value) {
+        return SELF.is_equal(value);
     }
 
 /*
@@ -462,8 +262,13 @@ C<value>; returns true if they match.
 */
 
     VTABLE INTVAL is_equal_num(PMC *value) {
-        const FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING        *str_val;
+        FLOATVAL       sf;
         const FLOATVAL vf = VTABLE_get_number(INTERP, value);
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        sf = Parrot_str_to_num(INTERP, str_val);
+
         return (INTVAL)(sf == vf);
     }
 
@@ -478,28 +283,10 @@ Compares the string with C<value>; returns FALSE if they match.
 */
 
     VTABLE INTVAL is_equal_string(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return string_equal(INTERP, s, v) == 0;
-    }
-
-/*
-
-=item C<INTVAL is_same(PMC *value)>
-
-Compares the string in this PMC with the one in the C<value> PMC.
-Returns true if this PMC and the one in C<value> are of the same PMC
-class and their strings are aliases of the same internal string.
-
-(this can only happen if you use the set_string_native method)
-
-=cut
-
-*/
-    VTABLE INTVAL is_same(PMC *value) {
-        const STRING * const s = VTABLE_get_string(INTERP, SELF);
-        const STRING * const v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(value->vtable == SELF->vtable && s == v);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_equal(INTERP, str_val, v);
     }
 
 /*
@@ -514,9 +301,10 @@ is smaller.
 
 */
     VTABLE INTVAL cmp(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return string_compare(INTERP, s, v);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_compare(INTERP, str_val, v);
     }
 
 /*
@@ -531,8 +319,11 @@ are equal, and 1 if C<value> is smaller.
 
 */
     VTABLE INTVAL cmp_num(PMC *value) {
-        const FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING        *str_val;
+        FLOATVAL       sf;
         const FLOATVAL vf = VTABLE_get_number(INTERP, value);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        sf = Parrot_str_to_num(INTERP, str_val);
 
         if (sf < vf)
             return (INTVAL)(-1);
@@ -555,9 +346,10 @@ is smaller.
 
 */
     VTABLE INTVAL cmp_string(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING        *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return string_compare(INTERP, s, v);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_compare(INTERP, str_val, v);
     }
 
 /*
@@ -571,8 +363,9 @@ C<length>, and places it in C<dest>.
 
 */
     VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
-        STRING * const s  = VTABLE_get_string(INTERP, SELF);
-        STRING * const s2 = string_substr(INTERP, s, offset, length, NULL, 0);
+        STRING *str_val, *s2;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        s2 = Parrot_str_substr(INTERP, str_val, offset, length);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
 
@@ -587,8 +380,9 @@ C<length>, and returns it.
 
 */
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-        return string_substr(INTERP, s, offset, length, NULL, 0);
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_substr(INTERP, str_val, offset, length);
     }
 
 /*
@@ -603,9 +397,14 @@ numbers count from the end.
 */
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        const INTVAL n = string_length(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING      *str_val;
+        INTVAL       n;
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        return (INTVAL)((k>=0 && k<=n) || (k<0 && -k<=n));
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        n = Parrot_str_length(INTERP, str_val);
+
+        return (INTVAL)((k >= 0 && k <= n) || (k < 0 && -k <= n));
     }
 
 /*
@@ -632,26 +431,65 @@ Replace the string at C<key> with the chr of C<value>.
 */
 
     VTABLE STRING *get_string_keyed(PMC *key) {
-        STRING * const s = PMC_str_val(SELF);
-        const INTVAL   k = key_integer(INTERP, key);
-        return string_substr(INTERP, s, k, 1, NULL, 0);
+        return SELF.get_string_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+    VTABLE STRING *get_string_keyed_int(INTVAL pos) {
+        STRING      *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_substr(INTERP, str_val, pos, 1);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        STRING * const s = PMC_str_val(SELF);
-        return string_ord(INTERP, s, key_integer(INTERP, key));
+        return SELF.get_integer_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
-    void set_string_keyed(PMC *key, STRING * const value) {
-        STRING * const s   = PMC_str_val(SELF);
-        const INTVAL   len = string_length(INTERP, value);
-        string_replace(INTERP, s, key_integer(INTERP, key), len, value, NULL);
+    VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
+        STRING      *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return string_ord(INTERP, str_val, pos);
+    }
+
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        return SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL pos) {
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(INTERP, dest, SELF.get_string_keyed_int(pos));
+        return dest;
+    }
+
+    VTABLE void set_string_keyed(PMC *key, STRING * const value) {
+        SELF.set_string_keyed_int(VTABLE_get_integer(INTERP, key), value);
+    }
+
+    VTABLE void set_string_keyed_int(INTVAL pos, STRING * const value) {
+        STRING      *str_val;
+        const INTVAL len = Parrot_str_length(INTERP, value);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        str_val = Parrot_str_replace(INTERP, str_val, pos, len, value);
+        SET_ATTR_str_val(INTERP, SELF, str_val);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        STRING * const s = PMC_str_val(SELF);
+        SELF.set_integer_keyed_int(VTABLE_get_integer(INTERP, key), value);
+    }
+
+    VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
+        STRING      *str_val;
         STRING * const c = string_chr(INTERP, (UINTVAL) value);
-        string_replace(INTERP, s, key_integer(INTERP, key), 1, c, NULL);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        str_val = Parrot_str_replace(INTERP, str_val, pos, 1, c);
+        SET_ATTR_str_val(INTERP, SELF, str_val);
+    }
+
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        SELF.set_pmc_keyed_int(VTABLE_get_integer(INTERP, key), value);
+    }
+
+    VTABLE void set_pmc_keyed_int(INTVAL pos, PMC *value) {
+        SELF.set_string_keyed_int(pos, VTABLE_get_string(INTERP, value));
     }
 /*
 
@@ -664,13 +502,13 @@ Replace every occurrence of C<orig> with C<_new>.
 */
 
     METHOD replace(STRING *orig, STRING *_new) {
-        const INTVAL   old_len = string_length(INTERP, orig);
-        const INTVAL   new_len = string_length(INTERP, _new);
-        STRING * const s       = VTABLE_get_string(INTERP, SELF);
+        const INTVAL   old_len = Parrot_str_length(INTERP, orig);
+        const INTVAL   new_len = Parrot_str_length(INTERP, _new);
+        STRING       * s       = VTABLE_get_string(INTERP, SELF);
         INTVAL         i       = 0;
 
-        while (-1 != (i = string_str_index(INTERP, s, orig, i))) {
-            (void)string_replace(INTERP, s, i, old_len, _new, NULL);
+        while (-1 != (i = Parrot_str_find_index(INTERP, s, orig, i))) {
+            s = Parrot_str_replace(INTERP, s, i, old_len, _new);
             i += new_len;
         }
 
@@ -694,21 +532,22 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD to_int(INTVAL base) {
-        PMC *result = pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp,
+        PMC * const result = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                         enum_class_Integer));
 
         /* TODO verify encoding */
-        const STRING *me         = VTABLE_get_string(INTERP, SELF);
-        const char   *start      = me->strstart;
-        const char   * const end = start + me->bufused;
-        UINTVAL              i   = 0;
+        const STRING *me  = VTABLE_get_string(INTERP, SELF);
+        char  * const str = Parrot_str_to_cstring(INTERP, me);
+        UINTVAL       i   = 0;
+        size_t        j   = 0;
+        size_t        len = strlen(str);
 
         if (base < 2 || base > 36)
-            real_exception(INTERP, NULL, E_ValueError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad base %d", base);
 
-        while (start < end) {
-            const unsigned char c = *start;
+        while (j < len) {
+            const unsigned char c = str[j];
             int dig;
 
             if (isdigit((unsigned char)c))
@@ -724,16 +563,23 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
                 break;
 
             i = i * base + dig;
-            ++start;
+            ++j;
         }
 
-        if (start < end)
-            real_exception(INTERP, NULL, E_ValueError,
-                    "invalid conversion to int - bad char %c", *start);
+        if (j < len) {
+            const char ch = str[j];
+            Parrot_str_free_cstring(str);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "invalid conversion to int - bad char %c", ch);
+        }
 
-        VTABLE_set_integer_native(INTERP, result, i);
+        Parrot_str_free_cstring(str);
+        /* TODO: autopromote to BigInt instead of casting away the high bit */
+        VTABLE_set_integer_native(INTERP, result, (INTVAL)i);
         RETURN(PMC *result);
     }
+
+
 /*
 
 =back
@@ -741,12 +587,6 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 =head2 Iterator Interface
 
 =over 4
-
-=item C<PMC *slice(PMC *key, INTVAL f)>
-
-Return a new iterator for the slice PMC C<key> if f==0.
-
-Return a new pythonic slice if f == 1.
 
 =item C<PMC *get_iter(PMC *key)>
 
@@ -756,36 +596,18 @@ Return a new iterator for this string.
 
 Return length of the string.
 
-
 =cut
 
 */
 
     VTABLE INTVAL elements() {
-        return string_length(INTERP, VTABLE_get_string(INTERP, SELF));
-    }
-
-    VTABLE PMC *slice(PMC *key, INTVAL f) {
-        if (f == 0) {
-            PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-            PMC_struct_val(iter) = key;
-            return iter;
-        }
-
-        real_exception(INTERP, NULL, E_ValueError, "String: Unknown slice type");
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_length(INTERP, str_val);
     }
 
     VTABLE PMC *get_iter() {
-        PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-        PMC * const key      =  pmc_new(INTERP, enum_class_Key);
-        PMC_struct_val(iter) = key;
-        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-        PMC_int_val(key)     = 0;
-
-        if (!string_length(INTERP, VTABLE_get_string(INTERP, SELF)))
-            PMC_int_val(key) = -1;
-
-        return iter;
+        return Parrot_pmc_new_init(INTERP, enum_class_StringIterator, SELF);
     }
 
 /*
@@ -796,33 +618,32 @@ Return length of the string.
 
 =over 4
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the string.
 
 =cut
 
 */
-    VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+    VTABLE void freeze(PMC *info) {
+        STRING *str_val;
         SUPER(info);
-        VTABLE_push_string(INTERP, io, VTABLE_get_string(INTERP, SELF));
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        VTABLE_push_string(INTERP, info, str_val);
     }
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the string.
 
 =cut
 
 */
-    VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+    VTABLE void thaw(PMC *info) {
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL)
-            SELF.set_string_native(VTABLE_shift_string(INTERP, io));
+        SET_ATTR_str_val(INTERP, SELF, VTABLE_shift_string(INTERP, info));
     }
 /*
 
@@ -841,8 +662,11 @@ Downcase this string
 */
 
     METHOD lower() {
-        STRING * const s   = string_downcase(INTERP,
-            VTABLE_get_string(INTERP, SELF));
+        STRING *str_val;
+        STRING *s;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        s = Parrot_str_downcase(INTERP, str_val);
 
         RETURN(STRING *s);
     }
@@ -861,58 +685,31 @@ Translate ascii string C<src> with entries from C<trans_table>.
         unsigned char *p;
         INTVAL        *tr_data;
         INTVAL         i;
+        STRING        *dest;
 
-        const INTVAL len = string_length(interp, src);
+        const INTVAL len = Parrot_str_length(INTERP, src);
 
         if (!len)
-            RETURN(void);
+            RETURN(STRING src);
 
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interp, NULL, INVALID_ENCODING,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
-        p = (unsigned char *)src->strstart;
+        dest = Parrot_str_clone(INTERP, src);
+        p = (unsigned char *)(dest->strstart);
         /* TODO verify trans table */
 
-        tr_data = PMC_data_typed(table, INTVAL *);    /* XXX */
+        GETATTR_FixedIntegerArray_int_array(INTERP, table, tr_data);
 
         for (i = 0; i < len; ++i, ++p) {
             const unsigned char ch = (unsigned char)tr_data[*p];
             if (ch)
                 *p = ch;
         }
-    }
 
-/*
-
-=item C<void reverse(STRING *src)>
-
-Reverse the ascii STRING C<src> in place.
-
-=cut
-
-*/
-
-    METHOD reverse(STRING *src) {
-        INTVAL         i;
-        unsigned char *p;
-        INTVAL         len = string_length(interp, src);
-
-        if (!len)
-            RETURN(void);
-
-        if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interp, NULL, INVALID_ENCODING,
-                "Can't reverse non-ascii");
-
-        p = (unsigned char *)src->strstart;
-
-        for (i = 0, --len; i < len; ++i, --len) {
-            const unsigned char ch = p[len];
-
-            p[len] = p[i];
-            p[i]   = ch;
-        }
+        dest->hashval = 0; /* hash is invalid */
+        RETURN(STRING dest);
     }
 
 /*
@@ -928,17 +725,17 @@ Checks if the ascii STRING C<str> is just an integer.
     METHOD is_integer(STRING *src) {
         INTVAL         i;
         unsigned char *p;
-        const INTVAL   len = string_length(interp, src);
+        const INTVAL   len = Parrot_str_length(INTERP, src);
 
         if (!len)
             RETURN(INTVAL 0);
 
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interp, NULL, INVALID_ENCODING,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't is_integer non-ascii");
 
         i = 0;
-        p = (unsigned char *)src->strstart;
+        p = (unsigned char *)Buffer_bufstart(src);
 
         if (p[i] == '-' || p[i] == '+' ||
             (p[i] >= '0' && p[i] <= '9')) {
@@ -953,12 +750,76 @@ Checks if the ascii STRING C<str> is just an integer.
     }
 
     VTABLE PMC *share_ro() {
-        PMC * const ret = SUPER();
+        STRING       *str_val;
+        PMC   * const ret    = SUPER();
 
-        /* prevent wrong garbage collection */
-        PObj_is_shared_SET(PMC_str_val(SELF));
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (!STRING_IS_NULL(str_val)) {
+            /* prevent wrong garbage collection */
+            PObj_is_shared_SET(str_val);
+        }
         return ret;
     }
+
+    VTABLE STRING* get_repr() {
+        return VTABLE_get_string(INTERP, SELF);
+    }
+
+/*
+
+=item C<INTEGER reverse_index(STRING *substring, INTVAL start)>
+
+Find last occurrence of C<substring>, but not after the C<start> position.
+
+=cut
+
+*/
+
+    METHOD reverse_index(STRING *substring, INTVAL start) {
+        STRING * const src = VTABLE_get_string(INTERP, SELF);
+        INTVAL         res = -1;
+        UINTVAL        len;
+
+        if (start < 0)
+            RETURN(INTVAL res);
+
+        len = Parrot_str_length(INTERP, src);
+
+        if (!len)
+            RETURN(INTVAL res);
+
+        if (start >= (INTVAL)len)
+            RETURN(INTVAL res);
+
+        if (!Parrot_str_length(INTERP, substring))
+            RETURN(INTVAL res);
+
+        res = CHARSET_RINDEX(INTERP, src, substring, (UINTVAL)start);
+        RETURN(INTVAL res);
+    }
+
+/*
+
+=item C<STRING *unescape()>
+
+EXPERIMENTAL, for testing only. See TT #1628
+
+=cut
+
+*/
+
+    METHOD unescape(STRING *charsetname, STRING *encodingname)
+    {
+        const CHARSET *charset = Parrot_get_charset(INTERP,
+            Parrot_charset_number(INTERP, charsetname));
+        const ENCODING *encoding = Parrot_get_encoding(INTERP,
+            Parrot_encoding_number(INTERP, encodingname));
+        STRING * const src = VTABLE_get_string(INTERP, SELF);
+        STRING * const dest = Parrot_str_unescape_string(INTERP, src,
+                charset, encoding, 0);
+        RETURN(STRING *dest);
+    }
+
 }
 
 /*

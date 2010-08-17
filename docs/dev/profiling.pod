@@ -1,0 +1,73 @@
+# Copyright (C) 2001-2005, Parrot Foundation.
+# $Id$
+
+=head1 Name
+
+docs/dev/profiling.pod - Profiling Parrot
+
+=head1 Description
+
+This file documents the use of Parrot's profiling runcore.
+
+=head2 Summary
+
+The profiling runcore is built as part of Parrot and is designed to allow
+discovery of bottlenecks in PIR code.  It is also being instrumented to support
+HLL profiling, but this support is currently limited.  Code can be run under
+the profiling runcore by passing C<-Rprofiling> or C<--runcore profiling> to
+the C<parrot> binary.  The location and format of the output file are
+determined by environment variables as documented below.  If the profiling
+runcore does not detect any relevant environment variables, it will use the
+defaults described below.
+
+=head2 Environment Variables
+
+=over 4
+
+=item C<PARROT_PROFILING_FILENAME>
+
+This determines the full name of the file where the output will be written, if
+any.  Parrot does not check if the filename exists before opening it for
+writing and will happily overwrite any existing files, including previous profiles.
+
+If no value is specified, Parrot will write to a file named C<parrot.pprof.X>,
+where X is the PID of the Parrot process.  When the profiling runcore exits, it
+will print a message announcing where the profile was written.
+
+This variable can also have the special values C<stdout> and C<stderr>.  When
+either of these values are detected (case-insensitively), Parrot will print its
+profiling output the stdout or stderr.
+
+=item C<PARROT_PROFILING_OUTPUT>
+
+This determines the type of output which will contain the profile.  Current
+options are C<pprof> and C<none>.  C<pprof> is the default and is a ascii-based
+human-readable format.  It can be post-processed into a Callgrind-compatible
+format by tools/dev/pprof2cg.pl.  C<none> writes nothing to the output file.
+It is most useful for testing and optimizing the profiling runcore itself.  It
+is expected to be of little interest to users wishing to profile PIR and HLL
+code.
+
+=item C<PARROT_PROFILING_ANNOTATIONS>
+
+This determines whether PIR annotations will be recorded as part of the
+profile.  Annotations are necessary when profiling HLL code, but will cause the
+profiling runcore to run more slowly.  By default, they are disabled.  Set this
+value to enable them.
+
+=item C<PARROT_PROFILING_CANONICAL_OUPUT> 
+
+When this is set, the profiling runcore will record all addresses as a single
+constant value and all times as 1.  This options is useful primarily for
+testing, where it's helpful to have a way to ensure that a given chunk of code
+will always produce exactly the same profile.  If you want this feature
+enabled, you also probably want to pass a fixed hash seed to Parrot via
+C<--hash-seed 1324> to avoid any non-deterministic behavior that hash seed
+randomization may cause.
+
+This variable is not useful apart from testing the profiling runcore and will
+most certainly not help you find hotspots in your code.
+
+=back
+
+=cut

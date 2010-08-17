@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,38 +24,13 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining some sizes};
+    $data{description} = q{Determine some sizes};
     $data{result}      = q{};
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
-
-    if ( defined $conf->options->get('miniparrot') ) {
-        $conf->data->set(
-            doublesize       => 8,
-            numvalsize       => 8,
-            nvsize           => 8,
-            floatsize        => 4,
-            opcode_t_size    => 4,
-            ptrsize          => 4,
-            intvalsize       => 4,
-            intsize          => 4,
-            longsize         => 4,
-            shortsize        => 2,
-            hugeintval       => 'long',
-            hugeintvalsize   => 4,
-            hugefloatval     => 'double',
-            hugefloatvalsize => 8,
-            int2_t           => 'int',
-            int4_t           => 'int',
-            float4_t         => 'double',
-            float8_t         => 'double',
-        );
-        $self->set_result('using miniparrot defaults');
-        return 1;
-    }
 
     $conf->cc_gen('config/auto/sizes/test_c.in');
     $conf->cc_build();
@@ -121,6 +96,10 @@ sub runstep {
     _set_hugefloatval( $conf, $size );
 
     $conf->cc_clean();
+
+    _set_intvalmaxmin($conf);
+
+    _set_floatvalmaxmin($conf);
 
     return 1;
 }
@@ -221,23 +200,12 @@ sub _handle_hugeintvalsize {
 
 sub _probe_for_hugefloatval {
     my $conf = shift;
-    my $size = q{};
-    $size = eval {
-        open( my $TEST, ">", "test.c" ) or die "Can't open test.c: $!";
-        print {$TEST} <<'END';
-#include <stdio.h>
-
-int main() {
-    long double foo;
-    printf("%u", sizeof(foo));
-    return 0;
-}
-END
-        close $TEST;
-
-        $conf->cc_build();
-        $conf->cc_run();
-    };
+    my $size;
+    $conf->cc_gen('config/auto/sizes/test3_c.in');
+    $conf->cc_build();
+    $size = eval $conf->cc_run();
+    $conf->cc_clean();
+    return $size;
 }
 
 sub _set_hugefloatval {
@@ -254,6 +222,59 @@ sub _set_hugefloatval {
             hugefloatvalsize => $conf->data->get('doublesize')
         );
     }
+}
+
+sub _set_intvalmaxmin {
+    my $conf = shift;
+    my $ivmin;
+    my $ivmax;
+    my $iv = $conf->data->get(qw(iv));
+
+    if ( $iv eq "int" ) {
+        $ivmin = 'INT_MIN';
+        $ivmax = 'INT_MAX';
+    }
+    elsif ( ( $iv eq "long" ) || ( $iv eq "long int" ) ) {
+        $ivmin = 'LONG_MIN';
+        $ivmax = 'LONG_MAX';
+    }
+    elsif ( ( $iv eq "long long" ) || ( $iv eq "long long int" ) ) {
+        # The assumption is that a compiler that have the long long type
+        # also provides his limit macros.
+        $ivmin = 'LLONG_MIN';
+        $ivmax = 'LLONG_MAX';
+    }
+    else {
+        die qq{Configure.pl:  Cannot find limits for type '$iv'\n};
+    }
+
+    $conf->data->set( intvalmin   => $ivmin );
+    $conf->data->set( intvalmax   => $ivmax );
+}
+
+sub _set_floatvalmaxmin {
+    my $conf = shift;
+    my $nvmin;
+    my $nvmax;
+    my $nv = $conf->data->get(qw(nv));
+
+    if ( $nv eq "double" ) {
+        $nvmin = 'DBL_MIN';
+        $nvmax = 'DBL_MAX';
+    }
+    elsif ( $nv eq "long double" ) {
+
+        # Stay way from long double for now (it may be 64 or 80 bits)
+        # die "long double not supported at this time, use double.";
+        $nvmin = 'LDBL_MIN';
+        $nvmax = 'LDBL_MAX';
+    }
+    else {
+        die qq{Configure.pl:  Cannot find limits for type '$nv'\n};
+    }
+
+    $conf->data->set( floatvalmin => $nvmin );
+    $conf->data->set( floatvalmax => $nvmax );
 }
 
 1;

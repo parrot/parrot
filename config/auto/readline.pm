@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -28,7 +28,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your platform supports readline};
+    $data{description} = q{Does your platform support readline};
     $data{result}      = q{};
     return \%data;
 }
@@ -36,16 +36,10 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
+    my $cc     = $conf->data->get('cc');
+    my $osname = $conf->data->get('osname');
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
-
-    my $osname = $conf->data->get_p5('OSNAME');
-
-    $self->_add_to_libs( {
+    my $extra_libs = $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
         cc              => $cc,
@@ -53,68 +47,51 @@ sub runstep {
         default         => '-lreadline',
     } );
 
-    # On OS X check the presence of the readline header in the standard
-    # Fink/macports locations.
-    $self->_handle_darwin_for_fink($conf, $osname, 'readline/readline.h');
-    $self->_handle_darwin_for_macports($conf, $osname, q{readline/readline.h});
-
-    $conf->cc_gen('config/auto/readline/readline.in');
+    $conf->cc_gen('config/auto/readline/readline_c.in');
     my $has_readline = 0;
-    eval { $conf->cc_build() };
+    eval { $conf->cc_build( q{}, $extra_libs ) };
     if ( !$@ ) {
         if ( $conf->cc_run() ) {
-            $has_readline = $self->_evaluate_cc_run($verbose);
+            $has_readline = $self->_evaluate_cc_run($conf);
         }
-        _handle_readline($conf, $has_readline);
+        _handle_readline($conf, $extra_libs);
     }
     else {
-        _handle_ncurses_need($conf, $osname, $cc);
-        eval { $conf->cc_build() };
+        # a second chance with ncurses
+        $extra_libs .= ' ';
+        $extra_libs .= $self->_select_lib( {
+            conf            => $conf,
+            osname          => $osname,
+            cc              => $cc,
+            win32_nongcc    => 'ncurses.lib',
+            default         => '-lncurses',
+        } );
+        eval { $conf->cc_build( q{}, $extra_libs) };
         if ( !$@ ) {
             if ( $conf->cc_run() ) {
-                $has_readline = $self->_evaluate_cc_run($verbose);
+                $has_readline = $self->_evaluate_cc_run($conf);
             }
-            _handle_readline($conf, $has_readline);
+            _handle_readline($conf, $extra_libs);
         }
     }
-    unless ($has_readline) {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-    }
+    $conf->data->set( HAS_READLINE => $has_readline );
+    $self->set_result($has_readline ? 'yes' : 'no');
 
-    return 1;
-}
-
-sub _handle_ncurses_need {
-    my ($conf, $osname, $cc) = @_;
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lncurses' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'ncurses.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lncurses' );
-    }
     return 1;
 }
 
 sub _evaluate_cc_run {
-    my ($self, $verbose) = @_;
+    my ($self, $conf) = @_;
     my $has_readline = 1;
-    print " (yes) " if $verbose;
+    $conf->debug(" (yes) ");
     $self->set_result('yes');
     return $has_readline;
 }
 
 sub _handle_readline {
-    my ($conf, $has_readline) = @_;
-    $conf->data->set(
-        readline     => 'define',
-        HAS_READLINE => $has_readline,
-    );
+    my ($conf, $libs) = @_;
+    $conf->data->set( readline => 'define' );
+    $conf->data->add( ' ', libs => $libs );
     return 1;
 }
 

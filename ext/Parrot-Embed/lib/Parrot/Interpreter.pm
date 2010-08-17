@@ -1,10 +1,10 @@
 package Parrot::Interpreter;
-
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '20081006';
 
 use Parrot::Embed;
 
@@ -18,7 +18,7 @@ Parrot::Interpreter - access a Parrot interpreter from Perl 5
 
 =head1 VERSION
 
-Version 0.02
+Version 20081006
 
 =head1 SYNOPSIS
 
@@ -47,11 +47,10 @@ Version 0.02
         print "Invoking the Sub gave ", $result_pmc->get_string( $interp ), "!\n";
 
 All Parrot access goes through an I<interpreter>, mediated through a
-C<Parrot::Interpreter> object.  There is always one or more interpreters active
-in a system.
-
-An interpreter allows you to load code, to compile code, and to find and store
-global symbols in Parrot.
+C<Parrot::Interpreter> object.  There is always at least one active interpreter
+in a system.  An interpreter allows you to load code, to compile code, and to
+find and store global symbols in Parrot.  These are usually subroutines but
+they may be other types of PMCs.
 
 =head3 Memory and Resource Implications
 
@@ -120,13 +119,6 @@ Patches welcome.
 
 Please report any bugs or feature requests to the Parrot Porters mailing list.
 Someday there may be a CPAN version of this code.  Who knows?
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (C) 2006-2007 The Perl Foundation / chromatic.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Parrot itself.
 
 =cut
 

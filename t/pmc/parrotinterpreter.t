@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -23,80 +17,106 @@ Tests the ParrotInterpreter PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'create new interpreter' );
-.sub 'test' :main
-    new P0, 'ParrotInterpreter'
-    print "ok 1\n"
-.end
-CODE
-ok 1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'run passed code pmc in another interpreter' );
 .sub main :main
-    $S0 = <<"PIR"
-.sub test :main
-    print "Hello, world\\n"
+.include 'test_more.pir'
+
+    plan(12)
+    test_new()      # 1 test
+    test_hll_map()  # 3 tests
+
+# Need for testing
+.annotate 'foo', 'bar'
+    test_inspect()  # 8 tests
 .end
-PIR
-    # Compile it.
-    $P0 = compreg "PIR"
-    $P1 = $P0($S0)
-    # Invoke in different interpreter.
-    $P2 = new 'ParrotInterpreter'
-    runinterp $P2, $P1
-    print "survived\n"
+
+.sub test_new
+    new $P0, ['ParrotInterpreter']
+    ok(1,'new')
 .end
-CODE
-Hello, world
-survived
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'running passed code pmc in another interpreter' );
-.sub 'main' :main
-     $S0 = <<'PIR'
- .sub 'main' :main
-     say "help, i'm stuck inside an interpreter!"
- .end
-PIR
-     $P0 = new 'ParrotInterpreter'
-     $P1 = compreg 'PIR'
-     $P2 = $P1($S0)
-     runinterp $P0, $P2
-     say "nobody cares."
-	 end
- .end
-CODE
-help, i'm stuck inside an interpreter!
-nobody cares.
-OUT
+.HLL 'Perl6'
 
-pir_output_is( <<'CODE', <<'OUT', 'accessing PMCs from nested interp' );
-.sub 'main' :main
-     $S0 = <<'PIR'
- .sub 'main' :main
- 	$P0 = get_global 'some_string'
-    $P0 = 'Accessing globals from other interpreters.'
- .end
-PIR
-     $P3 = new 'String'
-     set_global 'some_string', $P3
+.sub test_hll_map
+.include 'test_more.pir'
+    $P0 = get_class 'Integer'
+    $P1 = subclass $P0, 'MyInt'
 
-     $P0 = new 'ParrotInterpreter'
-     $P1 = compreg 'PIR'
-     $P2 = $P1($S0)
-     runinterp $P0, $P2
-	 $S1 = $P3
-	 say $S1
-	 end
- .end
-CODE
-Accessing globals from other interpreters.
-OUT
+    $P2 = getinterp
+    $P2.'hll_map'($P0, $P1)
+
+    $P3 = 'foo'()
+    is($P3, 3)
+    $S0 = typeof $P3
+    is($S0, "MyInt")
+    bar(4)
+.end
+
+.sub foo
+    .return (3)
+.end
+
+.sub bar
+    .param pmc n
+    $S0 = typeof n
+    is($S0, 'MyInt')
+.end
+
+# Switch back to root namespace
+.HLL 'parrot'
+
+# Test accessors to various Interp fields
+.sub 'test_inspect'
+    .local pmc interp
+    interp = getinterp
+
+    # Enforce creating of lexpad
+    .lex 'foo', interp
+
+    $P0 = interp['sub';0]
+    is($P0, 'test_inspect', 'Got ParrotInterp.sub')
+
+    $P0 = interp['lexpad';0]
+    $I0 = isa $P0, 'LexPad'
+    ok($I0, 'Got ParrotInterp.lexpad')
+
+    $P0 = interp['namespace';0]
+    $I0 = isa $P0, 'NameSpace'
+    ok($I0, 'Got ParrotInterp.namespace')
+
+    $P0 = interp['continuation';0]
+    $I0 = isa $P0, 'Continuation'
+    ok($I0, 'Got ParrotInterp.continuation')
+
+    $P0 = interp['annotations';1]
+    $S0 = $P0['foo']
+    is($S0, 'bar', 'Got ParrotInterp.annotations')
+
+    $P0 = interp['context';0]
+    $I0 = isa $P0, 'CallContext'
+    ok($I0, 'Got ParrotInterp.context')
+    # Add more tests for Context. E.g. it is correct Context by inspecting it.
+
+    push_eh caught
+    $I0 = 1
+    $P0 = interp['some_field';0]
+    $I0 = 0
+  caught:
+    pop_eh
+    ok($I0, "Access to non-existent field throws exception")
+
+    push_eh wrong_depth
+    $I0 = 1
+    $P0 = interp['sub';1000]
+    $I0 = 0
+  wrong_depth:
+    pop_eh
+    ok($I0, "Access to wrong depth throws exception")
+
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

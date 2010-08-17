@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 PGE::Dumper - various methods for displaying PGE structures
@@ -7,7 +10,7 @@ PGE::Dumper - various methods for displaying PGE structures
 .sub __onload
 .end
 
-.namespace [ "PGE::Match" ]
+.namespace [ "PGE";"Match" ]
 
 =head2 C<PGE::Match> Methods
 
@@ -23,7 +26,7 @@ This method enables Data::Dumper to work on Match objects.
     .param pmc dumper
     .param string label
     .local string indent, subindent
-    .local pmc iter, val
+    .local pmc it, val
     .local string key
     .local pmc hash, array
     .local int hascapts
@@ -33,21 +36,21 @@ This method enables Data::Dumper to work on Match objects.
     $S0 = self
     dumper."genericString"("", $S0)
     print " @ "
-    $I0 = self.from()
+    $I0 = self.'from'()
     print $I0
     hascapts = 0
     hash = self.'hash'()
     if_null hash, dump_array
-    iter = new 'Iterator', hash
+    it = iter hash
   dump_hash_1:
-    unless iter goto dump_array
+    unless it goto dump_array
     if hascapts goto dump_hash_2
     print " {"
     hascapts = 1
   dump_hash_2:
     print "\n"
     print subindent
-    key = shift iter
+    key = shift it
     val = hash[key]
     print "<"
     print key
@@ -99,16 +102,20 @@ An alternate dump output for a Match object and all of its subcaptures.
 
     .local pmc capt
     .local int spi, spc
-    .local pmc iter
+    .local pmc it
     .local string prefix1, prefix2
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
 
     if has_b2 goto start
     b2 = "]"
     if has_b1 goto start
     b1 = "["
   start:
-    .local string out
-    out = concat prefix, ':'
+    .local pmc out
+    out = new ['StringBuilder']
+    out = prefix
+    out .= ':'
     unless self goto subpats
     out .= ' <'
     $S0 = self
@@ -131,12 +138,12 @@ An alternate dump output for a Match object and all of its subcaptures.
     unless spi < spc goto subrules
     prefix1 = concat prefix, b1
     $S0 = spi
-    concat prefix1, $S0
-    concat prefix1, b2
+    prefix1 = concat prefix1, $S0
+    prefix1 = concat prefix1, b2
     $I0 = defined capt[spi]
     unless $I0 goto subpats_2
     $P0 = capt[spi]
-    bsr dumper
+    local_branch jmpstack, dumper
   subpats_2:
     inc spi
     goto subpats_1
@@ -144,25 +151,25 @@ An alternate dump output for a Match object and all of its subcaptures.
   subrules:
     capt = self.'hash'()
     if_null capt, end
-    iter = new 'Iterator', capt
+    it = iter capt
   subrules_1:
-    unless iter goto end
-    $S0 = shift iter
+    unless it goto end
+    $S0 = shift it
     prefix1 = concat prefix, '<'
-    concat prefix1, $S0
-    concat prefix1, ">"
+    prefix1 = concat prefix1, $S0
+    prefix1 = concat prefix1, ">"
     $I0 = defined capt[$S0]
     unless $I0 goto subrules_1
     $P0 = capt[$S0]
-    bsr dumper
+    local_branch jmpstack, dumper
     goto subrules_1
 
   dumper:
-    $I0 = isa $P0, 'PGE::Match'
+    $I0 = isa $P0, ['PGE';'Match']
     unless $I0 goto dumper_0
     $S0 = $P0.'dump_str'(prefix1, b1, b2)
     out .= $S0
-    ret
+    local_return jmpstack
   dumper_0:
     $I0 = does $P0, 'array'
     unless $I0 goto dumper_3
@@ -173,24 +180,25 @@ An alternate dump output for a Match object and all of its subcaptures.
     $P1 = $P0[$I0]
     prefix2 = concat prefix1, b1
     $S0 = $I0
-    concat prefix2, $S0
-    concat prefix2, b2
+    prefix2 = concat prefix2, $S0
+    prefix2 = concat prefix2, b2
     $S0 = $P1.'dump_str'(prefix2, b1, b2)
     out .= $S0
     inc $I0
     goto dumper_1
   dumper_2:
-    ret
+    local_return jmpstack
   dumper_3:
     out .= prefix1
     out .= ': '
     $S0 = $P0
     out .= $S0
     out .= "\n"
-    ret
+    local_return jmpstack
 
   end:
-    .return (out)
+    $S0 = out
+    .return ($S0)
 .end
 
 
@@ -234,7 +242,7 @@ obsoleted in favor of a Data::Dumper method.
 
 =cut
 
-.namespace [ "PGE::Exp" ]
+.namespace [ "PGE";"Exp" ]
 
 .sub "dumpindent" :method
     .param int indent
@@ -253,7 +261,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Start" ]
+.namespace [ "PGE";"Exp";"Start" ]
 
 .sub dump :method
     .param int indent
@@ -267,7 +275,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::End" ]
+.namespace [ "PGE";"Exp";"End" ]
 
 .sub dump :method
     .param int indent
@@ -276,7 +284,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Literal" ]
+.namespace [ "PGE";"Exp";"Literal" ]
 
 .sub "dump" :method
     .param int indent
@@ -292,7 +300,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Scalar" ]
+.namespace [ "PGE";"Exp";"Scalar" ]
 
 .sub "dump" :method
     .param int indent
@@ -308,7 +316,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Dot" ]
+.namespace [ "PGE";"Exp";"Dot" ]
 
 .sub "dump" :method
     .param int indent
@@ -320,7 +328,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::CharClass" ]
+.namespace [ "PGE";"Exp";"CharClass" ]
 
 .sub dump :method
     .param int indent
@@ -338,7 +346,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::WS" ]
+.namespace [ "PGE";"Exp";"WS" ]
 
 .sub "dump" :method
     .param int indent
@@ -350,7 +358,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Anchor" ]
+.namespace [ "PGE";"Exp";"Anchor" ]
 
 .sub "dump" :method
     .param int indent
@@ -364,7 +372,7 @@ obsoleted in favor of a Data::Dumper method.
 .end
 
 
-.namespace [ "PGE::Exp::Concat" ]
+.namespace [ "PGE";"Exp";"Concat" ]
 
 .sub "dump" :method
     .param int indent
@@ -375,7 +383,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Alt" ]
+.namespace [ "PGE";"Exp";"Alt" ]
 
 .sub "dump" :method
     .param int indent
@@ -384,7 +392,7 @@ obsoleted in favor of a Data::Dumper method.
 
     exp = self["exp1"]
     $I1 = indent
-    $I0 = isa exp, "PGE::Exp::Alt"
+    $I0 = isa exp, ["PGE";"Exp";"Alt"]
     if $I0 goto print_exp1
     $I1 += 4
   print_exp1:
@@ -393,7 +401,7 @@ obsoleted in favor of a Data::Dumper method.
     print "ALT\n"
     exp = self["exp2"]
     $I1 = indent
-    $I0 = isa exp, "PGE::Exp::Alt"
+    $I0 = isa exp, ["PGE";"Exp";"Alt"]
     if $I0 goto print_exp2
     $I1 += 4
   print_exp2:
@@ -402,7 +410,7 @@ obsoleted in favor of a Data::Dumper method.
 .end
 
 
-.namespace [ "PGE::Exp::Group" ]
+.namespace [ "PGE";"Exp";"Group" ]
 
 .sub "dump" :method
     .param int indent
@@ -443,7 +451,7 @@ obsoleted in favor of a Data::Dumper method.
     .return ()
 .end
 
-.namespace [ "PGE::OPTable" ]
+.namespace [ "PGE";"OPTable" ]
 
 =head2 C<PGE::OPTable> Methods
 
@@ -459,7 +467,7 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
     .param pmc dumper
     .param string label
     .local string indent, subindent
-    .local pmc iter, val
+    .local pmc it, val
     .local string key
     .local pmc hash, array
 
@@ -467,12 +475,12 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
     print " {"
     hash = self
     if_null hash, dump_rest
-    iter = new 'Iterator', hash
+    it = iter hash
   dump_hash:
-    unless iter goto dump_rest
+    unless it goto dump_rest
     print "\n"
     print subindent
-    key = shift iter
+    key = shift it
     val = hash[key]
     print "<"
     print key

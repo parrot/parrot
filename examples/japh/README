@@ -1,8 +1,8 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 $Id$
 
 These programs show very different ways how to print a simple
-string. Some are obfuscated, some are horribly platform dependend.
+string. Some are obfuscated, some are horribly platform dependent.
 
 To run them all (from the top level directory)
 

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ config/gen/platform/generic/exec.c
 
 =head1 DESCRIPTION
 
-system() stuff
+Parrot functions to run operating system commands.
 
 =head2 Functions
 
@@ -26,78 +26,80 @@ system() stuff
 
 /*
 
-=item C<INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+=item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
-Spawn off a subprocess and wait for the damn thing to complete,
-returning the return value of the process
+Spawn off a subprocess provided in a string.  Wait for it to complete,
+returning the return value of the process.
 
 =cut
 
 */
 
 INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 {
     pid_t child;
     child = fork();
     /* Did we fail? */
-    if (-1 == child) {
-        real_exception(interp, NULL, NOSPAWN, "Can't spawn child process");
-    }
+    if (-1 == child)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Can't spawn child process");
+
     /* Are we the parent or child? */
     if (child) {
         /* parent */
-        int status;
-        pid_t returnstat;
-        returnstat = waitpid(child, &status, 0);
-        UNUSED(returnstat);
+        int   status;
+        waitpid(child, &status, 0);
         return status;
     }
     else {
-        /* child. Be horribly profligate with memory, since we're
-           about to be something else */
-        int status;
-        status = execlp("sh", "sh", "-c",
-            string_to_cstring(interp, command), (void *)NULL);
-        /* if we get here, something's horribly wrong... */
-        if (status) {
+        /* child */
+        char * const cmd    = Parrot_str_to_cstring(interp, command);
+        const int    status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
+
+        /* if we get here, something's horribly wrong, but free anyway... */
+        Parrot_str_free_cstring(cmd);
+
+        if (status)
             exit(status);
-        }
     }
-    return 1;    /* make gcc happy */
+
+    /* make gcc happy */
+    return 1;
 }
 
 /*
 
-=item C<INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+=item C<INTVAL Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
-RT#48260: Not yet documented!!!
+Spawn off a subprocess provided in command-line arguments.  Wait for it to
+complete, returning the return value of the process.
 
 =cut
 
 */
 
 INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 {
     pid_t child;
     int len = VTABLE_elements(interp, cmdargs);
-    if (len == 0) {
-        real_exception(interp, NULL, NOSPAWN, "Empty argument array for execvp");
-    }
+
+    if (len == 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Empty argument array for execvp");
+
     child = fork();
     /* Did we fail? */
-    if (-1 == child) {
-        real_exception(interp, NULL, NOSPAWN, "Can't spawn child process");
-    }
+    if (-1 == child)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Can't spawn child process");
+
     /* Are we the parent or child? */
     if (child) {
         /* parent */
         int status;
-        pid_t returnstat;
-        returnstat = waitpid(child, &status, 0);
+        pid_t returnstat = waitpid(child, &status, 0);
         UNUSED(returnstat);
         return status;
     }
@@ -105,19 +107,18 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
         /* child. Be horribly profligate with memory, since we're
            about to be something else */
         int status, i;
-        char **argv;
         STRING *s;
-        char *cmd;
+        char   *cmd;
+        char  **argv = mem_gc_allocate_n_typed(interp, (len+1), char*);
 
-        argv = (char **)mem_sys_allocate((len+1)*sizeof (char *));
         for (i = 0; i < len; ++i) {
             s = VTABLE_get_string_keyed_int(interp, cmdargs, i);
-            argv[i] = string_to_cstring(interp, s);
+            argv[i] = Parrot_str_to_cstring(interp, s);
         }
-        cmd = argv[0];
-        argv[i] = NULL;
 
-        status = execvp(cmd, argv);
+        cmd     = argv[0];
+        argv[i] = NULL;
+        status  = execvp(cmd, argv);
         /* if we get here, something's horribly wrong... */
         if (status) {
             exit(status);
@@ -128,27 +129,11 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 
 /*
 
-=item C<void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)>
-
-RT #48260: Not yet documented!!!
+=back
 
 =cut
 
 */
-
-void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
-{
-    /* Be horribly profligate with memory, since we're
-       about to be something else */
-    char *cmd  = string_to_cstring(interp, command);
-    int status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
-
-    /* if we get here, something's horribly wrong... */
-    if (status)
-        real_exception(interp, NULL, NOSPAWN, "Exec failed, code %i", status);
-}
 
 /*
  * Local variables:

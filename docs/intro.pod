@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -98,7 +98,7 @@ The amount of registers needed is determined per subroutine at compile-time.
 
 =head2 PMCs
 
-PMC stands for Parrot Magic Cookie. PMCs represent any complex data structure
+PMC stands for Polymorphic Container. PMCs represent any complex data structure
 or type, including aggregate data types (arrays, hash tables, etc). A PMC can
 implement its own behavior for arithmetic, logical and string operations
 performed on it, allowing for language-specific behavior to be introduced. PMCs
@@ -116,13 +116,8 @@ is, no longer referenced) whenever the garbage collector runs.
 
 =head2 Where to get Parrot
 
-Periodically, numbered releases will appear on CPAN.  At this stage of the
-project, an awful lot is changing between releases. You can get a copy of the
-latest Parrot from the SVN repository. This is done as follows:
-
-  svn co https://svn.perl.org/parrot/trunk parrot
-
-You can find more instructions at: L<http://www.parrotcode.org/source.html>
+See L<http://www.parrot.org/download> for several ways to get a recent
+version of parrot.
 
 =head2 Building Parrot
 
@@ -132,15 +127,14 @@ typing:
 
   perl Configure.pl
 
-Once this is complete, run the C<make> program (sometimes called C<nmake> or
-C<dmake> or C<gmake>).  This should complete, giving you a working Parrot
-executable.
+Once this is complete, run the C<make> program C<Configure.pl> prompts you
+with. When this completes, you will have a working C<parrot> executable.
 
 Please report any problems that you encounter while building Parrot so the
-developers can fix them. You can do this by sending a message to
-C<parrotbug@parrotcode.org> containing a description of your problem. Please
-include the F<myconfig> file that was generated as part of the build process
-and any errors that you observed.
+developers can fix them. You can do this by creating a login and opening
+a new ticket at L<https://trac.parrot.org>.  Please include the F<myconfig>
+file that was generated as part of the build process and any errors that you
+observed.
 
 =head2 The Parrot test suite
 
@@ -151,7 +145,7 @@ Parrot has an extensive regression test suite. This can be run by typing:
 Substituting make for the name of the make program on your platform. The output
 will look something like this:
 
- C:\Perl\bin\perl.exe t\harness --gc-debug --running-make-test
+ C:\Perl\bin\perl.exe t\harness --gc-debug 
    t\library\*.t  t\op\*.t  t\pmc\*.t  t\run\*.t  t\native_pbc\*.t
    imcc\t\*\*.t  t\dynpmc\*.t  t\p6rules\*.t t\src\*.t t\perl\*.t
  t\library\dumper...............ok
@@ -173,16 +167,20 @@ build problems.
 
 Create a file called F<hello.pir> that contains the following code.
 
+=begin PIR
+
   .sub main
-      print "Hello world!\n"
+      say "Hello world!"
   .end
+
+=end PIR
 
 Then run it by typing:
 
   parrot hello.pir
 
 As expected, this will display the text C<Hello world!> on the console,
-followed by a new line (due to the C<\n>).
+followed by a new line. 
 
 Let's take the program apart. C<.sub main> states that the instructions that
 follow make up a subroutine named C<main>, until a C<.end> is encountered. The
@@ -192,35 +190,39 @@ care of deciding which variant of the instruction to use for us.
 
 =head2 Using registers
 
-We can modify hello.pir to first store the string C<Hello world!\n> in a
+We can modify hello.pir to first store the string C<Hello world!> in a
 register and then use that register with the print instruction.
 
-  .sub main
-      set S0, "Hello world!\n"
-      print S0
-  .end
-
-Here we have stated exactly which register to use. However, by
-replacing C<S0> with C<$S0> we can delegate the choice of which
-register to use to Parrot.  It is also possible to use an C<=>
-notation instead of writing the C<set> instruction.
+=begin PIR
 
   .sub main
-      $S0 = "Hello world!\n"
-      print $S0
+      $S0 = "Hello world!"
+      say $S0
   .end
+
+=end PIR
+
+PIR does not allow us to set a register directly. We need to prefix the
+register name with C<$> when referring to a register. The compiler will map $S0
+to one of the available string registers, for example S0, and set the value.
+This example also uses the syntactic sugar provided by the C<=> operator.  C<=>
+is simply a more readable way of using the C<set> opcode.  
 
 To make PIR even more readable, named registers can be used. These are later
 mapped to real numbered registers.
 
+=begin PIR
+
   .sub main
       .local string hello
-      hello = "Hello world!\n"
-      print hello
+      hello = "Hello world!"
+      say hello
   .end
 
+=end PIR
+
 The C<.local> directive indicates that the named register is only needed inside
-the current compilation unit (that is, between C<.sub> and C<.end>). Following
+the current subroutine (that is, between C<.sub> and C<.end>). Following
 C<.local> is a type. This can be C<int> (for I registers), C<float> (for N
 registers), C<string> (for S registers), C<pmc> (for P registers) or the name
 of a PMC type.
@@ -235,6 +237,8 @@ replacing them with a label at the start of the instructions.
 
 This example introduces some more instructions and PIR syntax. Lines starting
 with a C<#> are comments.
+
+=begin PIR
 
   .sub main
       # State the number of squares to sum.
@@ -262,30 +266,66 @@ with a C<#> are comments.
       print ".\n"
   .end
 
+=end PIR
+
 PIR provides a bit of syntactic sugar that makes it look more high level than
 assembly. For example:
 
+=begin PIR_FRAGMENT
+
+  .local pmc temp, i
   temp = i * i
+
+=end PIR_FRAGMENT
 
 Is just another way of writing the more assembly-ish:
 
+=begin PIR_FRAGMENT
+
+  .local pmc temp, i
   mul temp, i, i
 
+=end PIR_FRAGMENT
+
 And:
 
+=begin PIR_FRAGMENT
+
+  .local pmc i, maxnum
   if i <= maxnum goto loop
+  # ...
+  loop:
+
+=end PIR_FRAGMENT
 
 Is the same as:
 
+=begin PIR_FRAGMENT
+
+  .local pmc i, maxnum
   le i, maxnum, loop
+  # ...
+  loop:
+
+=end PIR_FRAGMENT
 
 And:
 
+=begin PIR_FRAGMENT
+
+  .local pmc temp, total
   total += temp
 
+=end PIR_FRAGMENT
+
 Is the same as:
 
+=begin PIR_FRAGMENT
+
+  .local pmc  temp, total
   add total, temp
+
+=end PIR_FRAGMENT
 
 As a rule, whenever a Parrot instruction modifies the contents of a register,
 that will be the first register when writing the instruction in assembly form.
@@ -298,6 +338,8 @@ programming is one place where using goto is not bad form!
 
 In this example we define a factorial function and recursively call it to
 compute factorial.
+
+=begin PIR
 
   .sub factorial
       # Get input parameter.
@@ -338,6 +380,8 @@ compute factorial.
       if i <= 10 goto loop
   .end
 
+=end PIR
+
 The first line, C<.param int n>, specifies that this subroutine takes one
 integer parameter and that we'd like to refer to the register it was passed in
 by the name C<n> for the rest of the sub.
@@ -345,9 +389,14 @@ by the name C<n> for the rest of the sub.
 Much of what follows has been seen in previous examples, apart from the line
 reading:
 
+=begin PIR_FRAGMENT
+
+  .local int result
   result = factorial($I0)
 
-This single line of PIR actually represents a few lines of PASM. The assembler
+=end PIR_FRAGMENT
+
+The last line of PIR actually represents a few lines of PASM. The assembler
 builds a PMC that describes the signature, including which register the
 arguments are held in. A similar process happens for providing the registers
 that the return values should be placed in. Finally, the C<factorial> sub is 
@@ -387,13 +436,13 @@ entitled I<Testing Parrot> that will help with this.
 =head2 The Parrot Mailing List
 
 Much Parrot development and discussion takes place on the
-parrot-porters mailing list. You can subscribe by sending an email to
-C<parrot-porters-subscribe@perl.org> or read the NNTP archive at
-L<http://www.nntp.perl.org/group/perl.perl6.internals>.
+parrot-dev mailing list. You can subscribe by filling out the form at
+L<http://lists.parrot.org/mailman/listinfo/parrot-dev> or read the NNTP
+archive at L<http://groups.google.com/group/parrot-dev/>.
 
 =head2 IRC
 
-The Parrot IRC channel is hosted on irc.perl.org and is named C<#parrot>.
+The Parrot IRC channel is hosted on irc.parrot.org and is named C<#parrot>.
 Alternative IRC servers are at irc.pobox.com and irc.rhizomatic.net.
 
 =cut

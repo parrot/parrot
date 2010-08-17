@@ -46,24 +46,23 @@
      TK_MACRO_CONST = 262,
      TK_MACRO_LOCAL = 263,
      TK_MACRO_LABEL = 264,
-     TK_LINE = 265,
-     TK_INT = 266,
-     TK_NUM = 267,
-     TK_STRING = 268,
-     TK_PMC = 269,
-     TK_IDENT = 270,
-     TK_ANY = 271,
-     TK_BODY = 272,
-     TK_DOT_IDENT = 273,
-     TK_LABEL_ID = 274,
-     TK_LOCAL_ID = 275,
-     TK_VAR_EXPANSION = 276,
-     TK_LABEL_EXPANSION = 277,
-     TK_UNIQUE_LABEL = 278,
-     TK_UNIQUE_LOCAL = 279,
-     TK_STRINGC = 280,
-     TK_NUMC = 281,
-     TK_INTC = 282
+     TK_INT = 265,
+     TK_NUM = 266,
+     TK_STRING = 267,
+     TK_PMC = 268,
+     TK_IDENT = 269,
+     TK_ANY = 270,
+     TK_BODY = 271,
+     TK_DOT_IDENT = 272,
+     TK_LABEL_ID = 273,
+     TK_LOCAL_ID = 274,
+     TK_VAR_EXPANSION = 275,
+     TK_LABEL_EXPANSION = 276,
+     TK_UNIQUE_LABEL = 277,
+     TK_UNIQUE_LOCAL = 278,
+     TK_STRINGC = 279,
+     TK_NUMC = 280,
+     TK_INTC = 281
    };
 #endif
 /* Tokens.  */
@@ -74,39 +73,37 @@
 #define TK_MACRO_CONST 262
 #define TK_MACRO_LOCAL 263
 #define TK_MACRO_LABEL 264
-#define TK_LINE 265
-#define TK_INT 266
-#define TK_NUM 267
-#define TK_STRING 268
-#define TK_PMC 269
-#define TK_IDENT 270
-#define TK_ANY 271
-#define TK_BODY 272
-#define TK_DOT_IDENT 273
-#define TK_LABEL_ID 274
-#define TK_LOCAL_ID 275
-#define TK_VAR_EXPANSION 276
-#define TK_LABEL_EXPANSION 277
-#define TK_UNIQUE_LABEL 278
-#define TK_UNIQUE_LOCAL 279
-#define TK_STRINGC 280
-#define TK_NUMC 281
-#define TK_INTC 282
+#define TK_INT 265
+#define TK_NUM 266
+#define TK_STRING 267
+#define TK_PMC 268
+#define TK_IDENT 269
+#define TK_ANY 270
+#define TK_BODY 271
+#define TK_DOT_IDENT 272
+#define TK_LABEL_ID 273
+#define TK_LOCAL_ID 274
+#define TK_VAR_EXPANSION 275
+#define TK_LABEL_EXPANSION 276
+#define TK_UNIQUE_LABEL 277
+#define TK_UNIQUE_LOCAL 278
+#define TK_STRINGC 279
+#define TK_NUMC 280
+#define TK_INTC 281
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 63 "macro.y"
+#line 99 "macro.y"
 {
-    char  *sval;
-    struct list *lval;
+    char const       *sval;
+    struct list      *lval;
     struct macro_def *mval;
-
 }
 /* Line 1489 of yacc.c.  */
-#line 110 "macroparser.h"
+#line 107 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

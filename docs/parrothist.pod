@@ -1,125 +1,116 @@
 =head1 NAME
 
-parrothist - the parrot history records
+parrothist - Parrot Release History
 
 =head1 DESCRIPTION
 
-This document aims to record the parrot source code releases.
+This document records Parrot source code releases, and their release managers.
 
-=head1 INTRODUCTION
-
-Parrot history in brief...
-
-... ok, done!
-
-=head1 THE KEEPERS OF THE PUMPKIN
+=head1 RELEASE MANAGERS
 
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
-Patrick Michaud, Will Coleda, Matt Diephouse, chromatic, Allison Randal,
-Jonathan Worthington.
+Patrick Michaud, Will "coke" Coleda, Matt Diephouse, chromatic, Allison Randal,
+Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
+Francois Perrad, Jonathan Leto.
 
-=head2 PUMPKIN?
-
-[from Porting/pumpkin.pod in the Perl source code distribution]
-
-Chip Salzenberg gets credit for that, with a nod to his coworker,
-David Croy.  We had passed around various names (baton, token, hot
-potato) but none caught on.  Then, Chip asked:
-
-[begin quote]
-
-   Who has the patch pumpkin?
-
-To explain:  David Croy once told me once that at a previous job,
-there was one tape drive and multiple systems that used it for backups.
-But instead of some high-tech exclusion software, they used a low-tech
-method to prevent multiple simultaneous backups: a stuffed pumpkin.
-No one was allowed to make backups unless they had the "backup pumpkin".
-
-[end quote]
-
-The name has stuck.  The holder of the pumpkin is sometimes called
-the pumpking (keeping the source afloat?) or the pumpkineer (pulling
-the strings?).
 
 =head1 THE RECORDS
 
- Pump-  Release         Date            Release name
- king
+Starred release numbers indicate supported releases.
+
+ Release     Release        Date            Release name
+ Manager
  ===========================================================================
 
- Simon     0.0.1          2001-Sep-10     n/a
-           0.0.2          2001-Oct-05     n/a
-           0.0.3          2001-Dec-08     n/a
-           0.0.4          2002-Mar-19     n/a
+ Simon       0.0.1          2001-Sep-10     n/a
+             0.0.2          2001-Oct-05     n/a
+             0.0.3          2001-Dec-08     n/a
+             0.0.4          2002-Mar-19     n/a
 
- Jeff      0.0.5          2002-Apr-16     n/a
-           0.0.6          2002-Jun-04     n/a
-           0.0.7          2002-Jul-18     "Percy"
-           0.0.8          2002-Sep-01     "Octarine"
-           0.0.8.1        2002-Sep-01     (bugfix release)
+ Jeff        0.0.5          2002-Apr-16     n/a
+             0.0.6          2002-Jun-04     n/a
+             0.0.7          2002-Jul-18     "Percy"
+             0.0.8          2002-Sep-01     "Octarine"
+             0.0.8.1        2002-Sep-01     (bugfix release)
 
- Steve     0.0.9          2002-Dec-19     "Nazgul"
-           0.0.10         2003-Mar-16     "Juice"
-           0.0.11         2003-Sep-20     "Dubloon"
-           0.0.11.2       2003-Sep-22     (bugfix release)
+ Steve       0.0.9          2002-Dec-19     "Nazgul"
+             0.0.10         2003-Mar-16     "Juice"
+             0.0.11         2003-Sep-20     "Dubloon"
+             0.0.11.2       2003-Sep-22     (bugfix release)
 
- Leo       0.0.13         2003-Oct-31     "Screaming Pumpkin"
-           0.1.0          2004-Feb-29     "Leaping Kakapo"
-           0.1.1          2004-Oct-09     "Poicephalus"
-           0.1.2          2005-Mar-06     "Phoenix"
-           0.2.0          2005-May-08     "NLnet"
-           0.2.1          2005-Jun-04     "APW"
-           0.2.2          2005-Jul-03     "Geeksunite"
-           0.2.3          2005-Aug-05     "Serenity"
-           0.3.0          2005-Oct-01     "Alex"
-           0.3.1          2005-Nov-06     "Wart"
-           0.4.0          2005-Dec-04     "Luthor"
-           0.4.1          2006-Jan-08     "Foghorn Leghorn"
-           0.4.2          2006-Feb-22     "GPW"
-           0.4.3          2006-Apr-02     "Cold Conure"
-           0.4.4          2006-May-14     "Feather"
-           0.4.5          2006-Jun-19     n/a
+ Leo         0.0.13         2003-Oct-31     "Screaming Pumpkin"
+             0.1.0          2004-Feb-29     "Leaping Kakapo"
+             0.1.1          2004-Oct-09     "Poicephalus"
+             0.1.2          2005-Mar-06     "Phoenix"
+             0.2.0          2005-May-08     "NLnet"
+             0.2.1          2005-Jun-04     "APW"
+             0.2.2          2005-Jul-03     "Geeksunite"
+             0.2.3          2005-Aug-05     "Serenity"
+             0.3.0          2005-Oct-01     "Alex"
+             0.3.1          2005-Nov-06     "Wart"
+             0.4.0          2005-Dec-04     "Luthor"
+             0.4.1          2006-Jan-08     "Foghorn Leghorn"
+             0.4.2          2006-Feb-22     "GPW"
+             0.4.3          2006-Apr-02     "Cold Conure"
+             0.4.4          2006-May-14     "Feather"
+             0.4.5          2006-Jun-19     n/a
 
- Chip      0.4.6          2006-Aug-08     n/a
-           0.4.7          2006-Nov-14     "Caique"
+ Chip        0.4.6          2006-Aug-08     n/a
+             0.4.7          2006-Nov-14     "Caique"
 
- Jerry     0.4.8b         2007-Jan-16     "Eponymous"
+ Jerry       0.4.8b         2007-Jan-16     "Eponymous"
+ Patrick     0.4.9          2007-Feb-22     "Socorro"
+ coke        0.4.10         2007-Mar-20     "Release Formerly Known as Prince"
+ Matt        0.4.11         2007-Apr-17     "Tax Bird"
+ chromatic   0.4.12         2007-May-15     "Of The Caribbean"
+ Allison     0.4.13         2007-Jun-19     "Clifton"
+ Jerry       0.4.14         2007-Jul-17     "Now, with Seat Belts!"
+ Patrick     0.4.15         2007-Aug-22     "Augean Stable"
+ Jerry       0.4.16         2007-Sep-18     "A Farewell to Alex"
+ coke        0.4.17         2007-Oct-17     "Two for Finching"
 
- Patrick   0.4.9          2007-Feb-22     "Socorro"
+ chromatic   0.5.0          2007-Nov-20     "Caulked Snack"
+ Jonathan    0.5.1          2007-Dec-18     "Hatachi"
+ Bob         0.5.2          2008-Jan-15     "P.e. nipalensis"
+ Patrick     0.5.3          2008-Feb-20     "Way of the Parrot"
 
- Will      0.4.10         2007-Mar-20     "Release Formerly Known as Prince"
+ Barney      0.6.0          2008-Mar-18     "P&P"
+ Jerry       0.6.1          2008-Apr-15     "Bird of Paradise"
+ chromatic   0.6.2          2008-May-20     "Reverse Sublimation"
+ smash       0.6.3          2008-Jun-17     "Beautiful Parrot"
+ Barney      0.6.4          2008-Jul-15     "St. Vincent Amazon"
 
- Matt      0.4.11         2007-Apr-17     "Tax Bird"
+ Bob         0.7.0          2008-Aug-19     "Severe Macaw"
+ Patrick     0.7.1          2008-Sep-16     "Manu Aloha"
 
- chromatic 0.4.12         2007-May-15     "Of The Caribbean"
+ Jerry       0.8.0          2008-Oct-21     "Pareto Principle"
+ chromatic   0.8.1          2008-Nov-18     "Tio Richie"
+ Whiteknight 0.8.2          2008-Dec-16     "Feliz Loro"
 
- Allison   0.4.13         2007-Jun-19     "Clifton"
+ chromatic   0.9.0          2009-Jan-20     "From Outer Space"
+ kjs         0.9.1          2009-Feb-17     "Final Countdown"
 
- Jerry     0.4.14         2007-Jul-17     "Now, with Seat Belts!"
+ Allison     1.0.0 *        2009-Mar-17     "Haru Tatsu"
+ Francois    1.1.0          2009-Apr-21     "Half-moon Conure"
+ Infinoid    1.2.0          2009-May-19     "Bird Brain"
+ Whiteknight 1.3.0          2009-Jun-16     "Andean Swift"
 
- Patrick   0.4.15         2007-Aug-22     "Augean Stable"
+ cotto       1.4.0 *        2009-Jul-21     "Mundo Cani"
+ Whiteknight 1.5.0          2009-Aug-18     "TEH PARROTZ!"
+ Jerry       1.6.0          2009-Sep-15     "half-pie"
+ dukeleto    1.7.0          2009-Oct-20     "African Grey"
+ Barney      1.8.0          2009-Nov-17     "Zygodactyly"
+ Gerd        1.9.0          2009-Dec-15     "Blue-fronted Amazon"
 
- Jerry     0.4.16         2007-Sep-18     "A Farewell to Alex"
+ chromatic   2.0.0 *        2010-Jan-19     "Inevitable"
+ darbelo     2.1.0          2010-Feb-16     "As Scheduled"
+ coke        2.1.1          2010-Feb-19     (bugfix release)
+ cotto       2.2.0          2010-Mar-16     "Like Clockwork"
 
- Will      0.4.17         2007-Oct-17     "Two for Finching"
+ Gerd        2.3.0 *        2010-Apr-20     "Samoan Lory"
+ Whiteknight 2.4.0          2010-May-18     "Sulfer Crest"
+ Gerd        2.5.0          2010-Jun-15     "Cheops"
 
- chromatic 0.5.0          2007-Nov-20     "Caulked Snack"
-
- Jonathan  0.5.1          2007-Dec-18     "Hatachi"
-
- Bob       0.5.2          2008-Jan-15     "P.e. nipalensis"
-
- Patrick   0.5.3          2008-Feb-20     "Way of the Parrot"
-
- Barney    0.6.0          2008-Mar-18     "P&P"
-
- Jerry     0.6.1          2008-Apr-15     "Bird of Paradise"
-
- chromatic 0.6.2          2008-May-20     "Reverse Sublimation"
-
- smash     0.6.3          2008-Jun-17     "Beautiful Parrot"
-
- Barney    0.6.4          2008-Jul-15     "St. Vincent Amazon"
+ coke        2.6.0 *        2010-Jul-20     "Red-rumped"
 
 =cut

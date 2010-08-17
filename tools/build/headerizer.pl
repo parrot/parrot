@@ -1,10 +1,6 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use Carp qw( confess );
 
 =head1 NAME
 
@@ -13,21 +9,17 @@ files from .c files
 
 =head1 SYNOPSIS
 
-Update the headers in F<include/parrot> with the function declarations in
-the F<*.pmc> or F<*.c> files that correspond to the F<*.o> files passed
-on the command line.
-
     % perl tools/build/headerizer.pl OBJFILES
 
 =head1 DESCRIPTION
 
+Update the headers in F<include/parrot> with the function declarations in
+the F<*.pmc> or F<*.c> files that correspond to the F<*.o> files passed
+on the command line.
+
 =head1 TODO
 
-* Tell if there are funcs without docs
-
 * Generate docs from funcs
-
-* Test the POD of the stuff we're parsing.
 
 * Somehow handle static functions in the source file
 
@@ -38,7 +30,7 @@ on the command line.
 * Support for multiple .c files pointing at the same .h file
 
 * Does NOT remove all blocks in the .h file, so if a .c file
-disappears, it's block is "orphaned" and will remain there.
+disappears, its block is "orphaned" and will remain there.
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -46,7 +38,7 @@ disappears, it's block is "orphaned" and will remain there.
 
 =item C<--macro=X>
 
-Print a list of all functions that have macro X.  For example, --macro=PARROT_API.
+Print a list of all functions that have macro X.  For example, --macro=PARROT_EXPORT.
 
 =back
 
@@ -62,92 +54,19 @@ One or more object file names.
 
 =cut
 
+use strict;
+use warnings;
+
 use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
+use Parrot::Headerizer;
 
-my %warnings;
-my %opt;
-
-my %valid_macros = map { ( $_, 1 ) } qw(
-    PARROT_API
-    PARROT_INLINE
-    PARROT_CAN_RETURN_NULL
-    PARROT_CANNOT_RETURN_NULL
-    PARROT_IGNORABLE_RESULT
-    PARROT_WARN_UNUSED_RESULT
-    PARROT_PURE_FUNCTION
-    PARROT_CONST_FUNCTION
-    PARROT_DOES_NOT_RETURN
-    PARROT_DOES_NOT_RETURN_WHEN_FALSE
-    PARROT_MALLOC
-);
+my $headerizer = Parrot::Headerizer->new;
 
 main();
 
 =head1 FUNCTIONS
-
-=head2 extract_function_declarations( $source_file_text )
-
-Rips apart a C file to get the function declarations.
-
-=cut
-
-sub extract_function_declarations {
-    my $text = shift;
-
-    # Only check the YACC C code if we find what looks like YACC file
-    $text =~ s[%\{(.*)%\}.*][$1]sm;
-
-    # Drop all text after HEADERIZER STOP
-    $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
-
-    # Strip blocks of comments
-    $text =~ s[^/\*.*?\*/][]mxsg;
-
-    # Strip # compiler directives (Thanks, Audrey!)
-    $text =~ s[^#(\\\n|.)*][]mg;
-
-    # Strip code blocks
-    $text =~ s[^{.+?^}][]msg;
-
-    # Split on paragraphs
-    my @funcs = split /\n{2,}/, $text;
-
-    # If it doesn't start in the left column, it's not a func
-    @funcs = grep /^\S/, @funcs;
-
-    # Typedefs, enums and externs are no good
-    @funcs = grep { !/^(typedef|enum|extern)\b/ } @funcs;
-
-    # Structs are OK if they're not alone on the line
-    @funcs = grep { !/^struct.+;\n/ } @funcs;
-
-    # Structs are OK if they're not being defined
-    @funcs = grep { !/^(static\s+)?struct.+{\n/ } @funcs;
-
-    # Ignore magic function name YY_DECL
-    @funcs = grep { !/YY_DECL/ } @funcs;
-
-    # Ignore anything with magic words HEADERIZER SKIP
-    @funcs = grep !m{/\*\s*HEADERIZER SKIP\s*\*/}, @funcs;
-
-    # Variables are of no use to us
-    @funcs = grep !/=/, @funcs;
-
-    # Get rid of any blocks at the end
-    s/\s*{.*//s for @funcs;
-
-    # Toast anything non-whitespace
-    @funcs = grep /\S/, @funcs;
-
-    # If it's got a semicolon, it's not a function header
-    @funcs = grep !/;/, @funcs;
-
-    chomp @funcs;
-
-    return @funcs;
-}
 
 =head2 extract_function_declaration_and_update_source( $cfile_name )
 
@@ -163,16 +82,16 @@ sub extract_function_declarations_and_update_source {
     my $text = join( '', <$fhin> );
     close $fhin;
 
-    my @func_declarations = extract_function_declarations( $text );
+    my @func_declarations = $headerizer->extract_function_declarations( $text );
     for my $decl ( @func_declarations ) {
-        my $specs = function_components_from_declaration( $cfile_name, $decl );
+        my $specs = $headerizer->function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
-        my $return_type = $specs->{return_type};
-        my $heading = "$return_type $name";
-        $heading = "static $heading" if $specs->{is_static};
 
-        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n/=item C<$heading>\n/sm or
-            warn "$name has no POD\n";
+        my $heading = $headerizer->generate_documentation_signature($decl);
+
+        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or do {
+            warn "$cfile_name: $name has no POD\n" unless $name =~ /^yy/; # lexer funcs don't have to have POD
+        }
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
     print {$fhout} $text;
@@ -181,83 +100,6 @@ sub extract_function_declarations_and_update_source {
     return @func_declarations;
 }
 
-sub function_components_from_declaration {
-    my $file  = shift;
-    my $proto = shift;
-
-    my @lines = split( /\n/, $proto );
-    chomp @lines;
-
-    my @macros;
-    my $parrot_api;
-    my $parrot_inline;
-
-    while ( @lines && ( $lines[0] =~ /^PARROT_/ ) ) {
-        my $macro = shift @lines;
-        if ( $macro eq 'PARROT_API' ) {
-            $parrot_api = 1;
-        }
-        elsif ( $macro eq 'PARROT_INLINE' ) {
-            $parrot_inline = 1;
-        }
-        push( @macros, $macro );
-    }
-
-    my $return_type = shift @lines;
-    my $args = join( ' ', @lines );
-
-    $args =~ s/\s+/ /g;
-    $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto"};
-
-    my $name = $1;
-    $args = $2;
-
-    die "Can't have both PARROT_API and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
-
-    my @args = split( /\s*,\s*/, $args );
-    for (@args) {
-        /\S+\s+\S+/
-            || ( $_ eq '...' )
-            || ( $_ eq 'void' )
-            || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
-            or die "Bad args in $proto";
-    }
-
-    my $is_static = 0;
-    $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
-
-    die "$file $name: Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
-
-    my %macros;
-    for my $macro (@macros) {
-        $macros{$macro} = 1;
-        if ( not $valid_macros{$macro} ) {
-            squawk( $file, $name, "Invalid macro $macro" );
-        }
-    }
-    if ( $return_type =~ /\*/ ) {
-        if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name,
-                "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
-        }
-        elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name,
-                "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
-        }
-    }
-
-    return {
-        file        => $file,
-        name        => $name,
-        args        => \@args,
-        macros      => \@macros,
-        is_static   => $is_static,
-        is_inline   => $parrot_inline,
-        is_api      => $parrot_api,
-        return_type => $return_type,
-    };
-}
 
 sub attrs_from_args {
     my $func = shift;
@@ -271,7 +113,7 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg (@args) {
         ++$n;
-        if ( $arg =~ m{ARG(?:MOD|OUT)(?:_NOTNULL)?\((.+?)\)} ) {
+        if ( $arg =~ m{ARG(?:MOD|OUT)(?:_NULLOK)?\((.+?)\)} ) {
             my $modified = $1;
             if ( $modified =~ s/.*\*/*/ ) {
                 # We're OK
@@ -281,18 +123,48 @@ sub attrs_from_args {
             }
             push( @mods, "FUNC_MODIFIES($modified)" );
         }
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
-        if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?)|ARGFREE)\b/ ) ) {
-            squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
+        if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?)|ARGFREE(_NOTNULL)?)\b/ ) ) {
+            if ( $name !~ /^yy/ ) { # Don't complain about the lexer auto-generated funcs
+                $headerizer->squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
+            }
         }
         if ( ($arg =~ /\bconst\b/) && ($arg =~ /\*/) && ($arg !~ /\*\*/) && ($arg =~ /\b(ARG(MOD|OUT))\b/) ) {
-            squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
+            $headerizer->squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
         }
     }
 
     return (@attrs,@mods);
+}
+
+sub asserts_from_args {
+    my @args = @_;
+    my @asserts;
+
+    for my $arg (@args) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+)\)} ) {
+            my $var = $2;
+            if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
+                # argument is a function pointer
+                $var = $1;
+            }
+            else {
+                # try to isolate the variable's name;
+                # strip off everything before the final space or asterisk.
+                $var =~ s{.+[* ]([^* ]+)$}{$1};
+                # strip off a trailing "[]", if any.
+                $var =~ s{\[\]$}{};
+            }
+            push( @asserts, "PARROT_ASSERT_ARG($var)" );
+        }
+        if( $arg eq 'PARROT_INTERP' ) {
+            push( @asserts, "PARROT_ASSERT_ARG(interp)" );
+        }
+    }
+
+    return (@asserts);
 }
 
 sub make_function_decls {
@@ -302,11 +174,21 @@ sub make_function_decls {
     foreach my $func (@funcs) {
         my $multiline = 0;
 
-        my $decl = sprintf( "%s %s(", $func->{return_type}, $func->{name} );
+        my $return = $func->{return_type};
+        my $alt_void = ' ';
+
+        # Splint can't handle /*@alt void@*/ on pointers, although this page
+        # http://www.mail-archive.com/lclint-interest@virginia.edu/msg00139.html
+        # seems to say that we can.
+        if ( $func->{is_ignorable} && ($return !~ /\*/) ) {
+            $alt_void = " /*\@alt void@*/\n";
+        }
+
+        my $decl = sprintf( "%s%s%s(", $return, $alt_void, $func->{name} );
         $decl = "static $decl" if $func->{is_static};
 
-        my @args = @{ $func->{args} };
-        my @attrs = attrs_from_args( $func, @args );
+        my @args    = @{ $func->{args} };
+        my @attrs   = attrs_from_args( $func, @args );
 
         for my $arg (@args) {
             if ( $arg =~ m{SHIM\((.+)\)} ) {
@@ -348,15 +230,27 @@ sub make_function_decls {
         push( @decls, $decl );
     }
 
+    foreach my $func (@funcs) {
+        my @args    = @{ $func->{args} };
+        my @asserts = asserts_from_args( @args );
+
+        my $assert = "#define ASSERT_ARGS_" . $func->{name};
+        if(length($func->{name}) > 29) {
+            $assert .= " \\\n    ";
+        }
+        $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = (";
+        if(@asserts) {
+            $assert .= "\\\n       ";
+            $assert .= join(" \\\n    , ", @asserts);
+        }
+        else {
+            $assert .= "0";
+        }
+        $assert .= ")";
+        push(@decls, $assert);
+    }
+
     return @decls;
-}
-
-sub squawk {
-    my $file  = shift;
-    my $func  = shift;
-    my $error = shift;
-
-    push( @{ $warnings{$file}->{$func} }, $error );
 }
 
 sub read_file {
@@ -380,12 +274,12 @@ sub write_file {
 
 sub replace_headerized_declarations {
     my $source_code = shift;
-    my $cfile       = shift;
+    my $sourcefile = shift;
     my $hfile       = shift;
     my @funcs       = @_;
 
     # Allow a way to not headerize statics
-    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$cfile\s*\*/} ) {
+    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$sourcefile\s*\*/} ) {
         return $source_code;
     }
 
@@ -394,14 +288,14 @@ sub replace_headerized_declarations {
     my @function_decls = make_function_decls(@funcs);
 
     my $function_decls = join( "\n", @function_decls );
-    my $STARTMARKER    = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
-    my $ENDMARKER      = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $sourcefile \*/\n};
+    my $ENDMARKER      = qr{/\* HEADERIZER END: $sourcefile \*/\n?};
     my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
 
     $source_code =~
         s{($STARTMARKER)(?:.*?)($ENDMARKER)}
          {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
-        or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
+        or die "Need begin/end HEADERIZER markers for $sourcefile in $hfile\n";
 
     return $source_code;
 }
@@ -417,15 +311,15 @@ sub main {
         'macro=s' => \$macro_match,
     ) or exit(1);
 
-    die "No files specified.\n" unless @ARGV;
+    die 'No files specified.' unless @ARGV;
     my %ofiles;
     ++$ofiles{$_} for @ARGV;
     my @ofiles = sort keys %ofiles;
     for (@ofiles) {
         print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
     }
-    my %cfiles;
-    my %cfiles_with_statics;
+    my %sourcefiles;
+    my %sourcefiles_with_statics;
     my %api;
 
     # Walk the object files and find corresponding source (either .c or .pmc)
@@ -448,31 +342,35 @@ sub main {
         my $pmcfile = $ofile;
         $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
 
-        my $csource = read_file($cfile);
-        die "can't find HEADERIZER HFILE directive in '$cfile'"
-            unless $csource =~
+        my $from_pmc = -f $pmcfile && !$is_yacc;
+
+        my $sourcefile = $from_pmc ? $pmcfile : $cfile;
+
+        my $source_code = read_file( $sourcefile );
+        die qq{can't find HEADERIZER HFILE directive in "$sourcefile"}
+            unless $source_code =~
                 m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
 
         my $hfile = $1;
         if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
-            die "'$hfile' not found (referenced from '$cfile')";
+            die qq{"$hfile" not found (referenced from "$sourcefile")};
         }
 
         my @decls;
-        if ( $macro_match || (-f $pmcfile && !$is_yacc) ) {
-            @decls = extract_function_declarations( $csource );
+        if ( $macro_match ) {
+            @decls = $headerizer->extract_function_declarations( $source_code );
         }
         else {
-            @decls = extract_function_declarations_and_update_source( $cfile );
+            @decls = extract_function_declarations_and_update_source( $sourcefile );
         }
 
         for my $decl (@decls) {
-            my $components = function_components_from_declaration( $cfile, $decl );
-            push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
-            push( @{ $cfiles_with_statics{$cfile} }, $components ) if $components->{is_static};
+            my $components = $headerizer->function_components_from_declaration( $sourcefile, $decl );
+            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
+            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
             if ( $macro_match ) {
                 if ( grep { $_ eq $macro_match } @{$components->{macros}} ) {
-                    push( @{ $api{$cfile} }, $components );
+                    push( @{ $api{$sourcefile} }, $components );
                 }
             }
         }
@@ -493,24 +391,24 @@ sub main {
     }
     else { # Normal headerization and updating
         # Update all the .h files
-        for my $hfile ( sort keys %cfiles ) {
-            my $cfiles = $cfiles{$hfile};
+        for my $hfile ( sort keys %sourcefiles ) {
+            my $sourcefiles = $sourcefiles{$hfile};
 
             my $header = read_file($hfile);
 
-            for my $cfile ( sort keys %{$cfiles} ) {
-                my @funcs = @{ $cfiles->{$cfile} };
+            for my $cfile ( sort keys %{$sourcefiles} ) {
+                my @funcs = @{ $sourcefiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs )
-                    unless $cfile =~ /\.y$/;
+
+                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
             }
 
             write_file( $hfile, $header );
         }
 
         # Update all the .c files in place
-        for my $cfile ( sort keys %cfiles_with_statics ) {
-            my @funcs = @{ $cfiles_with_statics{$cfile} };
+        for my $cfile ( sort keys %sourcefiles_with_statics ) {
+            my @funcs = @{ $sourcefiles_with_statics{$cfile} };
             @funcs = grep { $_->{is_static} } @funcs;
 
             my $source = read_file($cfile);
@@ -521,6 +419,7 @@ sub main {
         print "Headerization complete.\n";
     }
 
+    my %warnings = %{$headerizer->{warnings}};
     if ( keys %warnings ) {
         my $nwarnings     = 0;
         my $nwarningfuncs = 0;
@@ -585,6 +484,8 @@ Tells the headerizer where the declarations for the functions should go
 
     # In file bar.c
     /* HEADERIZER HFILE: foo.h */
+
+=back
 
 =cut
 

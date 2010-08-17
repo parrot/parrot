@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2008, The Perl Foundation.
+# Copyright (C) 2002-2010, Parrot Foundation.
 # $Id$
 
 This is a list of project roles, with a partial list of the folks who have
@@ -7,7 +7,7 @@ SVN commit access, just those who have a role they've taken responsibility
 for.
 
 See docs/project/roles_responsibilities.pod for role definitions, and
-languages/LANGUAGES.STATUS.pod for more language authors/maintainers.
+https://trac.parrot.org/parrot/wiki/Languages for language authors/maintainers.
 
 
 Project Team
@@ -22,65 +22,70 @@ Release Manager                 Bob Rogers
                                 chromatic
                                 Will Coleda
                                 Andrew Whitworth
+                                Klaas-Jan Stol
+                                Francois Perrad
+                                Mark Glines
+                                Christoph Otto
+                                Jonathan Leto
+                                Gerd Pokorra
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
                                 Will Coleda
-                                Jesse Vincent
+                                chromatic
+                                Jeff Horwitz
 
 
 Committers
 ----------
 
 Core Developer                  Jonathan Worthington
-                                Matt Diephouse
                                 Bernhard Schmalhofer
                                 Kevin Tew
                                 Bob Rogers
                                 Nuno Carvalho
                                 chromatic
-                                Chip Salzenberg
                                 Allison Randal
                                 Andrew Whitworth
+                                Christoph Otto
+                                Julian Albo
+                                Mark Glines
+                                Vasily Chekalkin
+                                Jonathan Leto
 
-Compiler Developer              Vishal Soni (BCG, IMCC)
-                                Patrick Michaud (PGE, PCT)
+Compiler Developer              Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
+                                Klaas-Jan Stol (PIRC)
 
-High Level Language Developer   Patrick Michaud (Perl 6, NQP)
-                                Matt Diephouse (Tcl)
-                                Will Coleda (Tcl)
-                                Francois Perrad (Lua, Pipp (PHP))
-                                Bernhard Schmalhofer (Pipp (PHP), Eclectus (Scheme))
-                                Kevin Tew (Cardinal (Ruby))
-                                Christoh Otto (Pipp (PHP))
-
-Build Manager                   Joshua Hoblitt
-
-Lead Tester                     Jerry Gay
-
-Platform Porter                 Allison Randal (Debian)
-                                Aldo Calpini (PocketPC)
+Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Francois Perrad (MinGW32)
+                                Reini Urban (cygwin)
+                                Will Coleda (MacPorts)
+                                Jerry Gay (Windows)
+                                Gerd Pokorra (Fedora)
+
 
 Patch Monster                   chromatic
                                 Jonathan Worthington
-                                Paul Cochrane
                                 Jerry Gay
-                                Matt Diephouse
                                 Will Coleda
                                 James Keenan
+                                Francois Perrad
+                                Christoph Otto
+                                Julian Albo
+                                Mark Glines
+                                Jonthan Leto
 
 
 Contributors
 ------------
 
 Cage Cleaner                    James Keenan
-                                Paul Cochrane
-                                Mike Mattie
-                                Steve Peters
                                 Jerry Gay
                                 chromatic
                                 Andy Lester
+                                Francois Perrad
+                                Mark Glines
+                                Bruce Gray
 
 General Contributor             See CREDITS

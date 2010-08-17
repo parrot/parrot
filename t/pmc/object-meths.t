@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -89,7 +89,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "can class" );
 .sub main :main
     $P2 = newclass "Foo"
 
-    $P3 = new "Sub"
+    $P3 = new ['Sub']
     # Add a method to the class manually
     $P2.'add_method'("meth", $P3)
 
@@ -106,9 +106,9 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "can object" );
 .sub main :main
     $P2 = newclass "Foo"
-    $P4 = new "Foo"
+    $P4 = new ['Foo']
 
-    $P3 = new "Sub"
+    $P3 = new ['Sub']
     # Add a method to the class manually
     $P2.'add_method'("meth", $P3)
 
@@ -128,7 +128,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "constructor" );
 .sub main :main
     $P1 = newclass "Foo"
-    new $P3, "Foo"
+    new $P3, ['Foo']
     print "ok 2\n"
     end
 .end
@@ -142,71 +142,73 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
-    newclass P1, "Foo"
-    addattribute P1, ".i"
-    new P3, "Foo"
-    print "ok 2\n"
-    print P3
-    print "\n"
+pir_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
+.sub 'main' :main
+    newclass $P1, "Foo"
+    addattribute $P1, ".i"
+    new $P3, ['Foo']
+    say "ok 2"
+    say $P3
     end
+.end
+
 .namespace ["Foo"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "ok 1\n"
-    new P10, 'Integer'
-    set P10, 42
-    setattribute P2, ".i", P10
-    set_returns ""
-    returncc
-.pcc_sub __get_string:
-    get_params "0", P2
-    getattribute P10, P2, ".i"
-    set_returns "0", P10
-    returncc
+
+.sub 'init' :vtable :method
+    say "ok 1"
+    new $P10, ['Integer']
+    set $P10, 42
+    setattribute self, ".i", $P10
+    .return()
+.end
+
+.sub 'get_string' :vtable :method
+    getattribute $P10, self, ".i"
+    .return( $P10 )
+.end
 CODE
 ok 1
 ok 2
 42
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
-    newclass P1, "Foo"
-    subclass P2, P1, "Bar"
-    subclass P3, P2, "Baz"
-    new P3, "Baz"
-    new P3, "Bar"
-    get_global P0, "_sub"
-    invokecc P0
-    print "done\n"
+pir_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
+.sub 'main' :main
+    newclass $P1, "Foo"
+    subclass $P2, $P1, "Bar"
+    subclass $P3, $P2, "Baz"
+    new $P3, ['Baz']
+    new $P3, ['Bar']
+    _sub()
+    say "done"
     end
+.end
 
-    .namespace ["Foo"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "foo_init\n"
-    typeof S0, P2
-    print S0
-    print "\n"
-    returncc
+.namespace ["Foo"]
 
-    .namespace ["Bar"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "bar_init\n"
-    returncc
+.sub 'init' :vtable :method
+    say "foo_init"
+    typeof $S0, self
+    say $S0
+.end
 
-    .namespace ["Baz"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "baz_init\n"
-    returncc
+.namespace ["Bar"]
 
-    .namespace [] # main again
-.pcc_sub _sub:
-    print "in sub\n"
-    returncc
+.sub 'init' :vtable :method
+    say "bar_init"
+.end
 
+.namespace ["Baz"]
+
+.sub 'init' :vtable :method
+    say "baz_init"
+.end
+
+.namespace [] # main again
+
+.sub '_sub'
+    say "in sub"
+.end
 CODE
 foo_init
 Baz
@@ -228,8 +230,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self" );
     newclass A, "A"
     newclass B, "B"
 
-    new A, "A"
-    new B, "B"
+    new A, ['A']
+    new B, ['B']
 
     setprop A, "B", B
 
@@ -283,8 +285,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg" );
     newclass A, "A"
     newclass B, "B"
 
-    new A, "A"
-    new B, "B"
+    new A, ['A']
+    new B, ['B']
 
     A."foo"(B)
     B."foo"()
@@ -335,8 +337,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
     newclass A, "A"
     newclass B, "B"
 
-    new A, "A"
-    new B, "B"
+    new A, ['A']
+    new B, ['B']
 
     .local pmc r
     r = A."foo"(B)
@@ -356,7 +358,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
     B."blah"()
     self."blah"()
     .begin_return
-    .return B
+    .set_return B
     .end_return
 
 .end
@@ -391,7 +393,7 @@ _main:
     newclass P0, "Foo"
 
     print "new\n"
-    new P2, "Foo"
+    new P2, ['Foo']
 eh:
     print "back in main\n"
     end
@@ -414,7 +416,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "find_method" );
     newclass P3, "Foo"
-    new P2, "Foo"
+    new P2, ['Foo']
 
     set S0, "meth"
     find_method P0, P2, S0
@@ -443,7 +445,7 @@ CODE
 /Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );
+pir_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );
 #
 # A   B A   E
 #  \ /   \ /
@@ -451,115 +453,103 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );
 #    \   /
 #     \ /
 #      F
-    newclass P1, "A"
-    newclass P2, "B"
-    subclass P3, P1, "C"
-    addparent P3, P2
+.sub 'main' :main
+    newclass $P1, "A"
+    newclass $P2, "B"
+    subclass $P3, $P1, "C"
+    addparent $P3, $P2
 
-    subclass P4, P1, "D"
-    newclass P5, "E"
-    addparent P4, P5
+    subclass $P4, $P1, "D"
+    newclass $P5, "E"
+    addparent $P4, $P5
 
-    subclass P6, P3, "F"
-    addparent P6, P4
-    bsr _check_isa
+    subclass $P6, $P3, "F"
+    addparent $P6, $P4
 
-    print "new F\n"
-    new P16, "F"
-    print "done\n"
-    end
-
-_check_isa:
     print "F isa D "
-    isa I0, P6, "D"
-    print I0
-    print "\n"
+    isa $I0, $P6, "D"
+    say $I0
     print "D isa F "
-    isa I0, P4, "F"
-    print I0
-    print "\n"
+    isa $I0, $P4, "F"
+    say $I0
     print "F isa C "
-    isa I0, P6, "C"
-    print I0
-    print "\n"
+    isa $I0, $P6, "C"
+    say $I0
     print "C isa F "
-    isa I0, P3, "F"
-    print I0
-    print "\n"
+    isa $I0, $P3, "F"
+    say $I0
     print "F isa E "
-    isa I0, P6, "E"
-    print I0
-    print "\n"
+    isa $I0, $P6, "E"
+    say $I0
     print "E isa F "
-    isa I0, P5, "F"
-    print I0
-    print "\n"
+    isa $I0, $P5, "F"
+    say $I0
     print "F isa A "
-    isa I0, P6, "A"
-    print I0
-    print "\n"
+    isa $I0, $P6, "A"
+    say $I0
     print "A isa F "
-    isa I0, P1, "F"
-    print I0
-    print "\n"
+    isa $I0, $P1, "F"
+    say $I0
     print "F isa B "
-    isa I0, P6, "B"
-    print I0
-    print "\n"
+    isa $I0, $P6, "B"
+    say $I0
     print "B isa F "
-    isa I0, P2, "F"
-    print I0
-    print "\n"
+    isa $I0, $P2, "F"
+    say $I0
 
     print "C isa A "
-    isa I0, P3, "A"
-    print I0
-    print "\n"
+    isa $I0, $P3, "A"
+    say $I0
     print "A isa C "
-    isa I0, P1, "C"
-    print I0
-    print "\n"
+    isa $I0, $P1, "C"
+    say $I0
     print "D isa A "
-    isa I0, P4, "A"
-    print I0
-    print "\n"
+    isa $I0, $P4, "A"
+    say $I0
     print "A isa D "
-    isa I0, P1, "D"
-    print I0
-    print "\n"
-    ret
+    isa $I0, $P1, "D"
+    say $I0
 
+    say "new F"
+    new $P16, ['F']
+    say "done"
+.end
 
 .namespace ["A"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "A init\n"
-    returncc
+
+.sub 'init' :vtable :method
+    say "A init"
+.end
+
 .namespace ["B"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "B init\n"
-    returncc
+
+.sub 'init' :vtable :method
+    say "B init"
+.end
+
 .namespace ["C"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "C init\n"
-    returncc
+
+.sub 'init' :vtable :method
+    say "C init"
+.end
+
 .namespace ["D"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "D init\n"
-    returncc
+
+.sub 'init' :vtable :method
+    say "D init"
+.end
+
 .namespace ["E"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "E init\n"
-    returncc
+
+.sub 'init' :vtable :method
+    say "E init"
+.end
+
 .namespace ["F"]
-.pcc_sub __init:
-    get_params "0", P2
-    print "F init\n"
-    returncc
+
+.sub 'init' :vtable :method
+    say "F init"
+.end
 CODE
 F isa D 1
 D isa F 0
@@ -589,7 +579,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "constructor - vtable override" );
 .sub main :main
   $P0 = newclass 'Foo'
   $P1 = subclass 'Foo', 'Bar'
-  $P2 = new 'Bar'
+  $P2 = new ['Bar']
 .end
 
 .namespace ['Foo']
@@ -639,7 +629,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
     .local pmc A
 
     newclass A, "A"
-    new A, "A"
+    new A, ['A']
     A."foo"()
     end
 .end
@@ -662,7 +652,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys" 
 .sub _main
     newclass $P0, "Foo"
 
-    new $P1, "Foo"
+    new $P1, ['Foo']
 
     $I1 = $P1["foo"]
 
@@ -691,7 +681,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys -
 .sub _main
     newclass $P0, "Foo"
 
-    new $P1, "Foo"
+    new $P1, ['Foo']
 
     $I1 = $P1["foo"]
 
@@ -725,10 +715,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "method cache invalidation" );
     .local pmc o, cl
     newclass cl, "Foo"
     subclass cl, cl, "Bar"
-    o = new "Bar"
+    o = new ['Bar']
     print o
-    $P0 = global "ok2"
-    cl.'add_method'('get_string', $P0, 'vtable' => 1)
+    $P0 = get_global "ok2"
+    cl.'add_vtable_override'('get_string', $P0)
     print o
 .end
 .sub ok2
@@ -757,8 +747,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
 .namespace ["Foo"]
 .sub meth :method
     print "in meth\n"
-    getinterp P0
-    $P1 = P0["sub"]
+    getinterp $P0
+    $P1 = $P0["sub"]
     print $P1
     print "\n"
     .return ()
@@ -775,7 +765,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUTPUT', "bound NCI method" );
 .sub main :main
     .local pmc s, l, f
-    s = new 'String'
+    s = new ['String']
     s = "ABC\n"
     f = getattribute s, "lower"
     typeof $S0, f
@@ -795,11 +785,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcallmeth" );
     .local pmc cl, o, n
     cl = newclass "Foo"
     addattribute cl, "n"
-    o = new "Foo"
-    n = new 'Integer'
+    o = new ['Foo']
+    n = new ['Integer']
     n = 2000
     setattribute o, [ "Foo" ], "n", n
-    o.go()
+    o.'go'()
     n = getattribute o, [ "Foo" ], "n"
     print n
     print "\n"
@@ -811,7 +801,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcallmeth" );
     n = getattribute self, [ "Foo" ], "n"
     dec n
     unless n goto done
-    .return self."go"()
+    .tailcall self."go"()
 done:
 .end
 CODE
@@ -822,7 +812,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "kind of a super" );
 .sub main :main
     .local pmc cl, o
     cl = subclass "String", "MyString"
-    o = new "MyString"
+    o = new ['MyString']
     o = "foo"
     print o
     print "\n"
@@ -843,7 +833,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int" );
 .sub main :main
     .local pmc cl, o
     cl = newclass "MyClass"
-    o = new "MyClass"
+    o = new ['MyClass']
     $I0 = 5
     $S0 = "foo"
     o[$I0] = 42
@@ -919,7 +909,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived" );
 .sub main :main
     .local pmc cl, o
     cl = subclass "ResizablePMCArray", "MyClass"
-    o = new "MyClass"
+    o = new ['MyClass']
     $I0 = 5
     o[$I0] = 42
     $I1 = o[$I0]
@@ -957,7 +947,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived - inherit" 
 .sub main :main
     .local pmc cl, o
     cl = subclass "ResizablePMCArray", "MyClass"
-    o = new "MyClass"
+    o = new ['MyClass']
     $I0 = 5
     o[$I0] = 42
     $I1 = o[$I0]
@@ -985,7 +975,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addmethod op" );
 .sub main :main
     .local pmc c
     c = newclass ['whatever']
-    .const .Sub foo = "whatever_foo"
+    .const 'Sub' foo = "whatever_foo"
     addmethod c, "foo", foo
     $P0 = new ['whatever']
     $P0.'foo'()
@@ -1002,7 +992,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "inherit a PMC METHOD" );
 .sub main :main
     .local pmc cl, o
     cl = subclass 'Integer', 'MyInt'
-    o = new 'MyInt'
+    o = new ['MyInt']
     o = 10
     $S0 = o.'get_as_base'(16)
     print $S0
@@ -1016,9 +1006,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init calls" );
 .sub main :main
     .local pmc cl, o
     cl = newclass 'MyClass'
-    o = new 'MyClass'
-    $P0 = new 'String'
-    o = new 'MyClass', $P0
+    o = new ['MyClass']
+    $P0 = new ['String']
+    o = new ['MyClass'], $P0
 .end
 
 .namespace ['MyClass']
@@ -1041,7 +1031,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading find_method vtable" );
 .sub main :main
     .local pmc cl, o
     cl = newclass 'MyClass'
-    o = new 'MyClass'
+    o = new ['MyClass']
     o.'foo'()
 .end
 
@@ -1067,8 +1057,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
 .sub main :main
     .local pmc cl, o
     cl = newclass 'MyClass'
-    o = new 'MyClass'
-    $P2 = new 'String'
+    o = new ['MyClass']
+    $P2 = new ['String']
     $P2 = "blue"
     setattribute o, "blue", $P2
     $P1 = getattribute o, "blue"
@@ -1094,7 +1084,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading get_class vtable" );
 .sub main :main
     .local pmc cl, o, cl2
     cl = newclass 'MyClass'
-    o = new 'MyClass'
+    o = new ['MyClass']
     cl2 = class o
 .end
 
@@ -1108,7 +1098,7 @@ CODE
 get_class was called
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object (RT #50440)" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object" );
 .namespace [ 'Foo' ]
 
 .sub 'blah' :method

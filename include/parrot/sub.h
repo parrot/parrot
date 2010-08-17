@@ -1,15 +1,10 @@
 /* sub.h
- *  Copyright (C) 2001-2008, The Perl Foundation.
+ *  Copyright (C) 2001-2008, Parrot Foundation.
  *  SVN Info
  *     $Id$
- *  Overview:
  *  Data Structure and Algorithms:
  *     Subroutine, coroutine, closure and continuation structures
  *     and related routines.
- *  History:
- *     Initial version by Melvin on on 2002/06/6
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_SUB_H_GUARD
@@ -21,7 +16,7 @@
  * Subroutine flags
  */
 typedef enum {
-     /* runtime usage flags */
+    /* runtime usage flags */
     SUB_FLAG_CORO_FF      = PObj_private0_FLAG,
     SUB_FLAG_C_HANDLER    = PObj_private0_FLAG, /* C exceptions only */
     SUB_FLAG_TAILCALL     = PObj_private2_FLAG,
@@ -36,10 +31,11 @@ typedef enum {
     SUB_FLAG_PF_IMMEDIATE = PObj_private6_FLAG,
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
-    /* [temporary expedient.  -- rgr, 13-Jul-08.] */
-    SUB_FLAG_NEWCLOSURE   = SUB_FLAG_PF_IMMEDIATE,
-
-    SUB_FLAG_PF_MASK      = 0xfa   /* anon ... postcomp, is_outer*/
+    SUB_FLAG_PF_MASK      = SUB_FLAG_PF_ANON
+                          | SUB_FLAG_PF_MAIN
+                          | SUB_FLAG_PF_LOAD
+                          | SUB_FLAG_PF_IMMEDIATE
+                          | SUB_FLAG_PF_POSTCOMP
 } sub_flags_enum;
 
 #define SUB_FLAG_get_FLAGS(o) (PObj_get_FLAGS(o))
@@ -60,6 +56,7 @@ typedef enum {
 typedef enum {
     SUB_COMP_FLAG_BIT_0     = SUB_FLAG(0),
     SUB_COMP_FLAG_BIT_1     = SUB_FLAG(1),
+    SUB_COMP_FLAG_VTABLE    = SUB_COMP_FLAG_BIT_1,
     SUB_COMP_FLAG_BIT_2     = SUB_FLAG(2),
     SUB_COMP_FLAG_METHOD    = SUB_COMP_FLAG_BIT_2,
     SUB_COMP_FLAG_BIT_3     = SUB_FLAG(3),
@@ -72,6 +69,7 @@ typedef enum {
     SUB_COMP_FLAG_BIT_10    = SUB_FLAG(10),
     SUB_COMP_FLAG_PF_INIT   = SUB_COMP_FLAG_BIT_10,
     SUB_COMP_FLAG_BIT_11    = SUB_FLAG(11),
+    SUB_COMP_FLAG_NSENTRY   = SUB_COMP_FLAG_BIT_11,
     SUB_COMP_FLAG_BIT_12    = SUB_FLAG(12),
     SUB_COMP_FLAG_BIT_13    = SUB_FLAG(13),
     SUB_COMP_FLAG_BIT_14    = SUB_FLAG(14),
@@ -91,11 +89,11 @@ typedef enum {
     SUB_COMP_FLAG_BIT_28    = SUB_FLAG(28),
     SUB_COMP_FLAG_BIT_29    = SUB_FLAG(29),
     SUB_COMP_FLAG_BIT_30    = SUB_FLAG(30),
-    SUB_COMP_FLAG_MASK      = 0x00000404
+    SUB_COMP_FLAG_MASK      = SUB_COMP_FLAG_VTABLE | SUB_COMP_FLAG_METHOD | SUB_COMP_FLAG_NSENTRY | SUB_COMP_FLAG_PF_INIT
 } sub_comp_flags_enum;
 #undef SUB_FLAG
 
-#define Sub_comp_get_FLAGS(o) ((PMC_sub(o))->comp_flags)
+#define Sub_comp_get_FLAGS(o) ((o)->comp_flags)
 #define Sub_comp_flag_TEST(flag, o) (Sub_comp_get_FLAGS(o) & SUB_COMP_FLAG_ ## flag)
 #define Sub_comp_flag_SET(flag, o) (Sub_comp_get_FLAGS(o) |= SUB_COMP_FLAG_ ## flag)
 #define Sub_comp_flag_CLEAR(flag, o) (Sub_comp_get_FLAGS(o) &= ~(UINTVAL)(SUB_COMP_FLAG_ ## flag))
@@ -132,91 +130,25 @@ typedef struct Parrot_sub_arginfo {
     Parrot_UInt1 named_slurpy;
 } Parrot_sub_arginfo;
 
+#define PMC_get_sub(interp, pmc, sub) \
+    do { \
+        const INTVAL type = (pmc)->vtable->base_type; \
+        if (type == enum_class_Sub || \
+            type == enum_class_Coroutine || \
+            type == enum_class_Eval)  \
+        {\
+            (sub) = PARROT_SUB((pmc)); \
+        } \
+        else { \
+            (sub) = (Parrot_Sub_attributes*)Parrot_get_sub_pmc_from_subclass((interp), (pmc)); \
+        } \
+    } while (0)
 
-/*
- * Sub and Closure share a Parrot_sub structure.
- * Closures have additionally an 'outer_ctx'
- */
-typedef struct Parrot_sub {
-    struct PackFile_ByteCode *seg;      /* bytecode segment */
-    size_t   start_offs;        /* sub entry in ops from seg->base.data */
-    size_t   end_offs;
+typedef struct Parrot_Sub_attributes Parrot_sub;
+typedef struct Parrot_Coroutine_attributes Parrot_coro;
+typedef struct Parrot_Continuation_attributes Parrot_cont;
 
-    INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    PMC      *namespace_name;    /* where this Sub is in - this is either
-                                  * a String or a [Key] and describes
-                                  * the relative path in the NameSpace
-                                  */
-    PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
-    STRING   *name;              /* name of the sub */
-    STRING   *lexid;             /* The lexical ID of the sub. */
-    INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
-    PMC      *multi_signature;   /* list of types for MMD */
-    INTVAL   n_regs_used[4];     /* INSP in PBC */
-
-    PMC      *lex_info;          /* LexInfo PMC */
-    PMC      *outer_sub;         /* :outer for closures */
-    PMC      *eval_pmc;          /* eval container / NULL */
-    parrot_context_t *ctx;       /* the context this sub is in */
-    UINTVAL  comp_flags;         /* compile time and additional flags */
-    Parrot_sub_arginfo *arg_info;/* Argument counts and flags. */
-
-    /* - end common */
-    struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
-} Parrot_sub;
-
-#define PMC_sub(pmc) ((Parrot_sub *)PMC_struct_val(pmc))
-
-/* the first entries must match Parrot_sub, so we can cast
- * these two to the other type
- */
-typedef struct Parrot_coro {
-    struct PackFile_ByteCode *seg;      /* bytecode segment */
-    size_t   start_offs;         /* sub entry in ops from seg->base.data */
-    size_t   end_offs;
-
-    INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    PMC      *_namespace;        /* where this Sub is in - this is either
-                                  * a String or a [Key] and describes
-                                  * the relative path in the NameSpace
-                                  */
-    PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
-    STRING   *name;              /* name of the sub */
-    STRING   *lexid;             /* The lexical ID of the sub. */
-    INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
-    PMC      *multi_signature;   /* list of types for MMD */
-    INTVAL   n_regs_used[4];     /* INSP in PBC */
-
-    PMC      *lex_info;          /* LexInfo PMC */
-    PMC      *outer_sub;         /* :outer for closures */
-    PMC      *eval_pmc;          /* eval container / NULL */
-    struct Parrot_Context  *ctx; /* coroutine context */
-    UINTVAL  comp_flags;         /* compile time and additional flags */
-    Parrot_sub_arginfo arg_info; /* Argument counts and flags. */
-
-    /* - end common */
-
-    struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
-    opcode_t *address;           /* next address to run - toggled each time */
-    struct Stack_Chunk *dynamic_state; /* next dynamic state */
-} Parrot_coro;
-
-#define PMC_coro(pmc) ((Parrot_coro *)PMC_struct_val(pmc))
-
-typedef struct Parrot_cont {
-    /* continuation destination */
-    struct PackFile_ByteCode *seg;   /* bytecode segment */
-    opcode_t *address;               /* start of bytecode, addr to continue */
-    struct Parrot_Context *to_ctx;   /* pointer to dest context */
-    struct Stack_Chunk *dynamic_state; /* dest dynamic state */
-    /* a Continuation keeps the from_ctx alive */
-    struct Parrot_Context *from_ctx; /* sub, this cont is returning from */
-    opcode_t *current_results;       /* ptr into code with get_results opcode
-                                        full continuation only */
-    int runloop_id;                  /* id of the creating runloop. */
-} Parrot_cont;
-
-#define PMC_cont(pmc) ((Parrot_cont *)PMC_struct_val(pmc))
+#define PMC_cont(pmc) PARROT_CONTINUATION(pmc)
 
 typedef struct Parrot_Context_info {
     STRING   *subname;
@@ -231,96 +163,61 @@ typedef struct Parrot_Context_info {
 /* HEADERIZER BEGIN: src/sub.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC * new_ret_continuation_pmc(PARROT_INTERP,
-    ARGIN_NULLOK(opcode_t *address))
-        __attribute__nonnull__(1);
+PARROT_EXPORT
+void Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*sub_pmc);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_Context_get_info(PARROT_INTERP,
-    ARGIN(const parrot_context_t *ctx),
+    ARGIN(PMC *ctx),
     ARGOUT(Parrot_Context_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_Context_infostr(PARROT_INTERP,
-    ARGIN(const parrot_context_t *ctx))
+STRING* Parrot_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
+STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+void * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
+void mark_context_start(void);
+void Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*cont);
+        __attribute__nonnull__(2);
 
-void mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
+void Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* ctx);
+        __attribute__nonnull__(2);
 
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub * new_closure(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_cont * new_continuation(PARROT_INTERP,
-    ARGIN_NULLOK(const Parrot_cont *to))
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_coro * new_coroutine(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_cont * new_ret_continuation(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub * new_sub(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void Parrot_continuation_check(PARROT_INTERP,
-    ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-void Parrot_continuation_rewind_environment(PARROT_INTERP,
-    ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-void Parrot_continuation_runloop_check(PARROT_INTERP,
-    ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC* Parrot_find_dynamic_pad(PARROT_INTERP,
+    ARGIN(STRING *lex_name),
+    ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -329,11 +226,62 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_find_pad(PARROT_INTERP,
     ARGIN(STRING *lex_name),
-    ARGIN(const parrot_context_t *ctx))
+    ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *subpmc),
+    ARGIN_NULLOK(opcode_t *pc))
+        __attribute__nonnull__(1);
+
+INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *subpmc),
+    ARGIN_NULLOK(opcode_t *pc))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_Parrot_capture_lex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_pmc))
+#define ASSERT_ARGS_Parrot_Context_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_Parrot_Context_infostr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_full_sub_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_get_sub_pmc_from_subclass \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(subclass))
+#define ASSERT_ARGS_parrot_new_closure __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_pmc))
+#define ASSERT_ARGS_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_continuation_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_continuation_rewind_environment \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_find_dynamic_pad __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lex_name) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_find_pad __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lex_name) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_Sub_get_filename_from_pc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_Sub_get_line_from_pc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/sub.c */
 

@@ -1,65 +1,49 @@
-#!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Config;
-use Parrot::Test tests => 3;
+.sub main :main
+    .include 'test_more.pir'
+    plan(4)
 
-##############################
-pir_output_is( <<'CODE', <<'OUT', "goto 1" );
-.sub test :main
-    goto foo
-    end
-foo:
-    print "ok 1\n"
-    end
+    test_goto_1()
+    test_goto_2()
+    test_illegal_label()
 .end
 
-CODE
-ok 1
-OUT
-
-##############################
-pir_output_is( <<'CODE', <<'OUT', "goto 2" );
-.sub test :main
+.sub test_goto_1
     goto foo
-bar:    print "ok 2\n"
-    end
-foo:
-    print "ok 1\n"
+    .return()
+  foo:
+    ok(1, 'goto 1')
+.end
+
+.sub test_goto_2
+    goto foo
+  bar:
+    ok(1, 'goto 2')
+    .return()
+  foo:
+    ok(1, 'goto 2')
     goto bar
 .end
 
-CODE
-ok 1
-ok 2
-OUT
-
-##############################
-pir_error_output_like( <<'CODE', <<'OUT', "illegal label" );
-.sub bogus
-         bsr _function
-         print "never\n"
-         end
+.sub test_illegal_label
+    dies_ok( <<'CODE', 'illegal label' )
+.sub bogus :main
+    goto _function
+    print "never\n"
+    .return()
 .end
 .sub _function
-         bsr FOO
-         ret
-FOO:    print "in function\n"
-         ret
+    print "in function\n"
+    .return()
 .end
 CODE
-/no label offset defined/
-OUT
-
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

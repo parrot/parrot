@@ -1,0 +1,446 @@
+/*
+Copyright (C) 2001-2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfileconstanttable.pmc - PackfileConstantTable PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileConstantTable object, a segment of the .pbc
+data file used for storing constants of various types.  (int, string, PMC)
+
+See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
+for the list of common methods every packfile segment pmc must implement; see
+PDD13 for the design spec.
+
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass PackfileConstantTable auto_attrs extends PackfileSegment {
+    /* ResizablePMCArray for storing constants */
+    ATTR PMC *constants;
+
+    /* ResizableIntegerArray for storing constant types */
+    ATTR PMC *types;
+
+/*
+
+=item C<init>
+
+Create empty PackfileConstantTable.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PMC_data_typed(SELF, Parrot_PackfileConstantTable_attributes*);
+
+        attrs->constants = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        attrs->types     = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+
+        PObj_custom_mark_SET(SELF);
+        PMC_data(SELF) = attrs;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->constants);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->types);
+
+        SUPER();
+    }
+
+
+/*
+
+=item C<set_pointer>
+
+Set pointer to underlying PackFile_ConstTable
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void * pointer) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        const PackFile_ConstTable * const table =
+                (const PackFile_ConstTable *)(pointer);
+        opcode_t i;
+
+        /* Preallocate required amount of memory */
+        VTABLE_set_integer_native(INTERP, attrs->constants, table->const_count);
+        VTABLE_set_integer_native(INTERP, attrs->types, table->const_count);
+
+        for (i = 0; i < table->const_count; ++i) {
+            const PackFile_Constant * val = &table->constants[i];
+            switch (val->type) {
+              case PFC_NONE:
+                break;
+              case PFC_NUMBER:
+                SELF.set_number_keyed_int(i, val->u.number);
+                break;
+              case PFC_STRING:
+                SELF.set_string_keyed_int(i, val->u.string);
+                break;
+              case PFC_KEY:
+                /* fall through */
+              case PFC_PMC:
+                SELF.set_pmc_keyed_int(i, val->u.key);
+                break;
+              default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_MALFORMED_PACKFILE,
+                        "Unknown PackFile constant type: %d", val->type);
+            }
+        }
+    }
+
+/*
+
+=item C<void *get_pointer()>
+=cut
+
+*/
+    VTABLE void *get_pointer() {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        PackFile_ConstTable * const pftable =
+                mem_gc_allocate_zeroed_typed(INTERP, PackFile_ConstTable);
+        opcode_t              i;
+
+        pftable->base.type = PF_CONST_SEG;
+
+        /* Copy all constanst with respect of type */
+        pftable->const_count = VTABLE_get_integer(INTERP, attrs->constants);
+        pftable->constants   = mem_gc_allocate_n_typed(INTERP,
+                pftable->const_count, PackFile_Constant);
+
+        for (i = 0; i < pftable->const_count; ++i) {
+            PackFile_Constant * const value = &pftable->constants[i];
+            value->type = VTABLE_get_integer_keyed_int(INTERP, attrs->types, i);
+            switch (value->type) {
+              case PFC_NONE:
+                break;
+              case PFC_NUMBER:
+                value->u.number = VTABLE_get_number_keyed_int(INTERP,
+                            attrs->constants, i);
+                break;
+              case PFC_STRING:
+                value->u.string = VTABLE_get_string_keyed_int(INTERP,
+                            attrs->constants, i);
+                break;
+              case PFC_KEY:
+              case PFC_PMC:
+                value->u.key = VTABLE_get_pmc_keyed_int(INTERP,
+                            attrs->constants, i);
+                break;
+              default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_MALFORMED_PACKFILE,
+                        "Unknown PackFile constant type: %d", value->type);
+            }
+        }
+
+        return pftable;
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Get the number of elements in the array.
+
+=cut
+
+*/
+    VTABLE INTVAL elements() {
+        return VTABLE_elements(INTERP,
+                PARROT_PACKFILECONSTANTTABLE(SELF)->constants);
+    }
+
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL index)>
+
+Fetch a numeric constant.  An exception is thrown if the given constant isn't
+numeric.
+
+=cut
+
+*/
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL index)  {
+        return VTABLE_get_number_keyed_int(INTERP,
+                PARROT_PACKFILECONSTANTTABLE(SELF)->constants, index);
+    }
+
+
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL index)>
+
+Fetch a string constant.  An exception is thrown if the given constant isn't
+a string.
+
+=cut
+
+*/
+    VTABLE STRING *get_string_keyed_int(INTVAL index)  {
+        return VTABLE_get_string_keyed_int(INTERP,
+                PARROT_PACKFILECONSTANTTABLE(SELF)->constants, index);
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL index)>
+
+Fetch a PMC constant.  An exception is thrown if the given constant isn't a PMC.
+
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+        return VTABLE_get_pmc_keyed_int(INTERP,
+                PARROT_PACKFILECONSTANTTABLE(SELF)->constants, index);
+    }
+
+
+/*
+
+=item C<void set_number_keyed_int(INTVAL index, FLOATVAL value)>
+
+Set the constant to the given number.
+
+=cut
+
+*/
+    VTABLE void set_number_keyed_int(INTVAL index, FLOATVAL value)  {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+
+        VTABLE_set_number_keyed_int(INTERP, attrs->constants, index, value);
+        VTABLE_set_integer_keyed_int(INTERP, attrs->types, index, PFC_NUMBER);
+    }
+
+
+/*
+
+=item C<void set_string_keyed_int(INTVAL index, STRING *value)>
+
+Set the constant to the given string.
+
+=cut
+
+*/
+
+    VTABLE void set_string_keyed_int(INTVAL index, STRING *value)  {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+
+        VTABLE_set_string_keyed_int(INTERP, attrs->constants, index, value);
+        VTABLE_set_integer_keyed_int(INTERP, attrs->types, index, PFC_STRING);
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL index, PMC *value)>
+
+Set the constant to the given PMC (or key).
+
+=cut
+
+*/
+    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *value)  {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        const opcode_t type =
+            VTABLE_isa(INTERP, value, Parrot_str_new_constant(INTERP, "Key"))
+                ? PFC_KEY
+                : PFC_PMC;
+
+        VTABLE_set_pmc_keyed_int(INTERP, attrs->constants,  index, value);
+        VTABLE_set_integer_keyed_int(INTERP, attrs->types, index, type);
+    }
+
+
+/*
+
+=item C<INTVAL get_type(INTVAL index)>
+
+Get the type of the specified constant.  Possible type IDs:
+
+=over 4
+
+=item 0x00 - No constant
+
+=item 0x6E - Number constant
+
+=item 0x73 - String constant
+
+=item 0x70 - PMC constant
+
+=item 0x6B - Key constant
+
+=back
+
+=cut
+
+*/
+    METHOD get_type(INTVAL index) {
+        INTVAL rv = VTABLE_get_integer_keyed_int(INTERP,
+                PARROT_PACKFILECONSTANTTABLE(SELF)->types, index);
+        RETURN(INTVAL rv);
+    }
+
+/*
+
+=item C<void set_main(INTVAL index)>
+
+Set the :main flag in a Sub in the constant table.
+
+Experimental. Use with care. There is no way to set the
+private flags from PIR, so we need something like this.
+
+If something goes wrong, blame NotFound.
+
+=cut
+
+*/
+    METHOD set_main(INTVAL index) {
+        PMC *mainsub = SELF.get_pmc_keyed_int(index);
+        if (mainsub->vtable->base_type != enum_class_Sub)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Attempt to set main flag in a non Sub");
+        SUB_FLAG_flag_SET(PF_MAIN, mainsub);
+    }
+
+/*
+
+=item C<INTVAL get_or_create_constant()>
+
+Get or create constant for passed value.
+
+=cut
+
+*/
+    MULTI INTVAL get_or_create_constant(STRING *value) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        const INTVAL num = VTABLE_elements(INTERP, attrs->types);
+        INTVAL  i;
+
+        for (i=0; i < num; ++i) {
+            const INTVAL type = VTABLE_get_integer_keyed_int(INTERP, attrs->types, i);
+            if (type == PFC_STRING) {
+                STRING * const str = VTABLE_get_string_keyed_int(INTERP, attrs->constants, i);
+                if (Parrot_str_equal(INTERP, value, str))
+                    return i;
+            }
+        }
+        /* Constant not found. Add new one */
+        VTABLE_set_string_keyed_int(INTERP, SELF, i, value);
+        return i;
+    }
+
+    MULTI INTVAL get_or_create_constant(FLOATVAL value) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        const INTVAL num = VTABLE_elements(INTERP, attrs->types);
+        INTVAL   i;
+
+        for (i=0; i < num; ++i) {
+            const INTVAL type = VTABLE_get_integer_keyed_int(INTERP, attrs->types, i);
+            if (type == PFC_NUMBER) {
+                const FLOATVAL val = VTABLE_get_number_keyed_int(INTERP, attrs->constants, i);
+                if (FLOAT_IS_ZERO(fabs(val - value)))
+                    return i;
+            }
+        }
+        /* Constant not found. Add new one */
+        VTABLE_set_number_keyed_int(INTERP, SELF, i, value);
+        return i;
+    }
+
+    MULTI INTVAL get_or_create_constant(PMC *value) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        const INTVAL   num = VTABLE_elements(INTERP, attrs->types);
+        INTVAL   i;
+        const INTVAL val_type =
+            value->vtable->base_type == enum_class_Key
+                            ? PFC_KEY
+                            : PFC_PMC;
+
+        for (i=0; i < num; ++i) {
+            const INTVAL type = VTABLE_get_integer_keyed_int(INTERP, attrs->types, i);
+            if (type == val_type) {
+                PMC * const val = VTABLE_get_pmc_keyed_int(INTERP, attrs->constants, i);
+                if (VTABLE_is_equal(INTERP, value, val))
+                    return i;
+            }
+        }
+        /* Constant not found. Add new one */
+        VTABLE_set_pmc_keyed_int(INTERP, SELF, i, value);
+        return i;
+    }
+
+/*
+
+=item C<METHOD type()>
+
+Set segment type.
+
+=cut
+
+*/
+
+    METHOD type() {
+        RETURN(INTVAL PF_CONST_SEG);
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

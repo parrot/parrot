@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -12,7 +12,7 @@ See 'library/pcre.pir' for details on the user interface.
 =cut
 
 
-.namespace ['PCRE::NCI']
+.namespace ['PCRE'; 'NCI']
 
 
 .sub compile
@@ -35,11 +35,11 @@ See 'library/pcre.pir' for details on the user interface.
     ## allocate space in string for error message
     repeat error, " ", error_size
 
-    PCRE_NCI_compile= find_global 'PCRE::NCI', 'PCRE_compile'
+    PCRE_NCI_compile = get_hll_global ['PCRE'; 'NCI'], 'PCRE_compile'
 
     .local pmc code
 
-    code= PCRE_NCI_compile( pat, options, error, errptr, NULL )
+    code = PCRE_NCI_compile( pat, options, error, errptr, NULL )
 
     .local int is_code_defined
     is_code_defined = defined code
@@ -66,26 +66,26 @@ RETURN:
 
     ## osize -- 1/(2/3) * 4 * 2
     .local int osize
-    osize= 12
+    osize = 12
 
     ## number of result pairs
     .local int num_result_pairs
-    num_result_pairs= 10
+    num_result_pairs = 10
 
     .local int ovector_length
-    ovector_length= osize * num_result_pairs
+    ovector_length = osize * num_result_pairs
 
     .local pmc ovector
-    ovector= new 'ManagedStruct'
-    ovector= ovector_length
+    ovector = new 'ManagedStruct'
+    ovector = ovector_length
 
     ## on 32 bit systems
     .local pmc PCRE_NCI_exec
-    PCRE_NCI_exec = find_global 'PCRE::NCI', 'PCRE_exec'
+    PCRE_NCI_exec = get_hll_global ['PCRE'; 'NCI'], 'PCRE_exec'
 
     .local int ok
 
-    ok= PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
+    ok = PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
 
     .return( ok, ovector )
 .end
@@ -105,8 +105,8 @@ RETURN:
     .local int ovece
 
     .local pmc struct
-    struct= new 'SArray'
-    struct= 3
+    struct = new 'FixedPMCArray'
+    struct = 3
 
     .include "datatypes.pasm"
 
@@ -128,37 +128,6 @@ M1:
 M0:
 NOMATCH:
     .return( match )
-.end
-
-=for todo
-    # or use convinience function
-    print "copy_substring\n"
-    i = 0
-    repeat match, " ", 500
-loop:
-    .begin_call
-    .arg s
-    .arg ovector
-    .arg ok
-    .arg i
-    .arg match
-    .arg 500
-    .nci_call COPY_SUBSTRING
-    .end_call
-    if i goto subp
-    print "all "
-    goto all
-subp:
-    print "("
-    print i
-    print ") "
-all:
-    print "matched: '"
-    print match
-    print "'\n"
-    inc i
-    if i < ok goto loop
-    end
 .end
 
 =head1 FILES

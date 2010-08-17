@@ -1,6 +1,8 @@
-#!./parrot -C
+#!./parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
 #
-# ./parrot -C takfp.pir N         (N = 10 for shootout)
+# ./parrot takfp.pir N         (N = 10 for shootout)
 # by Joshua Isom
 # changed default value to N=7 (shootout default before being deprecated)
 # anyway N=10 froze my laptop. Karl Forner
@@ -43,7 +45,7 @@ endif:
 	$N1 = Tak(tmp, z, x)
 	tmp = z - 1
 	$N2 = Tak(tmp, x, y)
-	.return Tak($N0, $N1, $N2)
+	.tailcall Tak($N0, $N1, $N2)
 .end
 
 

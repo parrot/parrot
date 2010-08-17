@@ -40,12 +40,12 @@ syn match pirDirective  /\.\(pcc_sub\|emit\|eom\)/
 syn match pirDirective  /\.\(local\|sym\|const\|lex\|global\|globalconst\)/
 syn match pirDirective  /\.\(endnamespace\|namespace\)/
 syn match pirDirective  /\.\(param\|arg\|return\|yield\)/
-syn match pirDirective  /\.\(pragma\|HLL_map\|HLL\|include\|loadlib\)/
+syn match pirDirective  /\.\(pragma\|HLL\|include\|loadlib\)/
 syn match pirDirective  /\.\(pcc_begin\|pcc_call\|pcc_end\|invocant\|meth_call\|nci_call\)/
 syn match pirDirective  /\.\(pcc_begin_return\|pcc_end_return\)/
 syn match pirDirective  /\.\(pcc_begin_yield\|pcc_end_yield\)/
 
-syn match pirDirective  /:\(main\|method\|load\|init\|anon\|multi\|immediate\|outer\|lex\|vtable\)/
+syn match pirDirective  /:\(main\|method\|load\|init\|anon\|multi\|immediate\|outer\|lex\|vtable|nsentry\|subid\)/
 syn match pirDirective  /:\(flat\|slurpy\|optional\|opt_flag\|named\)/
 
 " Macro invocation
@@ -105,8 +105,8 @@ let b:current_syntax = "pir"
 
 " Folding rules
 syn region foldManual  start=/^\s*#.*{{{/ end=/^\s*#.*}}}/ contains=ALL keepend fold
-syn region foldMakro   start=/\.macro/ end=/\.endm/ contains=ALLBUT,pirDirectiveMacro keepend fold
-syn region foldSub     start=/\.sub/ end=/\.end/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
+syn region foldMakro   start=/\.macro/ end=/^\s*\.endm/ contains=ALLBUT,pirDirectiveMacro keepend fold
+syn region foldSub     start=/\.sub/ end=/^\s*\.end/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
 syn region foldIf      start=/^\s*if.*goto\s*\z(\I\i*\)\s*$/ end=/^\s*\z1:\s*$/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
 syn region foldUnless  start=/^\s*unless.*goto\s*\z(\I\i*\)\s*$/ end=/^\s*\z1:\s*$/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
 

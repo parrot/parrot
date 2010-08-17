@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 =head1 NAME
@@ -38,15 +38,16 @@ ok
 OUTPUT
 
 my $loadlib = <<'EOC';
-#
-# the .loadlib directive gets run, before the .HLL_map below
-# is parsed, therefore the .DynLexPad constant is already
-# available
-#
 .loadlib "dynlexpad"
 
-.HLL "Some", "dynlexpad"
-.HLL_map "LexPad", "DynLexPad"
+.HLL "Some"
+.sub load :anon :init
+  .local pmc interp, lexpad, dynlexpad
+  interp = getinterp
+  lexpad = get_class 'LexPad'
+  dynlexpad = get_class 'DynLexPad'
+  interp.'hll_map'(lexpad, dynlexpad)
+.end
 
 EOC
 
@@ -83,12 +84,12 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check :outer" );
     $P2 = find_lex 'a'
     print $P2
     print "\n"
-    .const .Sub bar_sub = "bar"
+    .const 'Sub' bar_sub = "bar"
     $P0 = newclosure bar_sub
     $P0()
 .end
 .sub bar :outer(foo)
-    .const .Sub baz_sub = "baz"
+    .const 'Sub' baz_sub = "baz"
     $P0 = newclosure baz_sub
     $P0()
 .end
@@ -113,7 +114,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
     $P2 = find_lex 'a'
     print $P2
     print "\n"
-    .const .Sub bar_sub = "bar"
+    .const 'Sub' bar_sub = "bar"
     $P0 = newclosure bar_sub
     $P0()
     # check the upvar
@@ -122,7 +123,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
     print "\n"
 .end
 .sub bar :outer(foo)
-    .const .Sub baz_sub = "baz"
+    .const 'Sub' baz_sub = "baz"
     $P0 = newclosure baz_sub
     $P0()
 .end
@@ -160,7 +161,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors h
     print $S0
     print "\n"
 .end
-.HLL "parrot",""
+.HLL "parrot"
 .sub bar :lex
     .local pmc pad, interp
     interp = getinterp
@@ -175,31 +176,86 @@ LexPad
 OUTPUT
 
 pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop" );
-
 .sub 'test' :main
     foo()
 .end
+
 .sub foo
-    .lex 'a', $P0               # statix lexical
+    .lex 'a', $P0               # static lexical
     $P0 = new 'String'
-    $P0 = "ok 1\n"
+    $P0 = "ok 1"
     $P1 = find_lex 'a'
-    print $P1
+    say $P1
+
     $P2 = new 'String'
-    $P2 = "ok 2\n"
+    $P2 = "ok 2"
     store_lex 'a', $P2
-    print $P0                   # sic!
+    say $P0                   # sic!
+
     $P3 = new 'String'
-    $P3 = "ok 3\n"
+    $P3 = "ok 3"
     store_lex 'b', $P3          # and a dynamic one
     $P4 = find_lex 'b'
-    print $P4
+    say $P4
 .end
 CODE
 ok 1
 ok 2
 ok 3
 OUTPUT
+
+TODO: {
+    local $TODO = "iterator not implemented for DynLexPads; TT #1028";
+
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
+
+.loadlib 'dynlexpad'
+.sub 'onload' :immediate
+    .local pmc interp
+    interp = getinterp
+
+    .local pmc core
+    core = get_class 'LexPad'
+    .local pmc hll
+    hll = get_class 'DynLexPad'
+    interp.'hll_map'(core,hll)
+.end
+
+.sub 'test' :main
+
+    .local pmc str1,str2,str3
+    .lex 'a', str1
+    .lex 'b', str2
+    .lex 'c', str3
+
+    str1 = box 'pants'
+    str2 = box 'pants'
+    str3 = box 'pants'
+
+    .local pmc interp
+    interp = getinterp
+
+    .local pmc dlp
+    dlp    = interp['lexpad']
+
+    .local pmc iterator
+    iterator = iter dlp
+iter_loop:
+    unless iterator goto iter_done
+    .local pmc key
+    key = shift iterator
+    .local string value
+    value = dlp[key]
+    say value
+    goto iter_loop
+iter_done:
+.end
+CODE
+pants
+pants
+pants
+OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl

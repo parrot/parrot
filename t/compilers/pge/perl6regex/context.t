@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -27,12 +27,12 @@ ver. 8, in the B<'Return values from matches'> section
 my $PRE = <<PRE;
 .sub 'main' :main
     load_bytecode "PGE.pbc"
-    load_bytecode "dumper.pir"
-    load_bytecode "PGE/Dumper.pir"
-    load_bytecode "PGE/Glob.pir"
-    load_bytecode "PGE/Text.pir"
+    load_bytecode "dumper.pbc"
+    load_bytecode "PGE/Dumper.pbc"
+    load_bytecode "PGE/Glob.pbc"
+    load_bytecode "PGE/Text.pbc"
     .local string target, pattern
-    .local pmc perl6regex, rulesub, pir, exp, match
+    .local pmc perl6regex, rulesub, pir, match
     perl6regex = compreg 'PGE::Perl6Regex'
     null match
     null rulesub
@@ -188,7 +188,6 @@ pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as array ([2,1,0] => "cba")' );
 CODE
 cba
 OUT
-## RT#44445: more
 
 ## as hash
 pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as hash (A => "a")' );
@@ -276,7 +275,7 @@ pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'isa PGE::Match (success)' );
         print $S0
         print "\n"
 
-        isa_match = isa match, 'PGE::Match'
+        isa_match = isa match, ['PGE';'Match']
         if isa_match goto OK1
         print "not "
 OK1:print "ok 1\n"
@@ -287,7 +286,7 @@ OK1:print "ok 1\n"
         print $S0
         print "\n"
 
-        isa_match = isa $P0, 'PGE::Match'
+        isa_match = isa $P0, ['PGE';'Match']
         if isa_match goto OK2
         print "not "
 OK2:print "ok 2\n"
@@ -309,7 +308,7 @@ pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'isa PGE::Match (failure)' );
         print $S0
         print "\n"
 
-        isa_match = isa match, 'PGE::Match'
+        isa_match = isa match, ['PGE';'Match']
         if isa_match goto OK1
         print "not "
 OK1:print "ok 1\n"

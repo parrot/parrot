@@ -1,4 +1,8 @@
+# Copyright (C) 2006-2010, Parrot Foundation.
 # ATT no autoexpanding svn markers please
+
+# XXX currently broken
+.loadlib 'io_ops'
 
 .sub quine :main
     .param pmc argv
@@ -409,6 +413,7 @@ push code_as_data, 110
 push code_as_data, 101
 push code_as_data, 119
 push code_as_data, 32
+push code_as_data, 91
 push code_as_data, 34
 push code_as_data, 71
 push code_as_data, 101
@@ -416,12 +421,14 @@ push code_as_data, 116
 push code_as_data, 111
 push code_as_data, 112
 push code_as_data, 116
-push code_as_data, 58
-push code_as_data, 58
+push code_as_data, 34
+push code_as_data, 59
+push code_as_data, 34
 push code_as_data, 79
 push code_as_data, 98
 push code_as_data, 106
 push code_as_data, 34
+push code_as_data, 93
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -799,6 +806,66 @@ push code_as_data, 116
 push code_as_data, 105
 push code_as_data, 111
 push code_as_data, 110
+push code_as_data, 10
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 112
+push code_as_data, 114
+push code_as_data, 105
+push code_as_data, 110
+push code_as_data, 116
+push code_as_data, 32
+push code_as_data, 34
+push code_as_data, 35
+push code_as_data, 32
+push code_as_data, 67
+push code_as_data, 111
+push code_as_data, 112
+push code_as_data, 121
+push code_as_data, 114
+push code_as_data, 105
+push code_as_data, 103
+push code_as_data, 104
+push code_as_data, 116
+push code_as_data, 32
+push code_as_data, 40
+push code_as_data, 67
+push code_as_data, 41
+push code_as_data, 32
+push code_as_data, 50
+push code_as_data, 48
+push code_as_data, 48
+push code_as_data, 54
+push code_as_data, 45
+push code_as_data, 50
+push code_as_data, 48
+push code_as_data, 49
+push code_as_data, 48
+push code_as_data, 44
+push code_as_data, 32
+push code_as_data, 80
+push code_as_data, 97
+push code_as_data, 114
+push code_as_data, 114
+push code_as_data, 111
+push code_as_data, 116
+push code_as_data, 32
+push code_as_data, 70
+push code_as_data, 111
+push code_as_data, 117
+push code_as_data, 110
+push code_as_data, 100
+push code_as_data, 97
+push code_as_data, 116
+push code_as_data, 105
+push code_as_data, 111
+push code_as_data, 110
+push code_as_data, 46
+push code_as_data, 92
+push code_as_data, 110
+push code_as_data, 34
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -1433,9 +1500,9 @@ push code_as_data, 109
 push code_as_data, 101
 push code_as_data, 44
 push code_as_data, 32
-push code_as_data, 34
-push code_as_data, 60
-push code_as_data, 34
+push code_as_data, 39
+push code_as_data, 114
+push code_as_data, 39
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -1648,12 +1715,20 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 32
-push code_as_data, 115
-push code_as_data, 117
-push code_as_data, 98
-push code_as_data, 115
-push code_as_data, 116
+push code_as_data, 99
+push code_as_data, 111
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 32
+push code_as_data, 61
+push code_as_data, 32
 push code_as_data, 114
+push code_as_data, 101
+push code_as_data, 112
+push code_as_data, 108
+push code_as_data, 97
+push code_as_data, 99
+push code_as_data, 101
 push code_as_data, 32
 push code_as_data, 99
 push code_as_data, 111
@@ -1831,6 +1906,40 @@ push code_as_data, 98
 push code_as_data, 115
 push code_as_data, 116
 push code_as_data, 114
+push code_as_data, 32
+push code_as_data, 99
+push code_as_data, 111
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 44
+push code_as_data, 32
+push code_as_data, 48
+push code_as_data, 44
+push code_as_data, 32
+push code_as_data, 49
+push code_as_data, 10
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 99
+push code_as_data, 111
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 32
+push code_as_data, 61
+push code_as_data, 32
+push code_as_data, 114
+push code_as_data, 101
+push code_as_data, 112
+push code_as_data, 108
+push code_as_data, 97
+push code_as_data, 99
+push code_as_data, 101
 push code_as_data, 32
 push code_as_data, 99
 push code_as_data, 111
@@ -2110,8 +2219,6 @@ push code_as_data, 99
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -2142,26 +2249,13 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 61
 push code_as_data, 32
-push code_as_data, 110
-push code_as_data, 101
-push code_as_data, 119
-push code_as_data, 32
-push code_as_data, 39
-push code_as_data, 73
+push code_as_data, 105
 push code_as_data, 116
 push code_as_data, 101
 push code_as_data, 114
-push code_as_data, 97
-push code_as_data, 116
-push code_as_data, 111
-push code_as_data, 114
-push code_as_data, 39
-push code_as_data, 44
 push code_as_data, 32
 push code_as_data, 100
 push code_as_data, 97
@@ -2174,8 +2268,6 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 61
 push code_as_data, 32
@@ -2260,8 +2352,6 @@ push code_as_data, 115
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 103
 push code_as_data, 111
@@ -2334,8 +2424,6 @@ push code_as_data, 116
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 32
@@ -2569,8 +2657,6 @@ push code_as_data, 99
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -2578,26 +2664,13 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 61
 push code_as_data, 32
-push code_as_data, 110
-push code_as_data, 101
-push code_as_data, 119
-push code_as_data, 32
-push code_as_data, 39
-push code_as_data, 73
+push code_as_data, 105
 push code_as_data, 116
 push code_as_data, 101
 push code_as_data, 114
-push code_as_data, 97
-push code_as_data, 116
-push code_as_data, 111
-push code_as_data, 114
-push code_as_data, 39
-push code_as_data, 44
 push code_as_data, 32
 push code_as_data, 100
 push code_as_data, 97
@@ -2610,8 +2683,6 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 61
 push code_as_data, 32
@@ -2753,8 +2824,6 @@ push code_as_data, 115
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 103
 push code_as_data, 111
@@ -2827,8 +2896,6 @@ push code_as_data, 116
 push code_as_data, 32
 push code_as_data, 105
 push code_as_data, 116
-push code_as_data, 101
-push code_as_data, 114
 push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 32
@@ -3493,7 +3560,7 @@ push code_as_data, 10
 
     # Specification of command line arguments.
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     push getopts, "print-code-as-data"
 
     # Looking at command line
@@ -3508,6 +3575,7 @@ push code_as_data, 10
 
 DO_QUINE:
     # First print the stuff data section
+    print "# Copyright (C) 2006-2010, Parrot Foundation.\n"
     print "# ATT no autoexpanding svn markers please\n"
     print "\n"
     print ".sub quine :main\n"
@@ -3532,20 +3600,21 @@ DO_QUINE:
     .local pmc code_fh
     .local int size
     size = stat program_name, .STAT_FILESIZE
-    code_fh = open program_name, "<"
+    code_fh = open program_name, 'r'
     .local string code
     code = read code_fh, size
 
     # Ignore everything up to end of data section
     .local int end_of_data_pos
     end_of_data_pos = index code, "# ------ End of data section ------"
-    substr code, 0, end_of_data_pos, ''
+    code = replace code, 0, end_of_data_pos, ''
 
     .local string char_string
     .local int    char_int
     SHIFT_NEXT_CHAR:
     unless code goto FINISH_SHIFT_CHARS
-        char_string = substr code, 0, 1, ''
+        char_string = substr code, 0, 1
+        code = replace code, 0, 1, ''
         char_int = ord char_string
         print 'push code_as_data, '
         print char_int
@@ -3560,14 +3629,14 @@ DO_QUINE:
     .param pmc data
 
    .include "iterator.pasm"
-   .local pmc iter
+   .local pmc it
    .local int char_int
 
-   iter = new 'Iterator', data
-    iter = .ITERATE_FROM_START # reset iterator, begin at start
+   it = iter data
+    it = .ITERATE_FROM_START # reset iterator, begin at start
     ITER_LOOP:
-    unless iter goto ITER_END         # while (entries) ...
-        char_int = shift iter         # get entry
+    unless it goto ITER_END         # while (entries) ...
+        char_int = shift it         # get entry
         print 'push code_as_data, '
         print char_int
         print "\n"
@@ -3581,16 +3650,16 @@ DO_QUINE:
 
    .include "iterator.pasm"
 
-   .local pmc iter
-    iter = new 'Iterator', data
-    iter = .ITERATE_FROM_START # reset iterator, begin at start
+   .local pmc it
+    it = iter data
+    it = .ITERATE_FROM_START # reset iterator, begin at start
 
    .local int    char_int
    .local string char_string
 
     ITER_LOOP:
-    unless iter goto ITER_END         # while (entries) ...
-        char_int = shift iter         # get entry
+    unless it goto ITER_END         # while (entries) ...
+        char_int = shift it         # get entry
         char_string = chr char_int
         print char_string
         goto ITER_LOOP

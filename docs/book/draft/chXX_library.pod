@@ -1,0 +1,107 @@
+=pod
+
+Z<CHP-6>
+
+=head1 PIR Standard Library
+
+PIR and PASM are both very low-level languages by any programming
+standards, even though they support some important features of
+high-level dynamic languages,and PIR has some symbolic syntax features.
+Important re-occurring programming tasks in these languages have been
+extracted out into a series of runtime libraries to help make these
+tasks easier. Libraries written in PIR or PASM can be easily included
+and used from any of the high-level language compilers that target
+Parrot, in addition to being used in the Parrot test suite and
+PIR/PASM code generators like PCT.
+
+Some modules, such as F<pcre.pir> and F<postgres.pir> are NCI wrappers
+for common compiled shared libraries.
+
+From the Parrot repository, there are a number of premade libraries in
+F<runtime/library/>, and several generated libraries in F<runtime/include>
+that can be used by Parrot hackers and HLL-implementers alike, if needed.
+This chapter is going to give a brief overview of some of these libraries
+and how they are used.
+
+=head1 Loading and Using Libraries
+
+Libraries are precompiled code files that can be loaded into Parrot. There
+are ways to load a library into Parrot, each with a slightly different
+mechanism. The C<.loadlib> PIR directive causes the library file to be loaded
+at compile-time. The C<load_lib> opcode causes the library to be loaded
+dynamically at runtime.
+
+=head1 General Parrot Libraries
+
+=head2 F<Config.fpmc>
+
+C<Config.fpmc> is generated during the build process. The file defines a
+hash PMC that contains information about the system where Parrot was
+built. By accessing the data in this PMC, you can determine how Parrot
+was compiled and what features and libraries it has available.
+
+=head1 Perl-Inspired Libraries
+
+Since the Parrot project started as the internals of the Perl 6 development
+project, and since a number of Perl hackers are very active in Parrot,
+several libraries in the Parrot runtime are based on common Perl 5 libraries.
+
+=head2 F<Dumper.pir> and F<Data/Dumper.pir>
+
+Perl 5 had C<Data::Dumper>, that would print out the complete contents and
+structure of any arbitrary complex data type. This is useful in a number of
+cases, with debugging not the least of them. It's good to verify that
+complicated nested data structures are being composed and accessed in the
+manner that the programmer intends.
+
+=head1 NCI Wrapper Libraries
+
+Parrot does not intend to reinvent any wheels, and there is lots of important
+functionality encapsulated in various libraries that Parrot does not copy.
+Instead of having to reimplement all sorts of libraries for Parrot, Parrot
+provides the NCI interface to work with these libraries directly. PIR or
+PASM wrapper libraries are provided to create an interface that programs
+running on Parrot can use to access functionality in these libraries.
+
+Notice that these libraries are depending on having the compiled libraries
+they reference already installed on your system. Many of these are detected
+during the configuration process. If you do not have these libraries
+installed, you cannot call the modules discussed here. We will give some
+information about how to find and install the libraries, however.
+
+Notice that this is only a partial list of wrapper libraries that come
+bundled with the Parrot repository. Additional library wrappers may be
+added to the repository at a later date, or may be available from other
+sources.
+
+=head2 PCRE
+
+PCRE is a library that implements regular expressions using Perl 5 syntax.
+
+
+=head2 NCurses
+
+NCurses is a library for manipulating the console and the cursor.
+
+=head2 OpenGL
+
+OpenGL is a 3D graphics library.
+
+=head2 Postgres SQL
+
+=head2 SDL
+
+=head1 Mod_Parrot and CGI libraries
+
+Parrot is also available, through a related but separate development effort
+as a module for the Apache web server, Mod_Parrot. Mod_Parrot allows
+Parrot and the high-level languages which target it to be used in Apache
+to generate web content. Several libraries are available in the Parrot
+repository that can help manage these requests.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

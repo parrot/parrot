@@ -1,5 +1,5 @@
 /* misc.h
- *  Copyright (C) 2001-2008, The Perl Foundation.
+ *  Copyright (C) 2001-2008, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -33,7 +33,8 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 /* HEADERIZER BEGIN: src/utils.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
@@ -41,7 +42,7 @@ INTVAL Parrot_byte_index(SHIM_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_byte_rindex(SHIM_INTERP,
     ARGIN(const STRING *base),
@@ -50,16 +51,19 @@ INTVAL Parrot_byte_rindex(SHIM_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL Parrot_float_rand(INTVAL how_random);
 
-PARROT_API
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_int_rand(INTVAL how_random);
 
-PARROT_API
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_register_move(PARROT_INTERP,
     int n_regs,
     ARGOUT(unsigned char *dest_regs),
@@ -74,27 +78,62 @@ void Parrot_register_move(PARROT_INTERP,
         __attribute__nonnull__(8)
         FUNC_MODIFIES(*dest_regs);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_srand(INTVAL seed);
 
-PARROT_API
-INTVAL Parrot_uint_rand(INTVAL how_random);
-
-PARROT_CONST_FUNCTION
-FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
-
-PARROT_CONST_FUNCTION
-INTVAL intval_mod(INTVAL i2, INTVAL i3);
-
-void Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
-        __attribute__nonnull__(1);
-
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+PMC* Parrot_tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_uint_rand(INTVAL how_random);
+
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
+
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+INTVAL intval_mod(INTVAL i2, INTVAL i3);
+
+void Parrot_quicksort(PARROT_INTERP,
+    ARGMOD(void **data),
+    UINTVAL n,
+    ARGIN(PMC *cmp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*data);
+
+#define ASSERT_ARGS_Parrot_byte_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(base) \
+    , PARROT_ASSERT_ARG(search))
+#define ASSERT_ARGS_Parrot_byte_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(base) \
+    , PARROT_ASSERT_ARG(search))
+#define ASSERT_ARGS_Parrot_float_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_int_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_range_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_register_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest_regs) \
+    , PARROT_ASSERT_ARG(src_regs) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_Parrot_srand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_tm_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(tm))
+#define ASSERT_ARGS_Parrot_uint_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_floatval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_intval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_quicksort __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(data) \
+    , PARROT_ASSERT_ARG(cmp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/utils.c */
 
@@ -102,7 +141,7 @@ PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 /* HEADERIZER BEGIN: src/misc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_psprintf(PARROT_INTERP,
@@ -113,17 +152,19 @@ STRING * Parrot_psprintf(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*ary);
 
-PARROT_API
-int Parrot_secret_snprintf(
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+int /*@alt void@*/
+Parrot_secret_snprintf(
     ARGOUT(char *buffer),
-    const size_t len,
+    NULLOK(const size_t len),
     ARGIN(const char *format),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*buffer);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_snprintf(PARROT_INTERP,
     ARGOUT(char *targ),
     size_t len,
@@ -134,21 +175,21 @@ void Parrot_snprintf(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*targ);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_vsnprintf(PARROT_INTERP,
     ARGOUT(char *targ),
     size_t len,
@@ -159,21 +200,49 @@ void Parrot_vsnprintf(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*targ);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_vsprintf_c(PARROT_INTERP,
     ARGIN(const char *pat),
     va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_psprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat) \
+    , PARROT_ASSERT_ARG(ary))
+#define ASSERT_ARGS_Parrot_secret_snprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_snprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(targ) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_sprintf_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_sprintf_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_vsnprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(targ) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_vsprintf_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_vsprintf_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/misc.c */
 
@@ -210,12 +279,12 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 
     typedef struct sprintf_obj SPRINTF_OBJ;
 
-    typedef STRING *(*sprintf_getchar_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef HUGEINTVAL(*sprintf_getint_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef UHUGEINTVAL(*sprintf_getuint_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef STRING *(*sprintf_getstring_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef void *(*sprintf_getptr_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef STRING *(*sprintf_getchar_t)       (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef HUGEINTVAL(*sprintf_getint_t)      (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef UHUGEINTVAL(*sprintf_getuint_t)    (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef HUGEFLOATVAL(*sprintf_getfloat_t)  (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef STRING *(*sprintf_getstring_t)     (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef void *(*sprintf_getptr_t)          (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
 
     struct sprintf_obj {
         void *data;
@@ -238,22 +307,21 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_format(PARROT_INTERP,
-    ARGIN(STRING *pat),
-    ARGIN(SPRINTF_OBJ *obj))
+    ARGIN(const STRING *pat),
+    ARGMOD(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*obj);
 
+#define ASSERT_ARGS_Parrot_sprintf_format __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat) \
+    , PARROT_ASSERT_ARG(obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/spf_render.c */
 
 #endif /* IN_SPF_SYSTEM */
-
-
-/*
- * generated src/revision.c
- */
-PARROT_API int Parrot_config_revision(void);
 
 #endif /* PARROT_MISC_H_GUARD */
 

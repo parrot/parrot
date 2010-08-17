@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ math.c
 
 =head1 DESCRIPTION
 
-math stuff
+Mathematical functions.
 
 =head2 Functions
 
@@ -26,15 +26,18 @@ math stuff
  */
 
 #include <math.h>
+#ifdef _IEEE_
 
 _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
+
+#endif
 
 #if DOUBLE_SIZE == 2 * INT_SIZE
 /*
 
 =item C<extern int Parrot_signbit(double x)>
 
-return true if the Numval has a negative sign.
+Return true if the Numval has a negative sign.
 This is mostly for handling the -0.0 case.
 
 =cut
@@ -60,10 +63,9 @@ Parrot_signbit(double x)
 #if NUMVAL_SIZE == 12 && DOUBLE_SIZE == 3 * INT_SIZE && PARROT_LITTLE_ENDIAN
 /*
 
-=item C<int
-Parrot_signbit_l(long double x)>
+=item C<int Parrot_signbit_l(long double x)>
 
-RT#48260: Not yet documented!!!
+Like C<Parrot_signbit()>, only taking long double instead of double.
 
 =cut
 

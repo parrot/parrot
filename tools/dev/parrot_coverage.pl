@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -35,7 +35,7 @@ my $DEBUG   = 1;
 
 if ( $ARGV[0] && $ARGV[0] =~ /recompile/ ) {
 
-    # clean up remnants of prior biulds
+    # clean up remnants of prior builds
     File::Find::find(
         {
             wanted => sub {
@@ -93,7 +93,7 @@ foreach my $da_file (@dafiles) {
     # we need to move to the appropriate place, alongside the
     # sourcefile that produced it.  Hence, as soon as we know the true
     # name of the object file being profiled, we rename the gcov log
-    # file.  The -o flag is necessary to help gcov locate it's basic
+    # file.  The -o flag is necessary to help gcov locate its basic
     # block (.bb) files.
     my $cmd = "gcov -f -b -o $dirname $src_filename";
     print "Running $cmd\n" if $DEBUG;

@@ -1,5 +1,5 @@
 package samples;
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -17,11 +17,13 @@ $core = q{
 ** pseudo-core.ops
 */
 
+BEGIN_OPS_PREAMBLE
+
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
-#include "../interp_guts.h"
+#include "../interp/interp_guts.h"
 
-VERSION = PARROT_VERSION;
+END_OPS_PREAMBLE
 
 =head1 NAME
 
@@ -52,8 +54,8 @@ inline op end() :base_core :check_event :flow {
 
 =item B<load_bytecode>(in STR)
 
-Load Parrot bytecode from file $1, and
-RT#42381 search the library path to locate the file.
+Load Parrot bytecode from file $1, and search the library path to locate the
+file.
 
 =cut
 
@@ -124,7 +126,7 @@ inline op loadlib(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -144,14 +146,12 @@ as the Parrot interpreter itself.
  $debug = q{
 /*
  * $Id$
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2008, Parrot Foundation.
  */
 
 /*
 ** pseudo-debug.ops
 */
-
-VERSION = PARROT_VERSION;
 
 =head1 NAME
 
@@ -190,7 +190,7 @@ op debug_load(inconst STR) :base_debug {
     if (!(interp->pdb->state & PDB_BREAK)) {
         f = string_to_cstring(interp, ($1));
         PDB_load_source(interp, f);
-        string_cstring_free(f);
+        Parrot_str_free_cstring(f);
     }
 }
 
@@ -233,11 +233,11 @@ If $3 is negative, cut the string after -$3 characters.
 =cut
 
 inline op chopn(inout STR, in INT) :base_core {
-    string_chopn_inplace(interp, $1, $2);
+    Parrot_str_chopn_inplace(interp, $1, $2);
 }
 
 inline op chopn(out STR, in STR, in INT) :base_core {
-    $1 = string_chopn(interp, $2, $3);
+    $1 = Parrot_str_chopn(interp, $2, $3);
 }
 
 
@@ -245,7 +245,7 @@ inline op chopn(out STR, in STR, in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -269,8 +269,6 @@ $string = q{
  * $Id$
 ** pseudo-string.ops
 */
-
-VERSION = PARROT_VERSION;
 
 =head1 NAME
 
@@ -317,7 +315,7 @@ See F<src/ops/math.ops> for the general C<infix> and C<n_infix> syntax.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 

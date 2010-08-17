@@ -1,14 +1,12 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2006, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
-
-plan tests => 3;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -20,7 +18,7 @@ t/src/basic.t - Basics
 
 =head1 DESCRIPTION
 
-Tests C<printf> and C<internal_exception> functions.
+Tests C<printf> and C<exit_fatal> functions.
 
 =cut
 
@@ -29,7 +27,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
     #include <stdlib.h>
 
     int
-    main(int argc, char* argv[])
+    main(int argc, const char* argv[])
     {
         printf("Hello, World!\n");
         exit(0);
@@ -38,14 +36,14 @@ CODE
 Hello, World!
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "direct internal_exception call" );
+c_output_is( <<'CODE', <<'OUTPUT', "direct exit_fatal call" );
     #include <parrot/parrot.h>
     #include <parrot/exceptions.h>
 
     int
-    main(int argc, char* argv[])
+    main(int argc, const char* argv[])
     {
-         internal_exception(0, "Blow'd Up(tm)"); /* ' */
+         exit_fatal(0, "Blow'd Up(tm)"); /* ' */
     }
 CODE
 Blow'd Up(tm)
@@ -61,7 +59,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_run_native" );
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Interp *interp;
 
@@ -70,11 +68,11 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    PIO_eprintf(interp, "main\n");
+    Parrot_io_eprintf(interp, "main\n");
 
     Parrot_run_native(interp, the_test);
 
-    PIO_eprintf(interp, "back\n");
+    Parrot_io_eprintf(interp, "back\n");
     Parrot_exit(interp, 0);
     return 0;
 }
@@ -87,7 +85,7 @@ the_test(Interp *interp,
     UNUSED(start);
 
     /* tests go here */
-    PIO_eprintf(interp, "ok\n");
+    Parrot_io_eprintf(interp, "ok\n");
 
     return NULL; /* always return 0 or bad things may happen */
 }

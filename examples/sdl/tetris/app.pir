@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 app.pir - a tetris application object
@@ -15,7 +17,7 @@ B<Note:> The Tetris::App class is implemented as a singleton.
     ...
 
     # create a new random C<next block> on board 3
-    app = find_global "Tetris::App", "app"
+    app = get_hll_global [ "Tetris::App" ], "app"
     app."nextBlock"( 3 )
 
 =head1 CLASS INFORMATION
@@ -77,7 +79,7 @@ This method throws an exception if an error occurs.
 
 .sub BUILD :method
     # create the app object
-    store_global "Tetris::App", "app", self
+    set_hll_global [ "Tetris::App" ], "app", self
 
     $P0 = new 'Hash'
     setattribute self, 'DebugFlags', $P0
@@ -90,7 +92,7 @@ This method throws an exception if an error occurs.
     $P0["flags"]  =   1
 
     # create the SDL object
-    $P0 = new "SDL::App", $P0
+    $P0 = new ['SDL'; 'App'], $P0
 
     # store the SDL object
     setattribute self, 'SDL', $P0
@@ -160,12 +162,12 @@ END:
 The application's main loop.
 
 Returns if the user requested a shutdown.
-An exeption is thrown if an error occurs.
+An exception is thrown if an error occurs.
 
 =cut
 
 .sub _app_timer
-    find_global $P0, "Tetris::App", "app"
+    get_hll_global $P0, [ "Tetris::App" ], "app"
     $P0."timer"()
 .end
 
@@ -175,7 +177,7 @@ An exeption is thrown if an error occurs.
 
     getattribute eh, self, 'EventHandler'
 
-    loop = new "SDL::Event"
+    loop = new ['SDL'; 'Event']
 
     self."enableTimer"()
     loop."process_events"( 0.1, eh, self )
@@ -188,8 +190,8 @@ An exeption is thrown if an error occurs.
 =cut
 
 .sub initTimer :method
-    $P0 = new SArray
-    $P1 = find_global "Tetris::App", "_app_timer"
+    $P0 = new "Array"
+    $P1 = get_hll_global [ "Tetris::App" ], "_app_timer"
     $P0 = 8
     $P0[0] = .PARROT_TIMER_NSEC
     $P0[1] = 0.1
@@ -327,7 +329,7 @@ NOT_BRIGHT:
     hash["r"] = r
     hash["g"] = g
     hash["b"] = b
-    color = new "SDL::Color", hash
+    color = new ['SDL'; 'Color'], hash
 
     push palette, color
     inc i
@@ -835,7 +837,7 @@ FORCE:
     rect["height"] = 480
     rect["x"] = 0
     rect["y"] = 0
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = self."color"( 3 )
 
     screen."fill_rect"( temp, color )
@@ -854,7 +856,7 @@ NO_MAINBACKGROUND:
     rect["height"] = 480
     rect["x"] = 0
     rect["y"] = 0
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     screen."update_rect"( temp )
 
     self."enableTimer"()
@@ -1045,7 +1047,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

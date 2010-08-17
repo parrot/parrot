@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,21 +7,21 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 26;
 
 ##############################
 # Parrot Calling Conventions
 
 pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
 .sub test :main
-    .const .Sub sub = "_sub"
+    .const 'Sub' sub = "_sub"
     .const int y = 20
     .begin_call
-    .arg 10
-    .arg y
+    .set_arg 10
+    .set_arg y
     .call sub
     .local string z
-    .result z
+    .get_result z
     .end_call
     print z
     end
@@ -87,7 +87,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "_func() syntax with var - global" );
 .sub test :main
     .local pmc the_sub
-    the_sub = global "_sub"
+    the_sub = get_global "_sub"
     the_sub(10, 20)
     end
 .end
@@ -138,7 +138,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail recursive sub" );
 recur:
    product = product * count
    dec count
-   .return _fact(product, count)
+   .tailcall _fact(product, count)
 .end
 
 CODE
@@ -256,9 +256,9 @@ done in coroutine
 done in main
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
+pir_output_is( <<'CODE', <<'OUT', ".set_arg :flat" );
 .sub _main
-    .local pmc x, y, z, ar, ar2, s
+    .local pmc x, y, z, ar, ar2
     x = new 'String'
     x = "first\n"
     y = new 'String'
@@ -272,13 +272,13 @@ pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
-    .const .Sub s = "_sub"
+    .const 'Sub' s = "_sub"
     .begin_call
-    .arg x
-    .arg ar :flat
-    .arg y
-    .arg ar2 :flat
-    .arg z
+    .set_arg x
+    .set_arg ar :flat
+    .set_arg y
+    .set_arg ar2 :flat
+    .set_arg z
     .call s
     .end_call
     end
@@ -399,15 +399,15 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "\:main defined twice" );
 .sub foo :main
-        set S0, 'not ok'
-        print S0
+        set $S0, 'not ok'
+        print $S0
         print "\r\n"
         end
 .end
 
 .sub bar :main
-        set S0, 'ok'
-        print S0
+        set $S0, 'ok'
+        print $S0
         print "\r\n"
         end
 .end
@@ -508,6 +508,132 @@ pir_output_is( <<'CODE', <<'OUT', "()=foo() syntax, skip returned value" );
 .end
 CODE
 foo
+OUT
+
+my $too_many_args = <<'CODE';
+.sub main :main
+    'foo'(_ARGS_)
+    say "didn't segfault"
+.end
+
+.sub foo
+.end
+CODE
+
+my $too_many_args_args = join ',', 1 .. 20_000;
+$too_many_args =~ s/_ARGS_/$too_many_args_args/;
+
+pir_output_is( $too_many_args, "didn't segfault\n", "calling a sub with way too many args" );
+
+my $too_many_params = <<'CODE';
+.sub main :main
+    'foo'()
+    say "didn't segfault"
+.end
+
+.sub foo
+    _PARAMS_
+.end
+CODE
+
+my $too_many_params_params = join map { "    .param pmc xx$_\n" } 1 .. 20_000;
+$too_many_params =~ s/_PARAMS_/$too_many_params_params/;
+
+pir_output_is( $too_many_params, "didn't segfault\n", "calling a sub with way too many params" );
+
+pir_output_is( <<'CODE', <<'OUT', 'Unicode allowed in method names, TT #730' );
+.sub 'main' :main
+    $P0 = newclass 'Foo'
+    $P1 = new $P0
+    $S0 = unicode:"foo\x{b1}"
+    $P1.$S0(1)
+    $P1.unicode:"foo\x{b1}"(2)
+.end
+
+.namespace ['Foo']
+.sub unicode:"foo\x{b1}" :method
+    .param int count
+    print 'ok '
+    print count
+    say ' - Unicode method names allowed'
+.end
+CODE
+ok 1 - Unicode method names allowed
+ok 2 - Unicode method names allowed
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'named parameters');
+.sub main
+.local pmc foo
+foo = get_global 'foo'
+
+foo('x' => 1, 'y' => 2)
+foo(1 :named('x'), 2 :named('y'))
+
+.begin_call
+.set_arg 1 :named('x')
+.set_arg 2 :named('y')
+.call foo
+.end_call
+.end
+
+.sub foo
+.param int i :named('y')
+.param int j :named('x')
+say i
+say j
+.end
+
+CODE
+2
+1
+2
+1
+2
+1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'escape sequences in sub names, TT #1125' );
+.sub 'main'
+    say "xyz:<\" \">"
+    .const 'Sub' $P0 = 'foo'
+    say $P0
+
+    say ""
+
+    say "xyz:<\\>"
+    .const 'Sub' $P1 = 'bar'
+    say $P1
+.end
+
+.sub "xyz:<\" \">" :subid('foo')
+    say "xyz-quote"
+.end
+
+.sub "xyz:<\\>" :subid('bar')
+    say "xyz-backslash"
+.end
+CODE
+xyz:<" ">
+xyz:<" ">
+
+xyz:<\>
+xyz:<\>
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', ':named should default to param name');
+.sub main
+  $I0 = 'incr'('value'=>3)
+  say $I0
+.end
+
+.sub 'incr'
+  .param int value :named
+  inc value
+  .return(value)
+.end
+CODE
+4
 OUT
 
 # Local Variables:

@@ -1,3 +1,4 @@
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 .namespace [ "Foo" ]
@@ -22,7 +23,6 @@ loop:
     getattribute P2, P3, ".i"
     print P2
     print "\n"
-    typeof I0, P3
     end
 
 .pcc_sub __init:
@@ -35,3 +35,9 @@ loop:
     set P10, 20
     setattribute P2, ".j", P10
     returncc
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

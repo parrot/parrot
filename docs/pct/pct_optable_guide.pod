@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -37,7 +37,7 @@ Consider the following example grammar:
  }
 
 
-An expresson such as C<1 + 2> will result in a parse tree like this:
+An expression such as C<1 + 2> will result in a parse tree like this:
 
  expression
    mulexpr
@@ -52,7 +52,7 @@ An expresson such as C<1 + 2> will result in a parse tree like this:
             2
 
 This may not seem very big, but remember it's only for C<1 + 2>!
-Also note that you have to add at least one rule per precendence level,
+Also note that you have to add at least one rule per precedence level,
 so the rules for parsing simple statements can increase the size of
 your grammar dramatically.
 
@@ -78,7 +78,7 @@ top-down parsing to bottom-up, and after parsing the operators (and
 related operands), the parser switches back from bottom-up to top-down
 again.
 
-Buttom up parsing is very well suited for expressions that consist of
+Bottom up parsing is very well suited for expressions that consist of
 terms, unary and binary operators with no two terms in a row.
 
 In order to define the entry point of the bottom-up, operator parsing
@@ -152,12 +152,16 @@ generate a C<call> instruction to a subroutine with the same name, that is,
 C<infix:+>. Therefore, you need to write a subroutine for each operator
 you define. The subroutine for the C<infix:+> operator could look like this:
 
+=begin PIR_INVALID
+
  .sub 'infix:+'
     .param pmc a      # left operand
     .param pmc b      # right operand
     n_add $P0, a, b   # create a new PMC object with the value a+b
     .return ($P0)
  .end
+
+=end PIR_INVALID
 
 Whenever an expression such as C<42 + 1> is parsed, this will result in a
 call to C<infix:+> with the operands C<42> and C<1>. The C<infix:+> sub
@@ -241,7 +245,7 @@ Postcircumfix brackets are useful for subroutine invocation or indexing. Of
 course, this fully depends on the specification of your language. Sometimes,
 you need a different rule to define subroutine invocation syntax. This is the
 case when arguments can be other objects than operands of normal operators
-(which, again, are defined by the c<term:> rule).
+(which, again, are defined by the C<term:> rule).
 
 An example to handle indexing (assuming the index is an operand as any other
 operator's operand) is this:

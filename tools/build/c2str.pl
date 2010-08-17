@@ -1,11 +1,15 @@
 #! perl
 # $Id$
 
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 
 =head1 NAME
 
-tools/build/c2str.pl - constant string support
+tools/build/c2str.pl
+
+=head1 DESCRIPTION
+
+constant string support
 
 =cut
 
@@ -15,12 +19,11 @@ use lib 'lib';
 
 use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
-use Math::BigInt ();
 use Getopt::Long ();
-use IO::File;
+use IO::File ();
 
 my $outfile          = 'all_cstring.str';
-my $string_private_h = 'src/string_private_cstring.h';
+my $string_private_h = 'src/string/private_cstring.h';
 
 # add read/write permissions even if we don't read/write the file
 # for example, Solaris requires write permissions for exclusive locks
@@ -68,26 +71,14 @@ sub get_length {
     return length $s;
 }
 
-sub hash_val {
-    my $h = Math::BigInt->new('+0');
-    my $s = shift;
-    for ( my $i = 0 ; $i < length($s) ; ++$i ) {
-        $h += $h << 5;
-        $h &= 0xffffffff;
-        $h += ord substr( $s, $i, 1 );
-        $h &= 0xffffffff;
-    }
-    return sprintf( "0x%x", $h );
-}
-
 sub read_all {
     $ALL->seek(0, 0);
     while (<$ALL>) {
 
         # len hashval "string"
-        if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
-            push @all_strings, [ $1, $2, $3 ];
-            $known_strings{$3} = @all_strings;
+        if (/(\d+)\s+"(.*)"/) {
+            push @all_strings, [ $1, $2 ];
+            $known_strings{$2} = @all_strings;
         }
     }
     return;
@@ -131,26 +122,36 @@ HEADER
 
     # There is a chance that the same __LINE__ will reoccur if #line directives
     # are used.
+    my $prev_line;
     my %lines_seen;
+
     while (<$IN>) {
         if (m/^\s*#\s*line\s+(\d+)/) {
 
             # #line directive
             $line = $1 - 1;
+            $prev_line = $_;
             next;
         }
         $line++;
-        next if m/^\s*#/;    # otherwise ignore preprocessor
-        next unless s/.*\bCONST_STRING(_GEN)?\s*\(\w+\s*,//;
+        # otherwise ignore preprocessor
+
+        do { $prev_line = $_; next } if m/^\s*#/;
+        do { $prev_line = $_; next }
+            unless s/.*\bCONST_STRING(_GEN)?\s*\(\w+\s*,//;
+
         my $const_string = defined $1 ? 'CONST_STRING_GEN' : 'CONST_STRING';
 
         if ( $lines_seen{"$line:$const_string"}++ ) {
             die "Seen line $line before in $infile - can't continue";
         }
 
-        # RT #46909 maybe cope with escaped \"
-        my $cnt = tr/"/"/;
-        die "bogus $const_string at line $line" if $cnt % 2;
+        # semicolons, blank lines, opening braces, closing parens, #directives
+        # comments, labels, else keyword
+        if ($prev_line !~ /([{});:]|\*\/|\w+:|else)$/
+        &&  $prev_line !~ /^\s*(#.*)?$/) {
+            die "CONST_STRING split across lines at $line in $infile\n";
+        }
 
         my $str = extract_delimited;    # $_, '"';
         $str    = substr $str, 1, -1;
@@ -165,17 +166,18 @@ HEADER
                 print "#define _${const_string}_$line $n\n";
             }
             $this_file_seen{"$const_string:$str"} = $line;
+            $prev_line = $_;
             next;
         }
+
         my $len               = get_length($str);
-        my $hashval           = hash_val($str);
-        push @all_strings, [ $len, $hashval, $str ];
+        push @all_strings, [ $len, $str ];
 
         $n                    = @all_strings;
         $known_strings{$str}  = $n;
         $this_file_seen{"$const_string:$str"} = $line;
         print "#define _${const_string}_$line $n\n";
-        print $ALL qq!$len\t$hashval\t"$str"\n!;
+        print $ALL qq!$len\t"$str"\n!;
     }
     close($IN);
     return;
@@ -201,16 +203,15 @@ sub create_c_include {
 #ifndef PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 #define PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 
-static const struct _cstrings {
+static PARROT_OBSERVER const struct _cstrings {
     UINTVAL len;
-    Parrot_UInt4 hash_val;
-    const char *string;
+    PARROT_OBSERVER const char *string;
 } parrot_cstrings[] = {
-    { 0, 0, "" },
+    { 0, "" },
 HEADER
     my @all;
     for my $s (@all_strings) {
-        push @all, qq!    {$s->[0], $s->[1], "$s->[2]"}!;
+        push @all, qq!    {$s->[0], "$s->[1]"}!;
     }
     print $OUT join( ",\n", @all );
     print $OUT <<HEADER;

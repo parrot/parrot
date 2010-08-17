@@ -1,8 +1,9 @@
 # $Id$
+# Copyright (C) 2004-2009, Parrot Foundation.
 
 =head1 TITLE
 
-dumper.pir - PIR version of Data::Dumper
+dumper.pir - PIR version of Perl 5's Data::Dumper module
 
 =head1 VERSION
 
@@ -10,16 +11,13 @@ version 0.10
 
 =head1 SYNOPSIS
 
-    ...
-    # dump the P0 register
-    _dumper( P0 )
+    load_bytecode "dumper.pbc"
 
-    # dump the P0 register, with "name"
-    _dumper( P0, "name" )
-    ...
+    # dump the $P0 register
+    _dumper( $P0 )
 
-    END
-    .include "library/dumper.pir"
+    # dump the $P0 register, with "name"
+    _dumper( $P0, "name" )
 
 
 =head1 DESCRIPTION
@@ -29,13 +27,18 @@ version 0.10
 =cut
 
 # first method prints usage information
-.sub __library_dumper_onload
-    print "usage:"
-    print "\tload_bytecode \"library/Data/Dumper.pir\"\n"
-    print "\t...\n"
-    print "\tnew dumper, \"Data::Dumper\"\n"
-    print "\tdumper.\"dumper\"( foo, \"foo\" )\n\n"
-    end
+.sub __library_dumper_print_usage
+    say "# usage:"
+    say ".sub main"
+    say "    load_bytecode 'Data/Dumper.pbc'"
+    say ''
+    say "    .local pmc foo, dumper"
+    say "    foo    = new 'ResizablePMCArray'"
+    say "    dumper = new ['Data'; 'Dumper']"
+    say ''
+    say "    dumper.'dumper'( foo, 'foo' )"
+    say ".end"
+    say ''
 .end
 
 .include "errors.pasm"
@@ -70,7 +73,7 @@ B<Note:> This function currently returns nothing. It should return
 the dumped data as a string, like Perl's Data::Dumper. Instead,
 everything is printed out using C<print>.
 
-B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.pir)
+B<Note: #2> Hash keys are now sorted using C<_sort()> (sort.pir)
 
 =cut
 
@@ -96,7 +99,7 @@ ex:
 
 =item _register_dumper( id, sub )
 
-Registers a dumper for new PMC type. B<UNIMPLEMENTED>
+Registers a dumper for new PMC type. B<EXCEPTION_UNIMPLEMENTED>
 But see B<method __dump> below.
 
 =over 4
@@ -145,29 +148,29 @@ Returns the global dumper instance used by the non object interface.
     .local pmc dd_class
     .local int is_defined
 
-    get_class dd_class, "Data::Dumper"
+    get_class dd_class, ['Data'; 'Dumper']
     if null dd_class goto load_dd_pir
     goto TYPE_OK
 
   load_dd_pir:
-    load_bytecode "library/Data/Dumper.pir"
-    get_class dd_class, "Data::Dumper"
+    load_bytecode "Data/Dumper.pbc"
+    get_class dd_class, ['Data'; 'Dumper']
     if null dd_class goto no_class
     goto TYPE_OK
 
   no_class:
-    print "fatal error: failure while loading library/Data/Dumper.pir\n"
+    print "fatal error: failure while loading Data/Dumper.pbc\n"
     end
 TYPE_OK:
 
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    find_global self, "Data::Dumper", "global"
+    self = get_hll_global ['Data'; 'Dumper'], 'global'
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
 create_type:
-    new self, "Data::Dumper"
-    store_global "Data::Dumper", "global", self
+    new self, ['Data'; 'Dumper']
+    set_hll_global ['Data'; 'Dumper'], 'global', self
 
 END:
     .return( self )
@@ -179,13 +182,9 @@ END:
 
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
-Please send patches and suggestions to the Perl 6 Internals mailing list.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2004-2008, The Perl Foundation.
 
 =cut
+
 
 # Local Variables:
 #   mode: pir

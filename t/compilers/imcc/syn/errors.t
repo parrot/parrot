@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -11,9 +11,9 @@ use Parrot::Config;
 use Parrot::Test;
 
 plan skip_all => 'No reason to compile invalid PBC here'
-    if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/-r/;
+    if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/--run-pbc/;
 
-plan tests => 5;
+plan tests => 7;
 
 ## tests for imcc error messages
 
@@ -53,7 +53,7 @@ for ( 1 .. 50 ) {
 $test_3_pir_code .= ".end\n";
 
 pir_error_output_like( $test_3_pir_code, <<'OUT', "check parser recovery patience." );
-/Too many errors. Correct some first.\n$/
+/Too many errors. Correct some first.\n/
 OUT
 
 pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'identifier SomethingFunny is unexpected' );
@@ -67,7 +67,7 @@ END_PIR
 /^error:imcc:syntax error, unexpected IDENTIFIER, expecting/
 END_EXPECTED
 
-pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type, RT#42769' );
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type' );
 .sub main :main
   .local Array my_string
   my_string = new String
@@ -76,6 +76,24 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type, RT#4276
 .end
 END_PIR
 /^error:imcc:syntax error, unexpected IDENTIFIER, expecting/
+END_EXPECTED
+
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'no multiple .local, TT #767' );
+.sub main :main
+  .local pmc p
+  .local string p
+.end
+END_PIR
+/^error:imcc:syntax error, duplicated IDENTIFIER/
+END_EXPECTED
+
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'warn about failing .loadlib (TT #437)' );
+.loadlib 'nosuch'
+.sub main :main
+    say "WTF"
+.end
+END_PIR
+/^error:imcc:loadlib.*nosuch/
 END_EXPECTED
 
 # Local Variables:

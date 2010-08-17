@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -29,32 +29,36 @@ messages.
 static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_print_warning __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<void print_pbc_location>
+=item C<void print_pbc_location(PARROT_INTERP)>
 
-Prints the bytecode location of the warning or error to C<PIO_STDERR>.
+Prints the bytecode location of the warning or error to C<Parrot_io_STDERR>.
 
 =cut
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 print_pbc_location(PARROT_INTERP)
 {
-    Interp * const tracer = interp->debugger ? interp->debugger : interp;
-    PIO_eprintf(tracer, "%Ss\n",
-            Parrot_Context_infostr(interp,
-                CONTEXT(interp)));
+    ASSERT_ARGS(print_pbc_location)
+    Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
+        interp->pdb->debugger :
+        interp;
+    Parrot_io_eprintf(tracer, "%Ss\n",
+            Parrot_Context_infostr(interp, CURRENT_CONTEXT(interp)));
 }
 
 /*
 
-=item C<static INTVAL print_warning>
+=item C<static INTVAL print_warning(PARROT_INTERP, STRING *msg)>
 
 Prints the warning message and the bytecode location.
 
@@ -65,12 +69,13 @@ Prints the warning message and the bytecode location.
 static INTVAL
 print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 {
+    ASSERT_ARGS(print_warning)
     if (!msg)
-        PIO_puts(interp, PIO_STDERR(interp), "Unknown warning\n");
+        Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
     else {
-        PIO_putps(interp, PIO_STDERR(interp), msg);
+        Parrot_io_putps(interp, Parrot_io_STDERR(interp), msg);
         if (string_ord(interp, msg, -1) != '\n')
-            PIO_eprintf(interp, "%c", '\n');
+            Parrot_io_eprintf(interp, "%c", '\n');
     }
     print_pbc_location(interp);
     return 1;
@@ -84,7 +89,8 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 =over 4
 
-=item C<INTVAL Parrot_warn>
+=item C<INTVAL Parrot_warn(PARROT_INTERP, INTVAL warnclass, const char *message,
+...)>
 
 The Parrot C string warning/error reporter.
 
@@ -96,12 +102,13 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 
 */
 
-PARROT_API
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)
 {
-    PARROT_ASSERT(interp);
+    ASSERT_ARGS(Parrot_warn)
     if (!PARROT_WARNINGS_test(interp, warnclass))
         return 2;
     else {
@@ -112,6 +119,30 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
         targ = Parrot_vsprintf_c(interp, message, args);
         va_end(args);
         return print_warning(interp, targ);
+    }
+}
+
+/*
+
+=item C<void Parrot_warn_deprecated(PARROT_INTERP, const char *message)>
+
+Warn about use of a deprecated feature
+
+C<message> is a C string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
+{
+    ASSERT_ARGS(Parrot_warn_deprecated)
+
+    if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
+        STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
+        print_warning(interp, msg);
     }
 }
 

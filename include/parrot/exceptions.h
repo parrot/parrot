@@ -1,5 +1,5 @@
 /* exceptions.h
- *  Copyright (C) 2001-2008, The Perl Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -24,104 +24,77 @@
 
 /* &gen_from_enum(except_types.pasm) */
 typedef enum {
-    E_Exception,
-      E_SystemExit,
-      E_StopIteration,
-      E_StandardError,
-        E_KeyboardInterrupt,
-        E_ImportError,
-        E_EnvironmentError,
-          E_IOError,
-          E_OSError,
-            E_WindowsError,
-            E_VMSError,
-        E_EOFError,
-        E_RuntimeError,
-          E_NotImplementedError,
-          E_LibraryNotLoadedError,
-        E_NameError,
-          E_UnboundLocalError,
-        E_AttributeError,
-        E_SyntaxError,
-          E_IndentationError,
-            E_TabError,
-        E_TypeError,
-        E_AssertionError,
-        E_LookupError,
-          E_IndexError,
-          E_KeyError,
-        E_ArithmeticError,
-          E_OverflowError,
-          E_ZeroDivisionError,
-          E_FloatingPointError,
-        E_ValueError,
-          E_UnicodeError,
-            E_UnicodeEncodeError,
-            E_UnicodeDecodeError,
-            E_UnicodeTranslateError,
-        E_ReferenceError,
-        E_SystemError,
-        E_MemoryError,
-        E_LAST_PYTHON_E = E_MemoryError,
+    EXCEPTION_BAD_BUFFER_SIZE,
+    EXCEPTION_MISSING_ENCODING_NAME,
+    EXCEPTION_INVALID_STRING_REPRESENTATION,
+    EXCEPTION_ICU_ERROR,
+    EXCEPTION_UNIMPLEMENTED,
 
-        BAD_BUFFER_SIZE,
-        MISSING_ENCODING_NAME,
-        INVALID_STRING_REPRESENTATION,
-        ICU_ERROR,
-        UNIMPLEMENTED,
+    EXCEPTION_NULL_REG_ACCESS,
+    EXCEPTION_NO_REG_FRAMES,
+    EXCEPTION_SUBSTR_OUT_OF_STRING,
+    EXCEPTION_ORD_OUT_OF_STRING,
+    EXCEPTION_MALFORMED_UTF8,
+    EXCEPTION_MALFORMED_UTF16,
+    EXCEPTION_MALFORMED_UTF32,
+    EXCEPTION_INVALID_CHARACTER,
+    EXCEPTION_INVALID_CHARTYPE,
+    EXCEPTION_INVALID_ENCODING,
+    EXCEPTION_INVALID_CHARCLASS,
+    EXCEPTION_NEG_REPEAT,
+    EXCEPTION_NEG_SUBSTR,
+    EXCEPTION_NEG_SLEEP,
+    EXCEPTION_NEG_CHOP,
+    EXCEPTION_INVALID_OPERATION,
+    EXCEPTION_ARG_OP_NOT_HANDLED,
+    EXCEPTION_KEY_NOT_FOUND,
+    EXCEPTION_JIT_UNAVAILABLE,
+    EXCEPTION_EXEC_UNAVAILABLE,
+    EXCEPTION_INTERP_ERROR,
+    EXCEPTION_PARROT_USAGE_ERROR,
+    EXCEPTION_PIO_ERROR,
+    EXCEPTION_PARROT_POINTER_ERROR,
+    EXCEPTION_DIV_BY_ZERO,
+    EXCEPTION_PIO_NOT_IMPLEMENTED,
+    EXCEPTION_ALLOCATION_ERROR,
+    EXCEPTION_INTERNAL_PANIC,
+    EXCEPTION_OUT_OF_BOUNDS,
+    EXCEPTION_JIT_ERROR,
+    EXCEPTION_EXEC_ERROR,
+    EXCEPTION_ILL_INHERIT,
+    EXCEPTION_NO_PREV_CS,
+    EXCEPTION_NO_CLASS,
+    EXCEPTION_LEX_NOT_FOUND,
+    EXCEPTION_PAD_NOT_FOUND,
+    EXCEPTION_ATTRIB_NOT_FOUND,
+    EXCEPTION_GLOBAL_NOT_FOUND,
+    EXCEPTION_EXTERNAL_ERROR,
+    EXCEPTION_METHOD_NOT_FOUND,
+    EXCEPTION_VTABLE_NOT_FOUND,
+    EXCEPTION_WRITE_TO_CONSTCLASS,
+    EXCEPTION_NOSPAWN,
+    EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+    EXCEPTION_ERR_OVERFLOW,
+    EXCEPTION_LOSSY_CONVERSION,
+    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
+    EXCEPTION_UNEXPECTED_NULL,
+    EXCEPTION_LIBRARY_ERROR,
+    EXCEPTION_LIBRARY_NOT_LOADED,
+    EXCEPTION_SYNTAX_ERROR,
+    EXCEPTION_MALFORMED_PACKFILE,
 
-        NULL_REG_ACCESS,
-        NO_REG_FRAMES,
-        SUBSTR_OUT_OF_STRING,
-        ORD_OUT_OF_STRING,
-        MALFORMED_UTF8,
-        MALFORMED_UTF16,
-        MALFORMED_UTF32,
-        INVALID_CHARACTER,
-        INVALID_CHARTYPE,
-        INVALID_ENCODING,
-        INVALID_CHARCLASS,
-        NEG_REPEAT,
-        NEG_SUBSTR,
-        NEG_SLEEP,
-        NEG_CHOP,
-        INVALID_OPERATION,
-        ARG_OP_NOT_HANDLED,
-        KEY_NOT_FOUND,
-        JIT_UNAVAILABLE,
-        EXEC_UNAVAILABLE,
-        INTERP_ERROR,
-        PREDEREF_LOAD_ERROR,
-        PARROT_USAGE_ERROR,
-        PIO_ERROR,
-        PARROT_POINTER_ERROR,
-        DIV_BY_ZERO,
-        PIO_NOT_IMPLEMENTED,
-        ALLOCATION_ERROR,
-        INTERNAL_PANIC,
-        OUT_OF_BOUNDS,
-        JIT_ERROR,
-        EXEC_ERROR,
-        ILL_INHERIT,
-        NO_PREV_CS,
-        NO_CLASS,
-        LEX_NOT_FOUND,
-        PAD_NOT_FOUND,
-        ATTRIB_NOT_FOUND,
-        GLOBAL_NOT_FOUND,
-        METH_NOT_FOUND,
-        WRITE_TO_CONSTCLASS,
-        NOSPAWN,
-        INTERNAL_NOT_IMPLEMENTED,
-        ERR_OVERFLOW,
-        LOSSY_CONVERSION,
-        ROLE_COMPOSITION_METH_CONFLICT,
+    CONTROL_RETURN,
+    CONTROL_OK,
+    CONTROL_BREAK,
+    CONTROL_CONTINUE,
+    CONTROL_ERROR,
+    CONTROL_TAKE,
+    CONTROL_LEAVE,
+    CONTROL_EXIT,
 
-        CONTROL_RETURN,
-        CONTROL_OK,
-        CONTROL_BREAK,
-        CONTROL_CONTINUE,
-        CONTROL_ERROR
+    CONTROL_LOOP_NEXT,
+    CONTROL_LOOP_LAST,
+    CONTROL_LOOP_REDO
 } exception_type_enum;
 
 /* &end_gen */
@@ -140,64 +113,25 @@ typedef enum {
 
 /* &end_gen */
 
-/* Right now there's nothing special for the jump buffer, but there might be
- * one later, so we wrap it in a struct so that we can expand it later */
-typedef struct parrot_exception_t {
-    Parrot_jump_buff destination;       /* jmp_buf */
-    INTVAL severity;                    /* s. above */
-    long error;                         /* exception_type_enum */
-    STRING *msg;                        /* may be NULL */
-    void *resume;                       /* opcode_t* for resume or NULL */
-    struct parrot_exception_t *prev;    /* interpreters handler stack */
-    long language;                      /* what is this? */
-    long system;                        /* what is this? */
-} Parrot_exception;
-
 /* HEADERIZER BEGIN: src/exceptions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
-void do_exception(PARROT_INTERP, INTVAL severity, long error)
-        __attribute__nonnull__(1);
+PARROT_COLD
+void do_panic(
+    NULLOK_INTERP,
+    ARGIN_NULLOK(const char *message),
+    ARGIN_NULLOK(const char *file),
+    unsigned int line);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
-void do_pmc_exception(PARROT_INTERP, ARGIN(PMC *msg))
-        __attribute__nonnull__(1)
+PARROT_COLD
+void exit_fatal(int exitcode, ARGIN(const char *format), ...)
         __attribute__nonnull__(2);
 
-PARROT_API
-PARROT_DOES_NOT_RETURN
-void do_str_exception(PARROT_INTERP, ARGIN(STRING *msg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-void free_internal_exception(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
-size_t handle_exception(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
-PARROT_DOES_NOT_RETURN
-void internal_exception(int exitcode, ARGIN(const char *format), ...)
-        __attribute__nonnull__(2);
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* new_c_exception_handler(PARROT_INTERP, ARGIN(Parrot_exception *jb))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-void new_internal_exception(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN_WHEN_FALSE
 void Parrot_assert(
     INTVAL condition,
@@ -207,8 +141,9 @@ void Parrot_assert(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_confess(
     ARGIN(const char *cond),
     ARGIN(const char *file),
@@ -216,105 +151,151 @@ void Parrot_confess(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
-void Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
-        __attribute__nonnull__(1);
-
-PARROT_API
-void Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
+PARROT_EXPORT
+void Parrot_ex_add_c_handler(PARROT_INTERP, ARGIN(Parrot_runloop *jp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
-void Parrot_push_mark(PARROT_INTERP, INTVAL mark)
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_ex_build_exception(PARROT_INTERP,
+    INTVAL severity,
+    long error,
+    ARGIN_NULLOK(STRING *msg))
         __attribute__nonnull__(1);
 
-PARROT_API
-void pop_exception(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
-void push_exception(PARROT_INTERP, ARGIN(PMC *handler))
+PARROT_EXPORT
+void Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
-void push_new_c_exception_handler(PARROT_INTERP,
-    ARGIN(Parrot_exception *jb))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
-void real_exception(PARROT_INTERP,
-    ARGIN_NULLOK(void *ret_addr),
+PARROT_COLD
+void Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t * Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_ex_throw_from_c_args(PARROT_INTERP,
+    SHIM(void *ret_addr),
     int exitcode,
     ARGIN(const char *format),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-opcode_t * rethrow_exception(PARROT_INTERP, ARGIN(PMC *exception))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-PARROT_CAN_RETURN_NULL
-opcode_t * throw_exception(PARROT_INTERP,
+opcode_t * Parrot_ex_throw_from_op(PARROT_INTERP,
     ARGIN(PMC *exception),
-    SHIM(void *dest))
+    ARGIN_NULLOK(void *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-INTVAL count_exception_handlers(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void destroy_exception_list(PARROT_INTERP)
-        __attribute__nonnull__(1);
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+opcode_t * Parrot_ex_throw_from_op_args(PARROT_INTERP,
+    ARGIN_NULLOK(void *dest),
+    int ex_type,
+    ARGIN(const char *format),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 PARROT_DOES_NOT_RETURN
-void do_panic(
-    NULLOK_INTERP,
-    ARGIN_NULLOK(const char *message),
-    ARGIN_NULLOK(const char *file),
-    unsigned int line);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * get_all_exception_handlers(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC * get_exception_handler(PARROT_INTERP, INTVAL target_depth)
-        __attribute__nonnull__(1);
-
-void Parrot_init_exceptions(PARROT_INTERP)
-        __attribute__nonnull__(1);
+PARROT_COLD
+void die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void Parrot_print_backtrace(void);
-void really_destroy_exception_list(ARGIN(Parrot_exception *e))
-        __attribute__nonnull__(1);
-
-PARROT_DOES_NOT_RETURN
-void rethrow_c_exception(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
+#define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_assert __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(condition_string) \
+    , PARROT_ASSERT_ARG(file))
+#define ASSERT_ARGS_Parrot_confess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(cond) \
+    , PARROT_ASSERT_ARG(file))
+#define ASSERT_ARGS_Parrot_ex_add_c_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(jp))
+#define ASSERT_ARGS_Parrot_ex_build_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_ex_mark_unhandled __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_ex_rethrow_from_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_ex_rethrow_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_ex_throw_from_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_ex_throw_from_c_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_ex_throw_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_ex_throw_from_op_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_die_from_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
 
 #define PANIC(interp, message) do_panic((interp), (message), __FILE__, __LINE__)
 
+/* having a modified version of PARROT_ASSERT which resolves as an integer
+ * rvalue lets us put ASSERT_ARGS() at the top of the list of local variables.
+ * Thus, we can catch bad pointers before any of the local initialization
+ * logic is run.  And it always returns 0, so headerizer can chain them in
+ * ASSERT_ARGS_* macros like:
+ * int _ASSERT_ARGS = PARROT_ASSERT_ARG(a) || PARROT_ASSERT_ARG(b) || ...
+ */
 #ifdef NDEBUG
-#  define PARROT_ASSERT(x) ((void)0)
+#  define PARROT_ASSERT(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
+#  define PARROT_ASSERT_ARG(x) (0)
+#  define PARROT_FAILURE(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
+#  define PARROT_ASSERT_MSG(x, s) /*@-noeffect@*/((void)0)/*@=noeffect@*/
+#  define ASSERT_ARGS(a)
 #else
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
-#endif
+#  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
+#  define PARROT_FAILURE(x) Parrot_confess((x), __FILE__, __LINE__)
+#  define PARROT_ASSERT_MSG(x, s) ((x) ? (0) : (Parrot_confess(s, __FILE__, __LINE__), 0))
 
+#  ifdef __GNUC__
+#    define ASSERT_ARGS(a) ASSERT_ARGS_ ## a ;
+#  else
+#    define ASSERT_ARGS(a)
+#  endif /* __GNUC__ */
+
+#endif /* NDEBUG */
 
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
 

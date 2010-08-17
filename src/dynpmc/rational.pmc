@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, The Perl Foundation.
+Copyright (C) 2008-2009, Parrot Foundation.
 $Id$
 
 =pod
@@ -35,17 +35,18 @@ Currently C<rational.pmc> only has some C<static> functions for code sharing.
    typedef struct RATIONAL {
       mpq_t q;
    } RATIONAL;
-#  define RT(x)         ((RATIONAL*) PMC_struct_val(x))->q
+#  define PMC_rational(x) ((Parrot_Rational_attributes *)PMC_data(x))->rational
+#  define RT(x)           ((Parrot_Rational_attributes *)PMC_data(x))->rational->q
 #else
 #  define RT(x)
 #endif
 
-#define RAISE_EXCEPTION   real_exception(interp, NULL, E_LibraryNotLoadedError, \
-                                   "GNU Multiple Precision library not found.");
+#define RAISE_EXCEPTION   Parrot_ex_throw_from_c_args(interp, NULL, \
+    EXCEPTION_LIBRARY_NOT_LOADED, "GNU Multiple Precision library not found.");
 
 /*
 
-=item * static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base)
+=item C<static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base)>
 
 Returns a string representation of a Rational-PMC to a certain base.
 
@@ -54,10 +55,9 @@ Returns a string representation of a Rational-PMC to a certain base.
 */
 static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
   #ifdef PARROT_HAS_GMP
-    STRING *pstr;
-    char *cstr = mpq_get_str(NULL, (int) base, RT(self));
-    pstr = string_from_cstring(interp, cstr, 0);
-    string_cstring_free(cstr);
+    char * const cstr   = mpq_get_str(NULL, (int) base, RT(self));
+    STRING * const pstr = Parrot_str_new(interp, cstr, 0);
+    Parrot_str_free_cstring(cstr);
     return pstr;
   #else
     RAISE_EXCEPTION
@@ -66,28 +66,103 @@ static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
 
 /*
 
-=item * static void rat_add_integer(PARROT_INTERP, PMC *self, int value, PMC *dest)
+=item C<static void rat_add_integer(PARROT_INTERP, PMC *self, int value)>
 
-Adds an integer "value" to a Rational-PMC and stores the result in (another) Rational-PMC.
+Adds an integer "value" to a Rational-PMC inplace.
 
 =cut
 
 */
-static void rat_add_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
+static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
+  #ifdef PARROT_HAS_GMP
+    mpq_t t;
+    mpq_init(t);
+    mpq_set_si(t, (int) value, 1);
+    mpq_add(RT(self), RT(self), t);
+    mpq_clear(t);
+  #else
+    RAISE_EXCEPTION
+  #endif
+}
+
+/*
+
+=item C<static void rat_add_float(PARROT_INTERP, PMC *self, double value)>
+
+Adds a float "value" to a Rational-PMC in-place. "value" is first conveted to a
+rational using GMPs mpq_set_d-function. This is meant to be exact.
+
+=cut
+
+*/
+static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
 
-    if (dest) {
-        if (self != dest)
-            VTABLE_morph(interp, dest, self->vtable->base_type);
-    }
-    else {
-        dest = pmc_new(interp, self->vtable->base_type);
-    }
+    mpq_init(t);
+    mpq_set_d(t, (double) value);
+    mpq_add(RT(self), RT(self), t);
+    mpq_clear(t);
+  #else
+    RAISE_EXCEPTION
+  #endif
+}
+
+/*
+
+=item C<static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value)>
+
+Multiplys a Rational-PMC with an integer "value" in-place.
+
+=cut
+
+*/
+static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value) {
+  #ifdef PARROT_HAS_GMP
+    mpz_mul_ui(mpq_numref(RT(self)), mpq_numref(RT(self)), (unsigned int) value);
+  #else
+    RAISE_EXCEPTION
+  #endif
+}
+
+/*
+
+=item C<static void rat_multiply_float(PARROT_INTERP, PMC *self, double value)>
+
+Multiplies a Rational-PMC with a float "value" in-place.
+
+=cut
+
+*/
+static void rat_multiply_float(PARROT_INTERP, PMC *self, double value) {
+  #ifdef PARROT_HAS_GMP
+    mpq_t t;
+
+    mpq_init(t);
+    mpq_set_d(t, (double) value);
+    mpq_mul(RT(self), RT(self), t);
+    mpq_clear(t);
+  #else
+    RAISE_EXCEPTION
+  #endif
+}
+
+/*
+
+=item C<static void rat_divide_integer(PARROT_INTERP, PMC *self, int value)>
+
+Divides a Rational-PMC through an integer "value" in-place.
+
+=cut
+
+*/
+static void rat_divide_integer(PARROT_INTERP, PMC *self, int value) {
+  #ifdef PARROT_HAS_GMP
+    mpq_t t;
 
     mpq_init(t);
     mpq_set_si(t, (int) value, 1);
-    mpq_add(RT(dest), RT(self), t);
+    mpq_div(RT(self), RT(self), t);
     mpq_clear(t);
   #else
     RAISE_EXCEPTION
@@ -96,164 +171,21 @@ static void rat_add_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
 
 /*
 
-=item * static void rat_add_float(PARROT_INTERP, PMC *self, double value, PMC *dest)
+=item C<static void rat_divide_float(PARROT_INTERP, PMC *self, double value)>
 
-Adds a float "value" to a Rational-PMC and stores the result in (another) Rational-PMC. "value" is
-first conveted to a rational using GMPs mpq_set_d-function. This is meant to be exact.
+Divides a Rational-PMC through a float "value" in-place.
 
 =cut
 
 */
-static void rat_add_float(PARROT_INTERP, PMC *self, double value, PMC *dest) {
+static void rat_divide_float(PARROT_INTERP, PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
-
-    if (dest)
-        VTABLE_morph(interp, dest, self->vtable->base_type);
-    else
-        dest = pmc_new(interp, self->vtable->base_type);
 
     mpq_init(t);
     mpq_set_d(t, (double) value);
-    mpq_add(RT(dest), RT(self), t);
+    mpq_div(RT(self), RT(self), t);
     mpq_clear(t);
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
-=item * static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value, PMC *dest)
-
-Multiplys a Rational-PMC with an integer "value" and stores the result in (another) Rational-PMC.
-
-=cut
-
-*/
-static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
-  #ifdef PARROT_HAS_GMP
-    if (dest)
-        VTABLE_morph(interp, dest, self->vtable->base_type);
-    else
-        dest = pmc_new(interp, self->vtable->base_type);
-
-    mpz_mul_ui(mpq_numref(RT(dest)), mpq_numref(RT(self)), (unsigned int) value);
-    mpq_set_den(RT(dest), mpq_denref(RT(self)));
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
-=item * static void rat_multiply_float(PARROT_INTERP, PMC *self, double value, PMC *dest)
-
-Multiplies a Rational-PMC with a float "value" and stores the result in (another) Rational-PMC.
-
-=cut
-
-*/
-static void rat_multiply_float(PARROT_INTERP, PMC *self, double value, PMC *dest) {
-  #ifdef PARROT_HAS_GMP
-    mpq_t t;
-
-    if (dest)
-        VTABLE_morph(interp, dest, self->vtable->base_type);
-    else
-        dest = pmc_new(interp, self->vtable->base_type);
-
-    mpq_init(t);
-    mpq_set_d(t, (double) value);
-    mpq_mul(RT(dest), RT(self), t);
-    mpq_clear(t);
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
-=item * static void rat_divide_integer(PARROT_INTERP, PMC *self, int value, PMC *dest)
-
-Divides a Rational-PMC through an integer "value" and stores the result in (another) Rational-PMC.
-
-=cut
-
-*/
-static void rat_divide_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
-  #ifdef PARROT_HAS_GMP
-    mpq_t t;
-
-    if (dest)
-        VTABLE_morph(interp, dest, self->vtable->base_type);
-    else
-        dest = pmc_new(interp, self->vtable->base_type);
-
-    mpq_init(t);
-    mpq_set_si(t, (int) value, 1);
-    mpq_div(RT(dest), RT(self), t);
-    mpq_clear(t);
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
-=item * static void rat_divide_float(PARROT_INTERP, PMC *self, double value, PMC *dest)
-
-Divides a Rational-PMC through a float "value" and stores the result in (another) Rational-PMC.
-
-=cut
-
-*/
-static void rat_divide_float(PARROT_INTERP, PMC *self, double value, PMC *dest) {
-  #ifdef PARROT_HAS_GMP
-    mpq_t t;
-
-    if (dest)
-        VTABLE_morph(interp, dest, self->vtable->base_type);
-    else
-        dest = pmc_new(interp, self->vtable->base_type);
-
-    mpq_init(t);
-    mpq_set_d(t, (double) value);
-    mpq_div(RT(dest), RT(self), t);
-    mpq_clear(t);
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
-=item * static void rat_power_int(PARROT_INTERP, PMC *self, int value, PMC *dest)
-
-Calculates the power of a Rational-PMC to an exponent value and stores the result in (another)
-Rational-PMC.
-
-=cut
-
-*/
-static void rat_power_int(PARROT_INTERP, PMC *self, int value, PMC *dest) {
-  #ifdef PARROT_HAS_GMP
-    mpz_t t;
-
-    if (dest)
-        VTABLE_morph(interp, dest, self->vtable->base_type);
-    else
-        dest = pmc_new(interp, self->vtable->base_type);
-
-    mpq_get_num(t, RT(self));
-    mpz_pow_ui(t, t, (unsigned int) value);
-    mpq_set_num(RT(dest), t);
-    mpz_clear(t);
-
-    mpq_get_den(t, RT(self));
-    mpz_pow_ui(t, t, (unsigned int) value);
-    mpq_set_den(RT(dest), t);
-    mpz_clear(t);
   #else
     RAISE_EXCEPTION
   #endif
@@ -267,7 +199,8 @@ static void rat_power_int(PARROT_INTERP, PMC *self, int value, PMC *dest) {
 
 */
 
-pmclass Rational dynpmc provides scalar {
+pmclass Rational dynpmc provides scalar auto_attrs {
+    ATTR struct RATIONAL *rational;
 /*
 
 =head2 Methods
@@ -287,9 +220,9 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     METHOD version() {
         STRING *version;
       #ifdef PARROT_HAS_GMP
-        version = string_from_cstring(INTERP, gmp_version, 0);
+        version = Parrot_str_new(INTERP, gmp_version, 0);
       #else
-        version = string_from_cstring(INTERP, "0.0.0", 0);
+        version = Parrot_str_new(INTERP, "0.0.0", 0);
       #endif
         RETURN(STRING *version);
     }
@@ -303,11 +236,11 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void init() {
       #ifdef PARROT_HAS_GMP
-        PMC_struct_val(SELF) = malloc(sizeof (RATIONAL));
+        Parrot_Rational_attributes *attrs =
+            PARROT_RATIONAL(SELF);
+        attrs->rational = mem_gc_allocate_zeroed_typed(INTERP, RATIONAL);
         mpq_init(RT(SELF));
-        PObj_active_destroy_SET(SELF);
-      #else
-        PMC_struct_val(SELF) = NULL;
+        PObj_custom_destroy_SET(SELF);
       #endif
     }
 
@@ -320,14 +253,8 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE PMC *clone() {
       #ifdef PARROT_HAS_GMP
-        mpz_t num, den;
-        PMC *ret = pmc_new(INTERP, SELF->vtable->base_type);
-        mpq_get_num(num, RT(SELF));
-        mpq_get_den(den, RT(SELF));
-        mpq_set_num(RT(ret), num);
-        mpq_set_den(RT(ret), den);
-        mpz_clear(num);
-        mpz_clear(den);
+        PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        mpq_set(RT(ret), RT(SELF));
         return ret;
       #else
         RAISE_EXCEPTION
@@ -344,7 +271,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE void destroy() {
       #ifdef PARROT_HAS_GMP
         mpq_clear(RT(SELF));
-        mem_sys_free(PMC_struct_val(SELF));
+        mem_gc_free(INTERP, RT(SELF));
       #else
         RAISE_EXCEPTION
       #endif
@@ -391,10 +318,10 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_string_native(STRING *value) {
       #ifdef PARROT_HAS_GMP
-        char *cstr = string_to_cstring(INTERP, value);
+        char * const cstr = Parrot_str_to_cstring(INTERP, value);
         mpq_set_str(RT(SELF), cstr, 0);
         mpq_canonicalize(RT(SELF));
-        string_cstring_free(cstr);
+        Parrot_str_free_cstring(cstr);
       #else
         RAISE_EXCEPTION
       #endif
@@ -409,10 +336,10 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
       #ifdef PARROT_HAS_GMP
-        char *cstr = string_to_cstring(INTERP, value);
+        char * const cstr = Parrot_str_to_cstring(INTERP, value);
         mpq_set_str(RT(SELF), cstr, (int) base);
         mpq_canonicalize(RT(SELF));
-        string_cstring_free(cstr);
+        Parrot_str_free_cstring(cstr);
       #else
         RAISE_EXCEPTION
       #endif
@@ -432,13 +359,13 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
         mpz_init(q);
         mpz_tdiv_q(q, mpq_numref(RT(SELF)), mpq_denref(RT(SELF)));
         if (mpz_fits_slong_p(q)) {
-            INTVAL ret = (INTVAL) mpz_get_si(q);
+            const INTVAL ret = (INTVAL) mpz_get_si(q);
             mpz_clear(q);
             return ret;
         }
         else {
             mpz_clear(q);
-            real_exception(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                 "Rational, get_integer(): Number is too big.");
         }
       #else
@@ -455,8 +382,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE FLOATVAL get_number() {
       #ifdef PARROT_HAS_GMP
-        double d;
-        d = mpq_get_d(RT(SELF));
+        const double d = mpq_get_d(RT(SELF));
         return (FLOATVAL) d;
       #else
         RAISE_EXCEPTION
@@ -551,32 +477,32 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 =cut
 
 */
-    VTABLE PMC *add(PMC* value, PMC* dest) {
-MMD_Integer: {
-        rat_add_integer(INTERP, SELF, PMC_int_val(value), dest);
+    MULTI PMC *add(Integer value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_add_integer(INTERP, dest, VTABLE_get_integer(INTERP, value));
         return dest;
-        }
-MMD_Float: {
-        rat_add_float(INTERP, SELF, PMC_num_val(value), dest);
+    }
+
+    MULTI PMC *add(Float value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_add_float(INTERP, dest, VTABLE_get_number(INTERP, value));
         return dest;
-        }
-MMD_Rational: {
+    }
+
+    MULTI PMC *add(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         mpq_add(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
-        "Rational, add: Not implemented (yet).");
-        }
+    }
+
+    MULTI PMC *add(DEFAULT value, PMC* dest) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Rational, add: Not implemented (yet).");
     }
 
 /*
@@ -586,24 +512,25 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE void i_add(PMC *value) {
-MMD_Integer: {
-        rat_add_integer(INTERP, SELF, (int) PMC_int_val(value), SELF);
-        }
-MMD_Float: {
-        rat_add_float(INTERP, SELF, (double) PMC_num_val(value), SELF);
-        }
-MMD_Rational: {
+    MULTI void i_add(Integer value) {
+        rat_add_integer(INTERP, SELF, (int) VTABLE_get_integer(INTERP, value));
+    }
+
+    MULTI void i_add(Float value) {
+        rat_add_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value));
+    }
+
+    MULTI void i_add(Rational value) {
       #ifdef PARROT_HAS_GMP
         mpq_add(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
-        "Rational, i_add: Not implemented (yet).");
-        }
+    }
+
+    MULTI void i_add(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Rational, i_add: Not implemented (yet).");
     }
 
 /*
@@ -614,7 +541,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *add_int(INTVAL value, PMC* dest) {
-        rat_add_integer(INTERP, SELF, (int) value, dest);
+        dest = STATICSELF.clone();
+        rat_add_integer(INTERP, dest, (int) value);
         return dest;
     }
 
@@ -626,7 +554,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_add_int(INTVAL value) {
-        rat_add_integer(INTERP, SELF, (int) value, SELF);
+        rat_add_integer(INTERP, SELF, (int) value);
     }
 
 /*
@@ -637,7 +565,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *add_float(FLOATVAL value, PMC* dest) {
-        rat_add_float(INTERP, SELF, (double) value, dest);
+        dest = STATICSELF.clone();
+        rat_add_float(INTERP, dest, (double) value);
         return dest;
     }
 
@@ -649,7 +578,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_add_float(FLOATVAL value) {
-        rat_add_float(INTERP, SELF, (double) value, SELF);
+        rat_add_float(INTERP, SELF, (double) value);
     }
 
 /*
@@ -659,32 +588,31 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE PMC *subtract(PMC* value, PMC* dest) {
-MMD_Integer: {
-        rat_add_integer(INTERP, SELF, -((int) PMC_int_val(value)), dest);
+    MULTI PMC *subtract(Integer value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_add_integer(INTERP, dest, -((int) VTABLE_get_integer(INTERP, value)));
         return dest;
-        }
-MMD_Float: {
-        rat_add_float(INTERP, SELF, - ((double) PMC_num_val(value)), dest);
-        return dest;
-        }
-MMD_Rational: {
-      #ifdef PARROT_HAS_GMP
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+    }
 
+    MULTI PMC *subtract(Float value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_add_float(INTERP, dest, - ((double) VTABLE_get_number(INTERP, value)));
+        return dest;
+    }
+
+    MULTI PMC *subtract(Rational value, PMC* dest) {
+      #ifdef PARROT_HAS_GMP
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_sub(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
-        "Rational, subtract: Not implemented (yet).");
-        }
+    }
+
+    MULTI PMC *subtract(DEFAULT value, PMC* dest) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Rational, subtract: Not implemented (yet).");
     }
 
 /*
@@ -694,24 +622,25 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE void i_subtract(PMC *value) {
-MMD_Integer: {
-        rat_add_integer(INTERP, SELF, -((int) PMC_int_val(value)), SELF);
-        }
-MMD_Float: {
-        rat_add_float(INTERP, SELF, - ((double) PMC_num_val(value)), SELF);
-        }
-MMD_Rational: {
+    MULTI void i_subtract(Integer value) {
+        rat_add_integer(INTERP, SELF, -((int) VTABLE_get_integer(INTERP, value)));
+    }
+
+    MULTI void i_subtract(Float value) {
+        rat_add_float(INTERP, SELF, - ((double) VTABLE_get_number(INTERP, value)));
+    }
+
+    MULTI void i_subtract(Rational value) {
       #ifdef PARROT_HAS_GMP
         mpq_sub(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
-        "Rational, i_subtract: Not implemented (yet).");
-        }
+    }
+
+    MULTI void i_subtract(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Rational, i_subtract: Not implemented (yet).");
     }
 
 /*
@@ -722,7 +651,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *subtract_int(INTVAL value, PMC* dest) {
-        rat_add_integer(INTERP, SELF, -((int) value), dest);
+        dest = STATICSELF.clone();
+        rat_add_integer(INTERP, dest, -((int) value));
         return dest;
     }
 
@@ -734,7 +664,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_subtract_int(INTVAL value) {
-        rat_add_integer(INTERP, SELF, -((int) value), SELF);
+        rat_add_integer(INTERP, SELF, -((int) value));
     }
 
 /*
@@ -745,7 +675,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *subtract_float(FLOATVAL value, PMC* dest) {
-        rat_add_float(INTERP, SELF, -((double) value), dest);
+        dest = STATICSELF.clone();
+        rat_add_float(INTERP, dest, -((double) value));
         return dest;
     }
 
@@ -757,7 +688,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_subtract_float(FLOATVAL value) {
-        rat_add_float(INTERP, SELF, -((double) value), SELF);
+        rat_add_float(INTERP, SELF, -((double) value));
     }
 
 /*
@@ -767,32 +698,31 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE PMC *multiply(PMC* value, PMC* dest) {
-MMD_Integer: {
-        rat_multiply_integer(INTERP, SELF, (int) PMC_int_val(value), dest);
+    MULTI PMC *multiply(Integer value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_multiply_integer(INTERP, dest, (int) VTABLE_get_integer(INTERP, value));
         return dest;
-        }
-MMD_Float: {
-        rat_multiply_float(INTERP, SELF, (double) PMC_num_val(value), dest);
-        return dest;
-        }
-MMD_Rational: {
-      #ifdef PARROT_HAS_GMP
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+    }
 
+    MULTI PMC *multiply(Float value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_multiply_float(INTERP, dest, (double) VTABLE_get_number(INTERP, value));
+        return dest;
+    }
+
+    MULTI PMC *multiply(Rational value, PMC* dest) {
+      #ifdef PARROT_HAS_GMP
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_mul(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+    }
+
+    MULTI PMC *multiply(DEFAULT value, PMC* dest) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, multiply: Not implemented (yet).");
-        }
     }
 
 /*
@@ -802,24 +732,25 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE void i_multiply(PMC *value) {
-MMD_Integer: {
-        rat_multiply_integer(INTERP, SELF, (int) PMC_int_val(value), SELF);
-        }
-MMD_Float: {
-        rat_multiply_float(INTERP, SELF, (double) PMC_num_val(value), SELF);
-        }
-MMD_Rational: {
+    MULTI void i_multiply(Integer value) {
+        rat_multiply_integer(INTERP, SELF, (int) VTABLE_get_integer(INTERP, value));
+    }
+
+    MULTI void i_multiply(Float value) {
+        rat_multiply_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value));
+    }
+
+    MULTI void i_multiply(Rational value) {
       #ifdef PARROT_HAS_GMP
         mpq_mul(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+    }
+
+    MULTI void i_multiply(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, i_multiply: Not implemented (yet).");
-        }
     }
 
 /*
@@ -830,7 +761,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *multiply_int(INTVAL value, PMC* dest) {
-        rat_multiply_integer(INTERP, SELF, (int) value, dest);
+        dest = STATICSELF.clone();
+        rat_multiply_integer(INTERP, dest, (int) value);
         return dest;
     }
 
@@ -842,7 +774,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_multiply_int(INTVAL value) {
-        rat_multiply_integer(INTERP, SELF, (int) value, SELF);
+        rat_multiply_integer(INTERP, SELF, (int) value);
     }
 
 /*
@@ -853,7 +785,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *multiply_float(FLOATVAL value, PMC* dest) {
-        rat_multiply_float(INTERP, SELF, (double) value, dest);
+        dest = STATICSELF.clone();
+        rat_multiply_float(INTERP, dest, (double) value);
         return dest;
     }
 
@@ -865,7 +798,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_multiply_float(FLOATVAL value) {
-        rat_multiply_float(INTERP, SELF, (double) value, SELF);
+        rat_multiply_float(INTERP, SELF, (double) value);
     }
 
 /*
@@ -875,32 +808,31 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE PMC *divide(PMC* value, PMC* dest) {
-MMD_Integer: {
-        rat_divide_integer(INTERP, SELF, (int) PMC_int_val(value), dest);
+    MULTI PMC *divide(Integer value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_divide_integer(INTERP, dest, (int) VTABLE_get_integer(INTERP, value));
         return dest;
-        }
-MMD_Float: {
-        rat_divide_float(INTERP, SELF, (double) PMC_num_val(value), dest);
-        return dest;
-        }
-MMD_Rational: {
-      #ifdef PARROT_HAS_GMP
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+    }
 
+    MULTI PMC *divide(Float value, PMC* dest) {
+        dest = STATICSELF.clone();
+        rat_divide_float(INTERP, dest, (double) VTABLE_get_number(INTERP, value));
+        return dest;
+    }
+
+    MULTI PMC *divide(Rational value, PMC* dest) {
+      #ifdef PARROT_HAS_GMP
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_div(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+    }
+
+    MULTI PMC *divide(DEFAULT value, PMC* dest) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, divide: Not implemented (yet).");
-        }
     }
 
 /*
@@ -910,24 +842,25 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE void i_divide(PMC *value) {
-MMD_Integer: {
-        rat_divide_integer(INTERP, SELF, (int) PMC_int_val(value), SELF);
-        }
-MMD_Float: {
-        rat_divide_float(INTERP, SELF, (double) PMC_num_val(value), SELF);
-        }
-MMD_Rational: {
+    MULTI void i_divide(Integer value) {
+        rat_divide_integer(INTERP, SELF, (int) VTABLE_get_integer(INTERP, value));
+    }
+
+    MULTI void i_divide(Float value) {
+        rat_divide_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value));
+    }
+
+    MULTI void i_divide(Rational value) {
       #ifdef PARROT_HAS_GMP
         mpq_div(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
       #endif
-        }
-MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+    }
+
+    MULTI void i_divide(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, i_divide: Not implemented (yet).");
-        }
     }
 
 /*
@@ -938,7 +871,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *divide_int(INTVAL value, PMC* dest) {
-        rat_divide_integer(INTERP, SELF, (int) value, dest);
+        dest = STATICSELF.clone();
+        rat_divide_integer(INTERP, dest, (int) value);
         return dest;
     }
 
@@ -950,7 +884,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_divide_int(INTVAL value) {
-        rat_divide_integer(INTERP, SELF, (int) value, SELF);
+        rat_divide_integer(INTERP, SELF, (int) value);
     }
 
 /*
@@ -961,7 +895,8 @@ MMD_DEFAULT: {
 
 */
     VTABLE PMC *divide_float(FLOATVAL value, PMC* dest) {
-        rat_divide_float(INTERP, SELF, (double) value, dest);
+        dest = STATICSELF.clone();
+        rat_divide_float(INTERP, dest, (double) value);
         return dest;
     }
 
@@ -973,7 +908,7 @@ MMD_DEFAULT: {
 
 */
     VTABLE void i_divide_float(FLOATVAL value) {
-        rat_divide_float(INTERP, SELF, (double) value, SELF);
+        rat_divide_float(INTERP, SELF, (double) value);
     }
 
 /*
@@ -985,10 +920,7 @@ MMD_DEFAULT: {
 */
     VTABLE PMC *neg(PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         mpq_neg(RT(dest), RT(SELF));
         return dest;
@@ -1021,10 +953,7 @@ MMD_DEFAULT: {
 */
     VTABLE PMC *absolute(PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         mpq_abs(RT(dest), RT(SELF));
         return dest;
@@ -1055,33 +984,34 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE INTVAL cmp(PMC *value) {
-MMD_Integer: {
+    MULTI INTVAL cmp(Integer value) {
       #ifdef PARROT_HAS_GMP
-        return (INTVAL) mpq_cmp_si(RT(SELF), PMC_int_val(value), 1);
+        return (INTVAL) mpq_cmp_si(RT(SELF), VTABLE_get_integer(INTERP, value), 1);
       #else
         RAISE_EXCEPTION
       #endif
-      }
-MMD_Float: {
+    }
+
+    MULTI INTVAL cmp(Float value) {
       #ifdef PARROT_HAS_GMP
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "This is going to get implemented soon.");
       #else
         RAISE_EXCEPTION
       #endif
-      }
-MMD_Rational: {
+    }
+
+    MULTI INTVAL cmp(Rational value) {
       #ifdef PARROT_HAS_GMP
         return (INTVAL) mpq_cmp(RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
       #endif
-      }
-MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+    }
+
+    MULTI INTVAL cmp(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "cmp not implemented (yet).");
-      }
     }
 
 /*
@@ -1091,38 +1021,40 @@ MMD_DEFAULT: {
 =cut
 
 */
-    VTABLE INTVAL is_equal(PMC *value) {
-MMD_Integer: {
+    MULTI INTVAL is_equal(Integer value) {
       #ifdef PARROT_HAS_GMP
         INTVAL eq = 0;
         mpq_t t;
         mpq_init(t);
-        mpq_set_ui(t, PMC_int_val(value), 1);
+        mpq_set_ui(t, VTABLE_get_integer(INTERP, value), 1);
 
-        eq = (INTVAL) mpq_equal(RT(SELF), RT(value));
+        eq = (INTVAL) mpq_equal(RT(SELF), t);
         mpq_clear(t);
 
         return eq;
       #else
         RAISE_EXCEPTION
       #endif
-      }
-MMD_Float: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
-            "Equality to floats can not be checked because of limited machine accuracy.\n"
-             "Approximate the rational and check whether the difference to a value is lower\n"
-             "than an epsilon.");
-      }
-MMD_Rational: {
+    }
+
+    MULTI INTVAL is_equal(Float value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Equality to floats can not be checked because of limited machine "
+            "accuracy.\nApproximate the rational and check whether the "
+            "difference to a value is lower\nthan an epsilon.");
+    }
+
+    MULTI INTVAL is_equal(Rational value) {
       #ifdef PARROT_HAS_GMP
         return (INTVAL) mpq_equal(RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
       #endif
-      }
-MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError, "is_equal not implemented (yet).");
-      }
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "is_equal not implemented (yet).");
     }
 }
 

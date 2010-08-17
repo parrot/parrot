@@ -1,3 +1,5 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
 # used by examples/shootout/random.pir and others
 # by Joshua Isom
 

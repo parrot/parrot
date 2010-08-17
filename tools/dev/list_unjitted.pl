@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 use warnings;
 use strict;
@@ -59,7 +59,7 @@ printf "%-13s%5d\n", ( 'Total ops:' , scalar keys %ops );
 
 tools/dev/list_unjitted.pl
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 For a given platform, report the number of ops JITted or not JITted.
 

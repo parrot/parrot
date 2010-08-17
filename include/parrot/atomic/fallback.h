@@ -1,5 +1,5 @@
 /* atomic/fallback.h
- *  Copyright (C) 2006, The Perl Foundation.
+ *  Copyright (C) 2006, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -71,9 +71,7 @@ typedef struct Parrot_atomic_integer {
     do { \
         LOCK((a).lock); \
         if ((a).val == (expect)) { \
-            void * orig = (a).val; \
             (a).val = (update); \
-            UNUSED(orig) \
             (result) = 1; \
         } \
         else { \
@@ -86,9 +84,7 @@ typedef struct Parrot_atomic_integer {
     do { \
         LOCK((a).lock); \
         if ((a).val == (expect)) { \
-            INTVAL orig = (a).val; \
             (a).val = (update); \
-            UNUSED(orig) \
             (result) = 1; \
         } \
         else { \

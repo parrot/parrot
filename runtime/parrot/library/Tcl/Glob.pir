@@ -1,10 +1,39 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 Tcl::Glob - Parse and compile glob notation expressions.
 
 =head1 DESCRIPTION
 
-A parser for Tcl-stype glob notation.
+A PGE-based parser for glob notation. See C<PGE::Glob> for a slightly
+different glob syntax.
+
+The following special characters are supported
+
+=over 4
+
+=item C<?>
+
+Matches any single character
+
+=item C<*>
+
+Matches any number of any characters, including no characters.
+
+=item C<[chars]>
+
+Matches any character in the given set. Sets are either a sequence of explicit
+characters, or a range specified with a dash, e.g. [aeiou] matches lower
+case ASCII vowels, while [a-z] matches any lowercase ASCII letter.
+
+=item C<\x>
+
+Match a literal character, e.g. \* matches the literal C<*>, avoiding its
+special meaning.
+
+=back
 
 =head2 Functions
 
@@ -23,7 +52,7 @@ or the resulting PIR code (target='PIR').
 
 =cut
 
-.namespace [ 'Tcl::Glob' ]
+.namespace [ 'Tcl';'Glob' ]
 
 .sub 'compile_glob'
     .param pmc source
@@ -52,21 +81,21 @@ or the resulting PIR code (target='PIR').
 
   analyze:
     .local pmc exp, pad
-    exp = new 'PGE::Exp::Concat'
+    exp = new ['PGE';'Exp';'Concat']
     $I0 = 1
-    $P0 = new 'PGE::Exp::Anchor'
-    $P0.'result_object'('^')
+    $P0 = new ['PGE';'Exp';'Anchor']
+    $P0.'!make'('^')
     exp[0] = $P0
     if null match goto analyze_1
     $P0 = match['expr']
     exp[$I0] = $P0
     inc $I0
   analyze_1:
-    $P0 = new 'PGE::Exp::Anchor'
-    $P0.'result_object'('$')
+    $P0 = new ['PGE';'Exp';'Anchor']
+    $P0.'!make'('$')
     exp[$I0] = $P0
 
-    .return exp.'compile'(adverbs :flat :named)
+    .tailcall exp.'compile'(adverbs :flat :named)
 .end
 
 
@@ -76,7 +105,7 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PGE.pbc'
 
     $P0 = compreg 'Tcl::Glob'
-    .return $P0.'command_line'(args)
+    .tailcall $P0.'command_line'(args)
 .end
 
 
@@ -85,28 +114,28 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PGE.pbc'
     load_bytecode 'PCT/HLLCompiler.pbc'
 
-    optable = new 'PGE::OPTable'
-    store_global '$optable', optable
+    optable = new ['PGE';'OPTable']
+    set_global '$optable', optable
 
-    $P0 = find_global 'glob_literal'
-    optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_literal'
+    optable.'newtok'('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_quest'
-    optable.newtok('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_quest'
+    optable.'newtok'('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_star'
-    optable.newtok('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_star'
+    optable.'newtok'('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_enum'
-    optable.newtok('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_enum'
+    optable.'newtok'('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+    optable.'newtok'('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
-    $P2 = newclass [ 'Tcl::Glob::Compiler' ]
+    $P2 = newclass [ 'Tcl';'Glob';'Compiler' ]
     addattribute $P2, '$!compsub'
 
     $P0 = get_global 'compile_glob'
-    $P1 = new [ 'Tcl::Glob::Compiler' ]
+    $P1 = new [ 'Tcl';'Glob';'Compiler' ]
     $P1.'register'('Tcl::Glob', $P0)
 
     .return ()
@@ -127,7 +156,7 @@ parse C<PGE::Match> object.
     .param pmc adverbs         :slurpy :named
 
     .local pmc optable, match
-    optable = find_global 'Tcl::Glob', '$optable'
+    optable = get_global '$optable'
     match = optable.'parse'(mob)
     .return (match)
 .end
@@ -162,7 +191,7 @@ parse C<PGE::Match> object.
 =item C<glob_literal(PMC mob, PMC adverbs)>
 
 Scan a literal from a string, stopping at any metacharacters such
-as C<*> or C<[>.  Return the matched portion, with the C<result_object>
+as C<*> or C<[>.  Return the matched portion, with the I<ast object>
 set to the decoded literal.
 
 =cut
@@ -177,7 +206,7 @@ set to the decoded literal.
     ($S0, $I0) = 'scan_literal'(target, pos, '*?[')
     if $I0 <= pos goto end
     mob.'to'($I0)
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
   end:
     .return (mob)
 .end
@@ -197,7 +226,7 @@ return a CCShortcut that is set to '.'
     ##   The '?' is already in mob['KEY'], so we don't need to find it here.
     (mob, pos) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     mob.'to'(pos)
-    mob.'result_object'('.')
+    mob.'!make'('.')
     .return (mob)
 .end
 
@@ -221,7 +250,7 @@ bit more complex, as we have to return a quantified '.'.
     mob['max'] = GLOB_INF
     ($P0, $I0) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     $P0.'to'($I0)
-    $P0.'result_object'('.')
+    $P0.'!make'('.')
     mob[0] = $P0
     .return (mob)
 .end
@@ -277,7 +306,7 @@ Parse an enumerated character list, such as [abcd],
   scan_end:
     inc pos
     mob.'to'(pos)
-    mob.'result_object'(charlist)
+    mob.'!make'(charlist)
     .return (mob)
 
   err_noclose:
@@ -302,7 +331,7 @@ Parse an enumerated character list, such as [abcd],
     lastpos = length target
 
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
     mob.'to'(pos)
   alt_loop:
     if pos >= lastpos goto err_noclose
@@ -316,7 +345,7 @@ Parse an enumerated character list, such as [abcd],
     $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
     $P0.'to'(pos)
-    $P0.'result_object'($S0)
+    $P0.'!make'($S0)
     mob[1] = $P0
     goto alt_loop
   end:
@@ -325,11 +354,11 @@ Parse an enumerated character list, such as [abcd],
     .return (mob)
 
   err_noclose:
-    mob.to(-1)
+    mob.'to'(-1)
     .return (mob)
 .end
 
-.namespace [ 'Tcl::Glob::Compiler' ]
+.namespace [ 'Tcl';'Glob';'Compiler' ]
 
 =item register(string name, pmc compsub)
 
@@ -363,7 +392,7 @@ Compile C<source> (possibly modified by any provided options).
     #   $!compsub is deprecated
     compsub = getattribute self, '$!compsub'
 
-    .return compsub(source, adverbs :flat :named)
+    .tailcall compsub(source, adverbs :flat :named)
 .end
 
 =back
@@ -372,6 +401,9 @@ Compile C<source> (possibly modified by any provided options).
 
 This is basically a cut and paste of PGE::Glob. There should probably be
 much less code duplication here.
+
+While originally implemented based on Tcl's C<[string match]> globbing
+syntax, this code is useful enough to be part of parrot's core.
 
 =head1 AUTHOR
 

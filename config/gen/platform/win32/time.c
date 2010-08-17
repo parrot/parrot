@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
+ * Copyright (C) 2004-2006, Parrot Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ config\gen\platform\win32\time.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Provides access to system time functions for Win32 platforms.
 
 =head2 Functions
 
@@ -27,7 +27,7 @@ RT#48264
 
 =item C<INTVAL Parrot_intval_time(void)>
 
-RT#48260: Not yet documented!!!
+Returns the current time as an INTVAL
 
 =cut
 
@@ -37,10 +37,10 @@ INTVAL
 Parrot_intval_time(void)
 {
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-#  if INTVAL_SIZE <= 4
-    return _time32(NULL);
+#  ifdef _WIN64
+    return (INTVAL)_time64(NULL);
 #  else
-    return _time64(NULL);
+    return _time32(NULL);
 #  endif
 #else
     return time(NULL);
@@ -51,7 +51,7 @@ Parrot_intval_time(void)
 
 =item C<FLOATVAL Parrot_floatval_time(void)>
 
-RT#48260: Not yet documented!!!
+Returns the current time as a FLOATVAL.
 
 =cut
 
@@ -61,7 +61,8 @@ FLOATVAL
 Parrot_floatval_time(void)
 {
     SYSTEMTIME sysTime;
-    FILETIME fileTime;          /* 100ns == 1 */
+    /* 100 ns ticks since 1601-01-01 00:00:00 */
+    FILETIME fileTime;
     LARGE_INTEGER i;
 
     GetSystemTime(&sysTime);
@@ -69,7 +70,12 @@ Parrot_floatval_time(void)
     /* Documented as the way to get a 64 bit from a FILETIME. */
     memcpy(&i, &fileTime, sizeof (LARGE_INTEGER));
 
-    return (FLOATVAL)i.QuadPart / 10000000.0;   /*1e7 */
+    /* FILETIME uses 100ns steps since 1601-01-01 00:00:00 as epoch.
+     * We'd like 1 second steps since 1970-01-01 00:00:00.
+     * To get there, divide by 10,000,000 to get from 100ns steps to seconds.
+     * Then subtract the seconds between 1601 and 1970, i.e. 11,644,473,600.
+     */
+    return (FLOATVAL)i.QuadPart / 10000000.0 - 11644473600.0;
 }
 
 
@@ -77,7 +83,7 @@ Parrot_floatval_time(void)
 
 =item C<void Parrot_sleep(unsigned int seconds)>
 
-RT#48260: Not yet documented!!!
+Sleeps for C<seconds> seconds.
 
 =cut
 
@@ -91,14 +97,32 @@ Parrot_sleep(unsigned int seconds)
 
 /*
 
-=item C<struct tm * Parrot_gmtime_r(const time_t *t, struct tm *tm)>
+=item C<void Parrot_usleep(unsigned int microseconds)>
 
-RT#48260: Not yet documented!!!
+Sleep for at least the specified number of microseconds (millionths of a
+second).
 
 =cut
 
 */
 
+void
+Parrot_usleep(unsigned int microseconds)
+{
+    Sleep(microseconds / 1000);
+}
+
+/*
+
+=item C<struct tm * Parrot_gmtime_r(const time_t *t, struct tm *tm)>
+
+Returns a C<time_t> structure for the current Greenwich Mean Time.
+
+=cut
+
+*/
+
+PARROT_EXPORT
 struct tm *
 Parrot_gmtime_r(const time_t *t, struct tm *tm)
 {
@@ -110,12 +134,13 @@ Parrot_gmtime_r(const time_t *t, struct tm *tm)
 
 =item C<struct tm * Parrot_localtime_r(const time_t *t, struct tm *tm)>
 
-RT#48260: Not yet documented!!!
+Returns a C<time_t> struct for the current local time.
 
 =cut
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_localtime_r(const time_t *t, struct tm *tm)
 {
@@ -127,12 +152,14 @@ Parrot_localtime_r(const time_t *t, struct tm *tm)
 
 =item C<char* Parrot_asctime_r(const struct tm *tm, char *buffer)>
 
-RT#48260: Not yet documented!!!
+Returns an ASCII representation of the C<struct tm>. Puts it in the
+character array C<buffer>.
 
 =cut
 
 */
 
+PARROT_EXPORT
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {

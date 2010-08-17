@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004 - 2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -23,10 +23,14 @@ from there.
 
 */
 
-#include "parrot/parrot.h"
+#include "pmc/pmc_object.h"
 #define UNDEF_STRING_CLASS enum_class_String
 
-pmclass Undef extends default no_ro {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Undef no_ro {
 
 /*
 
@@ -40,8 +44,34 @@ appropriate type.
 */
 
     VTABLE void set_pmc(PMC *other) {
-        VTABLE_morph(INTERP, SELF, enum_class_Ref);
-        VTABLE_set_pmc(INTERP, SELF, other);
+        if (!PObj_is_object_TEST(other)) {
+            Parrot_pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
+            VTABLE_set_pmc(INTERP, SELF, other);
+        }
+        else {
+            PMC * const class_  = PARROT_OBJECT(other)->_class;
+            PMC        *clone   = VTABLE_clone(INTERP, other);
+            void       *attrs   = PMC_data(clone);
+            PMC        *meta    = PMC_metadata(clone);
+
+            /* now swap memory without leaking it */
+            PMC_data(clone)     = PMC_data(SELF);
+            PMC_data(SELF)      = attrs;
+            SELF->vtable        = clone->vtable;
+
+            /* Restore metadata. */
+            if (!PMC_IS_NULL(meta)) {
+                PMC * const iter = VTABLE_get_iter(INTERP, meta);
+                while (VTABLE_get_bool(INTERP, iter)) {
+                    STRING * const key = VTABLE_shift_string(INTERP, iter);
+                    PMC * const value  = VTABLE_get_pmc_keyed_str(INTERP, meta, key);
+                    VTABLE_setprop(INTERP, SELF, key, value);
+                }
+            }
+            PMC_data(clone) = NULL;
+
+            PObj_is_object_SET(SELF);
+        }
     }
 
 /*
@@ -56,9 +86,6 @@ appropriate type.
 */
 
     VTABLE void assign_pmc(PMC *other) {
-        if (!PObj_is_object_TEST(other))
-            VTABLE_morph(INTERP, SELF, other->vtable->base_type);
-
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
             VTABLE_set_pmc(INTERP, SELF, other);
@@ -104,7 +131,7 @@ Morphs the current PMC to an C<Integer> and sets the value from C<value>.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        VTABLE_morph(INTERP, SELF, enum_class_Integer);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
         VTABLE_set_integer_native(INTERP, SELF, value);
     }
 
@@ -133,7 +160,7 @@ Morphs the current PMC to a C<Float> and sets the value from C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        VTABLE_morph(INTERP, SELF, enum_class_Float);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
         VTABLE_set_number_native(INTERP, SELF, value);
     }
 
@@ -148,7 +175,10 @@ Returns an empty string.
 */
 
     VTABLE STRING *get_string() {
-        return string_make_empty(INTERP, enum_stringrep_one, 0);
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Stringifying an Undef PMC");
+
+        return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
     }
 
 /*
@@ -162,7 +192,7 @@ Morphs the current PMC to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        VTABLE_morph(INTERP, SELF, UNDEF_STRING_CLASS);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
         VTABLE_set_string_native(INTERP, SELF, value);
     }
 
@@ -178,6 +208,22 @@ Returns 0.
 
     VTABLE INTVAL get_bool() {
         return 0;
+    }
+
+/*
+
+=item C<INTVAL logical_not()>
+
+Returns 1.
+
+=cut
+
+*/
+
+    VTABLE PMC *logical_not(PMC *dest) {
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        VTABLE_set_bool(INTERP, dest, 1);
+        return dest;
     }
 
 /*
@@ -222,7 +268,7 @@ Clones the current Undef PMC.
 */
 
     VTABLE PMC *clone() {
-        return pmc_new(INTERP, SELF->vtable->base_type);
+        return Parrot_pmc_new(INTERP, SELF->vtable->base_type);
     }
 
 /*
@@ -235,13 +281,12 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
-        MMD_Undef: {
-            return 1;
-        }
-        MMD_DEFAULT: {
-            return 0;
-        }
+    MULTI INTVAL is_equal(Undef value) {
+        return 1;
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return 0;
     }
 }
 

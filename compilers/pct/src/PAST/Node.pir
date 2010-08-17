@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 PAST - Parrot abstract syntax tree
@@ -9,7 +11,7 @@ for compiling programs in Parrot.
 
 =cut
 
-.namespace [ 'PAST::Node' ]
+.namespace [ 'PAST';'Node' ]
 
 .sub 'onload' :anon :load :init
     ##   create the PAST::Node base class
@@ -22,6 +24,7 @@ for compiling programs in Parrot.
     p6meta.'new_class'('PAST::Val', 'parent'=>base)
     p6meta.'new_class'('PAST::Var', 'parent'=>base)
     p6meta.'new_class'('PAST::Block', 'parent'=>base)
+    p6meta.'new_class'('PAST::Control', 'parent'=>base)
     p6meta.'new_class'('PAST::VarList', 'parent'=>base)
 
     .return ()
@@ -57,7 +60,7 @@ Accessor method -- sets/returns the return type for the invocant.
 .sub 'returns' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('returns', value, has_value)
+    .tailcall self.'attr'('returns', value, has_value)
 .end
 
 
@@ -71,7 +74,7 @@ for the node.
 .sub 'arity' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('arity', value, has_value)
+    .tailcall self.'attr'('arity', value, has_value)
 .end
 
 
@@ -85,7 +88,7 @@ associated with the argument.
 .sub 'named' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('named', value, has_value)
+    .tailcall self.'attr'('named', value, has_value)
 .end
 
 
@@ -98,7 +101,27 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
 .sub 'flat' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('flat', value, has_value)
+    .tailcall self.'attr'('flat', value, has_value)
+.end
+
+.sub 'handlers' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handlers', value, has_value)
+.end
+
+
+=item lvalue([flag])
+
+Get/set the C<lvalue> attribute, which indicates whether this
+variable is being used in an lvalue context.
+
+=cut
+
+.sub 'lvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 
@@ -118,12 +141,28 @@ Get/set the constant value for this node.
 
 =cut
 
-.namespace [ 'PAST::Val' ]
+.namespace [ 'PAST';'Val' ]
 
 .sub 'value' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('value', value, has_value)
+    .tailcall self.'attr'('value', value, has_value)
+.end
+
+=item lvalue([value])
+
+Throw an exception if we try to make a PAST::Val into an lvalue.
+
+=cut
+
+.sub 'lvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    unless has_value goto normal
+    unless value goto normal
+    die "Unable to set lvalue on PAST::Val node"
+  normal:
+    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 =back
@@ -140,17 +179,18 @@ C<name> attribute.
 
 Get/set the PAST::Var node's "scope" (i.e., how the variable
 is accessed or set).  Allowable values include "package", "lexical",
-"parameter", and "keyed", representing HLL global, lexical, block
-parameter, and array/hash variables respectively.
+"parameter", "keyed", "attribute" and "register", representing
+HLL global, lexical, block parameter, array/hash variables, object
+members and (optionally named) Parrot registers respectively.
 
 =cut
 
-.namespace [ 'PAST::Var' ]
+.namespace [ 'PAST';'Var' ]
 
 .sub 'scope' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('scope', value, has_value)
+    .tailcall self.'attr'('scope', value, has_value)
 .end
 
 
@@ -166,21 +206,7 @@ Otherwise, the node refers to a lexical variable from an outer scope.
 .sub 'isdecl' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('isdecl', value, has_value)
-.end
-
-
-=item lvalue([flag])
-
-Get/set the C<lvalue> attribute, which indicates whether this
-variable is being used in an lvalue context.
-
-=cut
-
-.sub 'lvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('lvalue', value, has_value)
+    .tailcall self.'attr'('isdecl', value, has_value)
 .end
 
 
@@ -195,7 +221,7 @@ of 'package'.
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
 .end
 
 
@@ -211,7 +237,23 @@ passed in).
 .sub 'slurpy' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('slurpy', value, has_value)
+    .tailcall self.'attr'('slurpy', value, has_value)
+.end
+
+
+=item call_sig([flag])
+
+Get/set the node's C<call_sig> attribute (for parameter variables) to C<flag>.
+A true value of C<call_sig> indicates that the parameter variable given by this
+node is to be created as a C<:call_sig> parameter. If you use this, it should be
+the only parameter.
+
+=cut
+
+.sub 'call_sig' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('call_sig', value, has_value)
 .end
 
 
@@ -226,7 +268,7 @@ implementation) a PAST tree to create the value.
 .sub 'viviself' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('viviself', value, has_value)
+    .tailcall self.'attr'('viviself', value, has_value)
 .end
 
 
@@ -241,7 +283,19 @@ attribute.
 .sub 'vivibase' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('vivibase', value, has_value)
+    .tailcall self.'attr'('vivibase', value, has_value)
+.end
+
+=item multitype([type])
+
+Get/set MMD type of Var when used as parameter of Block.
+
+=cut
+
+.sub 'multitype' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('multitype', value, has_value)
 .end
 
 
@@ -319,12 +373,12 @@ assumes "call".
 
 =cut
 
-.namespace [ 'PAST::Op' ]
+.namespace [ 'PAST';'Op' ]
 
 .sub 'pasttype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pasttype', value, has_value)
+    .tailcall self.'attr'('pasttype', value, has_value)
 .end
 
 
@@ -343,7 +397,7 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
 .sub 'pirop' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirop', value, has_value)
+    .tailcall self.'attr'('pirop', value, has_value)
 .end
 
 
@@ -351,14 +405,6 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
 
 Get/set whether this node is an lvalue, or treats its first
 child as an lvalue (e.g., for assignment).
-
-=cut
-
-.sub 'lvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('lvalue', value, has_value)
-.end
 
 =item inline([STRING code])
 
@@ -387,7 +433,7 @@ given by "%r", "%t", or "%u" in the C<code> string:
 .sub 'inline' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('inline', value, has_value)
+    .tailcall self.'attr'('inline', value, has_value)
 .end
 
 
@@ -404,7 +450,7 @@ to traits in the grammar.
     .param pmc hash
 
     $P0 = split ' ', "pasttype pirop inline lvalue"
-    $P1 = new 'Iterator', $P0
+    $P1 = iter $P0
   iter_loop:
     unless $P1 goto iter_end
     $S0 = shift $P1
@@ -439,7 +485,7 @@ generated for the block.
 =item blocktype([STRING type])
 
 Get/set the type of the block.  The currently understood values
-are 'declaration' and 'immediate'.  'Declaration' indicates
+are 'declaration', 'immediate', and 'method'.  'Declaration' indicates
 that a block is simply being defined at this point, while
 'immediate' indicates a block that is to be immediately
 executed when it is evaluated in the AST (e.g., the immediate
@@ -447,12 +493,27 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 
 =cut
 
-.namespace [ 'PAST::Block' ]
+.namespace [ 'PAST';'Block' ]
 
 .sub 'blocktype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('blocktype', value, has_value)
+    .tailcall self.'attr'('blocktype', value, has_value)
+.end
+
+
+=item closure([value])
+
+Get/set the closure flag for the block to C<value>.  If set,
+any block reference returned by the node is to a clone of the
+block that has captured the current lexical context.
+
+=cut
+
+.sub 'closure' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('closure', value, has_value)
 .end
 
 
@@ -460,14 +521,43 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 
 Get/set the control exception handler for this block to C<value>.
 The exception handler can be any PAST tree.  The special (string)
-value "return" generates code to handle C<CONTROL_RETURN> exceptions.
+value "return_pir" generates code to handle C<CONTROL_RETURN> exceptions.
 
 =cut
 
 .sub 'control' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('control', value, has_value)
+    .tailcall self.'attr'('control', value, has_value)
+.end
+
+
+=item loadinit([past])
+
+Get/set the "load initializer" for this block to C<past>.
+The load initializer is a set of operations to be performed
+as soon as the block is compiled/loaded.  For convenience,
+requests to C<loadinit> autovivify an empty C<PAST::Stmts>
+node if one does not already exist.
+
+Within the load initializer, the C<block> PMC register is
+automatically initialized to refer to the block itself
+(to enable attaching properties, adding the block as a method,
+storing in a symbol table, etc.).
+
+=cut
+
+.sub 'loadinit' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    if has_value goto getset_value
+    $I0 = exists self['loadinit']
+    if $I0 goto getset_value
+    $P0 = get_hll_global ['PAST'], 'Stmts'
+    value = $P0.'new'()
+    has_value = 1
+  getset_value:
+    .tailcall self.'attr'('loadinit', value, has_value)
 .end
 
 
@@ -481,11 +571,50 @@ can be either a string or an array of strings.
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
+.end
+
+=item multi([multi])
+
+Get/set the multi signature for this block.  The C<multi> argument
+can be either a string or an array of strings.
+
+=cut
+
+.sub 'multi' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('multi', value, has_value)
 .end
 
 
-=item symbol(name, [attr1 => val1, attr2 => val2, ...])
+=item hll([hll])
+
+Get/set the C<hll> for this block.
+
+=cut
+
+.sub 'hll' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('hll', value, has_value)
+.end
+
+
+=item nsentry([nsentry])
+
+Get/set the C<nsentry> for this block.
+
+=cut
+
+.sub 'nsentry' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('nsentry', value, has_value)
+.end
+
+
+=item symbol(name [, attr1 => val1, attr2 => val2, ...])
 
 If called with named arguments, sets the symbol hash corresponding
 to C<name> in the current block.  The HLL is free to select
@@ -507,14 +636,24 @@ attribute hash for symbol C<name>.
     symtable = new 'Hash'
     self['symtable'] = symtable
   have_symtable:
-    if attr goto set_symbol
-  get_symbol:
-    $P0 = symtable[name]
-    if null $P0 goto end
-    .return ($P0)
-  set_symbol:
+    .local pmc symbol
+    symbol = symtable[name]
+    if null symbol goto symbol_empty
+    unless attr goto attr_done
+    .local pmc it
+    it = iter attr
+  attr_loop:
+    unless it goto attr_done
+    $S0 = shift it
+    $P0 = attr[$S0]
+    symbol[$S0] = $P0
+    goto attr_loop
+  attr_done:
+    .return (symbol)
+  symbol_empty:
+    unless attr goto symbol_done
     symtable[name] = attr
-  end:
+  symbol_done:
     .return (attr)
 .end
 
@@ -533,7 +672,7 @@ to rely on this behavior in the future.
 
 .sub 'symbol_defaults' :method
     .param pmc attr            :slurpy :named
-    .return self.'symbol'('', attr :flat :named)
+    .tailcall self.'symbol'('', attr :flat :named)
 .end
 
 
@@ -547,23 +686,21 @@ favor of the C<symbol> method above.
 .sub 'symtable' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('symtable', value, has_value)
+    .tailcall self.'attr'('symtable', value, has_value)
 .end
 
 
 =item lexical([flag])
 
-Get/set whether the block is a lexical block.  A block
-with this attribute set to false is not lexically scoped
-inside of its parent, and will not act as an outer lexical
-scope for any nested blocks within it.
+Get/set whether the block is lexically nested within
+the block that contains it.
 
 =cut
 
 .sub 'lexical' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lexical', value, has_value, 1)
+    .tailcall self.'attr'('lexical', value, has_value, 1)
 .end
 
 
@@ -578,7 +715,7 @@ PAST compiler.
 .sub 'compiler' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('compiler', value, has_value)
+    .tailcall self.'attr'('compiler', value, has_value)
 .end
 
 =item compiler_args()
@@ -593,8 +730,39 @@ not set.
     .param pmc value           :named :slurpy
     .local int have_value
     have_value = elements value
-    .return self.'attr'('compiler_args', value, have_value)
+    .tailcall self.'attr'('compiler_args', value, have_value)
 .end
+
+=item subid([subid])
+
+If C<subid> is provided, then sets the subid for this block.
+Returns the current subid for the block, generating a unique
+subid for the block if one does not already exist.
+
+=cut
+
+.sub 'subid' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    if has_value goto getset_value
+    $I0 = exists self['subid']
+    if $I0 goto getset_value
+    value = self.'unique'()
+    .local pmc suffix
+    suffix = get_global '$!subid_suffix'
+    unless null suffix goto have_suffix
+    $N0 = time
+    $S0 = $N0
+    $S0 = concat '_', $S0
+    suffix = box $S0
+    set_global '$!subid_suffix', suffix
+  have_suffix:
+    value .= suffix
+    has_value = 1
+  getset_value:
+    .tailcall self.'attr'('subid', value, has_value)
+.end
+
 
 =item pirflags([pirflags])
 
@@ -605,16 +773,31 @@ Get/set any pirflags for this block.
 .sub 'pirflags' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirflags', value, has_value)
+    .tailcall self.'attr'('pirflags', value, has_value)
 .end
 
 
-.namespace [ 'PAST::VarList' ]
+.namespace [ 'PAST';'Control' ]
+
+.sub 'handle_types' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types', value, has_value)
+.end
+
+.sub 'handle_types_except' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types_except', value, has_value)
+.end
+
+
+.namespace [ 'PAST';'VarList' ]
 
 .sub 'bindvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('bindvalue', value, has_value)
+    .tailcall self.'attr'('bindvalue', value, has_value)
 .end
 
 
@@ -633,7 +816,7 @@ Perl 6 compilers mailing lists.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, The Perl Foundation.
+Copyright (C) 2006-2008, Parrot Foundation.
 
 =cut
 

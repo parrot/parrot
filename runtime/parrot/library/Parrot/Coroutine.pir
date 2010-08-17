@@ -9,7 +9,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 =head1 SYNOPSIS
 
     .sub onload :load
-        load_bytecode 'Parrot/Coroutine.pir'
+        load_bytecode 'Parrot/Coroutine.pbc'
     .end
 
     ## Recursive coroutine to enumerate tree elements.  Each element that is
@@ -58,8 +58,8 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 
         .local int coro_class, idx
         .local pmc coro
-        .const .Sub coro_sub = "enumerate_tree"
-        coro = new 'Parrot::Coroutine', coro_sub
+        .const 'Sub' coro_sub = "enumerate_tree"
+        coro = new ['Parrot'; 'Coroutine'], coro_sub
         ($P0 :optional, $I0 :opt_flag) = coro.'resume'(coro, tree)
         idx = 0
 
@@ -83,9 +83,9 @@ in pure PIR using continuations.
 =cut
 
 .sub onload_create_class :load
-    $P0 = get_class "Parrot::Coroutine"
+    $P0 = get_class ['Parrot'; 'Coroutine']
     unless null $P0 goto END
-    $P0 = newclass "Parrot::Coroutine"
+    $P0 = newclass ['Parrot'; 'Coroutine']
     addattribute $P0, "state"       ## State:  1 is new/valid, 0 is dead.
     addattribute $P0, "initial_sub" ## Initial sub.
     addattribute $P0, "yield_cont"  ## Continuation to for yielding.
@@ -94,7 +94,7 @@ END:
     .return ()
 .end
 
-.namespace ["Parrot::Coroutine"]
+.namespace ['Parrot'; 'Coroutine']
 
 .include "interpinfo.pasm"
 
@@ -105,8 +105,8 @@ END:
 This method is normally called via the C<new> op:
 
     .local pmc coro
-    .const .Sub coro_sub = "enumerate_tree"
-    coro_class = get_class 'Parrot::Coroutine'
+    .const 'Sub' coro_sub = "enumerate_tree"
+    coro_class = get_class ['Parrot'; 'Coroutine']
     coro = coro_class.'new'('initial_sub' => coro_sub)
 
 Given a sub, it initializes a new C<Parrot::Coroutine> object.
@@ -125,8 +125,7 @@ Given a sub, it initializes a new C<Parrot::Coroutine> object.
 
 ## [it would be nice to include a pointer value.  -- rgr, 8-Oct-06.]
 .sub get_string :vtable :method
-    $S0 = '<Parrot::Coroutine ?>'
-    .return ($S0)
+    .return ('<Parrot::Coroutine ?>')
 .end
 
 =head3 B<coro.resume(args...)>
@@ -176,13 +175,13 @@ doit:
     ## changed magically behind our backs by a subsequent yield/resume, so
     ## we can't just return directly.
     cc = getattribute self, 'yield_cont'
-    .return cc(result :flat)
+    .tailcall cc(result :flat)
 
 dead:
     ## Complain about attempted zombie creation.
     .local pmc error
     error = new 'Exception'
-    error['_message'] = "Can't reanimate a dead coroutine.\n"
+    error = "Can't reanimate a dead coroutine.\n"
     throw error
 .end
 
@@ -207,7 +206,7 @@ passed to C<resume> are returned as the values from C<yield>.
 
     ## Return to the coro caller.
     cc = getattribute self, 'yield_cont'
-    .return cc(args :flat)
+    .tailcall cc(args :flat)
 .end
 
 =head1 BUGS
@@ -223,7 +222,7 @@ to 'yielded' ..., except that one might at any time transition to
 
 =back
 
-Please report any others you find to C<E<lt>parrot-porters@perl.orgE<gt>>.
+Please report any others you find to C<E<lt>parrot-dev@lists.parrot.orgE<gt>>.
 
 =head1 SEE ALSO
 
@@ -247,7 +246,7 @@ Bob Rogers C<E<lt>rogers-perl6@rgrjr.dyndns.orgE<gt>>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, The Perl Foundation.
+Copyright (C) 2006-2008, Parrot Foundation.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 

@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -59,11 +59,13 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .const int TESTS = 308
 
+#.loadlib 'sys_ops'
+#.loadlib 'io_ops'
+
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
+    load_bytecode 'Test/Builder.pbc'
     .include "iglobals.pasm"
+    .include "sysinfo.pasm"
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.
@@ -86,7 +88,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 
     .local pmc file_iterator # iterate over list of files..
-               file_iterator = new 'Iterator', test_files
+               file_iterator = iter test_files
 
     .local int test_number   # the number of the test we're running
                test_number = 0
@@ -100,14 +102,13 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local string data        # the data to format with the template
     .local string expected    # expected result of this test
     .local string description # user-facing description of the test
+    .local int    skip_it     # skip this test on this platform?
     .local string actual      # actual result of the test
 
     todo_tests = 'set_todo_info'()
     skip_tests = 'set_skip_info'()
 
     # how many tests to run?
-    # XXX: this should be summed automatically from test_files data
-    #      until then, it's set to no plan
     test.'plan'(TESTS)
 
   outer_loop:
@@ -123,7 +124,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     # Open the test file
     .local pmc file_handle   # currently open file
-               file_handle = open test_file, '<'
+               file_handle = new ['FileHandle']
+               file_handle.'open'(test_file, 'r')
 
     unless file_handle goto bad_file
 
@@ -134,7 +136,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $I0 = file_handle.'eof'()
     if $I0 goto end_loop
 
-    test_line = readline file_handle
+    test_line = file_handle.'readline'()
 
     # skip lines without tabs, and comment lines
     $I0 = index test_line, "\t"
@@ -146,7 +148,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   parse_data:
     push_eh eh_bad_line
-    ( template, data, expected, description ) = parse_data( test_line )
+    ( template, data, expected, description, skip_it ) = parse_data( test_line )
     pop_eh
 
     # prepend test filename and line number to description
@@ -156,7 +158,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
     data_hash = new 'Hash'
     data_hash["''"] = ''
     data_hash['2**32-1'] = 0xffffffff
-    $N0 = pow 2, 38
+    $N0 = data_hash['2**32-1']
+    inc $N0
     data_hash['2**38'] = $N0
     data_hash["'string'"] = 'string'
 
@@ -169,12 +172,16 @@ tag C<all> is allowed for todo tests that should fail on any system.
 #    expected = backslash_escape (expected)
 
     # Should this test be skipped?
+    $S0  = description
+    $S0 .= ' (skipped on this platform)'
+    if skip_it goto must_skip
     $I0 = exists skip_tests[test_name]
     unless $I0 goto not_skip
     $P0 = skip_tests[test_name]
     $I0 = exists $P0[local_test_number]
     unless $I0 goto not_skip
     $S0 = $P0[local_test_number]
+  must_skip:
     test.'skip'(1, $S0)
     goto loop
 
@@ -192,13 +199,16 @@ tag C<all> is allowed for todo tests that should fail on any system.
     description .= ' actual: >'
     description .= actual
     description .= '<'
+    description .= ' expected: >'
+    description .= expected
+    description .= '<'
     goto is_nok
 
     # remove /'s
     $S0 = substr expected, 0, 1
     if $S0 != "/" goto eh_bad_line
-    substr expected, 0, 1, ''
-    substr expected, -1, 1, ''
+    expected = replace expected, 0, 1, ''
+    expected = replace expected, -1, 1, ''
 
     $I0 = index $S1, expected
     if $I0 == -1 goto is_nok
@@ -223,7 +233,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     goto loop
   end_loop:
-    close file_handle
+    file_handle.'close'()
     goto outer_loop
   end_outer_loop:
 
@@ -238,7 +248,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
   eh_sprintf:
     .local pmc exception
     .local string message
-    get_results '0,0', exception, message
+    get_results '0', exception
+    message = exception
     $I0 = index message, 'is not a valid sprintf format'
     if $I0 == -1 goto other_error
     $I0 = index expected, ' INVALID'
@@ -274,10 +285,12 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     .local pmc todo_info
                todo_info = new 'Hash'
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
 
     .local string test_file
 
-    bsr reset_todo_info
+    local_branch jmpstack,  reset_todo_info
     test_file = 'sprintf_tests'
     # TODOs
     todo_info[64] = 'undecided perl5 vs. posix behavior'
@@ -296,7 +309,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   reset_todo_info:
     todo_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_todo_loop:
     if $I0 > $I1 goto end_loop
@@ -304,7 +317,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $I0 += 1
     goto set_todo_loop
   end_loop:
-    ret
+    local_return jmpstack
 .end
 
 
@@ -315,10 +328,12 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     .local pmc skip_info
                skip_info = new 'Hash'
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
 
     .local string test_file
 
-    bsr reset_skip_info
+    local_branch jmpstack,  reset_skip_info
     test_file = 'sprintf_tests'
     skip_info[5] = 'parrot extension (%B)'
     skip_info[7] = 'perl5-specific extension (%D)'
@@ -333,7 +348,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $S0 = 'perl5-specific extension (%v...)'
     $I0 = 71
     $I1 = 99
-    bsr set_skip_loop
+    local_branch jmpstack,  set_skip_loop
 
     skip_info[114] = 'harness needs support for * modifier'
     skip_info[144] = 'perl5 expresssion as test value'
@@ -351,16 +366,17 @@ tag C<all> is allowed for todo tests that should fail on any system.
     skip_info[233] = 'harness needs support for * modifier'
     skip_info[234] = 'perl5-specific extension (%v...)'
     skip_info[235] = 'perl5-specific extension (%v...)'
+    skip_info[300] = 'harness needs support for * modifier'
 
     $S0 = 'perl5-specific test'
     $I0 = 238
     $I1 = 251
-    bsr set_skip_loop
+    local_branch jmpstack,  set_skip_loop
 
     $S0 = 'perl5-specific extension (%v...)'
     $I0 = 252
     $I1 = 298
-    bsr set_skip_loop
+    local_branch jmpstack,  set_skip_loop
 
     skip_info[307] = 'perl5-specific extension (%v...)'
     skip_info[308] = 'perl5-specific extension (%v...)'
@@ -371,7 +387,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   reset_skip_info:
     skip_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_skip_loop:
     if $I0 > $I1 goto end_loop
@@ -383,7 +399,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     goto set_skip_loop
   end_loop:
     $S0 = ''
-    ret
+    local_return jmpstack
 .end
 
 
@@ -394,11 +410,13 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local string data        # the data to format with the template
     .local string expected    # expected result of this test
     .local string description # user-facing description of the test
+    .local int    skip_it     # skip this test on this platform
+                  skip_it = 0
 
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    chopn record, 1
+    record = chopn record, 1
     $P1 = split "\t", record
     $I0 = elements $P1 # length of array
     .local int tab_number
@@ -426,12 +444,14 @@ tag C<all> is allowed for todo tests that should fail on any system.
     inc tab_number
     if description == '' goto get_description
 
+    ( description, skip_it ) = find_skip_in_description( description )
+
     # chop (description)
     # substr description, -1, 1, ''
 
   return:
   empty_expected:
-    .return ( template, data, expected, description )
+    .return ( template, data, expected, description, skip_it )
 
   no_desc:
     description = ''
@@ -441,6 +461,47 @@ tag C<all> is allowed for todo tests that should fail on any system.
       $P1 = new 'Exception'
       $P1[0] = 'invalid data format'
       throw $P1
+.end
+
+
+.sub 'find_skip_in_description'
+    .param string description
+
+    .local pmc parts
+    parts = split ' skip: ', description
+
+    $I0 = parts
+    if $I0 > 1 goto check_os
+    .return( description, 0 )
+
+  check_os:
+    description = shift parts
+
+    .local string skip_list
+    skip_list = shift parts
+
+    .local pmc skip_os
+    skip_os = split ' ', skip_list
+
+    .local pmc it
+    it = iter skip_os
+
+    load_bytecode 'config.pbc'
+    $P1 = _config()
+    .local string osname
+    osname = $P1['osname']
+
+  iter_loop:
+    unless it goto iter_end
+    .local string os_name
+    os_name = shift it
+    eq os_name, osname, skip_it
+    goto iter_loop
+  iter_end:
+    .return( description, 0 )
+
+  skip_it:
+    .return( description, 1 )
 .end
 
 

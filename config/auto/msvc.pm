@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C compiler is actually Visual C++};
+    $data{description} = q{Is your C compiler actually Visual C++};
     $data{result}      = q{};
     return \%data;
 }
@@ -32,6 +32,12 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
+    if ($conf->data->get('gccversion')) {
+        $conf->debug(" (skipped) ");
+        $self->set_result('skipped');
+        $conf->data->set( msvcversion => undef );
+        return 1;
+    }
     my $msvcref = _probe_for_msvc($conf);
 
     $self->_evaluate_msvc($conf, $msvcref);
@@ -50,7 +56,6 @@ sub _probe_for_msvc {
 
 sub _evaluate_msvc {
     my ($self, $conf, $msvcref) = @_;
-    my $verbose = $conf->options->get('verbose');
     # Set msvcversion to undef.  This will also trigger any hints-file
     # callbacks that depend on knowing whether or not we're using Visual C++.
 
@@ -66,10 +71,10 @@ sub _evaluate_msvc {
 
     my $major = int( $msvcref->{_MSC_VER} / 100 );
     my $minor = $msvcref->{_MSC_VER} % 100;
-    my $status = $self->_handle_not_msvc($conf, $major, $minor, $verbose);
+    my $status = $self->_handle_not_msvc($conf, $major, $minor);
     return 1 if $status;
 
-    my $msvcversion = $self->_compose_msvcversion($major, $minor, $verbose);
+    my $msvcversion = $self->_compose_msvcversion($major, $minor);
 
     $conf->data->set( msvcversion => $msvcversion );
 
@@ -89,10 +94,10 @@ sub _evaluate_msvc {
 
 sub _handle_not_msvc {
     my $self = shift;
-    my ($conf, $major, $minor, $verbose) = @_;
+    my ($conf, $major, $minor) = @_;
     my $status;
     unless ( defined $major && defined $minor ) {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
         $conf->data->set( msvcversion => undef );
         $status++;
@@ -102,10 +107,9 @@ sub _handle_not_msvc {
 
 sub _compose_msvcversion {
     my $self = shift;
-    my ($major, $minor, $verbose) = @_;
+    my ($major, $minor) = @_;
     my $msvcversion = "$major.$minor";
-    print " (yep: $msvcversion )" if $verbose;
-    $self->set_result('yes');
+    $self->set_result("yes, $msvcversion");
     return $msvcversion;
 }
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ use Parrot::Configure::Utils ':inter', ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining what C compiler and linker to use};
+    $data{description} = q{Determine what C compiler and linker to use};
     $data{result}      = q{};
     return \%data;
 }
@@ -34,12 +34,10 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = _get_verbose($conf);
-
     my $ask = _prepare_for_interactivity($conf);
 
     my $cc;
-    ($conf, $cc) = _get_programs($conf, $verbose, $ask);
+    ($conf, $cc) = _get_programs($conf, $ask);
 
     my $debug = _get_debug($conf, $ask);
 
@@ -53,13 +51,6 @@ sub runstep {
     test_compiler($conf, $cc);
 
     return 1;
-}
-
-sub _get_verbose {
-    my $conf = shift;
-    my $verbose = $conf->options->get('verbose');
-    print "\n" if $verbose;
-    return $verbose;
 }
 
 sub _prepare_for_interactivity {
@@ -81,10 +72,10 @@ END
 }
 
 sub _get_programs {
-    my ($conf, $verbose, $ask) = @_;
+    my ($conf, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
-    my ( $cc, $cxx, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc );
+    my ( $cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc );
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
@@ -98,7 +89,8 @@ sub _get_programs {
     $ld = prompt( "What program do you want to use to build shared libraries?", $ld ) if $ask;
     $conf->data->set( ld => $ld );
 
-    $ccflags = $conf->data->get('ccflags');
+    $ccflags = integrate( $conf->data->get('ccflags'),
+        $conf->options->get('ccflags') );
 
     # Remove some perl5-isms.
     $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
@@ -108,32 +100,30 @@ sub _get_programs {
         if $ask;
     $conf->data->set( ccflags => $ccflags );
 
-    $verbose and print " ccflags: $ccflags\n";
+    $conf->debug("\nccflags: $ccflags\n");
 
     $linkflags = $conf->data->get('linkflags');
-    $linkflags =~ s/-libpath:\S+//g;    # RT#43174 No idea why.
+    $linkflags =~ s/-libpath:\S+//g;    # TT #854: No idea why.
     $linkflags = integrate( $linkflags, $conf->options->get('linkflags') );
-    $linkflags = prompt( "And your linker?", $linkflags ) if $ask;
+    $linkflags = prompt( "And flags for your linker?", $linkflags ) if $ask;
     $conf->data->set( linkflags => $linkflags );
 
     $ldflags = $conf->data->get('ldflags');
-    $ldflags =~ s/-libpath:\S+//g;      # RT#43174 No idea why.
+    $ldflags =~ s/-libpath:\S+//g;      # TT #854: No idea why.
     $ldflags = integrate( $ldflags, $conf->options->get('ldflags') );
-    $ldflags = prompt( "And your $ld for building shared libraries?", $ldflags )
+    $ldflags = prompt( "And your $ld flags for building shared libraries?", $ldflags )
         if $ask;
     $conf->data->set( ldflags => $ldflags );
 
     $libs = $conf->data->get('libs');
     $libs = join q{ },
-        grep { $conf->data->get_p5('OSNAME') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
+        grep { $conf->data->get('OSNAME_provisional') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
         split( q{ }, $libs );
     $libs = integrate( $libs, $conf->options->get('libs') );
-    $libs = prompt( "What libraries should your C compiler use?", $libs ) if $ask;
+    $libs = prompt( "What libraries should your C compiler use?", $libs )
+        if $ask;
     $conf->data->set( libs => $libs );
 
-    $cxx = integrate( $conf->data->get('cxx'), $conf->options->get('cxx') );
-    $cxx = prompt( "What C++ compiler do you want to use?", $cxx ) if $ask;
-    $conf->data->set( cxx => $cxx );
     return ($conf, $cc);
 }
 
@@ -170,7 +160,8 @@ sub _set_debug_and_warn {
 sub test_compiler {
     my ($conf, $cc) = @_;
 
-    open( my $out_fh, '>', 'test.c' ) or die "Unable to open 'test.c': $@\n";
+    open( my $out_fh, '>', "test_$$.c" )
+        or die "Unable to open 'test_$$.c': $@\n";
     print {$out_fh} <<END_C;
 int main() {
     return 0;

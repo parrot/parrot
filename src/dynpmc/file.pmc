@@ -1,0 +1,287 @@
+/*
+Copyright (C) 2001-2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/file.pmc - File PMC
+
+=head1 DESCRIPTION
+
+C<File> is a singleton class which provides access to File functions.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#ifdef WIN32
+#  include <direct.h>
+#endif
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+/* TT #1050 apparently, strerror_r is thread-safe and should be used instead.*/
+
+static PMC *File_PMC;
+pmclass File dynpmc singleton {
+
+/*
+
+=item C<void *get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
+    void class_init() {
+        File_PMC = NULL;
+    }
+
+    VTABLE void *get_pointer() {
+        return File_PMC;
+    }
+
+    VTABLE void set_pointer(void *ptr) {
+        File_PMC = (PMC *)ptr;
+    }
+
+/*
+
+=item C<INTVAL exists(STRING *file)>
+
+Returns a true value (1) if the supplied file or directory exists.
+
+=cut
+
+*/
+
+    METHOD exists(STRING *path) {
+        struct stat info;
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
+#ifdef WIN32
+        const int error = stat(cpath, &info);
+#else
+        const int error = lstat(cpath, &info);
+#endif
+        Parrot_str_free_cstring(cpath);
+
+        if (error)
+            RETURN(INTVAL 0);
+
+        RETURN(INTVAL 1);
+    }
+
+/*
+
+=item C<INTVAL is_dir(STRING *path)>
+
+Returns a true value (1) if the supplied path is a directory.
+
+=cut
+
+*/
+
+    METHOD is_dir(STRING *path) {
+        struct stat info;
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
+#ifdef WIN32
+        const int error = stat(cpath, &info);
+#else
+        const int error = lstat(cpath, &info);
+#endif
+        Parrot_str_free_cstring(cpath);
+
+        if (error) {
+            const char * const errmsg = strerror(errno);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
+        }
+
+        if (S_ISDIR(info.st_mode))
+            RETURN(INTVAL 1);
+        else
+            RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<INTVAL is_file(STRING *path)>
+
+Returns a true value (1) if the supplied path is a plain file.
+
+=cut
+
+*/
+
+    METHOD is_file(STRING *path) {
+        struct stat info;
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
+#ifdef WIN32
+        int error   = stat(cpath, &info);
+#else
+        int error   = lstat(cpath, &info);
+#endif
+        Parrot_str_free_cstring(cpath);
+
+        if (error) {
+            const char * const errmsg = strerror(errno);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
+        }
+
+        if (S_ISREG(info.st_mode))
+            RETURN(INTVAL 1);
+        else
+            RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<INTVAL is_link(STRING *path)>
+
+Returns a true value (1) if the supplied path is a link.
+
+=cut
+
+*/
+
+    METHOD is_link(STRING *path) {
+#ifdef WIN32
+        /* I love win32 implementations */
+        RETURN(INTVAL 0);
+#else
+        struct stat info;
+
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
+        const int    error = lstat(cpath, &info);
+
+        Parrot_str_free_cstring(cpath);
+
+        if (error) {
+            const char * const errmsg = strerror(errno);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
+        }
+
+        if (S_ISLNK(info.st_mode))
+            RETURN(INTVAL 1);
+        else
+            RETURN(INTVAL 0);
+#endif
+    }
+
+/*
+
+=item C<void copy(STRING *from, STRING *to)>
+
+Copy the contents from file represented by path C<from> to the path
+C<to>.
+
+Uses the "work everywhere method". It is good enough to start with.
+
+NOTE: I'm sure that there should be more efficient ways to do this. Be
+free to change or give me hints on how to change it. -- ambs
+
+=cut
+
+*/
+
+    METHOD copy(STRING *from, STRING *to) {
+#define CHUNK_SIZE 1024
+
+        char * const cfrom  = Parrot_str_to_cstring(INTERP, from);
+        FILE * const source = fopen(cfrom, "rb");
+
+        Parrot_str_free_cstring(cfrom);
+
+        if (source) {
+            char * const cto    = Parrot_str_to_cstring(INTERP, to);
+            FILE * const target = fopen(cto, "w+b");
+
+            Parrot_str_free_cstring(cto);
+
+            if (target) {
+                while (!feof(source)) {
+                    char buf[CHUNK_SIZE];
+                    const size_t bytes_read = fread(buf, 1, CHUNK_SIZE, source);
+
+                    if (bytes_read) {
+                        const size_t bytes_written = fwrite(buf, 1, bytes_read, target);
+                        if (bytes_read != bytes_written) {
+                            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                                EXCEPTION_EXTERNAL_ERROR, "Error writing file");
+                            break;
+                        }
+                    }
+                }
+                fclose(target);
+            }
+            else {
+                const char * const errmsg = strerror(errno);
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                    errmsg);
+            }
+            fclose(source);
+        }
+        else {
+            const char * const errmsg = strerror(errno);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
+        }
+#undef CHUNK_SIZE
+    }
+
+/*
+
+=item C<void rename(STRING *from, STRING *to)>
+
+Rename a file C<from> to the path C<to>.
+
+=cut
+
+*/
+
+    METHOD rename(STRING *from, STRING *to) {
+        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
+        char * const   cto = Parrot_str_to_cstring(INTERP, to);
+        const int    error = rename(cfrom, cto);
+
+        Parrot_str_free_cstring(cfrom);
+        Parrot_str_free_cstring(cto);
+
+        if (error) {
+            const char * const errmsg = strerror(errno);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
+        }
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALS0
+
+   stat(2), rename(2)
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

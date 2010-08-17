@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -13,7 +13,7 @@ use Test::Harness ();
 undef $Test::Harness::Switches;
 
 use Parrot::Harness::DefaultTests qw(
-    get_default_tests
+    get_common_tests
     @developing_tests
 );
 use Parrot::Harness::Options qw(
@@ -30,12 +30,10 @@ use Parrot::Harness::Smoke qw(
 local @ARGV = @ARGV;
 (my $longopts, @ARGV) = handle_long_options(@ARGV);
 
-$ENV{RUNNING_MAKE_TEST} = $longopts->{running_make_test};
-
-# Suck the short options into the TEST_PROG_ARGS 
+# Suck the short options into the TEST_PROG_ARGS
 # environmental variable.
 my %opts;
-getopts('wgjPCSefbvdr?hO:D:', \%opts);
+getopts('wgGjPCSefbvdr?hO:D:', \%opts);
 
 if ($opts{'?'} || $opts{h} || $longopts->{help}) {
     Usage();
@@ -50,21 +48,47 @@ my $args = get_test_prog_args(
 );
 $ENV{TEST_PROG_ARGS} = $args;
 
-# now build the list of tests to run, either from the command
-# line or from @default tests
-my @default_tests = get_default_tests(
-    $longopts->{core_tests_only},
-    $longopts->{runcore_tests_only}
-);
-
 my @tests;
 if ($longopts->{code}) {
     @tests = @developing_tests;
-} else {
-    @tests = map { glob($_) } (@ARGV ? @ARGV : @default_tests);
+}
+else {
+    @tests = map { glob($_) } (@ARGV
+        ? @ARGV
+        : get_common_tests( $longopts )
+    );
 }
 
-if ($longopts->{html}) {
+my $harness;
+if ($longopts->{archive}) {
+    eval { require TAP::Harness::Archive };
+    if ($@) {
+        die "\n" . ('-' x 55) . "\nCould not load TAP::Harness::Archive."
+            . "\nPlease install it if you want to create TAP archives.\n"
+            . ('-' x 55) . "\n\n$@\n";
+    }
+    # for extra_properties we need TAP::Harness::Archive >= .10
+    if ($TAP::Harness::Archive::VERSION < .10) {
+        die "\n" . ('-' x 55) . "\nWe need TAP::Harness::Archive >= .10."
+            . "\nPlease install it if you want to create TAP archives.\n"
+            . ('-' x 55) . "\n";
+    }
+
+    my %env_data = collect_test_environment_data();
+    $harness = TAP::Harness::Archive->new(
+        {
+            verbosity        => $ENV{HARNESS_VERBOSE},
+            archive          => 'parrot_test_run.tar.gz',
+            merge            => 1,
+            extra_properties => \%env_data,
+            extra_files      => [ 'myconfig', 'config_lib.pir' ],
+        }
+    );
+    $harness->runtests(@tests);
+    send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
+
+}
+elsif ($longopts->{html}) {
     generate_html_smoke_report(
         {
             tests => \@tests,
@@ -72,46 +96,24 @@ if ($longopts->{html}) {
             file  => 'smoke.html',
         }
     );
-} else {
-    my $harness;
-    if ($longopts->{archive}) {
-        eval { require TAP::Harness::Archive };
-        if ($@) {
-            die "\n" . ('-' x 55) . "\nCould not load TAP::Harness::Archive."
-                . "\nPlease install it if you want to create TAP archives.\n"
-                . ('-' x 55) . "\n\n$@\n";
-        }
-        # for extra_properties we need TAP::Harness::Archive >= .10
-        if ($TAP::Harness::Archive::VERSION < .10) {
-            die "\n" . ('-' x 55) . "\nWe need TAP::Harness::Archive >= .10."
-                . "\nPlease install it if you want to create TAP archives.\n"
-                . ('-' x 55) . "\n";
-        }
-
-        my %env_data = collect_test_environment_data();
-        $harness = TAP::Harness::Archive->new(
-            {
-                verbosity        => $ENV{HARNESS_VERBOSE},
-                archive          => 'parrot_test_run.tar.gz',
-                merge            => 1,
-                extra_properties => \%env_data,
-            }
-        );
-        $harness->runtests(@tests);
-        send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
-        
-    } else {
-        eval { require TAP::Harness };
-        if ($@) {
-            Test::Harness::runtests(@tests);
-            exit;
-        } else {
-            $harness = TAP::Harness->new({
-                verbosity => $ENV{HARNESS_VERBOSE}, merge => 0
-            });
-        }
-        $harness->runtests(@tests);
+}
+else {
+    eval { require TAP::Harness };
+    if ($@) {
+        Test::Harness::runtests(@tests);
+        exit;
     }
+    else {
+        $harness = TAP::Harness->new({
+            verbosity => $ENV{HARNESS_VERBOSE},
+            merge     => 0,
+            jobs      => $ENV{TEST_JOBS} || 1,
+            directives => 1,
+        });
+    }
+    my $results = $harness->runtests(@tests);
+
+    exit ( $results->all_passed() ? 0 : 1 );
 }
 
 =head1 NAME
@@ -132,21 +134,13 @@ The short command line options are:
 
 Turn warnings on.
 
-=item C<-g>
+=item C<-G>
 
-Run the C<CGoto> core.
+Run the C<GCDebug> core.
 
 =item C<-j>
 
-Run with JIT enabled.
-
-=item C<-C>
-
-Run the C<CGP> core.
-
-=item C<-S>
-
-Run Switched.
+Alias for running with the fast core.
 
 =item C<-b>
 
@@ -170,8 +164,8 @@ Run optimized to the specified level.
 
 =item C<-D[number]>
 
-Pass the specified debug bits to the parrot interpreter.  Note that 
-C<-D40> (fill I, N registers with garbage) is always enabled.  
+Pass the specified debug bits to the parrot interpreter.  Note that
+C<-D40> (fill I, N registers with garbage) is always enabled.
 See 'parrot --help-debug' for available flags.
 
 =back
@@ -179,10 +173,6 @@ See 'parrot --help-debug' for available flags.
 There are also long command line options:
 
 =over 4
-
-=item C<--running-make-test>
-
-Some test scripts run more quickly when this is set.
 
 =item C<--gc-debug>
 

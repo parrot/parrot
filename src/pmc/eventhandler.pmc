@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2008, The Perl Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -19,9 +19,12 @@ Event.
 
 */
 
-#include "parrot/parrot.h"
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
-pmclass EventHandler extends Sub need_ext {
+
+pmclass EventHandler extends Sub provides invokable auto_attrs {
 
     ATTR STRING *type;          /* the type of the event to handle */
     ATTR PMC    *code;          /* the code object to execute */
@@ -40,12 +43,8 @@ do anything.
 */
 
     VTABLE void init() {
-        Parrot_EventHandler *e = mem_allocate_zeroed_typed(Parrot_EventHandler);
-
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
-
-        PMC_data(SELF) = e;
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -85,23 +84,20 @@ handler to care
         PMC                 *interpreter = PMCNULL;
         STRING              *type        = NULL;
         INTVAL               priority    = 0;
-        Parrot_EventHandler *e           = NULL;
+        Parrot_EventHandler_attributes *e =
+                (Parrot_EventHandler_attributes *) PMC_data(SELF);
 
         if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Sub"))) {
             code = data;
         }
         else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
-            code =
-                VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-            interpreter =
-                VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
-            type =
-                VTABLE_get_string_keyed_str(INTERP, data, CONST_STRING(INTERP, "type"));
-            priority =
-                VTABLE_get_integer_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
+            code = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
+            interpreter = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
+            type = VTABLE_get_string_keyed_str(INTERP, data, CONST_STRING(INTERP, "type"));
+            priority = VTABLE_get_integer_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
         }
         else {
-            real_exception(INTERP, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "EventHandler initializer must be Sub or Hash");
         }
 
@@ -109,12 +105,9 @@ handler to care
             interpreter = VTABLE_get_pmc_keyed_int(INTERP,
                     INTERP->iglobals, IGLOBALS_INTERPRETER);
 
-        e = mem_allocate_zeroed_typed(Parrot_EventHandler);
-
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
 
-        PMC_data(SELF) = e;
         e->type        = type;
         e->code        = code;
         e->interp      = interpreter;
@@ -132,34 +125,14 @@ Marks this PMC and any of its contents as live.
 */
 
     VTABLE void mark() {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e) {
-            if (e->type)
-                pobject_lives(INTERP, (PObj *)e->type);
+            Parrot_gc_mark_STRING_alive(INTERP, e->type);
+            Parrot_gc_mark_PMC_alive(INTERP, e->interp);
+            Parrot_gc_mark_PMC_alive(INTERP, e->code);
 
-            if (! PMC_IS_NULL(e->interp))
-                pobject_lives(INTERP, (PObj *)e->interp);
-
-            if (! PMC_IS_NULL(e->code))
-                pobject_lives(INTERP, (PObj *)e->code);
-        }
-    }
-
-/*
-
-=item C<void destroy()>
-
-Frees any memory held by this PMC.
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
-
-        if (e) {
-            mem_sys_free(e);
-            PMC_data(SELF) = NULL;
+            SUPER();
         }
     }
 
@@ -173,8 +146,8 @@ Sets the C<type> attribute of this event handler to the passed-in string.
 
 */
 
-    void set_string(STRING *type) {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+    VTABLE void set_string(STRING *type) {
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             e->type = type;
@@ -191,10 +164,10 @@ Retrieves the C<type> attribute of this event handler.
 */
 
     VTABLE STRING *get_string() {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
-            return string_copy(INTERP, e->type);
+            return e->type;
 
         return CONST_STRING(INTERP, "");
     }
@@ -209,7 +182,7 @@ Sets the minimum interesting priority for this event handler.
 
 */
     VTABLE void set_integer_native(INTVAL priority) {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             e->priority = priority;
@@ -226,7 +199,7 @@ handle the registered events.
 
 */
     VTABLE void set_pmc(PMC *interpreter) {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             e->interp = interpreter;
@@ -241,11 +214,11 @@ handle the registered events.
 */
 
     VTABLE PMC *get_attr_str(STRING *name) {
-        Parrot_EventHandler *core_struct  = PMC_data_typed(SELF, Parrot_EventHandler *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
         PMC *value = PMCNULL;
 
-        if (string_equal(interp, name, CONST_STRING(interp, "code")) == 0) {
-            value = core_struct->code;
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "code"))) {
+            value = e->code;
         }
 
         return value;
@@ -261,12 +234,13 @@ Runs the contained code, if any; this is what handles the event.
 
 */
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
-        void                *unused;
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         /* can't invoke on INTERP and can't return its result; this may not be
          * the right interpreter */
         if (e) {
+            void *unused;
+
             unused = VTABLE_invoke(PMC_data_typed(e->interp, Parrot_Interp),
                     e->code, next);
             UNUSED(unused);
@@ -298,16 +272,17 @@ Report whether the event handler can handle a particular type of event.
 */
 
     METHOD can_handle(PMC *event) {
-        Parrot_EventHandler *handler_struct = PMC_data_typed(SELF, Parrot_EventHandler *);
+
         if (event->vtable->base_type == enum_class_Task) {
-            PMC *type = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
-            STRING *type_str = VTABLE_get_string(interp, type);
+            PMC    * const type     = VTABLE_get_attr_str(INTERP, event, CONST_STRING(INTERP, "type"));
+            STRING * const type_str = VTABLE_get_string(INTERP, type);
 
-            if (string_equal(interp, type_str, CONST_STRING(interp, "event")) == 0) {
-                PMC *subtype = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "subtype"));
-                STRING *subtype_str = VTABLE_get_string(interp, subtype);
+            if (Parrot_str_equal(INTERP, type_str, CONST_STRING(INTERP, "event"))) {
+                Parrot_EventHandler_attributes * const handler_struct = PARROT_EVENTHANDLER(SELF);
+                PMC    * const subtype     = VTABLE_get_attr_str(INTERP, event, CONST_STRING(INTERP, "subtype"));
+                STRING * const subtype_str = VTABLE_get_string(INTERP, subtype);
 
-                if (string_equal(interp, subtype_str, handler_struct->type) == 0) {
+                if (Parrot_str_equal(INTERP, subtype_str, handler_struct->type)) {
                     RETURN(INTVAL 1);
                 }
             }

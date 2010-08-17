@@ -1,9 +1,9 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-examples/benchmarks/primes2.pir - Calculate prime numbers < 10000
+examples/benchmarks/primes2.pir - Calculate prime numbers < 5000
 
 =head1 SYNOPSIS
 
@@ -11,7 +11,7 @@ examples/benchmarks/primes2.pir - Calculate prime numbers < 10000
 
 =head1 DESCRIPTION
 
-Calculates all the prime numbers up to 10000 and prints out the number
+Calculates all the prime numbers up to 5000 and prints out the number
 of primes and the last one found. Use PMCs, not ints.
 
 =cut
@@ -23,7 +23,7 @@ of primes and the last one found. Use PMCs, not ints.
   i   = new 'Integer'
   i   = 0
   max = new 'Integer'
-  max = 5000
+  max = 500
   i6  = new 'Integer'
   i6  = 0
   i7  = new 'Integer'

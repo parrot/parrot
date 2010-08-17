@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -10,6 +10,9 @@ src/test_main.c - A sample test program
 
 C<examples/c/test_main.c> is being retained as an example of a non-trivial, but
 still clean, Parrot embedding.
+
+While it bears some resemblance to IMCC, no effort is made to keep this
+sample up to date with respect to the latest parrot functionality.
 
 =head2 Functions
 
@@ -28,7 +31,7 @@ still clean, Parrot embedding.
 #define setopt(flag) Parrot_setflag(interp, (flag), (*argv)[0]+2);
 #define unsetopt(flag) Parrot_setflag(interp, (flag), 0)
 
-static char *parseflags(Parrot_Interp interp, int *argc, char **argv[]);
+static char *parseflags(PARROT_INTERP, int *argc, char **argv[]);
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
@@ -57,8 +60,7 @@ static void version(void);
 
 /*
 
-=item C<int
-main(int argc, char *argv[])>
+=item C<int main(int argc, char *argv[])>
 
 Loads the file and runs the code.
 
@@ -80,13 +82,13 @@ main(int argc, char *argv[])
 
     filename = parseflags(interp, &argc, &argv);
 
-    pf = Parrot_readbc(interp, filename);
+    pf = Parrot_pbc_read(interp, filename, 0);
 
     if (!pf) {
         return 1;
     }
 
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
     Parrot_runcode(interp, argc, argv);
     Parrot_destroy(interp);
 
@@ -96,8 +98,7 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<char *
-parseflags(Parrot_Interp interp, int *argc, char **argv[])>
+=item C<static char * parseflags(PARROT_INTERP, int *argc, char **argv[])>
 
 Parses the command-line.
 
@@ -106,7 +107,7 @@ Parses the command-line.
 */
 
 static char *
-parseflags(Parrot_Interp interp, int *argc, char **argv[])
+parseflags(PARROT_INTERP, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
 
@@ -130,48 +131,48 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
         }
 
         switch (opt.opt_id) {
-        case 'b':
+          case 'b':
             setopt(PARROT_BOUNDS_FLAG);
             break;
-        case 'j':
+          case 'j':
             setopt(PARROT_JIT_FLAG);
             break;
-        case 'o':
+          case 'o':
             setopt(PARROT_EXEC_FLAG);
             break;
-        case 'p':
+          case 'p':
             setopt(PARROT_PROFILE_FLAG);
             break;
-        case 'P':
+          case 'P':
             setopt(PARROT_PREDEREF_FLAG);
             break;
-        case 'S':
+          case 'S':
             setopt(PARROT_SWITCH_FLAG);
             break;
-        case 'g':
+          case 'g':
             unsetopt(PARROT_CGOTO_FLAG);
             break;
-        case 't':
+          case 't':
             setopt(PARROT_TRACE_FLAG);
             break;
-        case 'd':
+          case 'd':
             setopt(PARROT_DEBUG_FLAG);
             break;
-        case 'h':
+          case 'h':
             usage();
             break;
-        case 'v':
+          case 'v':
             version();
             break;
-        case 'w':
+          case 'w':
             Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
             break;
 
-        case '.':  /* Give Windows Parrot hackers an opportunity to
-                    * attach a debuggger. */
+          case '.':  /* Give Windows Parrot hackers an opportunity to
+                      * attach a debuggger. */
             fgetc(stdin);
             break;
-        case OPT_GC_DEBUG:
+          case OPT_GC_DEBUG:
 #if DISABLE_GC_DEBUG
             Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                         "PARROT_GC_DEBUG is set but the binary was "
@@ -179,7 +180,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 #endif
             setopt(PARROT_GC_DEBUG_FLAG);
             break;
-        case OPT_DESTROY_FLAG:
+          case OPT_DESTROY_FLAG:
             setopt(PARROT_DESTROY_FLAG);
             break;
         }
@@ -197,8 +198,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 
 /*
 
-=item C<static void
-usage(void)>
+=item C<static void usage(void)>
 
 Returns the user help.
 
@@ -209,13 +209,6 @@ Returns the user help.
 static void
 usage(void)
 {
-#ifdef HAVE_COMPUTED_GOTO
-    const char* cgoto_info = "Deactivate computed goto";
-#else
-    const char* cgoto_info =
-        "Deactivate computed goto (not available on this platform)";
-#endif
-
     fprintf(stderr,
 "Usage: parrot [switches] [--] programfile [arguments]\n\
   -b  --bounds-checks           Activate bounds checks\n\
@@ -223,9 +216,6 @@ usage(void)
   -h  --help                    Display this message\n\
   -j  --jit                     Activate Just-In-Time compiler\n\
   -p  --profile                 Activate profiling\n\
-  -P  --predereferenced_core    Activate predereferencing\n\
-  -S  --switched_core           Activate switched core\n\
-  -g  --no-computed-goto        %s\n\
   -t  --trace                   Activate tracing\n\
   -v  --version                 Display version information\n\
   -.  --wait                    Wait for a keypress (gives Windows users\n\
@@ -233,16 +223,14 @@ usage(void)
       --gc-debug\n\
         Enable garbage collection debugging mode. This may also be enabled\n\
         by setting the environment variable $PARROT_GC_DEBUG to 1.\n\
-\n",
-            cgoto_info);
+\n");
 
     Parrot_exit(interp, 0);
 }
 
 /*
 
-=item C<static void
-version(void)>
+=item C<static void version(void)>
 
 Returns the version information.
 
@@ -256,7 +244,7 @@ version(void)
     fprintf(stderr,
             "This is parrot version " PARROT_VERSION " built for "
             PARROT_ARCHNAME "\n\
-Copyright (C) 2001-2003, The Perl Foundation.\n\
+Copyright (C) 2001-2003, Parrot Foundation.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\
 \n\

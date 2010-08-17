@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -60,14 +60,14 @@ sub _print_to_cache {
     my ($cache, $revision) = @_;
     open my $FH, ">", $cache
         or die "Unable to open handle to $cache for writing: $!";
-    print $FH "$revision\n";
+    print {$FH} "$revision\n";
     close $FH or die "Unable to close handle to $cache after writing: $!";
 }
 
 sub _get_revision {
     my $revision;
     if (-f $cache) {
-        open my $FH, "<", $cache
+        open my $FH, '<', $cache
             or die "Unable to open $cache for reading: $!";
         chomp($revision = <$FH>);
         close $FH or die "Unable to close $cache after reading: $!";
@@ -83,16 +83,22 @@ sub _analyze_sandbox {
     my $revision = 0;
     # code taken from pugs/util/version_h.pl rev 14410
     # modified because in xml output commit and entry revision
-    # are difficult to distinguih in a simplified parsing
+    # are difficult to distinguish in a simplified parsing
     my $nul = File::Spec->devnull;
-    my $oldLANG = $ENV{LANG};
-    $ENV{LANG} = 'C';
+    # Avoid locale troubles with svn messages
+    local $ENV{LANG}   = 'C';
+    local $ENV{LC_ALL} = 'C';
     if ( my @svn_info = qx/svn info 2>$nul/ and $? == 0 ) {
         if ( my ($line) = grep /^Revision:/, @svn_info ) {
             ($revision) = $line =~ /(\d+)/;
         }
     }
-    $ENV{LANG} = $oldLANG;
+    if( !$revision && (-d '.git') ) {
+        my $git_log = qx/git log -100 2>$nul/;
+        if(defined($git_log) && $git_log =~ /git-svn-id: \S+\@(\d+)\s/) {
+            $revision = $1;
+        }
+    }
     return $revision;
 }
 

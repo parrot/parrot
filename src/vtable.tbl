@@ -2,7 +2,7 @@
 # [MAIN] #default section name
 
 # MMD_EQ ... MMD_STRCMP must be in one block
-# see src/mmd.c
+# see src/multidispatch.c
 
 # INPLACE MMD variant must always be normal op + 1
 
@@ -10,8 +10,7 @@ void init()
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 PMC* instantiate(PMC* sig)
-PMC* new_from_string(STRING* rep, INTVAL flags)
-void morph(INTVAL type) :write
+void morph(PMC* type) :write
 void mark()
 void destroy()
 PMC* get_namespace()
@@ -23,9 +22,6 @@ void delprop(STRING* key)
 PMC* getprops()
 
 INTVAL type()
-INTVAL type_keyed(PMC* key)
-INTVAL type_keyed_int(INTVAL key)
-INTVAL type_keyed_str(STRING* key)
 
 STRING* name()
 
@@ -45,8 +41,6 @@ FLOATVAL get_number_keyed(PMC* key)
 FLOATVAL get_number_keyed_int(INTVAL key)
 FLOATVAL get_number_keyed_str(STRING* key)
 
-PMC* get_bignum()
-
 STRING* get_string()
 STRING* get_repr()
 STRING* get_string_keyed(PMC* key)
@@ -59,7 +53,6 @@ PMC* get_pmc()
 PMC* get_pmc_keyed(PMC* key)
 PMC* get_pmc_keyed_int(INTVAL key)
 PMC* get_pmc_keyed_str(STRING* key)
-PMC* slice(PMC* key, INTVAL flag)
 
 void* get_pointer()
 void* get_pointer_keyed(PMC* key)
@@ -68,24 +61,17 @@ void* get_pointer_keyed_str(STRING* key)
 
 [STORE] :write
 void set_integer_native(INTVAL value)
-void set_integer_same(PMC* value)
 void set_integer_keyed(PMC* key, INTVAL value)
 void set_integer_keyed_int(INTVAL key, INTVAL value)
 void set_integer_keyed_str(STRING* key, INTVAL value)
 
 void set_number_native(FLOATVAL value)
-void set_number_same(PMC* value)
 void set_number_keyed(PMC* key, FLOATVAL value)
 void set_number_keyed_int(INTVAL key, FLOATVAL value)
 void set_number_keyed_str(STRING* key, FLOATVAL value)
 
-void set_bignum_int(INTVAL value)
-void set_bignum_num(FLOATVAL value)
-void set_bignum_str(STRING* value)
-
 void set_string_native(STRING* value)
 void assign_string_native(STRING* value)
-void set_string_same(PMC* value)
 void set_string_keyed(PMC* key, STRING* value)
 void set_string_keyed_int(INTVAL key, STRING* value)
 void set_string_keyed_str(STRING* key, STRING* value)
@@ -137,69 +123,53 @@ void splice(PMC* value, INTVAL offset, INTVAL count)
 
 # XXX marking writing here?
 [MATH]
-PMC* add(PMC* value, PMC* dest)             MMD_ADD
-PMC* add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
-PMC* add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
+PMC* add(PMC* value, PMC* dest)
+PMC* add_int(INTVAL value, PMC* dest)
+PMC* add_float(FLOATVAL value, PMC* dest)
 
-void i_add(PMC* value)                      MMD_I_ADD
-void i_add_int(INTVAL value)                MMD_I_ADD_INT
-void i_add_float(FLOATVAL value)            MMD_I_ADD_FLOAT
+void i_add(PMC* value) :write
+void i_add_int(INTVAL value) :write
+void i_add_float(FLOATVAL value) :write
 
-PMC* subtract(PMC* value, PMC* dest)        MMD_SUBTRACT
-PMC* subtract_int(INTVAL value, PMC* dest)  MMD_SUBTRACT_INT
-PMC* subtract_float(FLOATVAL value, PMC* dest)  MMD_SUBTRACT_FLOAT
+PMC* subtract(PMC* value, PMC* dest)
+PMC* subtract_int(INTVAL value, PMC* dest)
+PMC* subtract_float(FLOATVAL value, PMC* dest)
 
-void i_subtract(PMC* value)                 MMD_I_SUBTRACT
-void i_subtract_int(INTVAL value)           MMD_I_SUBTRACT_INT
-void i_subtract_float(FLOATVAL value)       MMD_I_SUBTRACT_FLOAT
+void i_subtract(PMC* value) :write
+void i_subtract_int(INTVAL value) :write
+void i_subtract_float(FLOATVAL value) :write
 
-PMC* multiply(PMC* value, PMC* dest)        MMD_MULTIPLY
-PMC* multiply_int(INTVAL value, PMC* dest)  MMD_MULTIPLY_INT
-PMC* multiply_float(FLOATVAL value, PMC* dest)  MMD_MULTIPLY_FLOAT
+PMC* multiply(PMC* value, PMC* dest)
+PMC* multiply_int(INTVAL value, PMC* dest)
+PMC* multiply_float(FLOATVAL value, PMC* dest)
 
-void i_multiply(PMC* value)                 MMD_I_MULTIPLY
-void i_multiply_int(INTVAL value)           MMD_I_MULTIPLY_INT
-void i_multiply_float(FLOATVAL value)       MMD_I_MULTIPLY_FLOAT
+void i_multiply(PMC* value) :write
+void i_multiply_int(INTVAL value) :write
+void i_multiply_float(FLOATVAL value) :write
 
-PMC* divide(PMC* value, PMC* dest)           MMD_DIVIDE
-PMC* divide_int(INTVAL value, PMC* dest)     MMD_DIVIDE_INT
-PMC* divide_float(FLOATVAL value, PMC* dest) MMD_DIVIDE_FLOAT
+PMC* divide(PMC* value, PMC* dest)
+PMC* divide_int(INTVAL value, PMC* dest)
+PMC* divide_float(FLOATVAL value, PMC* dest)
 
-void i_divide(PMC* value)                    MMD_I_DIVIDE
-void i_divide_int(INTVAL value)              MMD_I_DIVIDE_INT
-void i_divide_float(FLOATVAL value)          MMD_I_DIVIDE_FLOAT
+void i_divide(PMC* value) :write
+void i_divide_int(INTVAL value) :write
+void i_divide_float(FLOATVAL value) :write
 
-PMC* floor_divide(PMC* value, PMC* dest)           MMD_FLOOR_DIVIDE
-PMC* floor_divide_int(INTVAL value, PMC* dest)     MMD_FLOOR_DIVIDE_INT
-PMC* floor_divide_float(FLOATVAL value, PMC* dest) MMD_FLOOR_DIVIDE_FLOAT
+PMC* floor_divide(PMC* value, PMC* dest)
+PMC* floor_divide_int(INTVAL value, PMC* dest)
+PMC* floor_divide_float(FLOATVAL value, PMC* dest)
 
-void i_floor_divide(PMC* value)              MMD_I_FLOOR_DIVIDE
-void i_floor_divide_int(INTVAL value)        MMD_I_FLOOR_DIVIDE_INT
-void i_floor_divide_float(FLOATVAL value)    MMD_I_FLOOR_DIVIDE_FLOAT
+void i_floor_divide(PMC* value) :write
+void i_floor_divide_int(INTVAL value) :write
+void i_floor_divide_float(FLOATVAL value) :write
 
-PMC* modulus(PMC* value, PMC* dest)         MMD_MOD
-PMC* modulus_int(INTVAL value, PMC* dest)   MMD_MOD_INT
-PMC* modulus_float(FLOATVAL value, PMC* dest) MMD_MOD_FLOAT
+PMC* modulus(PMC* value, PMC* dest)
+PMC* modulus_int(INTVAL value, PMC* dest)
+PMC* modulus_float(FLOATVAL value, PMC* dest)
 
-void i_modulus(PMC* value)                  MMD_I_MOD
-void i_modulus_int(INTVAL value)            MMD_I_MOD_INT
-void i_modulus_float(FLOATVAL value)        MMD_I_MOD_FLOAT
-
-PMC* cmodulus(PMC* value, PMC* dest)        MMD_CMOD
-PMC* cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
-PMC* cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
-
-void i_cmodulus(PMC* value)                 MMD_I_CMOD
-void i_cmodulus_int(INTVAL value)           MMD_I_CMOD_INT
-void i_cmodulus_float(FLOATVAL value)       MMD_I_CMOD_FLOAT
-
-PMC* pow(PMC* value, PMC* dest)             MMD_POW
-PMC* pow_int(INTVAL value, PMC* dest)       MMD_POW_INT
-PMC* pow_float(FLOATVAL value, PMC* dest)   MMD_POW_FLOAT
-
-void i_pow(PMC* value)                      MMD_I_POW
-void i_pow_int(INTVAL value)                MMD_I_POW_INT
-void i_pow_float(FLOATVAL value)            MMD_I_POW_FLOAT
+void i_modulus(PMC* value) :write
+void i_modulus_int(INTVAL value) :write
+void i_modulus_float(FLOATVAL value) :write
 
 void increment() :write
 void decrement() :write
@@ -210,100 +180,40 @@ void i_absolute() :write
 PMC* neg(PMC* dest)
 void i_neg() :write
 
-[BITWISE]
-PMC* bitwise_or(PMC* value, PMC* dest)          MMD_BOR
-PMC* bitwise_or_int(INTVAL value, PMC* dest)    MMD_BOR_INT
-
-void i_bitwise_or(PMC* value)                   MMD_I_BOR
-void i_bitwise_or_int(INTVAL value)             MMD_I_BOR_INT
-
-PMC* bitwise_and(PMC* value, PMC* dest)         MMD_BAND
-PMC* bitwise_and_int(INTVAL value, PMC* dest)   MMD_BAND_INT
-
-void i_bitwise_and(PMC* value)                  MMD_I_BAND
-void i_bitwise_and_int(INTVAL value)            MMD_I_BAND_INT
-
-PMC* bitwise_xor(PMC* value, PMC* dest)         MMD_BXOR
-PMC* bitwise_xor_int(INTVAL value, PMC* dest)   MMD_BXOR_INT
-
-void i_bitwise_xor(PMC* value)                  MMD_I_BXOR
-void i_bitwise_xor_int(INTVAL value)            MMD_I_BXOR_INT
-
-PMC* bitwise_ors(PMC* value, PMC* dest)         MMD_SOR
-PMC* bitwise_ors_str(STRING* value, PMC* dest)  MMD_SOR_STR
-
-void i_bitwise_ors(PMC* value)                  MMD_I_SOR
-void i_bitwise_ors_str(STRING* value)           MMD_I_SOR_STR
-
-PMC* bitwise_ands(PMC* value, PMC* dest)        MMD_SAND
-PMC* bitwise_ands_str(STRING* value, PMC* dest) MMD_SAND_STR
-
-void i_bitwise_ands(PMC* value)                 MMD_I_SAND
-void i_bitwise_ands_str(STRING* value)          MMD_I_SAND_STR
-
-PMC* bitwise_xors(PMC* value, PMC* dest)        MMD_SXOR
-PMC* bitwise_xors_str(STRING* value, PMC* dest) MMD_SXOR_STR
-
-void i_bitwise_xors(PMC* value)                 MMD_I_SXOR
-void i_bitwise_xors_str(STRING* value)          MMD_I_SXOR_STR
-
-PMC* bitwise_not(PMC* dest)
-void i_bitwise_not() :write
-
-PMC* bitwise_nots(PMC* dest)
-void i_bitwise_nots() :write
-
-PMC* bitwise_shl(PMC* value, PMC* dest)         MMD_BSL
-PMC* bitwise_shl_int(INTVAL value, PMC* dest)   MMD_BSL_INT
-
-void i_bitwise_shl(PMC* value)                  MMD_I_BSL
-void i_bitwise_shl_int(INTVAL value)            MMD_I_BSL_INT
-
-PMC* bitwise_shr(PMC* value, PMC* dest)         MMD_BSR
-PMC* bitwise_shr_int(INTVAL value, PMC* dest)   MMD_BSR_INT
-
-void i_bitwise_shr(PMC* value)                  MMD_I_BSR
-void i_bitwise_shr_int(INTVAL value)            MMD_I_BSR_INT
-
-PMC* bitwise_lsr(PMC* value, PMC* dest)         MMD_LSR
-PMC* bitwise_lsr_int(INTVAL value, PMC* dest)   MMD_LSR_INT
-
-void i_bitwise_lsr(PMC* value)                  MMD_I_LSR
-void i_bitwise_lsr_int(INTVAL value)            MMD_I_LSR_INT
-
 [CMP]
-INTVAL is_equal(PMC* value)                  MMD_EQ
-INTVAL is_equal_num(PMC* value)              MMD_NUMEQ
-INTVAL is_equal_string(PMC* value)           MMD_STREQ
+INTVAL is_equal(PMC* value)
+INTVAL is_equal_num(PMC* value)
+INTVAL is_equal_string(PMC* value)
 
 INTVAL is_same(PMC* value)
 
-INTVAL cmp(PMC* value)                       MMD_CMP
-INTVAL cmp_num(PMC* value)                   MMD_NUMCMP
-INTVAL cmp_string(PMC* value)                MMD_STRCMP
+INTVAL cmp(PMC* value)
+INTVAL cmp_num(PMC* value)
+INTVAL cmp_string(PMC* value)
+PMC* cmp_pmc(PMC* value)
 
-PMC* logical_or(PMC* value, PMC* dest)       MMD_LOR
+PMC* logical_or(PMC* value, PMC* dest)
 
-PMC* logical_and(PMC* value, PMC* dest)      MMD_LAND
+PMC* logical_and(PMC* value, PMC* dest)
 
-PMC* logical_xor(PMC* value, PMC* dest)      MMD_LXOR
+PMC* logical_xor(PMC* value, PMC* dest)
 
 PMC* logical_not(PMC* dest)
 void i_logical_not() :write
 
 
 [STRING]
-PMC* concatenate(PMC* value, PMC* dest)        MMD_CONCAT
-PMC* concatenate_str(STRING* value, PMC* dest) MMD_CONCAT_STR
+PMC* concatenate(PMC* value, PMC* dest)
+PMC* concatenate_str(STRING* value, PMC* dest)
 
-void i_concatenate(PMC* value)               MMD_I_CONCAT
-void i_concatenate_str(STRING* value)        MMD_I_CONCAT_STR
+void i_concatenate(PMC* value) :write
+void i_concatenate_str(STRING* value) :write
 
-PMC* repeat(PMC* value, PMC* dest)           MMD_REPEAT
-PMC* repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
+PMC* repeat(PMC* value, PMC* dest)
+PMC* repeat_int(INTVAL value, PMC* dest)
 
-void i_repeat(PMC* value)                    MMD_I_REPEAT
-void i_repeat_int(INTVAL value)              MMD_I_REPEAT_INT
+void i_repeat(PMC* value) :write
+void i_repeat_int(INTVAL value) :write
 
 void substr(INTVAL offset, INTVAL length, PMC* dest)
 STRING* substr_str(INTVAL offset, INTVAL length)
@@ -325,10 +235,8 @@ void delete_keyed_int(INTVAL key)
 void delete_keyed_str(STRING* key)
 
 [MAIN]
-PMC* nextkey_keyed(PMC* key, INTVAL what)
-PMC* nextkey_keyed_int(INTVAL key, INTVAL what)
-PMC* nextkey_keyed_str(STRING* key, INTVAL what)
 PMC* get_iter()
+INTVAL hashvalue()
 
 opcode_t* invoke(void* next)
 
@@ -340,10 +248,8 @@ INTVAL does(STRING* role)
 INTVAL isa_pmc(PMC* _class)
 INTVAL isa(STRING* _class)
 
-PMC* get_attr(INTVAL idx)
 PMC* get_attr_str(STRING* idx)
 PMC* get_attr_keyed(PMC* key, STRING* idx)
-void set_attr(INTVAL idx, PMC* value) :write
 void set_attr_str(STRING* idx, PMC* value) :write
 void set_attr_keyed(PMC* key, STRING* idx, PMC* value) :write
 
@@ -367,11 +273,13 @@ void remove_vtable_override(STRING* vtable_name) :write
 PMC* inspect()
 PMC* inspect_str(STRING* what)
 
-void freeze(visit_info* info)
-void thaw  (visit_info* info) :write
-void thawfinish (visit_info* info) :write
-void visit (visit_info* info)
+void freeze(PMC* info)
+void thaw(PMC* info) :write
+void thawfinish(PMC* info) :write
+void visit(PMC* info)
 
 void share()
 
 PMC* share_ro()
+
+void init_int(INTVAL initializer)

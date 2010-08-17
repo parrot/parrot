@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 99;
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ t/op/calling.t - Parrot Calling Conventions
 
 =head1 SYNOPSIS
 
-        % prove t/op/calling.t
+    % prove t/op/calling.t
 
 =head1 DESCRIPTION
 
@@ -39,11 +39,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "var_args - parsing" );
 .pcc_sub main:
     print "Ok 1\n"
     set_args "0, 0", P0, I0
-    get_results "0", I0
     find_name P1, "foo"
     print "Ok 2\n"
     invokecc P1
     print "Ok 5\n"
+    get_results "0", I0
+    print "Ok 6\n"
     end
 .pcc_sub foo:
     get_params "0, 0", P0, I0
@@ -57,6 +58,7 @@ Ok 2
 Ok 3
 Ok 4
 Ok 5
+Ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic" );
@@ -84,9 +86,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic" );
 .pcc_sub main:
     set I16, 77
     set_args "0, 0", 42, I16
-    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -113,9 +115,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic - adjust sig" 
 .pcc_sub main:
     set I16, 77
     set_args "0, 0", 42, I16
-    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -146,9 +148,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     new P16, 'Integer'
     set P16, 101
     set_args "0, 0, 0, 0, 0, 0, 0", 42, I16, 4.5, N16, S16, "ok 2\n", P16
-    get_results "0, 0, 0, 0", I16, N16, S16, P16
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0, 0, 0", I16, N16, S16, P16
     print I16
     print "\n"
     print N16
@@ -180,13 +182,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
 CODE
 42
 77
-4.500000
-2.300000
+4.5
+2.3
 ok 1
 ok 2
 101
 88
-5.500000
+5.5
 ok 3
 ok 4
 OUTPUT
@@ -429,7 +431,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
     returncc
 .end
 CODE
-hello 42 again 47.110000
+hello 42 again 47.11
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
@@ -447,7 +449,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
     print $P0
 .end
 CODE
-/too few arguments passed/
+/too few positional arguments/
 OUTPUT
 
 pir_output_like(
@@ -478,7 +480,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - force ge
     print "nada"
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
@@ -488,7 +490,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "0,0", $P0,77
+    set_args "0,0", $P0, 77
     invokecc $P1
 .end
 .sub foo
@@ -496,7 +498,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
     print $P0
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exception" );
@@ -506,7 +508,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "0,0", $P0,77
+    set_args "0,0", $P0, 77
     invokecc $P1
 .end
 .sub foo
@@ -515,12 +517,16 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     print $P0
     print "never\n"
 arg_handler:
-    get_results "0,0", $P1, $S0
-    print "catched: "
+    get_results "0", $P1
+    $S0 = $P1
+    print "caught: "
     print $S0
+#    $S1 = typeof $P1
+#    print "\nexception type: "
+#    print $S1
 .end
 CODE
-/^catched: too many arguments passed/
+/^caught: too many positional arguments/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
@@ -567,16 +573,16 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
     .param int got_k :opt_flag
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_param later" );
 .pcc_sub main:
     set I16, 77
     set_args "0, 0", 42, I16
-    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -602,14 +608,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 1" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
-    get_results "0", $S0
     invokecc f
+    get_results "0", $S0
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     tailcall b
 .end
@@ -627,14 +633,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 2 - pass arg" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
-    get_results "0", $S0
     invokecc f
+    get_results "0", $S0
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     set_args "0", "from_foo\n"
     tailcall b
@@ -656,14 +662,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 3 - pass arg" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
-    get_results "0", $S0
     invokecc f
+    get_results "0", $S0
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     set_args "0", "from_foo\n"
     tailcall b
@@ -729,10 +735,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir uses no ops" );
 .end
 
 .sub foo
-    get_params "0, 0", I16, I17
-    print I16
+    get_params "0, 0", $I16, $I17
+    print $I16
     print "\n"
-    print I17
+    print $I17
     print "\n"
     set_returns ""
     returncc
@@ -771,15 +777,15 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 4 - pir calls" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
     $S0 = f()
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
-    .return b("from_foo\n")
+    .tailcall b("from_foo\n")
 .end
 .sub bar
     .param string s
@@ -830,7 +836,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
 .end
 CODE
 42 42 42
-42.000000 42.000000 42.200000
+42 42 42.2
 42 42 42.2
 OUTPUT
 
@@ -919,11 +925,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "optional returns, void ret" );
 .sub main :main
     .local pmc f
     $I0 = 99
-    f = global "foo"
+    f = get_global "foo"
     .begin_call
     .call f
-    .result   $P0 :optional
-    .result   $I0 :opt_flag
+    .get_result   $P0 :optional
+    .get_result   $I0 :opt_flag
     .end_call
     unless $I0,  ex
     print "not "
@@ -960,7 +966,7 @@ ok2:
     .param pmc b
     $P0 = new 'Integer'
     $P0 = 3
-    .return bar($P0, a, b)
+    .tailcall bar($P0, a, b)
 .end
 
 .sub bar
@@ -987,13 +993,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     f(o, "ok 4\n")
 .end
 .namespace ["Foo"]
-.sub bar :method
+.sub bar :method :nsentry('bar')
     .param string s
     print self
     print " "
     print s
 .end
-.sub baz :method
+.sub baz :method :nsentry('baz')
     .param string s
     print self
     print " "
@@ -1078,7 +1084,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "bug - :slurpy promotes to :flatten" );
 .end
 .sub foo
     .param pmc p :slurpy
-    .return bar(p)
+    .tailcall bar(p)
 .end
 .sub bar
     .param pmc p
@@ -1101,7 +1107,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call :slurpy with :flat" );
         print "\n"
 .end
 .sub main :main
-        $P34 = new 'Array'
+        $P34 = new 'ResizablePMCArray'
         $P34 = 0
         ## normal flattening direct call, non-slurpy returns
         $P35 = _fn1($P34 :flat)
@@ -1131,7 +1137,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call with :flat in the middle" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1164,7 +1170,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "right number of args via :flat" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 3
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1197,7 +1203,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 4
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1206,7 +1212,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
     $P35 = _fn1(1, $P34 :flat)
 .end
 CODE
-/too many arguments passed \(5\) - 4 params expected/
+/too many positional arguments: 5 passed, 4 expected/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
@@ -1231,14 +1237,14 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31
     $P35 = _fn1(1, $P34 :flat)
 .end
 CODE
-/too few arguments passed \(3\) - 4 params expected/
+/too few positional arguments: 3 passed, 4 \(or more\) expected/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
@@ -1274,7 +1280,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI - 2" );
     code = ".sub main :main :anon\n" . code
     code = code . "\n.end\n"
     $P0 = compreg "PIR"
-    .return $P0(code)
+    .tailcall $P0(code)
 .end
 CODE
 Foo!
@@ -1326,15 +1332,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - overlapping Ix" );
     print "\n"
 .end
 .sub foo
-    .const .Sub b = "bar"
-    I0 = 10
-    I1 = 20
-    set_args "0,0", I1, I0
+    .const 'Sub' b = "bar"
+    $I0 = 10
+    $I1 = 20
+    set_args "0,0", $I1, $I0
     tailcall b
 .end
 .sub bar
-    get_params "0,0", I0, I1
-    .return (I0, I1)
+    get_params "0,0", $I0, $I1
+    .return ($I0, $I1)
 .end
 CODE
 2010
@@ -1346,8 +1352,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - optional not set" );
     print "ok\n"
 .end
 .sub foo
-    .const .Sub b = "bar"
-    .return b(10, 20)
+    .const 'Sub' b = "bar"
+    .tailcall b(10, 20)
 .end
 .sub bar
     .param int a
@@ -1377,8 +1383,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - optional set" );
     print "ok\n"
 .end
 .sub foo
-    .const .Sub b = "bar"
-    .return b(10, 20, 30)
+    .const 'Sub' b = "bar"
+    .tailcall b(10, 20, 30)
 .end
 .sub bar
     .param int a
@@ -1444,7 +1450,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "result_info op" );
 .sub main :main
     test()
+    $P0 = new 'FixedIntegerArray'
+    set_result_info $P0
+    $P0 = 1
     $I0 = test()
+    $P0 = new 'FixedIntegerArray'
+    $P0 = 3
+    set_result_info $P0
     ($I1, $I2, $I3) = test()
 .end
 
@@ -1473,8 +1485,18 @@ pir_output_is( <<'CODE', <<'OUTPUT', "result_info op with eval" );
 TESTSUB
     $P0 = compreg "PIR"
     $P1 = $P0($S0)
+    $P0 = new 'FixedIntegerArray'
+    set_result_info $P0
     test()
+
+    $P0 = new 'FixedIntegerArray'
+    $P0 = 1
+    set_result_info $P0
     $I0 = test()
+
+    $P0 = new 'FixedIntegerArray'
+    $P0 = 3
+    set_result_info $P0
     ($I1, $I2, $I3) = test()
 .end
 CODE
@@ -1603,7 +1625,7 @@ cont_dest:
     .param pmc cc
     .param string s
     print s
-    .return cc()
+    .tailcall cc()
 .end
 CODE
 ok 1
@@ -1630,9 +1652,9 @@ L2:
         print ".\n"
         .return ()
 L3:
-        .const .Sub $P49 = "___internal_main_test_"
+        .const 'Sub' $P49 = "___internal_main_test_"
         newclosure $P48, $P49
-        .return _try_it($I42, $P48)
+        .tailcall _try_it($I42, $P48)
 .end
 
 .sub ___internal_main_test_ :outer('_main')
@@ -1643,7 +1665,7 @@ L3:
         if arg1 != 3 goto L3
         $P58 = arg1
         $P59 = arg1
-        $P57 = n_mul $P58, $P59
+        $P57 = mul $P58, $P59
         set_args '(0)', $P57
         tailcall $P41
 L3:
@@ -1704,9 +1726,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 1" );
 .pcc_sub main:
     set_args "0x200, 0, 0x200, 0", "b", 10, "a", 20
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1727,9 +1749,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 2 flatten" );
     set P0['a'], 20
     set P0['b'], 10
     set_args "0x220", P0            # :flatten :named
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1744,12 +1766,42 @@ CODE
 ok
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "named - 3 slurpy hash PIR" );
+.sub main :main
+    foo('a' => 10 , 'b' => 20, 'c' => 30)
+    print "ok\n"
+    end
+.end
+.sub foo
+    .param int a :named('a')
+    .param pmc bar :slurpy :named
+    print a
+    print ' '
+    elements $I1, bar
+    print $I1
+    print ' '
+    typeof $S0, bar
+    print $S0
+    print ' '
+    set $I2, bar['b']
+    print $I2
+    print ' '
+    set $I2, bar['c']
+    print $I2
+    print "\n"
+.end
+
+CODE
+10 2 Hash 20 30
+ok
+OUTPUT
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 3 slurpy hash" );
 .pcc_sub main:
     set_args "0x200, 0, 0x200, 0,0x200, 0", "a", 10, "b", 20, 'c', 30
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1778,9 +1830,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 4 positional -> named" );
 .pcc_sub main:
     set_args  "0, 0, 0", 10, 20, 30
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1800,9 +1852,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named" );
 .pcc_sub main:
     set_args  "0, 0, 0, 0x200, 0, 0x200, 0", 10, 20, 30, 'a', 40, 'b', 50
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1935,91 +1987,6 @@ CODE
 ok
 OUTPUT
 
-## Named
-pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for parameters" );
-.sub main :main
-        foo ('a'=>20,'b'=>10)
-        print "ok\n"
-
-        end
-.end
-
-.sub foo
-        .param int "b" => d
-        .param int "a" => c
-
-        print d
-        print ' '
-        print c
-        print "\n"
-
-        .return ()
-.end
-CODE
-10 20
-ok
-OUTPUT
-
-## Named
-pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for target list" );
-.sub main :main
-        ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
-        print $I0
-        print ' '
-        print $I1
-        print "\n"
-        print "ok\n"
-
-        end
-.end
-
-.sub foo
-        .param int "a" => c
-        .param int "b" => d
-
-        print d
-        print ' '
-        print c
-        print "\n"
-
-        .return ( 10 :named("a"), 20 :named("b"))
-.end
-CODE
-10 20
-20 10
-ok
-OUTPUT
-
-## Named
-pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for return" );
-.sub main :main
-        ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
-        print $I0
-        print ' '
-        print $I1
-        print "\n"
-        print "ok\n"
-
-        end
-.end
-
-.sub foo
-        .param int "a" => c
-        .param int "b" => d
-
-        print d
-        print ' '
-        print c
-        print "\n"
-
-        .return ( "a" => 10, "b" => 20 )
-.end
-CODE
-10 20
-20 10
-ok
-OUTPUT
-
 pir_error_output_like( <<'CODE', <<'OUTPUT', "named => pos passing" );
 .sub main :main
         foo( "b" => 10 , "a" => 20)
@@ -2032,7 +1999,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "named => pos passing" );
         .param int b
 .end
 CODE
-/many named arguments/
+/too few positional/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
@@ -2044,25 +2011,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
 .sub foo
         .param int d :named('b')
         .param int c :named('a') :optional
-        print d
-        print ' '
-        print c
-        print "\n"
-.end
-CODE
-10 20
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
-.sub main :main
-        foo ('a'=>20,'b'=>10)
-        print "ok\n"
-.end
-
-.sub foo
-        .param int 'b' => d
-        .param int 'a' => c  :optional
         print d
         print ' '
         print c
@@ -2162,21 +2110,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" )
 .end
 
 .sub foo
-        .param int "a" => c :named("foo")
-        .param int "b" => d
-.end
-CODE
-/Named parameter with more than one name/
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
-.sub main :main
-        foo( "b" => 10, "a" => 20)
-        print "never\n"
-        end
-.end
-
-.sub foo
         .param int  c :named("foo") :named("bar")
         .param int "b" => d
 .end
@@ -2200,7 +2133,7 @@ CODE
 1120
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
+pir_error_output_like( <<'CODE', qr/too few named arguments/, "argc mismatch - missing named" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -2217,10 +2150,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
         print "\n"
 .end
 CODE
-/too few arguments/
-OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
+pir_error_output_like( <<'CODE', qr/too few named arguments/, "argc mismatch - missing named" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -2237,8 +2168,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
         print "\n"
 .end
 CODE
-/too few arguments/
-OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
 .sub main :main
@@ -2373,7 +2302,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
     .param pmc args :slurpy :named
 .end
 CODE
-/positional inside named args at position 2/
+/too many positional arguments/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
@@ -2386,10 +2315,10 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
     .param pmc args :slurpy :named
 .end
 CODE
-/positional inside named args at position 3/
+/named arguments must follow all positional arguments/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
+pir_output_is( <<'CODE', <<'OUTPUT', "flat/slurpy named arguments" );
 .sub 'main' :main
         .local pmc args
         args = new 'Hash'
@@ -2418,33 +2347,33 @@ pir_output_is(
 .end
 
 .sub create_closure_and_run_it
-    P0 = new "Integer"
-    P0 = 3
-    .lex "val", P0
-    P2 = get_global "myclosure"
-    P1 = newclosure P2
+    $P0 = new "Integer"
+    $P0 = 3
+    .lex "val", $P0
+    $P2 = get_global "myclosure"
+    $P1 = newclosure $P2
     # There is a closure depending on our current context, so this shouldn't
     # free it.
-    .return P1()
+    .tailcall $P1()
 .end
 
 .sub myclosure :outer(create_closure_and_run_it)
-    P1 = find_lex "val"
-    say P1
+    $P1 = find_lex "val"
+    say $P1
     donothing()
-    P1 = find_lex "val"
-    say P1
+    $P1 = find_lex "val"
+    say $P1
     .return ()
 .end
 
 .sub donothing
-    P0 = new "Integer"
-    P0 = 5
+    $P0 = new "Integer"
+    $P0 = 5
     # This creates a new binding that is not accessible by the
     # caller (myclosure)
-    .lex "val", P0
-    P2 = null
-    P1 = null
+    .lex "val", $P0
+    null $P2
+    null $P1
 .end
 CODE
 3
@@ -2460,6 +2389,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional" );
     foo($P0 :flat, 'abc' => 3)
     $P0 = new 'ResizablePMCArray'
     foo($P0 :flat, 'abc' => 4)
+    $P0 = new 'Hash'
+    $P0['abc'] = 5
+    foo($P0 :named :flat)
 .end
 
 .sub foo
@@ -2476,9 +2408,36 @@ ok 1
 ok 2
 ok 3
 ok 4
+ok 5
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'RT #39844' );
+pir_output_is( <<'CODE', <<'OUTPUT', "named optional after :optional" );
+.sub main :main
+    foo()
+    foo(1 :named('y'))
+    $P0 = new 'Integer'
+    $P0 = 2
+    'foo'($P0 :named('y'))
+.end
+
+.sub foo
+    .param pmc x :optional
+    .param int has_x :opt_flag
+    .param pmc y :optional :named('y')
+    .param int has_y :opt_flag
+    if has_y goto have_y
+    y = new 'Integer'
+    y = 0
+have_y:
+    say y
+.end
+CODE
+0
+1
+2
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'TT #1033' );
 .sub main :main
   foo(1)
 .end
@@ -2487,6 +2446,154 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo
 .end
 CODE
 /too many arguments passed\(1\) - 0 params expected/
+OUTPUT
+
+# See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730
+pir_output_is( <<'CODE', <<'OUTPUT', "named from register, not constant" );
+.sub 'main'
+    $S0 = 'foo'
+    example('foo' => 42)              # normal named parameter
+    example( $S0  => 42)              # parameter named by non-const register
+    just_a_string( $S0, 'foo' => 42 ) # nameyness should not stick on register
+.end
+
+.sub 'example'
+    .param pmc foo :named('foo')
+    say foo
+.end
+
+.sub 'just_a_string'
+    .param pmc bar
+    .param int baz :named( 'foo' )
+    say bar
+    say baz
+.end
+CODE
+42
+42
+foo
+42
+OUTPUT
+
+# See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730
+pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
+.sub 'main'
+    $P0   = new ['Undef']
+    ($P0) = foo()
+    $S0   = typeof $P0
+    say $S0
+.end
+
+.sub 'foo'
+    .param pmc arg :slurpy
+    $S0 = typeof arg
+    say $S0
+    .return (arg :flat)
+.end
+CODE
+ResizablePMCArray
+Undef
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Tailcall from vtable" );
+
+.sub main :main
+$P1 = newclass "Foo"
+$P2 = new "Foo"
+
+## Should return 2, but doesn't.
+$I1 = elements $P2
+$S1 = $I1
+say $S1
+.end
+
+.namespace ["Foo"]
+
+.sub elements :vtable
+$I0 = 13
+$I1 = 2
+.tailcall identity($I1)
+.end
+
+.sub identity
+.param int arg
+.return (arg)
+.end
+CODE
+2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "methodtailcall 1 TT#133" );
+
+.sub main
+    say "main"
+    $P0 = foo() ## fails :-(
+    $P0 = bar()
+    say "done"
+.end
+
+.sub foo
+    .local pmc p
+    say "foo"
+    p = new "Class"
+    .tailcall p."attributes"()
+.end
+
+.sub bar
+    .local pmc  p
+    say "bar"
+    p = new "Class"
+    $P0 = p."attributes"()
+    .return ($P0)
+.end
+
+CODE
+main
+foo
+bar
+done
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "handling of slurpy after optional, TT #1733" );
+
+# Lua calling convention scheme
+
+# f() has 2 known parameters
+.sub 'f'
+    .param pmc p1 :optional
+    .param int has_p1 :opt_flag
+    .param pmc p2 :optional
+    .param int has_p2 :opt_flag
+    .param pmc extra :slurpy
+    unless has_p1 goto L1
+    say p1
+    unless has_p2 goto L1
+    say p2
+    $P0 = iter extra
+  L2:
+    unless $P0 goto L1
+    $P1 = shift $P0
+    say $P1
+    goto L2
+  L1:
+.end
+
+.sub 'main' :main
+    $P1 = box "p1"
+    $P2 = box "p2"
+    $P3 = box "p3"
+    f($P1, $P2, $P3)
+    f($P1, $P2)
+    f($P1)
+.end
+
+CODE
+p1
+p2
+p3
+p1
+p2
+p1
 OUTPUT
 
 # Local Variables:

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -11,8 +11,8 @@ How to submit bug reports, patches and new files to Parrot.
 
 =head1 How To Submit A Bug Report
 
-If you encounter an error while working with Parrot, and don't understand what
-is causing it, then submit a bug report using the F<parrotbug> utility. The
+If you encounter an error while working with Parrot and don't understand what
+is causing it, create a bug report using the F<parrotbug> utility. The
 simplest way to use it is to run
 
     % ./parrotbug
@@ -22,17 +22,11 @@ in the distribution's root directory, and follow the prompts.
 However, if you do know how to fix the problem you encountered, then think
 about submitting a patch, or (see below) getting commit privileges.
 
-=head1 How To Submit A Patch
+=head1 How To Create A Patch
 
 Try to keep your patches specific to a single change, and ensure that your
 change does not break any tests.  Do this by running C<make test>.  If there is
 no test for the fixed bug, please provide one.
-
-=over
-
-=item 1
-
-Create the patch.
 
 In the following examples, F<parrot> contains the Parrot distribution, and
 F<workingdir> contains F<parrot>. The name F<workingdir> is just a placeholder
@@ -44,7 +38,7 @@ for whatever the distribution's parent directory is called on your machine.
                 |
                 +--> LICENSE
                 |
-                +--> src 
+                +--> src
                 |
                 +--> tools
                 |
@@ -97,38 +91,57 @@ The format for entries in F<CREDITS> is defined at the top of the file.
 
 =back
 
+=head1 How To Submit A Patch
+
+=over 4
+
+=item 1
+
+Go to Parrot's ticket tracking system at
+L<https://trac.parrot.org/parrot/>. Log in, or create an account if you
+don't have one yet.
+
 =item 2
 
-Create a plain text email.
+If there is already a ticket for the bug or feature that your patch relates
+to, just attach the patch directly to the ticket.
 
 =item 3
 
-Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
+Otherwise select "New Ticket" at the top of the site.
+L<https://trac.parrot.org/parrot/newticket>
 
 =item 4
 
-Give the message a clear and concise subject.
-
-Prefix it with a C<[PATCH]> identifier.
+Give a clear and concise Summary.  You do B<NOT> need to prefix the Summary
+with a C<[PATCH]> identifier.  Instead, in the lower-right corner of the
+F<newticket> page, select status C<new> in the F<Patch status> drop-down box.
 
 =item 5
 
-The message body should contain an explanation of the purpose of the patch, and
+The Description should contain an explanation of the purpose of the patch, and
 a list of all files affected with summary of the changes made in each file.
 Optionally, the output of the C<diffstat(1)> utility when run on your patch(s)
 may be included at the bottom of the message body.
 
 =item 6
 
-Attach the patch file(s).
-
-Double-check that you've actually done this, because it's easy to forget.
-
-B<DO NOT> paste the patch file content into the body of the message.
+Set the Type of the ticket to "patch". Set other relevant drop-down
+menus, such as Version (the version of Parrot where you encountered the
+problem), Platform, or Severity.  As mentioned above, select status C<new> in
+the F<Patch status> drop-down box.
 
 =item 7
 
-Send the mail.
+Check the box for "I have files to attach to this ticket". Double-check
+that you've actually done this, because it's easy to forget.
+
+B<DO NOT> paste the patch file content into the Description.
+
+=item 8
+
+Click the "Create ticket" button. On the next page attach your patch
+file(s).
 
 =back
 
@@ -149,7 +162,7 @@ For recursive C<diff> patches, copy the patch file to F<workingdir>, and run:
     patch -p0 < some.patch
 
 In order to be on the safe side run 'make test' before actually committing
-the changes. 
+the changes.
 
 =head2 Configuration of files to ignore
 
@@ -166,7 +179,7 @@ The list of these ignore files can be set up with:
 
     svn propedit svn:ignore <PATH>
 
-In order to keep the two different checks synchronized, 
+In order to keep the two different checks synchronized,
 the MANIFEST and MANIFEST.SKIP file should be regenerated with:
 
     perl tools/dev/mk_manifest_and_skip.pl
@@ -195,75 +208,70 @@ to diff the file against /dev/null like this:
 
 =item 3
 
-Create a plain text email.
+Go to Parrot's ticket tracking system at
+L<https://trac.parrot.org/parrot/>. Log in, or create an account if you
+don't have one yet.
 
 =item 4
 
-Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
+Select "New Ticket" L<https://trac.parrot.org/parrot/newticket>.
 
 =item 5
 
-Give the message a clear and concise subject.
+Give a clear and concise Summary.
 
 Prefix it with a C<[NEW]> identifier.
 
 =item 6
 
-The message body should contain an explanation of the purpose of the feature
+The Description should contain an explanation of the purpose of the feature
 you are adding.  Optionally, include the output of the C<diffstat(1)> utility
 when run on your patch(es).
 
 =item 7
 
-Attach the patch for MANIFEST and your new file(s).
+Set the Type of the ticket to "patch". Set other relevant drop-down
+menus, such as Version, Platform, or Severity.
+
+=item 8
+
+Check the box for "I have files to attach to this ticket"
 
 Double-check that you've actually done this, because it's easy to forget.
 
 B<DO NOT> paste the content of the new file or files into the body of the
 message.
 
-=item 8
+=item 9
 
-Send the mail.
+Click the "Create ticket" button. On the next page attach the patch for
+MANIFEST and your new file(s).
 
 =back
 
 =head1 What Happens Next?
 
-RT creates a ticket for the submission, and you will receive an automatic reply
-with details of the ticket identifier. This identifier should be used in all
-further correspondence concerning the submission.
+If you created a new ticket for the submission, you will be taken to the page
+for the new ticket and can check on the progress of your submission there.
+This identifier should be used in all correspondence concerning the submission.
 
-Everyone on the list sees the submission, and can comment on it. A developer
-with SVN commit authority will commit it to SVN once it is clear that it is the
+Everyone on Trac sees the submission and can comment on it. A developer with
+SVN commit authority can commit it to SVN once it is clear that it is the
 right thing to do.
 
-Even developers with SVN commit authority stick to this scheme for larger or
-more complex changes, to allow time for peer review.
+However developers with SVN commit authority may not commit your changes
+immediately if they are large or complex, as we need time for peer review.
 
-You can check the progress of your submission at the Parrot bugs page
-L<http://bugs6.perl.org/>. If you have trouble logging in try username C<guest>
-with password C<guest>.
+A list of active tickets can be found here:
+L<http://trac.parrot.org/parrot/report/1>
 
-A Parrot Bug Summary page is also available from
-L<https://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
-
-A list of all the unresolved patches is at
-L<http://www.parrotcode.org/openpatches.html>
+A list of all the unresolved patches is at:
+L<http://trac.parrot.org/parrot/report/15>
 
 =head1 Patches for the Parrot website
 
-The sources for L<http://www.parrotcode.org> are managed in a subversion
-repository. The repository can be fetched from
-https://svn.perl.org/perl.org/docs/live/parrotcode/. A read only copy can be
-retrieved with 'guest/guest'.
-
-You will notice that some of the content is generated directly from the Parrot
-repository. So the usual rules for Parrot patches apply for this content.
-
-For changes specific for parrotcode.org please send patches to B<webmaster>
-I<at> B<perl> I<dot> B<org>, and cc B<parrot-porters> I<at> B<perl> I<dot>
-B<org>.
+The L<http://www.parrot.org> website is hosted in a Drupal CMS. Submit
+changes through the usual ticket interface in Trac.
 
 =head1 Getting Commit Privileges
 
@@ -279,34 +287,29 @@ described in this document.  This process may take weeks or months.
 
 =item 2
 
-Obtain a perl.org account at L<https://auth.perl.org/auth/account>
+Obtain a Trac account at L<https://trac.parrot.org/parrot>
 
 =item 3
 
-Submit a Perl Contributor License Agreement; this document signifies that you
-have the authority to license your work to The Perl Foundation for inclusion in
+Submit a Parrot Contributor License Agreement; this document signifies that you
+have the authority to license your work to Parrot Foundation for inclusion in
 their projects.  You may need to discuss this with your employer if you
 contribute to Parrot on work time or with work resources, or depending on your
 employment agreement.
 
-L<http://www.perlfoundation.org/contributor_license_agreement>
+L<http://www.parrot.org/files/parrot_cla.pdf>
 
 =item 4
 
-Request commit access via the C<parrot-porters> mailing list, or via IRC
-(#parrot on irc.perl.org).  The existing commiters will discuss your request in
-the next couple of weeks.
+Request commit access via the C<parrot-dev> mailing list, or via IRC
+(#parrot on irc.parrot.org). The existing committers will discuss your
+request in the next couple of weeks.
 
-If approved, a metacommiter will update the permissions to allow you to commit
+If approved, a metacommitter will update the permissions to allow you to commit
 to Parrot; see C<RESPONSIBLE_PARTIES> for the current list.  Welcome aboard!
 
 =back
 
 Thanks for your help!
-
-=head1 HISTORY
-
-Adapted by Michael Scott from a tutorial submitted by Aldo Calpini, with some
-additional remarks from Bruce Gray.
 
 =cut

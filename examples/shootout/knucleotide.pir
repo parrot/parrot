@@ -1,3 +1,7 @@
+# Copyright (C) 2005-2010, Parrot Foundation.
+# $Id$
+
+.loadlib 'io_ops'
 
 .sub main :main
 	.local pmc stdin
@@ -11,7 +15,7 @@ beginwhile_1:
 	line = ''
 	.local string seq
 beginwhile_2:
-	chopn line, 1
+	line = chopn line, 1
 	seq .= line
 	line = readline stdin
 	$I0 = length line
@@ -19,7 +23,7 @@ beginwhile_2:
 	$S0 = chopn line, -1
 	if $S0 != ">" goto beginwhile_2
 endwhile_2:
-	upcase seq
+	seq = upcase seq
 	sort_seq(seq, 1)
 	sort_seq(seq, 2)
 	find_seq(seq, "GGT")
@@ -63,13 +67,13 @@ endfor:
 	$I0 = elements table
 	array = $I0
 
-	.local pmc iter
-   	iter = new 'Iterator', table
-	set iter, .ITERATE_FROM_START
+	.local pmc it
+    it = iter table
+	set it, .ITERATE_FROM_START
 	i = 0
 iter_loop_1:
-	unless iter goto iter_end_1
-	$S0 = shift iter
+	unless it goto iter_end_1
+	$S0 = shift it
 	$I0 = table[$S0]
 	$P0 = new 'FixedPMCArray'
 	$P0 = 2
@@ -80,7 +84,7 @@ iter_loop_1:
 	goto iter_loop_1
 iter_end_1:
 
-	$P0 = global "sort"
+	$P0 = get_global "sort"
 	array."sort"($P0)
 
 	$I0 = array

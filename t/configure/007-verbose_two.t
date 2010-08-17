@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 007-verbose_two.t
 
@@ -16,7 +16,7 @@ use IO::CaptureOutput qw | capture |;
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [q{--verbose=2}],
         mode => q{configure},
@@ -56,7 +56,7 @@ is( $conf->options->{c}->{debugging},
     ok( $rv, "runsteps successfully ran $step" );
     like(
         $stdout,
-        qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*2/s,
+        qr/$description\.\.\..*Setting Configuration Data.*verbose.*2.*done/s,
         "Got message expected upon running $step"
     );
 }

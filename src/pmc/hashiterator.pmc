@@ -1,0 +1,300 @@
+/*
+Copyright (C) 2001-2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/hashiterator.pmc - Implementation of Iterator for Hashes.
+
+=head1 DESCRIPTION
+
+Generic iterator for traversing Hash.
+
+=head1 SYNOPSIS
+
+=head2 default usage
+
+    .local pmc iterator, hash, key, entry
+    iterator = iter hash
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    key   = shift iterator     # get the key. Some key
+    entry = hash[key]
+    ...
+    goto iter_loop
+  iter_end:
+
+=head2 C++-style usage
+
+    .local pmc iterator, hash, iter_key, key, entry
+    iterator = iter hash
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    iter_key = shift iterator     # get the key
+    key = iter_key.'key'()        # get an original key used to put value
+    key = iter_key.'value'()      # get an entry
+    ...
+    goto iter_loop
+  iter_end:
+
+
+=head1 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "pmc/pmc_hash.h"
+#include "pmc/pmc_hashiteratorkey.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+#define ASSERT_ARGS_advance_to_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static void advance_to_next(PARROT_INTERP, PMC *self)>
+
+Advance to next position. Return found (if any) HashBucket.
+
+=cut
+
+*/
+
+static void
+advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
+{
+    ASSERT_ARGS(advance_to_next)
+
+    Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
+    HashBucket                            *bucket = attrs->bucket;
+
+    /* Try to advance current bucket */
+    if (bucket)
+        bucket = bucket->next;
+
+    while (!bucket) {
+        /* If there is no more buckets */
+        if (attrs->pos == attrs->total_buckets)
+            break;
+
+        bucket = attrs->parrot_hash->bucket_indices[attrs->pos++];
+    }
+    attrs->bucket = bucket;
+    --attrs->elements;
+
+    return;
+}
+
+pmclass HashIterator extends Iterator no_ro auto_attrs {
+    ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
+    ATTR Hash       *parrot_hash;   /* Underlying implementation of hash */
+    ATTR HashBucket *bucket;        /* Current bucket */
+    ATTR INTVAL      total_buckets; /* Total buckets in index */
+    ATTR INTVAL      pos;           /* Current position in index */
+    ATTR INTVAL      elements;      /* How many elements left to iterate over */
+
+/*
+
+=item C<void init_pmc(PMC *initializer)>
+
+Initializes the iterator with an aggregate PMC.
+Defaults iteration mode to iterate from start.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *hash) {
+        Parrot_HashIterator_attributes * const attrs =
+            (Parrot_HashIterator_attributes *) PMC_data(SELF);
+
+        attrs->pmc_hash         = hash;
+        attrs->parrot_hash      = (Hash*)VTABLE_get_pointer(INTERP, hash);
+        attrs->total_buckets    = attrs->parrot_hash->mask + 1;
+        attrs->bucket           = 0;
+        attrs->pos              = 0;
+        /* Will be decreased on initial advance_to_next */
+        /* XXX Do we really need to support this use-case ? */
+        attrs->elements         = attrs->parrot_hash->entries + 1;
+
+        PObj_custom_mark_SET(SELF);
+
+        /* Initial state of iterator is "before start" */
+        /* So, advance to first element */
+        advance_to_next(INTERP, SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC * const hash = PARROT_HASHITERATOR(SELF)->pmc_hash;
+        Parrot_gc_mark_PMC_alive(INTERP, hash);
+        /* We don't mark underlying parrot_hash. Hash PMC will mark it */
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+=cut
+
+*/
+    VTABLE PMC* clone() {
+        return PMCNULL;
+    }
+
+/*
+
+=item C<void set_integer_native()>
+
+=cut
+
+*/
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_HashIterator_attributes * const attrs =
+                PARROT_HASHITERATOR(SELF);
+
+        if (value == ITERATE_FROM_START) {
+            /* Restart iterator */
+            attrs->bucket           = 0;
+            attrs->pos              = 0;
+            advance_to_next(INTERP, SELF);
+            return;
+        }
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "HashIterator: unknown iterator type");
+    };
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns this Iterator's Hash.
+
+=cut
+
+*/
+    VTABLE PMC* get_pmc() {
+        return PARROT_HASHITERATOR(SELF)->pmc_hash;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true if there is more elements to iterate over.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        return PARROT_HASHITERATOR(SELF)->bucket != 0;
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of remaining elements in the Hash.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        return PARROT_HASHITERATOR(SELF)->elements;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return SELF.elements();
+    }
+
+/*
+
+=item C<PMC *shift_pmc()>
+
+Returns the HashIteratorKey for the current position and advance
+the next one.
+
+=cut
+
+*/
+
+    VTABLE PMC *shift_pmc() {
+        Parrot_HashIterator_attributes * const attrs =
+                PARROT_HASHITERATOR(SELF);
+
+        PMC        *ret;
+
+        if (!attrs->bucket)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        ret = Parrot_pmc_new(INTERP, enum_class_HashIteratorKey);
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 1, attrs->bucket);
+
+        /* Move to next bucket */
+        advance_to_next(INTERP, SELF);
+
+        return ret;
+    }
+
+/*
+
+*/
+
+    VTABLE STRING* shift_string() {
+        Parrot_HashIterator_attributes * const attrs =
+                PARROT_HASHITERATOR(SELF);
+        HashBucket                     * const bucket = attrs->bucket;
+
+        if (!attrs->parrot_hash || !attrs->bucket)
+            return CONST_STRING(INTERP, "");
+
+        /* Move to next bucket */
+        advance_to_next(INTERP, SELF);
+
+        return hash_key_to_string(INTERP, attrs->parrot_hash, bucket->key);
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -1,11 +1,12 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 36;
+
+use Test::More tests => 26;
 use File::Spec;
 
 =head1 NAME
@@ -17,6 +18,8 @@ t/perl/Parrot_Distribution.t - Parrot::Distribution unit tests
     % prove t/perl/Parrot_Distribution.t
 
 =head1 DESCRIPTION
+
+Test individual Parrot::Distribution methods.
 
 =cut
 
@@ -51,11 +54,6 @@ ok( !$d->file_for_perl_module('Parrot::Dummy'), 'Perl module file not there' );
 my %pmc_source_file_directories = map { $_->path => 1 } $d->pmc_source_file_directories();
 
 my @old_directory_list = (
-    'compilers/bcg/src/pmc',   'languages/APL/src/pmc',
-    'languages/WMLScript/pmc',
-    'languages/dotnet/pmc',    'languages/lua/src/pmc',
-    'languages/perl6/src/pmc', 'languages/pugs/pmc',
-    'languages/tcl/src/pmc',
     map { File::Spec->catdir( 'src', $_ ) } qw(dynpmc pmc)
 );
 
@@ -78,10 +76,6 @@ for my $dir (@old_directory_list) {
 
     my $perl_exemption_regexp = $d->get_perl_exemption_regexp();
     ok( $perl_exemption_regexp, 'Got perl exemption regexp' );
-
-    my $exempted_file = Parrot::IO::File->new('../../lib/SmartLink.pm');
-    ok( $d->is_perl_exemption($exempted_file), 'SmartLink.pm is exempted' );
-    like( $exempted_file->path(), $perl_exemption_regexp, 'SmartLink.pm is matched' );
 
     # we are in 't/perl'
     {

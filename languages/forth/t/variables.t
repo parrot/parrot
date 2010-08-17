@@ -1,1 +1,0 @@
-#!../../parrot test.pir

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 =cut
 
     # Fetch a subroutine objec
-    .const .Sub P0 = "_sub"
+    .const 'Sub' P0 = "_sub"
 
     # Call the sub in argument, create return continuation
     invokecc P0
@@ -43,3 +43,8 @@ F<docs/pdds/pdd03_calling_conventions.pod>
     # Call the return continuation
     returncc
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

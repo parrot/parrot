@@ -1,4 +1,6 @@
-=head1 INFORMATION
+# $Id$
+
+=head1 Write Example
 
 This example shows the usage of C<Stream::Write>.
 
@@ -15,12 +17,12 @@ Creates a C<Stream::Writer> and writes to it.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Writer.pir"
+    load_bytecode 'Stream/Writer.pbc'
 
-    stream = new "Stream::Writer"
+    stream = new ['Stream'; 'Writer']
 
     # set the stream's source sub
-    .const .Sub temp = "_reader"
+    .const 'Sub' temp = "_reader"
     assign stream, temp
 
     print "main start\n"
@@ -58,7 +60,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

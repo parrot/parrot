@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blocks.pir - tetris block classes
@@ -58,7 +60,7 @@ blocks.pir - tetris block classes
     $P0 = get_class "Tetris::Block::6"
     push blocks, $P0
 
-    store_global "Tetris::Block", "blocks", blocks
+    set_hll_global [ "Tetris::Block" ], "blocks", blocks
 END:
 .end
 
@@ -247,7 +249,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

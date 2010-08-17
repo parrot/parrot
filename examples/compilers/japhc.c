@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- * Copyright (C) 2004-2008, The Perl Foundation.
+ * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
 /*
@@ -30,6 +30,7 @@ example compiler used by japh16.pasm
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "../../src/pmc/pmc_sub.h"
 
 #define C_DEBUG 0
 
@@ -40,12 +41,11 @@ example compiler used by japh16.pasm
 #  define cdebug(x)
 #endif
 
-PMC* japh_compiler(Parrot_Interp interp, const char *s);
+PMC* japh_compiler(PARROT_INTERP, const char *s);
 
 /*
 
-=item C<void
-Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)>
+=item C<void Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)>
 
 loadlib calls the load and init hooks
 we use init to register the compiler
@@ -55,22 +55,21 @@ we use init to register the compiler
 */
 
 void
-Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)
+Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)
 {
     STRING *cmp;
 
     cdebug((stderr, "japhc_init\n"));
-    cmp = const_string(interp, "JaPH_Compiler");
+    cmp = Parrot_str_new_constant(interp, "JaPH_Compiler");
     Parrot_compreg(interp, cmp, japh_compiler);
 }
 
 
 /*
 
-=item C<static int
-unescape(char *string)>
+=item C<static int unescape(char *string)>
 
-RT#48260: Not yet documented!!!
+Unescape a string.
 
 =cut
 
@@ -84,12 +83,12 @@ unescape(char *string)
     for (start = p = string ; *string; string++) {
         if (*string == '\\' && string[1]) {
             switch (*++string) {
-                case 'n':
-                    *p++ = '\n';
-                    break;
-                default:
-                    *p++ = *string;
-                    break;
+              case 'n':
+                *p++ = '\n';
+                break;
+              default:
+                *p++ = *string;
+                break;
             }
         }
         else
@@ -101,8 +100,8 @@ unescape(char *string)
 
 /*
 
-=item C<static int
-add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)>
+=item C<static int add_const_str(PARROT_INTERP, PackFile_ConstTable *consts,
+char *str)>
 
 add constant string to constant_table
 
@@ -111,7 +110,7 @@ add constant string to constant_table
 */
 
 static int
-add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
+add_const_str(PARROT_INTERP, PackFile_ConstTable *consts, char *str)
 {
     int k, l;
     char *o;
@@ -156,7 +155,7 @@ add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
 
 /*
 
-=item C<PMC* japh_compiler(Parrot_Interp interp, const char *program)>
+=item C<PMC* japh_compiler(PARROT_INTERP, const char *program)>
 
 simple compiler - no error checking
 
@@ -165,7 +164,7 @@ simple compiler - no error checking
 */
 
 PMC*
-japh_compiler(Parrot_Interp interp, const char *program)
+japh_compiler(PARROT_INTERP, const char *program)
 {
     PackFile_ByteCode *cur_cs, *old_cs;
     PackFile_ConstTable *consts;
@@ -194,32 +193,32 @@ japh_compiler(Parrot_Interp interp, const char *program)
     pc = cur_cs->base.data;
     for (p = program; *p; ++p) {
         switch (*p) {
-            case 'p':        /* print_sc */
-                *pc++ = interp->op_lib->op_code("print_sc", 1);
-                /* const follows */
-                ++p;
-                switch (*p) {
-                    case 'J':
-                        *pc++ = add_const_str(interp, consts, "Just ");
-                        break;
-                    case 'a':
-                        *pc++ = add_const_str(interp, consts, "another ");
-                        break;
-                    case 'P':
-                        *pc++ = add_const_str(interp, consts, "Parrot ");
-                        break;
-                    case 'H':
-                        *pc++ = add_const_str(interp, consts, "Hacker");
-                        break;
-                    case 'n':
-                        *pc++ = add_const_str(interp, consts, "\n");
-                        break;
-                }
+          case 'p':        /* print_sc */
+            *pc++ = interp->op_lib->op_code("print_sc", 1);
+            /* const follows */
+            ++p;
+            switch (*p) {
+              case 'J':
+                *pc++ = add_const_str(interp, consts, "Just ");
                 break;
-            case 'e':        /* end */
-                *pc++ = interp->op_lib->op_code("invoke_p", 1);
-                *pc++ = 1;
+              case 'a':
+                *pc++ = add_const_str(interp, consts, "another ");
                 break;
+              case 'P':
+                *pc++ = add_const_str(interp, consts, "Parrot ");
+                break;
+              case 'H':
+                *pc++ = add_const_str(interp, consts, "Hacker");
+                break;
+              case 'n':
+                *pc++ = add_const_str(interp, consts, "\n");
+                break;
+            }
+            break;
+          case 'e':        /* end */
+            *pc++ = interp->op_lib->op_code("invoke_p", 1);
+            *pc++ = 1;
+            break;
         }
     }
     if (old_cs) {
@@ -230,7 +229,7 @@ japh_compiler(Parrot_Interp interp, const char *program)
      * create sub PMC
      */
     sub = pmc_new(interp, enum_class_Eval);
-    sub_data = PMC_sub(sub);
+    PMC_get_sub(interp, sub, sub_data);
     sub_data->seg = cur_cs;
     sub_data->address = cur_cs->base.data;
     sub_data->end = cur_cs->base.data + cur_cs->base.size;

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining some signal stuff};
+    $data{description} = q{Determine some signal stuff};
     $data{result}      = q{};
     return \%data;
 }
@@ -38,31 +38,25 @@ sub runstep {
         has_sigaction      => undef,
         has_setitimer      => undef
     );
-    if ( defined $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
 
-    my $verbose = $conf->options->get('verbose');
-
-    $conf->cc_gen('config/auto/signal/test_1.in');
+    $conf->cc_gen('config/auto/signal/test1_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
-        _handle__sighandler_t($conf, $verbose);
+        _handle__sighandler_t($conf);
     }
     $conf->cc_clean();
 
-    $conf->cc_gen('config/auto/signal/test_2.in');
+    $conf->cc_gen('config/auto/signal/test2_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
-        _handle_sigaction($conf, $verbose);
+        _handle_sigaction($conf);
     }
     $conf->cc_clean();
 
-    $conf->cc_gen('config/auto/signal/test_itimer.in');
+    $conf->cc_gen('config/auto/signal/test_itimer_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
-        _handle_setitimer($conf, $verbose);
+        _handle_setitimer($conf);
     }
     $conf->cc_clean();
 
@@ -74,26 +68,26 @@ sub runstep {
 }
 
 sub _handle__sighandler_t {
-    my ($conf, $verbose) = @_;
+    my ($conf) = @_;
     $conf->data->set( has___sighandler_t => 'define' );
-    print " (__sighandler_t)" if $verbose;
+    $conf->debug(" (__sighandler_t)");
     return 1;
 }
 
 sub _handle_sigaction {
-    my ($conf, $verbose) = @_;
+    my ($conf) = @_;
     $conf->data->set( has_sigaction => 'define' );
-    print " (sigaction)" if $verbose;
+    $conf->debug(" (sigaction)");
     return 1;
 }
 
 sub _handle_setitimer {
-    my ($conf, $verbose) = @_;
+    my ($conf) = @_;
     $conf->data->set(
         has_setitimer    => 'define',
         has_sig_atomic_t => 'define',
     );
-    print " (setitimer) " if $verbose;
+    $conf->debug(" (setitimer) ");
     return 1;
 }
 
@@ -111,7 +105,7 @@ sub _print_signalpasm {
 EOF
     my ( $i, $name );
     $i = 0;
-    foreach $name ( split( ' ', $conf->data->get_p5('sig_name') ) ) {
+    foreach $name ( split( ' ', $conf->data->get('sig_name_provisional') ) ) {
         print {$O} ".macro_const SIG$name\t$i\n" if $i;
         $i++;
     }

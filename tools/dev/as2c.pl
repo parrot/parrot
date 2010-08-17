@@ -1,12 +1,12 @@
 #! perl
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2007, Parrot Foundation.
 
 # $Id$
 
 =head1 NAME
 
-as2c.pl - convert gas assember listing to i386 code array
+as2c.pl - convert gas assembler listing to i386 code array
 
 =head1 DESCRIPTION
 

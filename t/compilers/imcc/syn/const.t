@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -78,7 +78,7 @@ pir_output_is( <<'CODE', <<'OUT', "array/hash consts" );
    .const string key2 = "key2"
    .local int idx1
    .const int idx2 = 2
-   ar = new 'Array'
+   ar = new 'ResizablePMCArray'
    ar = 3
    ha = new 'Hash'
    key1 = "key1"
@@ -115,7 +115,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "PMC const 1 - Sub" );
 .sub 'main' :main
-    .const .Sub $P0 = "foo"
+    .const 'Sub' $P0 = "foo"
     print "ok 1\n"
     $P0()
     print "ok 3\n"
@@ -131,7 +131,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "PMC const 2 - Sub ident" );
 .sub 'main' :main
-    .const .Sub func = "foo"
+    .const 'Sub' func = "foo"
     print "ok 1\n"
     func()
     print "ok 3\n"
@@ -155,7 +155,7 @@ pasm_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
     end
 CODE
 2
-2.000000
+2
 ok
 OUT
 
@@ -172,7 +172,7 @@ pir_output_is( <<'CODE', <<'OUT', "const I/N mismatch 2" );
 .end
 CODE
 2
-2.000000
+2
 ok
 ok 2
 OUT
@@ -198,7 +198,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PIR heredocs: accepts inline with concat' );
     $S0 = ""
     $I0 = 0
 LOOP:
-    $S0 = concat <<"end"
+    concat $S0, <<"end"
 ending
 end
     inc $I0
@@ -571,10 +571,10 @@ pir_output_is( <<'CODE', <<'OUT', ".const in mixed opcodes" );
     print "\n"
 .end
 CODE
-10.000000
+10
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
+pir_output_is( <<'CODE', <<'OUT', "const int" );
 .const int c = 12
 .sub test
     .local num a
@@ -588,7 +588,7 @@ pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
     end
 .end
 CODE
-108.000000
+108
 12
 OUT
 

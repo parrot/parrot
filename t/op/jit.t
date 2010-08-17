@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 61;
 
 =head1 NAME
 
@@ -103,12 +103,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -164,12 +164,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -259,12 +259,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -320,12 +320,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -341,12 +341,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -436,12 +436,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -497,12 +497,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -575,12 +575,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -669,12 +669,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I5,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -730,12 +730,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped" );
-cleari
 set I0,0
 set I1,1
 set I2,2
 set I3,3
 set I4,4
+set I6,0
 set I0,I1
 set I2,I3
 set I0,I1
@@ -876,13 +876,14 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to JIT" );
         set I0, 42
         print I0
         print "\n"
-        bsr sub
+        new P0, 'ResizableIntegerArray'
+        local_branch P0, sub
         end
 sub:
         set I0, 43
         print I0
         print "\n"
-        ret
+        local_return P0
 CODE
 42
 43
@@ -907,11 +908,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to non JIT" )
         set I0, 42
         print I0
         print "\n"
-        bsr sub
+        new P0, 'ResizableIntegerArray'
+        local_branch P0, sub
         end
 sub:
         print "ok\n"
-        ret
+        local_return P0
 CODE
 42
 ok
@@ -927,19 +929,6 @@ FOO:   print "Jump succeeded\n"
        end
 CODE
 Jump succeeded
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "jsr" );
-     set_addr I1, FOO
-     jsr I1
-     print "and back again\n"
-     end
-
-FOO: print "There "
-     ret
-
-CODE
-There and back again
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "last is branch" );

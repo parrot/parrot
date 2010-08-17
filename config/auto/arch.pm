@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -10,6 +10,9 @@ config/auto/arch - Determine CPU architecture and operating system
 Determines the CPU architecture, the operating system.
 
 This code was formerly part of configuration step class auto::jit.
+
+TODO #356: This checks for the perl5 architecture, not for possible
+commandline overrides, such as -m64, -m32 or -Wl,-melf_x86_64.
 
 =cut
 
@@ -24,29 +27,33 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining CPU architecture and OS};
+    $data{description} = q{Determine CPU architecture and OS};
     $data{result}      = q{};
+    my $unamep;
+    eval {
+       chomp( $unamep  = `uname -p` ) unless ($^O eq 'MSWin32');
+    };
+    $data{unamep} = (! $@ and $unamep)
+        ? $unamep
+        : undef;
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
-
-    my $verbose = $conf->options->get('verbose');
-    $verbose and print "\n";
+    $conf->debug("\n");
 
     my $archname = $conf->data->get('archname');
+    # This was added to convert IA64.ARCHREV_0 on HP-UX, TT #645, TT #653
+    $archname =~ s|\.|_|g;
     my ( $cpuarch, $osname ) = split( /-/, $archname );
 
-    if ($verbose) {
-        print "determining operating system and cpu architecture\n";
-        print "archname: <$archname>\n";
-    }
+
+    $conf->debug(
+        "determining operating system and cpu architecture\n",
+        "archname: $archname\n")
+    ;
 
     if ( !defined $osname ) {
         ( $osname, $cpuarch ) = ( $cpuarch, q{} );
@@ -59,12 +66,9 @@ sub runstep {
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ( $cpuarch =~ /darwin/ ) {
         $osname = 'darwin';
-        if ( $conf->data->get('byteorder') == 1234 ) {
-            $cpuarch = 'i386';
-        }
-        else {
-            $cpuarch = 'ppc';
-        }
+        $cpuarch = ( $self->{unamep} eq 'powerpc' )
+            ? 'ppc'
+            : 'i386';
     }
 
     # cpuarch and osname are reversed in archname on windows
@@ -76,6 +80,12 @@ sub runstep {
         $cpuarch = 'i386';
         $osname  = 'cygwin';
     }
+    elsif ( $cpuarch eq 'i86pc' and $osname eq 'solaris' ) {
+        # That's only the perl value, and is the same for both i386
+        # and amd64.  Use uname -p instead to find the processor type.
+        chomp($archname = `uname -p`);
+        $cpuarch = $archname;
+    }
 
     if ( $archname =~ m/powerpc/ ) {
         $cpuarch = 'ppc';
@@ -85,13 +95,42 @@ sub runstep {
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
 
-    print "osname: $osname\ncpuarch: $cpuarch\n" if $verbose;
-
     $conf->data->set(
         cpuarch  => $cpuarch,
         osname   => $osname
     );
 
+    $conf->data->set( 'platform' => $self->_get_platform( $conf ) );
+
+    _report_verbose( $conf );
+
+    return 1;
+}
+
+sub _get_platform {
+    my ($self, $conf) = @_;
+    my $platform = lc ( $conf->data->get('osname') );
+
+    $platform = "win32" if $platform =~ /^msys/;
+    $platform = "win32" if $platform =~ /^mingw/;
+    $platform =~ s/^ms//;
+
+    if ( ( split m/-/, $conf->data->get('archname'), 2 )[0] eq 'ia64' ) {
+        $platform = 'ia64';
+    }
+
+    $platform = 'generic' unless -d "config/gen/platform/$platform";
+
+    return $platform;
+}
+
+sub _report_verbose {
+    my ($conf) = @_;
+    $conf->debug(
+        "osname:   ", $conf->data->get('osname'), "\n",
+        "cpuarch:  ", $conf->data->get('cpuarch'), "\n",
+        "platform: ", $conf->data->get('platform'), "\n",
+    );
     return 1;
 }
 

@@ -1,3 +1,4 @@
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -80,7 +81,7 @@ Print program version and exit.
 
     # Specification of command line arguments.
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     # getopts."notOptStop"(1)
     push getopts, "version"
     push getopts, "verbose=i"
@@ -156,7 +157,7 @@ do_help:
 no_v1:
     # op may be a file or an opcode - try to open it
     .local pmc F
-    open F, op, "<"
+    open F, op, 'r'
     .local int def
     def = defined F
     unless def goto op_is_op

@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
+
 =head1 NAME
 
 PCT::HLLCompiler - base class for compiler objects
@@ -19,9 +22,10 @@ running compilers from a command line.
     $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
 .end
 
-.namespace [ 'PCT::HLLCompiler' ]
+.namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
+.include 'stdio.pasm'
 
 .sub 'init' :vtable :method
     load_bytecode 'config.pir'
@@ -29,21 +33,20 @@ running compilers from a command line.
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
-    $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v'
+    $P0 = split ' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v stagestats'
     setattribute self, '@cmdoptions', $P0
 
-    $P1 = new 'String'
-    $P1 = <<'    USAGE'
+    $P1 = box <<'    USAGE'
   This compiler is based on PCT::HLLCompiler.
 
   Options:
     USAGE
 
-    .local pmc iter
-    iter = new 'Iterator', $P0
+    .local pmc it
+    it = iter $P0
   options_loop:
-    unless iter goto options_end
-    $P3  = shift iter
+    unless it goto options_end
+    $P3  = shift it
     $P1 .= "    "
     $P1 .= $P3
     $P1 .= "\n"
@@ -53,11 +56,18 @@ running compilers from a command line.
 
     $S0  = '???'
     push_eh _handler
-    $P0  = _config()    # currently works in the build tree, but not in the install tree
-    $S0  = $P0['revision']
+    $P0  = _config()
+    $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
   _handler:
-    $P2 = new 'String'
-    $P2  = 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
+    pop_eh
+    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot '
+    if $S0 goto _revision_lab
+    $P2 .= 'version '
+    $S0 = $P0['VERSION']
+    goto _is_version
+  _revision_lab:
+    $P2 .= 'revision '
+  _is_version:
     $P2 .= $S0
     $P2 .= '.'
     setattribute self, '$version', $P2
@@ -129,58 +139,57 @@ Accessor for the C<parsegrammar> attribute.
 
 Accessor for the C<parseactions> attribute.
 
-=item astgrammar([string grammar])
+=item astgrammar([grammar])
 
 Accessor for the C<astgrammar> attribute.
 
 =item commandline_banner([string value])
 
-Set the string in $S0 as a commandline prompt on the compiler in $P0.  The
-prompt is the text that is shown on the commandline before a command is entered
-when the compiler is started in interactive mode.
+Set the command-line banner for this compiler to C<value>.
+The banner is displayed at the beginning of interactive mode.
 
 =item commandline_prompt([string value])
 
-Set the string in $S0 as a commandline banner on the compiler in $P0.  The
-banner is the first text that is shown when the com‐ piler is started in
-interactive mode. This can be used for a copyright notice or other information.
+Set the command-line prompt for this compiler to C<value>.
+The prompt is displayed in interactive mode at each point where
+the compiler is ready for code to be compiled and executed.
 
 =cut
 
 .sub 'stages' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('@stages', value, has_value)
+    .tailcall self.'attr'('@stages', value, has_value)
 .end
 
 .sub 'parsegrammar' :method
-    .param string value        :optional
+    .param pmc value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$parsegrammar', value, has_value)
+    .tailcall self.'attr'('$parsegrammar', value, has_value)
 .end
 
 .sub 'parseactions' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$parseactions', value, has_value)
+    .tailcall self.'attr'('$parseactions', value, has_value)
 .end
 
 .sub 'astgrammar' :method
-    .param string value        :optional
+    .param pmc value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$astgrammar', value, has_value)
+    .tailcall self.'attr'('$astgrammar', value, has_value)
 .end
 
 .sub 'commandline_banner' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$commandline_banner', value, has_value)
+    .tailcall self.'attr'('$commandline_banner', value, has_value)
 .end
 
 .sub 'commandline_prompt' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$commandline_prompt', value, has_value)
+    .tailcall self.'attr'('$commandline_prompt', value, has_value)
 .end
 
 =item removestage(string stagename)
@@ -192,15 +201,15 @@ Delete a stage from the compilation process queue.
 .sub 'removestage' :method
     .param string stagename
 
-    .local pmc stages, iter, newstages
+    .local pmc stages, it, newstages
     stages = getattribute self, '@stages'
     newstages = new 'ResizableStringArray'
 
-    iter = new 'Iterator', stages
+    it = iter stages
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local pmc current
-    current = shift iter
+    current = shift it
     if current == stagename goto iter_loop
       push newstages, current
     goto iter_loop
@@ -244,14 +253,14 @@ be added at every instance of the repeated stage.
       target = adverbs['after']
 
   positional_insert:
-    .local pmc iter, newstages
+    .local pmc it, newstages
     newstages = new 'ResizableStringArray'
 
-    iter = new 'Iterator', stages
+    it = iter stages
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local pmc current
-    current = shift iter
+    current = shift it
     unless current == target goto no_insert_before
       unless position == 'before' goto no_insert_before
         push newstages, stagename
@@ -288,22 +297,51 @@ when the stage corresponding to target has been reached.
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
+    .local pmc compiling, options
+    compiling = new ['Hash']
+    .lex '%*COMPILING', compiling
+    compiling['%?OPTIONS'] = adverbs
+
     .local string target
     target = adverbs['target']
     target = downcase target
 
-    .local pmc stages, result, iter
+    .local int stagestats
+    stagestats = adverbs['stagestats']
+
+    .local pmc stages, result, it
     result = source
     stages = getattribute self, '@stages'
-    iter = new 'Iterator', stages
+    it = iter stages
+    if stagestats goto stagestats_loop
+
   iter_loop:
-    unless iter goto iter_end
+    unless it goto have_result
     .local string stagename
-    stagename = shift iter
+    stagename = shift it
     result = self.stagename(result, adverbs :flat :named)
     if target == stagename goto have_result
     goto iter_loop
-  iter_end:
+
+  stagestats_loop:
+    unless it goto have_result
+    stagename = shift it
+    $N0 = time
+    result = self.stagename(result, adverbs :flat :named)
+    $N1 = time
+    $N2 = $N1 - $N0
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1.'print'("Stage '")
+    $P1.'print'(stagename)
+    $P1.'print'("': ")
+    $P2 = new ['ResizablePMCArray']
+    push $P2, $N2
+    $S0 = sprintf "%.3f", $P2
+    $P1.'print'($S0)
+    $P1.'print'(" sec\n")
+    if target == stagename goto have_result
+    goto stagestats_loop
 
   have_result:
     .return (result)
@@ -320,43 +358,93 @@ to any options and return the resulting parse tree.
 .sub 'parse' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
-    .local pmc parsegrammar_name, top
+    .local pmc parsegrammar, top
 
     .local string tcode
     tcode = adverbs['transcode']
     unless tcode goto transcode_done
-    push_eh transcode_done
+    .local pmc tcode_it
+    $P0 = split ' ', tcode
+    tcode_it = iter $P0
+  tcode_loop:
+    unless tcode_it goto transcode_done
+    tcode = shift tcode_it
+    push_eh tcode_enc
     $I0 = find_charset tcode
     $S0 = source
     $S0 = trans_charset $S0, $I0
     assign source, $S0
     pop_eh
+    goto transcode_done
+  tcode_enc:
+    pop_eh
+    push_eh tcode_fail
+    $I0 = find_encoding tcode
+    $S0 = source
+    $S0 = trans_encoding $S0, $I0
+    assign source, $S0
+    pop_eh
+    goto transcode_done
+  tcode_fail:
+    pop_eh
+    goto tcode_loop
   transcode_done:
 
     .local string target
     target = adverbs['target']
     target = downcase target
 
-    parsegrammar_name = self.'parsegrammar'()
-    unless parsegrammar_name goto err_no_parsegrammar
-    top = get_hll_global parsegrammar_name, 'TOP'
+    parsegrammar = self.'parsegrammar'()
+    $I0 = can parsegrammar, 'TOP'
+    unless $I0 goto parsegrammar_string
+    top = find_method parsegrammar, 'TOP'
+    goto have_top
+  parsegrammar_string:
+    $S0 = typeof parsegrammar
+    eq $S0, 'NameSpace', parsegrammar_ns
+    $P0 = self.'parse_name'(parsegrammar)
+    $S0 = pop $P0
+    $P1 = get_hll_global $P0, $S0
+    $I0 = can $P1, 'TOP'
+    unless $I0 goto parsegrammar_ns_string
+    top = find_method $P1, 'TOP'
+    goto have_top
+  parsegrammar_ns_string:
+    $P0 = self.'parse_name'(parsegrammar)
+    top = get_hll_global $P0, 'TOP'
     unless null top goto have_top
-    self.'panic'('Cannot find TOP regex in ', parsegrammar_name)
+    goto err_notop
+  parsegrammar_ns:
+    top = parsegrammar['TOP']
+    unless null top goto have_top
+  err_notop:
+    self.'panic'('Cannot find TOP regex in ', parsegrammar)
   have_top:
     .local pmc parseactions, action
     null action
     if target == 'parse' goto have_action
     parseactions = self.'parseactions'()
-    unless parseactions goto have_action
+    $I0 = isa parseactions, ['Undef']
+    if $I0 goto have_action
+    ##  if parseactions is a protoobject, use it directly
+    $I0 = isa parseactions, 'P6protoobject'
+    if $I0 goto action_exact
     ##  if parseactions is a Class or array, make action directly from that
     $I0 = isa parseactions, 'Class'
     if $I0 goto action_make
+    $I0 = isa parseactions, 'NameSpace'
+    if $I0 goto action_namespace
     $I0 = does parseactions, 'array'
     if $I0 goto action_make
     ##  if parseactions is not a String, use it directly.
     $I0 = isa parseactions, 'String'
     if $I0 goto action_string
+  action_exact:
     action = parseactions
+    goto have_action
+  action_namespace:
+    $P0 = get_class parseactions
+    action = new $P0
     goto have_action
   action_string:
     ##  Try the string itself, if that fails try splitting on '::'
@@ -364,11 +452,15 @@ to any options and return the resulting parse tree.
     unless null $P0 goto action_make
     $S0 = parseactions
     parseactions = split '::', $S0
+    push_eh err_bad_parseactions
+    $P0 = get_class parseactions
+    if null $P0 goto err_bad_parseactions
+    pop_eh
   action_make:
     action = new parseactions
   have_action:
     .local pmc match
-    match = top(source, 'grammar' => parsegrammar_name, 'action' => action)
+    match = top(source, 'grammar' => parsegrammar, 'action' => action)
     unless match goto err_failedparse
     .return (match)
 
@@ -377,6 +469,11 @@ to any options and return the resulting parse tree.
     .return ()
   err_failedparse:
     self.'panic'('Failed to parse source')
+    .return ()
+  err_bad_parseactions:
+    pop_eh
+    $P0 = self.'parseactions'()
+    self.'panic'('Unable to find action grammar ', $P0)
     .return ()
 .end
 
@@ -394,26 +491,38 @@ resulting ast.
     .param pmc adverbs         :slurpy :named
 
   compile_astgrammar:
-    .local string astgrammar_name
+    .local pmc astgrammar_name
     astgrammar_name = self.'astgrammar'()
+    $S0 = typeof astgrammar_name
+    eq $S0, 'NameSpace', astgrammar_ns
     unless astgrammar_name goto compile_match
+
+    .local pmc astgrammar_namelist
     .local pmc astgrammar, astbuilder
-    astgrammar = new astgrammar_name
+    astgrammar_namelist = self.'parse_name'(astgrammar_name)
+    unless astgrammar_namelist goto err_past
+    astgrammar = new astgrammar_namelist
     astbuilder = astgrammar.'apply'(source)
-    .return astbuilder.'get'('past')
+    .tailcall astbuilder.'get'('past')
+  astgrammar_ns:
+    $P0 = get_class astgrammar_name
+    astgrammar = new $P0
+    astbuilder = astgrammar.'apply'(source)
+    .tailcall astbuilder.'get'('past')
 
   compile_match:
-    push_eh err_past
+    #push_eh err_past
     .local pmc ast
-    ast = source.'item'()
-    pop_eh
-    $I0 = isa ast, 'PAST::Node'
+    ast = source.'ast'()
+    #pop_eh
+    $I0 = isa ast, ['PAST';'Node']
     unless $I0 goto err_past
     .return (ast)
 
   err_past:
+    #pop_eh
     $S0 = typeof source
-    .return self.'panic'('Unable to obtain PAST from ', $S0)
+    .tailcall self.'panic'('Unable to obtain PAST from ', $S0)
 .end
 
 
@@ -427,7 +536,7 @@ Transform PAST C<source> into POST.
     .param pmc source
     .param pmc adverbs         :slurpy :named
     $P0 = compreg 'PAST'
-    .return $P0.'to_post'(source, adverbs :flat :named)
+    .tailcall $P0.'to_post'(source, adverbs :flat :named)
 .end
 
 
@@ -436,7 +545,7 @@ Transform PAST C<source> into POST.
     .param pmc adverbs         :slurpy :named
 
     $P0 = compreg 'POST'
-    .return $P0.'to_pir'(source, adverbs :flat :named)
+    .tailcall $P0.'to_pir'(source, adverbs :flat :named)
 .end
 
 
@@ -476,6 +585,13 @@ options provided.
     .local string target
     target = adverbs['target']
     if target != '' goto end
+    .local pmc outer_ctx, outer
+    outer_ctx = adverbs['outer_ctx']
+    if null outer_ctx goto outer_done
+    outer = outer_ctx['current_sub']
+    $P1 = $P0[0]
+    $P1.'set_outer'(outer)
+  outer_done:
     $I0 = adverbs['trace']
     trace $I0
     $P0 = $P0(args :flat)
@@ -501,50 +617,51 @@ specifies the encoding to use for the input (e.g., "utf8").
 
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
-    printerr $P0
+    $P1 = getinterp
+    $P2 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
-    stdin = getstdin
-    has_readline = stdin.'set_readline_interactive'(1)
+    $P0 = getinterp
+    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
-    push stdin, encoding
+    stdin.'encoding'(encoding)
   interactive_loop:
     .local pmc code
     unless stdin goto interactive_end
-    ##  FIXME:  we have to avoid stdin.'readline'() when readline
-    ##  libraries aren't present (RT #41103)
 
-    # for each input line, print the prompt
+    .local string prompt
+    prompt = '> '
     $P0 = self.'commandline_prompt'()
-    printerr $P0
+    $I0 = defined $P0
+    unless $I0 goto have_prompt
+    prompt = $P0
+  have_prompt:
 
-    if has_readline < 0 goto no_readline
-    code = stdin.'readline'('> ')
+    ##  display a prompt ourselves if readline isn't present
+  interactive_read:
+    code = stdin.'readline_interactive'(prompt)
     if null code goto interactive_end
-    concat code, "\n"
-    goto have_code
-  no_readline:
-    $S0 = readline stdin
-    code = new 'String'
-    code = $S0
-  have_code:
     unless code goto interactive_loop
+    concat code, "\n"
     push_eh interactive_trap
     $P0 = self.'eval'(code, adverbs :flat :named)
     pop_eh
     if null $P0 goto interactive_loop
     unless target goto interactive_loop
     if target == 'pir' goto target_pir
-    '_dumper'($P0, target)
+    self.'dumper'($P0, target, adverbs :flat :named)
     goto interactive_loop
   target_pir:
     say $P0
     goto interactive_loop
   interactive_trap:
-    get_results '0,0', $P0, $S0
+    get_results '0', $P0
+    pop_eh
+    $S0 = $P0
     if $S0 == '' goto have_newline
     $S1 = substr $S0, -1, 1
     $I0 = is_cclass .CCLASS_NEWLINE, $S1, 0
@@ -557,6 +674,42 @@ specifies the encoding to use for the input (e.g., "utf8").
     .return ()
 .end
 
+
+=item EXPORTALL(source, destination)
+
+Export all namespace entries from the default export namespace for source
+(source::EXPORT::ALL) to the destination namespace.
+
+=cut
+
+.sub 'EXPORTALL' :method
+    .param pmc source
+    .param pmc dest
+    .local pmc ns_iter, item, export_list
+
+    source = source['EXPORT']
+    unless source, no_namespace_error
+    source = source['ALL']
+    unless source, no_namespace_error
+
+    ns_iter = iter source
+    export_list = new 'ResizablePMCArray'
+  export_loop:
+    unless ns_iter, export_loop_end
+    item = shift ns_iter
+    push export_list, item
+    goto export_loop
+  export_loop_end:
+
+    source.'export_to'(dest,export_list)
+    .return ()
+
+  no_namespace_error:
+    $P0 = new 'Exception'
+    $P0 = 'Missing EXPORT::ALL NameSpace'
+    throw $P0
+    .return ()
+.end
 
 =item evalfiles(files [, args] [, "encoding" => encoding] [, "option" => value, ...])
 
@@ -589,33 +742,34 @@ options are passed to the evaluator.
   have_files_array:
     .local string code
     code = ''
-    .local pmc iter
-    iter = new 'Iterator', files
+    .local pmc it
+    it = iter files
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local string iname
     .local pmc ifh
-    iname = shift iter
-    ifh = open iname, '<'
-    unless ifh goto err_infile
-    if encoding == 'fixed_8' goto iter_loop_1
-    unless encoding goto iter_loop_1
-    push ifh, encoding
+    iname = shift it
+    ifh = new 'FileHandle'
+    unless encoding == 'utf8' goto iter_loop_1
+    ifh.'encoding'(encoding)
   iter_loop_1:
-    $S0 = ifh.'slurp'('')
+    $S0 = ifh.'readall'(iname)
     code .= $S0
-    close ifh
+    ifh.'close'()
     goto iter_loop
   iter_end:
-    $P0 = self.'eval'(code, adverbs :flat :named)
+    $S0 = join ' ', files
+    $P1 = box $S0
+    .lex '$?FILES', $P1
+    $P0 = self.'eval'(code, args :flat, adverbs :flat :named)
     if target == '' goto end
     if target == 'pir' goto end
-    '_dumper'($P0, target)
+    self.'dumper'($P0, target, adverbs :flat :named)
   end:
     .return ($P0)
 
   err_infile:
-    .return self.'panic'('Error: file cannot be read: ', iname)
+    .tailcall self.'panic'('Error: file cannot be read: ', iname)
 .end
 
 
@@ -633,18 +787,18 @@ Performs option processing of command-line args
     .local string arg0
     arg0 = shift args
     .local pmc getopts
-    getopts = new 'Getopt::Obj'
+    getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
     $P0 = getattribute self, '@cmdoptions'
-    .local pmc iter
-    iter = new 'Iterator', $P0
+    .local pmc it
+    it = iter $P0
   getopts_loop:
-    unless iter goto getopts_end
-    $S0 = shift iter
+    unless it goto getopts_end
+    $S0 = shift it
     push getopts, $S0
     goto getopts_loop
   getopts_end:
-    .return getopts.'get_options'(args)
+    .tailcall getopts.'get_options'(args)
 .end
 
 
@@ -654,9 +808,23 @@ Generic method for compilers invoked from a shell command line.
 
 =cut
 
+.include 'except_severity.pasm'
 .sub 'command_line' :method
     .param pmc args
     .param pmc adverbs         :slurpy :named
+
+    ## this bizarre piece of code causes the compiler to
+    ## immediately abort if it looks like it's being run
+    ## from Perl's Test::Harness.  (Test::Harness versions 2.64
+    ## and earlier have a hardwired commandline option that is
+    ## always passed to an initial run of the interpreter binary,
+    ## whether you want it or not.)  We expect to remove this
+    ## check eventually (or make it a lot smarter than it is here).
+    $S0 = args[2]
+    $I0 = index $S0, '@INC'
+    if $I0 < 0 goto not_harness
+    exit 0
+  not_harness:
 
     load_bytecode 'dumper.pbc'
     load_bytecode 'PGE/Dumper.pbc'
@@ -670,11 +838,11 @@ Generic method for compilers invoked from a shell command line.
     opts = self.'process_args'(args)
 
     ##   merge command-line args with defaults passed in from caller
-    .local pmc iter
-    iter = new 'Iterator', opts
+    .local pmc it
+    it = iter opts
   mergeopts_loop:
-    unless iter goto mergeopts_end
-    $S0 = shift iter
+    unless it goto mergeopts_end
+    $S0 = shift it
     $P0 = opts[$S0]
     adverbs[$S0] = $P0
     goto mergeopts_loop
@@ -686,16 +854,21 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
-    $S0 = adverbs['e']
-    if $S0 goto eval_line
+    .local int can_backtrace
+    can_backtrace = can self, 'backtrace'
+    unless can_backtrace goto no_push_eh
+    push_eh uncaught_exception
+  no_push_eh:
 
+    $S0 = adverbs['e']
+    $I0 = exists adverbs['e']
+    if $I0 goto eval_line
     .local pmc result
-    result = new 'String'
-    result = ''
+    result = box ''
     unless args goto interactive
     $I0 = adverbs['combine']
     if $I0 goto combine
-    $S0 = shift args
+    $S0 = args[0]
     result = self.'evalfiles'($S0, args :flat, adverbs :flat :named)
     goto save_output
   combine:
@@ -705,37 +878,66 @@ Generic method for compilers invoked from a shell command line.
     self.'interactive'(args :flat, adverbs :flat :named)
     goto save_output
   eval_line:
-    result = self.'eval'($S0, adverbs :flat :named)
+    result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
 
   save_output:
+    unless can_backtrace goto no_pop_eh
+    pop_eh
+  no_pop_eh:
     if null result goto end
-    unless result goto end
+    $I0 = defined result
+    unless $I0 goto end
     .local string target
     target = adverbs['target']
     target = downcase target
     if target != 'pir' goto end
     .local string output
     .local pmc ofh
-    ofh = getstdout
+    $P0 = getinterp
+    ofh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
-    ofh = open output, '>'
+    ofh = new ['FileHandle']
+    ofh.'open'(output, 'w')
     unless ofh goto err_output
   save_output_1:
     print ofh, result
-    close ofh
+    ofh.'close'()
   end:
     .return ()
 
   err_output:
-    .return self.'panic'('Error: file cannot be written: ', output)
+    .tailcall self.'panic'('Error: file cannot be written: ', output)
   usage:
     self.'usage'(arg0)
     goto end
   version:
     self.'version'()
     goto end
+
+    # If we get an uncaught exception in the program and the HLL provides
+    # a backtrace method, we end up here. We pass it the exception object
+    # so it can render a backtrace, unless the severity is exit or warning
+    # in which case it needs special handling.
+  uncaught_exception:
+    .get_results ($P0)
+    pop_eh
+    $P1 = getinterp
+    $P1 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $I0 = $P0['severity']
+    if $I0 == .EXCEPT_EXIT goto do_exit
+    $S0 = self.'backtrace'($P0)
+    print $P1, $S0
+    if $I0 <= .EXCEPT_WARNING goto do_warning
+    exit 1
+  do_exit:
+    $I0 = $P0['exit_code']
+    exit $I0
+  do_warning:
+    $P0 = $P0["resume"]
+    push_eh uncaught_exception # Otherwise we get errors about no handler to delete
+    $P0()
 .end
 
 
@@ -751,6 +953,28 @@ based on double-colon separators.
     .param string name
     $P0 = split '::', name
     .return ($P0)
+.end
+
+=item dumper(obj, name, options)
+
+Dump C<obj> with C<name> according to C<options>.
+
+=cut
+
+.sub 'dumper' :method
+    .param pmc obj
+    .param string name
+    .param pmc options         :slurpy :named
+
+    $S0 = options['dumper']
+    if $S0 goto load_dumper
+    .tailcall '_dumper'(obj, name)
+
+  load_dumper:
+    load_bytecode 'PCT/Dumper.pbc'
+    $S0 = downcase $S0
+    $P0 = get_hll_global ['PCT';'Dumper'], $S0
+    .tailcall $P0(obj, name)
 .end
 
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 05-trace.t
 
@@ -14,9 +14,11 @@ if ( ( -e qq{./lib/Parrot/Config/Generated.pm} )
     plan tests => 40;
 }
 else {
-    plan skip_all => q{Tests irrelevant unless configuration completed with tracing requested};
+    plan skip_all =>
+        q{Tests irrelevant unless configuration completed with tracing requested};
 }
 use lib qw( lib );
+use Parrot::Config;
 use_ok('Parrot::Configure::Trace');
 $Storable::Eval = 1;
 use Parrot::Configure::Step::List qw( get_steps_list );
@@ -45,10 +47,11 @@ my $steps_number = scalar( @{$steps} );
 is( ref($steps), q{ARRAY}, "list_steps() correctly returned array ref" );
 
 # Sanity check!
+my @PConfig_steps = split /\s+/, $PConfig{configuration_steps};
 is_deeply(
     $steps,
-    [ get_steps_list() ],
-    "list_steps() returned same as Parrot::Configure::Step::List::get_steps_list()"
+    [ @PConfig_steps ],
+    "list_steps() returned same as \$Parrot::Config::PConfig{configuration_steps}"
 );
 
 my $index = $obj->index_steps();

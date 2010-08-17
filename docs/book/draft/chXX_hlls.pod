@@ -1,0 +1,295 @@
+=pod
+
+=head1 HLLs and Interoperation
+
+Z<CHP-10>
+
+=head2 Parrot HLL Environment
+
+In the earliest days Parrot was designed to be the single-purpose backend
+for the Perl 6 language. It quickly blossomed beyond that, and now has a
+much grander purpose: to host all dynamic languages, and to host them
+together on a single platform. If we look back through the history of
+dynamic programming languages, they've had a more difficult time
+interoperating with each other then compiled languages have because
+compiled languages operate at the same machine-code level and typically
+can make use of the same application binary interface (ABI). With the
+right compiler settings, programs written in Visual Basic can interoperate
+with programs written in C N<On some systems anyway>, which can call
+functions written in C++, in Ada, Fortran, Pascal and so on. To try to mix
+two common dynamic languages, like Perl and Python, or Ruby and PHP, you
+would need to write some kind of custom "glue" function to try to include
+an interpreter object from one language as a library for another language,
+and then write code to try and get the parser for one to interact nicely
+with the parser for the other. It's a nightmare, frankly, and you don't
+see it happen too often.
+
+In Parrot, the situation is different because high level languages (HLL)
+are almost all written with the PCT tools, and are compiled to the same
+PIR and PBC code. Once compiled into PBC, a library written in any HLL
+language can be loaded and called by any other HLL N<Well, any HLL which
+supports loading libraries>. A language can have a syntax to include
+code snippets from other languages inline in the same file. We can write
+a binding for a popular library such as opengl or xlib once, and include
+that library into any language that needs it. Compare this to the current
+situation where a library like Gtk2 needs to have bindings for every
+language that wants to use it. In short, Parrot should make interoperation
+easier for everybody.
+
+This chapter is going to talk about HLLs, the way they operate, and the
+way they interoperate on Parrot.
+
+=head2 HLLs on Parrot
+
+=head2 Working with HLLs
+
+=head3 Fakecutables
+
+It's possible to turn compilers created with PCT into stand-alone
+executables that run without the Parrot executable. To do this, the
+compiler bytecode is linked together with a small driver program in
+C and the Parrot library, C<libparrot> X<libparrot>. These programs
+have been given a special name by the Parrot development community:
+I<fakecutables> X<fakecutables>. They're called fake because the PBC
+is not converted to native machine code like in a normal binary
+executable file, but instead is left in original PBC format.
+
+=head3 Compiler Objects
+
+The C<compreg> opcode has two forms that are used with HLL compilers. The
+first form stores an object as a compiler object to be retrieved later, and
+the second form retrieves a stored compiler object for a given language.
+The exact type of compiler object stored with C<compreg> can vary for each
+different language implementation, although most of the languages using PCT
+will have a common form. If a compiler object is in register C<$P0>, it can
+be stored using the following C<compreg> syntax:
+
+=begin PIR_FRAGMENT
+
+  compreg 'MyCompiler', $P0
+
+=end PIR_FRAGMENT
+
+There are two built-in compiler objects: One for PIR and one for PASM. These
+two don't need to be stored first, they can simply be retrieved and used.
+The PIR and PASM compiler objects are Sub PMCs that take a single string
+argument and return an array PMC containing a list of all the compiled
+subroutines from the string. Other compiler objects might be different
+entirely, and may need to be used in different ways. A common convention is
+for a compiler to be an object with a C<compile> method. This is done with
+PCT-based compilers and for languages who use a stateful compiler.
+
+Compiler objects allow programs in Parrot to compile arbitrary code strings
+at runtime and execute them. This ability, to dynamically compile
+code that is represented in a string variable at runtime, is of fundamental
+importance to many modern dynamic languages.  Here's an example using
+the PIR compiler:
+
+=begin PIR_FRAGMENT
+
+  .local string code
+  code = "..."
+  $P0 = compreg 'PIR'      # Get the compiler object
+  $P1 = $P0(code)          # Compile the string variable "code"
+
+=end PIR_FRAGMENT
+
+The returned value from invoking the compiler object is an array of PMCs
+that contains the various executable subroutines from the compiled source.
+Here's a more verbose example of this:
+
+=begin PIR_FRAGMENT
+
+  $P0 = compreg 'PIR'
+  $S0 = <<"END_OF_CODE"
+
+    .sub 'hello'
+       say 'hello world!'
+    .end
+  
+    .sub 'goodbye'
+       say 'goodbye world!'
+    .end
+
+END_OF_CODE
+
+  $P1 = $P0($S0)
+  $P2 = $P1[0]      # The sub "hello"
+  $P3 = $P1[0]      # The sub "goodbye"
+
+  $P2()             # "hello world!"
+  $P3()             # "goodbye world!"
+
+=end PIR_FRAGMENT
+
+Here's an example of a Read-Eval-Print-Loop (REPL) in PIR:
+
+=begin PIR
+
+  .include 'stdio.pasm'
+
+  .sub main
+    $P0 = getinterp
+    $P0 = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    $P1 = compreg 'PIR'
+    
+    loop_top:
+      $S0 = $P0.'readline'()
+      $S0 = ".sub '' :anon\n" . $S0
+      $S0 = $S0 . "\n.end\n"
+      $P2 = $P1($S0)
+      $P2()
+      
+      goto loop_top
+  .end
+
+=end PIR
+
+The exact list of HLL packages installed on your system may vary. Some
+language compiler packages will exist as part of the Parrot source code
+repository, but many will be developed and maintained separately. In any
+case, these compilers will typically need to be loaded into your program
+first, before a compiler object for them can be retrieved and used.
+
+=head2 HLL Namespaces
+
+Let's take a closer look at namespaces then we have in previous chapters.
+Namespaces, as we mentioned before can be nested to an arbitrary depth
+starting with the root namespace. In practice, the root namespace is
+not used often, and is typically left for use by the Parrot internals.
+Directly beneath the root namespace are the X<HLL Namespaces> HLL
+Namespaces, named after the HLLs that the application software is written
+in. HLL namespaces are all lower-case, such as "perl6", or "cardinal",
+or "pynie". By sticking to this convention, multiple HLL compilers can
+operate on Parrot simultaneously while staying completely oblivious to
+each other.
+
+=head2 HLL Mapping
+
+HLL mapping enables Parrot to use a custom data type for internal operations
+instead of using the normal built-in types. Mappings can be created with the
+C<"hll_map"> method of the interpreter PMC.
+
+=begin PIR_FRAGMENT
+
+  $P0 = newclass "MyNewClass"         # New type
+  $P1 = get_class "ResizablePMCArray"  # Built-in type
+  $P2 = getinterp
+  $P2.'hll_map'($P1, $P0)
+
+=end PIR_FRAGMENT
+
+With the mapping in place, anywhere that Parrot would have used a
+ResizablePMCArray it now uses a MyNewClass object instead. Here's one example
+of this:
+
+=begin PIR
+
+  .sub 'MyTestSub'
+      .param pmc arglist :slurpy   # A MyNewClass array of args
+      .return(arglist)
+  .end
+
+=end PIR
+
+=head2 Interoperability Guidelines
+
+=head3 Libraries and APIs
+
+As a thought experiment, imagine a library written in Common Lisp that
+uses Common Lisp data types. We like this library, so we want to include
+it in our Ruby project and call the functions from Ruby. Immediately
+we might think about writing a wrapper to convert parameters from Ruby
+types into Common Lisp types, and then to convert the Common Lisp return
+values back into Ruby types. This seems sane, and it would probably even
+work well. Now, expand this to all the languages on Parrot. We would need
+wrappers or converters to allow every pair of languages to communicate,
+which requires C<N^2> libraries to make it work! As the number of languages
+hosted on the platform increases, this clearly becomes an untenable
+solution.
+
+So, what do we do? How do we make very different languages like Common
+Lisp, Ruby, Scheme, PHP, Perl and Python to interoperate with each other
+at the data level? There are two ways:
+
+=over 4
+
+=item * VTable Functions
+
+VTable functions are the standard interface for PMC data types, and all PMCs
+have them. If the PMCs were written properly to satisfy this interface
+all the necessary information from those PMCs. Operate on the PMCs at the
+VTable level, and we can safely ignore the implementation details of them.
+
+=item * Class Methods
+
+If a library returns data in a particular format, the library reuser should
+know, understand, and make use of that format. Classes written in other
+languages will have a whole set of documented methods to be interfaced with
+and the reuser of those classes should use those methods. This only works,
+of course, in HLLs that allow object orientation and classes and methods,
+so for languages that don't have this the vtable interface should be used
+instead.
+
+=back
+
+=head3 Mixing and Matching Datatypes
+
+=head2 Linking and Embedding
+
+Not strictly a topic about HLLs and their interoperation, but it's important
+for us to also mention another interesting aspect of Parrot: Linking and
+embedding. We've touched on one related topic above, that of creating
+the compiler fakecutables. The fakecutables contain a link to C<libparrot>,
+which contains all the necessary guts of Parrot. When the fakecutable is
+executed, a small driver program loads the PBC data into libparrot through
+its API functions. The Parrot executable is just one small example of how
+Parrot's functionality can be implemented, and we will talk about a few other
+ways here too.
+
+=head3 Embedding Parrot
+
+C<libparrot> is a library that can be statically or dynamically linked
+to any other executable program that wants to use it. This linking process
+is known as I<embedding parrot>, and is a great way to interoperate
+
+=head3 Creating and Interoperating Interpreters
+
+Parrot's executable, which is the interface which most users are going
+to be familiar with, uses a single interpreter structure to perform a
+single execution task. However, this isn't the only supported structural
+model that Parrot supports. In fact, the interpreter structure is not a
+singleton, and multiple interpreters can be created by a single program.
+This allows separate tasks to be run in separate environments, which can
+be very helpful if we are writing programs and libraries in multiple
+languages. Interpreters can communicate and share data between each other,
+and can run independently from others in the same process.
+
+=head3 Small, Toy, and Domain-Specific Languages
+
+How many programs are out there with some sort of scripting capability?
+You can probably name a few off the top of your head with at least some
+amount of scripting or text-based commands. In developing programs like
+this, typically it's necessary to write a custom parser for the input
+commands, and a custom execution engine to make the instructions do what
+they are intended to do. Instead of doing all this, why not embed an
+instance of Parrot in the program, and let Parrot handle the parsing
+and executing details?
+
+Small scripting components which are not useful in a general sense like
+most programming languages, and are typically limited to use in very
+specific environments (such as within a single program) are called
+I<Domain-Specific Languages> (DSL). DSLs are a very popular topic because
+a DSL allows developers to create a custom language that makes dealing
+with a given problem space or data set very easy. Parrot and its suite
+of compiler tools in turn make creating the DSLs very easy. It's all
+about ease of use.
+
+=head3 Parrot API
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

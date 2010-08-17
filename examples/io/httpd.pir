@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -92,12 +92,18 @@ The code was heavily hacked by bernhard and leo.
 .const string SERVER_NAME = "Parrot-httpd/0.1"
 
 .include "stat.pasm"
+.include 'except_types.pasm'
+.include 'socket.pasm'
+
+.loadlib 'io_ops'
+.loadlib 'sys_ops'
 
 .sub main :main
-    .local pmc sock, work, fp
+    .local pmc listener, work, fp
     .local pmc fp               # read requested files from disk
     .local int port
-    .local string address, host
+    .local pmc address
+    .local string host
     .local string buf, req, rep, temp
     .local string meth, url, file_content
     .local int ret
@@ -109,12 +115,13 @@ The code was heavily hacked by bernhard and leo.
     port = 1234
 
     # TODO provide sys/socket constants
-    socket sock, 2, 1, 6	# PF_INET, SOCK_STREAM, tcp
-    unless sock goto ERR_NO_SOCKET
+    listener = new 'Socket'
+    listener.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)	# PF_INET, SOCK_STREAM, tcp
+    unless listener goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
-    address = sockaddr port, host
-    ret = bind sock, address
+    address = listener.'sockaddr'(host, port)
+    ret = listener.'bind'(address)
     if ret == -1 goto ERR_bind
     $S0 = port
     print "Running webserver on port "
@@ -129,12 +136,12 @@ The code was heavily hacked by bernhard and leo.
     print "\n"
     print "Be sure that the HTML docs have been generated with 'make html'.\n"
 
-    listen ret, sock, 1
+    listener.'listen'(1)
 NEXT:
-    accept work, sock
+    work = listener.'accept'()
     req = ""
 MORE:
-    recv ret, work, buf
+    buf = work.'recv'()
     # charset I0, buf
     # charsetname S1, I0
     # print "\nret: "
@@ -145,6 +152,7 @@ MORE:
     # print buf
     # print "\nafter buf"
 
+    ret = length buf
     if ret <= 0 goto SERVE_REQ
     concat req, buf
     index pos, req, CRLFCRLF
@@ -165,6 +173,11 @@ SERVE_REQ:
 #    print "Request:\n"
 #    print req
 #    print "*******\n"
+    .local string response
+    .local pmc headers
+    response = '500 Internal Server Error'
+    headers = new 'Hash'
+    headers['Server'] = SERVER_NAME
 
 # parse
 # GET the_file HTTP*
@@ -207,87 +220,102 @@ SERVE_GET:
 SERVE_file:
     # try to open the file in url
     concat url, doc_root, url
-    fp = open url, "<"
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+    set_addr eh, handle_404_exception
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    push_eh eh
+    fp = open url, 'r'
+    pop_eh
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
     read file_content, fp, len
 
 SERVE_blob:
-    # TODO make more subs
-    # takes: file_content, len
-    rep = "HTTP/1.1 200 OK"
-    rep .= CRLF
-    rep .= "Server: "
-    rep .= SERVER_NAME
-    rep .= CRLF
-    rep .= "Content-Length: "
-    temp = to_string (len)
-    rep .= temp
-    rep .= CRLFCRLF
-    rep .= file_content
-    send ret, work, rep
+    response = '200 OK'
+    send_response(work, response, headers, file_content)
     # TODO provide a log method
     print "served file '"
     print url
     print "'\n"
-    close work
     goto NEXT
 
 SERVE_docroot:
-    rep = 'HTTP/1.1 301 Moved Permamently'
-    rep .= CRLF
-    rep .= "Server: "
-    rep .= SERVER_NAME
-    rep .= CRLF
-    rep .= 'Location: /docs/html/index.html'
-    rep .= CRLF
-    rep .= 'Content-Length: '
+    response = '301 Moved Permanently'
+    headers['Location'] = '/docs/html/index.html'
     file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>."
-    length len, file_content
-    temp = to_string (len)
-    concat rep, temp
-    concat rep, CRLFCRLF
-    concat rep, file_content
-    send ret, work, rep
+    send_response(work, response, headers, file_content)
     print "Redirect to 'docs/html/index.html'\n"
-    close work
     goto NEXT
 
 SERVE_favicon:
     url = urldecode( '/docs/resources/favicon.ico')
     goto SERVE_file
 
+handle_404_exception:
+    .local pmc ex
+    .get_results (ex)
+    pop_eh
+    say "Trapped file not found exception."
+    # fall through
+
 SERVE_404:
-    $S0 = '404 Not found'
-    $I0 = length $S0
-    rep = 'HTTP/1.1 404 Not Found'
-    rep .= CRLF
-    rep .= "Server: "
-    rep .= SERVER_NAME
-    rep .= CRLF
-    rep .= 'Content-Length: '
-    $S1 = $I0
-    rep .= $S1
-    rep .= CRLF
-    rep .= 'Content-Type: text/plain'
-    rep .= CRLFCRLF
-    rep .= $S0
+    response = '404 Not found'
+    file_content = response
+    send_response(work, response, headers, file_content)
     print "File not found: '"
     print url
     print "'\n"
-    send ret, work, rep
     goto NEXT
 
 ERR_NO_SOCKET:
     print "Could not open socket.\n"
-    print "Did you enable PARROT_NET_DEVEL in include/io_private.h?\n"
     end
 ERR_bind:
     print "bind failed\n"
     # fall through
 END:
-    close sock
+    close listener
     end
+.end
+
+# send_response(socket, response_code, headers, body)
+# sends HTTP response to the socket and closes the socket afterwards.
+.sub send_response
+    .param pmc sock
+    .param string code
+    .param pmc headers
+    .param string body
+    .local string rep, temp, headername
+    .local int len, ret
+    .local pmc headers_iter
+    rep = "HTTP/1.1 "
+    rep .= code
+    rep .= CRLF
+    rep .= "Connection: close"
+    rep .= CRLF
+    ret = exists headers['Content-Length']
+    if ret goto SKIP_CONTENT_LENGTH
+    len = length body
+    temp = to_string (len)
+    headers['Content-Length'] = temp
+SKIP_CONTENT_LENGTH:
+
+    headers_iter = iter headers
+HEADER_LOOP:
+    headername = shift headers_iter
+    rep .= headername
+    rep .= ': '
+    temp = headers[headername]
+    rep .= temp
+    rep .= CRLF
+    if headers_iter goto HEADER_LOOP
+
+    rep .= CRLF
+    rep .= body
+    ret = sock.'send'(rep)
+    sock.'close'()
+    .return()
 .end
 
 .sub to_string
@@ -326,12 +354,12 @@ INC_IN:
     inc pos_in
     goto START
 END:
-   .return( out )
+    .return( out )
 .end
 
 .sub hex_to_int
     .param pmc hex
-    .return hex.'to_int'(16)
+    .tailcall hex.'to_int'(16)
 .end
 
 # if file is *.pir or *.pbc run it as CGI

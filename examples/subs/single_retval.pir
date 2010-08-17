@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,16 +26,16 @@ F<docs/imcc/calling_conventions.pod>
   $I1 = 8
   .local string s
   s = "nine"
-  I2  = 10
+  $I2  = 10
 
   # subs accept locals and registers
-  $I0 = foo(i, $I1, s, I2)
+  $I0 = foo(i, $I1, s, $I2)
   print "return: "
   print $I0
   print "\n"
 
   # subs accept locals and registers
-  ( $I3 ) = foo(i, $I1, s, I2)
+  ( $I3 ) = foo(i, $I1, s, $I2)
   print "return: "
   print $I3
   print "\n"

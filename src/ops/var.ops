@@ -3,16 +3,17 @@
 ** var.ops
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
-var.ops - Variable Ops
+var.ops - Variable Opcodes
 
 =head1 DESCRIPTION
 
 These operations deal with both lexical and global variables,
 as well as the symbol tables that contain them.
+
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =cut
 
@@ -39,13 +40,44 @@ Parrot's LexPad throws an exception for unknown names.
 =cut
 
 op store_lex(in STR, invar PMC) {
-    parrot_context_t * const ctx      = CONTEXT(interp);
-    STRING           * const lex_name = $1;
-    PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $1;
+    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
-        real_exception(interp, NULL, LEX_NOT_FOUND,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", lex_name);
+        goto ADDRESS(handler);
+    }
+    VTABLE_set_pmc_keyed_str(interp, lex_pad, lex_name, $2);
+}
+
+########################################
+
+=item B<store_dynamic_lex>(in STR, invar PMC)
+
+Search caller lexpads for lexical symbol $1 and store object $2
+there.  Throws an exception if no caller lexpad claims the
+lexical symbol.  (To store a value in the current lexpad,
+use C<store_lex> above.)
+
+=cut
+
+op store_dynamic_lex(in STR, invar PMC) {
+    STRING  * const lex_name = $1;
+    PMC     * const ctx      =
+        Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
+    PMC     * const lex_pad  =
+        PMC_IS_NULL(ctx)
+            ? PMCNULL
+            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+
+    if (PMC_IS_NULL(lex_pad)) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_LEX_NOT_FOUND,
+                "Lexical '%Ss' not found in dynamic scope", lex_name);
+        goto ADDRESS(handler);
     }
     VTABLE_set_pmc_keyed_str(interp, lex_pad, lex_name, $2);
 }
@@ -57,22 +89,77 @@ op store_lex(in STR, invar PMC) {
 Find the lexical variable named $2 and store it in $1. This
 opcode either throws an exception or returns a Null PMC for the failure case,
 depending on the implementation of the LexPad PMC. Parrot's
-standard LexPad throws and exception for non-existing names.
+standard LexPad throws an exception for non-existent names.
 
 =cut
 
 op find_lex(out PMC, in STR) {
-    parrot_context_t * const ctx      = CONTEXT(interp);
-    STRING           * const lex_name = $2;
-    PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $2;
+    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
             ? NULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
     if (!result) {
-        real_exception(interp, NULL, LEX_NOT_FOUND,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", lex_name);
+        goto ADDRESS(handler);
+    }
+    $1 = result;
+}
+
+########################################
+
+=item B<find_dynamic_lex>(out PMC, in STR)
+
+Search through caller lexpads for a lexical variable named $2
+and store it in $1.  Return a Null PMC if the lexical variable
+is not found.  (To search the current lexpad, use C<find_lex>
+above.)
+
+=cut
+
+op find_dynamic_lex(out PMC, in STR) {
+    STRING  * const lex_name = $2;
+    PMC     * const ctx      =
+        Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
+    PMC     * const lex_pad  =
+        PMC_IS_NULL(ctx)
+            ? PMCNULL
+            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+    PMC     * const result =
+        PMC_IS_NULL(lex_pad)
+            ? PMCNULL
+            : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
+    $1 = result;
+}
+
+########################################
+
+=item B<find_caller_lex>(out PMC, in STR)
+
+Like find_dynamic_lex above, but also searches caller's
+outer scopes in addition to the lexpads.
+
+=cut
+
+op find_caller_lex(out PMC, in STR) {
+    STRING  * const lex_name = $2;
+    PMC     * ctx            = CURRENT_CONTEXT(interp);
+    PMC     * result         = PMCNULL;
+
+    for (ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
+            !PMC_IS_NULL(ctx) && PMC_IS_NULL(result);
+            ctx = Parrot_pcc_get_caller_ctx(interp, ctx))
+    {
+        PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
+        if (!PMC_IS_NULL(lex_pad)) {
+            result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
+        }
+        if (!result) result = PMCNULL;
     }
     $1 = result;
 }
@@ -99,13 +186,13 @@ current namespace.  If the namespace doesn't exist, $1 is set to null.
 =cut
 
 op get_namespace(out PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     $1 = cur_ns;
 }
 
 op get_namespace(out PMC, in PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
-    PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
+    PMC * const ns     = Parrot_ns_get_namespace_keyed(interp, cur_ns, $2);
 
     $1 = PMC_IS_NULL(ns) ? PMCNULL : ns;
 }
@@ -132,7 +219,7 @@ op get_hll_namespace(out PMC, in PMC) {
     if (PMC_IS_NULL(hll_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, $2);
         $1 = ns;
     }
 }
@@ -158,7 +245,7 @@ op get_root_namespace(out PMC, in PMC) {
     if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, $2);
         $1 = ns;
     }
 }
@@ -187,21 +274,21 @@ doesn't exist, $1 is set to null.
 =cut
 
 op get_global(out PMC, in STR) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
-    $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
+    $1 = Parrot_ns_find_global_from_op(interp, cur_ns, $2, expr NEXT());
 }
 
 op get_global(out PMC, in PMC, in STR) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     if (PMC_IS_NULL(cur_ns)) {
         $1 = PMCNULL;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, cur_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
-            $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
+            $1 = Parrot_ns_find_global_from_op(interp, ns, $3, expr NEXT());
     }
 }
 
@@ -220,7 +307,7 @@ global doesn't exist, $1 is set to null.
 
 op get_hll_global(out PMC, in STR) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    $1 = Parrot_find_global_op(interp, hll_ns, $2, expr NEXT());
+    $1 = Parrot_ns_find_global_from_op(interp, hll_ns, $2, expr NEXT());
 }
 
 op get_hll_global(out PMC, in PMC, in STR) {
@@ -229,11 +316,11 @@ op get_hll_global(out PMC, in PMC, in STR) {
         $1 = hll_ns;
     }
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, hll_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
-            $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
+            $1 = Parrot_ns_find_global_from_op(interp, ns, $3, expr NEXT());
     }
 }
 
@@ -252,7 +339,7 @@ doesn't exist, $1 is set to null.
 
 op get_root_global(out PMC, in STR) {
     PMC * const root_ns = interp->root_namespace;
-    $1 = Parrot_find_global_op(interp, root_ns, $2, expr NEXT());
+    $1 = Parrot_ns_find_global_from_op(interp, root_ns, $2, expr NEXT());
 }
 
 op get_root_global(out PMC, in PMC, in STR) {
@@ -260,11 +347,11 @@ op get_root_global(out PMC, in PMC, in STR) {
     if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
     else {
-        PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
+        PMC * const ns = Parrot_ns_get_namespace_keyed(interp, root_ns, $2);
         if (PMC_IS_NULL(ns))
             $1 = PMCNULL;
         else
-            $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
+            $1 = Parrot_ns_find_global_from_op(interp, ns, $3, expr NEXT());
     }
 }
 
@@ -291,15 +378,15 @@ it is created.
 =cut
 
 op set_global(in STR, invar PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
-    Parrot_set_global(interp, cur_ns, $1, $2);
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
+    Parrot_ns_set_global(interp, cur_ns, $1, $2);
 }
 
 op set_global(in PMC, in STR, invar PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, $1);
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, cur_ns, $1);
 
-    Parrot_set_global(interp, ns, $2, $3);
+    Parrot_ns_set_global(interp, ns, $2, $3);
 }
 
 =item B<set_hll_global>(in STR, invar PMC)
@@ -316,14 +403,14 @@ does not exist, it is created.
 
 op set_hll_global(in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    Parrot_set_global(interp, hll_ns, $1, $2);
+    Parrot_ns_set_global(interp, hll_ns, $1, $2);
 }
 
 op set_hll_global(in PMC, in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, $1);
+    PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, $1);
 
-    Parrot_set_global(interp, ns, $2, $3);
+    Parrot_ns_set_global(interp, ns, $2, $3);
 }
 
 =item B<set_root_global>(in STR, invar PMC)
@@ -340,14 +427,14 @@ not exist, it is created.
 
 op set_root_global(in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
-    Parrot_set_global(interp, root_ns, $1, $2);
+    Parrot_ns_set_global(interp, root_ns, $1, $2);
 }
 
 op set_root_global(in PMC, in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
-    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, $1);
+    PMC * const ns      = Parrot_ns_make_namespace_keyed(interp, root_ns, $1);
 
-    Parrot_set_global(interp, ns, $2, $3);
+    Parrot_ns_set_global(interp, ns, $2, $3);
 }
 
 =back
@@ -366,77 +453,6 @@ Operations to modify global variables
 
 ########################################
 
-=item B<store_global>(in STR, invar PMC)
-
-Store value $2 as global symbol $1 in the current namespace.
-
-=item B<store_global>(in STR, in STR, invar PMC)
-
-=item B<store_global>(in PMC, in STR, invar PMC)
-
-Store global $3 as global symbol $2 in namespace designated by $1.  If
-namespace does not exist, create it.  $1 may be a key, a string, or an array
-of strings.
-
-=cut
-
-op store_global(in STR, invar PMC) :deprecated {
-    Parrot_store_global_cur(interp, $1, $2);
-}
-
-op store_global(in STR, in STR, invar PMC) :deprecated {
-    Parrot_store_global_s(interp, $1, $2, $3);
-}
-
-op store_global(in PMC, in STR, invar PMC) :deprecated {
-    Parrot_store_global_k(interp, $1, $2, $3);
-}
-
-########################################
-
-=item B<find_global>(out PMC, in STR)
-
-Find the global named $2 in the current namespace and store it in $1.
-
-If the global doesn't exist either throws an exception or sets $1 to the
-Null PMC, depending on current errors settings. See B<errorson>.
-
-=item B<find_global>(out PMC, in STR, in STR)
-
-Find the global named $3 in the namespace named $2 and store it in $1.
-
-If the global doesn't exist either throws an exception or sets $1 to the
-Null PMC, depending on current errors settings. See B<errorson>.
-
-=item B<find_global>(out PMC, in PMC, in STR)
-
-Find the global named $3 in the namespace designated by $2 and store it in
-$1.  $2 may be a key, a string, or an array of strings.
-
-If the global doesn't exist either throws an exception or sets $1 to the
-Null PMC, depending on current errors settings.  See B<errorson>.
-
-=cut
-
-op find_global(out PMC, in STR) :deprecated {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
-    $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
-}
-
-op find_global(out PMC, in STR, in STR) :deprecated {
-    PMC * const ns = Parrot_get_namespace_keyed_str(interp,
-                                                    Parrot_get_ctx_HLL_namespace(interp),
-                                                    $2);
-    $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
-}
-
-op find_global(out PMC, in PMC, in STR) :deprecated {
-    PMC * const ns = Parrot_get_namespace_keyed(interp,
-                                                Parrot_get_ctx_HLL_namespace(interp),
-                                                $2);
-    $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
-}
-
 =item B<find_name>(out PMC, in STR)
 
 Find the name $2 in lexical, current, global, or builtin namespace and
@@ -447,17 +463,45 @@ errors settings. See B<errorson>.
 =cut
 
 op find_name(out PMC, in STR) {
-    if (!$2)
-        real_exception(interp, NULL, 1, "Tried to find null name");
+    if (!$2) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Tried to find null name");
+        goto ADDRESS(handler);
+    }
 
-    $1 = Parrot_find_name_op(interp, $2, expr NEXT());
+    $1 = Parrot_ns_find_named_item(interp, $2, expr NEXT());
 }
+
+=item B<find_sub_not_null>(out PMC, in STR)
+
+Do the same thing as C<find_name>, but throw an exception if the name isn't
+found.
+
+=cut
+
+inline op find_sub_not_null(out PMC, in STR) :base_core {
+    opcode_t *dest = expr NEXT();
+    PMC *sub = Parrot_ns_find_named_item(interp, $2, dest);
+
+    if (PMC_IS_NULL(sub)) {
+        opcode_t *handler;
+        Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+        handler = Parrot_ex_throw_from_op_args(interp, dest,
+                       EXCEPTION_GLOBAL_NOT_FOUND,
+                       "Could not find sub %Ss", $2);
+        goto ADDRESS(handler);
+    }
+
+    $1 = sub;
+}
+
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 

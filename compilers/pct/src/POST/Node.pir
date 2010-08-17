@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 POST - Parrot opcode syntax tree
@@ -23,13 +25,14 @@ for compiling programs in Parrot.
     p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
     $P0 = new 'ResizableStringArray'
-    $P0[0] = "    .param pmc %0"
-    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag"
-    $P0[2] = "    .param pmc %0 :slurpy"
-    $P0[4] = "    .param pmc %0 :named(%1)"
-    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag"
-    $P0[6] = "    .param pmc %0 :slurpy :named"
-    set_hll_global ['POST::Sub'], '%!paramfmt', $P0
+    $P0[0] = "    .param pmc %0\n"
+    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
+    $P0[2] = "    .param pmc %0 :slurpy\n"
+    $P0[4] = "    .param pmc %0 :named(%1)\n"
+    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
+    $P0[6] = "    .param pmc %0 :slurpy :named\n"
+    $P0[8] = "    .param pmc %0 :call_sig\n"
+    set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()
 .end
 
@@ -43,13 +46,9 @@ C<PCT::Node> (see F<compilers/pct/src/PCT/Node.pir>).
 
 =over 4
 
-=item result([value])
-
-Get/set
-
 =cut
 
-.namespace [ 'POST::Node' ]
+.namespace [ 'POST';'Node' ]
 
 =item result([value])
 
@@ -66,11 +65,11 @@ as the result of the current node.
     if has_value == 1 goto set_value
     value = self['result']
     if null value goto result_null
-    $I0 = isa value, 'POST::Node'
+    $I0 = isa value, ['POST';'Node']
     if $I0 goto result_node
     .return (value)
   result_node:
-    .return value.'result'()
+    .tailcall value.'result'()
   result_null:
     .return ('')
   set_value:
@@ -79,7 +78,7 @@ as the result of the current node.
 .end
 
 
-=item get_string()   # vtable method
+=item get_string()
 
 Returns the result of the current node as a string.
 
@@ -113,13 +112,14 @@ newly created node.
 
 =item escape(str)
 
-Return C<str> as a PIR constant string.
+Return C<str> as a PIR constant string.  (Deprecated in favor of
+C<POST::Compiler.escape>.)
 
 =cut
 
 .sub 'escape' :method
     .param string str
-    $P0 = new 'CodeString'
+    $P0 = get_hll_global ['PAST'], 'Compiler'
     str = $P0.'escape'(str)
     .return (str)
 .end
@@ -138,22 +138,22 @@ Get/set the opcode type for this node.
 
 =cut
 
-.namespace [ 'POST::Op' ]
+.namespace [ 'POST';'Op' ]
 
 .sub 'pirop' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirop', value, has_value)
+    .tailcall self.'attr'('pirop', value, has_value)
 .end
 
 .sub 'inline' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('inline', value, has_value)
+    .tailcall self.'attr'('inline', value, has_value)
 .end
 
 
-.namespace [ 'POST::Label' ]
+.namespace [ 'POST';'Label' ]
 
 .sub 'result' :method
     .param pmc value           :optional
@@ -171,54 +171,73 @@ Get/set the opcode type for this node.
 .end
 
 
-.namespace [ 'POST::Sub' ]
+.namespace [ 'POST';'Sub' ]
 
 .sub 'blocktype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('blocktype', value, has_value)
+    .tailcall self.'attr'('blocktype', value, has_value)
 .end
 
 
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
+.end
+
+
+.sub 'hll' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('hll', value, has_value)
 .end
 
 
 .sub 'outer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('outer', value, has_value)
+    .tailcall self.'attr'('outer', value, has_value)
+.end
+
+.sub 'multi' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('multi', value, has_value)
 .end
 
 
-.sub 'lexid' :method
+.sub 'subid' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lexid', value, has_value)
+    if has_value goto getset_value
+    $I0 = exists self['subid']
+    if $I0 goto getset_value
+    value = self.'unique'('post')
+    has_value = 1
+  getset_value:
+    .tailcall self.'attr'('subid', value, has_value)
 .end
 
 
 .sub 'pirflags' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirflags', value, has_value)
+    .tailcall self.'attr'('pirflags', value, has_value)
 .end
 
 
 .sub 'compiler' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('compiler', value, has_value)
+    .tailcall self.'attr'('compiler', value, has_value)
 .end
 
 
 .sub 'compiler_args' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('compiler_args', value, has_value)
+    .tailcall self.'attr'('compiler_args', value, has_value)
 .end
 
 
@@ -226,11 +245,12 @@ Get/set the opcode type for this node.
     .param pmc pname
     .param pmc adverbs         :slurpy :named
 
-    .local int optional, slurpy
+    .local int optional, slurpy, call_sig
     .local string named
     optional = adverbs['optional']
     slurpy = adverbs['slurpy']
     named = adverbs['named']
+    call_sig = adverbs['call_sig']
 
     .local int paramseq
     paramseq = isne optional, 0
@@ -240,6 +260,9 @@ Get/set the opcode type for this node.
     unless named goto named_done
     paramseq += 4
   named_done:
+    unless call_sig goto call_sig_done
+    paramseq += 8
+  call_sig_done:
 
     .local pmc paramlist
     paramlist = self['paramlist']
@@ -251,18 +274,33 @@ Get/set the opcode type for this node.
     .local pmc code
     code = paramlist[paramseq]
     unless null code goto have_code
-    code = new 'CodeString'
+    code = new 'StringBuilder'
     paramlist[paramseq] = code
   have_code:
 
     .local pmc paramfmt
-    paramfmt = get_hll_global ['POST::Sub'], '%!paramfmt'
+    paramfmt = get_hll_global ['POST';'Sub'], '%!paramfmt'
     $S0 = paramfmt[paramseq]
-    named = code.'escape'(named)
-    code.'emit'($S0, pname, named)
+    named = self.'escape'(named)
+    code.'append_format'($S0, pname, named)
 
     .return ()
 .end
+
+
+.sub 'add_directive' :method
+    .param string line
+    .local string dlist
+    dlist = self['directives']
+    $I0 = index dlist, line
+    unless $I0 < 0 goto done
+    dlist = concat dlist, line
+    dlist = concat dlist, "\n"
+    self['directives'] = dlist
+  done:
+    .return ()
+.end
+
 
 =back
 
@@ -278,7 +316,7 @@ Perl 6 compilers mailing lists.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, The Perl Foundation.
+Copyright (C) 2006-2008, Parrot Foundation.
 
 =cut
 

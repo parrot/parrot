@@ -1,0 +1,105 @@
+html {
+    background: #7C98C9;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Trebuchet MS', Trebuchet, Arial, Verdana, sans-serif;
+    color: #1D2D45;
+    font-size: 13px;
+}
+
+h1 {
+    font-size: 150%;
+}
+
+h2 {
+    font-size: 130%;
+}
+
+h3 { 
+    font-size: 120%;
+}
+
+h4 {
+    font-size:  110%;
+}
+
+a:link,
+a:visited {
+        color: #819D26;
+	text-decoration: none;
+}
+
+div#bottom a:link,
+div#bottom a:visited {
+        color: #58a;
+}
+
+a:hover {
+
+	text-decoration: underline;
+}
+
+
+div#wrapper {
+	margin: 0 auto;
+	width: 868px;
+	padding-top: 18px;
+}
+
+div#header {
+	background: #EEEEEE;
+	padding: 5px;
+        height: 80px;
+}
+
+img#logo {
+	margin-left: 30px;
+	padding-top:  5px;
+	width: 261px;
+	height: 70px;
+}
+
+div#divider {
+	background: #80A902;
+        padding: 2px;
+}
+
+
+div#mainbody {
+	background: #fff;
+	padding-top: 15px;
+	padding-bottom: 20px;
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+div#footer {
+	background: #121A28;
+	text-align: center;
+    color: white;
+        padding-top: 1px;
+        padding-bottom: 10px;
+}
+
+
+#breadcrumb {
+	font-weight: bold;
+}
+
+/* =item constructs no <dt><dd> just <dt>, so we fake it */
+dt {
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+	font-weight: bold;
+}
+
+pre {
+        border: 1px dashed #3b5b91;
+        padding: 5px;
+        color: black;
+        background: #BFCa7d;
+        overflow: auto;
+}

@@ -1,60 +1,65 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-=head1 NAME
+=head1 [DRAFT] PDD 8: PMC Keys
 
-docs/pdds/pdd08_keys.pod - Indexing Aggregate PMCs
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD aims to clear up the confusion regarding the implementation of keyed
 access to PMCs in Parrot.
 
-=head1 DESCRIPTION
+=head2 Version
 
-First, let's define some terminology. An B<aggregate PMC> is one which allows
-indexed access to sub-element that it stores or references, by supporting and
-implementing the C<_keyed> variants of vtable methods. These variants are
-B<indexing> operations, as they act on a specific indexed element of an
-aggregate PMC.
+$Revision$
 
-Non-aggregates also support C<_keyed> variants of the vtable methods, but they
-may not do anything particularly clever - for instance, PMC types implementing
-Perl references will merely pass the index on to the referent. These aren't
-aggregates because they don't directly store or reference sub-elements.
+=head2 Description
 
-Indexing operations take one or more aggregate-B<key> atoms. At runtime, these
-operations will index the key into the aggregate returning a B<value>. Here is
-a well-known indexing operation in Perl 6:
+First, let's define some terminology. An C<aggregate PMC> is one which stores
+or references other values as elements.  The aggregate PMC allows indexed
+access to element by implementing some of the C<_keyed> variants of VTABLE
+functions.  These variants are called C<indexing> operations, as they act on a
+specific indexed element of an aggregate PMC.  Examples of a aggregate PMCs
+include C<Hash>, C<FixedIntegerArray> and C<ResizablePMCArray>.
+
+Non-aggregates may also support C<_keyed> variants of the VTABLE functions,
+but they not do anything particularly clever.  For instance, PMC types
+implementing Perl references will merely pass the index on to the referent.
+These aren't aggregates because they don't directly store or reference
+elements.
+
+Indexing operations take one or more aggregate B<keys>.  At runtime these
+operations will index into the B<aggregate> using the C<key> and return a
+B<value>.  Here is a well-known indexing operation in Perl 6:
 
     @a[12] = $b;
 
-The key here is the constant integer C<12>, and the aggregate is the
-C<PerlArray> C<@a>. In the process of this assignment, Parrot will have to
-extract the PMC in element 12 of the array, producing a value. C<$b> is then
-assigned to this value.
+The B<key> here is the constant integer C<12>  The aggregate is the
+C<Perl6Array> C<@a>.  In the process of this assignment, Parrot will have to
+extract the PMC in element 12 of the array, producing a C<value>.
+C<$b> is then assigned to this value.
 
 Now, how does this all get implemented?
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 The key structure
+=head3 The key structure
 
-The key structure has to have the following features: it must bundle up
-multiple keys so that multidimensional aggregates can be indexed; keys may be
-specified as integer, string, number or PMC.
+The key structure must bundle multiple keys.  This is to allow indexing into
+multidimensional aggregate PMCs.  These keys may be specified as integer,
+string, number or PMC.
 
-Hence, the following structure was produced. First, the individual keys as we
-think of them from a language level are each stored in a Key PMC with the key
-type encoded in the private flags of the PMC and the value stored in the PMCs
-cache.
+For this reason the following structure was produced.  Individual keys (e.g. a
+single C<Integer> or C<String>) are stored in a C<Key> PMC.  The type of the
+key is encoded in the private flags of the PMC as specified below.   The value
+of the C<Key> PMC is stored in the PMC's data structure internally and can be
+accessed using the appropriate get_* VTABLE functions.
 
-So, for instance, indexing the multidimensional array C<@foo[$a;12;"hi"]>
-produces three PMCs, one with a PMC type, one with an integer type and one
-with a string type.
+For example, indexing the multidimensional array C<@foo[$a,12;"hi"]>
+produces three PMCs; one with a PMC type, one with an integer type
+and one with a string type.
 
-As stated, the key type is encoded in the PMC flags using 8 bits based on the
-following scheme:
+The key type is encoded in the PMC flags using 8 bits based on the following
+scheme (from includes/parrot/key.h):
 
     typedef enum {
         KEY_integer_FLAG        = PObj_private0_FLAG,
@@ -64,53 +69,51 @@ following scheme:
         KEY_pmc_FLAG            = PObj_private3_FLAG,
         KEY_register_FLAG       = PObj_private4_FLAG,
 
-        KEY_start_slice_FLAG    = PObj_private5_FLAG,
-        KEY_end_slice_FLAG      = PObj_private6_FLAG,
-        KEY_inf_slice_FLAG      = PObj_private7_FLAG,
-
-        KEY_type_FLAGS          = KEY_integer_FLAG |
-                                  KEY_number_FLAG  |
-                                  KEY_string_FLAG |
-                                  KEY_pmc_FLAG |
-                                  KEY_register_FLAG |
+        KEY_type_FLAGS          = KEY_integer_FLAG   |
+                                  KEY_number_FLAG    |
+                                  KEY_string_FLAG    |
+                                  KEY_pmc_FLAG       |
+                                  KEY_register_FLA G |
                                   KEY_hash_iterator_FLAGS
     } KEY_flags
 
 
-The C<KEY_register_FLAG> is used to indicate that the C<int_val> component of
-the PMC's cache contains the number of a register of the appropriate type that
-itself contains the value of the key component.
+The C<KEY_register_FLAG> is used to indicate that value if the key is in a
+register.  In this case, the Key PMC's data contains the integer number of the
+appropriate register in the current context.
 
-The next issue is to combine these things into a single key. This is done by
-using the C<data> member of the PMC to form a linked list so that each key
-points to the next key. A linked list is used so that partial keys can be
-easily generated as a multidimensional data structure is traversed.
+Parrot must also have a way to combine multiple keys into a key that can be
+treated as a single unit.  This is done by forming a singly linked list such
+that each key points at the next.  Within a single Key PMC, the pointer to the
+next key is stored in C<PMC_data(key)>.  The linked list structure allows the
+use of partial keys in multidimensional lookups, since the next key can be
+generated while the aggregate PMC is being traversed.
 
 These definitions, along with declarations of support routines used to
 manipulate keys, can be found in F<include/parrot/key.h>
 
-=head2 Aggregate and non-aggregate PMCs
+=head3 Aggregate and non-aggregate PMCs
 
 We've already said that what separates the aggregate PMCs from the
-non-aggregates is their implementation of the C<_keyed> vtable methods. So it
-is Hereby Decreed that the default vtable which everyone inherits from defines
-the C<_keyed> forms to throw an exception.
+non-aggregates is their implementation of the C<_keyed> vtable functions. So
+it is Hereby Decreed that the default vtable which everyone inherits from
+defines the C<_keyed> forms to throw an exception.
 
 =over 3
 
 =item Todo
 
-Need discussion on whether C<OUT_OF_BOUNDS> is a good exception for this, or
-whether something else should be used. It's really a compiler screw-up, since
-code which indexes a non-aggregate shouldn't be generated.
+Need discussion on whether C<EXCEPTION_OUT_OF_BOUNDS> is a good exception for
+this, or whether something else should be used. It's really a compiler
+screw-up, since code which indexes a non-aggregate shouldn't be generated.
 
 =back
 
-=head2 C<_keyed> vtable methods
+=head3 C<_keyed> vtable functions
 
-So what of these magical C<_keyed> vtable methods? They are generated when you
-add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They are
-constructed by following B<every> C<PMC> argument with a second C<PMC>
+So what of these magical C<_keyed> vtable functions? They are generated when
+you add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They
+are constructed by following B<every> C<PMC> argument with a second C<PMC>
 argument which acts as the key for that argument; the name of the second
 C<PMC> argument is formed by adding C<_key> onto the end of the first C<PMC>
 argument.
@@ -124,8 +127,8 @@ and
 
     $a = @b[$c]
 
-use the same vtable method, reducing the multiplicity of methods.  Secondly, a
-three-argument C<assign> as suggested by the code above would be ambiguous -
+use the same vtable function, reducing the multiplicity of methods. Secondly,
+a three-argument C<assign> as suggested by the code above would be ambiguous -
 the code above uses 3 PMCs in different ways.
 
 Also, operations which take an aggregate key for one of their arguments should
@@ -168,7 +171,7 @@ applicable method - C<..._index> and C<..._index_s> for integer and string
 indexing respectively. However, this didn't give us the flexibility and
 scalability that key structures give us.
 
-=head2 Input to the assembler
+=head3 Input to the assembler
 
 There are several different valid specifications of an aggregate key to the
 assembler. These are:
@@ -195,7 +198,7 @@ and registers with any number of levels; and register keys which are
 represented by a single PMC register that is assumed to  contain a PMC of the
 Key class.
 
-=head2 What the assembler did next
+=head3 What the assembler did next
 
 When the assembler sees an aggregate key, it "detaches" the key to form a
 separate argument. It then decides on the type of key. For  integer keys (both
@@ -209,23 +212,39 @@ Next it selects the appropriate op. Register keys have the signature C<k> and
 constant keys have the signature C<kc>. Integer register and constant keys are
 encoded as C<ki> and C<kic> respectively.
 
-    set P1["hi"], 1234
+=begin PIR_FRAGMENT
+
+    set $P1["hi"], 1234
+
+=end PIR_FRAGMENT
 
 finds an op named C<set_p_kc_i>. On the other hand,
 
-    set P1[P1], 1234
+=begin PIR_FRAGMENT
+
+    set $P1[$P1], 1234
+
+=end PIR_FRAGMENT
 
 produces an op named C<set_p_k_i>. Likewise, this:
 
-    set P1[1], 1234
+=begin PIR_FRAGMENT
+
+    set $P1[1], 1234
+
+=end PIR_FRAGMENT
 
 produces an op named C<set_p_kic>, and this:
 
-    set P1[I1], 1234
+=begin PIR_FRAGMENT
+
+    set $P1[$I1], 1234
+
+=end PIR_FRAGMENT
 
 produces an op named C<set_p_ki>.
 
-=head2 Bytecode representation
+=head3 Bytecode representation
 
 The bytecode representation of these keys are as follows: constant keys are
 treated just like another constant, and are an index into the packfile's
@@ -250,43 +269,14 @@ number (for registers) or an index into the appropriate constant table.
 The type values shown above are actually the C<PARROT_ARG_*> values taken from
 F<include/parrot/op.h>.
 
-=head1 VERSION
+=head2 References
 
-=head2 CURRENT
-
-   Maintainer: Simon Cozens <simon@netthink.co.uk>
-   Class: Internals
-   PDD Number: 8
-   Version: 1.3
-   Status: Developing
-   Last Modified: 25 August, 2002
-   PDD Format: 1
-   Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Sun Aug 25 11:14:43 GMT 2002 : Version 1.3
-
-Updated to reflect Dan's decision to change keys to use PMCs instead of a
-custom data structure. Also corrects documentation of multi-level keys and how
-they are compiled and work. tom@compton.nu.
-
-=item Thu Apr 25 18:30:36 UTC 2002 : Version 1.2
-
-Renamed C<KEY_PAIR> to C<KEY_ATOM>, updated to reflect changeover to linked
-list. - steve@fink.com
-
-=item Fri Mar  8 18:47:34 GMT 2002 : Version 1.1
-
-updated to reflect Dan's comments that non-aggregates also support C<_keyed>
-variant vtable methods.
-
-=back
-
-=head1 REFERENCES
-
-To come.
+None.
 
 =cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

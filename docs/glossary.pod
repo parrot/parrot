@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ parser.
 =item bcg
 
 Byte Code Generation: bcg will be part of the Parrot Compiler
-tools. It will aid in coverting POST to byte code.
+tools. It will aid in converting POST to byte code.
 
 =item Continuations
 
@@ -164,7 +164,7 @@ machine.
 International Components for Unicode
 
 ICU is a C and C++ library that provides support for Unicode on a variety of
-platforms.  It was distributed with parrot at one time, but current releases
+platforms. It was distributed with parrot at one time, but current releases
 require you to get your own copy.
 
 L<http://oss.software.ibm.com/icu/index.html>
@@ -233,13 +233,10 @@ be added, or overridden (for instance, the PAST to PIR transformation).
 
 =item PIRC
 
-Acronym for PIR Compiler, a PIR compiler currently still in experimental
-phase. The purpose is to reimplement the PIR language, which is currently
-implemented by IMCC. There are two versions of PIRC: a handwritten, recursive-
-descent top-down compiler, written in C, and a version using a Bison and
-Flex grammar specification.
-
-Some day, either PIRC should be completed, or IMCC should be cleaned up.
+Acronym for PIR Compiler, a PIR compiler currently under development.
+The purpose is to reimplement the PIR language, which is currently
+implemented by IMCC. PIRC is written using a Bison and Flex grammar
+specification.
 
 =item PDD
 
@@ -267,14 +264,13 @@ extension C<.pir>.
 
 =item PMC
 
-Parrot Magic Cookie:  these classes are the primitives that
+Polymorphic Container:  these classes are the primitives that
 HLLs use to represent their fundamental types, such as Perl's
 scalar values.
 
-=item POD
+=item Pod
 
-(Perl's) Plain Old Documentation: the preferred form for all kinds of
-documentation in Parrot. See L<perlpod> for details.
+The preferred format for all kinds of documentation in Parrot.
 
 =item POST
 

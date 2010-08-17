@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -7,7 +7,7 @@ HTTP;Daemon - A Simple HTTPD Server
 
 =head1 SYNOPSIS
 
-  load_bytecode "HTTP/Daemon.pir"
+  load_bytecode "HTTP/Daemon.pbc"
   opts = new 'Hash'
   opts['LocalPort'] = 1234
   opts['LocalAddr'] = 'localhost'
@@ -21,7 +21,7 @@ A lot. The code is by now just an objectified version of httpd.pir.
 
 =head1 SEE ALSO
 
-RFC2616, F<examples/io/httpd2.pir>
+RFC2616
 
 =head1 AUTHOR
 
@@ -207,10 +207,9 @@ set_it:
     $P0 = doc_root
 .end
 
-=item __get_bool()
+=item get_bool()
 
-Vtable method, called from the C<if> or C<unless> opcode. Returns
-true, if the daemon object is listening on a socket, that is if the
+Object is true if the daemon is listening on a socket, that is if the
 initialization went ok.
 
 =cut
@@ -325,14 +324,15 @@ runnloop.
 .sub '_select_active' :method
     .local pmc active, conn, sock
     .local int i, n
-    .const .Sub req_handler = "req_handler"
+    .const 'Sub' req_handler = "req_handler"
     active = getattribute self, 'active'
     n = elements active
     i = 0
 add_lp:
     conn = active[i]
     sock = conn.'socket'()
-    add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD
+    # XXX: this opcode is long gone; need something else
+    # add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD
     ## self.'debug'('**select ', i, "\n")
     inc i
     if i < n goto add_lp
@@ -432,7 +432,7 @@ not_found:
 .end
 
 # close all sockets
-# this needs enabling of SIGHUP in src/events.c but still doesn't
+# this needs enabling of SIGHUP but still doesn't
 # help against FIN_WAIT2 / TIME_WAIT state of connections
 .sub 'shutdown' :method
     .local pmc active, sock
@@ -458,7 +458,7 @@ yes:
 .end
 
 
-# reguest handler sub - not a method
+# request handler sub - not a method
 # this is called from the async select code, i.e from the event
 # subsystem
 .sub req_handler
@@ -470,7 +470,7 @@ yes:
     srv = conn.'server'()
     $I0 = srv.'exists_conn'(conn)
     if $I0 goto do_read
-    .return srv.'accept_conn'()
+    .tailcall srv.'accept_conn'()
 
 do_read:
     req = conn.'get_request'()
@@ -639,7 +639,7 @@ TODO doc CGI urls.
 
 =item check_cgi(url)
 
-Check if a request url is a CGI request. If yes, return the reulst of the
+Check if a request url is a CGI request. If yes, return the result of the
 CGI invocation.
 
 =cut
@@ -713,7 +713,7 @@ normal:
 
 SERVE_file:
     # try to open the file in url
-    fp = open url, "<"
+    fp = open url, 'r'
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
     read file_content, fp, len
@@ -821,7 +821,7 @@ END:
 
 .sub hex_to_int
     .param pmc hex
-    .return hex.'to_int'(16)
+    .tailcall hex.'to_int'(16)
 .end
 
 # if file is *.pir or *.pbc run it as CGI
@@ -1074,7 +1074,7 @@ create header response items.
     goto fin
 no_200:
     if ccc != '301' goto no_301
-    line .= ' Moved Permamently'
+    line .= ' Moved Permanently'
     goto fin
 no_301:
     if ccc != '404' goto no_404

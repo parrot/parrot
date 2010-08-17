@@ -1,22 +1,10 @@
-/*
- * feature.h - arch specific defines resulting from some tests
- */
+/* feature.h - arch specific defines resulting from some tests */
 
 
 #ifndef PARROT_FEATURE_H_GUARD
 #define PARROT_FEATURE_H_GUARD
 
 #perl - all below here gets evaled by perl, OUT is the filehandle
-
-print OUT <<'END_PRINT';
-
-/* from config/init/miniparrot */
-END_PRINT
-if (@miniparrot@) {
-    print OUT <<'END_PRINT';
-#define MINIPARROT 1
-END_PRINT
-}
 
 print OUT <<'END_PRINT';
 
@@ -157,11 +145,35 @@ END_PRINT
 if (defined @backtrace@) {
     print OUT <<"END_PRINT";
 #define PARROT_HAS_BACKTRACE
+#include <execinfo.h>
+/* __USE_GNU seems to mess up stdio.h on Linux; only define it for dlfcn.h if
+it's not already defined */
+#ifndef __USE_GNU
+#  define __USE_GNU
+#  include <dlfcn.h>
+#  undef __USE_GNU
+#else
+#  include <dlfcn.h>
+#endif
 END_PRINT
 }
 
 print OUT <<'END_PRINT';
 
+/* from config/auto/neg_0 */
+END_PRINT
+if (@has_negative_zero@) {
+    print OUT <<'END_PRINT';
+#define PARROT_HAS_NEGATIVE_ZERO 1
+END_PRINT
+}
+else {
+    print OUT <<'END_PRINT';
+#undef PARROT_HAS_NEGATIVE_ZERO
+END_PRINT
+}
+
+print OUT <<'END_PRINT';
 
 #endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT

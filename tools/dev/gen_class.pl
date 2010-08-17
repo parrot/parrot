@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -45,7 +45,7 @@ my $year = (localtime())[5] + 1900; # get current year.
 ## emit file header
 print <<"EOF";
 /* ${classname}.pmc
- *  Copyright (C) $year, The Perl Foundation.
+ *  Copyright (C) $year, Parrot Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:

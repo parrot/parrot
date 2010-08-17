@@ -1,3 +1,5 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
 # create/export some useful but rarely used methods
 
 # TODO podify & beautify & doc
@@ -5,7 +7,7 @@
 .namespace [ 'Sub' ]
 
 # implementation Sub.get_lexenv :method
-.sub get_lexenv :method
+.sub get_lexenv :method :nsentry
     .local pmc env, pad, interp
     env = new 'ResizablePMCArray'
     .local int level

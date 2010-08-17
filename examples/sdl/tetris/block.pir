@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 block.pir - a tetris block class
@@ -365,7 +367,7 @@ XXX continue
 
 =item parameter C<extent>
 
-The size of the block's subblocks, in pixels.
+The size of the block's sub-blocks, in pixels.
 
 =back
 
@@ -406,8 +408,8 @@ This method returns nothing.
     add $I0, 9 # +1 = make first block id blue; +8 = make it bright
     # lookup the color value
     color = app."color"( $I0 )
-    $I0 = typeof color
-    if $I0 == .Undef goto END
+    $S0 = typeof color
+    if $S0 == "Undef" goto END
 
     # get the x/y position in board coordinates
     (xp, yp) = self."position"()
@@ -437,7 +439,7 @@ This method returns nothing.
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
 
     surface."fill_rect"( temp, color )
     sub i, 2
@@ -448,7 +450,7 @@ This method returns nothing.
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
 
     # lookup the color value
     $P0 = app."color"( 0 )
@@ -476,7 +478,7 @@ LOOPx:
     rect["y"] = yp
     rect["width"] = extent
     rect["height"] = extent
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     inc extent
     surface."fill_rect"( temp, color )
 SKIP:
@@ -575,7 +577,7 @@ BLOCK_MOVEDOWN_OKAY:
 
 =item app = block."application"()
 
-Returns the application object assosicated with the block's board.
+Returns the application object associated with the block's board.
 
 =cut
 
@@ -605,7 +607,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

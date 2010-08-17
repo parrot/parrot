@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -18,10 +18,13 @@ Implements the basic task behavior for the concurrency scheduler.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
-pmclass Task need_ext {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Task auto_attrs {
     ATTR INTVAL        id;        /* The task ID. */
     ATTR INTVAL        priority;  /* The priority of the task. */
     ATTR FLOATVAL      birthtime; /* The creation time stamp of the task. */
@@ -44,19 +47,17 @@ Initialize a concurrency task object.
 */
 
     VTABLE void init() {
-        Parrot_Task * const core_struct = mem_allocate_zeroed_typed(Parrot_Task);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
 
         /* Set up the core struct. */
-        PMC_data(SELF)           = core_struct;
         core_struct->id          = 0;
-        core_struct->type        = CONST_STRING(interp, "");
-        core_struct->subtype     = CONST_STRING(interp, "");
+        core_struct->type        = CONST_STRING(INTERP, "");
+        core_struct->subtype     = CONST_STRING(INTERP, "");
         core_struct->priority    = 0;
-        core_struct->status      = CONST_STRING(interp, "created");
+        core_struct->status      = CONST_STRING(INTERP, "created");
         core_struct->birthtime   = 0.0;
         core_struct->codeblock   = PMCNULL;
         core_struct->data        = PMCNULL;
@@ -103,7 +104,7 @@ The time at which this Task was inserted into the task list.
 
 =item C<code>
 
-A C<Sub> or descendent PMC related to this task.
+A C<Sub> or descendant PMC related to this task.
 
 =item C<interp>
 
@@ -117,20 +118,18 @@ An interpreter in which to execute this task.
 
     VTABLE void init_pmc(PMC *data) {
         PMC         *elem;
-        Parrot_Task *core_struct;
+        Parrot_Task_attributes *core_struct;
 
         if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
-            real_exception(INTERP, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Task initializer must be a Hash");
 
-        core_struct = mem_allocate_zeroed_typed(Parrot_Task);
+        core_struct = (Parrot_Task_attributes *) PMC_data(SELF);
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
 
         /* Set up the core struct. */
-        PMC_data(SELF)           = core_struct;
 
         elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "id"));
         if (! PMC_IS_NULL(elem))
@@ -168,10 +167,8 @@ An interpreter in which to execute this task.
         else
             core_struct->birthtime = 0.0;
 
-        core_struct->codeblock =
-            VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-        core_struct->interp = (Parrot_Interp)
-            VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
+        core_struct->codeblock = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
+        core_struct->interp = (Parrot_Interp)VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
     }
 
 /*
@@ -187,11 +184,11 @@ Create a copy of the task, resetting status, ID, and birthtime.
     VTABLE PMC *clone() {
         /* Create the new task PMC, of the same type of this one (we may
          * have been subclassed). */
-        PMC * const copy  = pmc_new(interp, SELF->vtable->base_type);
-        Parrot_Task * const new_struct = PARROT_TASK(copy);
-        Parrot_Task * const old_struct = PARROT_TASK(SELF);
+        PMC * const copy  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
+        Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
 
-        new_struct->codeblock = VTABLE_clone(interp, old_struct->codeblock);
+        new_struct->codeblock = VTABLE_clone(INTERP, old_struct->codeblock);
         new_struct->data      = old_struct->data;
         new_struct->type      = old_struct->type;
         new_struct->subtype   = old_struct->subtype;
@@ -209,32 +206,32 @@ Gets the value of an attribute for this task.
 
 */
     VTABLE PMC *get_attr_str(STRING *name) {
-        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         PMC *value;
 
-        if (string_equal(interp, name, CONST_STRING(interp, "id")) == 0) {
-            value = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, value, core_struct->id);
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "id"))) {
+            value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
+                    core_struct->id);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "type")) == 0) {
-            value = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, value, core_struct->type);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
+            value = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, value, core_struct->type);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "subtype")) == 0) {
-            value = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, value, core_struct->subtype);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "subtype"))) {
+            value = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, value, core_struct->subtype);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "priority")) == 0) {
-            value = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, value, core_struct->priority);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "priority"))) {
+            value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
+                    core_struct->priority);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "status")) == 0) {
-            value = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, value, core_struct->status);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "status"))) {
+            value = Parrot_pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, value, core_struct->status);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "birthtime")) == 0) {
-            value = pmc_new(interp, enum_class_Float);
-            VTABLE_set_number_native(interp, value, core_struct->birthtime);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
+            value = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, value, core_struct->birthtime);
         }
         else {
             value = PMCNULL;
@@ -253,30 +250,30 @@ Sets the value of an attribute for this task.
 
 */
     VTABLE void set_attr_str(STRING *name, PMC *value) {
-        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
-        if (string_equal(interp, name, CONST_STRING(interp, "id")) == 0) {
-            core_struct->id = VTABLE_get_integer(interp, value);
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "id"))) {
+            core_struct->id = VTABLE_get_integer(INTERP, value);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "type")) == 0) {
-            core_struct->type = VTABLE_get_string(interp, value);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
+            core_struct->type = VTABLE_get_string(INTERP, value);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "subtype")) == 0) {
-            core_struct->subtype = VTABLE_get_string(interp, value);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "subtype"))) {
+            core_struct->subtype = VTABLE_get_string(INTERP, value);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "priority")) == 0) {
-            core_struct->priority = VTABLE_get_integer(interp, value);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "priority"))) {
+            core_struct->priority = VTABLE_get_integer(INTERP, value);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "status")) == 0) {
-            core_struct->status = VTABLE_get_string(interp, value);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "status"))) {
+            core_struct->status = VTABLE_get_string(INTERP, value);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "birthtime")) == 0) {
-            core_struct->birthtime = VTABLE_get_number(interp, value);
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
+            core_struct->birthtime = VTABLE_get_number(INTERP, value);
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "code")) == 0) {
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "code"))) {
             core_struct->codeblock = value;
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "data")) == 0) {
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "data"))) {
             core_struct->data = value;
         }
     }
@@ -291,7 +288,7 @@ Retrieves the task ID for this task.
 
 */
     VTABLE INTVAL get_integer() {
-        const Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         return core_struct->id;
     }
 
@@ -306,7 +303,7 @@ Sets the task ID of the task.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         core_struct->id = value;
     }
 
@@ -321,7 +318,7 @@ Sets the birthtime of the task.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         core_struct->birthtime = value;
     }
 
@@ -336,7 +333,7 @@ Sets the type of the task.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         core_struct->type = value;
     }
 
@@ -352,7 +349,7 @@ Set this PMC as shared.
 
     VTABLE PMC *share_ro() {
         PMC *shared_self;
-        Parrot_Task *shared_struct;
+        Parrot_Task_attributes *shared_struct;
 
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;
@@ -371,19 +368,6 @@ Set this PMC as shared.
 
 /*
 
-=item C<void destroy()>
-
-Free the task's underlying struct.
-
-=cut
-
-*/
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-    }
-
-/*
-
 =item C<void mark()>
 
 Mark any referenced strings and PMCs.
@@ -393,18 +377,19 @@ Mark any referenced strings and PMCs.
 */
     VTABLE void mark() {
         if (PARROT_TASK(SELF)) {
-            Parrot_Task * const core_struct = PARROT_TASK(SELF);
+            Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
-            if (core_struct->codeblock)
-                pobject_lives(interp, (PObj*)core_struct->codeblock);
-            if (core_struct->data)
-                pobject_lives(interp, (PObj*)core_struct->data);
+            Parrot_gc_mark_STRING_alive(INTERP, core_struct->type);
+            Parrot_gc_mark_STRING_alive(INTERP, core_struct->subtype);
+            Parrot_gc_mark_STRING_alive(INTERP, core_struct->status);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->codeblock);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->data);
         }
     }
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the task.
 
@@ -414,19 +399,14 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(visit_info *info) {
-        Parrot_Task * const core_struct = PARROT_TASK(SELF);
-        PMC **pos;
-
+    VTABLE void visit(PMC *info) {
         /* 1) visit code block */
-        pos            = &core_struct->codeblock;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Task, codeblock);
     }
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the task.
 
@@ -434,32 +414,31 @@ Used to archive the task.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-        const Parrot_Task * const core_struct = PARROT_TASK(SELF);
+    VTABLE void freeze(PMC *info) {
+        const Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         /* 1) freeze task id */
-        VTABLE_push_integer(INTERP, io, core_struct->id);
+        VTABLE_push_integer(INTERP, info, core_struct->id);
 
         /* 2) freeze task birthtime */
-        VTABLE_push_float(INTERP, io, core_struct->birthtime);
+        VTABLE_push_float(INTERP, info, core_struct->birthtime);
 
         /* 3) freeze task priority */
-        VTABLE_push_integer(INTERP, io, core_struct->priority);
+        VTABLE_push_integer(INTERP, info, core_struct->priority);
 
         /* 4) freeze task type */
-        VTABLE_push_string(INTERP, io, core_struct->type);
+        VTABLE_push_string(INTERP, info, core_struct->type);
 
         /* 5) freeze task subtype */
-        VTABLE_push_string(INTERP, io, core_struct->subtype);
+        VTABLE_push_string(INTERP, info, core_struct->subtype);
 
         /* 6) freeze task status */
-        VTABLE_push_string(INTERP, io, core_struct->status);
+        VTABLE_push_string(INTERP, info, core_struct->status);
     }
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the task.
 
@@ -467,26 +446,24 @@ Used to unarchive the task.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
+    VTABLE void thaw(PMC *info) {
         /* 1. thaw task id */
-        const INTVAL id = VTABLE_shift_integer(INTERP, io);
+        const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
         /* 2. thaw task birthtime */
-        const FLOATVAL birthtime = VTABLE_shift_float(INTERP, io);
+        const FLOATVAL birthtime = VTABLE_shift_float(INTERP, info);
 
         /* 3. thaw task priority */
-        const INTVAL priority = VTABLE_shift_integer(INTERP, io);
+        const INTVAL priority = VTABLE_shift_integer(INTERP, info);
 
         /* 4. thaw task type */
-        STRING * const type = VTABLE_shift_string(INTERP, io);
+        STRING * const type = VTABLE_shift_string(INTERP, info);
 
         /* 5. thaw task subtype */
-        STRING * const subtype = VTABLE_shift_string(INTERP, io);
+        STRING * const subtype = VTABLE_shift_string(INTERP, info);
 
         /* 6. thaw task status */
-        STRING * const status = VTABLE_shift_string(INTERP, io);
+        STRING * const status = VTABLE_shift_string(INTERP, info);
 
         /* Allocate the task's core data struct and set custom flags. */
         SELF.init();
@@ -513,7 +490,7 @@ Used to unarchive the task.
 
 /*
 
-=item C<void thawfinish(visit_info *info)>
+=item C<void thawfinish(PMC *info)>
 
 Called after the task has been thawed.
 
@@ -521,8 +498,8 @@ Called after the task has been thawed.
 
 */
 
-    void thawfinish(visit_info *info) {
-        Parrot_Task * core_struct = PARROT_TASK(SELF);
+    VTABLE void thawfinish(PMC *info) {
+        Parrot_Task_attributes * core_struct = PARROT_TASK(SELF);
 
         UNUSED(core_struct); /* TODO: Rebuild the task index. */
     }

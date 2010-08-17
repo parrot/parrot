@@ -58,7 +58,7 @@ print a list of files that do match PATTERN
 
 treat binary files as text.
 
-This uses a basic hueristic to discover if a file is binary or not.  Files are
+This uses a basic heuristic to discover if a file is binary or not.  Files are
 read line by line, and it keeps processing "normally" until a control character
 is found, and then stops and goes onto the next file is that line matches.
 
@@ -81,6 +81,9 @@ print the filename for each match
 # Readability improved!
 .include 'hllmacros.pir'
 
+# for getstdin and friends
+.loadlib 'io_ops'
+
 .sub main :main
 	.param pmc argv # the script name, then our options.
 	.local string progname
@@ -88,7 +91,7 @@ print the filename for each match
 	load_bytecode 'Getopt/Obj.pbc'
 	load_bytecode 'PGE.pbc'
 	.local pmc getopts
-	getopts = new 'Getopt::Obj'
+	getopts = new [ 'Getopt';'Obj' ]
 	getopts.'notOptStop'(1)
 	push getopts, 'with-filename|H'
 	push getopts, 'files-with-matches|l'
@@ -130,7 +133,9 @@ print the filename for each match
 	filecount = files
 	# define with-filename if there's more than one file
 	.If(filecount >= 2, { opts['with-filename'] = 1 })
+        $P0 = loadlib 'file'
 	File = new 'File'
+        $P0 = loadlib 'os'
 	OS = new 'OS'
 	# This must be here, or else it'll get filled with junk data we use stdin...
 	i = 0
@@ -150,7 +155,7 @@ print the filename for each match
 		$I1 = File.'is_file'(filename)
 		.IfElse($I1, {
 			# Is a file
-			handle = open filename, '<'
+			handle = open filename, 'r'
 		},{
 			# Not a file, hopefully a directory
 			$I1 = File.'is_dir'(filename)
@@ -185,9 +190,12 @@ print the filename for each match
 
 	end
 handler:
-	.local pmc exception
+	.local pmc exception, pmcmsg
 	.local string message
-	.get_results (exception, message)
+	.get_results (exception)
+	pmcmsg = getattribute exception, 'message'
+	pop_eh
+        message = pmcmsg
         message  = "pgegrep: " . message
         die message
 .end
@@ -204,7 +212,7 @@ handler:
 	lineno = 1
 	matched = 0 # Only used for --files-without-matches
 	line = readline handle
-	linelen = length line 
+	linelen = length line
 
 	.local pmc p6rule_compile, cntrlchar
 	$S0 = '<+cntrl-[\t\r\n]>'

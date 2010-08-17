@@ -1,0 +1,318 @@
+/*
+Copyright (C) 2001-2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/exceptionhandler.pmc - Exception Handler PMC
+
+=head1 DESCRIPTION
+
+When an exception handler is called, the exception object is passed as
+C<REG_PMC(interp, 5)>, the original contents of this register is in the
+exception object's C<_P5> attribute.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/oplib/ops.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass ExceptionHandler extends Continuation provides invokable auto_attrs {
+
+    ATTR PMC    *handled_types;
+    ATTR PMC    *handled_types_except;
+    ATTR INTVAL min_severity;
+    ATTR INTVAL max_severity;
+
+/*
+
+=item C<void init()>
+
+Initializes the exception handler.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
+        SUPER();
+        attrs->invoked              = 0;
+        attrs->min_severity         = 0;
+        attrs->max_severity         = 0;
+        attrs->handled_types        = PMCNULL;
+        attrs->handled_types_except = PMCNULL;
+
+        /* an exception handler has no separate context; it's only a snapshot
+         * of an "earlier" context, which is contained in the interpreter's
+         * context - the stacks can only be deeper in the interpreter - so no
+         * mark of context is needed */
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any active exception handler data as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_ExceptionHandler_attributes * const attrs =
+            PARROT_EXCEPTIONHANDLER(SELF);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types_except);
+        SUPER();
+    }
+
+    VTABLE PMC *clone() {
+        PMC * const result = SUPER();
+        /* This looks wrong, why wouldn't we want to mark the clone? */
+        PObj_custom_mark_CLEAR(result);
+        return result;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL)>
+
+Mark whether the handler has been invoked.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL value) {
+        PARROT_CONTINUATION(SELF)->invoked = value;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Check whether the handler has been invoked.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return PARROT_CONTINUATION(SELF)->invoked;
+    }
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Set up the environment for the exception handler to be invoked.
+
+=cut
+
+*/
+
+    VTABLE opcode_t *invoke(void *next) {
+        opcode_t    * const pc = PARROT_CONTINUATION(SELF)->address;
+
+        Parrot_continuation_check(INTERP, SELF);
+        Parrot_continuation_rewind_environment(INTERP, SELF);
+
+        /* switch code segment if needed */
+        if (INTERP->code != PARROT_CONTINUATION(SELF)->seg)
+            Parrot_switch_to_cs(INTERP, PARROT_CONTINUATION(SELF)->seg, 1);
+
+        return pc;
+    }
+
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<METHOD can_handle(PMC *exception)>
+
+Report whether the exception handler can handle a particular type of exception.
+
+=cut
+
+*/
+
+    METHOD can_handle(PMC *exception) {
+        STRING * const sev    = CONST_STRING(INTERP, "severity");
+        STRING * const ex_str = CONST_STRING(INTERP, "Exception");
+
+        INTVAL severity = VTABLE_get_integer_keyed_str(INTERP, exception, sev);
+
+        if (exception->vtable->base_type == enum_class_Exception
+        ||  VTABLE_isa(INTERP, exception, ex_str)) {
+            PMC *handled_types;
+            PMC *handled_types_except;
+            INTVAL min_severity, max_severity;
+            GET_ATTR_handled_types(INTERP, SELF, handled_types);
+            GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
+            GET_ATTR_max_severity(INTERP, SELF, max_severity);
+            GET_ATTR_min_severity(INTERP, SELF, min_severity);
+
+            if (severity < min_severity) {
+                RETURN(INTVAL 0);
+            }
+            if (max_severity > 0 &&  severity > max_severity) {
+                RETURN(INTVAL 0);
+            }
+            if (! PMC_IS_NULL(handled_types)) {
+                const INTVAL elems = VTABLE_elements(INTERP, handled_types);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
+                INTVAL i;
+
+                for (i = 0; i < elems; ++i) {
+                    INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
+                            handled_types, i);
+                    if (handled_type == type)
+                        RETURN(INTVAL 1);
+                }
+
+                RETURN(INTVAL 0);
+            }
+            if (handled_types_except != PMCNULL) {
+                const INTVAL elems = VTABLE_elements(INTERP, handled_types_except);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
+                INTVAL i;
+
+                for (i = 0; i < elems; ++i) {
+                    const INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
+                            handled_types_except, i);
+                    if (handled_type == type)
+                        RETURN(INTVAL 0);
+                }
+
+                RETURN(INTVAL 1);
+            }
+            else if (max_severity > 0 || min_severity > 0) {
+                RETURN(INTVAL 1);
+            }
+
+            RETURN(INTVAL 1);
+        }
+
+        RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<METHOD min_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag)>
+
+Set or get the minimum severity of the exception handler.
+
+=cut
+
+*/
+
+    METHOD min_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
+        Parrot_ExceptionHandler_attributes * const attrs =
+                    PARROT_EXCEPTIONHANDLER(SELF);
+
+        if (have_severity)
+            attrs->min_severity = severity;
+        else
+            severity = attrs->min_severity;
+
+        RETURN(INTVAL severity);
+    }
+
+/*
+
+=item C<METHOD max_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag)>
+
+Set or get the maximum severity of the exception handler.
+
+=cut
+
+*/
+
+    METHOD max_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
+        Parrot_ExceptionHandler_attributes * const attrs =
+                    PARROT_EXCEPTIONHANDLER(SELF);
+
+        if (have_severity)
+            attrs->max_severity = severity;
+        else
+            severity = attrs->max_severity;
+
+        RETURN(INTVAL severity);
+    }
+
+/*
+
+=item C<METHOD handle_types(PMC *types :slurpy)>
+
+Set the exception types that the ExceptionHandler will handle.
+
+=cut
+
+*/
+
+    METHOD handle_types(PMC *types :slurpy) {
+        Parrot_ExceptionHandler_attributes * const attrs =
+                    PARROT_EXCEPTIONHANDLER(SELF);
+        attrs->handled_types =
+            VTABLE_elements(INTERP, types) > 0
+                ? types
+                : PMCNULL;
+    }
+
+/*
+
+=item C<METHOD handle_types_except(PMC *types :slurpy)>
+
+Set the exception types that the ExceptionHandler will not handle.
+
+=cut
+
+*/
+
+    METHOD handle_types_except(PMC *types :slurpy) {
+        Parrot_ExceptionHandler_attributes * const attrs =
+                    PARROT_EXCEPTIONHANDLER(SELF);
+        attrs->handled_types_except =
+            VTABLE_elements(INTERP, types) > 0
+                ? types
+                : PMCNULL;
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

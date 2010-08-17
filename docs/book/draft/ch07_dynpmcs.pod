@@ -1,0 +1,234 @@
+=pod
+
+=head1 Dynamic C-level Objects
+
+Z<CHP-11>
+
+PMCs are one of the four fundamental data types in Parrot, and definitely one
+of the most useful. A PMC can contain a single scalar value (integer, floating
+point number, string), an array of values, a subroutine, a namespace, or an
+entire list of other data types as well. PMCs are the basis for all higher
+order data types in Parrot, and are flexible enough to be used for any
+purpose that an HLL needs.
+
+All the common PMC types are included in the Parrot repository and built directly
+into libparrot and the parrot executable. However, the system is not rigid; new
+PMC types can be defined externally and loaded into Parrot at a later time. In
+this way, HLLs and libraries and applications can add new data types to Parrot
+at the C code level, which helps to ensure speed and efficiency. PMCs loaded
+this way are called X<dynamic PMCs;dynpmcs> Dynamic PMCs or I<dynpmcs>.
+
+=head2 PIR Classes
+
+It's worth a quick diversion here to talk about the difference between a pure
+PIR class object, and a PMC. Even though classes written in PIR can inherit from
+an existing PMC type, they aren't all their own type of PMC. In fact, classes
+written in PIR are all of the Object PMC type. In order to add a new fundamental
+PMC type to Parrot, it needs to be written in C N<well, a superset of C anyway>
+and it needs to be compiled using the X<PMC compiler> PMC compiler.
+
+=head2 Writing PMCs
+
+In the strictest sense, PMCs are written in C and are compiled by your local
+C compiler into machine code for linking with libparrot or the parrot
+executable. However, Parrot's build process makes use of a special PMC compiler
+program that converts PMCs defined in a special C-like script to ordinary
+C code. The PMC compiler adds all the necessary boiler plate code and installs
+the PMC type into Parrot for use. The PMC script is like a macro superset
+N<although the functionality is a little bit more involved then is available
+in the normal C preprocessor> over the C language. All valid C is valid in
+PMC scripts, but there are also a few additions that help to make common tasks
+a little easier.
+
+The PMC script was born of conflicting necessities. The internals of Parrot
+are all written according to the ISO C89 standard for maximum portability.
+However, PIR and languages that are built on top of Parrot are typically
+object-oriented (or have some OO capabilities). PMCs are like classes,
+they have data and methods, and they can inherit from parent PMCs.
+
+C is low-level and portable, which is desirable. But Parrot needed some
+support for OO features that C doesn't have, and the C preprocessor
+can't support directly. To support the necessary features, and to make
+the task of writing PMCs just a little bit easier, the Parrot developers
+created a PMC compiler program that takes a special PMC script and converts
+it into standard ISO C89.
+
+=head3 PMC Files
+
+PMC files have a C<.pmc> file extension. They're written in a C-like
+language with a few additions to help with creating PMCs. PMC files do
+not natively allow POD documentation, so all such documentation must be
+enclosed in C</* */> comments. All PMC files that ship with Parrot
+include significant file-level and function-level documentation to help
+explain how the PMCs operate.
+
+=head3 C<pmclass> Definitions
+
+A PMC file can contain a single PMC class definition and any other helper
+functions or data structure definitions that are needed to support the
+PMC. To define a PMC class in the PMC file, you use the C<pmclass>
+statement. Everything outside the C<pmclass> definition will be ignored by
+the PMC compiler and passed through verbatim into the generated C<.c> file.
+Inside the C<pmclass> definition are going to be all the VTABLE and METHOD
+declarations for the PMC.
+
+A standard definition can contain a number of parts. Here's a pseudo-grammar
+for them:
+
+  pmclass CLASSNAME [extends PARENT]? [provides INTERFACE] [FLAGS]* {
+      /* Attributes defined here */
+
+      /* VTABLE and METHODs defined here. */
+
+  }
+
+The C<extends> keyword is optional, but allows us to specify that this
+PMC class is a subtype of the given type. If we have an C<extends>
+in the definition, we can use the C<SUPER> keyword throughout the PMC
+file to refer to the parent type.
+
+The C<FLAGS> are a series of flags that can be specified to determine
+how the PMC behaves and how it's constructed internally. The C<singleton>
+flag means that there can only be one instantiated
+object of this class. The C<is_ro> and C<has_ro> flags indicate that the
+PMC class is read-only or that it contains read-only data, respectively.
+The C<is_shared> flag indicates that the PMC is intended to be shared
+between multiple interpreters, and therefore special synchronization
+logic should be applied. The C<abstract> flag indicates that the PMC
+class cannot be instantiated directly, but can be inherited from by a
+non-abstract PMC class.
+
+The C<provides> keyword is used to show that the PMC provides certain
+standard interfaces. For instance, you can specify C<provides array>
+and then Parrot will enable us to write things like C<$P0[2]> in PIR
+code to access the PMC using integer indices. C<provides hash> means
+that we can use string and PMC keys to access values in the PMC. These
+C<provides> each correspond to a series of VTABLE interfaces that the
+PMC must provide, or must inherit. Without the necessary VTABLE
+interfaces available, Parrot may try to perform illegal operations and
+things will go badly. We'll talk about all the available C<provides>
+interfaces and the VTABLE interfaces that they must define.
+
+=head3 Attributes
+
+PMCs can be given a custom set of data field attributes using the C<ATTR>
+keyword. ATTR allows the PMC to be extended to contain custom data
+structures that are automatically managed by Parrot's memory subsystem.
+Here's an example:
+
+  pmclass Foo {
+    ATTR INTVAL bar;
+    ATTR PMC baz;
+
+    ...
+  }
+
+The attributes are stored in a custom data structure that can be accessed
+using a macro with the same name as the PMC, but all upper-case:
+
+  Parrot_Foo_Attributes * attrs = PARROT_FOO(SELF);
+  attrs->bar = 7;                 /* it's an INTVAL */
+  attrs->baz = pmc_new( ... )     /* it's a PMC */
+
+Notice how the type name of the attributes structure is C<Parrot_>,
+followed by the name of the PMC with the same capitalization as is used
+in the C<pmclass> definition, followed by C<_Attributes>. The macro to
+return this structure is C<PARROT_> followed by the name of the PMC in
+all caps.
+
+=head3 C<INTERP>, C<SUPER> and C<SELF>
+
+The PMC compiler enables us to use a few pre-defined variable names
+throughout the file to make things easier. The C<INTERP> keyword always
+contains a reference to the current interpreter structure. This keyword is
+included by default in all VTABLE interfaces and all PMC methods. It is not
+automatically included in any extra helper functions that you define in
+the PMC file.
+
+Here's an example of a VTABLE interface function:
+
+  VTABLE Foo(INVAR PMC, INVAR INTVAL)
+  {
+      ...
+  }
+
+The PMC compiler will convert this to the following C function definition:
+
+  void Foo(PARROT_INTERP, PMC *self, PMC *arg_1, INTVAL arg_2)
+  {
+      ...
+  }
+
+The C<interp> and C<self> variables are provided in all VTABLE interfaces,
+even though you don't have to define them explicitly in the PMC file.
+
+If the C<pmclass> definition uses the C<extends> keyword, a reference to
+a member of the parent class is also contained in the C<SUPER> variable.
+The C<SUPER()> function calls the VTABLE interface from the parent class.
+
+  VTABLE destroy()
+  {
+      SUPER(); /* Call the parent PMC's VTABLE */
+  }
+
+The PMC compiler also allows the use of "method syntax" for the C<SELF> and
+C<SUPER> variables:
+
+  SUPER.clone()   /* Call the clone VTABLE interface on SUPER */
+  SELF.destroy()  /* Call the destroy VTABLE interface on SELF */
+
+Or, you can call the VTABLE interfaces more directly:
+
+  VTABLE_clone(INTERP, SUPER)
+  VTABLE_destroy(INTERP, SELF)
+
+=head3 PMC Compiler
+
+The PMC compiler is a small program written in Perl 5 that's part of the
+normal Parrot build process. It converts all C<.pmc> files to C<.c> files
+for final compilation. The long-term goal for Parrot is to not be dependent
+on Perl 5 for configuration and building, but for now Perl 5 is required
+when building Parrot.
+
+=head2 VTABLE Function Definitions
+
+=head3 VTABLE Functions Parameters
+
+VTABLE functions are defined just like ordinary C functions, almost. Here's
+a normal definition for a VTABLE function:
+
+  VTABLE VTABLENAME (PARAMETERS) {
+    /* ordinary C here, almost */
+  }
+
+You can't just name your VTABLE functions anything you want. There is a
+predefined list of VTABLE function names, and you must name it exactly
+the same as the one you are trying to implement. The PARAMETERS list
+is pretty particular as well: Each VTABLE function type has a specific
+parameter list that must be implemented exactly or else the compiler
+will throw a warning.
+
+=head2 Methods
+
+VTABLES are standard, but they're rigid. They need to have the exact name
+that Parrot expects, and they need to have the exact function signature
+that Parrot expects too. VTABLES are responsible for the low-level basic
+access operations that all data types need to implement. However, to get
+more out of your PMCs, we need a more flexible want to interact with them.
+
+Enter methods, which are ways to extend the functionality of your PMC
+in ways that the PMC needs. Methods allow the developer to add all sorts
+of arbitrary functionality to a PMC that the VTABLE functions themselves
+cannot define.
+
+=head2 Dynpmcs
+
+=head3 Loading dynpmcs
+
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

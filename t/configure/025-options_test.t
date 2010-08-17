@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 025-options_test.t
 
@@ -7,22 +7,14 @@ use strict;
 use warnings;
 use Carp;
 use Cwd;
-use Data::Dumper;
 use File::Temp qw( tempdir );
-use Test::More tests =>  9;
-#use Test::More qw( no_plan );
+use Test::More tests =>  7;
 use lib qw( lib );
 use IO::CaptureOutput qw| capture |;
-use_ok(
-    'Parrot::Configure::Options', qw|
-        process_options
-        |
-);
-use_ok('Parrot::Configure::Options::Test');
+use Parrot::Configure::Options qw| process_options |;
+use Parrot::Configure::Options::Test;
 
-my ( $args, $opttest );
-
-$args = process_options(
+my ( $args, $step_list_ref ) = process_options(
     {
         argv => [q{--test}],
         mode => q{configure},
@@ -31,7 +23,7 @@ $args = process_options(
 ok( defined $args,
     "process_options() returned successfully when options were specified" );
 
-$opttest = Parrot::Configure::Options::Test->new($args);
+my $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
 
 # Running the actual pre- and post-configuration tests would be too

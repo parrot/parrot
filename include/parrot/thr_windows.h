@@ -1,5 +1,5 @@
 /* thread.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2003, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -13,13 +13,9 @@
 #ifndef PARROT_THR_WINDOWS_H_GUARD
 #define PARROT_THR_WINDOWS_H_GUARD
 
-#  undef CONST
-#  include <windows.h>
 #  undef FASTCALL
 #  include <process.h>
 #  include <limits.h>
-
-#  define PARROT_SYNC_PRIMITIVES_DEFINED
 
 typedef CRITICAL_SECTION Parrot_mutex;
 typedef struct Windows_cond
@@ -123,15 +119,13 @@ typedef HANDLE Parrot_thread;
 
 typedef void (*Cleanup_Handler)(void *);
 
-#ifndef _STRUCT_TIMESPEC
-#  define _STRUCT_TIMESPEC
+#ifndef _TIMESPEC_DEFINED
+#  define _TIMESPEC_DEFINED
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#endif /* _STRUCT_TIMESPEC */
-
-#  undef CONST
+#endif /* _TIMESPEC_DEFINED */
 
 #endif /* PARROT_THR_WINDOWS_H_GUARD */
 

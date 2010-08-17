@@ -1,4 +1,4 @@
-# Parrot is Copyright (C) 2001-2008, The Perl Foundation.
+# Parrot is Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 DONORS
@@ -8,31 +8,36 @@ whose financial contributions help support the development of Parrot.
 
 =over 4
 
-=item *
+=item * The Perl Foundation
 
- N: The Perl Foundation
- W: perlfoundation.org
+L<http://perlfoundation.org>
 
-=item * 
+=item * NLnet Foundation
 
- N: NLnet Foundation
- W: nlnet.nl
+L<http://nlnet.nl>
 
-=item * 
+=item * The Mozilla Foundation
 
- N: The Mozilla Foundation
- W: www.mozilla.org
+L<http://www.mozilla.org>
 
-=item  * 
+=item  * Best Practical
 
- N: Best Practical
- W: bestpractical.com
+L<http://bestpractical.com>
+
+=item  * ActiveState
+
+L<http://activestate.com>
+
+=item  * BBC
+
+L<http://bbc.co.uk>
 
 =back
 
 =head1 ERRATA
 
 Information will be added to this file as it becomes available.
-For errors and omissions, please contact Will Coleda <will@coleda.com>.
+For errors and omissions, please contact the directors of the Parrot
+Foundation <directors at lists.parrot.org>
 
 =cut

@@ -1,19 +1,19 @@
 #!perl
 
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2006, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 pir_output_is( <<'CODE', <<'OUT', 'some of the auxiliary methods' );
 
 .sub _main :main
     load_bytecode 'PCT/HLLCompiler.pbc'
-    $P0 = new 'PCT::HLLCompiler'
+    $P0 = new ['PCT';'HLLCompiler']
 
     # parse_name method
     $P1 = $P0.'parse_name'('None::Module')
@@ -45,6 +45,7 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 
 .sub 'TOP'
     .param string source
+    .param pmc options         :slurpy :named
     .return (source)
 .end
 
@@ -59,12 +60,12 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 .sub 'get' :method
     .param string stage
 
-    $P0 = new 'PAST::Op'
+    $P0 = new ['PAST';'Op']
     $P0.'pasttype'('inline')
     $P0.'inline'("print %0\nprint \"\\n\"")
 
     $P2 = getattribute self, "text"
-    $P1 = new 'PAST::Val'
+    $P1 = new ['PAST';'Val']
     $P1.'value'($P2)
 
     $P0.'push'($P1)
@@ -94,12 +95,12 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
     .return ($P0)
 .end
 
-.namespace [ 'None::Compiler' ]
+.namespace [ 'None';'Compiler' ]
 
 .sub _main :main
     load_bytecode 'PCT.pbc'
 
-    $P0 = new 'PCT::HLLCompiler'
+    $P0 = new ['PCT';'HLLCompiler']
     $P0.'language'('None')
     $P0.'parsegrammar'('NoneParser')
     $P0.'astgrammar'('NoneGrammar')
@@ -124,7 +125,7 @@ pir_output_is( <<'CODE', <<'OUT', 'default stages' );
     load_bytecode 'PCT/HLLCompiler.pbc'
 
     .local pmc hllcompiler
-    hllcompiler = new 'PCT::HLLCompiler'
+    hllcompiler = new ['PCT';'HLLCompiler']
 
     $P0 = getattribute hllcompiler, "@stages"
     $S0 = join " ", $P0
@@ -141,14 +142,14 @@ pir_output_is( <<'CODE', <<'OUT', 'inserting and removing stages' );
     load_bytecode 'PCT/HLLCompiler.pbc'
 
     .local pmc hllcompiler
-    hllcompiler = new 'PCT::HLLCompiler'
+    hllcompiler = new ['PCT';'HLLCompiler']
 
-    hllcompiler.removestage('parse')
-    hllcompiler.addstage('foo')
-    hllcompiler.addstage('bar', 'before' => 'evalpmc')
-    hllcompiler.addstage('optimize', 'after' => 'past')
-    hllcompiler.addstage('optimize', 'after' => 'post')
-    hllcompiler.addstage('peel', 'after' => 'optimize')
+    hllcompiler.'removestage'('parse')
+    hllcompiler.'addstage'('foo')
+    hllcompiler.'addstage'('bar', 'before' => 'evalpmc')
+    hllcompiler.'addstage'('optimize', 'after' => 'past')
+    hllcompiler.'addstage'('optimize', 'after' => 'post')
+    hllcompiler.'addstage'('peel', 'after' => 'optimize')
     $P0 = getattribute hllcompiler, "@stages"
     $S0 = join " ", $P0
     say $S0
@@ -157,6 +158,44 @@ pir_output_is( <<'CODE', <<'OUT', 'inserting and removing stages' );
 
 CODE
 past optimize peel post optimize peel pir bar evalpmc foo
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'EXPORTALL method' );
+.namespace []
+
+.sub main :main
+    load_bytecode 'PCT.pbc'
+    .local pmc h, source, dest
+    h = new ['PCT';'HLLCompiler']
+
+    $P0 = new 'NameSpace'
+    set_hll_global ['Omg'], 'Lol', $P0
+
+    source = get_hll_namespace ['Foo';'Bar']
+    dest = get_hll_namespace ['Omg';'Lol']
+
+    h.'EXPORTALL'(source,dest)
+
+    $P0 = get_hll_global ['Omg';'Lol'], 'hi'
+    $P0()
+    $P0 = get_hll_global ['Omg';'Lol'], 'lol'
+    $P0()
+.end
+
+.namespace ['Foo';'Bar';'EXPORT';'ALL']
+
+.sub 'lol'
+    say 'omgwtf!'
+.end
+
+.sub 'hi'
+    say 'hello world!'
+.end
+
+
+CODE
+hello world!
+omgwtf!
 OUT
 
 # Local Variables:

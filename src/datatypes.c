@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2002-2008, The Perl Foundation.
+Copyright (C) 2002-2009, Parrot Foundation.
 License:  Artistic 2.0, see README and LICENSE for details
 $Id$
 
@@ -27,7 +27,7 @@ F<include/parrot/datatypes.h>.
 
 /*
 
-=item C<INTVAL Parrot_get_datatype_enum>
+=item C<INTVAL Parrot_get_datatype_enum(PARROT_INTERP, const STRING *type_name)>
 
 Return datatype C<enum> for C<STRING*> type_name.
 
@@ -35,29 +35,30 @@ Return datatype C<enum> for C<STRING*> type_name.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
 {
-    char * const type = string_to_cstring(interp, type_name);
+    ASSERT_ARGS(Parrot_get_datatype_enum)
+    char * const type = Parrot_str_to_cstring(interp, type_name);
     int i;
 
-    for (i = enum_first_type; i < enum_last_type; i++) {
+    for (i = enum_first_type; i < enum_last_type; ++i) {
         if (STREQ(data_types[i - enum_first_type].name, type)) {
-            string_cstring_free(type);
+            Parrot_str_free_cstring(type);
             return i;
         }
     }
 
-    string_cstring_free(type);
+    Parrot_str_free_cstring(type);
 
     return enum_type_undef;
 }
 
 /*
 
-=item C<STRING * Parrot_get_datatype_name>
+=item C<STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)>
 
 Return datatype name for C<type>.
 
@@ -65,12 +66,13 @@ Return datatype name for C<type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
 {
+    ASSERT_ARGS(Parrot_get_datatype_name)
     const char * const s =
         (type < enum_first_type || type >= enum_last_type)
             ? "illegal"
@@ -78,6 +80,27 @@ Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
 
     return string_make(interp, s, strlen(s), NULL, PObj_external_FLAG);
 }
+
+/*
+
+=item C<FLOATVAL floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)>
+
+Only used to generate Infinity and NaN constants in our corresponding
+header file.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+FLOATVAL
+floatval_divide_by_zero(SHIM_INTERP, FLOATVAL num)
+{
+    ASSERT_ARGS(floatval_divide_by_zero)
+    const FLOATVAL zero = 0.0;
+    return num / zero;
+}
+
 
 /*
 

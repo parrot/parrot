@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,11 +13,13 @@ examples/pasm/cat.pasm - cat-like utility
 
 Simple C<cat>-like utility to test PIO read/write. Does not use STDIO.
 
-Echoes what you type once you hit return. 
+Echoes what you type once you hit return.
 
 You'll have to Ctl-C to exit.
 
 =cut
+
+.loadlib 'io_ops'
 
 	getstdin P0
 	getstdout P1
@@ -26,3 +28,9 @@ REDO:
 	print S0
 	if S0, REDO
 	end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

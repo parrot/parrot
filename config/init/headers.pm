@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ use ExtUtils::Manifest qw(maniread);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Finding header files distributed with Parrot};
+    $data{description} = q{Find header files distributed with Parrot};
     $data{result}      = q{};
     return \%data;
 }

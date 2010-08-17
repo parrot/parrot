@@ -1,25 +1,23 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-=head1 NAME
+=head1 PDD 22: I/O
 
-docs/pdds/pdd22_io.pod - Parrot I/O
-
-=head1 ABSTRACT
+=head2 Abstract
 
 Parrot's I/O subsystem.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 A "stream" allows input or output operations on a source/destination
 such as a file, keyboard, or text console. Streams are also called
 "filehandles", though only some of them have anything to do with files.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -32,39 +30,33 @@ concurrency models.
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Composition
+=head3 Platform Implementation
 
-Currently, the Parrot I/O subsystem uses a per-interpreter stack to
-provide a layer-based approach to I/O. Each layer implements a subset of
-the C<ParrotIOLayerAPI> vtable. To find an I/O function, the layer stack
-is searched downwards until a non-NULL function pointer is found for
-that particular slot. This implementation will be replaced with a
-composition model. Rather than living in a stack, the module fragments
-that make up the ParrotIO class will be composed and any conflicts
-resolved when the class is loaded. This strategy eliminates the need to
-search a stack on each I/O call, while still allowing a "layered"
-combination of functionality for different platforms.
+Parrot uses a series of macros and conditional compilation to generate
+code to handle IO on various platforms. There is a "portable" version of
+the IO system that is used for most systems that use a common POSIX API
+for IO, and there are platform-specific files that can be used for systems
+that do not subscribe, or don't subscribe faithfully, to POSIX.
 
-=head2 Concurrency Model for Asynchronous I/O
+A series of macros and conditional compilation are used to determine which
+files get added to the build, and which functions are called to implement
+each operation.
 
-Currently, Parrot only implements synchronous I/O operations. For the
-1.0 release the asynchronous operations will be implemented separately
-from the synchronous ones. There may be an implementation that uses one
-variant to implement the other someday, but it's not an immediate
-priority.
+=head3 Concurrency Model for Asynchronous I/O
+
+Currently, Parrot only implements synchronous I/O operations. Initially,
+the asynchronous operations will be implemented separately from the
+synchronous ones. There may be an implementation that uses one variant
+to implement the other someday, but it's not an immediate priority.
 
 Synchronous opcodes are differentiated from asynchronous opcodes by the
 presence of a callback argument in the asynchronous calls.  Asynchronous
 calls that don't supply callbacks (perhaps if the user wants to manually
-check later if the operation succeded) are enough of a fringe case that
+check later if the operation succeeded) are enough of a fringe case that
 they don't need opcodes. They can access the functionality via methods
 on ParrotIO objects.
-
-The asynchronous I/O implementation will use the composition model to
-allow some platforms to take advantage of their built-in asynchronous
-operations, layered behind Parrot's asynchronous I/O interface.
 
 Asynchronous operations use a lightweight concurrency model. At the user
 level, Parrot follows the callback function model of asynchronous I/O.
@@ -87,46 +79,42 @@ The lightweight tasks typically used by the asynchronous I/O system
 capture no state other than the arguments passed to the I/O call, and
 share no variables with the calling code other than the status object.
 
-[See L<http://en.wikipedia.org/wiki/Asynchronous_I/O>, for a relatively
-comprehensive list of asynchronous I/O implementation options.]
-
-=head2 I/O PMC API
+=head3 FileHandle PMC API
 
 Methods
-
-[Over and over again throughout this section, I keep wanting an API that
-isn't possible with current low-level PMCs. This could mean that
-low-level PMCs need a good bit of work to gain the same argument passing
-capabilities as higher-level Parrot objects (which is true, long-term).
-It could mean that Parrot I/O objects would be better off defined in a
-higher-level syntax, with embedded C (via NCI, or a lighter-weight
-embedding mechanism) for those pieces that really are direct C access.
-Or, it could mean that I'll come back and rip this interface down to a
-bare minimum.]
 
 =over 4
 
 =item C<new>
 
-  $P0 = new ParrotIO
+=begin PIR_FRAGMENT
+
+  $P0 = new [ 'FileHandle' ]
+
+=end PIR_FRAGMENT
 
 Creates a new I/O stream object. [Note that this is usually performed
 via the C<open> opcode.]
 
 =item C<open>
 
-  $P0 = $P1.open()
-  $P0 = $P1.open($S2)
-  $P0 = $P1.open($S2, $S3)
+=begin PIR_FRAGMENT
+
+  $P0 = $P1.'open'()
+  $P0 = $P1.'open'($S2)
+  $P0 = $P1.'open'($S2, $S3)
+
+=end PIR_FRAGMENT
 
 Opens a stream on an existing I/O stream object, and returns a status
 object. With no arguments, it can be used to reopen a previously opened
 I/O stream. $S2 is a file path and $S3 is an optional mode for the
 stream (read, write, read/write, etc), using the same format as the
 C<open> opcode: 'r' for read, 'w' for write, 'a' for append, and 'p' for
-pipe. When the mode is set to write or append, a file is created without
-warning if none exists. When the mode is read (without write), a
-nonexistent file is an error.
+pipe. When the optional mode argument is not passed, the default is read mode.
+When the mode is set to write or append, a file is created without warning if
+none exists. When the mode is read (without write), a nonexistent file is an
+error.
 
 The asynchronous version takes a PMC callback as an additional final
 argument. When the open operation is complete, it invokes the callback
@@ -135,8 +123,12 @@ object.
 
 =item C<close>
 
-  $P0 = $P1.close()
-  $P0 = $P1.close($P2)
+=begin PIR_FRAGMENT
+
+  $P0 = $P1.'close'()
+  $P0 = $P1.'close'($P2)
+
+=end PIR_FRAGMENT
 
 Closes an I/O stream, but leaves destruction of the I/O object to the
 GC. The C<close> method returns a PMC status object.
@@ -149,14 +141,18 @@ you the option of executing an action when the stream has been closed.]
 
 =item C<print>
 
-  $P0 = $P1.print($I2)
-  $P0 = $P1.print($N2)
-  $P0 = $P1.print($S2)
-  $P0 = $P1.print($P2)
-  $P0 = $P1.print($I2, $P3)
-  $P0 = $P1.print($N2, $P3)
-  $P0 = $P1.print($S2, $P3)
-  $P0 = $P1.print($P2, $P3)
+=begin PIR_FRAGMENT
+
+  $P0 = $P1.'print'($I2)
+  $P0 = $P1.'print'($N2)
+  $P0 = $P1.'print'($S2)
+  $P0 = $P1.'print'($P2)
+  $P0 = $P1.'print'($I2, $P3)
+  $P0 = $P1.'print'($N2, $P3)
+  $P0 = $P1.'print'($S2, $P3)
+  $P0 = $P1.'print'($P2, $P3)
+
+=end PIR_FRAGMENT
 
 Writes an integer, float, string, or PMC value to an I/O stream object.
 Returns a PMC status object.
@@ -167,16 +163,19 @@ passing it a status object.
 
 =item C<read>
 
-  $S0 = $P1.read($I2)
-  $P0 = $P1.read($I2, $P3)
+=begin PIR_FRAGMENT
 
-Retrieves a specified number of bytes $I2, from a stream $P1 into a
-string $S0. By default it reads in bytes, but the ParrotIO object can be
-configured to read in code points instead, by applying a C<utf8> or
-similar role to the object [the syntax for applying a role to an object
-has yet to be defined in PDD 15]. If there are fewer bytes remaining in
-the stream than specified in the read request, it returns the remaining
-bytes (with no error).
+  $S0 = $P1.'read'($I2)
+  $P0 = $P1.'read'($I2, $P3)
+
+=end PIR_FRAGMENT
+
+Retrieves a specified number of bytes ($I2) from a stream $P1 into a
+string $S0. By default it reads in bytes, but the FileHandle object can
+be configured to read in code points instead, by setting the character
+set and encoding on the filehandle object. If there are fewer bytes
+remaining in the stream than specified in the read request, it returns
+the remaining bytes (with no error).
 
 The asynchronous version takes an additional final PMC callback argument
 $P3, and only returns a status object $P0. When the read operation is
@@ -189,8 +188,12 @@ contained in the string.]
 
 =item C<readline>
 
-  $S0 = $P1.readline()
-  $P0 = $P1.readline($P2)
+=begin PIR_FRAGMENT
+
+  $S0 = $P1.'readline'()
+  $P0 = $P1.'readline'($P2)
+
+=end PIR_FRAGMENT
 
 Retrieves a single line from a stream $P1 into a string $S1. Calling
 C<readline> flags the stream as operating in line-buffer mode (see the
@@ -203,10 +206,40 @@ $P2, and only returns a status object $P0. When the readline operation
 is complete, it invokes the callback, passing it a status object and a
 string of bytes.
 
+=item C<readall>
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P1.'readall'()
+  $P0 = $P1.'readall'($P2)
+
+  $S0 = $P1.'readall'($S2)
+  $P0 = $P1.'readall'($S2, $P3)
+
+=end PIR_FRAGMENT
+
+Retrieves the entire contents from a stream $P1 into a string $S0. On a
+previously opened stream, C<readall> will read the entire contents of
+the file, and return them as a string. It will respect the read mode of
+the I/O object the same as C<read> does.
+
+On an unopened stream, if a string file path is passed in $S2,
+C<readall> will open a stream on the file, read the contents and close
+it again. 
+
+The asynchronous version takes an additional final PMC callback argument
+($P2 or $P3), and only returns a status object $P0. When the readall operation
+is complete, it invokes the callback, passing it a status object and a
+string.
+
 =item C<record_separator>
 
-  $S0 = $P1.record_separator()
-  $P0.record_separator($S1)
+=begin PIR_FRAGMENT
+
+  $S0 = $P1.'record_separator'()
+  $P0.'record_separator'($S1)
+
+=end PIR_FRAGMENT
 
 Accessor (get and set) for the I/O stream's record separator attribute.
 The default value is a newline (CR, LF, CRLF, etc. depending on the
@@ -214,73 +247,96 @@ platform).
 
 =item C<buffer_type>
 
-  $I0 = $P1.buffer_type()
-  $S0 = $P1.buffer_type()
-  $P0.buffer_type($I1)
-  $P0.buffer_type($S1)
+=begin PIR_FRAGMENT
+
+  $S0 = $P1.'buffer_type'()
+  $P0.'buffer_type'($S1)
+
+=end PIR_FRAGMENT
 
 Accessor (get and set) for the I/O stream's buffer type attribute. The
-attribute is returned as an integer value of one of the following
-constants, or a string value of 'unbuffered', 'line-buffered', or
-'full-buffered'.
-
-  0    PIO_NONBUF
-           Unbuffered I/O. Bytes are sent as soon as possible.
-  1    PIO_LINEBUF
-           Line buffered I/O. Bytes are sent when a record separator is
-           encountered.
-  2    PIO_FULLBUF
-           Fully buffered I/O. Bytes are sent when the buffer is full.
-           [Note, the constant was called "BLKBUF" because bytes are
-           sent as a block, but line buffering also sends them as a
-           block, so changed to "FULLBUF".]
+attribute is set or returned as a string value of 'unbuffered' (bytes sent as
+soon as possible), 'line-buffered' (bytes sent when record separator is
+encountered), or 'full-buffered' (bytes sent when the buffer is full).
 
 =item C<buffer_size>
 
-  $I0 = $P1.buffer_size()
-  $P0.buffer_size($I1)
+=begin PIR_FRAGMENT
+
+  $I0 = $P1.'buffer_size'()
+  $P0.'buffer_size'($I1)
+
+=end PIR_FRAGMENT
 
 Accessor (get and set) for the I/O stream's buffer size attribute. The
 size is specified in bytes (positive integer value), though the buffer
 may hold a varying number of characters when dealing with an encoding of
-multi-byte codepoints.  The role that implements the handling of a
+multi-byte codepoints.  The code that implements the handling of a
 particular character set must provide the logic that marks the buffer as
 "full" when it can't hold the next codepoint even if there are empty
 bytes in the buffer.
 
-The buffer size can be set no matter what buffering mode is in use, but
-it's only relevant when in line buffering or full buffering mode (and
-line buffering mode will rarely reach the maximum buffer size).
+Setting the buffer size turns on full buffering mode for the I/O stream.
+The set buffer size is taken as a minimum, the I/O subsystem may round
+it up to a standard block size.
 
-It is recommended to only change the buffer size before starting IO
-operations, or after flushing the buffer. If the new size is larger than
-the existing data in the buffer, a size change is non-disruptive, but if
-the new size is smaller, it will truncate the buffer with a warning.
+The buffer is automatically flushed when the buffer size is changed. If
+the new size was larger than the existing data in the buffer, a size
+change would be non-disruptive, but if the new size was smaller,
+resizing it without flushing would truncate the buffer.
 
-=item C<get_fd> [RT #48312]
+=item C<mode>
 
-  $I0 = $P1.get_fd()
+=begin PIR_FRAGMENT
+
+  $S0 = $P1.'mode'()
+
+=end PIR_FRAGMENT
+
+Accessor (get only) for the I/O stream's read mode. This returns the mode
+string used to open the I/O stream.
+
+=item C<encoding>
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P1.'encoding'()
+  $P0.'encoding'($S1)
+
+=end PIR_FRAGMENT
+
+Accessor (get and set) for the I/O stream's encoding attribute. Currently,
+the only valid value to set is 'utf8' which turns on UTF-8 reading/writing
+mode for the stream. The default behavior is fixed-width 8-bit characters.
+
+=item C<get_fd>
+
+=begin PIR_FRAGMENT
+
+  $I0 = $P1.'get_fd'()
+
+=end PIR_FRAGMENT
 
 For stream objects that are simple wrappers around a Unix filehandle,
 C<get_fd> retrieves the Unix integer file descriptor of the object.
-This method doesn't exist on stream objects that aren't Unix
-filehandles, so check C<does> for the appropriate role, or C<can> for
-the method before calling it.
+This method will simply return -1 on stream objects that aren't Unix
+filehandles.
 
 No asynchronous version.
 
-{{ NOTE: use a config probe (behind C<does> or C<can>) to determine support }}
-
-
 =back
 
-=head2 Status Object PMC API
+=head3 Status Object PMC API
 
 =over 4
 
 =item C<get_integer> (vtable)
 
+=begin PIR_FRAGMENT
+
   $I0 = $P1
+
+=end PIR_FRAGMENT
 
 Returns an integer status for the status object, 1 for successful
 completion, -1 for an error, and 0 while still running. [Discuss: This
@@ -289,14 +345,24 @@ move away from that, is there a better representation?]
 
 =item C<get_bool> (vtable)
 
-  if $P0 goto ...
+=begin PIR_FRAGMENT
+
+  if $P0 goto L1
+  # ...
+  L1:
+
+=end PIR_FRAGMENT
 
 Returns a boolean status for the status object, C<true> for successful
 completion or while still running, C<false> for an error.
 
 =item C<return>
 
-  $P0 = $P1.return()
+=begin PIR_FRAGMENT
+
+  $P0 = $P1.'return'()
+
+=end PIR_FRAGMENT
 
 Retrieves the return value of the asynchronous operation from the status
 object. Returns a NULL PMC while still running, or if the operation had
@@ -304,7 +370,11 @@ no return value.
 
 =item C<error>
 
-  $P0 = $P1.error()
+=begin PIR_FRAGMENT
+
+  $P0 = $P1.'error'()
+
+=end PIR_FRAGMENT
 
 Retrieves the error object from the status object, if the execution of
 the asynchronous operation terminated with an error. The error object is
@@ -314,30 +384,42 @@ null PMC.
 
 =item C<throw>
 
-  $P0.throw()
+=begin PIR_FRAGMENT
+
+  $P0.'throw'()
+
+=end PIR_FRAGMENT
 
 Throw an exception from the status object if it contains an error
 object, otherwise do nothing.
 
 =back
 
-=head2 I/O Iterator PMC API
+=head3 I/O Iterator PMC API
 
 [Implementation NOTE: this may either be the default Iterator object
-applied to a ParrotIO object, a separate Iterator object for I/O
-objects, or an Iterator role applied to I/O objects.]
+applied to a FileHandle or Socket object, a separate Iterator object for
+I/O objects, or an Iterator role applied to I/O objects.]
 
 =over 4
 
 =item C<new>
 
-    new $P0, 'Iterator', $P1
+=begin PIR_FRAGMENT
+
+    new $P0, [ 'Iterator' ], $P1
+
+=end PIR_FRAGMENT
 
 Create a new iterator object $P0 from I/O object $P1.
 
 =item C<shift>
 
+=begin PIR_FRAGMENT
+
       shift $S0, $P1
+
+=end PIR_FRAGMENT
 
 Retrieve the next line/block $S0 from the I/O iterator $P1. The amount
 of data retrieved in each iteration is determined by the I/O object's
@@ -345,7 +427,11 @@ C<buffer_type> setting: unbuffered, line-buffered, or fully-buffered.
 
 =item C<get_bool> (vtable)
 
+=begin PIR_FRAGMENT
+
   unless $P0 goto iter_end
+
+=end PIR_FRAGMENT
 
 Returns a boolean value for the iterator, C<true> if there is more data
 to pull from the I/O object, C<false> if the iterator has reached the
@@ -354,7 +440,7 @@ the next line/block of data when it retrieves the current one.]
 
 =back
 
-=head2 I/O Opcodes
+=head3 I/O Opcodes
 
 The signatures for the asynchronous operations are nearly identical to
 the synchronous operations, but the asynchronous operations take an
@@ -368,18 +454,24 @@ information. For now assume that they can either return a status object,
 or return nothing. Error handling is discussed more thoroughly below in
 L<Error Handling>.
 
-=head2 I/O Stream Opcodes
+=head3 I/O Stream Opcodes
 
-=head3 Opening and closing streams
+=head4 Opening and closing streams
 
 =over 4
 
 =item C<open>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   $P0 = open $S1
   $P0 = open $S1, $S2
   $P0 = open $P1
   $P0 = open $P1, $S2
+
+=end PIR_FRAGMENT_INVALID
 
 Opens a stream object based on a file path in $S1 and returns it.  The
 stream object defaults to read/write mode. The optional string argument
@@ -396,8 +488,14 @@ object.
 
 =item C<close>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   close $P0
   close $P0, $P1
+
+=end PIR_FRAGMENT_INVALID
 
 Closes a stream object. It takes a single string object argument and
 returns a status object.
@@ -408,7 +506,7 @@ passing it a status object.
 
 =back
 
-=head3 Retrieving existing streams
+=head4 Retrieving existing streams
 
 These opcodes do not have asynchronous variants.
 
@@ -427,11 +525,13 @@ specify the mode.
 
 =back
 
-=head3 Writing to streams
+=head4 Writing to streams
 
 =over 4
 
 =item C<print>
+
+=begin PIR_FRAGMENT_INVALID
 
   print $I0
   print $N0
@@ -446,6 +546,8 @@ specify the mode.
   print $P0, $S1, $P2
   print $P0, $P1, $P2
 
+=end PIR_FRAGMENT_INVALID
+
 Writes an integer, float, string, or PMC value to a stream.  It
 writes to standard output by default, but optionally takes a PMC
 argument to select another stream to write to.
@@ -456,10 +558,16 @@ passing it a status object.
 
 =item C<printerr>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   printerr $I0
   printerr $N0
   printerr $S0
   printerr $P0
+
+=end PIR_FRAGMENT_INVALID
 
 Writes an integer, float, string, or PMC value to standard error.
 
@@ -468,15 +576,21 @@ If they want an asynchronous version, they can use C<print>.]
 
 =back
 
-=head3 Reading from streams
+=head4 Reading from streams
 
 =over 4
 
 =item C<read>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   $S0 = read $I1
   $S0 = read $P1, $I2
   $P0 = read $P1, $I2, $P3
+
+=end PIR_FRAGMENT_INVALID
 
 Retrieves a specified number of bytes, $I2, from a stream, $P2, into a
 string, $S0. [Note this is bytes, not codepoints.] By default it reads
@@ -490,12 +604,17 @@ string of bytes.
 
 =item C<readline>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   $S0 = readline $P1
   $P0 = readline $P1, $P2
 
+=end PIR_FRAGMENT_INVALID
+
 Retrieves a single line from a stream into a string. Calling
-C<readline> flags the stream as operating in line-buffer mode (see
-C<pioctl> below).
+C<readline> flags the stream as operating in line-buffer mode.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the readline operation
@@ -504,11 +623,17 @@ string of bytes.
 
 =item C<peek>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   $S0 = peek
   $S0 = peek $P1
 
-['peek', 'seek', 'tell', and 'poll' are all candidates for moving from
-opcodes to ParrotIO object methods.]
+=end PIR_FRAGMENT_INVALID
+
+[C<peek>, C<seek>, C<tell>, and C<poll> are all candidates for moving from
+opcodes to FileHandle object methods.]
 
 C<peek> retrieves the next byte from a stream into a string, but doesn't
 remove it from the stream. By default it reads from standard input, but
@@ -520,16 +645,22 @@ to be a synchronous one.]
 
 =back
 
-=head3 Retrieving and setting stream properties
+=head4 Retrieving and setting stream properties
 
 =over 4
 
 =item C<seek>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   seek $P0, $I1, $I2
   seek $P0, $I1, $I2, $I3
   seek $P0, $I1, $I2, $P3
   seek $P0, $I1, $I2, $I3, $P4
+
+=end PIR_FRAGMENT_INVALID
 
 Sets the current file position of a stream object, $P0, to an integer
 byte offset, $I1, from an integer starting position, $I2, (0 for the
@@ -545,8 +676,14 @@ passing it a status object and the stream object it was called on.
 
 =item C<tell>
 
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'io_ops'
+  ...
   $I0 = tell $P1
   ($I0, $I1) = tell $P2
+
+=end PIR_FRAGMENT_INVALID
 
 Retrieves the current file position of a stream object.  It also has a
 64-bit variant that returns the byte offset as two integers (one for the
@@ -558,7 +695,11 @@ No asynchronous version.
 
 =item C<poll>
 
+=begin PIR_FRAGMENT_INVALID
+
   $I0 = poll $P1, $I2, $I3, $I4
+
+=end PIR_FRAGMENT_INVALID
 
 Polls a stream or socket object for particular types of events (an
 integer flag) at a frequency set by seconds and microseconds (the final
@@ -577,63 +718,17 @@ asynchronously.
 
 =back
 
-=head3 Deprecated opcodes
-
-=over
-
-=item *
-
-C<pioctl> provides low-level access to the attributes of a stream
-object. It takes a stream object, an integer flag to select a command,
-and a single integer argument for the command. It returns an integer
-indicating the success or failure of the command.
-
-This opcode has been replaced with methods on the ParrotIO object, but
-is kept here for reference. See RT #48589
-
-The following constants are defined for the commands that C<pioctl> can
-execute:
-
-  0    PIOCTL_CMDRESERVED
-           No documentation available.
-  1    PIOCTL_CMDSETRECSEP
-           Set the record separator. [This doesn't actually work at the
-           moment.]
-  2    PIOCTL_CMDGETRECSEP
-           Get the record separator.
-  3    PIOCTL_CMDSETBUFTYPE
-           Set the buffer type.
-  4    PIOCTL_CMDGETBUFTYPE
-           Get the buffer type
-  5    PIOCTL_CMDSETBUFSIZE
-           Set the buffer size.
-  6    PIOCTL_CMDGETBUFSIZE
-           Get the buffer size.
-
-The following constants are defined as argument/return values for the
-buffer-type commands:
-
-  0    PIOCTL_NONBUF
-           Unbuffered I/O. Bytes are sent as soon as possible.
-  1    PIOCTL_LINEBUF
-           Line buffered I/O. Bytes are sent when a newline is
-           encountered.
-  2    PIOCTL_BLKBUF
-           Fully buffered I/O. Bytes are sent when the buffer is full.
-
-=back
-
-=head2 Filesystem Opcodes
+=head3 Filesystem Opcodes
 
 [Okay, I'm seriously considering moving most of these to methods on the
 ParrotIO object. More than that, moving them into a role that is
 composed into the ParrotIO object when needed. For the ones that have
-the form 'C<opcodename parrotIOobject, arguments>', I can't see that it's
-much less effort than 'C<parrotIOobject.methodname(arguments)>' for either
+the form C<opcodename io_object, arguments>, I can't see that it's
+much less effort than C<io_object.'methodname'(arguments)> for either
 manually writing PIR or generating PIR. The slowest thing about I/O is
 I/O, so I can't see that we're getting much speed gain out of making
-them opcodes. The ones to keep as opcodes are 'C<unlink>', 'C<rmdir>', and
-'C<opendir>'.]
+them opcodes. The ones to keep as opcodes are C<unlink>, C<rmdir>, and
+C<opendir>.]
 
 =over 4
 
@@ -664,7 +759,7 @@ information requested (see F<runtime/parrot/include/stat.pasm>):
   7    STAT_CHANGETIME
            The last time the file metadata was changed.
   8    STAT_BACKUPTIME
-           The last time the file was backed up. 
+           The last time the file was backed up.
            (Currently just returns -1.)
   9    STAT_UID
            The user ID of the file.
@@ -756,14 +851,11 @@ callback, passing it a status object.
 
 =back
 
-=head2 Network I/O Opcodes
+=head3 Network I/O Methods
 
-Most of these opcodes conform to the standard UNIX interface, but the
-layer API allows alternate implementations for each.
-
-[These I'm also considering moving to methods in a role for the ParrotIO
-object. Keep 'socket' as an opcode, or maybe just make 'socket' an
-option on creating a new ParrotIO object.]
+Most of these methods take a default set of arguments the same as the standard
+UNIX interface. Many also take additional optional arguments. There are no
+network-specific opcodes.
 
 =over 4
 
@@ -808,7 +900,7 @@ string containing the received message.
 
 =item *
 
-C<send> sends a message string to a connected socket object. 
+C<send> sends a message string to a connected socket object.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the send operation is
@@ -848,7 +940,7 @@ the socket object.
 =item *
 
 C<accept> accepts a new connection on a given socket object, and returns
-a newly created socket object for the connection. 
+a newly created socket object for the connection.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the accept operation
@@ -873,9 +965,7 @@ type of shutdown:
 
 =back
 
-
-
-=head2 Error Handling
+=head3 Error Handling
 
 Currently some of the networking opcodes (C<connect>, C<recv>, C<send>,
 C<poll>, C<bind>, and C<listen>) return an integer indicating the status
@@ -883,20 +973,20 @@ of the call, -1 or a system error code if unsuccessful. Other I/O
 opcodes (such as C<accept>) have various different
 strategies for error notification, and others have no way of marking
 errors at all. We want to unify all I/O opcodes so they use a consistent
-strategy for error notification. 
+strategy for error notification.
 
-=head3 Synchronous operations
+=head4 Synchronous operations
 
 Synchronous I/O operations return an integer status code indicating
 success or failure in addition to their ordinary return value(s). This
 approach has the advantage of being lightweight: returning a single
-additional integer is cheap. 
+additional integer is cheap.
 
 [Discuss: should synchronous operations take the same error handling
 strategy as asynchronous ones?]
 
 
-=head3 Asynchronous operations
+=head4 Asynchronous operations
 
 Asynchronous I/O operations return a status object. The status object
 contains an integer status code, string status/error message, and
@@ -910,7 +1000,7 @@ call. If no error callback is set, then the standard callback will be
 invoked, and the user will need to check for error conditions in the
 status object as the first operation of the handler code.
 
-=head3 Exceptions
+=head4 Exceptions
 
 At some point in the future, I/O objects may also provide a way to throw
 exceptions on error conditions. This feature will be enabled by calling
@@ -921,7 +1011,7 @@ Note that exception handlers for asynchronous I/O operations will likely
 have to be set at a global scope because execution will have left the
 dynamic scope of the I/O call by the time the error occurs.
 
-=head2 IPv6 Support
+=head3 IPv6 Support
 
 The transition from IPv4 to IPv6 is in progress, though not likely to be
 complete anytime soon. Most operating systems today offer at least
@@ -964,24 +1054,16 @@ See the relevant IETF RFCs: "Application Aspects of IPv6 Transition"
 (http://www.ietf.org/rfc/rfc4038.txt) and "Basic Socket Interface
 Extensions for IPv6" (http://www.ietf.org/rfc/rfc3493.txt).
 
-=head1 ATTACHMENTS
+=head2 Links
 
-None.
+L<http://en.wikipedia.org/wiki/Asynchronous_I/O> for a relatively
+comprehensive list of asynchronous I/O implementation options.
 
-=head1 FOOTNOTES
+=head2 References
 
-None.
-
-=head1 REFERENCES
-
-  src/io/io.c
-  src/ops/io.ops
-  include/parrot/io.h
-  runtime/parrot/library/Stream/*
-  src/io/io_unix.c
-  src/io/io_win32.c
-  Perl 5's IO::AIO
-  Perl 5's POE
+F<src/io/core.c>, F<src/ops/io.ops>, F<include/parrot/io.h>, 
+F<runtime/parrot/library/Stream/*>, F<src/io/unix.c>, F<src/io/win32.c>,
+Perl 5's IO::AIO, and POE
 
 =cut
 
@@ -989,3 +1071,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

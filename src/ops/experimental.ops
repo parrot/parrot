@@ -3,254 +3,42 @@
 ** experimental.ops
 */
 
-VERSION = PARROT_VERSION;
+BEGIN_OPS_PREAMBLE
+
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
+
+END_OPS_PREAMBLE
 
 =head1 NAME
 
-experimental.ops - Experimental Operations
+experimental.ops - Experimental Opcodes
 
 =cut
 
 =head1 DESCRIPTION
 
-This file contains operations that are in an experimental state. Do not
-rely upon the existence of the ops in this file when writing production code.
-No decision has yet been made as to whether they are accepted as regular
-Parrot ops or not. They are included here for testing purposes only!
+This file contains experimental opcodes.
+
+These opcodes should be considered implicitly deprecated - that is, they
+may be removed in any release.
+
+If you rely on any of these opcodes, please open a
+Trac ticket at L<https://trac.parrot.org/>.
+
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =cut
 
 ###############################################################################
-
-=head2 Mathematical operations
-
-Implementations of various mathematical operations
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<gcd>(out INT, in NUM, in NUM)
-
-Greatest Common divisor of $2 and $3.
-
-=item B<gcd>(out INT, out INT, out INT, in INT, in INT)
-
-Given $4 and $5, it calculates $1, $2 and $3 so that
-
-$1 = gcd($4, $5) = $2 * $4 + $3 * $5 (d = gcd(a, b) = x*a + y*b)
-
-=cut
-
-inline op gcd(out INT, in NUM, in NUM) :advanced_math {
-
-  FLOATVAL q     = 0;
-  FLOATVAL c     = 0;
-  FLOATVAL temp2 = fabs($2);
-  FLOATVAL temp3 = fabs($3);
-
-  while (!FLOAT_IS_ZERO(temp3)) {
-    q     = floor((FLOATVAL)temp2/temp3);
-    c     = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-
-  $1 = (INTVAL)temp2;
-}
-
-inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
-  /* r0 = q1*r1 + r2 */
-  INTVAL r0 = $4 < 0 ? -$4 : $4;
-  INTVAL r1 = $5 < 0 ? -$5 : $5;
-  INTVAL r2 = 0;
-  INTVAL q1 = 0;
-
-  INTVAL xkm1 = 1;
-  INTVAL xk = 0;
-  INTVAL xkp1 = 0;
-
-  INTVAL ykm1 = 0;
-  INTVAL yk = 1;
-  INTVAL ykp1 = 0;
-
-  INTVAL n = 1;
-
-  INTVAL x;
-  INTVAL y;
-
-  while (1) {
-    q1 = r0/r1;
-    r2 = r0 - q1*r1;
-    if (r2 == 0) {
-      break;
-    }
-    r0 = r1;
-    r1 = r2;
-
-    xkp1 = q1*xk + xkm1;
-    xkm1 = xk;
-    xk = xkp1;
-
-    ykp1 = q1*yk + ykm1;
-    ykm1 = yk;
-    yk = ykp1;
-  }
-  $1 = r1;
-  $2 = (INTVAL)(xk * pow(-1, n));
-  $3 = (INTVAL)(yk * pow(-1, n+1));
-
-  x = $2 * $4;
-  y = $3 * $5;
-
-  /* correct the sign (can be wrong because we used abs($4) and abs($5) */
-  if (x + y == r1) {
-    /* no correction necessary */
-  }
-  else if (x + y == -r1) {
-    $2 = -$2;
-    $3 = -$3;
-  }
-  else if (x - y == r1) {
-    $3 = -$3;
-  }
-  else if (-x + y == r1) {
-    $2 = -$2;
-  }
-}
-
-=back
-
-=cut
-
-###############################################################################
-
-=head2 Misc other ops
-
-=over 4
-
-=cut
-
-=item B<splice>(invar PMC, invar PMC, in INT, in INT)
-
-Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
-The values are put into the aggregate by a shallow copy. If the values would
-be reused, they have to be B<clone>d.
-
-=cut
-
-inline op splice(invar PMC, invar PMC, in INT, in INT) {
-    VTABLE_splice(interp, $1, $2, $3, $4);
-}
-
-
-=item B<slice>(out PMC, invar PMC, in KEY)
-
-Return a new Iterator PMC $1 for aggregate $2 and Slice PMC $3.
-
-=item B<slice>(out PMC, invar PMC, in KEY, inconst INT)
-
-Return a new list PMC $1 for aggregate $2 and Slice PMC $3.
-
-This is a Python opcode. Range is i <= k < j. $4 must be 1.
-May change and move to python.ops.
-
-=item B<iter>(out PMC, invar PMC)
-
-Return a new Iterator PMC $1 for aggregate $2.
-
-=cut
-
-inline op slice(out PMC, invar PMC, in KEY) :base_core {
-    $1 = VTABLE_slice(interp, $2, $3, 0);
-}
-
-inline op slice(out PMC, invar PMC, in KEY, inconst INT) :python {
-    $1 = VTABLE_slice(interp, $2, $3, $4);
-}
-
-inline op iter(out PMC, invar PMC) :base_core {
-    $1 = VTABLE_get_iter(interp, $2);
-}
-
-########################################
-
-=item B<morph>(invar PMC, in INT)
-
-=item B<morph>(invar PMC, in STR)
-
-Have $1 turn itself into a PMC of type $2.
-
-=cut
-
-inline op morph(invar PMC, in INT) {
-  VTABLE_morph(interp, $1, $2);
-}
-
-inline op morph(invar PMC, in STR) {
-  INTVAL type = pmc_type(interp, $2);
-  VTABLE_morph(interp, $1, type);
-}
-
-=item B<exec>(in STR)
-
-Execute the passed-in command. Completely tosses the current process
-image and replaces it with the command. Doesn't exit (the program
-ends, after all), though it does throw an exception if something goes
-wrong.
-
-=cut
-
-inline op exec(in STR) {
-  Parrot_Exec_OS_Command(interp, $1);
-}
-
-
-=item B<classname>(out PMC, invar PMC)
-
-Get the class name for the class in $2 and put it in $1. Note that $1 will be
-a Key PMC that you can use with "new", for example.
-
-=cut
-
-op classname(out PMC, invar PMC) :object_base {
-    PMC *ns = Parrot_ns_get_name(interp,
-                                    VTABLE_get_namespace(interp, $2));
-    if (PMC_IS_NULL(ns) || VTABLE_elements(interp, ns) < 2)
-    {
-        real_exception(interp, NULL, NO_CLASS,
-            "Attempt to get class name of a non-class.");
-    }
-    else
-    {
-        PMC *key_tail, *key;
-        STRING *tmp;
-        int i, max;
-
-        /* Need to turn list of strings into a key. Note that we are not
-           including the first item in the array, since that is the HLL. */
-        tmp = VTABLE_get_string_keyed_int(interp, ns, 1);
-        $1 = key_tail = key_new_string(interp, tmp);
-        max = VTABLE_elements(interp, ns);
-        for (i = 2; i < max; i++)
-        {
-            tmp = VTABLE_get_string_keyed_int(interp, ns, i);
-            key = key_new_string(interp, tmp);
-            key_append(interp, key_tail, key);
-            key_tail = key;
-        }
-    }
-}
-
-=back
 
 =head2 More Experimental Ops
 
 =over 4
 
-=item C<trap>
+=item B<trap>()
 
 Break into debugger. Implementation notes:
 
@@ -260,9 +48,11 @@ Break into debugger. Implementation notes:
 
 For other architectures, this is a C<noop>.
 
+=back
+
 =cut
 
-op trap() {
+op trap() :deprecated {
 #if defined(__GNUC__) && defined(i386)
     __asm__("int3");       /* opcode 0xcc */
 #endif
@@ -271,164 +61,365 @@ op trap() {
 #endif
 }
 
-=item B<pow>(out NUM, in NUM, in INT)
+=over 4
 
-Set $1 to $2 raised to the power $3.
+=item B<set_label>(invar PMC, inconst LABEL)
+
+Sets the opcode_t* label value for the given PMC. This is basically only
+useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
+
+=item B<get_label>(out INT, invar PMC)
+
+Gets the opcode_t* label value from the given PMC. This is basically only
+useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
+
+=back
 
 =cut
 
-inline op pow(out NUM, in NUM, in INT) :base_core {
-    FLOATVAL n2 = $2;
-    FLOATVAL res = 1.0;
-    INTVAL   e  = $3;
-    int s = 1;
-    if (e != 0) {
-        if (e < 0) {
-            s = -1;
-            e = -e;
+inline op set_label(invar PMC, inconst LABEL) {
+    VTABLE_set_pointer(interp, $1, (CUR_OPCODE + $2));
+}
+
+inline op get_label(out INT, invar PMC) {
+    void * const ptr = VTABLE_get_pointer(interp, $2);
+    $1 =  PTR2INTVAL(ptr);
+}
+
+=over 4
+
+=item B<fetch>(out PMC, in PMC, in PMC, in PMC)
+
+Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
+uses the type in $4 to create and return a new PMC.
+
+=item B<fetch>(out PMC, in PMC, in INT, in PMC)
+
+=item B<fetch>(out PMC, in PMC, in STR, in PMC)
+
+=back
+
+=cut
+
+inline op fetch(out PMC, in PMC, in PMC, in PMC) :base_core {
+    $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
+    if (PMC_IS_NULL($1)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+        if (!PMC_IS_NULL(classobj))
+            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, $4);
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+                goto ADDRESS(dest);
+            }
+
+            $1 = Parrot_pmc_new(interp, type);
         }
     }
-    while (e) {
-        if (e & 1) {
-            res *= n2;
+}
+
+inline op fetch(out PMC, in PMC, in INT, in PMC) :base_core {
+    $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
+    if (PMC_IS_NULL($1)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+        if (!PMC_IS_NULL(classobj))
+            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, $4);
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+                goto ADDRESS(dest);
+            }
+
+            $1 = Parrot_pmc_new(interp, type);
         }
-        n2 *= n2;
-        e >>= 1;
-    }
-    if (s < 0) {
-        res = 1.0/res;
-    }
-    $1 = res;
-}
-
-=item B<new>(out PMC, in INT, in STR)
-
-Create a new PMC of the type $2 according to the PMCs string representation
-in $3.
-
-BUT SINCE INSTANTIATE WILL PROBABLY DIE, DON'T USE THIS;
-OR IF YOU NEED THIS (OR INSTANTIATE), TELL CHIP
-
-=cut
-
-op new(out PMC, in INT, in STR) {
-  PMC *_class;
-  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    real_exception(interp, 0, NO_CLASS,
-                   "Illegal PMC enum (%d) in new", (int)$2);
-  }
-  _class = interp->vtables[$2]->pmc_class;
-  $1 = VTABLE_new_from_string(interp, _class, $3, 0);
-}
-
-########################################
-
-=item B<add_io_event>(invar PMC, invar PMC, invar PMC, inconst INT)
-
-Call the sub $2 for PIO $1 with user data $3 on ready state of $4.
-RT#42376 The only handled $4 = IO_THR_MSG_ADD_SELECT_RD aka 2 for now.
-
-=cut
-
-op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
-    Parrot_event_add_io_event(interp, $1, $2, $3, $4);
-}
-
-=item B<need_finalize>(invar PMC)
-
-The ParrotObject $1 needs the __finalize method during GC.
-
-=cut
-
-op need_finalize(invar PMC) {
-    PMC* pmc = $1;
-    if (PObj_is_object_TEST(pmc)) {
-        PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
     }
 }
 
-#########################################
+inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
+    $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
+    if (PMC_IS_NULL($1)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+        if (!PMC_IS_NULL(classobj))
+            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, $4);
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+                goto ADDRESS(dest);
+            }
 
-=item B<setstdout>(invar PMC)
+            $1 = Parrot_pmc_new(interp, type);
+        }
+    }
+}
 
-Sets the standard output for a bare C<print> op to go to the supplied ParrotIO
-PMC.  Call C<getstdout> first if you care about retaining the previous PMC.
+=over 4
 
-=item B<setstderr>(invar PMC)
+=item B<vivify>(out PMC, in PMC, in PMC, in PMC)
 
-Sets the standard error for a bare C<printerr> op to go to the supplied
-ParrotIO PMC.  Call C<getstderr> first if you care about retaining the previous
-PMC.
+Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
+uses the type in $4 to create and return a new PMC.
+
+=item B<vivify>(out PMC, in PMC, in INT, in PMC)
+
+=item B<vivify>(out PMC, in PMC, in STR, in PMC)
+
+=back
 
 =cut
 
-inline op setstdout(invar PMC) :base_io {
-        _PIO_STDOUT(interp) = $1;
+inline op vivify(out PMC, in PMC, in PMC, in PMC) :base_core {
+    $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
+
+    if (PMC_IS_NULL($1)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+
+        if (!PMC_IS_NULL(classobj))
+            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, $4);
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+                goto ADDRESS(dest);
+            }
+
+            $1 = Parrot_pmc_new(interp, type);
+        }
+        VTABLE_set_pmc_keyed(interp, $2, $3, $1);
+    }
 }
 
-inline op setstderr(invar PMC) :base_io {
-        _PIO_STDERR(interp) = $1;
+inline op vivify(out PMC, in PMC, in INT, in PMC) :base_core {
+    $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
+
+    if (PMC_IS_NULL($1)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+        if (!PMC_IS_NULL(classobj))
+            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, $4);
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+                goto ADDRESS(dest);
+            }
+
+            $1 = Parrot_pmc_new(interp, type);
+        }
+
+        VTABLE_set_pmc_keyed_int(interp, $2, $3, $1);
+    }
 }
 
+inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
+    $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
-########################################
+    if (PMC_IS_NULL($1)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+        if (!PMC_IS_NULL(classobj))
+            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, $4);
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+                goto ADDRESS(dest);
+            }
 
-=item B<runinterp>(invar PMC, in PMC)
+            $1 = Parrot_pmc_new(interp, type);
+        }
 
-Invokes the PMC $2 using interp $1.
+        VTABLE_set_pmc_keyed_str(interp, $2, $3, $1);
+    }
+}
+
+=over 4
+
+=item B<new>(out PMC, in STR, in INT)
+
+=item B<new>(out PMC, in PMC, in INT)
+
+=back
 
 =cut
 
-op runinterp(invar PMC, in PMC) {
-    Interp * const new_interp = (Interp *)PMC_data($1);
-    opcode_t *pc;
-    Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
-    pc = (opcode_t *)VTABLE_invoke(new_interp, $2, NULL);
-    UNUSED(pc);
-    Parrot_runops_fromc_args(new_interp, $2, "P");
+
+op new(out PMC, in STR, in INT) {
+    STRING * const name   = $2;
+    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
+                          ? Parrot_oo_get_class_str(interp, name)
+                          : PMCNULL;
+
+    if (!PMC_IS_NULL(_class)) {
+        PMC *initial = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+        VTABLE_set_integer_native(interp, initial, $3);
+        $1 = VTABLE_instantiate(interp, _class, initial);
+    }
+    else {
+        const INTVAL type = Parrot_pmc_get_type_str(interp, name);
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", name);
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new_init_int(interp, type, $3);
+    }
 }
 
-########################################
 
-=item B<substr_r>(out STR, in STR, in INT, in INT)
+op new(out PMC, in PMC, in INT) {
+    PMC * const  name_key = $2;
 
-Make $1 refer to the given part of $2, basically like above, but it
-is reusing the given destination string and does not care if the
-source string is changed later. This I<is changed> includes
-also GC runs, which will move the referenced string. This also
-means that $1 has to be reset before any GC may happen.
+    /* get_class() returns a PMCProxy for core types, so check for core PMCs */
+    const INTVAL type = Parrot_pmc_get_type(interp, name_key);
 
-This opcode should really be just used to quickly refer to a substring of
-another part, e.g. for printing and is a temporary hack.
+    /* if it's clearly a PIR-level PMC */
+    if (type > enum_class_core_max) {
+        PMC * const _class = Parrot_oo_get_class(interp, name_key);
+        if (!PMC_IS_NULL(_class)) {
+            PMC *initial = Parrot_pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+            VTABLE_set_integer_native(interp, initial, $3);
+            $1 = VTABLE_instantiate(interp, _class, initial);
+        }
+    }
 
-B<Handle with care.>
+    /* if it's a core PMC */
+    else if (type > enum_class_default)
+        $1 = Parrot_pmc_new_init_int(interp, type, $3);
+
+    /* it's a typo */
+    else {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+        goto ADDRESS(dest);
+    }
+}
+
+=over 4
+
+=item B<root_new>(out PMC, in PMC, in INT)
 
 =cut
 
-inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
-  STRING *dest = $1;
-  if (!dest)
-    dest = new_string_header(interp, 0);
-  $1 = string_substr(interp, $2, $3, $4, &dest, 1);
+op root_new(out PMC, in PMC, in INT) {
+    PMC * const  name_key = $2;
+
+    /* get_class() returns a PMCProxy for core types, so check for core PMCs */
+    const INTVAL type = Parrot_pmc_get_type(interp, name_key);
+
+    /* if it's clearly a PIR-level PMC */
+    if (type > enum_class_core_max) {
+        PMC * const root_ns  = interp->root_namespace;
+        PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const _class   = Parrot_oo_get_class(interp, ns);
+        if (!PMC_IS_NULL(_class)) {
+            PMC *initial = Parrot_pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+            VTABLE_set_integer_native(interp, initial, $3);
+            $1 = VTABLE_instantiate(interp, _class, initial);
+        }
+    }
+
+    /* if it's a core PMC */
+    else if (type > enum_class_default)
+        $1 = Parrot_pmc_new_init_int(interp, type, $3);
+
+    /* it's a typo */
+    else {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+        goto ADDRESS(dest);
+    }
 }
 
-=item C<find_sub_not_null>(out PMC, in STR)
+=item B<find_codepoint>(out INT, in STR)
 
-inline op find_sub_not_null(out PMC, in STR) :base_core {
-    PMC *sub = Parrot_find_name_op(interp, $2, expr NEXT());
+Set $1 to the codepoint with the name given in $2, or -1 if there is none.
+Requires ICU lib, otherwise exception is thrown.
 
-    if (PMC_IS_NULL(sub))
-        real_exception(interp, NULL, GLOBAL_NOT_FOUND,
-                       "Could not find non-existent sub %Ss", $2);
+=cut
 
-    $1 = sub;
+op find_codepoint(out INT, in STR) {
+#if PARROT_HAS_ICU
+    UErrorCode   err       = U_ZERO_ERROR;
+    char * const cstr      = Parrot_str_to_cstring(interp, $2);
+    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    Parrot_str_free_cstring(cstr);
+    $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
+#else
+    opcode_t * const dest = expr NEXT();
+    Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
+#endif
 }
+
+=item B<finalize>(in PMC)
+
+Finalize exception handling, freeing any information needed to resume
+the handled exception, like inner runloops.
+$1 is the Exception handled or the ExceptionHandler that is handling it.
+EXPERIMENTAL. Handle with care.
+
+=cut
+
+op finalize(in PMC) {
+    /* Go to the next op after loop unrolling */
+    opcode_t * const dest = expr NEXT();
+    PMC *eh = PMCNULL;
+    if (!PMC_IS_NULL($1)) {
+        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
+        if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
+            eh = $1;
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception"))) {
+            PMC *iter = VTABLE_get_attr_str(interp,
+                                            $1, Parrot_str_new_constant(interp, "handler_iter"));
+            if (!PMC_IS_NULL(iter))
+                eh = VTABLE_get_pmc_keyed_int(interp, iter, -1);
+        }
+    }
+    if (!PMC_IS_NULL(eh)) {
+        /* Get the runloop_id from the continuation and jump to it. */
+        Parrot_runloop *rl = interp->current_runloop;
+        INTVAL rid;
+        Parrot_pcc_invoke_method_from_c_args(interp,
+                                             eh, Parrot_str_new_constant(interp, "rid"),
+                                             "->I", &rid);
+        while (rl && rl->id != rid)
+            rl = rl->prev;
+        if (rl) {
+            if (rl != interp->current_runloop) {
+                rl->handler_start = dest;
+                longjmp(rl->resume, 3);
+            }
+        }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION, "missing runloop");
+    }
+}
+
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -436,7 +427,6 @@ This program is free software. It is subject to the same license
 as the Parrot interp itself.
 
 =cut
-
 
 /*
  * Local variables:

@@ -1,6 +1,10 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 String Operations (continued)
 
-PIR has a string repeat operator, that concatenates a string with itself N times.
+PIR has a string repeat opcode, that concatenates a string with
+itself N times.
 
 =cut
 

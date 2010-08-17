@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 26;
 
 =head1 NAME
 
@@ -23,828 +17,459 @@ number types.
 
 =cut
 
-my $fp_equality_macro = pasm_fp_equality_macro();
+.sub main :main
+    .include 'test_more.pir'
+    .include 'iglobals.pasm'
+
+    plan(80)
+
+    take_the_negative_of_a_native_integer()
+    take_the_absolute_of_a_native_integer()
+    add_native_integer_to_native_integer()
+    subtract_native_integer_from_native_integer()
+    multiply_native_integer_with_native_integer()
+    divide_native_integer_by_native_integer()
+    negate_minus_zero_point_zero()
+    negate_a_native_number()
+    take_the_absolute_of_a_native_number()
+    ceil_of_a_native_number()
+    floor_of_a_native_number()
+    add_native_integer_to_native_number()
+    subtract_native_integer_from_native_number()
+    multiply_native_number_with_native_integer()
+    divide_native_number_by_native_integer()
+    add_native_number_to_native_number()
+    subtract_native_number_from_native_number()
+    multiply_native_number_with_native_number()
+    divide_native_number_by_native_number()
+    # END_OF_TESTS
+
+.end
 
 #
 # Operations on a single INTVAL
 #
-pasm_output_is( <<'CODE', <<OUTPUT, "take the negative of a native integer" );
-        set I0, 0
-        neg I0
-        print I0
-        print "\n"
-        set I0, 1234567890
-        neg I0
-        print I0
-        print "\n"
-        set I0, -1234567890
-        neg I0
-        print I0
-        print "\n"
-        set I0, 0
-        set I1, 0
-        neg I1, I0
-        print I1
-        print "\n"
-        set I0, 1234567890
-        neg I1, I0
-        print I1
-        print "\n"
-        set I0, -1234567890
-        neg I1, I0
-        print I1
-        print "\n"
-        end
-CODE
-0
--1234567890
-1234567890
-0
--1234567890
-1234567890
-OUTPUT
+.sub take_the_negative_of_a_native_integer
+    set $I0, 0
+    neg $I0
+    is( $I0, "0", 'take_the_negative_of_a_native_integer' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native integer" );
-        set I0, 0
-        abs I0
-        print I0
-        print "\n"
-        set I0, 1234567890
-        abs I0
-        print I0
-        print "\n"
-        set I0, -1234567890
-        abs I0
-        print I0
-        print "\n"
-        set I0, 0
-        set I1, 0
-        abs I1, I0
-        print I1
-        print "\n"
-        set I0, 1234567890
-        abs I1, I0
-        print I1
-        print "\n"
-        set I0, -1234567890
-        abs I1, I0
-        print I1
-        print "\n"
-        end
-CODE
-0
-1234567890
-1234567890
-0
-1234567890
-1234567890
-OUTPUT
+    set $I0, 1234567890
+    neg $I0
+    is( $I0, "-1234567890", 'take_the_negative_of_a_native_integer' )
+
+    set $I0, -1234567890
+    neg $I0
+    is( $I0, "1234567890", 'take_the_negative_of_a_native_integer' )
+
+    set $I0, 0
+    set $I1, 0
+    neg $I1, $I0
+    is( $I1, "0", 'take_the_negative_of_a_native_integer' )
+
+    set $I0, 1234567890
+    neg $I1, $I0
+    is( $I1, "-1234567890", 'take_the_negative_of_a_native_integer' )
+
+    set $I0, -1234567890
+    neg $I1, $I0
+    is( $I1, "1234567890", 'take_the_negative_of_a_native_integer' )
+.end
+
+.sub take_the_absolute_of_a_native_integer
+    set $I0, 0
+    abs $I0
+    is( $I0, "0", 'take_the_absolute_of_a_native_integer' )
+
+    set $I0, 1234567890
+    abs $I0
+    is( $I0, "1234567890", 'take_the_absolute_of_a_native_integer' )
+
+    set $I0, -1234567890
+    abs $I0
+    is( $I0, "1234567890", 'take_the_absolute_of_a_native_integer' )
+
+    set $I0, 0
+    set $I1, 0
+    abs $I1, $I0
+    is( $I1, "0", 'take_the_absolute_of_a_native_integer' )
+
+    set $I0, 1234567890
+    abs $I1, $I0
+    is( $I1, "1234567890", 'take_the_absolute_of_a_native_integer' )
+
+    set $I0, -1234567890
+    abs $I1, $I0
+    is( $I1, "1234567890", 'take_the_absolute_of_a_native_integer' )
+.end
 
 #
 # first arg is INTVAL, second arg is INTVAL
 #
-pasm_output_is( <<'CODE', <<OUTPUT, "add native integer to native integer" );
-        set I0, 4000
-        set I1, -123
-        add I2, I0, I1
-        print I2
-        print "\n"
-        add I0, I0, I1
-        print I0
-        print "\n"
-        end
-CODE
-3877
-3877
-OUTPUT
+.sub add_native_integer_to_native_integer
+    set $I0, 4000
+    set $I1, -123
+    add $I2, $I0, $I1
+    is( $I2, "3877", 'add_native_integer_to_native_integer' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "subtract native integer from native integer" );
-        set I0, 4000
-        set I1, -123
-        sub I2, I0, I1
-        print I2
-        print "\n"
-        sub I0, I0, I1
-        print I0
-        print "\n"
-        end
-CODE
-4123
-4123
-OUTPUT
+    add $I0, $I0, $I1
+    is( $I0, "3877", 'add_native_integer_to_native_integer' )
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "multiply native integer with native integer" );
-        set I0, 4000
-        set I1, -123
-        mul I2, I0, I1
-        print I2
-        print "\n"
-        mul I0, I0, I1
-        print I0
-        print "\n"
-        end
-CODE
--492000
--492000
-OUTPUT
+.sub subtract_native_integer_from_native_integer
+    set $I0, 4000
+    set $I1, -123
+    sub $I2, $I0, $I1
+    is( $I2, "4123", 'subtract_native_integer_from_native_integer' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "divide native integer by native integer" );
-        set I0, 4000
-        set I1, -123
-        div I2, I0, I1
-        print I2
-        print "\n"
-        div I0, I0, I1
-        print I0
-        print "\n"
-        end
-CODE
--32
--32
-OUTPUT
+    sub $I0, $I0, $I1
+    is( $I0, "4123", 'subtract_native_integer_from_native_integer' )
+.end
+
+.sub multiply_native_integer_with_native_integer
+    set $I0, 4000
+    set $I1, -123
+    mul $I2, $I0, $I1
+    is( $I2, "-492000", 'multiply_native_integer_with_native_integer' )
+
+    mul $I0, $I0, $I1
+    is( $I0, "-492000", 'multiply_native_integer_with_native_integer' )
+.end
+
+.sub divide_native_integer_by_native_integer
+    set $I0, 4000
+    set $I1, -123
+    div $I2, $I0, $I1
+    is( $I2, "-32", 'divide_native_integer_by_native_integer' )
+
+    div $I0, $I0, $I1
+    is( $I0, "-32", 'divide_native_integer_by_native_integer' )
+.end
+
+#
+# print -0.0 as -0
+#
+.sub negate_minus_zero_point_zero
+    .local pmc interp, config_hash
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash['has_negative_zero']
+
+    set $N0, 0
+    neg $N0
+    $S0 = $N0
+    unless has_negative_zero goto Todo_test1
+    is( $S0, "-0", '1' )
+    goto End_test1
+Todo_test1:
+    $I0 = $S0 == "-0"
+    todo($I0, 'negative zero, TT #313')
+End_test1:
+
+    set $N0, -0.0
+    neg $N0
+    $S0 = $N0
+    is( $S0, "0", '2' )
+
+    set $N0, -0.0
+    neg $N1, $N0
+    $S0 = $N1
+    is( $S0, "0", '3' )
+
+    set $N0, 0
+    set $N1, 1
+    neg $N1, $N0
+    $S0 = $N1
+    unless has_negative_zero goto Todo_test4
+    is( $S0, "-0", '4' )
+    goto End_test4
+Todo_test4:
+    $I0 = $S0 == "-0"
+    todo($I0, 'negative zero, TT #313')
+End_test4:
+.end
 
 #
 # Operations on a single NUMVAL
 #
+.sub negate_a_native_number
+    set $N0, 123.4567890
+    neg $N0
+    is( $N0, "-123.456789", 'negate_a_native_number' )
 
-SKIP: {
-    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+    set $N0, -123.4567890
+    neg $N0
+    is( $N0, "123.456789", 'negate_a_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "turn a native number into its negative" );
-        set N0, 0
-        neg N0
-        print N0
-        print "\n"
-        set N0, -0.0
-        neg N0
-        print N0
-        print "\n"
-        set N0, 123.4567890
-        neg N0
-        print N0
-        print "\n"
-        set N0, -123.4567890
-        neg N0
-        print N0
-        print "\n"
-        set N0, 0
-        set N1, 1
-        neg N1, N0
-        print N1
-        print "\n"
-        set N0, -0.0
-        neg N1, N0
-        print N1
-        print "\n"
-        set N0, 123.4567890
-        neg N1, N0
-        print N1
-        print "\n"
-        set N0, -123.4567890
-        neg N1, N0
-        print N1
-        print "\n"
-        end
-CODE
--0.000000
-0.000000
--123.456789
-123.456789
--0.000000
-0.000000
--123.456789
-123.456789
-OUTPUT
+    set $N0, 123.4567890
+    neg $N1, $N0
+    is( $N1, "-123.456789", 'negate_a_native_number' )
 
-}
+    set $N0, -123.4567890
+    neg $N1, $N0
+    is( $N1, "123.456789", 'negate_a_native_number' )
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native number" );
-        set N0, 0
-        abs N0
-        print N0
-        print "\n"
-        set N0, -0.0
-        abs N0
-        print N0
-        print "\n"
-        set N0, 123.45678901
-        abs N0
-        print N0
-        print "\n"
-        set N0, -123.45678901
-        abs N0
-        print N0
-        print "\n"
-        set N0, 0
-        set N1, 1
-        abs N1, N0
-        print N1
-        print "\n"
-        set N0, 0.0
-        set N1, 1
-        abs N1, N0
-        print N1
-        print "\n"
-        set N0, 123.45678901
-        set N1, 1
-        abs N1, N0
-        print N1
-        print "\n"
-        set N0, -123.45678901
-        set N1, 1
-        abs N1, N0
-        print N1
-        print "\n"
-        end
-CODE
-0.000000
-0.000000
-123.456789
-123.456789
-0.000000
-0.000000
-123.456789
-123.456789
-OUTPUT
+.sub take_the_absolute_of_a_native_number
+    set $N0, 0
+    abs $N0
+    is( $N0, "0", 'take_the_absolute_of_a_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "ceil of a native number" );
-       set N0, 0
-       ceil N0
-       print N0
-       print "\n"
-       set N0, 123.45678901
-       ceil N0
-       print N0
-       print "\n"
-       set N0, -123.45678901
-       ceil N0
-       print N0
-       print "\n"
-       set N0, 0
-       set N1, 1
-       ceil N1, N0
-       print N1
-       print "\n"
-       set N0, 0.0
-       set N1, 1
-       ceil N1, N0
-       print N1
-       print "\n"
-       set N0, 123.45678901
-       set N1, 1
-       ceil N1, N0
-       print N1
-       print "\n"
-       set N0, -123.45678901
-       set N1, 1
-       ceil N1, N0
-       print N1
-       print "\n"
-       set N0, 0
-       set I1, 1
-       ceil I1, N0
-       print I1
-       print "\n"
-       set N0, 0.0
-       set I1, 1
-       ceil I1, N0
-       print I1
-       print "\n"
-       set N0, 123.45678901
-       set I1, 1
-       ceil I1, N0
-       print I1
-       print "\n"
-       set N0, -123.45678901
-       set I1, 1
-       ceil I1, N0
-       print I1
-       print "\n"
-       end
-CODE
-0.000000
-124.000000
--123.000000
-0.000000
-0.000000
-124.000000
--123.000000
-0
-0
-124
--123
-OUTPUT
+    set $N0, -0.0
+    abs $N0
+    is( $N0, "0", 'take_the_absolute_of_a_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "floor of a native number" );
-       set N0, 0
-       floor N0
-       print N0
-       print "\n"
-       set N0, 123.45678901
-       floor N0
-       print N0
-       print "\n"
-       set N0, -123.45678901
-       floor N0
-       print N0
-       print "\n"
-       set N0, 0
-       set N1, 1
-       floor N1, N0
-       print N1
-       print "\n"
-       set N0, 0.0
-       set N1, 1
-       floor N1, N0
-       print N1
-       print "\n"
-       set N0, 123.45678901
-       set N1, 1
-       floor N1, N0
-       print N1
-       print "\n"
-       set N0, -123.45678901
-       set N1, 1
-       floor N1, N0
-       print N1
-       print "\n"
-       set N0, 0
-       set I1, 1
-       floor I1, N0
-       print I1
-       print "\n"
-       set N0, 0.0
-       set I1, 1
-       floor I1, N0
-       print I1
-       print "\n"
-       set N0, 123.45678901
-       set I1, 1
-       floor I1, N0
-       print I1
-       print "\n"
-       set N0, -123.45678901
-       set I1, 1
-       floor I1, N0
-       print I1
-       print "\n"
-       end
-CODE
-0.000000
-123.000000
--124.000000
-0.000000
-0.000000
-123.000000
--124.000000
-0
-0
-123
--124
-OUTPUT
+    set $N0, 123.45678901
+    abs $N0
+    is( $N0, "123.45678901", 'take_the_absolute_of_a_native_number' )
+
+    set $N0, -123.45678901
+    abs $N0
+    is( $N0, "123.45678901", 'take_the_absolute_of_a_native_number' )
+
+    set $N0, 0
+    set $N1, 1
+    abs $N1, $N0
+    is( $N1, "0", 'take_the_absolute_of_a_native_number' )
+
+    set $N0, 0.0
+    set $N1, 1
+    abs $N1, $N0
+    is( $N1, "0", 'take_the_absolute_of_a_native_number' )
+
+    set $N0, 123.45678901
+    set $N1, 1
+    abs $N1, $N0
+    is( $N1, "123.45678901", 'take_the_absolute_of_a_native_number' )
+
+    set $N0, -123.45678901
+    set $N1, 1
+    abs $N1, $N0
+    is( $N1, "123.45678901", 'take_the_absolute_of_a_native_number' )
+.end
+
+.sub ceil_of_a_native_number
+    set $N0, 0
+    ceil $N0
+    is( $N0, "0", 'ceil_of_a_native_number' )
+
+    set $N0, 123.45678901
+    ceil $N0
+    is( $N0, "124", 'ceil_of_a_native_number' )
+
+    set $N0, -123.45678901
+    ceil $N0
+    is( $N0, "-123", 'ceil_of_a_native_number' )
+
+    set $N0, 0
+    set $N1, 1
+    ceil $N1, $N0
+    is( $N1, "0", 'ceil_of_a_native_number' )
+
+    set $N0, 0.0
+    set $N1, 1
+    ceil $N1, $N0
+    is( $N1, "0", 'ceil_of_a_native_number' )
+
+    set $N0, 123.45678901
+    set $N1, 1
+    ceil $N1, $N0
+    is( $N1, "124", 'ceil_of_a_native_number' )
+
+    set $N0, -123.45678901
+    set $N1, 1
+    ceil $N1, $N0
+    is( $N1, "-123", 'ceil_of_a_native_number' )
+
+    set $N0, 0
+    set $I1, 1
+    ceil $I1, $N0
+    is( $I1, "0", 'ceil_of_a_native_number' )
+
+    set $N0, 0.0
+    set $I1, 1
+    ceil $I1, $N0
+    is( $I1, "0", 'ceil_of_a_native_number' )
+
+    set $N0, 123.45678901
+    set $I1, 1
+    ceil $I1, $N0
+    is( $I1, "124", 'ceil_of_a_native_number' )
+
+    set $N0, -123.45678901
+    set $I1, 1
+    ceil $I1, $N0
+    is( $I1, "-123", 'ceil_of_a_native_number' )
+.end
+
+.sub floor_of_a_native_number
+    set $N0, 0
+    floor $N0
+    is( $N0, "0", 'floor_of_a_native_number' )
+
+    set $N0, 123.45678901
+    floor $N0
+    is( $N0, "123", 'floor_of_a_native_number' )
+
+    set $N0, -123.45678901
+    floor $N0
+    is( $N0, "-124", 'floor_of_a_native_number' )
+
+    set $N0, 0
+    set $N1, 1
+    floor $N1, $N0
+    is( $N1, "0", 'floor_of_a_native_number' )
+
+    set $N0, 0.0
+    set $N1, 1
+    floor $N1, $N0
+    is( $N1, "0", 'floor_of_a_native_number' )
+
+    set $N0, 123.45678901
+    set $N1, 1
+    floor $N1, $N0
+    is( $N1, "123", 'floor_of_a_native_number' )
+
+    set $N0, -123.45678901
+    set $N1, 1
+    floor $N1, $N0
+    is( $N1, "-124", 'floor_of_a_native_number' )
+
+    set $N0, 0
+    set $I1, 1
+    floor $I1, $N0
+    is( $I1, "0", 'floor_of_a_native_number' )
+
+    set $N0, 0.0
+    set $I1, 1
+    floor $I1, $N0
+    is( $I1, "0", 'floor_of_a_native_number' )
+
+    set $N0, 123.45678901
+    set $I1, 1
+    floor $I1, $N0
+    is( $I1, "123", 'floor_of_a_native_number' )
+
+    set $N0, -123.45678901
+    set $I1, 1
+    floor $I1, $N0
+    is( $I1, "-124", 'floor_of_a_native_number' )
+
+.end
 
 #
 # FLOATVAL and INTVAL tests
 #
-pasm_output_is( <<'CODE', <<OUTPUT, "add native integer to native number" );
-        set I0, 4000
-        set N0, -123.123
-        add N1, N0, I0
-        print N1
-        print "\n"
-        add N0, N0, I0
-        print N0
-        print "\n"
-        add N0, I0
-        print N0
-        print "\n"
-        end
-CODE
-3876.877000
-3876.877000
-7876.877000
-OUTPUT
+.sub add_native_integer_to_native_number
+    set $I0, 4000
+    set $N0, -123.123
+    add $N1, $N0, $I0
+    is( $N1, "3876.877", 'add_native_integer_to_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "subtract native integer from native number" );
-        set I0, 4000
-        set N0, -123.123
-        sub N1, N0, I0
-        print N1
-        print "\n"
-        sub N0, N0, I0
-        print N0
-        print "\n"
-        sub N0, I0
-        print N0
-        print "\n"
-        end
-CODE
--4123.123000
--4123.123000
--8123.123000
-OUTPUT
+    add $N0, $N0, $I0
+    is( $N0, "3876.877", 'add_native_integer_to_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native integer" );
-        set I0, 4000
-        set N0, -123.123
-        mul N1, N0, I0
-        print N1
-        print "\n"
-        mul N0, N0, I0
-        print N0
-        print "\n"
-        mul N0, -2
-        print N0
-        print "\n"
-        end
-CODE
--492492.000000
--492492.000000
-984984.000000
-OUTPUT
+    add $N0, $I0
+    is( $N0, "7876.877", 'add_native_integer_to_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native integer" );
-        set I0, 4000
-        set N0, -123.123
-        div N1, N0, I0
-        print N1
-        print "\n"
-        div N0, N0, I0
-        print N0
-        print "\n"
-        div N0, 1
-        print N0
-        print "\n"
-        set N0, 100.000
-        div N0, 100
-        print N0
-        print "\n"
-        div N0, 0.01
-        print N0
-        print "\n"
-        end
-CODE
--0.030781
--0.030781
--0.030781
-1.000000
-100.000000
-OUTPUT
+.end
+
+.sub subtract_native_integer_from_native_number
+    set $I0, 4000
+    set $N0, -123.123
+    sub $N1, $N0, $I0
+    is( $N1, "-4123.123", 'subtract_native_integer_from_native_number' )
+
+    sub $N0, $N0, $I0
+    is( $N0, "-4123.123", 'subtract_native_integer_from_native_number' )
+
+    sub $N0, $I0
+    is( $N0, "-8123.123", 'subtract_native_integer_from_native_number' )
+
+.end
+
+.sub multiply_native_number_with_native_integer
+    set $I0, 4000
+    set $N0, -123.123
+    mul $N1, $N0, $I0
+    is( $N1, "-492492", 'multiply_native_number_with_native_integer' )
+
+    mul $N0, $N0, $I0
+    is( $N0, "-492492", 'multiply_native_number_with_native_integer' )
+
+    mul $N0, -2
+    is( $N0, "984984", 'multiply_native_number_with_native_integer' )
+.end
+
+.sub divide_native_number_by_native_integer
+    set $I0, 4000
+    set $N0, -123.123
+    div $N1, $N0, $I0
+    is( $N1, "-0.03078075", 'divide_native_number_by_native_integer' )
+
+    div $N0, $N0, $I0
+    is( $N0, "-0.03078075", 'divide_native_number_by_native_integer' )
+
+    div $N0, 1
+    is( $N0, "-0.03078075", 'divide_native_number_by_native_integer' )
+
+    set $N0, 100.000
+    div $N0, 100
+    is( $N0, "1", 'divide_native_number_by_native_integer' )
+
+    div $N0, 0.01
+    is( $N0, "100", 'divide_native_number_by_native_integer' )
+.end
 
 #
 # FLOATVAL and FLOATVAL tests
 #
-pasm_output_is( <<'CODE', <<OUTPUT, "add native number to native number" );
-        set N2, 4000.246
-        set N0, -123.123
-        add N1, N0, N2
-        print N1
-        print "\n"
-        add N0, N0, N2
-        print N0
-        print "\n"
-        end
-CODE
-3877.123000
-3877.123000
-OUTPUT
+.sub add_native_number_to_native_number
+    set $N2, 4000.246
+    set $N0, -123.123
+    add $N1, $N0, $N2
+    is( $N1, "3877.123", 'add_native_number_to_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "subtract native number from native number" );
-        set N2, 4000.246
-        set N0, -123.123
-        sub N1, N0, N2
-        print N1
-        print "\n"
-        sub N0, N0, N2
-        print N0
-        print "\n"
-        end
-CODE
--4123.369000
--4123.369000
-OUTPUT
+    add $N0, $N0, $N2
+    is( $N0, "3877.123", 'add_native_number_to_native_number' )
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native number" );
-        set N2, 4000.246
-        set N0, -123.123
-        mul N1, N0, N2
-        print N1
-        print "\n"
-        mul N0, N0, N2
-        print N0
-        print "\n"
-        end
-CODE
--492522.288258
--492522.288258
-OUTPUT
+.sub subtract_native_number_from_native_number
+    set $N2, 4000.246
+    set $N0, -123.123
+    sub $N1, $N0, $N2
+    is( $N1, "-4123.369", 'subtract_native_number_from_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native number" );
-        set N2, 4000.246
-        set N0, -123.123
-        div N1, N0, N2
-        print N1
-        print "\n"
-        div N0, N0, N2
-        print N0
-        print "\n"
-        end
-CODE
--0.030779
--0.030779
-OUTPUT
+    sub $N0, $N0, $N2
+    is( $N0, "-4123.369", 'subtract_native_number_from_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "lcm_I_I_I" );
-        set I0, 10
-        set I1, 10
-        lcm I2, I1, I0
-        eq I2, 10, OK1
-        print "not "
-OK1:    print "ok 1\n"
+.end
 
-        set I1, 17
-        lcm I2, I1, I0
-        eq I2, 170, OK2
-        print I2
-        print "not "
-OK2:    print "ok 2\n"
+.sub multiply_native_number_with_native_number
+    set $N2, 4000.246
+    set $N0, -123.123
+    mul $N1, $N0, $N2
+    is( $N1, "-492522.288258", 'multiply_native_number_with_native_number' )
 
-        set I0, 17
-        set I1, 10
-        lcm I2, I1, I0
-        eq I2, 170, OK3
-        print "not "
-OK3:    print "ok 3\n"
+    mul $N0, $N0, $N2
+    is( $N0, "-492522.288258", 'multiply_native_number_with_native_number' )
 
-        set I0, 10
-        set I1, 0
-        lcm I2, I1, I0
-        eq I2, 0, OK4
-        print "not "
-OK4:    print "ok 4\n"
+.end
 
-        set I0, 0
-        set I1, 10
-        lcm I2, I1, I0
-        eq I2, 0, OK5
-        print "not "
-OK5:    print "ok 5\n"
+.sub divide_native_number_by_native_number
+    set $N2, 4000.246
+    set $N0, -123.123
+    div $N1, $N0, $N2
+    is( $N1, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
+    div $N0, $N0, $N2
+    is( $N0, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
-pasm_output_is( <<'CODE', <<OUTPUT, "gcd(int,int,int)" );
-        set I0, 125
-        set I1, 15
-        gcd I2, I1, I0
-        eq I2, 5, OK1
-        print "not "
-OK1:    print "ok 1\n"
-        end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "is gcd(int,int,int) transitive?" );
-        set I0, 125
-        set I1, 15
-        gcd I2, I1, I0
-
-        neg I0
-        gcd I3, I1, I0
-        eq I2, I3, OK1
-        print I2
-        print " not "
-        print I3
-OK1:    print "ok 1\n"
-
-        neg I1
-        gcd I3, I1, I0
-        eq I2, I3, OK2
-        print I2
-        print " not "
-        print I3
-OK2:    print "ok 2\n"
-
-        neg I0
-        neg I1
-        gcd I3, I1, I0
-        eq I2, I3, OK3
-        print I2
-        print " not "
-        print I3
-OK3:    print "ok 3\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "gcd num (with whole numbers)" );
-        set N0, 125.0
-        set N1, 15.0
-        gcd I0, N1, N0
-        eq I0, 5, OK1
-        print "not "
-OK1:    print "ok 1\n"
-        end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "gcd num (2)" );
-        set N0, 12.3
-        set N1, 24.6
-        gcd I0, N1, N0
-        eq I0, 12, OK1
-        print I0
-        print " not "
-OK1:    print "ok 1\n"
-        end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "is gcd(int,num,num) transitive?" );
-        set N0, 125
-        set N1, 15
-        gcd I2, N1, N0
-
-        neg N0
-        gcd I3, N1, N0
-        eq I2, I3, OK1
-        print I2
-        print " not "
-        print I3
-OK1:    print "ok 1\n"
-
-        neg N1
-        gcd I3, N1, N0
-        eq I2, I3, OK2
-        print I2
-        print " not "
-        print I3
-OK2:    print "ok 2\n"
-
-        neg N0
-        neg N1
-        gcd I3, N1, N0
-        eq I2, I3, OK3
-        print I2
-        print " not "
-        print I3
-OK3:    print "ok 3\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "gcd - 5 args version" );
-        set I3, +100
-        set I4,  +35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I3, +100
-        set I4,  -35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I3, -100
-        set I4,  -35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I3, -100
-        set I4,  +35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I4, +100
-        set I3,  +35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I4, +100
-        set I3,  -35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I4, -100
-        set I3,  -35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        set I4, -100
-        set I3,  +35
-        gcd I0, I1, I2, I3, I4
-        bsr output
-
-        print "done\n"
-        end
-
-output:
-        #I5 = I1*I3 + I2*I4
-        mul I5, I1, I3
-        mul I6, I2, I4
-        add I5, I6
-
-        print I0
-        print " = "
-        print I5
-        print " = "
-        print I1
-        print "*"
-        print I3
-        print " + "
-        print I2
-        print "*"
-        print I4
-        print "\n"
-        ret
-CODE
-5 = 5 = -1*100 + 3*35
-5 = 5 = -1*100 + -3*-35
-5 = 5 = 1*-100 + -3*-35
-5 = 5 = 1*-100 + 3*35
-5 = 5 = 3*35 + -1*100
-5 = 5 = -3*-35 + -1*100
-5 = 5 = -3*-35 + 1*-100
-5 = 5 = 3*35 + 1*-100
-done
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "is gcd(int,int,int,int,int) transitive?" );
-        set I0, 130
-        set I1, -35
-        gcd I7, I0, I1
-
-        # +, +
-        gcd I2, I3, I4, I0, I1
-        mul I5, I3, I0
-        mul I6, I4, I1
-        add I5, I5, I6
-        ne I2, I5, NOK1
-        eq I2, I7, OK1
-NOK1:
-        print " not "
-OK1:    print "ok 1\n"
-
-        # -, +
-        neg I0
-        gcd I2, I3, I4, I0, I1
-        mul I5, I3, I0
-        mul I6, I4, I1
-        add I5, I5, I6
-        ne I2, I5, NOK2
-        eq I2, I7, OK2
-NOK2:
-        print " not "
-OK2:    print "ok 2\n"
-
-        # -, -
-        neg I1
-        gcd I2, I3, I4, I0, I1
-        mul I5, I3, I0
-        mul I6, I4, I1
-        add I5, I5, I6
-        ne I2, I5, NOK3
-        eq I2, I7, OK3
-NOK3:
-        print " not "
-OK3:    print "ok 3\n"
-
-        # +, -
-        neg I0
-        gcd I2, I3, I4, I0, I1
-        mul I5, I3, I0
-        mul I6, I4, I1
-        add I5, I5, I6
-        ne I2, I5, NOK4
-        eq I2, I7, OK4
-NOK4:
-        print " not "
-OK4:    print "ok 4\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

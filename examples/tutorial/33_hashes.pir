@@ -1,14 +1,28 @@
-=head1 Hashes
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
 
-This example demonstrates using hashes, keyed access, and automatic conversion
-of low-level types to pmc types in keyed access.
+=head1 Associative Arrays
+
+Associative arrays, also known in some places as "dictionaries" or
+"hashes" are like ordered arrays except they are indexed by strings
+instead of integers. Parrot has a dedicated Hash PMC, and a number of
+other PMCs that implement the associative array interface as well.
+
+Associative arryas are indexed using C<[ ]> square brackets with a
+string inside them.
+
+Ordered arrays are often homogeneous structures where all elements in
+the array are of the same type. This is why Parrot has types like
+"FixedIntegerArray" and "ResizableStringArray", which only contain
+integers or strings respectively. Associative arrays are often
+heterogeneous, where each element may be a different type.
 
 =cut
 
 .sub main :main
 
     .local pmc myhash
-    myhash = new 'Hash'
+    myhash = new ['Hash']
 
     myhash['foo'] = 5
     myhash['bar'] = "Hello"

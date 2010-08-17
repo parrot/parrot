@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -79,7 +79,7 @@ table, which should be created by your sysadmin.
     test.'ok'($I1, 'res.resultStatus() == PGRES_COMMAND_OK ')
     res.'clear'()
     # install a notice receiver to silent the CREATE
-    .const .Sub cb = 'notice'
+    .const 'Sub' cb = 'notice'
     $P0 = con.'setNoticeReceiver'(cb, test)
     # create a temp table
     res = con.'exec'(<<'EOT')
@@ -226,10 +226,11 @@ EOT
     test.'ok'($I0, 'con is false after finish')
     test.'finish'()
     end
-no_pg:	
+no_pg:
     .local pmc ex
     .local string msg
-    .get_results(ex, msg)
+    .get_results(ex)
+    msg = ex
     test.'skip'(N_TESTS)
     test.'finish'()
 .end
@@ -240,9 +241,9 @@ no_pg:
     .param pmc res
     test.'ok'(1, 'notice receiver called')
     # res ought to be a PGresult struct
-    $I0 = typeof res
-    $I1 = iseq $I0, .UnManagedStruct
-    test.'ok'($I1, 'notice callback got a struct')
+    $S0 = typeof res
+    $I0 = $S0 == 'UnManagedStruct'
+    test.'ok'($I0, 'notice callback got a struct')
 
     .local pmc st
     st = get_root_global ['parrot';'Pg'], 'PQresultStatus'

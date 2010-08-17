@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -46,7 +46,7 @@ the type for the format.
 
 /*
 
-=item C<STRING * Parrot_vsprintf_s>
+=item C<STRING * Parrot_vsprintf_s(PARROT_INTERP, STRING *pat, va_list args)>
 
 Almost all the other sprintf variants in this file are implemented in
 terms of this function (see C<Parrot_psprintf()> for the exception). It
@@ -56,12 +56,13 @@ in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 {
+    ASSERT_ARGS(Parrot_vsprintf_s)
     SPRINTF_OBJ obj = va_core;
     obj.data = PARROT_VA_TO_VAPTR(args);
 
@@ -70,7 +71,8 @@ Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 
 /*
 
-=item C<STRING * Parrot_vsprintf_c>
+=item C<STRING * Parrot_vsprintf_c(PARROT_INTERP, const char *pat, va_list
+args)>
 
 C string version of C<Parrot_vsprintf_s()>.
 
@@ -78,11 +80,13 @@ C string version of C<Parrot_vsprintf_s()>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 {
+    ASSERT_ARGS(Parrot_vsprintf_c)
     STRING * const realpat = string_make(interp, pat, strlen(pat),
                                   NULL, PObj_external_FLAG);
 
@@ -93,7 +97,8 @@ Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 
 /*
 
-=item C<void Parrot_vsnprintf>
+=item C<void Parrot_vsnprintf(PARROT_INTERP, char *targ, size_t len, const char
+*pat, va_list args)>
 
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
@@ -102,31 +107,36 @@ Similar to C<Parrot_vsprintf()> but with an option to specify the length
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
 {
+    ASSERT_ARGS(Parrot_vsnprintf)
+
     if (len == 0)
         return;
-    len--;
+    --len;
     if (len) {
         const STRING * const ret = Parrot_vsprintf_c(interp, pat, args);
         /* string_transcode(interp, ret, NULL, NULL, &ret); */
 
-        if (len > ret->bufused) {
-            len = ret->bufused;
+        char     * const str_ret = Parrot_str_to_cstring(interp, ret);
+        const    size_t  str_len = strlen(str_ret);
+        if (len > str_len) {
+            len = str_len;
         }
 
         if (len)
-            memcpy(targ, ret->strstart, len);
+            memcpy(targ, str_ret, len);
+        Parrot_str_free_cstring(str_ret);
     }
     targ[len] = 0;
 }
 
 /*
 
-=item C<STRING * Parrot_sprintf_s>
+=item C<STRING * Parrot_sprintf_s(PARROT_INTERP, STRING *pat, ...)>
 
 Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 
@@ -134,12 +144,13 @@ Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 {
+    ASSERT_ARGS(Parrot_sprintf_s)
     STRING *ret;
     va_list args;
 
@@ -154,7 +165,7 @@ Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 
 /*
 
-=item C<STRING * Parrot_sprintf_c>
+=item C<STRING * Parrot_sprintf_c(PARROT_INTERP, const char *pat, ...)>
 
 C string version of C<Parrot_sprintf_s()>.
 
@@ -162,12 +173,13 @@ C string version of C<Parrot_sprintf_s()>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
 {
+    ASSERT_ARGS(Parrot_sprintf_c)
     STRING *ret;
     va_list args;
 
@@ -182,7 +194,8 @@ Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
 
 /*
 
-=item C<void Parrot_snprintf>
+=item C<void Parrot_snprintf(PARROT_INTERP, char *targ, size_t len, const char
+*pat, ...)>
 
 Similar to C<Parrot_sprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
@@ -191,11 +204,12 @@ Similar to C<Parrot_sprintf()> but with an option to specify the length
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
                 ARGIN(const char *pat), ...)
 {
+    ASSERT_ARGS(Parrot_snprintf)
     va_list args;
 
     va_start(args, pat);
@@ -207,7 +221,7 @@ Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
 
 /*
 
-=item C<STRING * Parrot_psprintf>
+=item C<STRING * Parrot_psprintf(PARROT_INTERP, STRING *pat, PMC *ary)>
 
 Calls C<Parrot_sprintf_format()> with the insertion arguments in an
 C<Array> PMC.
@@ -216,12 +230,13 @@ C<Array> PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 {
+    ASSERT_ARGS(Parrot_psprintf)
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;
 
@@ -230,7 +245,8 @@ Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 
 /*
 
-=item C<int Parrot_secret_snprintf>
+=item C<int Parrot_secret_snprintf(char *buffer, const size_t len, const char
+*format, ...)>
 
 A simulation of C<snprintf> for systems that do not support it.
 
@@ -239,18 +255,17 @@ A simulation of C<snprintf> for systems that do not support it.
 */
 
 
-PARROT_API
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 int
-Parrot_secret_snprintf(ARGOUT(char *buffer), const size_t len, ARGIN(const char *format), ...)
+Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(const size_t len),
+        ARGIN(const char *format), ...)
 {
+    ASSERT_ARGS(Parrot_secret_snprintf)
     int retval;
     va_list ap;
     va_start(ap, format);
-#ifdef BLAHBLAHBLAH_WAS_A_CHECK_FOR_VNSNPRINTF
-    retval = vsnprintf(buffer, len, format, ap);
-#else
     retval = vsprintf(buffer, format, ap);
-#endif
     va_end(ap);
 
     return retval;

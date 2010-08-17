@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -28,7 +28,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether perldoc is installed};
+    $data{description} = q{Is perldoc installed};
     $data{result}      = q{};
     return \%data;
 }
@@ -36,7 +36,8 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
+    my $slash = $conf->data->get('slash');
+    my $cmd = $conf->data->get('scriptdirexp_provisional') . $slash . q{perldoc};
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     my $content = capture_output("$cmd -ud $filename perldoc") || undef;
 
@@ -45,6 +46,47 @@ sub runstep {
     my $version = $self->_analyze_perldoc($cmd, $filename, $content);
 
     _handle_version($conf, $version, $cmd);
+
+    my $TEMP_pod_build = <<'E_NOTE';
+
+# the following part of the Makefile was built by 'config/auto/perldoc.pm'
+
+E_NOTE
+
+    opendir OPS, 'src/ops' or die "opendir ops: $!";
+    my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
+    closedir OPS;
+
+    my $TEMP_pod = join q{ } =>
+        map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
+
+    my $new_perldoc = $conf->data->get('new_perldoc');
+
+    foreach my $ops (@ops) {
+        my $pod = $ops;
+        $pod =~ s/\.ops$/.pod/;
+        if ( $new_perldoc ) {
+            $TEMP_pod_build .= <<"END"
+ops/$pod: ../src/ops/$ops
+\t\$(PERLDOC_BIN) -ud ops/$pod ../src/ops/$ops
+\t\$(CHMOD) 0644 ops/$pod
+
+END
+        }
+        else {
+            $TEMP_pod_build .= <<"END"
+ops/$pod: ../src/ops/$ops
+\t\$(PERLDOC_BIN) -u ../ops/$ops > ops/$pod
+\t\$(CHMOD) 0644 ../ops/$pod
+
+END
+        }
+    }
+
+    $conf->data->set(
+        TEMP_pod             => $TEMP_pod,
+        TEMP_pod_build       => $TEMP_pod_build,
+    );
 
     return 1;
 }
@@ -56,6 +98,9 @@ sub _initial_content_check {
         $conf->data->set(
             has_perldoc => 0,
             new_perldoc => 0,
+            perldoc     => 'echo',
+            TEMP_pod        => '',
+            TEMP_pod_build  => '',
         );
         $self->set_result('no');
         return;

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 #
 
@@ -27,7 +27,6 @@ use base qw( Exporter );
 our @EXPORT_OK = qw();
 use Storable ();
 use Parrot::PMC;
-use Parrot::Pmc2c::UtilFunctions qw(spew);
 use Parrot::Pmc2c::Method;
 
 sub create {
@@ -133,7 +132,7 @@ Determines if a given PMC type is dynamically loaded or not.
 
 =item C<implements_vtable($method)>
 
-True if pmc generates code for vtable method C<$method>.
+True if pmc generates code for vtable C<$method>.
 
 =cut
 
@@ -172,6 +171,12 @@ sub is_dynamic {
     return 1;
 }
 
+sub export {
+    my ( $self ) = @_;
+
+    return $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT' : 'PARROT_EXPORT';
+}
+
 sub implements_vtable {
     my ( $self, $vt_meth ) = @_;
     return 0 unless $self->has_method($vt_meth);
@@ -199,6 +204,11 @@ sub parents {
     return $self->{parents};
 }
 
+sub direct_parents {
+    my ($self) = @_;
+    return $self->{direct_parents};
+}
+
 sub mixins {
     my ($self) = @_;
     return $self->{mixins};
@@ -215,9 +225,9 @@ sub attributes {
 }
 
 sub filename {
-    my ( $self, $type ) = @_;
+    my ( $self, $type, $is_dynamic ) = @_;
     return $self->{filename} unless $type;
-    return Parrot::Pmc2c::UtilFunctions::filename( $self->{filename}, $type );
+    return Parrot::Pmc2c::UtilFunctions::filename( $self->{filename}, $type, $is_dynamic );
 }
 
 sub get_flags {
@@ -230,7 +240,10 @@ sub get_flags {
 sub set_parents {
     my ( $self, $value ) = @_;
     $value             ||= [];
-    $self->{parents}     = $value;
+    $self->{parents}        = $value;
+    for my $dp (@{ $value }) {
+        push @{$self->{direct_parents}}, $dp;
+    }
     return 1;
 }
 
@@ -308,7 +321,7 @@ sub method_attrs {
 
 =item C<vtable_method_does_write($method)>
 
-Returns true if the vtable method C<$method> writes our value.
+Returns true if the vtable C<$method> writes our value.
 
 =back
 
@@ -321,6 +334,15 @@ sub vtable_method_does_write {
     return 1 if $attrs->{write};
     return 0 if $attrs->{read};
     return $self->vtable->attrs($methodname)->{write};
+}
+
+sub vtable_method_does_multi {
+    my ( $self, $methodname ) = @_;
+
+    return 1 if ($methodname =~ m/^
+                (?:add|subtract|multiply|divide|floor_divide|modulus)
+                (?:_int|_float)?
+              $/x);
 }
 
 sub super_method {
@@ -410,12 +432,14 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub dump_is_current {
-    my ($self)   = @_;
-    my $dumpfile = $self->filename('.dump');
+    my ($self, $dumpfile)   = @_;
+    $dumpfile ||= $self->filename('.dump');
     return 0 unless -e $dumpfile;
 
     my $pmcfile  = $self->filename('.pmc');
-    return ( stat $dumpfile )[9] > ( stat $pmcfile )[9];
+    return 1 unless -e $pmcfile;
+
+    return ( stat $dumpfile )[9] >= ( stat $pmcfile )[9];
 }
 
 1;

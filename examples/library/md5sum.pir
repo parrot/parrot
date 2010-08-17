@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +14,7 @@ examples/library/md5sum.pir - calculate MD5 checksums
 The main purpose of this script is testing the Digest/MD5.pir library.
 It should behave very much like md5sum(1).
 
-Running parrot with -j will give a significant performance boost (often
+Running parrot with C<-R jit> will give a significant performance boost (often
 about ten-fold).
 
 =head1 AUTHOR
@@ -22,6 +23,8 @@ Nick Glencross     - <nickg@glencros.demon.co.uk>
 Leopold Toetsch    - <lt@toetsch.at>
 
 =cut
+
+.loadlib 'os'       # OS object
 
 .sub _main :main
     .param pmc args
@@ -33,9 +36,9 @@ Leopold Toetsch    - <lt@toetsch.at>
     $I0 = $I0 - 1
     if $I0 > 0 goto has_args
     $S0 = args[0]
-    printerr "(parrot) "
-    printerr $S0
-    printerr " filename [filename ...]\n"
+    print "(parrot) "
+    print $S0
+    print " filename [filename ...]\n"
     exit 1
 
 has_args:
@@ -49,31 +52,30 @@ next_iter:
     file = args[$I1]
     .include "stat.pasm"
     # Get size of file
-    size = stat file, .STAT_FILESIZE
+    .local pmc os, stat_buf
+    os = new ['OS']
+    stat_buf = os.'stat'(file)
+    size = stat_buf[7]
     .local pmc pio, cl
-    cl = getclass "ParrotIO"
+    cl = new 'FileHandle'
     # slurp the file into memory
-    pio = cl."open"(file, "<", "mmap")
-    # pio = open file, "<"
-    defined $I2, pio
-    if $I2 goto found
-    printerr file
-    printerr ": Cannot find\n"
-    goto iter_cont
-found:
-    read $S1, pio, size
-    close pio
+    .local string contents
+    contents = cl.'readall'(file)
 
-    $I2 = length $S1
+    $I2 = length contents
     if $I2 == size goto size_ok
 
-    printerr file
-    printerr ": size mismatch\n"
+    print file
+    print ": size mismatch ("
+    print size
+    print " vs "
+    print $I2
+    print ")\n"
     goto iter_cont
 
 size_ok:
 
-    $P0 = _md5sum ($S1)
+    $P0 = _md5sum (contents)
     _md5_print ($P0)
     print "\t"
     print file

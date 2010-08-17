@@ -1,4 +1,6 @@
-=head1 INFORMATION
+# $Id$
+
+=head1 Counter Example
 
 This example shows the usage of C<Stream::Sub>.
 
@@ -15,13 +17,13 @@ Creates a C<Stream::Sub> and dumps it.
 .sub _main
     .local pmc stream
 
-    load_bytecode "library/Stream/Base.pbc"
-    load_bytecode "library/Stream/Sub.pbc"
+    load_bytecode 'Stream/Base.pbc'
+    load_bytecode 'Stream/Sub.pbc'
 
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
 
     # set the stream's source sub
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # dump the stream
@@ -66,7 +68,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

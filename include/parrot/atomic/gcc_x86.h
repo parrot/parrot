@@ -1,5 +1,5 @@
 /* atomic/gcc_x86.h
- *  Copyright (C) 2006-2008, The Perl Foundation.
+ *  Copyright (C) 2006-2008, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -18,13 +18,23 @@
 /* HEADERIZER BEGIN: src/atomic/gcc_x86.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void * parrot_i386_cmpxchg(void *volatile *ptr, void *expect, void *update);
+void * parrot_i386_cmpxchg(
+    ARGMOD(void *volatile *ptr),
+    ARGIN_NULLOK(void *expect),
+    ARGIN_NULLOK(void *update))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*ptr);
 
-PARROT_API
-long parrot_i386_xadd(volatile long *l, long amount);
+PARROT_EXPORT
+long parrot_i386_xadd(ARGIN(volatile long *l), long amount)
+        __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_parrot_i386_cmpxchg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(ptr)
+#define ASSERT_ARGS_parrot_i386_xadd __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(l)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/atomic/gcc_x86.c */
 

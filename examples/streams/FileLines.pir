@@ -1,10 +1,15 @@
-=head1 INFORMATION
+=head1 Advanced Lines Example
 
 This is an advanced example.
 
 It uses a file stream (Stream::ParrotIO) that is processed linewise with
 Stream::Lines. A counter stream creates line numbers, both are combined to
 one stream and then dumped.
+
+=head1 NOTE
+
+When updating this file, be sure to verify L<t/examples/streams.t>, as its
+tests rely on the content of this file.
 
 =head1 FUNCTIONS
 
@@ -33,26 +38,26 @@ stream for it. Then it combines the stream with a stream providing line numbers.
     name = argv[1]
 NO_NAME:
 
-    load_bytecode "library/Stream/ParrotIO.pir"
-    load_bytecode "library/Stream/Lines.pir"
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Combiner.pir"
+    load_bytecode 'Stream/ParrotIO.pbc'
+    load_bytecode 'Stream/Lines.pbc'
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Combiner.pbc'
 
     # create a file stream
-    file = new "Stream::ParrotIO"
-    file."open"( name, "<" )
+    file = new ['Stream'; 'ParrotIO']
+    file."open"( name, 'r' )
 
     # process it one line per read
-    lines = new "Stream::Lines"
+    lines = new ['Stream'; 'Lines']
     assign lines, file
 
     # endless counter
-    counter = new "Stream::Sub"
-    .const .Sub temp = "_counter"
+    counter = new ['Stream'; 'Sub']
+    .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines
-    combiner = new "Stream::Combiner"
+    combiner = new ['Stream'; 'Combiner']
     assign combiner, counter
     assign combiner, lines
 
@@ -96,7 +101,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

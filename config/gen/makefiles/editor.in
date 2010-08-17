@@ -1,19 +1,24 @@
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
-OPS_DIR     = ../src/ops
-VIM_DIR     = $(HOME)/.vim
+#IF(win32):VIM_DIR     = $(USERPROFILE)/vimfiles
+#ELSE:VIM_DIR     = $(HOME)/.vim
 VIM_FT_DIR  = $(VIM_DIR)/plugin
 VIM_IN_DIR  = $(VIM_DIR)/indent
 VIM_SYN_DIR = $(VIM_DIR)/syntax
 
+PARROT = ../parrot@exe@
 PERL   = @perl@
 CP     = @cp@
 MKPATH = @mkpath@
 RM_F   = @rm_f@
 
+SKEL_FILE_DIR = `$(PERL) -e 'print "$(SKELETON)" || "$(VIM_DIR)"'`
+LINE          = "au BufNewFile         *.pir 0r $(SKEL_FILE_DIR)/skeleton.pir"
+
 default: all
 
-all: pir.vim imc.kate
+all: pir.vim imc.kate skeleton.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help :
@@ -31,11 +36,14 @@ help :
 	@echo "  realclean:         clean up local files including Makefile"
 	@echo ""
 
-pir.vim: pir_vim.in $(OPS_DIR)/*.ops ops2vim.pl
+pir.vim: pir_vim.in ../src/ops/*.ops ops2vim.pl
 	$(CP) pir_vim.in pir.vim
-	$(PERL) ops2vim.pl $(OPS_DIR)/*.ops >> pir.vim
+	$(PERL) ops2vim.pl ../src/ops/*.ops >> pir.vim
 
-vim-install: pir.vim
+skeleton.pir: mk_skeleton.pir
+	$(PARROT) mk_skeleton.pir > skeleton.pir
+
+vim-install: pir.vim skeleton.pir
 	$(MKPATH) "$(VIM_DIR)"
 	$(CP) skeleton.pir "$(VIM_DIR)"
 	$(MKPATH) "$(VIM_SYN_DIR)"
@@ -44,6 +52,7 @@ vim-install: pir.vim
 	$(CP) pmc.vim "$(VIM_SYN_DIR)"
 	$(MKPATH) "$(VIM_FT_DIR)"
 	$(CP) filetype_parrot.vim "$(VIM_FT_DIR)/parrot.vim"
+	echo $(LINE) >> "$(VIM_FT_DIR)/parrot.vim"
 	$(MKPATH) "$(VIM_IN_DIR)"
 	$(CP) indent_pir.vim "$(VIM_IN_DIR)/pir.vim"
 
@@ -65,3 +74,8 @@ clean:
 
 realclean: clean
 	$(RM_F) Makefile
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

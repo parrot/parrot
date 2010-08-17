@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -19,113 +19,174 @@ evaluation and execution.
 
 */
 
-#include "parrot/parrot.h"
+#include "pmc/pmc_sub.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void clear_fixups(PARROT_INTERP,
+    ARGIN(const Parrot_Sub_attributes *sub_data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC* get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_subs(PARROT_INTERP, ARGIN(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_clear_fixups __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_data))
+#define ASSERT_ARGS_get_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_mark_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static void clear_fixups(PARROT_INTERP, const Parrot_Sub_attributes *sub_data)>
+
+
+
+=cut
+
+*/
 
 static void
-clear_fixups(PARROT_INTERP, Parrot_sub *sub_data)
+clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
 {
-    INTVAL               i;
-    PackFile_ByteCode   *seg = sub_data->seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
+    ASSERT_ARGS(clear_fixups)
 
-    if (!seg)
-        return;
+    PackFile_ByteCode * const seg = sub_data->seg;
 
-    ft = seg->fixups;
-    if (!ft)
-        return;
+    if (seg) {
+        PackFile_FixupTable * const ft = seg->fixups;
+        if (ft) {
+            PackFile_ConstTable * const ct = seg->const_table;
+            if (ct) {
+                INTVAL i;
+                for (i = 0; i < ft->fixup_count; ++i) {
+                    PackFile_FixupEntry * const e = ft->fixups + i;
 
-    ct = seg->const_table;
-    if (!ct)
-        return;
+                    if (e->type == enum_fixup_sub) {
+                        opcode_t  ci             = e->offset;
 
-    for (i = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
-
-        if (e->type == enum_fixup_sub) {
-            opcode_t  ci             = e->offset;
-
-            ct->constants[ci]->u.key = NULL;
-            ft->fixups[i]->type      = 0;
+                        ct->constants[ci].u.key = NULL;
+                        e->type                  = 0;
+                    }
+                }
+            }
         }
     }
 }
 
+/*
+
+=item C<static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)>
+
+
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
-get_sub(PARROT_INTERP, PMC *self, int idx)
+get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 {
-    INTVAL               i, n;
-    PackFile_ByteCode   *seg = PMC_sub(self)->seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
+    ASSERT_ARGS(get_sub)
 
-    if (!seg)
-        return PMCNULL;
+    Parrot_Sub_attributes *sub;
+    PackFile_ByteCode     *seg;
 
-    ft = seg->fixups;
-    if (!ft)
-        return PMCNULL;
+    PMC_get_sub(interp, self, sub);
+    seg = sub->seg;
 
-    ct = seg->const_table;
-    if (!ct)
-        return PMCNULL;
+    if (seg) {
+        PackFile_FixupTable * const ft = seg->fixups;
+        if (ft) {
+            PackFile_ConstTable * const ct = seg->const_table;
+            if (ct) {
+                INTVAL i, n;
+                for (i = n = 0; i < ft->fixup_count; ++i) {
+                    const PackFile_FixupEntry * const e = ft->fixups + i;
 
-    for (i = n = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
+                    if (e->type == enum_fixup_sub) {
+                        opcode_t ci = e->offset;
 
-        if (e->type == enum_fixup_sub) {
-            opcode_t ci = e->offset;
-
-            if (n++ == idx)
-                return ct->constants[ci]->u.key;
+                        if (n++ == idx)
+                            return ct->constants[ci].u.key;
+                    }
+                }
+            }
         }
     }
 
     return PMCNULL;
 }
 
+/*
+
+=item C<static void mark_subs(PARROT_INTERP, PMC *self)>
+
+
+
+=cut
+
+*/
+
 static void
-mark_subs(PARROT_INTERP, PMC *self)
+mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 {
-    PackFile_ByteCode   * const seg = PMC_sub(self)->seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
-    INTVAL               i;
+    ASSERT_ARGS(mark_subs)
 
-    if (!seg)
-        return;
+    Parrot_Sub_attributes *sub;
+    PackFile_ByteCode   *seg;
 
-    ft = seg->fixups;
-    if (!ft)
-        return;
+    PMC_get_sub(interp, self, sub);
+    seg = sub->seg;
 
-    ct = seg->const_table;
-    if (!ct)
-        return;
+    if (seg) {
+        PackFile_FixupTable * const ft = seg->fixups;
+        if (ft) {
+            PackFile_ConstTable * const ct = seg->const_table;
+            if (ct) {
+                INTVAL i;
+                for (i = 0; i < ft->fixup_count; ++i) {
+                    const PackFile_FixupEntry * const e = ft->fixups + i;
 
-    for (i = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
+                    if (e->type == enum_fixup_sub) {
+                        opcode_t  ci  = e->offset;
+                        PMC      *sub = ct->constants[ci].u.key;
 
-        if (e->type == enum_fixup_sub) {
-            opcode_t  ci  = e->offset;
-            PMC      *sub = ct->constants[ci]->u.key;
-
-            if (!PMC_IS_NULL(sub))
-                pobject_lives(interp, (PObj *)sub);
+                        Parrot_gc_mark_PMC_alive(interp, sub);
+                    }
+                }
+            }
         }
     }
 }
 
-pmclass Eval extends Sub need_ext {
+pmclass Eval extends Sub provides invokable auto_attrs {
 
     VTABLE void init() {
-        Parrot_sub *sub_data;
+        Parrot_Sub_attributes *sub_data;
         SUPER();
 
-        sub_data      = PMC_sub(SELF);
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PMC_get_sub(INTERP, SELF, sub_data);
         sub_data->seg = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 /*
 
@@ -151,8 +212,8 @@ Invokes the first subroutine in the eval code.
          * These globals still exist, calling them will segfault
          * as the segment is destroyed now.
          *
-         * RT#46683 walk the fixups for this segment, locate globals
-         *      and nullify the Sub PMC.
+         * TT # 1230:
+         * Walk the fixups, locate globals and nullify the Sub PMC
          * This probably needs a pointer into the globals.
          *
          * OTOH - if the global exists - this eval pmc ought
@@ -160,7 +221,9 @@ Invokes the first subroutine in the eval code.
          */
         PackFile_Segment  *seg;
         PackFile_ByteCode *cur_cs;
-        Parrot_sub        *sub_data = PMC_sub(SELF);
+        Parrot_Sub_attributes *sub_data;
+
+        PMC_get_sub(INTERP, SELF, sub_data);
 
         if (!sub_data) {
             SUPER();
@@ -175,14 +238,25 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
-        /* RT#46685 create PF API, move it there */
+        /* XXX Quick and dirty fix for TT #995 */
+        if ((struct PackFile *)cur_cs == INTERP->initial_pf
+                || cur_cs == INTERP->code) {
+            SUPER();
+            return;
+        }
+
+        /* TT #1315 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
-        if (seg)
+        if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
+            cur_cs->const_table = NULL;
+        }
 
         seg = (PackFile_Segment *)cur_cs->debugs;
-        if (seg)
+        if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
+            cur_cs->debugs = NULL;
+        }
 
         seg = (PackFile_Segment *)cur_cs->fixups;
         if (seg) {
@@ -190,15 +264,12 @@ Invokes the first subroutine in the eval code.
             cur_cs->fixups = NULL;
         }
 
-        seg = cur_cs->pic_index;
-        if (seg)
-            PackFile_Segment_destroy(INTERP, seg);
-
         seg = (PackFile_Segment *)cur_cs;
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
 
         sub_data->seg = NULL;
+
         SUPER();
     }
 
@@ -219,10 +290,14 @@ for writing to disc and later loading via C<load_bytecode>.
 */
 
     VTABLE STRING *get_string() {
+        Parrot_Sub_attributes *sub;
         PackFile          *pf  = PackFile_new(INTERP, 0);
-        PackFile_ByteCode *seg = PMC_sub(SELF)->seg;
+        PackFile_ByteCode *seg;
         STRING            *res;
         size_t             size, aligned_size;
+
+        PMC_get_sub(INTERP, SELF, sub);
+        seg = sub->seg;
 
         PackFile_add_segment(INTERP, &pf->directory, (PackFile_Segment *)seg);
 
@@ -238,10 +313,6 @@ for writing to disc and later loading via C<load_bytecode>.
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->fixups);
 
-        if (seg->pic_index)
-            PackFile_add_segment(INTERP, &pf->directory,
-                    (PackFile_Segment *)seg->pic_index);
-
         size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
 
         /*
@@ -255,7 +326,7 @@ for writing to disc and later loading via C<load_bytecode>.
          * effect
          */
         aligned_size = size + 15;
-        res          = string_make_empty(INTERP, enum_stringrep_one,
+        res          = Parrot_str_new_noinit(INTERP, enum_stringrep_one,
                                          aligned_size);
         res->strlen  = res->bufused = size;
 
@@ -265,9 +336,10 @@ for writing to disc and later loading via C<load_bytecode>.
             res->strstart = adr;
         }
 
-        /* We block DOD while doing the packing, since GC run during a pack
+        /* We block GC while doing the packing, since GC run during a pack
            has been observed to cause problems. There may be a Better Fix.
-           See RT #40410 for example of the problem (note on line that
+           See http://rt.perl.org/rt3/Ticket/Display.html?id=40410
+           for example of the problem (note on line that
            segfaults, it is *cursor that is pointing to dealloced memory). */
         Parrot_block_GC_mark(INTERP);
         PackFile_pack(INTERP, pf, (opcode_t *)res->strstart);
@@ -297,11 +369,11 @@ Returns the Sub PMC of the element at index C<key> or PMCNULL.
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Archives the evaled code
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Unarchives the code.
 
@@ -309,19 +381,18 @@ Unarchives the code.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io     = info->image_io;
+    VTABLE void freeze(PMC *info) {
         STRING   *packed = SELF.get_string();
-        VTABLE_push_string(INTERP, io, packed);
+        VTABLE_push_string(INTERP, info, packed);
 
         SUPER(info);
     }
 
-    VTABLE void thaw(visit_info *info) {
-        IMAGE_IO         *io     = info->image_io;
-        STRING           *packed = VTABLE_shift_string(INTERP, io);
+    VTABLE void thaw(PMC *info) {
+        STRING           *packed = VTABLE_shift_string(INTERP, info);
         PackFile         *pf;
         PackFile_Segment *seg;
+        Parrot_Sub_attributes *sub;
         size_t            i;
 
         SUPER(info);
@@ -329,8 +400,8 @@ Unarchives the code.
 
         if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
                 packed->strlen))
-            real_exception(INTERP, NULL, E_IOError,
-                    "couldn't unpack packfile");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "couldn't unpack packfile");
 
         do_sub_pragmas(INTERP, pf->cur_cs, PBC_PBC, SELF);
 
@@ -338,7 +409,8 @@ Unarchives the code.
             seg = pf->directory.segments[i];
 
             if (seg->type == PF_BYTEC_SEG) {
-                PMC_sub(SELF)->seg = (PackFile_ByteCode *)seg;
+                PMC_get_sub(INTERP, SELF, sub);
+                sub->seg = (PackFile_ByteCode *)seg;
                 break;
             }
         }
@@ -346,13 +418,36 @@ Unarchives the code.
         pf->directory.num_segments = 0;
 
         /*
-         * RT#46687 this isn't ok - it seems that the packfile
-         *     gets attached to interp->code and is
+         * TT #1292 this isn't ok - it seems that the packfile
+         *     gets attached to INTERP->code and is
          *     destroyed again during interpreter destruction
          */
         /* PackFile_destroy(INTERP, pf); */
     }
 
+    VTABLE INTVAL elements() {
+        INTVAL                 n = 0;
+        Parrot_Sub_attributes *sub;
+        PackFile_ByteCode     *seg;
+
+        PMC_get_sub(INTERP, SELF, sub);
+        seg = sub->seg;
+
+        if (seg) {
+            PackFile_FixupTable *const ft = seg->fixups;
+            if (ft) {
+                INTVAL i;
+                for (i = n = 0; i < ft->fixup_count; ++i) {
+                    const PackFile_FixupEntry * const e = ft->fixups + i;
+
+                    if (e->type == enum_fixup_sub)
+                        ++n;
+                }
+            }
+        }
+
+        return n;
+    }
 }
 
 /*

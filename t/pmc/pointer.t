@@ -1,5 +1,5 @@
-#! parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -17,12 +17,12 @@ Tests the Pointer PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new P0, 'Pointer'
-    ok(1, 'Instantiated .Pointer')
+    new $P0, ['Pointer']
+    ok(1, 'Instantiated a Pointer PMC')
 .end
 
 # Local Variables:

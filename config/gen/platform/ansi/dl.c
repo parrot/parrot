@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2010, Parrot Foundation.
  */
 
 /*
@@ -11,28 +11,23 @@ config/gen/platform/ansi/dl.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Parrot functions -- B<none yet implemented> -- which wrap around standard
+library functions for handling dynamic libraries.
 
 =head2 Functions
 
 =over 4
 
-=cut
+=item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
-*/
-
-/*
-
-=item C<void * Parrot_dlopen(const char *filename)>
-
-RT#48260: Not yet documented!!!
+Parrot wrapper around C<dlopen>.  B<Not yet implemented.>
 
 =cut
 
 */
 
 void *
-Parrot_dlopen(const char *filename)
+Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 {
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlopen not implemented");
     return NULL;
@@ -43,7 +38,7 @@ Parrot_dlopen(const char *filename)
 
 =item C<const char * Parrot_dlerror(void)>
 
-RT#48260: Not yet documented!!!
+Parrot wrapper around C<dlerror>.  B<Not yet implemented.>
 
 =cut
 
@@ -60,7 +55,7 @@ Parrot_dlerror(void)
 
 =item C<void * Parrot_dlsym(void *handle, const char *symbol)>
 
-RT#48260: Not yet documented!!!
+Parrot wrapper around C<dlsym>.  B<Not yet implemented.>
 
 =cut
 
@@ -78,7 +73,7 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 =item C<int Parrot_dlclose(void *handle)>
 
-RT#48260: Not yet documented!!!
+Parrot wrapper around C<dlclose>.  B<Not yet implemented.>
 
 =cut
 

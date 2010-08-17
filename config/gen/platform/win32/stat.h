@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2008, The Perl Foundation.
+ * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_STAT_H_GUARD
@@ -28,6 +28,10 @@
 
 #ifndef S_ISDIR
 #  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#ifndef S_ISREG
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 #endif
 
 #endif /* PARROT_PLATFORM_WIN32_STAT_H_GUARD */

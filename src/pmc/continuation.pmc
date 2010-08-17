@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -21,8 +21,8 @@ more information.
 */
 
 
-#include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
 
 /*
 
@@ -36,16 +36,27 @@ more information.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 
 /*
- * A Continuation (and RetContinuation, Exception_Handler) has in its
+ * A Continuation (and RetContinuation, ExceptionHandler) has in its
  * context a pointer to the register frame, which contains active objects.
  * Additionally ct->current_cont has the continuation of the caller.
- * To avoid deep recursion during marking of nested subroutines, we
- * need the next_for_GC pointer in the pmc_ext area.
  */
 
-pmclass Continuation need_ext {
+pmclass Continuation auto_attrs provides invokable {
+    /* continuation destination */
+    ATTR PackFile_ByteCode *seg;             /* bytecode segment */
+    ATTR opcode_t          *address;         /* start of bytecode, addr to continue */
+    ATTR PMC               *to_ctx;          /* pointer to dest context */
+    ATTR PMC               *to_call_object;  /* pointer to CallSignature */
+    /* a Continuation keeps the from_ctx alive */
+    ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
+    ATTR int                runloop_id;      /* id of the creating runloop. */
+    ATTR int                invoked;         /* flag when a handler has been invoked. */
 
 /*
 
@@ -58,18 +69,52 @@ Initializes the continuation.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
-        PMC_pmc_val(SELF)    = NULL;
-        PObj_custom_mark_destroy_SETALL(SELF);
-        /* PANIC("don't do that"); */
-        /*
-         * Whenever we create a continuation, all return continuations
-         * up the call chain may be reused due to invoking the
-         * continuation. To avoid that all return continuations are
-         * converted to true continuations.
-         */
-        invalidate_retc_context(INTERP, SELF);
+        PMC * const to_ctx = CURRENT_CONTEXT(INTERP);
+
+        SET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        SET_ATTR_to_call_object(INTERP, SELF, Parrot_pcc_get_signature(INTERP, to_ctx));
+        SET_ATTR_from_ctx(INTERP, SELF, CURRENT_CONTEXT(INTERP));
+        SET_ATTR_runloop_id(INTERP, SELF, 0);
+        SET_ATTR_seg(INTERP, SELF, INTERP->code);
+        SET_ATTR_address(INTERP, SELF, NULL);
+
+        PObj_custom_mark_SET(SELF);
     }
+
+
+/*
+
+=item C<void init_pmc(PMC *continuation)>
+
+Initializes the continuation with values from the provided continuation.
+
+=cut
+
+*/
+
+
+    /* if they pass in a PMC to initialize with */
+    VTABLE void init_pmc(PMC *values) {
+        PMC               *to_ctx;
+        opcode_t          *address;
+        PackFile_ByteCode *seg;
+
+        GET_ATTR_to_ctx(INTERP, values, to_ctx);
+        SET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        SET_ATTR_to_call_object(INTERP, SELF, Parrot_pcc_get_signature(INTERP, to_ctx));
+
+        SET_ATTR_from_ctx(INTERP, SELF, CURRENT_CONTEXT(INTERP));
+        SET_ATTR_runloop_id(INTERP, SELF, 0);
+
+        GET_ATTR_seg(INTERP, values, seg);
+        SET_ATTR_seg(INTERP, SELF, seg);
+
+        GET_ATTR_address(INTERP, values, address);
+        SET_ATTR_address(INTERP, SELF, address);
+
+        PObj_custom_mark_SET(SELF);
+    }
+
 
 /*
 
@@ -82,46 +127,23 @@ Marks the continuation as live.
 */
 
     VTABLE void mark() {
-        Parrot_cont *cc = PMC_cont(SELF);
+        PMC *tmp;
 
-        if (cc->to_ctx)
-            mark_context(INTERP, cc->to_ctx);
+        /* If Continuation wasn't fully constructed yet */
+        if (!PMC_data(SELF))
+            return;
 
-        if (cc->dynamic_state)
-            mark_stack(INTERP, cc->dynamic_state);
+        GET_ATTR_to_ctx(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_to_call_object(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_from_ctx(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
     }
 
-/*
 
-=item C<void destroy()>
-
-Destroys the continuation.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_cont * const cc = PMC_cont(SELF);
-        if (cc) {
-#if CTX_LEAK_DEBUG
-            if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
-                fprintf(stderr,
-                        "[destroy cont    %p, to_ctx %p, from_ctx %p]\n",
-                        (void *)SELF, (void *)cc->to_ctx, (void *)cc->from_ctx);
-            }
-
-#endif
-            if (cc->dynamic_state)
-                cc->dynamic_state->refcount--;
-
-            if (cc->from_ctx)
-                Parrot_free_context(interp, cc->from_ctx, 0);
-
-            mem_sys_free(cc);
-            PMC_struct_val(SELF) = NULL;
-        }
-    }
 /*
 
 =item C<PMC *clone()>
@@ -133,66 +155,41 @@ Creates and returns a clone of the continuation.
 */
 
     VTABLE PMC *clone() {
-        Parrot_cont * const cc_self = PMC_cont(SELF);
-        Parrot_cont * const cc      = new_continuation(INTERP, cc_self);
-        PMC         * const ret     = pmc_new_noinit(INTERP, enum_class_Continuation);
-
-        PObj_custom_mark_destroy_SETALL(ret);
-        cc->runloop_id       = cc_self->runloop_id;
-        cc->dynamic_state    = cc_self->dynamic_state;
-        PMC_struct_val(ret)  = cc;
-        PMC_pmc_val(ret)     = PMC_pmc_val(SELF);
-
-        cc->dynamic_state->refcount++;
-
-        return ret;
+        /* Start to prepare for subclassable continuations */
+        return Parrot_pmc_new_init(INTERP, SELF->vtable->base_type, SELF);
     }
+
 
 /*
 
 =item C<PMC *set_pmc()>
 
-Assign context.
+Assigns context.
 
 =cut
 
 */
     VTABLE void set_pmc(PMC *src) {
-        Parrot_cont * const cc_self = PMC_cont(SELF);
-        Parrot_cont * const cc_src  = PMC_cont(src);
-
-        STRUCT_COPY(cc_self, cc_src);
-        PMC_pmc_val(SELF) = PMC_pmc_val(src);
+        STRUCT_COPY(PMC_data_typed(SELF, Parrot_Continuation_attributes *),
+                    PMC_data_typed(src,  Parrot_Continuation_attributes *));
     }
+
 /*
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the return instruction.  Also captures the current
-dynamic state, and the descriptor address for any returned values.
+Sets the pointer to the given return instruction and captures the runloop id
+for any returned values.
 
 =cut
 
 */
 
     VTABLE void set_pointer(void *value) {
-        opcode_t    * const pos = (opcode_t *)value;
-        Parrot_cont * const cc  = PMC_cont(SELF);
-
-        if (cc->dynamic_state)
-            cc->dynamic_state->refcount--;
-
-        cc->address       = (opcode_t *)value;
-        cc->dynamic_state = INTERP->dynamic_env;
-        cc->runloop_id    = INTERP->current_runloop_id;
-
-        cc->dynamic_state->refcount++;
-
-        if (pos && (*pos == PARROT_OP_get_results_pc))
-            cc->current_results = pos;
-        else
-            cc->current_results = NULL;
+        SET_ATTR_address(INTERP, SELF, (opcode_t *)value);
+        SET_ATTR_runloop_id(INTERP, SELF, INTERP->current_runloop_id);
     }
+
 
 /*
 
@@ -205,8 +202,13 @@ Returns the pointer to the return instruction.
 */
 
     VTABLE void *get_pointer() {
-        return PMC_cont(SELF)->address;
+        opcode_t          *address;
+
+        GET_ATTR_address(INTERP, SELF, address);
+        return address;
     }
+
+
 /*
 
 =item C<INTVAL defined()>
@@ -220,18 +222,26 @@ Returns whether the subroutine is defined.
 */
 
     VTABLE INTVAL defined() {
-        return PMC_cont(SELF)->address != NULL;
+        opcode_t          *address;
+
+        GET_ATTR_address(INTERP, SELF, address);
+        return address != NULL;
     }
 
+
     VTABLE INTVAL get_bool() {
-        return PMC_cont(SELF)->address != NULL;
+        opcode_t          *address;
+
+        GET_ATTR_address(INTERP, SELF, address);
+        return address != NULL;
     }
+
 
 /*
 
 =item C<opcode_t *invoke(void *next)>
 
-Restores the "context" of the interpreter and returns the branch
+Restores the context of the interpreter and returns the branch
 destination to continue execution.
 
 =cut
@@ -239,94 +249,112 @@ destination to continue execution.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_cont      *cc           = PMC_cont(SELF);
-        Stack_Chunk_t    *stack_target = cc->dynamic_state;
-        parrot_context_t *from_ctx     = CONTEXT(interp);
-        parrot_context_t *to_ctx       = cc->to_ctx;
-        opcode_t         *pc           = cc->address;
+        PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
+        PMC               *to_ctx, *call_obj;
+        opcode_t          *pc;
+        PackFile_ByteCode *seg;
+        UNUSED(next)
 
-        Parrot_continuation_runloop_check(interp, SELF, cc);
-        Parrot_continuation_check(interp, SELF, cc);
-        Parrot_continuation_rewind_environment(interp, SELF, cc);
+        GET_ATTR_seg(INTERP, SELF, seg);
+        GET_ATTR_address(INTERP, SELF, pc);
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        GET_ATTR_to_call_object(INTERP, SELF, call_obj);
 
-        /* pass args to where caller wants result */
-        if (cc->current_results)
-            to_ctx->current_results = cc->current_results;
+        Parrot_continuation_check(INTERP, SELF);
+        Parrot_continuation_rewind_environment(INTERP, SELF);
 
-        if (to_ctx->current_results && INTERP->current_args) {
-            /*
-             * the register pointer is already switched back
-             * to the caller, therefore the registers of the
-             * sub we are returning from aren't marked, if
-             * inside argument passing a DOD run is triggered
-             * therefore we have to block DOD
-             */
-            opcode_t *src_indexes  = interp->current_args;
-            opcode_t *dest_indexes = to_ctx->current_results;
-            interp->current_args   = NULL;
-
-            Parrot_block_GC_mark(INTERP);
-            parrot_pass_args(INTERP, from_ctx, to_ctx,
-                             src_indexes, dest_indexes, PARROT_PASS_PARAMS);
-            Parrot_unblock_GC_mark(INTERP);
-        }
+        if (!PMC_IS_NULL(from_obj))
+            Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);
 
         /* switch segment */
-        INTERP->current_args = NULL;
-
-        if (INTERP->code != cc->seg)
-            Parrot_switch_to_cs(INTERP, cc->seg, 1);
+        if (INTERP->code != seg)
+            Parrot_switch_to_cs(INTERP, seg, 1);
 
         return pc;
     }
+
 
 /*
 
 =item C<STRING *get_string()>
 
-Experimental: return caller info as a STRING.
+Experimental: returns caller info as a STRING.
 
 =cut
 
 */
 
     VTABLE STRING *get_string() {
-        return Parrot_Context_infostr(INTERP, PMC_cont(SELF)->to_ctx);
+        PMC *to_ctx;
+
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        return Parrot_Context_infostr(INTERP, to_ctx);
+    }
+
+
+/*
+
+=item C<INTVAL rid()>
+
+Experimental: return the runloop_id value.
+
+=cut
+
+*/
+
+    METHOD rid() {
+        INTVAL runloop_id;
+        GET_ATTR_runloop_id(INTERP, SELF, runloop_id);
+        RETURN(INTVAL runloop_id);
     }
 
 /*
 
 =item C<PMC *caller()>
 
-Experimental: return caller PMC or PMCNULL if none.
+Experimental: return callers PMC or PMCNULL if none.
 
 =cut
 
 */
 
     METHOD caller() {
-        Parrot_cont *cc     = PMC_cont(SELF);
-        PMC         *caller = cc->to_ctx->current_sub;
+        PMC *to_ctx, *caller;
 
-        if (!caller || !PMC_sub(caller)->seg)
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+
+        caller = Parrot_pcc_get_sub(INTERP, to_ctx);
+
+        if (!caller)
             caller = PMCNULL;
+        else {
+            Parrot_Sub_attributes *sub;
+            PMC_get_sub(INTERP, caller, sub);
+            if (!sub->seg)
+                caller = PMCNULL;
+        }
 
         RETURN(PMC *caller);
 
     }
+
+
 /*
 
 =item C<PMC *continuation()>
 
-Experimental: return continuation PMC of this Continuation or PMCNULL if none.
+Experimental: returns continuation PMC of this Continuation or PMCNULL if none.
 
 =cut
 
 */
 
     METHOD continuation() {
-        Parrot_cont *cc   = PMC_cont(SELF);
-        PMC         *cont = cc->to_ctx->current_cont;
+        PMC *to_ctx, *cont;
+
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+
+        cont = Parrot_pcc_get_continuation(INTERP, to_ctx);
 
         if (cont)
             RETURN(PMC *cont);
@@ -338,10 +366,6 @@ Experimental: return continuation PMC of this Continuation or PMCNULL if none.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial revision by sean 2002/08/04.
 
 =cut
 

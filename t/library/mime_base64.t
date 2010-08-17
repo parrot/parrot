@@ -1,5 +1,6 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -16,15 +17,13 @@ Test cases taken from base64.t of MIME::Base64.
 
 =cut
 
-.include "library/dumper.pir"
-
 .sub test :main
-
-    load_bytecode 'Test/More.pir'
-    load_bytecode 'MIME/Base64.pir'
+    load_bytecode "dumper.pbc"
+    load_bytecode 'Test/More.pbc'
+    load_bytecode 'MIME/Base64.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'compilers/json/JSON.pbc'
+    load_language 'data_json'
 
     .local pmc plan, is, ok
     plan = get_hll_global [ 'Test'; 'More' ], 'plan'
@@ -33,11 +32,11 @@ Test cases taken from base64.t of MIME::Base64.
 
     plan(550)
 
-    .local pmc JSON
-    JSON = compreg "JSON"
+    .local pmc json
+    json = compreg 'data_json'
 
     .local pmc encode_decode_tests, decode_tests
-    encode_decode_tests = JSON( <<'END_JSON' )
+    encode_decode_tests = json.'compile'( <<'END_JSON' )
 [ ["Hello, World!\n","SGVsbG8sIFdvcmxkIQo="],
   ["\u0000","AA=="],
   ["\u0001","AQ=="],
@@ -311,7 +310,7 @@ Test cases taken from base64.t of MIME::Base64.
 ]
 END_JSON
 
-    decode_tests = JSON( <<'END_JSON' )
+    decode_tests = json.'compile'( <<'END_JSON' )
 [ ["YWE=","aa"],
   [" YWE=","aa"],
   ["Y WE=","aa"],
@@ -334,7 +333,8 @@ END_JSON
     .local pmc test_iterator, test_case
     .local string plain, base64, comment, comment_cnt
 
-    test_iterator = new 'Iterator', encode_decode_tests
+    encode_decode_tests = encode_decode_tests()
+    test_iterator = iter encode_decode_tests
     enc_dec_loop:
         unless test_iterator goto enc_dec_loop_end
         test_case   = shift test_iterator
@@ -352,7 +352,8 @@ END_JSON
     goto enc_dec_loop
     enc_dec_loop_end:
 
-    test_iterator = new 'Iterator', decode_tests
+    decode_tests = decode_tests()
+    test_iterator = iter decode_tests
     dec_loop:
         unless test_iterator goto dec_loop_end
         test_case   = shift test_iterator

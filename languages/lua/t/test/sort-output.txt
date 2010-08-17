@@ -1,8 +1,0 @@
-original
-	Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec
-after quicksort
-	Apr,Aug,Dec,Feb,Jan,Jul,Jun,Mar,May,Nov,Oct,Sep
-after reverse selection sort
-	Sep,Oct,Nov,May,Mar,Jun,Jul,Jan,Feb,Dec,Aug,Apr
-after quicksort again
-	Apr,Aug,Dec,Feb,Jan,Jul,Jun,Mar,May,Nov,Oct,Sep

@@ -28,7 +28,7 @@ These are all of the built-in classes that are directly callable, or
     Eval
   Continuation
     RetContinuation
-    Exception_Handler
+    ExceptionHandler
 
 By "invokable" we mean that they can be supplied as the first argument to the
 C<invoke>, C<invokecc>, or C<tailcall> instructions.  Generally speaking,
@@ -68,14 +68,20 @@ Subs are created by IMCC (the PIR compiler) via the B<.sub> directive.  Unless
 the C<:anon> pragma is included, they are stored in the constant table
 associated with the bytecode and can be fetched with the B<get_hll_global> and
 B<get_root_global> opcodes.  Within the PIR source, they can also be put in
-registers with a C<.const .Sub> declaration:
+registers with a C<.const 'Sub'> declaration:
 
-    .const .Sub rsub = 'random_sub'
+=begin PIR_FRAGMENT
+
+    .const 'Sub' rsub = 'random_sub'
+
+=end PIR_FRAGMENT
 
 This uses C<find_sub_not_null> under the hood to look up the sub named
 "random_sub".
 
 Here's an example of fetching a sub from another namespace:
+
+=begin PIR
 
     .sub main :main
 	get_hll_global $P0, ['Other'; 'Namespace'], "the_sub"
@@ -89,6 +95,8 @@ Here's an example of fetching a sub from another namespace:
 	print "in sub\n"
     .end
 
+=end PIR
+
 Note that C<the_sub> could be defined in a different bytecode or PIR source
 file from C<main>.
 
@@ -97,7 +105,13 @@ file from C<main>.
 One subroutine in the first executed source or bytecode file may be flagged as
 the "main" subroutine, where execution starts.
 
+=begin PIR
+
   .sub the_main_event :main
+     # ...
+  .end
+
+=end PIR
 
 In the absence of a B<:main> entry Parrot starts execution at the first
 statement.  Any C<:main> directives in a subsequent PIR or bytecode file that
@@ -114,6 +128,8 @@ B<load_bytecode> opcode returns.
 
 e.g.
 
+=begin PIR
+
   .sub main :main
      print "in main\n"
      load_bytecode "library_code.pir"
@@ -126,13 +142,15 @@ e.g.
      print "initializing library\n"
   .end
 
+=end PIR
+
 If a subroutine is marked as B<:init> this subroutine is run before the
 B<:main> or the first subroutine in the source file runs.  Unlike B<:main>
 subs, B<:init> subs are also run when compiling from memory.  B<:load> subs
 are run only in any source or bytecode files loaded subsequently.
 
 These markers are called "pragmas", and are defined fully in
-L<docs/pdds/draft/pdd19_pir.pod>.  The following table summarizes the behavior
+L<docs/pdds/pdd19_pir.pod>.  The following table summarizes the behavior
 of the five pragmas that cause Parrot to run a sub implicitly:
 
                 ------ Executed when --------
@@ -149,13 +167,99 @@ The same load-time behavior applies regardless of whether the loaded file is
 PIR source or bytecode.  Note that it is possible to mark a sub with both
 B<:load> and B<:init>.
 
+=head2 Defining subs
+
+A sub is defined by a block of code starting with C<.sub> and ending with
+C<.end>. Parameters which the sub can be called with are defined by C<.param>:
+
+=begin PIR
+
+    .sub do_something
+      .param pmc a_pmc
+      .param string some_string
+      #do something
+    .end
+
+=end PIR
+
+The set of C<.param> instructions are converted to a single C<get_params>
+instruction. The compiler will decide which registers to use.
+
+=begin PIR_FRAGMENT
+    
+    get_params '(0,0)', $P0, $S0
+
+=end PIR_FRAGMENT
+
+A parameter can be declared optional with the C<:optional> command. If an
+optional parameter is followed by parameter declared C<:opt_flag>, this
+parameter will store an integer indicating whether the optional parameter
+was used.
+
+=begin PIR_FRAGMENT
+
+    .param string maybe :optional
+    .param int has_maybe :opt_flag
+    unless has_maybe goto no_maybe
+    #do something with maybe
+    no_maybe:
+    #don't use maybe
+
+=end PIR_FRAGMENT
+
+A sub can accept an arbitrary number of parameters by declaring a C<:slurpy>
+parameter.  This creates a pmc containing an array of all parameters passed to
+the sub, these can be accessed like so:
+
+=begin PIR_FRAGMENT
+
+    .param pmc all_params :slurpy
+
+    $P0 = all_params[0]
+    $S0 = all_params[1]
+
+=end PIR_FRAGMENT
+
+A slurpy parameter can also be defined after a set of positional parameters, in
+which case it will only hold any additional parameters passed.
+
+A parameter may also be declared C<:named>, giving them a string which can be
+used when calling the sub to explicitly assign a parameter, ignoring position.
+
+=begin PIR_FRAGMENT
+
+    .param int counter :named("counter")
+
+=end PIR_FRAGMENT
+
+This can be combined with C<:optional> as well as C<:opt_flag>, so that the
+parameter need only be passed when necessary.
+
+If a parameter is declared with C<:slurpy> and C<:named> (with no string), it
+creates an associative array containing all named parameters which can be
+accessed like so:
+
+=begin PIR_FRAGMENT
+
+    .param pmc all_params :slurpy :named
+    $S0 = all_params['name']
+    $I0 = all_params['counter']
+
+=end PIR_FRAGMENT
+
 =head2 Calling the sub
 
 PIR sub invocation syntax is similar to HLL syntax:
 
+=begin PIR_FRAGMENT
+
     $P0 = do_something($P1, $S3)
 
+=end PIR_FRAGMENT
+
 This is syntactic sugar for the following four bytecode instructions:
+
+=begin PIR_FRAGMENT
 
     # Establish arguments.
     set_args '(0,0)', $P1, $S3
@@ -165,6 +269,8 @@ This is syntactic sugar for the following four bytecode instructions:
     get_results '(0)', $P0
     # Call the sub in $P8, implicitly creating a return continuation.
     invokecc $P8
+
+=end PIR_FRAGMENT
 
 The sub name could be replaced with a PMC register, in which case the
 C<find_sub_not_null> instruction would not be needed.  If the return values
@@ -179,59 +285,134 @@ For example, the '(0,0)' for C<set_args> is replaced internally with C<[2,
 values get the same register type coercion as sub parameters.  This is all
 described in much more detail in L<docs/pdds/pdd03_calling_conventions.pod>.
 
+Named parameters can be explicity called in one of two ways:
+
+=begin PIR_FRAGMENT
+
+    $P5 = do_something($I6 :named("counter"), $S4 :named("name"))
+    #or equivalently
+    $P5 = do_something("counter" => $I6, "name" => $S4)
+
+=end PIR_FRAGMENT
+
 To receive multiple values, put the register names in parentheses:
 
+=begin PIR_FRAGMENT
+
     ($P10, $P11) = do_something($P1, $S3)
+
+    ($P10, $P11) = do_something($P1, $S3)
+
+=end PIR_FRAGMENT
 
 To test whether a value was returned, declare it C<:optional>, and follow it
 with an integer register declared C<:opt_val>:
 
+=begin PIR_FRAGMENT_INVALID
+
     ($P10 :optional, $I10 :opt_val) = do_something($P1, $S3)
 
-Both of these affect only the signature provided via C<get_results>.
+=end PIR_FRAGMENT_INVALID
 
-[should also describe :flat, :slurpy, :named, ..., or at least provide a
-reference.  -- rgr, 25-May-08.]
+A C<:slurpy> value can be declared, as in parameter declarations, to catch an
+arbitrary number of return values:
+
+=begin PIR_FRAGMENT
+
+    ($P12, $P13 :slurpy) = do_something($P1, $S3)
+
+=end PIR_FRAGMENT
+
+Note that the parameters stored in a C<:slurpy>, or C<:slurpy> C<:named> array
+can be used as parameters for another call using the C<:flat> declaration:
+
+=begin PIR_FRAGMENT
+
+    ($P14, $P15) = do_something($P13 :flat)
+
+=end PIR_FRAGMENT
+
+Subs may also return C<:named> values, which can be explicitly accessed similar
+to parameter declarations:
+
+=begin PIR_FRAGMENT
+
+    ($I11 :named("counter"), $S4 :named("name")) = do_something($P1, $S3)
+
+=end PIR_FRAGMENT
+
+All of these affect only the signature provided via C<get_results>.
+
+[not sure what this is for, leaving it alone for now -aninhumer]
+
+=begin PIR_FRAGMENT
 
     # Call the sub in $P8, with continuation (created earlier) in $P9.
     invoke $P8, $P9
+
+=end PIR_FRAGMENT
 
 =head2 Returning from a sub
 
 PIR supports a convenient syntax for returning any number of values from a sub
 or closure:
 
-    .return ($P0, $I1, $S3)
+=begin PIR
+
+    .sub main 
+      .return ($P0, $I1, $S3)
+    .end
+
+=end PIR
 
 Integer, float, and string constants are also accepted.  This is translated
 to:
 
-    get_results '(0,0,0)', $P0, $I1, $S3
+=begin PIR_FRAGMENT
+
+    set_returns '(0,0,0)', $P0, $I1, $S3
     returncc	# return by calling the current continuation
+
+=end PIR_FRAGMENT
 
 As for C<set_args>, the '(0,0,0)' is actually a placeholder for an integer
 array that describes the register types; it is replaced internally with C<[2,
 0, 1]>, which means "three arguments, of type PMC, integer, and string".
+
+All of the declarations allowed for calls to a sub can also be used with
+return values. (C<:named>, C<:flat>)
 
 Another way to return from a sub is to use tail-calling, which calls a new sub
 with the current continuation, so that the new sub returns directly to the
 caller of the old sub (i.e. without first returning to the old sub).  This
 passes the three values to C<another_sub> via tail-calling:
 
-    .return another_sub($P0, $I1, $S3)
+=begin PIR
+
+    .sub main
+      .tailcall another_sub($P0, $I1, $S3)
+    .end
+
+=end PIR
 
 This is translated into a C<set_args> instruction for the call, but with
 C<tailcall> instead of C<invokecc>:
 
+=begin PIR_FRAGMENT
+
     set_args '(0,0,0)', $P0, $I1, $S3
     $P8 = find_sub_not_null "another_sub"
     tailcall $P8
+
+=end PIR_FRAGMENT
 
 As for calling, the sub name could be replaced with a PMC register, in which
 case the C<find_sub_not_null> instruction would not be needed.
 
 If needed, the current continuation can be extracted and called explicitly as
 follows:
+
+=begin PIR_FRAGMENT
 
     ## This is what defines .INTERPINFO_CURRENT_CONT.
     .include 'interpinfo.pasm'
@@ -243,11 +424,15 @@ follows:
     ## ... or equivalently:
     tailcall exit_cont
 
+=end PIR_FRAGMENT
+
 To return values, use C<set_args> as before.
 
 =head2 All together now
 
 The following complete example illustrates the typical call/return pattern:
+
+=begin PIR
 
     .sub main :main
 	print "in main\n"
@@ -259,6 +444,8 @@ The following complete example illustrates the typical call/return pattern:
 	print "in sub\n"
     .end
 
+=end PIR
+
 Notice that we are not passing or returning values here.
 
 [example of passing values.  this could get pretty elaborate; look for other
@@ -266,6 +453,8 @@ examples first.  -- rgr, 6-Apr-08.]
 
 If a short subroutine is called several times, for instance inside a loop, the
 creation of the return continuation can be done outside the loop:
+
+=begin PIR_INVALID
 
     .sub main :main
 	    ## Initialize the sub and the return cont.
@@ -293,6 +482,8 @@ creation of the return continuation can be done outside the loop:
 	    ## do_something
     .end
 
+=end PIR_INVALID
+
 If the sub returns values, the C<get_results> must be B<after> C<ret_label> in
 order to receive them.
 
@@ -309,7 +500,7 @@ F<t/pmc/sub.t>
 =head1 SEE ALSO
 
 F<docs/pdds/pdd03_calling_conventions.pod>
-F<docs/pdds/draft/pdd19_pir.pod>
+F<docs/pdds/pdd19_pir.pod>
 
 =head1 AUTHOR
 

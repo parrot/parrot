@@ -1,9 +1,9 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-Parrot - running
+Parrot - Running
 
 =head1 VERSION
 
@@ -87,7 +87,7 @@ disc and run. This is mainly needed for tests.
 =item -v, --verbose
 
 One C<-v> shows which files are worked on and prints a summary over register
-usage and optimization stats per I<compilation unit>.  With two C<-v> switches,
+usage and optimization stats per I<subroutine>.  With two C<-v> switches,
 C<parrot> prints a line per individual processing step too.
 
 =item -y, --yydebug
@@ -107,7 +107,7 @@ Optimize
  -O  same
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
- -Ot select fastest runcore (default with -O1 and -O2)
+ -Ot select fastest runcore
  -Oc turns on the optional/experimental tail call optimizations
 
 See F<docs/dev/optimizer.pod> for more information on the optimizer.  Note that
@@ -131,48 +131,23 @@ debugging.  See L<About runcores> for details.
 
 =item -R, --runcore CORE
 
-Select the runcore. The following cores are available:
+Select the runcore. The following cores are available in Parrot, but not all
+may be available on your system:
 
   slow, bounds  bounds checking core (default)
-  fast          fast core (no bounds checking, profiling, or tracing)
-  switch        switch core
-  cgp           computed goto-predereferenced core
-  cgoto         computed goto core
-  jit           JIT core
-  cgp-jit       computed goto-predereferenced core with JIT
-  switch-jit    switch core with JIT
-  exec          exec core (uses JIT at compile time to generate native code)
-  trace         bounds checking core w/ trace info (see 'parrot --help-debug')
   gcdebug       performs a full GC run before every op dispatch (good for
                 debugging GC problems)
+  trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+  profiling     see F<docs/dev/profilling.pod>
 
-=item -b, --bounds-checks, --slow-core
-
-Select the bounds-checking slow core (default).
-
-=item -C, --CGP-core
-
-Select the CGP (CGoto Predereferenced) core (if available).
-
-=item -f, --fast-core
-
-Select the fast (or function) core.
-
-=item -g, --computed-goto-core
-
-Select the CGoto core (if available).
-
-=item -j, --jit-core
-
-Run with the JIT subsystem (if available).
+The C<jit>, C<switch-jit>, and C<cgp-jit> options are currently aliases for the
+C<fast>, C<switch>, and C<cgp> options, respectively.  We do not recommend
+their use in new code; they will continue working for existing code per our
+deprecation policy.
 
 =item -p, --profile
 
 Run with the slow core and print an execution profile.
-
-=item -S, --switched-core
-
-TODO:  This needs to be documented briefly here and also in glossary.pod.
 
 =item -t, --trace
 
@@ -194,6 +169,11 @@ Turn on warnings. See C<parrot --help-debug> for available flag bits.
 Turn on interpreter debug flag. See C<parrot --help-debug> for available flag
 bits.
 
+=item --hash-seed <hexnum>
+
+Sets the hash seed to the provided value. Only useful for debugging
+intermittent failures, and harmful in production.
+
 =item --gc-debug
 
 Turn on GC (Garbage Collection) debugging. This imposes some stress on the GC
@@ -201,9 +181,9 @@ subsystem and can slow down execution considerably.
 
 =item -G, --no-gc
 
-This turns off DOD (Dead Object Detection) and GC. This may be useful to find
-GC related bugs. Don't use this option for longer running programs: as memory
-is no longer recycled, it may quickly become exhausted.
+This turns off GC. This may be useful to find GC related bugs. Don't use this
+option for longer running programs: as memory is no longer recycled, it may
+quickly become exhausted.
 
 =item --leak-test, --destroy-at-end
 
@@ -238,17 +218,6 @@ assumed to know what to do with these.
 
 =head1 Generated files
 
-If JIT debugging is enabled (e.g. via C<--parrot-debug 04>), the
-following additional output files are generated:
-
-  F<file.stabs.s>     stabsfile for the program
-  F<file.o>           object file with debug information
-  F<EVAL_n>           source of C<compile> op number I<n>
-  F<EVAL_n.stabs.s>   stabsfile for this block
-  F<EVAL_n.o>         object file with debug information
-
-See F<docs/jit.pod> for further information.
-
 =head1 About runcores
 
 The runcore (or runloop) tells Parrot how to find the C code that implements
@@ -281,33 +250,6 @@ for more information.
 The trace and profile cores are also based on the "slow" core, doing
 full bounds checking, and also printing runtime information to stderr.
 
-The switched core eschews these tiny op functions in favor of cases in a large
-switch statement:
-
-    switch_runcore( op ):
-        while ( op ):
-            switch *op:
-                case NOP:
-                    ...
-                case STORE:
-                    ...
-                ...
-
-Depending on the C compiler implementation, this may be faster than function
-calling.  On older systems, it may fail to compile altogether.
-
-The computed-goto ("cgoto") runcore avoids the overhead of function
-calls by jumping directly to the address where each opcode's function
-starts.  The computed-goto-prederef ("CGP") core takes this one step
-further by replacing opcode numbers in the bytecode with those opfunc
-addresses.  See "Predereferencing" in F<docs/glossary.pod> for a
-fuller explanation.
-
-Finally, the JIT runcore uses the "slow" core, but also creates and
-jumps to JIT-compiled native code for supported opcodes.  "cgp-jit"
-and "switched-jit" are variations that use the CGP or switched core
-but run JIT code when possible.
-
 =head1 Operation table
 
  Command Line          Action         Output
@@ -329,16 +271,8 @@ but run JIT code when possible.
   ass ... assemble sourcefile
   obj ..  produce native (ELF) object file for the EXEC subsystem
 
-=head1 BUGS
-
-Yes.
-
 =head1 FILES
 
 F<main.c>
-
-=head1 AUTHOR
-
-Leopold Toetsch C<lt@toetsch.at>
 
 =cut

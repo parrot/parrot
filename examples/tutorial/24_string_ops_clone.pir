@@ -1,19 +1,20 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1
 
-This code example illustrates cloning with PMC strings. A simple copy is just
-another way of accessing the same variable, while a true clone creates a deep
-copy.
-
-  Ford
-  Zaphod
-  Zaphod
+This code example illustrates cloning with PMC strings. Simple copying
+operations create two pointers to the same underlying memory structure.
+A C<clone> operation actually creates two separate but identical
+objects in memory. In this example, notice how C<$P1> and C<firstname>
+both reference the same location in memory, but C<$P2> doesn't.
 
 =cut
 
 .sub main :main
     .local pmc firstname
 
-    firstname = new 'String'
+    firstname = new ['String']
     firstname = "Ford"
     say firstname
 

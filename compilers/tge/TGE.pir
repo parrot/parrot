@@ -1,4 +1,5 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -15,11 +16,11 @@ TGE - A tree grammar engine.
     # and elsewhere...
 
     .sub _main :main
-        load_bytecode 'TGE.pir'
+        load_bytecode 'TGE.pbc'
 
         # Compile a grammar from the source grammar file
         .local pmc compiler
-        compiler = new 'TGE::Compiler'
+        compiler = new ['TGE';'Compiler']
 
         .local pmc grammar
         grammar = compiler.'compile'(source)
@@ -80,7 +81,19 @@ applies to a child of the current node (generally inherited attributes).
 
 .namespace [ 'TGE' ]
 
-.sub '__onload' :load
+.sub '__onload_first' :load
+    # use other modules
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Util.pbc'
+.end
+
+.include "compilers/tge/TGE/Parser.pir"
+.include "compilers/tge/TGE/Rule.pir"
+.include "compilers/tge/TGE/Tree.pir"
+.include "compilers/tge/TGE/Grammar.pir"
+.include "compilers/tge/TGE/Compiler.pir"
+
+.sub '__onload_last' :load
     # make sure we execute this sub only once
     $P0 = get_global '$!tge_loaded'
     unless null $P0 goto end
@@ -88,20 +101,11 @@ applies to a child of the current node (generally inherited attributes).
     assign $P0, 1
     set_global '$!tge_loaded', $P0
 
-    # use other modules
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'compilers/tge/TGE/Rule.pbc'
-    load_bytecode 'compilers/tge/TGE/Tree.pbc'
-    load_bytecode 'compilers/tge/TGE/Parser.pbc'
-    load_bytecode 'compilers/tge/TGE/Grammar.pbc'
-    load_bytecode 'compilers/tge/TGE/Compiler.pbc'
-
     # import <die> and <line_number> rules from PGE::Util
-    $P0 = get_class ['TGE::Parser']
-    $P1 = get_hll_global ['PGE::Util'], 'die'
+    $P0 = get_class ['TGE';'Parser']
+    $P1 = get_hll_global ['PGE';'Util'], 'die'
     $P0.'add_method'('die', $P1)
-    $P1 = get_hll_global ['PGE::Util'], 'line_number'
+    $P1 = get_hll_global ['PGE';'Util'], 'line_number'
     $P0.'add_method'('line_number', $P1)
 
   end:
@@ -109,12 +113,45 @@ applies to a child of the current node (generally inherited attributes).
 .end
 
 
+.namespace [ 'PGE';'Match' ]
 
-=head1 AUTHOR
+=over 4
 
-Allison Randal <allison@perl.org>
+=item C<find_key([ key1, key2, ... ])>
+
+Find the first of C<key1>, C<key2>, etc. in the current
+Match object, and return it.  Returns '' if none of
+the specified keys are found.  If no keys are specified,
+then simply return the first key found.
+
+=back
 
 =cut
+
+.sub 'find_key' :method
+    .param pmc keys            :slurpy
+    if null keys goto first_key
+    unless keys goto first_key
+  loop:
+    unless keys goto not_found
+    $S0 = shift keys
+    $I0 = exists self[$S0]
+    unless $I0 goto loop
+    .return ($S0)
+  first_key:
+    $P0 = self.'hash'()
+    $P1 = iter $P0
+    unless $P1 goto not_found
+  next:
+    $S0 = shift $P1
+    $P2 = $P0[$S0]
+    $I0 = isa $P2, 'Capture'
+    unless $I0 goto next
+    .return ($S0)
+  not_found:
+    .return ('')
+.end
+
 
 # Local Variables:
 #   mode: pir

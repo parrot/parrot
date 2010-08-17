@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
 =head1 Title
@@ -10,7 +11,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
 =cut
 
-.namespace [ "PGE::OPTable" ]
+.namespace [ 'PGE';'OPTable' ]
 
 .const int PGE_OPTABLE_EXPECT_TERM   = 0x01
 .const int PGE_OPTABLE_EXPECT_OPER   = 0x02
@@ -51,7 +52,7 @@ PGE::OPTable - PGE operator precedence table and parser
     .return ()
 .end
 
-=item C<syncat(string name, adverbs :slurpy :named)>
+=item C<sctable(string name, adverbs :slurpy :named)>
 
 Adds (or replaces) a syntactic category's defaults.
 
@@ -91,7 +92,7 @@ Adds (or replaces) a syntactic category's defaults.
     key = substr name, $I0
 
     .local pmc sctable, token
-    sctable = get_hll_global ["PGE::OPTable"], "%!sctable"
+    sctable = get_hll_global ['PGE';'OPTable'], '%!sctable'
     $I0 = exists sctable[syncat]
     if $I0 == 0 goto token_hash
     token = sctable[syncat]
@@ -109,12 +110,12 @@ Adds (or replaces) a syntactic category's defaults.
     if $I0 goto end
     tokentable[name] = token
 
-    $P0 = new 'Iterator', args
+    $P0 = iter args
   args_loop:
     unless $P0 goto args_end
-    $P1 = shift $P0
-    $P2 = $P0[$P1]
-    token[$P1] = $P2
+    $S1 = shift $P0
+    $P2 = $P0[$S1]
+    token[$S1] = $P2
     goto args_loop
   args_end:
 
@@ -127,6 +128,15 @@ Adds (or replaces) a syntactic category's defaults.
     if $I1 < $I0 goto with_wb
     token['wb'] = 1
   with_wb:
+
+    ##  handle key scanning
+    unless key goto with_skipkey
+    $I0 = exists token['skipkey']
+    if $I0 goto with_skipkey
+    $P0 = token['parsed']
+    if null $P0 goto with_skipkey
+    token['skipkey'] = 1
+  with_skipkey:
 
     $S0 = token['match']
     if $S0 > '' goto with_match
@@ -145,7 +155,7 @@ Adds (or replaces) a syntactic category's defaults.
     unless $S0 goto with_looser
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
-    substr $S0, -1, 0, '<'
+    $S0 = replace $S0, -1, 0, '<'
     token['precedence'] = $S0
   with_looser:
 
@@ -153,7 +163,7 @@ Adds (or replaces) a syntactic category's defaults.
     unless $S0 goto with_tighter
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
-    substr $S0, -1, 0, '>'
+    $S0 = replace $S0, -1, 0, '>'
     token['precedence'] = $S0
   with_tighter:
 
@@ -229,9 +239,11 @@ Adds (or replaces) a syntactic category's defaults.
     .local pmc ws
     .local string key
     .local pmc token, top, oper
-    .local pmc iter
+    .local pmc it
     .local int tokencat, topcat
     .local int circumnest
+    .local pmc cstack
+    cstack = new 'ResizableIntegerArray'
 
     tokentable = self
     keytable = getattribute self, '%!key'
@@ -314,7 +326,7 @@ Adds (or replaces) a syntactic category's defaults.
     mpos = pos
     $P0 = ws(mob)
     unless $P0 goto token_next_1
-    pos = $P0.to()
+    pos = $P0.'to'()
     goto token_next_1
   token_next_ws:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
@@ -350,22 +362,22 @@ Adds (or replaces) a syntactic category's defaults.
     token = keytable[key]
     $I0 = does token, "array"
     if $I0 goto key_array
-    bsr token_match
+    local_branch cstack, token_match
     if_null oper, key_next
     if oper goto oper_found
     goto key_next
   key_array:
-    iter = new 'Iterator', token
+    it = iter token
   key_array_1:
-    unless iter goto key_next
-    token = shift iter
-    bsr token_match
+    unless it goto key_next
+    token = shift it
+    local_branch cstack, token_match
     if_null oper, key_array_1
     if oper goto oper_found
     goto key_array_1
   key_next:
     if key == '' goto token_nows
-    chopn key, 1
+    key = chopn key, 1
     goto key_loop
   token_nows:
     if pos == wspos goto oper_not_found
@@ -435,7 +447,7 @@ Adds (or replaces) a syntactic category's defaults.
     if $P2 == 'right' goto oper_shift                          # (P/A)
 
   oper_reduce:
-    bsr reduce
+    local_branch cstack, reduce
     goto shift_reduce
 
   oper_close:
@@ -451,7 +463,7 @@ Adds (or replaces) a syntactic category's defaults.
     ##   shift operator onto the operator stack
     push tokenstack, token
     push operstack, oper
-    pos = oper.to()
+    pos = oper.'to'()
     ##   for circumfix ops, increase the circumfix nesting level
     $I0 = isgt tokencat, PGE_OPTABLE_POSTCIRCUMFIX
     circumnest += $I0
@@ -461,7 +473,7 @@ Adds (or replaces) a syntactic category's defaults.
 
   term_shift:
     push termstack, oper
-    pos = oper.to()
+    pos = oper.'to'()
     expect = token['expect']
     expect = shr expect, 8
     goto token_next
@@ -515,11 +527,11 @@ Adds (or replaces) a syntactic category's defaults.
     unless rulename goto reduce_saveterm_1
     ($P0 :optional, $I0 :opt_flag) = action.rulename($P1, 'reduce')
     unless $I0 goto reduce_saveterm_1
-    $P1.'result_object'($P0)
+    $P1.'!make'($P0)
   reduce_saveterm_1:
     push termstack, $P1
   reduce_end:
-    ret
+    local_return cstack
 
   token_match:
     mpos = pos
@@ -545,13 +557,16 @@ Adds (or replaces) a syntactic category's defaults.
     goto token_match_success
   token_match_sub:
     $P0 = token['parsed']
-    $I0 = length key
-    $I0 += pos
     mob['KEY'] = key
-    mpos = $I0
+    mpos = pos
+    $I0 = token['skipkey']
+    unless $I0 goto token_match_sub_1
+    $I0 = length key
+    mpos += $I0
+  token_match_sub_1:
     oper = $P0(mob, 'action'=>action)
     delete mob['KEY']
-    $P0 = oper.from()
+    $P0 = oper.'from'()
     $P0 = pos
   token_match_success:
     $P0 = token["name"]
@@ -559,13 +574,13 @@ Adds (or replaces) a syntactic category's defaults.
     oper['type'] = $P0
     oper['top'] = token
   token_match_end:
-    ret
+    local_return cstack
 
   ## At end, reduce any remaining tokens and return result term
   end:
     $I0 = elements tokenstack
     if $I0 < 1 goto end_1
-    bsr reduce
+    local_branch cstack, reduce
     goto end
   end_1:
     mpos = -1
@@ -581,26 +596,31 @@ Adds (or replaces) a syntactic category's defaults.
     ##   somewhere we encountered an error that caused us to backtrack
     ##   find the "real" ending position here
   end_1a:
-    $I0 = $P0.to()
+    $I0 = $P0.'to'()
     if $I0 <= wspos goto end_1b
     wspos = $I0
     mpos = $I0
   end_1b:
     $P0 = $P0[-1]
     if null $P0 goto end_2
-    $I0 = isa $P0, 'PGE::Match'
+    $I0 = isa $P0, ['PGE';'Match']
     if $I0 goto end_1a
   end_2:
     unless rulename goto end_all
     ($P0 :optional, $I0 :opt_flag) = action.rulename(mob, 'end')
     unless $I0 goto end_all
-    mob.'result_object'($P0)
+    mob.'!make'($P0)
   end_all:
     .return (mob)
 
   err_ternary:
-    print "Ternary error\n"
-    end
+    $S1 = pos
+    $S0 = concat 'Ternary error at offset ', $S1
+    $S0 .= ", found '"
+    $S1 = substr target, pos, 1
+    $S0 .= $S1
+    $S0 .= "'"
+    die $S0
 .end
 
 

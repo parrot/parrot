@@ -1,0 +1,259 @@
+=pod
+
+=head1 Dynamic Opcodes
+
+Z<CHP-12>
+
+The smallest executable component is not the compilation unit or even the
+subroutine, but is actually the I<opcode>. Opcodes in Parrot, like opcodes in
+other machines (both virtual and physical), are individual instructions that
+implement low-level operations in the machine. In the world of
+microprocessors, the word "opcode" typically refers to the numeric identifier
+for each instructions. The human-readable word used in the associated assembly
+language is called the "mnemonic". An assembler, among other tasks, is
+responsible for converting mnemonics into opcodes for execution. In Parrot,
+instead of referring to an instruction by different names depending on what
+form it's in, we just call them all "opcodes".
+
+=head2 Opcodes
+
+Opcodes are the smallest logical execution element in Parrot. An
+individual opcode corresponds, in an abstract kind of way, with a single
+machine code instruction for a particular hardware processor
+architecture. Parrot is a pretty high-level virtual machine, and even though
+its opcodes represent the smallest bits of executable code in Parrot, they
+are hardly small or low-level by themselves. In fact, some Parrot opcodes
+implement some complex operations and algorithms. Other opcodes are more
+traditional, performing basic arithmetic and data manipulating operations.
+
+Parrot comes with about 1,200 opcodes total in a basic install. It also has a
+facility for dynamically loading additional opcode libraries, called
+C<dynops>, as needed.
+
+=head3 Opcode naming
+
+To the PIR and PASM programmers, opcodes appear to be polymorphic. That
+is, some opcodes appear to have multiple allowable argument formats. This is
+just an illusion, however. Parrot opcodes are not polymorphic, although
+certain features enable them to appear that way to the PIR programmer.
+Different argument list formats are detected during parsing and mapped to
+separate, unique opcode names.
+
+During the Parrot build process, opcode definitions called "ops files" are
+translated into C code prior to compilation. This translation process renames
+all ops to use unique names depending on their argument lists. An op "foo"
+that takes two PMCs and returns an integer would be renamed to C<foo_i_p_p>.
+Another op named "foo" that takes one floating point number and returns a
+string would be renamed to C<foo_s_n>. So, when we call the opcode "foo" from
+our PIR program, the PIR compiler will look at the list of arguments and
+call the appropriate opcode to handle it.
+
+=head2 Writing Opcodes
+
+Writing Opcodes, like writing PMCs, is done in a C-like language which is
+later compiled into C code by the X<opcode compiler> opcode compiler. The
+opcode script represents a thin overlay on top of ordinary C code: All
+valid C code is valid opcode script. There are a few neat additions that
+make writing opcodes easier. The C<INTERP> keyword, for instance, contains
+a reference to the current interpreter structure. C<INTERP> is always
+available when writing opcodes, even though it isn't defined anywhere.
+Opcodes are all defined with the C<op> keyword.
+
+Opcodes are written in files with the C<.ops> extension. The core
+operation files are stored in the C<src/ops/> directory.
+
+=head3 Opcode Parameters
+
+Each opcode can take any fixed number of input and output arguments. These
+arguments can be any of the four primary data types--INTVALs, PMCs, NUMBERS
+and STRINGs--but can also be one of several other types of values including
+LABELs, KEYs and INTKEYs.
+
+Each parameter can be an input, an output or both, using the C<in>, C<out>,
+and C<inout> keywords respectively. Here is an example:
+
+  op Foo (out INT, in NUM)
+
+This opcode could be called like this:
+
+  $I0 = Foo $N0     # in PIR syntax
+  Foo I0, N0        # in PASM syntax
+
+When Parrot parses through the file and sees the C<Foo> operation, it
+converts it to the real name C<Foo_i_n>. The real name of an opcode
+is its name followed by an underscore-separated ordered list of
+the parameters to that opcode. This is how Parrot appears to use
+polymorphism: It translates the overloaded opcode common names into
+longer unique names depending on the parameter list of that opcode. Here
+is a list of some of the variants of the C<add> opcode:
+
+  add_i_i      # $I0 += $I1
+  add_n_n      # $N0 += $N1
+  add_p_p      # $P0 += $P1
+  add_i_i_i    # $I0 = $I1 + $I2
+  add_p_p_i    # $P0 = $P1 + $I0
+  add_p_p_n    # $P0 = $P1 + $N0
+
+This isn't a complete list, but you should get the picture. Each different
+combination of parameters translates to a different unique operation, and
+each operation is remarkably simple to implement. In some cases, Parrot
+can even use its multi-method dispatch system to call opcodes which are
+heavily overloaded, or for which there is no exact fit but the parameters
+could be coerced into different types to complete the operation. For
+instance, attempting to add a STRING to a PMC might coerce the string into
+a numerical PMC type first, and then dispatch to the C<add_p_p_n> opcode.
+This is just an example, and the exact mechanisms may change as more opcodes
+are added or old ones are deleted.
+
+Parameters can be one of the following types:
+
+=over 4
+
+=item * INT
+
+A normal integer type, such as one of the I registers
+
+=item * NUM
+
+A floating point number, like is used in the N registers
+
+=item * STR
+
+A string, such as in a S register
+
+=item * PMC
+
+A PMC value, like a P register
+
+=item * KEY
+
+A key value. Something like C<[5 ; "Foo" ; 6 ; "Bar"]>. These are the same
+as indexes that we use in PMC aggregates.
+
+=item * INTKEY
+
+A basic key value that uses only integer values C<[1 ; 2 ; 3 ]>.
+
+=item * LABEL
+
+A label value, which represents a named statement in PIR or PASM code.
+
+=back
+
+In addition to these types, you need to specify the direction that data is
+moving through that parameter:
+
+=over 4
+
+=item * in
+
+The parameter is an input, and should be initialized before calling the op.
+
+=item * out
+
+The parameter is an output
+
+=item * inout
+
+The parameter is an input and an output. It should be initialized before
+calling the op, and its value will change after the op executes.
+
+=item * invar
+
+The parameter is a reference type like a String or PMC, and its internals
+might change in the call.
+
+=back
+
+=head3 Opcode Control Flow
+
+Some opcodes have the ability to alter control flow of the program they
+are in. There are a number of control behaviors that can be implemented,
+such as an unconditional jump in the C<goto> opcode, or a subroutine
+call in the C<call> code, or the conditional behavior implemented by C<if>.
+
+At the end of each opcode you can call a C<goto> operation to jump to the
+next opcode to execute. If no C<goto> is performed, control flow will
+continue like normal to the next operation in the program. In this way,
+opcodes can easily manipulate control flow. Opcode script provides a
+number of keywords to alter control flow:
+
+=over 4
+
+=item * NEXT()
+
+The keyword C<NEXT> contains the address of the next opcode in memory. At the
+end of a normal op you don't need to call C<goto NEXT()> because moving to the
+next opcode in the program is the default behavior of Parrot N<You can do
+this if you really want to, but it really wouldn't help you any>. The C<NEXT>
+keyword is frequently used in places like the C<invoke> opcode to create a
+continuation to the next opcode to return to after the subroutine returns.
+
+=item * ADDRESS()
+
+Jumps execution to the given address.
+
+  ADDRESS(x);
+
+Here, C<x> should be an C<opcode_t *> value of the opcode to jump to.
+
+=item * OFFSET()
+
+Jumps to the address given as an offset from the current address.
+
+  OFFSET(x)
+
+Here, C<x> is an offset in C<size_t> units that represents how far forward
+(positive) or how far backwards (negative) to jump to.
+
+=back
+
+=head2 The Opcode Compiler
+
+As we've seen in our discussions above, ops have a number of transformations
+to go through before they can be become C code and compiled into Parrot.
+The various special variables like C<$1>, C<INTERP> and C<ADDRESS> need to be
+converted to normal variable values. Also, each runcore requires the ops be
+compiled into various formats: The slow and fast cores need the ops to be
+compiled into individual subroutines. The switch core needs all the ops to be
+compiled into a single function using a large C<switch> statement. The
+computed goto cores require the ops be compiled into a large function with a
+large array of label addresses.
+
+Parrot's opcode compiler is a tool that's tasked with taking raw opcode files
+with a C<.ops> extension and converting them into several different formats,
+all of which need to be syntactically correct C code for compilation.
+
+=head2 Dynops
+
+Parrot has about 1200 built-in opcodes. These represent operations which are
+sufficiently simple and fundamental, but at the same time are very common.
+However, these do not represent all the possible operations that some
+programmers are going to want to use. Of course, not all of those 1200 ops
+are unique, many of them are overloaded variants of one another. As an example
+there are about 36 variants of the C<set> opcode, to account for all the
+different types of values you may want to set to all the various kinds of
+registers. The number of unique operations therefore is much smaller then 1200.
+
+This is where I<dynops> come in. Dynops are dynamically-loadable libraries of
+ops that can be written and compiled separately from Parrot and loaded in at
+runtime. dynops, along with dynpmcs and runtime libraries are some of the
+primary ways that Parrot can be extended.
+
+Parrot ships with a small number of example dynops libraries in the file
+L<src/dynoplibs/>. These are small libraries of mostly nonsensical but
+demonstrative opcodes that can be used as an example to follow.
+
+Dynops can be written in a C<.ops> file like the normal built-in ops are.
+The ops file should use C<#include "parrot/extend.h"> in addition to any
+other libraries the ops need. They can be compiled into C using the opcode
+compiler, then compiled into a shared library using a normal C compiler. Once
+compiled, the dynops can be loaded into Parrot using the .loadlib directive.
+
+=cut
+
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

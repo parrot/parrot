@@ -8,12 +8,12 @@ SDL::App - Parrot extension for SDL Applications
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/SDL/App.pir'
+    load_bytecode 'SDL/App.pir'
 
     # create a new SDL::App object
     .local pmc app
 
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
 
     # set the app's arguments
     .local pmc app_args
@@ -62,18 +62,18 @@ The SDL::App object has the following methods:
 
 =cut
 
-.namespace [ 'SDL::App' ]
+.namespace [ 'SDL'; 'App' ]
 
 .sub _initialize :load
 
     .include 'datatypes.pasm'
-    load_bytecode 'library/SDL.pir'
-    load_bytecode 'library/SDL/Surface.pir'
-    load_bytecode 'library/SDL/Constants.pir'
+    load_bytecode 'SDL.pir'
+    load_bytecode 'SDL/Surface.pir'
+    load_bytecode 'SDL/Constants.pir'
 
     .local pmc app_class
 
-    newclass     app_class, 'SDL::App'
+    newclass     app_class, ['SDL'; 'App']
     addattribute app_class, 'height'
     addattribute app_class, 'width'
     addattribute app_class, 'bpp'
@@ -121,7 +121,7 @@ about the interface here.
     .param int flags  :named('flags')
 
     .local pmc SetVideoMode
-    SetVideoMode = find_global 'SDL::NCI', 'SetVideoMode'
+    SetVideoMode = get_hll_global ['SDL'; 'NCI'], 'SetVideoMode'
 
     .local pmc screen
     screen = SetVideoMode( width, height, bpp, flags )
@@ -129,7 +129,7 @@ about the interface here.
     # defined $I0, screen
 
     .local pmc main_surface
-    new main_surface, 'SDL::Surface'
+    new main_surface, ['SDL'; 'Surface']
 
     main_surface.'wrap_surface'( screen )
 
@@ -178,7 +178,7 @@ this.
 
 .sub quit :method
     .local pmc SDL_Quit
-    SDL_Quit = find_global 'SDL::NCI', 'Quit'
+    SDL_Quit = get_hll_global ['SDL'; 'NCI'], 'Quit'
     SDL_Quit()
 .end
 
@@ -242,7 +242,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

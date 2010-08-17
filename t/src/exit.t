@@ -1,14 +1,12 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
-
-plan tests => 1;
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -30,21 +28,21 @@ c_output_is( <<'CODE', <<'OUTPUT', "on_exit - interpreter" );
 #include <parrot/embed.h>
 
 void
-ex1(Parrot_Interp interp, int x, void*p)
+ex1(PARROT_INTERP, int x, void*p)
 {
     printf("ex1\n");
 }
 
 void
-ex2(Parrot_Interp interp, int x, void*p)
+ex2(PARROT_INTERP, int x, void*p)
 {
     printf("ex2\n");
 }
 
 void
-ex3(Parrot_Interp interp, int x, void*p)
+ex3(PARROT_INTERP, int x, void*p)
 {
-    PIO_printf(interp, "ex3\n");
+    Parrot_io_printf(interp, "ex3\n");
 }
 
 int

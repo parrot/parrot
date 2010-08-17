@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,7 +27,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C library has setenv / unsetenv};
+    $data{description} = q{Does your C library have setenv / unsetenv};
     $data{result}      = q{};
     return \%data;
 }
@@ -37,13 +37,13 @@ sub runstep {
 
     my ( $setenv, $unsetenv ) = ( 0, 0 );
 
-    $conf->cc_gen('config/auto/env/test_setenv.in');
+    $conf->cc_gen('config/auto/env/test_setenv_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         $setenv = 1;
     }
     $conf->cc_clean();
-    $conf->cc_gen('config/auto/env/test_unsetenv.in');
+    $conf->cc_gen('config/auto/env/test_unsetenv_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         $unsetenv = 1;
@@ -57,26 +57,25 @@ sub runstep {
 
 sub _evaluate_env {
     my ($self, $conf, $setenv, $unsetenv) = @_;
-    my $verbose = $conf->options->get('verbose');
     $conf->data->set(
         setenv   => $setenv,
         unsetenv => $unsetenv
     );
 
     if ( $setenv && $unsetenv ) {
-        print " (both) " if $verbose;
+        $conf->debug(" (both) ");
         $self->set_result('both');
     }
     elsif ($setenv) {
-        print " (setenv) " if $verbose;
+        $conf->debug(" (setenv) ");
         $self->set_result('setenv');
     }
     elsif ($unsetenv) {
-        print " (unsetenv) " if $verbose;
+        $conf->debug(" (unsetenv) ");
         $self->set_result('unsetenv');
     }
     else {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
     }
 }

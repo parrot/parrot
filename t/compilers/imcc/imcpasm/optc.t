@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 42;
 use Test::More;
 
 # these tests are run with -Oc by TestCompiler and show
@@ -26,7 +26,7 @@ pir_output_is( <<'CODE', <<'OUT', "karl trivial test" );
 
 recurse:
     $I1= i - 1
-    .return  foo($I1)
+    .tailcall  foo($I1)
 .end
 CODE
 0
@@ -56,7 +56,7 @@ pir_output_is( <<'CODE', <<'OUT', "karl spot bug 1" );
     print "\n"
     end
 tc:
-    .return foo(1, 9, i, j,k)
+    .tailcall foo(1, 9, i, j,k)
 .end
 CODE
 i 9 j 1 k 2 l 3
@@ -81,7 +81,7 @@ pir_output_is( <<'CODE', <<'OUT', "karl tailcall 3 args" );
     print "\n"
     end
 tc:
-    .return foo(1, j, i, i)
+    .tailcall foo(1, j, i, i)
 .end
 CODE
 i 2 j 1 k 1
@@ -115,7 +115,7 @@ pir_output_is( <<'CODE', <<'OUT', "cycle no exit 1" );
     print "\n"
     end
 tc:
-    .return foo(1, m,i,j,k,l)
+    .tailcall foo(1, m,i,j,k,l)
 .end
 CODE
 i 5 j 1 k 2 l 3 m 4
@@ -149,7 +149,7 @@ pir_output_is( <<'CODE', <<'OUT', "cycle no exit 2" );
     print "\n"
     end
 tc:
-    .return foo(1, m,l,j,i,k)
+    .tailcall foo(1, m,l,j,i,k)
 .end
 CODE
 i 5 j 4 k 2 l 1 m 3
@@ -183,7 +183,7 @@ pir_output_is( <<'CODE', <<'OUT', "2 unconnected cycles no exit " );
     print "\n"
     end
 tc:
-    .return foo(1, k,m,i,j,l)
+    .tailcall foo(1, k,m,i,j,l)
 .end
 CODE
 i 3 j 5 k 1 l 2 m 4
@@ -217,7 +217,7 @@ pir_output_is( <<'CODE', <<'OUT', "cycle with exit 1" );
     print "\n"
     end
 tc:
-    .return foo(1, j,i,j,i,j)
+    .tailcall foo(1, j,i,j,i,j)
 .end
 CODE
 i 2 j 1 k 2 l 1 m 2
@@ -242,8 +242,8 @@ CODE
 @pcc_sub_call_\d:
   set_args
   set_p_pc (P\d+), foo
-  get_results
   invokecc \2
+  get_results
   noop
   end
 foo:
@@ -253,20 +253,6 @@ foo:
   returncc/
 OUT
 
-pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 1" );
-.sub _main
-    foo(1, 2)
-.end
-.sub foo
-    .param int i
-    .param int j
-    .return foo(I2, I3)
-.end
-CODE
-/ set I\d, I2
-  set I\d, I3/
-OUT
-
 pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 2" );
 .sub _main
     foo(1, 2)
@@ -274,7 +260,7 @@ pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 2" );
 .sub foo
     .param int i
     .param int j
-    .return foo(j, i)
+    .tailcall foo(j, i)
 .end
 CODE
 / set I(\d), I(\d)
@@ -301,28 +287,15 @@ pir_output_is( <<'CODE', <<'OUT', "tailcall 3 args" );
     print "\n"
     end
 tc:
-    .return foo(1, i, k, j)
+    .tailcall foo(1, i, k, j)
 .end
 CODE
 i 1 j 3 k 2
 OUT
 
-sub permute (&@) {
-    my $code = shift;
-    my @idx  = 0 .. $#_;
-    while ( $code->( @_[@idx] ) ) {
-        my $p = $#idx;
-        --$p while $idx[ $p - 1 ] > $idx[$p];
-        my $q = $p or return;
-        push @idx, reverse splice @idx, $p;
-        ++$q while $idx[ $p - 1 ] > $idx[$q];
-        @idx[ $p - 1, $q ] = @idx[ $q, $p - 1 ];
-    }
-}
-
 my @array = ( 'i', 'j', 'k' );
 my @b;
-permute { push @b, "@_" } @array;
+my_permute( sub { push @b, "@_" }, @array );
 my $x;
 my $y;
 foreach $x (@b) {
@@ -347,7 +320,7 @@ foreach $x (@b) {
     print "\\n"
     end
 tc:
-    .return foo(1, $x )
+    .tailcall foo(1, $x )
 .end
 CODE
 $y
@@ -356,7 +329,7 @@ OUT
 undef @b;
 
 @array = ( 'i', 'j', 'k', 'l' );
-permute { push @b, "@_" } @array;
+my_permute( sub { push @b, "@_" }, @array );
 foreach $x (@b) {
     $x =~ tr/ /,/;
     $y = $x;
@@ -382,7 +355,7 @@ foreach $x (@b) {
     print "\\n"
     end
 tc:
-    .return foo(1, $x )
+    .tailcall foo(1, $x )
 .end
 CODE
 $y
@@ -392,7 +365,7 @@ OUT
 undef @b;
 
 @array = ( 'i', 'j' );
-permute { push @b, "@_" } @array;
+my_permute( sub { push @b, "@_" }, @array );
 foreach $x (@b) {
     $x =~ tr/ /,/;
     $y = $x;
@@ -412,17 +385,28 @@ foreach $x (@b) {
     print "\\n"
     end
 tc:
-    .return foo(1, $x )
+    .tailcall foo(1, $x )
 .end
 CODE
 $y
 OUT
 }
 
+sub my_permute {
+    my $code = shift;
+    my @idx  = 0 .. $#_;
+    while ( $code->( @_[@idx] ) ) {
+        my $p = $#idx;
+        --$p while $idx[ $p - 1 ] > $idx[$p];
+        my $q = $p or return;
+        push @idx, reverse splice @idx, $p;
+        ++$q while $idx[ $p - 1 ] > $idx[$q];
+        @idx[ $p - 1, $q ] = @idx[ $q, $p - 1 ];
+    }
+}
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

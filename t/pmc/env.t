@@ -1,14 +1,6 @@
-#! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests => 13;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,234 +16,174 @@ Tests the C<Env> PMC.
 
 =cut
 
-pasm_output_is( <<'CODE', <<OUT, "all Envs are ident" );
-    new P0, 'Env'
-    new P1, 'Env'
-    eq_addr P0, P1, ok
-    print "not the same "
-ok: print "ok\n"
-    end
-CODE
-ok
-OUT
+.sub main :main
+    .include 'test_more.pir'
+    plan(16)
 
-$ENV{"PARROT_TMP"} = "riding a ponie";
-pasm_output_like( <<'CODE', <<OUT, "getenv" );
-    new P0, 'Env'
-    set S0, P0["PARROT_TMP"]
-    print S0
-    end
-CODE
-/riding a ponie/i
-OUT
+    all_envs_are_identical()
+    setenv_getenv()
+    all_envs_are_the_same()
+    gone_delete()
+    iterate()
+    exists_delete()
+    is_interface_done()
+    get_integer()
+    oob_query()
+.end
 
-delete $ENV{"PARROT_TMP"};
-pasm_output_like( <<'CODE', <<OUT, "setenv/getenv" );
-    new P0, 'Env'
-    set P0["PARROT_TMP"], "hello polly"
-    set S0, P0["PARROT_TMP"]
-    print S0
-    end
-CODE
-/hello polly/i
-OUT
-
-pasm_output_is( <<'CODE', <<OUT, "envs are all the same" );
-    new P0, 'Env'
-    set P0["PARROT_TMP"], "hello polly"
-    set S0, P0["PARROT_TMP"]
-    new P1, 'Env'
-    set S1, P1["PARROT_TMP"]
-    eq S0, S1, ok
-    print "not ok\n"
-    end
+.sub all_envs_are_identical
+    $P0 = new ['Env']
+    $P1 = new ['Env']
+    eq_addr $P0, $P1, ok
+    ok(0, "all Envs aren't identical")
+    goto end
 ok:
-    print "ok\n"
-    end
-CODE
-ok
-OUT
+    ok(1, "all Envs are identical")
+end:
+.end
 
-pasm_output_is( <<'CODE', <<OUT, "gone/delete" );
-    new P0, 'Env'
-    set P0["PARROT_TMP"], "hello polly"
-    exists I0, P0["PARROT_TMP"]
-    if I0, ok1
-    print "not "
+.sub setenv_getenv
+    $P0 = new ['Env']
+    set $P0['PARROT_TMP'], 'hello polly'
+    set $S0, $P0['PARROT_TMP']
+    is($S0, 'hello polly', 'getenv and setenv work with string keys')
+    delete $P0['PARROT_TMP']
+
+    $P1 = new ['Key']
+    set $P1, "PARROT_TMP"
+    $P2 = new ['String']
+    set $P2, "Foobar"
+    $P3 = new ['String']
+    set $P0[$P1], $P2
+    set $P3, $P0[$P1]
+    is($P3, "Foobar", "getenv and setenv work with PMC keys")
+    delete $P0['PARROT_TMP']
+
+    set $S0, $P0[""]
+    is($S0, '', 'getenv works with a null key')
+.end
+
+.sub all_envs_are_the_same
+    $P0 = new ['Env']
+    set $P0['PARROT_TMP'], 'hello polly'
+    set $S0, $P0['PARROT_TMP']
+    $P1 = new ['Env']
+    set $S1, $P1['PARROT_TMP']
+    is($S0, $S1, 'all envs are the same')
+    delete $P0['PARROT_TMP']
+.end
+
+.sub gone_delete
+    $P0 = new ['Env']
+    set $P0['PARROT_TMP'], 'hello polly'
+    exists $I0, $P0['PARROT_TMP']
+    if $I0, ok1
+    ok(0, "expected element doesn't exist")
 ok1:
-    print "ok 1\n"
-    delete P0["PARROT_TMP"]
-    set S0, P0["PARROT_TMP"]
-    unless S0, ok2
-    print "not "
+    ok(1, 'expected element exists')
+    delete $P0['PARROT_TMP']
+    set $S0, $P0['PARROT_TMP']
+    unless $S0, ok2
+    ok(0, 'deleted element exists')
 ok2:
-    print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUT
+    ok(1, 'deleted element is deleted')
+.end
 
-pasm_output_is( <<'CODE', <<OUT, "iterate" );
-    new P0, 'Env'
-    set P0["PARROT_1"], "hello"
-    set P0["PARROT_2"], "polly"
-    iter P1, P0
-    set I0, 0
+.sub iterate
+    $P0 = new ['Env']
+    set $P0["PARROT_1"], "hello"
+    set $P0["PARROT_2"], "polly"
+    iter $P1, $P0
+    set $I0, 0
 loop:
-    unless P1, loopend
-    shift S2, P1
-    eq S2, "PARROT_1", gotit
-    eq S2, "PARROT_2", gotit
+    unless $P1, loopend
+    shift $S2, $P1
+    eq $S2, "PARROT_1", gotit
+    eq $S2, "PARROT_2", gotit
     branch notit
 gotit:
-    inc I0
+    inc $I0
 notit:
     branch loop
 loopend:
-    eq I0, 2, isok
-    print "not "
-isok:
-    print "ok\n"
-    end
-CODE
-ok
-OUT
-
-SKIP: {
+    is($I0, 2, 'assigned env vars showed up in the iterator')
+.end
 
     # This will not work on our unsetenv implementation
-    skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
-    pasm_output_is( <<'CODE', <<OUT, "exists/delete" );
-    new P0, 'Env'
-    set P0["PARROT_TMP"], "hello polly"
-    exists I0, P0["PARROT_TMP"]
-    if I0, ok1
-    print "not "
-ok1:
-    print "ok 1\n"
-    delete P0["PARROT_TMP"]
-    exists I0, P0["PARROT_TMP"]
-    unless I0, ok2
-    print "not "
-ok2:
-    print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUT
-}
+    #skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
+.sub exists_delete
 
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
+    .include "iglobals.pasm"
+    .local pmc config_hash, interp
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    $I0 = config_hash["unsetenv"]
 
-.sub main
+    unless $I0 goto no_unsetenv
+
+    $P0 = new ['Env']
+    set $P0['PARROT_TMP'], 'hello polly'
+    exists $I0, $P0['PARROT_TMP']
+    ok( $I0, "set env var stays set")
+    delete $P0["PARROT_TMP"]
+    exists $I0, $P0["PARROT_TMP"]
+    is($I0, 0, "deleted env var stays deleted")
+    goto end
+
+no_unsetenv:
+    skip(1, "no native unsetenv")
+    skip(1, "no native unsetenv")
+end:
+.end
+
+.sub is_interface_done
     .local pmc pmc1
-    pmc1 = new 'Env'
+    pmc1 = new ['Env']
     .local int bool1
 
-    does bool1, pmc1, "hash"
-    print bool1
-    print "\n"
+    does bool1, pmc1, 'hash'
+    ok(bool1, 'does Hash')
 
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    does bool1, pmc1, 'scalar'
+    is(bool1, 0, "doesn't do Scalar")
 
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
+    does bool1, pmc1, 'no_interface'
+    is(bool1, 0, "doesn't do no_interface")
 .end
-CODE
-1
-0
-0
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "get_integer()" );
-.sub main
+.sub get_integer
     .local pmc env
-    .local int num_before, num_after, num_diff
-
-    # add three more keys in env
-    env = new 'Env'
-    num_before = env
-    env["PARROT_TMP_ADD_1"] = "tmp_add_1"
-    env["PARROT_TMP_ADD_2"] = "tmp_add_2"
-    env["PARROT_TMP_ADD_3"] = "tmp_add_3"
-    num_after = env
-    num_diff = num_after - num_before
-    print num_diff
-    print "\n"
-    end
-.end
-CODE
-3
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "get_number()" );
-.sub main
-    .local pmc env
+    .local int int_before, int_after, int_diff
     .local num num_before, num_after, num_diff
 
     # add three more keys in env
-    env = new 'Env'
+    env = new ['Env']
     num_before = env
+    int_before = env
     env["PARROT_TMP_ADD_1"] = "tmp_add_1"
     env["PARROT_TMP_ADD_2"] = "tmp_add_2"
     env["PARROT_TMP_ADD_3"] = "tmp_add_3"
     num_after = env
+    int_after = env
     num_diff = num_after - num_before
-    print num_diff
-    print "\n"
-    end
+    int_diff = int_after - int_before
+    is(int_diff, 3, "get_integer seems sane")
+    is(num_diff, 3, "get_number seems sane")
+
+    #clean up the environment
+    delete env['PARROT_TMP_ADD_1']
+    delete env['PARROT_TMP_ADD_2']
+    delete env['PARROT_TMP_ADD_3']
 .end
-CODE
-3.000000
-OUTPUT
 
-pasm_output_is( <<'CODE', <<OUT, "getenv - null key" );
-    new P0, 'Env'
-    set S0, P0[""]
-    eq S0, "", OK
-    print "not "
-OK: print "ok\n"
-    end
-CODE
-ok
-OUT
-
-# RT#50186
-pir_output_is( <<'CODE', <<OUT, 'out of bounds query should not segfault' );
-.sub main :main
-    new P0, 'Env'
-    set S0, P0[999]
-    eq S0, "", OK
-    print "not "
-OK: print "ok\n"
+.sub oob_query
+    $P0 = new ['Env']
+    set $S0, $P0[999]
+    is($S0, '', 'no segfault')
 .end
-CODE
-ok
-OUT
-
-pasm_output_like( <<'CODE', <<OUT, "setenv/getenv - PMC key" );
-    new P0, 'Env'
-    new P1, 'Key'
-    set P1, "PARROT_TMP"
-    new P2, 'String'
-    set P2, "Foobar"
-    new P3, 'String'
-    set P0[P1], P2
-    set P3, P0[P1]
-    print P3
-    end
-CODE
-/Foobar/i
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

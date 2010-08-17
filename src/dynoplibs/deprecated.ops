@@ -1,0 +1,166 @@
+/*
+ * $Id$
+ * deprecated.ops
+ */
+
+=head1 NAME
+
+deprecated.ops - Deprecated Opcodes
+
+=head1 DESCRIPTION
+
+These operations are slated for complete removal once their deprecation period
+expires but have been moved out of core on another ticket.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<exchange>(inout INT, inout INT)
+
+=item B<exchange>(inout NUM, inout NUM)
+
+=item B<exchange>(inout PMC, inout PMC)
+
+=item B<exchange>(inout STR, inout STR)
+
+Exchange the contents of registers $1 and $2
+
+=cut
+
+op exchange(inout INT, inout INT) :deprecated {
+    const INTVAL temp = $1;
+    $1 = $2;
+    $2 = temp;
+}
+
+op exchange(inout PMC, inout PMC) :deprecated {
+    PMC * const temp = $1;
+    $1 = $2;
+    $2 = temp;
+}
+
+op exchange(inout NUM, inout NUM) :deprecated {
+    FLOATVAL temp = $1;
+    $1 = $2;
+    $2 = temp;
+}
+
+op exchange(inout STR, inout STR) :deprecated {
+    STRING * const temp = $1;
+    $1 = $2;
+    $2 = temp;
+}
+
+=item B<setp_ind>(in INT, invar PMC)
+
+Set the PMC in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op setp_ind(in INT, invar PMC) :deprecated {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC(interp, "Out of bound register access");
+    REG_PMC(interp, $1) = $2;
+}
+
+=item B<setn_ind>(in INT, in NUM)
+
+Set the number in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op setn_ind(in INT, in NUM) :deprecated {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC(interp, "Out of bound register access");
+    REG_NUM(interp, $1) = $2;
+}
+
+=item B<sets_ind>(in INT, in STR)
+
+Set the string in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op sets_ind(in INT, in STR) :deprecated {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC(interp, "Out of bound register access");
+    REG_STR(interp, $1) = $2;
+}
+
+=item B<seti_ind>(in INT, in INT)
+
+Set the int in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op seti_ind(in INT, in INT) :deprecated {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC(interp, "Out of bound register access");
+    REG_INT(interp, $1) = $2;
+}
+
+########################################
+
+=item B<cleari>()
+
+=item B<clearn>()
+
+=item B<clearp>()
+
+=item B<clears>()
+
+Clear all the registers of the type indicated in the name of the operation.
+
+INTVAL ('i') and FLOATVAL ('n') registers clear to zero.
+
+PMC ('p') and STRING ('s') registers clear to NULL.
+
+=cut
+
+inline op cleari() :deprecated {
+    Parrot_clear_i(interp);
+}
+
+inline op clearn() :deprecated {
+    Parrot_clear_n(interp);
+}
+
+inline op clears() :deprecated {
+    Parrot_clear_s(interp);
+}
+
+inline op clearp() :deprecated {
+    Parrot_clear_p(interp);
+}
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010, Parrot Foundation.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

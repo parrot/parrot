@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 15;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
@@ -15,6 +15,7 @@ use IO::CaptureOutput qw | capture |;
 
 my $cwd = cwd();
 my $conf = Parrot::Configure->new;
+$conf->data->set( make => 'make' );
 
 my $nonexistent = 'config/gen/makefiles/foobar';
 eval { $conf->genfile(  $nonexistent => 'CFLAGS', comment_type => '#', ); };
@@ -33,9 +34,9 @@ like(
     ok(
         $conf->genfile(
             $dummy   => 'CFLAGS',
-            makefile => 1,
+            file_type => 'makefile',
         ),
-        "genfile() returned true value with 'makefile' option"
+        "genfile() returned true value with 'file_type' option being set to 'makefile'"
     );
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
@@ -48,7 +49,7 @@ like(
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN qq{Hello world\n};
     close $IN or croak "Unable to close temp file";
-    eval { $conf->genfile(  $dummy => 'CFLAGS', makefile => 1, comment_type => q{<!--}, ); };
+    eval { $conf->genfile(  $dummy => 'CFLAGS', file_type => 'makefile', comment_type => q{<!--}, ); };
     like(
         $@,
         qr/^Unknown comment type/,
@@ -68,7 +69,7 @@ like(
     ok(
         $conf->genfile(
             $dummy       => 'CFLAGS',
-            makefile     => 1,
+            file_type    => 'makefile',
             feature_file => 0,
         ),
         "genfile() returned true value with false value for 'feature_file' option"
@@ -85,13 +86,14 @@ like(
     print $IN q{#perl\nuse strict;\n$something = 'something';\n};
     print $IN <<'END_DUMMY';
 #perl
-if (@miniparrot@) { sprint "Hello world\n"; }
+if (@verbose@) { sprint "Hello world\n"; }
 END_DUMMY
     close $IN or croak "Unable to close temp file";
     my ($stdout, $stderr);
     capture ( sub { eval { $conf->genfile( $dummy => 'CFLAGS', feature_file => 1, ) } },
         \$stdout, \$stderr );
     ok( $stderr, "Error message caught" );
+    like( $stderr, qr/sprint/, "Error message had expected content" );
     ok( $@,     "Bad Perl code caught by genfile()" );
 
     unlink $dummy or croak "Unable to delete file after testing";
@@ -112,7 +114,7 @@ END_DUMMY
         \$stderr
     );
     ok($rv, "genfile() returned true when warning expected" );
-    like( $stderr, qr/value for 'foobar'/, "got expected warning" );
+    like( $stderr, qr/value for '\@foobar\@'/, "got expected warning" );
 
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
@@ -208,6 +210,24 @@ END_DUMMY
             expand_gmake_syntax => 1,
         ),
         "genfile() did transformation of 'make' 'wildcard' as expected"
+    );
+    unlink $dummy or croak "Unable to delete file after testing";
+    chdir $cwd    or croak "Unable to change back to starting directory";
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to change to temporary directory";
+    my $dummy = 'dummy';
+    open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
+    print $IN qq{Hello world\n};
+    close $IN or croak "Unable to close temp file";
+    my $file_type = q{foobar};
+    eval { $conf->genfile(  $dummy => 'CFLAGS', file_type => $file_type ); };
+    like(
+        $@,
+        qr/^Unknown file_type '$file_type'/,
+        "genfile() failed due to unrecognized file type with expected message"
     );
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";

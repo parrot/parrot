@@ -1,0 +1,5 @@
+Language 'Squaak' was created with tools/dev/mk_language_shell.pl, r47087.
+
+    $ parrot setup.pir
+    $ parrot setup.pir test
+

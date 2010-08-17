@@ -4,89 +4,78 @@
 
 # default must be 0
 
-default.pmc		0
+default.pmc    0
 
 # now utility PMCs that don't do MMD
 
-null.pmc		1
-env.pmc			2
-perlenv.pmc		3
-key.pmc			4
-random.pmc		5
-unmanagedstruct.pmc	6
-managedstruct.pmc	7
-delegate.pmc		8
-csub.pmc		9
-compiler.pmc		10
-exception.pmc		11
-version.pmc		12
-vtablecache.pmc		13
-parrotio.pmc		14
-parrotlibrary.pmc	15
-constparrotlibrary.pmc  16
-parrotinterpreter.pmc	17
-parrotthread.pmc	18
-lexpad.pmc		19
-timer.pmc		20
-pointer.pmc		21
+null.pmc    1
+env.pmc    2
+perlenv.pmc    3
+key.pmc    4
+random.pmc    5
+unmanagedstruct.pmc    6
+managedstruct.pmc    7
+csub.pmc    8
+compiler.pmc    9
+exception.pmc    10
+version.pmc    11
+parrotio.pmc    12
+parrotlibrary.pmc    13
+constparrotlibrary.pmc    14
+parrotinterpreter.pmc    15
+parrotthread.pmc    16
+lexpad.pmc    17
+timer.pmc    18
+pointer.pmc    19
 
 # sub and subroutine like pmcs
 
-sub.pmc			22
-closure.pmc		23
-continuation.pmc	24
-retcontinuation.pmc	25
-exception_handler.pmc	26
-coroutine.pmc		27
-eval.pmc		28
-nci.pmc			29
+sub.pmc    20
+continuation.pmc    21
+retcontinuation.pmc    22
+exception_handler.pmc    23
+coroutine.pmc    24
+eval.pmc    25
+nci.pmc    26
 
 # scalars
 
-# abstract scalar.pmc		29
-
 # base types
-float.pmc		30
-integer.pmc		31
-bigint.pmc              32
-complex.pmc             33
-string.pmc		34
+float.pmc    27
+integer.pmc    28
+bigint.pmc    29
+bignum.pmc    30
+complex.pmc    31
+string.pmc    32
 
 # abstract perlscalar.pmc
-perlint.pmc		35
-perlnum.pmc		36
-perlstring.pmc		37
-perlundef.pmc		38
-boolean.pmc		39
+perlint.pmc    33
+perlstring.pmc    34
+perlundef.pmc    35
+boolean.pmc    36
 
-ref.pmc			40
-sharedref.pmc		41
+ref.pmc    37
+sharedref.pmc    38
 
 # arrays XXX this list isn't complete
 
-array.pmc		42
-fixedintegerarray.pmc	43
-intlist.pmc		44
-iterator.pmc		45
-perlarray.pmc		46
-pmcarray.pmc		47
-sarray.pmc		48
-constsarray.pmc 	49
-fixedstringarray.pmc		50
-multiarray.pmc		51
-
+fixedintegerarray.pmc    39
+iterator.pmc    40
+perlarray.pmc    41
+pmcarray.pmc    42
+sarray.pmc    43
+constsarray.pmc    44
+fixedstringarray.pmc    45
 
 # hashes
-hash.pmc		52
-perlhash.pmc		53
-orderedhash.pmc		54
+hash.pmc    46
+perlhash.pmc    47
+orderedhash.pmc    48
 
 # other
 
-tqueue.pmc		55
+parrotclass.pmc    49
+parrotobject.pmc    50
 
-parrotclass.pmc		56
-parrotobject.pmc	57
-
-os.pmc                  58
-file.pmc                59
+oplib.pmc    51
+opcode.pmc    52

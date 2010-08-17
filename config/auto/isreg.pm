@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C library has a working S_ISREG};
+    $data{description} = q{Does your C library have a working S_ISREG};
     $data{result}      = q{};
     return \%data;
 }
@@ -63,7 +63,8 @@ sub _evaluate_isreg {
     my $test;
     $test = (! defined $anyerror) ? 1 : 0;
     $conf->data->set( isreg => $test );
-    print( $test ? " (Yep) " : " (no) " ) if $conf->options->get('verbose');
+    my $test_str = $test ? " (Yep) " : " (no) ";
+    $conf->debug($test_str);
     $self->set_result( $test ? 'yes' : 'no' );
     return 1;
 }

@@ -1,24 +1,43 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
-package Parrot::Pmc2c::Pmc2cMain;
+package Parrot::Pmc2c::Dumper;
+
 use strict;
 use warnings;
+
 use Parrot::Pmc2c::UtilFunctions qw(slurp spew filename);
 use Parrot::Pmc2c::Parser qw(parse_pmc);
 use Carp;
+
+use base 'Exporter';
+@Parrot::Pmc2c::Dumper::EXPORT_OK = 'dump_pmc';
+
+=head1 NAME
+
+Parrot::Pmc2c::Dumper
+
+=head1 DESCRIPTION
+
+Create dump file for PMCs.
+
+=head1 FUNCTIONS
+
+=head2 Public Functions
 
 =head3 C<dump_pmc()>
 
     $return_value = dump_pmc($pmc2cMain);
 
-B<Purpose:>  Create a F<.dump> file for each file listed in pmc2cMain's
-C<arg> key (which can be found in the directories listed in pmc2cMain's C<include> key).
+B<Purpose:>  Creates a F<.dump> file for each file listed in pmc2cMain's C<arg>
+key (which can be found in the directories listed in pmc2cMain's C<include>
+key).
 
 B<Arguments:>
 
 B<Return Values:>  Returns 1 upon success.
 
-B<Comments:>  Called when C<--dump> is specified as the command-line option to F<pmc2c.pl>.
+B<Comments:>  Called when C<--dump> is specified as the command-line option to
+F<pmc2c.pl>.
 
 =cut
 
@@ -32,8 +51,7 @@ sub dump_pmc {
     @files = glob $files[0] if $files[0] eq 'src/pmc/*.pmc';
 
     # make sure that a default.dump will always be created if it doesn't
-    # already exist; do so by adding default.pmc to list of files for dumping
-    unshift @files, './src/pmc/default.pmc' unless -e './src/pmc/default.dump';
+    $pmc2cMain->find_file('default.dump') or unshift @files, 'default.pmc';
 
     # load and parse all pmc files in @files
     for my $filename (@files) {
@@ -53,7 +71,7 @@ sub dump_pmc {
     }
 
     for my $pmc ( values %$pmcs ) {
-        next if $pmc->name =~ /default$/ && $pmc->dump_is_current;
+        next if $pmc->name =~ /default$/ && $pmc->dump_is_current($pmc2cMain->find_file('default.dump'));
 
         gen_parent_lookup_info( $pmc, $pmc2cMain, $pmcs );
         gen_parent_reverse_lookup_info( $pmc, $pmcs, $vtable_dump );

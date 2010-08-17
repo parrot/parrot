@@ -1,26 +1,28 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
-
 use lib qw( . lib ../lib ../../lib );
+
+use Cwd;
+use File::Spec ();
 use Parrot::Distribution;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 =head1 NAME
 
-t/codingstd/check_copyright.t - checks for an appropriate copyright
+t/codingstd/copyright.t - checks for an appropriate copyright
 statement in parrot source files
 
 =head1 SYNOPSIS
 
     # test all files
-    % prove t/codingstd/check_copyright.t
+    % prove t/codingstd/copyright.t
 
     # test specific files
-    % perl t/codingstd/check_copyright.t src/foo.c include/parrot/bar.h
+    % perl t/codingstd/copyright.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
@@ -35,18 +37,22 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my $DIST = Parrot::Distribution->new;
 
-my $skip_files = $DIST->generated_files();
-my @c_files    = $DIST->get_c_language_files();
-my @perl_files = $DIST->get_perl_language_files();
-my @all_files  = ( @c_files, @perl_files );
+my @files = @ARGV ? <@ARGV> : (
+    $DIST->get_c_language_files(),
+    $DIST->get_perl_language_files(),
+    $DIST->get_make_language_files(),
+    $DIST->get_pir_language_files(),
+);
+my (
+    @no_copyright_files,
+    @bad_format_copyright_files,
+    @duplicate_copyright_files,
+);
 
-my @files = @ARGV ? @ARGV : @all_files;
-my ( @no_copyright_files, @outdated_copyright_files );
-
-my @gmtime       = gmtime(time);
-my $current_year = $gmtime[5] + 1900;
-my $copyright_text =
-    "Copyright \\(C\\) (\\d{4}\\-$current_year|$current_year), The Perl Foundation.";
+my $copyright_simple =
+    qr/Copyright \(C\) \d{4}/i;
+my $copyright_parrot =
+    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.\n/;
 
 foreach my $file (@files) {
 
@@ -54,21 +60,32 @@ foreach my $file (@files) {
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
-    next if exists $skip_files->{$path};
-
     my $buf = $DIST->slurp($path);
 
     # does there exist a copyright statement at all?
-    if ( $buf !~ m{Copyright \(C\) \d{4}}m ) {
+    if ( $buf !~ $copyright_simple ) {
         push @no_copyright_files, $path;
         next;
     }
 
     # is the copyright text correct?
-    if ( $buf !~ m{$copyright_text}m ) {
-        push @outdated_copyright_files, $path;
+    # If so, remove it...
+    if ( ! ($buf =~ s/$copyright_parrot//) ) {
+        push @bad_format_copyright_files, $path;
+    }
+    # ... and then see if any other copyright notices exist.
+    elsif ($buf =~ $copyright_simple) {
+        push @duplicate_copyright_files, $path;
     }
 }
+
+my $suggested_version=<<END_SUGGESTION;
+  Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.
+To find the C<start-year>, use a command such as:
+  svn log C<filename> | grep 'lines' | tail -n 1
+To find the C<last-year-modified>, use a command such as:
+  svn log C<filename> | grep 'lines' | head -n 1
+END_SUGGESTION
 
 # run the tests
 ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
@@ -77,23 +94,94 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
         $/ => "No copyright statement found in " . scalar @no_copyright_files . " files:",
     @no_copyright_files,
     "The copyright statement should read something like:",
-    "  Copyright (C) C<start-year>-$current_year, The Perl Foundation.",
-    "To find the C<start-year>, use a command such as:",
-    "  svn log C<filename> | grep 'lines' | tail -n 1"
+    $suggested_version
     );
 
-SKIP:
-{
-    skip( "Waiting for decision as to whether copyright dates are necessary", 1 );
-    ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
+    ok( !scalar(@bad_format_copyright_files), 'Copyright statement in the right format' )
         or diag(
         join
-            $/ => "Outdated copyright statement found in "
-            . scalar @outdated_copyright_files
+            $/ => "Bad format in copyright statement found in "
+            . scalar @bad_format_copyright_files
             . " files:",
-        @outdated_copyright_files,
+        @bad_format_copyright_files,
         "Please update to read something like:",
-        "  Copyright (C) xxxx-$current_year, The Perl Foundation."
+        $suggested_version
+        );
+
+# Certain files contain the string 'Copyright (c)' more than once
+# because they contain heredocs for generated files, correctly cite the
+# copyright information for non-Parrot code, etc.  We shall exclude them
+# from our test for duplicate copyright statements.
+
+my @permitted_duplicate_copyright_files = (
+    {
+        file    => 'examples/c/test_main.c',
+        reason  => 'sample code',
+    },
+    {
+        file    => 'Configure.pl',
+        reason  => 'cite automake copyright statement',
+    },
+    {
+        file    => 'config/gen/opengl.pm',
+        reason  => 'heredoc text for generated file',
+    },
+    {
+        file    => 'lib/Parrot/Configure/Messages.pm',
+        reason  => 'heredoc for print_introduction()',
+    },
+    {
+        file    => 't/tools/dev/searchops/samples.pm',
+        reason  => 'sample code used in testing',
+    },
+    {
+        file    => 'tools/build/vtable_extend.pl',
+        reason  => 'heredoc text for generated file',
+    },
+    {
+        file    => 'tools/dev/create_language.pl',
+        reason  => 'generated files in data section',
+    },
+    {
+        file    => 'examples/pir/quine_ord.pir',
+        reason  => 'quine',
+    },
+    {
+        file    => 'tools/dev/nci_thunk_gen.pir',
+        reason  => 'heredoc text for generated file',
+    },
+    {
+        file    => 'src/main.c',
+        reason  => 'Parrot_version() prints copyright notice ',
+    },
+    {
+        file    => 't/examples/streams.t',
+        reason  => 'heredoc-like text in test',
+    },
+);
+my $cwd = cwd();
+my %permitted_duplicate_copyright_files =
+    map { ( File::Spec->catfile( $cwd, $_->{file} ) ) => 1 }
+        @permitted_duplicate_copyright_files;
+
+my @non_permitted_duplicate_copyright_files =
+    grep { ! $permitted_duplicate_copyright_files{ $_ } }
+        @duplicate_copyright_files;
+
+TODO: {
+    local $TODO = 'duplicate copyrights exist.';
+
+    ok( !scalar(@non_permitted_duplicate_copyright_files),
+        'Duplicate Copyright statements' )
+        or diag(
+        join
+            $/ => "Duplicate copyright statement found in "
+            . scalar @non_permitted_duplicate_copyright_files
+            . " files:",
+        @non_permitted_duplicate_copyright_files,
+        "Please get copyright assigned to Parrot Foundation",
+        "and remove alternate notice; or remove duplicated",
+        "notice for Parrot Foundation."
         );
 }
 

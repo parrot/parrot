@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -12,15 +12,15 @@ use Parrot::Test::Util::Runloop;
 
 =head1 NAME
 
-t/codingstd/cppcomments.t - checks for C++ style comments
+t/codingstd/c_cppcomments.t - checks for C++ style comments
 
 =head1 SYNOPSIS
 
     # test all files
-    % prove t/codingstd/cppcomments.t
+    % prove t/codingstd/c_cppcomments.t
 
     # test specific files
-    % perl t/codingstd/cppcoments.t src/foo.t include/parrot/bar.h
+    % perl t/codingstd/c_cppcoments.t src/foo.t include/parrot/bar.h
 
 =head1 DESCRIPTION
 
@@ -32,9 +32,15 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $DIST = Parrot::Distribution->new();
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
-
+my @files;
+if ( @ARGV ) {
+    @files = <@ARGV>;
+}
+else {
+    my $DIST = Parrot::Distribution->new();
+    @files = $DIST->get_c_language_files();
+    @files = grep { $_->name !~ /.l$/ } @files;
+}
 
 Parrot::Test::Util::Runloop->testloop(
     name        => 'no c++ comments',
@@ -43,14 +49,20 @@ Parrot::Test::Util::Runloop->testloop(
     diag_prefix => 'C++ comments found'
 );
 
+# TT # 414 (https://trac.parrot.org/parrot/ticket/414):
+# In the POD inside a C source code file, a hyperlink such as
+# https://trac.parrot.org will be inaccurately reported as a C++-style
+# comment.
+# Quick fix added
 sub check_cppcomments {
     my $buf = shift;
     $buf =~ s{ (?:
                    (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                  | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
                  | /\* .*? \*/                         # remove C comment
+                 | https?:\/\/                         # TT # 414 quick fix
                )
-            }{}gsx;
+             }{}gsx;
 
     return $buf !~ m{ ( .*? // .* ) }x;
 }

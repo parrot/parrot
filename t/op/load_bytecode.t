@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -21,6 +21,14 @@ t/op/load_bytecode.t - loading bytecode tests
 Tests the C<load_bytecode> operation.
 
 =cut
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on NULL" );
+.sub main :main
+    load_bytecode $S0
+.end
+CODE
+/no file name/
+OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on directory" );
 .sub main :main

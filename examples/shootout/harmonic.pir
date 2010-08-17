@@ -1,10 +1,13 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 NAME
 
 examples/shootout/harmonic.pir - Partial sum of Harmonic series
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/shootout/harmonic.pir -j 10000000
+    % ./parrot examples/shootout/harmonic.pir -R jit 10000000
 
 =head1 DESCRIPTION
 

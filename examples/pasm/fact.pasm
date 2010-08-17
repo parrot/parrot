@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,16 +27,17 @@ of the now missing C<clonei>.
 =cut
 
 main:
+    new P10, 'ResizableIntegerArray'
 	set 	I1,0
 	## P9 is used as a stack for temporaries.
-	new     P9, 'ResizableIntegerArray'
+	new	P9, 'ResizableIntegerArray'
 loop:
 	print	"fact of "
 	print	I1
 	print	" is: "
-    new P0, 'Integer'
+	new P0, 'Integer'
 	set	P0,I1
-	bsr	fact
+	local_branch P10, fact
 	print	P0
 	print	"\n"
 	inc	I1
@@ -52,10 +53,16 @@ fact:
 	push	P9,I2
 	set	I2,P0
 	dec	P0
-	bsr	fact
+	local_branch P10, fact
 	mul	P0,P0,I2
-	pop     I2,P9
-	ret
+	pop	I2,P9
+	local_return P10
 is_one:
 	set	P0,1
-	ret
+	local_return P10
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

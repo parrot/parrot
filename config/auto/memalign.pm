@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,19 +24,13 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C library supports memalign};
+    $data{description} = q{Does your C library support memalign};
     $data{result}      = q{};
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
-
-    if ( $conf->options->get('miniparrot') ) {
-        $conf->data->set( memalign => '' );
-        $self->set_result('skipped');
-        return 1;
-    }
 
     if ( defined $conf->data->get('memalign') ) {
 
@@ -59,7 +53,7 @@ sub runstep {
 
     my $test2 = 0;
 
-    $conf->cc_gen('config/auto/memalign/test_c2.in');
+    $conf->cc_gen('config/auto/memalign/test2_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run_capture() !~ /ok/ ) {
         $test2 = 1;
@@ -101,7 +95,8 @@ sub _set_memalign {
         : $test  ? 'memalign'
         :          '';
     $conf->data->set( memalign => $f );
-    print( $test ? " (Yep:$f) " : " (no) " ) if $conf->options->get('verbose');
+    my $test_str = $test ? " (Yep:$f) " : " (no) ";
+    $conf->debug($test_str);
     $self->set_result( $test ? 'yes' : 'no' );
 }
 

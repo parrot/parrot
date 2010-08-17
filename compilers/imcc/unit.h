@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2008, The Perl Foundation.
+ * Copyright (C) 2003-2010, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_UNIT_H_GUARD
@@ -32,13 +32,13 @@ struct imcc_ostat {
     int used_once;
 } ;
 
-typedef struct _IMC_Unit {
+struct IMC_Unit {
     INTVAL            type;
     Instruction      *instructions;
     Instruction      *last_ins;
     SymHash           hash;
     int               bb_list_size;
-    int               n_basic_blocks;
+    unsigned int      n_basic_blocks;
     Basic_block     **bb_list;
     Set             **dominators;
     int              *idoms;
@@ -48,29 +48,33 @@ typedef struct _IMC_Unit {
     Edge             *edge_list;
 
     /* register allocation */
-    unsigned int     *interference_graph;
     SymReg          **reglist;
-    int               n_symbols;
+    unsigned int      n_symbols;
     int               max_color;
-    struct _IMC_Unit *prev;
-    struct _IMC_Unit *next;
+    IMC_Unit         *prev;
+    IMC_Unit         *next;
 
     SymReg           *_namespace;
+    int               owns_namespace;   /* should this unit free *_namespace */
     int               pasm_file;
     const char       *file;
-    int               n_vars_used[4]; /* INSP in PIR */
-    int               n_regs_used[4]; /* INSP in PBC */
-    int               first_avail[4]; /* INSP */
+    int               n_vars_used[4];   /* INSP in PIR */
+    int               n_regs_used[4];   /* INSP in PBC */
+    int               first_avail[4];   /* INSP */
     SymReg           *outer;
     PMC              *sub_pmc;          /* this sub */
-    int               is_vtable_method; /* 1 if a v-table method */
-    char             *vtable_name;      /* v-table method name, if any */
-    char             *instance_of;      /* PMC or class this is an instance of
-                                         * if any */
-    SymReg           *lexid;            /* Unique lexical scope id */
+    int               is_vtable_method; /* 1 if a vtable */
+    int               is_method;        /* 1 if a method */
+    int               has_ns_entry_name;/* 1 if in ns */
+    char             *vtable_name;      /* vtable name, if any */
+    char             *method_name;      /* method name, if any */
+    char             *ns_entry_name;    /* ns entry name, if any */
+    char             *instance_of;      /* PMC or class this is an instance of if any */
+    INTVAL            hll_id;           /* HLL ID for this sub */
+    SymReg           *subid;            /* Unique subroutine id */
 
     struct            imcc_ostat ostat;
-} IMC_Unit;
+};
 
 
 /* HEADERIZER BEGIN: compilers/imcc/unit.c */

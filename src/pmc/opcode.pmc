@@ -1,0 +1,124 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/opcode.pmc
+
+=head1 DESCRIPTION
+
+Implements opcode VTABLEs.
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Opcode auto_attrs {
+    ATTR op_info_t *info;
+    ATTR INTVAL op_number;
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "Opcode must be created from OpLib.");
+    }
+
+    VTABLE void set_pointer(void *i) {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->info)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Opcode has already been initialized");
+        attrs->info = (op_info_t *)i;
+    }
+
+    VTABLE INTVAL get_integer() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (!attrs->info)
+            return -1;
+        return attrs->op_number;
+    }
+
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->info)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Opcode has already been initialized");
+        attrs->op_number = value;
+    }
+
+    VTABLE STRING* get_string() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const char * const name                = attrs->info->full_name;
+        const INTVAL len                       = strlen(name);
+        return Parrot_str_new(INTERP, name, len);
+    }
+
+    VTABLE INTVAL elements() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (!attrs->info)
+            return -1;
+        return attrs->info->op_count - 1;
+    }
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL i) {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        return i < attrs->info->op_count - 1
+               ? (INTVAL)attrs->info->types[i]
+               : -1;
+    }
+
+    METHOD family_name() {
+        const char * const name = PARROT_OPCODE(SELF)->info->name;
+        const INTVAL len = strlen(name);
+        STRING * result = Parrot_str_new(INTERP, name, len);
+        RETURN(STRING *result);
+    }
+
+    METHOD jump() {
+        const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        const INTVAL jump = info->jump;
+        RETURN(INTVAL jump);
+    }
+
+    METHOD dirs() {
+        const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        PMC *result;
+        INTVAL arg_count = info->op_count - 1;
+        if (arg_count > 0) {
+            INTVAL i;
+            result = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, arg_count);
+            for (i = 0; i < arg_count; ++i)
+                VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->dirs[i]);
+        }
+        else
+            result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        RETURN(PMC *result);
+    }
+
+    METHOD labels() {
+        const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        INTVAL arg_count = info->op_count - 1;
+        if (arg_count > 0) {
+            INTVAL i;
+            VTABLE_set_integer_native(INTERP, result, arg_count);
+            for (i = 0; i < arg_count; ++i)
+                VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->labels[i]);
+        }
+        RETURN(PMC *result);
+    }
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,13 +22,16 @@ use lib 'lib';
 use Getopt::Long;
 use Parrot::Docs::Section::Parrot;
 
-my ( $silent, $delete );
+my ( $silent, $delete, $version );
 
-die unless GetOptions( 'silent' => \$silent, 'delete' => \$delete );
+die unless GetOptions( 'silent'    => \$silent,
+                       'delete'    => \$delete,
+                       'version=s' => \$version,
+                     );
 
 my $docs = Parrot::Docs::Section::Parrot->new;
 
-$docs->write_docs( $silent, $delete );
+$docs->write_docs( $silent, $delete, $version );
 
 exit 0;
 

@@ -1,3 +1,6 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Pod Documentation
 
 As you may have noticed, PIR files can contain Pod documentation.

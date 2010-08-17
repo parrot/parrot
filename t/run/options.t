@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 26;
+use Test::More tests => 27;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -80,7 +80,7 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     for my $val (qw/ slow fast bounds trace /) {
         for my $opt ( '-R ', '--runcore ', '--runcore=' ) {
             $cmd = qq{"$PARROT" $opt$val "$second_pir_file" $redir};
-            is( qx{$cmd}, "second\n", "<$opt$val> option" );
+            is( qx{$cmd}, "second\n", "<$opt$val> option)" ) or diag $cmd;
         }
     }
 
@@ -88,10 +88,13 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     is( qx{$cmd}, "second\n", "-r option <$cmd>" );
 
     $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
-    like( qx{$cmd}, qr/Parrot VM: Slow core/, "-r option <$cmd>" );
+    like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
 }
 
-## RT#46815 test remaining options
+## TT #1150 test remaining options
+
+# Test --runtime-prefix
+like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 
 # clean up temporary files
 unlink $first_pir_file;
@@ -100,7 +103,7 @@ unlink $second_pir_file;
 sub create_pir_file {
     my $word = shift;
 
-    my ( $fh, $filename ) = tempfile( UNLINK => 0, SUFFIX => '.pir' );
+    my ( $fh, $filename ) = tempfile( UNLINK => 0, SUFFIX => '.pir', UNLINK => 1 );
     print $fh <<"END_PIR";
 
 .macro println(word)

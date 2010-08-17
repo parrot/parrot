@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -32,7 +32,15 @@ Note: These tests would benefit from judicial application of Iterators.
 
 =cut
 
-my $cmd = -d '.svn' ? 'svn' : 'svk';
+BEGIN {
+    unless ( -e 'DEVELOPING' ) {
+        plan skip_all => "Don't bother running these in a tarball.";
+        exit(0);
+    }
+}
+
+
+my $cmd = 'svn';
 my @git_svn_metadata;    # set in BEGIN block
 
 # how many files to check at a time. May have to lower this when we run
@@ -61,7 +69,7 @@ VALID_MIME: {
         image/gif
         image/png
     ];
-    push @expected, 'text/plain; charset=UTF-8'; # used by pugs, primarily
+    push @expected, 'text/plain; charset=UTF-8';
 
     my $expected    = join '|', @expected, "";
     my $expected_re = qr{^(${expected})$};
@@ -89,15 +97,16 @@ TEST_MIME: {
     my $test        = 'svn:mime-type';
     my $expected    = 'text/plain';
     my @failed      = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
+    my $test_name   = "$test for .t files";
 
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
             map { " $cmd ps $test '$expected' $_\n" } @failed;
         $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
-        is( $failure, '', $test );
+        is( $failure, '', $test_name );
     }
     else {
-        pass($test);
+        pass($test_name);
     }
 }    # TEST_MIME
 
@@ -236,7 +245,7 @@ BEGIN {
             plan skip_all => q{git svn file metadata not retained};
         }
     }
-    elsif ( !( (-d '.svn' && `svn info .`) or `svk info .` ) ) {
+    elsif ( ! (-d '.svn' && `svn info .`) ) {
         plan skip_all => 'not a working copy';
     }
     else { plan tests => 5 }
@@ -244,7 +253,7 @@ BEGIN {
 
 #
 # Given a list, a count, and a sub, process that list count elements
-# at a time. (do this to speed up execution for the svn/svk commands)
+# at a time. (do this to speed up execution for the svn commands)
 #
 
 sub at_a_time {
@@ -321,7 +330,7 @@ sub verify_attributes {
     my $results   = shift;    # the results hash ref: file -> value
     my $files     = shift;    # an arrayref of files we care about. (undef->all)
     my $allow_empty = shift;  # should we allow blank values? (default: no)
-   
+
     $allow_empty = 0 unless defined $allow_empty;
 
     my @files;

@@ -1,3 +1,6 @@
+# Copyright (C) 2008-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 shapes.pir - Exercise basic OpenGL 1.1/GLUT 3 APIs by drawing animated shapes
@@ -21,6 +24,7 @@ ASCII key.
 =cut
 
 
+.loadlib 'math_ops'
 .include 'datatypes.pasm'
 .include 'opengl_defines.pasm'
 
@@ -34,7 +38,7 @@ ASCII key.
     mode   |= .GLUT_DEPTH
     mode   |= .GLUT_STENCIL
     window  = new 'Integer'
-    window  = init_glut(argv, mode, 'Test')
+    window  = init_glut(argv, mode, 'Shapes: OpenGL 1.x NCI Test')
     set_global 'glut_window', window
 
     # Init miscellaneous globals
@@ -44,11 +48,11 @@ ASCII key.
     init_particle_effect()
 
     # Set up GLUT callbacks
-    .const .Sub draw       = 'draw'
-    .const .Sub idle       = 'idle'
-    .const .Sub reshape    = 'reshape'
-    .const .Sub keyboard   = 'keyboard'
-    .const .Sub visibility = 'visibility'
+    .const 'Sub' draw       = 'draw'
+    .const 'Sub' idle       = 'idle'
+    .const 'Sub' reshape    = 'reshape'
+    .const 'Sub' keyboard   = 'keyboard'
+    .const 'Sub' visibility = 'visibility'
     glutDisplayFunc   (draw)
     glutIdleFunc      (idle)
     glutReshapeFunc   (reshape)
@@ -65,8 +69,8 @@ ASCII key.
     .param string window_title
 
     # Load OpenGL libary and a helper library for calling glutInit
-    load_bytecode 'library/OpenGL.pbc'
-    load_bytecode 'library/NCI/call_toolkit_init.pbc'
+    load_bytecode 'OpenGL.pbc'
+    load_bytecode 'NCI/Utils.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
     .local pmc import_gl
@@ -78,9 +82,9 @@ ASCII key.
 
     # Initialize GLUT, overwriting argv in place
     .local pmc call_toolkit_init
-    call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
+    call_toolkit_init = get_global ['NCI';'Utils'], 'call_toolkit_init'
 
-    .const .Sub glutInit = 'glutInit'
+    .const 'Sub' glutInit = 'glutInit'
     $P0 = call_toolkit_init(glutInit, argv)
     copy argv, $P0
 
@@ -393,31 +397,26 @@ ASCII key.
     vy = 0.135
     vz = 0.0
 
-    .local pmc random
-    .local num rand
-    random = new 'Random'
-    rand  = random
-    rand *= .1
-    x    += rand
-    rand  = random
-    rand *= .1
-    y    += rand
-    rand  = random
-    rand *= .1
-    z    += rand
+    .local num random
+    random  = rand 0, 0.1
+    x      += random
+    random  = rand 0, 0.1
+    y      += random
+    random  = rand 0, 0.1
+    z      += random
 
-    rand  = random
-    rand -= .5
-    rand *= .01
-    vx   += rand
-    rand  = random
-    rand -= .5
-    rand *= .01
-    vy   += rand
-    rand  = random
-    rand -= .5
-    rand *= .01
-    vz   += rand
+    random  = rand
+    random -= .5
+    random *= .01
+    vx     += random
+    random  = rand
+    random -= .5
+    random *= .01
+    vy     += random
+    random  = rand
+    random -= .5
+    random *= .01
+    vz     += random
 
     .local pmc pos
     pos = new 'FixedFloatArray'
@@ -454,12 +453,9 @@ ASCII key.
     .local int count
     count = pfx_pos
     if count > 1000 goto update_particles
-    .local pmc random
-    .local num rand
-    random = new 'Random'
-    rand   = random
-    rand  *= 4
-    if rand > dt goto update_particles
+    .local num random
+    random = rand 0, 4
+    if random > dt goto update_particles
     new_particle(count, pfx_pos, pfx_vel)
 
     # Update all particles
@@ -751,7 +747,7 @@ ASCII key.
     # say state
 
     if state == .GLUT_NOT_VISIBLE goto hidden
-    .const .Sub idle = 'idle'
+    .const 'Sub' idle = 'idle'
     glutIdleFunc(idle)
     .return ()
 

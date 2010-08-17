@@ -1,9 +1,12 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Math Operations
 
-Many common math operations have simple operator syntax in PIR.
-
-Most operations have two forms: one that takes two arguments and returns the
-result of the operation.
+Many common math operations have simple operator syntax in
+PIR. Operators like C<+>, C<->, C</> and C<*> are all
+implemented in PIR, but so are a few less common ones such
+as C<<< << >>>, C<<< >> >>>, C<|>, C<&>, C<^>  and C<%>.
 
 =cut
 

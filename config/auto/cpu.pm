@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -18,14 +18,13 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Utils qw(copy_if_diff);
 use Carp;
 
 
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating CPU specific stuff};
+    $data{description} = q{Generate CPU specific stuff};
     $data{result}      = q{};
     return \%data;
 }
@@ -33,25 +32,18 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
-
-    my $verbose = $conf->options->get('verbose');
-
     $conf->data->add( ' ', TEMP_atomic_o => '' );    # assure a default
 
     my $hints = "auto::cpu::" . $conf->data->get('cpuarch') . "::auto";
 
-    print "\t(cpu hints = '$hints') " if $verbose;
+    $conf->debug("\t(cpu hints = '$hints') ");
 
     eval "use $hints";
     unless ($@) {
         $hints->runstep( $conf, @_ );
     }
     else {
-        print "(no cpu specific hints)" if $verbose;
+        $conf->debug("(no cpu specific hints)");
     }
 
     return 1;

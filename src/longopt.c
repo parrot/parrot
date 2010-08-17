@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -19,13 +19,13 @@ This is used by C<parrot>.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/longopt.h"
 
 /* HEADERIZER HFILE: include/parrot/longopt.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 static int longopt_get_longopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -37,6 +37,7 @@ static int longopt_get_longopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+PARROT_WARN_UNUSED_RESULT
 static int longopt_get_shortopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -48,6 +49,16 @@ static int longopt_get_shortopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+#define ASSERT_ARGS_longopt_get_longopt __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(options) \
+    , PARROT_ASSERT_ARG(info_buf))
+#define ASSERT_ARGS_longopt_get_shortopt __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(options) \
+    , PARROT_ASSERT_ARG(info_buf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -55,7 +66,59 @@ static char longopt_error_buffer[512];
 
 /*
 
-=item C<int longopt_get>
+=item C<const struct longopt_opt_decl * Parrot_cmd_options(void)>
+
+Set up the const struct declaration for cmd_options
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_CONST_FUNCTION
+const struct longopt_opt_decl *
+Parrot_cmd_options(void)
+{
+    ASSERT_ARGS(Parrot_cmd_options)
+    static const struct longopt_opt_decl cmd_options[] = {
+        { '.', '.', (OPTION_flags)0, { "--wait" } },
+        { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
+        { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
+        { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
+        { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
+        { 'I', 'I', OPTION_required_FLAG, { "--include" } },
+        { 'L', 'L', OPTION_required_FLAG, { "--library" } },
+        { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
+        { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
+        { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { 'V', 'V', (OPTION_flags)0, { "--version" } },
+        { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
+        { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
+                                     { "--leak-test", "--destroy-at-end" } },
+        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
+        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
+        { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
+        { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
+        { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
+        { 'h', 'h', (OPTION_flags)0, { "--help" } },
+        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
+        { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
+        { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
+        { 't', 't', OPTION_optional_FLAG, { "--trace" } },
+        { 'v', 'v', (OPTION_flags)0, { "--verbose" } },
+        { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
+        { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
+        { 0, 0, (OPTION_flags)0, { NULL } }
+    };
+    return cmd_options;
+}
+
+/*
+
+=item C<int longopt_get(PARROT_INTERP, int argc, const char* argv[], const
+struct longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
 Gets long or short options, specified in C<options[]> (see
 F<docs/dev/longopt.dev>).
@@ -72,12 +135,14 @@ Any other value is a valid option identifier.
 
 */
 
-PARROT_API
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int
 longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
             ARGMOD(struct longopt_opt_info* info_buf))
 {
+    ASSERT_ARGS(longopt_get)
     const int dex = info_buf->opt_index;
 
     info_buf->opt_id = 0;
@@ -108,7 +173,9 @@ longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
 
 /*
 
-=item C<static int longopt_get_longopt>
+=item C<static int longopt_get_longopt(PARROT_INTERP, int argc, const char*
+argv[], const struct longopt_opt_decl options[], struct longopt_opt_info*
+info_buf)>
 
 Find the option identifier of a long option.
 
@@ -121,23 +188,25 @@ characters and start with C<-->.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
                     ARGMOD(struct longopt_opt_info* info_buf))
 {
+    ASSERT_ARGS(longopt_get_longopt)
     const int dex = info_buf->opt_index;
     int optlen = 0;
     const struct longopt_opt_decl* dptr;
 
     while (argv[dex][optlen] != '\0' && argv[dex][optlen] != '=') {
-        optlen++;
+        ++optlen;
     }
 
-    for (dptr = options; dptr->opt_id; dptr++) {
+    for (dptr = options; dptr->opt_id; ++dptr) {
         int sptr;
         /* For each listed long option... */
-        for (sptr = 0; dptr->opt_long[sptr]; sptr++) {
+        for (sptr = 0; dptr->opt_long[sptr]; ++sptr) {
             if (strncmp(dptr->opt_long[sptr], argv[dex], optlen) == 0
              && dptr->opt_long[sptr][optlen] == '\0') {
                 /* Found it */
@@ -201,7 +270,9 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
 
 /*
 
-=item C<static int longopt_get_shortopt>
+=item C<static int longopt_get_shortopt(PARROT_INTERP, int argc, const char*
+argv[], const struct longopt_opt_decl options[], struct longopt_opt_info*
+info_buf)>
 
 Find the option identifier of the next short option.
 
@@ -215,11 +286,13 @@ characters long and start with a dash.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                      ARGIN(const struct longopt_opt_decl options[]),
                      ARGMOD(struct longopt_opt_info* info_buf))
 {
+    ASSERT_ARGS(longopt_get_shortopt)
     const int dex = info_buf->opt_index;
     const struct longopt_opt_decl* dptr;
     const char* pos;
@@ -229,7 +302,7 @@ longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
         info_buf->_shortopt_pos = &argv[dex][1];
     pos = info_buf->_shortopt_pos;
 
-    for (dptr = options; dptr->opt_id; dptr++) {
+    for (dptr = options; dptr->opt_id; ++dptr) {
         if (dptr->opt_short == *pos) {
             /* Found it */
             info_buf->opt_id = dptr->opt_id;

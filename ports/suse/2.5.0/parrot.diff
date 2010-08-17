@@ -1,0 +1,35 @@
+--- ./tools/dev/pbc_to_exe.pir.orig	2010-04-19 06:37:28.000000000 +0000
++++ ./tools/dev/pbc_to_exe.pir	2010-04-20 14:25:40.000000000 +0000
+@@ -510,10 +510,11 @@ END_OF_FUNCTION
+     .param int install :optional
+ 
+     $P0 = '_config'()
+-    .local string cc, ccflags, cc_o_out, osname, build_dir, slash
++    .local string cc, ccflags, optimize, cc_o_out, osname, build_dir, slash
+     .local string installed, includepath, versiondir
+     cc        = $P0['cc']
+     ccflags   = $P0['ccflags']
++    optimize  = $P0['optimize']
+     cc_o_out  = $P0['cc_o_out']
+     osname    = $P0['osname']
+     build_dir = $P0['build_dir']
+@@ -547,6 +548,8 @@ END_OF_FUNCTION
+     compile .= pathquote
+     compile .= ' '
+     compile .= ccflags
++    compile .= ' '
++    compile .= optimize
+     compile .= ' -c '
+     compile .= cfile
+ 
+--- ./src/gc/system.c.orig	2010-04-20 14:36:05.000000000 +0000
++++ ./src/gc/system.c	2010-04-20 14:38:24.000000000 +0000
+@@ -197,7 +197,7 @@ trace_system_areas(PARROT_INTERP, ARGIN(
+ 
+ #  endif /* __hpux */
+ 
+-        trace_mem_block(interp, base,
++        trace_mem_block(interp, mem_pools, base,
+                 (size_t)current_regstore_top);
+ 
+ #else /* !__ia64__ */

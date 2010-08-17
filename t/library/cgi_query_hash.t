@@ -1,5 +1,6 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -15,10 +16,9 @@ Test  [ 'CGI'; 'QueryHash' ]
 
 =cut
 
-.include "library/dumper.pir"
-
 .sub test :main
-    .include 'include/test_more.pir'
+    load_bytecode "dumper.pbc"
+    .include 'test_more.pir'
 
     load_bytecode 'CGI/QueryHash.pbc'
 

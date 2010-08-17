@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -19,53 +19,115 @@ Sub PMCs with the same short name, but different long names.
 
 */
 
-#include "parrot/parrot.h"
+#include "pmc/pmc_callcontext.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
-pmclass MultiSub extends ResizablePMCArray need_ext provides array {
+pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides invokable {
 
-    void push_pmc(PMC *value) {
-        STRING * const _sub = CONST_STRING(interp, "Sub");
-        STRING * const _nci = CONST_STRING(interp, "NCI");
-        if (!VTABLE_isa(interp, value, _sub) &&
-            !VTABLE_isa(interp, value, _nci))
-            real_exception(interp, NULL, E_TypeError,
+    VTABLE STRING * get_string() {
+        PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
+        STRING * const name = VTABLE_get_string(INTERP, sub0);
+        return name;
+    }
+
+    VTABLE void push_pmc(PMC *value) {
+        STRING * const _sub = CONST_STRING(INTERP, "Sub");
+        STRING * const _nci = CONST_STRING(INTERP, "NCI");
+
+        if (!VTABLE_isa(INTERP, value, _sub)
+        &&  !VTABLE_isa(INTERP, value, _nci))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "attempt to push non Sub PMC");
+
         SUPER(value);
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        STRING *_sub = CONST_STRING(interp, "Sub");
-        if (!VTABLE_isa(interp, value, _sub))
-            real_exception(interp, NULL, E_TypeError,
+        STRING * const _sub = CONST_STRING(INTERP, "Sub");
+        if (!VTABLE_isa(INTERP, value, _sub))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "attempt to set non Sub PMC");
         SUPER(key, value);
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        real_exception(interp, NULL, E_TypeError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to set non Sub PMC");
     }
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        real_exception(interp, NULL, E_TypeError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to set non Sub PMC");
     }
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        real_exception(interp, NULL, E_TypeError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to set non Sub PMC");
     }
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const list = Parrot_mmd_sort_candidate_list(interp, SELF);
-        PMC *func;
+        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
+        PMC * const func    = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
+                SELF, sig_obj);
 
-        if (PMC_IS_NULL(list))
-            real_exception(INTERP, NULL, 1, "No applicable methods.\n");
-
-        func = VTABLE_get_pmc_keyed_int(interp, list, 0);
+        if (PMC_IS_NULL(func))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    "No applicable candidates found to dispatch to for '%Ss'",
+                    VTABLE_get_string(INTERP, SELF));
         return VTABLE_invoke(INTERP, func, next);
+    }
+
+
+    /* I don't really know how to implement these if they need something
+       special, so I'll sort the sub list and defer processing to the
+       ResizablePMCArray's VTABLEs of the same names. Hopefully we
+       don't need anything beyond that. */
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
+                SELF, sig_obj);
+
+        if (PMC_IS_NULL(sub))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    "No applicable candidates found to dispatch to for '%Ss'",
+                    VTABLE_get_string(INTERP, SELF));
+        return SUPER(key);
+    }
+
+    VTABLE PMC *get_pmc_keyed_str(STRING *s) {
+        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
+                SELF, sig_obj);
+
+        if (PMC_IS_NULL(sub))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    "No applicable candidates found to dispatch to for '%Ss'",
+                    VTABLE_get_string(INTERP, SELF));
+        return SUPER(s);
+    }
+
+    /* get_iter method should take one of two inputs: either an array of
+       arguments, or a string with a whitespace delimited function signature
+       (N, I, S, P). It should sort the argument list according to closeness
+       to this input argument list and return an iterator over that list. */
+
+    METHOD get_iter(PMC *args) {
+        STRING * const _array  = CONST_STRING(INTERP, "Array");
+        STRING * const _string = CONST_STRING(INTERP, "String");
+
+        if (VTABLE_isa(INTERP, args, _array)){
+            /* TODO: What goes here? */
+        }
+        else if (VTABLE_isa(INTERP, args, _string)) {
+            STRING * const s = VTABLE_get_string(INTERP, args);
+            /* TODO: What goes here? */
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "attempt to call get_iter method with invalid arg type.\n");
     }
 }
 
@@ -75,13 +137,9 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 
 =head1 SEE ALSO
 
-F<src/mmd.c>,
+F<src/multidispatch.c>,
 F<$perl6/doc/trunk/design/apo/A12.pod>,
 F<$perl6/doc/trunk/design/syn/S12.pod>
-
-=head1 HISTORY
-
-Initial version                  - leo 14.03.2005
 
 =cut
 

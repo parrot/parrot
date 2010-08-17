@@ -1,5 +1,6 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -16,7 +17,7 @@ Test some simple grammars.
 =cut
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Perl6Grammar.pbc'
     .include "iglobals.pasm"
@@ -120,7 +121,7 @@ EOF_SIMPLE_GRAMMAR
     .param pmc    targets
     .param string description
 
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
     .local pmc    test
                   test = new [ 'Test'; 'Builder' ]
 
@@ -140,8 +141,9 @@ EOF_SIMPLE_GRAMMAR
     .local string test_name
                   test_name    = 'Simple::Test' . test_num_str
 
+    $P0 = split '::', test_name
     .local pmc parser
-               parser = find_global test_name, 'main'
+               parser = get_hll_global $P0, 'main'
 
   next_target:
     .local string target
@@ -179,6 +181,7 @@ EOF_SIMPLE_GRAMMAR
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Perl6Grammar.pbc'
 
+    ok        = 1
     match     = parser(expr)
     result    = match
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,6 +20,7 @@ you want to use in a file called F<t/harness>:
 
   use Parrot::Test::Harness
       language  => 'eclectus',
+      verbosity => 1,
       exec      => [ 'petite', '--script' ],
       arguments => [ '--files' ],
       files     => [ 't/*.pl' ];
@@ -46,12 +47,15 @@ This means that you can write your tests in your language itself and run them
 through your compiler itself.  If you can load PIR libraries from your
 language, you can even use the existing PIR testing tools.
 
+If the C<verbosity> argument pair is provided, it will pass it through to the TAP::Harness
+as is. This allows for extremely quiet or loud test output to be generated.
+
 =head1 AUTHOR
 
 Written by chromatic with most of the intelligence stolen from the Punie
 harness and most of that probably stolen from Test::Harness
 
-Please send patches and bug reports via Parrot's RT queue or to the mailing
+Please send patches and bug reports via Parrot's Trac queue or to the mailing
 list.
 
 =cut
@@ -86,13 +90,16 @@ sub get_files {
 
 =pod
 
-The option '--files' is used for supporting unified testing of language implementations.
-It is used by F<languages/t/harness> for collecting a list testfiles from
-many language implementations.
+The option '--files' is used for supporting unified testing of language
+implementations. It is used by F<languages/t/harness> for collecting a
+list testfiles from many language implementations.
 
 When that option is passed, a list of pathes to test files is printed.
-Currently these test files need to Perl 5 scripts.
+Currently these test files need to be Perl 5 scripts.
 The file pathes are relative to a language implementation dir.
+
+When the first argument in the '--files' list is '--master', add the language
+dir as a prefix to all files args.
 
 When there is no '--files' option, then things are saner.
 Nothing is printed. An array of file pathes is returned to the caller.
@@ -162,11 +169,14 @@ sub import {
     exit unless my @files = get_files(%options);
 
     if (eval { require TAP::Harness; 1 }) {
-        my %options =
+        my %harness_options =
               $options{exec}     ? ( exec => $options{exec} )
             : $options{compiler} ? ( exec => [ '../../parrot', './' . $options{compiler} ] )
             :                      ();
-        TAP::Harness->new( \%options )->runtests( @files );
+        $harness_options{verbosity} =                    $options{verbosity} || 0;
+        $harness_options{jobs}      = $ENV{TEST_JOBS} || $options{jobs}      || 1;
+
+        TAP::Harness->new( \%harness_options )->runtests( @files );
 
         return;
     }

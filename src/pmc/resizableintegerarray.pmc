@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -20,10 +20,12 @@ conversions.
 
 */
 
-#include "parrot/parrot.h"
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
-
-pmclass ResizableIntegerArray extends FixedIntegerArray need_ext provides array {
+pmclass ResizableIntegerArray extends FixedIntegerArray auto_attrs provides array {
+    ATTR INTVAL resize_threshold; /* max size before array needs to be resized */
 
 /*
 
@@ -36,17 +38,20 @@ Returns the integer value of the element at index C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        INTVAL *data;
+        INTVAL *int_array;
+        INTVAL  size;
 
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
-        if (key >= PMC_int_val(SELF))
-            SELF.set_integer_native(key+1);
+        GET_ATTR_size(INTERP, SELF, size);
 
-        data = (INTVAL *)PMC_data(SELF);
-        return data[key];
+        if (key >= size)
+            return 0;
+
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        return int_array[key];
     }
 
 /*
@@ -60,17 +65,17 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        INTVAL *data;
+        INTVAL *int_array;
 
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
-        if (key >= PMC_int_val(SELF))
-            SELF.set_integer_native(key+1);
+        if (key >= SELF.get_integer())
+            SELF.set_integer_native(key + 1);
 
-        data      = (INTVAL *)PMC_data(SELF);
-        data[key] = value;
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        int_array[key] = value;
     }
 
 /*
@@ -84,29 +89,35 @@ Resizes the array to C<size> elements.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-        if (size < 0)
-            real_exception(INTERP, NULL, E_IndexError,
-                    "ResizableStringArray: Can't resize!");
+        INTVAL *int_array;
+        INTVAL  resize_threshold;
 
-        if (!PMC_data(SELF)) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "ResizableIntegerArray: Can't resize!");
+
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+        if (!int_array) {
             /* empty - used fixed routine */
             if (size < 8) {
                 SUPER(8);
-                PMC_int_val(SELF)  = size;
-                PMC_int_val2(SELF) = 8;
+                SET_ATTR_size(INTERP, SELF, size);
+                SET_ATTR_resize_threshold(INTERP, SELF, 8);
             }
             else {
                 SUPER(size);
-                PMC_int_val2(SELF) = size;
+                SET_ATTR_resize_threshold(INTERP, SELF, size);
             }
         }
-        else if (size <= PMC_int_val2(SELF)) {
+        else if (size <= resize_threshold) {
             /* we could shrink here if necessary */
-            PMC_int_val(SELF) = size;
+            SET_ATTR_size(INTERP, SELF, size);
             return;
         }
         else {
-            INTVAL cur = PMC_int_val2(SELF);
+            INTVAL  cur = resize_threshold;
+            INTVAL *int_array;
 
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
@@ -116,10 +127,11 @@ Resizes the array to C<size> elements.
                 cur          &= ~0xfff;
             }
 
-            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
-                    cur * sizeof (INTVAL));
-            PMC_int_val2(SELF) = cur;
-            PMC_int_val(SELF)  = size;
+            GET_ATTR_int_array(INTERP, SELF, int_array);
+            int_array = mem_gc_realloc_n_typed(INTERP, int_array, cur, INTVAL);
+            SET_ATTR_int_array(INTERP, SELF, int_array);
+            SET_ATTR_size(INTERP, SELF, size);
+            SET_ATTR_resize_threshold(INTERP, SELF, cur);
         }
     }
 
@@ -135,8 +147,22 @@ of the array.
 */
 
     VTABLE void push_integer(INTVAL value) {
-        INTVAL nextix = SELF.elements();
-        SELF.set_integer_keyed_int(nextix, value);
+        INTVAL *int_array;
+        INTVAL  nextix;
+        INTVAL  resize_threshold;
+
+        GET_ATTR_size(INTERP, SELF, nextix);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+
+        /* can't always avoid the resize, but don't duplicate the code */
+        if ((nextix && (nextix >= resize_threshold)) || !nextix)
+            SELF.set_integer_native(nextix + 1);
+        else
+            SET_ATTR_size(INTERP, SELF, nextix + 1);
+
+        /* fetch the array only after resize check; realloc may move it */
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        int_array[nextix] = value;
     }
 
 /*
@@ -151,10 +177,10 @@ Removes and returns the last element in the array.
 
     VTABLE INTVAL pop_integer() {
         INTVAL value;
-        INTVAL size = PMC_int_val(SELF);
+        INTVAL size = SELF.get_integer();
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't pop from an empty array!");
 
         value = SELF.get_integer_keyed_int(size-1);
@@ -172,18 +198,19 @@ Removes and returns an item from the start of the array.
 */
 
     VTABLE INTVAL shift_integer() {
-        INTVAL value, *data;
-        INTVAL size = PMC_int_val(SELF);
+        INTVAL value, *int_array;
+        INTVAL size = SELF.get_integer();
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't shift from an empty array!");
 
-        data  = (INTVAL *)PMC_data(SELF);
-        value = data[0];
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        value = int_array[0];
 
-        PMC_int_val(SELF) = --size;
-        mem_sys_memmove(data, data + 1, size * sizeof (INTVAL));
+        --size;
+        mem_sys_memmove(int_array, int_array + 1, size * sizeof (INTVAL));
+        SELF.set_integer_native(size);
         return value;
     }
 
@@ -191,21 +218,48 @@ Removes and returns an item from the start of the array.
 
 =item C<void unshift_integer(INTVAL value)>
 
-Add and integer to the start of the array.
+Add an integer to the start of the array.
 
 =cut
 
 */
 
     VTABLE void unshift_integer(INTVAL value) {
-        INTVAL  size = PMC_int_val(SELF);
-        INTVAL *data;
+        INTVAL *int_array;
+        INTVAL size = SELF.get_integer();
 
         SELF.set_integer_native(size + 1);
-        data    = (INTVAL *)PMC_data(SELF);
-        mem_sys_memmove(data + 1, data, size * sizeof (INTVAL));
-        data[0] = value;
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        mem_sys_memmove(int_array + 1, int_array, size * sizeof (INTVAL));
+        int_array[0] = value;
     }
+
+/*
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+Removes the element at C<key>.
+
+=cut
+
+*/
+
+    VTABLE void delete_keyed_int(INTVAL key) {
+        INTVAL size = SELF.get_integer();
+
+        if (size < 1 || key >= size) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "ResizableIntegerArray: index out of bounds!");
+        }
+        else {
+            INTVAL *int_array;
+            GET_ATTR_int_array(INTERP, SELF, int_array);
+            --size;
+            mem_sys_memmove(int_array + key, int_array + key + 1, (size - key) * sizeof (INTVAL));
+            SELF.set_integer_native(size);
+        }
+    }
+
 /*
 
 =item C<PMC *clone()>
@@ -217,16 +271,73 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        PMC *copy          = SUPER();
+        INTVAL  size;
+        PMC    *copy = SUPER();
 
         /* copy trimmed extra space */
-        PMC_int_val2(copy) = PMC_int_val(SELF);
+        GET_ATTR_size(INTERP, SELF, size);
+        SET_ATTR_resize_threshold(INTERP, copy, size);
 
         return copy;
     }
 
-}
+/*
 
+=item C<void freeze(PMC *info)>
+
+Used to archive the array.
+
+=item C<void thaw(PMC *info)>
+
+Used to unarchive the array.
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *info) {
+        INTVAL   *int_array;
+        INTVAL    i, n, rt;
+
+        SUPER(info);
+
+        n  = SELF.get_integer();
+        GET_ATTR_resize_threshold(INTERP, SELF, rt);
+        VTABLE_push_integer(INTERP, info, n);
+        VTABLE_push_integer(INTERP, info, rt);
+
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+
+        for (i = 0; i < n; ++i)
+            VTABLE_push_integer(INTERP, info, int_array[i]);
+    }
+
+    VTABLE void thaw(PMC *info) {
+        INTVAL n, rt;
+
+        SUPER(info);
+
+        n = VTABLE_shift_integer(INTERP, info);
+        rt = VTABLE_shift_integer(INTERP, info);
+
+        SET_ATTR_size(INTERP, SELF, 0);
+        SET_ATTR_resize_threshold(INTERP, SELF, rt);
+        SET_ATTR_int_array(INTERP, SELF, NULL);
+
+        if (n) {
+            INTVAL  i;
+            INTVAL *int_array;
+
+            SELF.set_integer_native(n);
+            GET_ATTR_int_array(INTERP, SELF, int_array);
+
+            for (i = 0; i < n; ++i)
+                int_array[i] = VTABLE_shift_integer(INTERP, info);
+        }
+    }
+
+
+}
 /*
 
 =back

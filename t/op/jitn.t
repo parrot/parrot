@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 14;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -14,7 +15,7 @@ t/op/jitn.t - JIT register allocation
 
 =head1 SYNOPSIS
 
-        % prove t/op/jitn.t
+    % prove t/op/jitn.t
 
 =head1 DESCRIPTION
 
@@ -22,6 +23,8 @@ Tests JIT register allocation. These tests are written for four mappable
 registers.
 
 =cut
+
+my $output;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped" );
 set N0,0
@@ -36,9 +39,9 @@ print N2
 print "\n"
 end
 CODE
--1.000000
-1.000000
-2.000000
+-1
+1
+2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 1,2,3 mapped" );
@@ -52,8 +55,8 @@ print N1
 print "\n"
 end
 CODE
--1.000000
-1.000000
+-1
+1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2 mapped" );
@@ -75,9 +78,9 @@ print N4
 print "\n"
 end
 CODE
--3.000000
-1.000000
-4.000000
+-3
+1
+4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,3 mapped" );
@@ -99,9 +102,9 @@ print N1
 print "\n"
 end
 CODE
-3.000000
-4.000000
-1.000000
+3
+4
+1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 1,3 mapped" );
@@ -122,8 +125,8 @@ print N4
 print "\n"
 end
 CODE
-3.000000
-4.000000
+3
+4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 2,3 mapped" );
@@ -145,9 +148,9 @@ print N1
 print "\n"
 end
 CODE
-0.000000
-1.000000
-1.000000
+0
+1
+1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 2,3 mapped" );
@@ -170,9 +173,9 @@ print N1
 print "\n"
 end
 CODE
-0.000000
-1.000000
-1.000000
+0
+1
+1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1 mapped" );
@@ -195,9 +198,9 @@ print N4
 print "\n"
 end
 CODE
--4.000000
-0.000000
-4.000000
+-4
+0
+4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 2 mapped" );
@@ -219,9 +222,9 @@ print N4
 print "\n"
 end
 CODE
--3.000000
-1.000000
-4.000000
+-3
+1
+4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 3 mapped" );
@@ -243,9 +246,9 @@ print N4
 print "\n"
 end
 CODE
-3.000000
-1.000000
-4.000000
+3
+1
+4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 0 mapped" );
@@ -268,9 +271,9 @@ print N4
 print "\n"
 end
 CODE
--4.000000
-0.000000
-4.000000
+-4
+0
+4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n mapped same" );
@@ -289,9 +292,9 @@ print N0
 print "\n"
 end
 CODE
-4.000000
-0.000000
--10.000000
+4
+0
+-10
 OUTPUT
 
 # rounding behavior
@@ -320,7 +323,8 @@ CODE
 123
 OUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "rounding due to mapped" );
+$output = $PConfig{numvalsize} < 16 ? "zero\n" : "not zero\n";
+pasm_output_is( <<'CODE', $output, "rounding due to mapped" );
     set N0, 15
     mul N0, N0, 0.1
     sub N0, 1.5
@@ -330,8 +334,6 @@ z:
     print "zero\n"
     end
 CODE
-zero
-OUTPUT
 
 # Local Variables:
 #   mode: cperl

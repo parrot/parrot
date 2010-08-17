@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,6 +27,7 @@ use warnings;
 use base qw( Parrot::IO::Path );
 
 use FileHandle;
+use File::Spec ();
 use Parrot::IO::Directory;
 
 =item C<tmp_file($path)>
@@ -228,7 +229,7 @@ sub svn_version {
 
 =item C<is_hidden()>
 
-Returns whether the file is "hidden", i.e. it's name starts with a dot.
+Returns whether the file is "hidden", i.e. its name starts with a dot.
 
 =cut
 

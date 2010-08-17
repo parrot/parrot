@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Revision;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining Parrot's revision};
+    $data{description} = q{Determine Parrot's revision};
     $data{result}      = q{};
     return \%data;
 }

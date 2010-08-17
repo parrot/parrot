@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -35,7 +35,7 @@ also included.
 
 =cut
 
-.namespace [ 'PCT::Grammar' ]
+.namespace [ 'PCT';'Grammar' ]
 
 .sub 'onload' :anon :init :load
     load_bytecode 'PGE.pbc'
@@ -43,10 +43,33 @@ also included.
     .local pmc p6meta
     p6meta = new 'P6metaclass'
     p6meta.'new_class'('PCT::Grammar', 'parent'=>'PGE::Grammar')
-    $P0 = get_class 'PCT::Grammar'
-    $P1 = get_hll_global ['PGE::Util'], 'die'
+    $P0 = split '::', 'PCT::Grammar'
+    $P0 = get_class $P0
+    $P1 = get_hll_global ['PGE';'Util'], 'die'
     $P0.'add_method'('panic', $P1)
     .return ()
+.end
+
+
+=item FAILGOAL($goal [, 'dba'=>dba])
+
+Invoked when goal matching fails to find the goal.  Builds an appropriate
+error message and delegates the rest to C<panic>.
+
+=cut
+
+.sub 'FAILGOAL' :method
+    .param string goal
+    .param pmc options         :named :slurpy
+    .local string dba
+    dba = options['dba']
+    if dba goto have_dba
+    ##  if no dba supplied, use the name of the caller sub
+    $P0 = getinterp
+    $P0 = $P0['sub';1]
+    dba = $P0
+  have_dba:
+    .tailcall self.'panic'("Unable to parse ", dba, "; couldn't find final ", goal)
 .end
 
 
@@ -57,9 +80,9 @@ throw an exception if a result object hasn't been set.
 
 =cut
 
-.sub 'item' :method
+.sub 'ast' :method
     .local pmc obj
-    obj = getattribute self, '$!item'
+    obj = getattribute self, '$!ast'
     unless null obj goto end
     die "No result object"
   end:
@@ -200,7 +223,7 @@ to enforce whitespace between lexical words.
 
   literal_end:
     mob.'to'(pos)
-    mob.'result_object'(literal)
+    mob.'!make'(literal)
     .return (mob)
 
   fail:

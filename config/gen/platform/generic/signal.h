@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2007, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_GENERIC_SIGNAL_H_GUARD
@@ -12,7 +12,7 @@
 #if defined(PARROT_HAS_HEADER_SIGNAL) && defined(PARROT_HAS_HEADER_SYSTYPES)
 #  include <signal.h>
 #  include <sys/types.h>
-#  define dumpcore() raise(SIGQUIT); exit(EXIT_FAILURE);
+#  define DUMPCORE() raise(SIGQUIT); exit(EXIT_FAILURE);
 #endif
 
 #ifdef PARROT_HAS_HEADER_SIGNAL

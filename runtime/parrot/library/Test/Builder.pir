@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Builder - Parrot extension for building test modules
@@ -5,7 +7,7 @@ Test::Builder - Parrot extension for building test modules
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/Test/Builder.pbc'
+    load_bytecode 'Test/Builder.pbc'
 
     # create a new Test::Builder object
     .local pmc test
@@ -46,9 +48,9 @@ This class defines the following methods:
 .namespace [ 'Test'; 'Builder' ]
 
 .sub '_initialize' :load
-    load_bytecode 'library/Test/Builder/Test.pbc'
-    load_bytecode 'library/Test/Builder/Output.pbc'
-    load_bytecode 'library/Test/Builder/TestPlan.pbc'
+    load_bytecode 'Test/Builder/Test.pbc'
+    load_bytecode 'Test/Builder/Output.pbc'
+    load_bytecode 'Test/Builder/TestPlan.pbc'
 
     .local pmc tb_class
 
@@ -60,7 +62,7 @@ This class defines the following methods:
     .local pmc single
     single = new 'Undef'
 
-    store_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', single
+    set_hll_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', single
 .end
 
 =item C<new( args_hash )>
@@ -166,7 +168,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .param pmc args
 
     .local pmc single
-    single     = find_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton'
+    single     = get_hll_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton'
 
     .local pmc output
     .local pmc testplan
@@ -212,7 +214,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     results    = new 'ResizablePMCArray'
 
     # store this as the singleton
-    store_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', self
+    set_hll_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', self
 
   RESULTS_DEFINED:
     .return( output, testplan, results )
@@ -310,22 +312,50 @@ declared a plan or if you pass an invalid argument.
     .return()
 .end
 
-=item C<diag( diagnostic_message )>
+=item done_testing
+
+=cut
+
+.sub 'done_testing' :method
+    .param string tests     :optional
+    .param int    has_tests :opt_flag
+
+    .local pmc testplan
+    testplan = self.'testplan'()
+
+    unless has_tests goto write_footer
+
+    .local int num_tests
+    num_tests = tests
+    unless num_tests goto write_footer
+
+    testplan.'set_tests'( num_tests )
+
+  write_footer:
+    .local pmc output
+    output = self.'output'()
+
+    $S0 = testplan.'header'()
+    output.'write'( $S0 )
+
+    $I0 = self.'results'()
+    $S0 = testplan.'footer'( $I0 )
+    output.'write'( $S0 )
+
+.end
+
+=item C<diag( diagnostic_message, ... )>
 
 Records a diagnostic message for output.
 
 =cut
 
 .sub 'diag' :method
-    .param string diagnostic
+    .param pmc args :slurpy
 
-    if diagnostic goto DIAGNOSTIC_SET
-    .return()
-
-  DIAGNOSTIC_SET:
     .local pmc output
     output = self.'output'()
-    output.'diag'( diagnostic )
+    .tailcall output.'diag'( args :flat )
 .end
 
 =item C<ok( passed, description )>
@@ -336,11 +366,12 @@ recording it with the optional test description in C<description>.
 =cut
 
 .sub 'ok' :method
-    .param int    passed
-    .param string description     :optional
-    .param int    has_description :opt_flag
+    .param pmc passed
+    .param pmc description     :optional
+    .param int has_description :opt_flag
 
     if has_description goto OK
+    description = new 'String'
     description = ''
 
   OK:
@@ -470,7 +501,7 @@ plan.  This calls C<exit>; there's little point in continuing.
 
     .local pmc plan_exception
     plan_exception = new 'Exception'
-    plan_exception['_message'] = 'Cannot skip_all() with a plan!'
+    plan_exception = 'Cannot skip_all() with a plan!'
     throw plan_exception
 
   SKIP_ALL:
@@ -494,7 +525,8 @@ also calls C<exit>.
     .local pmc output
     output   = self.'output'()
 
-    .local string bail_out
+    .local pmc bail_out
+    bail_out = new ['StringBuilder']
     bail_out = 'Bail out!'
 
     unless has_reason goto WRITE_REASON
@@ -531,7 +563,7 @@ also calls C<exit>.
     push results, test
 
     .local pmc tbt_create
-    find_global tbt_create, [ 'Test'; 'Builder'; 'Test' ], 'create'
+    get_hll_global tbt_create, [ 'Test'; 'Builder'; 'Test' ], 'create'
     test = tbt_create( test_args )
 
     .local pmc output
@@ -554,7 +586,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2008, The Perl Foundation.
+Copyright (C) 2005-2008, Parrot Foundation.
 
 =cut
 

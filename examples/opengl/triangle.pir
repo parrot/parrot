@@ -1,3 +1,6 @@
+# Copyright (C) 2008-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 triangle.pir - Initialize GLUT and render a simple OpenGL animation
@@ -22,15 +25,14 @@ For a more complex and well-behaved example, try F<shapes.pir>.
 
 =cut
 
-
 .include 'opengl_defines.pasm'
 
 .sub main :main
     .param pmc argv
 
     # Load OpenGL libary and a helper library for calling glutInit
-    load_bytecode 'library/OpenGL.pbc'
-    load_bytecode 'library/NCI/call_toolkit_init.pbc'
+    load_bytecode 'OpenGL.pbc'
+    load_bytecode 'NCI/Utils.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
     .local pmc import_gl
@@ -39,9 +41,9 @@ For a more complex and well-behaved example, try F<shapes.pir>.
 
     # Initialize GLUT
     .local pmc call_toolkit_init
-    call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
+    call_toolkit_init = get_global ['NCI';'Utils'], 'call_toolkit_init'
 
-    .const .Sub glutInit = 'glutInit'
+    .const 'Sub' glutInit = 'glutInit'
     argv = call_toolkit_init(glutInit, argv)
 
     # Set display mode, create GLUT window, save window handle
@@ -51,13 +53,13 @@ For a more complex and well-behaved example, try F<shapes.pir>.
 
     .local pmc window
     window = new 'Integer'
-    window = glutCreateWindow('Test')
+    window = glutCreateWindow('Rotating Triangle NCI Test')
     set_global 'glut_window', window
 
     # Set up GLUT callbacks
-    .const .Sub draw     = 'draw'
-    .const .Sub idle     = 'idle'
-    .const .Sub keyboard = 'keyboard'
+    .const 'Sub' draw     = 'draw'
+    .const 'Sub' idle     = 'idle'
+    .const 'Sub' keyboard = 'keyboard'
     glutDisplayFunc (draw)
     glutIdleFunc    (idle)
     glutKeyboardFunc(keyboard)
@@ -142,6 +144,7 @@ For a more complex and well-behaved example, try F<shapes.pir>.
     .local pmc rotating
     rotating = get_global 'rotating'
     rotating = not rotating
+    set_global 'rotating', rotating
 .end
 
 

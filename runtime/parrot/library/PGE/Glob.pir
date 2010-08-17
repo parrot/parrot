@@ -1,10 +1,14 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 Glob - Parse and compile glob notation expressions.
 
 =head1 DESCRIPTION
 
-A parser for shell-stype glob notation.
+A parser for shell-stype glob notation. See C<Tcl::Glob> for a
+slightly different glob syntax.
 
 =head2 Functions
 
@@ -23,7 +27,7 @@ or the resulting PIR code (target='PIR').
 
 =cut
 
-.namespace [ 'PGE::Glob' ]
+.namespace [ 'PGE';'Glob' ]
 
 .sub 'compile_glob'
     .param pmc source
@@ -52,21 +56,21 @@ or the resulting PIR code (target='PIR').
 
   analyze:
     .local pmc exp, pad
-    exp = new 'PGE::Exp::Concat'
+    exp = new ['PGE';'Exp';'Concat']
     $I0 = 1
-    $P0 = new 'PGE::Exp::Anchor'
-    $P0.'result_object'('^')
+    $P0 = new ['PGE';'Exp';'Anchor']
+    $P0.'!make'('^')
     exp[0] = $P0
     if null match goto analyze_1
     $P0 = match['expr']
     exp[$I0] = $P0
     inc $I0
   analyze_1:
-    $P0 = new 'PGE::Exp::Anchor'
-    $P0.'result_object'('$')
+    $P0 = new ['PGE';'Exp';'Anchor']
+    $P0.'!make'('$')
     exp[$I0] = $P0
 
-    .return exp.'compile'(adverbs :flat :named)
+    .tailcall exp.'compile'(adverbs :flat :named)
 .end
 
 
@@ -77,7 +81,7 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PGE/Dumper.pbc'
 
     $P0 = compreg 'PGE::Glob'
-    .return $P0.'command_line'(args)
+    .tailcall $P0.'command_line'(args)
 .end
 
 
@@ -85,31 +89,32 @@ or the resulting PIR code (target='PIR').
     .local pmc optable
     load_bytecode 'PGE.pbc'
 
-    optable = new 'PGE::OPTable'
-    store_global '$optable', optable
+    optable = new ['PGE';'OPTable']
+    set_global '$optable', optable
 
-    $P0 = find_global 'glob_literal'
-    optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_literal'
+    optable.'newtok'('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_quest'
-    optable.newtok('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_quest'
+    optable.'newtok'('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_star'
-    optable.newtok('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_star'
+    optable.'newtok'('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_enum'
-    optable.newtok('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_enum'
+    optable.'newtok'('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_alt'
-    optable.newtok('term:{', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_global 'glob_alt'
+    optable.'newtok'('term:{', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+    optable.'newtok'('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
-    $P2 = newclass [ 'PGE::Glob::Compiler' ]
-    addattribute $P2, '$!compsub'
+    .local pmc p6meta
+    p6meta = get_hll_global 'P6metaclass'
+    p6meta.'new_class'('PGE::Glob::Compiler', 'attr'=>'$!compsub')
 
     $P0 = get_global 'compile_glob'
-    $P1 = new [ 'PGE::Glob::Compiler' ]
+    $P1 = new [ 'PGE';'Glob';'Compiler' ]
     $P1.'register'('PGE::Glob', $P0)
     .return ()
 .end
@@ -129,7 +134,7 @@ parse C<PGE::Match> object.
     .param pmc adverbs         :slurpy :named
 
     .local pmc optable, match
-    optable = find_global 'PGE::Glob', '$optable'
+    optable = get_hll_global ['PGE';'Glob'], '$optable'
     match = optable.'parse'(mob)
     .return (match)
 .end
@@ -164,7 +169,7 @@ parse C<PGE::Match> object.
 =item C<glob_literal(PMC mob, PMC adverbs)>
 
 Scan a literal from a string, stopping at any metacharacters such
-as C<*> or C<[>.  Return the matched portion, with the C<result_object>
+as C<*> or C<[>.  Return the matched portion, with the I<ast object>
 set to the decoded literal.
 
 =cut
@@ -179,7 +184,7 @@ set to the decoded literal.
     ($S0, $I0) = 'scan_literal'(target, pos, '*?[{')
     if $I0 <= pos goto end
     mob.'to'($I0)
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
   end:
     .return (mob)
 .end
@@ -198,7 +203,7 @@ return a CCShortcut that is set to '.'
     ##   The '?' is already in mob['KEY'], so we don't need to find it here.
     (mob, $I0) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     mob.'to'($I0)
-    mob.'result_object'('.')
+    mob.'!make'('.')
     .return (mob)
 .end
 
@@ -222,7 +227,7 @@ bit more complex, as we have to return a quantified '.'.
     mob['max'] = GLOB_INF
     $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     $P0.'to'(pos)
-    $P0.'result_object'('.')
+    $P0.'!make'('.')
     mob[0] = $P0
     .return (mob)
 .end
@@ -284,7 +289,7 @@ Parse an enumerated character list, such as [abcd],
   scan_end:
     inc pos
     mob.'to'(pos)
-    mob.'result_object'(charlist)
+    mob.'!make'(charlist)
     .return (mob)
 
   err_noclose:
@@ -310,7 +315,7 @@ Parse an enumerated character list, such as [abcd],
 
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
     mob.'to'(pos)
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
   alt_loop:
     if pos >= lastpos goto err_noclose
     $S0 = substr target, pos, 1
@@ -323,7 +328,7 @@ Parse an enumerated character list, such as [abcd],
     $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
     mob.'to'(pos)
-    $P0.'result_object'($S0)
+    $P0.'!make'($S0)
     mob[1] = $P0
     goto alt_loop
   end:
@@ -336,7 +341,7 @@ Parse an enumerated character list, such as [abcd],
     .return (mob)
 .end
 
-.namespace [ 'PGE::Glob::Compiler' ]
+.namespace [ 'PGE';'Glob';'Compiler' ]
 
 =item register(string name, pmc compsub)
 
@@ -370,7 +375,7 @@ Compile C<source> (possibly modified by any provided options).
     #   $!compsub is deprecated
     compsub = getattribute self, '$!compsub'
 
-    .return compsub(source, adverbs :flat :named)
+    .tailcall compsub(source, adverbs :flat :named)
 .end
 
 =back

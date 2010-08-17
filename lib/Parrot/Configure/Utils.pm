@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -33,6 +33,7 @@ use File::Copy ();
 use File::Spec;
 use File::Which;
 use lib ("lib");
+use Parrot::BuildUtil ();
 our @EXPORT    = ();
 our @EXPORT_OK = qw(
     prompt copy_if_diff move_if_diff integrate
@@ -117,7 +118,7 @@ sub _build_compile_command {
     my ( $cc, $ccflags, $cc_args ) = @_;
     $_ ||= '' for ( $cc, $ccflags, $cc_args );
 
-    return "$cc $ccflags $cc_args -I./include -c test.c";
+    return "$cc $ccflags $cc_args -I./include -c test_$$.c";
 }
 
 =item C<integrate($orig, $new)>
@@ -240,7 +241,7 @@ sub capture_output {
 
     # disable STDERR
     open my $OLDERR, '>&', \*STDERR;
-    open STDERR, '>', 'test.err';
+    open STDERR, '>', "test_$$.err";
 
     my $output = `$command`;
     my $retval = ( $? == -1 ) ? -1 : ( $? >> 8 );
@@ -250,10 +251,10 @@ sub capture_output {
     open STDERR, '>&', $OLDERR;
 
     # slurp stderr
-    my $out_err = _slurp('./test.err');
+    my $out_err = _slurp("./test_$$.err");
 
     # cleanup
-    unlink "test.err";
+    unlink "test_$$.err";
 
     return ( $output, $out_err, $retval ) if wantarray;
     return $output;
@@ -295,19 +296,12 @@ sub check_progs {
 
 =item C<_slurp($filename)>
 
-Slurps C<$filename> into memory and returns it as a string.
+Slurps C<$filename> into memory and returns it as a string.  This is just an
+alias for C<Parrot::BuildUtil::slurp_file>.
 
 =cut
 
-sub _slurp {
-    my $filename = shift;
-
-    open( my $fh, '<', $filename ) or die "Can't open $filename: $!";
-    my $text = do { local $/; <$fh> };
-    close($fh) or die "Can't close $filename: $!";
-
-    return $text;
-}
+*_slurp = \&Parrot::BuildUtil::slurp_file;
 
 =back
 

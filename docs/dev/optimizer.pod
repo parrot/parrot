@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -171,11 +171,6 @@ Does conservative constant propagation, i.e. replaces "1 + 2" with "3"
 
 Removes an instruction when the register written is only used once (only
 appears in that instruction)
-
-=item loop_optimization()
-
-Moves an invariant instruction outside of the loop, TURNED OFF (not currently
-working)
 
 =back
 

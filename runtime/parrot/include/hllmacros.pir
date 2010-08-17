@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
+
 =head1 High Level Language Macros
 
 These macros are to make it easier to write readable and maintainable PIR by
@@ -146,7 +149,7 @@ work with in C<code>.
 
 =cut
 
-# RT #55808 - the unlikely to conflict variable names here must be
+# TT #911 - the unlikely to conflict variable names here must be
 # replaced with the .macro_local syntax.
 .macro Foreach(name, array, code)
     .local int __Foreach__local__i

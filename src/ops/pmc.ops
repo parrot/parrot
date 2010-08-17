@@ -1,22 +1,22 @@
 /*
 
-Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 pmc.ops
 
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
-pmc.ops - PMC Operations
+pmc.ops - PMC Opcodes
 
 =head1 DESCRIPTION
 
 Operations that deal with PMCs, including creation and
 destruction, manipulation, and introspection.
+
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =cut
 
@@ -33,221 +33,172 @@ type information.
 
 ########################################
 
-=item B<new>(out PMC, in INT)
-
-=item B<new>(out PMC, in INT, invar PMC)
-
 =item B<new>(out PMC, in STR)
 
-=item B<new>(out PMC, in STR, invar PMC)
+=item B<new>(out PMC, in STR, in PMC)
 
 =item B<new>(out PMC, in PMC)
 
-=item B<new>(out PMC, in PMC, invar PMC)
+=item B<new>(out PMC, in PMC, in PMC)
 
 Instantiate a new object from a string PMC or key name, or from a class object.
 For strings and keys, first check the namespace for a class object, then fall
 back to the type ID if no class object is stored in the namespace.
 
-Creating a new PMC by type ID is deprecated. See RT #48014.
-
-  new P0, 'ResizableBooleanArray'
+  new $P0, 'ResizableBooleanArray'
 
 Optionally a PMC may be passed to the constructor. It's up to the class what
-to do with the intializer.  See PDD02 for more.
+to do with the initializer.  See PDD17 and the init_pmc function for more.
 
 =cut
 
-op new(out PMC, in INT) {
-  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    real_exception(interp, 0, NO_CLASS,
-                   "Illegal PMC enum (%d) in new", (int)$2);
-  }
-
-  /* If we're creating a continuation, the continuation PMC needs to be in the
-   * destination register before its init method copies the registers. */
-  if ($2 == enum_class_Continuation) {
-      $1 = pmc_new_noinit(interp, $2);
-      VTABLE_init(interp, $1);
-  }
-  else
-    $1 = pmc_new(interp, $2);
-}
-
-op new(out PMC, in INT, in PMC) {
-  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    real_exception(interp, 0, NO_CLASS,
-                   "Illegal PMC enum (%d) in new", (int)$2);
-  }
-  $1 = pmc_new_init(interp, $2, $3);
-}
-
 op new(out PMC, in STR) {
-    STRING * const classname = $2;
-    PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
+    STRING * const name   = $2;
+    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
+                          ? Parrot_oo_get_class_str(interp, name)
+                          : PMCNULL;
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, PMCNULL);
     else {
-        const INTVAL type = pmc_type(interp, classname);
-        if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", classname);
-        $1 = pmc_new(interp, type);
+        const INTVAL type = Parrot_pmc_get_type_str(interp, name);
+        if (type <= 0) {
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", name);
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new(interp, type);
     }
 }
 
 op new(out PMC, in STR, in PMC) {
-    STRING * const classname = $2;
-    PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
+    STRING * const name   = $2;
+    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
+                          ? Parrot_oo_get_class_str(interp, name)
+                          : PMCNULL;
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, $3);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, $3);
     else {
-        const INTVAL type = pmc_type(interp, classname);
-        if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", classname);
-        $1 = pmc_new_init(interp, type, $3);
+        const INTVAL type = Parrot_pmc_get_type_str(interp, name);
+        if (type <= 0) {
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", name);
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new_init(interp, type, $3);
     }
 }
 
 inline op new(out PMC, in PMC) :object_classes {
-    PMC * const classname_key = $2;
-    PMC * const classobj = Parrot_oo_get_class(interp, classname_key);
+    PMC * const name_key = $2;
+    PMC * const _class   = Parrot_oo_get_class(interp, name_key);
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, PMCNULL);
     else {
-        const INTVAL type = pmc_type_p(interp, classname_key);
-        if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", readable_name(interp, classname_key));
-        $1 = pmc_new(interp, type);
+        const INTVAL type = Parrot_pmc_get_type(interp, name_key);
+        if (type <= 0) {
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new(interp, type);
     }
 }
 
 op new(out PMC, in PMC, in PMC) {
-    PMC * const classname_key = $2;
-    PMC * const classobj = Parrot_oo_get_class(interp, classname_key);
+    PMC * const name_key = $2;
+    PMC * const _class   = Parrot_oo_get_class(interp, name_key);
 
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, $3);
+    else {
+        const INTVAL type = Parrot_pmc_get_type(interp, name_key);
+        if (type <= 0) {
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new_init(interp, type, $3);
+    }
+}
+
+########################################
+
+=item B<root_new>(out PMC, in PMC)
+
+=item B<root_new>(out PMC, in PMC, in PMC)
+
+Instantiate a new object from a key name relative to the root namespace.
+
+  root_new $P0, ['parrot';'ResizableBooleanArray']
+
+Optionally a PMC may be passed to the constructor. It's up to the class what
+to do with the initializer.
+
+=cut
+
+op root_new(out PMC, in PMC) {
+    PMC * const key      = $2;
+    PMC * const root_ns  = interp->root_namespace;
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
+    PMC * classobj       = PMCNULL;
+
+    if (!PMC_IS_NULL(ns))
+        classobj = Parrot_oo_get_class(interp, ns);
+    if (!PMC_IS_NULL(classobj))
+        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, key));
+        goto ADDRESS(dest);
+    }
+}
+
+op root_new(out PMC, in PMC, in PMC) {
+    PMC * const key      = $2;
+    PMC * const root_ns  = interp->root_namespace;
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
+    PMC * classobj       = PMCNULL;
+
+    if (!PMC_IS_NULL(ns))
+        classobj = Parrot_oo_get_class(interp, ns);
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
-        const INTVAL type = pmc_type_p(interp, classname_key);
-        if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", readable_name(interp, classname_key));
-        $1 = pmc_new_init(interp, type, $3);
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, key));
+        goto ADDRESS(dest);
     }
 }
+
 
 ########################################
 
 =item B<typeof>(out STR, invar PMC)
 
-=item B<typeof>(out INT, invar PMC)
-
 =item B<typeof>(out PMC, invar PMC)
 
 Return the type of PMC in $2.
 
-=item B<typeof>(out INT, invar PMC, in KEY)
-
-=item B<typeof>(out INT, invar PMC, in INTKEY)
-
-Return the type of the entry in aggregate PMC in $2 at key $3.
-
 =cut
 
 inline op typeof(out STR, invar PMC) {
-  $1 = VTABLE_name(interp, $2);
+    $1 = VTABLE_name(interp, $2);
 }
 
 inline op typeof(out PMC, invar PMC) {
-  $1 = VTABLE_get_class(interp, $2);
-}
-
-inline op typeof(out INT, invar PMC) {
-  $1 = VTABLE_type(interp, $2);
-}
-
-inline op typeof(out INT, invar PMC, in KEY) {
-  $1 = VTABLE_type_keyed(interp, $2, $3);
-}
-
-inline op typeof(out INT, invar PMC, in INTKEY) {
-  $1 = VTABLE_type_keyed_int(interp, $2, $3);
-}
-########################################
-
-=item B<typeof>(out STR, in INT)
-
-Return the (native) Parrot type of datatype $2.
-
-=cut
-
-inline op typeof(out STR, in INT) {
-    if ($2 > 0 && $2 < interp->n_vtable_max)
-                $1 = interp->vtables[$2]->whoami;
-    else
-                $1 = Parrot_get_datatype_name(interp, $2);
+    $1 = VTABLE_get_class(interp, $2);
 }
 
 ########################################
-
-=item B<find_type>(out INT, in STR)
-
-=item B<find_type>(out INT, in PMC)
-
-Find the PMC type or Parrot datatype by name.
-
-=cut
-
-op find_type(out INT, in STR) {
-    $1 = pmc_type(interp, $2);
-}
-
-op find_type(out INT, in PMC) {
-
-    INTVAL n;
-
-    if ($2->vtable->base_type == enum_class_String)
-        $1 = pmc_type(interp, VTABLE_get_string(interp, $2));
-    else if ($2->vtable->base_type == enum_class_Key)
-        $1 = pmc_type_p(interp, $2);
-    else if ((n = VTABLE_elements(interp, $2)) <= 0)
-        $1 = 0;
-    else {
-        PMC *_class = interp->class_hash;
-        INTVAL i;
-        for (i = 0; i < n; ++i) {
-            STRING *part = VTABLE_get_string_keyed_int(interp, $2, i);
-            _class = VTABLE_get_pmc_keyed_str(interp, _class, part);
-            if (PMC_IS_NULL(_class))
-                break;
-        }
-        $1 = PMC_IS_NULL(_class) ? 0 : PMC_int_val(_class);
-    }
-}
-
-########################################
-
-=item B<valid_type>(out INT, in INT)
-
-Check if the PMC type or Parrot datatype $2 is valid.
-
-=cut
-
-op valid_type(out INT, in INT) {
-    if ($2 > 0 && $2 < interp->n_vtable_max)
-        $1 = 1;
-    else if ($2 >= enum_first_type && $2 < enum_last_type)
-        $1 = 1;
-    else
-        $1 = 0;
-}
-
 
 =item B<get_repr>(out STR, invar PMC)
 
@@ -286,11 +237,13 @@ op find_method(out PMC, invar PMC, in STR) :flow {
     opcode_t * const resume = expr NEXT();
     $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
-        real_exception(interp, resume, METH_NOT_FOUND,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, resume,
+            EXCEPTION_METHOD_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
+        goto ADDRESS(dest);
     }
-    restart ADDRESS(resume);
+    goto ADDRESS(resume);
 }
 
 ########################################
@@ -313,23 +266,23 @@ Places the answer in INT.
 =cut
 
 inline op defined(out INT, invar PMC) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interp, $2);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interp, $2);
 }
 
 inline op defined(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed_int(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed_int(interp, $2, $3);
 }
 
 inline op defined(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed(interp, $2, $3);
 }
 
 inline op exists(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_exists_keyed_int(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_exists_keyed_int(interp, $2, $3);
 }
 
 inline op exists(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0: VTABLE_exists_keyed(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0: VTABLE_exists_keyed(interp, $2, $3);
 }
 
 ########################################
@@ -343,11 +296,11 @@ Delete the specified entry $2 from aggregate $1.
 =cut
 
 inline op delete(invar PMC, in KEY) {
-  VTABLE_delete_keyed(interp, $1, $2);
+    VTABLE_delete_keyed(interp, $1, $2);
 }
 
 inline op delete(invar PMC, in INTKEY) {
-  VTABLE_delete_keyed_int(interp, $1, $2);
+    VTABLE_delete_keyed_int(interp, $1, $2);
 }
 
 ########################################
@@ -359,7 +312,7 @@ Returns the number of items in aggregate $2
 =cut
 
 inline op elements(out INT, invar PMC) {
-  $1 = VTABLE_elements(interp, $2);
+    $1 = VTABLE_elements(interp, $2);
 }
 
 =back
@@ -370,7 +323,7 @@ inline op elements(out INT, invar PMC) {
 
 =head2 Fast access ops
 
-The fast access ops are shortcuts to common operations implemented invar PMCs.
+The fast access ops are shortcuts to common operations implemented in var PMCs.
 
 =over 4
 
@@ -496,6 +449,18 @@ inline op shift(out PMC, invar PMC) {
     $1 = VTABLE_shift_pmc(interp, $2);
 }
 
+=item B<splice>(invar PMC, invar PMC, in INT, in INT)
+
+Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
+The values are put into the aggregate by a shallow copy. If the values would
+be reused, they have to be B<clone>d.
+
+=cut
+
+inline op splice(invar PMC, invar PMC, in INT, in INT) {
+    VTABLE_splice(interp, $1, $2, $3, $4);
+}
+
 
 =back
 
@@ -520,7 +485,7 @@ Set property $2 to value $3 for PMC $1.
 =cut
 
 op setprop(invar PMC, in STR, invar PMC) {
-      VTABLE_setprop(interp, $1, $2, $3);
+    VTABLE_setprop(interp, $1, $2, $3);
 }
 
 ########################################
@@ -532,7 +497,7 @@ Get property $2 of PMC $3 and put it in $1.
 =cut
 
 op getprop(out PMC, in STR, invar PMC) {
-   $1 = VTABLE_getprop(interp, $3, $2);
+    $1 = VTABLE_getprop(interp, $3, $2);
 }
 
 ########################################
@@ -544,7 +509,7 @@ Delete property $2 from PMC $1.
 =cut
 
 op delprop(invar PMC, in STR) {
-   VTABLE_delprop(interp, $1, $2);
+    VTABLE_delprop(interp, $1, $2);
 }
 
 ########################################
@@ -557,7 +522,7 @@ hash doesn't exist, the C<Null> PMC is returned.
 =cut
 
 op prophash(out PMC, invar PMC) {
-   $1 = VTABLE_getprops(interp, $2);
+    $1 = VTABLE_getprops(interp, $2);
 }
 
 =back
@@ -587,11 +552,11 @@ Set $1 to a newly created PMC from the image $2.
 =cut
 
 op freeze(out STR, invar PMC) {
-   $1 = Parrot_freeze(interp, $2);
+    $1 = Parrot_freeze(interp, $2);
 }
 
 op thaw(out PMC, in STR) {
-   $1 = Parrot_thaw(interp, $2);
+    $1 = Parrot_thaw(interp, $2);
 }
 
 =back
@@ -615,25 +580,24 @@ addition or subtraction, or one of the other binary MMD operations.
 
 ########################################
 
-=item B<mmdvtregister>(in INT, in INT, in INT, invar PMC)
+=item B<add_multi>(in STR, in STR, invar PMC)
 
-Register method $4 as the MMD method for vtable entry $1 for classes
-$2 and $3.
+Register method $3 as the MMD method for the sub named $1 with signature $2.
 
 =cut
 
-inline op mmdvtregister(in INT, in INT, in INT, invar PMC) {
-  mmd_register_sub(interp, $1, $2, $3, $4);
+inline op add_multi(in STR, in STR, invar PMC) {
+    Parrot_mmd_add_multi_from_long_sig(interp, $1, $2, $3);
 }
 
-=item B<mmdvtfind>(out PMC, in INT, in INT, in INT)
+=item B<find_multi>(out PMC, in STR, in STR)
 
-Find the sub that would be called for vtable entry $2 for types $3 and $4.
+Set $1 to the sub that would be called for sub named $2 with signature $3.
 
 =cut
 
-inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
-  $1 = mmd_vtfind(interp, $2, $3, $4);
+inline op find_multi(out PMC, in STR, in STR) {
+    $1 = Parrot_mmd_find_multi_from_long_sig(interp, $2, $3);
 }
 
 =back
@@ -653,11 +617,11 @@ inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
 =item B<register>(invar PMC)
 
 Add a reference of PMC $1 to the interpreter's root set of PMCs. This is needed
-for extensions to make sure that the PMC is properly marked during DOD, if that
+for extensions to make sure that the PMC is properly marked during GC, if that
 PMC is not known to Parrot's core elsewhere.
 
 A PMC can be registered multiple times.  If it's unregistered and the
-registration count reaches zero, it will be destroyed during the next DOD run.
+registration count reaches zero, it will be destroyed during the next GC run.
 
 =item B<unregister>(invar PMC)
 
@@ -666,29 +630,70 @@ Remove one reference of $1.
 =cut
 
 op register(invar PMC) {
-  dod_register_pmc(interp, $1);
+    Parrot_pmc_gc_register(interp, $1);
 }
 
 op unregister(invar PMC) {
-  dod_unregister_pmc(interp, $1);
+    Parrot_pmc_gc_unregister(interp, $1);
 }
 
-=item B<get_mro>(out PMC, invar PMC)
 
-Set $1 to the mro array of the PMC $2. Please note that this is a
-direct reference so messing with it can do harm to the method lookup.
+########################################
+
+=item B<box>(out PMC, in INT)
+
+=item B<box>(out PMC, in NUM)
+
+=item B<box>(out PMC, in STR)
+
+Create a HLL-mapped PMC containing the provided primitive.
 
 =cut
 
-op get_mro(out PMC, invar PMC) :deprecated {
-  $1 = $2->vtable->mro;
+op box(out PMC, in INT) {
+    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+    VTABLE_set_integer_native(interp, $1, $2);
+}
+
+op box(out PMC, in NUM) {
+    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    VTABLE_set_number_native(interp, $1, $2);
+}
+
+op box(out PMC, in STR) {
+    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+    VTABLE_set_string_native(interp, $1, $2);
+}
+
+########################################
+
+=item B<iter>(out PMC, invar PMC)
+
+Return a new Iterator PMC $1 for aggregate $2.
+
+=cut
+
+inline op iter(out PMC, invar PMC) :base_core {
+    $1 = VTABLE_get_iter(interp, $2);
+}
+
+########################################
+
+=item B<morph>(invar PMC, in PMC)
+
+Have $1 turn itself into a PMC of type $2.
+
+=cut
+
+inline op morph(invar PMC, in PMC) {
+    VTABLE_morph(interp, $1, $2);
 }
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 

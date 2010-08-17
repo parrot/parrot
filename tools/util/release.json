@@ -1,25 +1,21 @@
 {
-    "release.version"  : "0.6.4",
-    "release.name"     : "St. Vincent Amazon",
+    "release.version"  : "2.6.0",
+    "release.name"     : "Red-rumped",
     "release.day"      : "Tuesday",
-    "release.date"     : "15 July 2008",
-    "release.nextdate" : "19 Aug 2008",
+    "release.date"     : "20 July 2010",
+    "release.nextdate" : "17 August 2010",
 
-    "web.root"         : "http://parrotcode.org/",
-    "web.source"       : "source.html",
+    "web.root"         : "http://parrot.org/",
+    "web.source"       : "download",
     "web.openpatches"  : "openpatches.html",
-    "web.repository"   : "https://svn.perl.org/parrot/trunk/",
+    "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "16 Aug 2008",
+    "bugday.date"      : "14 August 2010",
 
-    "rt.root"          : "https://rt.perl.org/rt3/",
-    "rt.tracking"      : "Ticket/Display.html?id=56912",
+    "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
+    "wiki.bugday"      : "bug_day_2010_08_14",
 
-    "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2008_08_16",
-
-    "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "subversion.root"  : "http://subversion.tigris.org/",
-    "svk.root"         : "http://svk.bestpractical.com/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.6.0/",
+    "subversion.root"  : "http://subversion.apache.org/"
 }

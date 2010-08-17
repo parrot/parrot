@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 package Parrot::Configure::Trace;
 use strict;
@@ -88,24 +88,23 @@ sub trace_data_c {
 sub diff_data_c {
     my ( $self, $argsref ) = @_;
     $argsref->{verbose} = 1;
-    my $trace_ref = $self->trace_data_c($argsref);
-    my @traces = @{ $trace_ref };
+    my @traces = @{ $self->trace_data_c($argsref) };
     my @results = ();
     for (my $i = 1; $i < scalar(@traces); $i++) {
         my %prior = %{$traces[$i - 1]};
         my %this  = %{$traces[$i]};
         my ($prior_key, $prior_value)   = each %prior;
-            my ($this_key,  $this_value)    = each %this;
-            $prior_value = q{} unless defined $prior_value;
-            $this_value = q{} unless defined $this_value;
-            if ($prior_value ne $this_value) {
-                push @results, {
-                    number  => $i,
-                    name    => $this_key,
-                    before  => $prior_value,
-                    after   => $this_value,
-                };
-            }
+        my ($this_key,  $this_value)    = each %this;
+        $prior_value = q{} unless defined $prior_value;
+        $this_value  = q{} unless defined $this_value;
+        if ($prior_value ne $this_value) {
+            push @results, {
+                number  => $i,
+                name    => $this_key,
+                before  => $prior_value,
+                after   => $this_value,
+            };
+        }
     }
     return \@results;
 }
@@ -202,7 +201,7 @@ to Parrot developers working on the configuration process or its results.
 
 To make use of Parrot::Configure::Trace's methods, first configure with the
 C<--configure_trace> option.  As configuration proceeds through what are
-currently 56 individual steps, the state of the Parrot::Configuration object
+currently 65 individual steps, the state of the Parrot::Configuration object
 is recorded in a Perl array reference.  That array ref is stored on disk via
 the Storable module in a file called F<.configure_trace.sto> found in the
 top-level of your Parrot sandbox directory.
@@ -403,7 +402,7 @@ the value is the value of the attribute at step C<n + 1>.
 
 Provide a list of those configuration steps where the value of a given
 attribute in the C<{data}->{c}> part of the Parrot::Configure object changed
-from that in effect at the conclusion of the preveious configuration step.
+from that in effect at the conclusion of the previous configuration step.
 
 =item * Arguments
 
@@ -422,8 +421,8 @@ following key-value pairs:
 
 =item * number
 
-Number of the configuration step where the value of the given attribute
-changed; enumeration starts at C<1>, not C<0>.
+Index position of the configuration step where the value of the given attribute
+changed.  Example:  C<init::defaults> has index position C<1>.
 
 =item * name
 

@@ -1,12 +1,13 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1;
+use Test::More;
+use Parrot::Config qw(%PConfig);
 use Parrot::Distribution;
 use Parrot::Headerizer;
 
@@ -27,76 +28,69 @@ t/codingstd/c_function_docs.t - checks for missing function documentation
 Checks that all C language source files have documentation for each function
 declared.
 
-=head1 AUTHOR
-
-Paul Cochrane <paultcochrane at gmail dot com>
-
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my $headerizer = Parrot::Headerizer->new;
-my @missing_docs;
-my @extra_docs;
 
-foreach my $file (@files) {
-    my $path = @ARGV ? $file : $file->path;
-    next unless $path =~ m/\.c|\.h$/;  # can't handle .ops or .pmc files yet
+# can not handle .ops or .pmc files yet
+my @files = grep {/\.(c|h)$/ } @ARGV ? @ARGV :
+    map {s/^$PConfig{build_dir}\///; $_} map {s/\\/\//g; $_} map {$_->path} $DIST->get_c_language_files();
+
+plan tests => scalar @files;
+
+my %todos;
+while (<DATA>) {
+    next if /^#/;
+    next if /^\s*$/;
+    chomp;
+    $todos{$_} = 1;
+}
+
+foreach my $path (@files) {
 
     my $buf = $DIST->slurp($path);
+    my @missing_docs;
 
     my @function_decls = $headerizer->extract_function_declarations($buf);
 
     for my $function_decl (@function_decls) {
 
-        my $escaped_decl = $function_decl;
+        my $escaped_decl = $headerizer->generate_documentation_signature($function_decl);
 
-        # escape [, ], (, ), and *
-        $escaped_decl =~ s/\[/\\[/g;
-        $escaped_decl =~ s/\]/\\]/g;
-        $escaped_decl =~ s/\(/\\(/g;
-        $escaped_decl =~ s/\)/\\)/g;
-        $escaped_decl =~ s/\*/\\*/g;
-
-        # don't worry if the function declaration has embedded newlines in
-        # it and the documented function doesn't.
-        $escaped_decl =~ s/\s+/\\s+/g;
-
-        my $decl_rx = qr/=item C<$escaped_decl>/;
-
-        # if we're sent just a single file, output all function declarations
-        # which aren't yet documented, otherwise just report the files
-        # without docs.
-        if ( @ARGV == 1 ) {
-            if ( $buf !~ m/$decl_rx/g ) {
-                push @missing_docs, "$function_decl\n";
+        my $missing = '';
+        if ( $buf =~ m/^\Q$escaped_decl\E$(.*?)^=cut/sm ) {
+            my $docs = $1;
+            $docs =~ s/\s//g;
+            if ($docs eq '') {
+                $missing = 'boilerplate only';
             }
+            # else:  docs!
         }
         else {
-            # look for matching documentation.  This means the text
-            # '=item C<function_declaration>'
-            if ( $buf !~ m/$decl_rx/g ) {
-                push @missing_docs, "$path\n";
-                last;
+            $missing = 'missing';
+        }
+        if ($missing) {
+            if ($missing eq 'boilerplate only') {
+                push @missing_docs, "$path ($missing)\nIn:\n$escaped_decl\n";
+            }
+            else {
+                push @missing_docs, "$path ($missing)\n$function_decl\nWant:\n$escaped_decl\n";
             }
         }
     }
+
+    TODO: {
+        local $TODO = 'Missing function docs' if $todos{$path};
+
+    ok ( ! @missing_docs, $path)
+        or diag( @missing_docs
+            . " function(s) lacking documentation:\n"
+            . join ("\n", @missing_docs, "\n"));
+    }
 }
 
-if ( @ARGV == 1 ) {
-    ok( !scalar(@missing_docs), 'Functions documented' )
-        or diag( "Number of functions lacking documentation = "
-            . scalar @missing_docs
-            . "\n Functions lacking documentation:\n"
-            . join "#" x 70 . "\n", @missing_docs, "\n");
-}
-else {
-    ok( !scalar(@missing_docs), 'Functions documented' )
-        or diag( "Functions lacking documentation in "
-            . scalar @missing_docs
-            . " files:\n@missing_docs\n"
-            . "Use tools/docs/func_boilerplate.pl to add missing documentation\n" );
-}
+__DATA__
 
 # Local Variables:
 #   mode: cperl

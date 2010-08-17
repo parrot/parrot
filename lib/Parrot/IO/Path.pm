@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2006, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -25,7 +25,7 @@ use strict;
 use warnings;
 
 use File::Path;
-use File::Spec;
+use File::Spec ();
 
 # qw() to avoid the export because we have a stat() method.
 use File::stat qw();
@@ -101,7 +101,7 @@ sub create_path {
     unless ( -e $self->parent_path ) {
 
         # This dies if it fails.
-        mkpath( $self->parent_path );
+        mkpath( [ $self->parent_path ], 0, 0777 );
     }
 
     return -e $self->parent_path;

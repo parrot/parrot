@@ -1,0 +1,497 @@
+=pod
+
+=head1 Classes and Objects
+
+Many of Parrot's core classes -- such as C<Integer>, C<String>, or
+C<ResizablePMCArray> -- are written in C, but you can also write your
+own classes in PIR.  PIR doesn't have the shiny syntax of high-level
+object-oriented languages, but it provides the necessary features to
+construct well-behaved objects every bit as powerful as those of
+high-level object systems.
+
+X<objects>
+Parrot developers often use the word "PMCs" to refer to the objects defined in
+C classes and "objects" to refer to the objects defined in PIR. In truth, all
+PMCs are objects and all objects are PMCs, so the distinction is a community
+tradition with no official meaning.
+
+=head2 Class Declaration
+
+X<classes>
+The C<newclass>X<newclass opcode> opcode defines a new class. It takes a
+single argument, the name of the class to define.
+
+=begin PIR_FRAGMENT
+
+    $P0 = newclass 'Foo'
+
+=end PIR_FRAGMENT
+
+Just as with Parrot's core classes, the C<new>X<new opcode> opcode
+instantiates a new object of a named class.
+
+=begin PIR_FRAGMENT
+
+  $P1 = new 'Foo'
+
+=end PIR_FRAGMENT
+
+In addition to a string name for the class, C<new> can also instantiate
+an object from a class object or from a keyed namespace name.
+
+=begin PIR_FRAGMENT
+
+  $P0 = newclass 'Foo'
+  $P1 = new $P0
+
+  $P2 = new ['Bar';'Baz']
+
+=end PIR_FRAGMENT
+
+=head2 Attributes
+
+X<attributes>
+X<classes;attributes>
+The C<addattribute> opcode defines a named attribute -- or I<instance variable> -- in the class:
+
+=begin PIR_FRAGMENT
+
+  $P0 = newclass 'Foo'
+  addattribute $P0, 'bar'
+
+=end PIR_FRAGMENT
+
+The C<setattribute>X<setattribute> opcode sets the value of a declared
+attribute.  You must declare an attribute before you may set it.  The value of
+an attribute is always a PMC, never an integer, number, or string.N<Though it
+can be an C<Integer>, C<Number>, or C<String> PMC.>
+
+=begin PIR_FRAGMENT
+
+    $P6 = box 42
+    setattribute $P1, 'bar', $P6
+
+=end PIR_FRAGMENT
+
+The C<getattribute>X<getattribute opcode> opcode fetches the value of a
+named attribute. It takes an object and an attribute name as arguments
+and returns the attribute PMC:
+
+=begin PIR_FRAGMENT
+
+    $P10 = getattribute $P1, 'bar'
+
+=end PIR_FRAGMENT
+
+Because PMCs are containers, you may modify an object's attribute by retrieving
+the attribute PMC and modifying its value.  You don't need to call
+C<setattribute> for the change to stick:
+
+=begin PIR_FRAGMENT
+
+    $P10 = getattribute $P1, 'bar'
+    $P10 = 5
+
+=end PIR_FRAGMENT
+
+=head2 Instantiation
+
+With a created class, we can use the C<new> opcode to instantiate an object of
+that class in the same way we can instantiate a new PMC.
+
+=begin PIR_FRAGMENT
+
+    $P0 = newclass "Foo"
+    $P1 = new $P0
+
+=end PIR_FRAGMENT
+
+Or, if we don't have the class object handy, we can do it by name too:
+
+=begin PIR_FRAGMENT
+
+    $P1 = new "Foo"
+
+=end PIR_FRAGMENT
+
+PMCs have two VTABLE interface functions for dealing with instantiating a new
+object: C<init> and C<init_pmc>. The former is called when a new PMC is
+created, the later is called when a new PMC is created with an initialization
+argument.
+
+=begin PIR
+
+    .namespace ["Foo"]
+    .sub 'init' :vtable
+        say "Creating a new Foo"
+    .end
+
+    .sub 'init_pmc' :vtable
+        .param pmc args
+        print "Creating a new Foo with argument "
+        say args
+    .end
+
+    .namespace[]
+    .sub 'main' :main
+        $P1 = new ['Foo']       # init
+        $P2 = new ['Foo'], $P1  # init_pmc
+    .end
+
+=end PIR
+
+
+=head2 Methods
+
+X<methods>
+X<classes;methods>
+X<subroutines;methods>
+Methods in PIR are subroutines stored in the class object. Define a method with
+the C<.sub> directive and the C<:method>X<:method subroutine modifier> modifier:
+
+=begin PIR
+
+  .sub half :method
+    $P0 = getattribute self, 'bar'
+    $P1 = $P0 / 2
+    .return($P1)
+  .end
+
+=end PIR
+
+This method returns the integer value of the C<bar> attribute of the object
+divided by two. Notice that the code never declares the named variable C<self>.
+Methods always make the invocant object -- the object on which the method was
+invoked -- available in a local variable called C<self>X<self variable>.
+
+The C<:method> modifier adds the subroutine to the class object
+associated with the currently selected namespace, so every class
+definition file must contain a C<.namespace>X<.namespace directive>
+declaration. Class files for languages may also contain an C<.HLL>X<.HLL
+directive> declaration to associate the namespace with the appropriate
+high-level language:
+
+=begin PIR
+
+  .HLL 'php'
+  .namespace [ 'Foo' ]
+
+=end PIR
+
+Method calls in PIR use a period (C<.>) to separate the object from the method
+name. The method name is either a literal string in quotes or a string
+variable. The method call looks up the method in the invocant object using the
+string name:
+
+=begin PIR_FRAGMENT
+
+    $P0 = $P1.'half'()
+
+    $S2 = 'double'
+    $P0 = $P1.$S2()
+
+=end PIR_FRAGMENT
+
+You can also pass a method object to the method call instead of looking it up
+by string name:
+
+=begin PIR_FRAGMENT
+
+    $P2 = get_global 'triple'
+    $P0 = $P1.$P2()
+
+=end PIR_FRAGMENT
+
+Parrot always treats a PMC used in the method position as a method object, so
+you can't pass a C<String> PMC as the method name.
+
+Methods can have multiple arguments and multiple return values just like
+subroutines:
+
+=begin PIR_FRAGMENT
+
+  ($P0, $S1) = $P2.'method'($I3, $P4)
+
+=end PIR_FRAGMENT
+
+The C<can>X<can opcode> opcode checks whether an object has a particular
+method. It returns 0 (false) or 1 (true):
+
+=begin PIR_FRAGMENT
+
+    $I0 = can $P3, 'add'
+
+=end PIR_FRAGMENT
+
+=head2 Inheritance
+
+X<inheritance>
+X<classes;inheritance>
+The C<subclass>X<subclass opcode> opcode creates a new class that
+inherits methods and attributes from another class. It takes two
+arguments: the name of the parent class and the name of the new class:
+
+=begin PIR_FRAGMENT
+
+    $P3 = subclass 'Foo', 'Bar'
+
+=end PIR_FRAGMENT
+
+C<subclass> can also take a class object as the parent class instead of
+a class name:
+
+=begin PIR_FRAGMENT
+
+    $P3 = subclass $P2, 'Bar'
+
+=end PIR_FRAGMENT
+
+X<multiple inheritance>
+The C<addparent>X<addparent opcode> opcode also adds a parent class to a
+subclass. This is especially useful for multiple inheritance, as
+the C<subclass> opcode only accepts a single parent class:
+
+=begin PIR_FRAGMENT
+
+  $P4 = newclass 'Baz'
+  addparent $P3, $P4
+  addparent $P3, $P5
+
+=end PIR_FRAGMENT
+
+To override an inherited method in the child class, define a method with the
+same name in the subclass. This example code overrides C<Bar>'s C<who_am_i>
+method to return a more meaningful name:
+
+=begin PIR
+
+  .namespace [ 'Bar' ]
+
+  .sub 'who_am_i' :method
+    .return( 'I am proud to be a Bar' )
+  .end
+
+=end PIR
+
+X<new opcode>
+Object creation for subclasses is the same as for ordinary classes:
+
+=begin PIR_FRAGMENT
+
+    $P5 = new 'Bar'
+
+=end PIR_FRAGMENT
+
+Calls to inherited methods are just like calls to methods defined in
+the class:
+
+=begin PIR_FRAGMENT
+
+    $P1.'increment'()
+
+=end PIR_FRAGMENT
+
+The C<isa> opcode checks whether an object is an instance of or inherits
+from a particular class. It returns 0 (false) or 1 (true):
+
+=begin PIR_FRAGMENT
+
+    $I0 = isa $P3, 'Foo'
+    $I0 = isa $P3, 'Bar'
+
+=end PIR_FRAGMENT
+
+=head2 Overriding Vtable Functions
+
+X<overriding vtable functions>
+X<vtable functions;overriding>
+The C<Object> PMCX<Object PMC> is a core PMC written in C that provides
+basic object-like behavior. Every object instantiated from a PIR class
+inherits a default set of vtable functions from C<Object>, but you can
+override them with your own PIR subroutines.
+
+The C<:vtable>X<:vtable subroutine modifier> modifier marks a subroutine
+as a vtable override. As it does with methods, Parrot stores vtable
+overrides in the class associated with the currently selected namespace:
+
+=begin PIR
+
+  .sub 'init' :vtable
+    $P6 = new 'Integer'
+    setattribute self, 'bar', $P6
+    .return()
+  .end
+
+=end PIR
+
+Subroutines acting as vtable overrides must either have the name of an actual
+vtable function or include the vtable function name in the C<:vtable> modifier:
+
+=begin PIR
+
+  .sub foozle :vtable('init')
+    # ...
+  .end
+
+=end PIR
+
+You must call methods on objects explicitly, but Parrot calls vtable functions
+implicitly in multiple contexts.  For example, creating a new object with C<$P3
+= new 'Foo'> will call C<init> with the new C<Foo> object.
+
+As an example of some of the common vtable overrides, the C<=>X<=
+operator> operator (or C<set>X<set opcode> opcode) calls C<Foo>'s
+vtable function C<set_integer_native> when its left-hand side is a
+C<Foo> object and the argument is an integer literal or integer
+variable:
+
+=begin PIR_FRAGMENT
+
+    $P3 = 30
+
+=end PIR_FRAGMENT
+
+The C<+>X<+ operator> operator (or C<add>X<add opcode> opcode) calls
+C<Foo>'s C<add> vtable function when it adds two C<Foo> objects:
+
+=begin PIR_FRAGMENT
+
+    $P3 = new 'Foo'
+    $P3 = 3
+    $P4 = new 'Foo'
+    $P4 = 1774
+
+    $P5 = $P3 + $P4
+    # or:
+    add $P5, $P3, $P4
+
+=end PIR_FRAGMENT
+
+The C<inc>X<inc opcode> opcode calls C<Foo>'s C<increment> vtable
+function when it increments a C<Foo> object:
+
+=begin PIR_FRAGMENT
+
+    inc $P3
+
+=end PIR_FRAGMENT
+
+Parrot calls C<Foo>'s C<get_integer> and C<get_string> vtable functions to
+retrieve an integer or string value from a C<Foo> object:
+
+=begin PIR_FRAGMENT
+
+    $I10 = $P5  # get_integer
+    say $P5     # get_string
+
+=end PIR_FRAGMENT
+
+=head2 Introspection
+
+X<introspection>
+X<classes;introspection>
+Classes defined in PIR using the C<newclass> opcode are instances of the
+C<Class> PMCX<Class PMC>. This PMC contains all the meta-information for
+the class, such as attribute definitions, methods, vtable overrides, and
+its inheritance hierarchy. The opcode C<inspect>X<inspect opcode>
+provides a way to peek behind the curtain of encapsulation to see what
+makes a class tick. When called with no arguments, C<inspect> returns an
+associative array containing data on all characteristics of the class
+that it chooses to reveal:
+
+=begin PIR_FRAGMENT
+
+  $P1 = inspect $P0
+  $P2 = $P1['attributes']
+
+=end PIR_FRAGMENT
+
+When called with a string argument, C<inspect> only returns the data for
+a specific characteristic of the class:
+
+=begin PIR_FRAGMENT
+
+  $P0 = inspect $P1, 'parents'
+
+=end PIR_FRAGMENT
+
+Table 7-1 shows the introspection characteristics supported by
+C<inspect>.
+
+=begin table Class Introspection
+
+=headrow
+
+=row
+
+=cell Characteristic
+
+=cell Description
+
+=bodyrows
+
+=row
+
+=cell C<attributes>
+
+=cell Information about the attributes the class will instantiate in
+its objects. An associative array, where the keys are the attribute
+names and the values are hashes of metadata.
+
+=row
+
+=cell C<flags>
+
+=cell An C<Integer> PMC containing any integer flags set on the class
+object.
+
+=row
+
+=cell C<methods>
+
+=cell A list of methods provided by the class. An associative array
+where the keys are the method names and the values are the invocable
+method objects.
+
+=row
+
+=cell C<name>
+
+=cell A C<String> PMC containing the name of the class.
+
+=row
+
+=cell C<namespace>
+
+=cell The C<NameSpace> PMC associated with the class.
+
+=row
+
+=cell C<parents>
+
+=cell An array of C<Class> objects that this class inherits from
+directly (via C<subclass> or C<add_parent>). Does not include indirectly
+inherited parents.
+
+=row
+
+=cell C<roles>
+
+=cell An array of C<Role> objects composed into the class.
+
+=row
+
+=cell C<vtable_overrides>
+
+=cell A list of vtable overrides defined by the class. An associative
+array where the keys are the vtable names and the values are the
+invocable sub objects.
+
+=end table
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

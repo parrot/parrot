@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ config/gen/platform/generic/dl.c
 
 =head1 DESCRIPTION
 
-Dynlib stuff
+Parrot functions which wrap around standard library functions for handling dynamic libraries.
 
 =head2 Functions
 
@@ -29,20 +29,21 @@ Dynlib stuff
 
 /*
 
-=item C<void *
-Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
-RT#48260: Not yet documented!!!
+Parrot wrapper around C<dlopen>.  Loads dynamic library file named by first
+argument and returns a handle to it.
 
 =cut
 
 */
 
 void *
-Parrot_dlopen(const char *filename)
+Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)
 {
 #ifdef PARROT_HAS_HEADER_DLFCN
-    return dlopen(filename, PARROT_DLOPEN_FLAGS);
+    return dlopen(filename, PARROT_DLOPEN_FLAGS
+                    | ((flags & Parrot_dlopen_global_FLAG) ? RTLD_GLOBAL : 0));
 #else
     return 0;
 #endif
@@ -50,10 +51,10 @@ Parrot_dlopen(const char *filename)
 
 /*
 
-=item C<const char *
-Parrot_dlerror(void)>
+=item C<const char * Parrot_dlerror(void)>
 
-RT#48260: Not yet documented!!!
+Wrapper around C<dlerror>.  System-dependent string that indicates most recent
+failure in use of C<Parrot_dlopen>, C<Parrot_dlclose> or C<Parrot_dlsym>.
 
 =cut
 
@@ -71,10 +72,10 @@ Parrot_dlerror(void)
 
 /*
 
-=item C<void *
-Parrot_dlsym(void *handle, const char *symbol)>
+=item C<void * Parrot_dlsym(void *handle, const char *symbol)>
 
-RT#48260: Not yet documented!!!
+Wrapper around C<dlysm>.  Takes a handle returned by C<Parrot_dlopen> and
+returns address where symbol is located.
 
 =cut
 
@@ -92,10 +93,10 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 /*
 
-=item C<int
-Parrot_dlclose(void *handle)>
+=item C<int Parrot_dlclose(void *handle)>
 
-RT#48260: Not yet documented!!!
+Wrapper around C<dlclose>.  Releases reference to dynamic library specified
+by argument.  Returns C<0> on success and C<-1> on failure.
 
 =cut
 

@@ -36,8 +36,7 @@ DEFAULT:
 OKAY:
 
     # XXX: get include paths from config
-    $S0 = clone root
-    concat $S0, "/include"
+    $S0 = concat root, "/include"
     paths = new 'ResizableStringArray'
     push paths, "."
     push paths, $S0
@@ -45,17 +44,17 @@ OKAY:
 
     # create includes array
     includes = new 'ResizablePMCArray'
-    store_global "_parrotlib", "include_paths", includes
+    set_hll_global ['_parrotlib'], 'include_paths', includes
 
     # get the directory handler
-    $P0 = find_global "_parrotlib", "handle_directory"
+    $P0 = get_hll_global ['_parrotlib'], 'handle_directory'
 
     # fill the includes array
 LOOP:
     $P1 = clone $P0
     $P2 = new 'String'
     $S0 = shift paths
-    concat $S0, "/"
+    $S0 = concat $S0, "/"
     $P2 = $S0
     setprop $P1, "path", $P2
     push includes, $P1
@@ -73,9 +72,9 @@ LOOP:
 
     $P1 = new 'String'
     $P1 = sig
-    find_global $P0, "_parrotlib", name
+    $P0 = get_hll_global ['_parrotlib'], name
     setprop $P0, "signature", $P1
-    store_global "_parrotlib", name, $P0
+    set_hll_global ['_parrotlib'], name, $P0
 .end
 
 =item STRING = include_file_location( STRING )
@@ -90,11 +89,11 @@ This function returns the absolute filename of the requested file.
 .sub include_file_location
     .param string name
 
-    find_global $P0, "_parrotlib", "include_paths"
+    $P0 = get_hll_global ['_parrotlib'], 'include_paths'
     $S0 = find_file_path( name, $P0 )
 
     .begin_return
-    .return $S0
+    .set_return $S0
     .end_return
 .end
 
@@ -110,11 +109,12 @@ This function returns the absolute filename of the requested file.
 .sub imcc_compile_file_location
     .param string name
 
-    find_global $P0, "_parrotlib", "include_paths"
+    $P0 = get_hll_global ['_parrotlib'], 'include_paths'
+
     $S0 = find_file_path( name, $P0 )
 
     .begin_return
-    .return $S0
+    .set_return $S0
     .end_return
 .end
 
@@ -127,36 +127,46 @@ Returns the location of a dynamic extension.
 .sub dynext_location
     .param string request
     .param string ext
+
+    .local pmc    os
     .local string name
 
+    $P0 = loadlib 'os'
+    os = new ['OS']
+
     name = request
-    stat $I0, name, 0
-    if $I0 goto END
+    push_eh FILE_NOT_FOUND_1
+    # OS.stat throws on file not found
+    os.'stat'(name)
+    goto END
 
-    name = clone request
-    concat name, ext
-    stat $I0, name, 0
-    if $I0 goto END
+FILE_NOT_FOUND_1:
+    name = concat request, ext
+    push_eh FILE_NOT_FOUND_2
+    os.'stat'(name)
+    goto END
 
-    name = "runtime/parrot/dynext/"
-    concat name, request
-    stat $I0, name, 0
-    if $I0 goto END
+FILE_NOT_FOUND_2:
+    name = concat "runtime/parrot/dynext/", request
+    push_eh FILE_NOT_FOUND_3
+    os.'stat'(name)
+    goto END
 
-    name = "runtime/parrot/dynext/"
-    concat name, request
-    concat name, ext
-    stat $I0, name, 0
-    if $I0 goto END
+FILE_NOT_FOUND_3:
+    name = concat "runtime/parrot/dynext/", request
+    name = concat name, ext
+    push_eh FILE_NOT_FOUND_4
+    os.'stat'(name)
+    goto END
 
+FILE_NOT_FOUND_4:
     # file not found, give the OS a chance to locate it
-    name = clone request
-    concat name, ext
+    name = concat request, ext
+    .return (name)
 
 END:
-    .begin_return
-    .return name
-    .end_return
+    pop_eh
+    .return (name)
 .end
 
 
@@ -164,21 +174,20 @@ END:
     .param string name
     .param pmc array
     .local string ret
-    .local pmc iter
+    .local pmc it
 
-    iter = new 'Iterator', array
-    iter = 0 #ITERATE_FROM_START
+    it = iter array
 
 NEXT:
     null ret
-    unless iter goto END
+    unless it goto END
 
-    $P0 = shift iter
+    $P0 = shift it
     ret = $P0( name )
     if_null ret, NEXT
 END:
     .begin_return
-    .return ret
+    .set_return ret
     .end_return
 .end
 
@@ -187,18 +196,25 @@ END:
     .local string path
 
 .include "interpinfo.pasm"
-    interpinfo P0, .INTERPINFO_CURRENT_SUB
-    getprop $P0, "path", P0
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    getprop $P0, "path", $P1
     path = $P0
 
-    $S0 = clone path
-    concat $S0, name
-    stat $I0, $S0, 0
-    if $I0 goto OK
+    $S0 = concat path, name
+    $P0 = loadlib 'os'
+    $P0 = new ['OS']
+    push_eh FILE_NOT_FOUND
+        # OS.stat throws on file not found
+        $P0.'stat'($S0)
+    pop_eh
+    goto END
+
+FILE_NOT_FOUND:
     null $S0
-OK:
+
+END:
     .begin_return
-    .return $S0
+    .set_return $S0
     .end_return
 .end
 
@@ -212,7 +228,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

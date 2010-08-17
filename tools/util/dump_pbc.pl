@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -70,9 +70,12 @@ sub go {
     my %cache;
 
     foreach (@dis) {
-        if    (/^Current Source Filename (.*)/) {
-            if ($cur_file ne $1) {
-                $cur_file           = $1;
+        if (/^(?:# )?Current Source Filename (.*)/) {
+            my $found = $1;
+            $found =~ s/^'//;
+            $found =~ s/'$//;
+            if ($cur_file ne $found) {
+                $cur_file           = $found;
                 $cache{$cur_file} ||= slurp_file($cur_file);
                 $cur_line           = -1;
 

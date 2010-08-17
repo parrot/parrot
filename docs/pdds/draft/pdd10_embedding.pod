@@ -1,11 +1,9 @@
-# Copyright (c) 2001-2006, The Perl Foundation.
+# Copyright (c) 2001-2010, Parrot Foundation.
 # $Id$
 
-=head1 NAME
+=head1 [DRAFT] PDD10: Embedding and Extending
 
-docs/pdds/embedding.pod - Parrot's Embedding and Extending Interface
-
-=head1 ABSTRACT
+=head2 Abstract
 
 What we believe people will do when embedding and extending Parrot, why they
 do it, and how.
@@ -13,11 +11,11 @@ do it, and how.
 {{ NOTE: some of this will later move into pdds 11 & 12, but for now
 just want to get the stub checked in. }}
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 Why embed:
 
@@ -76,7 +74,7 @@ Perl 5 problem
 
 =back
 
-=item * probably includes vtable methods on PMCs
+=item * probably includes vtable functions on PMCs
 
 =back
 
@@ -98,7 +96,7 @@ Gotchas:
 
 =item * probably a continuation/control flow boundary
 
-=item * packfiles and compilation units probably too much information for
+=item * packfiles and subroutines probably too much information for
 either
 
 =item * do not let MMD and other implementation details escape
@@ -135,7 +133,7 @@ level?
 
 =back
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 Embedding - using libparrot from within another program, likely with a
 C/NCI/FFI interface
@@ -145,7 +143,7 @@ Extending - writing Parrot extensions, likely through C or another language
 In practice, there is little difference between the two; mostly in terms of
 who has control.  The necessary interfaces should stay the same.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Implementation details.
 
@@ -168,13 +166,13 @@ as a test both of the sanity of the external interface as well as NCI
 
 =back
 
-=head2 Working with Interpreters
+=head3 Working with Interpreters
 
 It is the external code's duty to create, manage, and destroy interpreters.
 
 C<Parrot_new( NULL )> returns an opaque pointer to a new interpreter:
 
-	Parrot_Interp Parrot_new(Parrot_Interp parent);
+  Parrot_Interp Parrot_new(Parrot_Interp parent);
 
 C<parent> can be NULL for the I<first> interpreter created.  All subsequent
 calls to this function should pass an existing interpreter.
@@ -184,20 +182,20 @@ detect this in the interface and give a warning?>
 
 C<Parrot_destroy ( interp )> destroys an interpreter and frees its resources.
 
-	void Parrot_destroy(Parrot_Interp);
+  void Parrot_destroy(Parrot_Interp);
 
 I<Note: It is not clear what happens if this interpreter has active children.>
 
-=head2 Working with Source Code and PBC Files
+=head3 Working with Source Code and PBC Files
 
 Perhaps the most common case for working with code is loading it from an
 external file.  This may often be PBC, but it must also be possible to load
 code with any registered compiler.  This I<must> be a single-stage operation:
 
-	Parrot_PMC Parrot_load_bytecode( Parrot_Interp, const char *filepath );
+  Parrot_PMC Parrot_load_bytecode( Parrot_Interp, const char *filepath );
 
-	Parrot_PMC Parrot_load_hll_code( Parrot_Interp, const char *compiler,
-	                                                const char *filepath );
+  Parrot_PMC Parrot_load_hll_code( Parrot_Interp, const char *compiler,
+                                                  const char *filepath );
 
 The PMC returned will be the Sub PMC representing the entry point into the
 code.  That is, it will be the PMC representing the C<:main> subroutine, if
@@ -210,9 +208,9 @@ should be an Exception PMC instead.
 I<Note: I suppose NULL would work as well; it might be more C-like.  Continue
 considering.>
 
-I<Note also: the current C<Parrot_readbc()> and C<Parrot_loadbc()> exposes the
-details of packfiles to the external API and uses two operations to perform a
-single logical operation.>
+I<Note also: the current C<Parrot_pbc_read()> and C<Parrot_pbc_load()> exposes
+the details of packfiles to the external API and uses two operations to
+perform a single logical operation.>
 
 I<Note: it may be worth reconsidering these names, if
 C<Parrot_load_bytecode()> can load PBC, PIR, and PASM files without having a
@@ -221,42 +219,35 @@ compiler named explicitly.>
 Compiling source code generated or read from the host application is also
 possible:
 
-	 Parrot_PMC Parrot_compile_string( Parrot_Interp, const char *compiler,
-                                                      const char *code );
+  Parrot_PMC Parrot_compile_string( Parrot_Interp, Parrot_String compiler,
+                                                   const char *code,
+                                                   Parrot_String error );
 
 The potential return values are the same as for loading code from disk.
 
 I<Note: this declaration should move from F<interpreter.h> to F<embed.h>.>
 
-=head2 Working with PMCs
+=head3 Working with PMCs
 
 TBD.
 
-=head2 Calling Functions
+=head3 Calling Functions
 
 TBD.
 
-=head2 Calling Opcodes
+=head3 Calling Opcodes
 
 TBD.
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
 It should be possible to register a compiler for an HLL with an interpreter
 such that it is possible to load source code written in that language or pass
 source code to an interpreter successfully.
 
-=head1 ATTACHMENTS
+=head2 References
 
-Any associated documents.
-
-=head1 FOOTNOTES
-
-List of footnotes to the text.
-
-=head1 REFERENCES
-
-List of references.
+None.
 
 =cut
 

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Class - Parrot extension for objecty testing of modules
@@ -6,10 +8,10 @@ Test::Class - Parrot extension for objecty testing of modules
 
     .sub 'main'
         # load this library
-        load_bytecode 'library/Test/Class.pbc'
+        load_bytecode 'Test/Class.pbc'
 
         # load other testing libraries
-        .include 'include/test_more.pir'
+        .include 'test_more.pir'
 
         .local pmc class
         class = subclass [ 'Test'; 'Class' ], 'MyClass'
@@ -63,7 +65,7 @@ everything.
 .namespace [ 'Test'; 'Class' ]
 
 .sub '__init__' :load
-    load_bytecode 'runtime/parrot/library/Test/More.pbc'
+    load_bytecode 'Test/More.pbc'
 
     .local pmc class
     class = newclass [ 'Test'; 'Class' ]
@@ -256,13 +258,13 @@ everything.
     .local pmc attribute
     attribute = getattribute self, name
 
-    .local pmc iter
-    iter = new 'Iterator', attribute
+    .local pmc it
+    it = iter attribute
 
     .local string meth_name
   iter_loop:
-    unless iter goto loop_end
-    meth_name = shift iter
+    unless it goto loop_end
+    meth_name = shift it
     self.meth_name()
     goto iter_loop
   loop_end:
@@ -274,14 +276,14 @@ everything.
     .local pmc tests
     tests = getattribute self, 'tests'
 
-    .local pmc iter
-    iter = new 'Iterator', tests
+    .local pmc it
+    it = iter tests
 
     .local string meth_name
   iter_loop:
-    unless iter goto loop_end
+    unless it goto loop_end
     self.'loop_over_methods'( 'setup' )
-    meth_name = shift iter
+    meth_name = shift it
     self.meth_name()
     self.'loop_over_methods'( 'teardown' )
     goto iter_loop
@@ -299,7 +301,7 @@ internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008, The Perl Foundation.
+Copyright (C) 2008, Parrot Foundation.
 
 # $Id$
 

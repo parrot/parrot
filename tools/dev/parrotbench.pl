@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -63,7 +63,7 @@ Here is an example parrotbench.conf:
     exclude   = waves
 
     [benchmark parrotj]
-    exe       = ../../parrot -j
+    exe       = ../../parrot -R jit
     type      = .pasm
     type      = .pir
 

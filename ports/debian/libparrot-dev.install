@@ -1,4 +1,0 @@
-usr/include/*
-usr/bin/parrot-config
-usr/lib/libparrot.a
-usr/lib/pkgconfig/parrot.pc

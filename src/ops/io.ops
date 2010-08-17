@@ -1,15 +1,17 @@
 /*
  * $Id$
+ * Copyright (C) 2002-2008, Parrot Foundation.
 ** io.ops
 */
 
-VERSION = PARROT_VERSION;
+BEGIN_OPS_PREAMBLE
 #include "../io/io_private.h"
+END_OPS_PREAMBLE
 
 
 =head1 NAME
 
-io.ops
+io.ops - I/O Opcodes
 
 =cut
 
@@ -17,55 +19,160 @@ io.ops
 
 Parrot's IO API
 
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
+
 =cut
 
 ###############################################################################
 
 =head2 Parrot IO API Operations
 
-
 =over 4
 
 =cut
 
-
 ########################################
 
-=item B<close>(invar PMC)
+=item B<print>(in INT)
 
-Close IO object $1
+=item B<print>(in NUM)
+
+=item B<print>(invar PMC)
+
+=item B<print>(in STR)
+
+Print $1 to standard output.
 
 =cut
 
-inline op close(invar PMC) :base_io {
-  PIO_close(interp, $1);
+inline op print(in INT) :base_io {
+    Parrot_io_printf(interp, INTVAL_FMT, (INTVAL)$1);
 }
 
-########################################
+inline op print(in NUM) :base_io {
+#ifdef PARROT_HAS_NEGATIVE_ZERO
+    Parrot_io_printf(interp, FLOATVAL_FMT, $1);
+#else
+    /* Workaround for older msvcrt and openbsd. TT #313 */
+    if (Parrot_is_nzero($1)) {
+        Parrot_io_printf(interp, "-0");
+    }
+    else {
+        Parrot_io_printf(interp, FLOATVAL_FMT, $1);
+    }
+#endif
+}
 
-=item B<fdopen>(out PMC, in INT, in STR)
+op print(in STR) :base_io {
+    STRING * const s = $1;
+    if (s && Parrot_str_byte_length(interp, s))
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+}
 
-Create ParrotIO object in $1 as a copy of file descriptor $2.
+op print(invar PMC) :base_io {
+    PMC * const p = $1;
+    STRING * const s = (VTABLE_get_string(interp, p));
+    if (s)
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+}
 
-RT#42373: integral file descriptors might not exist outside of the UNIX
-     platform.  This op needs work.
+=item B<say>(in INT)
+
+=item B<say>(in NUM)
+
+=item B<say>(invar PMC)
+
+=item B<say>(in STR)
+
+Print $1 to standard output with a trailing newline.
 
 =cut
 
-inline op fdopen(out PMC, in INT, in STR) :filesys_open {
-    /* These char * need to go away soon */
-    char * const mode = string_to_cstring(interp, $3);
+inline op say(in INT) :base_io {
+    Parrot_io_printf(interp, INTVAL_FMT "\n", (INTVAL)$1);
+}
 
-    $1 = PIO_fdopen(interp, NULL, (PIOHANDLE)$2, mode);
-    if (!$1)
-        $1 = pmc_new(interp, enum_class_Undef);
+inline op say(in NUM) :base_io {
+#ifdef PARROT_HAS_NEGATIVE_ZERO
+    Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
+#else
+    /* Workaround for older msvcrt and openbsd. TT #313 */
+    if (Parrot_is_nzero($1)) {
+        Parrot_io_printf(interp, "-0\n");
+    }
+    else {
+        Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
+    }
+#endif
+}
 
-    /* RT#42374 all results from string_to_cstring() need freeing
-     but this generates ugly warnings WRT discarding the const
-     qualifier -lt
-    */
+op say(in STR) :base_io {
+    STRING * const s = $1;
+    if (s && Parrot_str_byte_length(interp, s))
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+    Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
+}
 
-    string_cstring_free(mode);
+op say(invar PMC) :base_io {
+    PMC * const p = $1;
+
+    if (PMC_IS_NULL(p)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+             EXCEPTION_UNEXPECTED_NULL,
+            "Null PMC in say");
+        goto ADDRESS(handler);
+    }
+    else {
+        STRING * const s = VTABLE_get_string(interp, p);
+        if (s)
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
+    }
+}
+
+
+
+
+##########################################
+
+=item B<print>(invar PMC, in INT)
+
+=item B<print>(invar PMC, in NUM)
+
+=item B<print>(invar PMC, in STR)
+
+=item B<print>(invar PMC, invar PMC)
+
+Print $2 on the IO stream object $1.
+
+=cut
+
+op print(invar PMC, in INT) :base_io {
+    if ($1) {
+        STRING * const s = Parrot_str_from_int(interp, $2);
+        Parrot_io_putps(interp, $1, s);
+    }
+}
+
+op print(invar PMC, in NUM) :base_io {
+    if ($1) {
+        STRING * const s = Parrot_sprintf_c(interp, FLOATVAL_FMT, $2);
+        Parrot_io_putps(interp, $1, s);
+    }
+}
+
+op print(invar PMC, in STR) :base_io {
+    if ($2 && $1) {
+        Parrot_io_putps(interp, $1, $2);
+    }
+}
+
+op print(invar PMC, invar PMC) :base_io {
+    if ($2 && $1) {
+        STRING * const s = VTABLE_get_string(interp, $2);
+        Parrot_io_putps(interp, $1, s);
+    }
 }
 
 =item B<getstdin>(out PMC)
@@ -86,434 +193,18 @@ store it in $1
 =cut
 
 inline op getstdin(out PMC) :base_io {
-  $1 = _PIO_STDIN(interp);
+    $1 = _PIO_STDIN(interp);
 }
 
 inline op getstdout(out PMC) :base_io {
-  $1 = _PIO_STDOUT(interp);
+    $1 = _PIO_STDOUT(interp);
 }
 
 inline op getstderr(out PMC) :base_io {
-  $1 = _PIO_STDERR(interp);
+    $1 = _PIO_STDERR(interp);
 }
-
-#########################################
-
-=item B<pioctl>(out INT, invar PMC, in INT, in INT)
-
-Perform an operation an an IO object. This is a general purpose
-hook for setting various flags, modes, etc.
-Examples: setting the record separator or setting the buffering
-
-=cut
-
-inline op pioctl(out INT, invar PMC, in INT, in INT) :advanced_io :deprecated {
-  $1 = PIO_pioctl(interp, $2, $3, $4);
-}
-
-
-#########################################
-
-=item B<open>(out PMC, in STR, in STR)
-
-Open URL (file, address, database, in core image) named $2 with
-Perl style mode string in $3 and create an IO object in $1.
-
-=item B<open>(out PMC, in STR)
-
-Open URL (file, address, database, in core image) named $2 with
-read/write mode and create an IO object in $1.
-
-=cut
-
-inline op open(out PMC, in STR, in STR) :filesys_open {
-    /* These char * need to go away soon */
-    char * const path = string_to_cstring(interp, $2);
-    char * const mode = string_to_cstring(interp, $3);
-
-    $1 = PIO_open(interp, NULL, path, mode);
-
-    string_cstring_free(mode);
-    string_cstring_free(path);
-
-    if (!$1 || !PMC_struct_val($1))
-        $1 = pmc_new(interp, enum_class_Undef);
-}
-
-inline op open(out PMC, in STR) :filesys_open {
-    /* These char * need to go away soon */
-    char * const path = string_to_cstring(interp, $2);
-
-    $1 = PIO_open(interp, NULL, path, "+<");
-    string_cstring_free(path);
-    if (!$1)
-        $1 = pmc_new(interp, enum_class_Undef);
-}
-
-########################################
-
-=item B<print>(in INT)
-
-=item B<print>(in NUM)
-
-=item B<print>(invar PMC)
-
-=item B<print>(in STR)
-
-Print $1 to standard output.
-
-=cut
-
-inline op print(in INT) :base_io {
-  PIO_printf(interp, INTVAL_FMT, (INTVAL)$1);
-}
-
-inline op print(in NUM) :base_io {
-  PIO_printf(interp, "%f", (double)$1);
-}
-
-op print(in STR) :base_io {
-  STRING * const s = $1;
-  if (s && string_length(interp, s)) {
-    PIO_putps(interp, _PIO_STDOUT(interp), s);
-  }
-}
-
-op print(invar PMC) :base_io {
-  PMC * const p = $1;
-  STRING * const s = (VTABLE_get_string(interp, p));
-  if (s) {
-    PIO_putps(interp, _PIO_STDOUT(interp), s);
-  }
-}
-
-##########################################
-
-=item B<printerr>(in INT)
-
-=item B<printerr>(in NUM)
-
-=item B<printerr>(in STR)
-
-=item B<printerr>(invar PMC)
-
-Print $1 to standard error.
-
-=cut
-
-op printerr(in INT) :base_io {
-  PIO_eprintf(interp, INTVAL_FMT, $1);
-}
-
-op printerr(in NUM) :base_io {
-  PIO_eprintf(interp, "%f", (double)$1);
-}
-
-op printerr(in STR) :base_io {
-  STRING * const s = $1;
-  if (s && string_length(interp, s))
-    PIO_putps(interp, _PIO_STDERR(interp), s);
-}
-
-op printerr(invar PMC) :base_io {
-  PMC * const p = $1;
-  STRING * const s = (VTABLE_get_string(interp, p));
-  if (s)
-    PIO_putps(interp, _PIO_STDERR(interp), s);
-}
-
-##########################################
-
-=item B<print>(invar PMC, in INT)
-
-=item B<print>(invar PMC, in NUM)
-
-=item B<print>(invar PMC, in STR)
-
-=item B<print>(invar PMC, invar PMC)
-
-Print $2 on the IO stream object $1.
-
-=cut
-
-op print(invar PMC, in INT) :base_io {
-  if ($1) {
-    STRING * const s = Parrot_sprintf_c(interp, INTVAL_FMT, $2);
-    PIO_putps(interp, $1, s);
-  }
-}
-
-op print(invar PMC, in NUM) :base_io {
-  if ($1) {
-    STRING * const s = Parrot_sprintf_c(interp, "%f", (double)$2);
-    PIO_putps(interp, $1, s);
-  }
-}
-
-op print(invar PMC, in STR) :base_io {
-  if ($2 && $1) {
-    PIO_putps(interp, $1, $2);
-  }
-}
-
-op print(invar PMC, invar PMC) :base_io {
-  if ($2 && $1) {
-    STRING * const s = VTABLE_get_string(interp, $2);
-    PIO_putps(interp, $1, s);
-  }
-}
-
-##########################################
-
-=item B<read>(out STR, in INT)
-
-Read up to N bytes from standard input stream
-
-=item B<read>(out STR, invar PMC, in INT)
-
-Read up to N bytes from IO PMC stream.
-
-=cut
-
-op read(out STR, in INT) :base_io {
-  $1 = PIO_reads(interp, _PIO_STDIN(interp), (size_t)$2);
-}
-
-op read(out STR, invar PMC, in INT) :base_io {
-  $1 = PIO_reads(interp, $2, (size_t)$3);
-}
-
-=item B<readline>(out STR, invar PMC)
-
-Read a line up to EOL from filehandle $2.
-This switches the filehandle to linebuffer-mode.
-
-=cut
-
-inline op readline(out STR, invar PMC) :base_io {
-    PMC * const pio = $2;
-    ParrotIO *io;
-    /* this ugly error handling will go away, when all the
-     * io stuff are methods
-     */
-    if (pio->vtable->base_type != enum_class_ParrotIO)
-        real_exception(interp, NULL, PIO_ERROR,
-                "Cannot read line from empty filehandle");
-    io = (ParrotIO *)PMC_data(pio);
-    if (!io)
-        real_exception(interp, NULL, PIO_ERROR,
-                "Cannot read line from empty filehandle");
-
-    if (!(io->flags & PIO_F_LINEBUF))
-        PIO_setlinebuf(interp, pio);
-    $1 = PIO_reads(interp, pio, 0);
-}
-
-##########################################
-
-=item B<peek>(out STR)
-
-Returns the next byte from standard input, but does not
-remove it from the stream.
-
-=item B<peek>(out STR, invar PMC)
-
-Reads the next byte from an IO PMC, but does not
-remove it from the stream.
-
-=cut
-
-op peek(out STR) :base_io {
-  STRING ** const s = &$1;
-
-  *s = NULL;
-  PIO_peek(interp, _PIO_STDIN(interp), s);
-}
-
-op peek(out STR, invar PMC) :base_io {
-  STRING ** const s = &$1;
-
-  *s = NULL;
-  PIO_peek(interp, $2, s);
-}
-
-##########################################
-
-=item B<stat>(out INT, in STR, in INT)
-
-=item B<stat>(out INT, in INT, in INT)
-
-Stat the file. Return stat element $3 for file $2 into $1. The queryable
-items currently are:
-
- EXISTS     0
- FILESIZE   1
- ISDIR      2
- ISDEV      3
- CREATETIME 4 (Time file was created)
- ACCESSTIME 5 (Time file was last accessed)
- MODIFYTIME 6 (Time file data was changed)
- CHANGETIME 7 (Time file metadata was changed)
- BACKUPTIME 8 (Time of last backup)
- UID        9
- GID        10
-
-
-=cut
-
-op stat(out INT, in STR, in INT) {
-  $1 = Parrot_stat_info_intval(interp, $2, $3);
-}
-
-op stat(out INT, in INT, in INT) {
-  $1 = Parrot_fstat_info_intval(interp, $2, $3);
-}
-
-
-##########################################
-
-=item B<seek>(invar PMC, in INT, in INT)
-
-seek:
-Set file position to offset $2 on IO stream $1. 'whence' is
-indicated by the value in $3.
-
-=item B<seek>(invar PMC, in INT, in INT, in INT)
-
-64bit seek:
-Set file position to offset ($2 << 32 | $3) on IO stream $1. 'whence' is
-indicated by the value in $4. This allows 64-bit seeks with only 32-bit
-INTVALS.
-
-=cut
-
-op seek(invar PMC, in INT, in INT) :base_io {
-  if ($1) {
-    if (PIO_seek(interp, $1, PIO_make_offset($2), $3) < 0) {
-      real_exception(interp, NULL, PIO_ERROR, "seek failed (32bit)");
-    }
-  }
-}
-
-op seek(invar PMC, in INT, in INT, in INT) :base_io {
-  if ($1) {
-    if (PIO_seek(interp, $1, PIO_make_offset32($2, $3), $4) < 0) {
-      real_exception(interp, NULL, PIO_ERROR, "seek failed (64bit)");
-    }
-  }
-}
-
-=item B<tell>(out INT, invar PMC)
-
-tell:
-Get the current file position of stream $2 and store it in $1.
-On systems where INTVAL is 32bit the result will be truncated if the
-position is beyond 2 GiB
-
-=item B<tell>(out INT, out INT, invar PMC)
-
-64bit tell:
-Get the current file positon of stream $3 in two parts of 32-bit each
-($1 = pos >> 32, $2 = pos & 0xffffffff).
-
-=cut
-
-op tell(out INT, invar PMC) :base_io {
-  if ($2)
-    $1 = (INTVAL)PIO_tell(interp, $2);
-}
-
-op tell(out INT, out INT, invar PMC) :base_io {
-  if ($3) {
-    PIOOFF_T pos;
-    pos = PIO_tell(interp, $3);
-    $1 = (INTVAL)(pos >> 31);
-    $2 = (INTVAL)(pos & 0xffffffff);
-  }
-}
-
-########################################
-
-=item B<socket>(out PMC, in INT, in INT, in INT)
-
-=item B<sockaddr>(out STR, in INT, in STR)
-
-=item B<connect>(out INT, invar PMC, in STR)
-
-=item B<recv>(out INT, invar PMC, out STR)
-
-=item B<send>(out INT, invar PMC, in STR)
-
-=item B<poll>(out INT, invar PMC, in INT, in INT, in INT)
-
-=item B<bind>(out INT, invar PMC, in STR)
-
-=item B<listen>(out INT, invar PMC, in INT)
-
-=item B<accept>(out PMC, invar PMC)
-
-=cut
-
-op socket(out PMC, in INT, in INT, in INT) :base_network {
-  $1 = PIO_socket(interp, $2, $3, $4);
-  if (!$1)
-    $1 = pmc_new(interp, enum_class_Undef);
-}
-
-op sockaddr(out STR, in INT, in STR) :base_network {
-    $1 = PIO_sockaddr_in(interp, (unsigned short)$2, $3);
-}
-
-op connect(out INT, invar PMC, in STR) :base_network {
-    $1 = (INTVAL)PIO_connect(interp, $2, $3);
-}
-
-op recv(out INT, invar PMC, out STR) :base_network {
-    STRING *dest = $3;
-    $1 = (INTVAL)PIO_recv(interp, $2, &dest);
-    $3 = dest;
-}
-
-op send(out INT, invar PMC, in STR) :base_network {
-    $1 = (INTVAL)PIO_send(interp, $2, $3);
-}
-
-op poll(out INT, invar PMC, in INT, in INT, in INT) :base_network {
-    $1 = (INTVAL)PIO_poll(interp, $2, $3, $4, $5);
-}
-
-op bind(out INT, invar PMC, in STR) :base_network {
-    $1 = (INTVAL)PIO_bind(interp, $2, $3);
-}
-
-op listen(out INT, invar PMC, in INT) :base_network {
-    $1 = (INTVAL)PIO_listen(interp, $2, $3);
-}
-
-op accept(out PMC, invar PMC) :base_network {
-    $1 = PIO_accept(interp, $2);
-}
-
-########################################
-
-=back
-
-=cut
-
 
 ###############################################################################
-
-=head1 COPYRIGHT
-
-Copyright (C) 2001-2008, The Perl Foundation.
-
-=head1 LICENSE
-
-This program is free software. It is subject to the same license
-as the Parrot interpreter itself.
-
-=cut
-
 
 /*
  * Local variables:

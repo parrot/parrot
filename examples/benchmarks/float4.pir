@@ -1,3 +1,6 @@
+# Copyright (C) 2008-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 float4.pir - Benchmark different ways of filling a float4 struct

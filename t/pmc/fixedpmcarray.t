@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 19;
-use Test::More;
 
 =head1 NAME
 
@@ -23,348 +17,162 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-my $fp_equality_macro = pasm_fp_equality_macro();
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0,'FixedPMCArray'
-
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, 'FixedPMCArray'
-
-    set I0,P0
-    set P0,1
-    set P0,2
-    print "Should have gotten an exception\n "
-
-
-        end
-CODE
-/FixedPMCArray: Can't resize!
-current instr\.:/
-OUTPUT
-
-#VIM's syntax highlighter needs this line
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Truth and falsehood" );
-        new P0, 'FixedPMCArray'
-
-        set P0, 0
-        if P0, NOK_1
-        branch OK_1
-NOK_1:  print "not "
-OK_1:   print "ok 1\n"
-        unless P0, OK_2
-        print "not "
-OK_2:   print "ok 2\n"
-
-        set P0, 1
-        unless P0, NOK_3
-        branch OK_3
-NOK_3:  print "not "
-OK_3:   print "ok 3\n"
-        if P0, OK_4
-        print "not "
-OK_4:   print "ok 4\n"
-
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-        new P0, 'FixedPMCArray'
-        set P0, 1
-
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,3.7,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-    set P0[0],"muwhahaha"
-    set S0,P0[0]
-    eq S0,"muwhahaha",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-        new P0, 'FixedPMCArray'
-        set P0, 2
-
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-    set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,3.7,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-    set P0[1],"purple"
-    set S0, P0[1]
-    eq S0,"purple",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-# RT#46823: Rewrite these properly when we have exceptions
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-        new P0, 'FixedPMCArray'
-        set P0, 1
-
-    set P0[1], -7
-
-    end
-CODE
-/FixedPMCArray: index out of bounds!
-current instr\.:/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-        new P0, 'FixedPMCArray'
-        set P0, 1
-
-    set I0, P0[1]
-    end
-CODE
-/FixedPMCArray: index out of bounds!
-current instr\.:/
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-@{[ $fp_equality_macro ]}
-     new P0, 'FixedPMCArray'
-     set P0, 3
-     new P1, 'Key'
-
-     set P1, 0
-     set P0[P1], 25
-
-     set P1, 1
-     set P0[P1], 2.5
-
-     set P1, 2
-     set P0[P1], "bleep"
-
-     set I0, P0[0]
-     eq I0, 25, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set N0, P0[1]
-     .fp_eq(N0, 2.5, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set S0, P0[2]
-     eq S0, "bleep", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-@{[ $fp_equality_macro ]}
-     new P0, 'FixedPMCArray'
-     set P0, 1024
-
-     set P0[25], 125
-     set P0[128], 10.2
-     set P0[513], "cow"
-     new P1, 'Integer'
-     set P1, 123456
-     set P0[1023], P1
-
-     new P2, 'Key'
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 125, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq(N0, 10.2, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "cow", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 123456, OK4
-     print "not "
-OK4: print "ok 4\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pir_output_like(
-    <<'CODE',
-
 .sub main :main
+    .include 'test_more.pir'
+    plan(83)
+    test_setting_array_size()
+    test_assign_from_another()
+    test_assign_self()
+    test_assign_non_array()
+    test_resize_exception()
+    test_truthiness()
+    test_tt991()
+    test_tt1039()
+    test_setting_first_elem()
+    test_setting_second_elem()
+    test_negative_index()
+    test_oob_elem()
+    test_set_pmc_keys_access_ints()
+    test_set_ints_access_pmc_keys()
+    test_interface()
+    test_get_uninitialized()
+    test_get_null_elem()
+    test_definedness()
+    test_splice_oob()
+    test_get_repr()
+    test_elements()
+    test_equality()
+    test_multi_keys()
+    test_splice()
+    test_sort()
+    test_exists()
+    test_new_style_init()
+    test_invalid_init_tt1509()
+.end
+
+.sub test_exists
+    .local pmc fpa
+    fpa = new ['FixedPMCArray']
+    fpa = 5
+    $I0 = exists fpa[3]
+    nok($I0,'FixedPMCArray element existence')
+    fpa[2] = 42
+    $I0 = exists fpa[2]
+    ok($I0,'FixedPMCArray element existence')
+
+    new $P1, ['Key']
+    set $P1, 0
+    fpa[$P1] = 99
+    $I0 = exists fpa[$P1]
+    ok($I0,'FixedPMCArray element existence')
+.end
+
+.sub test_sort
      .local pmc compares, cmp_fun
-     # RT#46855 doesnt work wit prederef of JIT
+     # TT #1317 doesnt work wit prederef of JIT
      bounds 1
-     compares = new 'Integer'
+     compares = new ['Integer']
      compares = 0
-     global "compares" = compares
-    cmp_fun = global "cmp_fun"
+     set_global "compares", compares
+     cmp_fun = get_global "cmp_fun"
      sort_ar()
      sort_ar(cmp_fun)
 .end
+
+# this is used by test_sort
 .sub sort_ar
     .param pmc cmp_fun :optional
     .local pmc compares
-    compares = global "compares"
+    compares = get_global "compares"
     compares = 0
-    .local pmc ar
-    new ar, 'FixedPMCArray'
-    ar = 5
-    ar[0] = 10
-    ar[1] = 2
-    ar[2] = 5
-    ar[3] = 9
-    ar[4] = 1
-    ar."sort"(cmp_fun)
-    print "ok 1\n"
+    .local pmc array
+    array = new ['FixedPMCArray']
+    array = 5
+    array[0] = 10
+    array[1] = 2
+    array[2] = 5
+    array[3] = 9
+    array[4] = 1
+    array."sort"(cmp_fun)
+    ok(1,'call sort on FixedPMCArray')
 
-    .local pmc it
-    iter it, ar
-lp:
-    unless it goto done
-    $P0 = shift it
-    print $P0
-    print " "
-    goto lp
-done:
-    print "x\n"
-     print "compares: "
-     print compares
-     print "\n"
+    .local pmc test1
+    test1 = new ['FixedPMCArray']
+    test1 = 5
+    test1[0] = 1
+    test1[1] = 2
+    test1[2] = 5
+    test1[3] = 9
+    test1[4] = 10
+
+    is_deeply( array, test1 )
+
 .end
 
+# this is used by test_sort
 .sub cmp_fun
     .param pmc a
     .param pmc b
     $I0 = cmp a, b
     .local pmc compares
-    compares = global "compares"
+    compares = get_global "compares"
     inc compares
     .begin_return
-    .return $I0
+    .set_return $I0
     .end_return
 .end
-CODE
 
-    qr/ok 1
-1 2 5 9 10 x
-compares: 0
-ok 1
-1 2 5 9 10 x
-compares: [1-9]\d*/, "sort"
-);
+.sub test_splice
+    .local pmc one
+    .local pmc test1, test2, test3
+    one = new ['Integer']
+    one = 1
 
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
+    .local pmc fpa
+    fpa = new ['FixedPMCArray']
+    fpa = 5
 
-.sub _main
-    .local pmc pmc1
-    pmc1 = new 'FixedPMCArray'
-    .local int bool1
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "array"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    splice fpa, one, 0, 5
+    test1 = new ['FixedPMCArray']
+    test1 = 5
+    test1[0] = 1
+    test1[1] = 1
+    test1[2] = 1
+    test1[3] = 1
+    test1[4] = 1
+
+    is_deeply(fpa, test1 )
+
+    .local pmc two
+    two = new ['Integer']
+    two = 2
+
+    splice fpa, two, 1, 3
+    test2 = new ['FixedPMCArray']
+    test2 = 5
+    test2[0] = 1
+    test2[1] = 2
+    test2[2] = 2
+    test2[3] = 2
+    test2[4] = 1
+    is_deeply(fpa, test2 )
+
+    .local pmc three
+    three = new ['Integer']
+    three = 3
+
+    splice fpa, three, 2, 3
+    test3 = new ['FixedPMCArray']
+    test3 = 5
+    test3[0] = 1
+    test3[1] = 2
+    test3[2] = 3
+    test3[3] = 3
+    test3[4] = 3
+    is_deeply(fpa, test3 )
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "Getting unitialized elements" );
-
-.sub main :main
-    .local pmc arr1
-    arr1 = new 'FixedPMCArray'
-    arr1 = 2005
-    .local pmc elem_1956
-    elem_1956 = arr1[1956]
-    .local string type_1956
-    type_1956 = typeof elem_1956
-    print type_1956
-.end
-CODE
-/Null PMC access in name()/
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
-
-.sub test :main
+.sub test_multi_keys
     .local pmc    matrix, row
     .local pmc    elem_in_pmc
     .local pmc    elem_out_pmc
@@ -372,330 +180,527 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
     .local num    elem_out_num
     .local string elem_out_string
 
-    matrix = new 'FixedPMCArray'
+    matrix = new ['FixedPMCArray']
     matrix = 1
-    row = new 'FixedPMCArray'
-    row = 4           # assing with an integer, number, pmc, string
+    row = new ['FixedPMCArray']
+    row = 4           # set the size by assigning an integer, number or pmc
     matrix[0] = row
     matrix[0;0] = 128
     matrix[0;1] = 128.128
-    elem_in_pmc = new 'Integer'
+    elem_in_pmc = new ['Integer']
     elem_in_pmc = 256
     matrix[0;2] = elem_in_pmc
     matrix[0;3] = "asdf"
 
     elem_out_int = matrix[0;0]
-    print "set_integer_keyed, get_integer_keyed: "
-    print elem_out_int
-    print "\n"
+    is(elem_out_int,128)
 
-    print "set_integer_keyed, get_pmc_keyed: "
     elem_out_pmc = matrix[0;0]
-    print elem_out_pmc
-    print "\n"
+    is(elem_out_pmc,128)
 
-    print "set_integer_keyed, get_number_keyed: "
     elem_out_num = matrix[0;0]
-    print elem_out_num
-    print "\n"
+    is(elem_out_num,128)
 
-    print "set_integer_keyed, get_string_keyed: "
     elem_out_string = matrix[0;0]
-    print elem_out_string
-    print "\n"
+    is(elem_out_string,128)
 
-    print "set_number_keyed, get_pmc_keyed: "
     elem_out_pmc = matrix[0;1]
-    print elem_out_pmc
-    print "\n"
+    is(elem_out_pmc,"128.128")
 
-    print "set_number_keyed, get_number_keyed: "
     elem_out_num = matrix[0;1]
-    print elem_out_num
-    print "\n"
+    is(elem_out_num,"128.128")
 
-    print "set_number_keyed, get_string_keyed: "
     elem_out_string = matrix[0;1]
-    print elem_out_string
-    print "\n"
+    is(elem_out_string,"128.128")
 
     elem_out_int = matrix[0;2]
-    print "set_pmc_keyed, get_integer_keyed: "
-    print elem_out_int
-    print "\n"
+    is(elem_out_int,256)
 
-    print "set_pmc_keyed, get_pmc_keyed: "
     elem_out_pmc = matrix[0;2]
-    print elem_out_pmc
-    print "\n"
+    is(elem_out_pmc,256)
 
-    print "set_pmc_keyed, get_number_keyed: "
     elem_out_num = matrix[0;2]
-    print elem_out_num
-    print "\n"
+    is(elem_out_num,256)
 
-    print "set_pmc_keyed, get_string_keyed: "
     elem_out_string = matrix[0;2]
-    print elem_out_string
-    print "\n"
+    is(elem_out_string,256)
 
     elem_out_int = matrix[0;0]
-    print "set_integer_keyed, get_integer_keyed: "
-    print elem_out_int
-    print "\n"
+    is(elem_out_int,128)
 
-    print "set_integer_keyed, get_pmc_keyed: "
     elem_out_pmc = matrix[0;0]
-    print elem_out_pmc
-    print "\n"
+    is(elem_out_pmc,128)
 
-    print "set_integer_keyed, get_number_keyed: "
     elem_out_num = matrix[0;0]
-    print elem_out_num
-    print "\n"
+    is(elem_out_num,128)
 
-    print "set_integer_keyed, get_string_keyed: "
     elem_out_string = matrix[0;0]
-    print elem_out_string
-    print "\n"
+    is(elem_out_string,128)
 
 .end
-CODE
-set_integer_keyed, get_integer_keyed: 128
-set_integer_keyed, get_pmc_keyed: 128
-set_integer_keyed, get_number_keyed: 128.000000
-set_integer_keyed, get_string_keyed: 128
-set_number_keyed, get_pmc_keyed: 128.128
-set_number_keyed, get_number_keyed: 128.128000
-set_number_keyed, get_string_keyed: 128.128
-set_pmc_keyed, get_integer_keyed: 256
-set_pmc_keyed, get_pmc_keyed: 256
-set_pmc_keyed, get_number_keyed: 256.000000
-set_pmc_keyed, get_string_keyed: 256
-set_integer_keyed, get_integer_keyed: 128
-set_integer_keyed, get_pmc_keyed: 128
-set_integer_keyed, get_number_keyed: 128.000000
-set_integer_keyed, get_string_keyed: 128
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "equality" );
-.sub main :main
+.sub test_equality
     .local pmc fpa1, fpa2, p1, p2
     .local int i
-    fpa1 = new 'FixedPMCArray'
-    fpa2 = new 'FixedPMCArray'
+    fpa1 = new ['FixedPMCArray']
+    fpa2 = new ['FixedPMCArray']
 
-    print "1:"
-    if fpa1 == fpa2 goto L1
-    print "not "
-L1: say "equal"    
+    is(fpa1,fpa2)
 
     fpa1 = 3
-    print "2:"
-    if fpa1 == fpa2 goto L2
-    print "not "
-L2: say "equal"
+    isnt(fpa1,fpa2)
 
     fpa2 = 3
 
-    p1 = new 'String'
+    p1 = new ['String']
     p1 = "foobarx"
-    p2 = new 'String'
+    p2 = new ['String']
     p2 = "foobarx"
 
     fpa1[0] = p1
     fpa2[0] = p2
 
-    print "3:"
-    if fpa1 == fpa2 goto L3
-    print "not "
-L3: say "equal"
+    is(fpa1,fpa2)
 
-    p1 = new 'String'
-    p2 = new 'String'
+    p1 = new ['String']
+    p2 = new ['String']
     p1 = ''
     p2 = ''
 
     fpa1[1] = p1
 
-    print "4:"
-    if fpa1 == fpa2 goto L4
-    print "not "
-L4: say "equal"
+    isnt(fpa1,fpa2)
 
     fpa2[1] = p2
 
-    print "5:"
-    if fpa1 == fpa2 goto L5
-    print "not "
-L5: say "equal"
+    is(fpa1,fpa2)
 
 .end
-CODE
-1:equal
-2:not equal
-3:equal
-4:not equal
-5:equal
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
-.sub main :main
+.sub test_elements
     .local pmc arr1
-    arr1 = new 'FixedPMCArray'
+    .local int elems_i
+    .local num elems_f
+    arr1 = new ['FixedPMCArray']
+    arr1 = 0
+    elems_i = elements arr1
+    is(elems_i,0)
+
+    elems_i = arr1
+    is(elems_i,0)
+
+    elems_f = arr1
+    is(elems_f,0)
+
+    arr1 = new ['FixedPMCArray']
+    arr1 = 2048
+    elems_i = elements arr1
+    is(elems_i,2048)
+
+    elems_i = arr1
+    is(elems_i,2048)
+
+    elems_f = arr1
+    is(elems_f,2048)
+.end
+
+.sub test_get_repr
+    .local string s, aux
+    s = get_repr_fpa_n(0)
+    aux = get_repr_fpa_n(1)
+    concat s, aux
+    aux = get_repr_fpa_n(2)
+    concat s, aux
+    aux = get_repr_fpa_n(3)
+    concat s, aux
+    substring(s,'()(0)(0, 1)(0, 1, 2)','get_repr')
+.end
+
+.sub get_repr_fpa_n
+    .param int n
+    .local int i
+    .local pmc fpa, p
+    .local string s
+    fpa = new ['FixedPMCArray']
+    fpa = n
+    i = 0
+next:
+    if i == n goto done
+    p = box i
+    fpa[i] = p
+    inc i
+    goto next
+done:
+    s = get_repr fpa
+    .return(s)
+.end
+
+.sub test_splice_oob
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, offset 0')
+    .sub main
+        .local pmc fpa
+        fpa = new ['FixedPMCArray']
+        fpa = 5
+
+        .local pmc nil
+        nil = new ['Undef']
+
+        splice fpa, nil, 0, 6
+    .end
+CODE
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, big offset')
+    .sub main
+        .local pmc fpa
+        fpa = new ['FixedPMCArray']
+        fpa = 5
+
+        .local pmc nil
+        nil = new ['Undef']
+
+        splice fpa, nil, 6, 0
+    .end
+CODE
+.end
+
+.sub test_definedness
+    .local pmc arr1
+    arr1 = new ['FixedPMCArray']
     arr1 = 2005
     .local int defined_elem_1956
     defined_elem_1956 = defined arr1[1956]
-    print defined_elem_1956
+    is(defined_elem_1956,0,'definedness')
     arr1[1956] = 42
     defined_elem_1956 = defined arr1[1956]
-    print defined_elem_1956
+    is(defined_elem_1956,1,'definedness')
     .local pmc val
     null val
     arr1[1956] = val
     defined_elem_1956 = defined arr1[1956]
-    print defined_elem_1956
-    print "\n"
+    is(defined_elem_1956,0,'definedness')
+.end
+
+.sub test_get_null_elem
+  .local pmc arr1, n
+  .local int i
+  .local string s
+  arr1 = new ['FixedPMCArray']
+  arr1 = 1
+  arr1[0] = n
+  i = arr1[0]
+  is(i,0,'null int is 0')
+  s = arr1[0]
+  is(s,"",'null string is empty string')
+.end
+
+.sub test_get_uninitialized
+    throws_substring(<<'CODE','Null PMC access in name','get uninitialized')
+    .sub main
+        .local pmc arr1
+        arr1 = new ['FixedPMCArray']
+        arr1 = 2005
+        .local pmc elem_1956
+        elem_1956 = arr1[1956]
+        .local string type_1956
+        type_1956 = typeof elem_1956
+        print type_1956
+    .end
+CODE
+.end
+
+.sub test_interface
+    .local pmc pmc1
+    pmc1 = new ['FixedPMCArray']
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    nok(bool1,'FixedPMCArray does not scalar')
+    does bool1, pmc1, "array"
+    ok(bool1,'FixedPMCArray does array')
+    does bool1, pmc1, "no_interface"
+    nok(bool1,'no interface')
+.end
+.sub test_set_ints_access_pmc_keys
+     new $P0, ['FixedPMCArray']
+     set $P0, 1024
+
+     set $P0[25], 125
+     set $P0[128], 10.2
+     set $P0[513], "cow"
+     new $P1, ['Integer']
+     set $P1, 123456
+     set $P0[1023], $P1
+
+     new $P2, ['Key']
+     set $P2, 25
+     set $I0, $P0[$P2]
+     is($I0, 125,'got int with pmc key')
+
+     set $P2, 128
+     set $N0, $P0[$P2]
+     is($N0,10.2,'got float with pmc key',0.00001)
+
+     set $P2, 513
+     set $S0, $P0[$P2]
+     is($S0, "cow", 'got string with pmc key')
+
+     set $P2, 1023
+     set $P3, $P0[$P2]
+     set $I1, $P3
+     is($I1, 123456, 'got another int with pmc key')
+.end
+
+.sub test_set_pmc_keys_access_ints
+     new $P0, ['FixedPMCArray']
+     set $P0, 3
+     new $P1, ['Key']
+
+     set $P1, 0
+     set $P0[$P1], 25
+
+     set $P1, 1
+     set $P0[$P1], 2.5
+
+     set $P1, 2
+     set $P0[$P1], "bleep"
+
+     set $I0, $P0[0]
+     is($I0, 25,'got integer with int lookup')
+     set $N0, $P0[1]
+     is($N0,2.5,'got float with int lookup',0.00001)
+
+     set $S0, $P0[2]
+     is($S0, "bleep",'got string with int lookup')
+.end
+
+.sub test_oob_elem
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
+        .sub main
+            new $P0, ['FixedPMCArray']
+            set $P0, 1
+            set $P0[1], -7
+        .end
+CODE
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
+        .sub main
+            new $P0, ['FixedPMCArray']
+            set $P0, 1
+            set $I0, $P0[1]
+        .end
+CODE
+
+.end
+
+.sub test_negative_index
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set negative index')
+.sub main
+    new $P0, ['FixedPMCArray']
+    set $P0, 1
+    set $P0[-1], -7
 .end
 CODE
-010
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "elements, get_integer, get_number" );
-.sub 'test' :main
-    .local pmc arr1
-    .local int elems_i
-    .local num elems_f
-    arr1 = new 'FixedPMCArray'
-    arr1 = 0
-    elems_i = elements arr1
-    if elems_i == 0 goto ok_1
-    print 'not '
-  ok_1:
-    say 'ok 1'
-
-    elems_i = arr1
-    if elems_i == 0 goto ok_2
-    print 'not '
-  ok_2:
-    say 'ok 2'
-
-    elems_f = arr1
-    if elems_f == 0 goto ok_3
-    print 'not '
-  ok_3:
-    say 'ok 3'
-
-    arr1 = new 'FixedPMCArray'
-    arr1 = 2048
-    elems_i = elements arr1
-    if elems_i == 2048 goto ok_4
-    print 'not '
-  ok_4:
-    say 'ok 4'
-
-    elems_i = arr1
-    if elems_i == 2048 goto ok_5
-    print 'not '
-  ok_5:
-    say 'ok 5'
-
-    elems_f = arr1
-    if elems_f == 2048 goto ok_6
-    print 'not '
-  ok_6:
-    say 'ok 6'
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','get negative index')
+.sub main
+    new $P0, ['FixedPMCArray']
+    set $P0, 1
+    set $I0, $P0[-1]
 .end
 CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'basic splice');
-.sub 'main'
-    .local pmc one
-    one = new 'Integer'
-    one = 1
-
-    .local pmc fpa
-    fpa = new 'FixedPMCArray'
-    fpa = 5
-
-    splice fpa, one, 0, 5
-    print_array( fpa )
-
-    .local pmc two
-    two = new 'Integer'
-    two = 2
-
-    splice fpa, two, 1, 3
-    print_array( fpa )
-
-    .local pmc three
-    three = new 'Integer'
-    three = 3
-
-    splice fpa, three, 2, 3
-    print_array( fpa )
 .end
 
-.sub 'print_array'
-    .param pmc fpa
+.sub test_setting_second_elem
+    new $P0, ['FixedPMCArray']
+    set $P0, 2
 
-    .local pmc it
-    iter it, fpa
+    set $P0[1],-7
+    set $I0,$P0[1]
+    is($I0,-7,'set second elem to int')
 
-    .local pmc elem
-  iter_start:
-    elem = shift it
-    print elem
-    if it goto iter_start
-  iter_end:
-    print "\n"
+    set $P0[1],3.7
+    set $N0,$P0[1]
+    is($N0,3.7,'set second elem to float')
+
+    set $P0[1],"muwhahaha"
+    set $S0,$P0[1]
+    is($S0,"muwhahaha",'set second elem to string')
 .end
+
+.sub test_setting_first_elem
+    new $P0, ['FixedPMCArray']
+    set $P0, 1
+
+    set $P0[0],-7
+    set $I0,$P0[0]
+    is($I0,-7,'set first elem to int')
+
+    set $P0[0],3.7
+    set $N0,$P0[0]
+    is($N0,3.7,'set first elem to float')
+
+    set $P0[0],"muwhahaha"
+    set $S0,$P0[0]
+    is($S0,"muwhahaha",'set first elem to string')
+.end
+
+.sub test_truthiness
+    new $P0, ['FixedPMCArray']
+    set $P0, 0
+    nok($P0,'length 0 FixedPMCArray is falsey')
+    set $P0, 1
+    ok($P0, 'length 1 FixedPMCArray is truthy')
+.end
+
+.sub test_tt991
+    throws_substring(<<'CODE','FixedPMCArray: Cannot set array size to a negative number','cannot create a negative length array')
+        .sub main
+            new $P0, ['FixedPMCArray']
+            set $P0, -1
+        .end
 CODE
-11111
-12221
-12333
-OUTPUT
-
-pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, offset 0');
-.sub 'main'
-    .local pmc fpa
-    fpa = new 'FixedPMCArray'
-    fpa = 5
-
-    .local pmc nil
-    nil = new 'Undef'
-
-    splice fpa, nil, 0, 6
 .end
-CODE
-/FixedPMCArray: index out of bounds!/
-OUTPUT
 
-pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, big offset');
-.sub 'main'
-    .local pmc fpa
-    fpa = new 'FixedPMCArray'
-    fpa = 5
+.sub test_tt1039
+    .local pmc arr
+    arr = new 'FixedPMCArray'
+    arr = 4
+    arr[0] = 'just'
+    arr[1] = 'another'
+    arr[2] = 'perl'
+    arr[3] = 'hacker'
 
-    .local pmc nil
-    nil = new 'Undef'
+    .local pmc sorted_arr
+    sorted_arr = new 'FixedPMCArray'
+    sorted_arr = 4
+    sorted_arr[0] = 'another'
+    sorted_arr[1] = 'hacker'
+    sorted_arr[2] = 'just'
+    sorted_arr[3] = 'perl'
 
-    splice fpa, nil, 6, 0
+    $P0 = get_global 'cmpfn1'
+    $P1 = clone arr
+    $P1.'sort'($P0)
+    is_deeply($P1, sorted_arr, 'fpa.sort called with normal Sub')
+
+    $P0 = get_global 'cmpfn2'
+    $P1 = clone arr
+    $P1.'sort'($P0)
+    is_deeply($P1, sorted_arr, 'fpa.sort called with MultiSub')
 .end
+
+.sub 'cmpfn1'
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_str a, b
+    .return ($I0)
+.end
+
+.sub 'cmpfn2' :multi(_, _)
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_str a, b
+    .return ($I0)
+.end
+
+.sub test_resize_exception
+    throws_substring(<<'CODE',"FixedPMCArray: Can't resize",'cannot resize FixedPMCArray')
+        .sub main
+            new $P0, ['FixedPMCArray']
+            set $I0,$P0
+            set $P0,1
+            set $P0,2
+        .end
 CODE
-/FixedPMCArray: index out of bounds!/
-OUTPUT
+
+    throws_substring(<<'CODE',"set_number_native() not implemented in class 'FixedPMCArray'", 'cannot use float as length to FixedPMCArray')
+        .sub main
+            new $P0, ['FixedPMCArray']
+            set $P0, 42.0
+        .end
+CODE
+
+    throws_substring(<<'CODE',"set_string_native() not implemented in class 'FixedPMCArray'", 'cannot use string as length to FixedPMCArray')
+        .sub main
+            new $P0, ['FixedPMCArray']
+            set $P0,"GIGO"
+        .end
+CODE
+.end
+
+.sub test_assign_non_array
+    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
+    .sub main
+        .local pmc arr, other
+        .local int n
+        arr = new ['FixedPMCArray']
+        other = new ['Integer']
+        assign arr, other
+    .end
+CODE
+.end
+
+.sub test_assign_self
+    .local pmc arr
+    arr = new ['FixedPMCArray']
+    assign arr, arr
+    ok(1, 'Can assign FixedPMCArray to itself')
+.end
+
+.sub test_assign_from_another
+    .local pmc arr1, arr2
+    .local int n
+    arr1 = new ['FixedPMCArray']
+    arr1 = 32
+    arr2 = new ['FixedPMCArray']
+    arr2 = 15
+    assign arr1, arr2
+    n = arr1
+    is(n,15,'assigning to FixedPMCArray from another FixedPMCArray')
+.end
+
+.sub test_setting_array_size
+    new $P0, ['FixedPMCArray']
+
+    set $I0, $P0
+    is($I0,0,'size of new FixedPMCArray is 0')
+
+    set $P0, 1
+    set $I0, $P0
+
+    is($I0,1,'size of FixedPMCArray is 1')
+.end
+
+.sub 'test_new_style_init'
+    $P0 = new 'FixedPMCArray', 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+
+    $P0 = new ['FixedPMCArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements for a key constant")
+
+    $P1 = new 'Integer'
+    $P0[9] = $P1
+    $P2 = $P0[9]
+    is($P2, $P1, 'New style init creates the array')
+.end
+
+.sub test_invalid_init_tt1509
+    throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    .sub main
+        $P0 = new ['FixedPMCArray'], -10
+    .end
+CODE
+
+    throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    .sub main
+        $P0 = new 'FixedPMCArray', -10
+    .end
+CODE
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

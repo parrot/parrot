@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -11,11 +11,15 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/library/pge.t - Parrot Grammar Engine basic tests
+t/library/pge.t
 
 =head1 SYNOPSIS
 
         % prove -Ilib t/library/pge.t
+
+=head1 DESCRIPTION
+
+Parrot Grammar Engine basic tests
 
 =cut
 

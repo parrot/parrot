@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -15,7 +15,7 @@ Generates several files used by the OpenGL binding.  These include:
 
 =item F<runtime/parrot/library/OpenGL_funcs.pir>
 
-=item F<config/gen/call_list/opengl.in>
+=item F<src/glut_nci_thunks.nci>
 
 =item F<src/glut_callbacks.c>
 
@@ -37,7 +37,9 @@ package gen::opengl;
 
 use strict;
 use warnings;
+use File::Basename;
 use File::Glob;
+use File::Which;
 
 use base qw(Parrot::Configure::Step);
 
@@ -105,6 +107,7 @@ my @FREEGLUT_CALLBACKS = (
 # alter the typemaps to fit this bug.
 
 my %C_TYPE = (
+    VOID                    => 'void',
     GLvoid                  => 'void',
     GLUnurbs                => 'void',
     GLUquadric              => 'void',
@@ -125,6 +128,7 @@ my %C_TYPE = (
     COLORREF                => 'void',
 
     wchar_t                 => 'void',
+    GLCchar                 => 'void',
 
     GLMfunctions            => 'void*',
     GLXContext              => 'void*',
@@ -141,14 +145,26 @@ my %C_TYPE = (
     AGLRendererInfo         => 'void*',
     AGLPbuffer              => 'void*',
     GDHandle                => 'void*',
+    IOSurfaceRef            => 'void*',
     WindowRef               => 'void*',
     HIViewRef               => 'void*',
     Style                   => 'void*',
+    HANDLE                  => 'void*',
+    HPBUFFERARB             => 'void*',
+    HPBUFFEREXT             => 'void*',
+    HVIDEOINPUTDEVICENV     => 'void*',
+    HVIDEOOUTPUTDEVICENV    => 'void*',
+    HPVIDEODEV              => 'void*',
+    HPGPUNV                 => 'void*',
+    HGPUNV                  => 'void*',
     HDC                     => 'void*',
     HGLRC                   => 'void*',
     LPGLYPHMETRICSFLOAT     => 'void*',
     LPLAYERPLANEDESCRIPTOR  => 'void*',
     LPPIXELFORMATDESCRIPTOR => 'void*',
+    LPVOID                  => 'void*',
+    PGPU_DEVICE             => 'void*',
+    GLsync                  => 'void*',
 
     GLchar                  => 'char',
     GLcharARB               => 'char',
@@ -157,10 +173,12 @@ my %C_TYPE = (
     GLboolean               => 'unsigned char',
 
     GLshort                 => 'short',
+    USHORT                  => 'unsigned short',
     GLushort                => 'unsigned short',
     GLhalfARB               => 'unsigned short',
     GLhalfNV                => 'unsigned short',
 
+    BOOL                    => 'int',
     Bool                    => 'int',
     Status                  => 'int',
     GLint                   => 'int',
@@ -168,8 +186,11 @@ my %C_TYPE = (
     GLfixed                 => 'int',
     GLclampx                => 'int',
     int32_t                 => 'int',
+    INT32                   => 'int',
+    INT                     => 'int',
 
     GLenum                  => 'unsigned int',
+    GLCenum                 => 'unsigned int',
     CGLPixelFormatAttribute => 'unsigned int',
     CGLRendererProperty     => 'unsigned int',
     CGLContextEnable        => 'unsigned int',
@@ -178,11 +199,14 @@ my %C_TYPE = (
     CGLError                => 'unsigned int',
     SphereMapFlags          => 'unsigned int',
 
+    UINT                    => 'unsigned int',
     GLuint                  => 'unsigned int',
     GLbitfield              => 'unsigned int',
     GLhandleARB             => 'unsigned int',
     GLXVideoDeviceNV        => 'unsigned int',
 
+    DWORD                   => 'unsigned long',
+    GLulong                 => 'unsigned long',
     XID                     => 'unsigned long',
     Window                  => 'unsigned long',
     Drawable                => 'unsigned long',
@@ -201,11 +225,16 @@ my %C_TYPE = (
     GLXPbufferSGIX          => 'unsigned long',
     GLXFBConfigIDSGIX       => 'unsigned long',
     GLXVideoSourceSGIX      => 'unsigned long',
+    GLXVideoCaptureDeviceNV => 'unsigned long',
 
     int64_t                 => 'long long',
+    INT64                   => 'long long',
+    GLint64                 => 'signed long long',
     GLint64EXT              => 'signed long long',
+    GLuint64                => 'unsigned long long',
     GLuint64EXT             => 'unsigned long long',
 
+    FLOAT                   => 'float',
     GLfloat                 => 'float',
     GLclampf                => 'float',
     GLdouble                => 'double',
@@ -216,6 +245,7 @@ my %C_TYPE = (
     GLsizeiptr              => 'ptrdiff_t',
     GLintptrARB             => 'ptrdiff_t',
     GLsizeiptrARB           => 'ptrdiff_t',
+    GLvdpauSurfaceNV        => 'ptrdiff_t',
 );
 
 my %NCI_TYPE = (
@@ -226,7 +256,7 @@ my %NCI_TYPE = (
     long         => 'l',
     size_t       => 'l',
     ptrdiff_t    => 'l',
-    # Requires RT 53406
+    # Requires TT #1182
     # longlong     => 'L',
     float        => 'f',
     double       => 'd',
@@ -236,6 +266,7 @@ my %NCI_TYPE = (
     'short*'     => 'p',
     'int*'       => 'p',
     'long*'      => 'p',
+    'ptrdiff_t*' => 'p',
     'longlong*'  => 'p',
     'float*'     => 'p',
     'double*'    => 'p',
@@ -251,6 +282,24 @@ my %NCI_TYPE = (
     'void**'     => 'p',
 
     'double***'  => 'p',
+);
+
+my %PCC_TYPE = (
+    c => 'I',
+    s => 'I',
+    i => 'I',
+    l => 'I',
+    f => 'N',
+    d => 'N',
+    t => 'S',
+    p => 'P',
+);
+
+my %PCC_CAST = (
+    I => '(INTVAL) ',
+    N => '(FLOATVAL) ',
+    S => '',
+    P => '',
 );
 
 my %OVERRIDE = (
@@ -269,8 +318,10 @@ my @IGNORE = (
     # Don't handle this odd create/callback register function yet
     'glutCreateMenu',
 
-    # Don't handle Mesa, GLU, or MUI callbacks yet
+    # Don't handle Mesa, GLC, GLU, or MUI callbacks yet
     'glProgramCallbackMESA',
+    'glcCallbackFunc',
+    'glcGetCallbackFunc',
     'gluNurbsCallback',
     'gluQuadricCallback',
     'gluTessCallback',
@@ -299,12 +350,22 @@ my @IGNORE = (
     'GetPixelFormat',
     'SetPixelFormat',
 
-    # Can't handle longlong until RT 53406 is done
+    # Can't handle longlong until TT #1182 is done
+    'glBufferAddressRangeNV',
+    'glClientWaitSync',
+    'glUniformui64NV',
+    'glProgramUniformui64NV',
     'glPresentFrameKeyedNV',
     'glPresentFrameDualFillNV',
+    'glWaitSync',
     'glXSwapBuffersMscOML',
     'glXWaitForMscOML',
     'glXWaitForSbcOML',
+    'wglGetSyncValuesOML',
+    'wglSwapBuffersMscOML',
+    'wglSwapLayerBuffersMscOML',
+    'wglWaitForMscOML',
+    'wglWaitForSbcOML',
 
     # Can't handle weird data types specified only in proprietary headers
     'glXCreateGLXVideoSourceSGIX',
@@ -370,11 +431,14 @@ my @SKIP = (
     'GLwDrawAP.h',
     'GLwMDrawA.h',
     'GLwMDrawAP.h',
+
+    # GLFW, a replacement for GLUT
+    'glfw.h',
 );
 
 my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
 my $FUNCS_FILE = 'runtime/parrot/library/OpenGL_funcs.pir';
-my $SIGS_FILE  = 'config/gen/call_list/opengl.in';
+my $SIGS_FILE  = 'src/glut_nci_thunks.nci';
 my $C_FILE     = 'src/glut_callbacks.c';
 
 
@@ -395,9 +459,14 @@ sub runstep {
         return 1;
     }
 
-    my $verbose = $conf->options->get('verbose') || 0;
-
     my @include_paths_win32 = grep /\S/ => split /;/ => ($ENV{INCLUDE} || '');
+
+    my $osname = $conf->data->get('osname');
+    if (scalar @include_paths_win32 == 0 && $osname =~ /mswin32/i) {
+        my $cc = $conf->data->get('cc');
+        my $path = dirname(dirname(which($cc))) . '\include';
+        @include_paths_win32 = ( $path );
+    }
 
     s{\\}{/}g foreach @include_paths_win32;
 
@@ -417,6 +486,8 @@ sub runstep {
         (map "$_/gl/*.h" => @include_paths_win32),
 
 #         # Portability testing headers
+#         "$ENV{HOME}/src/gentoo3/*.h",
+#         "$ENV{HOME}/src/gentoo4/usr/include/GL/*.h",
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
 #         "$ENV{HOME}/src/osx-10.4/GLUT/*.h",
@@ -445,23 +516,33 @@ sub runstep {
 #         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/*.h",
 #         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/internal/*.h",
 #         "$ENV{HOME}/src/osx-insane/usr/X11R6 1/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-10.6.3/Headers/*.h",
     );
 
-    print "\nChecking for OpenGL headers using the following globs:\n\t",
-        join("\n\t", @header_globs), "\n"
-        if $verbose;
+    # X freeglut only if DISPLAY is set, otherwise use native w32api GLUT
+    shift @header_globs if $^O eq 'cygwin' and !$ENV{DISPLAY};
+
+    my $globs_str = join("\n\t", @header_globs) . "\n";
+    $conf->debug(
+        "\n",
+        "Checking for OpenGL headers using the following globs:\n",
+        "\t$globs_str"
+    );
 
     my @header_files = sort map {File::Glob::bsd_glob($_)} @header_globs;
 
     my %skip = map {($_ => 1)} @SKIP;
-    @header_files = grep {my ($file) = m{([^/]+)$}; !$skip{$file}} @header_files;
-
-    print "\nFound the following OpenGL headers:\n\t",
-        join("\n\t", @header_files), "\n"
-        if $verbose;
-
+    @header_files =
+        grep {my ($file) = m{([^/]+)$}; !$skip{$file}} @header_files;
     die "OpenGL enabled and detected, but no OpenGL headers found!"
         unless @header_files;
+
+    my $files_str = join("\n\t", @header_files) . "\n";
+    $conf->debug(
+        "\n",
+        "Found the following OpenGL headers:\n",
+        "\t$files_str\n",
+    );
 
     my $autogen_header = <<'HEADER';
 # DO NOT EDIT THIS FILE.
@@ -475,15 +556,15 @@ HEADER
 
     $autogen_header .= "# $_\n" foreach @header_files;
 
-    $self->gen_opengl_defines ($conf, \@header_files, $autogen_header, $verbose);
-    $self->gen_opengl_wrappers($conf, \@header_files, $autogen_header, $verbose);
+    $self->gen_opengl_defines ($conf, \@header_files, $autogen_header);
+    $self->gen_opengl_wrappers($conf, \@header_files, $autogen_header);
     $self->gen_glut_callbacks ($conf);
 
     return 1;
 }
 
 sub gen_opengl_defines {
-    my ($self, $conf, $header_files, $autogen_header, $verbose) = @_;
+    my ($self, $conf, $header_files, $autogen_header) = @_;
 
     my (%defs, @macros, %non_numeric);
     my $max_len = 0;
@@ -506,27 +587,32 @@ sub gen_opengl_defines {
             if ($F[2] =~ /^(?:[ACW])?GL[A-Z]*_\w+$/) {
                 push @macros, [$api, $F[1], $F[2]];
             }
+            if ($F[2] =~ /^\(?((?:[ACW])?GL[A-Z]*_\w+)([+-]\d+(?:\.\d*)?(?:e\d+)?)\)?$/) {
+                push @macros, [$api, $F[1], $1, $2];
+            }
             elsif (   $F[2] =~ /^0x[0-9a-fA-F]+$/
                    || $F[2] =~ /^\d+(?:\.\d*)?(?:e\d+)?$/) {
                 $defs{$api}{$F[1]} = $F[2];
             }
             else {
                 $non_numeric{$F[1]}++;
-                print "\nNon-numeric value for '$F[1]': '$F[2]'\n" if $verbose;
+                $conf->debug("Non-numeric value for '$F[1]': '$F[2]'\n");
             }
         }
     }
 
     foreach my $macro (@macros) {
-        my ($api, $define, $value) = @$macro;
+        my ($api, $define, $value, $offset) = @$macro;
         my ($val_api) = $value =~ /^((?:[ACW])?GL[A-Z]*)_/;
 
-        unless (defined ($defs{$api}{$define} = $defs{$val_api}{$value})) {
-            delete $defs{$api}{$define};
+        unless (defined $defs{$val_api}{$value}) {
             next if $non_numeric{$define};
 
-            die "'$define' is defined as '$value', but no '$value' has been defined";
+            die "'$define' is defined using '$value', but no '$value' has been defined";
         }
+
+        $defs{$api}{$define}  = $defs{$val_api}{$value};
+        $defs{$api}{$define} += $offset if defined $offset;
     }
 
     open my $macros, '>', $MACRO_FILE
@@ -550,7 +636,8 @@ sub gen_opengl_defines {
 }
 
 sub gen_opengl_wrappers {
-    my ($self, $conf, $header_files, $autogen_header, $verbose) = @_;
+    my ($self, $conf, $header_files, $autogen_header) = @_;
+    my $verbose = $conf->options->get('verbose') || 0;
 
     my %IGNORE = map {($_ => 1)} @IGNORE;
 
@@ -584,6 +671,12 @@ sub gen_opengl_wrappers {
             next if     /^#/;
             next if     /\btypedef\b/;
 
+            # Work around bug in Mac OS X headers (glext.h as of 10.6.3, at least)
+            next if /^\s*extern\s+\w+\s+\(\*\s+/;
+
+            # Skip where we are explicitly told to do so
+            next if /\bFGUNUSED\b/;
+
             # Save a (space compressed) copy of the source line
             # for later error reporting
             my $orig =  $_;
@@ -592,7 +685,8 @@ sub gen_opengl_wrappers {
 
             # Get rid of junk needed for C, but not for Parrot NCI;
             # also do general cleanup to make parsing easier
-            s/\b(?:AVAILABLE|DEPRECATED_FOR)_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
+            s/\b(?:AVAILABLE|DEPRECATED_(?:IN|FOR))_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
+            s/\bAVAILABLE_MAC_OS_X_VERSION_\d+_\d+_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_\d+_\d+\b\s*//;
             s/\b__cdecl\b\s*//;
             s/\b__stdcall\b\s*//;
             s/\b_CRTIMP\b\s*//;
@@ -685,7 +779,8 @@ sub gen_opengl_wrappers {
             $sigs{$nci_sig}++;
             push @{$funcs{$group}}, [$name, $nci_sig];
 
-            print "$group\t$nci_sig\t$return $name($params);\n" if $verbose >= 3;
+            print "$group\t$nci_sig\t$return $name($params);\n"
+                if $verbose >= 3;
         }
     }
 
@@ -729,6 +824,8 @@ HEADER
 .sub _glutcb_func_list
     .local pmc glutcb_funcs
     glutcb_funcs = new 'ResizableStringArray'
+    push glutcb_funcs, 'Parrot_glut_nci_loader'
+    push glutcb_funcs, 'vJ'
     push glutcb_funcs, 'glutcbCloseFunc'
     push glutcb_funcs, 'vJP'
     push glutcb_funcs, 'glutcbDisplayFunc'
@@ -877,15 +974,16 @@ sub gen_glut_callbacks {
 
         my $args   =  $params;
            $args   =~ s/void//;
-           $args   =~ s/(^|, )(\w+ )+/$1/g;
+           $args   =~ s/unsigned //;
+           $args   =~ s/(^|, )((?:\w+ )+)/$1$PCC_CAST{$PCC_TYPE{$NCI_TYPE{(split ' ', $2)[0]}}}/g;
            $args   =  ", $args" if $args;
         my $proto  =  $params;
            $proto  =~ s/ \w+(,|$)/$1/g;
         my $sig    =  $proto;
            $sig    =~ s/void//;
            $sig    =~ s/unsigned //;
-           $sig    =~ s/(\w)\w+\W*/$1/g;
-           $sig    =  "v$sig";
+           $sig    =~ s/(\w+)\W*/$PCC_TYPE{$NCI_TYPE{$1}}/g;
+           $sig    =  "$sig->";
 
         my $glutcb =  "glutcb${friendly}Func";
            $glutcb =~ s/ //g;
@@ -928,7 +1026,7 @@ sub gen_glut_callbacks {
 #
 # This file is generated automatically by config/gen/opengl.pm
 
-Copyright (C) 2008, The Perl Foundation.
+Copyright (C) 2008, Parrot Foundation.
 
 =head1 NAME
 
@@ -950,8 +1048,9 @@ cannot be used.
 
 #define PARROT_IN_EXTENSION
 
-#include <$glut_header>
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
+#include <$glut_header>
 
 
 typedef enum {
@@ -989,7 +1088,7 @@ $reg_funcs
 /* Make sure that interp and sub are sane before running callback sub */
 /* XXXX: Should this do the moral equivalent of PANIC? */
 int
-is_safe(PARROT_INTERP, PMC *sub)
+is_safe(SHIM_INTERP, PMC *sub)
 {
     /* XXXX: Verify that interp still exists */
 
@@ -1020,7 +1119,7 @@ glut_timer_func(int data)
     PMC           *sub   = callback_data[GLUT_CB_TIMER].sub;
 
     if (is_safe(interp, sub))
-        Parrot_runops_fromc_args_event(interp, sub, "vi", data);
+        Parrot_ext_call(interp, sub, "I->", (INTVAL) data);
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1030,7 +1129,7 @@ glutcbTimerFunc(PARROT_INTERP, PMC *sub, unsigned int milliseconds, int data)
     callback_data[GLUT_CB_TIMER].interp = interp;
     callback_data[GLUT_CB_TIMER].sub    = sub;
 
-    if (sub == PMCNULL)
+    if (PMC_IS_NULL(sub))
         glutTimerFunc(0, NULL, 0);
     else
         glutTimerFunc(milliseconds, glut_timer_func, data);
@@ -1055,7 +1154,8 @@ glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
     PMC           *sub   = callback_data[GLUT_CB_JOYSTICK].sub;
 
     if (is_safe(interp, sub))
-        Parrot_runops_fromc_args_event(interp, sub, "viiii", buttons, xaxis, yaxis, zaxis);
+        Parrot_ext_call(interp, sub, "IIII->",
+            (INTVAL) buttons, (INTVAL) xaxis, (INTVAL) yaxis, (INTVAL) zaxis);
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1065,7 +1165,7 @@ glutcbJoystickFunc(PARROT_INTERP, PMC *sub, int pollinterval)
     callback_data[GLUT_CB_JOYSTICK].interp = interp;
     callback_data[GLUT_CB_JOYSTICK].sub    = sub;
 
-    if (sub == PMCNULL)
+    if (PMC_IS_NULL(sub))
         glutJoystickFunc(NULL, 0);
     else
         glutJoystickFunc(glut_joystick_func, pollinterval);
@@ -1095,7 +1195,7 @@ $_->{thunk}($_->{params})
     PMC           *sub   = callback_data[$_->{enum}].sub;
 
     if (is_safe(interp, sub))
-        Parrot_runops_fromc_args_event(interp, sub, "$_->{sig}"$_->{args});
+        Parrot_ext_call(interp, sub, "$_->{sig}"$_->{args});
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1105,7 +1205,7 @@ $_->{glutcb}(PARROT_INTERP, PMC *sub)
     callback_data[$_->{enum}].interp = interp;
     callback_data[$_->{enum}].sub    = sub;
 
-    if (sub == PMCNULL)
+    if (PMC_IS_NULL(sub))
         $_->{glut}(NULL);
     else
         $_->{glut}($_->{thunk});

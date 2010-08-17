@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ config/gen/platform/ansi/exec.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Functions for dealing with child processes and Execs. (Currently not implemented on this platform.)
 
 =head2 Functions
 
@@ -23,16 +23,16 @@ RT#48264
 
 /*
 
-=item C<INTVAL Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+=item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
-Spawn a subprocess
+B<Not yet implemented on this platform.> Spawn a subprocess.
 
 =cut
 
 */
 
 INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 {
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
             "Parrot_Run_OS_Command not implemented");
@@ -41,36 +41,20 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 
 /*
 
-=item C<INTVAL Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+=item C<INTVAL Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
-RT#48260: Not yet documented!!!
+B<Not yet implemented on this platform.>
 
 =cut
 
 */
 
 INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 {
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
             "Parrot_Run_OS_Command_Argv not implemented");
     return 0;
-}
-
-/*
-
-=item C<void Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-void
-Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)
-{
-  real_exception(interp, NULL, NOSPAWN, "Exec not implemented");
 }
 
 /*

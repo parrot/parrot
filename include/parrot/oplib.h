@@ -1,5 +1,5 @@
 /* oplib.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2003, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -32,7 +32,7 @@ typedef struct op_lib_t {
     size_t      op_count;
     op_info_t * op_info_table;
     op_func_t * op_func_table;
-    int (*op_code)(const char * name, int full);
+    int (*op_code)(PARROT_INTERP, const char * name, int full);
 } op_lib_t;
 
 typedef enum {
@@ -41,18 +41,16 @@ typedef enum {
 } op_lib_flags_enum;
 
 /* when init = true initialize, else de_initialize */
-typedef op_lib_t *(*oplib_init_f)(long init);
+typedef op_lib_t *(*oplib_init_f)(PARROT_INTERP, long init);
 
 /* core.ops special opcode numbers */
 typedef enum {
     CORE_OPS_end,               /* halt the runloop */
     CORE_OPS_noop,              /* do nothing */
-    CORE_OPS_cpu_ret,           /* __asm("ret") */
     CORE_OPS_check_events,      /* explicit event check */
     CORE_OPS_check_events__,    /* inserted into op dispatch when an event
                                    got scheduled */
-    CORE_OPS_wrapper__,         /* inserted by dynop_register for new ops */
-    CORE_OPS_prederef__         /* inserted by dynop_register for new ops */
+    CORE_OPS_wrapper__          /* inserted by dynop_register for new ops */
         /* 2 more reserved */
 } special_core_ops_enum;
 

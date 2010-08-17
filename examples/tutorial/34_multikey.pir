@@ -1,16 +1,25 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Multi-Level Keys
 
-This example demonstrates multiple keys with array and hash access. Note that
-the keys aren't auto instantiating, so the objects at each level have to be
-created.
+Hashes and arrays can be combined in a number of ways to
+make interesting and complex data structures. A hash may
+contain an array PMC, which in turn can contain other arrays
+or hashes. In these cases, the keys for each level can be
+combined together to form a single unique key for a data
+element in the structure.
+
+This technique works equally well for arrays-of-arrays,
+hashes-of-hashes, and combination structures as well.
 
 =cut
 
 .sub main :main
 
     .local pmc myhash, innerarray
-    myhash  = new 'Hash'
-    innerarray = new 'ResizableIntegerArray'
+    myhash  = new ['Hash']
+    innerarray = new ['ResizableIntegerArray']
 
     $I0 = 2
     innerarray[2] = 42

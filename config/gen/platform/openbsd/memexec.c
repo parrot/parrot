@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ memexec.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Memory protection functions.
 
 =head2 Functions
 
@@ -24,8 +24,7 @@ RT#48264
 #ifdef PARROT_HAS_EXEC_PROTECT
 /*
 
-=item C<void *
-mem_alloc_executable(size_t size)>
+=item C<void * mem_alloc_executable(size_t size)>
 
 Allocate executable memory
 Round up to page size because the whole page will be marked as executable
@@ -50,25 +49,24 @@ mem_alloc_executable(size_t size)
 
 /*
 
-=item C<void
-mem_free_executable(void *p)>
+=item C<void mem_free_executable(void *p, size_t size)>
 
-RT#48260: Not yet documented!!!
+Free a buffer allocated with mem_alloc_executable().
 
 =cut
 
 */
 
 void
-mem_free_executable(void *p)
+mem_free_executable(void *p, size_t size)
 {
     free(p);
 }
 
 /*
 
-=item C<void *
-mem_realloc_executable(void* oldp, size_t newsize)>
+=item C<void * mem_realloc_executable(void* oldp, size_t oldsize, size_t
+newsize)>
 
 Reallocate executable memory
 Round up to page size because the whole page will be marked as executable
@@ -78,7 +76,7 @@ Round up to page size because the whole page will be marked as executable
 */
 
 void *
-mem_realloc_executable(void* oldp, size_t newsize)
+mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
 {
     size_t pagesize = sysconf(_SC_PAGESIZE);
     size_t roundup = (newsize + pagesize - 1) & ~(pagesize-1);

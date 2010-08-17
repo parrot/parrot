@@ -1,15 +1,14 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
 docs/parrot.pod - Parrot
 
-=head1 The Parrot Bytecode Interpreter
+=head1 The Parrot Virtual Machine
 
-Parrot is a common bytecode format and interpreter for dynamic languages; it is
-designed to run Perl 6 code efficiently, but is also intended to be
-language-agnostic.
+Parrot is a language-agnostic common bytecode format and an interpreter for
+dynamic languages.
 
 =head2 Documentation
 
@@ -82,10 +81,6 @@ implement your own PMC type.
 
 Describes the embedding subsystem in excruciating detail.
 
-=item F<jit.pod>
-
-A brief description of Parrot's Just-In-Time compiler.
-
 =item F<memory_internals.pod>
 
 An introduction to the Parrot GC subsystem
@@ -120,36 +115,16 @@ Documentation for C<parrot_debugger>, the Parrot debugger.
 
 Parrot compiles and runs on a large number of platforms, including all common
 ones. The Parrot team is committed to supporting the following combinations as
-"core platforms": Linux (x86), Win32, OS X (x86 and PPC), Cygwin, Tru64,
-OpenVMS (Alpha), Solaris (Sparc), FreeBSD (x86).
+"core platforms": Linux (x86), Win32 (x86), OS X (x86 and PPC), Cygwin, Tru64,
+OpenVMS (Alpha), FreeBSD (x86).
 
 =head2 Authors
 
 Parrot is developed and maintained by the members of the
-C<parrot-porters@perl.org> mailing list. The list is archived at:
-L<http://nntp.perl.org/group/perl.perl6.internals>
-
-=over 4
-
-=item * Allison Randal is the chief architect.
-
-=item * Chip Salzenberg (C<chip@pobox.com>) was the second chief architect.
-
-=item * Dan Sugalski (C<dan@sidhe.org>) was the chief architect for the first
-I<5 years> of the project.  Parrot is largely his brainchild.
-
-=item * Leopold Toetsch (C<lt@toetsch.at>) was the release manager for some
-time. This position is currently rotated through several members of the
-project team.
-
-=item * Simon Cozens, Jeff Goff and Steve Fink were the release managers 
-for releases 0.0.1 - 0.0.4, 0.0.5 - 0.0.8, and 0.0.9 - 0.0.11 respectively.
-They have all subsequently recovered.
-
-=item * Many, many other people have contributed their time and expertise
+C<parrot-dev@lists.parrot.org> mailing list. The list is archived at:
+L<http://groups.google.com/group/parrot-dev/>
+Many people have contributed their time and expertise
 to the Parrot project; see the F<CREDITS> file for details.
-
-=back
 
 =head2 Web pages
 
@@ -157,11 +132,11 @@ See:
 
 =over 4
 
-=item * L<http://www.parrotcode.org/>
+=item * L<http://www.parrot.org/>
 
-=item * L<http://dev.perl.org/>
+=item * L<https://trac.parrot.org/>
 
-=item * L<http://svn.perl.org/>
+=item * L<https://svn.parrot.org/>
 
 =back
 

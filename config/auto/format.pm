@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Step;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Figuring out what formats should be used for sprintf};
+    $data{description} = q{What formats should be used for sprintf};
     $data{result}      = q{};
     return \%data;
 }
@@ -67,14 +67,21 @@ sub _set_floatvalfmt_nvsize {
     $nvsize = $floatsize;
     if ( $nv eq "double" ) {
         $nvsize   = $doublesize;
-        $nvformat = "%f";
+        $nvformat = "%.15g";
     }
     elsif ( $nv eq "long double" ) {
 
         # Stay way from long double for now (it may be 64 or 80 bits)
         # die "long double not supported at this time, use double.";
         $nvsize   = $ldsize;
-        $nvformat = "%Lf";
+        my $spri = $conf->data->get('sPRIgldbl_provisional');
+        if ( defined $spri ) {
+            $nvformat = "%.15" .  $spri;
+            $nvformat =~ s/"//g;   # Perl 5's Config value has embedded double quotes
+        }
+        else {
+            die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
+        }
     }
     else {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};

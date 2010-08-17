@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 # $Id$
 package Parrot::Pmc2c::Method;
 use strict;
@@ -6,7 +6,24 @@ use warnings;
 use constant VTABLE_ENTRY => 'VTABLE_ENTRY';
 use constant VTABLE       => 'VTABLE';
 use constant NON_VTABLE   => 'NON_VTABLE';
-use Parrot::Pmc2c::UtilFunctions qw(count_newlines args_from_parameter_list passable_args_from_parameter_list);
+use constant MULTI        => 'MULTI';
+use Parrot::Pmc2c::UtilFunctions qw( args_from_parameter_list passable_args_from_parameter_list );
+
+=head1 NAME
+
+Parrot::Pmc2c::Method
+
+=head1 DESCRIPTION
+
+Functions used in transformation of PMCs to C code.
+
+=head1 METHODS
+
+=head2 C<new()>
+
+Parrot::Pmc2c::Method constructor.
+
+=cut
 
 sub new {
     my ( $class, $self_hash ) = @_;
@@ -19,12 +36,15 @@ sub new {
             mmd_rights  => [],
             parent_name => "",
             decorators  => [],
+            pmc_unused  => 0,
             %{ $self_hash || {} }
         )
     };
 
     # this is usually wrong, but *something* calls new on an object somewhere
     bless $self, ref $class || $class;
+
+    return $self;
 }
 
 sub clone {
@@ -35,6 +55,8 @@ sub clone {
 sub add_mmd_rights {
     my ( $self, $value ) = @_;
     push @{ $self->{mmd_rights} }, $value;
+
+    return;
 }
 
 sub mmd_rights {
@@ -70,7 +92,20 @@ sub is_mmd {
     return 0;
 }
 
-=head1 C<trans($type)>
+sub is_multi {
+    my ($self) = @_;
+
+    return 1 if $self->{MULTI};
+    return 0;
+}
+
+sub pmc_unused {
+    my ($self) = @_;
+
+    return $self->{pmc_unused};
+}
+
+=head2 C<trans($type)>
 
 Used in C<signature()> to normalize argument types.
 
@@ -85,14 +120,14 @@ sub trans {
 
     return $1  if $char =~ /([ISP])/;
     return 'N' if $char eq 'F';
-    return 'v' if $type eq 'void';
-    return 'V' if $type =~ /void\s*\*\s*/;
+    return 'V' if $type =~ /void\s*\*/;
+    return 'v' if $type =~ /void\s*$/;
     return 'P' if $type =~ /opcode_t\*/;
     return 'I' if $type =~ /int(val)?/i;
     return '?';
 }
 
-=head1 C<signature()>
+=head2 C<signature()>
 
 Returns the method signature for the methods $parameters
 
@@ -129,6 +164,52 @@ sub signature {
 
     return ( $return_prefix, $method_suffix, $args, $sig, $return_type_char, $null_return );
 }
+
+=head2 C<pcc_signature()>
+
+Returns a PCC-style method signature for the method's parameters, as well as
+some additional information useful in building a call to that method.
+
+=cut
+
+sub pcc_signature {
+    my ($self) = @_;
+
+    my $args             = passable_args_from_parameter_list( $self->parameters );
+    my ($types, $vars)   = args_from_parameter_list( $self->parameters );
+    my $return_type      = $self->return_type;
+    my $return_type_char = $self->trans($return_type);
+    my $sig              = join ('', map { $self->trans($_) } @{$types}) .
+                           '->';
+
+    my $result_decl    = '';
+    my $return_stmt    = '';
+
+    if ( $return_type eq 'void' ) {
+        $return_stmt = "return ($return_type) NULL;" if $return_type_char =~ /P|I|S|V/;
+        $return_stmt = 'return (FLOATVAL) 0;'        if $return_type_char =~ /N/;
+        $return_stmt = 'return;'                     if $return_type_char =~ /v/;
+    }
+    else {
+        $result_decl = "$return_type result;";
+        $result_decl = "$return_type result = PMCNULL;" if $return_type_char eq 'P';
+        $args .= ', &result';
+        $sig .= $return_type_char;
+        $return_stmt = "return ($return_type) result;";
+    }
+
+    return ( $sig, $args, $result_decl, $return_stmt );
+}
+
+=head1 SEE ALSO
+
+    lib/Parrot/Pmc2c/PMC/RO.pm
+    lib/Parrot/Pmc2c/PMCEmitter.pm
+    lib/Parrot/Pmc2c/VTable.pm
+    lib/Parrot/Pmc2c/PMC.pm
+    lib/Parrot/Pmc2c/Parser.pm
+
+=cut
 
 1;
 

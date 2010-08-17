@@ -1,4 +1,0 @@
-[exit ?returnCode:int=0?]
-
-$I0 = $returnCode
-exit $I0

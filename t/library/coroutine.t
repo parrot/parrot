@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,6 +27,8 @@ L<http://swiss.csail.mit.edu/classes/symbolic/spring06/psets/ps6/samefringe.scm>
 =cut
 
 .const int N_TESTS = 6
+
+.loadlib 'io_ops'
 
 ## Build an N-ary tree (where N is passed as node_width) of the specified depth,
 ## with the leaves being consecutive integer PMCs from start but less than N.
@@ -145,13 +147,13 @@ done:
 	.param pmc tree2
 
 	.local pmc coro_class
-    coro_class = get_class 'Parrot::Coroutine'
+    coro_class = get_class ['Parrot'; 'Coroutine']
     unless null coro_class goto found
-	printerr "Bug:  Can't find 'Parrot::Coroutine' class.\n"
+	printerr "Bug:  Can't find ['Parrot'; 'Coroutine'] class.\n"
 	die 5, 1
 found:
 	.local pmc coro1, coro2
-	.const .Sub coro_sub = "coro_enumerate_tree"
+	.const 'Sub' coro_sub = "coro_enumerate_tree"
 	coro1 = coro_class.'new'('initial_sub' => coro_sub)
 	coro2 = coro_class.'new'('initial_sub' => coro_sub)
 	($P0 :optional, $I0 :opt_flag) = coro1.'resume'(coro1, tree1)
@@ -182,13 +184,13 @@ equal:
 .end
 
 .sub main :main
-	load_bytecode 'Test/Builder.pir'
+	load_bytecode 'Test/Builder.pbc'
 	.local pmc test
 	test = new [ 'Test'; 'Builder' ]
 	test.'plan'(N_TESTS)
 
 	push_eh cant_load
-	load_bytecode 'Parrot/Coroutine.pir'
+	load_bytecode 'Parrot/Coroutine.pbc'
 	pop_eh
 	test.'ok'(1, 'loaded bytecode')
 

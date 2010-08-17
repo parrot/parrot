@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2007, Parrot Foundation.
  */
 
 /*
@@ -26,8 +26,8 @@ Signal handling stuff
 
 /*
 
-=item C<Parrot_sighandler_t
-Parrot_set_sighandler(int signum, Parrot_sighandler_t handler)>
+=item C<Parrot_sighandler_t Parrot_set_sighandler(int signum,
+Parrot_sighandler_t handler)>
 
 for now use signal based functions
 

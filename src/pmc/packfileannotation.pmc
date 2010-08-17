@@ -1,0 +1,243 @@
+/*
+Copyright (C) 2001-2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfileannotation.pmc - PackfileAnnotation PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileAnnotation object.  It is an element in the
+PackfileAnnotations segment of the .pbc file.  See PDD13 for a design spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass PackfileAnnotation auto_attrs {
+    ATTR STRING    *name;
+    ATTR INTVAL     offset;
+    ATTR INTVAL     value_type;
+    /* This 3 attributes should be in single union. But Pmc2c isn't smart enough to handle it */
+    ATTR INTVAL     int_value;
+    ATTR FLOATVAL   num_value;
+    ATTR STRING    *str_value;
+
+/*
+
+=item C<init>
+
+Create empty PackfileAnnotation.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_PackfileAnnotation_attributes * const attrs =
+                PMC_data_typed(SELF, Parrot_PackfileAnnotation_attributes*);
+
+        PObj_custom_mark_SET(SELF);
+        PMC_data(SELF) = attrs;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileAnnotation_attributes * const attrs =
+                PARROT_PACKFILEANNOTATION(SELF);
+
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->name);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->str_value);
+    }
+
+
+/*
+
+=item C<INTVAL get_offset()>
+
+Fetch the offset into the bytecode of the instruction that is being annotated.
+
+=cut
+
+*/
+    METHOD get_offset() {
+        INTVAL offset = PARROT_PACKFILEANNOTATION(SELF)->offset;
+        RETURN(INTVAL offset);
+    }
+
+
+/*
+
+=item C<void set_offset(INTVAL offset)>
+
+Set the offset into the bytecode of the instruction that is being annotated.
+
+=cut
+
+*/
+    METHOD set_offset(INTVAL offset) {
+        PARROT_PACKFILEANNOTATION(SELF)->offset = offset;
+    }
+
+
+/*
+
+=item C<STRING* get_name()>
+
+Fetch the name of the annotation.
+
+=cut
+
+*/
+    METHOD get_name() {
+        STRING * name = PARROT_PACKFILEANNOTATION(SELF)->name;
+        RETURN(STRING * name);
+    }
+
+
+/*
+
+=item C<void set_name(STRING* name)>
+
+Set the name of the annotation.
+
+=cut
+
+*/
+    METHOD set_name(STRING * name) {
+        PARROT_PACKFILEANNOTATION(SELF)->name = name;
+    }
+
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Fetch the integer value of the annotation.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer() {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_INT)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Trying to fetch wrong type of value from annotation");
+        return attrs->int_value;
+    }
+
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Set the integer value of the annotation.
+
+=cut
+
+*/
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        attrs->value_type = PF_ANNOTATION_KEY_TYPE_INT;
+        attrs->int_value  = value;
+    }
+
+/*
+
+=item C<STRING * get_string()>
+
+Fetch the string value of the annotation.
+
+=cut
+
+*/
+    VTABLE STRING * get_string() {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_STR)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Trying to fetch wrong type of value from annotation");
+        return attrs->str_value;
+    }
+
+
+/*
+
+=item C<void set_string_native(STRING * value)>
+
+Set the string value of the annotation.
+
+=cut
+
+*/
+    VTABLE void set_string_native(STRING * value) {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        attrs->value_type = PF_ANNOTATION_KEY_TYPE_STR;
+        attrs->str_value  = value;
+    }
+
+/*
+
+=item C<INTVAL get_number()>
+
+Fetch the float value of the annotation.
+
+=cut
+
+*/
+    VTABLE FLOATVAL get_number() {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_NUM)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Trying to fetch wrong type of value from annotation");
+        return attrs->num_value;
+    }
+
+
+/*
+
+=item C<void set_number_native(INTVAL value)>
+
+Set the float value of the annotation.
+
+=cut
+
+*/
+    VTABLE void set_number_native(FLOATVAL value) {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        attrs->value_type = PF_ANNOTATION_KEY_TYPE_NUM;
+        attrs->num_value  = value;
+    }
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

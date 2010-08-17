@@ -1,10 +1,10 @@
 #!./parrot
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 .sub _main :main
-    load_bytecode 'library/Test/Builder/Tester.pir'
-    load_bytecode 'library/Test/More.pir'
+    load_bytecode 'Test/Builder/Tester.pbc'
+    load_bytecode 'Test/More.pbc'
 
     .local pmc tb_args
     tb_args = new 'Hash'
@@ -15,26 +15,172 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt"
-    test_namespace.export_to(curr_namespace, exports)
+    exports = split " ", "ok nok is diag like skip todo is_deeply is_null isa_ok isnt throws_like lives_ok dies_ok"
+    test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 74 )
+    plan( 117 )
+
     test_skip()
     test_todo()
     test_ok()
+    test_nok()
     test_is()
     test_isnt()
     test_like()
     test_is_deeply()
+    test_is_null()
     test_diagnostics()
+    test_lives_ok()
+    test_dies_ok()
+    test_throws_like()
     test_isa_ok()
 
     test.'finish'()
 .end
+
+.sub test_dies_ok
+    test_pass( 'dies_ok passes when there is an error' )
+    dies_ok( <<'CODE', 'dies_ok passes when there is an error' )
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_test( 'dies_ok passes when there is an error' )
+
+    test_fail( 'dies_ok fails when there is no error' )
+    dies_ok( <<'CODE', 'dies_ok fails when there is no error' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'dies_ok fails when there is no error' )
+
+    test_pass( 'dies_ok passes when there is an error with diagnostic message' )
+    dies_ok( <<'CODE', 'dies_ok passes when there is an error with diagnostic message' )
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_diag( '' )
+    test_test( 'dies_ok passes when there is an error with diagnostic message' )
+
+    test_fail( 'dies_ok fails when there is no error with diagnostic message' )
+    dies_ok( <<'CODE', 'dies_ok fails when there is no error with diagnostic message' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'dies_ok fails when there is no error with diagnostic message' )
+
+.end
+
+.sub test_lives_ok
+
+    test_pass( 'lives_ok passes when there is no error' )
+    lives_ok( <<'CODE', 'lives_ok passes when there is no error' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_test( 'lives_ok passes when there is no error' )
+
+    test_fail( 'lives_ok fails when there is an error')
+    lives_ok( <<'CODE', 'lives_ok fails when there is an error')
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_diag( 'I did it for the lulz' )
+    test_test( 'lives_ok fails when there is an error' )
+
+    test_pass( 'lives_ok passes when there is no error (with diagnostic message)' )
+    lives_ok( <<'CODE', 'lives_ok passes when there is no error (with diagnostic message)' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( '' )
+    test_test( 'lives_ok passes when there is no error (with diagnostic message)' )
+
+    test_fail( 'lives_ok fails when there is an error (with diagnostic message)' )
+    lives_ok( <<'CODE', 'lives_ok fails when there is an error (with diagnostic message)' )
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_diag( 'I did it for the lulz' )
+    test_test( 'lives_ok fails when there is an error' )
+.end
+
+.sub test_throws_like
+
+    test_fail('throws_like fails when there is no error')
+    throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error')
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'throws_like fails when there is no error')
+
+    test_pass('throws_like passes when error matches pattern')
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern')
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_test( 'throws_like passes when error matches pattern' )
+
+    test_fail( 'throws_like fails when error does not match pattern' )
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like fails when error does not match pattern')
+.sub main
+    die 'DO NOT WANT'
+.end
+CODE
+    .local string diagnostic
+    diagnostic  = "match failed: target 'DO NOT WANT' does not match pattern '"
+    diagnostic .= 'for\ the\ lulz'
+    diagnostic .= "'"
+    test_diag( diagnostic )
+    test_test('throws_like fails when error does not match pattern' )
+
+.end
+
+.namespace ['MyFalseClass']
+
+.sub '' :anon :load :init
+    $P0 = newclass ['MyFalseClass']
+.end
+
+.sub 'get_bool' :vtable
+    .return(0)
+.end
+
+.sub 'get_integer' :vtable
+    .return(1)
+.end
+
+.namespace ['MyTrueClass']
+
+.sub '' :anon :load :init
+    $P0 = newclass ['MyTrueClass']
+.end
+
+.sub 'get_bool' :vtable
+    .return(1)
+.end
+
+.sub 'get_integer' :vtable
+    .return(0)
+.end
+
+.namespace []
 
 .sub test_ok
     test_pass()
@@ -52,6 +198,44 @@
     test_fail( 'with description' )
     ok( 0, 'with description' )
     test_test( 'failing test ok() with description')
+
+    $P0 = new ['MyFalseClass']
+    test_fail()
+    ok( $P0 )
+    test_test( 'failing ok() calls get_bool')
+
+    $P0 = new ['MyTrueClass']
+    test_pass()
+    ok( $P0 )
+    test_test( 'passing ok() calls get_bool')
+.end
+
+.sub test_nok
+    test_fail()
+    nok( 1 )
+    test_test( 'failing test nok()')
+
+    test_pass()
+    nok( 0 )
+    test_test( 'passing test nok()')
+
+    test_fail( 'with description' )
+    nok( 1, 'with description' )
+    test_test( 'failing test nok() with description')
+
+    test_pass( 'with description' )
+    nok( 0, 'with description' )
+    test_test( 'passing test nok() with description')
+
+    $P0 = new ['MyFalseClass']
+    test_pass()
+    nok( $P0 )
+    test_test( 'passing nok() calls get_bool')
+
+    $P0 = new ['MyTrueClass']
+    test_fail()
+    nok( $P0 )
+    test_test( 'failing nok() calls get_bool')
 .end
 
 .sub test_is
@@ -60,8 +244,8 @@
     test_test( 'passing test is() for ints')
 
     test_fail()
-    test_diag( 'Received: -100' )
-    test_diag( 'Expected: 200' )
+    test_diag( 'Have: -100' )
+    test_diag( 'Want: 200' )
     is( -100, 200 )
     test_test( 'failing test is() for ints')
 
@@ -71,8 +255,8 @@
 
     test_fail( 'comparing two integers' )
     is( -512, 5120, 'comparing two integers' )
-    test_diag( 'Received: -512' )
-    test_diag( 'Expected: 5120' )
+    test_diag( 'Have: -512' )
+    test_diag( 'Want: 5120' )
     test_test( 'failing test is() for ints with description')
 
     test_pass()
@@ -81,8 +265,8 @@
 
     test_fail()
     is( 1.235, 5.321 )
-    test_diag( 'Received: 1.235' )
-    test_diag( 'Expected: 5.321' )
+    test_diag( 'Have: 1.235' )
+    test_diag( 'Want: 5.321' )
     test_test( 'failing test is() for floats')
 
     test_pass( 'comparing two floats' )
@@ -91,9 +275,44 @@
 
     test_fail( 'comparing two floats' )
     is( 777.1, 888.8, 'comparing two floats' )
-    test_diag( 'Received: 777.1' )
-    test_diag( 'Expected: 888.8' )
+    test_diag( 'Have: 777.1' )
+    test_diag( 'Want: 888.8' )
     test_test( 'failing test is() for floats with description')
+
+    test_fail( 'comparing two floats with precision, failure' )
+    is( 777.1, 888.8, 'comparing two floats with precision, failure', 1e-6)
+    test_diag( 'Have: 777.1' )
+    test_diag( 'Want: 888.8' )
+    test_test( 'failing test is() for floats with precision')
+
+    test_pass( 'comparing two floats with precision, success' )
+    is( 666.222, 666.223, 'comparing two floats with precision, success', 1e-2)
+    test_test( 'passing test is() for floats with precision')
+
+    test_fail( 'comparing Float PMC and a float with precision, failure' )
+    $P0 = new 'Float'
+    $P0 = 888.81
+    is( $P0, 888.82, 'comparing Float PMC and a float with precision, failure', 1e-2)
+    test_diag( 'Have: 888.81' )
+    test_diag( 'Want: 888.82' )
+    test_test( 'failing test is() for comparing a Float PMC and float with precision')
+
+    test_pass( 'comparing Float PMC and a float with precision, success' )
+    $P0 = 666.222
+    is( $P0, 666.223, 'comparing Float PMC and a float with precision, success', 1e-2)
+    test_test( 'passing test is() for comparing Float PMC and float with precision')
+
+    test_pass( 'comparing integer and a Float PMC with precision, success' )
+    $I0 = 42
+    is( $I0, 41.99, 'comparing integer and a Float PMC with precision, success', 0.1)
+    test_test( 'passing test is() for comparing Integer PMC and float with precision')
+
+    test_fail( 'comparing integer and a Float PMC with precision, failure' )
+    $I0 = 42
+    is( $I0, 41.99, 'comparing integer and a Float PMC with precision, failure', 1e-3)
+    test_diag( 'Have: 42' )
+    test_diag( 'Want: 41.99' )
+    test_test( 'failing test is() for comparing Integer PMC and float with precision')
 
     test_pass()
     is( 'bob', 'bob' )
@@ -101,8 +320,8 @@
 
     test_fail()
     is( 'larry', 'bob' )
-    test_diag( 'Received: larry' )
-    test_diag( 'Expected: bob' )
+    test_diag( 'Have: larry' )
+    test_diag( 'Want: bob' )
     test_test( 'failing test is() for strings')
 
     test_pass( 'comparing two strings' )
@@ -111,8 +330,8 @@
 
     test_fail( 'comparing two strings' )
     is( 'zeke', 'zelda', 'comparing two strings' )
-    test_diag( 'Received: zeke' )
-    test_diag( 'Expected: zelda' )
+    test_diag( 'Have: zeke' )
+    test_diag( 'Want: zelda' )
     test_test( 'failing test is() for strings with description')
 
     .local pmc left
@@ -127,14 +346,14 @@
     test_test( 'passing test is() for pmcs')
 
     right = new 'Integer'
-    right = 0
-    test_fail()
-    test_diag( 'Received: zero' )
-    test_diag( 'Expected: 0' )
-    is( left, right )
+    right = 1
+    test_fail( 'zero versus 1' )
+    test_diag( 'Have: zero' )
+    test_diag( 'Want: 1' )
+    is( left, right, 'zero versus 1' )
     test_test( 'failing test is() for pmcs')
 
-    left = '0'
+    left = '1'
     test_pass( 'comparing two pmcs' )
     is( left, right, 'comparing two pmcs' )
     test_test( 'passing test is() for pmcs with description')
@@ -143,15 +362,70 @@
 
     .local string expected
     .local string hash_string
-    expected     = 'Expected: '
+    expected     = 'Want: '
     hash_string  = right
     expected    .= hash_string
 
     test_fail( 'comparing two pmcs' )
-    test_diag( 'Received: 0' )
+    test_diag( 'Have: 1' )
     test_diag( expected )
     is( left, right, 'comparing two pmcs' )
-    test_test( 'failing test is() for pmcs with description')
+    test_test( 'failing test is() for pmcs with description' )
+
+    test_pass( 'comparing two nulls' )
+    null left
+    null right
+    is( left, right, 'comparing two nulls' )
+    test_test( 'passing test is() for nulls')
+
+    test_fail('comparing null with Int')
+    null left
+    right = box 1
+    is( left, right, 'comparing null with Int')
+    test_diag( 'Have: null' )
+    test_diag( 'Want: 1' )
+    test_test('failing test is() for null vs. pmc 1')
+
+    test_fail('comparing Int with null')
+    left = box 10
+    null right
+    is( left, right, 'comparing Int with null')
+    test_diag( 'Have: 10' )
+    test_diag( 'Want: null' )
+    test_test('failing test is() for pmc 10 vs. null')
+
+    test_fail('comparing null with Float')
+    null left
+    right = box 1.01
+    is( left, right, 'comparing null with Float')
+    test_diag( 'Have: null' )
+    test_diag( 'Want: 1.01' )
+    test_test('failing test is() for null vs. pmc 1.01')
+
+    test_fail('comparing Float with null')
+    left = box 2.787
+    null right
+    is( left, right, 'comparing Float with null')
+    test_diag( 'Have: 2.787' )
+    test_diag( 'Want: null' )
+    test_test('failing test is() for pmc 2.787 vs. null')
+
+    test_fail('comparing null with String')
+    null left
+    right = box 'September, when it comes'
+    is( left, right, 'comparing null with String')
+    test_diag( 'Have: null' )
+    test_diag( 'Want: September, when it comes' )
+    test_test('failing test is() for null vs. String pmc')
+
+    test_fail('comparing String with null')
+    left = box 'I cannot move a mountain now'
+    null right
+    is( left, right, 'comparing String with null')
+    test_diag( 'Have: I cannot move a mountain now' )
+    test_diag( 'Want: null' )
+    test_test('failing test is() for String pmc vs. null')
+
 .end
 
 .sub test_isnt
@@ -160,10 +434,10 @@
     test_test( 'passing test isnt() for ints')
 
     test_fail()
-    test_diag( 'Received: -100' )
-    test_diag( 'Expected: not -100' )
+    test_diag( 'Have: -100' )
+    test_diag( 'Want: not -100' )
     isnt( -100, -100 )
-    test_test( 'failing test is() for ints')
+    test_test( 'failing test isnt() for ints')
 
     test_pass( 'comparing two unidentical integers' )
     isnt( 512, 215, 'comparing two unidentical integers' )
@@ -171,8 +445,8 @@
 
     test_fail( 'comparing two integers' )
     isnt( -512, -512, 'comparing two integers' )
-    test_diag( 'Received: -512' )
-    test_diag( 'Expected: not -512' )
+    test_diag( 'Have: -512' )
+    test_diag( 'Want: not -512' )
     test_test( 'failing test isnt() for ints with description')
 
     test_pass()
@@ -181,8 +455,8 @@
 
     test_fail()
     isnt( 1.235, 1.235 )
-    test_diag( 'Received: 1.235' )
-    test_diag( 'Expected: not 1.235' )
+    test_diag( 'Have: 1.235' )
+    test_diag( 'Want: not 1.235' )
     test_test( 'failing test isnt() for floats')
 
     test_pass( 'comparing two floats' )
@@ -191,8 +465,8 @@
 
     test_fail( 'comparing two floats' )
     isnt( 80.8, 80.8, 'comparing two floats' )
-    test_diag( 'Received: 80.8' )
-    test_diag( 'Expected: not 80.8' )
+    test_diag( 'Have: 80.8' )
+    test_diag( 'Want: not 80.8' )
     test_test( 'failing test isnt() for floats with description')
 
     test_pass()
@@ -201,8 +475,8 @@
 
     test_fail()
     isnt( 'larry', 'larry' )
-    test_diag( 'Received: larry' )
-    test_diag( 'Expected: not larry' )
+    test_diag( 'Have: larry' )
+    test_diag( 'Want: not larry' )
     test_test( 'failing test isnt() for strings')
 
     test_pass( 'comparing two strings' )
@@ -211,8 +485,8 @@
 
     test_fail( 'comparing two strings' )
     isnt( 'larry', 'larry', 'comparing two strings' )
-    test_diag( 'Received: larry' )
-    test_diag( 'Expected: not larry' )
+    test_diag( 'Have: larry' )
+    test_diag( 'Want: not larry' )
     test_test( 'failing test isnt() for strings with description')
 
     .local pmc left
@@ -229,8 +503,8 @@
     right = new 'String'
     right = 'zero'
     test_fail()
-    test_diag( 'Received: zero' )
-    test_diag( 'Expected: not zero' )
+    test_diag( 'Have: zero' )
+    test_diag( 'Want: not zero' )
     isnt( left, right )
     test_test( 'failing test isnt() for pmcs')
 
@@ -243,7 +517,7 @@
 
     .local string expected
     .local string hash_string
-    expected     = 'Expected: '
+    expected     = 'Want: '
     hash_string  = right
     expected    .= hash_string
 
@@ -262,19 +536,33 @@
     test_test( 'passing test like() with description' )
 
     test_fail()
-    test_diag( 'match failed' )
+
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[g]>'" )
     like( 'abcdef', '<[g]>' )
     test_test( 'failing test like()' )
 
     test_fail( 'testing like()' )
-    test_diag( 'match failed' )
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[g]>'" )
     like( 'abcdef', '<[g]>', 'testing like()' )
     test_test( 'failing test like() with description' )
+
+    test_pass( 'like() can match literal strings' )
+    like( 'foobar', 'foobar', 'like() can match literal strings' )
+    test_test( 'like() can match literal strings' )
+
+    test_pass( 'like() can match partial literal strings' )
+    like( 'foobar()', 'foobar', 'like() can match partial literal strings' )
+    test_test( 'like() can match partial literal strings' )
+
+    test_pass( 'like() can match partial literal strings with spaces' )
+    like( 'foo bar()', 'foo\ bar', 'like() can match partial literal strings with spaces' )
+    test_test( 'like() can match partial literal strings with spaces' )
 .end
 
 .sub test_is_deeply
     test_is_deeply_array()
     test_is_deeply_hash()
+    test_is_deeply_hash_tt763()
     test_is_deeply_mismatch()
     test_is_deeply_nested()
 .end
@@ -325,9 +613,13 @@
 .sub test_is_deeply_hash
     .local pmc left
     .local pmc right
+    .local pmc undef1
+    .local pmc undef2
 
-    left  = new 'Hash'
-    right = new 'Hash'
+    left   = new 'Hash'
+    right  = new 'Hash'
+    undef1 = new 'Undef'
+    undef2 = new 'Undef'
 
     test_pass()
     is_deeply( left, right )
@@ -345,24 +637,72 @@
     test_test( 'failing is_deeply() for hashes with different numbers of keys' )
 
     left['bar']  = 1
-    right['foo'] = 1
+    right['bar'] = 1
 
     test_fail( 'more diag' )
     is_deeply( left, right, 'more diag' )
     test_diag( 'Mismatch: expected 2 elements, received 1' )
     test_test( '... with description and proper pluralization' )
 
-    right['bar'] = 2
+    right['foo'] = 2
 
     test_fail()
     is_deeply( left, right )
-    test_diag( 'Mismatch at [bar]: expected 1, received 2' )
+    test_diag( 'Mismatch at [foo]: expected 1, received 2' )
     test_test( 'failing is_deeply() for hash with value mismatch' )
 
     test_fail( '2 is not 1' )
     is_deeply( left, right, '2 is not 1' )
-    test_diag( 'Mismatch at [bar]: expected 1, received 2' )
+    test_diag( 'Mismatch at [foo]: expected 1, received 2' )
     test_test( '... with description' )
+
+    right['foo'] = 1
+    test_pass()
+    is_deeply( left, right )
+    test_test( 'passing test is_deeply() for hashes created in different orders' )
+.end
+
+.sub test_is_deeply_hash_tt763
+    .local pmc left
+    .local pmc right
+    .local pmc undef1
+    .local pmc undef2
+
+    left   = new 'Hash'
+    right  = new 'Hash'
+    undef1 = new 'Undef'
+    undef2 = new 'Undef'
+    right['undef1'] = undef1
+    left['undef2']  = undef2
+
+    test_fail()
+    is_deeply( left, right )
+    test_diag( 'Mismatch at [undef2]: expected (undef), received nonexistent' )
+    test_test( 'failing is_deeply() for undef in left, nonexistent in right' )
+
+    test_fail()
+    is_deeply( right, left )
+    test_diag( 'Mismatch at [undef1]: expected (undef), received nonexistent' )
+    test_test( 'failing is_deeply() for undef in left, nonexistent in right' )
+
+    right['undef2'] = undef2
+    left['undef1']  = undef1
+
+    test_pass()
+    is_deeply( left, right )
+    test_test( 'passing is_deeply() with undef values' )
+
+    left['foo'] = undef1
+    test_fail()
+    is_deeply( left, right )
+    test_diag( 'Mismatch: expected 3 elements, received 2')
+    test_test( 'failing is_deeply() for hashes differing by keys with undef values' )
+
+    right['bar'] = undef1
+    test_fail()
+    is_deeply( left, right )
+    test_diag( 'Mismatch at [foo]: expected (undef), received nonexistent')
+    test_test( 'failing is_deeply() for hashes differing by keys with undef values' )
 .end
 
 .sub test_is_deeply_mismatch
@@ -377,9 +717,9 @@
 
     .local pmc left_array
     .local pmc right_array
-    left_array  = new 'Array'
+    left_array  = new 'ResizablePMCArray'
     left_array  = 3
-    right_array = new 'Array'
+    right_array = new 'ResizablePMCArray'
     right_array = 3
 
     left[  'array' ] = left_array
@@ -457,23 +797,23 @@
     .local pmc test
     test = new [ 'Test'; 'Builder' ]
 
-    test_out( 'ok 8 # TODO passing test' )
+    test_out( 'ok 8 # TODO todo reason' )
     test.'todo'( 1, 'passing test', 'todo reason' )
     test_test( 'todo test should pass, marked as TODO' )
 
-    test_out( 'not ok 9 # TODO failing test' )
+    test_out( "not ok 9 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
     test.'todo'( 0, 'failing test', 'todo reason' )
     test_test( 'todo test should fail, marked as TODO' )
 
-    test_out( 'ok 10 # TODO passing test' )
+    test_out( 'ok 10 # TODO todo reason' )
     todo( 1, 'passing test', 'todo reason' )
     test_test( 'todo test should pass, marked as TODO' )
 
-    test_out( 'not ok 11 # TODO failing test' )
+    test_out( "not ok 11 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
     todo( 0, 'failing test', 'todo reason' )
     test_test( 'todo test should fail, marked as TODO' )
 
-    test_out( 'not ok 12 # TODO' )
+    test_out( "not ok 12 # TODO \n\tFailed (TODO) test ''" )
     todo( 0 )
     test_test( 'todo test with no description or reason' )
 
@@ -519,6 +859,21 @@
     test_test( 'failing test isnt() for PMC/string')
 
 .end
+
+.sub test_is_null
+    test_pass( 'null is_null')
+    null $P0
+    is_null($P0, 'null is_null')
+    test_test( 'passing is_null with null')
+
+    test_fail( 'String is not null' )
+    $P0 = box 'Concerto'
+    is_null($P0, 'String is not null')
+    test_diag( "Have: Concerto" )
+    test_diag( "Want: null" )
+    test_test( 'failing test is_null for String pmc')
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

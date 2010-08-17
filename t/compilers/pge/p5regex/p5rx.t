@@ -1,7 +1,6 @@
 #!./parrot
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
-# vi: ft=pir
 
 =head1 NAME
 
@@ -55,8 +54,10 @@ Column 6, if present, contains a description of what is being tested.
 
 .const int TESTS = 960
 
+.loadlib 'io_ops'
+
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Dumper.pbc'
     .include 'iglobals.pasm'
@@ -81,7 +82,7 @@ Column 6, if present, contains a description of what is being tested.
     push test_files, 're_tests'
 
     .local pmc file_iterator # iterate over list of files..
-               file_iterator = new 'Iterator', test_files
+               file_iterator = iter test_files
 
     .local int test_number   # the number of the test we're running
                test_number = 0
@@ -122,7 +123,7 @@ Column 6, if present, contains a description of what is being tested.
     test_file = test_dir . test_name
 
     # Open the test file
-    file_handle = open test_file, '<'
+    file_handle = open test_file, 'r'
     $S0 = typeof file_handle
     if $S0 == 'Undef' goto bad_file
 
@@ -255,7 +256,8 @@ Column 6, if present, contains a description of what is being tested.
   thrown:
     .local pmc exception
     .local string message
-    get_results '0,0', exception, message
+    get_results '0', exception
+    message = exception
     # remove /'s
     # $S0 = substr result, 0, 1
     # if $S0 != '/' goto bad_error
@@ -290,7 +292,9 @@ Column 6, if present, contains a description of what is being tested.
     .local string test_file
 
     test_file = 're_tests'
-    bsr reset_todo_info
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
+    local_branch jmpstack,  reset_todo_info
 
     $S0 = 'character class in enumeration'
     todo_info[116] = $S0
@@ -496,7 +500,7 @@ Column 6, if present, contains a description of what is being tested.
 
   reset_todo_info:
     todo_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_todo_loop: # for developer testing. not used normally
     if $I0 > $I1 goto end_loop
@@ -504,7 +508,7 @@ Column 6, if present, contains a description of what is being tested.
     $I0 += 1
     goto set_todo_loop
   end_loop:
-    ret
+    local_return jmpstack
 .end
 
 
@@ -519,51 +523,53 @@ Column 6, if present, contains a description of what is being tested.
     .local string test_file
 
     test_file = 're_tests'
-    bsr reset_skip_info
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
+    local_branch jmpstack,  reset_skip_info
 
     $S0 = 'trailing modifiers'
     $I0 = 264
     $I1 = 395
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 458
     $I1 = 480
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[483] = $S0
     skip_info[484] = $S0
     skip_info[496] = $S0
     $I0 = 609
     $I1 = 617
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 627
     $I1 = 635
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 645
     $I1 = 653
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 663
     $I1 = 671
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 681
     $I1 = 689
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 699
     $I1 = 707
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 717
     $I1 = 725
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 735
     $I1 = 743
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 753
     $I1 = 761
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 771
     $I1 = 779
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 789
     $I1 = 797
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[802] = $S0
     skip_info[803] = $S0
     skip_info[805] = $S0
@@ -625,7 +631,7 @@ Column 6, if present, contains a description of what is being tested.
     skip_info[557] = $S0
     $I0 = 568
     $I1 = 592
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[800] = $S0
     skip_info[828] = $S0
     skip_info[829] = $S0
@@ -636,7 +642,7 @@ Column 6, if present, contains a description of what is being tested.
     $S0 = 'hangs a parrot'
     $I0 = 806
     $I1 = 823
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[924] = $S0
 
     $S0 = 'unknown reason'
@@ -660,7 +666,7 @@ Column 6, if present, contains a description of what is being tested.
 
   reset_skip_info:
     skip_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_range:                         # for setting a range of tests
     if $I0 > $I1 goto end_loop       # put range min in $I0, max in $I1
@@ -672,7 +678,7 @@ Column 6, if present, contains a description of what is being tested.
     goto set_range
   end_loop:
     $S0 = ''
-    ret
+    local_return jmpstack
 .end
 
 
@@ -691,7 +697,7 @@ Column 6, if present, contains a description of what is being tested.
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    chopn test_line, 1
+    test_line = chopn test_line, 1
 
     $P1 = split "\t", test_line
 
@@ -784,7 +790,7 @@ Column 6, if present, contains a description of what is being tested.
 .end
 
 
-# given a single digit hex value, return it's int value.
+# given a single digit hex value, return its int value.
 .sub hex_val
     .param string digit
 
@@ -820,27 +826,27 @@ Column 6, if present, contains a description of what is being tested.
   target1:
     $I0 = index target, '\n'
     if $I0 == -1 goto target2
-    substr target, $I0, 2, "\n"
+    target = replace target, $I0, 2, "\n"
     goto target1
   target2:
     $I0 = index target, '\r'
     if $I0 == -1 goto target3
-    substr target, $I0, 2, "\r"
+    target = replace target, $I0, 2, "\r"
     goto target2
   target3:
     $I0 = index target, '\e'
     if $I0 == -1 goto target4
-    substr target, $I0, 2, "\e"
+    target = replace target, $I0, 2, "\e"
     goto target3
   target4:
     $I0 = index target, '\t'
     if $I0 == -1 goto target5
-    substr target, $I0, 2, "\t"
+    target = replace target, $I0, 2, "\t"
     goto target4
   target5:
     $I0 = index target, '\f'
     if $I0 == -1 goto target6
-    substr target, $I0, 2, "\f"
+    target = replace target, $I0, 2, "\f"
     goto target5
   target6:
     # handle \xHH, hex escape.
@@ -854,7 +860,7 @@ Column 6, if present, contains a description of what is being tested.
     if $I2 > $I1 goto target7
     $S0 = substr target, $I2, 2
     $S1 = hex_chr($S0)
-    substr target, $I0, 4, $S1
+    target = replace target, $I0, 4, $S1
 
     inc x_pos
     goto target6

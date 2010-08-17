@@ -1,3 +1,4 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 # Set up a PAST data structure that represents a sub and run it.
@@ -9,33 +10,33 @@
 
 =for example
 
-"stmts" => PMC 'PAST::Stmts'  {
+"stmts" => PMC ['PAST';'Stmts']  {
     <source> => "4 + 1\n"
     <pos> => 0
-    [0] => PMC 'PAST::Op'  {
+    [0] => PMC ['PAST';'Op']  {
         <name> => "say"
         <pasttype> => "call"
-        [0] => PMC 'PAST::Op'  {
+        [0] => PMC ['PAST';'Op']  {
             <pasttype> => "bind"
-            [0] => PMC 'PAST::Var'  {
+            [0] => PMC ['PAST';'Var']  {
                 <name> => "last"
                 <scope> => "package"
                 <lvalue> => 1
             }
-            [1] => PMC 'PAST::Op'  {
+            [1] => PMC ['PAST';'Op']  {
                 <name> => "infix:+"
                 <pasttype> => undef
-                <pirop> => "n_add"
+                <pirop> => "add"
                 <lvalue> => undef
                 <source> => "+"
                 <pos> => 2
-                [0] => PMC 'PAST::Val'  {
+                [0] => PMC ['PAST';'Val']  {
                     <value> => "4"
                     <returns> => "Integer"
                     <source> => "4"
                     <pos> => 0
                 }
-                [1] => PMC 'PAST::Val'  {
+                [1] => PMC ['PAST';'Val']  {
                     <value> => "1"
                     <returns> => "Integer"
                     <source> => "1"
@@ -48,11 +49,10 @@
 
 =cut
 
-.include "library/dumper.pir"
-
 .namespace []
 
 .sub '__onload' :init
+    load_bytecode "dumper.pbc"
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
@@ -63,36 +63,36 @@
 .sub main :main
 
     .local pmc val_4
-    val_4 = new 'PAST::Val'
-    val_4.init( 'value' => '4', 'returns' => 'Integer' )
+    val_4 = new ['PAST';'Val']
+    val_4.'init'( 'value' => '4', 'returns' => 'Integer' )
 
     .local pmc val_1
-    val_1 = new 'PAST::Val'
-    val_1.init( 'value' => '1', 'returns' => 'Integer' )
+    val_1 = new ['PAST';'Val']
+    val_1.'init'( 'value' => '1', 'returns' => 'Integer' )
 
     .local pmc op_add
-    op_add = new 'PAST::Op'
-    op_add.init( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'n_add' )
+    op_add = new ['PAST';'Op']
+    op_add.'init'( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'add' )
 
     .local pmc var_last
-    var_last = new 'PAST::Var'
-    var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
+    var_last = new ['PAST';'Var']
+    var_last.'init'( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
 
     .local pmc op_bind
-    op_bind = new 'PAST::Op'
-    op_bind.init( var_last, op_add, 'pasttype' => 'bind' )
+    op_bind = new ['PAST';'Op']
+    op_bind.'init'( var_last, op_add, 'pasttype' => 'bind' )
 
     .local pmc op_say
-    op_say = new 'PAST::Op'
-    op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )
+    op_say = new ['PAST';'Op']
+    op_say.'init'( op_bind, 'name' => 'say', 'pasttype' => 'call' )
 
     .local pmc stmts
-    stmts = new 'PAST::Stmts'
+    stmts = new ['PAST';'Stmts']
     stmts.'init'( op_say, 'name'=>'stmts' )
 
     # compile to PIR and display
     .local pmc astcompiler
-    astcompiler = new [ 'PCT::HLLCompiler' ]
+    astcompiler = new [ 'PCT';'HLLCompiler' ]
     astcompiler.'removestage'('parse')
     astcompiler.'removestage'('past')
 
@@ -116,11 +116,11 @@
 .sub 'say'
     .param pmc args :slurpy
     if null args goto end
-    .local pmc iter
-    iter = new 'Iterator', args
+    .local pmc it
+    it = iter args
   loop:
-    unless iter goto end
-    $P0 = shift iter
+    unless it goto end
+    $P0 = shift it
     print $P0
     goto loop
   end:

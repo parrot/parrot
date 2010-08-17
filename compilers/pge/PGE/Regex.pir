@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
+
 =head1 TITLE
 
 Regex - base class for grammars and built-in rules
@@ -9,7 +12,7 @@ a number of built-in rules.
 
 =cut
 
-.namespace [ 'PGE::Match' ]
+.namespace [ 'PGE'; 'Match' ]
 
 .include 'cclass.pasm'
 .include 'interpinfo.pasm'
@@ -34,7 +37,7 @@ Match an identifier.
 
 =cut
 
-.sub 'ident' :method
+.sub 'ident' :method :nsentry('ident')
     .param pmc adverbs         :slurpy :named
     .local string target
     .local pmc mob, mfrom, mpos
@@ -56,30 +59,31 @@ Match an identifier.
 .end
 
 
-=item C<null()>
+=item C<alpha()>
 
-Match a null string (always returns true on first match).
+Match a single alphabetic character.
 
 =cut
 
-.sub "null" :method
-    .local pmc mob
-    .local int pos
+.sub 'alpha' :method
+    .param pmc adverbs         :slurpy :named
+    .local string target
+    .local pmc mob, mfrom, mpos
+    .local int pos, lastpos
+
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos) = $P0.'new'(self)
+    (mob, pos, target) = $P0.'new'(self)
+
+    lastpos = length target
+    $S0 = substr target, pos, 1
+    if $S0 == '_' goto ident_1
+    $I0 = is_cclass .CCLASS_ALPHABETIC, target, pos
+    if $I0 == 0 goto end
+  ident_1:
+    inc pos
     mob.'to'(pos)
+  end:
     .return (mob)
-.end
-
-=item C<fail()>
-
-Force a backtrack.  (Taken from A05.)
-
-=cut
-
-.sub "fail" :method
-    $P0 = get_hll_global ['PGE'], 'Match'
-    .return $P0.'new'(self)
 .end
 
 
@@ -90,7 +94,7 @@ Match a single uppercase character.
 =cut
 
 .sub 'upper' :method
-    .return '!cclass'(self, .CCLASS_UPPERCASE)
+    .tailcall '!cclass'(self, .CCLASS_UPPERCASE)
 .end
 
 
@@ -101,19 +105,9 @@ Match a single lowercase character.
 =cut
 
 .sub "lower" :method
-    .return '!cclass'(self, .CCLASS_LOWERCASE)
+    .tailcall '!cclass'(self, .CCLASS_LOWERCASE)
 .end
 
-
-=item C<alpha()>
-
-Match a single alphabetic character.
-
-=cut
-
-.sub "alpha" :method
-    .return '!cclass'(self, .CCLASS_ALPHABETIC)
-.end
 
 =item C<digit()>
 
@@ -122,7 +116,7 @@ Match a single digit.
 =cut
 
 .sub "digit" :method
-    .return '!cclass'(self, .CCLASS_NUMERIC)
+    .tailcall '!cclass'(self, .CCLASS_NUMERIC)
 .end
 
 =item C<xdigit()>
@@ -132,7 +126,7 @@ Match a single alphanumeric character.
 =cut
 
 .sub "xdigit" :method
-    .return '!cclass'(self, .CCLASS_HEXADECIMAL)
+    .tailcall '!cclass'(self, .CCLASS_HEXADECIMAL)
 .end
 
 =item C<space()>
@@ -142,7 +136,7 @@ Match a single whitespace character.
 =cut
 
 .sub "space" :method
-    .return '!cclass'(self, .CCLASS_WHITESPACE)
+    .tailcall '!cclass'(self, .CCLASS_WHITESPACE)
 .end
 
 =item C<print()>
@@ -152,7 +146,7 @@ Match a single printable character.
 =cut
 
 .sub "print" :method
-    .return '!cclass'(self, .CCLASS_PRINTING)
+    .tailcall '!cclass'(self, .CCLASS_PRINTING)
 .end
 
 =item C<graph()>
@@ -162,7 +156,7 @@ Match a single "graphical" character.
 =cut
 
 .sub "graph" :method
-    .return '!cclass'(self, .CCLASS_GRAPHICAL)
+    .tailcall '!cclass'(self, .CCLASS_GRAPHICAL)
 .end
 
 =item C<blank()>
@@ -172,7 +166,7 @@ Match a single "blank" character.
 =cut
 
 .sub "blank" :method
-    .return '!cclass'(self, .CCLASS_BLANK)
+    .tailcall '!cclass'(self, .CCLASS_BLANK)
 .end
 
 =item C<cntrl()>
@@ -182,7 +176,7 @@ Match a single "control" character.
 =cut
 
 .sub "cntrl" :method
-    .return '!cclass'(self, .CCLASS_CONTROL)
+    .tailcall '!cclass'(self, .CCLASS_CONTROL)
 .end
 
 =item C<punct()>
@@ -192,7 +186,7 @@ Match a single punctuation character.
 =cut
 
 .sub "punct" :method
-    .return '!cclass'(self, .CCLASS_PUNCTUATION)
+    .tailcall '!cclass'(self, .CCLASS_PUNCTUATION)
 .end
 
 =item C<alnum()>
@@ -202,48 +196,9 @@ Match a single alphanumeric character.
 =cut
 
 .sub "alnum" :method
-    .return '!cclass'(self, .CCLASS_ALPHANUMERIC)
+    .tailcall '!cclass'(self, .CCLASS_ALPHANUMERIC)
 .end
 
-=item C<sp()>
-
-Match a single space character.  (Taken from E05.)
-
-=cut
-
-.sub "sp" :method
-    .return '!literal'(self, ' ')
-.end
-
-=item C<lt()>
-
-Match a single left angle bracket.  (Taken from E05.)
-
-=cut
-
-.sub "lt" :method
-    .return '!literal'(self, '<')
-.end
-
-=item C<gt()>
-
-Match a single right angle bracket. (Taken from E05.)
-
-=cut
-
-.sub "gt" :method
-    .return '!literal'(self, '>')
-.end
-
-=item C<dot()>
-
-Match a single dot ('.').  (Taken from E05.)
-
-=cut
-
-.sub "dot" :method
-    .return '!literal'(self, '.')
-.end
 
 =item C<ws()>
 
@@ -256,7 +211,7 @@ Match whitespace between tokens.
     .local pmc mob, mfrom, mpos
     .local int rep, pos, lastpos
     .local string nextchars
-    .const .Sub corou = "ws_corou"
+    .const 'Sub' corou = "ws_corou"
     nextchars = ""
   ws_1:
     $P0 = get_hll_global ['PGE'], 'Match'
@@ -352,7 +307,7 @@ success.
     .local pmc mob, cache, rule
 
     if has_pattern goto lookahead
-    mob = 'fail'(self)
+    mob = '!fail'(self)
     .return (mob)
   lookahead:
     cache = get_global '%!cache'
@@ -401,7 +356,7 @@ potentially very inefficient, but it "works" for now.
 
     mob = self
     if has_pattern goto lookbehind
-    mob = fail(mob)
+    mob = '!fail'(mob)
     .return (mob)
   lookbehind:
     pattern = concat '[', pattern
@@ -433,11 +388,48 @@ potentially very inefficient, but it "works" for now.
     .return (mob)
 .end
 
+=item FAILGOAL(pmc mob, string goal [, 'dba'=>dba])
+
+Throw an exception when parsing fails in goal matching.
+
+=cut
+
+.sub 'FAILGOAL' :method
+    .param string goal
+    .param pmc options         :slurpy :named
+    .local string dba
+    dba = options['dba']
+    if dba goto have_dba
+    $P0 = getinterp
+    $P0 = $P0['sub'; 1]
+    dba = $P0
+  have_dba:
+    .local string message
+    message = concat "Unable to parse ", dba
+    message .= ", couldn't find final "
+    message .= goal
+    die message
+.end
+
 =back
 
 =head2  Support subroutines
 
 =over 4
+
+
+=item C<!fail>
+
+Force a backtrack.  (Taken from A05.)
+
+=cut
+
+.sub "!fail" :anon
+    .param pmc mob
+    $P0 = get_hll_global ['PGE'], 'Match'
+    .tailcall $P0.'new'(mob)
+.end
+
 
 =item C<!cclass(mob, cclass)>
 
@@ -445,7 +437,7 @@ Match according to character class C<cclass>.
 
 =cut
 
-.sub '!cclass'
+.sub '!cclass' :anon
     .param pmc mob
     .param int cclass
 
@@ -466,7 +458,7 @@ Match according to C<literal>.
 
 =cut
 
-.sub '!literal'
+.sub '!literal' :anon
     .param pmc mob
     .param string literal
     .local string target

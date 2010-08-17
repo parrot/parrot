@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 028-option_or_data.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
 use lib qw( lib );
 use config::init::defaults;
@@ -14,11 +14,7 @@ use config::init::install;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use_ok(
-    'Parrot::Configure::Step::List', qw|
-        get_steps_list
-        |
-);
+use Parrot::Configure::Step::List qw( get_steps_list );
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -26,7 +22,7 @@ is( $|, 1, "output autoflush is set" );
 my $testopt    = q{bindir};
 my $testoptval = q{mybindir};
 my $localargv  = [];
-my $args       = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         mode => q{configure},
         argv => $localargv,

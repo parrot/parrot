@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 # 08-pmc-pm.t
 
@@ -49,6 +49,8 @@ pass("Completed all tests in $0");
     % prove t/tools/pmc2cutils/08-pmc-pm.t
 
 =head1 DESCRIPTION
+
+Test functionality of Parrot::Pmc2c::PMC.
 
 =head1 AUTHOR
 

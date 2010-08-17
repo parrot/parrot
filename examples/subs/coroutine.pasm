@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -21,7 +21,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 =cut
 
 # create a coro and save it on the user stack
-.const .Sub P0 =  "MYCOROUTINE"
+.const 'Sub' P0 =  "MYCOROUTINE"
 # a coroutine carries state - clone it
 clone P0, P0
 
@@ -50,3 +50,8 @@ end
     print "Done\n"
     yield
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

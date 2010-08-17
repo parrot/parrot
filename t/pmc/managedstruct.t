@@ -1,13 +1,6 @@
-#! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 6;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -23,104 +16,96 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting ManagedStruct size" );
-    new P0, 'ManagedStruct'
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-    set P0,2
-    set I0,P0
-    eq I0,2,OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub main :main
+    .include 'test_more.pir'
+    plan(24)
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "element access - float, double" );
-    new P2, 'ResizablePMCArray'
+    set_managedstruct_size()
+    element_access()
+    named_element_access_int16()
+    nested_struct_offsets()
+    interface_check()
+.end
+
+.sub set_managedstruct_size
+    new $P0, ['ManagedStruct']
+    set $I0,$P0
+    is($I0, 0, "empty ManagedStruct has size 0")
+    set $P0,1
+    set $I0,$P0
+    is($I0, 1, "non-empty ManagedStruct has correct size")
+    set $P0,2
+    set $I0,$P0
+    is($I0, 2, "non-empty ManagedStruct has correct size")
+.end
+
+#pasm_output_is( <<'CODE', <<'OUTPUT', "element access - float, double" );
+.sub element_access
+
+    #element access - float, double
+    new $P2, ['ResizablePMCArray']
     .include "datatypes.pasm"
-    push P2, .DATATYPE_FLOAT
-    push P2, 2	# 2 elem array
-    push P2, 0
-    push P2, .DATATYPE_DOUBLE
-    push P2, 0
-    push P2, 0
-    new P0, 'ManagedStruct', P2
+    push $P2, .DATATYPE_FLOAT
+    push $P2, 2	# 2 elem array
+    push $P2, 0
+    push $P2, .DATATYPE_DOUBLE
+    push $P2, 0
+    push $P2, 0
+    new $P0, ['ManagedStruct'], $P2
     # must have set size automatically
     # this is hopefully 2*4+8 everywhere
-    set I0, P0
-    print I0
-    print "\n"
-    set P0[0;0], 14.1
-    set N0, P0[0;0]
-    set P0[0;1], 14.2
-    set P0[1], 14.3
-    set N0, P0[0;0]
-    print N0
-    print "\n"
-    set N0, P0[0;1]
-    print N0
-    print "\n"
-    set N0, P0[1]
-    print N0
-    print "\n"
-    end
-CODE
-16
-14.100000
-14.200000
-14.300000
-OUTPUT
+    set $I0, $P0
+    is($I0, 16, "ManagedStruct has correct size")
+    set $P0[0;0], 14.1
+    set $N0, $P0[0;0]
+    set $P0[0;1], 14.2
+    set $P0[1], 14.3
+    set $N0, $P0[0;0]
+    sub $N1, $N0, 14.1
+    cmp $I0, $N1, 0.000001
+    ok($I0, "stored float has correct value")
+    set $N0, $P0[0;1]
+    sub $N1, $N0, 14.2
+    cmp $I0, $N1, 0.000001
+    ok($I0, "stored float has correct value")
+    set $N0, $P0[1]
+    sub $N1, $N0, 14.3
+    cmp $I0, $N1, 0.000001
+    ok($I0, "stored float has correct value")
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "element access - char, short" );
-    new P2, 'ResizablePMCArray'
-    .include "datatypes.pasm"
-    push P2, .DATATYPE_CHAR
-    push P2, 2	# 2 elem char array
-    push P2, 0
-    new P0, 'ManagedStruct', P2
-    set I0, P0
-    ge I0, 2, ok1
-    print "not "
-ok1:
-    print "ok "
-    set P0[0;0], 1
-    set P0[0;1], 258	# must be truncated to 2
-    set I0, P0[0;0]
-    print I0
-    set I0, P0[0;1]
-    print I0
-    print " "
+
+    #element access - char, short
+    new $P2, ['ResizablePMCArray']
+    push $P2, .DATATYPE_CHAR
+    push $P2, 2	# 2 elem char array
+    push $P2, 0
+    new $P0, ['ManagedStruct'], $P2
+    set $I0, $P0
+    $I1 = isge $I0, 2
+    ok($I1, "ManagedStruct size is at least 2")
+
+    set $P0[0;0], 1
+    set $P0[0;1], 258	# must be truncated to 2
+    set $I0, $P0[0;0]
+    is($I0, 1, "char val of 1 is correct")
+    set $I0, $P0[0;1]
+    is($I0, 2, "char val of 258 retrieved as 2")
     # now acces that as a short
-    new P2, 'ResizablePMCArray'
-    push P2, .DATATYPE_SHORT
-    push P2, 1
-    push P2, 0
-    assign P0, P2
+    new $P2, ['ResizablePMCArray']
+    push $P2, .DATATYPE_SHORT
+    push $P2, 1
+    push $P2, 0
+    assign $P0, $P2
     # should be 2*256+1 or 1*256+2
-    set I0, P0[0]
-    print I0
-    end
-CODE
-/^ok 12 (513|258)$/
-OUTPUT
+    set $I0, $P0[0]
+    $I1 = $I0 == 513
+    $I2 = $I0 == 258
+    $I0 = $I1 | $I2
+    ok($I0, "short val retrieved correctly")
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
-
-.include "datatypes.pasm"
-
-.sub _main
-    new $P1, 'OrderedHash'
+.sub named_element_access_int16
+    new $P1, ['OrderedHash']
     set  $P1['x'], .DATATYPE_INT16
     push $P1, 0
     push $P1, 0
@@ -130,15 +115,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
     push $P1, 0
 
     # need a ManagedStruct to allocate data memory
-    new $P2, 'ManagedStruct', $P1
-
-    # calc allocation size
-    set $I0, 0
-    sizeof $I1, .DATATYPE_INT16
-    add $I0, $I1
-    add $I0, $I1
-    # set size
-    set $P2, $I0
+    new $P2, ['ManagedStruct'], $P1
 
     # set struct values by name
     set $I0, 2
@@ -152,118 +129,79 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
     set $I2, $P2[0]
     set $I3, $P2[1]
 
-    print "x: "
-    print $I2
-
-    print "\ny: "
-    print $I3
+    is($I2, 2, "'x' value by idx is correct")
+    is($I3, 16, "'y' value by idx is correct")
 
     # get struct values by name
     set $I2, $P2["x"]
     set $I3, $P2["y"]
 
-    print "\nx: "
-    print $I2
-
-    print "\ny: "
-    print $I3
-    print "\n"
-    end
+    is($I2, 2, "'x' value by name is correct")
+    is($I3, 16, "'y' value by name is correct")
 .end
-CODE
-x: 2
-y: 16
-x: 2
-y: 16
-OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "nested struct offsets" );
-  # the nested structure
-  .include "datatypes.pasm"
-  new P3, 'ResizablePMCArray'
-  push P3, .DATATYPE_INT
-  push P3, 0
-  push P3, 0
-  push P3, .DATATYPE_INT
-  push P3, 0
-  push P3, 0
-  new P4, 'UnManagedStruct', P3
-  # outer structure
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  push P2, .DATATYPE_STRUCT
-  # attach the unmanged struct as property
-  set P1, P2[-1]
-  setprop P1, "_struct", P4
-  push P2, 0
-  push P2, 0
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  # attach struct initializer
-  new P5, 'UnManagedStruct', P2
+#pasm_output_is( <<'CODE', <<'OUTPUT', "nested struct offsets" );
+.sub nested_struct_offsets
 
-  # now check offsets
-  set I0, P2[2]
-  print I0
-  print "\n"
-  set I0, P2[5]
-  print I0
-  print "\n"
-  set I0, P2[8]
-  print I0
-  print "\n"
-  # nested
-  set I0, P3[2]
-  print I0
-  print "\n"
-  set I0, P3[5]
-  print I0
-  print "\n"
+    # the nested structure
+    new $P3, ['ResizablePMCArray']
+    push $P3, .DATATYPE_INT
+    push $P3, 0
+    push $P3, 0
+    push $P3, .DATATYPE_INT
+    push $P3, 0
+    push $P3, 0
+    new $P4, ['UnManagedStruct'], $P3
+    # outer structure
+    new $P2, ['ResizablePMCArray']
+    push $P2, .DATATYPE_INT
+    push $P2, 0
+    push $P2, 0
+    push $P2, .DATATYPE_STRUCT
+    # attach the unmanged struct as property
+    set $P1, $P2[-1]
+    setprop $P1, "_struct", $P4
+    push $P2, 0
+    push $P2, 0
+    push $P2, .DATATYPE_INT
+    push $P2, 0
+    push $P2, 0
+    # attach struct initializer
+    new $P5, ['UnManagedStruct'], $P2
 
-  # check struct size
-  set I0, P5
-  print I0
-  print "\n"
-  # nested
-  set I0, P4
-  print I0
-  print "\n"
-  end
-CODE
-0
-4
-12
-0
-4
-16
-8
-OUTPUT
+    # now check offsets
+    set $I0, $P2[2]
+    is($I0, 0, "offset 2 looks good")
+    set $I0, $P2[5]
+    is($I0, 4, "offset 5 looks good")
+    set $I0, $P2[8]
+    is($I0, 12, "offset 8 looks good")
+    # nested
+    set $I0, $P3[2]
+    is($I0, 0, "nested offest 2 looks good")
+    set $I0, $P3[5]
+    is($I0, 4, "nested offset 5 looks good")
 
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
+    # check struct size
+    set $I0, $P5
+    is($I0, 16, "struct size looks good")
+    # nested
+    set $I0, $P4
+    is($I0, 8, "nested struct size looks good")
+.end
 
-.sub _main
+.sub interface_check
     .local pmc pmc1
-    pmc1 = new 'ManagedStruct'
+    pmc1 = new ['ManagedStruct']
     .local int bool1
     does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    is(bool1, 1, "ManagedStruct does scalar")
     does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    is(bool1, 0, "ManagedStruct doesn't do no_interface")
 .end
-CODE
-1
-0
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

@@ -1,0 +1,229 @@
+# Copyright (C) 2001-2006, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/dev/c_functions.pod - C function decoration guidelines
+
+=head1 Overview
+
+Compilers have the ability to detect a wide class of potential errors in
+code during the compilation phase, especially if certain metadata is
+provided by the programmer to indicate details about specific operations.
+This metadata is typically compiler-dependent, but using a system of
+macros and our existing configuration system, we can instruct the
+compiler to search for and prevent certain types of errors.
+
+The net result is that errors (or potential errors) can be detected early
+at compile-rime instead of later an runtime or during "make test".
+
+Headerizer creates function declarations based on function
+definitions. It scans the source files passed to it and extracts the
+function declarations. Then it puts them into the appropriate .h file or,
+in the case of static functions, back into the source file itself.
+
+The headerizer also adds function attributes as specified by the
+decorations on the source. It's important to properly-decorate functions
+that are written, so that programs like headerizer can pass on important
+metadata to the compiler.
+
+Notice that not all of these decorations will have a real effect for all
+compilers. In some cases, the various macros might be empty placeholders.
+Also, where it says "compiler", it could also mean "lint or any
+other static analysis tool like splint."
+
+=head1 Function Parameter Decorators
+
+=head2 What's a shim?
+
+Think of "shim" as shorthand for "placeholder". It's 64% shorter.
+
+GCC (and lint and splint and other analysis tools) likes to complain if
+you pass an argument into a function and don't use it. If we know that we're
+not going to use an argument, we can either remove the argument from
+the function declaration, or mark it as unused.
+
+Throwing the argument away is not always possible. Usually, it's because
+the function is one that gets referred to by a function pointer, and
+all functions of this group must have the same signature. Consider a
+function with three args: Interp, Foo and Bar. Maybe a given function
+doesn't use Foo, but we still have to accept Foo because all the other
+functions like ours do. In this case we can use the C<UNUSED(Foo)> macro
+in the body of the function to silence any compiler warnings. C<UNUSED>
+lets the compiler know that we know the parameter isn't used, and that
+we haven't just forgotten about it. C<UNUSED> is for cases where we don't
+currently use a particular parameter, but we might in the future. If we
+never will use it, mark it as a C<SHIM(Foo)> in the declaration. Here's an
+example:
+
+  void MyFunction(PARROT_INTERP, SHIM(int Foo), /* Never using Foo */
+	  int Bar)
+  {
+      UNUSED(Bar);  /* We aren't using Bar YET */
+	  ...
+  }
+
+If the interpreter structure in a function is a shim, there is a special
+macro for that. 
+
+=head2 Passing Interpreter Pointers
+
+Most of the time, if you need an interpreter in your function,
+define that argument as C<PARROT_INTERP>.  If your interpreter is
+a shim, then use C<SHIM_INTERP>, not C<SHIM(PARROT_INTERP)>. 
+
+=head2 What are input and output arguments?
+
+Pointers are dangerous because they are so versatile. You can pass a pointer
+to a function only to have that function modify the data that the pointer
+is pointing to. In Parrot, we decorate all our pointer parameters with
+keywords like C<ARGIN>, C<ARGOUT>, and C<ARGMOD> to specify whether the
+pointer is an input only, an output only, or is modified.
+
+Input pointers are pointers which are read, but the data they point to is
+not changed. The data after the function call is the same as the data you
+had before it. If you specify a parameter is an input parameter, and the
+function tries to modify its contents anyway, you'll get a warning. Also,
+if you pass in an uninitialized pointer, the compiler will throw a warning.
+
+Output pointers are pointers that are passed into a function, its existing
+contents are ignored, and new contents are created for it. It's called an
+output because the data in the pointed-to structure are populated inside
+the function and passed back out to the caller. If you have a pointer that
+points to valid data and you pass it as an ARGOUT parameter, the compiler
+will throw a warning. Unlike input arguments, you can typically pass an
+uninitialized pointer as an ARGOUT parameter.
+
+Modifiable, or "in-out" parameters are parameters that have both behaviors.
+Some fields in it are read, some fields in it are changed.
+
+Please note that these are only to be used on pointer types.  If you're
+not absolutely sure that the argument is a pointer, don't use them.
+(The "va_list" builtin type is sometimes a pointer, sometimes a struct,
+depending on platform and compiler.)
+
+Here's a simple example of a function that uses these modifiers:
+
+  void MyFunction(PARROT_INTERP, ARGIN(char *Foo),
+	  ARGOUT(int *Bar), ARGMOD(float *Baz));
+
+=head2 NOTNULL(x)
+
+For function arguments and variables that must never have NULL
+assigned to them, or passed into them.  For example, if we were
+defining C<strlen()> in Parrot, we'd do it as
+C<strlen(NOTNULL(const char *p))>. All the previous pointer decorations,
+C<ARGIN>, C<ARGOUT> and C<ARGMOD> imply C<NOTNULL>. The compiler will
+throw a warning if it detects a null value being passed to a C<NOTNULL>
+parameter.
+
+=head2 NULLOK(x)
+
+For function arguments and variables where it's OK to pass in NULL.
+For example, if we wrote C<free()> in Parrot, it would be
+C<strlen(NULLOK(void *p))>. There are variants of C<ARGIN>, C<ARGOUT>,
+and C<ARGMOD> that allow NULL values: C<ARGIN_NULLOK>, C<ARGOUT_NULLOK>,
+and C<ARGMOD_NULLOK>. These have the same semantics as their
+non-NULLOK counterparts, except the compiler will not throw errors if
+a null value is passed.
+
+=head1 Function Decorators
+
+In addition to the C<SHIM>, C<ARGIN>, C<ARGOUT> and C<ARGMOD> parameters
+and variants for parameters, there are a number of helpful modifiers that
+can be applied directly to the function declaration itself.
+
+=head2 PARROT_WARN_UNUSED_RESULT
+
+Tells the compiler to warn if the function is called, but the result is
+ignored. For instance, on a memory allocation function you would want to
+keep track of the result so that you could free it later and not cause
+a memory leak.
+
+=head2 PARROT_IGNORABLE_RESULT
+
+Tells the compiler that it's OK to ignore the function's return value.
+
+=head2 PARROT_MALLOC
+
+Functions marked with this are flagged as having received C<malloc>ed
+memory. This lets the compiler do analysis on memory leaks.
+
+=head2 PARROT_CONST_FUNCTION
+
+The function is a deterministic one that will always return the
+same value if given the same arguments, every time.  Examples include
+functions like C<mod> or C<max>.  An anti-example is C<rand()> which
+returns a different value every time. Some compilers can do optimizations
+by replacing constant functions with lookup tables, if the results are
+always going to be the same.
+
+=head2 PARROT_PURE_FUNCTION
+
+Less stringent than PARROT_CONST_FUNCTION, these functions only
+operate on their arguments and the data they point to. These functions
+have no other side effects to worry about, and clever compilers may find
+ways to optimize these functions. Examples include C<strlen()> or
+C<strchr()>.
+
+=head2 PARROT_DOES_NOT_RETURN
+
+For functions that can't return, like C<Parrot_exit()> or functions that
+cause exceptions to be thrown. This helps the compiler's flow analysis
+which can help detect unreachable code, or opportunities for optimization.
+
+=head2 PARROT_CANNOT_RETURN_NULL
+
+For functions that return a pointer, but the pointer is guaranteed to not
+be NULL. The compiler can help to detect null pointer dereferences, and
+this hint will simplify the process.
+
+=head2 PARROT_CAN_RETURN_NULL
+
+For functions that return a pointer that could be null. These return values
+should be tested for null values before they are used or dereferenced.
+
+=head2 PARROT_INLINE
+
+For functions that could be inlined by the compiler for optimization. This
+is more of a hint then a command, and many compilers might ignore it
+entirely. Use this instead of the C<inline> keyword.
+
+=head2 PARROT_EXPORT
+
+For functions that are important API functions.
+
+{{TODO: More detail is needed on this}}
+
+=head1 Examples
+
+    PARROT_EXPORT
+    PARROT_WARN_UNUSED_RESULT
+    INTVAL
+    Parrot_str_find_index(PARROT_INTERP, NOTNULL(const STRING *s),
+            NOTNULL(const STRING *s2), INTVAL start)
+
+
+C<Parrot_str_find_index> is part of the Parrot API, and returns an INTVAL. The
+interpreter is used somewhere in the function. String C<s> and C<s2>
+cannot be NULL. If the calling function ignores the return value,
+it's an error, because you'd never want to call C<Parrot_str_find_index()>
+without wanting to know its value.
+
+    PARROT_EXPORT
+    PARROT_PURE_FUNCTION
+    INTVAL
+    parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
+    {
+        return hash->entries;
+    }
+
+This function is a pure function because it only looks at its parameters
+or global memory. The interpreter doesn't get used, but needs to be
+passed because all PARROT_EXPORT functions have interpreters passed, so is
+flagged as a SHIM_INTERP.
+
+We could put C<PARROT_WARN_UNUSED_RESULT> on this function, but since
+all C<PARROT_PURE_FUNCTION>s and C<PARROT_CONST_FUNCTION>s get flagged
+that way anyway, there's no need.
+

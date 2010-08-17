@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2007, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_SIGNAL_H_GUARD

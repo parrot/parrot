@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # 038-run_single_step.t
 
@@ -12,7 +12,7 @@ use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},

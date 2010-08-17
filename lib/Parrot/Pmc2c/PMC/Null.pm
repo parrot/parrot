@@ -1,17 +1,20 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
-
-=head1 Parrot::Pmc2c::Null Instance Methods
-
-=over 4
-
-=cut
 
 package Parrot::Pmc2c::PMC::Null;
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
+
+=head1 NAME
+
+Parrot::Pmc2c::PMC::Null
+
+=head1 DESCRIPTION
+
+PMC to C Instance Methods
+
+=over 4
 
 =item C<pre_method_gen($method, $line, $out_name)>
 
@@ -26,7 +29,7 @@ The C<Null> PMC throws an execption for all methods.
 sub pre_method_gen {
     my ($self) = @_;
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
@@ -37,11 +40,24 @@ sub pre_method_gen {
             }
         );
 
-        # don't return anything, ever
-        my $output = <<EOC;
-    real_exception(interp, NULL, NULL_REG_ACCESS, "Null PMC access in $vt_method_name()");
+        # take care to mark the parameters as unused
+        # to avoid compiler warnings
+        my $body = <<"EOC";
+    UNUSED(interp)
+    UNUSED(_self)
 EOC
-        $new_default_method->body( Parrot::Pmc2c::Emitter->text($output) );
+
+        foreach my $param (split /,\s*/, $method->parameters) {
+            $param =~ s/.*\b(\w+)/$1/;
+            $body .= "    UNUSED($param)\n";
+        }
+        my $vtname = uc $vt_method_name;
+        $body .= <<"EOC";
+
+    null_pmc_access(interp, PARROT_VTABLE_SLOT_$vtname);
+EOC
+
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text($body) );
         $self->add_method($new_default_method);
     }
     return 1;

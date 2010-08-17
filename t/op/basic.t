@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -97,16 +97,18 @@ three:
         end
 CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bsr_i" );
-        print   "start\n"
+pasm_output_is( <<'CODE', <<'OUTPUT', "local_branch_c_i" );
+        print    "start\n"
 
-        bsr     LAB1
+        new P0, 'ResizableIntegerArray'
 
-        print   "done\n"
+        local_branch P0, LAB1
+
+        print    "done\n"
         end
 
-LAB1:   print   "lab 1\n"
-        ret
+LAB1:   print    "lab 1\n"
+        local_return P0
 CODE
 start
 lab 1

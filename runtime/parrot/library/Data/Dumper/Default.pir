@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Data::Dumper::Default - The default output module of Data::Dumper.
@@ -18,19 +20,19 @@ This module provides the default output style of C<Data::Dumper>.
 
 .sub __library_data_dumper_default_onload :load
     .local pmc ddb_class
-    ddb_class = get_class "Data::Dumper::Default"
+    ddb_class = get_class ['Data'; 'Dumper'; 'Default']
     if null ddb_class goto create_ddb
     goto END
 
   create_ddb:
-    load_bytecode "library/Data/Dumper/Base.pir"
-    get_class $P0, "Data::Dumper::Base"
-    subclass $P0, $P0, "Data::Dumper::Default"
+    load_bytecode 'Data/Dumper/Base.pbc'
+    get_class $P0, ['Data'; 'Dumper'; 'Base']
+    subclass $P0, $P0, ['Data'; 'Dumper'; 'Default']
 END:
     .return ()
 .end
 
-.namespace ["Data::Dumper::Default"]
+.namespace ['Data'; 'Dumper'; 'Default']
 
 =head1 METHODS
 
@@ -108,7 +110,7 @@ Dumps a 'generic' Hash.
     .param pmc hash
     .local string indent
     .local string subindent
-    .local pmc iter
+    .local pmc it
     .local string key
     .local pmc val
     .local pmc keys
@@ -122,13 +124,12 @@ Dumps a 'generic' Hash.
     print " {"
 
     new keys, "ResizablePMCArray"
-    new iter, "Iterator", hash
-    set iter, 0
+    it = iter hash
 
 iter_loop:
-    unless iter, iter_end
+    unless it, iter_end
 
-    shift key, iter
+    shift key, it
     push keys, key
     branch iter_loop
 
@@ -404,6 +405,86 @@ Dumps a Null PMC.
     .return ( 1 )
 .end
 
+=item Capture dumpe
+
+Dump a capture object.
+
+=cut
+
+.namespace ['Capture']
+.sub '__dump' :method
+    .param pmc dumper
+    .param string label
+    .local int hasstuff
+    hasstuff = 0
+
+    .local string subindent, indent
+    (subindent, indent) = dumper.'newIndent'()
+
+    # Sort hash keys before dump to preseve order
+    # Use RPA instead of RSA because RSA doesn't have 'sort' method
+    .local pmc hash, it, keys
+    hash = self.'hash'()
+    keys = new ['ResizablePMCArray']
+    it = iter hash
+  dump_hash_keys_loop:
+    unless it goto dump_hash_keys_end
+    .local string key
+    key = shift it
+    push keys, key
+    goto dump_hash_keys_loop
+  dump_hash_keys_end:
+    keys.'sort'()
+
+    it = iter keys
+  dump_hash_loop:
+    unless it goto dump_hash_end
+    if hasstuff goto dump_hash_1
+    print " {"
+    hasstuff = 1
+  dump_hash_1:
+    print "\n"
+    print subindent
+    .local string key
+    .local pmc val
+    key = shift it
+    val = hash[key]
+    print "<"
+    print key
+    print "> => "
+    dumper.'dump'(label, val)
+    goto dump_hash_loop
+  dump_hash_end:
+
+    .local pmc array
+    array = self.'list'()
+    if null array goto dump_array_end
+    $I1 = elements array
+    $I0 = 0
+  dump_array_loop:
+    if $I0 >= $I1 goto dump_array_end
+    if hasstuff goto dump_array_1
+    print " {"
+    hasstuff = 1
+  dump_array_1:
+    print "\n"
+    print subindent
+    val = array[$I0]
+    print "["
+    print $I0
+    print "] => "
+    dumper.'dump'(label, val)
+    inc $I0
+    goto dump_array_loop
+  dump_array_end:
+    unless hasstuff goto end
+    print "\n"
+    print indent
+    print '}'
+  end:
+    dumper.'deleteIndent'()
+.end
+
 =back
 
 =head1 AUTHOR
@@ -414,7 +495,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

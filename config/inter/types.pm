@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -25,7 +25,7 @@ use Parrot::Configure::Utils ':inter';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining what types Parrot should use};
+    $data{description} = q{What types should Parrot use};
     $data{result}      = q{};
     return \%data;
 }

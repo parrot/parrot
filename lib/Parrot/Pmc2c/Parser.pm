@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 # $Id$
 
 package Parrot::Pmc2c::Parser;
@@ -10,11 +10,12 @@ use base qw( Exporter );
 
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
-use Parrot::Pmc2c::Attribute;
+use Parrot::Pmc2c::Attribute ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
 use Text::Balanced 'extract_bracketed';
+use File::Basename qw(basename);
 
 =head1 NAME
 
@@ -65,6 +66,10 @@ sub parse_pmc {
     my ( $preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines ) =
         parse_top_level($code);
 
+    my $filebase = basename($filename);
+    $filebase =~ s/\.pmc$//;
+    die("PMC filename $filebase.pmc does not match pmclass name $pmcname!\n")
+        unless lc($filebase) eq lc($pmcname);
     my $pmc = Parrot::Pmc2c::PMC->create($pmcname);
     $pmc->preamble( Parrot::Pmc2c::Emitter->text( $preamble, $filename, 1 ) );
     $pmc->name($pmcname);
@@ -76,7 +81,7 @@ sub parse_pmc {
     my $lineno = count_newlines($preamble) + $chewed_lines + 1;
     my $class_init;
 
-    ($lineno, $pmcbody)    = find_attrs(  $pmc, $pmcbody, $lineno, $filename);
+    ($lineno, $pmcbody)    = find_attrs(  $pmc, $pmcbody, $lineno, $filename, $pmc2cMain);
     ($lineno, $class_init) = find_methods($pmc, $pmcbody, $lineno, $filename);
 
     $pmc->postamble( Parrot::Pmc2c::Emitter->text( $post, $filename, $lineno ) );
@@ -90,7 +95,26 @@ sub parse_pmc {
 }
 
 sub find_attrs {
-    my ($pmc, $pmcbody, $lineno, $filename) = @_;
+    my ($pmc, $pmcbody, $lineno, $filename, $pmc2cMain) = @_;
+
+    #prepend parent ATTRs to this PMC's ATTR list, if possible
+    my $got_attrs_from = '';
+    foreach my $parent ( @{ $pmc->{parents} } ) {
+
+        my $parent_dump = $pmc2cMain->read_dump( lc($parent) . '.dump' );
+
+        if ( $got_attrs_from ne '' && $parent_dump->{has_attribute} ) {
+            die "$filename is trying to extend $got_attrs_from and $parent, ".
+                "but both these PMCs have ATTRs.";
+        }
+
+        if ( $parent_dump->{has_attribute} ) {
+            $got_attrs_from = $parent;
+            foreach my $parent_attrs ( @{ $parent_dump->{attributes} } ) {
+                $pmc->add_attribute($parent_attrs);
+            }
+        }
+    }
 
     # backreferences here are all +1 because below the qr is wrapped in quotes
     my $attr_re = qr{
@@ -105,11 +129,24 @@ sub find_attrs {
 
         # type
         \s+
-        (INTVAL|FLOATVAL|STRING\s+\*|PMC\s+\*|\w+\s+\*|Parrot_\w*)
+        (   U?INTVAL
+          | FLOATVAL
+          | STRING\s+\*
+          | PMC\s+\*
+          | (?:struct\s+)?\w+\s+\*+
+          | (?:unsigned\s+)?char\s+\*+
+          | \w*
+        )
 
         # name
         \s*
-        (\w+)
+        (
+            \w+
+          | \(\*\w*\)\(.*?\)
+        )
+
+        # Array size
+        (\[\d+\])?
 
         # modifiers
         \s*
@@ -123,20 +160,22 @@ sub find_attrs {
     (/\*.*?\*/)?
     }sx;
 
-    while ($pmcbody =~ s/($attr_re)//) {
-        my ($type, $name, @modifiers, $comment);
+    while ($pmcbody =~ s/($attr_re)//o) {
+        my ($type, $name, $array_size, @modifiers, $comment);
         $type = $2;
         $name = $3;
-        @modifiers = split /\s/, $4;
-        $comment = $5;
+        $array_size = $4 || '';
+        @modifiers = split /\s/, $5;
+        $comment = $6;
 
-        $lineno++;
+        $lineno += count_newlines($1);
 
         $pmc->add_attribute(Parrot::Pmc2c::Attribute->new(
             {
-                name      => $name,
-                type      => $type,
-                modifiers => \@modifiers,
+                name       => $name,
+                type       => $type,
+                array_size => $array_size,
+                modifiers  => \@modifiers,
             }
         ));
     }
@@ -158,8 +197,8 @@ sub find_methods {
 
         ((?:PARROT_\w+\s+)+)? # decorators
 
-        # vtable|method marker
-        (?:(VTABLE|METHOD)\s+)?
+        # vtable, method, or multi marker
+        (?:(VTABLE|METHOD|MULTI)\s+)?
 
         ((?:\w+\s*?\**\s*)?\w+) # method name (includes return type)
         \s*
@@ -179,7 +218,7 @@ sub find_methods {
         \s*
     }sx;
 
-    while ( $pmcbody =~ s/($signature_re)// ) {
+    while ( $pmcbody =~ s/($signature_re)//o ) {
         my ( $decorators, $marker, $methodname, $parameters, $rawattrs ) =
             ( $2, $3, $4, $5, $6 );
         my $attrs = defined $rawattrs ? parse_method_attrs($rawattrs) : {};
@@ -192,6 +231,7 @@ sub find_methods {
         }
 
         ( my $methodblock, $pmcbody ) = extract_balanced($pmcbody);
+        my $block_lines = count_newlines($methodblock);
 
         $methodblock = strip_outer_brackets($methodblock);
 
@@ -226,6 +266,10 @@ sub find_methods {
             $pmc->set_flag('need_fia_header');
         }
 
+        if ( $marker and $marker =~ /MULTI/ ) {
+            Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
+        }
+
         # PCCINVOKE needs FixedIntegerArray header
         $pmc->set_flag('need_fia_header') if $methodblock =~ /PCCINVOKE/;
 
@@ -235,21 +279,33 @@ sub find_methods {
         }
         else {
 
-            # Name-mangle NCI methods to avoid conflict with vtable methods.
-            if ( $marker and $marker !~ /VTABLE/ ) {
-                $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
-                $method->name("nci_$methodname");
-                $method->symbol($methodname);
+            # Name-mangle NCI and multi methods to avoid conflict with vtables
+            if ( $marker) {
+                if ( $marker =~ /MULTI/ ) {
+                    $method->type(Parrot::Pmc2c::Method::MULTI);
+                    $method->symbol($methodname);
+                }
+                elsif ( $marker !~ /VTABLE/ ) {
+                    $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
+                    $method->name("nci_$methodname");
+                    $method->symbol($methodname);
+                }
             }
 
+            # To be deprecated
             parse_mmds( $method, $filename, $lineno )
                 if $methodblock =~ /\bMMD_(\w+):/;
 
             $pmc->add_method($method);
         }
 
-        $lineno += count_newlines($methodblock);
+        $lineno += $block_lines;
     }
+
+    # include the remainder in the line count, minus the last one
+    # (the last one is included in the postamble directly)
+    chomp $pmcbody;
+    $lineno += count_newlines($pmcbody);
 
     return ($lineno, $class_init);
 }
@@ -502,8 +558,8 @@ sub extract_balanced {
     my $code       = shift;
     my $unbalanced = 0;
 
-    die "Unexpected whitespace, expecting" if $code =~ /^\s+/;
-    die "bad block open: ", substr( $code, 0, 40 ), "..." unless $code =~ /^\{/;
+    die 'Unexpected whitespace, expecting' if $code =~ /^\s+/;
+    die 'bad block open: ', substr( $code, 0, 40 ), '...' unless $code =~ /^\{/;
 
     # create a copy and remove strings and comments so that
     # unbalanced {} can be used in them in PMCs, being careful to

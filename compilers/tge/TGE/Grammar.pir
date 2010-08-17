@@ -1,4 +1,5 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -6,17 +7,18 @@ TGE::Grammar - The base class for all tree grammars.
 
 =head1 SYNOPSIS
 
+(To come.)
 
 =head1 DESCRIPTION
 
 =cut
 
-.namespace [ 'TGE::Grammar' ]
+.namespace [ 'TGE'; 'Grammar' ]
 
 .sub '__onload' :load
     # define the class
     .local pmc base
-    newclass base, 'TGE::Grammar'
+    newclass base, ['TGE';'Grammar']
     addattribute base, 'rules'   # the rules in the grammar (an array)
     addattribute base, 'symbols' # used for tracking symbols parsed
                                  # (often a hash, but grammar chooses
@@ -53,7 +55,7 @@ Add a rule to the current attribute grammar.
 
     # create a new attribute grammar rule
     .local pmc rule
-    rule = new 'TGE::Rule'
+    rule = new ['TGE';'Rule']
     setattribute rule, 'type', type
     setattribute rule, 'name', name
     setattribute rule, 'parent', parent
@@ -77,7 +79,7 @@ I<top node> of the data structure.
     .param pmc tree
     .local pmc newtree
     .local pmc visit
-    newtree = new 'TGE::Tree'
+    newtree = new ['TGE';'Tree']
     setattribute newtree, 'data', tree
     setattribute newtree, 'grammar', self
     visit = getattribute newtree, 'visit'
@@ -105,7 +107,7 @@ array_exists:
     goto loop
 end_loop:
 
-    newtree._scan_node(tree, 'ROOT')
+    newtree.'_scan_node'(tree, 'ROOT')
     .return (newtree)
 .end
 
@@ -138,7 +140,7 @@ Return an iterator for the symbol lookup table.
 
 .sub 'symbol_iter' :method
     $P1 = getattribute self, 'symbols'
-    $P2 = new 'Iterator', $P1
+    $P2 = iter $P1
 
     .return($P2)
 .end
@@ -158,19 +160,13 @@ LOOP:
     dec $I1
     $P1 = $P0[$I1]
     print "\t\t     [\n"
-    $P1.dump()
+    $P1.'dump'()
     print "\t\t     ],\n"
     if $I1 > 0 goto LOOP
 
 
     print "\t}\n"
 .end
-
-=head1 AUTHOR
-
-Allison Randal <allison@perl.org>
-
-=cut
 
 # Local Variables:
 #   mode: pir

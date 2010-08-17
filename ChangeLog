@@ -1,5 +1,101 @@
 #1 $Id$
 
+2010.07.10     coke
+	* Released 2.6.0
+	See NEWS for more.
+
+2010.06.15     Gerd
+	* Released 2.5.0
+	See NEWS for more.
+
+2010.05.18     Whiteknight
+	* Released 2.4.0
+	See NEWS for more
+
+2010.04.20     Gerd
+	* Released 2.3.0
+	See NEWS for more.
+
+2010.03.16     cotto
+	* Released 2.2.0
+	See NEWS for more.
+
+2010.02.16     darbelo
+	* Released 2.1.0
+	See NEWS for more.
+
+2010.01.19     chromatic
+	* Released 2.0.0
+	See NEWS for more.
+
+2009.12.15     Gerd
+	* Released 1.9.0
+	See NEWS for more.
+
+2009.11.17     barney
+	* Released 1.8.0
+	See NEWS for more.
+
+2009.10.20     dukeleto
+	* Released 1.7.0
+	See NEWS for more.
+
+2009.9.15     particle
+	* Released 1.6.0
+	See NEWS for more.
+
+2009.8.18     Whiteknight
+	* Released 1.5.0
+	See NEWS for more.
+
+2009.7.21     cotto
+	* Released 1.4.0
+	See NEWS for more.
+
+2009.06.16    Whiteknight
+	* Released 1.3.0
+	See NEWS for more.
+
+2009.05.19    Infinoid
+	* Released 1.2.0
+	See NEWS for more.
+
+2009.04.21    fperrad
+	* Released 1.1.0
+	See NEWS for more.
+
+2009.03.17    allison
+	* Released 1.0.0
+	See NEWS for more.
+
+2009.02.17    kjs
+	* Released 0.9.1
+	See NEWS for more.
+
+2009.01.20    chromatic
+	* Released 0.9.0
+	See NEWS for more.
+
+2008.12.16    Whiteknight
+	* Released 0.8.2
+	See NEWS for more.
+
+2008.11.18    chromatic
+	* Released 0.8.1
+	See NEWS for more.
+
+2008.10.21    particle
+	* Released 0.8.0
+	See NEWS for more.
+
+2008.09.16    pmichaud
+	* Released 0.7.1
+	See NEWS for more.
+
+2008.08.19    rgrjr
+	* Released 0.7.0
+	See NEWS for more.
+
 2008.07.15    barney
 	* Released 0.6.4
 	See NEWS for more.
@@ -69,7 +165,7 @@
 	See NEWS for more.
 
 2007.3.10     coke
-        * removed parakeet
+	* removed parakeet
 
 2007.02.22    pmichaud
 	* Released 0.4.9
@@ -134,8 +230,8 @@
 
 2006.07.20    audreyt
 	* --maintainer prerequesites are now bison 2.2+ and flex 2.5.3x
-	  (or some such --leo) 
-          (at the moment code is checking for 2.0 -- ambs)
+	  (or some such --leo)
+	  (at the moment code is checking for 2.0 -- ambs)
 
 2006.07.17    chip
 	partial implementation of new pdd21:
@@ -148,7 +244,7 @@
 	See NEWS for more.
 
 2006.06.03    leo
-        * I and N registers are never cleared to 0 / 0.0 on subroutine entry
+	* I and N registers are never cleared to 0 / 0.0 on subroutine entry
 
 2006.05.14    leo
 	* Released 0.4.4
@@ -162,17 +258,17 @@
 	See NEWS for more.
 
 2006.03.06    leo
-        * Shifted argument type bits left by 2 according to r11754
+	* Shifted argument type bits left by 2 according to r11754
 	  change of docs/pdds/pdd03_calling_conventions.pod
-	* if you are creating PASM then code needs adjustment  
+	* if you are creating PASM then code needs adjustment
 
 2006.02.22    leo
 	* Released 0.4.2
 	See NEWS for more.
 
 2006.01.16    bernhard
-	 * rename src/dynclasses to src/dynpmc 
-	 * rename src/classes to src/pmc 
+	 * rename src/dynclasses to src/dynpmc
+	 * rename src/classes to src/pmc
 
 2006.01.15    leo
 
@@ -265,7 +361,7 @@
 	* the usual bug fixes and improvements
 
 2005-03-06    leo
-        * Released 0.1.2
+	* Released 0.1.2
 	* big rewrite of string code, not yet finished but ...
 	* partial implementation of a generational garbage collector
 	* indirect register frame addressing
@@ -280,7 +376,7 @@
 	* and as always a lot more
 
 2004-10-09    leo
-        * Released 0.1.1
+	* Released 0.1.1
 	* Need Perl 5.6 now for building
 	* Basic AST support, PAST file parser, bits of code generation
 	* BigInt PMC using GMP
@@ -310,39 +406,39 @@
 	* ... and a lot more
 
 2004-02-29    leo
-        * Released 0.1.0
-        * "Ladies and gentlemen, I give you... objects!"
-        * Huge documentation overhaul
-        * More supported platforms, s. PLATFORMS
-        * Basic thread support for pthread based architectures
-        * Basic event handling for timers and signals including:
-        * PASM callbacks for NCI (native C) functions.
-        * Improved platform configuration
-        * COW stacks now working, stacks code redone
-        * Structure handling vastly improved
-        * Random PMC and rand primitives
-        * Better subroutine call syntax in PIR
-        * Make PIR subroutines compliant with pdd03
-        * Improved profiling (DOD, GC timings)
-        * Hash code improvements, incl. random key order support
-        * Experimental freeze/thaw code for some PMC types
-        * IO improvements for buffered layer and Win32
-        * String iterators
-        * String bitwise vtables
-        * Many new opcodes
-        * Support for JIT, where malloced memory isn't executable
-        * Priority DOD scheme for objects that need timely destruction
-        * Improved bytecode loading (e.g. onLoad functions)
-        * Language updates: forth, Perl6/P6C, m4
-        * Libraries: Getopt_Long, SDL, Dumper, Sort
-        * new JAPH examples
-        * Unified imcc and parrot test handling
-        * Many new tests (make test reports 1386 tests)
-        * Numerous bug fixes
+	* Released 0.1.0
+	* "Ladies and gentlemen, I give you... objects!"
+	* Huge documentation overhaul
+	* More supported platforms, s. PLATFORMS
+	* Basic thread support for pthread based architectures
+	* Basic event handling for timers and signals including:
+	* PASM callbacks for NCI (native C) functions.
+	* Improved platform configuration
+	* COW stacks now working, stacks code redone
+	* Structure handling vastly improved
+	* Random PMC and rand primitives
+	* Better subroutine call syntax in PIR
+	* Make PIR subroutines compliant with pdd03
+	* Improved profiling (DOD, GC timings)
+	* Hash code improvements, incl. random key order support
+	* Experimental freeze/thaw code for some PMC types
+	* IO improvements for buffered layer and Win32
+	* String iterators
+	* String bitwise vtables
+	* Many new opcodes
+	* Support for JIT, where malloced memory isn't executable
+	* Priority DOD scheme for objects that need timely destruction
+	* Improved bytecode loading (e.g. onLoad functions)
+	* Language updates: forth, Perl6/P6C, m4
+	* Libraries: Getopt_Long, SDL, Dumper, Sort
+	* new JAPH examples
+	* Unified imcc and parrot test handling
+	* Many new tests (make test reports 1386 tests)
+	* Numerous bug fixes
 
 
 2003-10-31    leo
-        * Released 0.0.13
+	* Released 0.0.13
 	* Yep thirteen - haunted by the ghost of 0.0.12
 	* Build imcc as parrot
 	* Objects more finished
@@ -365,7 +461,7 @@
 	* Many new tests and fixes
 
 2003-10-22    melvin
-        * imcc moved from parrot/languages/ to parrot/
+	* imcc moved from parrot/languages/ to parrot/
 
 2003-09-20    sfink
 
@@ -405,7 +501,7 @@
 
 2003-06-14 13:50 dan
 	* Moved the registers out of the context structure, since they
-          really aren't context
+	  really aren't context
 	* Changed the register stack frames to hold only 16 registers
 	  rather than 32, added half-set push and pop ops, and reworked
 	  the full set push/pops to do two half-set push/pops. Should
@@ -418,7 +514,7 @@
 
 	* Various files
 	  Update Yet Another copyright statements to reflect the (no longer
-          so) shiny new year.
+	  so) shiny new year.
 
 2003-03-11 22:06  chip
 

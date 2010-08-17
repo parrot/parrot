@@ -113,14 +113,34 @@ L<Pod::Simple>.
 L<Pod::Simple::DumpAsXML> is rather like this class; see its
 documentation for a discussion of the differences.
 
-L<Pod::Simple>, L<Pod::Simple::DumpAsXML>
+L<Pod::Simple>, L<Pod::Simple::DumpAsXML>, L<Pod::SAX>
 
-The older libraries L<Pod::PXML>, L<Pod::XML>, L<Pod::SAX>
+L<Pod::Simple::Subclassing>
+
+The older (and possibly obsolete) libraries L<Pod::PXML>, L<Pod::XML>
+
+
+=head1 ABOUT EXTENDING POD
+
+TODO: An example or two of =extend, then point to Pod::Simple::Subclassing
+
+
+=head1 ASK ME!
+
+If you actually want to use Pod as a format that you want to render to
+XML (particularly if to an XML instance with more elements than normal
+Pod has), please email me (C<sburke@cpan.org>) and I'll probably have
+some recommendations.
+
+For reasons of concision and energetic laziness, some methods and
+options in this module (and the dozen modules it depends on) are
+undocumented; but one of those undocumented bits might be just what
+you're looking for.
 
 
 =head1 COPYRIGHT AND DISCLAIMERS
 
-Copyright (c) 2002 Sean M. Burke.  All rights reserved.
+Copyright (c) 2002-4 Sean M. Burke.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

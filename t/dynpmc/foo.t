@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -26,7 +26,7 @@ Tests the Foo PMC.
 pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
 
 .sub main :main
-    loadlib P1, "foo"
+    loadlib $P1, "foo_group"
     $P1 = new "Foo"
 
     $I1 = $P1
@@ -41,8 +41,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" 
 .sub main :main
     ## load a relative pathname without the extension.  loadlib will convert the
     ## '/' characters to '\\' on windows.
-    $S0 = "runtime/parrot/dynext/foo"
-    loadlib P1, $S0
+    $S0 = "runtime/parrot/dynext/foo_group"
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -65,8 +65,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" 
     ## convert cwd to an absolute pathname without the extension, and load it.
     ## this should always find the version in the build directory, since that's
     ## the only place "make test" will work.
-    $S0 = concat "/runtime/parrot/dynext/foo"
-    loadlib P1, $S0
+    $S0 = concat "/runtime/parrot/dynext/foo_group"
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -87,8 +87,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
     $S0 = $P12["load_ext"]
 
     ## load a relative pathname with an extension.
-    $S0 = concat "runtime/parrot/dynext/foo", $S0
-    loadlib P1, $S0
+    $S0 = concat "runtime/parrot/dynext/foo_group", $S0
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -112,9 +112,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
     ## convert $S0 to an absolute pathname with extension, and load it.
     ## this should always find the version in the build directory, since that's
     ## the only place "make test" will work.
-    $S0 = concat $S0, "/runtime/parrot/dynext/foo"
+    $S0 = concat $S0, "/runtime/parrot/dynext/foo_group"
     $S0 = concat $S0, $S1
-    loadlib P1, $S0
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -132,7 +132,7 @@ SKIP: {
     pir_output_is( << 'CODE', << 'OUTPUT', "inherited add" );
 .sub _main :main
     .local pmc d, l, r
-    $P0 = loadlib "foo"
+    $P0 = loadlib "foo_group"
     print "ok\n"
     l = new "Foo"
     l = 42
@@ -157,7 +157,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "Foo subclass isa Integer" );
 .sub main :main
     .local pmc F, f, d, r
-    loadlib F, "foo"
+    loadlib F, "foo_group"
     f = new "Foo"
     f = 1
     d = new 'Integer'
@@ -174,7 +174,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 1" );
 # load our Foo test (pseudo) language
 # it defines one PMC type "Foo"
-.HLL "Fool", "foo"
+.HLL "Fool"
+.loadlib "foo_group"
 .sub main :main
     new $P1, "Foo"      # load by name
     $I1 = $P1
@@ -186,7 +187,8 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
-.HLL "Fool", "foo"
+.HLL "Fool"
+.loadlib "foo_group"
 .sub main :main
     new $P1, 'Foo'       # load by index
     $I1 = $P1

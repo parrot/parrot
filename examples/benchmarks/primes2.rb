@@ -2,7 +2,7 @@
 
 i6 = 0
 i7 = 0
-max = 5000
+max = 500
 
 def is_prime(n)
 	if n < 1

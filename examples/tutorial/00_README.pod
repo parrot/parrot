@@ -11,8 +11,9 @@ then type:
 
  ../../parrot example.pir
 
-The parrot test suite also checks the output of these examples. Exexute
-the tests by typing:
+The parrot test suite also checks the output of these examples, so you
+always know that they are valid PIR code. You can execute all the tests
+by typing:
 
  cd ../../ ; prove -v t/examples/tutorial.t ; cd examples/tutorial
 
@@ -20,3 +21,10 @@ When adding an new example or changing the output of an example please
 update F<t/examples/tutorial.t> as well.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
+

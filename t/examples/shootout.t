@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -35,7 +35,7 @@ Test the PIR shootout examples in 'examples/shootout/*.pir'.
 To add a new test, you do not have to modify this script:
 
  1. add your script (toto.pir) to examples/shootout
- 2. put parrot options in the first line (e.g  "#!./parrot -Oc -Cj")
+ 2. put parrot options in the first line (e.g  "#!./parrot -Oc")
  3. make sure you have default argument values
  4. put the expected output as a file : toto.pir_output
  5. if you need an input file (to be read from stdin), call it toto.pir_input
@@ -43,19 +43,10 @@ To add a new test, you do not have to modify this script:
 See the explanation of benchmarks and sample data for reduced N benches at
 http://shootout.alioth.debian.org/sandbox/
 
-=head1 SEE ALSO
-
-#40064: [TODO] shootout example testing in Parrot RT
-
-L<"https://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
-
 =cut
 
 my %skips = (
     'pidigits.pir'    => [ 'not exists $PConfig{HAS_GMP}', 'needs GMP' ],
-    'recursive.pir'   => [ '$PConfig{cpuarch} !~ /86/',    'float JIT broken on non-x86' ],
-    'recursive-2.pir' => [ '$PConfig{cpuarch} !~ /86/',    'float JIT broken on non-x86' ],
-    'fannkuch.pir'    => [ '$^O eq "darwin"',              'fannkuch benchmark failure on darwin' ],
 );
 my $INPUT_EXT = '_input';
 foreach my $script (@shootouts) {
@@ -83,15 +74,13 @@ foreach my $script (@shootouts) {
         $args =~ s/-j/-C/;
         $args =~ s/-Cj/-C/;
     }
-    unless ( $PConfig{cg_flag} =~ /HAVE/ ) {
-        $args =~ s/-Cj/-j/;
+    $args =~ s/-Cj/-j/;
 
-        # Remove any plain -C option.
-        $args =~ s/(^|\s)-C(\s|$)/$1$2/;
+    # Remove any plain -C option.
+    $args =~ s/(^|\s)-C(\s|$)/$1$2/;
 
-        # Remove any extra Cs still floating around
-        $args =~ s/C//;
-    }
+    # Remove any extra Cs still floating around
+    $args =~ s/C//;
 
     # look for input files
     my $input = "$file$INPUT_EXT";

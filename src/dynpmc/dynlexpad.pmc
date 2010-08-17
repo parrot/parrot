@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -19,11 +19,13 @@ lexicals at runtime.
 
 */
 
-pmclass DynLexPad dynpmc provides lexpad need_ext {
+pmclass DynLexPad dynpmc provides lexpad auto_attrs {
+    ATTR Hash *hash;
+    ATTR PMC  *init; /* the PMC used to initialize this DynLexPad */
 
     VTABLE void init() {
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "don't create me like this");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "don't create me like this");
     }
 
 /*
@@ -33,19 +35,82 @@ pmclass DynLexPad dynpmc provides lexpad need_ext {
 Initialize the LexPad PMC and remember the associate
 lexinfo.
 
+=cut
+
+*/
+    VTABLE void init_pmc(PMC* lexinfo) {
+        Hash *hash;
+
+        Parrot_DynLexPad_attributes *attrs =
+            (Parrot_DynLexPad_attributes *) PMC_data(SELF);
+
+        if (VTABLE_elements(INTERP, lexinfo)) {
+            attrs->init = Parrot_pmc_new_init(INTERP, enum_class_LexPad, lexinfo);
+        }
+        else
+            attrs->init = NULL;
+
+        hash             = parrot_new_hash(INTERP);
+        attrs->hash      = hash;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
 =item C<void set_pointer(void *)>
 
 Initialize the LexPad PMC and remember the associate context.
 
+=cut
+
+*/
+    VTABLE void set_pointer(void* ctx) {
+        PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
+        if (std_pad)
+            VTABLE_set_pointer(INTERP, std_pad, ctx);
+    }
+
+/*
+
 =item C<INTVAL elements()>
 
 Returns the number of elements in the hash.
+
+=cut
+
+*/
+    VTABLE INTVAL elements() {
+        return parrot_hash_size(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
+    }
+
+/*
 
 =item C<INTVAL exists_keyed(PMC *name)>
 
 =item C<INTVAL exists_keyed_str(STRING *name)>
 
 Returns whether a lexical C<name> exists in the hash.
+
+=cut
+
+*/
+
+    VTABLE INTVAL exists_keyed(PMC* name) {
+        STRING *s = VTABLE_get_string(INTERP, name);
+        return SELF.exists_keyed_str(s);
+    }
+
+    VTABLE INTVAL exists_keyed_str(STRING* name) {
+        PMC *std_pad;
+        if (parrot_hash_exists(INTERP, PARROT_DYNLEXPAD(SELF)->hash, name))
+            return 1;
+        std_pad = PARROT_DYNLEXPAD(SELF)->init;
+        if (std_pad)
+            return VTABLE_exists_keyed_str(INTERP, std_pad, name);
+        return 0;
+    }
+
+/*
 
 =item C<PMC *get_pmc_keyed_str(STRING *name)>
 
@@ -54,6 +119,33 @@ Returns whether a lexical C<name> exists in the hash.
 Return the lexical with the given name, or NULL (not PMCNULL), if the
 lexical doesn't exist.
 
+=cut
+
+*/
+    VTABLE PMC* get_pmc_keyed_str(STRING* name) {
+        HashBucket *b = parrot_hash_get_bucket(INTERP,
+            PARROT_DYNLEXPAD(SELF)->hash, name);
+
+        if (!b) {
+            PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
+
+            if (std_pad)
+                return VTABLE_get_pmc_keyed_str(INTERP, std_pad, name);
+
+            return PMCNULL;
+        }
+
+        return (PMC *)b->value;
+    }
+
+    VTABLE PMC* get_pmc_keyed(PMC* name) {
+        STRING *s = VTABLE_get_string(INTERP, name);
+        return SELF.get_pmc_keyed_str(s);
+    }
+
+
+/*
+
 =item C<void set_pmc_keyed(PMC *name, PMC *value)>
 
 =item C<void set_pmc_keyed_str(STRING *name, PMC *value)>
@@ -61,34 +153,49 @@ lexical doesn't exist.
 Set the lexical with the given name to value. If the lexical name
 doesn't exist, it is created.
 
-=item C<METHOD PMC* get_lexinfo()>
+=cut
 
-Return the LexInfo PMC, if any or a Null PMC.
+*/
+
+    VTABLE void set_pmc_keyed(PMC* name, PMC* value) {
+        STRING *s = VTABLE_get_string(INTERP, name);
+        SELF.set_pmc_keyed_str(s, value);
+    }
+
+    VTABLE void set_pmc_keyed_str(STRING* name, PMC* value) {
+        PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
+
+        if (PObj_constant_TEST(SELF)) {
+            if (!PObj_constant_TEST((PObj *)name))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant STRING key in constant hash.");
+            if (!PObj_constant_TEST((PObj *)value))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC value in constant hash.");
+        }
+
+        if (std_pad && VTABLE_exists_keyed_str(INTERP, std_pad, name))
+            VTABLE_set_pmc_keyed_str(INTERP, std_pad, name, value);
+
+        parrot_hash_put(INTERP, PARROT_DYNLEXPAD(SELF)->hash, name, value);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroy DynLexPad.
 
 =cut
 
 */
-    void init_pmc(PMC* lexinfo) {
-        if (VTABLE_elements(interp, lexinfo)) {
-            PMC_pmc_val(SELF) =
-                pmc_new_init(interp, enum_class_LexPad, lexinfo);
-        }
-        else
-            PMC_pmc_val(SELF) = NULL;
-        parrot_new_pmc_hash(interp, SELF);
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
-
-    void set_pointer(void* ctx) {
-        PMC *std_pad = PMC_pmc_val(SELF);
-        if (std_pad)
-            VTABLE_set_pointer(interp, std_pad, ctx);
-    }
 
     VTABLE void destroy() {
-        if (PMC_struct_val(SELF)) {
-            parrot_hash_destroy(interp, (Hash*) PMC_struct_val(SELF));
-            PMC_struct_val(SELF) = NULL;
+        if (PARROT_DYNLEXPAD(SELF)->hash) {
+            parrot_hash_destroy(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
+            PARROT_DYNLEXPAD(SELF)->hash = NULL;
         }
     }
 /*
@@ -102,62 +209,12 @@ Marks the lexpad hash as live.
 */
 
     VTABLE void mark() {
-        PMC *std_pad = PMC_pmc_val(SELF);
-        if (std_pad)
-            pobject_lives(interp, (PObj *)std_pad);
-        if (PMC_struct_val(SELF))
-            parrot_mark_hash(interp, (Hash *)PMC_struct_val(SELF));
+        PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
+        Parrot_gc_mark_PMC_alive(INTERP, std_pad);
+        if (PARROT_DYNLEXPAD(SELF)->hash)
+            parrot_mark_hash(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
     }
 
-    PMC* get_pmc_keyed_str(STRING* name) {
-        HashBucket *b = parrot_hash_get_bucket(interp,
-            (Hash *)PMC_struct_val(SELF), name);
-
-        if (!b) {
-            PMC *std_pad = PMC_pmc_val(SELF);
-
-            if (std_pad)
-                return VTABLE_get_pmc_keyed_str(interp, std_pad, name);
-
-            return PMCNULL;
-        }
-
-        return (PMC *)b->value;
-    }
-
-    INTVAL exists_keyed_str(STRING* name) {
-        PMC *std_pad;
-        if (parrot_hash_exists(interp, (Hash*) PMC_struct_val(SELF), name))
-            return 1;
-        std_pad = PMC_pmc_val(SELF);
-        if (std_pad)
-            return VTABLE_exists_keyed_str(interp, std_pad, name);
-        return 0;
-    }
-
-    INTVAL exists_keyed(PMC* name) {
-        STRING *s = key_string(interp, name);
-        return SELF.exists_keyed_str(s);
-    }
-
-    PMC* get_pmc_keyed(PMC* name) {
-        STRING *s = key_string(interp, name);
-        return SELF.get_pmc_keyed_str(s);
-    }
-
-    void set_pmc_keyed_str(STRING* name, PMC* value) {
-        PMC *std_pad = PMC_pmc_val(SELF);
-
-        if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name))
-            VTABLE_set_pmc_keyed_str(interp, std_pad, name, value);
-
-        parrot_hash_put(interp, (Hash *)PMC_struct_val(SELF), name, value);
-    }
-
-    void set_pmc_keyed(PMC* name, PMC* value) {
-        STRING *s = key_string(interp, name);
-        SELF.set_pmc_keyed_str(s, value);
-    }
 
 }
 

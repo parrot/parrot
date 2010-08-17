@@ -1,13 +1,15 @@
 #! perl
 
-# Copyright (C) 2003-2007, The Perl Foundation.
+# Copyright (C) 2003-2007, Parrot Foundation.
 # $Id$
 
-=head1 ncidef2asm.pl
+=head1 NAME
 
-Take an NCI library definition file and turn it into a
+F<tools/util/ncidef2asm.pl>
 
-=head1 Sections
+=head1 DESCRIPTION
+
+Take an NCI library definition file and turn it into PASM.
 
 An NCI library definition file provides the information needed to
 generate a parrot wrapper for the named library (or libraries). Its
@@ -50,7 +52,7 @@ will be exposed to subsequent defs.
 =head2 defs
 
 This section holds the definitions of functions. Each function is
-assumed to be in the immediate preceeding library. The definition of
+assumed to be in the immediate preceding library. The definition of
 the function is:
 
   return_type name [param [param [param ...]]]

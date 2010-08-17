@@ -32,6 +32,8 @@ EXPORTS
     nci_vP
     nci_vpii
     nci_vv
+    nci_vVi
+    nci_vp
     nci_cb_C1
     nci_cb_C2
     nci_cb_C3

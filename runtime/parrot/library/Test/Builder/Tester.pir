@@ -7,7 +7,7 @@ Test::Builder::Tester - Parrot extension for testing test modules
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/Test/Builder/Tester.pbc'
+    load_bytecode 'Test/Builder/Tester.pbc'
 
     # grab the subroutines you want to use
     .local pmc plan
@@ -15,10 +15,10 @@ Test::Builder::Tester - Parrot extension for testing test modules
     .local pmc test_diag
     .local pmc test_test
 
-    plan      = find_global [ 'Test'; 'Builder'; 'Tester' ], 'plan'
-    test_out  = find_global [ 'Test'; 'Builder'; 'Tester' ], 'test_out'
-    test_diag = find_global [ 'Test'; 'Builder'; 'Tester' ], 'test_diag'
-    test_test = find_global [ 'Test'; 'Builder'; 'Tester' ], 'test_test'
+    plan      = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], 'plan'
+    test_out  = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], 'test_out'
+    test_diag = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], 'test_diag'
+    test_test = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], 'test_test'
 
     # create a new Test::Builder object
     .local pmc tb_args
@@ -154,7 +154,7 @@ This module defines the following public functions:
 .namespace [ 'Test'; 'Builder'; 'Tester' ]
 
 .sub _initialize :load
-    load_bytecode 'library/Test/Builder.pbc'
+    load_bytecode 'Test/Builder.pbc'
 
     .local pmc test
     .local pmc output
@@ -175,7 +175,7 @@ This module defines the following public functions:
 
     # create the Test::Builder object that this uses
     .local pmc tb_create
-    tb_create   = find_global [ 'Test'; 'Builder' ], 'create'
+    tb_create   = get_hll_global [ 'Test'; 'Builder' ], 'create'
 
     args        = new 'Hash'
     output      = new [ 'Test'; 'Builder'; 'Output' ], args
@@ -190,11 +190,11 @@ This module defines the following public functions:
     expect_out  = new 'ResizablePMCArray'
     expect_diag = new 'ResizablePMCArray'
 
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_test',         test
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test', default_test
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output',  test_output
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out',   expect_out
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag',  expect_diag
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test',         test
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test', default_test
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output',  test_output
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out',   expect_out
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag',  expect_diag
 .end
 
 =item C<plan( num_tests )>
@@ -207,7 +207,7 @@ Sets the number of tests you plan to run, where C<num_tests> is an int.
     .param int tests
 
     .local pmc test
-    test = find_global [ 'Test'; 'Builder'; 'Tester' ], '_test'
+    test = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test'
 
     test.'plan'( tests )
 .end
@@ -224,6 +224,7 @@ description of the test.
 
 .sub test_pass
     .param string description :optional
+    .param int    have_desc   :opt_flag
 
     set_output( 'ok', description )
 .end
@@ -250,7 +251,7 @@ description of the test.
     .local int result_count
     .local pmc next_result
 
-    test         = find_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test'
+    test         = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test'
     results      = test.'results'()
     result_count = results
     inc result_count
@@ -272,7 +273,7 @@ description of the test.
 
   SET_EXPECT_OUTPUT:
     .local pmc expect_out
-    expect_out = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
+    expect_out = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
 
     push expect_out, line_string
 .end
@@ -293,7 +294,7 @@ directive.
     set line_string, line
 
     .local pmc expect_out
-    expect_out = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
+    expect_out = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
 
     push expect_out, line_string
 .end
@@ -313,7 +314,7 @@ a line of TAP output containing a test directive.
     set line_string, line
 
     .local pmc expect_diag
-    expect_diag = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
+    expect_diag = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
 
     push expect_diag, line_string
 .end
@@ -335,7 +336,7 @@ This and C<test_err()> are effectively the same.
     set line_string, line
 
     .local pmc expect_diag
-    expect_diag = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
+    expect_diag = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
 
     push expect_diag, line_string
 .end
@@ -363,10 +364,10 @@ output or diagnostic output.
     .local pmc expect_diag
     .local pmc test_output
 
-    test          = find_global [ 'Test'; 'Builder'; 'Tester' ], '_test'
-    expect_out    = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
-    expect_diag   = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
-    test_output   = find_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output'
+    test          = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test'
+    expect_out    = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
+    expect_diag   = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
+    test_output   = get_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output'
 
     .local string received_out_string
     .local string received_diag_string
@@ -422,20 +423,20 @@ output or diagnostic output.
 
   REPORT_OUTPUT_MISMATCH:
     .local string diagnostic
-    diagnostic = "output mismatch\nexpected: "
-    concat diagnostic, expected_out_string
-    concat diagnostic, "\nreceived: "
+    diagnostic = "output mismatch\nhave: "
     concat diagnostic, received_out_string
+    concat diagnostic, "\nwant: "
+    concat diagnostic, expected_out_string
     concat diagnostic, "\n"
     test.'diag'( diagnostic )
 
     eq diag_matches, 1, RETURN
 
   REPORT_DIAG_MISMATCH:
-    diagnostic = "diagnostic mismatch\nexpected: '"
-    concat diagnostic, expected_diag_string
-    concat diagnostic, "'\nreceived: '"
+    diagnostic = "diagnostic mismatch\nhave: '"
     concat diagnostic, received_diag_string
+    concat diagnostic, "'\nwant: '"
+    concat diagnostic, expected_diag_string
     concat diagnostic, "'\n"
     test.'diag'( diagnostic )
 
@@ -454,7 +455,7 @@ mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2008, The Perl Foundation.
+Copyright (C) 2005-2008, Parrot Foundation.
 
 =cut
 

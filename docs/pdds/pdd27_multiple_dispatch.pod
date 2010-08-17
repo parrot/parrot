@@ -1,19 +1,17 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
-=head1 NAME
+=head1 PDD 27: Multiple Dispatch
 
-docs/pdds/pdd27_multiple_dispatch.pod - Multiple Dispatch
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD defines Parrot's multiple dispatch system.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 Multiple dispatch allows a single function name to be associated with several
 alternate implementations. It selects the alternate to execute for a
@@ -25,26 +23,30 @@ or composed parents, to find the best match.
 A similar selection of alternates based on types at compile time is generally
 called overloading.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
-=item - Parrot supports multiple dispatch in opcodes and user-defined routines
+=item - Parrot supports multiple dispatch in opcodes and user-defined
+routines.
 
-=item - A single dispatch system supports MMD in both contexts
+=item - A single dispatch system supports MMD in both contexts.
 
 =item - For user-defined subroutines and methods, the dispatch system is
-pluggable, allowing users to swap in their own type-matching algorithms
+pluggable, allowing users to swap in their own type-matching algorithms.
 
 =item - For opcodes, the dispatch system is merely extensible, allowing users
-to define alternates with their own types
+to define alternates with their own types.
 
-=item Dispatch considers both low-level (register) types and high-level (PMC)
-types, as well as inherited and composed types
+=item - Dispatch considers both low-level (register) types and high-level
+(PMC) types, as well as inherited and composed types.
+
+=item - Dispatch does not consider argument values. HLLs with dispatch systems
+that do consider argument values will implement their own pluggable matching.
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 The aim of Parrot's multiple dispatch system is not to be an exact match to
 any one HLL, but to provide the features and tools needed to support multiple
@@ -60,7 +62,7 @@ are MultiSub PMCs, subclasses of MultiSub, or polymorphic equivalents of
 MultiSub. Calls to multiple dispatch routines use the Parrot calling
 conventions.
 
-=head2 MultiSub PMC API
+=head3 MultiSub PMC API
 
 A MultiSub stores a list of subroutines. When a MultiSub is invoked, it calls
 an MMD sorting routine to select the best candidate for the current arguments,
@@ -72,7 +74,7 @@ namespace or as a method or vtable override in a class.
 An alternate multiple dispatch matching algorithm may be plugged in by
 subclassing MultiSub and overriding C<invoke>.
 
-=head3 Vtable Functions
+=head4 Vtable Functions
 
 MultiSub defines the following vtable functions in addition to the ones
 inherited from ResizablePMCArray.
@@ -84,26 +86,70 @@ inherited from ResizablePMCArray.
 Add a Sub or NCI sub to the list of candidates. Throw an exception if the
 value passed in is anything other than a Sub or NCI sub.
 
-=item set_pmc_keyed_int
+=item set_pmc_keyed_int [deprecated]
 
 Add a Sub or NCI sub to the list of candidates at a particular position in the
 list. Throw an exception if the value passed in is anything other than a Sub
 or NCI sub.
 
+{{ NOTE: deprecated because MultiSub is no longer an array. }}
+
+=item get_pmc
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for the current call arguments.
+
+=item get_pmc_keyed
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for a passed in signature. The signature passed in is an array of
+PMCs, and the types are extracted from the types of the array elements.
+
+=item get_pmc_keyed_str
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for a passed in signature. The signature passed in is a simple type
+string for the signature ('P' for PMC, 'I' for integer, 'N' for number, and
+'S' for string).
+
+=item get_iter
+
+Return an iterator object of matching candidates, sorted from best matching to
+worst matching, for the current call arguments.
+
 =item invoke
 
-Invoke the best matching candidate for the current call arguments. This vtable
-function calls C<Parrot_mmd_sort_candidate_list> from the public MMD API, but
+Return a function pointer to the best matching candidate for the current call
+arguments, and set up the interpreter preparing for invocation. This vtable
+function calls C<Parrot_mmd_sort_manhattan> from the public MMD API, but
 may be changed to call C<Parrot_mmd_invoke>.
 
 =item set_integer_keyed_int, set_number_keyed_int, set_string_keyed_int
+[deprecated]
 
 Throw an exception, as an integer, float, or string value is not a Sub or NCI
 sub. (Masks the vtable functions inherited from ResizablePMCArray.)
 
+{{NOTE: no longer needed, since not inheriting from ResizablePMCArray.}}
+
 =back
 
-=head3 PIR subroutine attributes
+=head4 Methods
+
+=over 4
+
+=item get_iter
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for a passed in signature. If the signature passed in is an array of
+PMCs, the types are extracted from the types of the array elements. If the
+signature passed in is a simple type string for the signature ('P' for PMC,
+'I' for integer, 'N' for number, and 'S' for string), the types are matched as
+simple types.
+
+=back
+
+=head4 PIR subroutine attributes
 
 The following attributes are used when declaring a MultiSub in PIR.
 
@@ -111,14 +157,26 @@ The following attributes are used when declaring a MultiSub in PIR.
 
 =item :multi
 
+=begin PIR
+
   .sub mymultisub :multi(Integer, Integer)
+    # ...
+  .end
+
+=end PIR
 
 The C<:multi> attribute marks a subroutine or method as participating in
 multiple dispatch.
 
 =item :invocant
 
+=begin PIR_INVALID
+
+  .sub mymultisub
   .param pmc first :invocant
+  .end
+
+=end PIR_INVALID
 
 Not all elements of a multi-sub's signature are relevant for the purposes of
 multiple dispatch. The subroutine parameters that participate in dispatch are
@@ -132,7 +190,7 @@ an argument as a selector for multiple dispatch.}}
 
 =back
 
-=head2 C Multiple Dispatch API
+=head3 C Multiple Dispatch API
 
 These functions are the public interface to common multiple dispatch
 operations, and may be called from opcodes, vtable functions, or other C
@@ -140,7 +198,7 @@ functions.
 
 =over 4
 
-=item Parrot_mmd_sort_candidate_list
+=item Parrot_mmd_sort_manhattan
 
 Performs a multiple dispatch lookup on an array of subroutines. The call
 signature to match is pulled from the current interpreter, following the
@@ -149,11 +207,7 @@ the call signature, with the best matching candidate as the 0th element.
 
 =item Parrot_mmd_invoke
 
-Make a multiple dispatch call. Similar in syntax to C<Parrot_PCCINVOKE>, but
-doesn't separate out the invocant before the signature since the call can have
-multiple invocants. A significant part of the code from C<Parrot_PCCINVOKE>
-can be factored out to helper routines used by both C<Parrot_PCCINVOKE> and
-C<Parrot_mmd_invoke>.
+Make a multiple dispatch call.
 
   void
   Parrot_mmd_invoke(PARROT_INTERP, NOTNULL(STRING *sub_name),
@@ -170,7 +224,7 @@ C<mmd_dispatch_v_pi()>.
 
 =back
 
-=head2 Opcode Multiple Dispatch
+=head3 Opcode Multiple Dispatch
 
 Parrot's basic opcodes are not multiple dispatch. They appear to be so, since
 a single opcode name may have multiple signatures. But, behind the scenes,
@@ -189,7 +243,7 @@ C<Parrot_mmd_invoke> routine from the public MMD API.
 {{NOTE: It is no longer necessary to name multisubs used for opcode dispatch
 using the "__" names.}}
 
-=head2 Vtable Multiple Dispatch
+=head3 Vtable Multiple Dispatch
 
 Some PMCs call multiple dispatch routines from their vtable functions.
 ResizablePMCArray, for example, calls the multiple dispatch equality operation
@@ -198,15 +252,9 @@ on each element of two arrays from the 'is_equal' vtable function.
 Multiple dispatch calls from within vtable functions call the
 C<Parrot_mmd_invoke> routine from the public MMD API.
 
-=head1 ATTACHMENTS
+=head2 References
 
-None.
-
-=head1 REFERENCES
-
-docs/mmd.pod
-src/mmd.c
-src/pmc/multisub.pmc
+F<docs/mmd.pod>, F<src/multidispatch.c>, F<src/pmc/multisub.pmc>
 
 =cut
 

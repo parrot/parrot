@@ -1,3 +1,135 @@
+parrot (2.6.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/parrot-devel.install.in:
+    - Applied patch from Matt Kraai to install new NQP supporting
+      libraries and install new Opcode generation tool ops2c and
+      supporting library opsc.pbc.
+  * debian/patches:
+    - Added 04_fix_opsc_man.patch, added README for new ops2c
+      binary.
+  * debian/rules:
+    - Generate manpage from the ops2c README file.
+
+ -- Allison Randal <allison@parrot.org>  Sat, 31 Jul 2010 18:32:07 +0100
+
+parrot (2.3.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/patches:
+    - Removed 01_fix_doc_install.patch, change included upstream.
+    - Removed 02_fix_man_whatis.patch, change included upstream.
+  * control.in
+    - Removed package dependency on libgdbm-dev, no longer used.
+
+ -- Allison Randal <allison@parrot.org>  Tue, 27 Apr 2010 18:03:12 +0100
+
+parrot (2.0.0-1) unstable; urgency=low
+  * New upstream release
+  * parrot-devel.install.in
+    - Install parrot-nqp binary and supporting library.
+  * debian/patches:
+    - Added 01_fix_doc_install.patch, from upstream, missing DESTDIR
+      flag to new 'install-doc' target needed for package build.
+    - Added 02_fix_man_whatis.patch, from upstream, resolve parsing
+      errors in pbc_to_exe and parrot_debugger manpages.
+    - Added 03_fix_nqp_man.patch, added manpage for new parrot-nqp
+      binary.
+  * debian/control.in:
+    - Bumped Standards-Version to 3.8.4.
+    - Added quilt as Build-Depends for patches.
+  * debian/rules:
+    - Changed install target from 'install-dev' to 'install', they are
+      now identical.
+    - Added LD_LIBRARY_PATH to 'install' target, needed for the new parrot-nqp
+      binary.
+    - Added quilt support for patches.
+    - Generate and install manpage for parrot-nqp binary.
+  * debian/README.source:
+    - Added for use of quilt patch system.
+  * debian/copyright:
+    - Updated copyright year.
+    - Added copyright notice for external nqp files in ext/.
+
+ -- Allison Randal <allison@parrot.org>  Sun, 07 Feb 2010 14:26:29 +0000
+
+parrot (1.4.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/rules:
+    - New upstream configuration option --disable-rpath allows packages to
+      be built without rpath.
+  * debian/parrot-devel.install.in
+    - Install pbc_to_exe binary and supporting library.
+
+ -- Allison Randal <allison@parrot.org>  Fri, 24 Jul 2009 23:54:07 -0700
+
+parrot (1.0.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/control.in:
+    - Updated Description of all packages.
+    - Bumped Standards-Version to 3.8.1
+    - Add new packages parrot-minimal and parrot-devel
+  * debian/rules:
+    - Integrate Ubuntu packaging changes to automatically generate
+      debian/control.
+    - Re-order dh_installdeb in binary-arch to run after dh_makeshlibs and
+      shlibdeps so that the library gets installed properly (patch from David
+      Nusinow)
+    - Move manpage generation to new packages. Rename parrot-debugger.1 to
+      parrot_debugger.1 to match executable name. Generate parrot_config
+      manpage from .pir source files (patch from David Nusinow)
+  * parrot.install.in, parrot-doc.install.in, libparrot.install.in,
+    libparrot-dev.install.in
+    - Added template files, replace parrot.install, parrot-doc.install, 
+      libparrot.install, and libparrot-dev.install
+  * parrot-minimal.install.in, parrot-devel.install.in
+    - Added template files for new packages
+  * parrot-doc.docs, libparrot-dev.dirs
+    - Removed
+  * libparrot.postinst
+    - Added so ldconfig gets called properly by dh_makeshlibs (patch from
+      David Nusinow)
+  * debian/copyright:
+    - Changed copyright holder to Parrot Foundation, reflecting change in
+      distribution.
+    - Removed copyright info for files no longer in distribution.
+
+ -- Allison Randal <allison@parrot.org>  Wed, 25 Mar 2009 00:45:40 -0500
+
+parrot (0.9.0-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/control.in:
+    - Build-Depends removed optional library libicu-dev.
+      Removed optional library libgmp3-dev.
+    - Depends for libparrot-dev removed optional library
+      libicu-dev.
+  * debian/rules
+    - Removed --optimize flag from configure, known problems
+      on 64-bit architectures.
+    - Changed 'reallyinstall' target to 'install', matching
+      change in source makefile.
+  * debian/parrot-doc.docs
+    - Updated to sync with doc files in distribution.
+  * debian/copyright:
+    - Updated copyright years.
+
+ -- Allison Randal <allison@parrot.org>  Fri, 23 Jan 2009 15:16:25 -0800
+
+parrot (0.7.0-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Nuno Carvalho <mestre.smash@gmail.com>  Tue, 02 Sep 2008 13:05:31 +0100
+
+parrot (0.6.4-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/copyright:
+    - Added license link.
+    - Updated copyright years.
+    - Removed copyright info for files no longer in distribution.
+
+ -- Nuno Carvalho <mestre.smash@gmail.com>  Sat, 16 Aug 2008 14:15:14 +0200
+
 parrot (0.5.1-1) unstable; urgency=low
 
   * New upstream release (Closes: #444707).

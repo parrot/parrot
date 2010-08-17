@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -23,44 +17,56 @@ Tests the default PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not implemeted' );
-.sub 'test' :main
-    new P0, 'default'
-    print "ok 1\n"
-.end
-CODE
-ok 1
-OUT
+.sub main :main
+    .include 'test_more.pir'
 
-pir_output_is( <<'CODE', <<'OUT', 'inspect vtable function');
-.sub 'test' :main
-    $P0 = new 'String'
+    plan(5)
+    test_default()
+    test_inspect_vtable_function()
+.end
+
+.sub test_default
+    $I0 = 1
+    push_eh init
+    $P0 = new ['default']
+    $I0 = 0
+  init:
+    pop_eh
+    ok($I0, "Couldn't create default PMC directly")
+
+    $I0 = 1
+    push_eh init_int
+    $P0 = new ['default'], 42
+    $I0 = 0
+  init_int:
+    pop_eh
+    ok($I0, "Couldn't create default PMC directly with int initializer")
+
+    $I0 = 1
+    push_eh init_pmc
+    $P0 = new ['default'], $P1
+    $I0 = 0
+  init_pmc:
+    pop_eh
+    ok($I0, "Couldn't create default PMC directly with PMC initializer")
+.end
+
+.sub test_inspect_vtable_function
+    $P0 = new ['String']
     $P1 = inspect $P0, 'flags'
     $I9 = 1 << 9   # PObj_is_PMC_FLAG
     $I29 = 1 << 29 # PObj_is_class_FLAG
 
     $I0 = $P1
     $I1 = $I0 & $I9
-
-    if $I1 goto ok_1
-      print "not "
-    ok_1:
-    print "ok 1\n"
+    ok($I1)
 
     $I1 = $I0 & $I29
-    unless $I1 goto ok_2
-      print "not "
-    ok_2:
-    print "ok 2\n"
+    nok($I1)
 .end
-CODE
-ok 1
-ok 2
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

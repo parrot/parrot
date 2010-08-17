@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether there is socklen_t};
+    $data{description} = q{Determine whether there is socklen_t};
     $data{result}      = q{};
     return \%data;
 }
@@ -43,7 +43,7 @@ sub _probe_for_socklen_t {
     my $conf = shift;
     return $conf->data->get('has_socklen_t')
             ||
-           $conf->data->get_p5('d_socklen_t');
+           $conf->data->get('d_socklen_t_provisional');
 }
 
 sub _evaluate_socklen_t {

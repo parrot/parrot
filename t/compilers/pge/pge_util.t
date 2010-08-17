@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -11,11 +11,15 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/library/pge_util.t - Parrot Grammar Engine tests of utility rules
+t/library/pge_util.t
 
 =head1 SYNOPSIS
 
         % prove -Ilib t/library/pge_util.t
+
+=head1 DESCRIPTION
+
+Parrot Grammar Engine tests of utility rules
 
 =cut
 
@@ -30,10 +34,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -53,10 +57,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -74,10 +78,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, '::Foo'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -96,10 +100,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -117,10 +121,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:')
 
@@ -140,10 +144,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -162,10 +166,10 @@ pir_output_is( <<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('(a)(b)')
 

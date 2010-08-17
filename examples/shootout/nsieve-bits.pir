@@ -1,6 +1,8 @@
-#!./parrot -j
+#!./parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
 #
-# nsieve-bits N  (N = 9 for shootout)
+# ./parrot -R jit nsieve-bits.pir N  (N = 9 for shootout)
 # by Leopold Toetsch
 # modified by Joshua Isom
 # modified by Karl Forner to accept shootout default value of N=2

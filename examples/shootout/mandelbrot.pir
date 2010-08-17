@@ -1,11 +1,14 @@
-#!./parrot -j
+#!./parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 NAME
 
 examples/shootout/mandelbrot.pir - Print the Mandelbrot set
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/shootout/mandelbrot.pir -j 600 > out.pbm
+    % ./parrot examples/shootout/mandelbrot.pir -R jit 600 > out.pbm
 
 =head1 DESCRIPTION
 

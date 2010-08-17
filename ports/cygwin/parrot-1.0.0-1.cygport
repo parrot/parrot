@@ -1,0 +1,169 @@
+# -*- sh -*-
+DESCRIPTION="Parrot Virtual Machine"
+HOMEPAGE="http://www.parrot.org/"
+SRC_URI="ftp://ftp.parrot.org/pub/parrot/releases/devel/${PV}/${PN}-${PV}.tar.gz"
+LICENSE="Artistic2"
+DIFF_EXCLUDES="parrot.pc myconfig config_lib.pasm Makefile TAGS"
+DLLVER=$(echo $PV|sed -e's,\.,_,g')
+cygwin2=
+DOCDIR="/usr/share/doc"
+PKG_NAMES="${PN} ${PN}-devel ${PN}-docs"
+PKG_HINTS="${PKG_NAMES}"
+
+parrot_exists_check() {
+  #/usr/local/lib/parrot /usr/lib/parrot
+  inst="/usr/local/include/parrot /usr/include/parrot  \
+	/usr/lib/libparrot.dll.a /usr/local/lib/libparrot.dll.a"
+  for d in $inst; do
+    if [ -e $d ]; then
+      # With the local cygwin patches until 0.8.1 it did work, but this was not
+      # accepted upstream, so we have to live with this limitation.
+      # echo "Testing with $d is brave and might not work"
+      echo "Building and testing with $d is not yet supported! Remove or rename first."
+    fi
+  done
+  for d in $inst; do if [ -e $d ]; then exit; fi; done
+}
+
+src_compile() {
+  cd ${B}
+  parrot_exists_check
+
+  test -e Configure.pl || lndirs
+  test -e config_lib.pasm && make realclean
+
+  perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man
+  # only cygwin-1.5 -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
+  if [ -z "$cygwin2" ]; then
+    sed -e"s,/usr/share/doc/parrot/${PV}\",/usr/share/doc/${P}\"," -i config_lib.pasm
+  fi
+
+  cygmake all 
+  cygmake installable
+  cygmake -C editor all
+  cygmake docs
+  cygmake html
+
+  cat >>myconfig <<EOF
+  Locally applied patches:
+TT #253 r37202 opengl detection
+TT #280 r37214 bignum.pmc compiler warnings
+custom library.c patch to allow library/*.pbc
+EOF
+}
+
+src_check () {
+  cd ${B}
+  parrot_exists_check
+  cygtest
+}
+
+src_install () {
+  cd ${B}
+  parrot_exists_check
+  man1=${D}/usr/share/man/man1
+  mkdir -p $man1
+
+  # already in core now
+  make install DESTDIR=${D}
+  make install-dev DESTDIR=${D}
+
+  # now fix the wrong build_dir in the pbc_to_exe files
+  sed -e"s,\"${B}\",\"/usr\"," \
+      < config_lib.pasm > ${D}/usr/lib/${PN}/${PV}/include/config_lib.pasm
+  # said who? gentoo or freebsd
+  insinto /usr/lib/${PN}
+  doins parrotbug
+
+  insinto /usr/lib/parrot/${PV}
+  doins myconfig
+
+  # necessary for mod_parrot-0.3
+  #insinto /usr/lib/${PN}/${PV}/src/
+  #doins "${B}/src/install_config.o" "${B}/src/null_config.o" "${B}/src/parrot_config.o"
+
+  #pod2html DEPRECATED.pod > DEPRECATED.html
+  dodoc ABI_CHANGES ChangeLog CREDITS README_cygwin.pod DONORS.pod TODO DEPRECATED.pod
+
+  # editor support (make vim-install installs into ~/.vim/)
+  insinto /usr/share/emacs/site-lisp
+  doins ${B}/editor/*.el
+  pod2text ${B}/editor/README.pod > ${D}/usr/share/emacs/site-lisp/parrot.README
+  # put this into ~/.vim/ or to the global vim dirs?
+  insinto /usr/share/vim/vimfiles/syntax
+  doins ${B}/editor/pir.vim ${B}/editor/pasm.vim ${B}/editor/pmc.vim
+  mkdir -p ${D}/usr/share/vim/vimfiles/ftplugin
+  cp ${B}/editor/filetype_parrot.vim ${D}/usr/share/vim/vimfiles/ftplugin/parrot.vim
+  #mkdir -p ${D}/etc/defaults/.vim
+  #cp ${B}/editor/skeleton.pir ${D}/etc/defaults/.vim/
+
+  # man(1) for the main binaries
+  man1=${D}/usr/share/man/man1
+  pod2man docs/running.pod > $man1/parrot.1
+  pod2man src/parrot_debugger.c > $man1/parrot_debugger.1
+  pod2man src/pbc_disassemble.c > $man1/pbc_disassemble.1
+  pod2man src/pbc_dump.c > $man1/pbc_dump.1
+  pod2man tools/build/parrot_config_c.pl > $man1/parrot_config.1
+  pod2man src/pbc_merge.c > $man1/pbc_merge.1
+  pod2man tools/dev/pbc_to_exe.pir > $man1/pbc_to_exe.1
+
+  cd $man1
+  for f in *.1; do
+    b=$(basename $f .1)
+    if [ -e ${D}/usr/bin/$b.exe ]; then
+      test -s $f || rm $f
+      gzip $f
+    else
+      rm $f
+    fi
+  done
+
+  cd ${B}
+  cp -r docs/html $D/usr/share/doc/parrot/${PV}/html/
+  #insinto /usr/share/doc/parrot/${PV}/docs/html
+  #doins docs/html
+}
+
+# parrot
+PKG_CONTENTS[0]=" \
+--exclude=usr/include \
+--exclude=usr/share/doc/parrot/${PV}/languages \
+--exclude=usr/share/doc/parrot/DEPRECATED.pod \
+--exclude=usr/share/doc/parrot/${PV}/PBC_COMPAT \
+--exclude=usr/share/doc/parrot/${PV}/html \
+--exclude=usr/share/doc/parrot/${PV}/pod/project \
+usr/bin \
+usr/share \
+usr/lib/parrot/parrotbug \
+usr/lib/parrot/${PV}/myconfig \
+usr/lib/parrot/${PV}/VERSION \
+usr/lib/parrot/${PV}/dynext \
+usr/lib/parrot/${PV}/library \
+usr/lib/parrot/${PV}/languages \
+usr/lib/parrot/${PV}/include/config_lib.pasm \
+usr/lib/parrot/${PV}/include/interpinfo.pasm \
+usr/lib/parrot/${PV}/include/config.fpmc \
+"
+
+# parrot-devel
+PKG_CONTENTS[1]=" \
+--exclude=usr/lib/parrot/${PV}/dynext \
+--exclude=usr/lib/parrot/${PV}/languages \
+--exclude=usr/lib/parrot/${PV}/library \
+--exclude=usr/lib/parrot/${PV}/myconfig \
+--exclude=usr/lib/parrot/parrotbug \
+--exclude=usr/lib/parrot/${PV}/VERSION \
+--exclude=usr/lib/parrot/${PV}/include/config_lib.pasm \
+--exclude=usr/lib/parrot/${PV}/include/interpinfo.pasm \
+--exclude=usr/lib/parrot/${PV}/include/config.fpmc \
+--exclude=usr/share/doc/parrot/${PV}/html \
+usr/include \
+usr/lib \
+usr/share/doc/parrot/DEPRECATED.pod \
+usr/share/doc/parrot/${PV}/PBC_COMPAT \
+usr/share/doc/parrot/${PV}/pod/project \
+"
+
+# parrot-docs
+PKG_CONTENTS[2]=" \
+usr/share/doc/parrot/${PV}/html"

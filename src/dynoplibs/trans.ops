@@ -1,0 +1,320 @@
+/*
+ * $Id$
+ * trans.ops
+ */
+
+=head1 NAME
+
+trans.ops - Transcendental Opcodes
+
+=head1 DESCRIPTION
+
+Addition library of operations to perform various transcendental operations such
+as logarithmics and trigonometrics.
+
+To use this library of ops, add this directive to your PIR:
+
+  .loadlib 'trans_ops'
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<acos>(out NUM, in NUM)
+
+Set $1 to the arc cosine (in radians) of $2.
+
+=cut
+
+inline op acos(out NUM, in NUM) :base_math {
+    $1 = acos((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<asec>(out NUM, in NUM)
+
+Set $1 to the arc secant (in radians) of $2.
+
+=cut
+
+inline op asec(out NUM, in NUM) :base_math {
+    $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
+}
+
+########################################
+
+
+=item B<asin>(out NUM, in NUM)
+
+Set $1 to the arc sine (in radians) of $2.
+
+=cut
+
+inline op asin(out NUM, in NUM) :base_math {
+    $1 = asin((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<atan>(out NUM, in NUM)
+
+=item B<atan>(out NUM, in NUM, in NUM)
+
+The two-argument versions set $1 to the arc tangent (in radians) of $2.
+
+The three-argument versions set $1 to the arc tangent (in radians) of
+$2 / $3, taking account of the signs of the arguments in determining the
+quadrant of the result.
+
+=cut
+
+inline op atan(out NUM, in NUM) :base_math {
+    $1 = atan((FLOATVAL)$2);
+}
+
+inline op atan(out NUM, in NUM, in NUM) :base_math {
+    $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+}
+
+########################################
+
+=item B<cos>(out NUM, in NUM)
+
+Set $1 to the cosine of $2 (given in radians).
+
+=cut
+
+inline op cos(out NUM, in NUM) :base_math {
+    $1 = cos((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<cosh>(out NUM, in NUM)
+
+Set $1 to the hyperbolic cosine of $2 (given in radians).
+
+=cut
+
+inline op cosh(out NUM, in NUM) :base_math {
+    $1 = cosh((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<exp>(out NUM, in NUM)
+
+Set $1 to I<e> raised to the power $2. I<e> is the base of the natural
+logarithm.
+
+=cut
+
+inline op exp(out NUM, in NUM) :base_math {
+    $1 = exp((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<ln>(out NUM, in NUM)
+
+Set $1 to the natural (base I<e>) logarithm of $2.
+
+=cut
+
+inline op ln(out NUM, in NUM) :base_math {
+    $1 = log((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<log10>(out NUM, in NUM)
+
+Set $1 to the base 10 logarithm of $2.
+
+=cut
+
+inline op log10(out NUM, in NUM) :base_math {
+    $1 = log10((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<log2>(out NUM, in NUM)
+
+Set $1 to the base 2 logarithm of $2.
+
+=cut
+
+op log2(out NUM, in NUM) :base_math {
+    FLOATVAL temp = log((FLOATVAL)2.0);
+    $1 = log((FLOATVAL)$2) / temp;
+}
+
+########################################
+
+=item B<sec>(out NUM, in NUM)
+
+Set $1 to the secant of $2 (given in radians).
+
+=cut
+
+inline op sec(out NUM, in NUM) :base_math {
+    $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<sech>(out NUM, in NUM)
+
+Set $1 to the hyperbolic secant of $2 (given in radians).
+
+=cut
+
+inline op sech(out NUM, in NUM) :base_math {
+    $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<sin>(out NUM, in NUM)
+
+Set $1 to the sine of $2 (given in radians).
+
+=cut
+
+inline op sin(out NUM, in NUM) :base_math {
+    $1 = sin((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<sinh>(out NUM, in NUM)
+
+Set $1 to the hyperbolic sine of $2 (given in radians).
+
+=cut
+
+inline op sinh(out NUM, in NUM) :base_math {
+    $1 = sinh((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<tan>(out NUM, in NUM)
+
+Set $1 to the tangent of $2 (given in radians).
+
+=cut
+
+inline op tan(out NUM, in NUM) :base_math {
+    $1 = tan((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<tanh>(out NUM, in NUM)
+
+Set $1 to the hyperbolic tangent of $2 (given in radians).
+
+=cut
+
+inline op tanh(out NUM, in NUM) :base_math {
+    $1 = tanh((FLOATVAL)$2);
+}
+
+=item B<pow>(out NUM, in NUM, in NUM)
+
+=item B<pow>(out NUM, in NUM, in INT)
+
+=item B<pow>(invar PMC, invar PMC, invar PMC)
+
+=item B<pow>(invar PMC, invar PMC, in INT)
+
+=item B<pow>(invar PMC, invar PMC, in NUM)
+
+Set $1 to $2 raised to the power $3.
+
+=cut
+
+inline op pow(out NUM, in NUM, in NUM) :base_core {
+    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+}
+
+inline op pow(invar PMC, invar PMC, invar PMC) :base_core {
+    const FLOATVAL a = VTABLE_get_number(interp, $2);
+    const FLOATVAL b = VTABLE_get_number(interp, $3);
+    const FLOATVAL c = pow(a, b);
+    if (PMC_IS_NULL($1))
+        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    else
+        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
+    VTABLE_set_number_native(interp, $1, c);
+}
+
+inline op pow(invar PMC, invar PMC, in INT) :base_core {
+    const FLOATVAL a = VTABLE_get_number(interp, $2);
+    const FLOATVAL b = (FLOATVAL)$3;
+    const FLOATVAL c = pow(a, b);
+    if (PMC_IS_NULL($1))
+        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    else
+        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
+    VTABLE_set_number_native(interp, $1, c);
+}
+
+inline op pow(invar PMC, invar PMC, in NUM) :base_core {
+    const FLOATVAL a = VTABLE_get_number(interp, $2);
+    const FLOATVAL c = pow(a, $3);
+    if (PMC_IS_NULL($1))
+        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    else
+        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
+    VTABLE_set_number_native(interp, $1, c);
+}
+
+inline op pow(out NUM, in NUM, in INT) :base_core {
+    FLOATVAL n2 = $2;
+    FLOATVAL res = 1.0;
+    INTVAL   e  = $3;
+    int s = 1;
+    if (e != 0) {
+        if (e < 0) {
+            s = -1;
+            e = -e;
+        }
+    }
+    while (e) {
+        if (e & 1) {
+            res *= n2;
+        }
+        n2 *= n2;
+        e >>= 1;
+    }
+    if (s < 0) {
+        res = 1.0/res;
+    }
+    $1 = res;
+}
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010-2010, Parrot Foundation.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

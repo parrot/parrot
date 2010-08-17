@@ -1,18 +1,21 @@
+# Copyright (C) 2004-2009, Parrot Foundation.
+# $Id$
+
 .sub __library_data_dumper_onload :load
     .local pmc dd_class
-    dd_class = get_class "Data::Dumper"
+    dd_class = get_class ['Data'; 'Dumper']
     if null dd_class goto load_library
 
     goto END
 
   load_library:
-        load_bytecode "library/Data/Dumper/Default.pir"
-        newclass $P0, "Data::Dumper"
+        load_bytecode "Data/Dumper/Default.pbc"
+        newclass $P0, ['Data'; 'Dumper']
 END:
     .return ()
 .end
 
-.namespace ["Data::Dumper"]
+.namespace ['Data'; 'Dumper']
 
 .sub dumper :method
     .param pmc dump
@@ -33,7 +36,7 @@ no_def_name:
     .local pmc ddd_class
 
     push_eh ERROR2
-        ddd_class = get_class "Data::Dumper::Default"
+        ddd_class = get_class ['Data'; 'Dumper'; 'Default']
         style     = ddd_class."new"()
     pop_eh
 
@@ -45,14 +48,15 @@ no_def_name:
     .return ( 1 )
 
 ERROR2:
-    print "can not find class Data::Dumper::Default!\n"
+    pop_eh
+    print "can not find class ['Data'; 'Dumper'; 'Default']!\n"
     end
     .return ( 0 )
 ERROR:
     print "Syntax:\n"
-    print "Data::Dumper::dumper( pmc )\n"
-    print "Data::Dumper::dumper( pmc, name )\n"
-    print "Data::Dumper::dumper( pmc, name, indent )\n"
+    print "dumper( pmc )\n"
+    print "dumper( pmc, name )\n"
+    print "dumper( pmc, name, indent )\n"
     .return ( 0 )
 .end
 

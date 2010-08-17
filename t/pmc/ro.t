@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -22,11 +16,14 @@ Tests automatically generated read-only PMC support.
 
 =cut
 
-my $library = <<'CODE';
+.namespace []
+
+.include "except_types.pasm"
+
 .sub make_readonly
     .param pmc arg
     .local pmc one
-    one = new 'Integer'
+    one = new ['Integer']
     one = 1
     setprop arg, '_ro', one
 .end
@@ -34,186 +31,151 @@ my $library = <<'CODE';
 .sub make_writable
     .param pmc arg
     .local pmc zero
-    zero = new 'Integer'
+    zero = new ['Integer']
     zero = 0
     setprop arg, '_ro', zero
 .end
-CODE
 
-pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Integer set read-only is not writable" );
 .sub main :main
-    .local pmc foo
+    .include 'test_more.pir'
 
-    foo = new 'Integer'
+    plan(13)
+
+    integer_set_read_only_is_not_writable() # 1 test
+    integer_set_read_only_can_be_read()     # 6 tests
+    integer_stays_integer()                 # 1 test
+    integer_add()                           # 1 test
+    complex_i_add()                         # 1 test
+    resizablepmcarray_non_recursive_part()  # 1 test
+    objects()                               # 1 test
+    resizablepmcarray_recursive()           # 1 test
+.end
+
+.sub integer_set_read_only_is_not_writable
+    .local pmc foo, eh
+
+    foo = new ['Integer']
     foo = 42
 
-    make_readonly(foo)
-    foo = 43
-    print "NOT OKAY"
-.end
-CODE
-/NOT OKAY/
-OUTPUT
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
+    set_addr eh, eh_label
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be read" );
-.sub main :main
+    make_readonly(foo)
+    push_eh eh
+    foo = 43
+    pop_eh
+    ok( 0, "integer_set_read_only_is_not_writable" )
+    goto end
+
+  eh_label:
+    .local string message
+    .get_results($P0)
+    message = $P0['message']
+    is( message, "set_integer_native() in read-only instance of 'Integer'", "integer_set_read_only_is_not_writable" )
+  end:
+.end
+
+.sub integer_set_read_only_can_be_read
     .local pmc foo
     .local pmc tmp
 
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
     make_readonly(foo)
-    print foo
-    print "\n"
+    is(foo, 42, 'foo initialised to 42 is readable after make_readonly')
     $I0 = foo
+    is($I0, 42, 'foo copied to int correctly')
     $S0 = foo
-    print $I0
-    print "\n"
-    print $S0
-    print "\n"
+    is($S0, 42, 'foo copied to string correctly')
 
-    tmp = new 'Integer'
+    tmp = new ['Integer']
     add tmp, foo, foo
-    print tmp
-    print "\n"
+    is(tmp, 84, 'foo can be added to foo correctly and stored elsewhere')
 
     $P0 = foo
-    n_add foo, foo, foo
-    print foo
-    print "\n"
+    add foo, foo, foo
+    is(foo, 84, 'foo can be added to foo correctly and stored to foo')
 
-    print $P0
-    print "\n"
+    is($P0, 42, 'copied foo retains its value')
 .end
-CODE
-42
-42
-42
-84
-84
-42
-OUTPUT
 
-pir_error_output_unlike( <<"CODE", <<'OUTPUT', "PerlInteger" );
-$library
-.sub main :main
+.sub integer_stays_integer
     .local pmc foo
 
-    foo = new 'PerlInteger'
-    foo = 42
-
-    make_readonly(foo)
-    foo = 43
-    print "NOT OKAY"
-.end
-CODE
-/NOT OKAY/
-OUTPUT
-
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer stays Integer" );
-.sub main :main
-    .local pmc foo
-
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
     make_readonly(foo)
     typeof $S0, foo
-    print $S0
-    print "\n"
+    is($S0, 'Integer', 'integer_stays_integer')
 .end
-CODE
-Integer
-OUTPUT
 
-pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Integer add" );
-.sub main :main
-    .local pmc foo
+.sub integer_add
+    .local pmc foo, eh
 
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
+    set_addr eh, eh_label
+
     make_readonly(foo)
-    add foo, 16, foo
-    print "NOT OKAY\n"
+    push_eh eh
+    foo += 16
+    pop_eh
+
+    ok(0, 'integer_add')
+    goto end
+
+  eh_label:
+    .local string message
+    .get_results($P0)
+    message = $P0['message']
+    is( message, "i_add_int() in read-only instance of 'Integer'", 'integer_add' )
+  end:
 .end
-CODE
-/NOT OKAY/
-OUTPUT
 
-pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
-.sub main :main
-    .local pmc foo
+.sub complex_i_add
+    .local pmc foo, eh
 
-    foo = new 'Complex'
+    foo = new ['Complex']
     foo[0] = 1.0
     foo[1] = 1.0
+
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
+    set_addr eh, eh_label
+
     make_readonly(foo)
-    add foo, foo, 4
-    print "NOT OKAY\n"
+    push_eh eh
+    add foo, 4
+    pop_eh
+    ok( 0, 'complex_i_add')
+    goto end
+
+  eh_label:
+    .local string message
+    .get_results($P0)
+    message = $P0['message']
+    is( message, "i_add_int() in read-only instance of 'Complex'", 'complex_i_add' )
+  end:
 .end
-CODE
-/NOT OKAY/
-OUTPUT
 
-{
+.sub resizablepmcarray_non_recursive_part
+    .local pmc foo, three, four, eh
 
-    # The ROTest dynpmc has opposite of normal logic for set/get integer
-    # and 'reader' and 'writer' NCI methods.
-    # The values are [should work with read-only, is todo test].
-    my %tests = (
-
-        # these first two tests would test overriding of the default
-        # read-onlyness notion of vtable methods
-        q{value = 42}  => [ 1, 0 ],
-        q{$I0 = value} => [ 0, 0 ],
-
-        # these make sure NCI methods check does-write flags
-        # 'writer' is marked as writing; 'reader' is not.
-        q{$I0 = value.'reader'()} => [ 1, 0 ],
-        q{$I0 = value.'writer'(42)} => [ 0, 0 ],
-    );
-    for my $test ( keys %tests ) {
-        my $code = $library . <<"CODE";
-.loadlib 'rotest'
-.sub main :main
-    .local pmc value
-    value = new 'ROTest'
-    #READONLYTEST
-    $test
-    print "reached end\\n"
-.end
-CODE
-        {
-            my ( $readonly, $todo ) = @{ $tests{$test} };
-
-            # first make sure it works without the make_readonly
-            pir_output_is( $code, "reached end\n", "ROTest (dry run) ($test)" );
-            local $TODO = $todo;
-            $code =~ s/#READONLYTEST/make_readonly(value)/;
-            if ($readonly) {
-                pir_output_is( $code, "reached end\n", "ROTest (read-only/okay) ($test)" );
-            }
-            else {
-                pir_error_output_isnt( $code, "reached end\n", "ROTest (read-only/fail) ($test)" );
-            }
-        }
-    }
-}
-
-pir_error_output_unlike(
-    $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursive part)" );
-.sub main :main
-    .local pmc foo
-    .local pmc three
-    .local pmc four
-
-    foo = new 'ResizablePMCArray'
-    three = new 'Integer'
+    foo = new ['ResizablePMCArray']
+    three = new ['Integer']
     three = 3
-    four = new 'Integer'
+    four = new ['Integer']
     four = 4
+
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
+    set_addr eh, eh_label
 
     foo = 3
     foo[0] = three
@@ -221,69 +183,77 @@ pir_error_output_unlike(
     foo[2] = three
     make_readonly(foo)
 
+    push_eh eh
     foo[0] = four
-    print "NOT OKAY\n"
+    pop_eh
+
+    ok(0, 'resizablepmcarray_non_recursive_part')
+    goto end
+
+  eh_label:
+    .local string message
+    .get_results($P0)
+    message = $P0['message']
+    is( message, "set_pmc_keyed_int() in read-only instance of 'ResizablePMCArray'", 'resizablepmcarray_non_recursive_part' )
+  end:
 .end
-CODE
-/NOT OKAY/
-OUTPUT
 
-pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Objects" );
-.sub main :main
-    .local pmc fooclass
-    .local pmc foo
+.sub objects
+    .local pmc fooclass, foo, eh, i
 
-    $P0 = new 'Integer'
-    $P0 = 1
+    i = new ['Integer']
+    i = 1
+
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
+    set_addr eh, eh_label
 
     fooclass = newclass 'Foo'
     addattribute fooclass, 'bar'
-    foo = new 'Foo'
-    setattribute foo, 'bar', $P0
+    foo = new ['Foo']
+    setattribute foo, 'bar', i
     make_readonly(foo)
-    inc $P0
-    setattribute foo, 'bar', $P0
-    print "NOT OKAY\n"
-.end
-CODE
-/NOT OKAY/
-OUTPUT
+    inc i
 
-# RT#46821: should this work?
-{
-    local $TODO = 1;
-    pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray -- Recursive" );
-.sub main :main
+    push_eh eh
+    setattribute foo, 'bar', i
+    pop_eh
+
+    ok( 0, 'objects')
+    goto end
+
+  eh_label:
+    .local string message
+    .get_results($P0)
+    message = $P0['message']
+    is( message, "set_attr_str() in read-only instance of 'Foo'", 'objects' )
+  end:
+.end
+
+.sub resizablepmcarray_recursive
     .local pmc foo
     .local pmc three
-    .local pmc tmp
+    .local pmc four
 
-    foo = new 'ResizablePMCArray'
-    three = new 'Integer'
+    foo = new ['ResizablePMCArray']
+    three = new ['Integer']
     three = 3
 
     foo = 1
     foo[0] = three
 
-    print "before make_readonly\n"
     make_readonly(foo)
-    print "after\n"
 
-    # three = 4 # should fail -- is that what we want
-    tmp = foo[0]
-    tmp = 4
-    print "NOT OKAY\n"
-    tmp = foo[0]
-    print tmp
+    four = foo[0]
+    four = 4
+    four = foo[0]
+    is(four, 4, 'TT #1036 - readonly should be shallow')
 .end
-CODE
-/NOT OKAY/
-OUTPUT
-}
+
+
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

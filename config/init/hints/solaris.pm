@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 # $Id$
 
 package init::hints::solaris;
@@ -10,7 +10,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
     if ( $libs !~ /-lrt\b/ ) {
@@ -34,15 +34,18 @@ sub runstep {
         # Can't call cc_build since we haven't set all the flags yet.
         # This should suffice for this test.
         my $cc_inc = $conf->data->get('cc_inc');
-        Parrot::Configure::Utils::_run_command( "$cc -o test test.c",
-            'test.cco', 'test.cco' )
-            and confess "C compiler failed (see test.cco)";
+        Parrot::Configure::Utils::_run_command( "$cc -o test_$$ test_$$.c",
+            "test_$$.cco", "test_$$.cco" )
+            and confess "C compiler failed (see test_$$.cco)";
         %gnuc = eval $conf->cc_run() or die "Can't run the test program: $!";
         if ( defined $gnuc{__GNUC__} ) {
             $link = 'g++';
         }
         else {
             $link =~ s/\bcc\b/CC/;
+        }
+        unless ($conf->data->get('rpath')) {
+            $conf->data->set( 'rpath', '-R' );
         }
         $conf->data->set( link => $link );
         $conf->data->deltrigger( "cc", "solaris_link" );
@@ -54,7 +57,6 @@ sub runstep {
     # code for use in shared libraries.  -KPIC for Sun's compiler, -fPIC for
     # gcc.  We don't know which compiler we're using till after the
     # gccversion test.
-    # RT#43150 Should this go into the shlibs.pl Configure.pl unit instead?
     my $solaris_cc_shared_cb = sub {
         my ( $key, $gccversion ) = @_;
 
@@ -64,6 +66,8 @@ sub runstep {
         else {
             $conf->data->set( cc_shared => '-KPIC' );
         }
+        $conf->data->set( 'has_dynamic_linking', '1' );
+        $conf->data->set( 'parrot_is_shared', '1' );
         $conf->data->deltrigger( "gccversion", "solaris_cc_shared" );
     };
     $conf->data->settrigger(
@@ -96,6 +100,7 @@ sub runstep {
         $conf->data->deltrigger( "gccversion", "solaris_ieee" );
     };
     $conf->data->settrigger( "gccversion", "solaris_ieee", $solaris_ieee_cb );
+
 }
 
 1;

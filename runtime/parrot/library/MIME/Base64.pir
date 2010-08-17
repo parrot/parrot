@@ -164,9 +164,9 @@ then a warning is generated if perl is running under -w.
 
     # padding with '='
     if len_mod_3 == 0 goto END_2
-        substr base64, -1, 1, ascii:"="
+        base64 = replace base64, -1, 1, ascii:"="
         if len_mod_3 == 2 goto END_2
-            substr base64, -2, 1, ascii:"="
+            base64 = replace base64, -2, 1, ascii:"="
     END_2:
 
     .return( base64 )
@@ -200,7 +200,7 @@ then a warning is generated if perl is running under -w.
     goto START_5
     END_5:
 
-    .local int len, len_mod_4
+    .local int len_mod_4
     len = length base64_cleaned
     len_mod_4 = len % 4
 
@@ -260,9 +260,9 @@ then a warning is generated if perl is running under -w.
     # cut padded '='
     if len_mod_4 == 0 goto END_3
         if len_mod_4 == 1 goto END_3
-	    chopn plain, 1
+	    plain = chopn plain, 1
             if len_mod_4 == 3 goto END_3
-	        chopn plain, 1
+	        plain = chopn plain, 1
     END_3:
 
     .return( plain )
@@ -282,7 +282,7 @@ and on the article on de.selfhtml.org.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, The Perl Foundation.
+Copyright (C) 2006-2008, Parrot Foundation.
 
 =cut
 

@@ -1,7 +1,9 @@
-#! parrot
+#!./parrot
+# Copyright (C) 2008-2010, Parrot Foundation.
+# $Id$
 
 .sub 'init_test_builder_tester'
-    load_bytecode 'runtime/parrot/library/Test/Builder/Tester.pir'
+    load_bytecode 'Test/Builder/Tester.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
@@ -23,7 +25,7 @@
 .end
 
 .sub 'init_test_class'
-    load_bytecode 'runtime/parrot/library/Test/Class.pir'
+    load_bytecode 'Test/Class.pbc'
 .end
 
 .sub 'main' :main
@@ -96,3 +98,9 @@
     ok( 4, 'bar second' )
     ok( 5, 'bar third' )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

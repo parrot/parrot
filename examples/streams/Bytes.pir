@@ -1,4 +1,6 @@
-=head1 INFORMATION
+# $Id$
+
+=head1 Bytes Example
 
 This example shows the usage of C<Stream::read_bytes>.
 
@@ -14,15 +16,15 @@ This example shows the usage of C<Stream::read_bytes>.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Replay.pir"
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Replay.pbc'
 
-    $P0 = new "Stream::Sub"
+    $P0 = new ['Stream'; 'Sub']
     # set the stream's source sub
-    .const .Sub temp = "_hello"
-    assign $P0, $P1
+    .const 'Sub' temp = "_hello"
+    assign $P0, temp
 
-    stream = new "Stream::Replay"
+    stream = new ['Stream'; 'Replay']
     assign stream, $P0
 
     $S0 = stream."read_bytes"( 3 )
@@ -81,7 +83,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

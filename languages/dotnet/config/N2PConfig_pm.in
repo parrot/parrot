@@ -1,3 +1,0 @@
-package N2PConfig;
-
-our $parrot = '${trans_parrot_path}${slash}parrot${exe}';

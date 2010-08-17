@@ -1,5 +1,5 @@
 /* string.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2003, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -13,19 +13,19 @@
 #ifndef PARROT_STRING_H_GUARD
 #define PARROT_STRING_H_GUARD
 
+#include "parrot/core_types.h"
 #include "parrot/config.h"
-#include "parrot/pobj.h"
-
-struct parrot_string_t;
 
 #ifdef PARROT_IN_CORE
 
+#include "parrot/pobj.h"
 #include "parrot/parrot.h"
 
 typedef struct parrot_string_t STRING;
 
 typedef enum Forward_flag {
-    Buffer_moved_FLAG = 1 << 0
+    Buffer_moved_FLAG   = 1 << 0,
+    Buffer_shared_FLAG  = 1 << 1
 } Forward_flags;
 
 /* String iterator */

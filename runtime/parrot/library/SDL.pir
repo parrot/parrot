@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 SDL - Parrot extension for SDL bindings
@@ -40,7 +42,7 @@ When you load this file with C<load_bytecode>, it initializes the C<SDL_video>
 subsystem.  You'll have to use the appropriate IMC modules or initialize the
 other subsystems manually.
 
-The subsystem initalizers include:
+The subsystem initializers include:
 
 =over 4
 
@@ -51,9 +53,9 @@ The subsystem initalizers include:
 .include 'datatypes.pasm'
 
 .macro store_nci_func( func_name, signature )
-    c_func_name = prefix . .func_name
+    c_func_name = 'SDL_' . .func_name
     dlfunc c_function, libsdl, c_func_name, .signature
-    store_global namespace, .func_name, c_function
+    set_hll_global ['SDL'; 'NCI'], .func_name, c_function
 .endm
 
 .sub _sdl_init :load
@@ -61,7 +63,7 @@ The subsystem initalizers include:
 
     .local pmc layouts
     layouts = new 'OrderedHash'
-    store_global 'SDL::NCI', 'layouts', layouts
+    set_hll_global ['SDL'; 'NCI'], 'layouts', layouts
 
     # this order matters; trust me!
     _set_Event_layout(        layouts )
@@ -86,28 +88,36 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .local pmc libsdl
     .local pmc sdl_function
 
+    .local pmc env
+    env = new 'Env'
+    .local string sdlpath
+    sdlpath = env['SDLLIBPATH']
+    if sdlpath == '' goto default_locations
+    say sdlpath
+    loadlib libsdl, sdlpath
+    if libsdl goto OK
+    goto failed
+
+default_locations:
     loadlib libsdl, 'libSDL'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK
+    if libsdl goto OK
 
     # second try
     loadlib libsdl, 'libSDL-1.2'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK_HINT1
+    if libsdl goto OK_HINT1
 
     # third try
     loadlib libsdl, 'libSDL-1.2.so.0'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK_HINT2
+    if libsdl goto OK_HINT2
 
     # cygwin
     loadlib libsdl, 'cygSDL-1-2-0'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK
+    if libsdl goto OK
 
+failed:
     # failed to load libSDL
     $P0 = new 'Exception'
-    $P0["_message"] = "libSDL not found!"
+    $P0 = "libSDL not found!"
     throw $P0
     branch OK
   OK_HINT1:
@@ -116,11 +126,6 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
   OK_HINT2:
     printerr "Hint: create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
   OK:
-    .local string namespace
-    namespace = 'SDL::NCI'
-
-    .local string prefix
-    prefix    = 'SDL_'
 
     .local string c_func_name
     .local pmc    c_function
@@ -128,43 +133,43 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .store_nci_func( 'Init', 'ii' )
 
 #    dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
-#    store_global 'SDL::NCI', 'Init', sdl_function
+#    set_hll_global ['SDL'; 'NCI'], 'Init', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_SetVideoMode', 'piiil'
-    store_global 'SDL::NCI', 'SetVideoMode', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'SetVideoMode', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_Quit', 'v'
-    store_global 'SDL::NCI', 'Quit', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'Quit', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_FillRect', 'ippi'
-    store_global 'SDL::NCI', 'FillRect', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'FillRect', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_UpdateRect', 'vpiiii'
-    store_global 'SDL::NCI', 'UpdateRect', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'UpdateRect', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_UpdateRects', 'vpip'
-    store_global 'SDL::NCI', 'UpdateRects', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'UpdateRects', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_Flip', 'ip'
-    store_global 'SDL::NCI', 'Flip', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'Flip', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_FreeSurface', 'vp'
-    store_global 'SDL::NCI', 'FreeSurface', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'FreeSurface', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_LoadBMP_RW', 'ppi'
-    store_global 'SDL::NCI', 'LoadBMP_RW', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'LoadBMP_RW', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_DisplayFormat', 'pp'
-    store_global 'SDL::NCI', 'DisplayFormat', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'DisplayFormat', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_UpperBlit', 'ipppp'
-    store_global 'SDL::NCI', 'BlitSurface', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'BlitSurface', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_WaitEvent', 'ip'
-    store_global 'SDL::NCI', 'WaitEvent', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'WaitEvent', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_PollEvent', 'ip'
-    store_global 'SDL::NCI', 'PollEvent', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'PollEvent', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'ti'
-    store_global 'SDL::NCI', 'GetKeyName', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'GetKeyName', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_GetError', 'tv'
-    store_global 'SDL::NCI', 'GetError', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'GetError', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_SetColorKey', 'ipii'
-    store_global 'SDL::NCI', 'SetColorKey', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'SetColorKey', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_LockSurface', 'ip'
-    store_global 'SDL::NCI', 'LockSurface', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'LockSurface', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_UnlockSurface', 'vp'
-    store_global 'SDL::NCI', 'UnlockSurface', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'UnlockSurface', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_CreateRGBSurface', 'piiiiiiii'
-    store_global 'SDL::NCI', 'CreateRGBSurface', sdl_function
+    set_hll_global ['SDL'; 'NCI'], 'CreateRGBSurface', sdl_function
 .end
 
 =item _init_image()
@@ -180,24 +185,20 @@ SDL::Image library anyway, which calls this for you.
     .local pmc nci_sub
 
     loadlib image_lib, 'libSDL_image'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK
+    if image_lib goto OK
 
     loadlib image_lib, 'libSDL_image-1.2'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK_HINT1
+    if image_lib goto OK_HINT1
 
     loadlib image_lib, 'libSDL_image-1.2.so.0'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK_HINT2
+    if image_lib goto OK_HINT2
 
     loadlib image_lib, 'cygSDL_image-1-2-0'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK
+    if image_lib goto OK
 
     # failed to load libSDL
     $P0 = new 'Exception'
-    $P0["_message"] = "libSDL_image not found!"
+    $P0 = "libSDL_image not found!"
     throw $P0
     branch OK
   OK_HINT1:
@@ -207,7 +208,7 @@ SDL::Image library anyway, which calls this for you.
     printerr "Hint: create a link from libSDL_image-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
   OK:
     dlfunc nci_sub, image_lib, 'IMG_Load', 'pt'
-    store_global 'SDL::NCI', 'IMG_Load', nci_sub
+    set_hll_global ['SDL'; 'NCI'], 'IMG_Load', nci_sub
 .end
 
 =item _init_ttf()
@@ -225,14 +226,15 @@ SDL::Font library anyway, which calls this for you.
     loadlib ttf_lib, 'libSDL_ttf'
     if ttf_lib goto initialize
     loadlib ttf_lib, 'cygSDL_ttf-2-0-0'
+# RNH this is not trapping a non-existent libSDL_ttf library
     unless ttf_lib goto error
 
   initialize:
     .local pmc nci_sub
-    dlfunc nci_sub, ttf_lib, 'TTF_Init', 'iv'
+    dlfunc nci_sub, ttf_lib, 'TTF_Init', 'i'
     unless nci_sub goto error
 
-    store_global 'SDL::NCI::TTF', 'Init', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'Init', nci_sub
 
     # TTF_init() returns 0 if successful, -1 on error
     .local int initialized
@@ -243,35 +245,41 @@ SDL::Font library anyway, which calls this for you.
   error:
     .local pmc e
     e    = new 'Exception'
-    e[0] = "SDL_ttf not initialized\n"
+    e['message'] = "SDL_ttf not initialized\n"
     throw e
 
   success:
     dlfunc nci_sub, ttf_lib, 'TTF_OpenFont', 'pti'
-    store_global 'SDL::NCI::TTF', 'OpenFont', nci_sub
-
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'pptp'
-    store_global 'SDL::NCI::TTF', 'RenderText_Solid', nci_sub
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'pptp'
-    store_global 'SDL::NCI::TTF', 'RenderUTF8_Solid', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'OpenFont', nci_sub
+#RNH changes: all text routines expect an integer, not a pmc, for color parameter
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'ppti'
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'RenderText_Solid', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'ppti'
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'RenderUTF8_Solid', nci_sub
 
     # this one could be wrong
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'pptp'
-    store_global 'SDL::NCI::TTF', 'RenderUNICODE_Solid', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'ppti'
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'RenderUNICODE_Solid', nci_sub
+# RNH Additions. Add UTF8_Shaded and FontLine skip
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Shaded', 'pptii'
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'RenderUTF8_Shaded', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_FontLineSkip', 'ip'
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'FontLineSkip', nci_sub
+#end additions
 
     dlfunc nci_sub, ttf_lib, 'TTF_SizeText', 'ipt33'
-    store_global 'SDL::NCI::TTF', 'SizeText', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'SizeText', nci_sub
     dlfunc nci_sub, ttf_lib, 'TTF_SizeUTF8', 'ipt33'
-    store_global 'SDL::NCI::TTF', 'SizeUTF8', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'SizeUTF8', nci_sub
     dlfunc nci_sub, ttf_lib, 'TTF_SizeUNICODE', 'ipt33'
-    store_global 'SDL::NCI::TTF', 'SizeUNICODE', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'SizeUNICODE', nci_sub
 
     dlfunc nci_sub, ttf_lib, 'TTF_CloseFont', 'vp'
-    store_global 'SDL::NCI::TTF', 'CloseFont', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'CloseFont', nci_sub
     dlfunc nci_sub, ttf_lib, 'TTF_Quit', 'vv'
-    store_global 'SDL::NCI::TTF', 'Quit', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'Quit', nci_sub
     dlfunc nci_sub, ttf_lib, 'TTF_WasInit', 'iv'
-    store_global 'SDL::NCI::TTF', 'WasInit', nci_sub
+    set_hll_global ['SDL'; 'NCI'; 'TTF'], 'WasInit', nci_sub
 .end
 
 .sub _set_Event_layout
@@ -415,7 +423,7 @@ SDL::Font library anyway, which calls this for you.
     .param pmc layouts
 
     .local pmc fetch_struct
-    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    fetch_struct = get_hll_global ['SDL'; 'NCI'], 'fetch_struct'
 
     .local pmc rect
     rect   = fetch_struct( 'Rect', 0 )
@@ -439,7 +447,7 @@ SDL::Font library anyway, which calls this for you.
     .param pmc layouts
 
     .local pmc fetch_struct
-    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    fetch_struct = get_hll_global ['SDL'; 'NCI'], 'fetch_struct'
 
     # SDL_PixelFormat struct pointer
     .local pmc pixelformat
@@ -539,7 +547,7 @@ SDL::Font library anyway, which calls this for you.
     .param pmc layouts
 
     .local pmc fetch_struct
-    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    fetch_struct = get_hll_global ['SDL'; 'NCI'], 'fetch_struct'
 
     .local pmc palette
     palette = fetch_struct( 'Palette', 0 )
@@ -611,7 +619,7 @@ SDL::Font library anyway, which calls this for you.
     .param pmc layouts
 
     .local pmc fetch_struct
-    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    fetch_struct = get_hll_global ['SDL'; 'NCI'], 'fetch_struct'
 
     .local pmc color
     color  = fetch_struct( 'Color', 0 )
@@ -702,7 +710,7 @@ felt when I wrote it!
 
 =cut
 
-.namespace [ 'SDL::NCI' ]
+.namespace [ 'SDL'; 'NCI' ]
 
 .sub fetch_struct
     .param string struct_name
@@ -711,8 +719,8 @@ felt when I wrote it!
     .local pmc initializer
     .local pmc struct
 
-    .local pmc fetch_layout
-    fetch_layout = find_global 'SDL::NCI', 'fetch_layout'
+#    .local pmc fetch_layout
+#    fetch_layout = get_hll_global ['SDL'; 'NCI'], 'fetch_layout'
     initializer  = fetch_layout( struct_name )
 
     if managed == 1 goto build_managed
@@ -732,7 +740,7 @@ felt when I wrote it!
     .local pmc layouts
     .local pmc layout
 
-    layouts = find_global 'SDL::NCI', 'layouts'
+    layouts = get_hll_global ['SDL'; 'NCI'], 'layouts'
 
     exists $I0, layouts[ layout_name ]
     if $I0 goto found
@@ -758,7 +766,7 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

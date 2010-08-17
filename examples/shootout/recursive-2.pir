@@ -1,10 +1,12 @@
-#!./parrot -Oc -Cj
+#!./parrot
+# Copyright (C) 2006-2009, Parrot Foundation.
+# $Id$
 #
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom
 
 # use less registers (leo)
-# time ./parrot -Oc -Cj recursive-2.pir 11
+# time ./parrot -Oc recursive-2.pir 11
 # real 2.32 s   (AMD X2@2000)
 # modified default value to n=3. Karl Forner
 
@@ -69,13 +71,13 @@ END
     dec y
     y = ack(x, y)
     dec x
-    .return ack(x, y)
+    .tailcall ack(x, y)
 a1:
     inc y
     .return (y)
 a2:
     dec x
-    .return ack(x, 1)
+    .tailcall ack(x, 1)
 .end
 
 .sub FibInt
@@ -120,7 +122,7 @@ endif:
     $N1 = TakNum(tmp, z, x)
     dec z
     z = TakNum(z, x, y)
-    .return TakNum($N0, $N1, z)
+    .tailcall TakNum($N0, $N1, z)
 .end
 
 .sub TakInt
@@ -137,7 +139,7 @@ endif:
     tmp = TakInt(tmp, z, x)
     dec z
     z   = TakInt(z, x, y)
-    .return TakInt($I0, tmp, z)
+    .tailcall TakInt($I0, tmp, z)
 .end
 
 

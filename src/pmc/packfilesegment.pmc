@@ -1,0 +1,170 @@
+/*
+Copyright (C) 2001-2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfilesegment.pmc - PackfileSegment PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileSegment class, an abstract class defining a
+couple of methods which all Packfile segments will implement.  The stub methods
+found here explode when called.
+
+See packfile.pmc for the toplevel Packfile interface; see PDD13 for the design
+spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass PackfileSegment auto_attrs {
+    /*
+    Directory which owns this segment. Required for correct pack/unpack
+    Annotations.
+    */
+    ATTR PMC *directory;
+
+
+/*
+
+=item C<void init()>
+
+Initialize PackfileSegment.
+
+=cut
+
+*/
+    VTABLE void init() {
+        Parrot_PackfileSegment_attributes * attrs =
+                PMC_data_typed(SELF, Parrot_PackfileSegment_attributes*);
+
+        attrs->directory = PMCNULL;
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileSegment_attributes * attrs =
+                PARROT_PACKFILESEGMENT(SELF);
+
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->directory);
+    }
+
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+Initialize PMC internals.
+
+=cut
+
+*/
+    VTABLE void set_pointer(void *ptr) {
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Initialize PMC internals.
+
+=cut
+
+*/
+    VTABLE void *get_pointer() {
+        return NULL;
+    }
+
+/*
+
+=item C<STRING *pack()>
+
+Serialize the segment.
+
+=cut
+
+*/
+    METHOD pack() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "PackfileSegment.pack() not implemented yet.");
+    }
+
+
+/*
+
+=item C<void unpack(STRING *data)>
+
+Unpack a serialized segment string.
+
+=cut
+
+*/
+    METHOD unpack(STRING *data) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "PackfileSegment.unpack() not implemented yet.");
+    }
+
+/*
+
+=item C<void set_directory(PMC *directory)>
+
+Set owning directory.
+
+=cut
+
+*/
+    METHOD set_directory(PMC *directory) {
+        PARROT_PACKFILESEGMENT(SELF)->directory = directory;
+    }
+
+/*
+
+=item C<void get_directory(PMC *directory)>
+
+Get owning directory.
+
+=cut
+
+*/
+    METHOD get_directory() {
+        PMC * directory = PARROT_PACKFILESEGMENT(SELF)->directory;
+        if (!directory)
+            directory = PMCNULL;
+        RETURN(PMC* directory);
+    }
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

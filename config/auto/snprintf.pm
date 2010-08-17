@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Testing snprintf};
+    $data{description} = q{Test snprintf};
     $data{result}      = q{};
     return \%data;
 }
@@ -38,7 +38,7 @@ sub runstep {
 
 sub _probe_for_snprintf {
     my $conf = shift;
-    $conf->cc_gen('config/auto/snprintf/test.in');
+    $conf->cc_gen('config/auto/snprintf/test_c.in');
     $conf->cc_build();
     my $res = $conf->cc_run() or die "Can't run the snprintf testing program: $!";
     $conf->cc_clean();
@@ -56,7 +56,7 @@ sub _evaluate_snprintf {
     elsif ( $res =~ /^old snprintf/ ) {
         $conf->data->set( HAS_OLD_SNPRINTF => 1 );
     }
-    print " ($res) " if $conf->options->get('verbose');
+    $conf->debug(" ($res) ");
     return 1;
 }
 

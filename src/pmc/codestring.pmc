@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2008, The Perl Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -8,21 +8,19 @@ src/pmc/codestring.pmc - CodeString PMC Class
 
 =head1 DESCRIPTION
 
-C<CodeString> is a class intended to simplify the process of
-emitting code strings.  Ideally this will eventually
-become a form of "CodeBuffer" that is more efficient
-than string concatenation, but for now it works well
-enough for me.
+C<CodeString> is a class intended to simplify the process of emitting code
+strings.  Ideally this will eventually become a form of "CodeBuffer" that is
+more efficient than string concatenation, but for now it works well enough for
+me.
 
-The primary method for C<CodeString> objects is C<emit>,
-which appends a line (or lines) of code to the string
-according to a format parameter.  The line can contain
-substitution markers (ala printf) that indicate where
-other parameters to the call should be placed.
+The primary method for C<CodeString> objects is C<emit>, which appends a line
+(or lines) of code to the string according to a format parameter.  The line can
+contain substitution markers (ala printf) that indicate where other parameters
+to the call should be placed.
 
-Note that C<CodeString> is just a subclass of Parrot's
-native C<String> class, so it's easy to combine CodeString
-objects with other strings outside of the C<emit> method.
+Note that C<CodeString> is just a subclass of Parrot's native C<String> class,
+so it's easy to combine CodeString objects with other strings outside of the
+C<emit> method.
 
 =head2 Methods
 
@@ -32,9 +30,53 @@ objects with other strings outside of the C<emit> method.
 
 */
 
-#include "parrot/parrot.h"
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
 
-pmclass CodeString extends String provides string {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass CodeString extends String provides string auto_attrs {
+    ATTR PMC *linepos;            /* start of line positions */
+
+/*
+
+=item C<init()>
+
+Initialize the CodeString.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        SUPER();
+        SET_ATTR_linepos(INTERP, SELF, PMCNULL);
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<mark()>
+
+Mark the CodeString as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        SUPER();
+        if (PMC_data(SELF)) {
+            PMC *linepos;
+
+            GET_ATTR_linepos(INTERP, SELF, linepos);
+
+            Parrot_gc_mark_PMC_alive(INTERP, linepos);
+        }
+    }
 
 /*
 
@@ -62,45 +104,34 @@ A newline is automatically added to the end of the fmt.
 */
 
   METHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
+    STRING * const percent     = CONST_STRING(INTERP, "%");
+    STRING * const comma       = CONST_STRING(INTERP, ",");
+    STRING * const comma_space = CONST_STRING(INTERP, ", ");
+    STRING * const newline     = CONST_STRING(INTERP, "\n");
+    PMC           *parts       = PMCNULL;
+    STRING *key, *repl, *S1;
     INTVAL pos          = 0;
     INTVAL replen       = 0;
-    STRING *percent     = CONST_STRING(INTERP, "%");
-    STRING *comma       = CONST_STRING(INTERP, ",");
-    STRING *comma_space = CONST_STRING(INTERP, ", ");
-    STRING *newline     = CONST_STRING(INTERP, "\n");
-    STRING *key, *repl, *S0, *S1;
-    INTVAL I0, I1;
-
-    fmt = Parrot_make_COW_reference(INTERP, fmt);
 
     while (pos >= 0) {
         pos += replen;
-        pos = string_str_index(INTERP, fmt, percent, pos);
-        if (pos < 0) break;
+        pos = Parrot_str_find_index(INTERP, fmt, percent, pos);
+        if (pos < 0)
+            break;
 
-        key = string_substr(INTERP, fmt, pos+1, 1, &key, 0);
+        key = Parrot_str_substr(INTERP, fmt, pos+1, 1);
 
         if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
             repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
         }
-        else if (Parrot_string_is_cclass(INTERP, enum_cclass_numeric, fmt, pos+1)) {
-            I0   = string_to_int(INTERP, key);
+        else if (Parrot_str_is_cclass(INTERP, enum_cclass_numeric, fmt, (UINTVAL)pos + 1)) {
+            const INTVAL I0 = Parrot_str_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
-        else if (0 == string_equal(INTERP, key, comma)) {
-            repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
-            repl = Parrot_make_COW_reference(INTERP, repl);
-            I1   = VTABLE_elements(INTERP, args);
-            I0   = 1;
-
-            while (I0 < I1) {
-                S0   = VTABLE_get_string_keyed_int(INTERP, args, I0);
-                repl = string_append(INTERP, repl, comma_space);
-                repl = string_append(INTERP, repl, S0);
-                I0++;
-            }
+        else if (Parrot_str_equal(INTERP, key, comma)) {
+            repl = Parrot_str_join(INTERP, comma_space, args);
         }
-        else if (0 == string_equal(INTERP, key, percent)) {
+        else if (Parrot_str_equal(INTERP, key, percent)) {
             repl = percent;
         }
         else {
@@ -109,20 +140,88 @@ A newline is automatically added to the end of the fmt.
             continue;
         }
 
-        (void) string_replace(INTERP, fmt, pos, 2, repl, NULL);
-        replen = string_length(INTERP, repl);
+        fmt    = Parrot_str_replace(INTERP, fmt, pos, 2, repl);
+        replen = Parrot_str_length(INTERP, repl);
     }
 
-    /* Add a newline if necessary */
-    if ('\n' != string_index(INTERP, fmt, string_length(interp, fmt) - 1))
-        fmt = string_concat(INTERP, fmt, newline, 0);
+    GET_ATTR_str_val(INTERP, SELF, S1);
 
-    S1 = string_concat(INTERP, SELF.get_string(), fmt, 0);
+    parts = Parrot_pmc_new_init_int(INTERP, enum_class_FixedStringArray, 3);
+    VTABLE_set_string_keyed_int(INTERP, parts, 0, S1);
+    VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
+
+    /* Add a newline if necessary */
+    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_length(INTERP, fmt) - 1))
+        VTABLE_set_string_keyed_int(INTERP, parts, 2, newline);
+
+    S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
     VTABLE_set_string_native(INTERP, SELF, S1);
 
     RETURN(PMC *SELF);
-}
+  }
 
+
+/*
+
+=item lineof(INTVAL pos)
+
+Return the line number of the line at offset C<pos>.  This code assumes that
+the first line is line number zero.
+
+=cut
+
+*/
+
+  METHOD lineof(INTVAL pos) {
+    PMC    *linepos;
+    INTVAL  count;
+    INTVAL  line = 0;
+
+    GET_ATTR_linepos(INTERP, SELF, linepos);
+
+    /* build the linepos array if we haven't already done so */
+    if (!linepos || PMC_IS_NULL(linepos)) {
+        STRING *str             = NULL;
+        INTVAL  eos;
+        INTVAL  jpos;
+
+        linepos = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        /* get the string itself */
+        GET_ATTR_str_val(INTERP, SELF, str);
+        eos  = Parrot_str_length(INTERP, str);
+        /* find the first newline, if any */
+        jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
+                                      str, 0, eos);
+        while (jpos < eos) {
+            ++jpos;
+            /* add the start of line position */
+            VTABLE_push_integer(INTERP, linepos, jpos);
+
+            /* treat \r\n as a single newline */
+            if (jpos < eos
+            && string_ord(INTERP, str, jpos - 1)     == 13
+            && string_ord(INTERP, str, jpos)         == 10) {
+                ++jpos;
+            }
+            /* search for the next newline */
+            jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
+                                          str, jpos, eos);
+        }
+        /* save the array of line positions */
+        SET_ATTR_linepos(INTERP, SELF, linepos);
+    }
+
+    /* Find the line from the array, stop at the first index that is
+     * greater than the position we're looking for.  We do a linear
+     * search for now, * perhaps a binary search would be better someday.
+     */
+    count = VTABLE_elements(INTERP, linepos);
+    while (line < count
+          && VTABLE_get_integer_keyed_int(INTERP, linepos, line) <= pos)
+        ++line;
+
+    RETURN(INTVAL line);
+  }
 
 
 /*
@@ -141,17 +240,16 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
   METHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
-    STRING *counter_as_string = string_from_int(INTERP, counter);
+    STRING * const counter_as_string = Parrot_str_from_int(INTERP, counter);
     UNUSED(SELF);
 
-    counter++;
+    ++counter;
 
     if (!has_fmt) {
         RETURN(STRING *counter_as_string);
     }
     else {
-        STRING *result = string_copy(INTERP, format);
-        result         = string_concat(INTERP, result, counter_as_string, 1);
+        STRING *result = Parrot_str_concat(INTERP, format, counter_as_string);
         RETURN(STRING *result);
     }
   }
@@ -169,31 +267,30 @@ prefixed with 'unicode:'.
 */
 
   METHOD escape(STRING *str) {
-    STRING *escaped_str = string_escape_string(INTERP, str);
-    STRING *quote       = CONST_STRING(INTERP, "\x22");
-    STRING *x           = CONST_STRING(INTERP, "\\x");
+    STRING *escaped_str  = Parrot_str_escape(INTERP, str);
+    STRING * const quote = CONST_STRING(INTERP, "\x22");
+    STRING * const x     = CONST_STRING(INTERP, "\\x");
     INTVAL x_pos;
     INTVAL is_unicode = 0;
     UNUSED(SELF);
 
-    escaped_str = string_concat(INTERP, quote, escaped_str, 1);
-    escaped_str = string_concat(INTERP, escaped_str, quote, 1);
-    x_pos       = string_str_index(INTERP, escaped_str, x, 0);
+    escaped_str = Parrot_str_concat(INTERP, quote, escaped_str);
+    escaped_str = Parrot_str_concat(INTERP, escaped_str, quote);
+    x_pos       = Parrot_str_find_index(INTERP, escaped_str, x, 0);
 
     if (x_pos != -1) {
         is_unicode = 1;
     }
-    else
-    {
-        STRING *u = CONST_STRING(INTERP, "\\u");
-        INTVAL u_pos = string_str_index(INTERP, escaped_str, u, 0);
+    else {
+        STRING * const u = CONST_STRING(INTERP, "\\u");
+        const INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }
 
     if (is_unicode) {
-        STRING *unicode = CONST_STRING(INTERP, "unicode:");
-        escaped_str     = string_concat(INTERP, unicode, escaped_str, 1);
+        STRING * const unicode = CONST_STRING(INTERP, "unicode:");
+        escaped_str            = Parrot_str_concat(INTERP, unicode, escaped_str);
     }
 
     RETURN(STRING *escaped_str);
@@ -201,9 +298,37 @@ prefixed with 'unicode:'.
 
 /*
 
+=item C<charname_to_ord(string name)>
+
+Converts the Unicode character name given by C<name> to its
+codepoint value.  Returns -1 if an error occurs in conversion.
+
+=cut
+
+*/
+
+
+  METHOD charname_to_ord(STRING *name) {
+#if PARROT_HAS_ICU
+    UErrorCode   err       = U_ZERO_ERROR;
+    char * const cstr      = Parrot_str_to_cstring(INTERP, name);
+    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    Parrot_str_free_cstring(cstr);
+    if (U_SUCCESS(err)) {
+        RETURN(INTVAL codepoint);
+    }
+    RETURN(INTVAL -1);
+#else
+    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
+#endif
+  }
+
+/*
+
 =item C<key( string name1 [, string name2, ...] )>
 
-Construct a PIR key using the strings passed as arguments.
+Constructs a PIR key using the strings passed as arguments.
 For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 
 =cut
@@ -211,39 +336,44 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 */
 
   METHOD key(PMC *args :slurpy) {
-    STRING *open_bracket  = CONST_STRING(INTERP, "[");
-    STRING *semi          = CONST_STRING(INTERP, ";");
-    STRING *close_bracket = CONST_STRING(INTERP, "]");
-    STRING *s_array       = CONST_STRING(INTERP, "array");
-    STRING *prefix        = open_bracket;
-    STRING *out           = CONST_STRING(INTERP, "");
-    INTVAL elements, index;
+    INTVAL         index;
+    const INTVAL   elements      = VTABLE_elements(INTERP, args);
+    STRING * const open_bracket  = CONST_STRING(INTERP, "[");
+    STRING * const semi          = CONST_STRING(INTERP, ";");
+    STRING * const close_bracket = CONST_STRING(INTERP, "]");
+    STRING * const s_array       = CONST_STRING(INTERP, "array");
+    STRING *       prefix        = NULL;
+    STRING *       out           = open_bracket;
 
-    elements     = VTABLE_elements(INTERP, args);
+    for (index = 0; index < elements; ++index) {
+        PMC * const P0 = VTABLE_get_pmc_keyed_int(INTERP, args, index);
 
-    for (index = 0; index < elements; index++) {
-        PMC *P0      = VTABLE_get_pmc_keyed_int(INTERP, args, index);
-        if (VTABLE_does(interp, P0, s_array)) {
-            INTVAL elements2, index2;
-            elements2 = VTABLE_elements(INTERP, P0);
-            for (index2 = 0; index2 < elements2; index2++) {
-                STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
-                out          = string_append(INTERP, out, prefix);
-                (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-                out          = string_append(INTERP, out, S0);
-                prefix       = semi;
+        if (!PMC_IS_NULL(P0)) {
+            if (VTABLE_does(INTERP, P0, s_array)) {
+                const INTVAL elements2 = VTABLE_elements(INTERP, P0);
+                INTVAL index2;
+
+                for (index2 = 0; index2 < elements2; ++index2) {
+                    STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
+                    (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
+                    if (prefix)
+                        out = Parrot_str_concat(INTERP, out, prefix);
+                    out    = Parrot_str_concat(INTERP, out, S0);
+                    prefix = semi;
+                }
             }
-        }
-        else {
-            STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
-            out          = string_append(INTERP, out, prefix);
-            (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-            out          = string_append(INTERP, out, S0);
-            prefix       = semi;
+            else {
+                STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
+                (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
+                if (prefix)
+                    out = Parrot_str_concat(INTERP, out, prefix);
+                out    = Parrot_str_concat(INTERP, out, S0);
+                prefix = semi;
+            }
         }
     }
 
-    out = string_append(INTERP, out, close_bracket);
+    out = Parrot_str_concat(INTERP, out, close_bracket);
 
     RETURN(STRING *out);
 }

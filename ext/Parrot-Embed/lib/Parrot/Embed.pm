@@ -1,15 +1,13 @@
 package Parrot::Embed;
-
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '20081006';
 
-use base qw(DynaLoader Exporter);
-
-our @EXPORT_OK = qw(Parrot_revision);
+use base 'DynaLoader';
 
 Parrot::Embed->bootstrap($VERSION);
 
@@ -23,7 +21,7 @@ Parrot::Embed - use Parrot from Perl 5
 
 =head1 VERSION
 
-Version 0.02
+Version 20081006
 
 =head1 SYNOPSIS
 
@@ -39,11 +37,7 @@ It provides the core implementation used by the L<Parrot::Interpreter> module.
 Do consider using L<Parrot::Interpreter> first however.  See also
 L<Parrot::PMC>.
 
-The only useful interface provided by this module is Parrot_revision().
-
-=head2 Parrot_revision()
-
-Returns the integer revision number of the embedded libparrot.
+This module provides no user-inspectable code.
 
 =head1 AUTHOR
 
@@ -53,13 +47,6 @@ chromatic, C<< <chromatic at wgz.org> >>
 
 Please report any bugs or feature requests to the Parrot Porters mailing list.
 Someday there may be a CPAN version of this code.  Who knows?
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (C) 2006-2007 The Perl Foundation / chromatic.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Parrot itself.
 
 =cut
 

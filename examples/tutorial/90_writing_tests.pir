@@ -1,3 +1,6 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 Writing Tests
 
 This example demonstrates writing tests using the PIR version of Test::More.
@@ -9,13 +12,13 @@ to use particle's Exporter).
 =cut
 
 .sub _main :main
-    load_bytecode 'library/Test/More.pbc'
+    load_bytecode 'Test/More.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
     exports = split " ", "plan ok is isa_ok skip todo"
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     plan( 4 )
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -121,12 +121,47 @@ static UHUGEINTVAL getuint_va(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_getchr_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getchr_va __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getfloat_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getfloat_va __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getint_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getint_va __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getptr_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getptr_va __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getstring_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getstring_va __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getuint_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_getuint_va __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static STRING * getchr_va>
+=item C<static STRING * getchr_va(PARROT_INTERP, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -142,6 +177,7 @@ PARROT_WARN_UNUSED_RESULT
 static STRING *
 getchr_va(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getchr_va)
     va_list *arg = (va_list *)(obj->data);
 
     /* char promoted to int */
@@ -152,7 +188,8 @@ getchr_va(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<static HUGEINTVAL getint_va>
+=item C<static HUGEINTVAL getint_va(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Gets an integer out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -168,40 +205,44 @@ PARROT_WARN_UNUSED_RESULT
 static HUGEINTVAL
 getint_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getint_va)
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
-    case SIZE_REG:
+      case SIZE_REG:
         return va_arg(*arg, int);
 
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         /* "'short int' is promoted to 'int' when passed through '...'" */
         return (short)va_arg(*arg, int);
 
-    case SIZE_LONG:
+      case SIZE_LONG:
         return va_arg(*arg, long);
 
-    case SIZE_HUGE:
+      case SIZE_HUGE:
         return va_arg(*arg, HUGEINTVAL);
 
-    case SIZE_XVAL:
+      case SIZE_XVAL:
         return va_arg(*arg, INTVAL);
 
-    case SIZE_OPCODE:
+      case SIZE_OPCODE:
         return va_arg(*arg, opcode_t);
 
-    case SIZE_PMC:{
+      case SIZE_PMC:
+        {
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
             return VTABLE_get_integer(interp, pmc);
         }
-    default:
+
+      default:
         PANIC(interp, "Invalid int type!");
     }
 }
 
 /*
 
-=item C<static UHUGEINTVAL getuint_va>
+=item C<static UHUGEINTVAL getuint_va(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
 as a Parrot C<STRING>.
@@ -217,40 +258,44 @@ PARROT_WARN_UNUSED_RESULT
 static UHUGEINTVAL
 getuint_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getuint_va)
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
-    case SIZE_REG:
+      case SIZE_REG:
         return va_arg(*arg, unsigned int);
 
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         /* short int promoted HLAGHLAGHLAGH. See note above */
         return (unsigned short)va_arg(*arg, unsigned int);
 
-    case SIZE_LONG:
+      case SIZE_LONG:
         return va_arg(*arg, unsigned long);
 
-    case SIZE_HUGE:
+      case SIZE_HUGE:
         return va_arg(*arg, UHUGEINTVAL);
 
-    case SIZE_XVAL:
+      case SIZE_XVAL:
         return va_arg(*arg, UINTVAL);
 
-    case SIZE_OPCODE:
+      case SIZE_OPCODE:
         return va_arg(*arg, opcode_t);
 
-    case SIZE_PMC:{
+      case SIZE_PMC:
+        {
             PMC * const pmc = va_arg(*arg, PMC *);
             return (UINTVAL)VTABLE_get_integer(interp, pmc);
         }
-    default:
+
+      default:
         PANIC(interp, "Invalid uint type!");
     }
 }
 
 /*
 
-=item C<static HUGEFLOATVAL getfloat_va>
+=item C<static HUGEFLOATVAL getfloat_va(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Gets an floating-point number out of the C<va_list> in C<obj> and
 returns it as a Parrot C<STRING>.
@@ -266,36 +311,40 @@ PARROT_WARN_UNUSED_RESULT
 static HUGEFLOATVAL
 getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getfloat_va)
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         /* float is promoted to double */
         return (HUGEFLOATVAL)(float)va_arg(*arg, double);
 
-    case SIZE_REG:
+      case SIZE_REG:
         return (HUGEFLOATVAL)(double)va_arg(*arg, double);
 
-    case SIZE_HUGE:
+      case SIZE_HUGE:
         return (HUGEFLOATVAL)(HUGEFLOATVAL) va_arg(*arg, HUGEFLOATVAL);
 
-    case SIZE_XVAL:
+      case SIZE_XVAL:
         return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, FLOATVAL);
 
-    case SIZE_PMC:{
+      case SIZE_PMC:
+        {
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
 
             return (HUGEFLOATVAL)(VTABLE_get_number(interp, pmc));
         }
-    default:
-        real_exception(interp, NULL, INVALID_CHARACTER,
-                "Internal sprintf doesn't recognize size %d for a float", size);
+
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+            "Internal sprintf doesn't recognize size %d for a float", size);
     }
 }
 
 /*
 
-=item C<static STRING * getstring_va>
+=item C<static STRING * getstring_va(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Gets an string out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -312,6 +361,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 getstring_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getstring_va)
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
@@ -338,15 +388,14 @@ getstring_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
         }
 
     default:
-        real_exception(interp, NULL, INVALID_CHARACTER,
-                "Internal sprintf doesn't recognize size %d for a string",
-                size);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+            "Internal sprintf doesn't recognize size %d for a string", size);
     }
 }
 
 /*
 
-=item C<static void * getptr_va>
+=item C<static void * getptr_va(PARROT_INTERP, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
 
@@ -361,6 +410,7 @@ PARROT_CAN_RETURN_NULL
 static void *
 getptr_va(SHIM_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getptr_va)
     va_list * const arg = (va_list *)(obj->data);
 
     return (void *)va_arg(*arg, void *);
@@ -379,7 +429,8 @@ const SPRINTF_OBJ va_core = {
 
 =over 4
 
-=item C<static STRING * getchr_pmc>
+=item C<static STRING * getchr_pmc(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Same as C<getchr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -393,20 +444,22 @@ PARROT_WARN_UNUSED_RESULT
 static STRING *
 getchr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGMOD(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getchr_pmc)
     STRING *s;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index));
 
-    obj->index++;
+    ++obj->index;
     s = VTABLE_get_string(interp, tmp);
-    /* XXX string_copy like below? + adjusting bufused */
-    return string_substr(interp, s, 0, 1, NULL, 0);
+    /* XXX Parrot_str_copy like below? + adjusting bufused */
+    return Parrot_str_substr(interp, s, 0, 1);
 }
 
 /*
 
-=item C<static HUGEINTVAL getint_pmc>
+=item C<static HUGEINTVAL getint_pmc(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Same as C<getint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -419,23 +472,23 @@ PARROT_WARN_UNUSED_RESULT
 static HUGEINTVAL
 getint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
-    HUGEINTVAL ret;
+    ASSERT_ARGS(getint_pmc)
+
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    ret = VTABLE_get_integer(interp, tmp);
+    HUGEINTVAL ret  = VTABLE_get_integer(interp, tmp);
 
     switch (size) {
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         ret = (short)ret;
         break;
         /* case SIZE_REG: ret=(HUGEINTVAL)(int)ret; break; */
-    case SIZE_LONG:
+      case SIZE_LONG:
         ret = (long)ret;
         break;
-    default:
+      default:
         /* nothing */ ;
     }
 
@@ -444,7 +497,8 @@ getint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<static UHUGEINTVAL getuint_pmc>
+=item C<static UHUGEINTVAL getuint_pmc(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Same as C<getuint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -457,23 +511,23 @@ PARROT_WARN_UNUSED_RESULT
 static UHUGEINTVAL
 getuint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
-    UHUGEINTVAL ret;
+    ASSERT_ARGS(getuint_pmc)
+
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    ret = (UINTVAL)VTABLE_get_integer(interp, tmp);
+    UHUGEINTVAL ret = (UINTVAL)VTABLE_get_integer(interp, tmp);
 
     switch (size) {
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         ret = (unsigned short)ret;
         break;
         /* case SIZE_REG: * ret=(UHUGEINTVAL)(unsigned int)ret; * break; */
-    case SIZE_LONG:
+      case SIZE_LONG:
         ret = (unsigned long)ret;
         break;
-    default:
+      default:
         /* nothing */ ;
     }
 
@@ -482,7 +536,8 @@ getuint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<static HUGEFLOATVAL getfloat_pmc>
+=item C<static HUGEFLOATVAL getfloat_pmc(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Same as C<getfloat_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -495,13 +550,12 @@ PARROT_WARN_UNUSED_RESULT
 static HUGEFLOATVAL
 getfloat_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 {
-    HUGEFLOATVAL ret;
-    PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
+    ASSERT_ARGS(getfloat_pmc)
+    PMC * const tmp  = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    ret = (HUGEFLOATVAL)(VTABLE_get_number(interp, tmp));
+    HUGEFLOATVAL ret = (HUGEFLOATVAL)(VTABLE_get_number(interp, tmp));
 
     switch (size) {
     case SIZE_SHORT:
@@ -517,7 +571,8 @@ getfloat_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<static STRING * getstring_pmc>
+=item C<static STRING * getstring_pmc(PARROT_INTERP, INTVAL size, SPRINTF_OBJ
+*obj)>
 
 Same as C<getstring_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -531,19 +586,19 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 getstring_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
-    STRING *s;
+    ASSERT_ARGS(getstring_pmc)
+
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
-            (obj->index));
+            (obj->index++));
 
-    obj->index++;
-    s = (STRING *)(VTABLE_get_string(interp, tmp));
-    return s;
+    STRING * const str = (STRING *)(VTABLE_get_string(interp, tmp));
+    return str;
 }
 
 /*
 
-=item C<static void * getptr_pmc>
+=item C<static void * getptr_pmc(PARROT_INTERP, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getptr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -557,11 +612,10 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 getptr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(getptr_pmc)
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
-            ((PMC *)obj->data), (obj->index));
+            ((PMC *)obj->data), (obj->index++));
     const INTVAL i  = VTABLE_get_integer(interp, tmp);
-
-    obj->index++;
 
     /* XXX correct? */
     return (void *)i;
@@ -594,7 +648,7 @@ the result.
 =head1 TODO
 
 In the future, it may be deemed desirable to similarly vtable-ize
-appending things to the string, allowing for faster C<PIO_printf()> &c,
+appending things to the string, allowing for faster C<Parrot_io_printf()> &c,
 as well as a version that writes directly to a C string. However, at
 this point neither of those is needed.
 

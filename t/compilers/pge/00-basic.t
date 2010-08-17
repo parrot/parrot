@@ -1,5 +1,6 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -16,7 +17,7 @@ Test the basic testing library.
 =cut
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
 
     .local pmc test
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 # $Id$
 
 package init::hints::dec_osf;
@@ -11,7 +11,7 @@ sub runstep {
 
     # Tru64
     my $ccflags = $conf->data->get('ccflags');
-    if ( $ccflags !~ /-pthread/ ) {
+    if ( $ccflags !~ /-pthread\b/ ) {
         $ccflags .= ' -pthread';
     }
     if ( $ccflags !~ /-D_REENTRANT/ ) {
@@ -24,11 +24,8 @@ sub runstep {
     $conf->data->set( ccflags => $ccflags );
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
-    }
-    if ( $libs !~ /-laio/ ) {
-        $libs .= ' -laio';
     }
     $conf->data->set( libs => $libs );
 
@@ -40,7 +37,7 @@ sub runstep {
     }
 
     my $linkflags = $conf->data->get('linkflags');
-    if ( $linkflags !~ /-expect_unresolved/ ) {
+    if ( $linkflags !~ /-expect_unresolved\b/ ) {
         $linkflags = "-expect_unresolved '*' -O4 -msym -std $linkflags";
         $conf->data->set( linkflags => $linkflags );
     }

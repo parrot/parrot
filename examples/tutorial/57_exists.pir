@@ -1,13 +1,21 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 exists
 
-The C<exists> opcode tells you whether an element of a container PMC, such as an
-array or hash, exists. It differs from C<defined>, because C<defined>
-will return false on undefined values, which are valid entries.
+The C<exists> opcode tells you whether an element of a container PMC
+(array or hash for example) exists. It differs from C<defined>, because
+C<defined> will return false on undefined values, which are valid entries.
 
-In the example below, C<my_array[0]> exists and is defined, but C<my_array[1]> only
-exists. C<my_array[2]> does not exist and is thus not defined.
-Similar to C<defined>, the behavior of C<exists> for a given PMC depends
-on how that PMC implements vtable functions.
+It's important to think of an array or hash as being a collection of data
+buckets. That bucket can exist but not contain a defined value. If the
+bucket does not exist, there is no value to check.
+
+In the example below, C<my_array[0]> exists and is defined, but
+C<my_array[1]> only exists without ever being given a defined value.
+C<my_array[2]> does not exist and is thus not defined. Similar to
+C<defined>, the behavior of C<exists> for a given PMC depends on how
+that PMC implements the related vtable functions.
 
 =cut
 
@@ -15,10 +23,10 @@ on how that PMC implements vtable functions.
 
     # set up an array with two elements
     .local pmc my_array
-    my_array = new 'ResizablePMCArray'
-    $P0      = new 'String'
+    my_array = new ['ResizablePMCArray']
+    $P0      = new ['String']
     $P0      = "Hello"
-    $P1      = new 'Undef'
+    $P1      = new ['Undef']
     push my_array, $P0
     push my_array, $P1
 

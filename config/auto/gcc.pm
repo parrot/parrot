@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2007, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C compiler is actually gcc};
+    $data{description} = q{Is your C compiler actually gcc};
     $data{result}      = q{};
     return \%data;
 }
@@ -62,9 +62,8 @@ sub _evaluate_gcc {
     my $minor = $gnucref->{__GNUC_MINOR__};
     my $intel = $gnucref->{__INTEL_COMPILER};
 
-    my $verbose = $conf->options->get('verbose');
     if ( defined $intel || !defined $major ) {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
         $conf->data->set( gccversion => undef );
         return 1;
@@ -76,38 +75,25 @@ sub _evaluate_gcc {
         undef $minor;    # Don't use it
     }
     if ( ! defined $major ) {
-        print " (no) " if $verbose;
+        $conf->debug(" (no) ");
         $self->set_result('no');
         $conf->data->set( gccversion => undef );
         return 1;
     }
     my $gccversion = $major;
     $gccversion .= ".$minor" if defined $minor;
-    print " (yep: $gccversion )" if $verbose;
-    $self->set_result('yes');
-
-    my $ccwarn = $conf->data->get('ccwarn');
+    $self->set_result("yes, $gccversion");
 
     $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
-        if $gccversion >= 4.0;
+        if $gccversion >= 4.0 && !$conf->data->get('sym_export');
 
-    if ( defined $conf->options->get('miniparrot') ) {
-        # make the compiler act as ANSIish as possible, and avoid enabling
-        # support for GCC-specific features.
-        $conf->data->set(
-            ccwarn     => "-ansi -pedantic",
-            gccversion => undef
-        );
-    }
-    else {
-        $conf->data->set(
-            ccwarn              => "$ccwarn",
-            gccversion          => $gccversion,
-            HAS_aligned_funcptr => 1
-        );
-        $conf->data->set( HAS_aligned_funcptr => 0 )
-            if $conf->data->get_p5('OSNAME') eq 'hpux';
-    }
+    # sneaky check for g++
+    my $gpp = (index($conf->data->get('cc'), '++') > 0) ? 1 : 0;
+
+    $conf->data->set(
+        gccversion => $gccversion,
+        'g++'      => $gpp,
+    );
     return 1;
 }
 

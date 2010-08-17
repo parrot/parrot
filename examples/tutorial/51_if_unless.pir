@@ -1,10 +1,14 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
+# $Id$
+
 =head1 if and unless
 
 Both the if and unless conditionals are supported in PIR.  When the
 tested condition matches the sense of the conditional (true for if,
 false for unless), then the following C<goto> statement is executed.
 
-Truth is fairly simple to determine.
+Truth is fairly simple to determine, depending on the data type being
+considered.
 
 =over 4
 
@@ -18,11 +22,15 @@ The empty string is false, all other strings are true.
 
 =item Numbers
 
-0.0 is false, whether it is positive or negative.  All other numbers are true, including NaN.
+0.0 is false, whether it is positive or negative.  All other numbers
+are true, including NaN. NaN is the value you get if you try to divide
+by zero, or do other illegal operations.
 
 =item PMCs
 
-The "truthiness" of a PMC depends on how it implements its vtable method C<get_boolean>.
+The "truthiness" of a PMC depends on how it implements its vtable
+method C<get_boolean>. This changes for each different type of PMC,
+but is usually straight-forward.
 
 =back
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -23,7 +23,8 @@ t/codingstd/cuddled_else.t - checks for cuddled elses in source and headers
 
 =head1 DESCRIPTION
 
-Checks that files do not use cuddled else a.k.a C<} else {>.
+Checks that files do not use cuddled else, that is an else on the same
+line as the closing brace of the if part.
 
 =head1 SEE ALSO
 
@@ -32,7 +33,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : (
+my @files = @ARGV ? <@ARGV> : (
     $DIST->get_c_language_files(),
     $DIST->get_perl_language_files(),
 );

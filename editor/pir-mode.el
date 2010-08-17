@@ -1,5 +1,5 @@
 ;;; pir-mode.el --- pir-mode.el --- editing IMCC source files under Emacs
-
+;;; $Id $
 ;;; Commentary:
 
 ;; This package provides Emacs support for PIR.
@@ -13,7 +13,7 @@
 ;;   (add-to-list 'auto-mode-alist '("\\.pir\\'" . pir-mode))
 
 ;; If you have any problems with this, you're on your own,
-;; You could always try asking on parrot-porters@perl.org.
+;; You could always try asking on parrot-dev@lists.parrot.org.
 
 ;;; Code:
 (require 'regexp-opt)
@@ -66,7 +66,7 @@ newline or semicolon after an end keyword."
   :type 'boolean
   :group 'pir)
 
-(defcustom pir-basic-indent 8
+(defcustom pir-basic-indent 4
   "*Extra indentation applied to statements in PIR block structures."
   :type 'integer
   :group 'pir)
@@ -146,18 +146,18 @@ newline or semicolon after an end keyword."
 (defvar pir-PMC-keyword-symbols
   '("AddrRegistry" "Array" "BigInt" "Boolean" "Bound_NCI" "Capture"
     "Class" "Closure" "Compiler" "Complex" "Continuation" "Coroutine"
-    "Enumerate" "Env" "Eval" "Exception" "Exception_Handler"
+    "Env" "Eval" "Exception" "ExceptionHandler"
     "Exporter" "File" "FixedBooleanArray" "FixedFloatArray"
     "FixedIntegerArray" "FixedPMCArray" "FixedStringArray" "Float"
-    "Hash" "IntList" "Integer" "Iterator" "Key" "LexInfo" "LexPad"
-    "ManagedStruct" "MultiArray" "MultiSub" "NCI" "NameSpace" "Null"
-    "OS" "Object" "OrderedHash" "PMCProxy" "Pair" "ParrotClass"
+    "Hash" "Integer" "Iterator" "Key" "LexInfo" "LexPad"
+    "ManagedStruct" "MultiSub" "NCI" "NameSpace" "Null"
+    "OS" "Object" "OrderedHash" "PMCProxy" "ParrotClass"
     "ParrotIO" "ParrotInterpreter" "ParrotLibrary" "ParrotObject"
-    "ParrotRunningThread" "ParrotThread" "Pointer" "Random" "Ref"
+    "ParrotThread" "Pointer"
     "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
     "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
-    "Role" "SArray" "Scalar" "SharedRef" "Slice" "String" "Sub"
-    "Super" "TQueue" "Timer" "UnManagedStruct" "Undef" "VtableCache"))
+    "Role" "Scalar" "String" "Sub" "Super"
+    "Timer" "UnManagedStruct" "Undef" "VtableCache"))
 
 (defvar pir-ops
   '("abs" "accept" "acos" "add" "addattribute" "addmethod" "addparent"
@@ -186,11 +186,11 @@ newline or semicolon after an end keyword."
     "join" "jsr" "jump"
     "lcm" "le" "length" "listen" "ln" "load_bytecode" "loadlib" "localtime"
     "log10" "log2" "lookback" "lsr" "lt"
-    "mmdvtfind" "mmdvtregister" "mod" "mul"
+    "find_multi" "add_multi" "mod" "mul"
     "n_infix" "ne" "needs_destroy" "neg" "new" "new_callback" "newclass"
     "newclosure" "nors" "not" "null"
     "open" "or" "ord"
-    "peek" "pin" "pioctl" "poll" "pop" "popmark" "pow" "print" "printerr"
+    "peek" "pin" "poll" "pop" "popmark" "pow" "print" "printerr"
     "profile" "prophash" "push" "push_eh" "pushaction" "pushmark"
     "read" "readline" "recv" "register" "removeattribute" "removeparent"
     "repeat" "restore" "result_info" "ret" "rethrow" "returncc"
@@ -204,7 +204,6 @@ newline or semicolon after an end keyword."
     "tailcall" "tailcallmethod" "tan" "tanh" "tell" "thaw" "throw" "time"
     "titlecase" "trace" "trans_charset" "trans_encoding" "typeof"
     "unless" "unless_null" "unpin" "unregister" "unshift" "upcase"
-    "valid_type"
     "warningsoff" "warningson"
     "xor"
     "yield"))
@@ -222,17 +221,17 @@ newline or semicolon after an end keyword."
 (defvar pir-dollar-register-regexp "\\$[INPS][0-9]+")
 
 (defvar pir-directives
-  '(":anon" ":flat" ":init" ":lex" ":lexid" ":load" ":main" ":method" ":multi"
+  '(":anon" ":flat" ":init" ":lex" ":subid" ":load" ":main" ":method" ":multi"
     ":named" ":opt_count" ":opt_flag" ":optional" ":outer" ":postcomp"
     ":slurpy" ":unique_reg" ":vtable" ":wrap"))
 
 (defvar pir-dotted-directives
-  '(".HLL" ".HLL_map" ".arg" ".const" ".constant" ".emit" ".end" ".endm"
+  '(".HLL" ".arg" ".const" ".constant" ".emit" ".end" ".endm"
     ".endnamespace" ".eom" ".get_results" ".global" ".globalconst"
     ".include" ".invocant" ".lex" ".line" ".loadlib" ".macro" ".meth_call"
     ".namespace" ".nci_call" ".pcc_begin" ".pcc_begin_return"
     ".pcc_begin_yield" ".pcc_call" ".pcc_end" ".pcc_end_return"
-    ".pcc_end_yield" ".pcc_sub" ".pragma" ".result" ".return" ".sub"
+    ".pcc_end_yield" ".pcc_sub" ".result" ".return" ".sub"
     ".yield"))
 
 (defvar pir-variable-declarations
@@ -391,7 +390,7 @@ programming parrot than raw PASM (Parrot Assembly). In general,
 compilers (and certainly humans) should code in PIR and let Parrot
 handle register allocation and all that good stuff.
 
-To find out more, hie thee to `http://www.parrotcode.org/'.
+To find out more, hie thee to `http://www.parrot.org/'.
 
 Type \\[list-abbrevs] to display the built in abbrevs for PIR
 keywords. (When I've set them up.)
@@ -423,7 +422,7 @@ following lines to your `.emacs' file:
   (add-to-list 'auto-mode-alist '(\"\\\\.pir\\\\'\" . pir-mode))
 
 If you have any problems with this, you're on your own. You could always
-try asking on parrot-porters@perl.org."
+try asking on parrot-dev@lists.parrot.org."
   (interactive)
   (kill-all-local-variables)
   (use-local-map pir-mode-map)

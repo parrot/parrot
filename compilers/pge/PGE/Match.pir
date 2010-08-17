@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
+# $Id$
+
 =head1 NAME
 
 PGE::Match - implementation of PGE match objects
@@ -8,15 +11,15 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 =cut
 
-.namespace [ 'PGE::Match' ]
+.namespace [ 'PGE';'Match' ]
 
-.sub '__onload' :load
+.sub '' :load
     load_bytecode 'P6object.pbc'
-    load_bytecode 'Parrot/Capture_PIR.pbc'
     load_bytecode 'PGE/Dumper.pir'                 # FIXME, XXX, etc.
     .local pmc p6meta
     p6meta = new 'P6metaclass'
-    p6meta.'new_class'('PGE::Match', 'parent'=>'Capture_PIR', 'attr'=>'$.target $.from $.pos &!corou')
+    $P0 = p6meta.'new_class'('PGE::Match', 'parent'=>'Capture', 'attr'=>'$.target $.from $.pos &!corou $!ast')
+    set_hll_global ['PGE'], '$!MATCH', $P0
     .return ()
 .end
 
@@ -57,23 +60,23 @@ is set or implied.
 
     ##   set values based on src param
     .local int issrcmatch, pos, iscont
-    .local string grammar
-    .local pmc target
-    issrcmatch = isa src, 'PGE::Match'
+    .local pmc grammar
+    .local pmc target, grammar_class
+    issrcmatch = isa src, ['PGE';'Match']
     if issrcmatch goto target_from_src
-    .local pmc target
-    target = new 'String'
-    target = src
+    target = new 'CodeString'
+    assign target, src
     pos = 0
     iscont = 1
-    grammar = typeof self
+    $P0 = self.'HOW'()
+    grammar_class = getattribute $P0, 'parrotclass'
     goto adverb_pos
   target_from_src:
     target = getattribute src, '$.target'
     $P0 = getattribute src, '$.pos'
     pos = $P0
     iscont = 0
-    grammar = typeof src
+    grammar_class = typeof src
     if pos >= 0 goto adverb_pos
     pos = 0
 
@@ -108,18 +111,27 @@ is set or implied.
     $I0 = exists adverbs['grammar']
     unless $I0 goto with_grammar
     grammar = adverbs['grammar']
+    $S0 = typeof grammar
+    eq $S0, 'NameSpace', grammar_namespace
+    ne $S0, 'String', have_grammar
+    $S0 = grammar
+    $P0 = split '::', $S0
+    grammar_class = get_class $P0
+    goto with_grammar
+  have_grammar:
+    grammar_class = grammar
+  grammar_namespace:
+    grammar_class = get_class grammar
   with_grammar:
   with_adverbs:
 
     ##   create the new match object
     .local pmc mob, mfrom, mpos
-    mob = new grammar
+    mob = new grammar_class
     setattribute mob, '$.target', target
-    mfrom = new 'Integer'
-    mfrom = pos
+    mfrom = box pos
     setattribute mob, '$.from', mfrom
-    mpos = new 'Integer'
-    mpos = -1
+    mpos = box -1
     setattribute mob, '$.pos', mpos
 
     .return (mob, pos, target, mfrom, mpos, iscont)
@@ -202,13 +214,13 @@ Returns C<.to()> - C<.from()>.
 .end
 
 
-=item C<text()>
+=item C<Str()>
 
 Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub 'text' :method
+.sub 'Str' :method
     $P0 = getattribute self, '$.target'
     $P1 = getattribute self, '$.from'
     $P2 = getattribute self, '$.pos'
@@ -224,74 +236,45 @@ Returns the portion of the target string matched by this object.
 .end
 
 
-=item C<item()>
+=item C<orig()>
 
-Returns the scalar value of this match -- the "result object"
-if there is one, otherwise the substring matched by this match
-object.
+Return the original item being matched.
 
 =cut
 
-.sub 'item' :method
-    .return self.'result_object'()
+.sub 'orig' :method
+    $P0 = getattribute self, '$.target'
+    .return ($P0)
 .end
 
 
-# deprecated RT#54000
-.sub 'get_scalar' :method
-    .return self.'item'()
-.end
+=item C<!make(pmc obj)>
 
-
-=item C<result_object([pmc obj])>
-
-Returns or sets the "result object" for the match object.
+Sets the "ast object" for the Match invocant.
 
 =cut
 
-.sub 'result_object' :method
-    .param pmc obj             :optional
-    .param int has_obj         :opt_flag
-    if has_obj == 0 goto get_obj
-    setattribute self, '$!item', obj
-    goto ret_obj
-  get_obj:
-    obj = getattribute self, '$!item'
-  ret_obj:
+.sub '!make' :method
+    .param pmc obj
+    setattribute self, '$!ast', obj
+    .return (obj)
+.end
+
+
+=item C<ast([pmc obj])>
+
+Returns the "ast object" for the match object.  If no ast object
+has been set, then it returns the string between C<.from> and C<.to>.
+
+=cut
+
+.sub 'ast' :method
+    .local pmc obj
+    obj = getattribute self, '$!ast'
     if null obj goto ret_null
     .return (obj)
   ret_null:
-    .return self.'text'()
-.end
-
-
-=item C<find_key([ key1, key2, ... ])>
-
-Find the first of C<key1>, C<key2>, etc. in the current
-Match object, and return it.  Returns '' if none of
-the specified keys are found.  If no keys are specified,
-then simply return the first key found.
-
-=cut
-
-.sub 'find_key' :method
-    .param pmc keys            :slurpy
-    if null keys goto first_key
-    unless keys goto first_key
-  loop:
-    unless keys goto not_found
-    $S0 = shift keys
-    $I0 = exists self[$S0]
-    unless $I0 goto loop
-    .return ($S0)
-  first_key:
-    $P0 = self.'hash'()
-    $P1 = new 'Iterator', $P0
-    unless $P1 goto not_found
-    $S0 = shift $P1
-    .return ($S0)
-  not_found:
-    .return ('')
+    .tailcall self.'Str'()
 .end
 
 
@@ -310,21 +293,13 @@ the position of the match object to C<cutvalue>.
     null $P0
     setattribute self, '$.target', $P0
     setattribute self, '&!corou', $P0
-    setattribute self, '@!list', $P0
-    setattribute self, '$!item', $P0
-    .local pmc iter
-    iter = new 'Iterator', self
-  iter_loop:
-    unless iter goto iter_end
-    $S0 = shift iter
-    delete self[$S0]
-    goto iter_loop
-  iter_end:
+    setattribute self, '$!ast', $P0
+    setref self, $P0
     .return ()
 .end
 
 
-=item C<__get_bool()>
+=item C<get_bool()>
 
 Returns 1 if this object successfully matched the target string,
 0 otherwise.
@@ -338,36 +313,36 @@ Returns 1 if this object successfully matched the target string,
     .return ($I1)
 .end
 
-=item C<__get_integer()>
+=item C<get_integer()>
 
 Returns the integer value of this match.
 
 =cut
 
-.sub 'get_integer' :vtable :method
-    $I0 = self.'result_object'()
+.sub '' :vtable('get_integer') :method
+    $I0 = self.'Str'()
     .return ($I0)
 .end
 
-=item C<__get_number()>
+=item C<get_number()>
 
 Returns the numeric value of this match.
 
 =cut
 
-.sub 'get_number' :vtable :method
-    $N0 = self.'result_object'()
+.sub '' :vtable('get_number') :method
+    $N0 = self.'Str'()
     .return ($N0)
 .end
 
-=item C<__get_string()>
+=item C<get_string()>
 
 Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub 'get_string' :vtable :method
-    $S0 = self.'result_object'()
+.sub '' :vtable('get_string') :method
+    $S0 = self.'Str'()
     .return ($S0)
 .end
 

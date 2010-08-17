@@ -1,7 +1,10 @@
+# Copyright (C) 2007-2008, Parrot Foundation.
+# $Id$
+
 =head1 Purpose
 
-contain all the boilerplate code for starting off a test written in PIR using
-Test::More's subs.
+This file contains all the boilerplate code for starting off a test written in PIR using
+Test::More's subs. In order to use it, simply include it in the :main routine of your test script.
 
 Imports several subs into the current namespace from Test::More.
 
@@ -11,15 +14,15 @@ simple test file written in parrot.
 
 =cut
 
-    load_bytecode 'runtime/parrot/library/Test/More.pbc'
+    load_bytecode 'Test/More.pbc'
 
     # get the testing functions
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_root_namespace [ 'parrot'; 'Test'; 'More' ]
-    exports = split " ", "plan diag ok is is_deeply like isa_ok skip isnt"
+    exports = split ' ', 'plan diag ok nok is is_deeply is_null like substring isa_ok skip isnt todo throws_like lives_ok dies_ok throws_substring done_testing'
 
-    test_namespace."export_to"(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
 # Local Variables:
 #   mode: pir

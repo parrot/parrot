@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
 use lib qw( lib );
-use Test::More tests => 70;
+use Test::More tests => 69;
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ Regressions tests for the L<Parrote::Configure::Data> class.
 
 =cut
 
-BEGIN { use_ok('Parrot::Configure::Data'); }
+BEGIN { use Parrot::Configure::Data; }
 
 can_ok(
     'Parrot::Configure::Data', qw(

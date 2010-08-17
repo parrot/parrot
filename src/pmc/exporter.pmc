@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2008, The Perl Foundation.
+Copyright (C) 2007-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -49,7 +49,8 @@ the typed namespace interface, as outlined in
 F<docs/pdds/pdd21_namespaces.pod>.
 
 Exporter is not derived from any other PMC, and does not provide any
-vtable interface--its interface consists solely of non-vtable methods.
+vtable interface--its interface consists solely of methods, not
+vtable functions.
 
 =head2 Structure
 
@@ -78,8 +79,6 @@ A Null PMC is allocated during initialization.
 
 */
 
-#include "parrot/parrot.h"
-
 /*
 
 =back
@@ -92,7 +91,11 @@ A Null PMC is allocated during initialization.
 
 */
 
-pmclass Exporter need_ext {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Exporter auto_attrs {
 
     ATTR PMC *ns_src;
     ATTR PMC *ns_dest;
@@ -109,35 +112,14 @@ Initializes an Exporter PMC.
 */
 
     VTABLE void init() {
-        Parrot_Exporter *exp = NULL;
-
         /* Set up the object. */
-        exp                  = mem_allocate_zeroed_typed(Parrot_Exporter);
-        exp->ns_src          = PMCNULL;
-        exp->ns_dest         = CONTEXT(interp)->current_namespace;
-        exp->globals         = PMCNULL;
-        PMC_data(SELF)       = exp;
+        SET_ATTR_ns_src(INTERP, SELF, PMCNULL);
+        SET_ATTR_ns_dest(INTERP, SELF, Parrot_pcc_get_namespace(INTERP, CURRENT_CONTEXT(INTERP)));
+        SET_ATTR_globals(INTERP, SELF, PMCNULL);
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
     }
-
-
-/*
-
-=item C<void destroy()>
-
-Free the memory associated with the object's underlying struct.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-    }
-
 
 /*
 
@@ -150,14 +132,16 @@ Mark referenced strings and PMCs in the structure as live.
 */
 
     VTABLE void mark() {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        PMC *ns_src;
+        PMC *ns_dest;
+        PMC *globals;
+        GET_ATTR_ns_src(INTERP, SELF, ns_src);
+        GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
+        GET_ATTR_globals(INTERP, SELF, globals);
 
-        if (exp->ns_src)
-            pobject_lives(interp, (PObj *)exp->ns_src);
-        if (exp->ns_dest)
-            pobject_lives(interp, (PObj *)exp->ns_dest);
-        if (exp->globals)
-            pobject_lives(interp, (PObj *)exp->globals);
+        Parrot_gc_mark_PMC_alive(INTERP, ns_src);
+        Parrot_gc_mark_PMC_alive(INTERP, ns_dest);
+        Parrot_gc_mark_PMC_alive(INTERP, globals);
     }
 
 
@@ -182,15 +166,15 @@ Throws an exception if a non-NameSpace PMC is passed.
 
     METHOD source(PMC *src :optional, int got_src :opt_flag) {
         if (got_src) {
-            if (src->vtable->base_type != enum_class_NameSpace) {
-                real_exception(interp, NULL, 0,
+            if (src->vtable->base_type != enum_class_NameSpace)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "source must be a NameSpace PMC");
-            }
-            SET_ATTR_ns_src(interp, SELF, src);
+
+            SET_ATTR_ns_src(INTERP, SELF, src);
         }
         else {
             PMC *tmp_ns_src;
-            GET_ATTR_ns_src(interp, SELF, tmp_ns_src);
+            GET_ATTR_ns_src(INTERP, SELF, tmp_ns_src);
             RETURN(PMC *tmp_ns_src);
         }
     }
@@ -211,15 +195,16 @@ Throws an exception if a non-NameSpace PMC is passed.
 
     METHOD destination(PMC *dest :optional, int got_dest :opt_flag) {
         if (got_dest) {
-            if (dest->vtable->base_type != enum_class_NameSpace) {
-                real_exception(interp, NULL, 0,
-                        "destination must be a NameSpace PMC");
-            }
-            SET_ATTR_ns_dest(interp, SELF, dest);
+
+            if (dest->vtable->base_type != enum_class_NameSpace)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "destination must be a NameSpace PMC");
+
+            SET_ATTR_ns_dest(INTERP, SELF, dest);
         }
         else {
             PMC *tmp_ns_dest;
-            GET_ATTR_ns_dest(interp, SELF, tmp_ns_dest);
+            GET_ATTR_ns_dest(INTERP, SELF, tmp_ns_dest);
             RETURN(PMC *tmp_ns_dest);
         }
     }
@@ -244,54 +229,54 @@ Throws an exception if an unknown PMC type is passed.
 */
 
     METHOD globals(PMC *glb :optional, int got_glb :opt_flag) {
-        STRING          *s_str  = CONST_STRING(interp, "String");
-        STRING          *s_arr  = CONST_STRING(interp, "array");
-        STRING          *s_hash = CONST_STRING(interp, "hash");
+        STRING * const s_str   = CONST_STRING(INTERP, "String");
+        STRING * const s_arr   = CONST_STRING(INTERP, "array");
+        STRING * const s_hash  = CONST_STRING(INTERP, "hash");
+        STRING * const s_space = CONST_STRING(INTERP, " ");
 
         if (got_glb) {
-            STRING * const s_empty      = CONST_STRING(interp, "");
-            PMC           *temp_globals = pmc_new(interp, enum_class_Hash);
+            STRING * const s_empty      = CONST_STRING(INTERP, "");
+            PMC           *temp_globals = Parrot_pmc_new(INTERP, enum_class_Hash);
 
             if (PMC_IS_NULL(glb)) {
                 temp_globals = PMCNULL;
             }
-            else if (VTABLE_isa(interp, glb, s_str) || (VTABLE_does(interp, glb, s_arr))) {
+            else if (VTABLE_isa(INTERP, glb, s_str) || (VTABLE_does(INTERP, glb, s_arr))) {
                 PMC    *glb_array;
                 INTVAL n, i;
 
-                if (VTABLE_isa(interp, glb, s_str))
-                    glb_array = string_split(interp,
-                            CONST_STRING(interp, " "),
-                            VTABLE_get_string(interp, glb));
+                if (VTABLE_isa(INTERP, glb, s_str))
+                    glb_array = Parrot_str_split(INTERP, s_space,
+                        VTABLE_get_string(INTERP, glb));
                 else
                     glb_array = glb;
 
-                n = VTABLE_elements(interp, glb_array);
+                n = VTABLE_elements(INTERP, glb_array);
 
                 if (n == 0)
                     temp_globals = PMCNULL;
 
-                for (i = 0; i < n; i++) {
-                    STRING * const item = VTABLE_get_string_keyed_int(interp, glb_array, i);
-                    VTABLE_set_string_keyed_str(interp, temp_globals, item, s_empty);
+                for (i = 0; i < n; ++i) {
+                    STRING * const item = VTABLE_get_string_keyed_int(INTERP, glb_array, i);
+                    VTABLE_set_string_keyed_str(INTERP, temp_globals, item, s_empty);
                 }
             }
-            else if (VTABLE_does(interp, glb, s_hash)) {
-                if (VTABLE_elements(interp, glb) == 0)
+            else if (VTABLE_does(INTERP, glb, s_hash)) {
+                if (VTABLE_elements(INTERP, glb) == 0)
                     temp_globals = PMCNULL;
                 else
                     temp_globals = glb;
             }
             else {
-                real_exception(interp, NULL, 0,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Invalid type %d in globals()", glb->vtable->base_type);
             }
 
-            SET_ATTR_globals(interp, SELF, temp_globals);
+            SET_ATTR_globals(INTERP, SELF, temp_globals);
          }
          else {
             PMC *tmp_globals;
-            GET_ATTR_globals(interp, SELF, tmp_globals);
+            GET_ATTR_globals(INTERP, SELF, tmp_globals);
             if (PMC_IS_NULL(tmp_globals)) {
                 RETURN(PMC *PMCNULL);
             }
@@ -329,25 +314,26 @@ Throws an exception upon error.
         PMC *ns_src, *ns_dest, *ns_globals;
 
         if (got_src)
-            PCCINVOKE(interp, SELF, "source", PMC *src);
+            PCCINVOKE(INTERP, SELF, "source", PMC *src);
 
         if (got_dest)
-            PCCINVOKE(interp, SELF, "destination", PMC *dest);
+            PCCINVOKE(INTERP, SELF, "destination", PMC *dest);
 
         if (got_globals)
-            PCCINVOKE(interp, SELF, "globals", PMC *globals);
+            PCCINVOKE(INTERP, SELF, "globals", PMC *globals);
 
-        GET_ATTR_ns_src(interp, SELF, ns_src);
+        GET_ATTR_ns_src(INTERP, SELF, ns_src);
         if (PMC_IS_NULL(ns_src))
-            real_exception(interp, NULL, 0, "source namespace not set");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "source namespace not set");
 
-        GET_ATTR_ns_dest(interp, SELF, ns_dest);
+        GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
         if (PMC_IS_NULL(ns_dest))
-            real_exception(interp, NULL, 0, "destination namespace not set");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                "destination namespace not set");
 
-        GET_ATTR_globals(interp, SELF, ns_globals);
+        GET_ATTR_globals(INTERP, SELF, ns_globals);
 
-        PCCINVOKE(interp, ns_src, "export_to", PMC *ns_dest, PMC *ns_globals);
+        PCCINVOKE(INTERP, ns_src, "export_to", PMC *ns_dest, PMC *ns_globals);
     }
 
 

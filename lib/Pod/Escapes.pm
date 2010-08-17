@@ -1,11 +1,11 @@
 
 require 5;
 #                        The documentation is at the end.
-# Time-stamp: "2002-08-27 19:58:02 MDT"
+# Time-stamp: "2004-05-07 15:31:25 ADT"
 package Pod::Escapes;
 require Exporter;
 @ISA = ('Exporter');
-$VERSION = '1.03';
+$VERSION = '1.04';
 @EXPORT_OK = qw(
   %Code2USASCII
   %Name2character
@@ -44,7 +44,7 @@ sub e2char {
   # Convert to decimal:
   if($in =~ m/^(0[0-7]*)$/s ) {
     $in = oct $in;
-  } elsif($in =~ m/^0x([0-9a-fA-F]+)$/s ) {
+  } elsif($in =~ m/^0?x([0-9a-fA-F]+)$/s ) {
     $in = hex $1;
   } # else it's decimal, or named
 
@@ -86,7 +86,7 @@ sub e2charnum {
   # Convert to decimal:
   if($in =~ m/^(0[0-7]*)$/s ) {
     $in = oct $in;
-  } elsif($in =~ m/^0x([0-9a-fA-F]+)$/s ) {
+  } elsif($in =~ m/^0?x([0-9a-fA-F]+)$/s ) {
     $in = hex $1;
   } # else it's decimal, or named
 
@@ -649,7 +649,7 @@ L<Text::Unidecode|Text::Unidecode>
 
 =head1 COPYRIGHT AND DISCLAIMERS
 
-Copyright (c) 2001 Sean M. Burke.  All rights reserved.
+Copyright (c) 2001-2004 Sean M. Burke.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -685,7 +685,7 @@ foreach my $file (qw(
   xhtml-lat1.ent
   xhtml-special.ent
 )) {
-  open(IN, "<$dir$file") or die "can't read-open $dir$file: $!";
+  open(IN, "<", "$dir$file") or die "can't read-open $dir$file: $!";
   print "Reading $file...\n";
   while(<IN>) {
     if(m/<!ENTITY\s+(\S+)\s+"&#([^;]+);">/) {
