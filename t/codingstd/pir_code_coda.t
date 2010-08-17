@@ -82,4 +82,4 @@ is_deeply( \@extra_coda, [], 'PIR code coda appears only once' );
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 tabstop=4:
+# vim: expandtab shiftwidth=4:
