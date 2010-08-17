@@ -10,7 +10,7 @@ squaak.pir - A Squaak compiler.
 This is the base file for the Squaak compiler.
 
 This file includes the parsing and grammar rules from
-the src/ directory, loads the relevant PGE libraries,
+the src/ directory, loads the relevant PCT libraries,
 and registers the compiler under the name 'Squaak'.
 
 =head2 Functions
