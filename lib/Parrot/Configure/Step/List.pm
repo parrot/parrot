@@ -61,11 +61,13 @@ my @steps = qw(
     auto::ctags
     auto::revision
     auto::icu
+    auto::libffi    
     gen::config_h
     gen::core_pmcs
     gen::opengl
     gen::makefiles
     gen::platform
+    gen::libffi    
     gen::config_pm
 );
 

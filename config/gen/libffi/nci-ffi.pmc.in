@@ -1204,7 +1204,7 @@ class, the PMC arguments are shifted down.
                         translation_pointers[i] = mem_internal_allocate_zeroed_typed(pmc_holder_t);
                         ((pmc_holder_t*)translation_pointers[i])->p = *(PMC**)pcc_val[i - j_offset];
                         ((pmc_holder_t*)translation_pointers[i])->pval = (void**)mem_internal_allocate_zeroed_typed(void*);
-                        *((pmc_holder_t*)translation_pointers[i])->pval =  PMC_IS_NULL(*(PMC**)pcc_val[i - j_offset]) ? 
+                        *((pmc_holder_t*)translation_pointers[i])->pval =  PMC_IS_NULL(*(PMC**)pcc_ptr[i - j_offset]) ? 
                                     (void *)NULL : (void*)VTABLE_get_pointer(interp, *(PMC**)pcc_val[i - j_offset]);
                         values[i] = &((pmc_holder_t*)translation_pointers[i])->pval;
                         break;
@@ -1213,7 +1213,7 @@ class, the PMC arguments are shifted down.
                         values[i] = &translation_pointers[i];
                         break;
                       case 'p':
-                        translation_pointers[i] = PMC_IS_NULL(*(PMC**)pcc_val[i - j_offset]) ? 
+                        translation_pointers[i] = PMC_IS_NULL(*(PMC**)pcc_ptr[i - j_offset]) ? 
                                     (void *)NULL : VTABLE_get_pointer(interp, *(PMC**)pcc_val[i - j_offset]);
                         values[i] = &translation_pointers[i];
                         break;
