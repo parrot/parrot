@@ -1,11 +1,28 @@
 # $Id$
 
+New in 2.7.0
+- Core
+  + cleanups in packfile and freeze/thaw handling
+  + some work on hashes
+  + As always bug fixes and some optimizations
+- Runtime
+  + some runtime library cleanups
+- Testing
+  + added more tests to improve coverage
+  + new codingstd test for documentation in .pmc files
+- Documentation
+  + added documentation to .pmc files (some still missing but headers in place)
+  + general documentation improvements and bringing up-to-date
+- NQP-rx
+  + Updated version included from http://github.com/perl6/nqp-rx includes
+    speed improvements
+
 New in 2.6.0
 - Core
   + Plug some memory leaks
   + As always, bug fixes and some optimizations
 - Runtime
-  + added (experimental) URI::Escape 
+  + added (experimental) URI::Escape
 - Testing
   + Improved test coverage of core parrot
 - Documentation
@@ -13,7 +30,7 @@ New in 2.6.0
 - Platforms
   + The Fedora package 'parrot-devel' install the files for syntax-highlighting
     and automatic indenting for the vim editor
-- NQP-rx 
+- NQP-rx
   + Updated version included from http://github.com/perl6/nqp-rx includes
     new or improved: regex backtracking, named assertions, interactive mode,
     and setting (a minimal but useful runtime library)
