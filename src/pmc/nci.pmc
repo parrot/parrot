@@ -49,6 +49,15 @@ static void pcc_params(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes *nci_info, size_t sig_length)>
+
+
+
+=cut
+
+*/
 
 static void
 pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_info),
@@ -143,7 +152,15 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
         mem_sys_free(sig_buf);
 }
 
-/* actually build the NCI thunk */
+/*
+
+=item C<static nci_thunk_t build_func(PARROT_INTERP, Parrot_NCI_attributes *nci_info)>
+
+Actually build the NCI thunk.
+
+=cut
+
+*/
 
 PARROT_IGNORABLE_RESULT
 static nci_thunk_t
