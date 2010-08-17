@@ -51,10 +51,8 @@ static void pcc_params(PARROT_INTERP,
 
 /*
 
-=item C<static void pcc_params(PARROT_INTERP, STRING *sig,
-       Parrot_NCI_attributes *nci_info, size_t sig_length)>
-
-
+=item C<static void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes
+*nci_info, size_t sig_length)>
 
 =cut
 
@@ -155,7 +153,8 @@ pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_
 
 /*
 
-=item C<static nci_thunk_t build_func(PARROT_INTERP, Parrot_NCI_attributes *nci_info)>
+=item C<static nci_thunk_t build_func(PARROT_INTERP, Parrot_NCI_attributes
+*nci_info)>
 
 Actually build the NCI thunk.
 

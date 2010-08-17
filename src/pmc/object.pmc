@@ -89,8 +89,6 @@ static INTVAL get_attrib_index_keyed(PARROT_INTERP,
 
 =item C<static INTVAL get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)>
 
-
-
 =cut
 
 */
@@ -150,7 +148,8 @@ get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
 
 /*
 
-=item C<static INTVAL get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)>
+=item C<static INTVAL get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key,
+STRING *name)>
 
 This variation bypasses the cache and finds the index of a particular
 parent's attribute in an object's attribute store and returns it.
@@ -197,8 +196,6 @@ get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(S
 
 =item C<static PMC * find_cached(PARROT_INTERP, PMC *_class, STRING *name)>
 
-
-
 =cut
 
 */
@@ -220,9 +217,8 @@ find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
 
 /*
 
-=item C<static void cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC *method)>
-
-
+=item C<static void cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC
+*method)>
 
 =cut
 
