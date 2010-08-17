@@ -469,7 +469,6 @@ INTERP_O_FILES = \
     src/misc$(O) \
     src/multidispatch$(O) \
     src/namespace$(O) \
-    src/frame_builder$(O) \
     src/nci/api$(O) \
     src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
@@ -675,7 +674,6 @@ STR_FILES = \
     src/library.str \
     src/multidispatch.str \
     src/namespace.str \
-    src/frame_builder.str \
     src/nci/api.str \
     src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
@@ -1487,13 +1485,6 @@ src/nci/extra_thunks$(O) : \
     include/pmc/pmc_nci.h \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
-
-src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
-	src/frame_builder.c \
-	include/pmc/pmc_fixedintegerarray.h \
-	include/pmc/pmc_unmanagedstruct.h \
-	include/pmc/pmc_managedstruct.h \
-	$(INC_DIR)/oplib/ops.h
 
 src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 
