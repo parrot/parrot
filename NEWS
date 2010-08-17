@@ -3,8 +3,8 @@
 New in 2.7.0
 - Core
   + cleanups in packfile and freeze/thaw handling
-  + some work on hashes
-  + As always bug fixes and some optimizations
+  + Hash optimizations that improve HLL startup and run time
+  + As always, many bug fixes and other optimizations
 - Runtime
   + some runtime library cleanups
 - Testing
