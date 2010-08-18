@@ -1667,10 +1667,18 @@ EXAMPLES_TEST_FILES = \
 CONFIGURE_TEST_FILES = \
     t/configure/*.t \
     t/steps/*.t
+PBC_TEST_FILES = \
+    t/pmc/testlib/number.pbc
+
+# pbc files used for several tests
+pbctestfiles: $(PARROT) $(PBC_TEST_FILES)
+
+t/pmc/testlib/number.pbc: t/pmc/testlib/number.pasm
+	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
-test_prep : all
+test_prep : all pbctestfiles
 
 # Run test cases with a single call of t/harness. Users have to look at only
 # one report. The default set of tests to run is contained in t/harness,
@@ -1694,7 +1702,7 @@ smolder_coretest : corevm
 smoke : smolder_test
 
 # "core tests" -- test basic functionality but not ancillaries
-coretest : corevm
+coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
 
 # automake compatibility
@@ -1944,6 +1952,7 @@ test-clean :
 	$(RM_F) t/compilers/pge/*.pir
 	$(RM_F) t/compilers/tge/*.pir
 	$(RM_F) \
+    $(PBC_TEST_FILES) \
     "t/*/*$(O)" \
     "t/*/*.out" \
     "t/*/*.pasm" \
