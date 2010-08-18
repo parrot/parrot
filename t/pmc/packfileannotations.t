@@ -19,6 +19,9 @@ Tests the PackfileAnnotations PMC.
 
 .include 't/pmc/testlib/packfile_common.pir'
 
+.const string annofilename = 't/pmc/testlib/annotations.pbc'
+
+
 .sub 'main' :main
 .include 'test_more.pir'
     plan(17)
@@ -42,7 +45,7 @@ Tests the PackfileAnnotations PMC.
 
     push_eh load_error
     $P0 = new ['FileHandle']
-    $P0.'open'('t/native_pbc/annotations.pbc', 'r')
+    $P0.'open'(annofilename, 'r')
     $P0.'encoding'('binary')
     $S0 = $P0.'readall'()
     pf = new 'Packfile'
