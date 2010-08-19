@@ -468,17 +468,10 @@ static void
 mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 {
     ASSERT_ARGS(mark_hash)
-    INTVAL  i;
-
-    for (i = h->mask; i >= 0; --i) {
-        HashBucket *b = h->bucket_indices[i];
-
-        while (b) {
-            Parrot_gc_mark_STRING_alive(interp, (STRING *)b->key);
-            mark_cell(interp, (Pcc_cell *)b->value);
-            b = b->next;
-        }
-    }
+    parrot_hash_iterate(h,
+        Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->key);
+        mark_cell(interp, (Pcc_cell *)_bucket->value);
+    );
 }
 
 /*
@@ -500,19 +493,11 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
 
     /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
     if (hash && hash->entries) {
-        UINTVAL i, j = 0;
+        UINTVAL j = 0;
         PMC *result = Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
-
-        for (i = 0; i <= hash->mask; ++i) {
-            HashBucket *b = hash->bucket_indices[i];
-
-            while (b) {
-                VTABLE_set_string_keyed_int(interp, result,
-                    j++, (STRING *)b->key);
-                b = b->next;
-            }
-        }
-
+        parrot_hash_iterate(hash,
+            VTABLE_set_string_keyed_int(interp, result, j++, (STRING *)_bucket->key);
+        );
         return result;
     }
 
@@ -702,17 +687,9 @@ stored.)
         GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
-            UINTVAL i;
-
-            for (i = 0; i <= hash->mask; ++i) {
-                HashBucket *b = hash->bucket_indices[i];
-
-                while (b) {
-                    FREE_CELL(INTERP, (Pcc_cell *)b->value);
-                    b = b->next;
-                }
-            }
-
+            parrot_hash_iterate(hash,
+               FREE_CELL(INTERP, (Pcc_cell *)_bucket->value);
+            );
             parrot_hash_destroy(INTERP, hash);
             SET_ATTR_hash(INTERP, SELF, NULL);
         }
@@ -740,17 +717,9 @@ stored.)
         }
 
         if (hash) {
-            UINTVAL i;
-
-            for (i = 0; i <= hash->mask; ++i) {
-                HashBucket *b = hash->bucket_indices[i];
-
-                while (b) {
-                    FREE_CELL(INTERP, (Pcc_cell *)b->value);
-                    b = b->next;
-                }
-            }
-
+            parrot_hash_iterate(hash,
+                FREE_CELL(INTERP, (Pcc_cell *)_bucket->value);
+            );
             parrot_hash_destroy(INTERP, hash);
         }
 

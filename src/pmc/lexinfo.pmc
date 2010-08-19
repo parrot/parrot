@@ -99,25 +99,11 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
         if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "symbols"))) {
             PMC * const result    = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
             const Hash *hash      = (Hash *)SELF.get_pointer();
-            const UINTVAL entries = hash->entries;
 
-            UINTVAL found   = 0;
-            INTVAL  i;
-
-            for (i = hash->mask; i >= 0; --i) {
-                HashBucket *bucket = hash->bucket_indices[i];
-                while (bucket) {
-                    if (++found > entries)
-                        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                            "Detected corruption at LexInfo hash %p entries %d",
-                            hash, (int)entries);
-
-                    PARROT_ASSERT(bucket->key);
-                    VTABLE_push_string(INTERP, result, (STRING *)bucket->key);
-
-                    bucket = bucket->next;
-                }
-            }
+            parrot_hash_iterate(hash,
+                PARROT_ASSERT(_bucket->key);
+                VTABLE_push_string(INTERP, result, (STRING *)_bucket->key);
+            );
 
             return result;
         }

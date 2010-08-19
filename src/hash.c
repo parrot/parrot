@@ -512,22 +512,10 @@ static void
 parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_keys)
-    const UINTVAL entries = hash->entries;
-    UINTVAL found = 0;
-    UINTVAL i;
-
-    HashBucket *bucket = hash->buckets;
-
-    for (i= 0; i <= hash->mask; ++i, ++bucket) {
-        if (bucket->key){
-
-            PARROT_ASSERT(bucket->key);
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
-
-            if (++found >= entries)
-                break;
-        }
-    }
+    parrot_hash_iterate(hash,
+        PARROT_ASSERT(_bucket->key);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key);
+    );
 }
 
 
@@ -545,23 +533,12 @@ static void
 parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_values)
-    const UINTVAL entries = hash->entries;
-    UINTVAL found = 0;
-    UINTVAL i;
-
-    HashBucket *bucket = hash->buckets;
-
-    for (i= 0; i <= hash->mask; ++i, ++bucket) {
-        if (bucket->key){
-
-            PARROT_ASSERT(bucket->value);
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
-
-            if (++found >= entries)
-                break;
-        }
-    }
+    parrot_hash_iterate(hash,
+        PARROT_ASSERT(_bucket->value);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value);
+    );
 }
+
 
 /*
 
@@ -577,24 +554,12 @@ static void
 parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_both)
-    const UINTVAL entries = hash->entries;
-    UINTVAL found = 0;
-    UINTVAL i;
-
-    HashBucket *bucket = hash->buckets;
-
-    for (i= 0; i <= hash->mask; ++i, ++bucket) {
-        if (bucket->key){
-            PARROT_ASSERT(bucket->key);
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
-
-            PARROT_ASSERT(bucket->value);
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
-
-            if (++found >= entries)
-                break;
-        }
-    }
+    parrot_hash_iterate(hash,
+        PARROT_ASSERT(_bucket->key);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key);
+        PARROT_ASSERT(_bucket->value);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value);
+    );
 }
 
 /*
@@ -714,41 +679,38 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
     const size_t           entries    = hash->entries;
     size_t                 i;
 
-    for (i = 0; i < entries; ++i) {
-        HashBucket * const b = hash->buckets + i;
-
+    parrot_hash_iterate(hash,
         switch (key_type) {
           case Hash_key_type_int:
-            VTABLE_push_integer(interp, info, (INTVAL)b->key);
+            VTABLE_push_integer(interp, info, (INTVAL)_bucket->key);
             break;
           case Hash_key_type_STRING:
-            VTABLE_push_string(interp, info, (STRING *)b->key);
+            VTABLE_push_string(interp, info, (STRING *)_bucket->key);
             break;
           case Hash_key_type_PMC:
-            VTABLE_push_pmc(interp, info, (PMC *)b->key);
+            VTABLE_push_pmc(interp, info, (PMC *)_bucket->key);
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "unimplemented key type");
             break;
         }
-
         switch (entry_type) {
           case enum_hash_int:
-            VTABLE_push_integer(interp, info, (INTVAL)b->value);
+            VTABLE_push_integer(interp, info, (INTVAL)_bucket->value);
             break;
           case enum_hash_string:
-            VTABLE_push_string(interp, info, (STRING *)b->value);
+            VTABLE_push_string(interp, info, (STRING *)_bucket->value);
             break;
           case enum_hash_pmc:
-            VTABLE_push_pmc(interp, info, (PMC *)b->value);
+            VTABLE_push_pmc(interp, info, (PMC *)_bucket->value);
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "unimplemented value type");
             break;
         }
-    }
+    );
 }
 
 
@@ -1121,17 +1083,10 @@ void
 parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
 {
     ASSERT_ARGS(parrot_chash_destroy)
-    UINTVAL i;
-
-    for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bucket_indices[i];
-        while (bucket) {
-            mem_gc_free(interp, bucket->key);
-            mem_gc_free(interp, bucket->value);
-            bucket = bucket->next;
-        }
-    }
-
+    parrot_hash_iterate(hash,
+        mem_gc_free(interp, _bucket->key);
+        mem_gc_free(interp, _bucket->value);
+    );
     parrot_hash_destroy(interp, hash);
 }
 
@@ -1472,33 +1427,30 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
     ARGOUT(Hash *dest), int deep)
 {
     ASSERT_ARGS(parrot_hash_clone_prunable)
-    UINTVAL entries = hash->entries;
-    UINTVAL i;
 
-    for (i = 0; i < entries; ++i) {
+    parrot_hash_iterate(hash,
         void         *valtmp;
-        HashBucket   *b   = hash->buckets + i;
-        void * const  key = b->key;
+        void * const  key = _bucket->key;
 
         switch (hash->entry_type) {
           case enum_type_undef:
           case enum_type_ptr:
           case enum_type_INTVAL:
-            valtmp = (void *)b->value;
+            valtmp = (void *)_bucket->value;
             break;
 
           case enum_type_STRING:
-            valtmp = b->value;
+            valtmp = _bucket->value;
             break;
 
           case enum_type_PMC:
-            if (PMC_IS_NULL((PMC *)b->value))
+            if (PMC_IS_NULL((PMC *)_bucket->value))
                 valtmp = (void *)PMCNULL;
             else
                 if (deep)
-                    valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                    valtmp = (void *)VTABLE_clone(interp, (PMC*)_bucket->value);
                 else
-                    valtmp = b->value;
+                    valtmp = _bucket->value;
             break;
 
           default:
@@ -1506,10 +1458,9 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
             Parrot_ex_throw_from_c_args(interp, NULL, -1,
                     "hash corruption: type = %d\n", hash->entry_type);
         };
-
         if (key)
             parrot_hash_put(interp, dest, key, valtmp);
-    }
+    );
 }
 
 /*

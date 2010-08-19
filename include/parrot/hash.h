@@ -78,6 +78,49 @@ struct _hash {
     hash_hash_key_fn hash_val;
 };
 
+/* Utility macros - use them, do not reinvent the weel */
+#define parrot_hash_iterate parrot_hash_iterate_linear
+
+#define parrot_hash_iterate_linear(_hash, _code)                            \
+{                                                                           \
+    HashBucket *_bucket = (_hash)->buckets;                                 \
+    UINTVAL     _found  = 0;                                                \
+    while (_found < _hash->entries){                                        \
+        if (_bucket->key){                                                  \
+            _code                                                           \
+            _found++;                                                       \
+        }                                                                   \
+       _bucket++;                                                           \
+    }                                                                       \
+}
+
+#define parrot_hash_iterate_indexed(_hash, _code)                           \
+{                                                                           \
+    INTVAL _loc;                                                            \
+    for (_loc = (_hash)->mask; _loc >= 0; --_loc) {                         \
+        HashBucket *_bucket = (_hash)->bucket_indices[_loc];                \
+        while (_bucket) {                                                   \
+            _code                                                           \
+            _bucket = _bucket->next;                                        \
+        }                                                                   \
+    }                                                                       \
+}
+
+
+#define parrot_hash_iterator_advance(_hash,_bucket,_loc)                    \
+{                                                                           \
+    /* Try to advance current bucket */                                     \
+    if ((_bucket))                                                          \
+        (_bucket) = (_bucket)->next;                                        \
+    while (!(_bucket)) {                                                    \
+        /* If there is no more buckets */                                   \
+        if ((_loc) == (INTVAL)(_hash)->mask+1)                              \
+            break;                                                          \
+        (_bucket) = (_hash)->bucket_indices[_loc++];                        \
+    }                                                                       \
+}
+
+
 typedef void (*value_free)(ARGFREE(void *));
 
 /* To avoid creating OrderedHashItem PMC we reuse FixedPMCArray PMC */
