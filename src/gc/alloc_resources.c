@@ -448,19 +448,21 @@ compact_pool(PARROT_INTERP,
     if (mem_pools->gc_sweep_block_level)
         return;
 
-    ++mem_pools->gc_collect_runs;
-
-    /* Snag a block big enough for everything */
-    total_size = pad_pool_size(pool);
-
-    if (total_size == 0)
-        return;
-
     ++mem_pools->gc_sweep_block_level;
 
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
+    ++mem_pools->gc_collect_runs;
+
+    /* Snag a block big enough for everything */
+    total_size = pad_pool_size(pool);
+
+    if (total_size == 0) {
+        free_old_mem_blocks(mem_pools, pool, pool->top_block, total_size);
+        --mem_pools->gc_sweep_block_level;
+        return;
+    }
 
     alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
