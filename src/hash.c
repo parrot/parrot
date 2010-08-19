@@ -800,7 +800,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
          | --> buckets |     |
          +---+---+---+-+-+-+-+
          ^             ^
-         | old_mem     | hash->bucket_indices
+         | old_mem     | hash->index
     */
 
     /* resize mem */
@@ -821,7 +821,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
          |  buckets  | old_bi    |  new_bi       |
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
          ^                       ^
-         | new_mem               | hash->bucket_indices
+         | new_mem               | hash->index
     */
 
     bs     = new_mem;
@@ -835,7 +835,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     mem_sys_memmove(new_bi, old_bi, old_size * sizeof (HashBucket *));
 
     /* update hash data */
-    hash->bucket_indices = new_bi;
+    hash->index = new_bi;
     hash->buckets        = bs;
     hash->mask = new_size - 1;
 
@@ -1033,7 +1033,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 
     hash->buckets = bp;
     bp += N_BUCKETS(INITIAL_BUCKETS);
-    hash->bucket_indices = (HashBucket **)bp;
+    hash->index = (HashBucket **)bp;
 
     for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
         bp->next        = hash->free_list;
@@ -1113,7 +1113,7 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_fre
     UINTVAL i;
 
     for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bucket_indices[i];
+        HashBucket *bucket = hash->index[i];
         while (bucket) {
             mem_gc_free(interp, bucket->key);
             func(bucket->value);
@@ -1238,7 +1238,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
     /* if the fast search didn't work, try the normal hashing search */
     {
         const UINTVAL hashval = get_hash_val(interp, hash, key);
-        HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
+        HashBucket   *bucket  = hash->index[hashval & hash->mask];
         const hash_comp_fn compare = hash->compare;
 
         while (bucket) {
@@ -1320,7 +1320,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 {
     ASSERT_ARGS(parrot_hash_put)
     const UINTVAL hashval = get_hash_val(interp, hash, key);
-    HashBucket   *bucket  = hash->bucket_indices[hashval & hash->mask];
+    HashBucket   *bucket  = hash->index[hashval & hash->mask];
     const hash_comp_fn compare = hash->compare;
 
     /* See if we have an existing value for this key */
@@ -1349,8 +1349,8 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         hash->free_list                = bucket->next;
         bucket->key                    = key;
         bucket->value                  = value;
-        bucket->next = hash->bucket_indices[hashval & hash->mask];
-        hash->bucket_indices[hashval & hash->mask] = bucket;
+        bucket->next = hash->index[hashval & hash->mask];
+        hash->index[hashval & hash->mask] = bucket;
     }
 
     return bucket;
@@ -1373,7 +1373,7 @@ parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
     ASSERT_ARGS(parrot_hash_delete)
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed) & hash->mask;
-    HashBucket   **prev   = &hash->bucket_indices[hashval];
+    HashBucket   **prev   = &hash->index[hashval];
     if (*prev) {
         const hash_comp_fn compare = hash->compare;
         for (; *prev; prev = &(*prev)->next) {

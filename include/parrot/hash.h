@@ -51,7 +51,7 @@ struct _hash {
     HashBucket *buckets;
 
     /* List of Bucket pointers */
-    HashBucket **bucket_indices;
+    HashBucket **index;
 
     /* Store for empty buckets */
     HashBucket *free_list;
@@ -87,8 +87,10 @@ struct _hash {
     UINTVAL     _found  = 0;                                                \
     while (_found < _hash->entries){                                        \
         if (_bucket->key){                                                  \
-            _code                                                           \
             _found++;                                                       \
+            {                                                               \
+                _code                                                       \
+            }                                                               \
         }                                                                   \
        _bucket++;                                                           \
     }                                                                       \
@@ -98,7 +100,7 @@ struct _hash {
 {                                                                           \
     INTVAL _loc;                                                            \
     for (_loc = (_hash)->mask; _loc >= 0; --_loc) {                         \
-        HashBucket *_bucket = (_hash)->bucket_indices[_loc];                \
+        HashBucket *_bucket = (_hash)->index[_loc];                         \
         while (_bucket) {                                                   \
             _code                                                           \
             _bucket = _bucket->next;                                        \
@@ -116,7 +118,7 @@ struct _hash {
         /* If there is no more buckets */                                   \
         if ((_loc) == (INTVAL)(_hash)->mask+1)                              \
             break;                                                          \
-        (_bucket) = (_hash)->bucket_indices[_loc++];                        \
+        (_bucket) = (_hash)->index[_loc++];                                 \
     }                                                                       \
 }
 
