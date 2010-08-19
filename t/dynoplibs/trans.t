@@ -23,7 +23,7 @@ Tests various transcendental operations
     .local num epsilon
     epsilon = _epsilon()
 
-    plan(69)
+    plan(77)
 
     test_sin_n(epsilon)
     test_sin_i(epsilon)
@@ -31,8 +31,12 @@ Tests various transcendental operations
     test_cos_i(epsilon)
     test_tan_n(epsilon)
     test_tan_i(epsilon)
+    test_cot_n(epsilon)
+    test_cot_i(epsilon)
     test_sec_n(epsilon)
     test_sec_i(epsilon)
+    test_csc_n(epsilon)
+    test_csc_i(epsilon)
     test_atan_n(epsilon)
     test_atan_i(epsilon)
     test_asin_n(epsilon)
@@ -137,6 +141,26 @@ Tests various transcendental operations
     is($N0, 1.557408, "tan(1)", epsilon)
 .end
 
+.sub test_cot_n
+    .param num epsilon
+
+    $N0 = cot 0.5
+    is($N0,  1.8305, "cot(0.5)", epsilon)
+
+    $N0 = cot 1.0
+    is($N0,  0.64209, "cot(1.0)", epsilon)
+.end
+
+.sub test_cot_i
+    .param num epsilon
+
+    $N0 = cot 1
+    is($N0, 0.64209, "cot(1)", epsilon)
+
+    $N0 = cot 2
+    is($N0,  -0.45766, "cot(2)", epsilon)
+.end
+
 .sub test_sec_n
     .param num epsilon
 
@@ -151,6 +175,26 @@ Tests various transcendental operations
     $I1 = 1
     $N1 = sec $I1
     is($N1, 1.850816, "sec(1)", epsilon)
+.end
+
+.sub test_csc_n
+    .param num epsilon
+
+    $N0 = csc 0.5
+    is($N0,   2.0858, "csc(0.5)", epsilon)
+
+    $N0 = csc 1.0
+    is($N0,  1.1884, "csc(1.0)", epsilon)
+.end
+
+.sub test_csc_i
+    .param num epsilon
+
+    $N0 = csc 1
+    is($N0, 1.1884, "csc(1)", epsilon)
+
+    $N0 = csc 2
+    is($N0,   1.0998, "csc(2)", epsilon)
 .end
 
 .sub test_atan_n
