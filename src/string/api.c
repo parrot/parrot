@@ -1104,6 +1104,104 @@ Parrot_str_substr(PARROT_INTERP,
     return CHARSET_GET_CODEPOINTS(interp, src, true_offset, true_length);
 }
 
+/*
+
+=item C<STRING * Parrot_str_iter_substr(PARROT_INTERP, const STRING *str, const
+String_iter *l, const String_iter *r)>
+
+Returns the substring between iterators C<l> and C<r>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+Parrot_str_iter_substr(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGIN(const String_iter *l), ARGIN_NULLOK(const String_iter *r))
+{
+    ASSERT_ARGS(Parrot_str_iter_substr)
+    STRING *dest = Parrot_str_copy(interp, str);
+
+    dest->strstart = (char *)dest->strstart + l->bytepos;
+
+    if (r == NULL) {
+        dest->bufused = str->bufused - l->bytepos;
+        dest->strlen  = str->strlen  - l->charpos;
+    }
+    else {
+        dest->bufused = r->bytepos - l->bytepos;
+        dest->strlen  = r->charpos - l->charpos;
+    }
+
+    dest->hashval = 0;
+
+    return dest;
+}
+
+/*
+
+=item C<INTVAL Parrot_str_iter_index(PARROT_INTERP, const STRING *src,
+String_iter *start, String_iter *end, const STRING *search)>
+
+Find the next occurence of STRING C<search> in STRING C<src> starting at
+String_iter C<start>. If C<search> is found C<start> is modified to mark the
+beginning of C<search> and String_iter C<end> is set to the character after
+C<search> in C<src>.  Returns the character position where C<search> was found
+or -1 if it wasn't found.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_str_iter_index(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGMOD(String_iter *start), ARGOUT(String_iter *end),
+    ARGIN(const STRING *search))
+{
+    ASSERT_ARGS(Parrot_str_iter_index)
+    String_iter search_iter, search_start, next_start;
+    const UINTVAL len = search->strlen;
+    UINTVAL c0;
+
+    if (len == 0) {
+        *end = *start;
+        return start->charpos;
+    }
+
+    STRING_ITER_INIT(interp, &search_iter);
+    c0 = STRING_ITER_GET_AND_ADVANCE(interp, search, &search_iter);
+    search_start = search_iter;
+    next_start = *start;
+
+    while (start->charpos + len <= src->strlen) {
+        UINTVAL c1 = STRING_ITER_GET_AND_ADVANCE(interp, src, &next_start);
+
+        if (c1 == c0) {
+            UINTVAL c2;
+            *end = next_start;
+
+            do {
+                if (search_iter.charpos >= len)
+                    return start->charpos;
+                c1 = STRING_ITER_GET_AND_ADVANCE(interp, src, end);
+                c2 = STRING_ITER_GET_AND_ADVANCE(interp, search, &search_iter);
+            } while (c1 == c2);
+
+            search_iter = search_start;
+        }
+
+        *start = next_start;
+    }
+
+    return -1;
+}
+
 
 /*
 
@@ -1145,7 +1243,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     UINTVAL         true_offset = (UINTVAL)offset;
     UINTVAL         true_length = (UINTVAL)length;
 
-    UINTVAL         start_byte, end_byte;
+    UINTVAL         start_byte, end_byte, start_char, end_char;
     INTVAL          buf_size;
 
     if (STRING_IS_NULL(src)) {
@@ -1181,13 +1279,15 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     }
 
     /* get byte position of the part that will be replaced */
-    ENCODING_ITER_INIT(interp, src, &iter);
+    STRING_ITER_INIT(interp, &iter);
 
-    iter.set_position(interp, &iter, true_offset);
+    STRING_ITER_SET_POSITION(interp, src, &iter, true_offset);
     start_byte = iter.bytepos;
+    start_char = iter.charpos;
 
-    iter.set_position(interp, &iter, true_offset + true_length);
+    STRING_ITER_SKIP(interp, src, &iter, true_length);
     end_byte   = iter.bytepos;
+    end_char   = iter.charpos;
 
     /* not possible.... */
     if (end_byte < start_byte)
@@ -1226,7 +1326,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
             (char *)src->strstart + end_byte,
             src->bufused - end_byte);
 
-    dest->strlen  = CHARSET_CODEPOINTS(interp, dest);
+    dest->strlen  = src->strlen - (end_char - start_char) + rep->strlen;
     dest->hashval = 0;
 
     return dest;
@@ -1252,7 +1352,7 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
     ASSERT_ARGS(Parrot_str_chopn)
 
     STRING * const chopped = Parrot_str_copy(interp, s);
-    UINTVAL new_length, uchar_size;
+    UINTVAL new_length;
 
     if (n < 0) {
         new_length = -n;
@@ -1273,22 +1373,22 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
         return chopped;
     }
 
-    uchar_size      = chopped->bufused / chopped->strlen;
-    chopped->strlen = new_length;
-
     if (chopped->encoding == Parrot_fixed_8_encoding_ptr) {
         chopped->bufused = new_length;
     }
     else if (chopped->encoding == Parrot_ucs2_encoding_ptr) {
+        const UINTVAL uchar_size = chopped->bufused / chopped->strlen;
         chopped->bufused = new_length * uchar_size;
     }
     else {
         String_iter iter;
 
-        ENCODING_ITER_INIT(interp, s, &iter);
-        iter.set_position(interp, &iter, new_length);
+        STRING_ITER_INIT(interp, &iter);
+        STRING_ITER_SET_POSITION(interp, s, &iter, new_length);
         chopped->bufused = iter.bytepos;
     }
+
+    chopped->strlen = new_length;
 
     return chopped;
 }
@@ -1860,13 +1960,12 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         int                 sign      = 1;
         UINTVAL             i         = 0;
         String_iter         iter;
-        UINTVAL             offs;
         number_parse_state  state = parse_start;
 
-        ENCODING_ITER_INIT(interp, s, &iter);
+        STRING_ITER_INIT(interp, &iter);
 
-        for (offs = 0; (state != parse_end) && (offs < s->strlen); ++offs) {
-            const UINTVAL c = iter.get_and_advance(interp, &iter);
+        while (state != parse_end && iter.charpos < s->strlen) {
+            const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, s, &iter);
             /* Check for overflow */
             if (c > 255)
                 break;
@@ -1956,17 +2055,16 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     int           d_length  = 0;
     int           check_nan = 0;    /* Check for NaN and Inf after main loop */
     String_iter iter;
-    UINTVAL     offs;
     number_parse_state state = parse_start;
 
     if (STRING_IS_NULL(s))
         return 0.0;
 
-    ENCODING_ITER_INIT(interp, s, &iter);
+    STRING_ITER_INIT(interp, &iter);
 
-    /* Handcrafter FSM to read float value */
-    for (offs = 0; (state != parse_end) && (offs < s->strlen); ++offs) {
-        const UINTVAL c = iter.get_and_advance(interp, &iter);
+    /* Handcrafted FSM to read float value */
+    while (state != parse_end && iter.charpos < s->strlen) {
+        const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, s, &iter);
         /* Check for overflow */
         if (c > 255)
             break;
@@ -2415,11 +2513,11 @@ Parrot_str_escape_truncate(PARROT_INTERP,
             Parrot_fixed_8_encoding_ptr, Parrot_ascii_charset_ptr, 0);
 
     /* more work TODO */
-    ENCODING_ITER_INIT(interp, src, &iter);
+    STRING_ITER_INIT(interp, &iter);
     dp = (unsigned char *)result->strstart;
 
     for (i = 0; len > 0; --len) {
-        UINTVAL c = iter.get_and_advance(interp, &iter);
+        UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         if (c < 0x7f) {
             /* process ASCII chars */
             if (i >= charlen - 2) {
@@ -2559,17 +2657,17 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     Parrot_gc_allocate_string_storage(interp, result, reserved);
     result->bufused = reserved;
 
-    src->encoding->iter_init(interp, src, &itersrc);
-    encoding->iter_init(interp, result, &iterdest);
+    STRING_ITER_INIT(interp, &itersrc);
+    STRING_ITER_INIT(interp, &iterdest);
     while (itersrc.bytepos < srclen) {
-        INTVAL c = itersrc.get_and_advance(interp, &itersrc);
+        INTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
         INTVAL next;
 
         do {
             pending = 0;
             next = c;
             if (c == '\\') {
-                c = itersrc.get_and_advance(interp, &itersrc);
+                c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                 switch (c) {
                 /* Common one char sequences */
                 case 'a': next = '\a'; break;
@@ -2582,7 +2680,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'e': next = '\e'; break;
                 /* Escape character */
                 case 'c':
-                    c = itersrc.get_and_advance(interp, &itersrc);
+                    c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                     /* This assumes ascii-alike encoding */
                     if (c < 'A' || c > 'Z')
                         throw_illegal_escape(interp);
@@ -2590,11 +2688,11 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
-                    c = itersrc.get_and_advance(interp, &itersrc);
+                    c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */
                         while (itersrc.bytepos < srclen) {
-                            c = itersrc.get_and_advance(interp, &itersrc);
+                            c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                             if (c == '}')
                                 break;
                             if (!isxdigit(c))
@@ -2618,7 +2716,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                                 pending = 0;
                                 break;
                             }
-                            c = itersrc.get_and_advance(interp, &itersrc);
+                            c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                         }
                     }
                     if (digcount == 0)
@@ -2629,7 +2727,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'u':
                     /* \uhhhh 4 hex digits */
                     for (digcount = 0; digcount < 4; ++digcount) {
-                        c = itersrc.get_and_advance(interp, &itersrc);
+                        c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                         if (!isxdigit(c))
                             throw_illegal_escape(interp);
                         digbuf[digcount] = c;
@@ -2640,7 +2738,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'U':
                     /* \Uhhhhhhhh 8 hex digits */
                     for (digcount = 0; digcount < 8; ++digcount) {
-                        c = itersrc.get_and_advance(interp, &itersrc);
+                        c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                         if (!isxdigit(c))
                             throw_illegal_escape(interp);
                         digbuf[digcount] = c;
@@ -2653,7 +2751,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     /* \ooo 1..3 oct digits */
                     digbuf[0] = c;
                     for (digcount = 1; digcount < 3; ++digcount) {
-                        c = itersrc.get_and_advance(interp, &itersrc);
+                        c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
                         if (c < '0' || c > '7')
                             break;
                         digbuf[digcount] = c;
@@ -2667,7 +2765,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     next = c;
                 }
             }
-            iterdest.set_and_advance(interp, &iterdest, next);
+            STRING_ITER_SET_AND_ADVANCE(interp, result, &iterdest, next);
         } while (pending);
     }
     result->bufused = iterdest.bytepos;
@@ -2748,7 +2846,7 @@ Parrot_str_unescape(PARROT_INTERP,
         encoding = result->encoding;
     }
 
-    encoding->iter_init(interp, result, &iter);
+    STRING_ITER_INIT(interp, &iter);
 
     for (offs = d = 0; offs < clength; ++offs) {
         r = (Parrot_UInt4)((unsigned char *)result->strstart)[offs];
@@ -2771,7 +2869,7 @@ Parrot_str_unescape(PARROT_INTERP,
         }
 
         PARROT_ASSERT(d < offs);
-        iter.set_and_advance(interp, &iter, r);
+        encoding->iter_set_and_advance(interp, result, &iter, r);
         ++d;
     }
 
@@ -3269,8 +3367,10 @@ Parrot_str_split(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *delim), ARGIN_NULLOK(STRING *str))
 {
     ASSERT_ARGS(Parrot_str_split)
-    PMC    *res;
-    INTVAL  slen, dlen, ps, pe;
+    PMC     *res;
+    STRING  *tstr;
+    UINTVAL  slen, dlen;
+    String_iter iter;
 
     if (STRING_IS_NULL(delim) || STRING_IS_NULL(str))
         return PMCNULL;
@@ -3282,44 +3382,38 @@ Parrot_str_split(PARROT_INTERP,
     if (!slen)
         return res;
 
+    STRING_ITER_INIT(interp, &iter);
     dlen = Parrot_str_length(interp, delim);
 
     if (dlen == 0) {
-        int i;
         VTABLE_set_integer_native(interp, res, slen);
 
-        for (i = 0; i < slen; ++i) {
-            STRING * const p = Parrot_str_substr(interp, str, i, 1);
-            VTABLE_set_string_keyed_int(interp, res, i, p);
-        }
+        do {
+            const String_iter old_iter = iter;
+
+            STRING_ITER_SKIP(interp, str, &iter, 1);
+            tstr = Parrot_str_iter_substr(interp, str, &old_iter, &iter);
+            VTABLE_set_string_keyed_int(interp, res, old_iter.charpos, tstr);
+        } while (iter.charpos < slen);
 
         return res;
     }
 
-    pe = Parrot_str_find_index(interp, str, delim, 0);
+    do {
+        String_iter start, end;
+        INTVAL pos;
 
-    if (pe < 0) {
-        VTABLE_push_string(interp, res, str);
-        return res;
-    }
-
-    ps = 0;
-
-    while (ps <= slen) {
-        const int      pl   = pe - ps;
-        STRING * const tstr = Parrot_str_substr(interp, str, ps, pl);
-
-        VTABLE_push_string(interp, res, tstr);
-        ps = pe + Parrot_str_length(interp, delim);
-
-        if (ps > slen)
+        start = iter;
+        if (Parrot_str_iter_index(interp, str, &start, &end, delim) < 0)
             break;
 
-        pe = Parrot_str_find_index(interp, str, delim, ps);
+        tstr = Parrot_str_iter_substr(interp, str, &iter, &start);
+        VTABLE_push_string(interp, res, tstr);
+        iter = end;
+    } while (iter.charpos < slen);
 
-        if (pe < 0)
-            pe = slen;
-    }
+    tstr = Parrot_str_iter_substr(interp, str, &iter, NULL);
+    VTABLE_push_string(interp, res, tstr);
 
     return res;
 }
