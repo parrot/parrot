@@ -46,25 +46,25 @@ function calls.
     inc counter
     if counter < 10e6 goto loop
 
-    diag("")
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
+    $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
+    $I3 = interpinfo.INTERPINFO_TOTAL_MEM_ALLOC
+
     $S1 = $I1
     $S0 = "performed " . $S1
     $S0 .= " (which should be >=1) GC collect runs"
     ok($I1,$S0)
 
-    $I1 = interpinfo.INTERPINFO_GC_MARK_RUNS
-    $S1 = $I1
+    $S1 = $I2
     $S0 = "performed " . $S1
     $S0 .= " (which should be >=1) GC mark runs"
-    ok($I1,$S0)
+    ok($I2,$S0)
 
-    $I1 = interpinfo.INTERPINFO_TOTAL_MEM_ALLOC
-    $S1 = $I1
+    $S1 = $I3
     $S0 = "allocated " . $S1
     $S0 .= " (which should be <= 2_000_000) bytes of memory, TODO: TT#945"
-    $I2 = isle $I1, 2000000
-    todo($I2,$S0)
+    $I4 = isle $I3, 2000000
+    todo($I4,$S0)
 .end
 
 .sub consume
