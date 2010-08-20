@@ -1,4 +1,4 @@
-/* $Id: $
+/* $Id$
  * Copyright (C) 2010, Parrot Foundation.
  */
 
@@ -18,7 +18,7 @@ Parrot process id functions.
 
 =cut
 
-=item C<INTVAL Parrot_getpid(void)>
+=item C<UINTVAL Parrot_getpid(void)>
 
 Parrot wrapper around standard library C<getpid()> function, returning an UINTVAL.
 

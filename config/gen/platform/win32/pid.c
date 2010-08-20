@@ -6,7 +6,7 @@
 
 =head1 NAME
 
-config/gen/platform/generic/pid.c
+config/gen/platform/win32/pid.c
 
 =head1 DESCRIPTION
 
@@ -17,13 +17,6 @@ Parrot process id functions.
 =over 4
 
 =cut
-
-*/
-
-#include <sys/types.h>
-#include <unistd.h>
-
-/*
 
 =item C<UINTVAL Parrot_getpid(void)>
 
@@ -36,7 +29,8 @@ Parrot wrapper around standard library C<getpid()> function, returning an UINTVA
 UINTVAL
 Parrot_getpid(void)
 {
-    return getpid();
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_getpid unuseful in this platform");
+    return 0;
 }
 
 

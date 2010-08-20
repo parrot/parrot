@@ -848,9 +848,22 @@ This method is experimental. See TT #264.
         RETURN(PMC *handle);
     }
 
+/*
+
+=item METHOD getpid()
+
+Returns the pid of the current process, 0 in platforms that doesn't
+support it.
+
+This method is experimental. See TT #1564.
+
+=cut
+
+*/
+
     METHOD getpid() {
         INTVAL id = Parrot_getpid();
-	RETURN(INTVAL id);
+        RETURN(INTVAL id);
     }
 
 }
