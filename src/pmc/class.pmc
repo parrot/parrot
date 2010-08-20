@@ -1451,10 +1451,14 @@ Returns whether the class is or inherits from C<*class>.
         if (PMC_IS_NULL(lookup))
             return 0;
 
-        if (PObj_is_class_TEST(lookup) && lookup == SELF)
-            return 1;
-
-        classobj = Parrot_oo_get_class(INTERP, lookup);
+        if (PObj_is_class_TEST(lookup)) {
+            if (lookup == SELF)
+                return 1;
+            else
+                classobj = lookup;
+        }
+        else
+            classobj = Parrot_oo_get_class(INTERP, lookup);
 
         if (PMC_IS_NULL(classobj))
             return 0;
