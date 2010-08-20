@@ -359,9 +359,9 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 =item C<STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)>
 
 Returns a new C<STRING> header from the string pool or the constant string
-pool. Sets default flags on the string object: C<PObj_is_string_FLAG>,
-C<PObj_is_COWable_FLAG>, and C<PObj_live_FLAG> (for GC). Initializes the data
-field of the string buffer to C<NULL>.
+pool. Sets default flags on the string object: C<PObj_is_string_FLAG> and
+C<PObj_is_COWable_FLAG>. Initializes the data field of the string buffer to
+C<NULL>.
 
 =cut
 
@@ -381,7 +381,7 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 
     string->strstart        = NULL;
     PObj_get_FLAGS(string) |=
-        flags | PObj_is_string_FLAG | PObj_is_COWable_FLAG | PObj_live_FLAG;
+        flags | PObj_is_string_FLAG | PObj_is_COWable_FLAG;
 
     return string;
 }

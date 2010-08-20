@@ -353,8 +353,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
 
     /* Clear COW flag. We own buffer */
     PObj_get_FLAGS(result)  = PObj_is_string_FLAG
-                            | PObj_is_COWable_FLAG
-                            | PObj_live_FLAG;
+                            | PObj_is_COWable_FLAG;
 
     /* Allocate new chunk of memory */
     Parrot_gc_allocate_string_storage(interp, result, alloc_size);
@@ -1304,8 +1303,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
 
     /* Clear COW flag. We own buffer */
     PObj_get_FLAGS(dest) = PObj_is_string_FLAG
-                         | PObj_is_COWable_FLAG
-                         | PObj_live_FLAG;
+                         | PObj_is_COWable_FLAG;
 
             /* size            removed bytes            added bytes */
     buf_size = src->bufused - (end_byte - start_byte) + rep->bufused;
