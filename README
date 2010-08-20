@@ -11,6 +11,11 @@ LICENSE INFORMATION
 This code is distributed under the terms of the Artistic License 2.0.
 For more details, see the full text of the license in the file LICENSE.
 
+OVERVIEW
+--------
+Parrot is a virtual machine designed to efficiently compile and execute
+bytecode for dynamic languages.
+
 PREREQUISITES
 -------------
 
