@@ -2677,7 +2677,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'v': next = '\v'; break;
                 case 'f': next = '\f'; break;
                 case 'r': next = '\r'; break;
-                case 'e': next = '\e'; break;
+                case 'e': next = '\x27'; break;
                 /* Escape character */
                 case 'c':
                     c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);

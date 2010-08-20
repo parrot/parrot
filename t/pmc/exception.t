@@ -16,9 +16,11 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(20)
+    plan(21)
     test_bool()
     test_int()
     test_attrs()
@@ -28,6 +30,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_push_eh_throw()
     test_die()
     test_throw_obj()
+    test_throw_clone()
 .end
 
 .sub test_bool
@@ -171,6 +174,28 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     say "not reached"
 _handler:
     ok(1,'caught exception object thrown')
+.end
+
+.sub test_throw_clone
+    .local pmc ex, exclone, eh, ehguard
+    .local int result
+    ex = new ['Exception']
+    ex['type'] = .EXCEPTION_SYNTAX_ERROR
+    exclone = clone ex
+    ehguard = new ['ExceptionHandler']
+    set_label ehguard, catchall
+    push_eh ehguard
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_SYNTAX_ERROR)
+    set_label eh, catch
+    result = 0
+    push_eh eh
+    throw exclone
+  catch:
+    result = 1
+  catchall:
+    # TT #1446
+    todo(result, 1, 'caught a cloned Exception')
 .end
 
 # Local Variables:
