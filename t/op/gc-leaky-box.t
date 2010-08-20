@@ -65,9 +65,9 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
 
     $S1 = $I3
     $S0 = "allocated " . $S1
-    $S0 .= " (which should be <= 2_000_000) bytes of memory, TODO: TT#1465"
+    $S0 .= " (which should be <= 2_000_000) bytes of memory"
     $I4 = isle $I3, 2000000
-    todo($I4,$S0)
+    ok($I4,$S0)
 .end
 
 # Local Variables:

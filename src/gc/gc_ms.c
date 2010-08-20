@@ -1239,7 +1239,6 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     /* Decrease usage */
     PARROT_ASSERT(Buffer_pool(str));
     Buffer_pool(str)->freed += old_size;
-    interp->mem_pools->memory_used -= old_size;
 
     /* copy mem from strstart, *not* bufstart */
     oldmem             = str->strstart;
@@ -1509,8 +1508,8 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
         pool->skip = GC_NO_SKIP;
     else if (pool->skip == GC_NEVER_SKIP
          || (pool->skip == GC_NO_SKIP
-         && (new_mem > (mem_pools->mem_used_last_collect >> 1)
-         &&  mem_pools->header_allocs_since_last_collect >= GC_SIZE_THRESHOLD)))
+         && (new_mem > (mem_pools->mem_used_last_collect >> 2)
+         &&  new_mem >= GC_SIZE_THRESHOLD)))
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
@@ -1649,9 +1648,6 @@ gc_ms_alloc_objects(PARROT_INTERP,
 
     if (alloc_size > POOL_MAX_BYTES)
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
-
-    if (alloc_size > GC_SIZE_THRESHOLD)
-        pool->skip = GC_NEVER_SKIP;
 }
 
 

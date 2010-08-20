@@ -86,9 +86,9 @@ typedef enum _gc_sys_type_enum {
 /* how often to skip a full GC when this pool has nothing free */
 typedef enum _gc_skip_type_enum {
     GC_NO_SKIP = 0,
-    GC_ONE_SKIP,
+    GC_ONE_SKIP,        /* unused */
     GC_ALWAYS_SKIP,
-    GC_NEVER_SKIP
+    GC_NEVER_SKIP       /* unused */
 } gc_skip_type_enum;
 
 typedef struct GC_Subsystem {
@@ -326,7 +326,10 @@ typedef struct Memory_Pools {
                                    * structures */
     size_t  memory_used;          /* The total amount of memory used
                                    * in fixed and variable size
-                                   * pools. */
+                                   * pools. Also includes memory in
+                                   * variable size pools that has been
+                                   * freed but can only be reclaimed
+                                   * by a GC run */
     size_t  mem_used_last_collect;    /* The total amount of
                                        * memory used after
                                        * the last GC run */

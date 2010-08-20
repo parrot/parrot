@@ -314,7 +314,7 @@ mem_allocate(PARROT_INTERP,
         size_t new_mem = mem_pools->memory_used -
                          mem_pools->mem_used_last_collect;
         if (!mem_pools->gc_mark_block_level
-            && new_mem > (mem_pools->mem_used_last_collect >> 1)
+            && new_mem > (mem_pools->mem_used_last_collect >> 2)
             && new_mem > GC_SIZE_THRESHOLD) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
@@ -731,8 +731,7 @@ free_old_mem_blocks(
         else {
             /* Note that we don't have it any more */
             mem_pools->memory_allocated -= cur_block->size;
-            mem_pools->memory_used -=
-                cur_block->size - cur_block->free - cur_block->freed;
+            mem_pools->memory_used -= cur_block->size - cur_block->free;
 
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */
