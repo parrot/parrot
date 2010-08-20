@@ -77,13 +77,16 @@ If you see this tests failing after bumping PBC_COMPAT rerun tools/dev/mk_packfi
 
 
 .sub 'test_get_string'
-    .local pmc pf
+    .local pmc pf, eh
     pf = new ['Packfile']
     $S0 = pf["uuid"]
     ok(1, 'get_string(uuid)')
 
     # Requesting unknown key should throw exception
-    push_eh unknown_key
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_KEY_NOT_FOUND)
+    set_label eh, unknown_key
+    push_eh eh
     $S0 = pf["foo"]
     ok(0, "get_string_keyed_int return unknown key")
     .return ()
