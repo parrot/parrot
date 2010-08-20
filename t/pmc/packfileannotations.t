@@ -101,6 +101,9 @@ load_error:
     $P6 = 2
     anns[3] = $P6
 
+    # Make sure the mark vtable is exercised and the content survives
+    sweep 1
+
     # Pack
     $S0 = pf
     pf = new 'Packfile'
