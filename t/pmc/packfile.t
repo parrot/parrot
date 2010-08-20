@@ -25,12 +25,12 @@ If you see this tests failing after bumping PBC_COMPAT rerun tools/dev/mk_packfi
 .sub main :main
 .include 'test_more.pir'
 
-    plan(37)
+    plan(42)
     'test_new'()
     'test_set_string_native'()
     'test_get_string'()
     'test_set_string'()
-    'test_get_integer'()
+    'test_get_integer_keyed_str'()
     'test_set_integer'()
     'test_get_directory'()
     'test_load'()
@@ -124,20 +124,61 @@ If you see this tests failing after bumping PBC_COMPAT rerun tools/dev/mk_packfi
     .return ()
 .end
 
+# Compose the message for the given key
+.sub 'keyed_str_msg'
+    .param string key
+    .local string msg
+    msg = 'get_integer_keyed_str('
+    msg = concat msg, key
+    msg = concat msg, ')'
+    .return(msg)
+.end
 
-.sub 'test_get_integer'
-    .local pmc pf
+# Check the given key in the Packfile pf
+.sub 'do_get_integer_keyed_str'
+    .param pmc pf
+    .param string key
+    .local string msg
+    .local int result
+    msg = 'keyed_str_msg'(key)
+    result = 0
+    push_eh fail
+
+    $I0 = pf[key]
+    result = 1
+    goto end
+  fail:
+    .get_results($P0)
+    pop_eh
+  end:
+    ok(result, msg)
+.end
+
+.sub 'test_get_integer_keyed_str'
+    .local pmc pf, keys
+    .local int nkeys, i
+
+    keys = new ['ResizableStringArray']
+    push keys, 'wordsize'
+    push keys, 'byteorder'
+    push keys, 'fptype'
+    push keys, 'version_major'
+    push keys, 'version_minor'
+    push keys, 'version_patch'
+    push keys, 'bytecode_major'
+    push keys, 'bytecode_minor'
+    nkeys = elements keys
+
     push_eh load_error
     pf  = _pbc()
     pop_eh
-    $I0 = pf["version_major"]
-    ok(1, "get_integer_keyed_str(version_major)")
 
-    $I1 = pf["version_minor"]
-    ok(1, "get_integer_keyed_str(version_minor)")
-
-    $I2 = pf["version_patch"]
-    ok(1, "get_integer_keyed_str(version_patch)")
+    i = 0
+  nextkey:
+    $S0 = keys[i]
+    do_get_integer_keyed_str(pf, $S0)
+    inc i
+    if i < nkeys goto nextkey
 
     # Requesting unknown key should throw exception
     push_eh unknown_key
@@ -149,12 +190,20 @@ If you see this tests failing after bumping PBC_COMPAT rerun tools/dev/mk_packfi
     pop_eh
     ok(1, "get_integer_keyed_str handle unknown key properly")
     .return ()
+
+    # On load error report a failure for each test
 load_error:
     .get_results($P0)
     pop_eh
-    report_load_error($P0, "get_integer_keyed_str(version_major)")
-    report_load_error($P0, "get_integer_keyed_str(version_minor)")
-    report_load_error($P0, "get_integer_keyed_str(version_patch)")
+
+    i = 0
+  nexterr:
+    $S0 = keys[i]
+    $S0 = keyed_str_msg($S0)
+    report_load_error($P0, $S0)
+    inc i
+    if i < nkeys goto nexterr
+
     report_load_error($P0, "get_integer_keyed_str unknown key")
     .return()
 .end
