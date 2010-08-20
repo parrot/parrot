@@ -848,6 +848,10 @@ This method is experimental. See TT #264.
         RETURN(PMC *handle);
     }
 
+    METHOD getpid() {
+        INTVAL id = Parrot_getpid();
+	RETURN(INTVAL id);
+    }
 
 }
 
