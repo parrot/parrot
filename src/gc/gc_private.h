@@ -320,13 +320,13 @@ typedef struct Memory_Pools {
                                                  * blocks allocated from
                                                  * the system since the last
                                                  * GC run */
-    size_t  memory_allocated;     /* The total amount of allocatable memory
-                                   * allocated. Doesn't count memory for
-                                   * headers or internal structures or
-                                   * anything */
-    size_t  memory_used;              /* The total amount of
-                                       * memory used for
-                                       * buffers and headers */
+    size_t  memory_allocated;     /* The total amount of memory allocated
+                                   * in fixed and variable size pools.
+                                   * Doesn't count memory for internal
+                                   * structures */
+    size_t  memory_used;          /* The total amount of memory used
+                                   * in fixed and variable size
+                                   * pools. */
     size_t  mem_used_last_collect;    /* The total amount of
                                        * memory used after
                                        * the last GC run */
