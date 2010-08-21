@@ -6,16 +6,16 @@
 
 =head1 NAME
 
-as2c.pl - convert gas assembler listing to i386 code array
+as2c.pl - convert GNU Assembler listing to i386 code array
 
 =head1 DESCRIPTION
 
-The plan behind of as2c.pl is to create compiler independent
-machine code for an architecture. Code in e.g. masm, gas, nasm syntax
-doesn't fit all compilers. Therefore as2c.pl translates gas syntax to a
+The plan behind of F<as2c.pl> is to create compiler independent
+machine code for an architecture. Code in, I<e.g.,> MASM, GAS, NASM syntax
+doesn't fit all compilers. Therefore F<as2c.pl> translates GAS syntax to a
 bytestring, which is then used as the asm code.
 
-as2c.pl is used very rarely. Once the code is generated and
+F<as2c.pl> is used very rarely. Once the code is generated and
 checked in, there's usually no need to change it later.
 
 =cut
@@ -124,6 +124,14 @@ sub add_glue {
     }
     close $IN;
 }
+
+=head1 REFERENCES
+
+GNU Assembler: (GAS) L<http://en.wikipedia.org/wiki/GNU_Assembler>
+
+Microsoft Macro Assembler (MASM): L<http://en.wikipedia.org/wiki/Microsoft_Macro_Assembler>
+
+Netwide Assembler (NASM) L<http://en.wikipedia.org/wiki/Netwide_Assembler>
 
 # Local Variables:
 #   mode: cperl
