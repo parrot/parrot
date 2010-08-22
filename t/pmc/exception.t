@@ -194,8 +194,8 @@ _handler:
   catch:
     result = 1
   catchall:
-    # TT #1446
-    todo(result, 1, 'caught a cloned Exception')
+    # TT #1446 - need more tests
+    is(result, 1, 'caught a cloned Exception')
 .end
 
 # Local Variables:
