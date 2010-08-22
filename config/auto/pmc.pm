@@ -36,8 +36,8 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    # $pmc_list is a string holding a space-delimited, asciibetically-sorted
-    # list of currently active PMCs.
+    # $pmc_list is a string holding a space-delimited list of currently active
+    # PMCs, sorted (largely) on the basis of src/pmc/pmc.num.
     # (By 'current', we take into account the fact that there are PMCs listed
     # in src/pmc/pmc.num that no longer exist but whose index numbers are
     # never deleted.)
