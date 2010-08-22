@@ -114,7 +114,7 @@ my $cwd = cwd();
     );
 
     my @pmcs = qw| env.pmc default.pmc null.pmc other.pmc |;
-    my @sorted_pmcs = auto::pmc::sort_pmcs(@pmcs);
+    my @sorted_pmcs = split / /, auto::pmc::get_sorted_pmc_str(@pmcs);
     is_deeply(
         \@sorted_pmcs,
         [ qw| default.pmc null.pmc env.pmc other.pmc | ],
