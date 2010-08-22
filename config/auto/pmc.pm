@@ -249,7 +249,41 @@ sub get_sorted_pmc_str {
 
     # With the test for definedness below, we account for PMCs which have been
     # deactivated but whose index numbers remain in src/pmc/pmc.num.
-    return join(' ' => grep { defined $_ } @sorted_pmcs);
+#    return join(' ' => grep { defined $_ } @sorted_pmcs);
+    my $active_pmcs = [ grep { defined $_ } @sorted_pmcs ];
+ 
+    # At this point we check to see whether any active_pmcs are missing from
+    # the MANIFEST.  We warn about any such missing PMCs but (for the time
+    # being at least) we proceed to compose $pmc_str.
+    my $seen_manifest = pmcs_in_manifest();
+    check_pmcs_against_manifest( $active_pmcs, $seen_manifest );
+    return join(' ' => @{ $active_pmcs });
+}
+
+sub pmcs_in_manifest {
+    my $manifest = shift || 'MANIFEST';
+    my %seen_manifest = ();
+    open my $MAN, '<', $manifest
+        or die "Unable to open MANIFEST: $!";
+    while (my $f = <$MAN>) {
+        chomp $f;
+        if ($f =~ m{^src/pmc/(.*\.pmc)}) {
+            my $pmc = $1;
+            $seen_manifest{$pmc}++;
+        }
+    }
+    close $MAN or die "Unable to close MANIFEST: $!";
+    return \%seen_manifest;
+}
+
+#    check_pmcs_against_manifest( $active_pmcs, $seen_manifest );
+sub check_pmcs_against_manifest {
+    my ($active_pmcs, $seen_manifest) = @_;
+    my @missing_from_manifest = grep { ! exists $seen_manifest->{$_} }
+        @{ $active_pmcs };
+    if (@missing_from_manifest) {
+        warn "PMCs found in /src/pmc not found in MANIFEST: @missing_from_manifest";
+    }
 }
 
 sub contains_pccmethod {

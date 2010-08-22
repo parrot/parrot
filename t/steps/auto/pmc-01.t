@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  23;
+use Test::More tests =>  30;
 use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
@@ -17,6 +17,7 @@ use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
+use IO::CaptureOutput qw( capture );
 
 ########## regular ##########
 
@@ -94,14 +95,14 @@ my $cwd = cwd();
     my $pmcdir = qq{$tdir/src/pmc};
     ok(mkpath($pmcdir, { mode => 0755 }), "Able to make directory for testing");
     my $num = qq{$pmcdir/pmc.num};
-    open my $IN3, ">", $num or croak "Unable to open file for writing: $!";
-    print $IN3 "# comment line\n";
-    print $IN3 "\n";
-    print $IN3 "default.pmc\t0\n";
-    print $IN3 "null.pmc    1\n";
-    print $IN3 "env.pmc 2\n";
-    print $IN3 "notapmc 3\n";
-    close $IN3 or croak "Unable to close file after writing: $!";
+    open my $OUT3, ">", $num or croak "Unable to open file for writing: $!";
+    print $OUT3 "# comment line\n";
+    print $OUT3 "\n";
+    print $OUT3 "default.pmc\t0\n";
+    print $OUT3 "null.pmc    1\n";
+    print $OUT3 "env.pmc 2\n";
+    print $OUT3 "notapmc 3\n";
+    close $OUT3 or croak "Unable to close file after writing: $!";
     my $order_ref = auto::pmc::get_pmc_order();
     is_deeply(
         $order_ref,
@@ -114,12 +115,72 @@ my $cwd = cwd();
     );
 
     my @pmcs = qw| env.pmc default.pmc null.pmc other.pmc |;
-    my @sorted_pmcs = split / /, auto::pmc::get_sorted_pmc_str(@pmcs);
+    my $pseudoman = 'MANIFEST';
+    open my $MAN, '>', $pseudoman or croak "Unable to open $pseudoman";
+    print $MAN "src/pmc/$_\n" for @pmcs;
+    close $MAN or croak;
+    my @sorted_pmcs =
+        split / /, auto::pmc::get_sorted_pmc_str(@pmcs);
     is_deeply(
         \@sorted_pmcs,
         [ qw| default.pmc null.pmc env.pmc other.pmc | ],
         "PMCs sorted correctly"
     );
+
+    ok( chdir $cwd, 'changed back to original directory after testing' );
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
+
+    my $pmcdir = qq{$tdir/src/pmc};
+    ok(mkpath($pmcdir, { mode => 0755 }), "Able to make directory for testing");
+    my $num = qq{$pmcdir/pmc.num};
+    open my $OUT4, ">", $num or croak "Unable to open file for writing: $!";
+    print $OUT4 "# comment line\n";
+    print $OUT4 "\n";
+    print $OUT4 "default.pmc\t0\n";
+    print $OUT4 "null.pmc    1\n";
+    print $OUT4 "env.pmc 2\n";
+    print $OUT4 "notapmc 3\n";
+    close $OUT4 or croak "Unable to close file after writing: $!";
+    my $order_ref = auto::pmc::get_pmc_order();
+    is_deeply(
+        $order_ref,
+        {
+            'default.pmc' => 0,
+            'null.pmc' => 1,
+            'env.pmc' => 2,
+        },
+        "Able to read src/pmc/pmc.num correctly"
+    );
+
+    my @pmcs = qw| env.pmc default.pmc null.pmc other.pmc |;
+    my $pseudoman = 'MANIFEST';
+    open my $MAN, '>', $pseudoman or croak "Unable to open $pseudoman";
+    print $MAN "src/pmc/$_\n" for @pmcs[0..2];
+    close $MAN or croak;
+    {
+        my ($stdout, $stderr);
+        my @sorted_pmcs;
+        capture( sub {
+            @sorted_pmcs = split / /,
+                auto::pmc::get_sorted_pmc_str(@pmcs);
+            },
+            \$stdout,
+            \$stderr,
+        );
+        like( $stderr,
+            qr/PMCs found in \/src\/pmc not found in MANIFEST: $pmcs[3]/,
+            "Got expected warning",
+        );
+        is_deeply(
+            \@sorted_pmcs,
+            [ qw| default.pmc null.pmc env.pmc other.pmc | ],
+            "PMCs sorted correctly"
+        );
+    }
 
     ok( chdir $cwd, 'changed back to original directory after testing' );
 }
@@ -137,6 +198,9 @@ my $cwd = cwd();
 
     ok( chdir $cwd, 'changed back to original directory after testing' );
 }
+
+my $seen_man = auto::pmc::pmcs_in_manifest();
+ok( keys %{$seen_man}, 'src/pmc/*.pmc files were seen in MANIFEST' );
 
 pass("Completed all tests in $0");
 
