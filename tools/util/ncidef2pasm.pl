@@ -5,11 +5,15 @@
 
 =head1 NAME
 
-F<tools/util/ncidef2asm.pl>
+tools/util/ncidef2asm.pl - Turn an NCI library definition file into PASM
+
+=head1 SYNOPSIS
+
+    perl tools/util/ncidef2asm.pl path/to/from_file [ path/to/to_file ]
 
 =head1 DESCRIPTION
 
-Take an NCI library definition file and turn it into PASM.
+This program takes an NCI library definition file and turns it into PASM.
 
 An NCI library definition file provides the information needed to
 generate a parrot wrapper for the named library (or libraries). Its
