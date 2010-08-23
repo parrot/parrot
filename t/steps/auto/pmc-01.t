@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  30;
+use Test::More tests =>  33;
 use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
@@ -201,6 +201,25 @@ my $cwd = cwd();
 
 my $seen_man = auto::pmc::pmcs_in_manifest();
 ok( keys %{$seen_man}, 'src/pmc/*.pmc files were seen in MANIFEST' );
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
+
+    my @pmcs = qw| env.pmc default.pmc null.pmc other.pmc |;
+    my $pseudoman = 'foobar';
+    open my $MAN, '>', $pseudoman or croak "Unable to open $pseudoman";
+    print $MAN "src/pmc/$_\n" for @pmcs;
+    close $MAN or croak;
+
+    my $seen_manifest = auto::pmc::pmcs_in_manifest($pseudoman);
+    is_deeply(
+        $seen_manifest,
+        { map { $_ => 1} @pmcs },
+        "Got expected files in differently named MANIFEST",
+    );
+    ok( chdir $cwd, 'changed back to original directory after testing' );
+}
 
 pass("Completed all tests in $0");
 
