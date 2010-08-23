@@ -85,11 +85,11 @@ struct _hash {
 {                                                                           \
     HashBucket *_bucket = (_hash)->buckets;                                 \
     UINTVAL     _found  = 0;                                                \
-    while (_found < _hash->entries){                                        \
+    while (_found < (_hash)->entries){                                      \
         if (_bucket->key){                                                  \
             _found++;                                                       \
             {                                                               \
-                _code                                                       \
+                (_code)                                                     \
             }                                                               \
         }                                                                   \
        _bucket++;                                                           \
@@ -102,14 +102,14 @@ struct _hash {
     for (_loc = (_hash)->mask; _loc >= 0; --_loc) {                         \
         HashBucket *_bucket = (_hash)->index[_loc];                         \
         while (_bucket) {                                                   \
-            _code                                                           \
+            (_code)                                                         \
             _bucket = _bucket->next;                                        \
         }                                                                   \
     }                                                                       \
 }
 
 
-#define parrot_hash_iterator_advance(_hash,_bucket,_loc)                    \
+#define parrot_hash_iterator_advance(_hash, _bucket, _loc)                  \
 {                                                                           \
     /* Try to advance current bucket */                                     \
     if ((_bucket))                                                          \
@@ -118,7 +118,7 @@ struct _hash {
         /* If there is no more buckets */                                   \
         if ((_loc) == (INTVAL)(_hash)->mask+1)                              \
             break;                                                          \
-        (_bucket) = (_hash)->index[_loc++];                                 \
+        (_bucket) = (_hash)->index[(_loc)++];                               \
     }                                                                       \
 }
 
