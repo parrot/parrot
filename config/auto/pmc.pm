@@ -249,7 +249,6 @@ sub get_sorted_pmc_str {
 
     # With the test for definedness below, we account for PMCs which have been
     # deactivated but whose index numbers remain in src/pmc/pmc.num.
-#    return join(' ' => grep { defined $_ } @sorted_pmcs);
     my $active_pmcs = [ grep { defined $_ } @sorted_pmcs ];
  
     # At this point we check to see whether any active_pmcs are missing from
@@ -276,7 +275,6 @@ sub pmcs_in_manifest {
     return \%seen_manifest;
 }
 
-#    check_pmcs_against_manifest( $active_pmcs, $seen_manifest );
 sub check_pmcs_against_manifest {
     my ($active_pmcs, $seen_manifest) = @_;
     my @missing_from_manifest = grep { ! exists $seen_manifest->{$_} }
