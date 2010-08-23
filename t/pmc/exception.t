@@ -20,7 +20,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(21)
+    plan(22)
     test_bool()
     test_int()
     test_attrs()
@@ -182,6 +182,10 @@ _handler:
     ex = new ['Exception']
     ex['type'] = .EXCEPTION_SYNTAX_ERROR
     exclone = clone ex
+
+    result = iseq ex, exclone
+    is(result, 1, 'cloned Exception is equal to original')
+
     ehguard = new ['ExceptionHandler']
     set_label ehguard, catchall
     push_eh ehguard
