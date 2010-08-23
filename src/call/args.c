@@ -488,22 +488,13 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         }
     }
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
-        const INTVAL elements = VTABLE_elements(interp, aggregate);
-        INTVAL index;
-        PMC * const key = Parrot_pmc_new(interp, enum_class_Key);
-        VTABLE_set_integer_native(interp, key, 0);
-        SETATTR_Key_next_key(interp, key, (PMC *)INITBucketIndex);
+        Hash *hash = (Hash *)VTABLE_get_pointer(interp, aggregate);
 
-        /* Low-level hash iteration. */
-        for (index = 0; index < elements; ++index) {
-            if (!PMC_IS_NULL(key)) {
-                STRING * const name = (STRING *)parrot_hash_get_idx(interp,
-                                (Hash *)VTABLE_get_pointer(interp, aggregate), key);
-                PARROT_ASSERT(name);
-                VTABLE_set_pmc_keyed_str(interp, call_object, name,
-                    VTABLE_get_pmc_keyed_str(interp, aggregate, name));
-            }
-        }
+        parrot_hash_iterate(hash,
+            VTABLE_set_pmc_keyed_str(interp, call_object,
+                (STRING *)_bucket->key,
+                hash_value_to_pmc(interp, hash, _bucket->value));
+        )
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
