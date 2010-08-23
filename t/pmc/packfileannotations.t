@@ -9,6 +9,7 @@ t/pmc/packfileannotations.t - test the PackfileAnnotations PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfileannotations.t
 
 =head1 DESCRIPTION

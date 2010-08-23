@@ -9,13 +9,12 @@ t/pmc/packfile.t - test the Packfile PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfile.t
 
 =head1 DESCRIPTION
 
 Tests the Packfile PMC.
-
-If you see this tests failing after bumping PBC_COMPAT rerun tools/dev/mk_packfile_pbc.
 
 =cut
 

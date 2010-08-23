@@ -8,6 +8,7 @@ t/pmc/packfileconstanttable.t - test the PackfileConstantTable PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfileconstanttable.t
 
 =head1 DESCRIPTION
