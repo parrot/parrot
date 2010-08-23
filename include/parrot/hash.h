@@ -78,7 +78,7 @@ struct _hash {
     hash_hash_key_fn hash_val;
 };
 
-/* Utility macros - use them, do not reinvent the weel */
+/* Utility macros - use them, do not reinvent the wheel */
 #define parrot_hash_iterate parrot_hash_iterate_linear
 
 #define parrot_hash_iterate_linear(_hash, _code)                            \
