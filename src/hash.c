@@ -49,12 +49,6 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
-static UINTVAL get_hash_val(PARROT_INTERP,
-    ARGIN(const Hash *hash),
-    ARGIN_NULLOK(const void *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGMOD(PMC *info))
@@ -106,9 +100,6 @@ static int pointer_compare(SHIM_INTERP,
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_expand_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_get_hash_val __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -164,36 +155,6 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
 
 /*
 
-=item C<static UINTVAL get_hash_val(PARROT_INTERP, const Hash *hash, const void
-*key)>
-
-An inlinable helper function to avoid the overhead of calling key_hash_STRING()
-when there's already a calculated hash value for the STRING key.
-
-=cut
-
-*/
-
-static UINTVAL
-get_hash_val(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *key))
-{
-    ASSERT_ARGS(get_hash_val)
-    if (hash->hash_val == (hash_hash_key_fn)key_hash_STRING) {
-        /* Must be non-const because str_to_hashval caches the result
-         * in the STRING struct */
-        DECL_CONST_CAST;
-        STRING * const s = (STRING *)PARROT_const_cast(void *, key);
-        if (s->hashval)
-            return s->hashval;
-        return Parrot_str_to_hashval(interp, s);
-    }
-
-    return (hash->hash_val)(interp, key, hash->seed);
-}
-
-
-/*
-
 =item C<int STRING_compare(PARROT_INTERP, const void *search_key, const void
 *bucket_key)>
 
@@ -211,16 +172,8 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
     STRING const *s1 = (STRING const *)search_key;
     STRING const *s2 = (STRING const *)bucket_key;
 
-    if (!s2)
-        return 1;
-
     if (s1->hashval != s2->hashval)
         return 1;
-
-    /* COWed strings */
-    if (Buffer_bufstart(s1) == Buffer_bufstart(s2)
-    &&  s1->bufused == s2->bufused)
-        return 0;
 
     return CHARSET_COMPARE(interp, s1, s2);
 }
@@ -863,7 +816,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         while ((b = *next_p) != NULL) {
             /* rehash the bucket */
             const size_t new_loc =
-                get_hash_val(interp, hash, b->key) & (new_size - 1);
+                (hash->hash_val)(interp, b->key, hash->seed) & (new_size - 1);
 
             if (i != new_loc) {
                 *next_p         = b->next;
@@ -1160,15 +1113,39 @@ HashBucket *
 parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *key))
 {
     ASSERT_ARGS(parrot_hash_get_bucket)
+    UINTVAL     hashval;
+    HashBucket *bucket;
+    const hash_hash_key_fn hash_val = hash->hash_val;
+    const hash_comp_fn     compare  = hash->compare;
 
     if (hash->entries <= 0)
         return NULL;
 
-    /* if the fast search didn't work, try the normal hashing search */
-    {
-        const UINTVAL hashval = get_hash_val(interp, hash, key);
-        HashBucket   *bucket  = hash->index[hashval & hash->mask];
-        const hash_comp_fn compare = hash->compare;
+    if (hash_val == key_hash_STRING && compare == STRING_compare) {
+        /* fast path for string keys */
+        const STRING *s = (const STRING *)key;
+
+        if (s->hashval)
+            hashval = s->hashval;
+        else
+            hashval = Parrot_str_to_hashval(interp, s);
+
+        bucket = hash->index[hashval & hash->mask];
+
+        while (bucket) {
+            const STRING *s2 = (const STRING *)bucket->key;
+
+            if (s == s2
+            || (s->hashval == s2->hashval
+            &&  CHARSET_COMPARE(interp, s, s2) == 0))
+                return bucket;
+
+            bucket = bucket->next;
+        }
+    }
+    else {
+        hashval = hash_val(interp, key, hash->seed);
+        bucket  = hash->index[hashval & hash->mask];
 
         while (bucket) {
             /* key equality is always a match, so it's worth checking */
@@ -1248,16 +1225,44 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(parrot_hash_put)
-    const UINTVAL hashval = get_hash_val(interp, hash, key);
-    HashBucket   *bucket  = hash->index[hashval & hash->mask];
-    const hash_comp_fn compare = hash->compare;
+    UINTVAL     hashval;
+    HashBucket *bucket;
+    const hash_hash_key_fn hash_val = hash->hash_val;
+    const hash_comp_fn     compare  = hash->compare;
 
-    /* See if we have an existing value for this key */
-    while (bucket) {
-        /* store hash_val or not */
-        if ((compare)(interp, key, bucket->key) == 0)
-            break;
-        bucket = bucket->next;
+    if (hash_val == key_hash_STRING && compare == STRING_compare) {
+        /* fast path for string keys */
+        const STRING *s = (const STRING *)key;
+
+        if (s->hashval)
+            hashval = s->hashval;
+        else
+            hashval = Parrot_str_to_hashval(interp, s);
+
+        bucket = hash->index[hashval & hash->mask];
+
+        while (bucket) {
+            const STRING *s2 = (const STRING *)bucket->key;
+
+            if (s == s2
+            || (s->hashval  == s2->hashval
+            &&  CHARSET_COMPARE(interp, s, s2) == 0))
+                break;
+
+            bucket = bucket->next;
+        }
+    }
+    else {
+        hashval = hash_val(interp, key, hash->seed);
+        bucket  = hash->index[hashval & hash->mask];
+
+        /* See if we have an existing value for this key */
+        while (bucket) {
+            /* store hash_val or not */
+            if (compare(interp, key, bucket->key) == 0)
+                break;
+            bucket = bucket->next;
+        }
     }
 
     /* If we have a bucket already, put the value in it. Otherwise, we need
