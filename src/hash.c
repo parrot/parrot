@@ -742,6 +742,9 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     const UINTVAL new_nb     = N_BUCKETS(new_size);
     size_t        offset, i;
 
+    const hash_hash_key_fn hash_val_func = hash->hash_val;
+    const int              is_string_key = (hash_val_func == (hash_hash_key_fn)key_hash_STRING);
+
     /*
        allocate some less buckets
        e.g. 3 buckets, 4 pointers:
@@ -798,10 +801,20 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
         while (*next_p != NULL) {
             size_t new_loc;
+            size_t hashval;
 
             b = (HashBucket *)((char *)*next_p + offset);
+
             /* rehash the bucket */
-            new_loc = (hash->hash_val)(interp, b->key, hash->seed) & (new_size - 1);
+            if (is_string_key) {
+                STRING *s = (STRING *)b->key;
+                hashval   = s->hashval;
+            }
+            else {
+                hashval = hash_val_func(interp, b->key, hash->seed);
+            }
+
+            new_loc = hashval & (new_size - 1);
 
             if (i != new_loc) {
                 *next_p         = b->next;
@@ -1110,9 +1123,11 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
     if (hash->entries <= 0)
         return NULL;
 
-    if (hash_val == key_hash_STRING && compare == STRING_compare) {
+    if (hash_val == (hash_hash_key_fn)key_hash_STRING
+    &&  compare == STRING_compare) {
         /* fast path for string keys */
-        const STRING *s = (const STRING *)key;
+        DECL_CONST_CAST;
+        STRING * const s = (STRING *)PARROT_const_cast(void *, key);
 
         if (s->hashval)
             hashval = s->hashval;
@@ -1125,7 +1140,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
             const STRING *s2 = (const STRING *)bucket->key;
 
             if (s == s2
-            || (s->hashval == s2->hashval
+            || (hashval == s2->hashval
             &&  CHARSET_COMPARE(interp, s, s2) == 0))
                 return bucket;
 
@@ -1219,9 +1234,10 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     const hash_hash_key_fn hash_val = hash->hash_val;
     const hash_comp_fn     compare  = hash->compare;
 
-    if (hash_val == key_hash_STRING && compare == STRING_compare) {
+    if (hash_val == (hash_hash_key_fn)key_hash_STRING
+    &&  compare == STRING_compare) {
         /* fast path for string keys */
-        const STRING *s = (const STRING *)key;
+        STRING *s = (STRING *)key;
 
         if (s->hashval)
             hashval = s->hashval;
@@ -1234,7 +1250,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
             const STRING *s2 = (const STRING *)bucket->key;
 
             if (s == s2
-            || (s->hashval  == s2->hashval
+            || (hashval == s2->hashval
             &&  CHARSET_COMPARE(interp, s, s2) == 0))
                 break;
 
