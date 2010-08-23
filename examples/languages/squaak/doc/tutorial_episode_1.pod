@@ -219,8 +219,9 @@ appreciated.
 
 The exercises are provided at the end of each episode of this tutorial. In
 order to keep the length of this tutorial somewhat acceptable, not everything
-can be discussed in full detail. With episode 3 the answers and/or solutions to these exercises are at the end of each episode. The answer of the exercise from
-episode 1 is at the end of episode 2.
+can be discussed in full detail. With episode 3 the answers and/or solutions
+to these exercises are at the end of each episode. The answer of the exercise
+from episode 1 is at the end of episode 2.
 
 =head3 Advanced interactive mode.
 
