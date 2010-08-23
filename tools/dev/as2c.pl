@@ -133,6 +133,8 @@ Microsoft Macro Assembler (MASM): L<http://en.wikipedia.org/wiki/Microsoft_Macro
 
 Netwide Assembler (NASM) L<http://en.wikipedia.org/wiki/Netwide_Assembler>
 
+=cut
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
