@@ -514,8 +514,7 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
     ASSERT_ARGS(parrot_mark_hash_keys)
     parrot_hash_iterate(hash,
         PARROT_ASSERT(_bucket->key);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key);
-    );
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key););
 }
 
 
@@ -535,8 +534,7 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     ASSERT_ARGS(parrot_mark_hash_values)
     parrot_hash_iterate(hash,
         PARROT_ASSERT(_bucket->value);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value);
-    );
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value););
 }
 
 
@@ -558,8 +556,7 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
         PARROT_ASSERT(_bucket->key);
         Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key);
         PARROT_ASSERT(_bucket->value);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value);
-    );
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value););
 }
 
 /*
@@ -709,8 +706,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "unimplemented value type");
             break;
-        }
-    );
+        });
 }
 
 
@@ -1085,8 +1081,7 @@ parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
     ASSERT_ARGS(parrot_chash_destroy)
     parrot_hash_iterate(hash,
         mem_gc_free(interp, _bucket->key);
-        mem_gc_free(interp, _bucket->value);
-    );
+        mem_gc_free(interp, _bucket->value););
     parrot_hash_destroy(interp, hash);
 }
 
@@ -1459,8 +1454,7 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
                     "hash corruption: type = %d\n", hash->entry_type);
         };
         if (key)
-            parrot_hash_put(interp, dest, key, valtmp);
-    );
+            parrot_hash_put(interp, dest, key, valtmp););
 }
 
 /*

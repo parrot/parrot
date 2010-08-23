@@ -470,8 +470,7 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
     ASSERT_ARGS(mark_hash)
     parrot_hash_iterate(h,
         Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->key);
-        mark_cell(interp, (Pcc_cell *)_bucket->value);
-    );
+        mark_cell(interp, (Pcc_cell *)_bucket->value););
 }
 
 /*
@@ -496,8 +495,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
         UINTVAL j = 0;
         PMC *result = Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
         parrot_hash_iterate(hash,
-            VTABLE_set_string_keyed_int(interp, result, j++, (STRING *)_bucket->key);
-        );
+            VTABLE_set_string_keyed_int(interp, result, j++, (STRING *)_bucket->key););
         return result;
     }
 
@@ -688,8 +686,7 @@ stored.)
 
         if (hash) {
             parrot_hash_iterate(hash,
-               FREE_CELL(INTERP, (Pcc_cell *)_bucket->value);
-            );
+               FREE_CELL(INTERP, (Pcc_cell *)_bucket->value););
             parrot_hash_destroy(INTERP, hash);
             SET_ATTR_hash(INTERP, SELF, NULL);
         }
@@ -718,8 +715,7 @@ stored.)
 
         if (hash) {
             parrot_hash_iterate(hash,
-                FREE_CELL(INTERP, (Pcc_cell *)_bucket->value);
-            );
+                FREE_CELL(INTERP, (Pcc_cell *)_bucket->value););
             parrot_hash_destroy(INTERP, hash);
         }
 

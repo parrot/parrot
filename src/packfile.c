@@ -3475,8 +3475,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         PackFile_ConstTable * const table     = (PackFile_ConstTable *)_bucket->key;
         PackFile_Constant * const orig_consts = table->constants;
         PackFile_Constant * const consts      = (PackFile_Constant *) _bucket->value;
-        mem_gc_free(interp, consts);
-    );
+        mem_gc_free(interp, consts););
     parrot_hash_destroy(interp, hash);
 }
 

@@ -102,8 +102,7 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
 
             parrot_hash_iterate(hash,
                 PARROT_ASSERT(_bucket->key);
-                VTABLE_push_string(INTERP, result, (STRING *)_bucket->key);
-            );
+                VTABLE_push_string(INTERP, result, (STRING *)_bucket->key););
 
             return result;
         }
