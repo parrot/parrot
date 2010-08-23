@@ -739,6 +739,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     const UINTVAL old_size   = hash->mask + 1;
     const UINTVAL new_size   = old_size << 1; /* Double. Right-shift is 2x */
     const UINTVAL old_nb     = N_BUCKETS(old_size);
+    const UINTVAL new_nb     = N_BUCKETS(new_size);
     size_t        offset, i;
 
     /*
@@ -775,7 +776,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
     bs     = new_mem;
     old_bi = (HashBucket **)(bs + old_nb);
-    new_bi = (HashBucket **)(bs + N_BUCKETS(new_size));
+    new_bi = (HashBucket **)(bs + new_nb);
 
     /* things can have moved by this offset */
     offset = (char *)new_mem - (char *)old_mem;
@@ -789,52 +790,40 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
-    memset(new_bi + old_size, 0, sizeof (HashBucket *) * old_size);
+    memset(new_bi + old_size, 0, sizeof (HashBucket *) * (new_size - old_size));
 
-    /*
-     * reloc pointers - this part would be also needed, if we
-     * allocate hash memory from GC movable memory, and then
-     * also the free_list needs updating (this is empty now,
-     * as expand_hash is only called for that case).
-     */
-    if (offset) {
-        size_t j;
-        for (j = 0; j < old_size; ++j) {
-            HashBucket **next_p = new_bi + j;
-            while (*next_p) {
-                *next_p = (HashBucket *)((char *)*next_p + offset);
-                b       = *next_p;
-                next_p  = &b->next;
-            }
-        }
-    }
-
-    /* recalc bucket index */
+    /* reloc pointers and recalc bucket indices */
     for (i = 0; i < old_size; ++i) {
         HashBucket **next_p = new_bi + i;
 
-        while ((b = *next_p) != NULL) {
+        while (*next_p != NULL) {
+            size_t new_loc;
+
+            b = (HashBucket *)((char *)*next_p + offset);
             /* rehash the bucket */
-            const size_t new_loc =
-                (hash->hash_val)(interp, b->key, hash->seed) & (new_size - 1);
+            new_loc = (hash->hash_val)(interp, b->key, hash->seed) & (new_size - 1);
 
             if (i != new_loc) {
                 *next_p         = b->next;
                 b->next         = new_bi[new_loc];
                 new_bi[new_loc] = b;
             }
-            else
-                next_p = &b->next;
+            else {
+                *next_p = b;
+                next_p  = &b->next;
+            }
         }
     }
 
-    /* add new buckets to free_list in reverse order
+    /* add new buckets to free_list
      * lowest bucket is top on free list and will be used first */
-    for (i = 0, b = (HashBucket *)new_bi - 1; i < old_nb; ++i, --b) {
-        b->next         = hash->free_list;
-        b->key          = b->value         = NULL;
-        hash->free_list = b;
+    for (b = bs + old_nb; b < bs + new_nb - 1; ++b) {
+        b->next = b + 1;
+        b->key  = b->value = NULL;
     }
+
+    b->next = hash->free_list;
+    hash->free_list = bs + old_nb;
 }
 
 
