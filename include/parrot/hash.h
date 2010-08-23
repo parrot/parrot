@@ -89,7 +89,7 @@ struct _hash {
         if (_bucket->key){                                                  \
             _found++;                                                       \
             {                                                               \
-                (_code)                                                     \
+                _code                                                       \
             }                                                               \
         }                                                                   \
        _bucket++;                                                           \
@@ -102,7 +102,7 @@ struct _hash {
     for (_loc = (_hash)->mask; _loc >= 0; --_loc) {                         \
         HashBucket *_bucket = (_hash)->index[_loc];                         \
         while (_bucket) {                                                   \
-            (_code)                                                         \
+            _code                                                           \
             _bucket = _bucket->next;                                        \
         }                                                                   \
     }                                                                       \
