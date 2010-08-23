@@ -250,7 +250,7 @@ sub get_sorted_pmc_str {
     # With the test for definedness below, we account for PMCs which have been
     # deactivated but whose index numbers remain in src/pmc/pmc.num.
     my $active_pmcs = [ grep { defined $_ } @sorted_pmcs ];
- 
+
     # At this point we check to see whether any active_pmcs are missing from
     # the MANIFEST.  We warn about any such missing PMCs but (for the time
     # being at least) we proceed to compose $pmc_str.
