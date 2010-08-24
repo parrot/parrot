@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id: byteorder.c 45297 2010-03-30 01:33:45Z coke $
+$Id$
 
 =head1 NAME
 
