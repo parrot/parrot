@@ -207,16 +207,6 @@ INTVAL parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void parrot_hash_visit(PARROT_INTERP,
-    ARGMOD(Hash *hash),
-    ARGMOD(void *pinfo))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*hash)
-        FUNC_MODIFIES(*pinfo);
-
-PARROT_EXPORT
 void parrot_mark_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -412,6 +402,21 @@ void parrot_hash_clone_prunable(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
+void Parrot_hash_freeze(PARROT_INTERP,
+    ARGIN(const Hash *hash),
+    ARGMOD(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
+
+void Parrot_hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash)
+        FUNC_MODIFIES(*info);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int PMC_compare(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
@@ -462,10 +467,6 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_parrot_hash_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_parrot_hash_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(pinfo))
 #define ASSERT_ARGS_parrot_mark_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -552,6 +553,14 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(dest))
+#define ASSERT_ARGS_Parrot_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_Parrot_hash_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash) \
+    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_PMC_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \

@@ -49,21 +49,6 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
-static void hash_freeze(PARROT_INTERP,
-    ARGIN(const Hash *hash),
-    ARGMOD(PMC *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*info);
-
-static void hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*hash)
-        FUNC_MODIFIES(*info);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t key_hash_cstring(SHIM_INTERP,
@@ -102,14 +87,6 @@ static int pointer_compare(SHIM_INTERP,
 #define ASSERT_ARGS_expand_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_hash_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -514,7 +491,7 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static void hash_thaw(PARROT_INTERP, Hash *hash, PMC *info)>
+=item C<void Parrot_hash_thaw(PARROT_INTERP, Hash *hash, PMC *info)>
 
 Visits the contents of a hash during freeze/thaw.
 
@@ -524,12 +501,11 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 */
 
-static void
-hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
+void
+Parrot_hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
 {
-    ASSERT_ARGS(hash_thaw)
+    ASSERT_ARGS(Parrot_hash_thaw)
 
-    /* during thaw, info->extra is the key/value count */
     const size_t           num_entries = (size_t) hash->entries;
     const Hash_key_type    key_type    = hash->key_type;
     const PARROT_DATA_TYPE entry_type  = hash->entry_type;
@@ -607,23 +583,21 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
 
 /*
 
-=item C<static void hash_freeze(PARROT_INTERP, const Hash *hash, PMC *info)>
+=item C<void Parrot_hash_freeze(PARROT_INTERP, const Hash *hash, PMC *info)>
 
 Freezes hash into a string.
 
 Takes an interpreter, a pointer to the hash, and a pointer to the structure
 containing the string start location.
 
-Use by parrot_hash_visit.
-
 =cut
 
 */
 
-static void
-hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
+void
+Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
 {
-    ASSERT_ARGS(hash_freeze)
+    ASSERT_ARGS(Parrot_hash_freeze)
     const Hash_key_type    key_type   = hash->key_type;
     const PARROT_DATA_TYPE entry_type = hash->entry_type;
     const size_t           entries    = hash->entries;
@@ -660,39 +634,6 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
                     "unimplemented value type");
             break;
         });
-}
-
-
-/*
-
-=item C<void parrot_hash_visit(PARROT_INTERP, Hash *hash, void *pinfo)>
-
-Freezes or thaws a hash as specified.  Takes an interpreter, a pointer to the
-hash, and a pointer to the structure identifying what to do and the location of
-the string.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
-{
-    ASSERT_ARGS(parrot_hash_visit)
-    PMC* const info = (PMC*) pinfo;
-
-    switch (VTABLE_get_integer(interp, info)) {
-      case VISIT_THAW_NORMAL:
-        hash_thaw(interp, hash, info);
-        break;
-      case VISIT_FREEZE_NORMAL:
-        hash_freeze(interp, hash, info);
-        break;
-      default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "unimplemented visit mode");
-    }
 }
 
 

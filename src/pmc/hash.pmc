@@ -1154,21 +1154,6 @@ Check if two hashes hold the same keys and values.
 
 /*
 
-=item C<void visit(PMC *info)>
-
-Used during archiving to visit the elements in the hash.
-
-=cut
-
-*/
-
-    VTABLE void visit(PMC *info) {
-        parrot_hash_visit(INTERP, (Hash *)SELF.get_pointer(), info);
-        SUPER(info);
-    }
-
-/*
-
 =item C<void freeze(PMC *info)>
 
 Used to archive the hash.
@@ -1184,6 +1169,8 @@ Used to archive the hash.
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
         VTABLE_push_integer(INTERP, info, (INTVAL)hash->key_type);
         VTABLE_push_integer(INTERP, info, hash->entry_type);
+
+        Parrot_hash_freeze(INTERP, hash, info);
     }
 
 /*
@@ -1238,6 +1225,8 @@ Used to unarchive the hash.
             PARROT_ASSERT(hash->entry_type       == v_type);
 
             hash->entries   = elems;
+
+            Parrot_hash_thaw(INTERP, hash, info);
         }
     }
 }
