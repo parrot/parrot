@@ -1164,7 +1164,7 @@ Used to archive the hash.
 
     VTABLE void freeze(PMC *info) {
         SUPER(info);
-        Parrot_hash_freeze(INTERP, SELF.get_pointer(), info);
+        Parrot_hash_freeze(INTERP, (Hash *)SELF.get_pointer(), info);
     }
 
 /*
@@ -1179,7 +1179,7 @@ Used to unarchive the hash.
 
     VTABLE void thaw(PMC *info) {
         SUPER(info);
-        SELF.set_pointer(Parrot_hash_thaw(INTERP, info));
+        SELF.set_pointer((void *)Parrot_hash_thaw(INTERP, info));
     }
 }
 

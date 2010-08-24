@@ -510,8 +510,8 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
     ASSERT_ARGS(Parrot_hash_thaw)
 
     const size_t            num_entries = VTABLE_shift_integer(interp, info);
-    const Hash_key_type     key_type    = VTABLE_shift_integer(interp, info);
-    const PARROT_DATA_TYPE  entry_type  = VTABLE_shift_integer(interp, info);
+    const Hash_key_type     key_type    = (Hash_key_type)VTABLE_shift_integer(interp, info);
+    const PARROT_DATA_TYPE  entry_type  = (PARROT_DATA_TYPE)VTABLE_shift_integer(interp, info);
     size_t                  entry_index;
     Hash                   *hash;
 
@@ -982,7 +982,7 @@ parrot_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type
         NOTNULL(hash_comp_fn compare), NOTNULL(hash_hash_key_fn keyhash), UINTVAL size)
 {
     ASSERT_ARGS(parrot_create_hash_sized)
-    UINTVAL      initial_buckets = round_up_pow2(size);
+    UINTVAL      initial_buckets = size > INITIAL_BUCKETS ? round_up_pow2(size) : INITIAL_BUCKETS;
     HashBucket  *bp;
     void        *alloc = Parrot_gc_allocate_memory_chunk_with_interior_pointers(
                             interp, sizeof (Hash) + HASH_ALLOC_SIZE(initial_buckets));
