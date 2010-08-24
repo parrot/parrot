@@ -47,7 +47,6 @@ PARROT_CONST_FUNCTION
 static INTVAL
 fetch_iv_le(INTVAL w)
 {
-    ASSERT_ARGS(fetch_iv_le)
 #if !PARROT_BIGENDIAN
     return w;
 #else
@@ -91,7 +90,6 @@ PARROT_CONST_FUNCTION
 static INTVAL
 fetch_iv_be(INTVAL w)
 {
-    ASSERT_ARGS(fetch_iv_be)
 #if PARROT_BIGENDIAN
     return w;
 #else
@@ -133,7 +131,6 @@ PARROT_CONST_FUNCTION
 static opcode_t
 fetch_op_be(opcode_t w)
 {
-    ASSERT_ARGS(fetch_op_be)
 #if PARROT_BIGENDIAN
     return w;
 #else
@@ -172,7 +169,6 @@ PARROT_CONST_FUNCTION
 static opcode_t
 fetch_op_le(opcode_t w)
 {
-    ASSERT_ARGS(fetch_op_le)
 #if !PARROT_BIGENDIAN
     return w;
 #else
@@ -221,7 +217,6 @@ PARROT_INLINE
 static void
 fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_4)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
@@ -246,7 +241,6 @@ PARROT_INLINE
 static void
 fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_4)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
@@ -271,7 +265,6 @@ PARROT_INLINE
 static void
 fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_8)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
@@ -300,7 +293,6 @@ PARROT_INLINE
 static void
 fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_8)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
@@ -329,7 +321,6 @@ PARROT_INLINE
 static void
 fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_12)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
@@ -362,7 +353,6 @@ PARROT_INLINE
 static void
 fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_12)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
@@ -395,7 +385,6 @@ PARROT_INLINE
 static void
 fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_16)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
@@ -432,7 +421,6 @@ PARROT_INLINE
 static void
 fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_16)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
@@ -469,7 +457,6 @@ PARROT_INLINE
 static void
 fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_32)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 32);
 #else
@@ -522,7 +509,6 @@ PARROT_INLINE
 static void
 fetch_buf_be_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_32)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 32);
 #else
