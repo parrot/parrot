@@ -491,7 +491,7 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<void Parrot_hash_thaw(PARROT_INTERP, Hash *hash, PMC *info)>
+=item C<Hash * Parrot_hash_thaw(PARROT_INTERP, PMC *info)>
 
 Visits the contents of a hash during freeze/thaw.
 
@@ -501,17 +501,46 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 */
 
-void
-Parrot_hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash *
+Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
 {
     ASSERT_ARGS(Parrot_hash_thaw)
 
-    const size_t           num_entries = (size_t) hash->entries;
-    const Hash_key_type    key_type    = hash->key_type;
-    const PARROT_DATA_TYPE entry_type  = hash->entry_type;
-    size_t                 entry_index;
+    const size_t            num_entries = VTABLE_shift_integer(interp, info);
+    const Hash_key_type     key_type    = VTABLE_shift_integer(interp, info);
+    const PARROT_DATA_TYPE  entry_type  = VTABLE_shift_integer(interp, info);
+    size_t                  entry_index;
+    Hash                   *hash;
 
-    hash->entries = 0;
+    {
+        hash_comp_fn     cmp_fn;
+        hash_hash_key_fn key_fn;
+
+        switch (key_type) {
+            case Hash_key_type_int:
+                key_fn = (hash_hash_key_fn)key_hash_int;
+                cmp_fn = (hash_comp_fn)int_compare;
+                break;
+            case Hash_key_type_STRING:
+                key_fn = (hash_hash_key_fn)key_hash_STRING;
+                cmp_fn = (hash_comp_fn)STRING_compare;
+                break;
+            case Hash_key_type_PMC:
+                key_fn = (hash_hash_key_fn)key_hash_PMC;
+                cmp_fn = (hash_comp_fn)PMC_compare;
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "unimplemented key type");
+                break;
+        }
+
+        hash = parrot_create_hash(interp, entry_type, key_type, cmp_fn, key_fn);
+
+    }
 
     /* special case for great speed */
     if (key_type   == Hash_key_type_STRING
@@ -522,7 +551,7 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
             parrot_hash_put(interp, hash, (void *)key, (void *)i);
         }
 
-        return;
+        return hash;
     }
 
     for (entry_index = 0; entry_index < num_entries; ++entry_index) {
@@ -578,6 +607,8 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
             break;
         }
     }
+
+    return hash;
 }
 
 
@@ -602,6 +633,10 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
     const PARROT_DATA_TYPE entry_type = hash->entry_type;
     const size_t           entries    = hash->entries;
     size_t                 i;
+
+    VTABLE_push_integer(interp, info, entries);
+    VTABLE_push_integer(interp, info, key_type);
+    VTABLE_push_integer(interp, info, entry_type);
 
     parrot_hash_iterate(hash,
         switch (key_type) {

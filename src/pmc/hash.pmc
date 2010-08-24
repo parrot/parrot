@@ -1163,14 +1163,8 @@ Used to archive the hash.
 */
 
     VTABLE void freeze(PMC *info) {
-        Hash     * const hash = (Hash *)SELF.get_pointer();
-
         SUPER(info);
-        VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
-        VTABLE_push_integer(INTERP, info, (INTVAL)hash->key_type);
-        VTABLE_push_integer(INTERP, info, hash->entry_type);
-
-        Parrot_hash_freeze(INTERP, hash, info);
+        Parrot_hash_freeze(INTERP, SELF.get_pointer(), info);
     }
 
 /*
@@ -1185,49 +1179,7 @@ Used to unarchive the hash.
 
     VTABLE void thaw(PMC *info) {
         SUPER(info);
-
-        {
-            const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
-            const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
-            const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
-            Hash        *hash;
-
-            if (k_type != Hash_key_type_STRING || v_type != enum_hash_pmc) {
-                hash_comp_fn cmp_fn;
-                hash_hash_key_fn key_fn;
-
-                switch (k_type) {
-                  case Hash_key_type_int:
-                    key_fn = (hash_hash_key_fn)key_hash_int;
-                    cmp_fn = (hash_comp_fn)int_compare;
-                    break;
-                  case Hash_key_type_STRING:
-                    key_fn = (hash_hash_key_fn)key_hash_STRING;
-                    cmp_fn = (hash_comp_fn)STRING_compare;
-                    break;
-                  case Hash_key_type_PMC:
-                    key_fn = (hash_hash_key_fn)key_hash_PMC;
-                    cmp_fn = (hash_comp_fn)PMC_compare;
-                    break;
-                  default:
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                            "unimplemented key type");
-                    break;
-                }
-
-                SELF.set_pointer(parrot_create_hash(INTERP, (PARROT_DATA_TYPE)v_type,
-                                                    (Hash_key_type)k_type, cmp_fn, key_fn));
-            }
-
-            hash = (Hash *)SELF.get_pointer();
-
-            PARROT_ASSERT((INTVAL)hash->key_type == k_type);
-            PARROT_ASSERT(hash->entry_type       == v_type);
-
-            hash->entries   = elems;
-
-            Parrot_hash_thaw(INTERP, hash, info);
-        }
+        SELF.set_pointer(Parrot_hash_thaw(INTERP, info));
     }
 }
 

@@ -410,11 +410,12 @@ void Parrot_hash_freeze(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
 
-void Parrot_hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*hash)
         FUNC_MODIFIES(*info);
 
 PARROT_WARN_UNUSED_RESULT
@@ -559,7 +560,6 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_Parrot_hash_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_PMC_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
