@@ -15,7 +15,7 @@ module, L<runtime/parrot/library/Crow.pir>.
 =head1 SYNOPSIS
 
   # see
-  % parrot tools/util/crow.pir --help
+  % parrot tools/release/crow.pir --help
 
 =cut
 
@@ -39,7 +39,7 @@ module, L<runtime/parrot/library/Crow.pir>.
   got_opts:
 
     .local pmc templates
-    templates = 'get_json'('tools/util/templates.json')
+    templates = 'get_json'('tools/release/templates.json')
 
     .local string template, type
     type = opts['type']
@@ -50,7 +50,7 @@ got_type:
     template = 'get_template'(templates, type)
 
     .local pmc data
-    data = 'get_json'('tools/util/release.json')
+    data = 'get_json'('tools/release/release.json')
 
     .local string version
     version = data['release.version']

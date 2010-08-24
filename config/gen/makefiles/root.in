@@ -47,8 +47,13 @@ VERSION_DIR     = @versiondir@
 # where we're building parrot from (needed for pbc_to_exe)
 BUILD_DIR = @build_dir@
 
-# directory for build tools
+# directory for build tools:
+# programs, templates, configuration files invoked by 'make all'
+# (with or without command-line options)
 BUILD_TOOLS_DIR = tools/build
+# directory for developers' tools
+# programs, templates, configuration files NOT invoked by 'make all'
+DEV_TOOLS_DIR = tools/dev
 
 # directory for header files
 INC_DIR         = @inc@
@@ -116,7 +121,7 @@ LINKARGS         = $(LDFLAGS) $(LD_LOAD_FLAGS) @libparrot_ldflags@ @icu_shared@ 
 NONGEN_HEADERS   = @TEMP_nongen_headers@
 
 # The headerizer
-HEADERIZER       = $(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl
+HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
 
 include src/dynpmc/Defines.mak
 include src/dynoplibs/Defines.mak
@@ -857,8 +862,8 @@ parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 $(PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot-prove.pbc
 
-$(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
-	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
+$(PARROT_CONFIG) : tools/dev/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
+	$(PARROT) -o parrot_config.pbc tools/dev/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
 $(MINIPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -968,7 +973,7 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
-	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
+	$(PARROT) -o parrot_config.pbc tools/dev/parrot-config.pir
 	$(PBC_TO_EXE) parrot_config.pbc --install
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
@@ -2512,7 +2517,7 @@ tags-vi: tags.vi.dummy
 	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.
-	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
+	$(PERL) $(DEV_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.vi.dummy:
 
@@ -2524,12 +2529,12 @@ tags.dummy:
 CRITIC_FILES = 'lib/Parrot'
 
 perlcritic:
-	perlcritic --profile tools/util/perlcritic.conf $(CRITIC_FILES)
+	perlcritic --profile tools/dev/perlcritic.conf $(CRITIC_FILES)
 
 # Andy's extra-cranky Perl::Critic checking for cage cleaners
 cagecritic:
 	@perl -MPerl::Critic::Bangs -e'$$min=q{1.04};die qq{You need Bangs $$min} unless $$Perl::Critic::Bangs::VERSION ge $$min'
-	perlcritic -1 --profile tools/util/perlcritic-cage.conf $(CRITIC_FILES)
+	perlcritic -1 --profile tools/dev/perlcritic-cage.conf $(CRITIC_FILES)
 
 # This target will eventually create all the headers automatically.  If you
 # are having problems with linkage in Win32 (or elsewhere), because something

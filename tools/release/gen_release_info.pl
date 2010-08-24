@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-tools/util/gen_release_info.pl - generate release info for graphs and charts
+tools/release/gen_release_info.pl - generate release info for graphs and charts
 
 =head1 DESCRIPTION
 
