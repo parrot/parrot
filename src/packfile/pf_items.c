@@ -33,6 +33,7 @@ for "little endian".
 */
 
 #include "parrot/parrot.h"
+#include "byteorder.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 

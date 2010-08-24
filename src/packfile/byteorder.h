@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+$Id: byteorder.c 45297 2010-03-30 01:33:45Z coke $
 
 =head1 NAME
 
@@ -27,11 +27,11 @@ Configure will have checked for supported word sizes.
 
 #include "parrot/parrot.h"
 
-/* HEADERIZER HFILE: include/parrot/packfile.h */
+/* HEADERIZER HFILE: none */
 
 /*
 
-=item C<INTVAL fetch_iv_le(INTVAL w)>
+=item C<static INTVAL fetch_iv_le(INTVAL w)>
 
 This function converts a 4 or 8 byte C<INTVAL> into little endian
 format. If the native format is already little endian, then no
@@ -41,9 +41,10 @@ conversion is done.
 
 */
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-INTVAL
+static INTVAL
 fetch_iv_le(INTVAL w)
 {
     ASSERT_ARGS(fetch_iv_le)
@@ -75,7 +76,7 @@ fetch_iv_le(INTVAL w)
 
 /*
 
-=item C<INTVAL fetch_iv_be(INTVAL w)>
+=item C<static INTVAL fetch_iv_be(INTVAL w)>
 
 This function converts a 4 or 8 byte C<INTVAL> into big endian format.
 If the native format is already big endian, then no conversion is done.
@@ -84,9 +85,10 @@ If the native format is already big endian, then no conversion is done.
 
 */
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-INTVAL
+static INTVAL
 fetch_iv_be(INTVAL w)
 {
     ASSERT_ARGS(fetch_iv_be)
@@ -117,7 +119,7 @@ fetch_iv_be(INTVAL w)
 
 /*
 
-=item C<opcode_t fetch_op_be(opcode_t w)>
+=item C<static opcode_t fetch_op_be(opcode_t w)>
 
 Same as C<fetch_iv_be> for opcode_t
 
@@ -125,9 +127,10 @@ Same as C<fetch_iv_be> for opcode_t
 
 */
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-opcode_t
+static opcode_t
 fetch_op_be(opcode_t w)
 {
     ASSERT_ARGS(fetch_op_be)
@@ -155,7 +158,7 @@ fetch_op_be(opcode_t w)
 
 /*
 
-=item C<opcode_t fetch_op_le(opcode_t w)>
+=item C<static opcode_t fetch_op_le(opcode_t w)>
 
 Same as C<fetch_iv_le> for opcode_t
 
@@ -163,9 +166,10 @@ Same as C<fetch_iv_le> for opcode_t
 
 */
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-opcode_t
+static opcode_t
 fetch_op_le(opcode_t w)
 {
     ASSERT_ARGS(fetch_op_le)
@@ -205,7 +209,7 @@ out of a padded buffer.
 
 /*
 
-=item C<void fetch_buf_be_4(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_be_4(unsigned char *rb, const unsigned char *b)>
 
 Converts a 4-byte big-endian buffer C<b> into a little-endian C<rb>.
 
@@ -213,7 +217,8 @@ Converts a 4-byte big-endian buffer C<b> into a little-endian C<rb>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_be_4)
@@ -229,7 +234,7 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_le_4(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_le_4(unsigned char *rb, const unsigned char *b)>
 
 Converts a 4-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 
@@ -237,7 +242,8 @@ Converts a 4-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_4)
@@ -253,7 +259,7 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_be_8(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_be_8(unsigned char *rb, const unsigned char *b)>
 
 Converts an 8-byte big-endian buffer C<b> into a little-endian buffer C<rb>
 
@@ -261,7 +267,8 @@ Converts an 8-byte big-endian buffer C<b> into a little-endian buffer C<rb>
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_be_8)
@@ -281,7 +288,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_le_8(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_le_8(unsigned char *rb, const unsigned char *b)>
 
 Converts an 8-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 
@@ -289,7 +296,8 @@ Converts an 8-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_8)
@@ -309,7 +317,7 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_le_12(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_le_12(unsigned char *rb, const unsigned char *b)>
 
 Converts a 12-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
@@ -317,7 +325,8 @@ Converts a 12-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_12)
@@ -341,7 +350,7 @@ fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_be_12(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_be_12(unsigned char *rb, const unsigned char *b)>
 
 Converts a 12-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
@@ -349,7 +358,8 @@ Converts a 12-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_be_12)
@@ -373,7 +383,7 @@ fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_le_16(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_le_16(unsigned char *rb, const unsigned char *b)>
 
 Converts a 16-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
@@ -381,7 +391,8 @@ Converts a 16-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_16)
@@ -409,7 +420,7 @@ fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_be_16(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_be_16(unsigned char *rb, const unsigned char *b)>
 
 Converts a 16-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
@@ -417,7 +428,8 @@ Converts a 16-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_be_16)
@@ -445,7 +457,7 @@ fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_le_32(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_le_32(unsigned char *rb, const unsigned char *b)>
 
 Converts a 32-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
@@ -453,7 +465,8 @@ Converts a 32-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_32)
@@ -497,7 +510,7 @@ fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void fetch_buf_be_32(unsigned char *rb, const unsigned char *b)>
+=item C<static void fetch_buf_be_32(unsigned char *rb, const unsigned char *b)>
 
 Converts a 32-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
@@ -505,7 +518,8 @@ Converts a 32-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
 */
 
-void
+PARROT_INLINE
+static void
 fetch_buf_be_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_be_32)
