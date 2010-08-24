@@ -82,20 +82,6 @@ static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void visit_todo_list_freeze(PARROT_INTERP,
-    ARGIN_NULLOK(PMC* pmc),
-    ARGMOD(PMC* info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* info);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PARROT_INLINE
-static PMC * visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
@@ -114,12 +100,6 @@ static PMC * visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 #define ASSERT_ARGS_SET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_visit_todo_list_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_visit_todo_list_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -294,127 +274,6 @@ id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id)
 
     return VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIO(io)->todo, id - 1);
 }
-
-/*
-
-=item C<static PMC * visit_todo_list_thaw(PARROT_INTERP, PMC* info)>
-
-=cut
-
-*/
-
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PARROT_INLINE
-static PMC *
-visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
-{
-    ASSERT_ARGS(visit_todo_list_thaw)
-
-    const UINTVAL  n            = VTABLE_shift_integer(interp, info);
-    const INTVAL   id           = PackID_get_PMCID(n);
-    const int      packid_flags = PackID_get_FLAGS(n);
-    PMC           *pmc          = PMCNULL;
-
-    PARROT_ASSERT(PARROT_IMAGEIO(info)->what == VISIT_THAW_NORMAL);
-
-    switch (packid_flags) {
-      case enum_PackID_seen:
-        if (id) /* got a non-NULL PMC */
-            pmc = id_list_get(interp, info, id);
-        break;
-      case enum_PackID_normal:
-        {
-            PMC * const  todo = PARROT_IMAGEIO(info)->todo;
-            const INTVAL type = VTABLE_shift_integer(interp, info);
-
-            PARROT_ASSERT(id - 1
-                 == VTABLE_elements(interp, PARROT_IMAGEIO(info)->todo));
-
-            if (type <= 0 || type > interp->n_vtable_max)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Unknown PMC type to thaw %d", type);
-
-            /* workaround to keep ParrotInterpreter PBC hack working */
-            if (type == enum_class_ParrotInterpreter)
-                PObj_flag_CLEAR(private1, info);
-
-            pmc = Parrot_pmc_new_noinit(interp, type);
-
-            VTABLE_set_pmc_keyed_int(interp, todo, id - 1, pmc);
-        }
-        break;
-      default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "Unknown PMC id args thaw %d", packid_flags);
-        break;
-    }
-
-    return pmc;
-}
-
-/*
-
-=item C<static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info)>
-
-=cut
-
-*/
-
-
-static void
-visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGMOD(PMC* info))
-{
-    ASSERT_ARGS(visit_todo_list_freeze)
-
-    UINTVAL id;
-    int packid_type;
-
-    PARROT_ASSERT(PARROT_IMAGEIO(info)->what == VISIT_FREEZE_NORMAL);
-
-    if (PMC_IS_NULL(pmc)) {
-        id   = 0;
-        packid_type = enum_PackID_seen;
-    }
-    else {
-        Hash * const hash = (Hash *)VTABLE_get_pointer(interp,
-            PARROT_IMAGEIO(info)->seen);
-        HashBucket * const b = parrot_hash_get_bucket(interp, hash, pmc);
-
-        if (b) {
-            id = (UINTVAL)b->value;
-            packid_type = enum_PackID_seen;
-        }
-        else {
-            ++PARROT_IMAGEIO(info)->id; /* next id to freeze */
-            id = PARROT_IMAGEIO(info)->id;
-            packid_type = enum_PackID_normal;
-        }
-    }
-
-    VTABLE_push_integer(interp, info, PackID_new(id, packid_type));
-
-    if (packid_type == enum_PackID_normal) {
-        Hash * const hash = (Hash *)VTABLE_get_pointer(interp,
-            PARROT_IMAGEIO(info)->seen);
-
-        PARROT_ASSERT(pmc);
-
-        /* workaround to keep ParrotInterpreter PBC hack working */
-        if (pmc->vtable->base_type == enum_class_ParrotInterpreter)
-            PObj_flag_CLEAR(private1, info);
-
-        VTABLE_push_integer(interp, info,
-            PObj_is_object_TEST(pmc)
-                ? (INTVAL) enum_class_Object
-                : pmc->vtable->base_type);
-
-        parrot_hash_put(interp, hash, pmc, (void *)id);
-        VTABLE_push_pmc(interp, PARROT_IMAGEIO(info)->todo, pmc);
-    }
-}
-
 
 pmclass ImageIO auto_attrs {
     ATTR Buffer              *buffer;      /* buffer to store the image */
@@ -644,7 +503,51 @@ hasn't been seen yet, it is also pushed onto the todo list.
 */
 
     VTABLE void push_pmc(PMC *v) {
-        visit_todo_list_freeze(INTERP, v, SELF);
+        UINTVAL id;
+        int packid_type;
+
+        PARROT_ASSERT(PARROT_IMAGEIO(SELF)->what == VISIT_FREEZE_NORMAL);
+
+        if (PMC_IS_NULL(v)) {
+            id   = 0;
+            packid_type = enum_PackID_seen;
+        }
+        else {
+            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
+                    PARROT_IMAGEIO(SELF)->seen);
+            HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
+
+            if (b) {
+                id = (UINTVAL)b->value;
+                packid_type = enum_PackID_seen;
+            }
+            else {
+                ++PARROT_IMAGEIO(SELF)->id; /* next id to freeze */
+                id = PARROT_IMAGEIO(SELF)->id;
+                packid_type = enum_PackID_normal;
+            }
+        }
+
+        SELF.push_integer(PackID_new(id, packid_type));
+
+        if (packid_type == enum_PackID_normal) {
+            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
+                    PARROT_IMAGEIO(SELF)->seen);
+
+            PARROT_ASSERT(v);
+
+            /* workaround to keep ParrotInterpreter PBC hack working */
+            if (v->vtable->base_type == enum_class_ParrotInterpreter)
+                PObj_flag_CLEAR(private1, SELF);
+
+            SELF.push_integer(
+                    PObj_is_object_TEST(v)
+                    ? (INTVAL) enum_class_Object
+                    : v->vtable->base_type);
+
+            parrot_hash_put(INTERP, hash, v, (void *)id);
+            VTABLE_push_pmc(INTERP, PARROT_IMAGEIO(SELF)->todo, v);
+        }
     }
 
 
@@ -758,7 +661,46 @@ Removes and returns a reference to a pmc from the start of the image.
 */
 
     VTABLE PMC *shift_pmc() {
-        return visit_todo_list_thaw(INTERP, SELF);
+        const UINTVAL  n            = SELF.shift_integer();
+        const INTVAL   id           = PackID_get_PMCID(n);
+        const int      packid_flags = PackID_get_FLAGS(n);
+        PMC           *pmc          = PMCNULL;
+
+        PARROT_ASSERT(PARROT_IMAGEIO(SELF)->what == VISIT_THAW_NORMAL);
+
+        switch (packid_flags) {
+            case enum_PackID_seen:
+                if (id) /* got a non-NULL PMC */
+                    pmc = id_list_get(INTERP, SELF, id);
+                break;
+            case enum_PackID_normal:
+                {
+                    PMC * const  todo = PARROT_IMAGEIO(SELF)->todo;
+                    const INTVAL type = VTABLE_shift_integer(INTERP, SELF);
+
+                    PARROT_ASSERT(id - 1
+                            == VTABLE_elements(INTERP, PARROT_IMAGEIO(SELF)->todo));
+
+                    if (type <= 0 || type > INTERP->n_vtable_max)
+                        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                                "Unknown PMC type to thaw %d", type);
+
+                    /* workaround to keep ParrotInterpreter PBC hack working */
+                    if (type == enum_class_ParrotInterpreter)
+                        PObj_flag_CLEAR(private1, SELF);
+
+                    pmc = Parrot_pmc_new_noinit(INTERP, type);
+
+                    VTABLE_set_pmc_keyed_int(INTERP, todo, id - 1, pmc);
+                }
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                        "Unknown PMC id args thaw %d", packid_flags);
+                break;
+        }
+
+        return pmc;
     }
 
     VTABLE void set_pmc(PMC *p)
