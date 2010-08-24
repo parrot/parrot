@@ -25,6 +25,9 @@ Configure will have checked for supported word sizes.
 
 */
 
+#ifndef PARROT_BYTEORDER_H_GUARD
+#define PARROT_BYTEORDER_H_GUARD
+
 #include "parrot/parrot.h"
 
 /* HEADERIZER HFILE: none */
@@ -546,6 +549,8 @@ fetch_buf_be_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
     rb[31] = b[0];
 #endif
 }
+
+#endif /* PARROT_BYTEORDER_H_GUARD */
 
 /*
 
