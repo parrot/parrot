@@ -538,7 +538,7 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
                 break;
         }
 
-        hash = parrot_create_hash(interp, entry_type, key_type, cmp_fn, key_fn);
+        hash = parrot_create_hash_sized(interp, entry_type, key_type, cmp_fn, key_fn, num_entries);
 
     }
 
@@ -935,20 +935,68 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
         NOTNULL(hash_comp_fn compare), NOTNULL(hash_hash_key_fn keyhash))
 {
     ASSERT_ARGS(parrot_create_hash)
+    return parrot_create_hash_sized(interp, val_type, hkey_type, compare, keyhash,
+                                    INITIAL_BUCKETS);
+}
+
+
+/*
+
+=item C<static UINTVAL round_up_pow2(UINTVAL x)>
+
+Round a value up to the nearest power of 2.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static UINTVAL
+round_up_pow2(UINTVAL x) {
+    UINTVAL y = 1;
+    while (y < x)
+        y <<= 1;
+    return y;
+}
+
+
+/*
+
+=item C<Hash * parrot_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE
+val_type, Hash_key_type hkey_type, hash_comp_fn compare, hash_hash_key_fn
+keyhash, UINTVAL size)>
+
+Creates and initializes a hash, similar to C<parrot_create_hash>.
+
+Preallocates at least C<size> buckets.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash *
+parrot_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
+        NOTNULL(hash_comp_fn compare), NOTNULL(hash_hash_key_fn keyhash), UINTVAL size)
+{
+    ASSERT_ARGS(parrot_create_hash_sized)
+    UINTVAL      initial_buckets = round_up_pow2(size);
     HashBucket  *bp;
     void        *alloc = Parrot_gc_allocate_memory_chunk_with_interior_pointers(
-                            interp, sizeof (Hash) + HASH_ALLOC_SIZE(INITIAL_BUCKETS));
+                            interp, sizeof (Hash) + HASH_ALLOC_SIZE(initial_buckets));
     Hash * const hash  = (Hash*)alloc;
     size_t       i;
 
-    PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
+    PARROT_ASSERT(initial_buckets % 4 == 0);
 
     hash->compare    = compare;
     hash->hash_val   = keyhash;
     hash->entry_type = val_type;
     hash->key_type   = hkey_type;
     hash->seed       = interp->hash_seed;
-    hash->mask       = INITIAL_BUCKETS - 1;
+    hash->mask       = initial_buckets - 1;
     hash->entries    = 0;
 
     bp = (HashBucket *)((char *)alloc + sizeof (Hash));
@@ -959,10 +1007,10 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
      * was deleted */
 
     hash->buckets = bp;
-    bp += N_BUCKETS(INITIAL_BUCKETS);
+    bp += N_BUCKETS(initial_buckets);
     hash->index = (HashBucket **)bp;
 
-    for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
+    for (i = 0, --bp; i < N_BUCKETS(initial_buckets); ++i, --bp) {
         bp->next        = hash->free_list;
         hash->free_list = bp;
     }
