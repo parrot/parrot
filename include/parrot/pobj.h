@@ -328,8 +328,8 @@ typedef enum PObj_enum {
 
 #define PObj_gc_CLEAR(o) (PObj_get_FLAGS(o) \
     &= ~PObj_custom_destroy_FLAG \
-     | ~PObj_custom_mark_FLAG \
-     | ~PObj_live_FLAG)
+     & ~PObj_custom_mark_FLAG \
+     & ~PObj_live_FLAG)
 
 #endif /* PARROT_POBJ_H_GUARD */
 

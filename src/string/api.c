@@ -389,7 +389,11 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 
     d = Parrot_gc_new_string_header(interp,
         PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+    /* This overwrites the constant flag again. Not sure if this is OK */
     STRUCT_COPY(d, s);
+
+    /* Clear live flag. It might be set on constant strings */
+    PObj_live_CLEAR(d);
 
     /* Now check that buffer allocated from pool and affected by compacting */
     if (is_movable && Buffer_bufstart(s)) {
