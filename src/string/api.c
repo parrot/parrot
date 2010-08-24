@@ -382,21 +382,17 @@ STRING *
 Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
-    STRING * const d = Parrot_gc_new_string_header(interp, 0);
+    STRING *d;
     const int is_movable = PObj_is_movable_TESTALL(s);
 
-    /* Copy encoding/charset/etc */
+    d = Parrot_gc_new_string_header(interp,
+        PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+    /* This might set the constant flag again but it is the right thing
+     * to do */
     STRUCT_COPY(d, s);
 
-    /* Only copy is_COWable, constant, and external flags.
-     * Note that it's important (and safe) to copy the constant flag
-     * although the copied string header is not allocated from the constant
-     * string header pool. */
-    PObj_get_FLAGS(d) =  PObj_is_string_FLAG
-                      | (PObj_get_FLAGS(s)
-                      & (PObj_is_COWable_FLAG
-                      |  PObj_constant_FLAG
-                      |  PObj_external_FLAG));
+    /* Clear live flag. It might be set on constant strings */
+    PObj_live_CLEAR(d);
 
     /* Now check that buffer allocated from pool and affected by compacting */
     if (is_movable && Buffer_bufstart(s)) {
