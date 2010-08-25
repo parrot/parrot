@@ -419,4 +419,5 @@ src/pmc/undef.dump                               [devel]src
 src/pmc/unmanagedstruct.dump                     [devel]src
 src/string_private_cstring.h                     []
 tools/build/dynpmc.pl                            []
+tools/dev/mk_language_shell.pl                   [devel]
 vtable.dump                                      [devel]src

@@ -68,6 +68,9 @@ sub runstep {
 
     $self->makefiles($conf);
 
+    $conf->shebang_mod( 'tools/dev/mk_language_shell.pl.in'
+                         => 'tools/dev/mk_language_shell.pl', );
+
     return 1;
 }
 
