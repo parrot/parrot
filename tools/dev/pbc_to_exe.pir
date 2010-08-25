@@ -93,7 +93,7 @@ HEADER
             Parrot_init_stacktop(interp, &interp);
             Parrot_set_executable_name(interp,
                 Parrot_str_new(interp, argv[0], 0));
-            Parrot_set_run_core(interp, RUNCORE);
+            Parrot_set_run_core(interp, (Parrot_Run_core_t)RUNCORE);
             Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
             pf = PackFile_new(interp, 0);
