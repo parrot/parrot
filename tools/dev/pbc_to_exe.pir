@@ -143,49 +143,29 @@ MAIN
     obj    = $P0['o']
     exe    = $P0['exe']
 
-    .local pmc args
-    args   = argv
+    load_bytecode 'Getopt/Obj.pbc'
+    .local pmc getopt
+    getopt = new ['Getopt';'Obj']
+    push getopt, 'install|i'
 
-    .local int argc
-    argc = args
-
-    if argc == 2 goto proper_args
-    if argc == 3 goto check_install
-    .return ()
-
-  check_install:
-    .local string infile, install
-
-    $P0     = shift args
-    infile  = shift args
-    install = shift args
-    if install == '--install' goto proper_install
-    .return ()
-
-  proper_install:
-    .local string cfile, objfile, exefile
-
-    cfile   = 'replace_pbc_extension'(infile, '.c')
-    objfile = 'replace_pbc_extension'(infile, obj)
-    $S0     = 'replace_pbc_extension'(infile, exe)
-    exefile = 'prepend_installable'($S0)
-
-    .return(infile, cfile, objfile, exefile)
-
-  proper_args:
-
-    $P0    = shift args
-    infile = shift args
-
-    cfile   = 'replace_pbc_extension'(infile, '.c')
-    objfile = 'replace_pbc_extension'(infile, obj)
-    exefile = 'replace_pbc_extension'(infile, exe)
+    $P0 = shift argv # ignore program name
+    .local pmc opts
+    opts = getopt.'get_options'(argv)
+    .local string infile
+    infile = shift argv
 
     # substitute .c for .pbc
     # remove .c for executable
+    .local string cfile, objfile, exefile
+    cfile   = 'replace_pbc_extension'(infile, '.c')
+    objfile = 'replace_pbc_extension'(infile, obj)
+    exefile = 'replace_pbc_extension'(infile, exe)
+    $I0 = opts['install']
+    unless $I0 goto end_installable
+        exefile = 'prepend_installable'(exefile)
+    end_installable:
 
-    # TODO this should complain about results/returns mismatch
-    .return(infile, cfile, objfile, exefile)
+    .return (infile, cfile, objfile, exefile)
 .end
 
 .sub 'determine_code_type'
