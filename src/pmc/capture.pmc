@@ -731,6 +731,8 @@ erase the contents of the array and hash components.
             GET_ATTR_hash(INTERP, capture, hash);
             SET_ATTR_array(INTERP, SELF, array);
             SET_ATTR_hash(INTERP, SELF, hash);
+            if (!PMC_IS_NULL(array) || !PMC_IS_NULL(hash))
+                PObj_custom_mark_SET(SELF);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
