@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/tools/pgegrep.t - test the script tools/utils/pgegrep
+t/tools/pgegrep.t - test the script tools/dev/pgegrep
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ sub pgegrep_output_like {
     my ($options, $snippet, $desc)  = @_;
 
     my $PARROT  = ".$PConfig{slash}$PConfig{test_prog}";
-    my $pgegrep = File::Spec->catfile( qw{. tools util pgegrep} );
+    my $pgegrep = File::Spec->catfile( qw{. tools dev pgegrep} );
     my $out     = `$PARROT $pgegrep $options`;
 
     like( $out, $snippet, $desc );
