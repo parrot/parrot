@@ -23,7 +23,10 @@ Tests the ExceptionHandler PMC.
     .include 'test_more.pir'
 
     # If test exited with "bad plan" MyHandlerCan.can_handle wasn't invoked.
-    plan(15)
+    plan(18)
+
+    test_bool()
+    test_int()
 
     .local pmc eh, eh2
     eh = new ['ExceptionHandler']
@@ -135,6 +138,26 @@ Tests the ExceptionHandler PMC.
   outcatch:
     ok($I0, 'Exception Handler subclass catch exception')
 .end
+
+.sub test_bool
+    $P0 = new 'ExceptionHandler'
+    nok($P0,'ExceptionHandler without address is false')
+    set_addr $P0, _handler
+    ok($P0,'ExceptionHandler with address is true')
+  _handler:
+.end
+
+.sub test_int
+    $P0 = new 'ExceptionHandler'
+    set_addr $P0, _handler
+    push_eh $P0
+    $I0 = $P0
+    ok(1,'get_integer on ExceptionHandler ')
+    .return()
+  _handler:
+    say "howdy int!"
+.end
+
 
 .sub subclass_exception_handler
     .local pmc myhandler

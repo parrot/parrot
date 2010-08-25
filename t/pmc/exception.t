@@ -20,7 +20,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(24)
+    plan(23)
     test_bool()
     test_int()
     test_attrs()
@@ -34,25 +34,15 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 .end
 
 .sub test_bool
-    $P0 = new 'ExceptionHandler'
-    set_addr $P0, _handler
-    ok($P0,'ExceptionHandler object return true')
     $P1 = new 'Exception'
     ok($P1,'Exception object return true')
-    .return()
-  _handler:
-    say "howdy bool!"
 .end
 
 .sub test_int
-    $P0 = new 'ExceptionHandler'
-    set_addr $P0, _handler
-    push_eh $P0
+    $P0 = new 'Exception'
+    $P0 = 42
     $I0 = $P0
-    ok(1,'get_integer on ExceptionHandler ')
-    .return()
-  _handler:
-    say "howdy int!"
+    is($I0, 42, 'set/get integer on Exception')
 .end
 
 .sub test_attrs
