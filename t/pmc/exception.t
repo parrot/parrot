@@ -177,7 +177,6 @@ _handler:
 .end
 
 # Test clone vtable function
-# TT #1446 - need more tests
 .sub test_throw_clone
     .local pmc ex, exclone, eh, ehguard
     .local int result
