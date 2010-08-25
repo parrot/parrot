@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,7 +68,7 @@ sub runstep {
 
     $self->makefiles($conf);
 
-    $conf->shebang_mod( 'tools/dev/mk_language_shell.pl.in'
+    $conf->shebang_mod( 'tools/dev/mk_language_shell.in'
                          => 'tools/dev/mk_language_shell.pl', );
 
     return 1;
