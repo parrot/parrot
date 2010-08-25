@@ -22,6 +22,8 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
 =cut
 
+.include 'interpcores.pasm'
+
 .sub 'main' :main
     .param pmc    argv
 
@@ -31,8 +33,9 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     .local string cfile
     .local string objfile
     .local string exefile
+    .local int    runcore
 
-    (infile :optional, cfile :optional, objfile :optional, exefile :optional) = 'handle_args'(argv)
+    (infile, cfile, objfile, exefile, runcore) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
     .local string code_type
@@ -66,6 +69,10 @@ HEADER
 
     print outfh, codestring
 
+    print outfh, '#define RUNCORE '
+    print outfh, runcore
+    print outfh, "\n"
+
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
         {
@@ -86,6 +93,7 @@ HEADER
             Parrot_init_stacktop(interp, &interp);
             Parrot_set_executable_name(interp,
                 Parrot_str_new(interp, argv[0], 0));
+            Parrot_set_run_core(interp, RUNCORE);
             Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
             pf = PackFile_new(interp, 0);
@@ -147,6 +155,7 @@ MAIN
     .local pmc getopt
     getopt = new ['Getopt';'Obj']
     push getopt, 'install|i'
+    push getopt, 'runcore|R:s'
 
     $P0 = shift argv # ignore program name
     .local pmc opts
@@ -165,7 +174,27 @@ MAIN
         exefile = 'prepend_installable'(exefile)
     end_installable:
 
-    .return (infile, cfile, objfile, exefile)
+    .local int runcore
+    $S0 = opts['runcore']
+    unless $S0 == 'slow' goto end_slow_core
+        runcore = .PARROT_SLOW_CORE
+        goto done_runcore
+    end_slow_core:
+    unless $S0 == 'fast' goto end_fast_core
+        runcore = .PARROT_FAST_CORE
+        goto done_runcore
+    end_fast_core:
+    unless $S0 == '' goto end_unspecified_core
+        runcore = .PARROT_FAST_CORE
+        goto done_runcore
+    end_unspecified_core:
+        # invalid runcore name
+        $S0 = "Unsupported runcore: `" . $S0
+        $S0 = $S0 . "'"
+        die $S0
+    done_runcore:
+
+    .return (infile, cfile, objfile, exefile, runcore)
 .end
 
 .sub 'determine_code_type'
