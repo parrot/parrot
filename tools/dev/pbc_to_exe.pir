@@ -34,8 +34,9 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     .local string objfile
     .local string exefile
     .local int    runcore
+    .local int    install
 
-    (infile, cfile, objfile, exefile, runcore) = 'handle_args'(argv)
+    (infile, cfile, objfile, exefile, runcore, install) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
     .local string code_type
@@ -130,8 +131,8 @@ MAIN
   no_extra:
 
 
-    'compile_file'(cfile, objfile)
-    'link_file'(objfile, exefile, extra_obj)
+    'compile_file'(cfile, objfile, install)
+    'link_file'(objfile, exefile, extra_obj, install)
     .return ()
 
   err_infile:
@@ -156,6 +157,7 @@ MAIN
     getopt = new ['Getopt';'Obj']
     push getopt, 'install|i'
     push getopt, 'runcore|R:s'
+    push getopt, 'output|o:s'
 
     $P0 = shift argv # ignore program name
     .local pmc opts
@@ -163,38 +165,69 @@ MAIN
     .local string infile
     infile = shift argv
 
-    # substitute .c for .pbc
-    # remove .c for executable
-    .local string cfile, objfile, exefile
-    cfile   = 'replace_pbc_extension'(infile, '.c')
-    objfile = 'replace_pbc_extension'(infile, obj)
-    exefile = 'replace_pbc_extension'(infile, exe)
-    $I0 = opts['install']
-    unless $I0 goto end_installable
-        exefile = 'prepend_installable'(exefile)
-    end_installable:
+    .local int    install
+    .local string runcore
+    .local string outfile
+    install = opts['install']
+    runcore = opts['runcore']
+    outfile = opts['output']
 
-    .local int runcore
-    $S0 = opts['runcore']
-    unless $S0 == 'slow' goto end_slow_core
-        runcore = .PARROT_SLOW_CORE
+    $S0 = substr infile, -4, 4
+    $S0 = downcase $S0
+    unless $S0 != '.pbc' goto done_pbc_extn_check
+        die "input pbc file name does not end in '.pbc'"
+    done_pbc_extn_check:
+
+    .local string cfile, objfile, exefile
+    if outfile == '' goto no_outfile
+        $I0 = length exe
+        $I1 = - $I0
+        $S0 = substr outfile, $I1, $I0
+        $S0 = downcase $S0
+        $S1 = downcase exe
+        unless $S0 != $S1 goto done_exe_extn_check
+            $S0 = "output executable name does not end in `" . exe
+            $S0 = $S0 . "'"
+            die $S0
+        done_exe_extn_check:
+        outfile = replace outfile, $I1, $I0, ''
+
+        cfile   = outfile . '.c'
+        objfile = outfile . obj
+        exefile = outfile . exe
+        goto end_outfile
+    no_outfile:
+        # substitute .c for .pbc
+        # remove .c for executable
+        outfile = replace infile, -4, 4, '' # remove .pbc extension
+        cfile   = outfile . '.c'
+        objfile = outfile . obj
+        exefile = outfile . exe
+        unless install goto end_installable
+            exefile = 'prepend_installable'(exefile)
+        end_installable:
+    end_outfile:
+
+    .local int runcore_code
+    unless runcore == 'slow' goto end_slow_core
+        runcore_code = .PARROT_SLOW_CORE
         goto done_runcore
     end_slow_core:
-    unless $S0 == 'fast' goto end_fast_core
-        runcore = .PARROT_FAST_CORE
+    unless runcore == 'fast' goto end_fast_core
+        runcore_code = .PARROT_FAST_CORE
         goto done_runcore
     end_fast_core:
-    unless $S0 == '' goto end_unspecified_core
-        runcore = .PARROT_FAST_CORE
+    unless runcore == '' goto end_unspecified_core
+        runcore_code = .PARROT_FAST_CORE
         goto done_runcore
     end_unspecified_core:
         # invalid runcore name
-        $S0 = "Unsupported runcore: `" . $S0
+        $S0 = "Unsupported runcore: `" . runcore
         $S0 = $S0 . "'"
         die $S0
     done_runcore:
 
-    .return (infile, cfile, objfile, exefile, runcore)
+    .return (infile, cfile, objfile, exefile, runcore_code, install)
 .end
 
 .sub 'determine_code_type'
@@ -527,7 +560,7 @@ END_OF_FUNCTION
 .sub 'compile_file'
     .param string cfile
     .param string objfile
-    .param int install :optional
+    .param int    install
 
     $P0 = '_config'()
     .local string cc, ccflags, cc_o_out, osname, build_dir, slash
@@ -587,7 +620,7 @@ END_OF_FUNCTION
     .param string objfile
     .param string exefile
     .param string extra_obj
-    .param int install :optional
+    .param int    install
 
     $P0 = '_config'()
     .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
@@ -616,7 +649,7 @@ END_OF_FUNCTION
     config     = concat build_dir, slash
     config    .= 'src'
     config    .= slash
-    if exeprefix == 'installable_' goto config_to_install
+    if install goto config_to_install
     config    .= 'parrot_config'
     goto config_cont
  config_to_install:
