@@ -208,7 +208,7 @@ ensure_positionals_storage_ap(PARROT_INTERP,
         GETATTR_CallContext_num_positionals(interp, self, num_positionals);
         memcpy(new_array, array, num_positionals * sizeof (Pcc_cell));
 
-        if (num_positionals > 8)
+        if (allocated_positionals > 8)
             Parrot_gc_free_memory_chunk(interp, array);
         else
             Parrot_gc_free_fixed_size_storage(interp,
