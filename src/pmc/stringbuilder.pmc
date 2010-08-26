@@ -353,16 +353,13 @@ key receives the value of the hash element.
             }
             else if (Parrot_str_equal(INTERP, key, comma)) {
                 INTVAL num_args = VTABLE_elements(INTERP, args);
-                INTVAL pos_args = 1;
+                INTVAL pos_args;
 
-                VTABLE_push_string(INTERP, stringbuilder,
-                    VTABLE_get_string_keyed_int(INTERP, args, 0));
-
-                while (pos_args < num_args) {
-                    VTABLE_push_string(INTERP, stringbuilder, comma_space);
+                for (pos_args = 0; pos_args < num_args; ++pos_args) {
+                    if (pos_args > 0)
+                        VTABLE_push_string(INTERP, stringbuilder, comma_space);
                     VTABLE_push_string(INTERP, stringbuilder,
                         VTABLE_get_string_keyed_int(INTERP, args, pos_args));
-                    pos_args++;
                 }
             }
             else if (Parrot_str_equal(INTERP, key, percent)) {
