@@ -18,8 +18,6 @@ Compile bytecode to executable.
   pbc_to_exe my.pbc --install
   => installable_my.exe
 
-Warning! With --install there must be no directory prefix in the first arg yet.
-
 =cut
 
 .include 'interpcores.pasm'
@@ -158,19 +156,36 @@ MAIN
     push getopt, 'install|i'
     push getopt, 'runcore|R:s'
     push getopt, 'output|o:s'
+    push getopt, 'help|h'
 
     $P0 = shift argv # ignore program name
     .local pmc opts
     opts = getopt.'get_options'(argv)
-    .local string infile
-    infile = shift argv
 
+    .local int    help
     .local int    install
     .local string runcore
     .local string outfile
+    help    = opts['help']
     install = opts['install']
     runcore = opts['runcore']
     outfile = opts['output']
+
+    unless help goto end_help
+        $P0 = getstderr
+        print $P0, <<'HELP'
+pbc_to_exe [options] <file>
+  Options:
+    -h --help
+    -i --install
+    -R --runcore=slow|fast
+    -o --output=FILE
+HELP
+        exit 0
+    end_help:
+
+    .local string infile
+    infile = shift argv
 
     $S0 = substr infile, -4, 4
     $S0 = downcase $S0
