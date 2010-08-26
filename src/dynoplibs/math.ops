@@ -95,8 +95,7 @@ inline op cmod(invar PMC, invar PMC, in INT) :base_core {
 
     result = VTABLE_get_integer(interp, $2) % $3;
 
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, $1, result);
+    $1 = Parrot_pmc_new_init_int(interp, VTABLE_type(interp, $2), result);
 }
 
 inline op cmod(invar PMC, invar PMC, invar PMC) :base_core {
@@ -112,8 +111,7 @@ inline op cmod(invar PMC, invar PMC, invar PMC) :base_core {
 
     result = VTABLE_get_integer(interp, $2) % value;
 
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, $1, result);
+    $1 = Parrot_pmc_new_init_int(interp, VTABLE_type(interp, $2), result);
 }
 
 ########################################
@@ -173,8 +171,8 @@ inline op cmod(invar PMC, invar PMC, in NUM) :base_core {
 
     result = fmod(VTABLE_get_integer(interp, $2), value);
 
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, $1, (INTVAL) result);
+    $1 = Parrot_pmc_new_init_int(interp,
+        VTABLE_type(interp, $2), (INTVAL)result);
 }
 
 =back
