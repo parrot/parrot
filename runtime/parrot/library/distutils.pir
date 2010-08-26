@@ -201,7 +201,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 
 =cut
 
-.loadlib 'io_ops' # workaround TT #1663
 .loadlib 'sys_ops'
 
 .sub '__onload' :load :init :anon
@@ -2334,11 +2333,11 @@ array of pathname or a single pathname
     if $I0 goto L1
     $S0 = array
     $S3 = $S0
-    $S2 = $S1 . $S3
     $I0 = index $S0, "build/"
     unless $I0 == 0 goto L0
     $S3 = substr $S0, 6
   L0:
+    $S2 = $S1 . $S3
     files[$S2] = $S0
     goto L2
   L1:

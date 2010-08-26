@@ -2452,13 +2452,15 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
        one fixed parameter (the signature vector), plus a varying number of
        registers/constants.  For each arg/return, we show the register and its
        flags using PIR syntax. */
-    if (*(op) == PARROT_OP_set_args_pc || *(op) == PARROT_OP_set_returns_pc)
+    if (OPCODE_IS(interp, interp->code, *(op), PARROT_OP_set_args_pc)
+    ||  OPCODE_IS(interp, interp->code, *(op), PARROT_OP_set_returns_pc))
         specialop = 1;
 
     /* if it's a retrieving op, specialop = 2, so that later a :flat flag
      * can be changed into a :slurpy flag. See flag handling below.
      */
-    if (*(op) == PARROT_OP_get_results_pc || *(op) == PARROT_OP_get_params_pc)
+    if (OPCODE_IS(interp, interp->code, *(op), PARROT_OP_get_results_pc)
+    ||  OPCODE_IS(interp, interp->code, *(op), PARROT_OP_get_params_pc))
         specialop = 2;
 
     if (specialop > 0) {
@@ -2593,14 +2595,14 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         }
 
         size = PDB_disassemble_op(interp, pfile->source + pfile->size,
-                space, &interp->op_info_table[*pc], pc, pfile, NULL, 1);
+                space, interp->code->op_info_table[*pc], pc, pfile, NULL, 1);
         space       -= size;
         pfile->size += size;
         pfile->source[pfile->size - 1] = '\n';
 
         /* Store the opcode of this line */
         pline->opcode = pc;
-        n             = interp->op_info_table[*pc].op_count;
+        n             = interp->code->op_info_table[*pc]->op_count;
 
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
@@ -2797,7 +2799,8 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
     pfile->line   = pline;
     pline->number = 1;
 
-    PARROT_ASSERT(interp->op_info_table);
+    PARROT_ASSERT(interp->code);
+    PARROT_ASSERT(interp->code->op_info_table);
     PARROT_ASSERT(pc);
 
     while ((c = fgetc(file)) != EOF) {
@@ -2817,7 +2820,7 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
             PDB_line_t *newline = mem_gc_allocate_zeroed_typed(interp, PDB_line_t);
 
             if (PDB_hasinstruction(pfile->source + pline->source_offset)) {
-                size_t n      = interp->op_info_table[*pc].op_count;
+                size_t n      = interp->code->op_info_table[*pc]->op_count;
                 pline->opcode = pc;
                 ADD_OP_VAR_PART(interp, interp->code, pc, n);
                 pc           += n;

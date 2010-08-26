@@ -201,7 +201,6 @@ to_ascii(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(to_ascii)
     String_iter iter;
-    UINTVAL offs;
     unsigned char *p;
     const UINTVAL len = src->strlen;
 
@@ -209,9 +208,9 @@ to_ascii(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const dest = Parrot_str_clone(interp, src);
 
     p = (unsigned char *)dest->strstart;
-    ENCODING_ITER_INIT(interp, src, &iter);
-    for (offs = 0; offs < len; ++offs) {
-        const UINTVAL c = iter.get_and_advance(interp, &iter);
+    STRING_ITER_INIT(interp, &iter);
+    while (iter.charpos < len) {
+        const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         if (c >= 128)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
                     "can't convert unicode string to ascii");
@@ -493,11 +492,10 @@ ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
             return ret_val < 0 ? -1 : 1;
     }
     else {
-        UINTVAL offs;
-        ENCODING_ITER_INIT(interp, rhs, &iter);
-        for (offs = 0; offs < min_len; ++offs) {
-            const UINTVAL cl = ENCODING_GET_BYTE(interp, lhs, offs);
-            const UINTVAL cr = iter.get_and_advance(interp, &iter);
+        STRING_ITER_INIT(interp, &iter);
+        while (iter.charpos < min_len) {
+            const UINTVAL cl = ENCODING_GET_BYTE(interp, lhs, iter.charpos);
+            const UINTVAL cr = STRING_ITER_GET_AND_ADVANCE(interp, rhs, &iter);
             if (cl != cr)
                 return cl < cr ? -1 : 1;
         }
@@ -531,35 +529,12 @@ mixed_cs_index(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *sear
     UINTVAL offs)
 {
     ASSERT_ARGS(mixed_cs_index)
+    String_iter start, end;
 
-    if (search->strlen <= src->strlen) {
-        String_iter src_iter, search_iter;
-        const UINTVAL maxpos = src->strlen - search->strlen + 1;
-        const UINTVAL cfirst = Parrot_str_indexed(interp, search, 0);
+    STRING_ITER_INIT(interp, &start);
+    STRING_ITER_SET_POSITION(interp, src, &start, offs);
 
-        ENCODING_ITER_INIT(interp, src, &src_iter);
-        src_iter.set_position(interp, &src_iter, offs);
-        ENCODING_ITER_INIT(interp, search, &search_iter);
-
-        while (src_iter.charpos < maxpos) {
-            if (cfirst == src_iter.get_and_advance(interp, &src_iter)) {
-                const INTVAL next_pos = src_iter.charpos;
-                const INTVAL next_byte = src_iter.bytepos;
-                UINTVAL len;
-                search_iter.set_position(interp, &search_iter, 1);
-                for (len = search->strlen - 1; len; --len) {
-                    if ((src_iter.get_and_advance(interp, &src_iter)) !=
-                            (search_iter.get_and_advance(interp, &search_iter)))
-                        break;
-                }
-                if (len == 0)
-                    return next_pos - 1;
-                src_iter.charpos = next_pos;
-                src_iter.bytepos = next_byte;
-            }
-        }
-    }
-    return -1;
+    return Parrot_str_iter_index(interp, src, &start, &end, search);
 }
 
 /*
@@ -638,13 +613,12 @@ static UINTVAL
 validate(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(validate)
-    INTVAL      offset;
     String_iter iter;
     const INTVAL length = Parrot_str_length(interp, src);
 
-    ENCODING_ITER_INIT(interp, src, &iter);
-    for (offset = 0; offset < length; ++offset) {
-        const UINTVAL codepoint = iter.get_and_advance(interp, &iter);
+    STRING_ITER_INIT(interp, &iter);
+    while (iter.charpos < length) {
+        const UINTVAL codepoint = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         if (codepoint >= 0x80)
             return 0;
     }

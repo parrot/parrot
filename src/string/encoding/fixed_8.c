@@ -41,22 +41,46 @@ static UINTVAL find_cclass(SHIM_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static UINTVAL fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
+static UINTVAL fixed8_iter_get(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGIN(const String_iter *iter),
+    INTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static UINTVAL fixed8_iter_get_and_advance(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGMOD(String_iter *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*iter);
 
-static void fixed8_set_next(PARROT_INTERP,
+static void fixed8_iter_set_and_advance(PARROT_INTERP,
+    ARGMOD(STRING *str),
     ARGMOD(String_iter *iter),
     UINTVAL c)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*iter);
 
-static void fixed8_set_position(SHIM_INTERP,
+static void fixed8_iter_set_position(SHIM_INTERP,
+    ARGIN(const STRING *str),
     ARGMOD(String_iter *iter),
     UINTVAL pos)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*iter);
+
+static void fixed8_iter_skip(SHIM_INTERP,
+    ARGIN(const STRING *str),
+    ARGMOD(String_iter *iter),
+    INTVAL skip)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*iter);
 
 static size_t fixed_8_hash(SHIM_INTERP,
@@ -95,13 +119,6 @@ static STRING * get_codepoints(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void iter_init(SHIM_INTERP,
-    ARGIN(const STRING *src),
-    ARGOUT(String_iter *iter))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*iter);
-
 static void set_byte(PARROT_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset,
@@ -122,14 +139,24 @@ static STRING * to_encoding(PARROT_INTERP, SHIM(const STRING *src))
 #define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(typetable))
-#define ASSERT_ARGS_fixed8_get_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_fixed8_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(iter))
-#define ASSERT_ARGS_fixed8_set_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_fixed8_iter_get_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(iter))
-#define ASSERT_ARGS_fixed8_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(iter))
+#define ASSERT_ARGS_fixed8_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(iter))
+#define ASSERT_ARGS_fixed8_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(iter))
+#define ASSERT_ARGS_fixed8_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_fixed_8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -143,9 +170,6 @@ static STRING * to_encoding(PARROT_INTERP, SHIM(const STRING *src))
 #define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(src) \
-    , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_set_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -375,7 +399,48 @@ bytes(SHIM_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL fixed8_get_next(PARROT_INTERP, String_iter *iter)>
+=item C<static UINTVAL fixed8_iter_get(PARROT_INTERP, const STRING *str, const
+String_iter *iter, INTVAL offset)>
+
+Get the character at C<iter> plus C<offset>.
+
+=cut
+
+*/
+
+static UINTVAL
+fixed8_iter_get(PARROT_INTERP,
+    ARGIN(const STRING *str), ARGIN(const String_iter *iter), INTVAL offset)
+{
+    ASSERT_ARGS(fixed8_iter_get)
+    return get_byte(interp, str, iter->charpos + offset);
+}
+
+/*
+
+=item C<static void fixed8_iter_skip(PARROT_INTERP, const STRING *str,
+String_iter *iter, INTVAL skip)>
+
+Moves the string iterator C<i> by C<skip> characters.
+
+=cut
+
+*/
+
+static void
+fixed8_iter_skip(SHIM_INTERP,
+    ARGIN(const STRING *str), ARGMOD(String_iter *iter), INTVAL skip)
+{
+    ASSERT_ARGS(fixed8_iter_skip)
+    iter->bytepos += skip;
+    iter->charpos += skip;
+    PARROT_ASSERT(iter->bytepos <= Buffer_buflen(str));
+}
+
+/*
+
+=item C<static UINTVAL fixed8_iter_get_and_advance(PARROT_INTERP, const STRING
+*str, String_iter *iter)>
 
 Moves the string iterator C<i> to the next codepoint.
 
@@ -384,18 +449,19 @@ Moves the string iterator C<i> to the next codepoint.
 */
 
 static UINTVAL
-fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
+fixed8_iter_get_and_advance(PARROT_INTERP,
+    ARGIN(const STRING *str), ARGMOD(String_iter *iter))
 {
-    ASSERT_ARGS(fixed8_get_next)
-    const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
-    ++iter->bytepos;
+    ASSERT_ARGS(fixed8_iter_get_and_advance)
+    const UINTVAL c = get_byte(interp, str, iter->charpos++);
+    iter->bytepos++;
     return c;
 }
 
 /*
 
-=item C<static void fixed8_set_next(PARROT_INTERP, String_iter *iter, UINTVAL
-c)>
+=item C<static void fixed8_iter_set_and_advance(PARROT_INTERP, STRING *str,
+String_iter *iter, UINTVAL c)>
 
 With the string iterator C<i>, appends the codepoint C<c> and advances to the
 next position in the string.
@@ -405,17 +471,18 @@ next position in the string.
 */
 
 static void
-fixed8_set_next(PARROT_INTERP, ARGMOD(String_iter *iter), UINTVAL c)
+fixed8_iter_set_and_advance(PARROT_INTERP,
+    ARGMOD(STRING *str), ARGMOD(String_iter *iter), UINTVAL c)
 {
-    ASSERT_ARGS(fixed8_set_next)
-    set_byte(interp, iter->str, iter->charpos++, c);
-    ++iter->bytepos;
+    ASSERT_ARGS(fixed8_iter_set_and_advance)
+    set_byte(interp, str, iter->charpos++, c);
+    iter->bytepos++;
 }
 
 /*
 
-=item C<static void fixed8_set_position(PARROT_INTERP, String_iter *iter,
-UINTVAL pos)>
+=item C<static void fixed8_iter_set_position(PARROT_INTERP, const STRING *str,
+String_iter *iter, UINTVAL pos)>
 
 Moves the string iterator C<i> to the position C<n> in the string.
 
@@ -424,36 +491,13 @@ Moves the string iterator C<i> to the position C<n> in the string.
 */
 
 static void
-fixed8_set_position(SHIM_INTERP, ARGMOD(String_iter *iter), UINTVAL pos)
+fixed8_iter_set_position(SHIM_INTERP,
+    ARGIN(const STRING *str), ARGMOD(String_iter *iter), UINTVAL pos)
 {
-    ASSERT_ARGS(fixed8_set_position)
+    ASSERT_ARGS(fixed8_iter_set_position)
     iter->bytepos = iter->charpos = pos;
-    PARROT_ASSERT(pos <= Buffer_buflen(iter->str));
+    PARROT_ASSERT(pos <= Buffer_buflen(str));
 }
-
-
-/*
-
-=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter
-*iter)>
-
-Initializes for string C<src> the string iterator C<iter>.
-
-=cut
-
-*/
-
-static void
-iter_init(SHIM_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
-{
-    ASSERT_ARGS(iter_init)
-    iter->str             = src;
-    iter->bytepos         = iter->charpos        = 0;
-    iter->get_and_advance = fixed8_get_next;
-    iter->set_and_advance = fixed8_set_next;
-    iter->set_position    = fixed8_set_position;
-}
-
 
 /*
 
@@ -509,9 +553,13 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         get_bytes,
         codepoints,
         bytes,
-        iter_init,
         find_cclass,
-        fixed_8_hash
+        fixed_8_hash,
+        fixed8_iter_get,
+        fixed8_iter_skip,
+        fixed8_iter_get_and_advance,
+        fixed8_iter_set_and_advance,
+        fixed8_iter_set_position
     };
 
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);

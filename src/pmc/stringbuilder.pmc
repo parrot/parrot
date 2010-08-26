@@ -66,7 +66,7 @@ Initializes the StringBuilder with initial size of buffer.
         buffer->encoding  = Parrot_default_encoding_ptr;
         buffer->charset   = Parrot_default_charset_ptr;
         /* We need all string flags here because we use this buffer in substr_str */
-        buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
+        buffer->flags     = PObj_is_string_FLAG | PObj_external_FLAG;
         buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
                 initial_size, char);
         buffer->_buflen   = initial_size;
@@ -145,7 +145,7 @@ Append string to current buffer.
             STRING * const new_buffer = Parrot_unicode_charset_ptr->to_charset(interp, buffer);
             mem_gc_free(INTERP, buffer->_bufstart);
             STRUCT_COPY(buffer, new_buffer);
-            buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG | PObj_external_FLAG;
+            buffer->flags     = PObj_is_string_FLAG | PObj_external_FLAG;
 
             buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
                                                     new_buffer->_buflen, char);

@@ -77,7 +77,8 @@ Returns the value of the number.
 
 =item C<INTVAL get_integer()>
 
-Returns an integer representation of the number (by casting).
+Returns an integer representation of the number by truncating
+(rounding toward zero).
 
 =cut
 
@@ -391,6 +392,10 @@ Used to unarchive the number.
 
 =item C<METHOD PMC *cosh()>
 
+=item C<METHOD PMC *cot()>
+
+=item C<METHOD PMC *csc()>
+
 =item C<METHOD PMC *exp()>
 
 =item C<METHOD PMC *ln()>
@@ -425,13 +430,6 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
         RETURN(PMC *d);
     }
 
-    METHOD cos() {
-        PMC * const d  = Parrot_pmc_new(INTERP,
-                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
-        SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
-        RETURN(PMC *d);
-    }
-
     METHOD asec() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(1.0 / SELF.get_number()));
@@ -456,9 +454,28 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
         RETURN(PMC *d);
     }
 
+    METHOD cos() {
+        PMC * const d  = Parrot_pmc_new(INTERP,
+                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+        SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
     METHOD cosh() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, cosh(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+    METHOD cot() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / tan(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+    METHOD csc() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / sin(SELF.get_number()));
         RETURN(PMC *d);
     }
 

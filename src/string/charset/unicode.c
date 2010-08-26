@@ -651,20 +651,20 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(compare)
     String_iter l_iter, r_iter;
-    UINTVAL offs, cl, cr, min_len, l_len, r_len;
+    UINTVAL min_len, l_len, r_len;
 
     /* TODO make optimized equal - strings are equal length then already */
-    ENCODING_ITER_INIT(interp, lhs, &l_iter);
-    ENCODING_ITER_INIT(interp, rhs, &r_iter);
+    STRING_ITER_INIT(interp, &l_iter);
+    STRING_ITER_INIT(interp, &r_iter);
 
     l_len = lhs->strlen;
     r_len = rhs->strlen;
 
     min_len = l_len > r_len ? r_len : l_len;
 
-    for (offs = 0; offs < min_len; ++offs) {
-        cl = l_iter.get_and_advance(interp, &l_iter);
-        cr = r_iter.get_and_advance(interp, &r_iter);
+    while (l_iter.charpos < min_len) {
+        const UINTVAL cl = STRING_ITER_GET_AND_ADVANCE(interp, lhs, &l_iter);
+        const UINTVAL cr = STRING_ITER_GET_AND_ADVANCE(interp, rhs, &r_iter);
 
         if (cl != cr)
             return cl < cr ? -1 : 1;
@@ -716,13 +716,12 @@ static UINTVAL
 validate(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(validate)
-    INTVAL      offset;
     String_iter iter;
     const INTVAL length = Parrot_str_length(interp, src);
 
-    ENCODING_ITER_INIT(interp, src, &iter);
-    for (offset = 0; offset < length; ++offset) {
-        const UINTVAL codepoint = iter.get_and_advance(interp, &iter);
+    STRING_ITER_INIT(interp, &iter);
+    while (iter.charpos < length) {
+        const UINTVAL codepoint = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         /* Check for Unicode non-characters */
         if (codepoint >= 0xfdd0
         && (codepoint <= 0xfdef || (codepoint & 0xfffe) == 0xfffe)
@@ -877,24 +876,22 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offse
     ASSERT_ARGS(find_cclass)
     String_iter iter;
     UINTVAL     codepoint;
-    UINTVAL     pos = offset;
     UINTVAL     end = offset + count;
 
-    ENCODING_ITER_INIT(interp, src, &iter);
-
-    iter.set_position(interp, &iter, pos);
+    STRING_ITER_INIT(interp, &iter);
+    STRING_ITER_SET_POSITION(interp, src, &iter, offset);
 
     end = src->strlen < end ? src->strlen : end;
 
-    for (; pos < end; ++pos) {
-        codepoint = iter.get_and_advance(interp, &iter);
+    while (iter.charpos < end) {
+        codepoint = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         if (codepoint >= 256) {
             if (u_iscclass(interp, codepoint, flags))
-                    return pos;
+                    return iter.charpos - 1;
         }
         else {
             if (Parrot_iso_8859_1_typetable[codepoint] & flags)
-                return pos;
+                return iter.charpos - 1;
         }
     }
 
@@ -920,37 +917,36 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
     ASSERT_ARGS(find_not_cclass)
     String_iter iter;
     UINTVAL     codepoint;
-    UINTVAL     pos = offset;
     UINTVAL     end = offset + count;
     int         bit;
 
-    if (pos > src->strlen) {
+    if (offset > src->strlen) {
         /* XXX: Throw in this case? */
         return offset + count;
     }
 
-    ENCODING_ITER_INIT(interp, src, &iter);
+    STRING_ITER_INIT(interp, &iter);
 
-    if (pos)
-        iter.set_position(interp, &iter, pos);
+    if (offset)
+        STRING_ITER_SET_POSITION(interp, src, &iter, offset);
 
     end = src->strlen < end ? src->strlen : end;
 
     if (flags == enum_cclass_any)
         return end;
 
-    for (; pos < end; ++pos) {
-        codepoint = iter.get_and_advance(interp, &iter);
+    while (iter.charpos < end) {
+        codepoint = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         if (codepoint >= 256) {
             for (bit = enum_cclass_uppercase;
                     bit <= enum_cclass_word ; bit <<= 1) {
                 if ((bit & flags) && !u_iscclass(interp, codepoint, bit))
-                    return pos;
+                    return iter.charpos - 1;
             }
         }
         else {
             if (!(Parrot_iso_8859_1_typetable[codepoint] & flags))
-                return pos;
+                return iter.charpos - 1;
         }
     }
 
@@ -978,8 +974,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
     dest->strlen = 1;
 
-    ENCODING_ITER_INIT(interp, dest, &iter);
-    iter.set_and_advance(interp, &iter, codepoint);
+    STRING_ITER_INIT(interp, &iter);
+    STRING_ITER_SET_AND_ADVANCE(interp, dest, &iter, codepoint);
     dest->bufused = iter.bytepos;
 
     return dest;
@@ -1002,13 +998,12 @@ compute_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
 {
     ASSERT_ARGS(compute_hash)
     String_iter iter;
-    UINTVAL     offs;
     size_t      hashval = seed;
 
-    ENCODING_ITER_INIT(interp, src, &iter);
+    STRING_ITER_INIT(interp, &iter);
 
-    for (offs = 0; offs < src->strlen; ++offs) {
-        const UINTVAL c = iter.get_and_advance(interp, &iter);
+    while (iter.charpos < src->strlen) {
+        const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         hashval += hashval << 5;
         hashval += c;
     }

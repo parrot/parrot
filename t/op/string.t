@@ -16,6 +16,8 @@ Tests Parrot string registers and operations.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
 
@@ -30,8 +32,9 @@ Tests Parrot string registers and operations.
     three_argument_chopn__oob_values()
     substr_tests()
     neg_substr_offset()
+    exception_substr_null_string()
     exception_substr_oob()
-    exception_substr_oob()
+    exception_substr_oob_neg()
     len_greater_than_strlen()
     len_greater_than_strlen_neg_offset()
     replace_w_rep_eq_length()
@@ -121,6 +124,7 @@ Tests Parrot string registers and operations.
     test_find_encoding()
     test_assign()
     assign_and_globber()
+    split_on_null_string()
     split_on_empty_string()
     split_on_non_empty_string()
     test_join()
@@ -307,26 +311,61 @@ Tests Parrot string registers and operations.
     is( $S1, "length", '' )
 .end
 
-# This asks for substring that shouldn't be allowed...
-.sub exception_substr_oob
-    set $S0, "A string of length 21"
-    set $I0, -99
-    set $I1, 6
-    push_eh handler
-        substr $S1, $S0, $I0, $I1
-handler:
-    .exception_is( "Cannot take substr outside string" )
+.sub exception_substr_null_string
+    .local string s
+    .local pmc eh
+    .local int r
+    null s
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
+    set_addr eh, handler
+    push_eh eh
+    r = 1
+    substr s, s, 0, 0
+    r = 0
+  handler:
+    pop_eh
+    is(r, 1, "substr with null string throws" )
 .end
 
 # This asks for substring that shouldn't be allowed...
 .sub exception_substr_oob
+    .local pmc eh
+    .local int r
     set $S0, "A string of length 21"
     set $I0, 99
     set $I1, 6
-    push_eh handler
-        substr $S1, $S0, $I0, $I1
-handler:
-    .exception_is( "Cannot take substr outside string" )
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
+    set_addr eh, handler
+    push_eh eh
+    r = 1
+
+    substr $S1, $S0, $I0, $I1
+    r = 0
+  handler:
+    pop_eh
+    is(r, 1, "substr outside string throws" )
+.end
+
+# This asks for substring that shouldn't be allowed...
+.sub exception_substr_oob_neg
+    .local pmc eh
+    .local int r
+    set $S0, "A string of length 21"
+    set $I0, -99
+    set $I1, 6
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
+    set_addr eh, handler
+    push_eh eh
+    r = 1
+
+    substr $S1, $S0, $I0, $I1
+    r = 0
+  handler:
+    pop_eh
+    is(r, 1, "substr outside string throws - negative" )
 .end
 
 # This asks for substring much greater than length of original string
@@ -1386,6 +1425,28 @@ WHILE:
     assign  $S4, "Parrot"
     is( $S4, "Parrot", 'assign & globber' )
     is( $S5, "JAPH", 'assign & globber' )
+.end
+
+.sub split_on_null_string
+    .local string s, delim
+    .local pmc p
+    .local int i
+    null s
+    null delim
+    split p, s, delim
+    i = isnull p
+    is(i, 1, 'split on null string and delim')
+
+    s = 'foo'
+    split p, s, delim
+    i = isnull p
+    is(i, 1, 'split on null delim')
+
+    null s
+    delim = 'bar'
+    split p, s, delim
+    i = isnull p
+    is(i, 1, 'split on null string')
 .end
 
 .sub split_on_empty_string

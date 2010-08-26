@@ -9,6 +9,7 @@ t/pmc/packfiledirectory.t - test the PackfileDirectory PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfiledirectory.t
 
 =head1 DESCRIPTION

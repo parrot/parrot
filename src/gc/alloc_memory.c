@@ -64,37 +64,6 @@ mem_sys_allocate(size_t size)
 
 /*
 
-=item C<void * mem__internal_allocate(size_t size, const char *file, int line)>
-
-Calls C<malloc> to allocate memory from the system, Panics if there is no
-memory available. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
-debug information to C<STDERR>.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void *
-mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
-{
-    ASSERT_ARGS(mem__internal_allocate)
-    void * const ptr = malloc((size_t)size);
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
-            size, ptr, file, line);
-#else
-    UNUSED(file);
-    UNUSED(line);
-#endif
-    if (!ptr)
-        PANIC_OUT_OF_MEM(size);
-    return ptr;
-}
-
-/*
-
 =item C<void * mem_sys_allocate_zeroed(size_t size)>
 
 Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
@@ -114,38 +83,6 @@ mem_sys_allocate_zeroed(size_t size)
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
-    if (!ptr)
-        PANIC_OUT_OF_MEM(size);
-    return ptr;
-}
-
-/*
-
-=item C<void * mem__internal_allocate_zeroed(size_t size, const char *file, int
-line)>
-
-Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
-otherwise. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
-debug information to C<STDERR>.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void *
-mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
-{
-    ASSERT_ARGS(mem__internal_allocate_zeroed)
-    void * const ptr = calloc(1, (size_t)size);
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
-            size, ptr, file, line);
-#else
-    UNUSED(file);
-    UNUSED(line);
 #endif
     if (!ptr)
         PANIC_OUT_OF_MEM(size);
@@ -226,81 +163,6 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 
 /*
 
-=item C<void * mem__internal_realloc(void *from, size_t size, const char *file,
-int line)>
-
-Resizes a chunk of system memory.  Unlike C<realloc>, it can handle a
-NULL pointer, in which case a new memory block is allocated for the
-requested size. If C<DETAIL_MEMORY_DEBUG> macro is defined, debug
-information is printed to C<STDERR>.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void *
-mem__internal_realloc(ARGFREE(void *from), size_t size,
-        ARGIN(const char *file), int line)
-{
-    ASSERT_ARGS(mem__internal_realloc)
-    void * const ptr = realloc(from, size);
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n",
-            from, size, file, line);
-    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
-            size, ptr, file, line);
-#else
-    UNUSED(file);
-    UNUSED(line);
-#endif
-    if (!ptr)
-        PANIC_OUT_OF_MEM(size);
-    return ptr;
-}
-
-/*
-
-=item C<void * mem__internal_realloc_zeroed(void *from, size_t size, size_t
-old_size, const char *file, int line)>
-
-Reallocates a given buffer of size C<old_size> to C<size>. If the new size
-is larger then the old size, the difference is filled with zeros. Contains
-debugging information, and can print filename and line number where it is
-used if C<DETAIL_MEMORY_DEBUG> is defined.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void *
-mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
-    ARGIN(const char *file), int line)
-{
-    ASSERT_ARGS(mem__internal_realloc_zeroed)
-    void * const ptr = realloc(from, size);
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n",
-            from, size, file, line);
-    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
-            size, ptr, file, line);
-#else
-    UNUSED(file);
-    UNUSED(line);
-#endif
-    if (!ptr)
-        PANIC_OUT_OF_MEM(size);
-    if (size > old_size)
-        memset((char*)ptr + old_size, 0, size - old_size);
-
-    return ptr;
-}
-
-/*
-
 =item C<void mem_sys_free(void *from)>
 
 Frees a chunk of memory back to the system.
@@ -319,31 +181,6 @@ mem_sys_free(ARGFREE(void *from))
 #endif
     if (from)
         free(from);
-}
-
-/*
-
-=item C<void mem__internal_free(void *from, const char *file, int line)>
-
-Frees a chunk of memory back to the system. If
-C<DETAIL_MEMORY_DEBUG> macro is defined, prints debug information to
-C<STDERR>.
-
-=cut
-
-*/
-
-void
-mem__internal_free(ARGFREE(void *from), ARGIN(const char *file), int line)
-{
-    ASSERT_ARGS(mem__internal_free)
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);
-#else
-    UNUSED(file);
-    UNUSED(line);
-#endif
-    free(from);
 }
 
 /*

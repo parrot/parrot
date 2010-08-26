@@ -1009,19 +1009,22 @@ access these from PASM, include F<errors.pasm>.  The current categories are:
 
 =item .PARROT_ERRORS_GLOBALS_FLAG
 
-Throw an exception if global doesn't exist.  Default: on.
+Throw an exception if a global doesn't exist. This
+flag is not used by Parrot and is deprecated.
 
 =item .PARROT_ERRORS_OVERFLOW_FLAG
 
-Throw math overflow instead of promoting to BigInt.  Default: off.
+When performing arithmetic on Integer PMCs, throw a math overflow exception
+instead of promoting to BigInt. This flag does not pertain to native integers,
+which are never promoted. Default: off.
 
 =item .PARROT_ERRORS_PARAM_COUNT_FLAG
 
-Throw exception on argument <-> param count mismatch.  Default: off.
+Throw an exception on an argument versus parameter count mismatch. Default: on.
 
 =item .PARROT_ERRORS_RESULT_COUNT_FLAG
 
-Throw exception on return <-> result count mismatch.  Default: off.
+Throw an exception on a return versus result count mismatch. Default: off.
 
 =item .PARROT_ERRORS_ALL_FLAG
 

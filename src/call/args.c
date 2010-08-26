@@ -488,22 +488,12 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         }
     }
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
-        const INTVAL elements = VTABLE_elements(interp, aggregate);
-        INTVAL index;
-        PMC * const key = Parrot_pmc_new(interp, enum_class_Key);
-        VTABLE_set_integer_native(interp, key, 0);
-        SETATTR_Key_next_key(interp, key, (PMC *)INITBucketIndex);
+        Hash *hash = (Hash *)VTABLE_get_pointer(interp, aggregate);
 
-        /* Low-level hash iteration. */
-        for (index = 0; index < elements; ++index) {
-            if (!PMC_IS_NULL(key)) {
-                STRING * const name = (STRING *)parrot_hash_get_idx(interp,
-                                (Hash *)VTABLE_get_pointer(interp, aggregate), key);
-                PARROT_ASSERT(name);
-                VTABLE_set_pmc_keyed_str(interp, call_object, name,
-                    VTABLE_get_pmc_keyed_str(interp, aggregate, name));
-            }
-        }
+        parrot_hash_iterate(hash,
+            VTABLE_set_pmc_keyed_str(interp, call_object,
+                (STRING *)_bucket->key,
+                hash_value_to_pmc(interp, hash, _bucket->value));)
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -563,9 +553,9 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(Parrot_pcc_build_call_from_varargs)
-    PMC         * arg_flags         = PMCNULL;
-    PMC         * call_object;
-    INTVAL       i                  = 0;
+    PMC         *call_object;
+    PMC         *arg_flags    = PMCNULL;
+    INTVAL       i            = 0;
 
     if (PMC_IS_NULL(signature))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
@@ -758,7 +748,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
     GETATTR_FixedIntegerArray_size(interp, raw_sig, param_count);
 
-
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
         if (param_count > 0 && err_check)
@@ -817,27 +806,29 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* If the parameter is slurpy, collect all remaining positional
          * arguments into an array.*/
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
-            PMC *collect_positional;
-
             /* Can't handle named slurpy here, go to named argument handling */
-            if (param_flags & PARROT_ARG_NAME)
-                break;
+            if (!(param_flags & PARROT_ARG_NAME)) {
+                PMC *collect_positional;
+                int  j;
+                INTVAL num_positionals = positional_args - arg_index;
+                if (num_positionals < 0)
+                    num_positionals = 0;
+                if (named_count > 0)
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "named parameters must follow all positional parameters");
 
-            if (named_count > 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "named parameters must follow all positional parameters");
+                collect_positional = Parrot_pmc_new_init_int(interp,
+                    Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
+                    num_positionals);
 
-            collect_positional = Parrot_pmc_new(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
+                for (j = 0; arg_index < positional_args; ++arg_index)
+                    VTABLE_set_pmc_keyed_int(interp, collect_positional, j++,
+                        VTABLE_get_pmc_keyed_int(interp, call_object, arg_index));
 
-            for (; arg_index < positional_args; ++arg_index) {
-                VTABLE_push_pmc(interp, collect_positional,
-                    VTABLE_get_pmc_keyed_int(interp, call_object, arg_index));
+                *accessor->pmc(interp, arg_info, param_index) = collect_positional;
+                ++param_index;
             }
-
-            *accessor->pmc(interp, arg_info, param_index) = collect_positional;
-            ++param_index;
             break; /* Terminate the positional arg loop. */
         }
 
@@ -1363,14 +1354,34 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
         ARGMOD(PMC **arg_flags))
 {
     ASSERT_ARGS(parse_signature_string)
-    PMC *current_array;
+    PMC        *current_array;
     const char *x;
-    INTVAL flags = 0;
-    INTVAL set = 0;
+    INTVAL      flags = 0;
+    INTVAL      set   = 0;
+    INTVAL      count = 0;
+
+    for (x = signature; *x; ++x) {
+        if (*x == '-')
+            break;
+        switch (*x) {
+            case 'I': count++; break;
+            case 'N': count++; break;
+            case 'S': count++; break;
+            case 'P': count++; break;
+            default: break;
+        }
+    }
 
     if (PMC_IS_NULL(*arg_flags))
-        *arg_flags = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
-    current_array = *arg_flags;
+        current_array = *arg_flags
+                      = Parrot_pmc_new_init_int(interp,
+                            enum_class_ResizableIntegerArray, count);
+    else {
+        current_array = *arg_flags;
+        VTABLE_set_integer_native(interp, current_array, count);
+    }
+
+    count = 0;
 
     for (x = signature; *x != '\0'; ++x) {
 
@@ -1383,7 +1394,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
             /* Starting a new argument, so store the previous argument,
              * if there was one. */
             if (set) {
-                VTABLE_push_integer(interp, current_array, flags);
+                VTABLE_set_integer_keyed_int(interp, current_array, count++, flags);
                 set = 0;
             }
 
@@ -1420,7 +1431,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
 
     /* Store the final argument, if there was one. */
     if (set)
-        VTABLE_push_integer(interp, current_array, flags);
+        VTABLE_set_integer_keyed_int(interp, current_array, count, flags);
 }
 
 /*

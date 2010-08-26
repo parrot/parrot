@@ -666,7 +666,7 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
             (*src_lines)++;
             if (ins->opnum < 0)
                 IMCC_fatal(interp, 1, "get_code_size: "
-                        "no opnum ins#%d %I\n",
+                        "no opnum ins#%d %d\n",
                         ins->index, ins);
 
             if (ins->opnum == PARROT_OP_set_p_pc) {
@@ -686,6 +686,85 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
     }
 
     return code_size;
+}
+
+
+/*
+
+=item C<opcode_t bytecode_map_op(PARROT_INTERP, opcode_t op)>
+
+Lookup the mapping of an op for the current bytecode segment or make one if
+none exists.
+
+=cut
+
+*/
+
+static
+opcode_t
+bytecode_map_op(PARROT_INTERP, opcode_t op) {
+    int i;
+    op_info_t         *info    = &interp->op_info_table[op];
+    op_lib_t          *lib     = info->lib;
+    op_func_t         op_func  = interp->op_func_table[op];
+    PackFile_ByteCode *bc      = interp->code;
+    PackFile_ByteCode_OpMappingEntry *om;
+
+    for (i = 0; i < bc->op_mapping.n_libs; i++) {
+        if (lib == bc->op_mapping.libs[i].lib) {
+            om = &bc->op_mapping.libs[i];
+            goto found_lib;
+        }
+    }
+
+    /* library not yet mapped */
+    bc->op_mapping.n_libs++;
+    bc->op_mapping.libs = mem_gc_realloc_n_typed_zeroed(interp, bc->op_mapping.libs,
+                            bc->op_mapping.n_libs, bc->op_mapping.n_libs - 1,
+                            PackFile_ByteCode_OpMappingEntry);
+
+    /* initialize a new lib entry */
+    om            = &bc->op_mapping.libs[bc->op_mapping.n_libs - 1];
+    om->lib       = lib;
+    om->n_ops     = 0;
+    om->lib_ops   = mem_gc_allocate_n_zeroed_typed(interp, 0, opcode_t);
+    om->table_ops = mem_gc_allocate_n_zeroed_typed(interp, 0, opcode_t);
+
+  found_lib:
+    for (i = 0; i < om->n_ops; i++) {
+        if (bc->op_func_table[om->table_ops[i]] == op_func)
+            return om->table_ops[i];
+    }
+
+    /* op not yet mapped */
+    bc->op_count++;
+    bc->op_func_table =
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_func_table, bc->op_count, bc->op_count,
+                                        op_func_t);
+    bc->op_func_table[bc->op_count - 1] = op_func;
+    bc->op_info_table =
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_info_table, bc->op_count, bc->op_count,
+                                        op_info_t *);
+    bc->op_info_table[bc->op_count - 1] = info;
+
+    /* initialize new op mapping */
+    om->n_ops++;
+
+    om->lib_ops =
+        mem_gc_realloc_n_typed_zeroed(interp, om->lib_ops, om->n_ops, om->n_ops - 1, opcode_t);
+    for (i = 0; i < lib->op_count; i++) {
+        if (lib->op_func_table[i] == op_func) {
+            om->lib_ops[om->n_ops - 1] = i;
+            break;
+        }
+    }
+    PARROT_ASSERT(om->lib_ops[om->n_ops - 1] || !i);
+
+    om->table_ops =
+        mem_gc_realloc_n_typed_zeroed(interp, om->table_ops, om->n_ops, om->n_ops - 1, opcode_t);
+    om->table_ops[om->n_ops - 1] = bc->op_count - 1;
+
+    return bc->op_count - 1;
 }
 
 
@@ -836,7 +915,7 @@ fixup_globals(PARROT_INTERP)
                     const int op = interp->op_lib->op_code(interp, "find_sub_not_null_p_sc", 1);
                     PARROT_ASSERT(op);
 
-                    interp->code->base.data[addr] = op;
+                    interp->code->base.data[addr] = bytecode_map_op(interp, op);
 
                     if (nam->color < 0)
                         nam->color = add_const_str(interp, IMCC_string_from_reg(interp, nam));
@@ -1437,7 +1516,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     sub->namespace_name = ns_pmc;
     sub->start_offs     = offs;
     sub->end_offs       = end;
-    sub->HLL_id         = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
+    sub->HLL_id         = unit->hll_id;
 
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];
@@ -1643,22 +1722,20 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         SymReg *r = reg;
-        int     type;
 
         if (key_length >= MAX_KEY_LEN)
             IMCC_fatal(interp, 1, "build_key:"
                     "Key too long, increase MAX_KEY_LEN.\n");
 
-        /* if key is a register, the original sym is in r->reg */
-        type = r->type;
-
-        if (r->reg)
-            r = r->reg;
-
-        switch (type) {
+        switch (r->type) {
           case VTIDENTIFIER:       /* P[S0] */
           case VTPASM:             /* P[S0] */
           case VTREG:              /* P[S0] */
+
+            /* if key is a register, the original sym is in r->reg */
+            if (r->reg)
+                r = r->reg;
+
             if (r->set == 'I')
                 *pc++ = PARROT_ARG_I;    /* register type */
             else if (r->set == 'S')
@@ -1678,7 +1755,9 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
                     " keypart reg %s %c%d\n",
                     r->name, r->set, (int)r->color);
             break;
+
           case VT_CONSTP:
+            r = r->reg;
           case VTCONST:
           case VTCONST|VT_ENCODED:
             switch (r->set) {
@@ -1711,7 +1790,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             break;
           default:
             IMCC_fatal(interp, 1, "build_key: "
-                    "unknown type 0x%x on %s\n", type, r->name);
+                    "unknown type 0x%x on %s\n", r->type, r->name);
         }
     }
 
@@ -1969,7 +2048,7 @@ add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
             SymReg *key = r;
 
             for (r = r->nextkey; r; r = r->nextkey)
-                if (r->type & VTCONST)
+                if (r->type & (VTCONST|VT_CONSTP))
                     add_1_const(interp, r);
                 build_key(interp, key);
         }
@@ -2351,14 +2430,14 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         op = (opcode_t)ins->opnum;
 
-        /* Start generating the bytecode */
-        *(IMCC_INFO(interp)->pc)++   = op;
-
         /* Get the info for that opcode */
         op_info = &interp->op_info_table[op];
 
         IMCC_debug(interp, DEBUG_PBC, "%d %s", IMCC_INFO(interp)->npc,
             op_info->full_name);
+
+        /* Start generating the bytecode */
+        *(IMCC_INFO(interp)->pc)++ = bytecode_map_op(interp, op);
 
         for (i = 0; i < op_info->op_count-1; i++) {
             switch (op_info->types[i]) {
@@ -2429,7 +2508,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             }
         }
 
-        IMCC_debug(interp, DEBUG_PBC, "\t%I\n", ins);
+        IMCC_debug(interp, DEBUG_PBC, "\t%d\n", ins);
         IMCC_INFO(interp)->npc += ins->opsize;
     }
 

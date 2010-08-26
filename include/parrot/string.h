@@ -30,13 +30,22 @@ typedef enum Forward_flag {
 
 /* String iterator */
 typedef struct string_iterator_t {
-    const STRING *str;
     UINTVAL bytepos;
     UINTVAL charpos;
-    UINTVAL (*get_and_advance)(PARROT_INTERP, struct string_iterator_t *i);
-    void (*set_and_advance)(PARROT_INTERP, struct string_iterator_t *i, UINTVAL c);
-    void (*set_position)(PARROT_INTERP, struct string_iterator_t *i, UINTVAL pos);
 } String_iter;
+
+#define STRING_ITER_INIT(i, iter) \
+    (iter)->charpos = (iter)->bytepos = 0
+#define STRING_ITER_GET(i, str, iter, offset) \
+    ((str)->encoding)->iter_get((i), (str), (iter), (offset))
+#define STRING_ITER_SKIP(i, str, iter, skip) \
+    ((str)->encoding)->iter_skip((i), (str), (iter), (skip))
+#define STRING_ITER_GET_AND_ADVANCE(i, str, iter) \
+    ((str)->encoding)->iter_get_and_advance((i), (str), (iter))
+#define STRING_ITER_SET_AND_ADVANCE(i, str, iter, c) \
+    ((str)->encoding)->iter_set_and_advance((i), (str), (iter), (c))
+#define STRING_ITER_SET_POSITION(i, str, iter, pos) \
+    ((str)->encoding)->iter_set_position((i), (str), (iter), (pos))
 
 #define STREQ(x, y)  (strcmp((x), (y))==0)
 #define STRNEQ(x, y) (strcmp((x), (y))!=0)

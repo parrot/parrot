@@ -263,16 +263,32 @@ typedef struct PackFile_ConstTable {
     opcode_t                   const_count;
     PackFile_Constant         *constants;
     PackFile_ByteCode         *code;  /* where this segment belongs to */
-
     PMC                       *string_hash; /* Hash for lookup strings and numbers */
 } PackFile_ConstTable;
 
+typedef struct PackFile_ByteCode_OpMappingEntry {
+    op_lib_t *lib;       /* library for this entry */
+    opcode_t  n_ops;     /* number of ops used */
+    opcode_t *lib_ops;   /* indices of ops within the library */
+    opcode_t *table_ops; /* indices of ops within the op table */
+} PackFile_ByteCode_OpMappingEntry;
+
+typedef struct PackFile_ByteCode_OpMapping {
+    opcode_t                          n_libs; /* number of library entries */
+    PackFile_ByteCode_OpMappingEntry *libs;   /* opcode libraries used by this segment */
+} PackFile_ByteCode_OpMapping;
+
 struct PackFile_ByteCode {
-    PackFile_Segment       base;
-    struct PackFile_Debug *debugs;
-    PackFile_ConstTable   *const_table;
-    PackFile_FixupTable   *fixups;
-    struct PackFile_Annotations *annotations;
+    PackFile_Segment              base;
+    struct PackFile_Debug        *debugs;
+    PackFile_ConstTable          *const_table;
+    PackFile_FixupTable          *fixups;
+    struct PackFile_Annotations  *annotations;
+    PackFile_ByteCode_OpMapping   op_mapping;      /* opcode mapping information */
+    size_t                        op_count;        /* number of ops in the func table */
+    op_func_t                    *op_func_table;   /* opcode dispatch table */
+    op_func_t                    *save_func_table; /* for when we hijack op_func_table */
+    op_info_t                   **op_info_table;
 };
 
 typedef struct PackFile_DebugFilenameMapping {
@@ -1038,6 +1054,14 @@ void PackFile_assign_transforms(ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pf);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * PF_fetch_buf(PARROT_INTERP,
+    ARGIN_NULLOK(PackFile *pf),
+    ARGIN(const opcode_t **cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char * PF_fetch_cstring(PARROT_INTERP,
@@ -1075,6 +1099,10 @@ STRING * PF_fetch_string(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_PURE_FUNCTION
+size_t PF_size_buf(ARGIN(const STRING *s))
+        __attribute__nonnull__(1);
+
+PARROT_PURE_FUNCTION
 size_t PF_size_cstring(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
@@ -1094,6 +1122,13 @@ size_t PF_size_string(ARGIN(const STRING *s))
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 size_t PF_size_strlen(const UINTVAL len);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t* PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cursor);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -1132,6 +1167,9 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
 #define ASSERT_ARGS_PackFile_assign_transforms __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_PF_fetch_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PF_fetch_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf) \
@@ -1146,6 +1184,8 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 #define ASSERT_ARGS_PF_fetch_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_PF_size_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_PF_size_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_PF_size_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -1154,6 +1194,9 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 #define ASSERT_ARGS_PF_size_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_PF_size_strlen __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_PF_store_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(cursor) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_PF_store_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cursor) \
     , PARROT_ASSERT_ARG(s))
@@ -1169,138 +1212,6 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     , PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/pf_items.c */
-
-
-
-/*
-** Byte Ordering Functions (byteorder.c)
-*/
-
-/* HEADERIZER BEGIN: src/byteorder.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-void fetch_buf_be_12(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_be_16(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_be_32(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_be_4(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_be_8(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_le_12(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_le_16(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_le_32(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_le_4(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_le_8(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-INTVAL fetch_iv_be(INTVAL w);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-INTVAL fetch_iv_le(INTVAL w);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-opcode_t fetch_op_be(opcode_t w);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-opcode_t fetch_op_le(opcode_t w);
-
-#define ASSERT_ARGS_fetch_buf_be_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_be_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_be_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_be_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_le_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_le_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_le_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_le_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_buf_le_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(rb) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_iv_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_fetch_iv_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_fetch_op_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_fetch_op_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/byteorder.c */
 
 #endif /* PARROT_PACKFILE_H_GUARD */
 

@@ -242,6 +242,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* it's a C exception handler */
         Parrot_runloop * const jump_point = (Parrot_runloop *)address;
+        jump_point->exception = exception;
         longjmp(jump_point->resume, 1);
     }
 
@@ -367,6 +368,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         Parrot_runloop * const jump_point =
             (Parrot_runloop * const)VTABLE_get_pointer(interp, handler);
+        jump_point->exception = exception;
         longjmp(jump_point->resume, 1);
     }
 

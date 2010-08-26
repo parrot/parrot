@@ -46,6 +46,13 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void print_sub_name(PARROT_INTERP, PMC *sub_pmc)>
+
+=cut
+
+*/
 
 static void
 print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))

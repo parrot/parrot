@@ -413,7 +413,6 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Aug 17, 2010 - 2.7   - mikehh
  - Sep 21, 2010 - 2.8   - gerd
  - Oct 19, 2010 - 2.9*  - gerd
  - Nov 16, 2010 - 2.10  - ??

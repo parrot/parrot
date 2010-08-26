@@ -49,6 +49,8 @@ consumption which should be resolved soon.
 
 =cut
 
+.HLL 'parrot'
+
 .loadlib 'bit_ops'
 
 ###########################################################################

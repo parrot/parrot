@@ -84,16 +84,27 @@ sub check_operators {
                 }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
         my @lines = split( /\n/, $buf );
-        for my $line (@lines) {
+        $comma_space{$path} = [];
+        for (my $i=0; $i <= $#lines; $i++) {
             # after a comma there should be one space or a newline
-            if ( $line =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
-                $comma_space{$path} = undef;
+            if ( $lines[$i] =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
+                push @{ $comma_space{$path} }, $i;
             }
         }
     }
 
 ## L<PDD07/Code Formatting"there should be one space or a newline after a comma">/
-    is( join("\n", keys %comma_space), "", "there should be one space or a newline after a comma" );
+    my $files_with_errors = 0;
+    for my $path ( sort keys %comma_space ) {
+        $files_with_errors++ if scalar @{ $comma_space{$path} };
+    }
+    is( $files_with_errors, 0, "there should be one space or a newline after a comma" )
+        or diag( do {
+            for my $k (sort keys %comma_space) {
+                my @lines_failed = @{$comma_space{$k}};
+                print "$k: line(s): @lines_failed\n" if scalar(@lines_failed);
+            }
+        } );
 }
 
 # Local Variables:

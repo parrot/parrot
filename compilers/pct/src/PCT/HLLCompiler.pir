@@ -26,10 +26,9 @@ running compilers from a command line.
 
 .include 'cclass.pasm'
 .include 'stdio.pasm'
+.include 'iglobals.pasm'
 
 .sub 'init' :vtable :method
-    load_bytecode 'config.pir'
-
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
@@ -56,7 +55,8 @@ running compilers from a command line.
 
     $S0  = '???'
     push_eh _handler
-    $P0  = _config()
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
     $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
   _handler:
     pop_eh
@@ -335,7 +335,10 @@ when the stage corresponding to target has been reached.
     $P1.'print'("Stage '")
     $P1.'print'(stagename)
     $P1.'print'("': ")
-    $P1.'print'($N2)
+    $P2 = new ['ResizablePMCArray']
+    push $P2, $N2
+    $S0 = sprintf "%.3f", $P2
+    $P1.'print'($S0)
     $P1.'print'(" sec\n")
     if target == stagename goto have_result
     goto stagestats_loop

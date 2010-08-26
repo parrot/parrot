@@ -7,9 +7,21 @@ use warnings;
 
 use Gravatar::URL;
 
-=for usage
+=head1 NAME
 
-use to generate source for http://trac.parrot.org/parrot/wiki/ParrotFaces
+faces.pl - Generate source for Parrot wiki ParrotFaces page
+
+=head1 SYNOPSIS
+
+    perl tools/dev/faces.pl
+
+=head1 DESCRIPTION
+
+Used to create L<http://trac.parrot.org/parrot/wiki/ParrotFaces>
+
+=head1 PREREQUISITE
+
+Gravatar::URL (L<http://search.cpan.org/dist/Gravatar-URL/>).
 
 =cut
 

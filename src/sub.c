@@ -182,7 +182,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
         if (!debug)
             return 0;
         for (i = n = 0; n < sub->seg->base.size; ++i) {
-            op_info_t * const op_info = &interp->op_info_table[*pc];
+            op_info_t * const op_info = sub->seg->op_info_table[*pc];
             opcode_t var_args = 0;
 
             if (i >= debug->base.size)
@@ -234,7 +234,7 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     current_annotation = pc - base_pc;
 
     for (i = op = 0; op < debug_size; ++i) {
-        op_info_t * const op_info  = &interp->op_info_table[*base_pc];
+        op_info_t * const op_info  = interp->code->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 
         if (i >= debug_size)

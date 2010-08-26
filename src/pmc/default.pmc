@@ -360,6 +360,23 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
 
 /*
 
+=item C<void init_int(INTVAL initvalue)>
+
+Calls C<init()> and C<set_integer_native(initvalue)>.
+Default implementation to allow more usages of init_int without having to
+implement it everywhere.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL initvalue) {
+        SELF.init();
+        SELF.set_integer_native(initvalue);
+    }
+
+/*
+
 =item C<void destroy()>
 
 Does nothing.

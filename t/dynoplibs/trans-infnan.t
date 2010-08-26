@@ -20,7 +20,7 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
 
 .sub main :main
     .include 'test_more.pir'
-    plan(67)
+    plan(70)
 
     test_exp()
     test_sin()
@@ -36,6 +36,7 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
     test_coth()
     test_acot()
     test_sec()
+    test_csc()
     test_sech()
     test_asec()
     test_ln()
@@ -232,6 +233,18 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
     is($N1, 'NaN', '... sec NaN')
 .end
 
+.sub test_csc
+    $N0 = 'Inf'
+    $N1 = csc $N0
+    is($N1, 'NaN', 'csc: csc Inf')
+    $N0 = '-Inf'
+    $N1 = csc $N0
+    is($N1, 'NaN', '... csc -Inf')
+    $N0 = 'NaN'
+    $N1 = csc $N0
+    is($N1, 'NaN', '... csc NaN')
+.end
+
 .sub test_sech
     $N0 = 'Inf'
     $N1 = sech $N0
@@ -295,20 +308,16 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
     is($N1, 'NaN', '... log2 -Inf')
 .end
 
-
 .sub test_cot
     $N0 = 'Inf'
-    #$N1 = cot $N0
-    #is($N1, 'NaN', 'cot: cot Inf')
-    todo(0, 'cot Inf', 'cot/coth/acot not implemented for real numbers')
+    $N1 = cot $N0
+    is($N1, 'NaN', 'cot: cot Inf')
     $N0 = '-Inf'
-    #$N1 = cot $N0
-    #is($N1, 'NaN', '... cot -Inf')
-    todo(0, 'cot -Inf', 'cot/coth/acot not implemented for real numbers')
+    $N1 = cot $N0
+    is($N1, 'NaN', '... cot -Inf')
     $N0 = 'NaN'
-    #$N1 = cot $N0
-    #is($N1, 'NaN', '... cot NaN')
-    todo(0, 'cot NaN', 'cot/coth/acot not implemented for real numbers')
+    $N1 = cot $N0
+    is($N1, 'NaN', '... cot NaN')
 .end
 
 .sub test_pow

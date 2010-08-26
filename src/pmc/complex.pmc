@@ -13,14 +13,12 @@ string parsing/generating and basic mathematical operations.
 
 =head2 Functions
 
+Equations used are sometimes listed.  At times, multiple equations are given,
+but those starting with => are the ones used
+
 =over 4
 
 =cut
-    ASSERT_ARGS()
-
-
-Equations used are sometimes listed.  At times, multiple equations are given,
-but those starting with => are the ones used
 
 */
 
@@ -76,6 +74,12 @@ C<a+bi> with optional spaces around C<+> and before C<i>. You can also
 use C<j> instead of C<i>.
 
 =cut
+
+We have a conflict among our coding standards here.  Our 100-character line
+limit meant that the following function declaration had to be split over two
+lines.  However, that leads to t/codingstd/pmc_docs.t reporting that this
+function lacks documentation -- reporting due to differences in whitespacing
+between '=item' and function declaration.
 
 */
 
@@ -238,6 +242,14 @@ complex_parse_string(PARROT_INTERP,
     Parrot_str_free_cstring(str);
 }
 
+/*
+
+=item C<static void int_check_divide_zero(PARROT_INTERP, INTVAL value)>
+
+=cut
+
+*/
+
 static void
 int_check_divide_zero(PARROT_INTERP, INTVAL value)
 {
@@ -248,6 +260,14 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
             "Divide by zero");
 }
 
+/*
+
+=item C<static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)>
+
+=cut
+
+*/
+
 static void
 float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
 {
@@ -257,6 +277,14 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
+
+/*
+
+=item C<static void complex_check_divide_zero(PARROT_INTERP, PMC *value)>
+
+=cut
+
+*/
 
 static void
 complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))

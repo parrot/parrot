@@ -298,7 +298,7 @@ SymReg *
 mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_symreg)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
 
     /* Check for the condition that fires up a segfault in TT #162 */
     PARROT_ASSERT(unit != NULL);
@@ -393,7 +393,7 @@ SymReg *
 mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 {
     ASSERT_ARGS(mk_pcc_sub)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
     SymReg   * const r    = _mk_symreg(interp, &unit->hash, name, proto);
 
     r->type    = VT_PCC_SUB;
@@ -407,7 +407,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 
 =item C<void add_namespace(PARROT_INTERP, IMC_Unit *unit)>
 
-Add the current namespace to a sub declaration.
+Add the current namespace (and HLL id) to a sub declaration.
 
 =cut
 
@@ -418,6 +418,8 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(add_namespace)
     SymReg * const ns = IMCC_INFO(interp)->cur_namespace;
+
+    unit->hll_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
 
     if (!ns)
         return;
@@ -647,7 +649,7 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_ident)
     char   * const fullname = _mk_fullname(interp, IMCC_INFO(interp)->namespace_stack, name);
-    SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->last_unit->hash), name);
+    SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->cur_unit->hash), name);
     if (r && r->set != t)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                 "syntax error, duplicated IDENTIFIER '%s'\n", fullname);
@@ -1075,7 +1077,7 @@ SymReg *
 mk_local_label(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_local_label)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
     return _mk_address(interp, &unit->hash, name, U_add_uniq_label);
 }
 
@@ -1096,7 +1098,7 @@ SymReg *
 mk_label_address(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_label_address)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
     return _mk_address(interp, &unit->hash, name, U_add_once);
 }
 

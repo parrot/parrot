@@ -607,35 +607,6 @@ Parrot_ns_find_current_namespace_global(PARROT_INTERP, ARGIN_NULLOK(STRING *glob
 
 /*
 
-=item C<PMC * Parrot_find_global_s(PARROT_INTERP, STRING *str_key, STRING
-*globalname)>
-
-Search the namespace designated by C<str_key>, or the HLL root if
-C<str_key> is NULL, for an object with name C<globalname>.  Return the
-object, or NULL if not found.
-
-TT #1222 - For now this function prefers non-namespaces, it will eventually
-entirely use the untyped interface.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
-        ARGIN_NULLOK(STRING *globalname))
-{
-    ASSERT_ARGS(Parrot_find_global_s)
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns = Parrot_ns_get_namespace_keyed_str(interp, hll_ns, str_key);
-    return Parrot_ns_find_namespace_global(interp, ns, globalname);
-}
-
-/*
-
 =item C<void Parrot_ns_store_global(PARROT_INTERP, PMC *ns, STRING *globalname,
 PMC *val)>
 
@@ -658,33 +629,6 @@ Parrot_ns_store_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
     VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
-
-/*
-
-=item C<void Parrot_store_global_s(PARROT_INTERP, STRING *str_key, STRING
-*globalname, PMC *val)>
-
-Store the PMC C<val> into the namespace designated by C<str_key>, or
-the HLL root if C<str_key> is NULL, with the name C<globalname>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
-        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
-{
-    ASSERT_ARGS(Parrot_store_global_s)
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns = Parrot_ns_make_namespace_keyed_str(interp, hll_ns, str_key);
-    Parrot_ns_store_global(interp, ns, globalname, val);
-
-    /* TT #1225 - method cache invalidation should be a namespace function */
-    Parrot_invalidate_method_cache(interp, str_key);
-}
-
 
 /*
 

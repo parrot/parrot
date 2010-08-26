@@ -220,7 +220,8 @@ CONFIGURE_GENERATED_FILES = \
     .parrot_current_rev \
 #IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
 #IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
-    runtime/parrot/include/signal.pasm
+    runtime/parrot/include/signal.pasm \
+    tools/dev/mk_language_shell.pl
 
 
 ###############################################################################
@@ -434,7 +435,6 @@ INTERP_O_FILES = \
     src/string/api$(O) \
     src/ops/core_ops$(O) \
 #IF(i386_has_gcc_cmpxchg):    src/atomic/gcc_x86$(O) \
-    src/byteorder$(O) \
     src/string/charset$(O) \
     src/core_pmcs$(O) \
     src/datatypes$(O) \
@@ -469,7 +469,6 @@ INTERP_O_FILES = \
     src/misc$(O) \
     src/multidispatch$(O) \
     src/namespace$(O) \
-    src/frame_builder$(O) \
     src/nci/api$(O) \
     src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
@@ -675,7 +674,6 @@ STR_FILES = \
     src/library.str \
     src/multidispatch.str \
     src/namespace.str \
-    src/frame_builder.str \
     src/nci/api.str \
     src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
@@ -844,7 +842,7 @@ $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
+$(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT) $(LIBRARY_DIR)/Getopt/Obj.pbc
 	$(PARROT) -o pbc_to_exe.pbc tools/dev/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
@@ -1238,8 +1236,6 @@ examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 #
 ###############################################################################
 
-src/byteorder$(O) : $(PARROT_H_HEADERS) src/byteorder.c
-
 src/datatypes$(O) : $(PARROT_H_HEADERS) src/datatypes.c
 
 src/extend_vtable$(O) : $(PARROT_H_HEADERS) \
@@ -1488,13 +1484,6 @@ src/nci/extra_thunks$(O) : \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
 
-src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
-	src/frame_builder.c \
-	include/pmc/pmc_fixedintegerarray.h \
-	include/pmc/pmc_unmanagedstruct.h \
-	include/pmc/pmc_managedstruct.h \
-	$(INC_DIR)/oplib/ops.h
-
 src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 
 ## SUFFIX OVERRIDE
@@ -1676,10 +1665,22 @@ EXAMPLES_TEST_FILES = \
 CONFIGURE_TEST_FILES = \
     t/configure/*.t \
     t/steps/*.t
+PBC_TEST_FILES = \
+    t/pmc/testlib/annotations.pbc \
+    t/pmc/testlib/number.pbc
+
+# pbc files used for several tests
+pbctestfiles: $(PARROT) $(PBC_TEST_FILES)
+
+t/pmc/testlib/number.pbc: t/pmc/testlib/number.pasm
+	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
+
+t/pmc/testlib/annotations.pbc: t/pmc/testlib/annotations.pir
+	$(PARROT) -o t/pmc/testlib/annotations.pbc t/pmc/testlib/annotations.pir
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
-test_prep : all
+test_prep : all pbctestfiles
 
 # Run test cases with a single call of t/harness. Users have to look at only
 # one report. The default set of tests to run is contained in t/harness,
@@ -1703,7 +1704,7 @@ smolder_coretest : corevm
 smoke : smolder_test
 
 # "core tests" -- test basic functionality but not ancillaries
-coretest : corevm
+coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
 
 # automake compatibility
@@ -1953,6 +1954,7 @@ test-clean :
 	$(RM_F) t/compilers/pge/*.pir
 	$(RM_F) t/compilers/tge/*.pir
 	$(RM_F) \
+    $(PBC_TEST_FILES) \
     "t/*/*$(O)" \
     "t/*/*.out" \
     "t/*/*.pasm" \
