@@ -273,7 +273,6 @@ struct parrot_interp_t {
     PMC             *current_task;            /* there's always one running task */
 
     Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
-    INTVAL           active_thread;           /* Index of the active thread in thread_table */
 
     struct Thread_table  *thread_table;       /* Array of this interpreter's threads */
     Parrot_atomic_integer thread_signal;      /* Flag. Set if threads need rescheduling */

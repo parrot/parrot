@@ -40,6 +40,8 @@ Parrot_threads_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_threads_init)
     Thread_table *tbl;
+    INTVAL *zero = (INTVAL*) malloc(sizeof(INTVAL));
+    *zero = 0;
 
     MUTEX_INIT(interp->interp_lock);
     PARROT_ATOMIC_INT_INIT(interp->thread_signal);
@@ -48,13 +50,13 @@ Parrot_threads_init(PARROT_INTERP)
     MUTEX_INIT(interp->thread_lock);
 
     interp->thread_table = (Thread_table*) malloc(sizeof(Thread_table));
-    interp->active_thread = 0;
-
     tbl = interp->thread_table;
 
     tbl->size    = 8; /* arbitrarily */
     tbl->count   = 1;
     tbl->threads = (Thread_info*) malloc(sizeof(Thread_info) * tbl->size);
+    TLS_KEY_INIT(tbl->tid_key);
+    TLS_SET(tbl->tid_key, zero);
 
     tbl->threads[0].id    = THREAD_SELF();
     tbl->threads[0].state = 0;
@@ -83,6 +85,7 @@ Parrot_threads_cleanup(PARROT_INTERP)
 
     COND_DESTROY(tbl->threads[0].cvar);
     free(tbl->threads);
+    TLS_KEY_FREE(tbl->tid_key);
 
     free(interp->thread_table);
 }
@@ -105,18 +108,21 @@ Parrot_threads_main(ARGMOD(void *args_ptr))
     ASSERT_ARGS(Parrot_threads_main)
     Thread_args *args = (Thread_args*) args_ptr;
     Interp    *interp = args->interp;
-    INTVAL       tidx = args->idx;
+    INTVAL      *tidx = (INTVAL*) malloc(sizeof(INTVAL));
     Thread_table *tbl = interp->thread_table;
     free(args_ptr);
 
     Parrot_alarm_mask(interp);
+    *tidx = args->idx;
 
     /* Yay stack scanning */
     LOCK(interp->thread_lock);
-    tbl->threads[tidx].lo_var_ptr = &tidx;
+    tbl->threads[*tidx].lo_var_ptr = &tidx;
     UNLOCK(interp->thread_lock);
 
-    Parrot_threads_outer_runloop(interp, tidx);
+    TLS_SET(tbl->tid_key, tidx);
+    
+    Parrot_threads_outer_runloop(interp, *tidx);
 
     return 0;
 }
@@ -143,7 +149,6 @@ Parrot_threads_outer_runloop(PARROT_INTERP, INTVAL tidx)
 
     for (;;) {
         LOCK_INTERP(interp);
-        interp->active_thread = tidx;
         interp->current_runloop_level = 0;
 
         LOCK(interp->thread_lock);
@@ -192,9 +197,8 @@ Parrot_threads_block(PARROT_INTERP, ARGOUT(INTVAL *tidx))
     Thread_table *tbl = interp->thread_table;
     int next, i, have_runnable;
 
-    *tidx = interp->active_thread;
-
-    next = Parrot_threads_next_to_run(interp, *tidx);
+    *tidx = Parrot_threads_current(interp);
+    next  = Parrot_threads_next_to_run(interp, *tidx);
 
     LOCK(interp->thread_lock);
 
@@ -249,7 +253,6 @@ Parrot_threads_unblock(PARROT_INTERP, ARGIN(INTVAL *tidx_ptr))
     LOCK(interp->thread_lock);
 
     tbl = interp->thread_table;
-    interp->active_thread = tidx;
     THREAD_STATE_SET(interp, tidx, RESTLESS);
 
     UNLOCK(interp->thread_lock);
@@ -351,10 +354,11 @@ Parrot_threads_reap(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_threads_reap)
     Thread_table *tbl = interp->thread_table;
+    INTVAL tidx = Parrot_threads_current(interp);
     int i;
 
     LOCK(interp->thread_lock);
-    for (i = tbl->count - 1; i > interp->active_thread; --i) {
+    for (i = tbl->count - 1; i > tidx; --i) {
         void *rv;
 
         if (THREAD_STATE_TEST(interp, i, SCAN_STACK))
@@ -409,7 +413,6 @@ Parrot_threads_idle(PARROT_INTERP, INTVAL tidx)
     Thread_table *tbl = interp->thread_table;
     THREAD_STATE_SET(interp, tidx, RUNNABLE);
     COND_WAIT(tbl->threads[tidx].cvar, interp->interp_lock);
-    interp->active_thread = tidx;
 }
 
 /*
@@ -473,21 +476,9 @@ INTVAL
 Parrot_threads_current(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_threads_current)
-
-    INTVAL idx;
     Thread_table *tbl = interp->thread_table;
-    Parrot_thread tid = THREAD_SELF();
-
-    LOCK(interp->thread_lock);
-    for(idx = 0; idx < tbl->count; ++idx) {
-        if (THREAD_EQUAL(tbl->threads[idx].id, tid)) {
-            UNLOCK(interp->thread_lock);
-            return idx;
-        }
-    }
-    UNLOCK(interp->thread_lock);
-
-    exit_fatal(1, "threads.c: Current thread is not in the threads table.");
+    INTVAL *tidp = (INTVAL*) TLS_GET(tbl->tid_key);
+    return *tidp;
 }
 
 /*

@@ -31,9 +31,10 @@ typedef struct Thread_info {
 } Thread_info;
 
 typedef struct Thread_table {
-    Thread_info *threads;
-    INTVAL       size;
-    INTVAL       count;
+    Thread_info   *threads;
+    INTVAL         size;
+    INTVAL         count;
+    Parrot_tls_key tid_key;
 } Thread_table;
 
 typedef struct Thread_args {

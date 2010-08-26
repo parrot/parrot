@@ -42,6 +42,12 @@
 
 #  define THREAD_EXIT(s) exit(s)
 
+#  define TLS_KEY_INIT(k)
+#  define TLS_KEY_FREE(k)
+#  define TLS_SET(k, v)
+#  define TLS_GET(k)
+
+#  define Parrot_tls_key int
 #  define Parrot_mutex int
 #  define Parrot_cond int
 #  define Parrot_thread int

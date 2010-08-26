@@ -232,7 +232,7 @@ opcode_t*
 Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
-    INTVAL tid = interp->active_thread;
+    INTVAL tid = Parrot_threads_current(interp);
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
