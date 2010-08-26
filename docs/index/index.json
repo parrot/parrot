@@ -53,7 +53,7 @@
       },
       {
          "source" : [
-            "docs/book/pir/*"
+            "docs/book/pct/*"
          ],
          "title" : "PCT Book"
       }
