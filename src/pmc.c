@@ -127,7 +127,7 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 #ifndef NDEBUG
 
-    pmc->vtable      = (VTABLE  *)0xdeadbeef;
+    pmc->data = (DPOINTER *)0xdeadbeef;
 
 #endif
 
