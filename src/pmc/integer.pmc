@@ -1027,15 +1027,20 @@ Returns the result of comparing the integer with C<*value>.
 */
 
     MULTI INTVAL cmp(String value) {
-        const FLOATVAL fdiff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        {
+            const FLOATVAL fdiff =
+                (FLOATVAL)iv - VTABLE_get_number(INTERP, value);
 
-        if (FLOAT_IS_ZERO(fdiff)) {
-            const INTVAL idiff =
-                SELF.get_integer() - VTABLE_get_integer(INTERP, value);
-            return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            if (FLOAT_IS_ZERO(fdiff)) {
+                const INTVAL idiff =
+                    SELF.get_integer() - VTABLE_get_integer(INTERP, value);
+                return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            }
+
+            return fdiff > 0 ? 1 : -1;
         }
-
-        return fdiff > 0 ? 1 : -1;
     }
 
 
