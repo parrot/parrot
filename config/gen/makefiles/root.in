@@ -220,7 +220,8 @@ CONFIGURE_GENERATED_FILES = \
     .parrot_current_rev \
 #IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
 #IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
-    runtime/parrot/include/signal.pasm
+    runtime/parrot/include/signal.pasm \
+    tools/dev/mk_language_shell.pl
 
 
 ###############################################################################
