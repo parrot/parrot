@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -73,11 +73,9 @@ foreach my $file (@files) {
         if $vim_many > 1 || $emacs_many > 1;
 }
 
-ok( !scalar(@no_coda), 'PIR code coda present' )
-    or diag( "PIR code coda missing in " . scalar @no_coda . " files:\n@no_coda" );
-
-ok( !scalar(@extra_coda), 'PIR code coda appears only once' )
-    or diag( "PIR code coda repeating in " . scalar @extra_coda . " files:\n@extra_coda" );
+# If we use is_deeply, then the differences will show in the test output.
+is_deeply( \@no_coda,    [], 'PIR code coda present' );
+is_deeply( \@extra_coda, [], 'PIR code coda appears only once' );
 
 # Local Variables:
 #   mode: cperl

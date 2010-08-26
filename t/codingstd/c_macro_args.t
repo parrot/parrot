@@ -60,6 +60,9 @@ sub check_macro_args {
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
 
+                    # skip args that are code blocks
+                    next if $arg eq '_code';
+
                     # eliminate any properly formed usage of the macro arg
                     $definition =~ s/\Q($arg)//g;
                     $definition =~ s/\Q[$arg]//g;

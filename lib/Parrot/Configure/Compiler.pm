@@ -1,15 +1,17 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-Parrot::Configure::Compiler - C-Related methods for configuration
+Parrot::Configure::Compiler - C-Related methods for configuration and more
 
 =head1 DESCRIPTION
 
 The Parrot::Configure::Compiler module provides methods inherited by
 Parrot::Configure which prepare and/or run C programs during
-compilation.
+compilation. Also other files like makefiles will be generated with methods
+from this module by replacing entries like C<@key@> with C<key>'s value from
+the configuration system's data.
 
 =head2 Methods
 
@@ -191,6 +193,49 @@ sub cc_clean {    ## no critic Subroutines::RequireFinalReturn
         $conf->data->get(qw( o exe )),
         # MSVC
         qw( .exe.manifest .ilk .pdb );
+}
+
+=item C<shebang_mod()>
+
+    $conf->shebang_mod($source, $target);
+
+Takes the specified source file, replacing entries like C<@key@> with
+C<key>'s value from the configuration system's data, and writes the results
+to specified target file. The replacement is only done in the first line of
+the file normally to set the shebang value accordingly.
+
+=cut
+
+sub shebang_mod {
+    my $conf = shift;
+    my ( $source, $target ) = @_;
+
+    open my $in,  '<', $source       or die "Can't open $source: $!";
+    open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
+
+    my $line = <$in>;
+
+    # interpolate @foo@ values
+    $line =~ s{ \@ (\w+) \@ }{
+        if(defined(my $val=$conf->data->get($1))) {
+            $val;
+        }
+        else {
+            warn "value for '\@$1\@' in $source is undef";
+            '';
+        }
+    }egx;
+
+    print $out $line;
+
+    while ( my $line = <$in> ) {
+        print $out $line;
+    }
+
+    close($in)  or die "Can't close $source: $!";
+    close($out) or die "Can't close $target: $!";
+
+    move_if_diff( "$target.tmp", $target );
 }
 
 =item C<genfile()>

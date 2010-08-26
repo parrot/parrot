@@ -197,6 +197,7 @@ sub _set_implementations {
         exec.c
         misc.c
         hires_timer.c
+        pid.c
         /;
 
     my $plat_c = q{src/platform.c};

@@ -35,11 +35,13 @@ static int gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
 static void gc_ms_add_free_object(SHIM_INTERP,
-    SHIM(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
@@ -134,11 +136,12 @@ static void gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ms_get_free_object(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 static size_t gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
@@ -253,7 +256,8 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 #define ASSERT_ARGS_gc_ms_active_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(to_add))
 #define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -560,6 +564,7 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     ++mem_pools->gc_mark_runs;
     --mem_pools->gc_mark_block_level;
     mem_pools->header_allocs_since_last_collect = 0;
+    mem_pools->mem_used_last_collect = mem_pools->memory_used;
 
     return;
 }
@@ -1099,6 +1104,7 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
     &&  (pool->top_block->top  == (char *)Buffer_bufstart(buffer) + old_size)) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
+        interp->mem_pools->memory_used += needed;
         Buffer_buflen(buffer)  = newsize;
         return;
     }
@@ -1211,6 +1217,7 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     &&  pool->top_block->top  == (char *)Buffer_bufstart(str) + old_size) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
+        interp->mem_pools->memory_used += needed;
         Buffer_buflen(str) = new_size - sizeof (void *);
         return;
     }
@@ -1228,11 +1235,11 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     PARROT_ASSERT(PObj_is_movable_TESTALL(str));
 
     /* We must not reallocate shared buffers! */
-    PARROT_ASSERT(!(*Buffer_bufrefcountptr(str) & Buffer_shared_FLAG));
+    PARROT_ASSERT(!(*Buffer_bufflagsptr(str) & Buffer_shared_FLAG));
 
     /* Decrease usage */
     PARROT_ASSERT(Buffer_pool(str));
-    Buffer_pool(str)->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(str));
+    Buffer_pool(str)->freed += old_size;
 
     /* copy mem from strstart, *not* bufstart */
     oldmem             = str->strstart;
@@ -1495,12 +1502,15 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
         ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
+    size_t new_mem = mem_pools->memory_used
+                   - mem_pools->mem_used_last_collect;
 
     if (pool->skip == GC_ONE_SKIP)
         pool->skip = GC_NO_SKIP;
     else if (pool->skip == GC_NEVER_SKIP
          || (pool->skip == GC_NO_SKIP
-         &&  mem_pools->header_allocs_since_last_collect >= GC_SIZE_THRESHOLD))
+         && (new_mem > (mem_pools->mem_used_last_collect >> 2)
+         &&  new_mem >= GC_SIZE_THRESHOLD)))
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
@@ -1524,7 +1534,7 @@ the PObj flags to indicate that the item is free.
 
 static void
 gc_ms_add_free_object(SHIM_INTERP,
-        SHIM(Memory_Pools *mem_pools),
+        ARGMOD(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGIN(void *to_add))
 {
@@ -1535,6 +1545,7 @@ gc_ms_add_free_object(SHIM_INTERP,
 
     object->next_ptr = pool->free_list;
     pool->free_list  = object;
+    mem_pools->memory_used -= pool->object_size;
 }
 
 /*
@@ -1555,7 +1566,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void *
 gc_ms_get_free_object(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_get_free_object)
@@ -1585,6 +1596,7 @@ gc_ms_get_free_object(PARROT_INTERP,
     }
 
     --pool->num_free_objects;
+    mem_pools->memory_used += pool->object_size;
 
     return ptr;
 }
@@ -1637,9 +1649,6 @@ gc_ms_alloc_objects(PARROT_INTERP,
 
     if (alloc_size > POOL_MAX_BYTES)
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
-
-    if (alloc_size > GC_SIZE_THRESHOLD)
-        pool->skip = GC_NEVER_SKIP;
 }
 
 

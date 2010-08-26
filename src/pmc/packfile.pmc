@@ -41,8 +41,16 @@ static void copy_packfile_header(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 /*
+
+=item C<static void copy_packfile_header(PARROT_INTERP, PMC *self, PackFile
+*pf)>
+
 Copy attributes from PackFile* to Packfile PMC.
+
+=cut
+
 */
+
 static void
 copy_packfile_header(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(PackFile *pf))
 {

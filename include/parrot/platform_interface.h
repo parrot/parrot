@@ -49,6 +49,13 @@ void *mem_realloc_executable(void *, size_t, size_t);
 #  define mem_realloc_executable(a, b, c) mem_internal_realloc((a), (c))
 #endif
 
+
+/*
+** Process ID
+*/
+
+UINTVAL Parrot_getpid(void);
+
 /*
 ** Time
 */

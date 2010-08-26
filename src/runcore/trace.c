@@ -127,14 +127,14 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         return;
     }
 
-    if (!pmc->vtable || (UINTVAL)pmc->vtable == 0xdeadbeef) {
-        Parrot_io_eprintf(debugger, "<!!no vtable!!>");
-        return;
-    }
-
     if (PObj_on_free_list_TEST(pmc))
         Parrot_io_eprintf(debugger,
             "**************** PMC is on free list *****\n");
+
+    if (!pmc->vtable) {
+        Parrot_io_eprintf(debugger, "<!!no vtable!!>");
+        return;
+    }
 
     if (pmc->vtable->pmc_class == pmc) {
         STRING * const name = trace_class_name(interp, pmc);

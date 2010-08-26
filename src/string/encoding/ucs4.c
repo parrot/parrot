@@ -84,14 +84,6 @@ static STRING * get_codepoints(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void iter_init(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    ARGOUT(String_iter *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*iter);
-
 static void set_byte(PARROT_INTERP,
     SHIM(const STRING *src),
     SHIM(UINTVAL offset),
@@ -104,30 +96,54 @@ static STRING * to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL ucs4_decode_and_advance(PARROT_INTERP,
-    ARGMOD(String_iter *i))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*i);
-
-static void ucs4_encode_and_advance(PARROT_INTERP,
-    ARGMOD(String_iter *i),
-    UINTVAL c)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*i);
-
 static size_t ucs4_hash(PARROT_INTERP,
     ARGIN(const STRING *s),
     size_t hashval)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void ucs4_set_position(PARROT_INTERP,
+static UINTVAL ucs4_iter_get(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGIN(const String_iter *i),
+    INTVAL offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static UINTVAL ucs4_iter_get_and_advance(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGMOD(String_iter *i))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*i);
+
+static void ucs4_iter_set_and_advance(PARROT_INTERP,
+    ARGMOD(STRING *str),
+    ARGMOD(String_iter *i),
+    UINTVAL c)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*str)
+        FUNC_MODIFIES(*i);
+
+static void ucs4_iter_set_position(PARROT_INTERP,
+    ARGIN(const STRING *str),
     ARGMOD(String_iter *i),
     UINTVAL n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*i);
+
+static void ucs4_iter_skip(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGMOD(String_iter *i),
+    INTVAL skip)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
 
 #define ASSERT_ARGS_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -149,26 +165,33 @@ static void ucs4_set_position(PARROT_INTERP,
 #define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src) \
-    , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_set_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ucs4_decode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(i))
-#define ASSERT_ARGS_ucs4_encode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs4_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_ucs4_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_ucs4_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_ucs4_iter_get_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_ucs4_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_ucs4_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_ucs4_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -414,35 +437,85 @@ bytes(SHIM_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL ucs4_decode_and_advance(PARROT_INTERP, String_iter *i)>
+=item C<static UINTVAL ucs4_iter_get(PARROT_INTERP, const STRING *str, const
+String_iter *i, INTVAL offset)>
 
-Moves the string iterator C<i> to the next UCS-4 codepoint.
+Get the character at C<i> + C<offset>.
 
 =cut
 
 */
 
 static UINTVAL
-ucs4_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
+ucs4_iter_get(PARROT_INTERP,
+    ARGIN(const STRING *str), ARGIN(const String_iter *i), INTVAL offset)
 {
-    ASSERT_ARGS(ucs4_decode_and_advance)
+    ASSERT_ARGS(ucs4_iter_get)
+    return get_codepoint(interp, str, i->charpos + offset);
+}
+
+/*
+
+=item C<static void ucs4_iter_skip(PARROT_INTERP, const STRING *str, String_iter
+*i, INTVAL skip)>
+
+Moves the string iterator C<i> by C<skip> characters.
+
+=cut
+
+*/
+
+static void
+ucs4_iter_skip(PARROT_INTERP,
+    ARGIN(const STRING *str), ARGMOD(String_iter *i), INTVAL skip)
+{
+    ASSERT_ARGS(ucs4_iter_skip)
+    UNUSED(str);
+
 #if PARROT_HAS_ICU
-    const UChar32 * const s = (const UChar32 *) i->str->strstart;
-    size_t pos              = i->bytepos / sizeof (UChar32);
-    const UChar32         c = s[pos++];
-    ++i->charpos;
-    i->bytepos = pos * sizeof (UChar32);
-    return c;
+    i->charpos += skip;
+    i->bytepos += skip * sizeof (UChar32);
 #else
     UNUSED(i);
+    UNUSED(skip);
     no_ICU_lib(interp);
 #endif
 }
 
 /*
 
-=item C<static void ucs4_encode_and_advance(PARROT_INTERP, String_iter *i,
-UINTVAL c)>
+=item C<static UINTVAL ucs4_iter_get_and_advance(PARROT_INTERP, const STRING
+*str, String_iter *i)>
+
+Moves the string iterator C<i> to the next codepoint.
+
+=cut
+
+*/
+
+static UINTVAL
+ucs4_iter_get_and_advance(PARROT_INTERP,
+    ARGIN(const STRING *str), ARGMOD(String_iter *i))
+{
+    ASSERT_ARGS(ucs4_iter_get_and_advance)
+
+#if PARROT_HAS_ICU
+    const UChar32 * const s = (const UChar32*) str->strstart;
+    const UChar32 c = s[i->charpos++];
+    i->bytepos += sizeof (UChar32);
+    return c;
+#else
+    UNUSED(str);
+    UNUSED(i);
+    no_ICU_lib(interp);
+    return (UINTVAL)0; /* Stop the static analyzers from panicing */
+#endif
+}
+
+/*
+
+=item C<static void ucs4_iter_set_and_advance(PARROT_INTERP, STRING *str,
+String_iter *i, UINTVAL c)>
 
 With the string iterator C<i>, appends the codepoint C<c> and advances to the
 next position in the string.
@@ -452,17 +525,47 @@ next position in the string.
 */
 
 static void
-ucs4_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
+ucs4_iter_set_and_advance(PARROT_INTERP,
+    ARGMOD(STRING *str), ARGMOD(String_iter *i), UINTVAL c)
 {
-    ASSERT_ARGS(ucs4_encode_and_advance)
+    ASSERT_ARGS(ucs4_iter_set_and_advance)
+
 #if PARROT_HAS_ICU
-    UChar32 *s   = (UChar32 *) i->str->strstart;
-    size_t   pos = i->bytepos / sizeof (UChar32);
-    s[pos++] = (UChar32) c;
-    ++i->charpos;
-    i->bytepos = pos * sizeof (UChar32);
+    UChar32 * const s = (UChar32*) str->strstart;
+    s[i->charpos++] = (UChar32)c;
+    i->bytepos += sizeof (UChar32);
+#else
+    UNUSED(str);
+    UNUSED(i);
+    UNUSED(c);
+    no_ICU_lib(interp);
+#endif
+}
+
+/*
+
+=item C<static void ucs4_iter_set_position(PARROT_INTERP, const STRING *str,
+String_iter *i, UINTVAL n)>
+
+Moves the string iterator C<i> to the position C<n> in the string.
+
+=cut
+
+*/
+
+static void
+ucs4_iter_set_position(PARROT_INTERP,
+    ARGIN(const STRING *str), ARGMOD(String_iter *i), UINTVAL n)
+{
+    ASSERT_ARGS(ucs4_iter_set_position)
+    UNUSED(str);
+
+#if PARROT_HAS_ICU
+    i->charpos = n;
+    i->bytepos = n * sizeof (UChar32);
 #else
     UNUSED(i);
+    UNUSED(n);
     no_ICU_lib(interp);
 #endif
 }
@@ -497,61 +600,6 @@ ucs4_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 
 /*
 
-=item C<static void ucs4_set_position(PARROT_INTERP, String_iter *i, UINTVAL n)>
-
-Moves the string iterator C<i> to the position C<n> in the string.
-
-=cut
-
-*/
-
-static void
-ucs4_set_position(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL n)
-{
-    ASSERT_ARGS(ucs4_set_position)
-#if PARROT_HAS_ICU
-    i->charpos = n;
-    i->bytepos = n * sizeof (UChar32);
-#else
-    UNUSED(i);
-    UNUSED(n);
-    no_ICU_lib(interp);
-#endif
-}
-
-
-/*
-
-=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter
-*iter)>
-
-Initializes for string C<src> the string iterator C<iter>.
-
-=cut
-
-*/
-
-static void
-iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
-{
-    ASSERT_ARGS(iter_init)
-#if PARROT_HAS_ICU
-    UNUSED(interp);
-    iter->str             = src;
-    iter->bytepos         = 0;
-    iter->charpos         = 0;
-    iter->get_and_advance = ucs4_decode_and_advance;
-    iter->set_and_advance = ucs4_encode_and_advance;
-    iter->set_position    = ucs4_set_position;
-#else
-    UNUSED(src);
-    UNUSED(iter);
-    no_ICU_lib(interp);
-#endif
-}
-
-/*
-
 =item C<void Parrot_encoding_ucs4_init(PARROT_INTERP)>
 
 Initializes the UCS-4 encoding.
@@ -577,13 +625,17 @@ Parrot_encoding_ucs4_init(PARROT_INTERP)
         get_bytes,
         codepoints,
         bytes,
-        iter_init,
         find_cclass,
 #if PARROT_HAS_ICU
-        ucs4_hash
+        ucs4_hash,
 #else
-        NULL
+        NULL,
 #endif
+        ucs4_iter_get,
+        ucs4_iter_skip,
+        ucs4_iter_get_and_advance,
+        ucs4_iter_set_and_advance,
+        ucs4_iter_set_position
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "ucs4", return_encoding);

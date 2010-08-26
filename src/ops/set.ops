@@ -40,6 +40,9 @@ inline op clone(out STR, in STR) :base_mem {
 
 =item B<set>(out INT, in NUM)
 
+A floating-point number is truncated (rounded toward zero) when assigned
+to an integer register.
+
 =item B<set>(out INT, invar PMC)
 
 =item B<set>(out INT, invar PMC)

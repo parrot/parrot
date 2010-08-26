@@ -78,24 +78,9 @@ static void
 advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
 {
     ASSERT_ARGS(advance_to_next)
-
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
-    HashBucket                            *bucket = attrs->bucket;
-
-    /* Try to advance current bucket */
-    if (bucket)
-        bucket = bucket->next;
-
-    while (!bucket) {
-        /* If there is no more buckets */
-        if (attrs->pos == attrs->total_buckets)
-            break;
-
-        bucket = attrs->parrot_hash->bucket_indices[attrs->pos++];
-    }
-    attrs->bucket = bucket;
+    parrot_hash_iterator_advance(attrs->parrot_hash, attrs->bucket, attrs->pos);
     --attrs->elements;
-
     return;
 }
 

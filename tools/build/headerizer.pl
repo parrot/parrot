@@ -9,28 +9,43 @@ files from .c files
 
 =head1 SYNOPSIS
 
-    % perl tools/build/headerizer.pl OBJFILES
+  $ perl tools/build/headerizer.pl [object files]
+
+Generates C function declarations based on the function definitions in
+the C source code.
 
 =head1 DESCRIPTION
 
-Update the headers in F<include/parrot> with the function declarations in
-the F<*.pmc> or F<*.c> files that correspond to the F<*.o> files passed
-on the command line.
+The headerizer works off of directives in the source and header files.
 
-=head1 TODO
+One source file's public declarations can only go into one header file.
+However, one header file can have declarations from multiple source files.
+In other words, headers-to-source is one-to-many.
 
-* Generate docs from funcs
+=over 4
 
-* Somehow handle static functions in the source file
+=item C<HEADERIZER BEGIN:> F<source-filename> / C<HEADERIZER END:> F<source-filename>
 
-=head1 NOTES
+Marks the beginning and end of a block of declarations in a header file.
 
-* the .c files MUST have a /* HEADERIZER HFILE: foo/bar.h */ directive in them
+    # In file foo.h
+    /* HEADERIZER BEGIN: src/foo.c */
+    /* HEADERIZER END: src/foo.c */
 
-* Support for multiple .c files pointing at the same .h file
+    /* HEADERIZER BEGIN: src/bar.c */
+    /* HEADERIZER END: src/bar.c */
 
-* Does NOT remove all blocks in the .h file, so if a .c file
-disappears, its block is "orphaned" and will remain there.
+=item C<HEADERIZER HFILE:> F<header-filename>
+
+Tells the headerizer where the declarations for the functions should go
+
+    # In file foo.c
+    /* HEADERIZER HFILE: foo.h */
+
+    # In file bar.c
+    /* HEADERIZER HFILE: foo.h */
+
+=back
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -39,16 +54,6 @@ disappears, its block is "orphaned" and will remain there.
 =item C<--macro=X>
 
 Print a list of all functions that have macro X.  For example, --macro=PARROT_EXPORT.
-
-=back
-
-=head1 COMMAND-LINE ARGUMENTS
-
-=over 4
-
-=item C<OBJFILES>
-
-One or more object file names.
 
 =back
 
@@ -443,51 +448,13 @@ sub main {
     return;
 }
 
-=head1 NAME
-
-headerizer.pl
-
-=head1 SYNOPSIS
-
-  $ tools/build/headerizer.pl [object files]
-
-Generates C function declarations based on the function definitions in
-the C source code.
-
-=head1 DIRECTIVES
-
-The headerizer works off of directives in the source and header files.
-
-One source file's public declarations can only go into one header file.
-However, one header file can have declarations from multiple source files.
-In other words, headers-to-source is one-to-many.
-
-=over 4
-
-=item HEADERIZER BEGIN: F<source-filename> / HEADERIZER END: F<source-filename>
-
-Marks the beginning and end of a block of declarations in a header file.
-
-    # In file foo.h
-    /* HEADERIZER BEGIN: src/foo.c */
-    /* HEADERIZER END: src/foo.c */
-
-    /* HEADERIZER BEGIN: src/bar.c */
-    /* HEADERIZER END: src/bar.c */
-
-=item HEADERIZER HFILE: F<header-filename>
-
-Tells the headerizer where the declarations for the functions should go
-
-    # In file foo.c
-    /* HEADERIZER HFILE: foo.h */
-
-    # In file bar.c
-    /* HEADERIZER HFILE: foo.h */
-
-=back
-
-=cut
+# From earlier documentation:
+# * Generate docs from funcs
+# * Somehow handle static functions in the source file
+# * the .c files MUST have a /* HEADERIZER HFILE: foo/bar.h */ directive in them
+# * Support for multiple .c files pointing at the same .h file
+# * Does NOT remove all blocks in the .h file, so if a .c file
+#   disappears, its block is "orphaned" and will remain there.
 
 # Local Variables:
 #   mode: cperl

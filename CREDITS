@@ -248,7 +248,7 @@ D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
 A: Christoph Otto
-D: Pipp
+D: Pipp, Lorito taskmaster
 E: christoph@mksig.org
 
 N: chromatic
@@ -773,6 +773,11 @@ U: nickg
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
 
+N: Nick Wellnhofer
+D: String iterator rewrite, GC fixes
+E: wellnhofer@aevum.de
+U: nwellnhof
+
 N: Nikolay Ananiev
 D: Win32 build fix
 
@@ -816,7 +821,9 @@ E: pmichaud@pobox.com
 
 N: Paul C. Anagnostopoulos
 U: Paul_the_Greek
-D: Memory management
+A: Paul C. Anagnostopoulos
+E: paul@windfall.com
+D: Improving memory management documentation
 
 N: Paul Cochrane
 U: paultcochrane

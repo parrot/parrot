@@ -166,6 +166,46 @@ Initializes the exception with supplied values.
 
 /*
 
+=item C<PMC *clone()>
+
+Create a copy of the Exception.
+
+Copy only the user supplied values, not the throwing and handling
+information.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        INTVAL   id;
+        STRING   *message;
+        PMC      *payload;
+        INTVAL   severity;
+        INTVAL   type;
+        INTVAL   exit_code;
+        GET_ATTR_id(INTERP, SELF, id);
+        SET_ATTR_id(INTERP, dest, id);
+        GET_ATTR_message(INTERP, SELF, message);
+        SET_ATTR_message(INTERP, dest, message);
+        GET_ATTR_severity(INTERP, SELF, severity);
+        SET_ATTR_severity(INTERP, dest, severity);
+        GET_ATTR_type(INTERP, SELF, type);
+        SET_ATTR_type(INTERP, dest, type);
+        GET_ATTR_exit_code(INTERP, SELF, exit_code);
+        SET_ATTR_exit_code(INTERP, dest, exit_code);
+
+        GET_ATTR_payload(INTERP, SELF, payload);
+        if (!PMC_IS_NULL(payload)) {
+            payload = VTABLE_clone(INTERP, payload);
+            SET_ATTR_payload(INTERP, dest, payload);
+        }
+        return dest;
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any active exception data as live.

@@ -8,6 +8,7 @@ t/pmc/packfileconstanttable.t - test the PackfileConstantTable PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfileconstanttable.t
 
 =head1 DESCRIPTION
@@ -62,6 +63,10 @@ load_error:
     pf      = _pbc()
     pop_eh
     pftable = _get_consttable(pf)
+
+    # Make sure the mark vtable is exercised and the content survives
+    sweep 1
+
     size    = elements pftable
     ok(size, "PackfileConstantTable.elements returns non-zero")
     .return ()

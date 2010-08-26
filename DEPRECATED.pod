@@ -147,6 +147,12 @@ Use isatty instead.
 
 L<https://trac.parrot.org/parrot/ticket/1689>
 
+=item Method getpid on ParrotInterpreter [experimental]
+
+Used to test the experimental function Parrot_getpid
+
+L<https://trac.parrot.org/parrot/ticket/1564>
+
 =back
 
 =head1 Opcodes
@@ -248,6 +254,10 @@ L<https://trac.parrot.org/parrot/ticket/1635>
 These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
+
+=item errorson, errorsoff operations [eligible in 2.10]
+
+The C<.PARROT_ERRORS_GLOBAL_FLAG> flag will be eliminated. It is not used by Parrot.
 
 =back
 
@@ -378,6 +388,12 @@ L<https://trac.parrot.org/parrot/ticket/1628>
 Use Parrot_get_runtime_path instead.
 
 L<https://trac.parrot.org/parrot/ticket/1191>
+
+=item Parrot_getpid [experimental]
+
+Get process id, experimental.
+
+L<https://trac.parrot.org/parrot/ticket/1564>
 
 =back
 

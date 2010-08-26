@@ -479,6 +479,7 @@ Parrot_append_arena_in_pool(SHIM_INTERP,
 
     pool->last_Arena = new_arena;
     mem_pools->header_allocs_since_last_collect += size;
+    mem_pools->memory_allocated += size;
 }
 
 /*
@@ -672,7 +673,7 @@ free_buffer(SHIM_INTERP,
     if (mem_pool) {
         /* Update Memory_Block usage */
         if (PObj_is_movable_TESTALL(b)) {
-            INTVAL *buffer_flags = Buffer_bufrefcountptr(b);
+            INTVAL *buffer_flags = Buffer_bufflagsptr(b);
 
             /* Mask low 2 bits used for flags */
             Memory_Block * block = Buffer_pool(b);
@@ -789,7 +790,7 @@ initialize_fixed_size_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
 /*
 
 =item C<int header_pools_iterate_callback(PARROT_INTERP, Memory_Pools
-*mem_pools, int flag, void *arg, pool_iter_fn func)>
+*mem_pools, int flag, void *arg, const pool_iter_fn func)>
 
 Iterates through header pools, invoking the given callback function on each
 pool in the list matching the given criteria. Determines which pools to iterate
@@ -831,7 +832,7 @@ int
 header_pools_iterate_callback(PARROT_INTERP,
         ARGMOD(Memory_Pools *mem_pools),
         int flag, ARGIN_NULLOK(void *arg),
-        NOTNULL(pool_iter_fn func))
+        NOTNULL(const pool_iter_fn func))
 {
     ASSERT_ARGS(header_pools_iterate_callback)
 

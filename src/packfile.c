@@ -3479,22 +3479,11 @@ Parrot_destroy_constants(PARROT_INTERP)
     if (!hash)
         return;
 
-    for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bucket_indices[i];
-
-        while (bucket) {
-            PackFile_ConstTable * const table      =
-                (PackFile_ConstTable *)bucket->key;
-            PackFile_Constant * const orig_consts = table->constants;
-            PackFile_Constant * const consts      =
-                (PackFile_Constant *) bucket->value;
-            INTVAL j;
-
-            mem_gc_free(interp, consts);
-            bucket = bucket->next;
-        }
-    }
-
+    parrot_hash_iterate(hash,
+        PackFile_ConstTable * const table     = (PackFile_ConstTable *)_bucket->key;
+        PackFile_Constant * const orig_consts = table->constants;
+        PackFile_Constant * const consts      = (PackFile_Constant *) _bucket->value;
+        mem_gc_free(interp, consts););
     parrot_hash_destroy(interp, hash);
 }
 
@@ -4162,15 +4151,12 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     ASSERT_ARGS(PackFile_Constant_unpack_pmc)
     PackFile * const pf   = constt->base.pf;
     STRING          *_sub = CONST_STRING(interp, "Sub");
-    STRING          *image;
     PMC             *pmc;
 
     /* thawing the PMC needs the real packfile in place */
     PackFile_ByteCode * const cs_save = interp->code;
     interp->code                      = pf->cur_cs;
-    image                             = PF_fetch_buf(interp, pf, &cursor);
-
-    pmc         = Parrot_thaw_pbc(interp, image, constt);
+    pmc                               = Parrot_thaw_pbc(interp, constt, &cursor);
 
     /* place item in const_table */
     self->type  = PFC_PMC;

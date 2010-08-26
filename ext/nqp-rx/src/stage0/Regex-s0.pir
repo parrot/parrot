@@ -493,22 +493,27 @@ Log a debug message.
 =cut
 
 .sub '!cursor_debug' :method
+    .param string tag
     .param pmc args            :slurpy
     $P0 = getattribute self, '$!debug'
     if null $P0 goto done
     unless $P0 goto done
-    .local pmc from, pos, orig
-    .local int line
+    .local pmc fmt, from, pos, orig, line
+    fmt = new ['ResizablePMCArray']
     from = getattribute self, '$!from'
     orig = getattribute self, '$!target'
     line = orig.'lineof'(from)
-    inc line
+
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(2)
-    print $P1, from
-    print $P1, '/'
-    print $P1, line
-    print $P1, ': '
+
+    $N0 = time
+    push fmt, $N0
+    push fmt, from
+    push fmt, line
+    push fmt, tag
+    $S0 = sprintf "%.6f %d/%d %-8s ", fmt
+    print $P1, $S0
     $S0 = join '', args
     print $P1, $S0
     print $P1, "\n"
@@ -1015,6 +1020,11 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     .local int pos, eos
     .local string tgt
     (cur, pos, tgt) = self.'!cursor_start'()
+    .local pmc debug
+    debug = getattribute cur, '$!debug'
+    if null debug goto debug_1
+    cur.'!cursor_debug'('START', 'ww')
+  debug_1:
     if pos == 0 goto fail
     eos = length tgt
     if pos == eos goto fail
@@ -1025,7 +1035,13 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     unless $I0 goto fail
   pass:
     cur.'!cursor_pass'(pos, 'ww')
+    if null debug goto done
+    cur.'!cursor_debug'('PASS', 'ww')
+    goto done
   fail:
+    if null debug goto done
+    cur.'!cursor_debug'('FAIL', 'ww')
+  done:
     .return (cur)
 .end
 
@@ -1197,11 +1213,20 @@ Perform a match for protoregex C<name>.
 .sub '!protoregex' :method
     .param string name
 
+    .local pmc debug
+    debug = getattribute self, '$!debug'
+    if null debug goto have_debug
+    if debug goto have_debug
+    null debug
+  have_debug:
+
     .local pmc tokrx, toklen
     (tokrx, toklen) = self.'!protoregex_tokrx'(name)
   have_tokrx:
 
-    self.'!cursor_debug'('PROTO ', name)
+    if null debug goto debug_skip_1
+    self.'!cursor_debug'('PROTO', name)
+  debug_skip_1:
 
     # If there are no entries at all for this protoregex, we fail outright.
     unless tokrx goto fail
@@ -1219,9 +1244,12 @@ Perform a match for protoregex C<name>.
     token1 = substr target, pos, 1
     $I0 = toklen[token1]
     token = substr target, pos, $I0
+
+    if null debug goto debug_skip_2
     $S0 = escape token
     $S1 = escape token1
-    self.'!cursor_debug'('        token1="', $S1, '", token="', $S0, '"')
+    self.'!cursor_debug'('NOTE', 'token1="', $S1, '", token="', $S0, '"')
+  debug_skip_2:
 
     # Create a hash to keep track of the methods we've already called,
     # so that we don't end up calling it twice.
@@ -1267,11 +1295,17 @@ Perform a match for protoregex C<name>.
 
   done:
     pos = result.'pos'()
-    self.'!cursor_debug'('PASS  ', name, ' at pos=', pos)
+
+    if null debug goto debug_skip_3
+    self.'!cursor_debug'('PASS', name, ' at pos=', pos)
+  debug_skip_3:
+
     .return (result)
 
   fail:
-    self.'!cursor_debug'('FAIL  ', name)
+    if null debug goto debug_skip_4
+    self.'!cursor_debug'('FAIL', name)
+  debug_skip_4:
     unless null result goto fail_1
     result = self.'!cursor_start'()
     result.'!cursor_fail'()
@@ -1335,7 +1369,7 @@ create a new one and return it.
     toklen = prototable[$S0]
     unless null tokrx goto tokrx_done
 
-    self.'!cursor_debug'('Generating protoregex table for ', name)
+    self.'!cursor_debug'('NOTE','Generating protoregex table for ', name)
 
     .local pmc toklen, tokrx
     toklen = new ['Hash']
@@ -2495,7 +2529,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     .local string prefix, rname, rtype
     prefix = self.'unique'('rx')
     concat prefix, '_'
-    $P0 = split ' ', 'tgt string pos int off int eos int rep int cur pmc'
+    $P0 = split ' ', 'tgt string pos int off int eos int rep int cur pmc debug pmc'
     $P1 = iter $P0
   iter_loop:
     unless $P1 goto iter_done
@@ -2539,8 +2573,8 @@ Return the POST representation of the regex AST rooted by C<node>.
     goto capnames_loop
   capnames_done:
 
-    .local string cur, rep, pos, tgt, off, eos
-    (cur, rep, pos, tgt, off, eos) = self.'!rxregs'('cur rep pos tgt off eos')
+    .local string cur, rep, pos, tgt, off, eos, debug
+    (cur, rep, pos, tgt, off, eos, debug) = self.'!rxregs'('cur rep pos tgt off eos debug')
 
     unless regexname goto peek_done
     .local pmc tpast, token, tpost
@@ -2572,6 +2606,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     self.'!cursorop'(ops, '!cursor_caparray', 0, caparray :flat)
   caparray_skip:
 
+    ops.'push_pirop'('getattribute', debug, cur, '"$!debug"')
     ops.'push_pirop'('.lex', 'unicode:"$\x{a2}"', cur)
     ops.'push_pirop'('.local pmc', 'match')
     ops.'push_pirop'('.lex', '"$/"', 'match')
@@ -2594,12 +2629,12 @@ Return the POST representation of the regex AST rooted by C<node>.
     ops.'push_pirop'('substr', tgt, tgt, off, 'result'=>tgt)
     ops.'push'(startlabel)
     ops.'push_pirop'('eq', '$I10', 1, restartlabel)
-    self.'!cursorop'(ops, '!cursor_debug', 0, '"START "', regexname_esc)
+    self.'!cursorop'(ops, '!cursor_debug', 0, '"START"', regexname_esc)
 
     $P0 = self.'post_regex'(node)
     ops.'push'($P0)
     ops.'push'(restartlabel)
-    self.'!cursorop'(ops, '!cursor_debug', 0, '"NEXT "', regexname_esc)
+    self.'!cursorop'(ops, '!cursor_debug', 0, '"NEXT"', regexname_esc)
     ops.'push'(faillabel)
     self.'!cursorop'(ops, '!mark_fail', 4, rep, pos, '$I10', '$P10', 0)
     ops.'push_pirop'('lt', pos, CURSOR_FAIL, donelabel)
@@ -2607,7 +2642,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     ops.'push_pirop'('jump', '$I10')
     ops.'push'(donelabel)
     self.'!cursorop'(ops, '!cursor_fail', 0)
-    self.'!cursorop'(ops, '!cursor_debug', 0, '"FAIL  "', regexname_esc)
+    self.'!cursorop'(ops, '!cursor_debug', 0, '"FAIL"', regexname_esc)
     ops.'push_pirop'('return', cur)
     .return (ops)
 .end
@@ -2631,6 +2666,13 @@ are passed to the function as input arguments.
     .param int retelems
     .param pmc args            :slurpy
 
+    $S0 = concat '!cursorop_', func
+    $I0 = can self, $S0
+    unless $I0 goto cursorop_default
+    $P0 = self.$S0(ops, func, retelems, args :flat)
+    unless null $P0 goto done
+
+  cursorop_default:
     if retelems < 1 goto result_done
     .local pmc retargs
     retargs = new ['ResizableStringArray']
@@ -2655,6 +2697,23 @@ are passed to the function as input arguments.
     if retelems < 1 goto done
     $P0.'result'(result)
   done:
+    .return (ops)
+.end
+
+.sub '!cursorop_!cursor_debug' :method
+    .param pmc ops
+    .param string func
+    .param int retelems
+    .param pmc args            :slurpy
+
+    .local pmc cur, debug, debuglabel
+    $P99 = get_hll_global ['POST'], 'Label'
+    debuglabel = $P99.'new'('name'=>'debug_')
+    (cur, debug) = self.'!rxregs'('cur debug')
+    ops.'push_pirop'('if_null', debug, debuglabel)
+    $S0 = self.'escape'(func)
+    ops.'push_pirop'('callmethod', $S0, cur, args :flat)
+    ops.'push'(debuglabel)
     .return (ops)
 .end
 
@@ -3058,6 +3117,70 @@ Handle a concatenation of regexes.
 .end
 
 
+=item conj(PAST::Regex node)
+
+=cut
+
+.sub 'conj' :method :multi(_, ['PAST';'Regex'])
+    .param pmc node
+
+    .local pmc cur, pos, fail
+    (cur, pos, fail) = self.'!rxregs'('cur pos fail')
+
+    .local string name
+    name = self.'unique'('conj')
+    concat name, '_'
+
+    .local pmc ops, iter
+    ops = self.'post_new'('Ops', 'node'=>node, 'result'=>cur)
+    iter = node.'iterator'()
+    unless iter goto done
+
+    .local pmc clabel
+    $S0 = concat name, 'mark'
+    clabel = self.'post_new'('Label', 'result'=>$S0)
+
+    .local int acount
+    .local pmc alabel, apast, apost
+    acount = 0
+    $S0 = acount
+    $S0 = concat name, $S0
+    alabel = self.'post_new'('Label', 'result'=>$S0)
+
+    ops.'push_pirop'('inline', name, 'inline'=>'  # rx %0')
+    ops.'push_pirop'('set_addr', '$I10', clabel)
+    self.'!cursorop'(ops, '!mark_push', 0, pos, CURSOR_FAIL, '$I10')
+    ops.'push_pirop'('goto', alabel)
+    ops.'push'(clabel)
+    ops.'push_pirop'('goto', fail)
+    ops.'push'(alabel)
+    apast = shift iter
+    apost = self.'post_regex'(apast, cur)
+    ops.'push'(apost)
+    ops.'push_pirop'('set_addr', '$I10', clabel)
+    self.'!cursorop'(ops, '!mark_peek', 1, '$I11', '$I10')
+    self.'!cursorop'(ops, '!mark_push', 0, '$I11', pos, '$I10')
+
+  iter_loop:
+    inc acount
+    $S0 = acount
+    $S0 = concat name, $S0
+    alabel = self.'post_new'('Label', 'result'=>$S0)
+    ops.'push'(alabel)
+    ops.'push_pirop'('set', pos, '$I11')
+    apast = shift iter
+    apost = self.'post_regex'(apast, cur)
+    ops.'push'(apost)
+    ops.'push_pirop'('set_addr', '$I10', clabel)
+    self.'!cursorop'(ops, '!mark_peek', 2, '$I11', '$I12', '$I10')
+    ops.'push_pirop'('ne', pos, '$I12', fail)
+    if iter goto iter_loop
+  iter_done:
+  done:
+    .return (ops)
+.end
+
+
 =item cut(PAST::Regex node)
 
 Generate POST for the cut-group and cut-rule operators.
@@ -3114,6 +3237,69 @@ character list.
     .return (ops)
 .end
 
+.sub 'enumcharlist_q' :method :multi(_, ['PAST';'Regex'])
+    .param pmc node
+    .param string backtrack
+    .param int min
+    .param int max
+    .param pmc sep
+
+    if backtrack != 'r' goto pessimistic
+    if sep goto pessimistic
+
+    .local pmc cur, tgt, pos, off, eos, fail, rep, ops
+    (cur, tgt, pos, off, eos, fail, rep) = self.'!rxregs'('cur tgt pos off eos fail rep')
+    ops = self.'post_new'('Ops', 'node'=>node, 'result'=>cur)
+
+    .local string charlist
+    charlist = node[0]
+    charlist = self.'escape'(charlist)
+    .local pmc negate, testop
+    negate = node.'negate'()
+    testop = self.'??!!'(negate, 'ge', 'lt')
+    .local string subtype
+    subtype = node.'subtype'()
+    if subtype == 'zerowidth' goto pessimistic
+
+    .local pmc looplabel, donelabel
+    .local string name
+    name = self.'unique'('rxenumcharlistq')
+    $S1 = concat name, '_loop'
+    looplabel = self.'post_new'('Label', 'result'=>$S1)
+    $S1 = concat name, '_done'
+    donelabel = self.'post_new'('Label', 'result'=>$S1)
+
+    ops.'push_pirop'('inline', negate, subtype, backtrack, min, max, 'inline'=>'  # rx enumcharlist_q negate=%0 %1 %2 %3..%4')
+    ops.'push_pirop'('sub', '$I10', pos, off)
+    ops.'push_pirop'('set', rep, 0)
+    ops.'push_pirop'('sub', '$I12', eos, pos)
+    unless max > 0 goto max1_done
+    ops.'push_pirop'('le', '$I12', max, looplabel)
+    ops.'push_pirop'('set', '$I12', max)
+  max1_done:
+    ops.'push'(looplabel)
+    ops.'push_pirop'('le', '$I12', 0, donelabel)
+    ops.'push_pirop'('substr', '$S10', tgt, '$I10', 1)
+    ops.'push_pirop'('index', '$I11', charlist, '$S10')
+    ops.'push_pirop'(testop, '$I11', 0, donelabel)
+    ops.'push_pirop'('inc', rep)
+    if max == 1 goto max2_done
+    ops.'push_pirop'('inc', '$I10')
+    ops.'push_pirop'('dec', '$I12')
+    ops.'push_pirop'('goto', looplabel)
+  max2_done:
+    ops.'push'(donelabel)
+    unless min > 0 goto min2_done
+    ops.'push_pirop'('lt', rep, min, fail)
+  min2_done:
+    ops.'push_pirop'('add', pos, pos, rep)
+    .return (ops)
+
+  pessimistic:
+    null ops
+    .return (ops)
+.end
+
 
 =item literal(PAST::Regex node)
 
@@ -3165,7 +3351,7 @@ second child of this node.
     ops.'push_pirop'('inline', subtype, $S0, 'inline'=>'  # rx literal %0 %1')
     ops.'push'(lpost)
 
-    .local int litlen
+    .local string litlen
     if litconst goto litlen_const
     litlen = '$I10'
     ops.'push_pirop'('length', '$I10', lpost)
@@ -3182,12 +3368,23 @@ second child of this node.
 
     # compute string to be matched and fail if mismatch
     ops.'push_pirop'('sub', '$I11', pos, off)
+    if ignorecase goto literal_ignorecase
+    if litlen == "1" goto literal_1
     ops.'push_pirop'('substr', '$S10', tgt, '$I11', litlen)
-    unless ignorecase goto literal_test
+    ops.'push_pirop'('ne', '$S10', lpost, fail)
+    goto literal_pass
+  literal_1:
+    $S0 = lpast
+    $I0 = ord $S0
+    ops.'push_pirop'('ord', '$I11', tgt, '$I11')
+    ops.'push_pirop'('ne', '$I11', $I0, fail)
+    goto literal_pass
+  literal_ignorecase:
+    ops.'push_pirop'('substr', '$S10', tgt, '$I11', litlen)
     ops.'push_pirop'('downcase', '$S10', '$S10')
-  literal_test:
     ops.'push_pirop'('ne', '$S10', lpost, fail)
 
+  literal_pass:
     # increase position by literal length and move on
     ops.'push_pirop'('add', pos, litlen)
   done:
@@ -3240,7 +3437,7 @@ second child of this node.
 
     ops.'push_pirop'('inline', 'inline'=>'  # rx pass')
     self.'!cursorop'(ops, '!cursor_pass', 0, pos, regexname)
-    self.'!cursorop'(ops, '!cursor_debug', 0, '"PASS  "', regexname, '" at pos="', pos)
+    self.'!cursorop'(ops, '!cursor_debug', 0, '"PASS"', regexname, '" at pos="', pos)
 
     .local string backtrack
     backtrack = node.'backtrack'()

@@ -21,7 +21,6 @@ typedef enum {
 
 /* A BucketIndex is an index into the pool of available buckets. */
 typedef UINTVAL BucketIndex;
-#define INITBucketIndex ((BucketIndex)-2)
 
 #define N_BUCKETS(n) ((n))
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
@@ -51,7 +50,7 @@ struct _hash {
     HashBucket *buckets;
 
     /* List of Bucket pointers */
-    HashBucket **bucket_indices;
+    HashBucket **index;
 
     /* Store for empty buckets */
     HashBucket *free_list;
@@ -77,6 +76,51 @@ struct _hash {
     /* Function pointer to generate a hash value for the object */
     hash_hash_key_fn hash_val;
 };
+
+/* Utility macros - use them, do not reinvent the wheel */
+#define parrot_hash_iterate parrot_hash_iterate_linear
+
+#define parrot_hash_iterate_linear(_hash, _code)                            \
+{                                                                           \
+    HashBucket *_bucket = (_hash)->buckets;                                 \
+    UINTVAL     _found  = 0;                                                \
+    while (_found < (_hash)->entries){                                      \
+        if (_bucket->key){                                                  \
+            _found++;                                                       \
+            {                                                               \
+                _code                                                       \
+            }                                                               \
+        }                                                                   \
+       _bucket++;                                                           \
+    }                                                                       \
+}
+
+#define parrot_hash_iterate_indexed(_hash, _code)                           \
+{                                                                           \
+    INTVAL _loc;                                                            \
+    for (_loc = (_hash)->mask; _loc >= 0; --_loc) {                         \
+        HashBucket *_bucket = (_hash)->index[_loc];                         \
+        while (_bucket) {                                                   \
+            _code                                                           \
+            _bucket = _bucket->next;                                        \
+        }                                                                   \
+    }                                                                       \
+}
+
+
+#define parrot_hash_iterator_advance(_hash, _bucket, _loc)                  \
+{                                                                           \
+    /* Try to advance current bucket */                                     \
+    if ((_bucket))                                                          \
+        (_bucket) = (_bucket)->next;                                        \
+    while (!(_bucket)) {                                                    \
+        /* If there is no more buckets */                                   \
+        if ((_loc) == (INTVAL)(_hash)->mask+1)                              \
+            break;                                                          \
+        (_bucket) = (_hash)->index[(_loc)++];                               \
+    }                                                                       \
+}
+
 
 typedef void (*value_free)(ARGFREE(void *));
 
@@ -146,17 +190,6 @@ HashBucket * parrot_hash_get_bucket(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void * parrot_hash_get_idx(PARROT_INTERP,
-    ARGIN(const Hash *hash),
-    ARGMOD(PMC *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*key);
-
-PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket* parrot_hash_put(PARROT_INTERP,
@@ -172,16 +205,6 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
         __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void parrot_hash_visit(PARROT_INTERP,
-    ARGMOD(Hash *hash),
-    ARGMOD(void *pinfo))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*hash)
-        FUNC_MODIFIES(*pinfo);
 
 PARROT_EXPORT
 void parrot_mark_hash(PARROT_INTERP, ARGMOD(Hash *hash))
@@ -370,6 +393,19 @@ Hash * parrot_create_hash(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash * parrot_create_hash_sized(PARROT_INTERP,
+    PARROT_DATA_TYPE val_type,
+    Hash_key_type hkey_type,
+    NOTNULL(hash_comp_fn compare),
+    NOTNULL(hash_hash_key_fn keyhash),
+    UINTVAL size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
 void parrot_hash_clone_prunable(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGOUT(Hash *dest),
@@ -378,6 +414,22 @@ void parrot_hash_clone_prunable(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
+
+void Parrot_hash_freeze(PARROT_INTERP,
+    ARGIN(const Hash *hash),
+    ARGMOD(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*info);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -424,19 +476,11 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
 #define ASSERT_ARGS_parrot_hash_get_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_parrot_hash_get_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_parrot_hash_put __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_parrot_hash_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_parrot_hash_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(pinfo))
 #define ASSERT_ARGS_parrot_mark_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -519,10 +563,21 @@ int STRING_compare_distinct_cs_enc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compare) \
     , PARROT_ASSERT_ARG(keyhash))
+#define ASSERT_ARGS_parrot_create_hash_sized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(compare) \
+    , PARROT_ASSERT_ARG(keyhash))
 #define ASSERT_ARGS_parrot_hash_clone_prunable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(dest))
+#define ASSERT_ARGS_Parrot_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_Parrot_hash_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_PMC_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \
