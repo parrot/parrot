@@ -529,6 +529,7 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         else if (bytes < 0) {
             switch (errno) {
               case EINTR:
+                Parrot_check_if_task_killed(interp);
                 continue;
               default:
                 s->bufused = s->strlen = 0;

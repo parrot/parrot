@@ -484,11 +484,11 @@ Inserts an item into an ordered list by it's number value.
 
 =back
 
-=head2 Auxiliar functions
+=head2 Auxiliary functions
 
 =over 4
 
-=item C(void Parrot_pmc_list_insert_by_num(PARROT_INTERP, PMC* list, PMC* value)
+=item C<void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) >
 
 Insert an item into a sorted list by its num value.
 
@@ -497,7 +497,8 @@ Insert an item into a sorted list by its num value.
 
 PARROT_EXPORT
 void
-Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) {
+Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) 
+{
     void *tmp;
     PMC_List_Item *item;
     PMC_List_Item *head;

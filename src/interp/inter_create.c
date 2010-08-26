@@ -165,8 +165,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
                                     ? parent->gc_sys->sys_type
                                     : PARROT_GC_DEFAULT_TYPE;
 
-    interp->current_task = PMCNULL;
-
     /* Done. Return and be done with it */
     return interp;
 }

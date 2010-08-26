@@ -26164,7 +26164,7 @@ opcode_t *
 Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t *const dest = cur_opcode + 2;
-    PMC *cur_task = interp->current_task;
+    PMC *cur_task = Parrot_task_current(interp);
     Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
     int msg_count = VTABLE_get_integer(interp, tdata->mailbox);
 
@@ -26172,7 +26172,7 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP)  {
         PREG(1) = VTABLE_shift_pmc(interp, tdata->mailbox);return (opcode_t *)dest;
     }
     else {
-        TASK_recv_block_SET(interp->current_task);
+        TASK_recv_block_SET(cur_task);
         (void) Parrot_cx_stop_task(interp, cur_opcode);return (opcode_t *)0;
     }
 

@@ -52,6 +52,9 @@ static void scheduler_process_messages(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+
+static int enable_scheduling = 0;
+
 /*
 
 =head2 Scheduler Interface Functions
@@ -115,6 +118,8 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes *tdata = PARROT_TASK(main_task);
 
+    enable_scheduling  = 1;
+
     tdata->code = main;
     tdata->data = argv;
 
@@ -167,16 +172,19 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
         FLOATVAL  time_now = Parrot_floatval_time();
         opcode_t *dest;
 
-        interp->current_task = VTABLE_shift_pmc(interp, sched->task_queue);
+        PMC *task = VTABLE_shift_pmc(interp, sched->task_queue);
+        INTVAL tidx = Parrot_threads_current(interp);
 
-        if (!VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
+        if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Found a non-Task in the task queue.\n");
+
+        interp->thread_table->threads[tidx].cur_task = task;
 
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
 
-        Parrot_ext_call(interp, interp->current_task, "->");
+        Parrot_ext_call(interp, task, "->");
     }
     else {
         Parrot_alarm_now();
@@ -243,13 +251,8 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *n
         /* A task switch will only work in the outer runloop of a fully
            booted Parrot. In a Parrot that hasn't called begin_execution,
            or in a nested runloop, we silently ignore task switches. */
-        if (interp->current_task && interp->current_runloop_level <= 1)
+        if (enable_scheduling && interp->current_runloop_level <= 1)
             return Parrot_cx_preempt_task(interp, scheduler, next);
-
-#ifdef ARBITRARY_DEBUG_STATEMENT
-        fprintf(stderr, "Should have exited runloop. Didn't (%lx, %ld)\n",
-                interp->current_task, interp->current_runloop_level);
-#endif
     }
 
     return next;
@@ -291,13 +294,13 @@ Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_stop_task)
 
-    PMC *task = interp->current_task;
+    PMC *task = Parrot_task_current(interp);
     Parrot_Task_attributes *tdata = PARROT_TASK(task);
 
     PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);
     VTABLE_set_pointer(interp, cont, next);
 
-    if (PMC_IS_NULL(task) || !VTABLE_isa(interp, interp->current_task, CONST_STRING(interp, "Task")))
+    if (PMC_IS_NULL(task) || !VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Attempt to stop invalid interp->current_task.\n");
 
@@ -327,7 +330,6 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *ne
     PMC* task = Parrot_cx_stop_task(interp, next);
     VTABLE_push_pmc(interp, sched->task_queue, task);
 
-    interp->current_task = PMCNULL;
     return (opcode_t*) 0;
 }
 
@@ -448,6 +450,26 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
 }
+
+/*
+
+=item C<PMC* Parrot_task_current(PARROT_INTERP)>
+
+Returns the task that is currently running.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_task_current(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_task_current)
+    INTVAL tidx = Parrot_threads_current(interp);
+    return interp->thread_table->threads[tidx].cur_task;
+}
+
 
 /*
 
@@ -700,7 +722,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     PMC *alarm = Parrot_pmc_new(interp, enum_class_Alarm);
     Parrot_Alarm_attributes *adata = PARROT_ALARM(alarm);
 
-    PMC *task = interp->current_task;
+    PMC *task = Parrot_task_current(interp);
     Parrot_Task_attributes *tdata = PARROT_TASK(task);
 
     PMC *cont = Parrot_pmc_new(interp, enum_class_Continuation);

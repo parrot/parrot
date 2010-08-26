@@ -159,6 +159,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_gc_trace_root)
     PObj    *obj;
+    PMC     *tmp;
 
     /* note: adding locals here did cause increased GC runs */
     mark_context_start();
@@ -195,9 +196,9 @@ Parrot_gc_trace_root(PARROT_INTERP,
     /* mark the root_namespace */
     Parrot_gc_mark_PMC_alive(interp, interp->root_namespace);
 
-    /* mark the concurrency scheduler and current task */
+    /* mark the concurrency scheduler and tasks */
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
-    Parrot_gc_mark_PMC_alive(interp, interp->current_task);
+    Parrot_threads_gc_mark(interp);
 
     /* s. packfile.c */
     mark_const_subs(interp);

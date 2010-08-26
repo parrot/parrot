@@ -28,6 +28,7 @@ typedef struct Thread_info {
     Parrot_cond   cvar;
     void         *lo_var_ptr; /* Full range of stack for GC scan */
     void         *hi_var_ptr;
+    PMC          *cur_task;
 } Thread_info;
 
 typedef struct Thread_table {
@@ -65,6 +66,9 @@ typedef struct Thread_args {
 /* HEADERIZER BEGIN: src/threads.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void Parrot_check_if_task_killed(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_threads_block(PARROT_INTERP, ARGOUT(INTVAL *tidx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -80,6 +84,9 @@ INTVAL Parrot_threads_count_active(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 INTVAL Parrot_threads_current(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_threads_gc_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_threads_idle(PARROT_INTERP, INTVAL tidx)
@@ -108,13 +115,22 @@ void Parrot_threads_reap(PARROT_INTERP)
 void Parrot_threads_set_signal(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_threads_setup_signal_handler(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_threads_spawn(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_threads_task_killed(PARROT_INTERP, INTVAL tidx)
+        __attribute__nonnull__(1);
+
+void Parrot_threads_task_killed_handler(NULLOK(int sig_number));
 void Parrot_threads_unblock(PARROT_INTERP, ARGIN(INTVAL *tidx_ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_check_if_task_killed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_threads_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(tidx))
@@ -126,6 +142,8 @@ void Parrot_threads_unblock(PARROT_INTERP, ARGIN(INTVAL *tidx_ptr))
 #define ASSERT_ARGS_Parrot_threads_count_active __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_threads_current __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_threads_gc_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_threads_idle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -143,8 +161,15 @@ void Parrot_threads_unblock(PARROT_INTERP, ARGIN(INTVAL *tidx_ptr))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_threads_set_signal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_threads_setup_signal_handler \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_threads_spawn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_threads_task_killed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_threads_task_killed_handler \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_threads_unblock __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(tidx_ptr))

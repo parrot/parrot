@@ -21,6 +21,7 @@ These functions transparently manage OS threads in the Parrot interpreter.
 #include "parrot/threads.h"
 #include "parrot/alarm.h"
 #include "pmc/pmc_scheduler.h"
+#include "pmc/pmc_task.h"
 
 /* HEADERIZER HFILE: include/parrot/threads.h */
 
@@ -62,6 +63,8 @@ Parrot_threads_init(PARROT_INTERP)
     tbl->threads[0].state = 0;
     THREAD_STATE_SET(interp, 0, INITIALIZED);
     COND_INIT(tbl->threads[0].cvar);
+
+    Parrot_threads_setup_signal_handler(interp);
 
     LOCK_INTERP(interp);
 }
@@ -114,6 +117,8 @@ Parrot_threads_main(ARGMOD(void *args_ptr))
 
     Parrot_alarm_mask(interp);
     *tidx = args->idx;
+
+    Parrot_threads_setup_signal_handler(interp);
 
     /* Yay stack scanning */
     LOCK(interp->thread_lock);
@@ -562,6 +567,115 @@ Parrot_threads_print_table(PARROT_INTERP)
         if (THREAD_STATE_TEST(interp, i, RESTLESS))
             fprintf(stderr, "restless ");
         fprintf(stderr, "\n");
+    }
+}
+
+/*
+
+=item C<void Parrot_threads_task_killed(PARROT_INTERP, INTVAL tidx)>
+
+Send a signal to a thread notifying it that its active task has been killed.
+
+=cut
+
+*/
+
+void
+Parrot_threads_task_killed(PARROT_INTERP, INTVAL tidx)
+{
+    ASSERT_ARGS(Parrot_threads_task_killed)
+
+    Thread_table *tbl = interp->thread_table;
+    pthread_kill(tbl->threads[tidx].id, SIGUSR2);
+}
+
+/*
+
+=item C<void Parrot_threads_task_killed_handler(int sig_number)>
+
+Signal handler that does the stuff when the thing happens.
+
+=cut
+
+*/
+
+void
+Parrot_threads_task_killed_handler(SHIM(int sig_number))
+{
+    ASSERT_ARGS(Parrot_threads_task_killed_handler)
+       
+    /* interrupt_blocking_system_calls_from_a_comment(); */
+}
+
+/*
+
+=item C<void Parrot_threads_setup_signal_handler(PARROT_INTERP)>
+
+Prepare the current thread to handle a signal notifying it that its active
+task has been killed.
+
+=cut
+
+*/
+
+void
+Parrot_threads_setup_signal_handler(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_threads_setup_signal_handler)
+
+    struct sigaction sa;
+    memset(&sa, 0, sizeof (struct sigaction));
+    sa.sa_handler = Parrot_threads_task_killed_handler;
+    sa.sa_flags   = ~SA_RESTART;
+
+    if (sigaction(SIGUSR2, &sa, 0) == -1) {
+        perror("sigaction failed in Parrot_threads_setup-signal_handler");
+        exit(EXIT_FAILURE);
+    }
+}
+
+/*
+
+=item C<void Parrot_check_if_task_killed(PARROT_INTERP)>
+
+If the current task has been killed, longjmp back to the task
+entry point.
+
+=cut
+
+*/
+
+void
+Parrot_check_if_task_killed(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_check_if_task_killed)
+    
+    PMC *current_task = Parrot_task_current(interp);
+    Parrot_Task_attributes *const tdata = PARROT_TASK(current_task);
+
+    if (tdata->killed) {
+        longjmp(tdata->abort_jump, 1);
+    }
+}
+
+/*
+
+=item C<void Parrot_threads_gc_mark(PARROT_INTERP)>
+
+Marks any PMCs in the thread table alive.
+
+=cut
+
+*/
+
+void
+Parrot_threads_gc_mark(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_threads_gc_mark)
+    Thread_table *tbl = interp->thread_table;
+    INTVAL i;
+    for (i = 0; i < tbl->count; ++i) {
+        Parrot_gc_mark_PMC_alive(interp, tbl->threads[i].cur_task);
     }
 }
 

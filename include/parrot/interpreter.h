@@ -270,7 +270,6 @@ struct parrot_interp_t {
 
     UINTVAL          last_alarm;              /* has an alarm triggered? */
     FLOATVAL         quantum_done;            /* expiration of current quantum */
-    PMC             *current_task;            /* there's always one running task */
 
     Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
 
