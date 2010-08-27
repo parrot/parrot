@@ -25,7 +25,6 @@ C<< hash->buckets >> bucket store points to this region.
 */
 
 #include "parrot/parrot.h"
-#include "pmc/pmc_key.h"
 
 /* the number of entries above which it's faster to hash the hashval instead of
  * looping over the used HashBuckets directly */

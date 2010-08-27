@@ -1251,7 +1251,7 @@ src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
 
 src/pmc_freeze$(O) : $(PARROT_H_HEADERS) src/pmc_freeze.str src/pmc_freeze.c
 
-src/hash$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/hash.c
+src/hash$(O) : $(PARROT_H_HEADERS) src/hash.c
 
 src/library$(O) : $(PARROT_H_HEADERS) src/library.str src/library.c\
 	$(INC_DIR)/dynext.h
