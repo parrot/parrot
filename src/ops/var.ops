@@ -455,9 +455,10 @@ Operations to modify global variables
 
 =item B<find_name>(out PMC, in STR)
 
-Find the name $2 in lexical, current, global, or builtin namespace and
-store it in $1. If the name doesn't exist
-either throws an exception or sets $1 to PMCNULL, depending on current
+Find the name C<$2> in lexicals, then the current namespace, then the HLL
+root namespace, and finally Parrot builtins. These are checked in order
+and the first match is returned in C<$1>. If no matches are found,
+either throws an exception or sets C<$1> to PMCNULL, depending on current
 errors settings. See B<errorson>.
 
 =cut
