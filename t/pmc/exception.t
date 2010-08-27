@@ -20,10 +20,10 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(27)
+    plan(31)
     test_bool()
     test_int()
-    test_get_integer_keyed()
+    test_integer_keyed()
     test_attrs()
     test_attributes()
     test_push_pop_eh()
@@ -46,28 +46,47 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     is($I0, 42, 'set/get integer on Exception')
 .end
 
-.sub test_get_integer_keyed
+.sub test_integer_keyed
     .local pmc ex, eh
     .local int value
     ex = new ['Exception']
+
     value = ex['type']
     is(value, 0, 'get type default value')
+    ex['type'] = .EXCEPTION_SYNTAX_ERROR
+    value = ex['type']
+    is(value, .EXCEPTION_SYNTAX_ERROR, 'get type value changed')
+
     value = ex['exit_code']
     is(value, 0, 'get exit_code default value')
+    ex['exit_code'] = 127
+    value = ex['exit_code']
+    is(value, 127, 'get exit_code value changed')
+
     value = ex['handled']
     is(value, 0, 'get handled default is false')
+    ex['handled'] = 1
+    value = ex['handled']
+    is(value, 1, 'get handled value changed')
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_ATTRIB_NOT_FOUND)
     set_label eh, catch
     push_eh eh
     value = 1
-    value = ex['the droids you are looking for']
+    ex['the droids you are looking for'] = 42
     value = 0
   catch:
     finalize eh
-    pop_eh
-    is(value, 1, 'invalid key throws')
+    is(value, 1, 'set invalid key throws')
+
+    set_label eh, catch2
+    value = 1
+    value = ex['the droids you are looking for']
+    value = 0
+  catch2:
+    finalize eh
+    is(value, 1, 'get invalid key throws')
 .end
 
 .sub test_attrs
