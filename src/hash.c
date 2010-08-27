@@ -28,7 +28,7 @@ C<< hash->buckets >> bucket store points to this region.
 
 /* the number of entries above which it's faster to hash the hashval instead of
  * looping over the used HashBuckets directly */
-#define INITIAL_BUCKETS  8
+#define INITIAL_SIZE  8
 
 /* HEADERIZER HFILE: include/parrot/hash.h */
 
@@ -935,7 +935,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 {
     ASSERT_ARGS(parrot_create_hash)
     return parrot_create_hash_sized(interp, val_type, hkey_type, compare, keyhash,
-                                    INITIAL_BUCKETS);
+                                    INITIAL_SIZE);
 }
 
 
@@ -981,7 +981,7 @@ parrot_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type
         NOTNULL(hash_comp_fn compare), NOTNULL(hash_hash_key_fn keyhash), UINTVAL size)
 {
     ASSERT_ARGS(parrot_create_hash_sized)
-    UINTVAL      initial_buckets = size > INITIAL_BUCKETS ? round_up_pow2(size) : INITIAL_BUCKETS;
+    UINTVAL      initial_buckets = size > INITIAL_SIZE ? round_up_pow2(size) : INITIAL_SIZE;
     HashBucket  *bp;
     void        *alloc = Parrot_gc_allocate_memory_chunk_with_interior_pointers(
                             interp, sizeof (Hash) + HASH_ALLOC_SIZE(initial_buckets));
