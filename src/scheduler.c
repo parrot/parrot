@@ -111,8 +111,7 @@ Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 =item C<void Parrot_cx_handle_tasks(PARROT_INTERP, PMC *scheduler)>
 
 Handle the pending tasks in the scheduler's task list. Returns when there are
-no more pending tasks. Returns 0 to terminate the scheduler runloop, or 1 to
-continue the runloop.
+no more pending tasks.
 
 =cut
 
@@ -123,6 +122,13 @@ void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_handle_tasks)
+    Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
+
+    /* avoid recursive calls */
+    if (sched_struct->in_handler)
+        return;
+    sched_struct->in_handler = 1;
+
     SCHEDULER_wake_requested_CLEAR(scheduler);
     Parrot_cx_refresh_task_list(interp, scheduler);
 
@@ -159,6 +165,8 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
             Parrot_cx_refresh_task_list(interp, scheduler);
 
     } /* end of pending tasks */
+
+    sched_struct->in_handler = 0;
 }
 
 /*
