@@ -1085,14 +1085,9 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_fre
     ASSERT_ARGS(parrot_chash_destroy_values)
     UINTVAL i;
 
-    for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->index[i];
-        while (bucket) {
-            mem_gc_free(interp, bucket->key);
-            func(bucket->value);
-            bucket = bucket->next;
-        }
-    }
+    parrot_hash_iterate(hash,
+        mem_gc_free(interp, _bucket->key);
+    );
 
     parrot_hash_destroy(interp, hash);
 }
