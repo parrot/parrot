@@ -371,7 +371,7 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         else {
             PMC *temp;
             maybe_throw_overflow_error(INTERP);
-            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a );
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
             return VTABLE_add_int(INTERP, temp, b, dest);
         }
     }
