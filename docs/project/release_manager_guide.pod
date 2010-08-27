@@ -118,16 +118,9 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-In the two files F<src/ops/core_ops.c> and F<include/parrot/oplib/core_ops.h>
-is the function C<Parrot_DynOp_core_a_b_c>, which has a name that includes
-the version number. a_b_c is the version number. You have to update this
-version number on two places in the file F<src/ops/core_ops.c>.
-In the file F<include/parrot/oplib/core_ops.h> you have to change this line:
-
- op_lib_t *Parrot_DynOp_core_a_b_c(PARROT_INTERP, long init);
-
-Ignore the warning to not edit this files. It is necessary to edit this files,
-so that "make" builds with the increased version number.
+Run C<./ops2c --core> (or C<make bootstrap-ops>, ignoring errors) followed by
+C<make reconfig> and C<make> to update the names of version-specific internal
+functions.
 
 =item g
 

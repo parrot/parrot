@@ -295,8 +295,7 @@ method _calculate_op_codes() {
 }
 
 method _set_version() {
-    my $config := _config();
-    my $version := $config<VERSION>;
+    my $version := pir::chopn__ssi(slurp('VERSION'), 1);
     #say("# $version");
     my @bits := split('.', $version);
     self<version_major> := @bits[0];
