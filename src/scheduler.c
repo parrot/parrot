@@ -122,13 +122,12 @@ void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_handle_tasks)
-    Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
 
     /* avoid recursive calls */
-    if (sched_struct->in_handler)
+    if (SCHEDULER_in_handler_TEST(scheduler))
         return;
-    sched_struct->in_handler = 1;
 
+    SCHEDULER_in_handler_SET(scheduler);
     SCHEDULER_wake_requested_CLEAR(scheduler);
     Parrot_cx_refresh_task_list(interp, scheduler);
 
@@ -166,7 +165,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     } /* end of pending tasks */
 
-    sched_struct->in_handler = 0;
+    SCHEDULER_in_handler_CLEAR(scheduler);
 }
 
 /*
