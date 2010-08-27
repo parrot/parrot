@@ -1086,8 +1086,7 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_fre
     UINTVAL i;
 
     parrot_hash_iterate(hash,
-        mem_gc_free(interp, _bucket->key);
-    );
+        mem_gc_free(interp, _bucket->key););
 
     parrot_hash_destroy(interp, hash);
 }
