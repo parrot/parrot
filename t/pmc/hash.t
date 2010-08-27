@@ -25,11 +25,12 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(172)
+    plan(174)
 
     initial_hash_tests()
     more_than_one_hash()
     hash_key_type()
+    hash_value_type()
     null_key()
     hash_keys_with_nulls_in_them()
     nearly_the_same_hash_keys()
@@ -154,6 +155,26 @@ invalid_type:
     pop_eh
     ok(1, 'Setting invalid type throws')
 end:
+.end
+
+.sub hash_value_type
+    .local pmc h, eh
+    .local int r
+    h = new ['Hash']
+
+    h.'set_value_type'(.DATATYPE_INTVAL)
+    r  = h.'get_value_type'()
+    is(r, .DATATYPE_INTVAL, 'get/set _value_type')
+
+    r = 1
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_UNIMPLEMENTED)
+    set_label eh, catch
+    push_eh eh
+    h.'set_value_type'(999999)
+    r = 0
+  catch:
+    is(r, 1, 'set_value_type with invalid type throws')
 .end
 
 .sub null_key
