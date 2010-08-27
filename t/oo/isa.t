@@ -20,7 +20,7 @@ composition.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(29)
+    plan(30)
 
     isa_by_string_name()
     isa_by_class_object()
@@ -28,6 +28,7 @@ composition.
     subclass_isa_by_class_object()
     string_isa_and_pmc_isa_have_same_result()
     string_register_and_string_pmc_isa_have_same_result()
+    isa_accepts_rsa()
 .end
 
 
@@ -180,6 +181,14 @@ composition.
     $I0 = not $I0
     ok( $I0, '... and false when it is not' )
 .end
+
+.sub isa_accepts_rsa
+    $P0 = newclass ['Foo';'Buz']
+    $P1 = new $P0
+    $P0 = split "::", "Foo::Buz"
+    $I0 = isa $P1, $P0
+    ok($I0, "isa accepts a ResizablePMCArray")
+ .end
 
 .HLL 'foo'
 .namespace ['XYZ']
