@@ -301,42 +301,6 @@ C<key> is "message".
 
 /*
 
-=item C<INTVAL get_integer_keyed(PMC *key)>
-
-Returns the integer value for C<*key>.
-
-=cut
-
-*/
-
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
-        STRING * const name = VTABLE_get_string(INTERP, key);
-        INTVAL  result = 0;
-
-        switch (getAttrEnum(INTERP, name)) {
-          case attr_type:
-            GET_ATTR_type(INTERP, SELF, result);
-            break;
-          case attr_severity:
-            GET_ATTR_severity(INTERP, SELF, result);
-            break;
-          case attr_exit_code:
-            GET_ATTR_exit_code(INTERP, SELF, result);
-            break;
-          case attr_handled:
-            GET_ATTR_handled(INTERP, SELF, result);
-            break;
-          default:
-            /* If unknown attribute name, throw an exception. */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
-                "No such integer attribute '%S'", name);
-        }
-
-        return result;
-    }
-
-/*
-
 =item C<INTVAL get_integer_keyed_str(STRING *key)>
 
 Returns the integer value for C<*key>.
@@ -367,6 +331,21 @@ Returns the integer value for C<*key>.
         }
 
         return result;
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        return SELF.get_integer_keyed_str(name);
     }
 
 /*
@@ -454,38 +433,6 @@ Sets the Parrot string value for C<*key>.
 
 /*
 
-=item C<void set_integer_keyed(PMC *key, INTVAL value)>
-
-Sets the integer value for C<*key>.
-
-=cut
-
-*/
-
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        STRING * const name = VTABLE_get_string(INTERP, key);
-        switch (getAttrEnum(INTERP, name)) {
-          case attr_type:
-            SET_ATTR_type(INTERP, SELF, value);
-            break;
-          case attr_severity:
-            SET_ATTR_severity(INTERP, SELF, value);
-            break;
-          case attr_exit_code:
-            SET_ATTR_exit_code(INTERP, SELF, value);
-            break;
-          case attr_handled:
-            SET_ATTR_handled(INTERP, SELF, value);
-            break;
-          default:
-            /* If unknown attribute name, throw an exception. */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
-                "No such integer attribute '%S'", name);
-        }
-    }
-
-/*
-
 =item C<void set_integer_keyed_str(STRING *key, INTVAL value) >
 
 Sets the integer value for C<*key>.
@@ -513,6 +460,21 @@ Sets the integer value for C<*key>.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such integer attribute '%S'", key);
         }
+    }
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Sets the integer value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        SELF.set_integer_keyed_str(name, value);
     }
 
 /*
