@@ -2645,7 +2645,7 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     }
 
     if (byte_code->annotations)
-        PackFile_Annotations_destroy(interp, byte_code->annotations);
+        PackFile_Annotations_destroy(interp, (PackFile_Segment *)byte_code->annotations);
 
     byte_code->annotations     = NULL;
     byte_code->const_table     = NULL;
