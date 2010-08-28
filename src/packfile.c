@@ -2644,12 +2644,16 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         mem_gc_free(interp, byte_code->op_mapping.libs);
     }
 
-    byte_code->fixups          = NULL;
+    if (byte_code->annotations)
+        PackFile_Annotations_destroy(interp, byte_code->annotations);
+
+    byte_code->annotations     = NULL;
     byte_code->const_table     = NULL;
     byte_code->debugs          = NULL;
-    byte_code->op_mapping.libs = NULL;
+    byte_code->fixups          = NULL;
     byte_code->op_func_table   = NULL;
     byte_code->op_info_table   = NULL;
+    byte_code->op_mapping.libs = NULL;
 }
 
 
@@ -4308,6 +4312,10 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     /* Free any entries. */
     if (self->entries)
         mem_gc_free(interp, self->entries);
+
+    self->keys    = NULL;
+    self->groups  = NULL;
+    self->entries = NULL;
 }
 
 
@@ -4450,6 +4458,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->num_entries = PF_fetch_opcode(seg->pf, &cursor);
     self->entries     = mem_gc_allocate_n_zeroed_typed(interp,
             self->num_entries, PackFile_Annotations_Entry);
+
     for (i = 0; i < self->num_entries; ++i) {
         PackFile_Annotations_Entry * const entry = self->entries + i;
         entry->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
@@ -4646,11 +4655,11 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
     /* Add annotations entry. */
     if (self->entries)
-            self->entries = mem_gc_realloc_n_typed(interp, self->entries,
-                    1 + self->num_entries, PackFile_Annotations_Entry);
-        else
-            self->entries = mem_gc_allocate_n_typed(interp,
-                    1 + self->num_entries, PackFile_Annotations_Entry);
+        self->entries = mem_gc_realloc_n_typed(interp, self->entries,
+                1 + self->num_entries, PackFile_Annotations_Entry);
+    else
+        self->entries = mem_gc_allocate_n_typed(interp,
+                1 + self->num_entries, PackFile_Annotations_Entry);
 
     self->entries[self->num_entries].bytecode_offset = offset;
     self->entries[self->num_entries].key             = key_id;
