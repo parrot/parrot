@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -49,9 +49,7 @@ Initializes the library with a C<NULL> oplib init function.
 
 */
 
-    VTABLE void init() {
-        PObj_custom_destroy_SET(SELF);
-    }
+    VTABLE void init() {}
 
 /*
 
@@ -82,8 +80,14 @@ Creates and returns a clone of the library.
 
     VTABLE PMC *clone() {
         PMC * const dest     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_oplib_init(dest) = PMC_oplib_init(SELF);
-        PMC_dlhandle(dest)   = PMC_dlhandle(SELF);
+
+        if (PMC_oplib_init(SELF))
+            PMC_oplib_init(dest) = PMC_oplib_init(SELF);
+
+        if (PMC_dlhandle(SELF)) {
+            PMC_dlhandle(dest)   = PMC_dlhandle(SELF);
+            PObj_custom_destroy_SET(dest);
+        }
 
         if (PMC_metadata(SELF))
             PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
@@ -126,7 +130,7 @@ Returns the name of the loaded library.
 
 =item C<void *get_pointer()>
 
-Get the pointer to the shared library handle.
+Gets the pointer to the shared library handle.
 
 =cut
 
@@ -140,7 +144,7 @@ Get the pointer to the shared library handle.
 
 =item C<void set_pointer(void *handle)>
 
-Set the pointer to the shared library handle.
+Sets the pointer to the shared library handle.
 
 =cut
 
@@ -148,22 +152,13 @@ Set the pointer to the shared library handle.
 
     VTABLE void set_pointer(void *handle) {
         PMC_dlhandle(SELF) = handle;
+        PObj_custom_destroy_SET(SELF);
     }
 }
 
 /*
 
 =back
-
-=head1 SEE ALSO
-
-    Date:    Mon, 29 Sep 2003 14:37:11 -0400 (EDT)
-    Subject: Library loading and initialization sequence
-    From:    Dan Sugalski
-
-=head1 HISTORY
-
-Initial version by leo 2003.10.12.
 
 =cut
 
