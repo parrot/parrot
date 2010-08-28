@@ -2632,8 +2632,17 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         mem_gc_free(interp, byte_code->op_func_table);
     if (byte_code->op_info_table)
         mem_gc_free(interp, byte_code->op_info_table);
-    if (byte_code->op_mapping.libs)
+    if (byte_code->op_mapping.libs) {
+        opcode_t n_libs = byte_code->op_mapping.n_libs;
+        opcode_t i;
+
+        for (i = 0; i < n_libs; i++) {
+            mem_gc_free(interp, byte_code->op_mapping.libs[i].table_ops);
+            mem_gc_free(interp, byte_code->op_mapping.libs[i].lib_ops);
+        }
+
         mem_gc_free(interp, byte_code->op_mapping.libs);
+    }
 
     byte_code->fixups          = NULL;
     byte_code->const_table     = NULL;
