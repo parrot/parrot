@@ -155,7 +155,8 @@ Compares the two strings, returning 0 if they are identical.
 
 PARROT_WARN_UNUSED_RESULT
 int
-hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const void *bucket_key))
+hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
+        ARGIN_NULLOK(const void *bucket_key))
 {
     ASSERT_ARGS(hash_compare_string)
     STRING const *s1 = (STRING const *)search_key;

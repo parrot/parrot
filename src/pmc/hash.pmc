@@ -71,7 +71,7 @@ static PMC* get_next_hash(PARROT_INTERP,
 
 /*
 
-=item C<void init()>
+=item C<static PMC* get_next_hash(PARROT_INTERP, Hash *hash, void *key)>
 
 Get the next hash for multipart keys. Autovivify a hash if it doesn't exist.
 
@@ -84,6 +84,7 @@ PARROT_WARN_UNUSED_RESULT
 static PMC*
 get_next_hash(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
+    ASSERT_ARGS(get_next_hash)
     PMC        *next_hash;
     HashBucket *bucket;
 
