@@ -84,7 +84,7 @@ monthly release.
 
 =item c
 
-Update release-related information in F<tools/util/release.json>. This will be
+Update release-related information in F<tools/release/release.json>. This will be
 used later when making release announcements.  There are a few essential
 fields that must be updated at each release:
 
@@ -244,11 +244,11 @@ only take a few minutes for the mirrors to sync.
 
 =item 9.
 
-Compose the release announcement.  Use F<tools/util/crow.pir> to make
+Compose the release announcement.  Use F<tools/release/crow.pir> to make
 this part easier.  You can specify the format of your announcements like so:
 
-  $ ./parrot tools/util/crow.pir --type=text
-  $ ./parrot tools/util/crow.pir --type=html
+  $ ./parrot tools/release/crow.pir --type=text
+  $ ./parrot tools/release/crow.pir --type=html
 
 Take the screen output and paste it into the application you need.  HTML
 works well for use Perl and PerlMonks, and text for the rest.  It is not a

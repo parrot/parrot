@@ -47,8 +47,13 @@ VERSION_DIR     = @versiondir@
 # where we're building parrot from (needed for pbc_to_exe)
 BUILD_DIR = @build_dir@
 
-# directory for build tools
+# directory for build tools:
+# programs, templates, configuration files invoked by 'make all'
+# (with or without command-line options)
 BUILD_TOOLS_DIR = tools/build
+# directory for developers' tools
+# programs, templates, configuration files NOT invoked by 'make all'
+DEV_TOOLS_DIR = tools/dev
 
 # directory for header files
 INC_DIR         = @inc@
@@ -116,7 +121,7 @@ LINKARGS         = $(LDFLAGS) $(LD_LOAD_FLAGS) @libparrot_ldflags@ @icu_shared@ 
 NONGEN_HEADERS   = @TEMP_nongen_headers@
 
 # The headerizer
-HEADERIZER       = $(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl
+HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
 
 include src/dynpmc/Defines.mak
 include src/dynoplibs/Defines.mak
@@ -842,12 +847,12 @@ $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT) $(LIBRARY_DIR)/Getopt/Obj.pbc
-	$(PARROT) -o pbc_to_exe.pbc tools/dev/pbc_to_exe.pir
+$(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
+	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
-parrot_nci_thunk_gen.pbc : tools/dev/nci_thunk_gen.pir $(DATA_JSON_LIB_PBCS) $(PARROT)
-	$(PARROT) -o parrot_nci_thunk_gen.pbc tools/dev/nci_thunk_gen.pir
+parrot_nci_thunk_gen.pbc : $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(DATA_JSON_LIB_PBCS) $(PARROT)
+	$(PARROT) -o parrot_nci_thunk_gen.pbc $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
 
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc
@@ -858,8 +863,8 @@ parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 $(PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot-prove.pbc
 
-$(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
-	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
+$(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
+	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
 $(MINIPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -936,10 +941,10 @@ O_FILES = \
     $(IMCC_O_FILES)
 
 lib_deps_object : $(O_FILES)
-	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
+	$(PERL) $(DEV_TOOLS_DIR)/lib_deps.pl object $(O_FILES)
 
 lib_deps_source : $(GENERAL_H_FILES)
-	$(PERL) tools/dev/lib_deps.pl source all_source
+	$(PERL) $(DEV_TOOLS_DIR)/lib_deps.pl source all_source
 
 lib_deps : lib_deps_object lib_deps_source
 
@@ -969,7 +974,7 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
-	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
+	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PBC_TO_EXE) parrot_config.pbc --install
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
@@ -1997,19 +2002,19 @@ distclean : realclean
 # Require .svn to exist first
 # Otherwise it'll remove every last file
 svnclobber : .svn
-	$(PERL) tools/dev/svnclobber.pl
+	$(PERL) $(DEV_TOOLS_DIR)/svnclobber.pl
 
 reconfig : realclean
 	$(PERL) Configure.pl $(CONFIG_ARGS)
 
 manitest :
-	$(PERL) tools/dev/manicheck.pl
+	$(PERL) $(DEV_TOOLS_DIR)/manicheck.pl
 
 opsrenumber :
-	$(PERL) tools/dev/opsrenumber.pl $(OPS_FILES)
+	$(PERL) $(DEV_TOOLS_DIR)/opsrenumber.pl $(OPS_FILES)
 
 pmcrenumber :
-	$(PERL) tools/dev/pmcrenumber.pl src/pmc/pmc.num
+	$(PERL) $(DEV_TOOLS_DIR)/pmcrenumber.pl src/pmc/pmc.num
 
 ###############################################################################
 #
@@ -2361,7 +2366,7 @@ install: install-bin install-dev-only
 install-dev: install
 
 install-bin: installable
-	$(PERL) tools/dev/install_files.pl \
+	$(PERL) $(DEV_TOOLS_DIR)/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
     --exec-prefix=$(EXEC_PREFIX) \
@@ -2375,7 +2380,7 @@ install-bin: installable
     MANIFEST MANIFEST.generated
 
 install-dev-only: installable
-	$(PERL) tools/dev/install_dev_files.pl \
+	$(PERL) $(DEV_TOOLS_DIR)/install_dev_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
     --exec-prefix=$(EXEC_PREFIX) \
@@ -2390,7 +2395,7 @@ install-dev-only: installable
     MANIFEST MANIFEST.generated
 
 install-doc:
-	$(PERL) tools/dev/install_doc_files.pl \
+	$(PERL) $(DEV_TOOLS_DIR)/install_doc_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
     --docdir=$(DOC_DIR) \
@@ -2419,7 +2424,7 @@ release : MANIFEST MANIFEST.generated
 	rm parrot-$(VERSION)
 
 win32-inno-installer : world installable
-	$(PERL) tools/dev/mk_inno.pl
+	$(PERL) $(DEV_TOOLS_DIR)/mk_inno.pl
 	$(INNO_SETUP) parrot.iss
 
 ###############################################################################
@@ -2513,7 +2518,7 @@ tags-vi: tags.vi.dummy
 	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.
-	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
+	$(PERL) $(DEV_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.vi.dummy:
 
@@ -2525,12 +2530,12 @@ tags.dummy:
 CRITIC_FILES = 'lib/Parrot'
 
 perlcritic:
-	perlcritic --profile tools/util/perlcritic.conf $(CRITIC_FILES)
+	perlcritic --profile $(DEV_TOOLS_DIR)/perlcritic.conf $(CRITIC_FILES)
 
 # Andy's extra-cranky Perl::Critic checking for cage cleaners
 cagecritic:
 	@perl -MPerl::Critic::Bangs -e'$$min=q{1.04};die qq{You need Bangs $$min} unless $$Perl::Critic::Bangs::VERSION ge $$min'
-	perlcritic -1 --profile tools/util/perlcritic-cage.conf $(CRITIC_FILES)
+	perlcritic -1 --profile $(DEV_TOOLS_DIR)/perlcritic-cage.conf $(CRITIC_FILES)
 
 # This target will eventually create all the headers automatically.  If you
 # are having problems with linkage in Win32 (or elsewhere), because something

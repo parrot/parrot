@@ -4,12 +4,12 @@
 
 =head1 NAME
 
-tools/build/headerizer.pl - Generates the function header parts of .h
+tools/dev/headerizer.pl - Generates the function header parts of .h
 files from .c files
 
 =head1 SYNOPSIS
 
-  $ perl tools/build/headerizer.pl [object files]
+  $ perl tools/dev/headerizer.pl [object files]
 
 Generates C function declarations based on the function definitions in
 the C source code.
