@@ -689,7 +689,7 @@ arguments. The class is attached to the current HLL namespace.
                 (Parrot_Class_attributes *) PMC_data(SELF);
 
         /* Set flag for custom GC mark. */
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
 
         /* Set up the object. */
         _class->name            = CONST_STRING(INTERP, "");
