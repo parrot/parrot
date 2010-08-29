@@ -438,67 +438,46 @@ filehandle when finished.
 */
 
     METHOD readall(STRING *name :optional, INTVAL got_name :opt_flag) {
-        PMC    *filehandle;
-        STRING *result      = STRINGNULL;
-        size_t  size        = 0;
+        STRING *result;
 
         if (got_name) {
             /* called as class method - open, slurp, close file */
+            PMC    *filehandle;
             STRING *encoding;
+            size_t  size;
+
+            GET_ATTR_encoding(INTERP, SELF, encoding);
 
             if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            GET_ATTR_encoding(INTERP, SELF, encoding);
-
             filehandle  = Parrot_io_open(INTERP, PMCNULL, name, NULL);
+
             PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
 
             SET_ATTR_encoding(INTERP, filehandle, encoding);
             size = (size_t)(Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE));
+
+            result = Parrot_io_reads(INTERP, filehandle, size);
+            Parrot_io_close(INTERP, filehandle);
         }
         else {
-            /* Just get size of already opened file */
-            STRING *filename;
-            Parrot_runloop   jump_point;
-
+            /* slurp open file */
             if (Parrot_io_is_closed_filehandle(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall without a file name or open filehandle");
 
-            GET_ATTR_filename(INTERP, SELF, filename);
+            /* Do line buffering on the filehandle */
+            if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
+                Parrot_io_setlinebuf(INTERP, SELF);
 
-            /* stat_info ca throw exception. Switch to chunked loading */
-            if (setjmp(jump_point.resume)) {
-                /* caught exception */
-                Parrot_cx_delete_handler_local(interp,
-                    Parrot_str_new_constant(interp, "exception"));
-
-                /* Do line buffering on the filehandle */
-                if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
-                    Parrot_io_setlinebuf(INTERP, SELF);
-
-                do {
-                    STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
-                    result = STRING_IS_NULL(result) ? part :
+            result = STRINGNULL;
+            do {
+                STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
+                result = STRING_IS_NULL(result) ? part :
                         Parrot_str_concat(INTERP, result, part);
-                } while (!Parrot_io_eof(INTERP, SELF));
-            }
-            else {
-                /* run normally */
-                Parrot_ex_add_c_handler(interp, &jump_point);
-
-                size = (size_t)(Parrot_stat_info_intval(INTERP, filename, STAT_FILESIZE));
-                filehandle = SELF;
-            }
-        }
-
-        if (size)
-            result = Parrot_io_reads(INTERP, filehandle, size);
-
-        if (got_name) {
-            Parrot_io_close(INTERP, filehandle);
+            } while (!Parrot_io_eof(INTERP, SELF));
         }
 
         RETURN(STRING *result);
