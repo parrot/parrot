@@ -699,7 +699,6 @@ bigint_sub_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 =item C<static void bigint_sub_bigint_int(PARROT_INTERP, PMC *self, INTVAL
 value, PMC *dest)>
 
-
 =cut
 
 */
@@ -1256,6 +1255,12 @@ Return GMP version string "x.y.z".
 
     VTABLE void init() {
         bigint_init(INTERP, SELF);
+        PObj_custom_destroy_SET(SELF);
+    }
+
+    VTABLE void init_int(INTVAL iv) {
+        bigint_init(INTERP, SELF);
+        bigint_set_long(INTERP, SELF, (long)iv);
         PObj_custom_destroy_SET(SELF);
     }
 

@@ -329,7 +329,7 @@ Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 #if PARROT_HAS_ICU
     return u_charDigitValue(character);
 #else
-    if ((character >= 0x30) || (character <= 0x39))
+    if ((character >= 0x30) && (character <= 0x39))
         return character - 0x30;
     return -1;
 #endif

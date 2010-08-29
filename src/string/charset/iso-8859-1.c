@@ -178,24 +178,24 @@ static STRING *
 to_iso_8859_1(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(to_iso_8859_1)
-    UINTVAL offs, src_len;
+    UINTVAL src_len;
     String_iter iter;
     /* iso-8859-1 is never bigger then source */
     STRING * dest = Parrot_str_clone(interp, src);
 
-    ENCODING_ITER_INIT(interp, src, &iter);
+    STRING_ITER_INIT(interp, &iter);
     src_len = src->strlen;
     dest->bufused = src_len;
-    dest->charset = Parrot_iso_8859_1_charset_ptr;
-    dest->encoding = Parrot_fixed_8_encoding_ptr;
-    for (offs = 0; offs < src_len; ++offs) {
-        const UINTVAL c = iter.get_and_advance(interp, &iter);
+    while (iter.charpos < src_len) {
+        const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
         if (c >= 0x100)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
                 "lossy conversion to iso-8559-1");
 
-        ENCODING_SET_BYTE(interp, dest, offs, c);
+        Parrot_fixed_8_encoding_ptr->set_byte(interp, dest, iter.charpos - 1, c);
     }
+    dest->charset = Parrot_iso_8859_1_charset_ptr;
+    dest->encoding = Parrot_fixed_8_encoding_ptr;
     return dest;
 }
 
@@ -221,18 +221,18 @@ to_unicode(PARROT_INTERP, ARGIN(const STRING *src))
     dest->charset = Parrot_unicode_charset_ptr;
     dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
     Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
-    ENCODING_ITER_INIT(interp, dest, &iter);
-    for (offs = 0; offs < src->strlen; ++offs) {
-        const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
+    STRING_ITER_INIT(interp, &iter);
+    while (iter.charpos < src->strlen) {
+        const UINTVAL c = ENCODING_GET_BYTE(interp, src, iter.charpos);
 
         if (iter.bytepos >= Buffer_buflen(dest) - 4) {
-            UINTVAL need = (UINTVAL)((src->strlen - offs) * 1.5);
+            UINTVAL need = (UINTVAL)((src->strlen - iter.charpos) * 1.5);
             if (need < 16)
                 need = 16;
             Parrot_gc_reallocate_string_storage(interp, dest,
                     Buffer_buflen(dest) + need);
         }
-        iter.set_and_advance(interp, &iter, c);
+        STRING_ITER_SET_AND_ADVANCE(interp, dest, &iter, c);
     }
     dest->bufused = iter.bytepos;
     dest->strlen  = iter.charpos;

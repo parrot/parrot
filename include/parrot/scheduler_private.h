@@ -19,7 +19,8 @@
 typedef enum {
     SCHEDULER_cache_valid_FLAG         = PObj_private0_FLAG,
     SCHEDULER_wake_requested_FLAG      = PObj_private1_FLAG,
-    SCHEDULER_terminate_requested_FLAG = PObj_private2_FLAG
+    SCHEDULER_terminate_requested_FLAG = PObj_private2_FLAG,
+    SCHEDULER_in_handler_FLAG          = PObj_private3_FLAG
 } scheduler_flags_enum;
 
 #define SCHEDULER_get_FLAGS(o) (PObj_get_FLAGS(o))
@@ -41,6 +42,11 @@ typedef enum {
 #define SCHEDULER_terminate_requested_TEST(o)  SCHEDULER_flag_TEST(terminate_requested, o)
 #define SCHEDULER_terminate_requested_SET(o)   SCHEDULER_flag_SET(terminate_requested, o)
 #define SCHEDULER_terminate_requested_CLEAR(o) SCHEDULER_flag_CLEAR(terminate_requested, o)
+
+/* Mark if the scheduler is inside a handler */
+#define SCHEDULER_in_handler_TEST(o)  SCHEDULER_flag_TEST(in_handler, o)
+#define SCHEDULER_in_handler_SET(o)   SCHEDULER_flag_SET(in_handler, o)
+#define SCHEDULER_in_handler_CLEAR(o) SCHEDULER_flag_CLEAR(in_handler, o)
 
 /*
  * Task private flags

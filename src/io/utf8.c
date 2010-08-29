@@ -57,7 +57,7 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
     s->encoding = Parrot_utf8_encoding_ptr;
 
     /* count chars, verify utf8 */
-    Parrot_utf8_encoding_ptr->iter_init(interp, s, &iter);
+    STRING_ITER_INIT(interp, &iter);
 
     while (iter.bytepos < s->bufused) {
         if (iter.bytepos + 4 > s->bufused) {
@@ -84,8 +84,6 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
                 s->strlen    = iter.charpos;
                 s            = Parrot_str_concat(interp, s, s2);
-                /* String is updated. Poke into iterator to replace old string */
-                iter.str     = s;
                 *buf         = s;
                 len         += len2 + 1;
 
@@ -93,7 +91,7 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
             }
         }
 ok:
-        iter.get_and_advance(interp, &iter);
+        Parrot_utf8_encoding_ptr->iter_get_and_advance(interp, *buf, &iter);
     }
     s->strlen = iter.charpos;
     return len;

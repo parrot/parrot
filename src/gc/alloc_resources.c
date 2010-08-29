@@ -324,7 +324,7 @@ mem_allocate(PARROT_INTERP,
         size_t new_mem = mem_pools->memory_used -
                          mem_pools->mem_used_last_collect;
         if (!mem_pools->gc_mark_block_level
-            && new_mem > (mem_pools->mem_used_last_collect >> 1)
+            && new_mem > (mem_pools->mem_used_last_collect >> 2)
             && new_mem > GC_SIZE_THRESHOLD) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
         }
@@ -447,19 +447,21 @@ compact_pool(PARROT_INTERP,
     if (mem_pools->gc_sweep_block_level)
         return;
 
-    ++mem_pools->gc_collect_runs;
-
-    /* Snag a block big enough for everything */
-    total_size = pad_pool_size(pool);
-
-    if (total_size == 0)
-        return;
-
     ++mem_pools->gc_sweep_block_level;
 
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
+    ++mem_pools->gc_collect_runs;
+
+    /* Snag a block big enough for everything */
+    total_size = pad_pool_size(pool);
+
+    if (total_size == 0) {
+        free_old_mem_blocks(mem_pools, pool, pool->top_block, total_size);
+        --mem_pools->gc_sweep_block_level;
+        return;
+    }
 
     alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
@@ -678,8 +680,7 @@ free_old_mem_blocks(
         else {
             /* Note that we don't have it any more */
             mem_pools->memory_allocated -= cur_block->size;
-            mem_pools->memory_used -=
-                cur_block->size - cur_block->free - cur_block->freed;
+            mem_pools->memory_used -= cur_block->size - cur_block->free;
 
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */

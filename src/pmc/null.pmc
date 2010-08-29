@@ -11,10 +11,6 @@ src/pmc/null.pmc - NULL
 This simply creates a way of catching C<NULL> register accesses without
 really slowing down the bytecode execution.
 
-=head2 Methods
-
-=over 4
-
 =cut
 
 */
@@ -32,29 +28,13 @@ static void null_pmc_access(PARROT_INTERP, int index)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/*
-
-=item C<static void null_pmc_access(PARROT_INTERP, int index)>
-
-
-
-=cut
-
-*/
-
-PARROT_DOES_NOT_RETURN
-static void
-null_pmc_access(PARROT_INTERP, int index)
-{
-    ASSERT_ARGS(null_pmc_access)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
-            "Null PMC access in %s()",
-            Parrot_get_vtable_name(interp, index));
-}
-
 pmclass Null singleton {
 
 /*
+
+=head2 Vtable functions
+
+=over 4
 
 =item C<void init()>
 
@@ -102,9 +82,9 @@ Returns true if value is also a null PMC, false otherwise.
 
 =item C<PMC *find_method(STRING *method_name)>
 
-=cut
+Gives a more informative message than the automaticaly generated version.
 
-Gives a more informative message than the automaticaaly generated version.
+=cut
 
 */
 
@@ -114,6 +94,32 @@ Gives a more informative message than the automaticaaly generated version.
                 method_name);
     }
 
+}
+
+/*
+
+=back
+
+=head2 Auxiliar functions
+
+=over 4
+
+=item C<static void null_pmc_access(PARROT_INTERP, int index)>
+
+Throws the Null PMC access exception.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+null_pmc_access(PARROT_INTERP, int index)
+{
+    ASSERT_ARGS(null_pmc_access)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+            "Null PMC access in %s()",
+            Parrot_get_vtable_name(interp, index));
 }
 
 /*

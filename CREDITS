@@ -773,6 +773,11 @@ U: nickg
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
 
+N: Nick Wellnhofer
+D: String iterator rewrite, GC fixes
+E: wellnhofer@aevum.de
+U: nwellnhof
+
 N: Nikolay Ananiev
 D: Win32 build fix
 

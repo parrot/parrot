@@ -296,7 +296,22 @@ method _calculate_op_codes() {
 
 method _set_version() {
     my $config := _config();
-    my $version := $config<VERSION>;
+    my $version_filename;
+    if $config<installed> {
+        $version_filename :=
+            $config<libdir> ~
+            $config<versiondir> ~
+            $config<slash> ~
+            'VERSION';
+    }
+    else {
+        $version_filename :=
+            $config<prefix> ~
+            $config<slash> ~
+            'VERSION';
+    }
+
+    my $version := pir::chopn__ssi(slurp($version_filename), 1);
     #say("# $version");
     my @bits := split('.', $version);
     self<version_major> := @bits[0];

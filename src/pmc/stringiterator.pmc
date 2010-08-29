@@ -27,11 +27,9 @@ Implementation of Iterator for String PMC.
 /* HEADERIZER END: static */
 
 pmclass StringIterator auto_attrs extends Iterator {
-    ATTR PMC    *string;    /* String to iterate over */
-    ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */
-                            /* Previous position of iterator for reverse iterator */
-    ATTR INTVAL  length;    /* Length of C<string> */
-    ATTR INTVAL  reverse;   /* Direction of iteration. 1 - for reverse iteration */
+    ATTR STRING      *str_val;   /* String to iterate over */
+    ATTR String_iter  iter;      /* String iterator */
+    ATTR INTVAL       reverse;   /* Direction of iteration. 1 - for reverse iteration */
 
 /*
 
@@ -43,10 +41,13 @@ Initialize StringIterator.
 
 */
     VTABLE void init_pmc(PMC *string) {
-        SET_ATTR_string(INTERP, SELF, string);
+        String_iter * const iter    = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING      * const str_val = VTABLE_get_string(INTERP, string);
 
-        /* by default, iterate from start */
-        SELF.set_integer_native(ITERATE_FROM_START);
+        SET_ATTR_str_val(INTERP, SELF, str_val);
+        STRING_ITER_INIT(INTERP, iter);
+        SET_ATTR_reverse(INTERP, SELF, ITERATE_FROM_START);
+
         PObj_custom_mark_SET(SELF);
     }
 
@@ -61,9 +62,10 @@ Marks the current idx/key and the aggregate as live.
 */
 
     VTABLE void mark() {
-        PMC *string;
-        GET_ATTR_string(INTERP, SELF, string);
-        Parrot_gc_mark_PMC_alive(INTERP, string);
+        STRING *str_val;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        Parrot_gc_mark_STRING_alive(INTERP, str_val);
     }
 
 /*
@@ -74,15 +76,21 @@ Marks the current idx/key and the aggregate as live.
 
 */
     VTABLE PMC* clone() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
-        PMC                              * const clone =
-                Parrot_pmc_new_init(INTERP, enum_class_StringIterator, attrs->string);
-        Parrot_StringIterator_attributes * const clone_attrs =
-                PARROT_STRINGITERATOR(clone);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        PMC         *clone, *str_pmc;
+        String_iter *clone_iter;
+        STRING      *str_val;
+        INTVAL       reverse;
 
-        clone_attrs->pos     = attrs->pos;
-        clone_attrs->reverse = attrs->reverse;
+        str_pmc = Parrot_pmc_new(INTERP, enum_class_String);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        VTABLE_set_string_native(INTERP, str_pmc, str_val);
+        clone = Parrot_pmc_new_init(INTERP, enum_class_StringIterator, str_pmc);
+        clone_iter = &PARROT_STRINGITERATOR(clone)->iter;
+        *clone_iter = *iter;
+        GET_ATTR_reverse(INTERP, SELF, reverse);
+        SET_ATTR_reverse(INTERP, clone, reverse);
+
         return clone;
     }
 
@@ -111,12 +119,17 @@ Returns the number of remaining elements in the C<string>.
 */
 
     VTABLE INTVAL elements() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
-        if (attrs->reverse)
-            return attrs->pos;
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val;
+        INTVAL  reverse;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
+
+        if (reverse)
+            return iter->charpos;
         else
-            return attrs->length - attrs->pos;
+            return str_val->strlen - iter->charpos;
     }
 
     VTABLE INTVAL get_integer() {
@@ -137,20 +150,19 @@ Reset the Iterator. C<value> must be one of
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
-        switch (value) {
-          case ITERATE_FROM_START:
-            attrs->reverse   = 0;
-            attrs->pos       = 0;
-            attrs->length    = VTABLE_elements(INTERP, attrs->string);
-            break;
-          case ITERATE_FROM_END:
-            attrs->reverse   = 1;
-            attrs->pos       = attrs->length
-                             = VTABLE_elements(INTERP, attrs->string);
-            break;
-          default:
+        STRING *str_val;
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (value == ITERATE_FROM_START) {
+            SET_ATTR_reverse(INTERP, SELF, 0);
+            STRING_ITER_SET_POSITION(INTERP, str_val, iter, 0);
+        }
+        else if (value == ITERATE_FROM_END) {
+            SET_ATTR_reverse(INTERP, SELF, 1);
+            STRING_ITER_SET_POSITION(INTERP, str_val, iter, str_val->strlen);
+        }
+        else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Wrong direction for StringIterator");
         }
@@ -167,9 +179,13 @@ Returns this Iterator's string.
 */
 
     VTABLE PMC *get_pmc() {
-        PMC *string;
-        GET_ATTR_string(INTERP, SELF, string);
-        return string ? string : PMCNULL;
+        PMC * const string = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(
+            interp, enum_class_String));
+        STRING *str_val;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        VTABLE_set_string_native(interp, string, str_val);
+        return string;
     }
 
 /*
@@ -182,17 +198,20 @@ Shift next character from C<string> as PMC.
 
 */
     VTABLE PMC *shift_pmc() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         PMC *ret;
+        STRING *str_val, *substr;
+        const String_iter old_iter = *iter;
 
-        if (attrs->pos >= attrs->length)
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (iter->charpos >= str_val->strlen)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
-        VTABLE_set_string_native(INTERP, ret,
-                VTABLE_get_string_keyed_int(INTERP, attrs->string, attrs->pos++));
+        STRING_ITER_SKIP(INTERP, str_val, iter, 1);
+        substr = Parrot_str_iter_substr(INTERP, str_val, &old_iter, iter);
+        VTABLE_set_string_native(INTERP, ret, substr);
         return ret;
     }
 
@@ -206,14 +225,17 @@ Shift next character from C<string>.
 
 */
     VTABLE STRING *shift_string() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val;
+        const String_iter old_iter = *iter;
 
-        if (attrs->pos >= attrs->length)
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (iter->charpos >= str_val->strlen)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_string_keyed_int(INTERP, attrs->string, attrs->pos++);
+        STRING_ITER_SKIP(INTERP, str_val, iter, 1);
+        return Parrot_str_iter_substr(INTERP, str_val, &old_iter, iter);
     }
 
 /*
@@ -226,14 +248,15 @@ Shift next character code from C<string>.
 
 */
     VTABLE INTVAL shift_integer() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val;
 
-        if (attrs->pos >= attrs->length)
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (iter->charpos >= str_val->strlen)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_integer_keyed_int(INTERP, attrs->string, attrs->pos++);
+        return STRING_ITER_GET_AND_ADVANCE(INTERP, str_val, iter);
     }
 
 /*
@@ -246,17 +269,21 @@ Shift "next" character from C<string> for reverse iterator as PMC.
 
 */
     VTABLE PMC *pop_pmc() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val, *substr;
         PMC *ret;
+        const String_iter old_iter = *iter;
 
-        if (!STATICSELF.get_bool())
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        /* Shouldn't this test be (iter->charpos <= 0) ? */
+        if (SELF.elements() <= 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
-        VTABLE_set_string_native(INTERP, ret,
-                VTABLE_get_string_keyed_int(INTERP, attrs->string, --attrs->pos));
+        STRING_ITER_SKIP(INTERP, str_val, iter, -1);
+        substr = Parrot_str_iter_substr(INTERP, str_val, iter, &old_iter);
+        VTABLE_set_string_native(INTERP, ret, substr);
         return ret;
     }
 
@@ -270,14 +297,18 @@ Shift "next" character from C<string> for reverse iterator.
 
 */
     VTABLE STRING *pop_string() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val;
+        const String_iter old_iter = *iter;
 
-        if (!STATICSELF.get_bool())
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        /* Shouldn't this test be (iter->charpos <= 0) ? */
+        if (SELF.elements() <= 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_string_keyed_int(INTERP, attrs->string, --attrs->pos);
+        STRING_ITER_SKIP(INTERP, str_val, iter, -1);
+        return Parrot_str_iter_substr(INTERP, str_val, iter, &old_iter);
     }
 
 /*
@@ -290,14 +321,17 @@ Shift "next" character code from C<string> for reverse iterator.
 
 */
     VTABLE INTVAL pop_integer() {
-        Parrot_StringIterator_attributes * const attrs =
-                PARROT_STRINGITERATOR(SELF);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val;
 
-        if (!STATICSELF.get_bool())
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        /* Shouldn't this test be (iter->charpos <= 0) ? */
+        if (SELF.elements() <= 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_integer_keyed_int(INTERP, attrs->string, --attrs->pos);
+        STRING_ITER_SKIP(INTERP, str_val, iter, -1);
+        return STRING_ITER_GET(INTERP, str_val, iter, 0);
     }
 
 /*
@@ -311,8 +345,16 @@ Get integer value of current position plus idx.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
-        return VTABLE_get_integer_keyed_int(INTERP, STATICSELF.get_pmc(),
-                PARROT_STRINGITERATOR(SELF)->pos + idx);
+        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
+        STRING *str_val;
+        const UINTVAL offset = iter->charpos + idx;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (offset >= str_val->strlen)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return STRING_ITER_GET(INTERP, str_val, iter, idx);
     }
 
 /*
@@ -326,8 +368,22 @@ Get string value of current position plus idx.
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL idx) {
-        return VTABLE_get_string_keyed_int(INTERP, STATICSELF.get_pmc(),
-                PARROT_STRINGITERATOR(SELF)->pos + idx);
+        String_iter iter = PARROT_STRINGITERATOR(SELF)->iter;
+        String_iter next_iter;
+        STRING *str_val;
+        const UINTVAL offset = iter.charpos + idx;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        if (offset >= str_val->strlen)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        if (idx != 0)
+            STRING_ITER_SKIP(INTERP, str_val, &iter, idx);
+        next_iter = iter;
+        STRING_ITER_SKIP(INTERP, str_val, &next_iter, 1);
+
+        return Parrot_str_iter_substr(INTERP, str_val, &iter, &next_iter);
     }
 }
 

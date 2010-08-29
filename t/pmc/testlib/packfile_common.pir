@@ -9,7 +9,7 @@
 
 .sub '_filename'
     .local string filename
-    filename = 't/native_pbc/number.pbc'
+    filename = 't/pmc/testlib/number.pbc'
     .return (filename)
 .end
 

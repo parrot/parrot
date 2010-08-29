@@ -9,6 +9,7 @@ t/pmc/packfilefixuptable.t - test the PackfileFixupTable PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfilefixuptable.t
 
 =head1 DESCRIPTION

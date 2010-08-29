@@ -1,9 +1,9 @@
 {
-    "release.version"  : "2.6.0",
-    "release.name"     : "Red-rumped",
+    "release.version"  : "2.7.0",
+    "release.name"     : "Australian King",
     "release.day"      : "Tuesday",
-    "release.date"     : "20 July 2010",
-    "release.nextdate" : "17 August 2010",
+    "release.date"     : "17 August 2010",
+    "release.nextdate" : "21 September 2010",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,11 +11,11 @@
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 August 2010",
+    "bugday.date"      : "18 September 2010",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2010_08_14",
+    "wiki.bugday"      : "bug_day_2010_09_18",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.6.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.7.0/",
     "subversion.root"  : "http://subversion.apache.org/"
 }

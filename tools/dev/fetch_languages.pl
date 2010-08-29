@@ -3,7 +3,8 @@
 
 =head1 NAME
 
-fetch_languages.pl - A helper to fetch language implementations from the SCM repoistories
+fetch_languages.pl - Fetch language implementations from their source code
+management repositories
 
 =head1 SYNOPSIS
 

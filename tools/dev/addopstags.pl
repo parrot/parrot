@@ -8,11 +8,11 @@ use warnings;
 
 =head1 NAME
 
-tools/build/addopstags.pl - add src/ops/*.ops to tags
+tools/dev/addopstags.pl - add src/ops/*.ops to tags
 
 =head1 SYNOPSIS
 
- perl tools/build/addopstags.pl src/ops/*.ops
+ perl tools/dev/addopstags.pl src/ops/*.ops
 
 =head1 DESCRIPTION
 

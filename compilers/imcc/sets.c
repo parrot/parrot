@@ -154,6 +154,7 @@ elements.
 
 */
 
+PARROT_PURE_FUNCTION
 int
 set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {

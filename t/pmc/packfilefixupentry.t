@@ -8,6 +8,7 @@ t/pmc/packfilefixupentry.t - test the PackfileFixupEntry PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfilefixupentry.t
 
 =head1 DESCRIPTION

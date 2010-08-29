@@ -791,7 +791,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     const char                *ext;
     FILE                      *fp;
     STRING                    *fs;
-    PMC                       *ignored;
+    PMC                       *newcontext;
 
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants() */
@@ -816,9 +816,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         IMCC_fatal(interp, EXCEPTION_EXTERNAL_ERROR,
                 "imcc_compile_file: couldn't open '%s'\n", fullname);
 
-    IMCC_INFO(interp)->cur_namespace = NULL;
-    interp->code                     = NULL;
-
     IMCC_push_parser_state(interp);
     {
         /* Store a copy, in order to know how to free it later */
@@ -835,8 +832,13 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
      * which can destroy packfiles under construction
      */
     Parrot_block_GC_mark(interp);
-    ignored = Parrot_push_context(interp, regs_used);
-    UNUSED(ignored);
+
+    /* Activate a new context and reset it to initial values */
+    newcontext = Parrot_push_context(interp, regs_used);
+    Parrot_pcc_set_HLL(interp, newcontext, 0);
+    Parrot_pcc_set_sub(interp, newcontext, 0);
+    IMCC_INFO(interp)->cur_namespace = NULL;
+    interp->code                     = NULL;
 
     if (ext && STREQ(ext, ".pasm")) {
         void *yyscanner;

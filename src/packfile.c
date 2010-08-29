@@ -2632,15 +2632,28 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         mem_gc_free(interp, byte_code->op_func_table);
     if (byte_code->op_info_table)
         mem_gc_free(interp, byte_code->op_info_table);
-    if (byte_code->op_mapping.libs)
-        mem_gc_free(interp, byte_code->op_mapping.libs);
+    if (byte_code->op_mapping.libs) {
+        opcode_t n_libs = byte_code->op_mapping.n_libs;
+        opcode_t i;
 
-    byte_code->fixups          = NULL;
+        for (i = 0; i < n_libs; i++) {
+            mem_gc_free(interp, byte_code->op_mapping.libs[i].table_ops);
+            mem_gc_free(interp, byte_code->op_mapping.libs[i].lib_ops);
+        }
+
+        mem_gc_free(interp, byte_code->op_mapping.libs);
+    }
+
+    if (byte_code->annotations)
+        PackFile_Annotations_destroy(interp, (PackFile_Segment *)byte_code->annotations);
+
+    byte_code->annotations     = NULL;
     byte_code->const_table     = NULL;
     byte_code->debugs          = NULL;
-    byte_code->op_mapping.libs = NULL;
+    byte_code->fixups          = NULL;
     byte_code->op_func_table   = NULL;
     byte_code->op_info_table   = NULL;
+    byte_code->op_mapping.libs = NULL;
 }
 
 
@@ -3471,22 +3484,11 @@ Parrot_destroy_constants(PARROT_INTERP)
     if (!hash)
         return;
 
-    for (i = 0; i <= hash->mask; ++i) {
-        HashBucket *bucket = hash->bucket_indices[i];
-
-        while (bucket) {
-            PackFile_ConstTable * const table      =
-                (PackFile_ConstTable *)bucket->key;
-            PackFile_Constant * const orig_consts = table->constants;
-            PackFile_Constant * const consts      =
-                (PackFile_Constant *) bucket->value;
-            INTVAL j;
-
-            mem_gc_free(interp, consts);
-            bucket = bucket->next;
-        }
-    }
-
+    parrot_hash_iterate(hash,
+        PackFile_ConstTable * const table     = (PackFile_ConstTable *)_bucket->key;
+        PackFile_Constant * const orig_consts = table->constants;
+        PackFile_Constant * const consts      = (PackFile_Constant *) _bucket->value;
+        mem_gc_free(interp, consts););
     parrot_hash_destroy(interp, hash);
 }
 
@@ -4310,6 +4312,10 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     /* Free any entries. */
     if (self->entries)
         mem_gc_free(interp, self->entries);
+
+    self->keys    = NULL;
+    self->groups  = NULL;
+    self->entries = NULL;
 }
 
 
@@ -4452,6 +4458,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->num_entries = PF_fetch_opcode(seg->pf, &cursor);
     self->entries     = mem_gc_allocate_n_zeroed_typed(interp,
             self->num_entries, PackFile_Annotations_Entry);
+
     for (i = 0; i < self->num_entries; ++i) {
         PackFile_Annotations_Entry * const entry = self->entries + i;
         entry->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
@@ -4648,11 +4655,11 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
     /* Add annotations entry. */
     if (self->entries)
-            self->entries = mem_gc_realloc_n_typed(interp, self->entries,
-                    1 + self->num_entries, PackFile_Annotations_Entry);
-        else
-            self->entries = mem_gc_allocate_n_typed(interp,
-                    1 + self->num_entries, PackFile_Annotations_Entry);
+        self->entries = mem_gc_realloc_n_typed(interp, self->entries,
+                1 + self->num_entries, PackFile_Annotations_Entry);
+    else
+        self->entries = mem_gc_allocate_n_typed(interp,
+                1 + self->num_entries, PackFile_Annotations_Entry);
 
     self->entries[self->num_entries].bytecode_offset = offset;
     self->entries[self->num_entries].key             = key_id;

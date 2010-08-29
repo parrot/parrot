@@ -32,13 +32,11 @@ throughout the rest of Parrot.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void free_buffer(SHIM_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+    SHIM(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Buffer *b))
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
@@ -80,8 +78,7 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools);
 
 #define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools) \
-    , PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -481,6 +478,7 @@ Parrot_append_arena_in_pool(SHIM_INTERP,
 
     pool->last_Arena = new_arena;
     mem_pools->header_allocs_since_last_collect += size;
+    mem_pools->memory_allocated += size;
 }
 
 /*
@@ -658,7 +656,7 @@ reuse later.
 
 static void
 free_buffer(SHIM_INTERP,
-        ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGMOD(Buffer *b))
 {

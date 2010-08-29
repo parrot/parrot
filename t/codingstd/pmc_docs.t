@@ -130,7 +130,6 @@ src/pmc/eval.pmc
 src/pmc/imageio.pmc
 src/pmc/namespace.pmc
 src/pmc/nci.pmc
-src/pmc/null.pmc
 src/pmc/object.pmc
 src/pmc/sub.pmc
 src/pmc/threadinterpreter.pmc

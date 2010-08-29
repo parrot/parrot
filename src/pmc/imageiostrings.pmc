@@ -50,6 +50,8 @@ Initializes the PMC.
             parrot_new_intval_hash(INTERP));
 
         PARROT_IMAGEIOSTRINGS(SELF)->list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+
+        PObj_custom_mark_SET(SELF);
     }
 
 /*

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Parrot::Config;
 
 =head1 NAME
@@ -198,6 +198,38 @@ CODE
 0
 1
 0
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "Timer - many repetitions" );
+
+.include 'timer.pasm'
+
+.sub expired
+    $P0 = get_global "expired_count"
+    inc $P0
+.end
+
+.sub main :main
+    $P2 = new 'Integer'
+    set_global "expired_count", $P2
+
+    $P0 = new 'Timer'
+    $P1 = get_global "expired"
+
+    $P0[.PARROT_TIMER_HANDLER]  = $P1
+    $P0[.PARROT_TIMER_SEC]      = 0
+    $P0[.PARROT_TIMER_REPEAT]   = 9999
+    $P0[.PARROT_TIMER_RUNNING]  = 1
+
+loop:
+    sleep 0
+    if $P2 < 10000 goto loop
+
+    sleep 0.5
+    say $P2
+.end
+CODE
+10000
 OUTPUT
 
 # Local Variables:

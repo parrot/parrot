@@ -66,7 +66,7 @@ Initializes the StringBuilder with initial size of buffer.
         buffer->encoding  = Parrot_default_encoding_ptr;
         buffer->charset   = Parrot_default_charset_ptr;
         /* We need all string flags here because we use this buffer in substr_str */
-        buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG;
+        buffer->flags     = PObj_is_string_FLAG;
         Buffer_bufstart(buffer) = mem_gc_allocate_n_typed(INTERP,
                 initial_size, char);
         Buffer_buflen(buffer) = initial_size;
@@ -145,7 +145,7 @@ Append string to current buffer.
             STRING * const new_buffer = Parrot_unicode_charset_ptr->to_charset(interp, buffer);
             mem_gc_free(INTERP, Buffer_bufstart(buffer));
             STRUCT_COPY(buffer, new_buffer);
-            buffer->flags     = PObj_is_string_FLAG | PObj_live_FLAG;
+            buffer->flags     = PObj_is_string_FLAG;
 
             Buffer_bufstart(buffer) = mem_gc_allocate_n_typed(INTERP,
                                                     Buffer_buflen(new_buffer), char);
@@ -351,16 +351,13 @@ key receives the value of the hash element.
             }
             else if (Parrot_str_equal(INTERP, key, comma)) {
                 INTVAL num_args = VTABLE_elements(INTERP, args);
-                INTVAL pos_args = 1;
+                INTVAL pos_args;
 
-                VTABLE_push_string(INTERP, stringbuilder,
-                    VTABLE_get_string_keyed_int(INTERP, args, 0));
-
-                while (pos_args < num_args) {
-                    VTABLE_push_string(INTERP, stringbuilder, comma_space);
+                for (pos_args = 0; pos_args < num_args; ++pos_args) {
+                    if (pos_args > 0)
+                        VTABLE_push_string(INTERP, stringbuilder, comma_space);
                     VTABLE_push_string(INTERP, stringbuilder,
                         VTABLE_get_string_keyed_int(INTERP, args, pos_args));
-                    pos_args++;
                 }
             }
             else if (Parrot_str_equal(INTERP, key, percent)) {

@@ -30,8 +30,16 @@ typedef size_t   (*encoding_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_
 
 struct string_iterator_t;       /* s. parrot/string.h */
 
-typedef void (*encoding_iter_init_t)(PARROT_INTERP, const STRING *src,
-        struct string_iterator_t *);
+typedef UINTVAL (*encoding_iter_get_t)(
+    PARROT_INTERP, const STRING *str, const String_iter *i, INTVAL  offset);
+typedef void    (*encoding_iter_skip_t)(
+    PARROT_INTERP, const STRING *str,       String_iter *i, INTVAL  skip);
+typedef UINTVAL (*encoding_iter_get_and_advance_t)(
+    PARROT_INTERP, const STRING *str,       String_iter *i);
+typedef void    (*encoding_iter_set_and_advance_t)(
+    PARROT_INTERP,       STRING *str,       String_iter *i, UINTVAL c);
+typedef void    (*encoding_iter_set_position_t)(
+    PARROT_INTERP, const STRING *str,       String_iter *i, UINTVAL pos);
 
 struct _encoding {
     ARGIN(const char *name);
@@ -44,9 +52,13 @@ struct _encoding {
     encoding_get_bytes_t                get_bytes;
     encoding_codepoints_t               codepoints;
     encoding_bytes_t                    bytes;
-    encoding_iter_init_t                iter_init;
     encoding_find_cclass_t              find_cclass;
     encoding_hash_t                     hash;
+    encoding_iter_get_t                 iter_get;
+    encoding_iter_skip_t                iter_skip;
+    encoding_iter_get_and_advance_t     iter_get_and_advance;
+    encoding_iter_set_and_advance_t     iter_set_and_advance;
+    encoding_iter_set_position_t        iter_set_position;
 };
 
 typedef struct _encoding ENCODING;
@@ -209,8 +221,6 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     ((src)->encoding)->codepoints((i), (src))
 #define ENCODING_BYTES(i, src) \
     ((src)->encoding)->bytes((i), (src))
-#define ENCODING_ITER_INIT(i, src, iter) \
-    ((src)->encoding)->iter_init((i), (src), (iter))
 #define ENCODING_FIND_CCLASS(i, src, typetable, flags, pos, end) \
     ((src)->encoding)->find_cclass((i), (src), (typetable), (flags), (pos), (end))
 #define ENCODING_HASH(i, src, seed) \
