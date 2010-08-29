@@ -908,15 +908,13 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 {
     ASSERT_ARGS(Parrot_find_method_with_cache)
 
-    UINTVAL type, bits;
-    Caches           *mc;
-    Meth_cache_entry *e;
-
-    PARROT_ASSERT(method_name != 0);
-
 #if DISABLE_METH_CACHE
     return Parrot_find_method_direct(interp, _class, method_name);
 #else
+
+    Caches           *mc;
+    Meth_cache_entry *e;
+    UINTVAL type, bits;
 
     if (! PObj_constant_TEST(method_name))
         return Parrot_find_method_direct(interp, _class, method_name);
@@ -926,31 +924,29 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
     bits = (((UINTVAL) Buffer_bufstart(method_name)) >> 2) & TBL_SIZE_MASK;
 
     if (type >= mc->mc_size) {
-        if (mc->idx) {
+        if (mc->idx)
             mc->idx = mem_gc_realloc_n_typed_zeroed(interp, mc->idx,
-                    type + 1, mc->mc_size, Meth_cache_entry**);
-        }
-        else {
-            mc->idx = mem_gc_allocate_n_zeroed_typed(interp, type + 1, Meth_cache_entry**);
-        }
+                    type + 1, mc->mc_size, Meth_cache_entry **);
+        else
+            mc->idx = mem_gc_allocate_n_zeroed_typed(interp, type + 1,
+                        Meth_cache_entry **);
+
         mc->mc_size = type + 1;
     }
 
-    if (mc->idx[type] == NULL) {
+    if (! mc->idx[type])
         mc->idx[type] = mem_gc_allocate_n_zeroed_typed(interp,
-                TBL_SIZE, Meth_cache_entry*);
-    }
+                TBL_SIZE, Meth_cache_entry *);
 
-    e   = mc->idx[type][bits];
+    e = mc->idx[type][bits];
 
-    while (e && e->strstart != Buffer_bufstart(method_name)) {
-        e   = e->next;
-    }
+    while (e && e->strstart != Buffer_bufstart(method_name))
+        e = e->next;
 
     if (!e) {
         /* when here no or no correct entry was at [bits] */
         /* Use zeroed allocation because find_method_direct can trigger GC */
-        e     = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
+        e = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
 
         mc->idx[type][bits] = e;
 
