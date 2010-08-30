@@ -20,10 +20,11 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(31)
+    plan(33)
     test_bool()
     test_int()
     test_integer_keyed()
+    test_string_keyed()
     test_attrs()
     test_attributes()
     test_push_pop_eh()
@@ -31,6 +32,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_push_eh_throw()
     test_die()
     test_throw_obj()
+    test_clone()
     test_throw_clone()
 .end
 
@@ -87,6 +89,16 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
   catch2:
     finalize eh
     is(value, 1, 'get invalid key throws')
+.end
+
+.sub test_string_keyed
+    .local pmc ex, eh
+    .local string value
+    .const string TEST_VALUE = 'fubar'
+    ex = new ['Exception']
+    ex['message'] = TEST_VALUE
+    value = ex['message']
+    is(value, TEST_VALUE, 'set/get string_keyed')
 .end
 
 .sub test_attrs
@@ -211,15 +223,26 @@ _handler:
 .end
 
 # Test clone vtable function
+
+.sub test_clone
+    .local pmc ex, exclone
+    ex = new ['Exception']
+    ex['type'] = .EXCEPTION_SYNTAX_ERROR
+    exclone = clone ex
+    .local int result
+    result = iseq ex, exclone
+    is(result, 1, 'cloned Exception is equal to original')
+    exclone['type'] = .EXCEPTION_ERR_OVERFLOW
+    result = iseq ex, exclone
+    is(result, 0, 'cloned and modified Exception is not equal to original')
+.end
+
 .sub test_throw_clone
     .local pmc ex, exclone, eh, ehguard
     .local int result
     ex = new ['Exception']
     ex['type'] = .EXCEPTION_SYNTAX_ERROR
     exclone = clone ex
-
-    result = iseq ex, exclone
-    is(result, 1, 'cloned Exception is equal to original')
 
     ehguard = new ['ExceptionHandler']
     set_label ehguard, catchall
