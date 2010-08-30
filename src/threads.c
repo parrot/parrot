@@ -126,7 +126,7 @@ Parrot_threads_main(ARGMOD(void *args_ptr))
     UNLOCK(interp->thread_lock);
 
     TLS_SET(tbl->tid_key, tidx);
-    
+
     Parrot_threads_outer_runloop(interp, *tidx);
 
     return 0;
@@ -603,7 +603,7 @@ void
 Parrot_threads_task_killed_handler(SHIM(int sig_number))
 {
     ASSERT_ARGS(Parrot_threads_task_killed_handler)
-       
+
     /* interrupt_blocking_system_calls_from_a_comment(); */
 }
 
@@ -649,7 +649,7 @@ void
 Parrot_check_if_task_killed(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_check_if_task_killed)
-    
+
     PMC *current_task = Parrot_task_current(interp);
     Parrot_Task_attributes *const tdata = PARROT_TASK(current_task);
 

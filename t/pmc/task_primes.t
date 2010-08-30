@@ -21,7 +21,7 @@ is now a Parrot test.
     set_global 'test_task', tt
 
     plan(8)
-    
+
     nt = make_checker()
 
     $I0 = 2
@@ -80,7 +80,7 @@ loop:
 
     cp = get_global 'check_prime'
     ct = interpinfo .INTERPINFO_CURRENT_TASK
-    
+
     $P0 = new 'Hash'
     $P0['code'] = cp
     $P0['data'] = ct
@@ -94,11 +94,11 @@ loop:
     .param pmc pt
     .local pmc nt, tt, M
     .local int N, x
-    
+
     tt = get_global 'test_task'
-  
+
     N = 0
-    
+
 next_msg:
     M = receive
     x = M

@@ -11,6 +11,8 @@ src/events.c - Routines supporting the event handling mechanism.
 Users can register event handlers. When events occur, they are dispatched
 to the appropriate handler asynchronously.
 
+=over 4
+
 =cut
 
 */
@@ -410,6 +412,15 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
     --already_doing;
     return PMCNULL;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
+
 
 /*
  * Local variables:

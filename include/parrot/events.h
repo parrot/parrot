@@ -1,5 +1,5 @@
 /* Copyright (C) 2010, Parrot Foundation.
- * $Id$ 
+ * $Id$
  */
 
 #ifndef PARROT_EVENTS_H_GUARD

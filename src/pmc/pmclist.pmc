@@ -497,7 +497,7 @@ Insert an item into a sorted list by its num value.
 
 PARROT_EXPORT
 void
-Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) 
+Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
 {
     void *tmp;
     PMC_List_Item *item;

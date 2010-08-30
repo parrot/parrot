@@ -26,7 +26,7 @@ $pir->print(<<'EOF');
     spinsub  = get_global 'spin'
     spintask = new 'Task', spinsub
     schedule spintask
-    
+
     pass
 
     say "ok 2 - main task sleeping"
@@ -41,7 +41,7 @@ $pir->print(<<'EOF');
     stdin = getstdin
 
     $P0 = stdin.'readline'()
-    
+
     $S0 = $P0
     if $S0 == "grumblecake\n" goto good
     say "not ok 3"
