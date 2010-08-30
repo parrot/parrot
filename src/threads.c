@@ -170,7 +170,8 @@ Parrot_threads_outer_runloop(PARROT_INTERP, INTVAL tidx)
 
         if (next_thread == tidx && task_count > 0) {
             Parrot_cx_next_task(interp, scheduler);
-        } else {
+        }
+        else {
             /* Wake up the main thread to check if we're done before
                going idle. */
             Parrot_alarm_now();
