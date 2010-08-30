@@ -104,7 +104,7 @@ END_ERROR
         }
     }
     is(join("\n",@comma_space_files),
-       "", 
+       "",
        "there should be one space or a newline after a comma");
 }
 
