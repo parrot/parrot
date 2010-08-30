@@ -1,5 +1,5 @@
-/* threads.h
- *  Copyright (C) 2010, Parrot Foundation.
+/* Copyright (C) 2010, Parrot Foundation.
+ * $Id$ 
  */
 
 #ifndef PARROT_THREADS_H_GUARD
