@@ -75,11 +75,11 @@ sub check_operators {
             $buf = strip_pod($buf);
         }
 
-        # strip ', ", and C comments
+        # strip ', ", and C comments #'
         $buf =~ s{ (?:
-                       (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
-                     | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string
-                     | /(\*) .*? (\*)/                        # remove C comment
+                       (?: (') (?: \\\\ | \\' | [^'] )* (') ) # rm ' string #'
+                     | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # rm " string #"
+                     | /(\*) .*? (\*)/                        # rm C comment
                    )
                 }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
@@ -88,23 +88,24 @@ sub check_operators {
         for (my $i=0; $i <= $#lines; $i++) {
             # after a comma there should be one space or a newline
             if ( $lines[$i] =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
-                push @{ $comma_space{$path} }, $i;
+                push @{ $comma_space{$path} }, $lines[$i];
             }
         }
     }
 
 ## L<PDD07/Code Formatting"there should be one space or a newline after a comma">/
-    my $files_with_errors = 0;
+    my @comma_space_files;
     for my $path ( sort keys %comma_space ) {
-        $files_with_errors++ if scalar @{ $comma_space{$path} };
+        if (my $cnt = scalar  @{ $comma_space{$path} }) {
+            push @comma_space_files, <<"END_ERROR";
+$path [$cnt line@{[ ($cnt >1) ? 's': '' ]}] at :
+@{[ join("\n--\n", @{$comma_space{$path}}) ]}
+END_ERROR
+        }
     }
-    is( $files_with_errors, 0, "there should be one space or a newline after a comma" )
-        or diag( do {
-            for my $k (sort keys %comma_space) {
-                my @lines_failed = @{$comma_space{$k}};
-                print "$k: line(s): @lines_failed\n" if scalar(@lines_failed);
-            }
-        } );
+    is(join("\n",@comma_space_files),
+       "", 
+       "there should be one space or a newline after a comma");
 }
 
 # Local Variables:
