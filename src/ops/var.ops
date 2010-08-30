@@ -86,10 +86,8 @@ op store_dynamic_lex(in STR, invar PMC) {
 
 =item B<find_lex>(out PMC, in STR)
 
-Find the lexical variable named $2 and store it in $1. This
-opcode either throws an exception or returns a Null PMC for the failure case,
-depending on the implementation of the LexPad PMC. Parrot's
-standard LexPad throws an exception for non-existent names.
+Find the lexical variable named $2 and store it in $1. Return a
+Null PMC if the variable is not found.
 
 =cut
 
@@ -100,14 +98,8 @@ op find_lex(out PMC, in STR) {
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
-            ? NULL
+            ? PMCNULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
-    if (!result) {
-        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
-                EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", lex_name);
-        goto ADDRESS(handler);
-    }
     $1 = result;
 }
 

@@ -541,7 +541,8 @@ print $TEMP <<'EOF';
   .pcc_sub _sub1:
   get_params ""
   print "in sub1\n"
-  find_lex P2, "no_such_var"
+  set I1, 0                             # Divide by 0 to force exception.
+  div I2, I1, 0
   print "never\n"
   returncc
 EOF
