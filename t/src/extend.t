@@ -43,15 +43,13 @@ main(int argc, const char *argv[])
     Parrot_Int    new_value;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        Parrot_set_intreg(interp, parrot_reg, value);
+        new_value = Parrot_get_intreg(interp, parrot_reg);
 
-    Parrot_set_intreg(interp, parrot_reg, value);
-    new_value = Parrot_get_intreg(interp, parrot_reg);
-
-    printf("%d\n", (int)new_value);
-
-    Parrot_exit(interp, 0);
+        printf("%d\n", (int)new_value);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -74,15 +72,14 @@ main(int argc, const char *argv[])
     Parrot_Float  new_value;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        Parrot_set_numreg(interp, parrot_reg, value);
+        new_value = Parrot_get_numreg(interp, parrot_reg);
 
-    Parrot_set_numreg(interp, parrot_reg, value);
-    new_value = Parrot_get_numreg(interp, parrot_reg);
+        printf("%.1f\n", (double)new_value);
 
-    printf("%.1f\n", (double)new_value);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -103,13 +100,12 @@ main(int argc, const char *argv[])
     Parrot_String output;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        output = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
+        Parrot_eprintf(interp, "%S\n", output);
 
-    output = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
-    Parrot_eprintf(interp, "%S\n", output);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -131,16 +127,15 @@ main(int argc, const char *argv[])
     Parrot_String value, new_value;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        value = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
+        Parrot_set_strreg(interp, parrot_reg, value);
 
-    value = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
-    Parrot_set_strreg(interp, parrot_reg, value);
+        new_value = Parrot_get_strreg(interp, parrot_reg);
+        Parrot_eprintf(interp, "%S\n", new_value);
 
-    new_value = Parrot_get_strreg(interp, parrot_reg);
-    Parrot_eprintf(interp, "%S\n", new_value);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -163,18 +158,17 @@ main(int argc, const char *argv[])
     Parrot_Int    type, new_value;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        type    = Parrot_PMC_typenum(interp, "Integer");
+        testpmc = Parrot_PMC_new(interp, type);
 
-    type    = Parrot_PMC_typenum(interp, "Integer");
-    testpmc = Parrot_PMC_new(interp, type);
+        Parrot_PMC_set_integer_native(interp, testpmc, value);
+        new_value = Parrot_PMC_get_integer(interp, testpmc);
 
-    Parrot_PMC_set_integer_native(interp, testpmc, value);
-    new_value = Parrot_PMC_get_integer(interp, testpmc);
+        printf("%ld\n", (long)new_value);
 
-    printf("%ld\n", (long)new_value);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 CODE
@@ -211,11 +205,11 @@ main(int argc, const char *argv[])
     Parrot_Interp interp = Parrot_new(NULL);
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        Parrot_run_native(interp, the_test);
 
-    Parrot_run_native(interp, the_test);
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 CODE
