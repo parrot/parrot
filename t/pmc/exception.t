@@ -20,7 +20,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(33)
+    plan(36)
     test_bool()
     test_int()
     test_integer_keyed()
@@ -101,6 +101,47 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     is(value, TEST_VALUE, 'set/get string_keyed')
 .end
 
+
+.sub setattr_int
+    .param pmc obj
+    .param string attrname
+    .param int value
+    $P0 = new ['Integer'], value
+    setattribute obj, attrname, $P0
+.end
+
+.sub setattr_string
+    .param pmc obj
+    .param string attrname
+    .param string value
+    $P0 = new ['String']
+    $P0 = value
+    setattribute obj, attrname, $P0
+.end
+
+.sub gotattr_int
+    .param pmc obj
+    .param string attrname
+    .param int checkvalue
+
+    $S0 = 'got ' . attrname
+    $P1 = getattribute obj, attrname
+    $I1 = $P1
+    is($I1, checkvalue, $S0)
+.end
+
+.sub gotattr_string
+    .param pmc obj
+    .param string attrname
+    .param string checkvalue
+
+    $S0 = 'got ' . attrname
+    $P1 = getattribute obj, attrname
+    $S1 = $P1
+    is($S1, checkvalue, $S0)
+.end
+
+
 .sub test_attrs
     $P0 = new 'ExceptionHandler'
     set_addr $P0, _handler
@@ -117,53 +158,56 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     getattribute $P4, $P0, 'severity'
     ok(1,'got severity')
 
-    push_eh done
+    push_eh catch
     $I0 = 1
     getattribute $P5, $P0, 'foo'
     $I0 = 0
+    goto done
+  catch:
+    .get_results($P0)
+    finalize $P0
   done:
     ok($I0, "Can't fetch non-existent attribute")
 .end
 
 .sub test_attributes
-    push_eh handler
     $P1 = new ['Exception']
-    $P2 = new ['String']
-    $P2 = "just pining"
-    setattribute $P1, 'message', $P2
-    $P3 = new ['Integer']
-    $P3 = 5
-    setattribute $P1, 'severity', $P3
-    $P4 = new ['String']
-    $P4 = "additional payload"
-    setattribute $P1, 'payload', $P4
-    $P5 = new ['ResizablePMCArray']
-    $P5 = 2
-    $P5[0] = 'backtrace line 1'
-    $P5[1] = 'backtrace line 2'
-    setattribute $P1, 'backtrace', $P5
 
+    setattr_int($P1,    'type',      5)
+    setattr_int($P1,    'severity',  6)
+    setattr_int($P1,    'exit_code', 7)
+    setattr_int($P1,    'handled',   1)
+    setattr_string($P1, 'message',   "just pining")
+    setattr_string($P1, 'payload',   "additional payload")
+
+    $P8 = new ['ResizablePMCArray']
+    $P8 = 2
+    $P8[0] = 'backtrace line 1'
+    $P8[1] = 'backtrace line 2'
+    setattribute $P1, 'backtrace', $P8
+
+    push_eh handler
     throw $P1
-    is(0, "throwing exception failed")
+    ok(0, "throwing exception failed")
+    skip(7, "because of throwing exception failed")
     .return()
   handler:
     .get_results($P0)
+    pop_eh
 
-    $P16 = getattribute $P0, 'message'
-    is($P16, "just pining", 'got message')
+    gotattr_int($P0,    'type',      5)
+    gotattr_int($P0,    'severity',  6)
+    gotattr_int($P0,    'exit_code', 7)
+    gotattr_int($P0,    'handled',   1)
+    gotattr_string($P0, 'message',   "just pining")
+    gotattr_string($P0, 'payload',   "additional payload")
 
-    $P17 = getattribute $P0, 'severity'
-    is($P17, 5, 'got severity')
+    $P28 = getattribute $P0, 'backtrace'
+    $P30 = $P28[0]
+    is($P30, "backtrace line 1", 'got backtrace data')
 
-    $P18 = getattribute $P0, 'payload'
-    is($P18, "additional payload", 'got payload')
-
-    $P19 = getattribute $P0, 'backtrace'
-    $P20 = $P19[0]
-    is($P20, "backtrace line 1", 'got backtrace data')
-
-    $P20 = $P19[1]
-    is($P20, "backtrace line 2", 'more backtrace data')
+    $P31 = $P28[1]
+    is($P31, "backtrace line 2", 'more backtrace data')
 .end
 
 .sub test_push_pop_eh
