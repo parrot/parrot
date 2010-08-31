@@ -20,7 +20,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(36)
+    plan(37)
     test_bool()
     test_int()
     test_integer_keyed()
@@ -34,6 +34,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_obj()
     test_clone()
     test_throw_clone()
+    test_backtrace()
 .end
 
 .sub test_bool
@@ -328,6 +329,14 @@ _handler:
     result = 1
   catchall2:
     is(result, 1, 'caught a cloned Exception with payload')
+.end
+
+.sub test_backtrace
+    .local pmc ex, bt
+    ex = new ['Exception']
+    bt = ex.'backtrace'()
+    $I0 = isnull bt
+    is($I0, 0, 'got backtrace from unthrow Exception')
 .end
 
 # Local Variables:
