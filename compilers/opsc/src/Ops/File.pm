@@ -311,13 +311,22 @@ method _set_version() {
             'VERSION';
     }
 
-    my $version := pir::chopn__ssi(slurp($version_filename), 1);
+    grammar VERSION {
+        rule TOP { <version> }
+        rule version { $<major>=(\d+) '.' $<minor>=(\d+) '.' $<patch>=(\d+) }
+    }
+
+    my $version       := slurp($version_filename);
+    my $version_match := VERSION.parse($version);
     #say("# $version");
-    my @bits := split('.', $version);
-    self<version_major> := @bits[0];
-    self<version_minor> := @bits[1];
-    self<version_patch> := @bits[2];
-    self<version>       := @bits;
+    self<version_major> := +$version_match<version><major>;
+    self<version_minor> := +$version_match<version><minor>;
+    self<version_patch> := +$version_match<version><patch>;
+    self<version>       := [
+        +self<version_major>,
+        +self<version_minor>,
+        +self<version_match>,
+    ];
 }
 
 # Local Variables:
