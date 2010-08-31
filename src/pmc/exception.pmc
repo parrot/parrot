@@ -787,6 +787,7 @@ sub, or for the point of the call a level deeper for the rest.
 */
 
     METHOD backtrace() {
+        STRING * const meth_backtrace = CONST_STRING(INTERP, "backtrace");
         PMC *result = PMCNULL;
         PMC *resume;
 
@@ -795,7 +796,8 @@ sub, or for the point of the call a level deeper for the rest.
         if (!PMC_IS_NULL(resume)) {
             /* We have a resume continuation, so we can get the address from that. */
             const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, CONST_STRING(INTERP, "backtrace"), "P->P", resume, &result);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, meth_backtrace,
+                    "P->P", resume, &result);
         }
         else {
             /* Hopefully we have a thrower set - our most epic fail fallback is
@@ -804,7 +806,8 @@ sub, or for the point of the call a level deeper for the rest.
             GET_ATTR_thrower(INTERP, SELF, cur_ctx);
             if (PMC_IS_NULL(cur_ctx))
                 cur_ctx = CURRENT_CONTEXT(INTERP);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, cur_ctx, CONST_STRING(INTERP, "backtrace"), "->P", &result);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cur_ctx, meth_backtrace,
+                    "->P", &result);
         }
 
         RETURN(PMC *result);
