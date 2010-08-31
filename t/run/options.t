@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 27;
+use Test::More tests => 28;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -118,6 +118,14 @@ END_PIR
 
     return $filename;
 }
+
+#make sure that VERSION matches the output of --version
+open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
+my $file_version = <$version_fh>;
+chomp($file_version);
+close($version_fh);
+like( qx{$PARROT --version}, qr/.*${file_version}.*/, "VERSION matches --version" );
+
 
 # Local Variables:
 #   mode: cperl
