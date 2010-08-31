@@ -590,6 +590,7 @@ Retrieve an attribute value for the exception object.
             GET_ATTR_exit_code(INTERP, SELF, exit_code);
             value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, exit_code);
             }
+            break;
           case attr_handled:
             {
             INTVAL handled;
