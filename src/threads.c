@@ -41,7 +41,7 @@ Parrot_threads_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_threads_init)
     Thread_table *tbl;
-    INTVAL *zero = (INTVAL*) malloc(sizeof(INTVAL));
+    INTVAL *zero = (INTVAL*) malloc(sizeof (INTVAL));
     *zero = 0;
 
     MUTEX_INIT(interp->interp_lock);
@@ -50,12 +50,12 @@ Parrot_threads_init(PARROT_INTERP)
 
     MUTEX_INIT(interp->thread_lock);
 
-    interp->thread_table = (Thread_table*) malloc(sizeof(Thread_table));
+    interp->thread_table = (Thread_table*) malloc(sizeof (Thread_table));
     tbl = interp->thread_table;
 
     tbl->size    = 8; /* arbitrarily */
     tbl->count   = 1;
-    tbl->threads = (Thread_info*) malloc(sizeof(Thread_info) * tbl->size);
+    tbl->threads = (Thread_info*) malloc(sizeof (Thread_info) * tbl->size);
     TLS_KEY_INIT(tbl->tid_key);
     TLS_SET(tbl->tid_key, zero);
 
@@ -111,7 +111,7 @@ Parrot_threads_main(ARGMOD(void *args_ptr))
     ASSERT_ARGS(Parrot_threads_main)
     Thread_args *args = (Thread_args*) args_ptr;
     Interp    *interp = args->interp;
-    INTVAL      *tidx = (INTVAL*) malloc(sizeof(INTVAL));
+    INTVAL      *tidx = (INTVAL*) malloc(sizeof (INTVAL));
     Thread_table *tbl = interp->thread_table;
     free(args_ptr);
 
@@ -321,7 +321,7 @@ Parrot_threads_spawn(PARROT_INTERP)
     ASSERT_ARGS(Parrot_threads_spawn)
     Thread_table *tbl = interp->thread_table;
     INTVAL    new_idx = tbl->count;
-    Thread_args *args = (Thread_args*) malloc(sizeof(Thread_args));
+    Thread_args *args = (Thread_args*) malloc(sizeof (Thread_args));
 
 
     tbl->count += 1;
@@ -329,7 +329,7 @@ Parrot_threads_spawn(PARROT_INTERP)
     /* Maybe grow table */
     if (tbl->count > tbl->size) {
         tbl->size *= 2;
-        tbl->threads = (Thread_info*) realloc(tbl, sizeof(Thread_info) * tbl->size);
+        tbl->threads = (Thread_info*) realloc(tbl, sizeof (Thread_info) * tbl->size);
     }
 
     args->interp = interp;
@@ -396,7 +396,7 @@ Parrot_threads_reap(PARROT_INTERP)
         /* Shrink that table */
         tbl->size /= 2;
         tbl->threads = (Thread_info*) realloc(
-            tbl->threads, sizeof(Thread_info) * tbl->size);
+            tbl->threads, sizeof (Thread_info) * tbl->size);
     }
 
     UNLOCK(interp->thread_lock);
