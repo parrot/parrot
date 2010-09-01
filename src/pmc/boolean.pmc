@@ -99,6 +99,28 @@ Sets the value to C<*value> evaluated in a boolean context.
     VTABLE void set_string_native(STRING *value) {
         SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
+
+/*
+
+=item C<PMC *neg(PMC *dest)>
+
+=item C<void i_neg()>
+
+Set C<dest> to the ''negated'' value of C<SELF>. The negative of a
+boolean value is the identical value.
+
+=cut
+
+*/
+
+    VTABLE PMC *neg(PMC *dest) {
+        dest = Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                       SELF.get_bool());
+        return dest;
+    }
+
+    VTABLE void i_neg() {
+    }
 }
 
 /*

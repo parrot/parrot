@@ -257,7 +257,7 @@ Returns the string value of the integer.
 
 =item C<void set_integer_native(INTVAL value)>
 
-Sets the value of the integer to the value of the C<Integer> C<*value>.
+Sets the value of the integer to the value of the native integer C<*value>.
 
 =cut
 
@@ -987,6 +987,46 @@ Calculates modulus in place.
 
 /*
 
+=item C<PMC *neg(PMC *dest)>
+
+=item C<void i_neg()>
+
+Set C<dest> to the negated value of C<SELF>. If the value of C<SELF>
+is the minimum integer, a BigInt is created.
+
+=cut
+
+*/
+
+    VTABLE PMC *neg(PMC *dest) {
+        const INTVAL a = SELF.get_integer();
+
+        if (a != PARROT_INTVAL_MIN)
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                                   -a);
+        else {
+            PMC *promoted;
+            maybe_throw_overflow_error(INTERP);
+            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, 0);   
+            return VTABLE_subtract_int(INTERP, promoted, a, promoted);
+        }
+    }
+
+    VTABLE void i_neg() {
+        const INTVAL a = SELF.get_integer();
+   
+        if (a != PARROT_INTVAL_MIN)
+            VTABLE_set_integer_native(INTERP, SELF, -a);
+        else {
+            maybe_throw_overflow_error(INTERP);
+            SELF = upgrade_self_to_bignum(INTERP, SELF);
+            VTABLE_set_integer_native(INTERP, SELF, 0);
+            VTABLE_i_subtract_int(INTERP, SELF, a);
+        }
+    }
+
+/*
+
 =item C<INTVAL is_equal(PMC *value)>
 
 The C<==> operation.
@@ -1158,23 +1198,38 @@ Decrements the integer.
 
 =item C<void absolute()>
 
-Sets C<dest> to the absolute value of SELF.
+Sets C<dest> to the absolute value of C<SELF>. If the value of C<SELF>
+is the minimum integer, a BigInt is created.
 
 =cut
 
 */
 
     VTABLE PMC *absolute(PMC *dest) {
-        const INTVAL a = abs(SELF.get_integer());
+        const INTVAL a = SELF.get_integer();
 
-        /* TT # 1245 overflow for -maxint */
-        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF), a);
+        if (a != PARROT_INTVAL_MIN)
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                                   abs(a));
+        else {
+            PMC *promoted;
+            maybe_throw_overflow_error(INTERP);
+            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);   
+            return VTABLE_neg(INTERP, promoted, dest);
+        }
     }
 
 
     VTABLE void i_absolute() {
-        const INTVAL a = abs(SELF.get_integer());
-        VTABLE_set_integer_native(INTERP, SELF, a);
+        const INTVAL a = SELF.get_integer();
+
+        if (a != PARROT_INTVAL_MIN)
+            VTABLE_set_integer_native(INTERP, SELF, abs(a));
+        else {
+            maybe_throw_overflow_error(INTERP);
+            SELF = upgrade_self_to_bignum(INTERP, SELF);
+            return VTABLE_i_neg(INTERP, SELF);
+        }
     }
 
 
