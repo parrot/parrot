@@ -86,7 +86,7 @@ PMC * Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/events.c */
 
-#endif
+#endif /* PARROT_EVENTS_H_GUARD */
 
 /*
  * Local variables:
