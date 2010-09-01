@@ -650,24 +650,16 @@ main(int argc, const char *argv[])
     const char * code[] = { ".sub foo\\nsay \\"Hello from foo!\\"\\n.end\\n" };
 
     Parrot_Interp interp = Parrot_new(NULL);
-    if (!interp) {
-        printf( "Hiss\\n" );
-        return 1;
+    if (interp) {
+        packfile = Parrot_pbc_read( interp, "$temp_pbc", 0 );
+
+        if (packfile) {
+            Parrot_pbc_load( interp, packfile );
+            Parrot_runcode( interp, 1, code );
+        }
+
+        Parrot_destroy( interp );
     }
-
-    packfile = Parrot_pbc_read( interp, "$temp_pbc", 0 );
-
-    if (!packfile) {
-        printf( "Boo\\n" );
-        return 1;
-    }
-
-    Parrot_pbc_load( interp, packfile );
-    Parrot_runcode( interp, 1, code );
-
-    Parrot_destroy( interp );
-
-    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -689,25 +681,18 @@ main(int argc, const char *argv[])
     Parrot_PMC      sub;
     Parrot_String   code_type, error, foo_name;
 
-    if (!interp) {
-        printf( "Hiss\n" );
-        return 1;
+    if (interp) {
+        code_type = Parrot_str_new_constant( interp, "PIR" );
+        retval    = Parrot_compile_string( interp, code_type, code, &error );
+
+        if (retval) {
+            foo_name = Parrot_str_new_constant( interp, "foo" );
+            sub      = Parrot_ns_find_current_namespace_global( interp, foo_name );
+
+            Parrot_ext_call(interp, sub, "->");
+        }
+        Parrot_destroy(interp);
     }
-
-    code_type = Parrot_str_new_constant( interp, "PIR" );
-    retval    = Parrot_compile_string( interp, code_type, code, &error );
-
-    if (!retval) {
-        printf( "Boo\n" );
-        return 1;
-    }
-
-    foo_name = Parrot_str_new_constant( interp, "foo" );
-    sub      = Parrot_ns_find_current_namespace_global( interp, foo_name );
-
-    Parrot_ext_call(interp, sub, "->");
-
-    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -727,19 +712,15 @@ main(int argc, const char *argv[])
     Parrot_PackFile pf;
     Parrot_Interp   interp = Parrot_new(NULL);
 
-    if (!interp) {
-        printf( "No interpreter\\n" );
-        return 1;
+    if (interp) {
+        pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
+        Parrot_pbc_load( interp, pf );
+
+        sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
+        Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
+        printf( "Result is %d.\\n", result );
+        Parrot_destroy(interp);
     }
-
-    pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
-    Parrot_pbc_load( interp, pf );
-
-    sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
-    Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
-    printf( "Result is %d.\\n", result );
-
-    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
@@ -759,19 +740,15 @@ main(int argc, const char *argv[])
     Parrot_PackFile pf;
     Parrot_Interp   interp = Parrot_new(NULL);
 
-    if (!interp) {
-        printf( "No interpreter\\n" );
-        return 1;
+    if (interp) {
+        pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
+        Parrot_pbc_load( interp, pf );
+
+        sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
+        Parrot_ext_call( interp, sub, "II->I", 100, 200, &result );
+        printf( "Result is %d.\\n", result );
+        Parrot_destroy(interp);
     }
-
-    pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
-    Parrot_pbc_load( interp, pf );
-
-    sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
-    Parrot_ext_call( interp, sub, "II->I", 100, 200, &result );
-    printf( "Result is %d.\\n", result );
-
-    Parrot_exit(interp, 0);
     return 0;
 }
 CODE
