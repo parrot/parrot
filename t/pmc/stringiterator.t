@@ -22,8 +22,9 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(28)
+    plan(29)
 
+    test_get_pmc()
     test_clone()
     test_elements()
     iterate_forward() # 11 tests
@@ -32,6 +33,16 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     iterate_out() # 1 test
     get_keyed()
 
+.end
+
+
+.sub 'test_get_pmc'
+    .local pmc s, it, sget
+    s = new ['String']
+    s = 'foobar'
+    it = iter s
+    sget = deref it
+    is(s, sget, 'deref StringIterator gives the iterated string')
 .end
 
 .sub 'test_clone'
