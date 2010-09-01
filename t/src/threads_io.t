@@ -74,3 +74,10 @@ $run->flush;
 sleep(0.25);
 
 close($run);
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
