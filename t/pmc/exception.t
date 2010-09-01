@@ -20,13 +20,14 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(37)
+    plan(40)
     test_bool()
     test_int()
     test_integer_keyed()
     test_string_keyed()
     test_attrs()
     test_attributes()
+    test_birthtime()
     test_push_pop_eh()
     test_push_pop_eh_long()
     test_push_eh_throw()
@@ -35,6 +36,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_clone()
     test_throw_clone()
     test_backtrace()
+    test_annotations()
 .end
 
 .sub test_bool
@@ -211,6 +213,17 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     is($P31, "backtrace line 2", 'more backtrace data')
 .end
 
+.sub test_birthtime
+    .local pmc ex, bt
+    ex = new ['Exception']
+    .local num n, nbt
+    n = 123.456
+    ex = n
+    bt = getattribute ex, 'birthtime'
+    nbt = bt
+    is(nbt, n, 'get and set birthtime')
+.end
+
 .sub test_push_pop_eh
     push_eh handler
     ok(1,'push_eh works')
@@ -337,6 +350,16 @@ _handler:
     bt = ex.'backtrace'()
     $I0 = isnull bt
     is($I0, 0, 'got backtrace from unthrow Exception')
+.end
+
+.sub test_annotations
+    .local pmc ex, ann
+    ex = new ['Exception']
+    ann = ex.'annotations'()
+    $I0 = isnull ann
+    is($I0, 0, 'got annotations from unthrow Exception')
+    $I0 = ann
+    is($I0, 0, 'annotations from unthrow Exception are empty')
 .end
 
 # Local Variables:
