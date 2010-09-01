@@ -232,23 +232,22 @@ main(int argc, const char *argv[])
     Parrot_PMC    testpmc, newpmc;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        type    = Parrot_PMC_typenum(interp, "Integer");
+        testpmc = Parrot_PMC_new(interp, type);
 
-    type    = Parrot_PMC_typenum(interp, "Integer");
-    testpmc = Parrot_PMC_new(interp, type);
+        Parrot_PMC_set_integer_native(interp, testpmc, value);
 
-    Parrot_PMC_set_integer_native(interp, testpmc, value);
+        parrot_reg = 31;
+        Parrot_set_pmcreg(interp, parrot_reg, testpmc);
 
-    parrot_reg = 31;
-    Parrot_set_pmcreg(interp, parrot_reg, testpmc);
+        newpmc    = Parrot_get_pmcreg(interp, parrot_reg);
+        new_value = Parrot_PMC_get_integer(interp, newpmc);
 
-    newpmc    = Parrot_get_pmcreg(interp, parrot_reg);
-    new_value = Parrot_PMC_get_integer(interp, newpmc);
+        printf("%d\n", (int)new_value);
 
-    printf("%d\n", (int)new_value);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 CODE
@@ -271,18 +270,17 @@ main(int argc, const char *argv[])
     Parrot_PMC    testpmc;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        type    = Parrot_PMC_typenum(interp, "Float");
+        testpmc = Parrot_PMC_new(interp, type);
 
-    type    = Parrot_PMC_typenum(interp, "Float");
-    testpmc = Parrot_PMC_new(interp, type);
+        Parrot_PMC_set_number_native(interp, testpmc, value);
+        new_value = Parrot_PMC_get_number(interp, testpmc);
 
-    Parrot_PMC_set_number_native(interp, testpmc, value);
-    new_value = Parrot_PMC_get_number(interp, testpmc);
+        printf("%.7f\n", (double)new_value);
 
-    printf("%.7f\n", (double)new_value);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 CODE
@@ -304,19 +302,18 @@ main(int argc, const char *argv[])
     Parrot_PMC    testpmc;
 
     /* Interpreter set-up */
-    if (!interp)
-        return 1;
+    if (interp) {
+        type    = Parrot_PMC_typenum(interp, "String");
+        testpmc = Parrot_PMC_new(interp, type);
 
-    type    = Parrot_PMC_typenum(interp, "String");
-    testpmc = Parrot_PMC_new(interp, type);
+        value     = Parrot_new_string(interp, "Pumpking", 8, "iso-8859-1", 0);
+        Parrot_PMC_set_string_native(interp, testpmc, value);
+        new_value = Parrot_PMC_get_string(interp, testpmc);
 
-    value     = Parrot_new_string(interp, "Pumpking", 8, "iso-8859-1", 0);
-    Parrot_PMC_set_string_native(interp, testpmc, value);
-    new_value = Parrot_PMC_get_string(interp, testpmc);
+        Parrot_eprintf(interp, "%S\n", new_value);
 
-    Parrot_eprintf(interp, "%S\n", new_value);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 CODE
@@ -356,12 +353,12 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    if (!interp)
-        return 1;
+    if (interp) {
 
-    Parrot_run_native(interp, the_test);
+        Parrot_run_native(interp, the_test);
 
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -414,12 +411,11 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    if (!interp)
-        return 1;
+    if (interp) {
+        Parrot_run_native(interp, the_test);
 
-    Parrot_run_native(interp, the_test);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -490,12 +486,11 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    if (!interp)
-        return 1;
+    if (interp) {
+        Parrot_run_native(interp, the_test);
 
-    Parrot_run_native(interp, the_test);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
@@ -558,12 +553,11 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    if (!interp)
-        return 1;
+    if (interp) {
+        Parrot_run_native(interp, the_test);
 
-    Parrot_run_native(interp, the_test);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 
