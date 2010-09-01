@@ -5,11 +5,11 @@
 
 =head1 NAME
 
-tools/util/ncidef2asm.pl - Turn an NCI library definition file into PASM
+tools/dev/ncidef2asm.pl - Turn an NCI library definition file into PASM
 
 =head1 SYNOPSIS
 
-    perl tools/util/ncidef2asm.pl path/to/from_file [ path/to/to_file ]
+    perl tools/dev/ncidef2asm.pl path/to/from_file [ path/to/to_file ]
 
 =head1 DESCRIPTION
 

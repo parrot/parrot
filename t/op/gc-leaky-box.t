@@ -47,7 +47,7 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
   loop:
     $P0 = box 0
     inc counter
-    if counter < 10e6 goto loop
+    if counter < 2e6 goto loop
 
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
     $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS

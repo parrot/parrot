@@ -84,7 +84,7 @@ monthly release.
 
 =item c
 
-Update release-related information in F<tools/util/release.json>. This will be
+Update release-related information in F<tools/release/release.json>. This will be
 used later when making release announcements.  There are a few essential
 fields that must be updated at each release:
 
@@ -118,16 +118,9 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-In the two files F<src/ops/core_ops.c> and F<include/parrot/oplib/core_ops.h>
-is the function C<Parrot_DynOp_core_a_b_c>, which has a name that includes
-the version number. a_b_c is the version number. You have to update this
-version number on two places in the file F<src/ops/core_ops.c>.
-In the file F<include/parrot/oplib/core_ops.h> you have to change this line:
-
- op_lib_t *Parrot_DynOp_core_a_b_c(PARROT_INTERP, long init);
-
-Ignore the warning to not edit this files. It is necessary to edit this files,
-so that "make" builds with the increased version number.
+Run C<./ops2c --core> (or C<make bootstrap-ops>, ignoring errors) followed by
+C<make reconfig> and C<make> to update the names of version-specific internal
+functions.
 
 =item g
 
@@ -251,11 +244,11 @@ only take a few minutes for the mirrors to sync.
 
 =item 9.
 
-Compose the release announcement.  Use F<tools/util/crow.pir> to make
+Compose the release announcement.  Use F<tools/release/crow.pir> to make
 this part easier.  You can specify the format of your announcements like so:
 
-  $ ./parrot tools/util/crow.pir --type=text
-  $ ./parrot tools/util/crow.pir --type=html
+  $ ./parrot tools/release/crow.pir --type=text
+  $ ./parrot tools/release/crow.pir --type=html
 
 Take the screen output and paste it into the application you need.  HTML
 works well for use Perl and PerlMonks, and text for the rest.  It is not a

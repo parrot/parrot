@@ -34,13 +34,9 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides in
     }
 
     VTABLE void push_pmc(PMC *value) {
-        STRING * const _sub = CONST_STRING(INTERP, "Sub");
-        STRING * const _nci = CONST_STRING(INTERP, "NCI");
-
-        if (!VTABLE_isa(INTERP, value, _sub)
-        &&  !VTABLE_isa(INTERP, value, _nci))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "attempt to push non Sub PMC");
+        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "invokable")))
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION, "attempt to push non Sub PMC");
 
         SUPER(value);
     }

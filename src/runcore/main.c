@@ -322,6 +322,11 @@ Parrot_runcore_destroy(PARROT_INTERP)
     interp->cores    = NULL;
     interp->run_core = NULL;
 
+    if (interp->all_op_libs)
+        mem_gc_free(interp, interp->all_op_libs);
+
+    interp->all_op_libs = NULL;
+
     /* dynop libs */
     if (interp->n_libs <= 0)
         return;

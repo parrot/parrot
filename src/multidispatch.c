@@ -963,7 +963,6 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     ASSERT_ARGS(Parrot_mmd_add_multi_from_long_sig)
     Parrot_Sub_attributes *sub;
     STRING     *sub_str     = CONST_STRING(interp, "Sub");
-    STRING     *closure_str = CONST_STRING(interp, "Closure");
     PMC        *type_list   = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
     STRING     *ns_name     = VTABLE_get_string_keyed_int(interp, type_list, 0);
 
@@ -973,8 +972,7 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     if (sub_obj->vtable->base_type == enum_class_NCI) {
         SETATTR_NCI_multi_sig(interp, sub_obj, multi_sig);
     }
-    else if (VTABLE_isa(interp, sub_obj, sub_str)
-         ||  VTABLE_isa(interp, sub_obj, closure_str)) {
+    else if (VTABLE_isa(interp, sub_obj, sub_str)) {
         PMC_get_sub(interp, sub_obj, sub);
         sub->multi_signature = multi_sig;
     }

@@ -17,6 +17,8 @@ This code implements the default mark and sweep garbage collector.
 #include "parrot/parrot.h"
 #include "gc_private.h"
 
+#define DEBUG_FREE_LIST 0
+
 PARROT_DOES_NOT_RETURN
 static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZER SKIP */
 {
@@ -30,6 +32,13 @@ static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZ
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+static INTVAL contained_in_attr_pool(
+    ARGIN(const PMC_Attribute_Pool *pool),
+    ARGIN(const void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
@@ -253,6 +262,9 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
+#define ASSERT_ARGS_contained_in_attr_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_gc_ms_active_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -984,6 +996,37 @@ gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
+=item C<static INTVAL contained_in_attr_pool(const PMC_Attribute_Pool *pool,
+const void *ptr)>
+
+Returns whether the given C<*ptr> points to a location in C<pool>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static INTVAL
+contained_in_attr_pool(ARGIN(const PMC_Attribute_Pool *pool), ARGIN(const void *ptr))
+{
+    ASSERT_ARGS(contained_in_attr_pool)
+    const PMC_Attribute_Arena *arena;
+    const ptrdiff_t item_space = pool->objects_per_alloc * pool->attr_size;
+
+    for (arena = pool->top_arena; arena; arena = arena->next) {
+        const ptrdiff_t ptr_diff = (const char *)ptr - (const char *)(arena + 1);
+
+        if (ptr_diff >= 0
+        &&  ptr_diff < item_space
+        &&  ptr_diff % pool->attr_size == 0)
+            return 1;
+    }
+
+    return 0;
+}
+
+/*
+
 =item C<void gc_ms_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
 Deallocates an attibutes structure from a PMC if it has the auto_attrs
@@ -1021,6 +1064,10 @@ gc_ms_free_attributes_from_pool(ARGMOD(PMC_Attribute_Pool *pool), ARGMOD(void *d
 {
     ASSERT_ARGS(gc_ms_free_attributes_from_pool)
     PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
+
+#if DEBUG_FREE_LIST
+    PARROT_ASSERT(contained_in_attr_pool(pool, data));
+#endif
 
     item->next      = pool->free_list;
     pool->free_list = item;
@@ -1539,6 +1586,10 @@ gc_ms_add_free_object(SHIM_INTERP,
 {
     ASSERT_ARGS(gc_ms_add_free_object)
     GC_MS_PObj_Wrapper *object = (GC_MS_PObj_Wrapper *)to_add;
+
+#if DEBUG_FREE_LIST
+    PARROT_ASSERT(contained_in_pool(pool, to_add));
+#endif
 
     PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
 

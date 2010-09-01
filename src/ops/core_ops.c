@@ -23778,13 +23778,8 @@ Parrot_find_lex_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
-            ? NULL
+            ? PMCNULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
-    if (!result) {
-        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
-                EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", lex_name);return (opcode_t *)handler;
-    }
     PREG(1) = result;
 
 return (opcode_t *)cur_opcode + 3;}
@@ -23798,13 +23793,8 @@ Parrot_find_lex_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
-            ? NULL
+            ? PMCNULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
-    if (!result) {
-        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
-                EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", lex_name);return (opcode_t *)handler;
-    }
     PREG(1) = result;
 
 return (opcode_t *)cur_opcode + 3;}

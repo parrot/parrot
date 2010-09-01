@@ -9,7 +9,7 @@ use Fatal qw( open close );
 
 =head1 NAME
 
-F<tools/util/update_copyright.pl>
+F<tools/dev/update_copyright.pl>
 
 =head1 DESCRIPTION
 

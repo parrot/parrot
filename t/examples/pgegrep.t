@@ -8,11 +8,11 @@ t/tools/pgegrep.t - test the script tools/utils/pgegrep
 
 =head1 SYNOPSIS
 
-    % prove t/tools/pgegrep.t
+    % prove t/examples/tools/pgegrep.t
 
 =head1 DESCRIPTION
 
-Tests the features of of the C<pgegrep> utility.
+Tests the features of of the C<pgegrep> utility (see F<examples/pgegrep>).
 
 =cut
 
@@ -34,7 +34,7 @@ sub pgegrep_output_like {
     my ($options, $snippet, $desc)  = @_;
 
     my $PARROT  = ".$PConfig{slash}$PConfig{test_prog}";
-    my $pgegrep = File::Spec->catfile( qw{. tools util pgegrep} );
+    my $pgegrep = File::Spec->catfile( qw{. examples tools pgegrep} );
     my $out     = `$PARROT $pgegrep $options`;
 
     like( $out, $snippet, $desc );

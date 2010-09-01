@@ -44,7 +44,7 @@ function calls.
   loop:
     consume()
     inc counter
-    if counter < 10e6 goto loop
+    if counter < 1e6 goto loop
 
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
     $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS

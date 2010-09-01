@@ -427,7 +427,7 @@ really a public API.
                               :value->vtable->base_type == enum_class_NameSpace;
 
         /* don't need this everywhere yet */
-        PMC * const old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC *old;
 
         /* If it's a sub... */
         if (maybe_add_sub_to_namespace(INTERP, SELF, key, value))
@@ -438,6 +438,8 @@ really a public API.
 
         /* If it's a multi-sub and the first in this NS... */
         add_multi_to_namespace(INTERP, SELF, key, value);
+
+        old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!old)
             SUPER(key, value);

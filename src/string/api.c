@@ -3300,7 +3300,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
             if (s->encoding != e || s->charset != c) {
                 STRING *new_s = e->to_encoding(interp, s);
                 chunks[i]     = new_s;
-                total_length += s->bufused - new_s->bufused;
+                total_length += new_s->bufused - s->bufused;
             }
         }
     }

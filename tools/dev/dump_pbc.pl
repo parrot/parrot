@@ -5,11 +5,11 @@
 
 =head1 NAME
 
-tools/util/dump_pbc.pl - Weave together PBC disassembly with PIR source
+tools/dev/dump_pbc.pl - Weave together PBC disassembly with PIR source
 
 =head1 SYNOPSIS
 
- perl tools/util/dump_pbc.pl foo.pbc
+ perl tools/dev/dump_pbc.pl foo.pbc
 
 =head1 DESCRIPTION
 
