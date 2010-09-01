@@ -48,7 +48,7 @@
             "tools/dev/list_unjitted.pl",
             "tools/dev/gen_class.pl",
             "tools/dev/nm.pl",
-            "tools/util/ncidef2pasm.pl",
+            "tools/dev/ncidef2pasm.pl",
             "tools/dev/pbc_header.pl"
          ],
          "title" : "Utilities"
