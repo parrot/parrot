@@ -16,7 +16,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 152
+.const int TESTS = 153
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -48,6 +48,7 @@ Tests the use of Parrot integer registers.
     test_sub_i_i()
     test_set_n()
     test_neg()
+    test_negate_max_integer()
     test_mul_i_i()
     test_null()
     test_div_i_i_by_zero()
@@ -743,6 +744,23 @@ Tests the use of Parrot integer registers.
     neg $I0
 
     is($I0, -3, 'neg_i')
+.end
+
+# Test to ensure that the negative of the maximum integer is equal to the
+# minimum integer + 1. This should be true because we are assuming a
+# two's-complement machine.
+
+.loadlib 'sys_ops'
+.include 'sysinfo.pasm'
+
+.sub test_negate_max_integer
+    .local int max
+    .local int min
+    max = sysinfo .SYSINFO_PARROT_INTMAX
+    neg max
+    min = sysinfo .SYSINFO_PARROT_INTMIN
+    inc min
+    is(max, min)
 .end
 
 .sub 'test_mul_i_i'
