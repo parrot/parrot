@@ -77,12 +77,12 @@ Config2:
 
 NoLibGMP:
     diag( 'No BigInt Lib configured' )
-    skip(34)
+    skip(36)
     exit 0
 
 OldLibGMP:
     diag( 'Buggy GMP version [', $S3, '] with huge digit multiply - please upgrade' )
-    skip(34)
+    skip(36)
     exit 0
 
 ret:
