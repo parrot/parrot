@@ -20,7 +20,7 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(34)
+    plan(36)
     check_libgmp_good()
 
     set_and_get()
@@ -29,6 +29,7 @@ Tests the BigInt PMC.
     multiplication()
     division()
     negation()
+    division_by_zero()
     negate_min_integer()
     absolute_value()
     absolute_min_integer()
