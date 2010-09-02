@@ -22,7 +22,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(29)
+    plan(30)
 
     test_get_pmc()
     test_clone()
@@ -230,7 +230,9 @@ end:
     s = 'hi'
     it = iter s
     s1 = it[0]
-    is(s1, 'h', 'get_string_keyed_int')
+    is(s1, 'h', 'get_string_keyed_int - zero')
+    s1 = it[1]
+    is(s1, 'i', 'get_string_keyed_int - not zero')
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
