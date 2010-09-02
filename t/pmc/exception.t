@@ -20,13 +20,14 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(40)
+    plan(41)
     test_bool()
     test_int()
     test_integer_keyed()
     test_string_keyed()
     test_attrs()
     test_attributes()
+    test_setattribute_wrong()
     test_birthtime()
     test_push_pop_eh()
     test_push_pop_eh_long()
@@ -211,6 +212,24 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
     $P31 = $P28[1]
     is($P31, "backtrace line 2", 'more backtrace data')
+.end
+
+.sub test_setattribute_wrong
+    .local pmc ex, eh
+    .local int result
+    ex = new ['Exception']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_ATTRIB_NOT_FOUND)
+    set_addr eh, catch
+    result = 0
+    push_eh eh
+    setattribute ex, 'wrong attribute', eh
+    goto done
+  catch:
+    result = 1
+    finalize eh
+  done:
+    is(result, 1, 'setting a wrong attribute throws')
 .end
 
 .sub test_birthtime
