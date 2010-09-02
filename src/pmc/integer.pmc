@@ -1007,14 +1007,14 @@ is the minimum integer, a BigInt is created.
         else {
             PMC *promoted;
             maybe_throw_overflow_error(INTERP);
-            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, 0);   
+            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, 0);
             return VTABLE_subtract_int(INTERP, promoted, a, promoted);
         }
     }
 
     VTABLE void i_neg() {
         const INTVAL a = SELF.get_integer();
-   
+
         if (a != PARROT_INTVAL_MIN)
             VTABLE_set_integer_native(INTERP, SELF, -a);
         else {
@@ -1214,7 +1214,7 @@ is the minimum integer, a BigInt is created.
         else {
             PMC *promoted;
             maybe_throw_overflow_error(INTERP);
-            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);   
+            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
             return VTABLE_neg(INTERP, promoted, dest);
         }
     }
