@@ -318,15 +318,16 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     namespace_description = null;
                 }
                 Parrot_io_printf(interp,
-                            "\t\tclass => %Ss,\n"
-                            "\t\tstart_offs => %d,\n"
-                            "\t\tend_offs => %d,\n"
-                            "\t\tname    => '%Ss',\n"
-                            "\t\tsubid   => '%Ss',\n"
-                            "\t\tmethod  => '%Ss',\n"
-                            "\t\tnsentry => '%Ss',\n"
-                            "\t\tnamespace => %Ss\n"
-                            "\t\tHLL_id => %d,\n",
+                            "\t\tclass       => %Ss,\n"
+                            "\t\tstart_offs  => %d,\n"
+                            "\t\tend_offs    => %d,\n"
+                            "\t\tname        => '%Ss',\n"
+                            "\t\tsubid       => '%Ss',\n"
+                            "\t\tmethod      => '%Ss',\n"
+                            "\t\tnsentry     => '%Ss',\n"
+                            "\t\tnamespace   => %Ss,\n"
+                            "\t\tHLL_id      => %d,\n"
+                            "\t\tn_regs_used => [ %d, %d, %d, %d ],\n",
                             pmc->vtable->whoami,
                             sub->start_offs,
                             sub->end_offs,
@@ -335,7 +336,11 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             sub->method_name,
                             sub->ns_entry_name,
                             namespace_description,
-                            sub->HLL_id);
+                            sub->HLL_id,
+                            sub->n_regs_used[0],
+                            sub->n_regs_used[1],
+                            sub->n_regs_used[2],
+                            sub->n_regs_used[3]);
                 break;
               case enum_class_FixedIntegerArray:
                 Parrot_io_printf(interp,
