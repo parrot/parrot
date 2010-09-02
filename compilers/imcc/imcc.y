@@ -1447,7 +1447,7 @@ sub_param_type_def:
            }
            if ($3 & VT_NAMED && !($3 & VT_FLAT) && !IMCC_INFO(interp)->adv_named_id)
                adv_named_set(interp, $2);
-           $$ = mk_ident(interp, $2, $1);
+           $$ = mk_ident(interp, $2, $1, VTIDENTIFIER);
            $$->type |= $3;
            mem_sys_free($2);
           }
@@ -1730,7 +1730,7 @@ pcc_result:
          {
            IdList * const l = $4;
            SymReg *ignored;
-           ignored = mk_ident(interp, l->id, $3);
+           ignored = mk_ident(interp, l->id, $3, VTIDENTIFIER);
            UNUSED(ignored);
            IMCC_INFO(interp)->is_def = 0;
            $$ = 0;
@@ -1959,7 +1959,7 @@ labeled_inst:
            IdList *l = $4;
            while (l) {
                IdList *l1;
-               mk_ident(interp, l->id, $3);
+               mk_ident(interp, l->id, $3, VTIDENTIFIER);
                l1 = l;
                l  = l->next;
                mem_sys_free(l1->id);

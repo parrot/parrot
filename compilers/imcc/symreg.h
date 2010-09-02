@@ -239,7 +239,10 @@ SymReg * mk_const_ident(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
-SymReg * mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
+SymReg * mk_ident(PARROT_INTERP,
+    ARGIN(const char *name),
+    int t,
+    INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

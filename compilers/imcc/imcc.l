@@ -1457,7 +1457,7 @@ handle_identifier(PARROT_INTERP, YYSTYPE *valp, const char *text)
             if (((r->pcc_sub->pragma & P_METHOD)
             ||   (IMCC_INFO(interp)->cur_unit->is_vtable_method))
             &&   !strcmp(text, "self")) {
-                valp->sr = mk_ident(interp, "self", 'P');
+                valp->sr = mk_ident(interp, "self", 'P', VTIDENTIFIER);
                 IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
                 return VAR;
             }

@@ -634,7 +634,7 @@ _mk_fullname(PARROT_INTERP, ARGIN_NULLOK(const Namespace *ns), ARGIN(const char 
 
 /*
 
-=item C<SymReg * mk_ident(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_ident(PARROT_INTERP, const char *name, int t, INTVAL type)>
 
 Makes a new identifier.
 
@@ -645,18 +645,17 @@ Makes a new identifier.
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 SymReg *
-mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
+mk_ident(PARROT_INTERP, ARGIN(const char *name), int t, INTVAL type)
 {
     ASSERT_ARGS(mk_ident)
     char   * const fullname = _mk_fullname(interp, IMCC_INFO(interp)->namespace_stack, name);
     SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->cur_unit->hash), name);
-    if (r && r->set != t)
+    if (r && (r->set != t || r->type != type))
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                 "syntax error, duplicated IDENTIFIER '%s'\n", fullname);
 
     r = mk_symreg(interp, fullname, t);
-    r->type = VTIDENTIFIER;
-
+    r->type = type;
 
     if (IMCC_INFO(interp)->namespace_stack) {
         Identifier * const ident = mem_gc_allocate_zeroed_typed(interp, Identifier);
@@ -768,16 +767,17 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
                     "global PMC constant not allowed");
 
         r = _mk_symreg(interp, &IMCC_INFO(interp)->ghash, name, t);
+
+        r->type = VT_CONSTP;
     }
     else {
-        r = mk_ident(interp, name, t);
+        r = mk_ident(interp, name, t, VT_CONSTP);
 
         if (t == 'P')
             return mk_pmc_const_2(interp, IMCC_INFO(interp)->cur_unit, r, val);
     }
 
-    r->type = VT_CONSTP;
-    r->reg  = val;
+    r->reg = val;
 
     return r;
 }
