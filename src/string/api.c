@@ -3261,6 +3261,9 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     if (STRING_IS_NULL(j))
         j = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
+    /* We don't mark "chunks". So block GC here to avoid crash */
+    Parrot_block_GC_mark(interp);
+
     chunks = (STRING **)Parrot_gc_allocate_fixed_size_storage(interp,
         ar_len * sizeof (STRING *));
 
@@ -3345,6 +3348,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
     Parrot_gc_free_fixed_size_storage(interp, ar_len * sizeof (STRING *),
         chunks);
+
+    Parrot_unblock_GC_mark(interp);
 
     return res;
 }
