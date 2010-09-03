@@ -791,14 +791,13 @@ main(int argc, const char *argv[])
         printf("Starting interp %d\n", i);
         fflush(stdout);
         interp = Parrot_new(NULL);
-        if (!interp)
-            return 1;
+        if (interp) {
+            Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
-        Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
-
-        printf("Destroying interp %d\n", i);
-        fflush(stdout);
-        interp_cleanup(interp, 0);
+            printf("Destroying interp %d\n", i);
+            fflush(stdout);
+            interp_cleanup(interp, 0);
+        }
     }
 
     return 0;
