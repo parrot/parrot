@@ -103,11 +103,16 @@ sub _get_programs {
     $conf->debug("\nccflags: $ccflags\n");
 
     $linkflags = $conf->data->get('linkflags');
+    # The substitution below has no effect on most platforms but may be needed
+    # on Win32 with Strawberry Perl and other OSes.  See TT #854.
+    $linkflags =~ s/-libpath:\S+//g;
     $linkflags = integrate( $linkflags, $conf->options->get('linkflags') );
     $linkflags = prompt( "And flags for your linker?", $linkflags ) if $ask;
     $conf->data->set( linkflags => $linkflags );
 
     $ldflags = $conf->data->get('ldflags');
+    # For substitution below, see comment above.
+    $ldflags =~ s/-libpath:\S+//g;
     $ldflags = integrate( $ldflags, $conf->options->get('ldflags') );
     $ldflags = prompt( "And your $ld flags for building shared libraries?", $ldflags )
         if $ask;
