@@ -20,7 +20,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(41)
+    plan(43)
     test_bool()
     test_int()
     test_integer_keyed()
@@ -29,6 +29,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_attributes()
     test_setattribute_wrong()
     test_birthtime()
+    test_handler_ctx()
     test_push_pop_eh()
     test_push_pop_eh_long()
     test_push_eh_throw()
@@ -241,6 +242,35 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     bt = getattribute ex, 'birthtime'
     nbt = bt
     is(nbt, n, 'get and set birthtime')
+.end
+
+.sub test_handler_ctx
+    .local pmc ex, eh, hc
+    .local int result
+    ex = new ['Exception']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+
+    result = 0
+    set_label eh, catch_get
+    push_eh eh
+    hc = getattribute ex, 'handler_ctx'
+    goto done_get
+  catch_get:
+    finalize eh
+    result = 1
+  done_get:
+    is(result, 1, 'get handler_ctx invalid operation')
+
+    result = 0
+    set_label eh, catch_set
+    setattribute ex, 'handler_ctx', ex
+    goto done_set
+  catch_set:
+    finalize eh
+    result = 1
+  done_set:
+    is(result, 1, 'set handler_ctx invalid operation')
 .end
 
 .sub test_push_pop_eh
