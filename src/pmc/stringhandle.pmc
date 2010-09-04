@@ -195,7 +195,7 @@ stored for mocking.
             if (encoding_is_utf8(INTERP, encoding))
                 new_string = string_make(INTERP, "", 0, "unicode", 0);
             else
-                new_string = Parrot_str_new(INTERP, "", 0);
+                new_string = CONST_STRING(INTERP, "");
 
             SET_ATTR_stringhandle(INTERP, SELF, new_string);
         }
@@ -203,7 +203,7 @@ stored for mocking.
         /* Set a default mode of read-only. */
         GET_ATTR_mode(INTERP, SELF, open_mode);
         if (STRING_IS_NULL(open_mode)) {
-            open_mode = Parrot_str_new_constant(INTERP, "r");
+            open_mode = CONST_STRING(INTERP, "r");
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
@@ -315,7 +315,7 @@ StringHandle object that isn't opened yet, returns an empty string.
             if (encoding_is_utf8(INTERP, encoding))
                 string_result = string_make(INTERP, "", 0, "unicode", 0);
             else
-                string_result = Parrot_str_new_constant(INTERP, "");
+                string_result = CONST_STRING(INTERP, "");
         }
 
         RETURN(STRING *string_result);
