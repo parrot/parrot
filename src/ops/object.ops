@@ -463,17 +463,7 @@ Add the attribute named $2 to the class $1.
 =cut
 
 inline op addattribute(invar PMC, in STR) :object_classes {
-    STRING * const class_name  = string_from_literal(interp, "Class");
-    STRING * const role_name   = string_from_literal(interp, "Role");
-
-    if (VTABLE_isa(interp, $1, class_name) || VTABLE_isa(interp, $1, role_name))
-        VTABLE_add_attribute(interp, $1, $2, PMCNULL);
-    else {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION,
-            "Cannot add attribute to non-class");
-        goto ADDRESS(handler);
-    }
+    VTABLE_add_attribute(interp, $1, $2, PMCNULL);
 }
 
 =item B<removeattribute>(invar PMC, in STR) B<(unimplemented)>

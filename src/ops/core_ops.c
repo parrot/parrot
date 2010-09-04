@@ -20453,32 +20453,14 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_addattribute_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const class_name  = string_from_literal(interp, "Class");
-    STRING * const role_name   = string_from_literal(interp, "Role");
-
-    if (VTABLE_isa(interp, PREG(1), class_name) || VTABLE_isa(interp, PREG(1), role_name))
-        VTABLE_add_attribute(interp, PREG(1), SREG(2), PMCNULL);
-    else {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION,
-            "Cannot add attribute to non-class");return (opcode_t *)handler;
-    }
+    VTABLE_add_attribute(interp, PREG(1), SREG(2), PMCNULL);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_addattribute_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const class_name  = string_from_literal(interp, "Class");
-    STRING * const role_name   = string_from_literal(interp, "Role");
-
-    if (VTABLE_isa(interp, PREG(1), class_name) || VTABLE_isa(interp, PREG(1), role_name))
-        VTABLE_add_attribute(interp, PREG(1), CONST(2).u.string, PMCNULL);
-    else {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION,
-            "Cannot add attribute to non-class");return (opcode_t *)handler;
-    }
+    VTABLE_add_attribute(interp, PREG(1), CONST(2).u.string, PMCNULL);
 
 return (opcode_t *)cur_opcode + 3;}
 
