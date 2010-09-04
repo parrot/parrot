@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -178,7 +178,7 @@ Returns an empty string.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
             "Stringifying an Undef PMC");
 
-        return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        return CONST_STRING(INTERP, "");
     }
 
 /*
