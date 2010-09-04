@@ -120,7 +120,9 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
         class_name = _class->vtable->whoami;
 
     if (sub) {
-        if (sub->vtable->base_type == enum_class_NCI)
+        if (sub->vtable->base_type == enum_class_NativePCCMethod)
+            result = "NativePCCMethod";
+        else if (sub->vtable->base_type == enum_class_NCI)
             result = "NCI";
         else
             result = "Sub";

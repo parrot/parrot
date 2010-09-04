@@ -43,6 +43,7 @@ them, with default behaviour.
 #include "parrot/oplib/ops.h"
 #include "multidispatch.str"
 #include "pmc/pmc_nci.h"
+#include "pmc/pmc_nativepccmethod.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
@@ -590,8 +591,17 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     Parrot_Sub_attributes *sub;
     INTVAL      args, dist, i, j, n, m;
 
-    /* has to be a builtin multi method */
-    if (pmc->vtable->base_type == enum_class_NCI) {
+    if (pmc->vtable->base_type == enum_class_NativePCCMethod) {
+        GETATTR_NativePCCMethod_mmd_multi_sig(interp, pmc, multi_sig);
+        if (PMC_IS_NULL(multi_sig)) {
+            STRING *long_sig;
+
+            GETATTR_NativePCCMethod_mmd_long_signature(interp, pmc, long_sig);
+            multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+            SETATTR_NativePCCMethod_mmd_multi_sig(interp, pmc, multi_sig);
+        }
+    }
+    else if (pmc->vtable->base_type == enum_class_NCI) {
         GETATTR_NCI_multi_sig(interp, pmc, multi_sig);
         if (PMC_IS_NULL(multi_sig)) {
             STRING *long_sig;
@@ -602,10 +612,10 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         }
     }
     else {
-        /* not a multi; no distance */
         PMC_get_sub(interp, pmc, sub);
+
         if (!sub->multi_signature)
-            return 0;
+            return 0; /* not a multi; no distance */
 
         multi_sig = Parrot_mmd_get_cached_multi_sig(interp, pmc);
     }
@@ -969,7 +979,10 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     /* Attach a type tuple array to the sub for multi dispatch */
     PMC    *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
 
-    if (sub_obj->vtable->base_type == enum_class_NCI) {
+    if (sub_obj->vtable->base_type == enum_class_NativePCCMethod) {
+        SETATTR_NativePCCMethod_mmd_multi_sig(interp, sub_obj, multi_sig);
+    }
+    else if (sub_obj->vtable->base_type == enum_class_NCI) {
         SETATTR_NCI_multi_sig(interp, sub_obj, multi_sig);
     }
     else if (VTABLE_isa(interp, sub_obj, sub_str)) {

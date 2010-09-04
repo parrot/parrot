@@ -503,6 +503,17 @@ void Parrot_mark_method_writes(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void register_native_pcc_method_in_ns(PARROT_INTERP,
+    const int type,
+    ARGIN(void *func),
+    ARGIN(STRING *name),
+    ARGIN(STRING *signature))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
 void register_nci_method(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
@@ -512,15 +523,6 @@ void register_nci_method(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
-
-PARROT_EXPORT
-void register_raw_nci_method_in_ns(PARROT_INTERP,
-    const int type,
-    ARGIN(void *func),
-    ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
 
 #define ASSERT_ARGS_interpinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -539,15 +541,17 @@ void register_raw_nci_method_in_ns(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_register_native_pcc_method_in_ns \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(func) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_register_nci_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(func) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(proto))
-#define ASSERT_ARGS_register_raw_nci_method_in_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_misc.c */
 

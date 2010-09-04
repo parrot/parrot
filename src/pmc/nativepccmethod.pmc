@@ -1,0 +1,198 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/nativepccmethod.pmc - Native PCC Method PMC
+
+=head1 DESCRIPTION
+
+Container for native functions that handle PCC on their own.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+
+pmclass NativePCCMethod auto_attrs {
+    ATTR STRING *signature;
+    ATTR void   *func;
+
+    /* MMD fields */
+    ATTR STRING *mmd_long_signature;
+    ATTR PMC    *mmd_multi_sig;
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC with a C<NULL> function pointer.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_NativePCCMethod_attributes *attrs = PARROT_NATIVEPCCMETHOD(SELF);
+
+        attrs->func               = NULL;
+        attrs->signature          = STRINGNULL;
+        attrs->mmd_long_signature = STRINGNULL;
+        attrs->mmd_multi_sig      = PMCNULL;
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Get the pointer to the native function.
+
+=item C<void set_pointer_keyed_str(STRING *sig, void *func)>
+
+Set the pointer to the native function and the PCC signature.
+
+=cut
+
+*/
+
+
+    VTABLE void *get_pointer() {
+        return PARROT_NATIVEPCCMETHOD(SELF)->func;
+    }
+
+    VTABLE void set_pointer_keyed_str(STRING *sig, void *func) {
+        PARROT_NATIVEPCCMETHOD(SELF)->signature = sig;
+        PARROT_NATIVEPCCMETHOD(SELF)->func = func;
+    }
+
+/*
+
+=item C<INTVAL defined()>
+
+=item C<INTVAL get_bool()>
+
+NULLness check.
+
+=cut
+
+*/
+
+    VTABLE INTVAL defined() {
+        return !! PARROT_NATIVEPCCMETHOD(SELF)->func;
+    }
+
+    VTABLE INTVAL get_bool() {
+        return STATICSELF.defined();
+    }
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Call the function pointer.
+
+=cut
+
+*/
+
+    VTABLE opcode_t *invoke(void *next) {
+        void                *func;
+        native_pcc_method_t  fptr;
+
+        GET_ATTR_func(INTERP, SELF, func);
+        if (!func)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "attempt to call NULL native function");
+
+        fptr = D2FPTR(func);
+        fptr(INTERP);
+
+        /*
+         * If this function was tailcalled, the return result
+         * is already passed back to the caller of this frame.
+         * We therefore invoke the return continuation here,
+         * which gets rid of this frame and returns the real
+         * return address.
+         */
+        {
+            PMC *cont = INTERP->current_cont;
+
+            if (cont && cont != NEED_CONTINUATION
+            && (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
+                cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+                next = VTABLE_invoke(INTERP, cont, next);
+            }
+        }
+
+        return (opcode_t *)next;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark contained elements for GC.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_NativePCCMethod_attributes *attrs = PARROT_NATIVEPCCMETHOD(SELF);
+
+        Parrot_gc_mark_STRING_alive(interp, attrs->signature);
+        Parrot_gc_mark_STRING_alive(interp, attrs->mmd_long_signature);
+        Parrot_gc_mark_PMC_alive(interp,    attrs->mmd_multi_sig);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Create a clone of this PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC *ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        Parrot_NativePCCMethod_attributes *self_attrs = PARROT_NATIVEPCCMETHOD(SELF);
+        Parrot_NativePCCMethod_attributes *ret_attrs  = PARROT_NATIVEPCCMETHOD(ret);
+
+        ret_attrs->func               = self_attrs->func;
+        ret_attrs->signature          = self_attrs->signature;
+        ret_attrs->mmd_long_signature = self_attrs->mmd_long_signature;
+        ret_attrs->mmd_multi_sig      = self_attrs->mmd_multi_sig;
+
+        return ret;
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

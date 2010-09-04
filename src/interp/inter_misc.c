@@ -64,8 +64,8 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 
 /*
 
-=item C<void register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void
-*func, STRING *name)>
+=item C<void register_native_pcc_method_in_ns(PARROT_INTERP, const int type,
+void *func, STRING *name, STRING *signature)>
 
 Create an entry in the C<nci_method_table> for the given raw NCI method
 of PMC class C<type>.
@@ -76,14 +76,14 @@ of PMC class C<type>.
 
 PARROT_EXPORT
 void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
-        ARGIN(STRING *name))
+register_native_pcc_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
+        ARGIN(STRING *name), ARGIN(STRING *signature))
 {
-    ASSERT_ARGS(register_raw_nci_method_in_ns)
-    PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
+    ASSERT_ARGS(register_native_pcc_method_in_ns)
+    PMC * method = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
 
     /* setup call func */
-    VTABLE_set_pointer(interp, method, func);
+    VTABLE_set_pointer_keyed_str(interp, method, signature, func);
 
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
