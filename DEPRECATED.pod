@@ -71,13 +71,6 @@ not already here. This allows the usage of $P0() instead of $P0($P0).
 
 L<https://trac.parrot.org/parrot/ticket/103>
 
-=item NCI without signature ("raw" pointers) [eligible in 2.4]
-
-No equivalent functionality is promised. You shouldn't be using this. Here be
-segfaults.
-
-L<https://trac.parrot.org/parrot/ticket/1549>
-
 =item UnManagedStruct handling nested structure [eligible in 2.4]
 
 UnManagedStruct will be simplified to only support flat structures. This means
