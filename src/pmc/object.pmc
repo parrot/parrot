@@ -594,20 +594,7 @@ Get the class PMC representing the class that this object is an instance of.
 
 */
     VTABLE PMC *get_class() {
-        PMC    * const classobj  = PARROT_OBJECT(SELF)->_class;
-        STRING * const get_class = CONST_STRING(INTERP, "get_class");
-
-        /* If there's a vtable override for 'get_class' run that instead. */
-        PMC    * const method    = Parrot_oo_find_vtable_override(INTERP,
-                classobj, get_class);
-
-        if (!PMC_IS_NULL(method)) {
-            PMC *result;
-            Parrot_ext_call(INTERP, method, "Pi->P", SELF, &result);
-            return result;
-        }
-
-        return classobj;
+        return PARROT_OBJECT(SELF)->_class;
     }
 
 
