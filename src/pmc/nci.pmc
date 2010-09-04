@@ -221,20 +221,6 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 /*
 
-=item C<METHOD set_raw_nci_ptr(void *func)>
-
-Sets the specified function pointer and raw flag.
-
-=cut
-
-*/
-
-    METHOD make_raw_nci(PMC *func) {
-        VTABLE_set_pointer(interp, SELF, (void *)func);
-    }
-
-/*
-
 =item C<void init()>
 
 Initializes the NCI with a C<NULL> function pointer.
@@ -244,9 +230,11 @@ Initializes the NCI with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        /* Mark that we're not a raw NCI. */
-        PObj_flag_CLEAR(private2, SELF);
         PObj_custom_mark_SET(SELF);
+    }
+
+    VTABLE void *get_pointer() {
+        return PARROT_NCI(SELF)->orig_func;
     }
 
 /*
@@ -258,15 +246,6 @@ Sets the specified function pointer and signature (C<*key>).
 =cut
 
 */
-
-    VTABLE void set_pointer(void *ptr) {
-        SET_ATTR_orig_func(INTERP, SELF, ptr);
-        PObj_flag_SET(private2, SELF);
-    }
-
-    VTABLE void *get_pointer() {
-        return PARROT_NCI(SELF)->orig_func;
-    }
 
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI_attributes * const nci_info   = PARROT_NCI(SELF);
@@ -337,7 +316,7 @@ Creates and returns a clone of the NCI.
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->pcc_return_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
-        PObj_get_FLAGS(ret)                |= (PObj_get_FLAGS(SELF) & 0x7);
+        PObj_get_FLAGS(ret)                 = PObj_get_FLAGS(SELF);
 
         return ret;
     }
@@ -377,9 +356,7 @@ class, the PMC arguments are shifted down.
         PMC                          *cont;
 
         GET_ATTR_orig_func(INTERP, SELF, orig_func);
-        func = PObj_flag_TEST(private2, SELF)
-            ? (nci_thunk_t) D2FPTR(orig_func)
-            : (nci_thunk_t) D2FPTR(nci_info->func);
+        func = D2FPTR(nci_info->func);
 
         GET_ATTR_fb_info(INTERP, SELF, fb_info);
 
