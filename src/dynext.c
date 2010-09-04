@@ -477,12 +477,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     Parrot_pcc_set_namespace(interp, context,
             Parrot_get_HLL_namespace(interp, parrot_hll_id));
 
-    /*
-     * work around gcc 3.3.3 and other problem with dynpmcs
-     * something during library loading doesn't stand a GC run
-     */
-    Parrot_block_GC_mark(interp);
-
     if (lib_name) {
         STRING * const load_name       = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
@@ -516,9 +510,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 
     /* remember lib_pmc in iglobals */
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
-
-    /* UNLOCK */
-    Parrot_unblock_GC_mark(interp);
 
     Parrot_pop_context(interp);
 
