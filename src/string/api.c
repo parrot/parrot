@@ -3249,6 +3249,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     STRING  **chunks;
     STRING   *res;
     STRING   *s;
+    PMC      *sb;
     char     *pos;
     const int ar_len       = VTABLE_elements(interp, ar);
     int       total_length = 0;
@@ -3258,8 +3259,10 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     if (ar_len == 0)
         return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
-    if (STRING_IS_NULL(j))
-        j = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    if (STRING_IS_NULL(j)) {
+        sb = Parrot_pmc_new_init(interp, enum_class_StringBuilder, ar);
+        return VTABLE_get_string(interp, sb);
+    }
 
     /* We don't mark "chunks". So block GC here to avoid crash */
     Parrot_block_GC_mark(interp);
