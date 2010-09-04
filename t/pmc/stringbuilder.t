@@ -21,6 +21,7 @@ Tests the C<StringBuilder> PMC.
     .include 'test_more.pir'
 
     test_create()               # 2 tests
+    test_init_pmc()
     test_push_string()
     test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
@@ -110,7 +111,6 @@ Tests the C<StringBuilder> PMC.
     push sb, $S0
     $I0 = sb
     is( $I0, 16384, "push a null string does nothing" )
-
 .end
 
 .sub 'test_push_pmc'
@@ -303,6 +303,34 @@ CODE
       $S0 = sb
 
     ok( $S0, "Pushing unicode strings doesn't kill StringBuilder")
+.end
+
+.sub 'test_init_pmc'
+    .local pmc ar
+    ar = new ['ResizableStringArray']
+
+    push ar, "foo"
+    push ar, "bar"
+
+    $S99 = repeat "x", 12
+    push ar, $S99
+    $S1 = 'foobar' . $S99
+
+    $S99 = repeat "y", 13
+    push ar, $S99
+    $S1 = $S1 . $S99
+
+    $S99 = repeat "z", 14
+    push ar, $S99
+    $S1 = $S1 . $S99
+
+    null $S0
+    push ar, $S0
+
+    .local pmc sb
+    sb  = new ["StringBuilder"], ar
+    $S0 = sb
+    is( $S0, $S1, 'init_pmc() should join all passed strings' )
 .end
 
 # Local Variables:

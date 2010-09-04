@@ -37,6 +37,7 @@ static size_t calculate_capacity(SHIM_INTERP,
 pmclass StringBuilder provides string auto_attrs {
     ATTR STRING *buffer;    /* Mutable string to gather results */
 
+
 /*
 
 =item C<void init()>
@@ -51,6 +52,7 @@ Initializes the StringBuilder.
         STATICSELF.init_int(INITIAL_STRING_CAPACITY);
     }
 
+
 /*
 
 =item C<void init_int()>
@@ -63,18 +65,52 @@ Initializes the StringBuilder with initial size of buffer.
 
     VTABLE void init_int(INTVAL initial_size) {
         STRING * const buffer = mem_gc_allocate_zeroed_typed(INTERP, STRING);
-        buffer->encoding  = Parrot_default_encoding_ptr;
-        buffer->charset   = Parrot_default_charset_ptr;
-        /* We need all string flags here because we use this buffer in substr_str */
-        buffer->flags     = PObj_is_string_FLAG | PObj_external_FLAG;
-        buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
-                initial_size, char);
-        buffer->_buflen   = initial_size;
+
+        buffer->encoding      = Parrot_default_encoding_ptr;
+        buffer->charset       = Parrot_default_charset_ptr;
+        buffer->_buflen       = initial_size;
+        buffer->_bufstart     = buffer->strstart
+                              = mem_gc_allocate_n_typed(INTERP,
+                                        initial_size, char);
+
+        /* We need these string flags to use this buffer in substr_str */
+        buffer->flags         = PObj_is_string_FLAG | PObj_external_FLAG;
 
         SET_ATTR_buffer(INTERP, SELF, buffer);
 
         PObj_custom_destroy_SET(SELF);
     }
+
+
+/*
+
+=item C<void init_pmc()>
+
+Initializes the StringBuilder with an array of STRINGs.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *ar) {
+        const INTVAL count = VTABLE_elements(INTERP, ar);
+
+        if (!count)
+            STATICSELF.init_int(INITIAL_STRING_CAPACITY);
+        else {
+            STRING * const first = VTABLE_get_string_keyed_int(INTERP, ar, 0);
+            const INTVAL   size  = Parrot_str_byte_length(INTERP, first);
+            INTVAL         i;
+
+            /* it's just an estimate, but estimates help */
+            STATICSELF.init_int(size * count);
+            SELF.push_string(first);
+
+            for (i = 1; i < count; ++i)
+                SELF.push_string(VTABLE_get_string_keyed_int(INTERP, ar, i));
+        }
+    }
+
 
 /*
 
