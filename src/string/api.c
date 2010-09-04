@@ -3246,115 +3246,117 @@ STRING*
 Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 {
     ASSERT_ARGS(Parrot_str_join)
-    STRING  **chunks;
-    STRING   *res;
-    STRING   *s;
     PMC      *sb;
-    char     *pos;
-    const int ar_len       = VTABLE_elements(interp, ar);
-    int       total_length = 0;
-    int       transcoded   = 0;
-    int       i;
-
-    if (ar_len == 0)
-        return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
     if (STRING_IS_NULL(j)) {
         sb = Parrot_pmc_new_init(interp, enum_class_StringBuilder, ar);
         return VTABLE_get_string(interp, sb);
     }
+    else {
+        const int ar_len = VTABLE_elements(interp, ar);
+        STRING  **chunks;
+        STRING   *res;
+        STRING   *s;
+        char     *pos;
+        int       total_length = 0;
+        int       transcoded   = 0;
+        int       i;
 
-    /* We don't mark "chunks". So block GC here to avoid crash */
-    Parrot_block_GC_mark(interp);
+        if (ar_len == 0)
+            return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
-    chunks = (STRING **)Parrot_gc_allocate_fixed_size_storage(interp,
-        ar_len * sizeof (STRING *));
+        /* We don't mark "chunks". So block GC here to avoid crash */
+        Parrot_block_GC_mark(interp);
 
-    for (i = 0; i < ar_len; ++i) {
-        STRING *next = VTABLE_get_string_keyed_int(interp, ar, i);
-
-        if (STRING_IS_NULL(next)) {
-            chunks[i] = STRINGNULL;
-            continue;
-        }
-
-        if (next->encoding != j->encoding) {
-            const ENCODING *e = j->encoding;
-
-            string_rep_compatible(interp, next, j, &e);
-            if (e == Parrot_fixed_8_encoding_ptr)
-                e = Parrot_utf8_encoding_ptr;
-            j           = e->to_encoding(interp, j);
-            transcoded  = 1;
-        }
-
-        chunks[i]     = next;
-        total_length += next->bufused;
-    }
-
-    /* with the right charset, transcode any strings if necessary */
-    if (transcoded) {
-        const CHARSET  *c = j->charset;
-        const ENCODING *e = j->encoding;
+        chunks = (STRING **)Parrot_gc_allocate_fixed_size_storage(interp,
+            ar_len * sizeof (STRING *));
 
         for (i = 0; i < ar_len; ++i) {
-            STRING *s = chunks[i];
+            STRING *next = VTABLE_get_string_keyed_int(interp, ar, i);
 
-            if (STRING_IS_NULL(s))
+            if (STRING_IS_NULL(next)) {
+                chunks[i] = STRINGNULL;
                 continue;
+            }
 
-            if (s->encoding != e || s->charset != c) {
-                STRING *new_s = e->to_encoding(interp, s);
-                chunks[i]     = new_s;
-                total_length += new_s->bufused - s->bufused;
+            if (next->encoding != j->encoding) {
+                const ENCODING *e = j->encoding;
+
+                string_rep_compatible(interp, next, j, &e);
+                if (e == Parrot_fixed_8_encoding_ptr)
+                    e = Parrot_utf8_encoding_ptr;
+                j           = e->to_encoding(interp, j);
+                transcoded  = 1;
+            }
+
+            chunks[i]     = next;
+            total_length += next->bufused;
+        }
+
+        /* with the right charset, transcode any strings if necessary */
+        if (transcoded) {
+            const CHARSET  *c = j->charset;
+            const ENCODING *e = j->encoding;
+
+            for (i = 0; i < ar_len; ++i) {
+                STRING *s = chunks[i];
+
+                if (STRING_IS_NULL(s))
+                    continue;
+
+                if (s->encoding != e || s->charset != c) {
+                    STRING *new_s = e->to_encoding(interp, s);
+                    chunks[i]     = new_s;
+                    total_length += new_s->bufused - s->bufused;
+                }
             }
         }
+
+        /* add the length of the separator, now that it's transcoded */
+        total_length += j->bufused * ar_len;
+
+        res = Parrot_gc_new_string_header(interp, 0);
+        Parrot_gc_allocate_string_storage(interp, res, total_length);
+
+        res->charset  = j->charset;
+        res->encoding = j->encoding;
+
+        /* Iterate over chunks and append it to res */
+        pos = res->strstart;
+
+        /* Copy first chunk */
+        s = chunks[0];
+        if (!STRING_IS_NULL(s)) {
+            mem_sys_memcopy(pos, s->strstart, s->bufused);
+            pos += s->bufused;
+        }
+
+        for (i = 1; i < ar_len; ++i) {
+            STRING *next = chunks[i];
+
+            if (STRING_IS_NULL(next))
+                continue;
+
+            mem_sys_memcopy(pos, j->strstart, j->bufused);
+            pos += j->bufused;
+
+            mem_sys_memcopy(pos, next->strstart, next->bufused);
+            pos += next->bufused;
+
+            /* We can consume all buffer and pos will be next-after-end of buffer */
+            PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);
+        }
+
+        res->bufused  = pos - res->strstart;
+        res->strlen = CHARSET_CODEPOINTS(interp, res);
+
+        Parrot_gc_free_fixed_size_storage(interp, ar_len * sizeof (STRING *),
+            chunks);
+
+        Parrot_unblock_GC_mark(interp);
+
+        return res;
     }
-
-    /* add the length of the separator, now that it's transcoded */
-    total_length += j->bufused * ar_len;
-
-    res = Parrot_gc_new_string_header(interp, 0);
-    Parrot_gc_allocate_string_storage(interp, res, total_length);
-
-    res->charset  = j->charset;
-    res->encoding = j->encoding;
-
-    /* Iterate over chunks and append it to res */
-    pos = res->strstart;
-
-    /* Copy first chunk */
-    s = chunks[0];
-    if (!STRING_IS_NULL(s)) {
-        mem_sys_memcopy(pos, s->strstart, s->bufused);
-        pos += s->bufused;
-    }
-
-    for (i = 1; i < ar_len; ++i) {
-        STRING *next = chunks[i];
-
-        if (STRING_IS_NULL(next))
-            continue;
-
-        mem_sys_memcopy(pos, j->strstart, j->bufused);
-        pos += j->bufused;
-
-        mem_sys_memcopy(pos, next->strstart, next->bufused);
-        pos += next->bufused;
-
-        /* We can consume all buffer and pos will be next-after-end of buffer */
-        PARROT_ASSERT(pos <= res->strstart + Buffer_buflen(res) + 1);
-    }
-
-    res->bufused  = pos - res->strstart;
-    res->strlen = CHARSET_CODEPOINTS(interp, res);
-
-    Parrot_gc_free_fixed_size_storage(interp, ar_len * sizeof (STRING *),
-        chunks);
-
-    Parrot_unblock_GC_mark(interp);
-
-    return res;
 }
 
 
