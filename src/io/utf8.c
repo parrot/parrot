@@ -78,7 +78,6 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
                                          Parrot_unicode_charset_ptr, 0);
                 s2->bufused  = len2;
 
-                /* TT #1257: need to check the amount read here? */
                 read = Parrot_io_read_buffer(interp, filehandle, &s2);
                 UNUSED(read);
 
