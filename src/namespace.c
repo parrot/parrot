@@ -727,9 +727,6 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     PMC *ns;
     Parrot_Sub_attributes *sub;
 
-    /* PF structures aren't fully constructed yet */
-    Parrot_block_GC_mark(interp);
-
     /* store relative to HLL namespace */
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
@@ -762,7 +759,6 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     /* restore HLL_id */
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_id);
-    Parrot_unblock_GC_mark(interp);
 }
 
 /*
