@@ -355,7 +355,7 @@ of the given name walking up the inheritance tree.
 
         /* If there's a vtable override for 'get_attr_str' run that first. */
         PMC * const method = Parrot_oo_find_vtable_override(INTERP,
-                VTABLE_get_class(INTERP, SELF), get_attr);
+                obj->_class, get_attr);
 
         if (!PMC_IS_NULL(method)) {
             PMC *result = PMCNULL;
@@ -420,7 +420,7 @@ of the given name walking up the inheritance tree.
 
         /* If there's a vtable override for 'set_attr_str' run that first. */
         PMC * const method = Parrot_oo_find_vtable_override(INTERP,
-                VTABLE_get_class(INTERP, SELF), vtable_meth_name);
+                obj->_class, vtable_meth_name);
 
         if (!PMC_IS_NULL(method)) {
             Parrot_ext_call(INTERP, method, "PiSP->", SELF, name, value);
