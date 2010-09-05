@@ -37,6 +37,7 @@ Tests the C<StringBuilder> PMC.
     emit_with_pos_and_named_args()
 
     test_unicode_conversion_tt1665()
+    test_encodings()
 
     done_testing()
 
@@ -331,6 +332,19 @@ CODE
     sb  = new ["StringBuilder"], ar
     $S0 = sb
     is( $S0, $S1, 'init_pmc() should join all passed strings' )
+.end
+
+.sub 'test_encodings'
+    .local pmc sb
+    sb  = new ["StringBuilder"]
+
+    push sb, "foo"
+    push sb, iso-8859-1:"\x{E4}\x{F6}\x{FC}"
+    push sb, utf8:unicode:"БДЖ"
+    push sb, "bar"
+
+    $S0 = sb
+    is( $S0, utf8:unicode:"fooäöüБДЖbar", 'push strings with different encodings' )
 .end
 
 # Local Variables:
