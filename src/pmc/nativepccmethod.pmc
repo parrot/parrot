@@ -113,7 +113,7 @@ Call the function pointer.
                     EXCEPTION_INVALID_OPERATION,
                     "attempt to call NULL native function");
 
-        fptr = D2FPTR(func);
+        fptr = (native_pcc_method_t)D2FPTR(func);
         fptr(INTERP);
 
         /*

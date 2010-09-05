@@ -356,7 +356,7 @@ class, the PMC arguments are shifted down.
         PMC                          *cont;
 
         GET_ATTR_orig_func(INTERP, SELF, orig_func);
-        func = D2FPTR(nci_info->func);
+        func = (nci_thunk_t)D2FPTR(nci_info->func);
 
         GET_ATTR_fb_info(INTERP, SELF, fb_info);
 
