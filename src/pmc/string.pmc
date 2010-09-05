@@ -724,18 +724,18 @@ Checks if the ascii STRING C<str> is just an integer.
 
     METHOD is_integer(STRING *src) {
         INTVAL         i;
-        unsigned char *p;
+        char          *p;
         const INTVAL   len = Parrot_str_length(INTERP, src);
 
         if (!len)
             RETURN(INTVAL 0);
 
-        if (src->charset != Parrot_ascii_charset_ptr)
+        if (src->encoding != Parrot_fixed_8_encoding_ptr)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
-                "Can't is_integer non-ascii");
+                "Can't is_integer non fixed_8");
 
         i = 0;
-        p = (unsigned char *)Buffer_bufstart(src);
+        p = src->strstart;
 
         if (p[i] == '-' || p[i] == '+' ||
             (p[i] >= '0' && p[i] <= '9')) {
