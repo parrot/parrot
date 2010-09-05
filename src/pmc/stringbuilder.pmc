@@ -143,11 +143,15 @@ Returns created string.
 */
 
     VTABLE STRING *get_string() {
-        STRING *buffer;
+        STRING *buffer, *result;
         GET_ATTR_buffer(INTERP, SELF, buffer);
-        /* We need to clone buffer because outside of StringBuilder strings */
-        /* are immutable */
-        return Parrot_str_clone(INTERP, buffer);
+        /* We need to build a new string because outside of StringBuilder
+         * strings are immutable. Don't use Parrot_str_clone, the buffer
+         * is not a STRING valid enough for that. */
+        result = Parrot_str_new_init(INTERP,
+            buffer->strstart, buffer->bufused,
+            buffer->encoding, buffer->charset,
+            0);
     }
 
 /*
