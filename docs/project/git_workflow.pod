@@ -1,0 +1,88 @@
+# Copyright (C) 2008-2010, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/project/git_workflow.pod - How to use Git to work on Parrot
+
+=head1 DESCRIPTION
+
+To minimize the disruption of feature development on language and tool
+developers, all major changes to Parrot core take place in a branch. Ideally,
+branches are short-lived, and contain the smallest set of changes possible.
+It is also good practice to have "atomic" commits, in the sense that each
+commit does one thing, so that it makes it easier to accept/revert some
+things while keeping others. Git provides many powerful tools in the
+maintainence of branches. This document aims to provide everything a Parrot
+developer needs to know about Git to successfully create a branch, work on
+it, keep it in sync with changes on master and finally merge the branch.
+
+
+=head2 Creating and Switching Branches
+
+To create a branch and check it out, use the C<git checkout -b> command.
+Current convention is to create branch names of the form username/foo.
+
+  $ git checkout -b username/foo
+
+You can also create a branch without checking it out:
+
+  $ git branch username/foo
+
+To checkout (or "switch to", as it is commonly referred to) the username/foo
+branch:
+
+  $ git checkout username/foo
+
+=head2 Maintaining a Branch
+
+=head2 Preparing to Merge a Branch
+
+Post to parrot-dev@lists.parrot.org letting people know that you're about to
+merge a branch.
+
+=over
+
+=item 1
+
+Ask people to submit test results for their language, tool, or platform. If
+you don't hear back from people, it doesn't mean they ran the tests and found
+no problems, it means they didn't bother testing the branch. If you need
+feedback on a particular language or platform, follow up with the person
+responsible until you hear an explicit "Yes, it's working" answer.
+
+=item 2
+
+Let people know what tests you ran, so they can determine if you didn't run
+the tests for their language or tool (or, didn't run I<all> the tests for
+their language or tool if they have some unusual testing configuration).
+
+=item 3
+
+Mention any significant feature changes in the branch that you particularly
+want tested.
+
+=back
+
+
+=head2 Merging a Branch
+
+=head2 Announcing a Merge
+
+Send a message to parrot-dev@lists.parrot.org letting people know that your
+branch has been merged. Include a detailed list of changes made in the branch
+(you may want to keep this list as you work). Particularly note any added,
+removed, or changed opcodes, changes to PIR syntax or conventions, and changes
+in the C interface.
+
+If there was a specific language, tool, or platform that you wanted tested
+before merging but couldn't get any response from the responsible person, you
+may want to include some warning in the announcement that you weren't able to
+test that piece fully.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
