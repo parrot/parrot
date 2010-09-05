@@ -2376,7 +2376,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     &interp->initial_pf->directory;
             interp->code->annotations = (PackFile_Annotations *)
                     PackFile_Segment_new_seg(interp, dir,
-                        PF_ANNOTATIONS_SEG, name, add);
+                        PF_ANNOTATIONS_SEG, name, 1);
             interp->code->annotations->code = interp->code;
 
             /* Create initial group. */
