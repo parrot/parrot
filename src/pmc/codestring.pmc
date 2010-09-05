@@ -107,8 +107,6 @@ A newline is automatically added to the end of the fmt.
     STRING * const percent     = CONST_STRING(INTERP, "%");
     STRING * const comma       = CONST_STRING(INTERP, ",");
     STRING * const comma_space = CONST_STRING(INTERP, ", ");
-    STRING * const newline     = CONST_STRING(INTERP, "\n");
-    PMC           *parts       = PMCNULL;
     STRING *key, *repl, *S1;
     INTVAL pos          = 0;
     INTVAL replen       = 0;
@@ -146,15 +144,18 @@ A newline is automatically added to the end of the fmt.
 
     GET_ATTR_str_val(INTERP, SELF, S1);
 
-    parts = Parrot_pmc_new_init_int(INTERP, enum_class_FixedStringArray, 3);
-    VTABLE_set_string_keyed_int(INTERP, parts, 0, S1);
-    VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
-
     /* Add a newline if necessary */
-    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_length(INTERP, fmt) - 1))
+    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_length(INTERP, fmt) - 1)) {
+        STRING * const newline     = CONST_STRING(INTERP, "\n");
+        PMC     *parts = Parrot_pmc_new_init_int(INTERP, enum_class_FixedStringArray, 3);
+        VTABLE_set_string_keyed_int(INTERP, parts, 0, S1);
+        VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
         VTABLE_set_string_keyed_int(INTERP, parts, 2, newline);
+        S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
+    }
+    else
+        S1 = Parrot_str_concat(INTERP, S1, fmt);
 
-    S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
     VTABLE_set_string_native(INTERP, SELF, S1);
 
     RETURN(PMC *SELF);
