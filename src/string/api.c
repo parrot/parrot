@@ -355,8 +355,6 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     PObj_get_FLAGS(result)  = PObj_is_string_FLAG
                             | PObj_is_COWable_FLAG;
 
-    Buffer_buflen(result) = alloc_size;
-
     /* Allocate new chunk of memory */
     Parrot_gc_allocate_string_storage(interp, result, alloc_size);
 
