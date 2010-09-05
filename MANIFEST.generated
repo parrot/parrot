@@ -80,6 +80,7 @@ include/pmc/pmc_lexpad.h                         [devel]include
 include/pmc/pmc_managedstruct.h                  [devel]include
 include/pmc/pmc_multisub.h                       [devel]include
 include/pmc/pmc_namespace.h                      [devel]include
+include/pmc/pmc_nativepccmethod.h                [devel]include
 include/pmc/pmc_nci.h                            [devel]include
 include/pmc/pmc_null.h                           [devel]include
 include/pmc/pmc_object.h                         [devel]include
@@ -374,6 +375,7 @@ src/pmc/lexpad.dump                              [devel]src
 src/pmc/managedstruct.dump                       [devel]src
 src/pmc/multisub.dump                            [devel]src
 src/pmc/namespace.dump                           [devel]src
+src/pmc/nativepccmethod.dump                     [devel]src
 src/pmc/nci.dump                                 [devel]src
 src/pmc/null.dump                                [devel]src
 src/pmc/object.dump                              [devel]src
