@@ -18,6 +18,31 @@ developer needs to know about Git to successfully create a branch, work on
 it, keep it in sync with changes on master and finally merge the branch.
 
 
+
+=head2 Cloning the Git Repository
+
+To get the full version history Parrot, which is called "cloning a repository",
+you will use the C<git clone> command. This will show how to clone the repo from
+L<http://github.com> :
+
+  $ git clone git://github.com/parrot/parrot.git
+
+If you have commit access to parrot.git, then you can use the read/write SSH
+protocol
+
+  $ git clone git@github.com:parrot/parrot.git
+
+If you are behind a firewall that will only let you do HTTP, you can use the
+HTTP protocol, but it is much slower and inefficient, so only use it if you
+must:
+
+  $ git clone http://github.com/parrot/parrot.git
+
+Cloning a git repo automatically makes the URL that you cloned from your
+default "remote", which is called "origin". What this means is that
+when you want to pull in new changes or push changes out in the future,
+"origin" is what will be used by default.
+
 =head2 Creating and Switching Branches
 
 To create a branch and check it out, use the C<git checkout -b> command.
