@@ -369,10 +369,7 @@ my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
 # converting to skip at the moment
 #
 
-SKIP: {
-    skip ".tailcall and lexical maps not thawed from PBC - hangs", 1 if @todo;
-
-pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception", @todo );
+pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception" );
 .sub main :main
     .local pmc a
     .lex 'a', a
@@ -381,7 +378,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception", @todo );
     push_eh handler
     exit 0
 handler:
-    .tailcall exit_handler()
+    .const 'Sub' $P0 = 'exit_handler'
+    capture_lex $P0
+    .tailcall $P0()
 .end
 
 .sub exit_handler :outer(main)
@@ -395,8 +394,6 @@ CODE
 at_exit
 a = 42
 OUTPUT
-
-}
 
 ## Regression test for r14697.  This probably won't be needed when PDD23 is
 ## fully implemented.
