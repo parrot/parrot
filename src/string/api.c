@@ -348,18 +348,17 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     const size_t alloc_size = s->bufused;
     STRING * const result = Parrot_gc_new_string_header(interp, 0);
 
-    /* Copy encoding/charset/etc */
-    STRUCT_COPY(result, s);
-
-    /* Clear COW flag. We own buffer */
-    PObj_get_FLAGS(result)  = PObj_is_string_FLAG
-                            | PObj_is_COWable_FLAG;
-
     /* Allocate new chunk of memory */
     Parrot_gc_allocate_string_storage(interp, result, alloc_size);
 
     /* and copy it over */
     mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
+
+    result->strlen   = s->strlen;
+    result->bufused  = s->bufused;
+    result->hashval  = s->hashval;
+    result->encoding = s->encoding;
+    result->charset  = s->charset;
 
     return result;
 }
