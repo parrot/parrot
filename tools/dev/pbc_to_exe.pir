@@ -578,10 +578,11 @@ END_OF_FUNCTION
     .param int    install
 
     $P0 = '_config'()
-    .local string cc, ccflags, cc_o_out, osname, build_dir, slash
+    .local string cc, ccflags, optimize, cc_o_out, osname, build_dir, slash
     .local string installed, includepath, versiondir
     cc        = $P0['cc']
     ccflags   = $P0['ccflags']
+    optimize  = $P0['optimize']
     cc_o_out  = $P0['cc_o_out']
     osname    = $P0['osname']
     build_dir = $P0['build_dir']
@@ -615,6 +616,8 @@ END_OF_FUNCTION
     compile .= pathquote
     compile .= ' '
     compile .= ccflags
+    compile .= ' '
+    compile .= optimize
     compile .= ' -c '
     compile .= cfile
 
