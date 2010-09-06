@@ -20,7 +20,7 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    test_create()               # 2 tests
+    test_create()               # 3 tests
     test_init_pmc()
     test_push_string()
     test_push_pmc()             # 4 tests
@@ -55,6 +55,12 @@ Tests the C<StringBuilder> PMC.
     $S0 = sb
     is( $S0, '', '... with empty content')
 
+    .local pmc ar
+    ar = new ['FixedStringArray']
+    sb = new ['StringBuilder'], ar
+    $I0 = isnull sb
+    not $I0
+    ok( $I0, 'StringBuilder created from empty array' )
 .end
 
 .sub 'test_push_string'
