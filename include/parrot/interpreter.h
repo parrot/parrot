@@ -194,6 +194,7 @@ struct parrot_interp_t {
                                                 * running */
 
     op_func_t *evc_func_table;                /* event check opcode dispatch */
+    size_t     evc_func_table_size;
 
     int         n_libs;                       /* count of libs below */
     op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */

@@ -210,10 +210,6 @@ runops_int(PARROT_INTERP, size_t offset)
 {
     ASSERT_ARGS(runops_int)
 
-    /* setup event function ptrs */
-    if (!interp->evc_func_table)
-        Parrot_setup_event_func_ptrs(interp);
-
     interp->resume_offset = offset;
     interp->resume_flag  |= RESUME_RESTART;
 
@@ -235,44 +231,6 @@ runops_int(PARROT_INTERP, size_t offset)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "branch_cs: illegal resume offset");
         }
-    }
-}
-
-
-/*
-
-=item C<void Parrot_setup_event_func_ptrs(PARROT_INTERP)>
-
-Setup a C<func_table> containing pointers (or addresses) of the
-C<check_event__> opcode.
-
-TODO: Free it at destroy. Handle run-core changes.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_setup_event_func_ptrs(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_setup_event_func_ptrs)
-    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
-    op_lib_t * const   lib       = init_func(interp, 1);
-    const size_t       n         = lib->op_count;
-
-    if (!lib->op_func_table)
-        return;
-
-    /* function or CG core - prepare func_table */
-    if (!interp->evc_func_table) {
-        size_t i;
-
-        interp->evc_func_table = mem_gc_allocate_n_zeroed_typed(interp, n, op_func_t);
-
-        for (i = 0; i < n; ++i)
-            interp->evc_func_table[i] = (op_func_t)
-                D2FPTR(((void**)lib->op_func_table)[CORE_OPS_check_events__]);
     }
 }
 
@@ -349,7 +307,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     ASSERT_ARGS(dynop_register)
     op_lib_t *lib, *core;
     oplib_init_f init_func;
-    op_func_t *new_func_table, *new_evc_func_table;
+    op_func_t *new_func_table;
     op_info_t *new_info_table;
     size_t i, n_old, n_new, n_tot;
 
@@ -387,9 +345,6 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
         return;
     }
 
-    /* when called from yyparse, we have to set up the evc_func_table */
-    Parrot_setup_event_func_ptrs(interp);
-
     n_old = interp->op_count;
     n_new = lib->op_count;
     n_tot = n_old + n_new;
@@ -397,8 +352,6 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 
     PARROT_ASSERT(interp->op_count == core->op_count);
 
-    new_evc_func_table = mem_gc_realloc_n_typed_zeroed(interp,
-            interp->evc_func_table, n_tot, n_old, op_func_t);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
         new_func_table = mem_gc_realloc_n_typed_zeroed(interp,
                 core->op_func_table, n_tot, n_old, op_func_t);
@@ -421,16 +374,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     for (i = n_old; i < n_tot; ++i) {
         new_func_table[i] = ((op_func_t*)lib->op_func_table)[i - n_old];
         new_info_table[i] = lib->op_info_table[i - n_old];
-
-        /*
-         * fill new ops of event checker func table
-         * if we are running a different core, entries are
-         * changed below
-         */
-        new_evc_func_table[i] = new_func_table[CORE_OPS_check_events__];
     }
-
-    interp->evc_func_table  = new_evc_func_table;
 
     /* deinit core, so that it gets rehashed */
     (void) PARROT_CORE_OPLIB_INIT(interp, 0);
@@ -516,9 +460,30 @@ enable_event_checking(PARROT_INTERP)
 {
     ASSERT_ARGS(enable_event_checking)
     PackFile_ByteCode *cs = interp->code;
+
     /* only save if we're not already event checking */
     if (cs->save_func_table == NULL)
         cs->save_func_table = cs->op_func_table;
+
+    /* ensure event checking table is big enough */
+    if (interp->evc_func_table_size < cs->op_count) {
+        int i;
+        op_lib_t *core_lib = get_core_op_lib_init(interp, interp->run_core)(interp, 1);
+
+        interp->evc_func_table = interp->evc_func_table ?
+                                    mem_gc_realloc_n_typed_zeroed(interp,
+                                        interp->evc_func_table, cs->op_count,
+                                        interp->evc_func_table_size, op_func_t) :
+                                    mem_gc_allocate_n_zeroed_typed(interp,
+                                        cs->op_count, op_func_t);
+
+        for (i = interp->evc_func_table_size; i < cs->op_count; i++)
+            interp->evc_func_table[i] = (op_func_t)
+                D2FPTR(((void**)core_lib->op_func_table)[CORE_OPS_check_events__]);
+
+        interp->evc_func_table_size = cs->op_count;
+    }
+
     /* put evc table in place */
     cs->op_func_table   = interp->evc_func_table;
 }
