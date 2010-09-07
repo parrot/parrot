@@ -45,19 +45,10 @@ static oplib_init_f get_dynamic_op_lib_init(SHIM_INTERP,
     ARGIN(const PMC *lib))
         __attribute__nonnull__(2);
 
-static void notify_func_table(PARROT_INTERP,
-    ARGIN(op_func_t *table),
-    int on)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lib))
-#define ASSERT_ARGS_notify_func_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(table))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -476,31 +467,6 @@ dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
     ASSERT_ARGS(dynop_register_switch)
     op_lib_t * const lib = PARROT_CORE_OPLIB_INIT(interp, 1);
     lib->op_count        = n_old + n_new;
-}
-
-
-/*
-
-=item C<static void notify_func_table(PARROT_INTERP, op_func_t *table, int on)>
-
-Tell the interpreter's running core about the new function table.
-
-=cut
-
-*/
-
-static void
-notify_func_table(PARROT_INTERP, ARGIN(op_func_t *table), int on)
-{
-    ASSERT_ARGS(notify_func_table)
-    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
-
-    init_func(interp, (long) table);
-
-    if (PARROT_RUNCORE_FUNC_TABLE_TEST(interp->run_core)) {
-        PARROT_ASSERT(table);
-        interp->op_func_table = table;
-    }
 }
 
 
