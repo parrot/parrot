@@ -7,6 +7,18 @@ docs/project/git_terminology.pod - Git Terminology
 This document describes terms that are used in docs/project/git_workflow.pod
 and contains generally useful things to know about Git.
 
+
+=head2 INTRODUCTION
+
+Before learning any terminology, there are a few very basic things that
+should be understood about Git, which will provide a foundation for
+understanding anything else.
+
+A Git repository is a Directed Acyclic Graph (DAG), where each node in the
+graph is a commit, with zero or more parents. The first commit of a
+repository has zero parents, others have at least one parent. If a commit has
+more than one parent, that means it was the result of a merge.
+
 =cut
 
 __END__
