@@ -153,7 +153,7 @@ latin1_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     STRING      *dest;
 
     if (STRING_max_bytes_per_codepoint(src) == 1) {
-        dest           = Parrot_str_clone(interp, src);
+        dest           = Parrot_str_copy(interp, src);
         dest->encoding = Parrot_latin1_encoding_ptr;
     }
     else {

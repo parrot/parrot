@@ -171,8 +171,10 @@ utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     int src_len;
     STRING *result;
 
-    if (src->encoding == Parrot_utf16_encoding_ptr ||
-            src->encoding == Parrot_ucs2_encoding_ptr)
+    if (src->encoding == Parrot_utf16_encoding_ptr
+    ||  src->encoding == Parrot_ucs2_encoding_ptr)
+        /* we have to use clone instead of copy because the Unicode upcase
+         * and downcase functions assume to get an unshared buffer */
         return Parrot_str_clone(interp, src);
 
     result = Parrot_gc_new_string_header(interp, 0);
