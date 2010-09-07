@@ -19,6 +19,28 @@ graph is a commit, with zero or more parents. The first commit of a
 repository has zero parents, others have at least one parent. If a commit has
 more than one parent, that means it was the result of a merge.
 
+Each commit is uniquely identified by a SHA1 sum. You may refer to any commit
+by the first few characters of a SHA1 sum, as long as it is unique. If it is
+not unique, C<git> will complain loudly. Usually 6-7 characters of a SHA1 is
+sufficient, but this number increases as the number of commits in a repo
+grows.
+
+There are three distinct "places" in a Git repository, which are referred to
+as the index, the working copy, and the staging area. The index is the actual
+DAG, where all the history of the repo is stored. This lives in the .git
+directory of a repository. The "working copy" are the actual files on the
+filesystem. The staging area is where things that will be included in the
+next commit live. When you type C<git add foo>, you are adding the
+file/directory foo to the staging area. When you type C<git log> you are
+asking the index to show you a log of all commits. When you run a non-git
+command in a repo, such as C<rm foo>, you are modifying the working copy.
+
+The most important thing to learn when understanding a C<git> command is
+whether it operates on the index, working copy or staging area. Also note
+that certain C<git> commands can operate on different areas when given
+certain command-line options.
+
+
 =cut
 
 __END__
