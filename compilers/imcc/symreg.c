@@ -1256,6 +1256,30 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
 
 /*
 
+=item C<void free_pcc_sub(pcc_sub_t *sub)>
+
+Frees all memory of the given pcc_sub_t.
+
+=cut
+
+*/
+
+void
+free_pcc_sub(ARGMOD(pcc_sub_t *sub))
+{
+    ASSERT_ARGS(free_pcc_sub)
+
+    mem_sys_free(sub->multi);
+    mem_sys_free(sub->args);
+    mem_sys_free(sub->arg_flags);
+    mem_sys_free(sub->ret);
+    mem_sys_free(sub->ret_flags);
+    mem_sys_free(sub);
+}
+
+
+/*
+
 =item C<void free_sym(SymReg *r)>
 
 Frees all memory of the specified SymReg.  If it has a pcc_sub_t entry, frees
@@ -1271,14 +1295,8 @@ free_sym(ARGMOD(SymReg *r))
     ASSERT_ARGS(free_sym)
     pcc_sub_t * const sub = r->pcc_sub;
 
-    if (sub) {
-        mem_sys_free(sub->multi);
-        mem_sys_free(sub->args);
-        mem_sys_free(sub->arg_flags);
-        mem_sys_free(sub->ret);
-        mem_sys_free(sub->ret_flags);
-        mem_sys_free(sub);
-    }
+    if (sub)
+        free_pcc_sub(sub);
 
     if (r->set == 'K') {
         SymReg *key     = r->nextkey;

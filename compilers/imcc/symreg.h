@@ -84,6 +84,45 @@ struct namespace_t {
     Identifier *idents;
 };
 
+typedef enum {
+    P_NONE           = 0x00,                  /* 0<<0 */
+    P_NEED_LEX       = 0x01,                  /* 1<<0 */
+    P_VTABLE         = SUB_COMP_FLAG_VTABLE,  /* 1<<1 0x2 */
+    P_METHOD         = SUB_COMP_FLAG_METHOD,  /* 1<<2 0x4 */
+    P_ANON           = SUB_FLAG_PF_ANON,      /* 1<<3 0x8    - private3 */
+    P_MAIN           = SUB_FLAG_PF_MAIN,      /* 1<<4 0x10   - private4 */
+    P_LOAD           = SUB_FLAG_PF_LOAD,      /* 1<<5 0x20   - private5 */
+    P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE, /* 1<<6 0x40   - private6 */
+    P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP,  /* 1<<7 0x80   - private7 */
+    P_INIT           = SUB_COMP_FLAG_PF_INIT, /* 1<<10 0x400 - 10       */
+    P_NSENTRY        = SUB_COMP_FLAG_NSENTRY  /* 1<<11 0x800 - 11       */
+} pragma_enum_t;
+
+typedef struct pcc_sub_t {
+    SymReg *sub;
+    SymReg *cc;
+    SymReg **args;
+    SymReg **multi;
+    SymReg **ret;
+    SymReg *object;
+    int    *arg_flags;    /* :slurpy, :optional, ... */
+    int    *ret_flags;    /* :slurpy, :optional, ... */
+    int     nargs;
+    int     nret;
+    int     nmulti;
+    int     yield;
+    int     tailcall;
+    int     label;
+    INTVAL  pragma;
+} pcc_sub_t;
+
+enum uniq_t {
+    U_add_once,
+    U_add_uniq_label,
+    U_add_uniq_sub,
+    U_add_all
+};
+
 /* functions */
 
 /* HEADERIZER BEGIN: compilers/imcc/symreg.c */
@@ -194,6 +233,10 @@ PARROT_WARN_UNUSED_RESULT
 SymReg * find_sym(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void free_pcc_sub(ARGMOD(pcc_sub_t *sub))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*sub);
 
 void free_sym(ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
@@ -365,6 +408,8 @@ char * symreg_to_str(ARGIN(const SymReg *s))
 #define ASSERT_ARGS_find_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_free_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_free_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_get_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -421,45 +466,6 @@ char * symreg_to_str(ARGIN(const SymReg *s))
        PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/symreg.c */
-
-typedef enum {
-    P_NONE           = 0x00,                  /* 0<<0 */
-    P_NEED_LEX       = 0x01,                  /* 1<<0 */
-    P_VTABLE         = SUB_COMP_FLAG_VTABLE,  /* 1<<1 0x2 */
-    P_METHOD         = SUB_COMP_FLAG_METHOD,  /* 1<<2 0x4 */
-    P_ANON           = SUB_FLAG_PF_ANON,      /* 1<<3 0x8    - private3 */
-    P_MAIN           = SUB_FLAG_PF_MAIN,      /* 1<<4 0x10   - private4 */
-    P_LOAD           = SUB_FLAG_PF_LOAD,      /* 1<<5 0x20   - private5 */
-    P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE, /* 1<<6 0x40   - private6 */
-    P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP,  /* 1<<7 0x80   - private7 */
-    P_INIT           = SUB_COMP_FLAG_PF_INIT, /* 1<<10 0x400 - 10       */
-    P_NSENTRY        = SUB_COMP_FLAG_NSENTRY  /* 1<<11 0x800 - 11       */
-} pragma_enum_t;
-
-typedef struct pcc_sub_t {
-    SymReg *sub;
-    SymReg *cc;
-    SymReg **args;
-    SymReg **multi;
-    SymReg **ret;
-    SymReg *object;
-    int    *arg_flags;    /* :slurpy, :optional, ... */
-    int    *ret_flags;    /* :slurpy, :optional, ... */
-    int     nargs;
-    int     nret;
-    int     nmulti;
-    int     yield;
-    int     tailcall;
-    int     label;
-    INTVAL  pragma;
-} pcc_sub_t;
-
-enum uniq_t {
-    U_add_once,
-    U_add_uniq_label,
-    U_add_uniq_sub,
-    U_add_all
-};
 
 #endif /* PARROT_IMCC_SYMREG_H_GUARD */
 

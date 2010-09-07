@@ -749,7 +749,13 @@ insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
         ins     = insINS(interp, unit, ins, "tailcall", regs, 1);
     }
 
+    /* don't leak this sub SymReg; it gets detached here */
+    if (regs[0]->pcc_sub)
+        free_pcc_sub(regs[0]->pcc_sub);
+
+    /* this register is always the symbol "self", global to this IMC_Unit */
     regs[0]->pcc_sub  = sub->pcc_sub;
+
     sub->pcc_sub      = NULL;
     ins->type        |= ITPCCSUB;
 }
