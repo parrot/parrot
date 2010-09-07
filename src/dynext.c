@@ -282,6 +282,8 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
             Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                         "Couldn't dlopen(NULL): %s\n",
                         err ? err : "unknown reason");
+            /* clear the error memory */
+            (void)Parrot_dlerror();
             return NULL;
         }
     }
@@ -307,6 +309,8 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
                     Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                                 "Couldn't load '%Ss': %s\n",
                             full_name, err ? err : "unknown reason");
+                    /* clear the error memory */
+                    (void)Parrot_dlerror();
                     return NULL;
                 }
             }
@@ -372,6 +376,9 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
         Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                     "Couldn't load '%Ss': %s\n",
                     lib, err ? err : "unknown reason");
+
+        /* clear the error memory */
+        (void)Parrot_dlerror();
         return NULL;
     }
 }
