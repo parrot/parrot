@@ -24,10 +24,7 @@ TODO: Add description here.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static size_t calculate_capacity(SHIM_INTERP,
-    size_t current,
-    size_t additional);
-
+static size_t calculate_capacity(SHIM_INTERP, size_t needed);
 #define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -143,16 +140,11 @@ Returns created string.
 */
 
     VTABLE STRING *get_string() {
-        STRING *buffer, *result;
+        STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* We need to build a new string because outside of StringBuilder
-         * strings are immutable. Don't use Parrot_str_clone, the buffer
-         * is not a STRING valid enough for that. */
-        result = Parrot_str_new_init(INTERP,
-            buffer->strstart, buffer->bufused,
-            buffer->encoding, buffer->charset,
-            0);
-        return result;
+         * strings are immutable. */
+        return Parrot_str_clone(INTERP, buffer);
     }
 
 /*
@@ -177,37 +169,59 @@ Append string to current buffer.
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
 
-        /* If strings are incompatible - convert them */
-        /* TODO Ask chromatic why in Parrot_str_join he ignored charset */
-        cs = Parrot_str_rep_compatible(interp, buffer, s, &enc);
-        if (cs) {
-            buffer->charset = cs;
-            buffer->encoding = enc;
+        if (buffer->bufused == 0) {
+            /* Always copy the encoding of the first string. The IO functions
+               assume that the concatenation of utf8 strings doesn't change
+               the encoding. */
+            buffer->charset  = s->charset;
+            buffer->encoding = s->encoding;
         }
         else {
-            if (buffer->encoding != Parrot_utf8_encoding_ptr) {
-                /* Create new temporary string */
-                STRING * const new_buffer = Parrot_utf8_encoding_ptr->to_encoding(interp, buffer);
-                mem_gc_free(INTERP, buffer->_bufstart);
-                STRUCT_COPY(buffer, new_buffer);
-                buffer->flags     = PObj_is_string_FLAG | PObj_external_FLAG;
+            cs = Parrot_str_rep_compatible(interp, buffer, s, &enc);
 
-                buffer->_bufstart = buffer->strstart = mem_gc_allocate_n_typed(INTERP,
-                                                        new_buffer->_buflen, char);
-                mem_sys_memcopy(buffer->_bufstart, new_buffer->_bufstart, new_buffer->_buflen);
-
-                SET_ATTR_buffer(INTERP, SELF, buffer);
+            if (cs) {
+                buffer->charset = cs;
+                buffer->encoding = enc;
             }
+            else {
+                /* If strings are incompatible - convert them to utf8 */
 
-            if (s->encoding != Parrot_utf8_encoding_ptr)
-                s = Parrot_utf8_encoding_ptr->to_encoding(interp, s);
+                if (s->encoding != Parrot_utf8_encoding_ptr)
+                    s = Parrot_utf8_encoding_ptr->to_encoding(interp, s);
+
+                if (buffer->encoding != Parrot_utf8_encoding_ptr) {
+                    /* Create new temporary string */
+                    STRING * new_buffer;
+
+                    new_buffer = Parrot_utf8_encoding_ptr->to_encoding(interp, buffer);
+                    total_size = new_buffer->bufused + s->bufused;
+
+                    if (total_size > buffer->_buflen) {
+                        /* Reallocate */
+                        mem_gc_free(INTERP, buffer->_bufstart);
+                        total_size = calculate_capacity(INTERP, total_size);
+                        buffer->_bufstart = buffer->strstart
+                                          = mem_gc_allocate_n_typed(INTERP, total_size, char);
+                        buffer->_buflen   = total_size;
+                    }
+
+                    buffer->bufused  = new_buffer->bufused;
+                    buffer->charset  = new_buffer->charset;
+                    buffer->encoding = new_buffer->encoding;
+
+                    mem_sys_memcopy(buffer->strstart, new_buffer->strstart,
+                            new_buffer->bufused);
+                }
+            }
         }
 
-        /* Calculate (possibly new) total size */
-        total_size = calculate_capacity(INTERP, buffer->bufused, s->bufused);
+        total_size = buffer->bufused + s->bufused;
 
         /* Reallocate if necessary */
-        if (total_size > Buffer_buflen(buffer)) {
+        if (total_size > buffer->_buflen) {
+            /* Calculate (possibly new) total size */
+            total_size = calculate_capacity(INTERP, total_size);
+
             /* Parrot_unicode_charset_ptr can produce NULL buffer */
             buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
                 buffer->_bufstart, total_size, char);
@@ -265,7 +279,7 @@ Set content of buffer to passed string or PMC
         STRING * buffer;
 
         /* Calculate (possibly new) total size */
-        size_t total_size = calculate_capacity(INTERP, 0, s->bufused);
+        size_t total_size = calculate_capacity(INTERP, s->bufused);
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
 
@@ -462,17 +476,9 @@ Returns length of currently built string.
 
 /*
 
-=item C<static size_t calculate_capacity(PARROT_INTERP, size_t current, size_t
-additional)>
+=item C<static size_t calculate_capacity(PARROT_INTERP, size_t needed)>
 
-Calculate capacity for string. Usually StringBuilders used for "large"
-strings. So capacity rounded up by next algorithm:
-  - By 128 bytes if total capacity less then 1KB
-  - By 1KB if total less than 4KB
-  - By 4KB if total less than 1MB
-  - By 1MB otherwise.
-
-This function is subject for tuning on real-world usage scenarios.
+Calculate capacity for string. We allocate double the amount needed.
 
 =back
 
@@ -481,22 +487,15 @@ This function is subject for tuning on real-world usage scenarios.
 */
 
 static size_t
-calculate_capacity(SHIM_INTERP, size_t current, size_t additional)
+calculate_capacity(SHIM_INTERP, size_t needed)
 {
     ASSERT_ARGS(calculate_capacity)
-    size_t total_size = current + additional;
-    size_t chunk_size = 1024*1024;
 
-    if (total_size < 1024)
-        chunk_size = 128;
-    else if (total_size < 4096)
-        chunk_size = 1024;
-    else if (total_size < 1024*1024)
-        chunk_size = 4096;
+    needed *= 2;
+    /* round up to 16 */
+    needed  = (needed + 15) & ~15;
 
-    total_size = (total_size / chunk_size + 1) * chunk_size;
-
-    return total_size;
+    return needed;
 }
 
 /*

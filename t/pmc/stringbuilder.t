@@ -77,9 +77,6 @@ Tests the C<StringBuilder> PMC.
 
     is( $S0, "foo", "... without clobbering first string")
 
-    $I0 = sb
-    is( $I0, 128, "... and capacity still 128" )
-
     $I0 = sb.'get_string_length'()
     is( $I0, 6,   "... and string length is correct")
 
@@ -91,18 +88,12 @@ Tests the C<StringBuilder> PMC.
     $S1 = sb
     is( $S0, $S1, "Push 128 chars string works")
 
-    $I0 = sb
-    is( $I0, 256, "... and capacity increased" )
-
     $S99 = repeat "x", 1000
     push sb, $S99
 
     $S0 = concat $S0, $S99
     $S1 = sb
     is( $S0, $S1, "Push 1000 chars string works")
-
-    $I0 = sb
-    is( $I0, 2048, "... and capacity increased" )
 
     $S99 = repeat "x", 12000
     push sb, $S99
@@ -111,13 +102,11 @@ Tests the C<StringBuilder> PMC.
     $S1 = sb
     is( $S0, $S1, "Push 10000 chars string works")
 
-    $I0 = sb
-    is( $I0, 16384, "... and capacity increased" )
+    null $S99
+    push sb, $S99
 
-    null $S0
-    push sb, $S0
-    $I0 = sb
-    is( $I0, 16384, "push a null string does nothing" )
+    $S1 = sb
+    is( $S0, $S1, "push a null string does nothing" )
 .end
 
 .sub 'test_push_pmc'
