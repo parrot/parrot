@@ -23,12 +23,13 @@ t/pmc/orderedhash.t.
 .sub 'main'
     .include 'test_more.pir'
 
-    plan(6)
+    plan(7)
 
     'test_init'()
     'test_bad_type'()
     'test_shift'()
     'test_pop'()
+    'test_clone'()
 .end
 
 .sub 'test_init'
@@ -111,6 +112,18 @@ t/pmc/orderedhash.t.
     finalize eh
     pop_eh
     ok(i, 'pop_pmc in empty OH throws')
+.end
+
+.sub 'test_clone'
+    .local pmc oh, it, cl
+    .local int result
+    oh = new ['OrderedHash']
+    it = iter oh
+
+    # This chekcs the de facto behavior for code coverage purposes.
+    cl = clone it
+    result = isnull cl
+    ok(result, 'clone of OHI gives null')
 .end
 
 # Local Variables:
