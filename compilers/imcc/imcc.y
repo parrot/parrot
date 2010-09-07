@@ -2269,9 +2269,8 @@ argtype:
    | ADV_NAMED                 { $$ = VT_NAMED;    }
    | ADV_CALL_SIG              { $$ = VT_CALL_SIG; }
 
-   /* don't free $3 here; adv_named_set uses the pointer directly */
-   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
-   | ADV_NAMED '(' STRINGC  ')' { adv_named_set(interp, $3);   $$ = 0; }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); mem_sys_free($3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC  ')' { adv_named_set(interp, $3);   mem_sys_free($3); $$ = 0; }
    ;
 
 result:
