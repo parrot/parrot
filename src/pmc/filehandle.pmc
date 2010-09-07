@@ -463,6 +463,8 @@ filehandle when finished.
             Parrot_io_close(INTERP, filehandle);
         }
         else {
+            PMC *sb;
+
             /* slurp open file */
             if (Parrot_io_is_closed_filehandle(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
@@ -472,12 +474,15 @@ filehandle when finished.
             if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
                 Parrot_io_setlinebuf(INTERP, SELF);
 
-            result = STRINGNULL;
+            sb = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
+                    4096);
+
             do {
                 STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
-                result = STRING_IS_NULL(result) ? part :
-                        Parrot_str_concat(INTERP, result, part);
+                VTABLE_push_string(interp, sb, part);
             } while (!Parrot_io_eof(INTERP, SELF));
+
+            result = VTABLE_get_string(interp, sb);
         }
 
         RETURN(STRING *result);
