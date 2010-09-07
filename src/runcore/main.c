@@ -220,7 +220,7 @@ runops_int(PARROT_INTERP, size_t offset)
     ASSERT_ARGS(runops_int)
 
     /* setup event function ptrs */
-    if (!interp->save_func_table)
+    if (!interp->evc_func_table)
         Parrot_setup_event_func_ptrs(interp);
 
     interp->resume_offset = offset;
@@ -266,12 +266,9 @@ void
 Parrot_setup_event_func_ptrs(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_setup_event_func_ptrs)
-    const size_t       n         = interp->op_count;
     const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
     op_lib_t * const   lib       = init_func(interp, 1);
-
-    /* remember op_func_table */
-    interp->save_func_table      = lib->op_func_table;
+    const size_t       n         = lib->op_count;
 
     if (!lib->op_func_table)
         return;
@@ -443,7 +440,6 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     }
 
     interp->evc_func_table  = new_evc_func_table;
-    interp->save_func_table = new_func_table;
 
     /* deinit core, so that it gets rehashed */
     (void) PARROT_CORE_OPLIB_INIT(interp, 0);

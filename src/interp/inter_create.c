@@ -258,7 +258,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->op_info_table   = interp->op_lib->op_info_table;
     interp->all_op_libs     = NULL;
     interp->evc_func_table  = NULL;
-    interp->save_func_table = NULL;
     interp->code            = NULL;
 
     /* create the root set registry */
