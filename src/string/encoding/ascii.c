@@ -284,7 +284,8 @@ method of the encoding plugin.
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
-ascii_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
+ascii_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset,
+                    UINTVAL count)
 {
     ASSERT_ARGS(ascii_find_cclass)
     const unsigned char *contents = (const unsigned char *)src->strstart;
