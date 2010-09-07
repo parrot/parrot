@@ -2778,7 +2778,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     ASSERT_ARGS(byte_code_unpack)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
-    int total_ops = 0;
+    size_t total_ops = 0;
 
     byte_code->op_count          = PF_fetch_opcode(self->pf, &cursor);
     byte_code->op_func_table     = mem_gc_allocate_n_zeroed_typed(interp,
@@ -2849,12 +2849,12 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                 opcode_t idx = PF_fetch_opcode(self->pf, &cursor);
                 opcode_t op  = PF_fetch_opcode(self->pf, &cursor);
 
-                if (0 > op || op >= entry->lib->op_count)
+                if (0 > op || (size_t)op >= entry->lib->op_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                         "opcode index out of bounds on library `%s'. Found %d, expected 0 to %d.",
                         entry->lib->name, op, entry->lib->op_count - 1);
 
-                if (0 > idx || idx >= byte_code->op_count)
+                if (0 > idx || (size_t)idx >= byte_code->op_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                         "op table index out of bounds for entry from library `%s'."
                         " Found %d, expected 0 to %d",
