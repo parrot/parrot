@@ -302,7 +302,8 @@ AGAIN:
         /* The charset should probably be 'binary', but right now httpd.pir
          * only works with 'ascii'
          */
-        *s = string_make(interp, buf, bytesread, "ascii", 0);
+        *s = Parrot_str_new_init(interp, buf, bytesread,
+                Parrot_ascii_encoding_ptr, 0);
         return bytesread;
     }
     else {

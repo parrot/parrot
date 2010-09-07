@@ -1048,12 +1048,13 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     }
     else if (*buf == '\'') {   /* TODO handle python raw strings */
         buf++;
-        return string_make(interp, buf, strlen(buf) - 1, "ascii",
-                PObj_constant_FLAG);
+        return Parrot_str_new_init(interp, buf, strlen(buf) - 1,
+                Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
 
     /* unquoted bare name - ASCII only don't unescape it */
-    return string_make(interp, buf, strlen(buf), "ascii", PObj_constant_FLAG);
+    return Parrot_str_new_init(interp, buf, strlen(buf),
+            Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
 }
 
 /*
@@ -1101,7 +1102,8 @@ IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(char *buf))
     }
     else if (*buf == '\'') {
         buf++;
-        return string_make(interp, buf, strlen(buf) - 1, "ascii", PObj_constant_FLAG);
+        return Parrot_str_new_init(interp, buf, strlen(buf) - 1,
+                Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
     else {
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "Unknown STRING format: '%s'\n", buf);

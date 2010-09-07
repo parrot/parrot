@@ -210,8 +210,8 @@ ascii_chr(PARROT_INTERP, UINTVAL codepoint)
 {
     ASSERT_ARGS(ascii_chr)
     char real_codepoint = (char)codepoint;
-    STRING * const return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
-    return return_string;
+    return Parrot_str_new_init(interp, &real_codepoint, 1,
+            Parrot_ascii_encoding_ptr, 0);
 }
 
 /*

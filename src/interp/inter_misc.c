@@ -48,13 +48,13 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 {
     ASSERT_ARGS(register_nci_method)
     PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const method_name = string_make(interp, name, strlen(name),
-        NULL, PObj_constant_FLAG|PObj_external_FLAG);
+    STRING * const method_name = Parrot_str_new_init(interp, name, strlen(name),
+        Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
 
     /* create call func */
     VTABLE_set_pointer_keyed_str(interp, method,
-            string_make(interp, proto, strlen(proto), NULL,
-                PObj_constant_FLAG|PObj_external_FLAG),
+            Parrot_str_new_init(interp, proto, strlen(proto),
+                Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG),
             func);
 
     /* insert it into namespace */

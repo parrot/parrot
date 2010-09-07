@@ -203,7 +203,8 @@ inline op sysinfo(out STR, in INT) {
         {
             struct utsname info;
             if (uname(&info) == 0) {
-                $1 = string_make(interp, info.version, strlen(info.version), "ascii", 0);
+                $1 = Parrot_str_new_init(interp, info.version, strlen(info.version),
+                        Parrot_ascii_encoding_ptr, 0);
             }
         }
         break;
@@ -212,14 +213,16 @@ inline op sysinfo(out STR, in INT) {
         {
             struct utsname info;
             if (uname(&info) == 0) {
-                $1 = string_make(interp, info.release, strlen(info.version), "ascii", 0);
+                $1 = Parrot_str_new_init(interp, info.release, strlen(info.version),
+                        Parrot_ascii_encoding_ptr, 0);
             }
         }
         break;
 #endif
 
       case CPU_ARCH:
-        $1 = string_make(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1, "ascii", 0);
+        $1 = Parrot_str_new_init(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1,
+                Parrot_ascii_encoding_ptr, 0);
         break;
 
       case CPU_TYPE:

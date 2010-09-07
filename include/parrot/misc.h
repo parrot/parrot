@@ -259,8 +259,10 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
      */
 #  define PARROT_SPRINTF_MAX_PREC 3 * PARROT_SPRINTF_BUFFER_SIZE / 4
 
-#  define cstr2pstr(cstr) string_make(interp, (cstr), strlen(cstr), "ascii", 0)
-#  define char2pstr(ch)   string_make(interp, &(ch), 1, "ascii", 0)
+#  define cstr2pstr(cstr) Parrot_str_new_init(interp, (cstr), strlen(cstr), \
+        Parrot_ascii_encoding_ptr, 0)
+#  define char2pstr(ch)   Parrot_str_new_init(interp, &(ch), 1, \
+        Parrot_ascii_encoding_ptr, 0)
 
     /* SPRINTF DATA STRUCTURE AND FLAGS */
 

@@ -300,7 +300,8 @@ build_exception_from_args(PARROT_INTERP, int ex_type,
     STRING * const msg =
         strchr(format, '%')
             ? Parrot_vsprintf_c(interp, format, arglist)
-            : string_make(interp, format, strlen(format), NULL, 0);
+            : Parrot_str_new_init(interp, format, strlen(format),
+                    Parrot_default_encoding_ptr, 0);
 
     return Parrot_ex_build_exception(interp, EXCEPT_error, ex_type, msg);
 }

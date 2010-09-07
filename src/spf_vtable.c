@@ -183,7 +183,7 @@ getchr_va(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
     /* char promoted to int */
     char ch = (char)va_arg(*arg, int);
 
-    return string_make(interp, &ch, 1, "iso-8859-1", 0);
+    return Parrot_str_new_init(interp, &ch, 1, Parrot_latin1_encoding_ptr, 0);
 }
 
 /*

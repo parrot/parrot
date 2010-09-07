@@ -427,8 +427,8 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
         program_size = 0;
     }
     else {
-        STRING * const fs = string_make(interp, fullname, strlen(fullname),
-            NULL, 0);
+        STRING * const fs = Parrot_str_new_init(interp, fullname, strlen(fullname),
+            Parrot_default_encoding_ptr, 0);
 
         /* can't read a file that doesn't exist */
         if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
@@ -658,9 +658,8 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 
     for (i = 0; i < argc; ++i) {
         /* Run through argv, adding everything to @ARGS. */
-        STRING * const arg =
-            string_make(interp, argv[i], strlen(argv[i]), "unicode",
-                PObj_external_FLAG);
+        STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
+                Parrot_utf8_encoding_ptr, PObj_external_FLAG);
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
             Parrot_io_eprintf(interp, "\t%vd: %s\n", i, argv[i]);

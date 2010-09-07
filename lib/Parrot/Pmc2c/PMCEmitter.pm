@@ -569,10 +569,10 @@ EOC
     if ( $self->is_dynamic ) {
         $cout .= <<"EOC";
         vt->base_type    = entry;
-        vt->whoami       = string_make(interp, "$classname", @{[length($classname)]},
-                                       "ascii", PObj_constant_FLAG|PObj_external_FLAG);
+        vt->whoami       = Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
+                                       Parrot_ascii_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
         vt->provides_str = Parrot_str_concat(interp, vt->provides_str,
-            string_make(interp, "$provides", @{[length($provides)]}, "ascii",
+            Parrot_str_new_init(interp, "$provides", @{[length($provides)]}, Parrot_ascii_encoding_ptr,
             PObj_constant_FLAG|PObj_external_FLAG));
 
 EOC
@@ -835,7 +835,8 @@ PMC* Parrot_${classname}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro)) {
     }
 $get_mro
     VTABLE_unshift_string(interp, mro,
-        string_make(interp, "$classname", @{[length($classname)]}, NULL, 0));
+        Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
+            Parrot_default_encoding_ptr, 0));
     return mro;
 }
 

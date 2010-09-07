@@ -198,10 +198,9 @@ latin1_chr(PARROT_INTERP, UINTVAL codepoint)
 {
     ASSERT_ARGS(latin1_chr)
     char real_codepoint = (char)codepoint;
-    STRING * const return_string = string_make(interp, &real_codepoint, 1,
-            "iso-8859-1", 0);
     PARROT_ASSERT(codepoint < 0x100);
-    return return_string;
+    return Parrot_str_new_init(interp, &real_codepoint, 1,
+            Parrot_latin1_encoding_ptr, 0);
 }
 
 

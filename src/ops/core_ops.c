@@ -23597,7 +23597,8 @@ opcode_t *
 Parrot_err_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const char * const tmp = strerror(errno);
-    SREG(1) = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    SREG(1) = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 
 return (opcode_t *)cur_opcode + 2;}
 
@@ -23605,7 +23606,8 @@ opcode_t *
 Parrot_err_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const char * const tmp = strerror(IREG(2));
-    SREG(1) = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    SREG(1) = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23613,7 +23615,8 @@ opcode_t *
 Parrot_err_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const char * const tmp = strerror(cur_opcode[2]);
-    SREG(1) = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    SREG(1) = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 
 return (opcode_t *)cur_opcode + 3;}
 

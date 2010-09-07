@@ -121,7 +121,8 @@ binary_chr(PARROT_INTERP, UINTVAL codepoint)
 {
     ASSERT_ARGS(binary_chr)
     char real_codepoint = (char)codepoint;
-    return string_make(interp, &real_codepoint, 1, "binary", 0);
+    return Parrot_str_new_init(interp, &real_codepoint, 1,
+            Parrot_binary_encoding_ptr, 0);
 }
 
 

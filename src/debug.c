@@ -1415,8 +1415,8 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 #if TRACE_DEBUGGER
             fprintf(stderr, "PDB_break: '%s'\n", str);
 #endif
-            condition->value = string_make(interp, str, (UINTVAL)(i - 1),
-                NULL, 0);
+            condition->value = Parrot_str_new_init(interp, str, (UINTVAL)(i - 1),
+                Parrot_default_encoding_ptr, 0);
 
             condition->type |= PDB_cond_const;
         }

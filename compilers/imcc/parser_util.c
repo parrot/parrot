@@ -805,7 +805,8 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         IMCC_INFO(interp) = imc_info;
     }
 
-    fs = string_make(interp, fullname, strlen(fullname), NULL, 0);
+    fs = Parrot_str_new_init(interp, fullname, strlen(fullname),
+            Parrot_default_encoding_ptr, 0);
 
     if (Parrot_stat_info_intval(interp, fs, STAT_ISDIR))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,

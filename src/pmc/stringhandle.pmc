@@ -193,7 +193,8 @@ stored for mocking.
 
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (encoding_is_utf8(INTERP, encoding))
-                new_string = string_make(INTERP, "", 0, "unicode", 0);
+                new_string = Parrot_str_new_init(INTERP, "", 0,
+                        Parrot_utf8_encoding_ptr, 0);
             else
                 new_string = CONST_STRING(INTERP, "");
 
@@ -313,7 +314,8 @@ StringHandle object that isn't opened yet, returns an empty string.
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (encoding_is_utf8(INTERP, encoding))
-                string_result = string_make(INTERP, "", 0, "unicode", 0);
+                string_result = Parrot_str_new_init(INTERP, "", 0,
+                        Parrot_utf8_encoding_ptr, 0);
             else
                 string_result = CONST_STRING(INTERP, "");
         }

@@ -3282,7 +3282,8 @@ Parrot_str_from_uint(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num,
     if (minus)
         *--p = '-';
 
-    return string_make(interp, p, (UINTVAL)(tail - p), NULL, 0);
+    return Parrot_str_new_init(interp, p, (UINTVAL)(tail - p),
+            Parrot_default_encoding_ptr, 0);
 }
 
 

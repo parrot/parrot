@@ -147,8 +147,8 @@ add_const_str(PARROT_INTERP, PackFile_ConstTable *consts, char *str)
     /* Allocate a new constant */
     consts->constants[--k] = PackFile_Constant_new(interp);
     consts->constants[k]->type = PFC_STRING;
-    consts->constants[k]->u.string =
-        string_make(interp, buf, (UINTVAL) l, "iso-8859-1", 0);
+    consts->constants[k]->u.string = Parrot_str_new_init(interp, buf,
+            (UINTVAL) l, Parrot_latin1_encoding_ptr, 0);
     free(o);
     return k;
 }

@@ -968,7 +968,8 @@ unicode_chr(PARROT_INTERP, UINTVAL codepoint)
 {
     ASSERT_ARGS(unicode_chr)
     String_iter    iter;
-    STRING * const dest = string_make(interp, "", 1, "unicode", 0);
+    STRING * const dest = Parrot_str_new_init(interp, NULL, 4,
+        Parrot_utf8_encoding_ptr, 0);
 
     dest->strlen = 1;
 

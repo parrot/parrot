@@ -232,8 +232,8 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     INTVAL read_result;
 
     /* Check the file exists. */
-    STRING * const fs = string_make(interp, fullname,
-            strlen(fullname), NULL, 0);
+    STRING * const fs = Parrot_str_new_init(interp, fullname,
+            strlen(fullname), Parrot_default_encoding_ptr, 0);
     if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't stat %s, code %i.\n",
                 fullname, errno);
