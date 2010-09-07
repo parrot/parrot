@@ -152,6 +152,7 @@ Returns created string.
             buffer->strstart, buffer->bufused,
             buffer->encoding, buffer->charset,
             0);
+        return result;
     }
 
 /*
