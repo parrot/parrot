@@ -2669,9 +2669,9 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-          if (!STRING_IS_NULL(ts_0)) { fprintf( stderr, "Freeing t_0\n" ); Parrot_str_free_cstring(t_0); }
+          if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
-if (!STRING_IS_NULL(ts_2)) { fprintf( stderr, "Freeing t_2\n" ); Parrot_str_free_cstring(t_2); }
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 VTABLE_set_integer_native(interp, t_3, i_3);
 
 }
