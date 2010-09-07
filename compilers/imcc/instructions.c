@@ -618,16 +618,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
             snprintf(regb[i], REGB_SIZE, "%c%d", p->set, (int)p->color);
             regstr[i] = regb[i];
         }
-        else if (IMCC_INFO(interp)->allocated
-             && (IMCC_INFO(interp)->optimizer_level & OPT_J)
-             &&  p->set != 'K'
-             &&  p->color < 0
-             && REG_NEEDS_ALLOC(p)) {
-                    snprintf(regb[i], REGB_SIZE,
-                        "r%c%d", tolower((unsigned char)p->set),
-                        -1 -(int)p->color);
-                    regstr[i] = regb[i];
-        }
         else if (p->type & VTREGKEY) {
             const SymReg *k = p;
 
@@ -639,13 +629,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
                 if (k->reg && k->reg->color >= 0)
                     snprintf(regb[i]+used, REGB_SIZE - used, "%c%d",
                             k->reg->set, (int)k->reg->color);
-                else if (IMCC_INFO(interp)->allocated
-                     && (IMCC_INFO(interp)->optimizer_level & OPT_J)
-                     && k->reg
-                     && k->reg->color < 0)
-                        snprintf(regb[i]+used, REGB_SIZE - used, "r%c%d",
-                            tolower((unsigned char)k->reg->set),
-                            -1 -(int)k->reg->color);
                 else
                     strncat(regb[i], k->name, REGB_SIZE - used - 1);
 

@@ -562,7 +562,6 @@ typedef struct _imc_info_t {
     SymHash               ghash;
     jmp_buf               jump_buf;        /* The jump for error  handling */
     int                   IMCC_DEBUG;
-    int                   allocated;
     int                   cnr;
     int                   debug;
     int                   dont_optimize;
