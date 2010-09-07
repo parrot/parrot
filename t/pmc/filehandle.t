@@ -541,7 +541,7 @@ print line
 
     \$I1 = charset line
     \$S2 = charsetname \$I1
-    if \$S2 == 'unicode' goto ok_3
+    if \$S2 == 'utf8' goto ok_3
     print \$S2
     print 'not '
   ok_3:

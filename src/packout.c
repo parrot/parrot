@@ -290,10 +290,7 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
             if (constant->type == PFC_STRING) {
                 STRING * const sc = constant->u.string;
                 if (Parrot_str_equal(interp, key_str, sc)
-                &&  Parrot_charset_number_of_str(interp, key_str)
-                ==  Parrot_charset_number_of_str(interp, sc)
-                &&  Parrot_encoding_number_of_str(interp, key_str)
-                ==  Parrot_encoding_number_of_str(interp, sc)) {
+                &&  key_str->encoding == sc->encoding) {
                     return i;
                 }
             }

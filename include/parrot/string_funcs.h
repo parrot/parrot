@@ -297,12 +297,10 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_new_init(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
-    ARGIN(const ENCODING *encoding),
-    ARGIN(const CHARSET *charset),
+    ARGIN(const STR_VTABLE *encoding),
     UINTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(4);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -326,15 +324,12 @@ void Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-const CHARSET * Parrot_str_rep_compatible(PARROT_INTERP,
+const STR_VTABLE * Parrot_str_rep_compatible(PARROT_INTERP,
     ARGIN(const STRING *a),
-    ARGIN(const STRING *b),
-    ARGOUT(const ENCODING **e))
+    ARGIN(const STRING *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*e);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -415,13 +410,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_unescape_string(PARROT_INTERP,
     ARGIN(const STRING *src),
-    ARGIN(const CHARSET *charset),
-    ARGIN(const ENCODING *encoding),
+    ARGIN(const STR_VTABLE *encoding),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
@@ -454,17 +447,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_make(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
-    ARGIN_NULLOK(const char *charset_name),
-    UINTVAL flags)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * string_make_from_charset(PARROT_INTERP,
-    ARGIN_NULLOK(const char *buffer),
-    UINTVAL len,
-    INTVAL charset_nr,
+    ARGIN_NULLOK(const char *encoding_name),
     UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -608,8 +591,7 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_str_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(encoding) \
-    , PARROT_ASSERT_ARG(charset))
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_str_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_not_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -619,8 +601,7 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b) \
-    , PARROT_ASSERT_ARG(e))
+    , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_Parrot_str_repeat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -649,7 +630,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_unescape_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
-    , PARROT_ASSERT_ARG(charset) \
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_str_unpin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -662,8 +642,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_string_make __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_string_make_from_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_string_max_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))

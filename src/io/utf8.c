@@ -53,7 +53,6 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     size_t len  = Parrot_io_read_buffer(interp, filehandle, buf);
     s           = *buf;
-    s->charset  = Parrot_unicode_charset_ptr;
     s->encoding = Parrot_utf8_encoding_ptr;
 
     /* count chars, verify utf8 */
@@ -74,8 +73,8 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
                 /* need len - 1 more chars */
                 --len2;
-                s2 = Parrot_str_new_init(interp, NULL, len2, Parrot_utf8_encoding_ptr,
-                                         Parrot_unicode_charset_ptr, 0);
+                s2 = Parrot_str_new_init(interp, NULL, len2,
+                        Parrot_utf8_encoding_ptr, 0);
                 s2->bufused  = len2;
 
                 read = Parrot_io_read_buffer(interp, filehandle, &s2);

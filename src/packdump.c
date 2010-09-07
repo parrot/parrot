@@ -169,8 +169,8 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
       case PFC_STRING:
         Parrot_io_printf(interp, "    [ 'PFC_STRING', {\n");
         pobj_flag_dump(interp, (long)PObj_get_FLAGS(self->u.string));
-        Parrot_io_printf(interp, "        CHARSET  => %ld,\n",
-                   self->u.string->charset);
+        Parrot_io_printf(interp, "        ENCODING => %ld,\n",
+                   self->u.string->encoding);
         i = self->u.string->bufused;
         Parrot_io_printf(interp, "        SIZE     => %ld,\n",
                    (long)i);

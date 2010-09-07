@@ -604,8 +604,6 @@ configuration file.
     init::optimize
     inter::shlibs
     inter::libparrot
-    inter::charset
-    inter::encoding
     inter::types
     auto::ops
     auto::alignptrs

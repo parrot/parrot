@@ -3202,7 +3202,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         /* Set up new entry and insert it. */
         PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
         STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+                Parrot_default_encoding_ptr, 0);
         size_t count = ct->const_count;
         size_t i;
 
@@ -3228,7 +3228,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
             fnconst           = &ct->constants[ct->const_count - 1];
             fnconst->type     = PFC_STRING;
             fnconst->u.string = Parrot_str_new_init(interp, filename, strlen(filename),
-                    PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                    Parrot_default_encoding_ptr,
                     PObj_constant_FLAG);
         }
 

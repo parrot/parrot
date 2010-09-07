@@ -193,7 +193,7 @@ Sets the value of the string to that of the specified C<string>.
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
             char * const copy = Parrot_str_to_cstring(INTERP, value);
             value             = Parrot_str_new_init(INTERP, copy, strlen(copy),
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                Parrot_default_encoding_ptr,
                 PObj_constant_FLAG);
             Parrot_str_free_cstring(copy);
         }
@@ -692,7 +692,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
         if (!len)
             RETURN(STRING src);
 
-        if (src->charset != Parrot_ascii_charset_ptr)
+        if (src->encoding != Parrot_ascii_encoding_ptr)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
@@ -730,7 +730,7 @@ Checks if the ascii STRING C<str> is just an integer.
         if (!len)
             RETURN(INTVAL 0);
 
-        if (src->encoding != Parrot_fixed_8_encoding_ptr)
+        if (STRING_max_bytes_per_codepoint(src) != 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't is_integer non fixed_8");
 
@@ -794,7 +794,7 @@ Find last occurrence of C<substring>, but not after the C<start> position.
         if (!Parrot_str_length(INTERP, substring))
             RETURN(INTVAL res);
 
-        res = CHARSET_RINDEX(INTERP, src, substring, (UINTVAL)start);
+        res = STRING_rindex(INTERP, src, substring, (UINTVAL)start);
         RETURN(INTVAL res);
     }
 
@@ -808,15 +808,13 @@ EXPERIMENTAL, for testing only. See TT #1628
 
 */
 
-    METHOD unescape(STRING *charsetname, STRING *encodingname)
+    METHOD unescape(STRING *encodingname)
     {
-        const CHARSET *charset = Parrot_get_charset(INTERP,
-            Parrot_charset_number(INTERP, charsetname));
-        const ENCODING *encoding = Parrot_get_encoding(INTERP,
+        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
             Parrot_encoding_number(INTERP, encodingname));
         STRING * const src = VTABLE_get_string(INTERP, SELF);
         STRING * const dest = Parrot_str_unescape_string(INTERP, src,
-                charset, encoding, 0);
+                encoding, 0);
         RETURN(STRING *dest);
     }
 

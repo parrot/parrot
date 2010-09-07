@@ -64,7 +64,6 @@ Initializes the StringBuilder with initial size of buffer.
         STRING * const buffer = mem_gc_allocate_zeroed_typed(INTERP, STRING);
 
         buffer->encoding      = Parrot_default_encoding_ptr;
-        buffer->charset       = Parrot_default_charset_ptr;
         buffer->_buflen       = initial_size;
         buffer->_bufstart     = buffer->strstart
                               = mem_gc_allocate_n_typed(INTERP,
@@ -158,10 +157,9 @@ Append string to current buffer.
 */
 
     VTABLE void push_string(STRING *s) {
-        STRING          *buffer;
-        size_t           total_size;
-        const CHARSET   *cs;
-        const ENCODING  *enc = NULL;
+        STRING           *buffer;
+        size_t            total_size;
+        const STR_VTABLE *enc;
 
         /* Early return on NULL strings */
         if (STRING_IS_NULL(s))
@@ -173,14 +171,12 @@ Append string to current buffer.
             /* Always copy the encoding of the first string. The IO functions
                assume that the concatenation of utf8 strings doesn't change
                the encoding. */
-            buffer->charset  = s->charset;
             buffer->encoding = s->encoding;
         }
         else {
-            cs = Parrot_str_rep_compatible(interp, buffer, s, &enc);
+            enc = Parrot_str_rep_compatible(interp, buffer, s);
 
-            if (cs) {
-                buffer->charset = cs;
+            if (enc) {
                 buffer->encoding = enc;
             }
             else {
@@ -206,7 +202,6 @@ Append string to current buffer.
                     }
 
                     buffer->bufused  = new_buffer->bufused;
-                    buffer->charset  = new_buffer->charset;
                     buffer->encoding = new_buffer->encoding;
 
                     mem_sys_memcopy(buffer->strstart, new_buffer->strstart,
@@ -222,7 +217,6 @@ Append string to current buffer.
             /* Calculate (possibly new) total size */
             total_size = calculate_capacity(INTERP, total_size);
 
-            /* Parrot_unicode_charset_ptr can produce NULL buffer */
             buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
                 buffer->_bufstart, total_size, char);
             buffer->_buflen   = total_size;
@@ -298,7 +292,6 @@ Set content of buffer to passed string or PMC
         buffer->bufused  = s->bufused;
         buffer->strlen   = Parrot_str_length(INTERP, s);
         buffer->encoding = s->encoding;
-        buffer->charset  = s->charset;
     }
 
     VTABLE void set_pmc(PMC *s) {

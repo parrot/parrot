@@ -35,7 +35,6 @@ STRING *STRINGNULL;
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define ASSERT_STRING_SANITY(s) \
     PARROT_ASSERT((s)->encoding); \
-    PARROT_ASSERT((s)->charset); \
     PARROT_ASSERT(!PObj_on_free_list_TEST(s))
 
 /* HEADERIZER HFILE: include/parrot/string_funcs.h */
@@ -46,14 +45,11 @@ STRING *STRINGNULL;
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-static const CHARSET * string_rep_compatible(SHIM_INTERP,
+static const STR_VTABLE * string_rep_compatible(SHIM_INTERP,
     ARGIN(const STRING *a),
-    ARGIN(const STRING *b),
-    ARGOUT(const ENCODING **e))
+    ARGIN(const STRING *b))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*e);
+        __attribute__nonnull__(3);
 
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
@@ -62,8 +58,7 @@ static void throw_illegal_escape(PARROT_INTERP)
 
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b) \
-    , PARROT_ASSERT_ARG(e))
+    , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_throw_illegal_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -137,15 +132,15 @@ Parrot_str_init(PARROT_INTERP)
         return;
     }
 
-    /* Set up the cstring cache, then load the basic encodings and charsets */
+    /* Set up the cstring cache, then load the basic encodings */
     const_cstring_hash          = parrot_new_cstring_hash(interp);
     interp->const_cstring_hash  = const_cstring_hash;
-    Parrot_charsets_encodings_init(interp);
+    Parrot_encodings_init(interp);
 
 #if PARROT_CATCH_NULL
     /* initialize STRINGNULL, but not in the constant table */
     STRINGNULL = Parrot_str_new_init(interp, NULL, 0,
-                       PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                       Parrot_default_encoding_ptr,
                        PObj_constant_FLAG);
 #endif
 
@@ -158,7 +153,7 @@ Parrot_str_init(PARROT_INTERP)
             Parrot_str_new_init(interp,
                 parrot_cstrings[i].string,
                 parrot_cstrings[i].len,
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                Parrot_default_encoding_ptr,
                 PObj_external_FLAG|PObj_constant_FLAG);
         parrot_hash_put(interp, const_cstring_hash,
             PARROT_const_cast(char *, parrot_cstrings[i].string), (void *)s);
@@ -187,7 +182,7 @@ Parrot_str_finish(PARROT_INTERP)
     if (!interp->parent_interpreter) {
         mem_internal_free(interp->const_cstring_table);
         interp->const_cstring_table = NULL;
-        Parrot_charsets_encodings_deinit(interp);
+        Parrot_deinit_encodings(interp);
         parrot_hash_destroy(interp, interp->const_cstring_hash);
     }
 }
@@ -218,8 +213,7 @@ Parrot_str_new_noinit(PARROT_INTERP,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARTYPE,
             "Unsupported representation");
 
-    s->charset  = PARROT_DEFAULT_CHARSET;
-    s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);
+    s->encoding = Parrot_default_encoding_ptr;
 
     Parrot_gc_allocate_string_storage(interp, s,
         (size_t)string_max_bytes(interp, s, capacity));
@@ -230,10 +224,10 @@ Parrot_str_new_noinit(PARROT_INTERP,
 
 /*
 
-=item C<static const CHARSET * string_rep_compatible(PARROT_INTERP, const STRING
-*a, const STRING *b, const ENCODING **e)>
+=item C<static const STR_VTABLE * string_rep_compatible(PARROT_INTERP, const
+STRING *a, const STRING *b)>
 
-Find the "lowest" possible charset and encoding for the given string. E.g.
+Find the "lowest" possible encoding for the given string. E.g.
 
   ascii <op> utf8 => utf8
                   => ascii, B<if> C<STRING *b> has ascii chars only.
@@ -247,66 +241,55 @@ Returns NULL, if no compatible string representation can be found.
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-static const CHARSET *
+static const STR_VTABLE *
 string_rep_compatible(SHIM_INTERP,
-    ARGIN(const STRING *a), ARGIN(const STRING *b), ARGOUT(const ENCODING **e))
+    ARGIN(const STRING *a), ARGIN(const STRING *b))
 {
     ASSERT_ARGS(string_rep_compatible)
 
-    if (a->encoding == b->encoding && a->charset == b->charset) {
-        *e = a->encoding;
-        return a->charset;
+    if (a->encoding == b->encoding) {
+        return a->encoding;
     }
 
     /* a table could possibly simplify the logic */
     if (a->encoding == Parrot_utf8_encoding_ptr
-    &&  b->charset  == Parrot_ascii_charset_ptr) {
+    &&  b->encoding == Parrot_ascii_encoding_ptr) {
         if (a->strlen == a->bufused) {
-            *e = Parrot_fixed_8_encoding_ptr;
-            return b->charset;
+            return b->encoding;
         }
-        *e = a->encoding;
-        return a->charset;
+        return a->encoding;
     }
 
     if (b->encoding == Parrot_utf8_encoding_ptr
-    &&  a->charset  == Parrot_ascii_charset_ptr) {
+    &&  a->encoding == Parrot_ascii_encoding_ptr) {
         if (b->strlen == b->bufused) {
-            *e = Parrot_fixed_8_encoding_ptr;
-            return a->charset;
+            return a->encoding;
         }
-        *e = b->encoding;
-        return b->charset;
+        return b->encoding;
     }
 
-    if (a->encoding != b->encoding)
+    if (STRING_max_bytes_per_codepoint(a) != 1 ||
+        STRING_max_bytes_per_codepoint(b) != 1)
         return NULL;
 
-    if (a->encoding != Parrot_fixed_8_encoding_ptr)
-        return NULL;
-
-    *e = Parrot_fixed_8_encoding_ptr;
-
-    if (a->charset == b->charset)
-        return a->charset;
-    if (b->charset == Parrot_ascii_charset_ptr)
-        return a->charset;
-    if (a->charset == Parrot_ascii_charset_ptr)
-        return b->charset;
-    if (a->charset == Parrot_binary_charset_ptr)
-        return a->charset;
-    if (b->charset == Parrot_binary_charset_ptr)
-        return b->charset;
+    if (b->encoding == Parrot_ascii_encoding_ptr)
+        return a->encoding;
+    if (a->encoding == Parrot_ascii_encoding_ptr)
+        return b->encoding;
+    if (a->encoding == Parrot_binary_encoding_ptr)
+        return a->encoding;
+    if (b->encoding == Parrot_binary_encoding_ptr)
+        return b->encoding;
 
     return NULL;
 }
 
 /*
 
-=item C<const CHARSET * Parrot_str_rep_compatible(PARROT_INTERP, const STRING
-*a, const STRING *b, const ENCODING **e)>
+=item C<const STR_VTABLE * Parrot_str_rep_compatible(PARROT_INTERP, const STRING
+*a, const STRING *b)>
 
-Find the "lowest" possible charset and encoding for the given string. E.g.
+Find the "lowest" possible encoding for the given string. E.g.
 
   ascii <op> utf8 => utf8
                   => ascii, B<if> C<STRING *b> has ascii chars only.
@@ -320,12 +303,12 @@ Returns NULL, if no compatible string representation can be found.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-const CHARSET *
+const STR_VTABLE *
 Parrot_str_rep_compatible(PARROT_INTERP,
-    ARGIN(const STRING *a), ARGIN(const STRING *b), ARGOUT(const ENCODING **e))
+    ARGIN(const STRING *a), ARGIN(const STRING *b))
 {
     ASSERT_ARGS(Parrot_str_rep_compatible)
-    return string_rep_compatible(interp, a, b, e);
+    return string_rep_compatible(interp, a, b);
 }
 
 /*
@@ -358,7 +341,6 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     result->bufused  = s->bufused;
     result->hashval  = s->hashval;
     result->encoding = s->encoding;
-    result->charset  = s->charset;
 
     return result;
 }
@@ -427,30 +409,28 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             ARGIN_NULLOK(const STRING *b))
 {
     ASSERT_ARGS(Parrot_str_concat)
-    const CHARSET   *cs;
-    const ENCODING  *enc = NULL;
-    STRING          *dest;
-    UINTVAL          total_length;
+    const STR_VTABLE *enc;
+    STRING           *dest;
+    UINTVAL           total_length;
 
-    /* XXX should this be a CHARSET method? */
-
-    /* If B isn't real, we just bail */
-    const UINTVAL b_len = b ? Parrot_str_length(interp, b) : 0;
-    if (!b_len)
-        return STRING_IS_NULL(a) ? STRINGNULL : Parrot_str_copy(interp, a);
-
-    /* Is A real? */
-    if (STRING_IS_NULL(a) || Buffer_bufstart(a) == NULL)
-        return Parrot_str_copy(interp, b);
+    if (STRING_IS_NULL(a)) {
+        if (STRING_IS_NULL(b))
+            return STRINGNULL;
+        else
+            return Parrot_str_copy(interp, b);
+    }
+    else {
+        if (STRING_IS_NULL(b))
+            return Parrot_str_copy(interp, a);
+    }
 
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
 
-    cs = string_rep_compatible(interp, a, b, &enc);
+    enc = string_rep_compatible(interp, a, b);
 
-    if (!cs) {
+    if (!enc) {
         /* upgrade strings for concatenation */
-        cs = Parrot_unicode_charset_ptr;
         if (a->encoding == Parrot_ucs4_encoding_ptr
             || b->encoding == Parrot_ucs4_encoding_ptr)
             enc = Parrot_ucs4_encoding_ptr;
@@ -462,22 +442,15 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         else
             enc = Parrot_utf8_encoding_ptr;
 
-        a = Parrot_unicode_charset_ptr->to_charset(interp, a);
-        b = Parrot_unicode_charset_ptr->to_charset(interp, b);
-
-        if (a->encoding != enc)
-            a = enc->to_encoding(interp, a);
-        if (b->encoding != enc)
-            b = enc->to_encoding(interp, b);
+        a = enc->to_encoding(interp, a);
+        b = enc->to_encoding(interp, b);
     }
     /* calc usable and total bytes */
     total_length = a->bufused + b->bufused;
 
     dest = Parrot_str_new_noinit(interp, enum_stringrep_one, total_length);
     PARROT_ASSERT(enc);
-    PARROT_ASSERT(cs);
     dest->encoding = enc;
-    dest->charset  = cs;
 
     /* Copy A first */
     mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
@@ -487,7 +460,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             b->strstart, b->bufused);
 
     dest->bufused = a->bufused + b->bufused;
-    dest->strlen  = a->strlen + b_len;
+    dest->strlen  = a->strlen + b->strlen;
 
     return dest;
 }
@@ -516,7 +489,7 @@ Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), const UINTVAL le
     const UINTVAL buff_length = (len > 0) ? len : buffer ? strlen(buffer) : 0;
 
     return Parrot_str_new_init(interp, buffer, buff_length,
-        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+        Parrot_default_encoding_ptr, 0);
 }
 
 
@@ -549,8 +522,7 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL 
     result->strstart        = (char *)Buffer_bufstart(result);
     result->bufused         = len;
     result->strlen          = len;
-    result->encoding        = Parrot_fixed_8_encoding_ptr;
-    result->charset         = Parrot_binary_charset_ptr;
+    result->encoding      = Parrot_binary_encoding_ptr;
 
     Buffer_buflen(buffer)   = 0;
     Buffer_bufstart(buffer) = NULL;
@@ -616,7 +588,7 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
         return s;
 
     s = Parrot_str_new_init(interp, buffer, strlen(buffer),
-                       PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                       Parrot_default_encoding_ptr,
                        PObj_external_FLAG|PObj_constant_FLAG);
 
     parrot_hash_put(interp, cstring_cache,
@@ -629,12 +601,12 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 /*
 
 =item C<STRING * string_make(PARROT_INTERP, const char *buffer, UINTVAL len,
-const char *charset_name, UINTVAL flags)>
+const char *encoding_name, UINTVAL flags)>
 
 Creates and returns a new Parrot string using C<len> bytes of string data read
 from C<buffer>.
 
-The value of C<charset_name> specifies the string's representation.
+The value of C<encoding_name> specifies the string's representation.
 The currently recognised values are:
 
     'iso-8859-1'
@@ -645,7 +617,7 @@ The currently recognised values are:
 The encoding is implicitly guessed; C<unicode> implies the C<utf-8> encoding,
 and the other three assume C<fixed-8> encoding.
 
-If C<charset> is unspecified, the default charset 'ascii' will be used.
+If C<encoding_name> is unspecified, the default encoding 'ascii' will be used.
 
 The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
 together.
@@ -659,74 +631,28 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
-        UINTVAL len, ARGIN_NULLOK(const char *charset_name), UINTVAL flags)
+        UINTVAL len, ARGIN_NULLOK(const char *encoding_name), UINTVAL flags)
 {
     ASSERT_ARGS(string_make)
-    const CHARSET *charset;
+    const STR_VTABLE *encoding;
 
-    if (charset_name) {
-        charset = Parrot_find_charset(interp, charset_name);
-        if (!charset)
+    if (encoding_name) {
+        encoding = Parrot_find_encoding(interp, encoding_name);
+        if (!encoding)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Can't make '%s' charset strings", charset_name);
+                "Can't make '%s' encoding strings", encoding_name);
     }
     else
-        charset = Parrot_get_charset(interp, 0);
+        encoding = Parrot_default_encoding_ptr;
 
-    return Parrot_str_new_init(interp, buffer, len,
-        charset->preferred_encoding, charset, flags);
-}
-
-
-/*
-
-=item C<STRING * string_make_from_charset(PARROT_INTERP, const char *buffer,
-UINTVAL len, INTVAL charset_nr, UINTVAL flags)>
-
-Creates and returns a new Parrot string using C<len> bytes of string data read
-from C<buffer>.
-
-The value of C<charset_name> specifies the string's representation.  It must be
-a valid charset identifier.
-
-    'iso-8859-1'
-    'ascii'
-    'binary'
-    'unicode'
-
-The encoding is implicitly guessed; C<unicode> implies the C<utf-8> encoding,
-and the other three assume C<fixed-8> encoding.
-
-The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
-together.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-string_make_from_charset(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
-    UINTVAL len, INTVAL charset_nr, UINTVAL flags)
-{
-    ASSERT_ARGS(string_make_from_charset)
-    const CHARSET *charset = Parrot_get_charset(interp, charset_nr);
-
-    if (!charset)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Invalid charset number '%d' specified", charset_nr);
-
-    return Parrot_str_new_init(interp, buffer, len,
-        charset->preferred_encoding, charset, flags);
+    return Parrot_str_new_init(interp, buffer, len, encoding, flags);
 }
 
 
 /*
 
 =item C<STRING * Parrot_str_new_init(PARROT_INTERP, const char *buffer, UINTVAL
-len, const ENCODING *encoding, const CHARSET *charset, UINTVAL flags)>
+len, const STR_VTABLE *encoding, UINTVAL flags)>
 
 Given a buffer, its length, an encoding, a character set, and STRING flags,
 creates and returns a new string.  Don't call this directly.
@@ -740,13 +666,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
-        ARGIN(const ENCODING *encoding), ARGIN(const CHARSET *charset), UINTVAL flags)
+        ARGIN(const STR_VTABLE *encoding), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_str_new_init)
     DECL_CONST_CAST;
     STRING * const s = Parrot_gc_new_string_header(interp, flags);
     s->encoding      = encoding;
-    s->charset       = charset;
 
     if (flags & PObj_external_FLAG) {
         /*
@@ -761,10 +686,10 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         Buffer_bufstart(s) = s->strstart = PARROT_const_cast(char *, buffer);
         Buffer_buflen(s)   = s->bufused  = len;
 
-        if (encoding == Parrot_fixed_8_encoding_ptr)
+        if (encoding->max_bytes_per_codepoint == 1)
             s->strlen = len;
         else
-            s->strlen = CHARSET_CODEPOINTS(interp, s);
+            s->strlen = STRING_scan(interp, s);
 
         return s;
     }
@@ -774,10 +699,10 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     if (buffer) {
         mem_sys_memcopy(s->strstart, buffer, len);
         s->bufused = len;
-        if (encoding == Parrot_fixed_8_encoding_ptr)
+        if (encoding->max_bytes_per_codepoint == 1)
             s->strlen = len;
         else
-            s->strlen = CHARSET_CODEPOINTS(interp, s);
+            s->strlen = STRING_scan(interp, s);
     }
     else
         s->strlen = s->bufused = 0;
@@ -835,7 +760,7 @@ Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_str_indexed)
     ASSERT_STRING_SANITY(s);
-    return (INTVAL)CHARSET_GET_CODEPOINT(interp, s, idx);
+    return (INTVAL)STRING_ord(interp, s, idx);
 }
 
 
@@ -883,7 +808,7 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *s),
         STRING *src    = PARROT_const_cast(STRING *, s);
         STRING *search = PARROT_const_cast(STRING *, s2);
 
-        return CHARSET_INDEX(interp, src, search, (UINTVAL)start);
+        return STRING_index(interp, src, search, (UINTVAL)start);
     }
 }
 
@@ -951,17 +876,13 @@ STRING *
 string_chr(PARROT_INTERP, UINTVAL character)
 {
     ASSERT_ARGS(string_chr)
+
     if (character > 0xff)
-        return Parrot_unicode_charset_ptr->string_from_codepoint(interp,
-                character);
-
+        return Parrot_utf8_encoding_ptr->chr(interp, character);
     else if (character > 0x7f)
-        return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interp,
-                character);
-
+        return Parrot_latin1_encoding_ptr->chr(interp, character);
     else
-        return Parrot_ascii_charset_ptr->string_from_codepoint(interp,
-                 character);
+        return Parrot_ascii_encoding_ptr->chr(interp, character);
 }
 
 
@@ -1012,7 +933,7 @@ string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
 {
     ASSERT_ARGS(string_max_bytes)
     PARROT_ASSERT(s->encoding);
-    return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
+    return STRING_max_bytes_per_codepoint(s) * nchars;
 }
 
 
@@ -1034,7 +955,7 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
     ASSERT_ARGS(Parrot_str_repeat)
     STRING * const dest = Parrot_str_new_init(interp, NULL,
                         s->bufused * num,
-                        s->encoding, s->charset, 0);
+                        s->encoding, 0);
     if (num > 0) {
         /* copy s into dest num times */
         UINTVAL length = s->bufused;
@@ -1102,7 +1023,7 @@ Parrot_str_substr(PARROT_INTERP,
     if (true_length > (src->strlen - true_offset))
         true_length = (UINTVAL)(src->strlen - true_offset);
 
-    return CHARSET_GET_CODEPOINTS(interp, src, true_offset, true_length);
+    return STRING_substr(interp, src, true_offset, true_length);
 }
 
 /*
@@ -1176,12 +1097,12 @@ Parrot_str_iter_index(PARROT_INTERP,
     }
 
     STRING_ITER_INIT(interp, &search_iter);
-    c0 = STRING_ITER_GET_AND_ADVANCE(interp, search, &search_iter);
+    c0 = STRING_iter_get_and_advance(interp, search, &search_iter);
     search_start = search_iter;
     next_start = *start;
 
     while (start->charpos + len <= src->strlen) {
-        UINTVAL c1 = STRING_ITER_GET_AND_ADVANCE(interp, src, &next_start);
+        UINTVAL c1 = STRING_iter_get_and_advance(interp, src, &next_start);
 
         if (c1 == c0) {
             UINTVAL c2;
@@ -1190,8 +1111,8 @@ Parrot_str_iter_index(PARROT_INTERP,
             do {
                 if (search_iter.charpos >= len)
                     return start->charpos;
-                c1 = STRING_ITER_GET_AND_ADVANCE(interp, src, end);
-                c2 = STRING_ITER_GET_AND_ADVANCE(interp, search, &search_iter);
+                c1 = STRING_iter_get_and_advance(interp, src, end);
+                c2 = STRING_iter_get_and_advance(interp, search, &search_iter);
             } while (c1 == c2);
 
             search_iter = search_start;
@@ -1237,12 +1158,11 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     INTVAL offset, INTVAL length, ARGIN(const STRING *rep))
 {
     ASSERT_ARGS(Parrot_str_replace)
-    String_iter     iter;
-    const CHARSET  *cs;
-    const ENCODING *enc;
-    STRING         *dest        = NULL;
-    UINTVAL         true_offset = (UINTVAL)offset;
-    UINTVAL         true_length = (UINTVAL)length;
+    String_iter       iter;
+    const STR_VTABLE *enc;
+    STRING           *dest        = NULL;
+    UINTVAL           true_offset = (UINTVAL)offset;
+    UINTVAL           true_length = (UINTVAL)length;
 
     UINTVAL         start_byte, end_byte, start_char, end_char;
     INTVAL          buf_size;
@@ -1269,24 +1189,23 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
         true_length = (UINTVAL)(src->strlen - true_offset);
 
     /* may have different reps..... */
-    cs = string_rep_compatible(interp, src, rep, &enc);
+    enc = string_rep_compatible(interp, src, rep);
 
-    if (!cs) {
+    if (!enc) {
         src = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
         rep = Parrot_utf16_encoding_ptr->to_encoding(interp, rep);
-        /* Remember selected charset and encoding */
+        /* Remember selected encoding */
         enc = src->encoding;
-        cs  = src->charset;
     }
 
     /* get byte position of the part that will be replaced */
     STRING_ITER_INIT(interp, &iter);
 
-    STRING_ITER_SET_POSITION(interp, src, &iter, true_offset);
+    STRING_iter_set_position(interp, src, &iter, true_offset);
     start_byte = iter.bytepos;
     start_char = iter.charpos;
 
-    STRING_ITER_SKIP(interp, src, &iter, true_length);
+    STRING_iter_skip(interp, src, &iter, true_length);
     end_byte   = iter.bytepos;
     end_char   = iter.charpos;
 
@@ -1299,9 +1218,8 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     /* Now do the replacement */
     dest = Parrot_gc_new_string_header(interp, 0);
 
-    /* Set encoding and charset to compatible */
+    /* Set encoding to compatible */
     dest->encoding = enc;
-    dest->charset  = cs;
 
     /* Clear COW flag. We own buffer */
     PObj_get_FLAGS(dest) = PObj_is_string_FLAG
@@ -1373,7 +1291,7 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
         return chopped;
     }
 
-    if (chopped->encoding == Parrot_fixed_8_encoding_ptr) {
+    if (STRING_max_bytes_per_codepoint(chopped) == 1) {
         chopped->bufused = new_length;
     }
     else if (chopped->encoding == Parrot_ucs2_encoding_ptr) {
@@ -1384,7 +1302,7 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
         String_iter iter;
 
         STRING_ITER_INIT(interp, &iter);
-        STRING_ITER_SET_POSITION(interp, s, &iter, new_length);
+        STRING_iter_set_position(interp, s, &iter, new_length);
         chopped->bufused = iter.bytepos;
     }
 
@@ -1423,7 +1341,7 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
     ASSERT_STRING_SANITY(s1);
     ASSERT_STRING_SANITY(s2);
 
-    return CHARSET_COMPARE(interp, s1, s2);
+    return STRING_compare(interp, s1, s2);
 }
 
 
@@ -1496,7 +1414,7 @@ Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(con
      * both strings are non-null
      * both strings have same length
      */
-    return CHARSET_COMPARE(interp, s1, s2) == 0;
+    return STRING_compare(interp, s1, s2) == 0;
 }
 
 
@@ -1522,13 +1440,13 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     STRING *res;
     size_t  minlen;
 
-    /* we could also trans_charset to iso-8859-1 */
-    if (s1 && s1->encoding != Parrot_fixed_8_encoding_ptr)
+    /* we could also trans_encoding to iso-8859-1 */
+    if (s1 && STRING_max_bytes_per_codepoint(s1) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "string bitwise_and (%s/%s) unsupported",
             s1->encoding->name, nonnull_encoding_name(s2));
 
-    if (s2 && s2->encoding != Parrot_fixed_8_encoding_ptr)
+    if (s2 && STRING_max_bytes_per_codepoint(s2) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "string bitwise_and (%s/%s) unsupported",
             nonnull_encoding_name(s1), s2->encoding->name);
@@ -1540,7 +1458,7 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         minlen = 0;
 
     res = Parrot_str_new_init(interp, NULL, minlen,
-            Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+            Parrot_binary_encoding_ptr, 0);
 
     if (STRING_IS_NULL(s1) || STRING_IS_NULL(s2)) {
         res->bufused = 0;
@@ -1664,7 +1582,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     size_t  maxlen = 0;
 
     if (!STRING_IS_NULL(s1)) {
-        if (s1->encoding != Parrot_fixed_8_encoding_ptr)
+        if (STRING_max_bytes_per_codepoint(s1) != 1)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_ENCODING,
                 "string bitwise_or (%s/%s) unsupported",
@@ -1674,7 +1592,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     }
 
     if (!STRING_IS_NULL(s2)) {
-        if (s2->encoding != Parrot_fixed_8_encoding_ptr)
+        if (STRING_max_bytes_per_codepoint(s2) != 1)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_ENCODING,
                 "string bitwise_or (%s/%s) unsupported",
@@ -1685,7 +1603,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     }
 
     res = Parrot_str_new_init(interp, NULL, maxlen,
-            Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+            Parrot_binary_encoding_ptr, 0);
 
     if (!maxlen) {
         res->bufused = 0;
@@ -1730,7 +1648,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     size_t  maxlen = 0;
 
     if (!STRING_IS_NULL(s1)) {
-        if (s1->encoding != Parrot_fixed_8_encoding_ptr)
+        if (STRING_max_bytes_per_codepoint(s1) != 1)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_ENCODING,
                 "string bitwise_xor (%s/%s) unsupported",
@@ -1740,7 +1658,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     }
 
     if (!STRING_IS_NULL(s2)) {
-        if (s2->encoding != Parrot_fixed_8_encoding_ptr)
+        if (STRING_max_bytes_per_codepoint(s2) != 1)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_ENCODING,
                 "string bitwise_xor (%s/%s) unsupported",
@@ -1751,7 +1669,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     }
 
     res = Parrot_str_new_init(interp, NULL, maxlen,
-            Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+            Parrot_binary_encoding_ptr, 0);
 
     if (!maxlen) {
         res->bufused = 0;
@@ -1807,11 +1725,11 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     size_t  len;
 
     if (!STRING_IS_NULL(s)) {
-        if (s->encoding != Parrot_fixed_8_encoding_ptr)
+        if (STRING_max_bytes_per_codepoint(s) != 1)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_ENCODING,
-                "string bitwise_not (%s/%s) unsupported",
-                s->encoding->name, s->encoding->name);
+                "string bitwise_not (%s) unsupported",
+                s->encoding->name);
 
         len = s->bufused;
     }
@@ -1819,7 +1737,7 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         len = 0;
 
     res = Parrot_str_new_init(interp, NULL, len,
-            Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+            Parrot_binary_encoding_ptr, 0);
 
     if (!len) {
         res->bufused = 0;
@@ -1965,7 +1883,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         STRING_ITER_INIT(interp, &iter);
 
         while (state != parse_end && iter.charpos < s->strlen) {
-            const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, s, &iter);
+            const UINTVAL c = STRING_iter_get_and_advance(interp, s, &iter);
             /* Check for overflow */
             if (c > 255)
                 break;
@@ -2064,7 +1982,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 
     /* Handcrafted FSM to read float value */
     while (state != parse_end && iter.charpos < s->strlen) {
-        const UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, s, &iter);
+        const UINTVAL c = STRING_iter_get_and_advance(interp, s, &iter);
         /* Check for overflow */
         if (c > 255)
             break;
@@ -2431,15 +2349,8 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
     size_t hashval = interp->hash_seed;
 
     if (!STRING_IS_NULL(s)) {
-        if (s->strlen) {
-            if (s->encoding->hash)
-                hashval = ENCODING_HASH(interp, s, hashval);
-            else if (s->charset->compute_hash)
-                hashval = CHARSET_COMPUTE_HASH(interp, s, hashval);
-            else {
-                exit_fatal(1, "String subsystem not properly initialized");
-            }
-        }
+        if (s->strlen)
+            hashval = STRING_hash(interp, s, hashval);
 
         s->hashval = hashval;
     }
@@ -2512,14 +2423,14 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
     /* create ascii result */
     result = Parrot_str_new_init(interp, NULL, charlen,
-            Parrot_fixed_8_encoding_ptr, Parrot_ascii_charset_ptr, 0);
+            Parrot_ascii_encoding_ptr, 0);
 
     /* more work TODO */
     STRING_ITER_INIT(interp, &iter);
     dp = (unsigned char *)result->strstart;
 
     for (i = 0; len > 0; --len) {
-        UINTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &iter);
+        UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
         if (c < 0x7f) {
             /* process ASCII chars */
             if (i >= charlen - 2) {
@@ -2622,12 +2533,11 @@ throw_illegal_escape(PARROT_INTERP)
 /*
 
 =item C<STRING * Parrot_str_unescape_string(PARROT_INTERP, const STRING *src,
-const CHARSET *charset, const ENCODING *encoding, UINTVAL flags)>
+const STR_VTABLE *encoding, UINTVAL flags)>
 
 EXPERIMENTAL, see TT #1628
 
-Unescapes the src string returnning a new string with the charset
-and encoding specified.
+Unescapes the src string returnning a new string with the encoding specified.
 
 
 =cut
@@ -2638,8 +2548,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
-        ARGIN(const CHARSET *charset),
-        ARGIN(const ENCODING *encoding),
+        ARGIN(const STR_VTABLE *encoding),
         UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_str_unescape_string)
@@ -2653,7 +2562,6 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     char digbuf[9];
     int pending;
 
-    result->charset = charset;
     result->encoding = encoding;
     reserved = string_max_bytes(interp, result, srclen);
     Parrot_gc_allocate_string_storage(interp, result, reserved);
@@ -2662,14 +2570,14 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     STRING_ITER_INIT(interp, &itersrc);
     STRING_ITER_INIT(interp, &iterdest);
     while (itersrc.bytepos < srclen) {
-        INTVAL c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+        INTVAL c = STRING_iter_get_and_advance(interp, src, &itersrc);
         INTVAL next;
 
         do {
             pending = 0;
             next = c;
             if (c == '\\') {
-                c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                c = STRING_iter_get_and_advance(interp, src, &itersrc);
                 switch (c) {
                 /* Common one char sequences */
                 case 'a': next = '\a'; break;
@@ -2682,7 +2590,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'e': next = '\x1B'; break;
                 /* Escape character */
                 case 'c':
-                    c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                    c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     /* This assumes ascii-alike encoding */
                     if (c < 'A' || c > 'Z')
                         throw_illegal_escape(interp);
@@ -2690,11 +2598,11 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
-                    c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                    c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */
                         while (itersrc.bytepos < srclen) {
-                            c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                            c = STRING_iter_get_and_advance(interp, src, &itersrc);
                             if (c == '}')
                                 break;
                             if (!isxdigit(c))
@@ -2718,7 +2626,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                                 pending = 0;
                                 break;
                             }
-                            c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                            c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         }
                     }
                     if (digcount == 0)
@@ -2729,7 +2637,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'u':
                     /* \uhhhh 4 hex digits */
                     for (digcount = 0; digcount < 4; ++digcount) {
-                        c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                        c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (!isxdigit(c))
                             throw_illegal_escape(interp);
                         digbuf[digcount] = c;
@@ -2740,7 +2648,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'U':
                     /* \Uhhhhhhhh 8 hex digits */
                     for (digcount = 0; digcount < 8; ++digcount) {
-                        c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                        c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (!isxdigit(c))
                             throw_illegal_escape(interp);
                         digbuf[digcount] = c;
@@ -2753,7 +2661,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     /* \ooo 1..3 oct digits */
                     digbuf[0] = c;
                     for (digcount = 1; digcount < 3; ++digcount) {
-                        c = STRING_ITER_GET_AND_ADVANCE(interp, src, &itersrc);
+                        c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (c < '0' || c > '7')
                             break;
                         digbuf[digcount] = c;
@@ -2767,7 +2675,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     next = c;
                 }
             }
-            STRING_ITER_SET_AND_ADVANCE(interp, result, &iterdest, next);
+            STRING_iter_set_and_advance(interp, result, &iterdest, next);
         } while (pending);
     }
     result->bufused = iterdest.bytepos;
@@ -2802,9 +2710,8 @@ Parrot_str_unescape(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_str_unescape)
 
-    STRING         *result;
-    const CHARSET  *charset;
-    const ENCODING *encoding = NULL;
+    STRING           *result;
+    const STR_VTABLE *encoding;
 
     /* does the encoding have a character set? */
     const char     *p        = enc_char ? strchr(enc_char, ':') : NULL;
@@ -2823,25 +2730,17 @@ Parrot_str_unescape(PARROT_INTERP,
         #define MAX_ENCODING_NAME_ALLOWED 63
         char   buffer[MAX_ENCODING_NAME_ALLOWED + 1];
         size_t l = p - enc_char;
-        charset  = NULL;
 
         if (l < MAX_ENCODING_NAME_ALLOWED) {
             memcpy(buffer, enc_char, l);
             buffer[l] = '\0';
-            encoding  = Parrot_find_encoding(interp, buffer);
         }
-        if (!encoding)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Can't make '%s' encoding strings", enc_char);
+        else {
+            buffer[0] = '\0';
+        }
 
-        charset = Parrot_find_charset(interp, p + 1);
-        if (!charset)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Can't make '%s' charset strings", p + 1);
-
-        result   = Parrot_str_new_init(interp, cstring, clength,
-                        encoding, charset, flags);
-        encoding = Parrot_fixed_8_encoding_ptr;
+        result   = string_make(interp, cstring, clength, buffer, flags);
+        encoding = Parrot_ascii_encoding_ptr;
     }
     else {
         result   = string_make(interp, cstring, clength, enc_char, flags);
@@ -2880,9 +2779,9 @@ Parrot_str_unescape(PARROT_INTERP,
 
     /* Force validating the string */
     if (encoding != result->encoding)
-        result->strlen = CHARSET_CODEPOINTS(interp, result);
+        result->strlen = STRING_scan(interp, result);
 
-    if (!CHARSET_VALIDATE(interp, result))
+    if (!STRING_validate(interp, result))
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_STRING_REPRESENTATION, "Malformed string");
 
@@ -2912,7 +2811,7 @@ Parrot_str_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't upcase NULL string");
     else {
-        STRING * const res = CHARSET_UPCASE(interp, s);
+        STRING * const res = STRING_upcase(interp, s);
         res->hashval = 0;
         return res;
     }
@@ -2942,7 +2841,7 @@ Parrot_str_downcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't downcase NULL string");
     else {
-        STRING * const res = CHARSET_DOWNCASE(interp, s);
+        STRING * const res = STRING_downcase(interp, s);
         res->hashval = 0;
         return res;
     }
@@ -2972,7 +2871,7 @@ Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't titlecase NULL string");
     else {
-        STRING * const res = CHARSET_TITLECASE(interp, s);
+        STRING * const res = STRING_titlecase(interp, s);
         res->hashval = 0;
         return res;
     }
@@ -3063,7 +2962,7 @@ Parrot_str_is_cclass(PARROT_INTERP, INTVAL flags,
     if (!Parrot_str_byte_length(interp, s))
         return 0;
 
-    return CHARSET_IS_CCLASS(interp, flags, s, offset);
+    return STRING_is_cclass(interp, flags, s, offset);
 }
 
 
@@ -3090,7 +2989,7 @@ Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(const STRING *s
     if (STRING_IS_NULL(s))
         return -1;
 
-    return CHARSET_FIND_CCLASS(interp, flags, s, offset, count);
+    return STRING_find_cclass(interp, flags, s, offset, count);
 }
 
 
@@ -3119,7 +3018,7 @@ Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags,
     if (STRING_IS_NULL(s))
         return -1;
 
-    return CHARSET_FIND_NOT_CCLASS(interp, flags, s, offset, count);
+    return STRING_find_not_cclass(interp, flags, s, offset, count);
 }
 
 
@@ -3143,21 +3042,8 @@ Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
         INTVAL charset_nr)
 {
     ASSERT_ARGS(Parrot_str_change_charset)
-    const CHARSET *new_charset;
 
-    if (STRING_IS_NULL(src))
-        return STRINGNULL;
-
-    new_charset = Parrot_get_charset(interp, charset_nr);
-
-    if (!new_charset)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARTYPE,
-                "charset #%d not found", (int) charset_nr);
-
-    if (new_charset == src->charset)
-        return src;
-
-    return new_charset->to_charset(interp, src);
+    return Parrot_str_change_encoding(interp, src, charset_nr);
 }
 
 
@@ -3166,8 +3052,7 @@ Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
 =item C<STRING* Parrot_str_change_encoding(PARROT_INTERP, STRING *src, INTVAL
 encoding_nr)>
 
-Converts C<src> to the given charset or encoding and returns the result as a
-new string.
+Converts C<src> to the given encoding and returns the result as a new string.
 
 =cut
 
@@ -3181,7 +3066,7 @@ Parrot_str_change_encoding(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
         INTVAL encoding_nr)
 {
     ASSERT_ARGS(Parrot_str_change_encoding)
-    const ENCODING *new_encoding;
+    const STR_VTABLE *new_encoding;
 
     if (STRING_IS_NULL(src))
         return STRINGNULL;
@@ -3223,7 +3108,7 @@ Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
     if (!src->strlen)
         return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
-    return CHARSET_COMPOSE(interp, src);
+    return STRING_compose(interp, src);
 }
 
 
@@ -3325,7 +3210,7 @@ Parrot_str_split(PARROT_INTERP,
         do {
             const String_iter old_iter = iter;
 
-            STRING_ITER_SKIP(interp, str, &iter, 1);
+            STRING_iter_skip(interp, str, &iter, 1);
             tstr = Parrot_str_iter_substr(interp, str, &old_iter, &iter);
             VTABLE_set_string_keyed_int(interp, res, old_iter.charpos, tstr);
         } while (iter.charpos < slen);

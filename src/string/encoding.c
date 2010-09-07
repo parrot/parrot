@@ -16,50 +16,28 @@ These are parrot's generic encoding handling functions
 
 */
 
-#define PARROT_NO_EXTERN_ENCODING_PTRS
-#include "parrot/parrot.h"
+#include "parrot/encoding.h"
+
+STR_VTABLE *Parrot_default_encoding_ptr = NULL;
+
+static STR_VTABLE **encodings;
+static int          n_encodings;
+/* for backwards compatibility */
+static STRING      *unicode_str;
+static STRING      *fixed_8_str;
 
 /* HEADERIZER HFILE: include/parrot/encoding.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL register_encoding(PARROT_INTERP,
-    ARGIN(const char *encodingname),
-    ARGIN(ENCODING *encoding))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-#define ASSERT_ARGS_register_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(encodingname) \
-    , PARROT_ASSERT_ARG(encoding))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-ENCODING *Parrot_default_encoding_ptr = NULL;
-ENCODING *Parrot_fixed_8_encoding_ptr = NULL;
-ENCODING *Parrot_utf8_encoding_ptr    = NULL;
-ENCODING *Parrot_ucs2_encoding_ptr    = NULL;
-ENCODING *Parrot_utf16_encoding_ptr   = NULL;
-ENCODING *Parrot_ucs4_encoding_ptr    = NULL;
-
-typedef struct One_encoding {
-    NOTNULL(ENCODING *encoding);
-    STRING  *name;
-} One_encoding;
-
-typedef struct All_encodings {
-    int n_encodings;
-    One_encoding *enc;
-} All_encodings;
-
-static All_encodings *all_encodings;
 
 /*
 
-=item C<void parrot_deinit_encodings(PARROT_INTERP)>
+=item C<void Parrot_deinit_encodings(PARROT_INTERP)>
 
 Deinitialize encodings and free all memory used by them.
 
@@ -68,25 +46,20 @@ Deinitialize encodings and free all memory used by them.
 */
 
 void
-parrot_deinit_encodings(PARROT_INTERP)
+Parrot_deinit_encodings(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_deinit_encodings)
-    const int n = all_encodings->n_encodings;
-    int i;
+    ASSERT_ARGS(Parrot_deinit_encodings)
 
-    for (i = 0; i < n; ++i) {
-        mem_gc_free(interp, all_encodings->enc[i].encoding);
-    }
-    mem_gc_free(interp, all_encodings->enc);
-    mem_gc_free(interp, all_encodings);
-    all_encodings = NULL;
+    mem_gc_free(interp, encodings);
+    encodings   = NULL;
+    n_encodings = 0;
 }
 
 /*
 
-=item C<ENCODING * Parrot_new_encoding(PARROT_INTERP)>
+=item C<STR_VTABLE * Parrot_new_encoding(PARROT_INTERP)>
 
-Allocates the memory for a new C<ENCODING> from the system.
+Allocates the memory for a new string vtable from the system.
 
 =cut
 
@@ -95,16 +68,16 @@ Allocates the memory for a new C<ENCODING> from the system.
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-ENCODING *
+STR_VTABLE *
 Parrot_new_encoding(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_new_encoding)
-    return mem_gc_allocate_typed(interp, ENCODING);
+    return mem_gc_allocate_typed(interp, STR_VTABLE);
 }
 
 /*
 
-=item C<const ENCODING * Parrot_find_encoding(PARROT_INTERP, const char
+=item C<const STR_VTABLE * Parrot_find_encoding(PARROT_INTERP, const char
 *encodingname)>
 
 Finds an encoding with the name C<encodingname>. Returns the encoding
@@ -118,22 +91,27 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const ENCODING *
+const STR_VTABLE *
 Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 {
     ASSERT_ARGS(Parrot_find_encoding)
-    const int n = all_encodings->n_encodings;
+    const int n = n_encodings;
     int i;
 
     for (i = 0; i < n; ++i)
-        if (STREQ(all_encodings->enc[i].encoding->name, encodingname))
-            return all_encodings->enc[i].encoding;
+        if (STREQ(encodings[i]->name, encodingname))
+            return encodings[i];
+
+    /* backwards compatibility */
+    if (strcmp(encodingname, "unicode") == 0)
+        return Parrot_utf8_encoding_ptr;
+
     return NULL;
 }
 
 /*
 
-=item C<const ENCODING * Parrot_load_encoding(PARROT_INTERP, const char
+=item C<const STR_VTABLE * Parrot_load_encoding(PARROT_INTERP, const char
 *encodingname)>
 
 Loads an encoding. Currently throws an exception because we cannot load
@@ -154,7 +132,7 @@ encodings. See https://trac.parrot.org/parrot/wiki/StringsTasklist.
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_CANNOT_RETURN_NULL
-const ENCODING *
+const STR_VTABLE *
 Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 {
     ASSERT_ARGS(Parrot_load_encoding)
@@ -181,13 +159,28 @@ INTVAL
 Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
 {
     ASSERT_ARGS(Parrot_encoding_number)
-    const int n = all_encodings->n_encodings;
+    const int n = n_encodings;
     int i;
 
     for (i = 0; i < n; ++i) {
-        if (Parrot_str_equal(interp, all_encodings->enc[i].name, encodingname))
+        if (Parrot_str_equal(interp, encodings[i]->name_str, encodingname))
             return i;
     }
+
+    /* backwards compatibility */
+    if (Parrot_str_equal(interp, encodingname, unicode_str)) {
+        for (i = 0; i < n; ++i) {
+            if (STREQ(encodings[i]->name, "utf8"))
+                return i;
+        }
+    }
+    else if (STRING_equal(interp, encodingname, fixed_8_str)) {
+        for (i = 0; i < n; ++i) {
+            if (STREQ(encodings[i]->name, "ascii"))
+                return i;
+        }
+    }
+
     return -1;
 }
 
@@ -196,6 +189,8 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
 =item C<INTVAL Parrot_encoding_number_of_str(PARROT_INTERP, const STRING *src)>
 
 Return the number of the encoding of the given string or -1 if not found.
+
+This could be converted to a macro.
 
 =cut
 
@@ -208,14 +203,8 @@ INTVAL
 Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(Parrot_encoding_number_of_str)
-    const int n = all_encodings->n_encodings;
-    int i;
 
-    for (i = 0; i < n; ++i) {
-        if (src->encoding == all_encodings->enc[i].encoding)
-            return i;
-    }
-    return -1;
+    return src->encoding->num;
 }
 
 /*
@@ -224,6 +213,8 @@ Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 
 Returns the name of a character encoding based on the INTVAL index
 C<number_of_encoding> to the All_encodings array.
+
+This could be converted to a macro.
 
 =cut
 
@@ -237,15 +228,15 @@ STRING*
 Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
     ASSERT_ARGS(Parrot_encoding_name)
-    if (number_of_encoding >= all_encodings->n_encodings ||
+    if (number_of_encoding >= n_encodings ||
         number_of_encoding < 0)
         return NULL;
-    return all_encodings->enc[number_of_encoding].name;
+    return encodings[number_of_encoding]->name_str;
 }
 
 /*
 
-=item C<const ENCODING* Parrot_get_encoding(PARROT_INTERP, INTVAL
+=item C<const STR_VTABLE* Parrot_get_encoding(PARROT_INTERP, INTVAL
 number_of_encoding)>
 
 Returns the encoding given by the INTVAL index C<number_of_encoding>.
@@ -258,14 +249,14 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const ENCODING*
+const STR_VTABLE*
 Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding)
 {
     ASSERT_ARGS(Parrot_get_encoding)
-    if (number_of_encoding >= all_encodings->n_encodings ||
+    if (number_of_encoding >= n_encodings ||
         number_of_encoding < 0)
         return NULL;
-    return all_encodings->enc[number_of_encoding].encoding;
+    return encodings[number_of_encoding];
 }
 
 /*
@@ -288,50 +279,10 @@ const char *
 Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
     ASSERT_ARGS(Parrot_encoding_c_name)
-    if (number_of_encoding >= all_encodings->n_encodings ||
+    if (number_of_encoding >= n_encodings ||
         number_of_encoding < 0)
         return NULL;
-    return all_encodings->enc[number_of_encoding].encoding->name;
-}
-
-/*
-
-=item C<static INTVAL register_encoding(PARROT_INTERP, const char *encodingname,
-ENCODING *encoding)>
-
-Registers a new character encoding C<encoding> with the given name
-C<encodingname>. Returns 1 if successful, returns 0 otherwise.
-
-=cut
-
-*/
-
-static INTVAL
-register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
-        ARGIN(ENCODING *encoding))
-{
-    ASSERT_ARGS(register_encoding)
-    const int n = all_encodings->n_encodings;
-    int i;
-
-    for (i = 0; i < n; ++i) {
-        if (STREQ(all_encodings->enc[i].encoding->name, encodingname))
-            return 0;
-    }
-    /*
-     * TODO
-     * this needs either a LOCK or we just forbid dynamic
-     * loading of encodings from inside threads
-     */
-    if (!n)
-        all_encodings->enc = mem_gc_allocate_zeroed_typed(interp, One_encoding);
-    else
-        all_encodings->enc = mem_gc_realloc_n_typed_zeroed(interp,
-                all_encodings->enc, n + 1, n, One_encoding);
-    ++all_encodings->n_encodings;
-    all_encodings->enc[n].encoding = encoding;
-
-    return 1;
+    return encodings[number_of_encoding]->name;
 }
 
 /*
@@ -352,15 +303,16 @@ Parrot_str_internal_register_encoding_names(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_str_internal_register_encoding_names)
     int n;
-    for (n = 0; n < all_encodings->n_encodings; ++n)
-        all_encodings->enc[n].name =
-            Parrot_str_new_constant(interp, all_encodings->enc[n].encoding->name);
+    for (n = 0; n < n_encodings; ++n)
+        encodings[n]->name_str =
+            Parrot_str_new_constant(interp, encodings[n]->name);
+    unicode_str = Parrot_str_new_constant(interp, "unicode");
+    fixed_8_str = Parrot_str_new_constant(interp, "fixed_8");
 }
 
 /*
 
-=item C<INTVAL Parrot_register_encoding(PARROT_INTERP, const char *encodingname,
-ENCODING *encoding)>
+=item C<INTVAL Parrot_register_encoding(PARROT_INTERP, STR_VTABLE *encoding)>
 
 Registers a character encoding C<encoding> with name C<encodingname>.
 Only allows one of 5 possibilities: fixed_8, utf8, utf16, ucs2 and ucs4.
@@ -371,46 +323,66 @@ Only allows one of 5 possibilities: fixed_8, utf8, utf16, ucs2 and ucs4.
 
 PARROT_EXPORT
 INTVAL
-Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
-        ARGIN(ENCODING *encoding))
+Parrot_register_encoding(PARROT_INTERP, ARGIN(STR_VTABLE *encoding))
 {
     ASSERT_ARGS(Parrot_register_encoding)
-    if (!all_encodings) {
-        all_encodings = mem_gc_allocate_zeroed_typed(interp, All_encodings);
-        all_encodings->n_encodings = 0;
-        all_encodings->enc = NULL;
-    }
-    if (STREQ("fixed_8", encodingname)) {
-        Parrot_fixed_8_encoding_ptr = encoding;
-        if (!Parrot_default_encoding_ptr) {
-            Parrot_default_encoding_ptr = encoding;
+    int i;
+    int n = n_encodings;
 
-        }
-        return register_encoding(interp, encodingname, encoding);
+    for (i = 0; i < n_encodings; ++i) {
+        if (STREQ(encodings[i]->name, encoding->name))
+            return 0;
     }
-    if (STREQ("utf8", encodingname)) {
-        Parrot_utf8_encoding_ptr = encoding;
-        return register_encoding(interp, encodingname, encoding);
-    }
-    if (STREQ("utf16", encodingname)) {
-        Parrot_utf16_encoding_ptr = encoding;
-        return register_encoding(interp, encodingname, encoding);
-    }
-    if (STREQ("ucs2", encodingname)) {
-        Parrot_ucs2_encoding_ptr = encoding;
-        return register_encoding(interp, encodingname, encoding);
-    }
-    if (STREQ("ucs4", encodingname)) {
-        Parrot_ucs4_encoding_ptr = encoding;
-        return register_encoding(interp, encodingname, encoding);
-    }
-    return 0;
+
+    if (!n)
+        encodings = mem_gc_allocate_zeroed_typed(interp, STR_VTABLE *);
+    else
+        encodings = mem_gc_realloc_n_typed_zeroed(interp,
+                encodings, n + 1, n, STR_VTABLE *);
+
+    encoding->num = n;
+    encodings[n]  = encoding;
+    ++n_encodings;
+
+    return 1;
+}
+
+/*
+
+=item C<void Parrot_encodings_init(PARROT_INTERP)>
+
+Creates the initial charsets and encodings, and registers the initial
+charset converters.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_encodings_init(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_encodings_init)
+
+    Parrot_register_encoding(interp, Parrot_ascii_encoding_ptr);
+    Parrot_register_encoding(interp, Parrot_latin1_encoding_ptr);
+    Parrot_register_encoding(interp, Parrot_binary_encoding_ptr);
+    Parrot_register_encoding(interp, Parrot_utf8_encoding_ptr);
+    Parrot_register_encoding(interp, Parrot_utf16_encoding_ptr);
+    Parrot_register_encoding(interp, Parrot_ucs2_encoding_ptr);
+    Parrot_register_encoding(interp, Parrot_ucs4_encoding_ptr);
+
+    Parrot_default_encoding_ptr = Parrot_ascii_encoding_ptr;
+
+    /* Now that the plugins are registered, we can create STRING
+     * names for them.  */
+    Parrot_str_internal_register_encoding_names(interp);
 }
 
 /*
 
 =item C<INTVAL Parrot_make_default_encoding(PARROT_INTERP, const char
-*encodingname, ENCODING *encoding)>
+*encodingname, STR_VTABLE *encoding)>
 
 Sets the default encoding to C<encoding> with name C<encodingname>.
 
@@ -421,7 +393,7 @@ Sets the default encoding to C<encoding> with name C<encodingname>.
 PARROT_EXPORT
 INTVAL
 Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
-        ARGIN(ENCODING *encoding))
+        ARGIN(STR_VTABLE *encoding))
 {
     ASSERT_ARGS(Parrot_make_default_encoding)
     Parrot_default_encoding_ptr = encoding;
@@ -430,7 +402,7 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
 
 /*
 
-=item C<const ENCODING * Parrot_default_encoding(PARROT_INTERP)>
+=item C<const STR_VTABLE * Parrot_default_encoding(PARROT_INTERP)>
 
 Gets the default encoding.
 
@@ -442,37 +414,11 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-const ENCODING *
+const STR_VTABLE *
 Parrot_default_encoding(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_default_encoding)
     return Parrot_default_encoding_ptr;
-}
-
-/*
-
-=item C<encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
-ENCODING *lhs, ENCODING *rhs)>
-
-Finds a converter from encoding C<rhs> to C<lhs>. Not yet implemented, so
-throws an exception.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-encoding_converter_t
-Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODING *rhs))
-{
-    ASSERT_ARGS(Parrot_find_encoding_converter)
-    UNUSED(lhs);
-    UNUSED(rhs);
-
-    /* XXX Apparently unwritten https://trac.parrot.org/parrot/wiki/StringsTasklist */
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "Can't find encoding converters yet.");
 }
 
 

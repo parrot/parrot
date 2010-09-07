@@ -31,6 +31,11 @@ typedef struct buffer_t {
     size_t     _buflen;                 /* Length of buffer data. */
 } Buffer;
 
+typedef enum Forward_flag {
+    Buffer_moved_FLAG   = 1 << 0,
+    Buffer_shared_FLAG  = 1 << 1
+} Forward_flags;
+
 /* Use these macros to access the two buffer header slots. */
 
 #define Buffer_bufstart(buffer)    (buffer)->_bufstart
@@ -96,8 +101,7 @@ struct parrot_string_t {
     UINTVAL     hashval;                /* Cached hash value. */
 
     /*    parrot_string_representation_t representation;*/
-    const struct _encoding *encoding;   /* Pointer to encoding structure. */
-    const struct _charset  *charset;    /* Pointer to charset structure. */
+    const struct _str_vtable *encoding; /* Pointer to string vtable. */
 };
 
 /* Here is the Parrot PMC object, "inheriting" from PObj. */

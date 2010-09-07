@@ -160,7 +160,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
         PackFile_pack(INTERP, pf, ptr);
 
         str = Parrot_str_new_init(INTERP, (const char*)ptr, length,
-                PARROT_FIXED_8_ENCODING, PARROT_BINARY_CHARSET, 0);
+                Parrot_binary_encoding_ptr, 0);
         Parrot_gc_free_memory_chunk(INTERP, ptr);
 
         PackFile_destroy(INTERP, pf);

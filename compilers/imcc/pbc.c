@@ -973,9 +973,8 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
          * get first part as charset, rest as string
          */
         STRING     *s;
-        const CHARSET *s_charset;
-        const ENCODING *s_encoding = NULL;
-        const ENCODING *src_encoding;
+        const STR_VTABLE *s_encoding;
+        const STR_VTABLE *src_encoding;
         #define MAX_NAME 31
         char charset_name[MAX_NAME + 1];
         char encoding_name[MAX_NAME + 1];
@@ -983,38 +982,38 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         char * p2 = strchr(r->name, ':');
         PARROT_ASSERT(p && p[-1] == ':');
         if (p2 < p -1) {
+            /* Handle the old 'encoding:charset' format by trying
+             * encoding as well as charset */
             strncpy(encoding_name, buf, p2 - buf);
             encoding_name[p2-buf] = '\0';
             strncpy(charset_name, p2 +1, p - p2 - 2);
             charset_name[p- p2 - 2] = '\0';
             /*fprintf(stderr, "%s:%s\n", charset_name, encoding_name);*/
-            s_charset = Parrot_find_charset(interp, charset_name);
-            if (s_charset == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "Unknown charset '%s'", charset_name);
+            s_encoding = Parrot_find_encoding(interp, encoding_name);
+            if (s_encoding == NULL) {
+                s_encoding = Parrot_find_encoding(interp, charset_name);
+                if (s_encoding == NULL)
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_STRING_REPRESENTATION,
+                            "Unknown encoding '%s:%s'",
+                            encoding_name, charset_name);
+            }
+        }
+        else {
+            strncpy(encoding_name, buf, p - buf - 1);
+            encoding_name[p - buf - 1] = '\0';
+            charset_name[0] = '\0';
+            /*fprintf(stderr, "%s\n", encoding_name);*/
             s_encoding = Parrot_find_encoding(interp, encoding_name);
             if (s_encoding == NULL)
                 Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_STRING_REPRESENTATION,
                         "Unknown encoding '%s'", encoding_name);
         }
-        else {
-            strncpy(charset_name, buf, p - buf - 1);
-            charset_name[p - buf - 1] = '\0';
-            /*fprintf(stderr, "%s\n", charset_name);*/
-            s_charset = Parrot_find_charset(interp, charset_name);
-            if (s_charset == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "Unknown charset '%s'", charset_name);
-        }
-        if (strcmp(charset_name, "unicode") == 0)
-            src_encoding = Parrot_utf8_encoding_ptr;
+        if (s_encoding->max_bytes_per_codepoint == 1)
+            src_encoding = Parrot_ascii_encoding_ptr;
         else
-            src_encoding = Parrot_fixed_8_encoding_ptr;
-        if (s_encoding == NULL)
-            s_encoding = src_encoding;
+            src_encoding = Parrot_utf8_encoding_ptr;
 
         /* past delim */
         buf     = p + 1;
@@ -1032,10 +1031,10 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
             }
             {
                 STRING * aux = Parrot_str_new_init(interp, buf, p - buf,
-                        src_encoding, s_charset, 0);
+                        src_encoding, 0);
                 s = Parrot_str_unescape_string(interp, aux,
-                        s_charset, s_encoding, PObj_constant_FLAG);
-                if (!CHARSET_VALIDATE(interp, s))
+                        s_encoding, PObj_constant_FLAG);
+                if (!STRING_validate(interp, s))
                        Parrot_ex_throw_from_c_args(interp, NULL,
                                EXCEPTION_INVALID_STRING_REPRESENTATION,
                                "Malformed string");
@@ -1882,7 +1881,7 @@ init_fixedintegerarray_from_string(PARROT_INTERP, ARGIN(PMC *p), ARGIN(STRING *s
     char   *src, *chr, *start;
     int     base;
 
-    if (s->encoding != Parrot_fixed_8_encoding_ptr)
+    if (STRING_max_bytes_per_codepoint(s) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "unhandled string encoding in FixedIntegerArray initialization");
 

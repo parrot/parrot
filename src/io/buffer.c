@@ -232,7 +232,7 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
     size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
     STRING  *s    = Parrot_str_new_init(interp, buf, size,
-                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                        Parrot_default_encoding_ptr,
                         PObj_external_FLAG);
     size_t   got  = PIO_READ(interp, filehandle, &s);
 
@@ -338,7 +338,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
             STRING *sf = Parrot_str_new_init(interp, (char *)out_buf, len,
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                Parrot_default_encoding_ptr,
                 PObj_external_FLAG);
             got                 = PIO_READ(interp, filehandle, &sf);
             s->strlen           = s->bufused = current + got;

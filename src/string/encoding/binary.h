@@ -10,21 +10,17 @@
  *  References:
  */
 
-#ifndef PARROT_CHARSET_BINARY_H_GUARD
-#define PARROT_CHARSET_BINARY_H_GUARD
+#ifndef PARROT_ENCODING_BINARY_H_GUARD
+#define PARROT_ENCODING_BINARY_H_GUARD
 
-/* HEADERIZER BEGIN: src/string/charset/binary.c */
+/* HEADERIZER BEGIN: src/string/encoding/binary.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_charset_binary_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_charset_binary_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/string/charset/binary.c */
+/* HEADERIZER END: src/string/encoding/binary.c */
 
-#endif /* PARROT_CHARSET_BINARY_H_GUARD */
+#endif /* PARROT_ENCODING_BINARY_H_GUARD */
 
 /*
  * Local variables:

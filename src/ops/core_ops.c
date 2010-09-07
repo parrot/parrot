@@ -23103,35 +23103,35 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_charset_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_charset_number_of_str(interp, SREG(2));
+    IREG(1) = Parrot_encoding_number_of_str(interp, SREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_charset_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_charset_number_of_str(interp, CONST(2).u.string);
+    IREG(1) = Parrot_encoding_number_of_str(interp, CONST(2).u.string);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_charsetname_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_charset_name(interp, IREG(2));
+    SREG(1) = Parrot_encoding_name(interp, IREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_charsetname_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_charset_name(interp, cur_opcode[2]);
+    SREG(1) = Parrot_encoding_name(interp, cur_opcode[2]);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_find_charset_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    const INTVAL n = Parrot_charset_number(interp, SREG(2));
+    const INTVAL n = Parrot_encoding_number(interp, SREG(2));
     if (n < 0) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_INVALID_CHARTYPE,
@@ -23144,7 +23144,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_find_charset_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    const INTVAL n = Parrot_charset_number(interp, CONST(2).u.string);
+    const INTVAL n = Parrot_encoding_number(interp, CONST(2).u.string);
     if (n < 0) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_INVALID_CHARTYPE,

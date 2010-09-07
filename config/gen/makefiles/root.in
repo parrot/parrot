@@ -368,7 +368,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/interpreter.h \
 	$(INC_DIR)/datatypes.h \
 	$(INC_DIR)/encoding.h \
-	$(INC_DIR)/charset.h \
 	$(INC_DIR)/string.h \
 	$(INC_DIR)/string_primitives.h \
 	$(INC_DIR)/hash.h \
@@ -417,11 +416,20 @@ PARROT_H_HEADERS = \
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) \
 
 
-CHARSET_O_FILES   = @TEMP_charset_o@
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
 CLASS_O_FILES     = @TEMP_pmc_classes_o@
 CLASS_STR_FILES   = @TEMP_pmc_classes_str@
-ENCODING_O_FILES  = @TEMP_encoding_o@
+
+ENCODING_O_FILES = \
+    src/string/encoding/shared$(O) \
+    src/string/encoding/tables$(O) \
+    src/string/encoding/ascii$(O) \
+    src/string/encoding/latin1$(O) \
+    src/string/encoding/binary$(O) \
+    src/string/encoding/utf8$(O) \
+    src/string/encoding/utf16$(O) \
+    src/string/encoding/ucs2$(O) \
+    src/string/encoding/ucs4$(O)
 
 IO_O_FILES = \
     src/io/core$(O) \
@@ -440,7 +448,6 @@ INTERP_O_FILES = \
     src/string/api$(O) \
     src/ops/core_ops$(O) \
 #IF(i386_has_gcc_cmpxchg):    src/atomic/gcc_x86$(O) \
-    src/string/charset$(O) \
     src/core_pmcs$(O) \
     src/datatypes$(O) \
     src/debug$(O) \
@@ -934,7 +941,6 @@ src/io/socket_win32$(O) : $(PARROT_H_HEADERS) \
 
 O_FILES = \
     $(INTERP_O_FILES) \
-    $(CHARSET_O_FILES) \
     $(IO_O_FILES) \
     $(CLASS_O_FILES) \
     $(ENCODING_O_FILES) \
@@ -1511,18 +1517,40 @@ src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str src/spf_render.c
 
 src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
-src/string/encoding$(O) : $(PARROT_H_HEADERS) src/string/encoding.c
+src/string/encoding$(O) : $(PARROT_H_HEADERS)
 
-src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
-	src/string/encoding/fixed_8.h \
-	src/string/encoding/utf8.h \
-	src/string/encoding/utf16.h \
-	src/string/encoding/ucs2.h \
-	src/string/encoding/ucs4.h \
-	src/string/charset/ascii.h \
-	src/string/charset/binary.h \
-	src/string/charset/iso-8859-1.h \
-	src/string/charset/unicode.h
+src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/tables.h
+src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/shared.h \
+    src/string/encoding/tables.h
+src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/ascii.h \
+    src/string/encoding/shared.h \
+    src/string/encoding/tables.h
+src/string/encoding/latin1$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/latin1.h \
+    src/string/encoding/shared.h \
+    src/string/encoding/tables.h
+src/string/encoding/binary$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/binary.h \
+    src/string/encoding/shared.h
+src/string/encoding/utf8$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/utf8.h \
+    src/string/encoding/shared.h \
+    src/string/unicode.h
+src/string/encoding/utf16$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/utf16.h \
+    src/string/encoding/shared.h \
+    src/string/unicode.h
+src/string/encoding/ucs2$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/ucs2.h \
+    src/string/encoding/shared.h \
+    src/string/unicode.h
+src/string/encoding/ucs4$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/ucs4.h \
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 
 src/pbc_merge$(O) : $(INC_DIR)/embed.h src/pbc_merge.c \
 	include/pmc/pmc_sub.h $(INC_DIR)/oplib/ops.h $(PARROT_H_HEADERS)
@@ -1552,10 +1580,6 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 @TEMP_gc_c@
 
 @TEMP_pmc_build@
-
-@TEMP_charset_build@
-
-@TEMP_encoding_build@
 
 # $(CONFIGURE_GENERATED_FILES) : Configure.pl
 #	$(PERL) Configure.pl
@@ -2276,7 +2300,6 @@ COVER_DIRS = \
     src/pmc \
     src/runcore \
     src/string \
-    src/string/charset \
     src/string/encoding \
     $(BUILD_DIR) \
     $(BUILD_DIR)/t/perl \

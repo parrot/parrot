@@ -165,7 +165,7 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
     if (s1->hashval != s2->hashval)
         return 1;
 
-    return CHARSET_COMPARE(interp, s1, s2);
+    return STRING_compare(interp, s1, s2);
 }
 
 
@@ -188,11 +188,8 @@ hash_compare_string_distinct_enc(PARROT_INTERP, ARGIN(const void *search_key),
     STRING const *s1 = (STRING const *)search_key;
     STRING const *s2 = (STRING const *)bucket_key;
 
-    if (s1 && s2 && (
-            s1->charset != s2->charset ||
-            s1->encoding != s2->encoding)) {
+    if (s1 && s2 && s1->encoding != s2->encoding)
         return 1;
-    }
 
     return hash_compare_string(interp, search_key, bucket_key);
 }
@@ -1174,7 +1171,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
 
             if (s == s2
             || (hashval == s2->hashval
-            &&  CHARSET_COMPARE(interp, s, s2) == 0))
+            &&  STRING_compare(interp, s, s2) == 0))
                 return bucket;
 
             bucket = bucket->next;
@@ -1284,7 +1281,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 
             if (s == s2
             || (hashval == s2->hashval
-            &&  CHARSET_COMPARE(interp, s, s2) == 0))
+            &&  STRING_compare(interp, s, s2) == 0))
                 break;
 
             bucket = bucket->next;

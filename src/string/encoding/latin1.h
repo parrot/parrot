@@ -1,26 +1,26 @@
-/* utf16.h
+/* iso_8859_1.h
  *  Copyright (C) 2004-2007, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     This is the header for the utf16 variable-width encoding.
+ *     This is the header for the iso_8859-1 charset functions
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
  *  References:
  */
 
-#ifndef PARROT_ENCODING_UTF16_H_GUARD
-#define PARROT_ENCODING_UTF16_H_GUARD
+#ifndef PARROT_ENCODING_LATIN1_H_GUARD
+#define PARROT_ENCODING_LATIN1_H_GUARD
 
-/* HEADERIZER BEGIN: src/string/encoding/utf16.c */
+/* HEADERIZER BEGIN: src/string/encoding/latin1.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/string/encoding/utf16.c */
+/* HEADERIZER END: src/string/encoding/latin1.c */
 
-#endif /* PARROT_ENCODING_UTF16_H_GUARD */
+#endif /* PARROT_ENCODING_LATIN1_H_GUARD */
 
 /*
  * Local variables:

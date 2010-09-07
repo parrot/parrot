@@ -1217,7 +1217,7 @@ PF_fetch_buf(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **c
     const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
     size_t  size       = PF_fetch_opcode(pf, cursor);
     STRING *s          = Parrot_str_new_init(interp, (const char *)*cursor, size,
-                            Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr,
+                            Parrot_binary_encoding_ptr,
                             PObj_external_FLAG);
     *((const unsigned char **)(cursor)) += ROUND_UP_B(size, wordsize);
     return s;
@@ -1244,8 +1244,7 @@ PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     ASSERT_ARGS(PF_store_buf)
     const int  wordsize = sizeof (opcode_t);
 
-    PARROT_ASSERT(s->encoding == Parrot_fixed_8_encoding_ptr);
-    PARROT_ASSERT(s->charset  == Parrot_binary_charset_ptr);
+    PARROT_ASSERT(s->encoding == Parrot_binary_encoding_ptr);
 
     *cursor++ = s->bufused;
 
@@ -1315,9 +1314,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     STRING   *s;
     UINTVAL   flags;
     UINTVAL   encoding_nr;
-    UINTVAL   charset_nr;
-    const ENCODING *encoding;
-    const CHARSET  *charset;
+    const STR_VTABLE *encoding;
     size_t    size;
     const int wordsize          = pf ? pf->header->wordsize : sizeof (opcode_t);
     opcode_t  flag_charset_word = PF_fetch_opcode(pf, cursor);
@@ -1326,30 +1323,24 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
         return STRINGNULL;
 
     /* decode flags, charset and encoding */
-    flags         = (flag_charset_word & 0x1 ? PObj_constant_FLAG : 0) |
-                    (flag_charset_word & 0x2 ? PObj_private7_FLAG : 0) ;
-    encoding_nr   = (flag_charset_word >> 16);
-    charset_nr    = (flag_charset_word >> 8) & 0xFF;
+    flags       = (flag_charset_word & 0x1 ? PObj_constant_FLAG : 0) |
+                  (flag_charset_word & 0x2 ? PObj_private7_FLAG : 0) ;
+    encoding_nr = (flag_charset_word >> 8) & 0xFF;
 
 
     size = (size_t)PF_fetch_opcode(pf, cursor);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("encoding_nr=%ld, ", encoding_nr));
-    TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
     TRACE_PRINTF(("size=%ld.\n", size));
 
     encoding = Parrot_get_encoding(interp, encoding_nr);
-    charset  = Parrot_get_charset(interp, charset_nr);
     if (!encoding)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                     "Invalid encoding number '%d' specified", encoding_nr);
-    if (!charset)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                    "Invalid charset number '%d' specified", charset_nr);
 
     s = Parrot_str_new_init(interp, (const char *)*cursor, size,
-            encoding, charset, flags);
+            encoding, flags);
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
@@ -1411,8 +1402,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
      */
 
     /* encode charset_nr, encoding_nr and flags into the same word */
-    *cursor++ = (Parrot_encoding_number_of_str(NULL, s) << 16)       |
-                (Parrot_charset_number_of_str(NULL, s) << 8)         |
+    *cursor++ = (Parrot_encoding_number_of_str(NULL, s) << 8)         |
                 (PObj_get_FLAGS(s) & PObj_constant_FLAG ? 0x1 : 0x0) |
                 (PObj_get_FLAGS(s) & PObj_private7_FLAG ? 0x2 : 0x0) ;
     *cursor++ = s->bufused;

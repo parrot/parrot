@@ -23,8 +23,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING * build_string(PARROT_INTERP,
     ARGIN(const unsigned char *content),
     INTVAL size,
-    ARGIN_NULLOK(const CHARSET *charset),
-    ARGIN_NULLOK(const ENCODING *encoding))
+    ARGIN_NULLOK(const STR_VTABLE *encoding))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -315,17 +314,15 @@ specified.
 
 */
 
-    METHOD get_string(STRING *charsetname, STRING *encodingname) {
+    METHOD get_string(STRING *encodingname) {
         STRING *result;
         unsigned char *content;
         INTVAL size;
-        const CHARSET *charset = Parrot_get_charset(INTERP,
-            Parrot_charset_number(INTERP, charsetname));
-        const ENCODING *encoding = Parrot_get_encoding(INTERP,
+        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
             Parrot_encoding_number(INTERP, encodingname));
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
-        result = build_string(INTERP, content, size, charset, encoding);
+        result = build_string(INTERP, content, size, encoding);
         RETURN(STRING *result);
     }
 
@@ -344,11 +341,11 @@ as the string argument.
         STRING *result;
         unsigned char *content;
         INTVAL size;
-        const CHARSET* charset = STRING_IS_NULL(as) ? PARROT_DEFAULT_CHARSET : as->charset;
-        const ENCODING *encoding = STRING_IS_NULL(as) ? PARROT_DEFAULT_ENCODING : as->encoding;
+        const STR_VTABLE *encoding = STRING_IS_NULL(as) ?
+                Parrot_default_encoding_ptr : as->encoding;
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
-        result = build_string(INTERP, content, size, charset, encoding);
+        result = build_string(INTERP, content, size, encoding);
         RETURN(STRING *result);
     }
 
@@ -368,7 +365,7 @@ Calculate new size enough for using position and with some margin to
 decrease the number of reallocations.
 
 =item C<static STRING * build_string(PARROT_INTERP, const unsigned char
-*content, INTVAL size, const CHARSET *charset, const ENCODING *encoding)>
+*content, INTVAL size, const STR_VTABLE *encoding)>
 
 Build a string fro the buffer content with the charset and encoding specified.
 
@@ -393,19 +390,15 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 build_string(PARROT_INTERP, ARGIN(const unsigned char *content),
         INTVAL size,
-        ARGIN_NULLOK(const CHARSET *charset),
-        ARGIN_NULLOK(const ENCODING *encoding))
+        ARGIN_NULLOK(const STR_VTABLE *encoding))
 {
     ASSERT_ARGS(build_string)
     STRING *result;
-    if (charset == NULL)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
-                "Invalid charset");
     if (encoding == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Invalid encoding");
-    result = Parrot_str_new_init(interp, (const char *)content, size, encoding, charset, 0);
-    if (!CHARSET_VALIDATE(interp, result))
+    result = Parrot_str_new_init(interp, (const char *)content, size, encoding, 0);
+    if (!STRING_validate(interp, result))
         Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "Invalid buffer content");

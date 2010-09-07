@@ -345,7 +345,7 @@ is_abs_path(ARGIN(const STRING *file))
     const char * const file_name = (const char *)file->strstart;
     if (file->strlen <= 1)
         return 0;
-    PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
+    PARROT_ASSERT(STRING_max_bytes_per_codepoint(file) == 1 ||
             file->encoding == Parrot_utf8_encoding_ptr);
 
     /* XXX  ../foo, ./bar */
@@ -887,23 +887,21 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    const char *   charset = Parrot_charset_c_name(interp,
-            Parrot_charset_number_of_str(interp, in));
-    STRING * const slash1  = string_make(interp, "/", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2  = string_make(interp, "\\", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot     = string_make(interp, ".", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash1 = Parrot_str_new_init(interp, "/", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash2 = Parrot_str_new_init(interp, "\\", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const dot    = Parrot_str_new_init(interp, ".", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
 
     const INTVAL len = Parrot_str_byte_length(interp, in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
 
-    pos_sl = CHARSET_RINDEX(interp, in, slash1, len);
+    pos_sl = STRING_rindex(interp, in, slash1, len);
     if (pos_sl == -1)
-        pos_sl = CHARSET_RINDEX(interp, in, slash2, len);
-    pos_dot = CHARSET_RINDEX(interp, in, dot, len);
+        pos_sl = STRING_rindex(interp, in, slash2, len);
+    pos_dot = STRING_rindex(interp, in, dot, len);
 
     /* ignore dot in directory name */
     if (pos_dot != -1 && pos_dot < pos_sl)

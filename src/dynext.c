@@ -546,7 +546,7 @@ clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
     char   * const  raw_str = Parrot_str_to_cstring(s, orig);
     STRING * const  ret     =
         Parrot_str_new_init(d, raw_str, strlen(raw_str),
-            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+            Parrot_default_encoding_ptr,
             PObj_constant_FLAG);
     Parrot_str_free_cstring(raw_str);
     return ret;

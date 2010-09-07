@@ -337,7 +337,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to unicode" 
     end
 CODE
 abc_\xc3\xa4_
-unicode
+utf8
 6
 OUTPUT
 

@@ -658,7 +658,7 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, re
     print $S1
 .end
 CODE
-unicode
+utf8
 utf8
 T\xf6tsch
 OUTPUT
