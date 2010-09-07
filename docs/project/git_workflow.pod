@@ -17,8 +17,6 @@ maintainence of branches. This document aims to provide everything a Parrot
 developer needs to know about Git to successfully create a branch, work on
 it, keep it in sync with changes on master and finally merge the branch.
 
-
-
 =head2 Cloning the Git Repository
 
 To get the full version history Parrot, which is called "cloning a repository",
@@ -58,6 +56,29 @@ To checkout (or "switch to", as it is commonly referred to) the username/foo
 branch:
 
   $ git checkout username/foo
+
+=head2 Keeping updated
+
+To get the latest updates:
+
+  $ git fetch
+
+This copies the index from your default remote (origin) and saves it to your
+local index. This does not effect your working copy. To sync up your working
+copy, you can use C<git rebase>
+
+  $ git checkout master       # Switch to the master branch
+  $ git rebase origin/master  # rebase latest fetched changes onto master
+
+This is a common action, so there is also a simpler way to do it:
+
+  $ git pull --rebase
+
+Whenever you don't specify a remote or branch to a git command, they default
+to the remote called "origin" and the master branch, so the previous command
+means exactly the same as:
+
+  $ git pull --rebase origin master
 
 =head2 Maintaining a Branch
 

@@ -1,0 +1,15 @@
+=head1 NAME
+
+docs/project/git_terminology.pod - Git Terminology
+
+=head1 DESCRIPTION
+
+This document describes terms that are used in docs/project/git_workflow.pod
+and contains generally useful things to know about Git.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
