@@ -380,12 +380,8 @@ static void
 cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
     ASSERT_ARGS(cnv_to_win32_filesep)
-    char* cnv;
+    char *cnv = path->strstart;
 
-    PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
-        path->encoding == Parrot_utf8_encoding_ptr);
-
-    cnv = path->strstart;
     while ((cnv = strchr(cnv, path_separator)) != NULL)
         *cnv = win32_path_separator;
 }
