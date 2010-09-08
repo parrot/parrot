@@ -399,7 +399,8 @@ op subclass(out PMC, in STR, in PMC) :object_classes :flow {
 
 =item B<get_class>(out PMC, in PMC)
 
-Find the PMC for a class, by string name or by key.
+Find the PMC for a class, by string name, key or namespace.  This op does
+C<not> find the class of an instance of an object.  use C<typeof> for that.
 
 =cut
 

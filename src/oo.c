@@ -260,8 +260,12 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
          || base_type == enum_class_ResizableStringArray
          || base_type == enum_class_String)
             type = Parrot_pmc_get_type(interp, key);
-        else
+        else if (VTABLE_does(interp, key, CONST_STRING(interp, "string")) ||
+                base_type == enum_class_NameSpace)
             type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key));
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "can't get class from an instance of class '%Ss'", VTABLE_name(interp, key));
 
         classobj = get_pmc_proxy(interp, type);
     }
