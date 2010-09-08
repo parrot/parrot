@@ -136,6 +136,8 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 */
 
+#define PARROT_IN_EXTENSION
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

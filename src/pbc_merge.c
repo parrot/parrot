@@ -36,6 +36,7 @@ segments from the input PBC files.
 
 */
 
+#define PARROT_IN_EXTENSION
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
