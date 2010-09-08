@@ -453,9 +453,17 @@ static void
 parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_keys)
-    parrot_hash_iterate(hash,
-        PARROT_ASSERT(_bucket->key);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key););
+
+    if (hash->key_type == Hash_key_type_STRING) {
+        parrot_hash_iterate(hash,
+            PARROT_ASSERT(_bucket->key);
+            Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->key););
+    }
+    else if (hash->key_type == Hash_key_type_PMC) {
+        parrot_hash_iterate(hash,
+            PARROT_ASSERT(_bucket->key);
+            Parrot_gc_mark_PMC_alive(interp, (PMC *)_bucket->key););
+    }
 }
 
 
@@ -473,9 +481,17 @@ static void
 parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_values)
-    parrot_hash_iterate(hash,
-        PARROT_ASSERT(_bucket->value);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value););
+
+    if (hash->entry_type == (PARROT_DATA_TYPE) enum_hash_string) {
+        parrot_hash_iterate(hash,
+            PARROT_ASSERT(_bucket->value);
+            Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->value););
+    }
+    else if (hash->entry_type == (PARROT_DATA_TYPE) enum_hash_pmc) {
+        parrot_hash_iterate(hash,
+            PARROT_ASSERT(_bucket->value);
+            Parrot_gc_mark_PMC_alive(interp, (PMC *)_bucket->value););
+    }
 }
 
 
@@ -493,11 +509,22 @@ static void
 parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_both)
-    parrot_hash_iterate(hash,
-        PARROT_ASSERT(_bucket->key);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key);
-        PARROT_ASSERT(_bucket->value);
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value););
+
+    if (hash->key_type == Hash_key_type_STRING
+    &&  hash->entry_type == (PARROT_DATA_TYPE) enum_hash_pmc) {
+        parrot_hash_iterate(hash,
+            PARROT_ASSERT(_bucket->key);
+            Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->key);
+            PARROT_ASSERT(_bucket->value);
+            Parrot_gc_mark_PMC_alive(interp, (PMC *)_bucket->value););
+    }
+    else {
+        parrot_hash_iterate(hash,
+            PARROT_ASSERT(_bucket->key);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->key);
+            PARROT_ASSERT(_bucket->value);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_bucket->value););
+    }
 }
 
 /*
