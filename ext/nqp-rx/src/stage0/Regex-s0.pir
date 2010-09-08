@@ -294,8 +294,7 @@ Create a new cursor for matching C<target>.
     parrotclass = getattribute $P0, 'parrotclass'
     cur = new parrotclass
 
-    $P0 = new ['CodeString']
-    $P0 = target
+    $P0 = box target
     setattribute cur, '$!target', $P0
 
     if has_cont goto cursor_cont
@@ -502,7 +501,8 @@ Log a debug message.
     fmt = new ['ResizablePMCArray']
     from = getattribute self, '$!from'
     orig = getattribute self, '$!target'
-    line = orig.'lineof'(from)
+    $P0 = get_hll_global ['HLL'], 'Compiler'
+    line = $P0.'lineof'(orig, from, 'cache'=>1)
 
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(2)
@@ -1180,12 +1180,11 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     message = concat "Unable to parse ", dba
     message .= ", couldn't find final "
     message .= goal
-    $P0 = getattribute self, '$!target'
-    $I0 = can $P0, 'lineof'
-    unless $I0 goto have_line
     message .= ' at line '
+    $P0 = getattribute self, '$!target'
+    $P1 = get_hll_global ['HLL'], 'Compiler'
     $I0 = self.'pos'()
-    $I0 = $P0.'lineof'($I0)
+    $I0 = $P1.'lineof'($P0, $I0)
     inc $I0
     $S0 = $I0
     message .= $S0
