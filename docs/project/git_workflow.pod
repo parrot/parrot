@@ -103,7 +103,13 @@ and give you metadata which will help you write your commit message,
 such as which files changed and if conflicts happened. Only lines that do
 not begin with a # will be in your commit message.
 
-TODO: Talk about how to write commit messages
+Commit messages consist of a one line "short message" and an optional long
+message that can be as long as you like. There must be an empty line between
+the short message and the long message. It is often a good practice to keep the
+first line of a commit message relatively short, around 50 characters. This
+allows for tools to succinctly display one-line commit messages with metadata.
+It is good practice to describe *why* something was done in the long message,
+in addition to what was done.
 
 =head2 Maintaining a Branch
 
