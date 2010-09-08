@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 pir_output_is( <<'CODE', <<'OUT', 'some of the auxiliary methods' );
 
@@ -196,6 +196,72 @@ pir_output_is( <<'CODE', <<'OUT', 'EXPORTALL method' );
 CODE
 hello world!
 omgwtf!
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'lineof method' );
+.sub 'main' :main
+    load_bytecode 'PCT/HLLCompiler.pbc'
+    'lineof_tests'()
+.end
+
+.sub 'is'
+    .param int a
+    .param int b
+    .param string message
+    if a == b goto ok
+    print "not "
+  ok:
+    print "ok\n"
+.end
+
+.sub 'lineof_tests'
+    .local pmc hll, target
+    hll = get_hll_global ['PCT'], 'HLLCompiler'
+    target = box "0123\n5678\r0123\r\n678\n"
+    $I0 = hll.'lineof'(target, 0, 1)
+    is($I0, 0, "lineof - beginning of string")
+    $I0 = hll.'lineof'(target, 1, 1)
+    is($I0, 0, "lineof - char on first line")
+    $I0 = hll.'lineof'(target, 4, 1)
+    is($I0, 0, "lineof - immediately before nl")
+    $I0 = hll.'lineof'(target, 5, 1)
+    is($I0, 1, "lineof - immediately after nl")
+    $I0 = hll.'lineof'(target, 8, 1)
+    is($I0, 1, "lineof - char before cr")
+    $I0 = hll.'lineof'(target, 9, 1)
+    is($I0, 1, "lineof - immediately before cr")
+    $I0 = hll.'lineof'(target, 10, 1)
+    is($I0, 2, "lineof - immediately after cr")
+    $I0 = hll.'lineof'(target, 11, 1)
+    is($I0, 2, "lineof - char after cr")
+    $I0 = hll.'lineof'(target, 13, 1)
+    is($I0, 2, "lineof - char before crnl")
+    $I0 = hll.'lineof'(target, 14, 1)
+    is($I0, 2, "lineof - immediately before crnl")
+    $I0 = hll.'lineof'(target, 15, 1)
+    is($I0, 3, "lineof - middle of crnl")
+    $I0 = hll.'lineof'(target, 16, 1)
+    is($I0, 3, "lineof - immediately after crnl")
+    $I0 = hll.'lineof'(target, 19, 1)
+    is($I0, 3, "lineof - immediately before final nl")
+    $I0 = hll.'lineof'(target, 20, 1)
+    is($I0, 4, "lineof - immediately after final nl")
+.end
+CODE
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
 OUT
 
 # Local Variables:
