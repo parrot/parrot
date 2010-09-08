@@ -163,6 +163,7 @@ if [ "$enable_long_double" = "1" ]; then
       perl t/harness t/native_pbc/string.t
 fi
 
-echo ""
+echo "You should run these commands to update the PBC files in your repo:"
 echo "cd t/native_pbc"
+echo "git add *.pbc"
 echo "git commit -m 'native_pbc platform updates'"
