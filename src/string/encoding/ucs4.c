@@ -437,7 +437,7 @@ static size_t
 ucs4_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(ucs4_hash)
-    const UChar32 *pos = (const UChar32*) s->strstart;
+    const Parrot_UInt4 *pos = (const Parrot_UInt4 *) s->strstart;
     UINTVAL len = s->strlen;
     UNUSED(interp);
 
