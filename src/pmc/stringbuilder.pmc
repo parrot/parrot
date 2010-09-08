@@ -63,6 +63,9 @@ Initializes the StringBuilder with initial size of buffer.
     VTABLE void init_int(INTVAL initial_size) {
         STRING * const buffer = mem_gc_allocate_zeroed_typed(INTERP, STRING);
 
+        if (initial_size < INITIAL_STRING_CAPACITY)
+            initial_size = INITIAL_STRING_CAPACITY;
+
         buffer->encoding      = Parrot_default_encoding_ptr;
         buffer->_buflen       = initial_size;
         buffer->_bufstart     = buffer->strstart
