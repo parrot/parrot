@@ -81,13 +81,6 @@ typedef enum Forward_flag {
 #define Buffer_poolptr(b) ((Memory_Block **)Buffer_bufprolog(b))
 
 
-typedef enum {
-    enum_stringrep_unknown = 0,
-    enum_stringrep_one     = 1,
-    enum_stringrep_two     = 2,
-    enum_stringrep_four    = 4
-} parrot_string_representation_t;
-
 /* Here is the Parrot string header object, "inheriting" from Buffer. */
 
 struct parrot_string_t {

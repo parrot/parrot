@@ -628,8 +628,9 @@ Returns the floating-point value for the element at C<*key>.
         HashBucket * const b =
             parrot_hash_get_bucket(INTERP, hash, hash_key_from_string(INTERP, hash, key));
 
+        /* XXX: shouldn't we return STRINGNULL? */
         if (!b)
-            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+            return Parrot_str_new_noinit(INTERP, 0);
 
         return hash_value_to_string(INTERP, hash, b->value);
     }
@@ -640,7 +641,7 @@ Returns the floating-point value for the element at C<*key>.
             parrot_hash_get_bucket(INTERP, hash, hash_key_from_int(INTERP, hash, key));
 
         if (!b)
-            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+            return Parrot_str_new_noinit(INTERP, 0);
 
         return hash_value_to_string(INTERP, hash, b->value);
     }
@@ -661,7 +662,7 @@ Returns the string value for the element at C<*key>.
         HashBucket * const b        = parrot_hash_get_bucket(INTERP, hash, hash_key);
 
         if (!b)
-            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+            return Parrot_str_new_noinit(INTERP, 0);
 
         key = key_next(INTERP, key);
 

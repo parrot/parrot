@@ -293,7 +293,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         return Parrot_io_readline_buffer(interp, filehandle, buf);
 
     if (*buf == NULL)
-        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, 2048);
+        *buf = Parrot_str_new_noinit(interp, 2048);
 
     s       = *buf;
     len     = s->bufused;

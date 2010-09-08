@@ -100,7 +100,7 @@ Initialize the structure.  (Create a blank PackFile object.)
                 PMC_data_typed(SELF, Parrot_Packfile_attributes*);
         PackFile                   *pf;
 
-        attrs->uuid     = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        attrs->uuid     = Parrot_str_new_noinit(INTERP, 0);
         attrs->directory = Parrot_pmc_new(INTERP, enum_class_PackfileDirectory);
 
         /* Create dummy PackFile and copy default attributes to self */

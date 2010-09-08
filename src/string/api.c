@@ -190,8 +190,7 @@ Parrot_str_finish(PARROT_INTERP)
 
 /*
 
-=item C<STRING * Parrot_str_new_noinit(PARROT_INTERP,
-parrot_string_representation_t representation, UINTVAL capacity)>
+=item C<STRING * Parrot_str_new_noinit(PARROT_INTERP, UINTVAL capacity)>
 
 Creates and returns an empty Parrot string.
 
@@ -202,16 +201,10 @@ Creates and returns an empty Parrot string.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_new_noinit(PARROT_INTERP,
-    parrot_string_representation_t representation, UINTVAL capacity)
+Parrot_str_new_noinit(PARROT_INTERP, UINTVAL capacity)
 {
     ASSERT_ARGS(Parrot_str_new_noinit)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
-
-    /* TODO adapt string creation functions */
-    if (representation != enum_stringrep_one)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARTYPE,
-            "Unsupported representation");
 
     s->encoding = Parrot_default_encoding_ptr;
 
@@ -448,7 +441,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     /* calc usable and total bytes */
     total_length = a->bufused + b->bufused;
 
-    dest = Parrot_str_new_noinit(interp, enum_stringrep_one, total_length);
+    dest = Parrot_str_new_noinit(interp, total_length);
     PARROT_ASSERT(enc);
     dest->encoding = enc;
 
@@ -528,37 +521,6 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL 
     Buffer_bufstart(buffer) = NULL;
 
     return result;
-}
-
-
-/*
-
-=item C<const char* string_primary_encoding_for_representation(PARROT_INTERP,
-parrot_string_representation_t representation)>
-
-Returns the primary encoding for the specified representation.
-
-This is needed for packfile unpacking, unless we just always use UTF-8 or BOCU.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_OBSERVER
-const char*
-string_primary_encoding_for_representation(PARROT_INTERP,
-    parrot_string_representation_t representation)
-{
-    ASSERT_ARGS(string_primary_encoding_for_representation)
-    if (representation == enum_stringrep_one)
-        return "ascii";
-
-    Parrot_ex_throw_from_c_args(interp, NULL,
-        EXCEPTION_INVALID_STRING_REPRESENTATION,
-        "string_primary_encoding_for_representation: "
-        "invalid string representation");
 }
 
 
@@ -1007,7 +969,7 @@ Parrot_str_substr(PARROT_INTERP,
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
     if (offset == (INTVAL)Parrot_str_length(interp, src) || length < 1)
-        return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+        return Parrot_str_new_noinit(interp, 0);
 
     if (offset < 0)
         true_offset = (UINTVAL)(src->strlen + offset);
@@ -3106,7 +3068,7 @@ Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
         return NULL;
 
     if (!src->strlen)
-        return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+        return Parrot_str_new_noinit(interp, 0);
 
     return STRING_compose(interp, src);
 }
@@ -3143,7 +3105,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         int       i;
 
         if (count == 0)
-            return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            return Parrot_str_new_noinit(interp, 0);
 
         first    = VTABLE_get_string_keyed_int(interp, ar, 0);
         length   = Parrot_str_byte_length(interp, first);

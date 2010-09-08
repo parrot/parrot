@@ -121,7 +121,7 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
      * when we get a NULL string, we read a default len
      */
     if (*buf == NULL) {
-        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, len);
+        *buf = Parrot_str_new_noinit(interp, len);
         return *buf;
     }
     else {

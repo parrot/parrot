@@ -321,8 +321,7 @@ for writing to disc and later loading via C<load_bytecode>.
          * effect
          */
         aligned_size = size + 15;
-        res          = Parrot_str_new_noinit(INTERP, enum_stringrep_one,
-                                         aligned_size);
+        res          = Parrot_str_new_noinit(INTERP, aligned_size);
         res->strlen  = res->bufused = size;
 
         if ((size_t)(res->strstart) & 0xf) {

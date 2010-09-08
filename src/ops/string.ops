@@ -323,14 +323,16 @@ inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
 
 Allocate a new empty string of length $2 (optional).
 
+XXX: Do these ops make sense with immutable strings?
+
 =cut
 
 inline op new(out STR) :base_mem {
-    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    $1 = Parrot_str_new_noinit(interp, 0);
 }
 
 inline op new(out STR, in INT) :base_mem {
-    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, $2);
+    $1 = Parrot_str_new_noinit(interp, $2);
 }
 
 

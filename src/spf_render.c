@@ -317,7 +317,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     HUGEINTVAL num;
 
     /* start with a buffer; double the pattern length to avoid realloc #1 */
-    STRING *targ = Parrot_str_new_noinit(interp, enum_stringrep_one, pat_len * 2);
+    STRING *targ = Parrot_str_new_noinit(interp, pat_len * 2);
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by Parrot_str_from_uint and

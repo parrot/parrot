@@ -320,11 +320,11 @@ AGAIN:
           case WSAECONNRESET:
             /* XXX why close it on err return result is -1 anyway */
             close((int)io->os_handle);
-            *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            *s = Parrot_str_new_noinit(interp, 0);
             return -1;
           default:
             close((int)io->os_handle);
-            *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            *s = Parrot_str_new_noinit(interp, 0);
             return -1;
         }
     }

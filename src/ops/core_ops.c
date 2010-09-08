@@ -22854,21 +22854,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_new_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    SREG(1) = Parrot_str_new_noinit(interp, 0);
 
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
 Parrot_new_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_new_noinit(interp, enum_stringrep_one, IREG(2));
+    SREG(1) = Parrot_str_new_noinit(interp, IREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_new_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_new_noinit(interp, enum_stringrep_one, cur_opcode[2]);
+    SREG(1) = Parrot_str_new_noinit(interp, cur_opcode[2]);
 
 return (opcode_t *)cur_opcode + 3;}
 
