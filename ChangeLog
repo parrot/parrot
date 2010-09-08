@@ -3865,9 +3865,9 @@
 2002-01-04 16:09  dan
 
 	* classes/: genclass.pl, perlarray.pmc, perlint.pmc, perlnum.pmc,
-	perlstring.pmc, perlundef.pmc:	- genclass.pl attempts to put $Id$
+	perlstring.pmc, perlundef.pmc:	- genclass.pl attempts to put the Id mark
 	into generated files
-	   but the $Id$ string gets mangled when it's committed.
+	   but the Id mark string gets mangled when it's committed.
 	   This patch fixes the existing .pmc files and fixes genclass.pl.
 
 	 - Makes capitalization in .pmc header match actual filenames
