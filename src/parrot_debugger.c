@@ -113,7 +113,7 @@ collection.
 =item C<gcdebug>
 
 Toggle garbage collection debugging mode.  In gcdebug mode a garbage collection
-cycle is run before each opcocde, which is the same as using the gcdebug core.
+cycle is run before each opcode, which is the same as using the gcdebug core.
 
 =item C<quit> or C<q>
 
@@ -152,7 +152,7 @@ static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 
 =item C<int main(int argc, const char *argv[])>
 
-Reads the PIR, PASM or PBC file from argv[1], loads it, and then calls
+Reads the PIR, PASM, or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
 
 =cut
@@ -247,11 +247,12 @@ main(int argc, const char *argv[])
     Parrot_exit(interp, 0);
 }
 
+
 /*
 
 =item C<static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[])>
 
-Run the code, catching exceptions if they are left unhandled.
+Runs the code, catching exceptions if they are left unhandled.
 
 =cut
 
@@ -274,6 +275,7 @@ PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
     } while (! (interp->pdb->state & PDB_EXIT));
     free_runloop_jump_point(interp);
 }
+
 
 /*
 
@@ -331,11 +333,7 @@ it bang now, try listing the source before loading or disassembling it.
 
 =item * Print the interpreter info.
 
-=item * Make the user interface better (add comands
-history/completion).
-
-=item * Some other things I don't remember now because it's late.
-
+=item * Make the user interface better (add command history/completion).
 
 =back
 
