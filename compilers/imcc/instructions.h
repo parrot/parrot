@@ -16,10 +16,9 @@ enum INSTYPE {    /*instruction type can be   */
     ITALIAS    =  0x100000, /*  set P,P  */
     ITADDR     =  0x200000, /*  set_addr P, addr*/
     ITRESULT   =  0x400000, /*  .get_results */
-    ITEXT      =  0x800000, /*  instruction is extcall in JIT */
-    ITSAVES    = 0x1000000, /*  saveall/restoreall in a bsr */
-    ITPCCSUB   = 0x2000000, /*  PCC sub call */
-    ITPCCYIELD = 0x4000000  /*  yield from PCC call instead of return */
+    ITSAVES    =  0x800000, /*  saveall/restoreall in a bsr */
+    ITPCCSUB   = 0x1000000, /*  PCC sub call */
+    ITPCCYIELD = 0x2000000  /*  yield from PCC call instead of return */
 };
 
 
