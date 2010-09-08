@@ -196,7 +196,7 @@ utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     unsigned char *p;
 
     if (src_encoding == Parrot_utf8_encoding_ptr)
-        return Parrot_str_copy(interp, src);
+        return Parrot_str_clone(interp, src);
 
     src_len          = src->strlen;
     result           = Parrot_gc_new_string_header(interp, 0);

@@ -164,7 +164,7 @@ ascii_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
                     "lossy conversion to ascii");
         }
 
-        dest           = Parrot_str_copy(interp, src);
+        dest           = Parrot_str_clone(interp, src);
         dest->encoding = Parrot_ascii_encoding_ptr;
     }
     else {

@@ -95,7 +95,7 @@ binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     ASSERT_ARGS(binary_to_encoding)
     STRING      *dest;
 
-    dest           = Parrot_str_copy(interp, src);
+    dest           = Parrot_str_clone(interp, src);
     dest->encoding = Parrot_binary_encoding_ptr;
     dest->strlen   = dest->bufused;
     dest->hashval  = 0;

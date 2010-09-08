@@ -176,7 +176,7 @@ ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     ASSERT_ARGS(ucs4_to_encoding)
 #if PARROT_HAS_ICU
     if (src->encoding == Parrot_ucs4_encoding_ptr) {
-        return Parrot_str_copy(interp, src);
+        return Parrot_str_clone(interp, src);
     }
     else {
         UINTVAL len = Parrot_str_length(interp, src);
