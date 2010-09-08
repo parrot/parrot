@@ -20,7 +20,7 @@
  *  References:
  */
 
-#define PARROT_IN_EXTENSION
+
 #include "parrot/parrot.h"
 #include "pmc/pmc_nci.h"
 
@@ -2658,9 +2658,7 @@ PMC * final_destination = PMCNULL;
     PMC * t_4;
     UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "SISPP", &ts_0, &t_1, &ts_2, &t_3, &t_4);
-    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);
-    t_2 = STRING_IS_NULL(ts_2) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_2);
-    i_3 = VTABLE_get_integer(interp, t_3);
+    t_0 = STRING_IS_NULL(ts_0) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_0);t_2 = STRING_IS_NULL(ts_2) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_2);i_3 = VTABLE_get_integer(interp, t_3);
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, &t_2, &i_3, t_4);
@@ -2669,7 +2667,7 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-          if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 VTABLE_set_integer_native(interp, t_3, i_3);
