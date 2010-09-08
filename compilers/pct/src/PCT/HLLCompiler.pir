@@ -955,7 +955,7 @@ based on double-colon separators.
     .return ($P0)
 .end
 
-=item lineof(target, pos [, cache])
+=item lineof(target, pos [, cache :named('cache')])
 
 Return the line number of offset C<pos> within C<target>.  The return
 value uses zero for the first line.  If C<cache> is true, then
@@ -966,7 +966,7 @@ memoize the line offsets as a C<!lineof> property on C<target>.
 .sub 'lineof' :method
     .param pmc target
     .param int pos
-    .param int cache           :optional
+    .param int cache           :optional :named('cache')
     .local pmc linepos
 
     # If we've previously cached C<linepos> for target, we use it.

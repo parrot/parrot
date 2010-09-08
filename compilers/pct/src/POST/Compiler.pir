@@ -131,7 +131,7 @@ Return generated PIR for C<node> and all of its children.
     if null pos goto done_subline
     source = cpost['source']
     if null source goto done_subline
-    line = self.'lineof'(source, pos, 1)
+    line = self.'lineof'(source, pos, 'cache'=>1)
     inc line
   done_subline:
     self.'pir'(cpost)
