@@ -77,6 +77,8 @@ encoding_equal(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs)
         return 1;
     if (lhs->hashval && rhs->hashval && lhs->hashval != rhs->hashval)
         return 0;
+    if (lhs->encoding == rhs->encoding)
+        return memcmp(lhs->strstart, rhs->strstart, STRING_byte_length(lhs)) == 0;
 
     STRING_ITER_INIT(interp, &l_iter);
     STRING_ITER_INIT(interp, &r_iter);
