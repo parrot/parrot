@@ -324,14 +324,16 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
     const size_t alloc_size = s->bufused;
     STRING * const result = Parrot_gc_new_string_header(interp, 0);
 
-    /* Allocate new chunk of memory */
-    Parrot_gc_allocate_string_storage(interp, result, alloc_size);
+    if (alloc_size) {
+        /* Allocate new chunk of memory */
+        Parrot_gc_allocate_string_storage(interp, result, alloc_size);
 
-    /* and copy it over */
-    mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
+        /* and copy it over */
+        mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
+    }
 
+    result->bufused  = alloc_size;
     result->strlen   = s->strlen;
-    result->bufused  = s->bufused;
     result->hashval  = s->hashval;
     result->encoding = s->encoding;
 
@@ -658,7 +660,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
     Parrot_gc_allocate_string_storage(interp, s, len);
 
-    if (buffer) {
+    if (buffer && len) {
         mem_sys_memcopy(s->strstart, buffer, len);
         s->bufused = len;
         if (encoding->max_bytes_per_codepoint == 1)
