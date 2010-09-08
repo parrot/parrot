@@ -1156,8 +1156,10 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     enc = string_rep_compatible(interp, src, rep);
 
     if (!enc) {
-        src = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
-        rep = Parrot_utf16_encoding_ptr->to_encoding(interp, rep);
+        if (src->encoding != Parrot_utf8_encoding_ptr)
+            src = Parrot_utf8_encoding_ptr->to_encoding(interp, src);
+        if (rep->encoding != Parrot_utf8_encoding_ptr)
+            rep = Parrot_utf8_encoding_ptr->to_encoding(interp, rep);
         /* Remember selected encoding */
         enc = src->encoding;
     }
