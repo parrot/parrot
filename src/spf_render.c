@@ -56,6 +56,14 @@ enum {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void canonicalize_exponent (PARROT_INTERP,
+    ARGMOD(char *tc),
+    ARGIN(SpfInfo *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*tc);
+
 static void gen_sprintf_call(
     ARGOUT(char *out),
     ARGMOD(SpfInfo *info),
@@ -89,6 +97,10 @@ static STRING* str_concat_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*src);
 
+#define ASSERT_ARGS_canonicalize_exponent  __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(tc) \
+    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_gen_sprintf_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(out) \
     , PARROT_ASSERT_ARG(info))
@@ -292,6 +304,88 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
     *p = '\0';
 }
 
+/* This function is called to canonicalize any exponent in a formatted
+   float. PARROT_SPRINTF_EXP_DIGITS specifies the standard number of
+   exponent digits that we want. Remember that the exponent has the
+   form '...Esddd ', where 's' is the sign, 'ddd' is some number of digits,
+   and there may be trailing spaces. */
+
+static void
+canonicalize_exponent (PARROT_INTERP, ARGMOD(char *tc),
+                                      ARGIN(SpfInfo *info))
+{
+    ASSERT_ARGS(canonicalize_exponent)
+
+    const size_t exp_digits = PARROT_SPRINTF_EXP_DIGITS;
+    size_t len      = strlen(tc),
+           last_pos = len,
+           non0_pos = len,
+           sign_pos = 0,
+           e_pos    = 0;
+    int i;
+
+    /* Scan the formatted number backward to find the positions of the
+       last digit, leftmost non-0 exponent digit, sign, and E. */
+
+    for (i = len-1; i >= 0 && e_pos == 0; --i) {
+        switch (tc[i]) {
+            case '1': case '2': case '3':
+            case '4': case '5': case '6':
+            case '7': case '8': case '9':   non0_pos = i;
+                                            /* fall through */
+
+            case '0':                       if (last_pos == len) last_pos = i;
+                                            break;
+
+            case '+': case '-':             sign_pos = i;
+                                            break;
+
+            case 'E': case 'e':             e_pos = i;
+                                            break;
+
+            default:                        break;
+        }
+    }
+
+    /* If there is an E, and it is followed by a sign, and there are
+       leading zeroes on the exponent, and there are more than the
+       standard number of exponent digits, then we have work to do. */
+
+    if (e_pos != 0 && sign_pos == e_pos + 1 &&
+        non0_pos > sign_pos + 1 &&
+        last_pos - sign_pos > exp_digits) {
+
+        /* Close up to eliminate excess exponent digits and
+           adjust the length. Don't forget to move the NUL. */
+
+        size_t keep = (last_pos - non0_pos + 1 > exp_digits)
+                        ? len - non0_pos
+                        : exp_digits + (len - last_pos - 1);
+
+        mem_sys_memmove(&tc[sign_pos+1], &tc[len - keep], keep+1);
+        len = sign_pos + 1 + keep;
+
+        /* If it's a fixed-width field and we're too short now,
+           we have more work to do. If the field is left-justified,
+           pad the number on the right. Otherwise pad the number on
+           the left, possibly with leading zeroes. */
+
+        if ((info->flags & FLAG_WIDTH) && len < info->width) {
+            if (info->flags & FLAG_MINUS) {
+                while (len < info->width) {
+                    strcat(tc, " ");
+                    ++len;
+                }
+            }
+            else {
+                size_t i;
+                mem_sys_memmove(&tc[info->width - len], &tc[0], len+1);
+                for (i = 0; i < info->width - len; ++i)
+                    tc[i] = (info->flags & FLAG_ZERO) ? '0' : ' ';
+            }
+        }
+    }
+}
 
 /*
 
@@ -759,45 +853,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                 Parrot_str_free_cstring(tempstr);
                             }
 
-#ifdef WIN32
-
-                            /* Microsoft defaults to three digits for
-                             * exponents, even when fewer digits would suffice.
-                             * For the sake of portability, we will here
-                             * attempt to hide that.  */
-                            if (ch == 'g' || ch == 'G'
-                             || ch == 'e' || ch == 'E') {
-                                const size_t tclen = strlen(tc);
-                                size_t j;
-                                for (j = 0; j < tclen; ++j) {
-                                    if ((tc[j] == 'e' || tc[j] == 'E')
-                                        && (tc[j+1] == '+' || tc[j+1] == '-')
-                                        && tc[j+2] == '0'
-                                        && isdigit((unsigned char)tc[j+3])
-                                        && isdigit((unsigned char)tc[j+4]))
-                                    {
-                                        mem_sys_memmove(&tc[j+2], &tc[j+3],
-                                            strlen(&tc[j+2]));
-
-                                        /* now fix any broken length */
-
-                                        if ((info.flags & FLAG_WIDTH)
-                                          && strlen(tc) < info.width) {
-                                            if (info.flags & FLAG_MINUS)
-                                                strcat(tc, " ");
-                                            else {
-                                                mem_sys_memmove(&tc[1], &tc[0],
-                                                    strlen(tc) + 1);
-                                                tc[0] = (info.flags & FLAG_ZERO) ? '0' : ' ';
-                                            }
-                                        }
-
-                                        /* only one fix required per string */
-                                        break;
-                                    }
-                                }
-                            }
-#endif /* WIN32 */
+                            if (ch == 'e' || ch == 'E' ||
+                                ch == 'g' || ch == 'G')
+                              canonicalize_exponent(interp, tc, &info);
 
                             targ = Parrot_str_concat(interp, targ, cstr2pstr(tc));
                             }
