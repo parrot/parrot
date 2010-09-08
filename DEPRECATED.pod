@@ -152,6 +152,13 @@ L<https://trac.parrot.org/parrot/ticket/1564>
 
 =over 4
 
+=item charset, charsetname, find_charset, trans_charset [eligible in 2.10]
+
+L<https://trac.parrot.org/parrot/ticket/1778>
+
+These opcodes will be removed. The corresponding encoding opcodes should be
+used instead.
+
 =item open and close opcodes will be removed [eligible in 2.7]
 
 L<https://trac.parrot.org/parrot/ticket/1697>
