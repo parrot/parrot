@@ -80,6 +80,31 @@ means exactly the same as:
 
   $ git pull --rebase origin master
 
+=head2 How to commit
+
+Let's say you modified the file foo.c and added the file bar.c and you want to commit
+these changes. To add these changes to the staging area (the list of stuff 
+that will be included in your next commit) :
+
+  $ git add foo.c bar.c
+
+The command C<git add> is not only for adding new files, just keep that in mind.
+It tells git "add the state of these files to my staging area."
+
+Now for actually creating your commit! Since Git is a distributed version control
+system, committing code is seperate from sending your changes to a remote server.
+Keep this in mind if you are used to Subversion or similar VCS's, where committing
+and sending changes are tied together.
+
+  $ git commit -m "This is an awesome and detailed commit message"
+
+If you do not give the -m option to C<git commit>, it will open your $EDITOR
+and give you metadata which will help you write your commit message,
+such as which files changed and if conflicts happened. Only lines that do
+not begin with a # will be in your commit message.
+
+TODO: Talk about how to write commit messages
+
 =head2 Maintaining a Branch
 
 =head2 Preparing to Merge a Branch
