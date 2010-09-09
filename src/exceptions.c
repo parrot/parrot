@@ -94,52 +94,68 @@ void
 die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(die_from_exception)
-    STRING * const message     = VTABLE_get_string(interp, exception);
+    /* Avoid anyhting that can throw if we are already throwing from
+     * a previous call to this function */
+    static int already_dying = 0;
+
+    STRING * const message     = already_dying ? STRINGNULL :
+            VTABLE_get_string(interp, exception);
     INTVAL         exit_status = 1;
-    const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
+    const INTVAL   severity    = already_dying ? EXCEPT_fatal :
+            VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
-    /* In some cases we have a fatal exception before the IO system
-     * is completely initialized. Do some attempt to output the
-     * message to stderr, to help diagnosing. */
-    int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
 
-    /* flush interpreter output to get things printed in order */
-    if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
-        Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
-    if (use_perr)
-        Parrot_io_flush(interp, Parrot_io_STDERR(interp));
-
-    if (interp->pdb) {
-        Interp * interpdeb = interp->pdb->debugger;
-        if (interpdeb) {
-            Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
-            Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
-        }
-    }
-
-    if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, ""))) {
-        if (use_perr)
-            Parrot_io_eprintf(interp, "%S\n", message);
-        else {
-            char * const msg = Parrot_str_to_cstring(interp, message);
-            fflush(stderr);
-            fprintf(stderr, "\n%s\n", msg);
-            Parrot_str_free_cstring(msg);
-        }
-
-        /* caution against output swap (with PDB_backtrace) */
+    if (already_dying) {
         fflush(stderr);
-        PDB_backtrace(interp);
-    }
-    else if (severity == EXCEPT_exit) {
-        /* TODO: get exit status based on type */
-        exit_status = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+        fprintf(stderr, "\n***FATAL ERROR: "
+                "Exception thrown while dying from previous unhandled Exception\n");
     }
     else {
-        Parrot_io_eprintf(interp, "No exception handler and no message\n");
-        /* caution against output swap (with PDB_backtrace) */
-        fflush(stderr);
-        PDB_backtrace(interp);
+        /* In some cases we have a fatal exception before the IO system
+         * is completely initialized. Do some attempt to output the
+         * message to stderr, to help diagnosing. */
+        int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
+        already_dying = 1;
+
+        /* flush interpreter output to get things printed in order */
+        if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
+            Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
+        if (use_perr)
+            Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+
+        if (interp->pdb) {
+            Interp * interpdeb = interp->pdb->debugger;
+            if (interpdeb) {
+                Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
+                Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
+            }
+        }
+
+        if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, ""))) {
+            if (use_perr)
+                Parrot_io_eprintf(interp, "%S\n", message);
+            else {
+                char * const msg = Parrot_str_to_cstring(interp, message);
+                fflush(stderr);
+                fprintf(stderr, "\n%s\n", msg);
+                Parrot_str_free_cstring(msg);
+            }
+
+            /* caution against output swap (with PDB_backtrace) */
+            fflush(stderr);
+            PDB_backtrace(interp);
+        }
+        else if (severity == EXCEPT_exit) {
+            /* TODO: get exit status based on type */
+            exit_status = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+        }
+        else {
+            Parrot_io_eprintf(interp, "No exception handler and no message\n");
+            /* caution against output swap (with PDB_backtrace) */
+            fflush(stderr);
+            PDB_backtrace(interp);
+        }
+
     }
 
     /*
