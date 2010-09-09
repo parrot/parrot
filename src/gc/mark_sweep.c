@@ -257,9 +257,11 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
 
     PObj               *b;
     Fixed_Size_Arena   *cur_arena;
-    gc_object_fn_type   gc_object   = pool->gc_object;
     UINTVAL             total_used  = 0;
     const UINTVAL       object_size = pool->object_size;
+
+    const gc_object_fn_type       gc_object       = pool->gc_object;
+    const add_free_object_fn_type add_free_object = pool->add_free_object;
 
     /* Run through all the PObj header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
@@ -297,7 +299,7 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
                 if (gc_object)
                     gc_object(interp, mem_pools, pool, b);
 
-                pool->add_free_object(interp, mem_pools, pool, b);
+                add_free_object(interp, mem_pools, pool, b);
             }
 next:
             b = (PObj *)((char *)b + object_size);
