@@ -80,6 +80,8 @@ Marks the object as live.
                 PARROT_PACKFILEANNOTATIONS(SELF);
 
         Parrot_gc_mark_PMC_alive(INTERP, attrs->const_table);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->gr_byte);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->gr_entries);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->annotations);
 
         SUPER();
