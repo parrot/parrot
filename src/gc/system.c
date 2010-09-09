@@ -234,12 +234,14 @@ trace_system_areas(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
 Traces the memory block starting at C<< interp->lo_var_ptr >>. This should be
 the address of a local variable which has been created on the stack early in
 the interpreter's lifecycle. We trace until the address of another local stack
-variable in this function, which should be at the "top" of the stack.
+variable in this function, which should be at the "top" of the stack. For this
+reason, this function must never be inlined.
 
 =cut
 
 */
 
+PARROT_NOINLINE
 static void
 trace_system_stack(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
 {

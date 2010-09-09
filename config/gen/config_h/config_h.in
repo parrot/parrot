@@ -84,6 +84,8 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 #endif
 #endif
 
+#define PARROT_NOINLINE @noinline@
+
 #if defined(PARROT_IN_CORE)
 
 /* Put any other symbols here. */
