@@ -301,7 +301,7 @@ complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
 }
 
 
-pmclass Complex auto_attrs {
+pmclass Complex provides complex auto_attrs {
 
     ATTR FLOATVAL re; /* real part */
     ATTR FLOATVAL im; /* imaginary part */
