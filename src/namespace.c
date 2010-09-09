@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -131,12 +131,12 @@ internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
     ARGIN(STRING *key), int flags)
 {
     ASSERT_ARGS(internal_ns_keyed_str)
-    PMC    * const ns        = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
-    STRING * const namespace = CONST_STRING(interp, "NameSpace");
+    PMC    * const ns     = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
+    STRING * const namesp = CONST_STRING(interp, "NameSpace");
 
     if (!PMC_IS_NULL(ns)
     && (ns->vtable->base_type == enum_class_NameSpace
-     || VTABLE_isa(interp, ns, namespace)))
+     || VTABLE_isa(interp, ns, namesp)))
         return ns;
 
     return internal_ns_maybe_create(interp, base_ns, key, flags);
