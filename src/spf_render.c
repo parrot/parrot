@@ -304,15 +304,16 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
     *p = '\0';
 }
 
-/* This function is called to canonicalize any exponent in a formatted
+/*
+
+=item C<static void canonicalize_exponent(PARROT_INTERP, char *tc, SpfInfo
+*info)>
+
+   This function is called to canonicalize any exponent in a formatted
    float. PARROT_SPRINTF_EXP_DIGITS specifies the standard number of
    exponent digits that we want. Remember that the exponent has the
    form '...Esddd ', where 's' is the sign, 'ddd' is some number of digits,
-   and there may be trailing spaces. */
-
-/*
-
-=item C<static void canonicalize_exponent(PARROT_INTERP, char *tc, SpfInfo *info)>
+   and there may be trailing spaces
 
 =cut
 
