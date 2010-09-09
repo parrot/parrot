@@ -56,7 +56,7 @@ enum {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void canonicalize_exponent (PARROT_INTERP,
+static void canonicalize_exponent(PARROT_INTERP,
     ARGMOD(char *tc),
     ARGIN(SpfInfo *info))
         __attribute__nonnull__(1)
@@ -97,7 +97,7 @@ static STRING* str_concat_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*src);
 
-#define ASSERT_ARGS_canonicalize_exponent  __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_canonicalize_exponent __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(tc) \
     , PARROT_ASSERT_ARG(info))
@@ -310,9 +310,16 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
    form '...Esddd ', where 's' is the sign, 'ddd' is some number of digits,
    and there may be trailing spaces. */
 
+/*
+
+=item C<static void canonicalize_exponent(PARROT_INTERP, char *tc, SpfInfo *info)>
+
+=cut
+
+*/
+
 static void
-canonicalize_exponent (PARROT_INTERP, ARGMOD(char *tc),
-                                      ARGIN(SpfInfo *info))
+canonicalize_exponent(PARROT_INTERP, ARGMOD(char *tc), ARGIN(SpfInfo *info))
 {
     ASSERT_ARGS(canonicalize_exponent)
 
