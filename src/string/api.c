@@ -261,6 +261,10 @@ string_rep_compatible(SHIM_INTERP,
         return b->encoding;
     }
 
+    /* Sanity check before dereferencing the encoding pointers */
+    if (a->encoding == NULL || b->encoding == NULL)
+        return NULL;
+
     if (STRING_max_bytes_per_codepoint(a) != 1 ||
         STRING_max_bytes_per_codepoint(b) != 1)
         return NULL;
