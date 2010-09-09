@@ -390,6 +390,30 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 }
 
 
+/*
+
+=item C<void parrot_hash_oplib(PARROT_INTERP, op_lib_t *lib)>
+
+Add the ops in C<lib> to the global name => op_info hash.
+
+=cut
+
+*/
+
+void
+parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
+{
+    ASSERT_ARGS(parrot_hash_oplib)
+    int i;
+    for (i = 0; i < lib->op_count; i++) {
+        op_info_t *op = &lib->op_info_table[i];
+        parrot_hash_put(interp, interp->op_hash, (void *)op->full_name, (void *)op);
+        if (!parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
+            parrot_hash_put(interp, interp->op_hash, (void *)op->name, (void *)op);
+    }
+}
+
+
 
 
 /*

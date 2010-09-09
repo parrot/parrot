@@ -216,6 +216,8 @@ struct parrot_interp_t {
     struct PackFile          *initial_pf;     /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */
+    Hash               *op_hash;              /* mapping from op names to op_info_t */
+
 
     const char *output_file;                  /* where to write output */
 

@@ -54,21 +54,6 @@ static PMC * get_string_pmc(PARROT_INTERP, ARGIN(STRING *value))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-static int hash_compare_cstring(SHIM_INTERP,
-    ARGIN(const char *a),
-    ARGIN(const char *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-static size_t key_hash_cstring(SHIM_INTERP,
-    ARGIN(const void *value),
-    size_t seed)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
 static size_t key_hash_pointer(SHIM_INTERP,
     ARGIN(const void *value),
@@ -97,11 +82,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_get_string_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_hash_compare_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_parrot_mark_hash_both __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -238,8 +218,7 @@ key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<static size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t
-seed)>
+=item C<size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t seed)>
 
 Creates and returns a hash value from a string.
 
@@ -254,7 +233,7 @@ Used by parrot_new_cstring_hash.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t
+size_t
 key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
     ASSERT_ARGS(key_hash_cstring)
@@ -272,8 +251,7 @@ key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<static int hash_compare_cstring(PARROT_INTERP, const char *a, const char
-*b)>
+=item C<int hash_compare_cstring(PARROT_INTERP, const char *a, const char *b)>
 
 Compares two C strings for equality, returning -1, 0, and 1 if the first string
 is less than, equal to, or greater than the second, respectively.
@@ -284,7 +262,7 @@ is less than, equal to, or greater than the second, respectively.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int
+int
 hash_compare_cstring(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 {
     ASSERT_ARGS(hash_compare_cstring)
