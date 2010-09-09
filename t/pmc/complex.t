@@ -21,7 +21,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(458)
+    plan(460)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -76,6 +76,7 @@ Tests the Complex PMC.
     sech_of_complex_numbers()
     csch_of_complex_numbers()
     add_using_subclass_of_complex_bug_59630()
+    provides_complex()
 
     # END_OF_TESTS
 
@@ -514,10 +515,10 @@ handler:
     .local int bool1
 
     does bool1, pmc1, "scalar"
-    ok( bool1, 'Comples does scalar' )
+    ok( bool1, 'Complex does scalar' )
 
     does bool1, pmc1, "no_interface"
-    nok( bool1, 'Comples !does no_interface' )
+    nok( bool1, 'Complex !does no_interface' )
 .end
 
 .sub instantiate__pasm__i
@@ -1154,6 +1155,17 @@ todo:
     $S0 = concat $S0, ' - subclassing Complex add returns 0+0i - TT #562'
     $I0 = not $I0    # invert $I0 so todo does not pass
     todo( $I0, $S0 )
+.end
+
+.sub provides_complex
+    $P0 = new 'Complex'
+    $I0 = does $P0, 'complex'
+    ok($I0)
+
+    # ...And test a subclass, for good measure
+    $P0 = new 'MyComplex'
+    $I0 = does $P0, 'complex'
+    ok($I0)
 .end
 
 .namespace ['MyComplex']
