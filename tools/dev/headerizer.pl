@@ -329,7 +329,13 @@ sub main {
 
     # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
-        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
+
+        # Skip files in the src/ops/ subdirectory. Make sure to
+        # match the local directory separator character along with
+        # the usual slash.
+            
+        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ ||
+                $ofile =~ m/^src\/ops/;
 
         $ofile =~ s/\\/\//g;
 
