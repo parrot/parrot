@@ -75,6 +75,7 @@ static void trace_mem_block(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_NOINLINE
 static void trace_system_stack(PARROT_INTERP,
     ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1)

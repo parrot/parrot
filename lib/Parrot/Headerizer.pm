@@ -45,6 +45,7 @@ sub new {
     $self->{valid_macros} = { map { ( $_, 1 ) } qw(
         PARROT_EXPORT
         PARROT_INLINE
+        PARROT_NOINLINE
 
         PARROT_CAN_RETURN_NULL
         PARROT_CANNOT_RETURN_NULL
