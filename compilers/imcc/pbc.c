@@ -360,11 +360,11 @@ add_const_table(PARROT_INTERP)
     }
     else {
         /* initialize rlookup cache */
-        interp->code->const_table->string_hash =
-            Parrot_pmc_new_init_int(interp, enum_class_Hash, enum_type_INTVAL);
-        ((Hash *)VTABLE_get_pointer(interp, interp->code->const_table->string_hash))->compare =
-            (hash_comp_fn)hash_compare_string_distinct_enc;
-
+        interp->code->const_table->string_hash = parrot_create_hash(interp,
+                enum_type_INTVAL,
+                Hash_key_type_STRING,
+                hash_compare_string_distinct_enc,
+                (hash_hash_key_fn)key_hash_STRING);
         interp->code->const_table->constants =
             mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant);
     }
@@ -1142,7 +1142,7 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
         constant->type              = PFC_STRING;
         constant->u.string          = s;
 
-        VTABLE_set_integer_keyed_str(interp, table->string_hash, s, k);
+        parrot_hash_put(interp, table->string_hash, s, (void *)k);
 
         return k;
     }

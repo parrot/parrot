@@ -273,9 +273,11 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
     GETATTR_Key_str_key(interp, key, key_str);
     GETATTR_Key_num_key(interp, key, key_num);
 
-    if (type == PFC_STRING && !PMC_IS_NULL(ct->string_hash)) {
-        if (VTABLE_exists_keyed_str(interp, ct->string_hash, key_str)) {
-            i = VTABLE_get_integer_keyed_str(interp, ct->string_hash, key_str);
+    if (type == PFC_STRING && ct->string_hash) {
+        HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash,
+                key_str);
+        if (bucket) {
+            i = (int)bucket->value;
             if (i < ct->const_count) /* only consider constants that have already occured */
                 return i;
         }
