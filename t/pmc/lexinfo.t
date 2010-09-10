@@ -17,11 +17,15 @@ Tests the LexInfo PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(3)
+    plan(5)
 
     inspect_test()
+    inspect_invalid_test()
+    declare_lex_preg_test()
 .end
 
 .sub inspect_test
@@ -56,6 +60,33 @@ Tests the LexInfo PMC.
 
     is(have_a, 1, "$a symbol was in list")
     is(have_b, 1, "$b symbol was in list")
+.end
+
+.sub inspect_invalid_test
+    .local pmc li, in, ex
+    .local int r, type
+    li = new ['LexInfo']
+    r = 0
+    push_eh catch
+    in = inspect li, 'fubar'
+    goto done
+  catch:
+    .get_results(ex)
+    type = ex['type']
+    r = iseq type, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok(r, 'invalid introspection key throws as expected')
+.end
+
+.sub declare_lex_preg_test
+    .const string preg_name = 'foo'
+    .const int preg_value = 42
+    .local pmc li
+    li = new ['LexInfo']
+    li.'declare_lex_preg'(preg_name, preg_value)
+    .local int r
+    r = li[preg_name]
+    is(r, preg_value, 'declare_lex_preg method')
 .end
 
 # Local Variables:
