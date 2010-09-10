@@ -231,7 +231,7 @@ my @hlls = (
     {
         name       => 'pir',
         scm        => 'GIT',
-        repository => 'http://github.com/bacek/pir.git'
+        repository => 'http://github.com/parrot/pir.git'
     },
 
     {
