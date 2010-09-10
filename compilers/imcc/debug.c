@@ -202,7 +202,7 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
             Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
                     "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
-                     ins->flags, ins->type, ins->opnum,
+                     ins->flags, ins->type, OP_INFO_OPNUM(ins->op),
                      ins->opsize, pc);
         }
         else {

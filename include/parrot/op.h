@@ -78,8 +78,11 @@ typedef struct op_info_t {
     struct op_lib_t *lib;
 } op_info_t;
 
-#define OPCODE_IS(interp, seg, opnum, global_opnum) \
-    ((seg)->op_func_table[(opnum)] == (interp)->op_func_table[(global_opnum)])
+#define OP_INFO_OPNUM(oi)  ((oi) - (oi)->lib->op_info_table)
+#define OP_INFO_OPFUNC(oi) ((oi)->lib->op_func_table[OP_INFO_OPNUM(oi)])
+
+#define OPCODE_IS(interp, seg, opnum, lib, oplibnum) \
+    ((seg)->op_func_table[(opnum)] == (lib)->op_func_table[(oplibnum)])
 
 #endif /* PARROT_OP_H_GUARD */
 

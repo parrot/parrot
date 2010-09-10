@@ -34,7 +34,7 @@ typedef struct _Instruction {
     struct _Instruction *prev;
     struct _Instruction *next;
 
-    int     opnum;         /* parrot op number */
+    op_info_t *op;         /* parrot opcode */
     int     opsize;        /* parrot op size   */
     int     line;          /* source code line number */
     int     symreg_count;  /* count of regs in **symregs */

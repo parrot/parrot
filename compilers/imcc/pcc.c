@@ -29,6 +29,7 @@ PCC Implementation by Leopold Toetsch
 #include <string.h>
 #include "imc.h"
 #include "parser.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
@@ -675,6 +676,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     SymReg *regs[2];
     Instruction *get_params, *tmp_ins, *unused_ins;
     char *buf;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     if (!(unit->instructions->type & ITLABEL))
         return 0;
@@ -696,7 +698,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 
     get_params = unit->instructions->next;
 
-    if (get_params->opnum != PARROT_OP_get_params_pc)
+    if (get_params->op != &core_ops->op_info_table[PARROT_OP_get_params_pc])
         return 0;
 
     buf = (char *)malloc(strlen(this_sub->name) + 3);

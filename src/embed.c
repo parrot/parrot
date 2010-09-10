@@ -25,6 +25,7 @@ This file implements the Parrot embedding interface.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
+#include "parrot/oplib/core_ops.h"
 
 #include "../compilers/imcc/imc.h"
 
@@ -1077,6 +1078,7 @@ void
 Parrot_run_native(PARROT_INTERP, native_func_t func)
 {
     ASSERT_ARGS(Parrot_run_native)
+    op_lib_t *core_ops  = PARROT_GET_CORE_OPLIB(interp);
     PackFile * const pf = PackFile_new(interp, 0);
     static opcode_t program_code[2] = {
         0, /* enternative */
@@ -1084,8 +1086,8 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     };
 
     static op_func_t op_func_table[2];
-    op_func_table[0] = interp->op_func_table[ interp->op_lib->op_code(interp, "enternative", 0) ];
-    op_func_table[1] = interp->op_func_table[ interp->op_lib->op_code(interp, "end", 0) ];
+    op_func_table[0] = core_ops->op_func_table[PARROT_OP_enternative];
+    op_func_table[1] = core_ops->op_func_table[PARROT_OP_end];
 
 
     pf->cur_cs = (PackFile_ByteCode *)

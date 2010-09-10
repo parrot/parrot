@@ -9,6 +9,7 @@
 #include "parrot/pmc_freeze.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/pbc.h */
 
@@ -642,6 +643,7 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
     ASSERT_ARGS(get_code_size)
     Instruction *ins = unit->instructions;
     size_t       code_size;
+    op_lib_t    *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     /* run through instructions:
      * - sanity check
@@ -664,12 +666,12 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
         }
         else if (ins->opname && *ins->opname) {
             (*src_lines)++;
-            if (ins->opnum < 0)
+            if (!ins->op)
                 IMCC_fatal(interp, 1, "get_code_size: "
                         "no opnum ins#%d %d\n",
                         ins->index, ins);
 
-            if (ins->opnum == PARROT_OP_set_p_pc) {
+            if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
                 /* set_p_pc opcode */
                 IMCC_debug(interp, DEBUG_PBC_FIXUP, "PMC constant %s\n",
                         ins->symregs[1]->name);
@@ -702,11 +704,10 @@ none exists.
 
 static
 opcode_t
-bytecode_map_op(PARROT_INTERP, opcode_t op) {
+bytecode_map_op(PARROT_INTERP, op_info_t *info) {
     int i;
-    op_info_t         *info    = &interp->op_info_table[op];
     op_lib_t          *lib     = info->lib;
-    op_func_t         op_func  = interp->op_func_table[op];
+    op_func_t         op_func  = OP_INFO_OPFUNC(info);
     PackFile_ByteCode *bc      = interp->code;
     PackFile_ByteCode_OpMappingEntry *om;
 
@@ -857,6 +858,7 @@ fixup_globals(PARROT_INTERP)
     ASSERT_ARGS(fixup_globals)
     subs_t *s;
     int     jumppc = 0;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         const SymHash * const hsh = &s->fixup;
@@ -912,7 +914,7 @@ fixup_globals(PARROT_INTERP)
                     SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
-                    const int op = interp->op_lib->op_code(interp, "find_sub_not_null_p_sc", 1);
+                    op_info_t *op = &core_ops->op_info_table[PARROT_OP_find_sub_not_null_p_sc];
                     PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = bytecode_map_op(interp, op);
@@ -2227,9 +2229,10 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
     ASSERT_ARGS(verify_signature)
     PMC    *changed_sig    = NULL;
     PMC    * const sig_arr = interp->code->const_table->constants[pc[-1]].u.key;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
     int     needed         = 0;
-    int     no_consts      = (ins->opnum == PARROT_OP_get_results_pc
-                           || ins->opnum == PARROT_OP_get_params_pc);
+    int     no_consts      = (ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]
+                           || ins->op == &core_ops->op_info_table[PARROT_OP_get_params_pc]);
 
     INTVAL  i, n;
 
@@ -2305,7 +2308,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 {
     ASSERT_ARGS(e_pbc_emit)
     int        ok = 0;
-    int        op, i;
+    int        i;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
@@ -2429,16 +2433,14 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             IMCC_INFO(interp)->debug_seg->base.data[IMCC_INFO(interp)->ins_line++] =
                 (opcode_t)ins->line;
 
-        op = (opcode_t)ins->opnum;
-
         /* Get the info for that opcode */
-        op_info = &interp->op_info_table[op];
+        op_info = ins->op;
 
         IMCC_debug(interp, DEBUG_PBC, "%d %s", IMCC_INFO(interp)->npc,
             op_info->full_name);
 
         /* Start generating the bytecode */
-        *(IMCC_INFO(interp)->pc)++ = bytecode_map_op(interp, op);
+        *(IMCC_INFO(interp)->pc)++ = bytecode_map_op(interp, op_info);
 
         for (i = 0; i < op_info->op_count-1; i++) {
             switch (op_info->types[i]) {
@@ -2490,10 +2492,10 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                 break;
             }
         }
-        if (ins->opnum == PARROT_OP_set_args_pc
-        ||  ins->opnum == PARROT_OP_get_results_pc
-        ||  ins->opnum == PARROT_OP_get_params_pc
-        ||  ins->opnum == PARROT_OP_set_returns_pc) {
+        if (ins->op == &core_ops->op_info_table[PARROT_OP_set_args_pc]
+        ||  ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]
+        ||  ins->op == &core_ops->op_info_table[PARROT_OP_get_params_pc]
+        ||  ins->op == &core_ops->op_info_table[PARROT_OP_set_returns_pc]) {
 
             /* TODO get rid of verify_signature - PIR call sigs are already
              * fixed, but PASM still needs it */

@@ -41,6 +41,7 @@ segments from the input PBC files.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
+#include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
 
 
@@ -699,6 +700,7 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     opcode_t  *ops       = bc->base.data;
     opcode_t   cur_op    = 0;
     int        cur_input = 0;
+    op_lib_t  *core_ops  = PARROT_GET_CORE_OPLIB(interp);
 
     /* Loop over the ops in the merged bytecode. */
     while (cur_op < (opcode_t)bc->base.size) {
@@ -738,10 +740,10 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
         /* Handle special case variable argument opcodes. */
         op_func = interp->code->op_func_table[op_num];
-        if (op_func == interp->op_func_table[PARROT_OP_set_args_pc]    ||
-            op_func == interp->op_func_table[PARROT_OP_get_results_pc] ||
-            op_func == interp->op_func_table[PARROT_OP_get_params_pc]  ||
-            op_func == interp->op_func_table[PARROT_OP_set_returns_pc]) {
+        if (op_func == core_ops->op_func_table[PARROT_OP_set_args_pc]    ||
+            op_func == core_ops->op_func_table[PARROT_OP_get_results_pc] ||
+            op_func == core_ops->op_func_table[PARROT_OP_get_params_pc]  ||
+            op_func == core_ops->op_func_table[PARROT_OP_set_returns_pc]) {
             /* Get the signature. */
             PMC * const sig = bc->const_table->constants[op_ptr[1]].u.key;
 

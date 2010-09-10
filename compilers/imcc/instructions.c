@@ -10,6 +10,7 @@
 #include "pbc.h"
 #include "optimizer.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /*
 
@@ -112,7 +113,7 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         ins->symregs[i]  = r[i];
 
     ins->flags = flags;
-    ins->opnum = -1;
+    ins->op    = NULL;
 
     return ins;
 }
@@ -133,19 +134,22 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(instruction_reads)
     int f, i;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(NULL);
 
-    if (ins->opnum == PARROT_OP_set_args_pc
-    ||  ins->opnum == PARROT_OP_set_returns_pc) {
+    if (ins->op && ins->op->lib == core_ops) {
+        if (OP_INFO_OPNUM(ins->op) == PARROT_OP_set_args_pc
+        ||  OP_INFO_OPNUM(ins->op) == PARROT_OP_set_returns_pc) {
 
-        for (i = ins->symreg_count - 1; i >= 0; --i)
-            if (r == ins->symregs[i])
-                return 1;
+            for (i = ins->symreg_count - 1; i >= 0; --i)
+                if (r == ins->symregs[i])
+                    return 1;
 
-        return 0;
-    }
-    else if (ins->opnum == PARROT_OP_get_params_pc ||
-             ins->opnum == PARROT_OP_get_results_pc) {
-        return 0;
+            return 0;
+        }
+        else if (OP_INFO_OPNUM(ins->op) == PARROT_OP_get_params_pc ||
+                 OP_INFO_OPNUM(ins->op) == PARROT_OP_get_results_pc) {
+            return 0;
+        }
     }
 
     f = ins->flags;
@@ -172,7 +176,7 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
     /* a sub call reads the previous args */
     if (ins->type & ITPCCSUB) {
-        while (ins && ins->opnum != PARROT_OP_set_args_pc)
+        while (ins && ins->op != &core_ops->op_info_table[PARROT_OP_set_args_pc])
             ins = ins->prev;
 
         if (!ins)
@@ -204,9 +208,10 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
     ASSERT_ARGS(instruction_writes)
     const int f = ins->flags;
     int j;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(NULL);
 
     /* a get_results opcode occurs after the actual sub call */
-    if (ins->opnum == PARROT_OP_get_results_pc) {
+    if (ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]) {
         int i;
 
         /* but only if it isn't the get_results opcode of
@@ -231,7 +236,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
          * and point to the most recent pcc_sub
          * structure
          */
-        while (ins && ins->opnum != PARROT_OP_get_results_pc)
+        while (ins && ins->op != &core_ops->op_info_table[PARROT_OP_get_results_pc])
             ins = ins->next;
 
         if (!ins)
@@ -245,7 +250,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
         return 0;
     }
 
-    if (ins->opnum == PARROT_OP_get_params_pc) {
+    if (ins->op == &core_ops->op_info_table[PARROT_OP_get_params_pc]) {
         int i;
 
         for (i = ins->symreg_count - 1; i >= 0; --i) {
@@ -255,8 +260,8 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
         return 0;
     }
-    else if (ins->opnum == PARROT_OP_set_args_pc
-         ||  ins->opnum == PARROT_OP_set_returns_pc) {
+    else if (ins->op == &core_ops->op_info_table[PARROT_OP_set_args_pc]
+         ||  ins->op == &core_ops->op_info_table[PARROT_OP_set_returns_pc]) {
         return 0;
     }
 

@@ -257,6 +257,7 @@ method _emit_init_func($fh) {
 
     # TODO There is a bug in NQP about \{
     $fh.print(q|
+PARROT_EXPORT
 op_lib_t *
 | ~ self.init_func ~ q|(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */

@@ -19,6 +19,7 @@ These are the vtable functions for the Sub (subroutine) base class
 */
 
 #include "parrot/oplib/ops.h"
+#include "parrot/oplib/core_ops.h"
 #include "sub.str"
 
 /* HEADERIZER HFILE: none */
@@ -863,14 +864,14 @@ The number of optional named arguments
         if (!sub->arg_info) {
             /* Get pointer into the bytecode where this sub starts. */
             const opcode_t *pc = sub->seg->base.data + sub->start_offs;
+            op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(INTERP);
 
             /* Allocate structure to store argument information in. */
             sub->arg_info = mem_gc_allocate_zeroed_typed(INTERP,
                     Parrot_sub_arginfo);
 
             /* If the first instruction is a get_params... */
-            if (sub->seg->op_func_table[*pc]
-                == interp->op_func_table[PARROT_OP_get_params_pc]) {
+            if (OPCODE_IS(INTERP, sub->seg, *pc, core_ops, PARROT_OP_get_params_pc)) {
                 /* Get the signature (the next thing in the bytecode). */
                 PMC * const sig = PF_CONST(sub->seg, *(++pc)).u.key;
 

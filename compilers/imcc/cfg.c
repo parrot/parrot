@@ -29,6 +29,7 @@ between blocks.
 #include <string.h>
 #include "imc.h"
 #include "optimizer.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/cfg.h */
 
@@ -276,7 +277,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
         ins->index   = ++i;
         ins->bbindex = unit->n_basic_blocks - 1;
 
-        if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
+        if (!ins->op && (ins->type & ITPCCSUB)) {
             if (first) {
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interp, unit, ins);
@@ -347,9 +348,10 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 {
     ASSERT_ARGS(bb_check_set_addr)
     const Instruction *ins;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if ((ins->opnum == PARROT_OP_set_addr_p_ic)
+        if ((ins->op == &core_ops->op_info_table[PARROT_OP_set_addr_p_ic])
         &&   STREQ(label->name, ins->symregs[1]->name)) {
             IMCC_debug(interp, DEBUG_CFG, "set_addr %s\n",
                     ins->symregs[1]->name);

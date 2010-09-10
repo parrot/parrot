@@ -196,8 +196,8 @@ void * imcc_compile_file(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
 
-PARROT_WARN_UNUSED_RESULT
-int check_op(PARROT_INTERP,
+void check_op(PARROT_INTERP,
+    ARGOUT(op_info_t **op_info),
     ARGOUT(char *fullname),
     ARGIN(const char *name),
     ARGIN(SymReg * const * r),
@@ -207,6 +207,8 @@ int check_op(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*op_info)
         FUNC_MODIFIES(*fullname);
 
 PARROT_WARN_UNUSED_RESULT
@@ -317,7 +319,7 @@ void register_compilers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-int try_find_op(PARROT_INTERP,
+op_info_t * try_find_op(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
     ARGMOD(SymReg **r),
@@ -337,6 +339,7 @@ int try_find_op(PARROT_INTERP,
     , PARROT_ASSERT_ARG(error_message))
 #define ASSERT_ARGS_check_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(op_info) \
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))

@@ -33,6 +33,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "debug.str"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /* Hand switched debugger tracing
  * Set to 1 to enable tracing to stderr
@@ -2256,6 +2257,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
     int         j;
     size_t     size = 0;
     int        specialop = 0;
+    op_lib_t  *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     /* Write the opcode name */
     const char * p = full_name ? info->full_name : info->name;
@@ -2452,15 +2454,15 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
        one fixed parameter (the signature vector), plus a varying number of
        registers/constants.  For each arg/return, we show the register and its
        flags using PIR syntax. */
-    if (OPCODE_IS(interp, interp->code, *(op), PARROT_OP_set_args_pc)
-    ||  OPCODE_IS(interp, interp->code, *(op), PARROT_OP_set_returns_pc))
+    if (OPCODE_IS(interp, interp->code, *(op), core_ops, PARROT_OP_set_args_pc)
+    ||  OPCODE_IS(interp, interp->code, *(op), core_ops, PARROT_OP_set_returns_pc))
         specialop = 1;
 
     /* if it's a retrieving op, specialop = 2, so that later a :flat flag
      * can be changed into a :slurpy flag. See flag handling below.
      */
-    if (OPCODE_IS(interp, interp->code, *(op), PARROT_OP_get_results_pc)
-    ||  OPCODE_IS(interp, interp->code, *(op), PARROT_OP_get_params_pc))
+    if (OPCODE_IS(interp, interp->code, *(op), core_ops, PARROT_OP_get_results_pc)
+    ||  OPCODE_IS(interp, interp->code, *(op), core_ops, PARROT_OP_get_params_pc))
         specialop = 2;
 
     if (specialop > 0) {

@@ -36,17 +36,12 @@ The runcore API handles running the operations.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f get_dynamic_op_lib_init(SHIM_INTERP,
     ARGIN(const PMC *lib))
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lib))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -272,15 +267,6 @@ Parrot_runcore_destroy(PARROT_INTERP)
         mem_gc_free(interp, interp->all_op_libs);
 
     interp->all_op_libs = NULL;
-
-    /* dynop libs */
-    if (interp->n_libs <= 0)
-        return;
-
-    mem_gc_free(interp, interp->op_info_table);
-    mem_gc_free(interp, interp->op_func_table);
-    interp->op_info_table = NULL;
-    interp->op_func_table = NULL;
 }
 
 
@@ -305,21 +291,12 @@ void
 dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 {
     ASSERT_ARGS(dynop_register)
-    op_lib_t *lib, *core;
-    oplib_init_f init_func;
-    op_func_t *new_func_table;
-    op_info_t *new_info_table;
-    size_t i, n_old, n_new, n_tot;
+    op_lib_t     *lib;
+    oplib_init_f  init_func;
 
     if (n_interpreters > 1) {
-        /* This is not supported because oplibs are always shared.
-         * If we mem_sys_reallocate() the op_func_table while another
-         * interpreter is running using that exact op_func_table,
-         * this will cause problems
-         * Also, the mapping from op name to op number is global even for
-         * dynops (!). The mapping is done by get_op in core_ops.c (even for
-         * dynops) and uses a global hash as a cache and relies on modifications
-         * to the static-scoped core_op_lib data structure to see dynops.
+        /* This is not supported yet because interp->all_op_libs
+         * and interp->op_hash are shared.
          */
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "loading a new dynoplib while "
             "more than one thread is running is not supported.");
@@ -340,77 +317,34 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     /* if we are registering an op_lib variant, called from below the base
      * names of this lib and the previous one are the same */
     if (interp->n_libs >= 2
-    && (STREQ(interp->all_op_libs[interp->n_libs-2]->name, lib->name))) {
-        /* registering is handled below */
+    && (STREQ(interp->all_op_libs[interp->n_libs-2]->name, lib->name)))
         return;
-    }
 
-    n_old = interp->op_count;
-    n_new = lib->op_count;
-    n_tot = n_old + n_new;
-    core  = PARROT_CORE_OPLIB_INIT(interp, 1);
-
-    PARROT_ASSERT(interp->op_count == core->op_count);
-
-    if (core->flags & OP_FUNC_IS_ALLOCATED) {
-        new_func_table = mem_gc_realloc_n_typed_zeroed(interp,
-                core->op_func_table, n_tot, n_old, op_func_t);
-        new_info_table = mem_gc_realloc_n_typed_zeroed(interp,
-                core->op_info_table, n_tot, n_old, op_info_t);
-    }
-    else {
-        /* allocate new op_func and info tables */
-        new_func_table = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_func_t);
-        new_info_table = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_info_t);
-
-        /* copy old */
-        for (i = 0; i < n_old; ++i) {
-            new_func_table[i] = interp->op_func_table[i];
-            new_info_table[i] = interp->op_info_table[i];
-        }
-    }
-
-    /* add new */
-    for (i = n_old; i < n_tot; ++i) {
-        new_func_table[i] = ((op_func_t*)lib->op_func_table)[i - n_old];
-        new_info_table[i] = lib->op_info_table[i - n_old];
-    }
-
-    /* deinit core, so that it gets rehashed */
-    (void) PARROT_CORE_OPLIB_INIT(interp, 0);
-
-    /* set table */
-    core->op_func_table = interp->op_func_table = new_func_table;
-    core->op_info_table = interp->op_info_table = new_info_table;
-    core->op_count      = interp->op_count      = n_tot;
-    core->flags         = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
-
-    /* done for plain core */
-    dynop_register_switch(interp, n_old, n_new);
+    parrot_hash_oplib(interp, lib);
 }
-
-
 
 
 /*
 
-=item C<static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t
-n_new)>
+=item C<void parrot_hash_oplib(PARROT_INTERP, op_lib_t *lib)>
 
-Used only at the end of dynop_register.  Sums the old and new op_counts
-storing the result into the operations count field of the interpreter
-object.
+Add the ops in C<lib> to the global name => op_info hash.
 
 =cut
 
 */
 
-static void
-dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
+void
+parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 {
-    ASSERT_ARGS(dynop_register_switch)
-    op_lib_t * const lib = PARROT_CORE_OPLIB_INIT(interp, 1);
-    lib->op_count        = n_old + n_new;
+    ASSERT_ARGS(parrot_hash_oplib)
+    int i;
+    for (i = 0; i < lib->op_count; i++) {
+        op_info_t *op = &lib->op_info_table[i];
+        parrot_hash_put(interp, interp->op_hash, (void *)op->full_name, (void *)op);
+        if (!parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
+            parrot_hash_put(interp, interp->op_hash, (void *)op->name, (void *)op);
+    }
 }
 
 

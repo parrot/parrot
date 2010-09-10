@@ -182,17 +182,6 @@ struct parrot_interp_t {
 
     struct _ParrotIOData   *piodata;          /* interpreter's IO system */
 
-    op_lib_t  *op_lib;                        /* Opcode library */
-    size_t     op_count;                      /* The number of ops */
-    op_info_t *op_info_table;                 /* Opcode info table
-                                               * (name, nargs, arg types) */
-
-    op_func_t *op_func_table;                  /* opcode dispatch table
-                                                * (functions, labels, or nothing
-                                                * (e.g. switched core), which
-                                                * the interpreter is currently
-                                                * running */
-
     op_func_t *evc_func_table;                /* event check opcode dispatch */
     size_t     evc_func_table_size;
 
@@ -216,6 +205,8 @@ struct parrot_interp_t {
     struct PackFile          *initial_pf;     /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */
+    Hash               *op_hash;              /* mapping from op names to op_info_t */
+
 
     const char *output_file;                  /* where to write output */
 
