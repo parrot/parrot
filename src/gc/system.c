@@ -453,8 +453,8 @@ trace_mem_block(PARROT_INTERP,
     prefix = mask & buffer_min;
 
     for (cur_var_ptr = hi_var_ptr;
-            (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
-            cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
+        (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
+        cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
         const size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */
@@ -463,14 +463,14 @@ trace_mem_block(PARROT_INTERP,
              * guaranteed to be live pmcs/buffers, and could very well have
              * had their bufstart/vtable destroyed due to the linked list of
              * free headers... */
-            if ((pmc_min <= ptr) && (ptr < pmc_max) && is_pmc_ptr(mem_pools, (void *)ptr)) {
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
+            if ((pmc_min <= ptr)
+            &&  (ptr     < pmc_max)
+            &&   is_pmc_ptr(mem_pools, (void *)ptr)) {
+                Parrot_gc_mark_PMC_alive(interp, (PMC *)ptr);
             }
-            else if ((buffer_min <= ptr) && (ptr < buffer_max) &&
-                    is_buffer_ptr(mem_pools, (void *)ptr)) {
-                /* ...and since Parrot_gc_mark_PObj_alive doesn't care about bufstart, it
-                 * doesn't really matter if it sets a flag */
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
+            else if ((buffer_min <= ptr) && (ptr < buffer_max)
+            &&        is_buffer_ptr(mem_pools, (void *)ptr)) {
+                Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
             }
         }
     }
