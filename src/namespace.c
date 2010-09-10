@@ -203,12 +203,12 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
 {
     ASSERT_ARGS(internal_ns_keyed)
 
-    if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
+    if (PMC_IS_TYPE(pmc_key, Key))
+        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
+    else if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
         STRING * const str_key = VTABLE_get_string(interp, pmc_key);
         return internal_ns_keyed_str(interp, base_ns, str_key, flags);
     }
-    else if (PMC_IS_TYPE(pmc_key, Key))
-        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
     else {
         /* array of strings */
         STRING * const isans = CONST_STRING(interp, "NameSpace");
