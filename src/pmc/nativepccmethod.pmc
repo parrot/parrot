@@ -20,7 +20,7 @@ Container for native functions that handle PCC on their own.
 
 /* HEADERIZER HFILE: none */
 
-pmclass NativePCCMethod auto_attrs {
+pmclass NativePCCMethod auto_attrs provides invokable {
     ATTR STRING *signature;
     ATTR void   *func;
 
