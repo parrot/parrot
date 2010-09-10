@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,10 +22,10 @@ L<https://trac.parrot.org/parrot/wiki/NewParrotDeveloperGuide>.
 
 =item *
 
-There is a web interface to the subversion repository, in case you just want to
+There is a web interface to the git repository, in case you just want to
 browse the source.
 
-L<https://trac.parrot.org/parrot/browser>
+L<http://github.com/parrot/parrot>
 
 =item *
 
@@ -36,16 +36,10 @@ L<http://www.parrot.org/release/current>
 
 =item *
 
-An even better option is to use SVN, which gets you the very latest copy of the
+An even better option is to use git, which gets you the very latest copy of the
 Parrot distribution. The procedure for this is:
 
-    svn checkout https://svn.parrot.org/parrot/trunk parrot
-
-=item *
-
-If you're using git-svn, you should check out just the latest version. First:
-
-C<< git svn clone -s -r HEAD https://svn.parrot.org/parrot >>
+    git clone    http://github.com/parrot/parrot
 
 =back
 
@@ -64,7 +58,7 @@ some reasonable form of C<make>. To do this, follow these three easy steps.
 
 =item 1
 
-C<cd> to your parrot directory and run C<Configure.pl> to create the makefile
+C<cd> to your parrot directory and run C<perl Configure.pl> to create the makefile
 for your platform.
 
 =item 2
@@ -175,15 +169,7 @@ helpful to subscribe and keep up on changes that people are making.
 
 L<http://lists.parrot.org/mailman/listinfo/parrot-commits>
 
-=item * Parrot Commits NNTP Interface
-
-L<...>
-
-L<...>
-
 =item * Commit List Archives, RSS
-
-L<...>
 
 L<http://lists.parrot.org/pipermail/parrot-commits/>
 
@@ -197,8 +183,6 @@ is an IRC channel which you may find useful if your problem is better solved
 with real-time discussion.  Visit the channel #parrot on the IRC
 server L<irc.parrot.org>.  Alternative IRC servers are
 L<irc.rhizomatic.net> and L<irc.pobox.com>.
-
-
 
 =head2 I've developed a patch. What should I do with it?
 
