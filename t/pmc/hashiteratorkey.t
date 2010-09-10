@@ -55,7 +55,7 @@ iterating over Hash. Just check that we create it.
 
     # De facto behavior tested for code coverage
 
-    p = hik.'key'() 
+    p = hik.'key'()
     i = isnull p
     is(i, 1, 'HIK.key gives null when unitialized')
 
