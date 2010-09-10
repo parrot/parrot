@@ -21,6 +21,19 @@ the top level parser and serializer for *.pbc files.
 
 #include "pmc/pmc_packfiledirectory.h"
 
+typedef enum {
+    attr_wordsize,
+    attr_byteorder,
+    attr_fptype,
+    attr_version_major,
+    attr_version_minor,
+    attr_version_patch,
+    attr_bytecode_major,
+    attr_bytecode_minor,
+    attr_uuid_type,
+    attr_NONE = -1
+} AttrEnumPackfile;
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -33,10 +46,18 @@ static void copy_packfile_header(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self);
 
+static AttrEnumPackfile getAttrEnum(PARROT_INTERP,
+    ARGIN(const STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_copy_packfile_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_getAttrEnum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -243,28 +264,40 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
 
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "wordsize")))
-            return attrs->wordsize;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "byteorder")))
-            return attrs->byteorder;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "fptype")))
-            return attrs->fptype;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "version_major")))
-            return attrs->version_major;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "version_minor")))
-            return attrs->version_minor;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "version_patch")))
-            return attrs->version_patch;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "bytecode_major")))
-            return attrs->bytecode_major;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "bytecode_minor")))
-            return attrs->bytecode_minor;
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "uuid_type")))
-            return attrs->uuid_type;
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "Packfile: No such integer key \"%s\"",
-                       Parrot_str_cstring(INTERP, key));
+        INTVAL result;
+        switch (getAttrEnum(INTERP, key)) {
+          case attr_wordsize:
+            result = attrs->wordsize;
+            break;
+          case attr_byteorder:
+            result = attrs->byteorder;
+            break;
+          case attr_fptype:
+            result = attrs->fptype;
+            break;
+          case attr_version_major:
+            result = attrs->version_major;
+            break;
+          case attr_version_minor:
+            result = attrs->version_minor;
+            break;
+          case attr_version_patch:
+            result = attrs->version_patch;
+            break;
+          case attr_bytecode_major:
+            result = attrs->bytecode_major;
+            break;
+          case attr_bytecode_minor:
+            result = attrs->bytecode_minor;
+            break;
+          case attr_uuid_type:
+            result = attrs->uuid_type;
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                    "Packfile: No such integer key \"%Ss\"", key);
+        }
+        return result;
     }
 
 /*
@@ -287,8 +320,7 @@ Fetch a string keyed value from the packfile object.  Valid keys are:
             return PARROT_PACKFILE(SELF)->uuid;
 
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "Packfile: No such string key \"%s\"",
-                       Parrot_str_cstring(INTERP, key));
+                    "Packfile: No such string key \"%Ss\"", key);
     }
 
 
@@ -346,25 +378,23 @@ Set an integer keyed value to the specified value.  Valid keys are:
 */
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "version_major"))) {
+        switch (getAttrEnum(INTERP, key)) {
+          case attr_version_major:
             attrs->version_major = value;
-            return;
-        }
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "version_minor"))) {
+            break;
+          case attr_version_minor:
             attrs->version_minor = value;
-            return;
-        }
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "version_patch"))) {
+            break;
+          case attr_version_patch:
             attrs->version_patch = value;
-            return;
-        }
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "uuid_type"))) {
+            break;
+          case attr_uuid_type:
             attrs->uuid_type = value;
-            return;
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                    "Packfile: No such integer key \"%Ss\"", key);
         }
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "Packfile: No such integer key \"%s\"",
-                       Parrot_str_cstring(INTERP, key));
     }
 
 
@@ -407,8 +437,7 @@ keys are:
         }
 
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "Packfile: No such string key \"%s\"",
-                       Parrot_str_cstring(INTERP, key));
+                       "Packfile: No such string key \"%Ss\"", key);
     }
 
 /*
@@ -471,7 +500,61 @@ start of the packfile.
         PMC * const dir = PARROT_PACKFILE(SELF)->directory;
         RETURN(PMC *dir);
     }
+
 }
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+
+=head2 Auxliary functions
+
+=over 4
+
+=item C<static AttrEnumPackfile getAttrEnum(PARROT_INTERP, const STRING *name)>
+
+Gets an enumerated value corresponding to the attribute with that name.
+
+=cut
+
+*/
+
+static AttrEnumPackfile
+getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
+{
+    ASSERT_ARGS(getAttrEnum)
+
+    AttrEnumPackfile r;
+    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "wordsize")))
+        r = attr_wordsize;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "byteorder")))
+        r = attr_byteorder;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fptype")))
+        r = attr_fptype;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "version_major")))
+        r = attr_version_major;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "version_minor")))
+        r = attr_version_minor;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "version_patch")))
+        r = attr_version_patch;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "bytecode_major")))
+        r = attr_bytecode_major;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "bytecode_minor")))
+        r = attr_bytecode_minor;
+    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "uuid_type")))
+        r = attr_uuid_type;
+    else
+        r = attr_NONE;
+    return r;
+}
+
 /*
 
 =back
