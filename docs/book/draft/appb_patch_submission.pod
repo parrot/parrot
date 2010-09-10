@@ -40,7 +40,7 @@ an old version, the problem may have already been resolved! Make sure
 the paths listed in the patch match those in the repository. There are two
 methods of creating patches that will do this for you. You can make changes
 directly in your checked-out copy of the subversion repository and
-then create diffs using the command C<svn diff>. Alternatively, you can
+then create diffs using the command C<git diff>. Alternatively, you can
 make a copy of the repository and then create diffs between the two
 copies with the C<diff -u> command:
 
