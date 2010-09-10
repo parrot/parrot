@@ -61,23 +61,17 @@ Initializes the StringBuilder with initial size of buffer.
 */
 
     VTABLE void init_int(INTVAL initial_size) {
-        STRING * const buffer = mem_gc_allocate_zeroed_typed(INTERP, STRING);
+        STRING * const buffer = Parrot_gc_new_string_header(INTERP, 0);
 
         if (initial_size < INITIAL_STRING_CAPACITY)
             initial_size = INITIAL_STRING_CAPACITY;
 
-        buffer->encoding      = Parrot_default_encoding_ptr;
-        buffer->_buflen       = initial_size;
-        buffer->_bufstart     = buffer->strstart
-                              = mem_gc_allocate_n_typed(INTERP,
-                                        initial_size, char);
-
-        /* We need these string flags to use this buffer in substr_str */
-        buffer->flags         = PObj_is_string_FLAG | PObj_external_FLAG;
+        Parrot_gc_allocate_string_storage(INTERP, buffer, initial_size);
+        buffer->encoding = Parrot_default_encoding_ptr;
 
         SET_ATTR_buffer(INTERP, SELF, buffer);
 
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 
@@ -110,24 +104,21 @@ Initializes the StringBuilder with an array of STRINGs.
         }
     }
 
-
 /*
 
-=item C<void destroy()>
+=item C<void mark()>
 
-Free the buffer on destruction.
+Mark the buffer.
 
 =cut
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void mark() {
         if (PMC_data(SELF)) {
             STRING *buffer;
             GET_ATTR_buffer(INTERP, SELF, buffer);
-            if (buffer->_bufstart)
-                mem_gc_free(INTERP, buffer->_bufstart);
-            mem_gc_free(INTERP, buffer);
+            Parrot_gc_mark_STRING_alive(INTERP, buffer);
         }
     }
 
@@ -197,13 +188,9 @@ Append string to current buffer.
 
                     if (total_size > buffer->_buflen) {
                         /* Reallocate */
-                        mem_gc_free(INTERP, buffer->_bufstart);
                         total_size = calculate_capacity(INTERP, total_size);
-                        buffer->_bufstart = buffer->strstart
-                                          = mem_gc_allocate_n_typed(INTERP, total_size, char);
-                        buffer->_buflen   = total_size;
+                        Parrot_gc_reallocate_string_storage(INTERP, buffer, total_size);
                     }
-
                     buffer->bufused  = new_buffer->bufused;
                     buffer->encoding = new_buffer->encoding;
 
@@ -220,17 +207,17 @@ Append string to current buffer.
             /* Calculate (possibly new) total size */
             total_size = calculate_capacity(INTERP, total_size);
 
-            buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
-                buffer->_bufstart, total_size, char);
-            buffer->_buflen   = total_size;
+            Parrot_gc_reallocate_string_storage(INTERP, buffer, total_size);
+            buffer->_buflen = total_size;
         }
 
         /* Tack s on the end of buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart + buffer->bufused),
+        mem_sys_memcopy((void *)((ptrcast_t)buffer->_bufstart + buffer->bufused),
                 s->strstart, s->bufused);
 
         /* Update buffer */
         buffer->bufused += s->bufused;
+        buffer->strstart = (char *)buffer->_bufstart;
         buffer->strlen  += Parrot_str_length(INTERP, s);
         buffer->hashval = 0; /* hash is invalid */
 
@@ -282,13 +269,12 @@ Set content of buffer to passed string or PMC
 
         /* Reallocate if necessary */
         if (total_size > Buffer_buflen(buffer)) {
-            buffer->_bufstart = buffer->strstart = mem_gc_realloc_n_typed(INTERP,
-                    buffer->_bufstart, total_size, char);
-            buffer->_buflen   = total_size;
+            Parrot_gc_reallocate_string_storage(INTERP, buffer, total_size);
+            buffer->strstart = (char*)buffer->_bufstart;
         }
 
         /* Tack s on the buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->strstart),
+        mem_sys_memcopy((void *)((char*)buffer->_bufstart),
                 s->strstart, s->bufused);
 
         /* Update buffer */
