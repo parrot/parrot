@@ -746,10 +746,6 @@ The Pod documentation should follow the layout:
 
 =over 4
 
-=item Version
-
-A SVN id string.
-
 =item Title
 
     =head1 Foo
