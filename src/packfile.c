@@ -3912,6 +3912,11 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
 
     self->const_count = 0;
 
+    if (self->string_hash) {
+        parrot_hash_destroy(interp, self->string_hash);
+        self->string_hash = NULL;
+    }
+
     return;
 }
 
