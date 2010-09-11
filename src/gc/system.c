@@ -470,7 +470,10 @@ trace_mem_block(PARROT_INTERP,
             }
             else if ((buffer_min <= ptr) && (ptr < buffer_max)
             &&        is_buffer_ptr(mem_pools, (void *)ptr)) {
-                Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
+                if (PObj_is_string_TEST((PObj *)ptr))
+                    Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
+                else
+                    PObj_live_SET((PObj *)ptr);
             }
         }
     }
