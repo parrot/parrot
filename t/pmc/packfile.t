@@ -273,15 +273,15 @@ load_error:
     inc i
     if i < nkeys goto get_next    
 
-    value = 0
+    i = 0
     push_eh unknown_key
-    value = pf["foo"]
+    pf["foo"] = value
     goto done
   unknown_key:
-    value = 1
+    i = 1
   done:
     pop_eh
-    is(value, 1, "set_integer_keyed_str handle unknown key properly")
+    is(i, 1, "set_integer_keyed_str handle unknown key properly")
     .return()
 .end
 
