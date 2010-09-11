@@ -976,7 +976,7 @@ Parrot_str_substr(PARROT_INTERP,
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
     if (offset == src_length || length < 1)
-        return Parrot_str_new_noinit(interp, 0);
+        return CONST_STRING(interp, "");
 
     if (offset < 0)
         true_offset = src_length + offset;
@@ -3080,7 +3080,7 @@ Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
         return NULL;
 
     if (!src->strlen)
-        return Parrot_str_new_noinit(interp, 0);
+        return CONST_STRING(interp, "");
 
     return STRING_compose(interp, src);
 }

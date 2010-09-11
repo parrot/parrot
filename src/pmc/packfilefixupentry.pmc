@@ -42,7 +42,7 @@ Initialize PackfileFixupEntry.
         Parrot_PackfileFixupEntry_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileFixupEntry_attributes*);
 
-        attrs->name = Parrot_str_new_noinit(INTERP, 0);
+        attrs->name = CONST_STRING(INTERP, "");
 
         PObj_custom_mark_SET(SELF);
     }
