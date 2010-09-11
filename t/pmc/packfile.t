@@ -271,7 +271,7 @@ load_error:
     msg = 'set_keyed_str_msg'(skey)
     is(value, check, msg)
     inc i
-    if i < nkeys goto get_next    
+    if i < nkeys goto get_next
 
     i = 0
     push_eh unknown_key

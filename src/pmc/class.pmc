@@ -141,11 +141,6 @@ static void initialize_parents_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t key_hash_pointer(SHIM_INTERP,
-    ARGIN(const void *value),
-    size_t seed)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
@@ -174,29 +169,11 @@ static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
     , PARROT_ASSERT_ARG(object) \
     , PARROT_ASSERT_ARG(all_parents) \
     , PARROT_ASSERT_ARG(init))
-#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_make_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-/*
-
-=item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t
-seed)>
-
-=cut
-
-*/
-
-static size_t
-key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_pointer)
-    return ((size_t) value ^ seed);
-}
 
 /*
 
@@ -685,9 +662,10 @@ arguments. The class is attached to the current HLL namespace.
 
         _class->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
         _class->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
+
         _class->isa_cache        = parrot_create_hash(INTERP,
-            enum_type_INTVAL, Hash_key_type_PMC,
-            (hash_comp_fn)hash_compare_pointer, (hash_hash_key_fn)key_hash_pointer);
+            enum_type_INTVAL, Hash_key_type_PMC_ptr);
+
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(INTERP, _class->all_parents, SELF);

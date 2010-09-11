@@ -363,9 +363,7 @@ add_const_table(PARROT_INTERP)
         /* initialize rlookup cache */
         interp->code->const_table->string_hash = parrot_create_hash(interp,
                 enum_type_INTVAL,
-                Hash_key_type_STRING,
-                hash_compare_string_distinct_enc,
-                (hash_hash_key_fn)key_hash_STRING);
+                Hash_key_type_STRING_enc);
         interp->code->const_table->constants =
             mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant);
     }

@@ -224,10 +224,8 @@ parrot_global_setup_2(PARROT_INTERP)
     }
     else {
         op_lib_t  *core_ops = PARROT_CORE_OPLIB_INIT(interp, 1);
-        interp->op_hash     = parrot_create_hash_sized(interp, enum_type_ptr, Hash_key_type_cstring,
-                                                        (hash_comp_fn)hash_compare_cstring,
-                                                        (hash_hash_key_fn)key_hash_cstring,
-                                                        core_ops->op_count);
+        interp->op_hash     = parrot_create_hash_sized(interp, enum_type_ptr, 
+                                    Hash_key_type_cstring, core_ops->op_count);
         parrot_hash_oplib(interp, core_ops);
     }
 

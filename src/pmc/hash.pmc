@@ -141,9 +141,7 @@ Free hash structure.
 
         attr->hash = parrot_create_hash(INTERP,
                 (PARROT_DATA_TYPE)value_type,
-                Hash_key_type_STRING,
-                hash_compare_string,
-                (hash_hash_key_fn)key_hash_STRING);
+                Hash_key_type_STRING);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -233,23 +231,17 @@ NB: this method will destroy all old data!
         if (type == Hash_key_type_STRING)
             new_hash = parrot_create_hash(INTERP,
                     entry_type,
-                    Hash_key_type_STRING,
-                    hash_compare_string,
-                    (hash_hash_key_fn)key_hash_STRING);
+                    Hash_key_type_STRING);
         else if (type == Hash_key_type_int)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(INTERP,
                     entry_type,
-                    Hash_key_type_int,
-                    hash_compare_int,
-                    key_hash_int);
+                    Hash_key_type_int);
         else if (type == Hash_key_type_PMC)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(INTERP,
                     entry_type,
-                    Hash_key_type_PMC,
-                    (hash_comp_fn)hash_compare_pmc,
-                    (hash_hash_key_fn)key_hash_PMC);
+                    Hash_key_type_PMC);
         else
             /* We probably will not implement other types of keys. They are way
              * too dangerous to use from PIR */
@@ -310,9 +302,7 @@ NB: this method will destroy all old data!
           case enum_type_PMC:
             new_hash = parrot_create_hash(INTERP,
                         (PARROT_DATA_TYPE)type,
-                        old_hash ? old_hash->key_type : Hash_key_type_STRING,
-                        old_hash ? old_hash->compare  : hash_compare_string,
-                        old_hash ? old_hash->hash_val : (hash_hash_key_fn)key_hash_STRING);
+                        old_hash ? old_hash->key_type : Hash_key_type_STRING);
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,

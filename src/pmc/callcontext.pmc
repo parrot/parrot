@@ -390,9 +390,7 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
     if (!hash) {
         hash = parrot_create_hash(interp,
             enum_type_ptr,
-            Hash_key_type_STRING,
-            hash_compare_string,
-            (hash_hash_key_fn)key_hash_STRING);
+            Hash_key_type_STRING);
 
         SETATTR_CallContext_hash(interp, SELF, hash);
     }
