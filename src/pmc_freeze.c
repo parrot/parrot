@@ -318,7 +318,6 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
 
     PMC * const  todo   = VTABLE_get_iter(interp, info);
     const INTVAL action = VTABLE_get_integer(interp, info);
-    const INTVAL e      = VTABLE_elements(interp, todo);
     INTVAL       i;
 
     /* can't cache upper limit, visit may append items */
