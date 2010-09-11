@@ -410,7 +410,13 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
  - Oct 19, 2010 - 2.9*  - gerd
  - Nov 16, 2010 - 2.10  - ??
  - Dec 21, 2010 - 2.11  - ??
- - Jan 18, 2010 - 3.0*  - ??
+ - Jan 18, 2011 - 3.0*  - ??
+ - Feb 15, 2011 - 3.1   - ??
+ - Mar 15, 2011 - 3.2   - ??
+ - Apr 19, 2011 - 3.3*  - ??
+ - May 17, 2011 - 3.4   - ??
+ - Jun 21, 2011 - 3.5   - ??
+ - Jul 19, 2011 - 3.6*  - ??
 
 =cut
 
