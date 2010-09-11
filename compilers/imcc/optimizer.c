@@ -805,7 +805,7 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
     opcode_t eval[4], *pc;
     int opnum;
     int i;
-    op_info_t *op_info = parrot_hash_get(interp, interp->op_hash, (void *)op);
+    op_info_t *op_info = (op_info_t *)parrot_hash_get(interp, interp->op_hash, (void *)op);
     if (!op_info || !STREQ(op_info->full_name, op))
         IMCC_fatal(interp, 1, "eval_ins: op '%s' not found\n", op);
     /* now fill registers */

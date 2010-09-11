@@ -190,7 +190,7 @@ check_op(PARROT_INTERP, ARGOUT(op_info_t **op_info), ARGOUT(char *fullname),
 {
     ASSERT_ARGS(check_op)
     op_fullname(fullname, name, r, narg, keyvec);
-    *op_info = parrot_hash_get(interp, interp->op_hash, fullname);
+    *op_info = (op_info_t *)parrot_hash_get(interp, interp->op_hash, fullname);
     if (*op_info && !STREQ((*op_info)->full_name, fullname))
         *op_info = NULL;
 }
@@ -250,7 +250,7 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     r[0]->pmc_type = enum_class_FixedIntegerArray;
 
     op_fullname(fullname, name, r, 1, 0);
-    op = parrot_hash_get(interp, interp->op_hash, fullname);
+    op = (op_info_t *)parrot_hash_get(interp, interp->op_hash, fullname);
 
     PARROT_ASSERT(op && STREQ(op->full_name, fullname));
 
@@ -314,13 +314,13 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         char fullname[64] = "", format[128] = "";
 
         op_fullname(fullname, name, r, n, keyvec);
-        op = parrot_hash_get(interp, interp->op_hash, fullname);
+        op = (op_info_t *)parrot_hash_get(interp, interp->op_hash, fullname);
         if (op && !STREQ(op->full_name, fullname))
             op = NULL;
 
         /* maybe we have a fullname */
         if (!op) {
-            op = parrot_hash_get(interp, interp->op_hash, name);
+            op = (op_info_t *)parrot_hash_get(interp, interp->op_hash, name);
             if (op && !STREQ(op->full_name, name))
                 op = NULL;
         }
@@ -331,7 +331,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             if (n_name) {
                 name = n_name;
                 op_fullname(fullname, name, r, n, keyvec);
-                op = parrot_hash_get(interp, interp->op_hash, fullname);
+                op = (op_info_t *)parrot_hash_get(interp, interp->op_hash, fullname);
                 if (op && !STREQ(op->full_name, fullname))
                     op = NULL;
             }
@@ -1024,7 +1024,7 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     if (changed) {
         op_info_t *op;
         op_fullname(fullname, name, r, n, keyvec);
-        op = parrot_hash_get(interp, interp->op_hash, fullname);
+        op = (op_info_t *)parrot_hash_get(interp, interp->op_hash, fullname);
         if (op && !STREQ(op->full_name, fullname))
             op = NULL;
         return op;

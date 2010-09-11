@@ -26204,8 +26204,7 @@ static void hop_deinit(PARROT_INTERP)
 
     hop         = NULL;
     hop_buckets = NULL;
-}
-PARROT_EXPORT
+}PARROT_EXPORT
 op_lib_t *
 Parrot_DynOp_core_2_7_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */

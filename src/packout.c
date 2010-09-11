@@ -277,7 +277,7 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
         HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash,
                 key_str);
         if (bucket) {
-            i = (int)bucket->value;
+            i = (int)PTR2INTVAL(bucket->value);
             if (i < ct->const_count) /* only consider constants that have already occured */
                 return i;
         }
