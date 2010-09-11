@@ -813,13 +813,11 @@ fixed8_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL c
     ASSERT_ARGS(fixed8_substr)
     STRING * const return_string = Parrot_str_copy(interp, src);
 
-    return_string->encoding = src->encoding;
-
-    return_string->strstart = (char *)return_string->strstart + offset ;
-    return_string->bufused = count;
-
-    return_string->strlen = count;
-    return_string->hashval = 0;
+    return_string->encoding      = src->encoding;
+    return_string->strstart      = (char *)return_string->strstart + offset;
+    return_string->bufused       = count;
+    return_string->strlen        = count;
+    return_string->hashval       = 0;
 
     return return_string;
 }

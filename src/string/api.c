@@ -964,8 +964,9 @@ Parrot_str_substr(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_str_substr)
 
-    UINTVAL true_length;
-    UINTVAL true_offset = (UINTVAL)offset;
+    UINTVAL       true_length;
+    UINTVAL       true_offset = (UINTVAL)offset;
+    const UINTVAL src_length  = Parrot_str_length(interp, src);
 
     if (STRING_IS_NULL(src))
         Parrot_ex_throw_from_c_args(interp, NULL,
@@ -974,24 +975,27 @@ Parrot_str_substr(PARROT_INTERP,
     ASSERT_STRING_SANITY(src);
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-    if (offset == (INTVAL)Parrot_str_length(interp, src) || length < 1)
+    if (offset == src_length || length < 1)
         return Parrot_str_new_noinit(interp, 0);
 
     if (offset < 0)
-        true_offset = (UINTVAL)(src->strlen + offset);
+        true_offset = src_length + offset;
 
     /* 0 based... */
-    if (src->strlen == 0 || true_offset > src->strlen - 1)
+    if (src_length == 0 || true_offset > src_length - 1)
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Cannot take substr outside string");
 
     true_length = (UINTVAL)length;
 
-    if (true_length > (src->strlen - true_offset))
-        true_length = (UINTVAL)(src->strlen - true_offset);
+    if (true_length > (src_length - true_offset))
+        true_length = (UINTVAL)(src_length - true_offset);
 
-    return STRING_substr(interp, src, true_offset, true_length);
+    if (true_length == src_length && !offset)
+        return src;
+    else
+        return STRING_substr(interp, src, true_offset, true_length);
 }
 
 /*
