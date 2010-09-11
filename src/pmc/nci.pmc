@@ -279,11 +279,12 @@ Mark any referenced strings and PMCs.
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
             Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->signature);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
             Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
+
+            Parrot_gc_mark_STRING_alive(interp, nci_info->signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_return_signature);
         }
     }
 
