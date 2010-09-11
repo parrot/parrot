@@ -24,13 +24,13 @@ Tests the Packfile PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(42)
+    plan(47)
     'test_new'()
     'test_set_string_native'()
     'test_get_string'()
     'test_set_string'()
     'test_get_integer_keyed_str'()
-    'test_set_integer'()
+    'test_set_integer_keyed_str'()
     'test_get_directory'()
     'test_load'()
     'test_pack_fresh_packfile'()
@@ -71,6 +71,7 @@ Tests the Packfile PMC.
   catch:
     result = 1
   end:
+    pop_eh
     is(result, 1, 'set_string_native with invalid data throws')
 .end
 
@@ -87,6 +88,7 @@ Tests the Packfile PMC.
     set_label eh, unknown_key
     push_eh eh
     $S0 = pf["foo"]
+    pop_eh
     ok(0, "get_string_keyed_int return unknown key")
     .return ()
 
@@ -114,6 +116,7 @@ Tests the Packfile PMC.
     # Requesting unknown key should throw exception
     push_eh unknown_key
     pf["foo"] = "fe9ab64082e0f6bbbd7b1e8264127908"
+    pop_eh
     ok(0, "set_string_keyed_int set unknown key")
     .return ()
 
@@ -128,6 +131,14 @@ Tests the Packfile PMC.
     .param string key
     .local string msg
     msg = 'get_integer_keyed_str('
+    msg = concat msg, key
+    msg = concat msg, ')'
+    .return(msg)
+.end
+.sub 'set_keyed_str_msg'
+    .param string key
+    .local string msg
+    msg = 'set_integer_keyed_str('
     msg = concat msg, key
     msg = concat msg, ')'
     .return(msg)
@@ -153,10 +164,9 @@ Tests the Packfile PMC.
     ok(result, msg)
 .end
 
-.sub 'test_get_integer_keyed_str'
-    .local pmc pf, keys
-    .local int nkeys, i
-
+# Create a list of the keys for the integer attributes
+.sub 'integer_keys'
+    .local pmc keys
     keys = new ['ResizableStringArray']
     push keys, 'wordsize'
     push keys, 'byteorder'
@@ -166,6 +176,28 @@ Tests the Packfile PMC.
     push keys, 'version_patch'
     push keys, 'bytecode_major'
     push keys, 'bytecode_minor'
+    push keys, 'uuid_type'
+    .return(keys)
+.end
+
+# Some keys are still not handled in set_integer_keyed_str
+# Use this list for its test
+.sub 'integer_keys_s'
+    .local pmc keys
+    keys = new ['ResizableStringArray']
+    push keys, 'version_major'
+    push keys, 'version_minor'
+    push keys, 'version_patch'
+    push keys, 'uuid_type'
+    .return(keys)
+.end
+
+
+.sub 'test_get_integer_keyed_str'
+    .local pmc pf, keys
+    .local int nkeys, i
+
+    keys = 'integer_keys'()
     nkeys = elements keys
 
     push_eh load_error
@@ -208,28 +240,51 @@ load_error:
 .end
 
 
-# Packfile.set_integer_keyed_str
-.sub 'test_set_integer'
-    .local pmc pf
-    push_eh load_error
-    pf  = _pbc()
+.sub 'test_set_integer_keyed_str'
+    .local pmc pf, keys, saved
+    .local int nkeys, i, value, check
+    .local string skey, msg
+    keys = 'integer_keys_s'()
+    nkeys = elements keys
+    pf = new ['Packfile']
+    saved = new ['FixedIntegerArray'], nkeys
+
+    # For each key get its value, set it modified and save the new value
+    # The modified value may be invalid, but we are not going to pack it,
+    # so it shouldn't fail here.
+    i = 0
+  set_next:
+    skey = keys[i]
+    value = pf[skey]
+    inc value
+    pf[skey] = value
+    saved[i] = value
+    inc i
+    if i < nkeys goto set_next
+
+    # Read new values and compare with the saved ones
+    i = 0
+  get_next:
+    skey = keys[i]
+    value = pf[skey]
+    check = saved[i]
+    msg = 'set_keyed_str_msg'(skey)
+    is(value, check, msg)
+    inc i
+    if i < nkeys goto get_next    
+
+    value = 0
+    push_eh unknown_key
+    value = pf["foo"]
+    goto done
+  unknown_key:
+    value = 1
+  done:
     pop_eh
-    $S1 = 'version_major'
-    $I0 = pf[$S1]
-    $I1 = $I0
-    inc $I1
-    pf[$S1] = $I1
-    $I2 = pf[$S1]
-    $I3 = cmp $I0, $I2
-    $I3 = cmp $I3, 0
-    ok($I3, 'set_integer_keyed_str version bumped')
-    .return()
-load_error:
-    .get_results($P0)
-    pop_eh
-    report_load_error($P0, 'set_integer_keyed_str version bumped')
+    is(value, 1, "set_integer_keyed_str handle unknown key properly")
     .return()
 .end
+
 
 # Packfile.get_directory
 .sub 'test_get_directory'
