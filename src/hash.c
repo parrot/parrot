@@ -54,9 +54,6 @@ static PMC * get_string_pmc(PARROT_INTERP, ARGIN(STRING *value))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-<<<<<<< HEAD
-PARROT_CONST_FUNCTION
-=======
 PARROT_PURE_FUNCTION
 PARROT_INLINE
 static int hash_compare(PARROT_INTERP,
@@ -272,7 +269,8 @@ key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t seed)>
+=item C<static size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t
+seed)>
 
 Creates and returns a hash value from a string.
 
@@ -305,7 +303,8 @@ key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<int hash_compare_cstring(PARROT_INTERP, const char *a, const char *b)>
+=item C<static int hash_compare_cstring(PARROT_INTERP, const char *a, const char
+*b)>
 
 Compares two C strings for equality, returning -1, 0, and 1 if the first string
 is less than, equal to, or greater than the second, respectively.

@@ -226,6 +226,7 @@ Hash * parrot_new_pointer_hash(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
+PARROT_INLINE
 int hash_compare_int(SHIM_INTERP,
     ARGIN_NULLOK(const void *a),
     ARGIN_NULLOK(const void *b));
@@ -360,6 +361,7 @@ STRING* hash_value_to_string(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
+PARROT_INLINE
 size_t key_hash_int(SHIM_INTERP,
     ARGIN_NULLOK(const void *value),
     size_t seed);
@@ -473,9 +475,6 @@ Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parrot_new_pointer_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_hash_compare_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_hash_compare_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_hash_compare_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -534,8 +533,6 @@ Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
 #define ASSERT_ARGS_hash_value_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_hash_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_key_hash_PMC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
