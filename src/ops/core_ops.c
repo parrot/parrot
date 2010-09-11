@@ -25965,9 +25965,8 @@ Parrot_find_codepoint_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_str_free_cstring(cstr);
     IREG(1) = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    opcode_t * const dest = cur_opcode + 3;
-    Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
+        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");return (opcode_t *)dest;
 #endif
 
 return (opcode_t *)cur_opcode + 3;}
@@ -25982,9 +25981,8 @@ Parrot_find_codepoint_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_str_free_cstring(cstr);
     IREG(1) = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    opcode_t * const dest = cur_opcode + 3;
-    Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
+        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");return (opcode_t *)dest;
 #endif
 
 return (opcode_t *)cur_opcode + 3;}
