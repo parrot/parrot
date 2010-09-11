@@ -324,9 +324,12 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
     /* can't cache upper limit, visit may append items */
     for (i = 0; i < VTABLE_elements(interp, todo); ++i) {
         PMC * const current = VTABLE_get_pmc_keyed_int(interp, todo, i);
-        if (!current)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "NULL current PMC in visit_loop_todo_list");
+        if (PMC_IS_NULL(current))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_MALFORMED_PACKFILE,
+                    "NULL current PMC at %d in visit_loop_todo_list - %s",
+                    (int) i,
+                    action == VISIT_FREEZE_NORMAL ? "feeze" : "thaw");
 
         PARROT_ASSERT(current->vtable);
 
