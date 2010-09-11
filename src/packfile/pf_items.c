@@ -959,14 +959,16 @@ opcode_t
 PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_opcode)
-    opcode_t o;
-    if (!pf || !pf->fetch_op)
+    if (!pf || !pf->fetch_op) {
         return *(*stream)++;
-    o = (pf->fetch_op)(*((const unsigned char **)stream));
-    TRACE_PRINTF_VAL(("  PF_fetch_opcode: 0x%lx (%ld), at 0x%x\n",
-                      o, o, OFFS(pf, *stream)));
-    *((const unsigned char **) (stream)) += pf->header->wordsize;
-    return o;
+    }
+    else {
+        const unsigned char *ucstream = *(const unsigned char **)stream;
+        opcode_t o  = (pf->fetch_op)(ucstream);
+        ucstream   += pf->header->wordsize;
+        *stream     = (opcode_t *)ucstream;
+        return o;
+    }
 }
 
 /*
