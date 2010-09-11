@@ -302,6 +302,25 @@ Removes and returns an item from the start of the array.
 
 /*
 
+=item C<PMC *shift_pmc()>
+
+Removes and returns the first element in the array.
+
+=cut
+
+*/
+
+    VTABLE PMC *shift_pmc() {
+        STRING * const strval = SELF.shift_string();
+        PMC    * const value  = Parrot_pmc_new(INTERP, enum_class_String);
+
+        VTABLE_set_string_native(INTERP, value, strval);
+
+        return value;
+    }
+
+/*
+
 =item C<INTVAL shift_integer()>
 
 Removes and returns the first element in the array.

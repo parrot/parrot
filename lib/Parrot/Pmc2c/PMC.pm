@@ -71,7 +71,7 @@ sub dump {
 # methods
 sub add_method {
     my ( $self, $method ) = @_;
-    die "FATAL ERROR: Duplicated VTABLE function: " . $method->name
+    warn "FATAL ERROR: Duplicated VTABLE function: " . $method->name
         if exists $self->{has_method}{$method->name};
     $self->{has_method}{ $method->name } = @{ $self->{methods} };
     push @{ $self->{methods} }, $method;

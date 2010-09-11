@@ -146,6 +146,14 @@ Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
+=item Duplicated VTABLE functions [eligible in 2.10]
+
+In F<src/pmc/oplib.pmc>, C<INTVAL get_integer()> is declared twice.
+
+In F<src/pmc/resizablestringarray.pmc>, C<PMC *shift_pmc()> is declared twice.
+
+L<http://trac.parrot.org/parrot/ticket/1785>
+
 =back
 
 =head1 Opcodes
