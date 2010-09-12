@@ -75,6 +75,45 @@ static int hash_compare_cstring(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
+static int hash_compare_int(SHIM_INTERP,
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
+static int hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
+static int hash_compare_pointer(SHIM_INTERP,
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
+static int hash_compare_string(PARROT_INTERP,
+    ARGIN(const void *search_key),
+    ARGIN_NULLOK(const void *bucket_key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static int hash_compare_string_enc(PARROT_INTERP,
+    ARGIN(const void *search_key),
+    ARGIN(const void *bucket_key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
 static size_t key_hash(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGIN_NULLOK(void *key))
@@ -92,10 +131,34 @@ static size_t key_hash_cstring(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
+static size_t key_hash_int(SHIM_INTERP,
+    ARGIN_NULLOK(const void *value),
+    size_t seed);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
+static size_t key_hash_PMC(PARROT_INTERP,
+    ARGIN(PMC *value),
+    SHIM(size_t seed))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
 static size_t key_hash_pointer(SHIM_INTERP,
     ARGIN(const void *value),
     size_t seed)
         __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+PARROT_INLINE
+static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*s);
 
 static void parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(1)
@@ -125,13 +188,33 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_hash_compare_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
+#define ASSERT_ARGS_hash_compare_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_hash_compare_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(a) \
+    , PARROT_ASSERT_ARG(b))
+#define ASSERT_ARGS_hash_compare_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_hash_compare_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(search_key))
+#define ASSERT_ARGS_hash_compare_string_enc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(search_key) \
+    , PARROT_ASSERT_ARG(bucket_key))
 #define ASSERT_ARGS_key_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_key_hash_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_key_hash_PMC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_parrot_mark_hash_both __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -146,7 +229,7 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<size_t key_hash_STRING(PARROT_INTERP, STRING *s, size_t seed)>
+=item C<static size_t key_hash_STRING(PARROT_INTERP, STRING *s, size_t seed)>
 
 Returns the hashed value of the key C<value>.  See also string.c.
 
@@ -158,7 +241,7 @@ Returns the hashed value of the key C<value>.  See also string.c.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-size_t
+static size_t
 key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
 {
     ASSERT_ARGS(key_hash_STRING)
@@ -172,8 +255,8 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
 
 /*
 
-=item C<int hash_compare_string(PARROT_INTERP, const void *search_key, const
-void *bucket_key)>
+=item C<static int hash_compare_string(PARROT_INTERP, const void *search_key,
+const void *bucket_key)>
 
 Compares the two strings, returning 0 if they are identical.
 
@@ -184,7 +267,7 @@ Compares the two strings, returning 0 if they are identical.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-int
+static int
 hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
         ARGIN_NULLOK(const void *bucket_key))
 {
@@ -198,8 +281,8 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
 
 /*
 
-=item C<int hash_compare_string_enc(PARROT_INTERP, const void *search_key, const
-void *bucket_key)>
+=item C<static int hash_compare_string_enc(PARROT_INTERP, const void
+*search_key, const void *bucket_key)>
 
 Compare two strings. Returns 0 if they are identical. Considers differing
 charset or encoding to be distinct.
@@ -207,7 +290,7 @@ charset or encoding to be distinct.
 */
 
 PARROT_WARN_UNUSED_RESULT
-int
+static int
 hash_compare_string_enc(PARROT_INTERP, ARGIN(const void *search_key),
                                        ARGIN(const void *bucket_key))
 {
@@ -226,7 +309,8 @@ hash_compare_string_enc(PARROT_INTERP, ARGIN(const void *search_key),
 
 /*
 
-=item C<int hash_compare_pointer(PARROT_INTERP, const void *a, const void *b)>
+=item C<static int hash_compare_pointer(PARROT_INTERP, const void *a, const void
+*b)>
 
 Compares the two pointers, returning 0 if they are identical
 
@@ -237,7 +321,7 @@ Compares the two pointers, returning 0 if they are identical
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-int
+static int
 hash_compare_pointer(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     ASSERT_ARGS(hash_compare_pointer)
@@ -290,9 +374,8 @@ static size_t
 key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
     ASSERT_ARGS(key_hash_cstring)
-    const char    * p = (const char *) value;
-    register size_t h = seed;
-    size_t        len = strlen(p);
+    const unsigned char *p = (const unsigned char *) value;
+    size_t h = seed;
     while (*p) {
         h += h << 5;
         h += *p++;
@@ -326,7 +409,7 @@ hash_compare_cstring(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 
 /*
 
-=item C<size_t key_hash_PMC(PARROT_INTERP, PMC *value, size_t seed)>
+=item C<static size_t key_hash_PMC(PARROT_INTERP, PMC *value, size_t seed)>
 
 Returns a hashed value for an PMC key (passed as a void pointer, sadly).
 
@@ -337,7 +420,7 @@ Returns a hashed value for an PMC key (passed as a void pointer, sadly).
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-size_t
+static size_t
 key_hash_PMC(PARROT_INTERP, ARGIN(PMC *value), SHIM(size_t seed))
 {
     ASSERT_ARGS(key_hash_PMC)
@@ -346,7 +429,7 @@ key_hash_PMC(PARROT_INTERP, ARGIN(PMC *value), SHIM(size_t seed))
 
 /*
 
-=item C<int hash_compare_pmc(PARROT_INTERP, PMC *a, PMC *b)>
+=item C<static int hash_compare_pmc(PARROT_INTERP, PMC *a, PMC *b)>
 
 Compares two PMC for equality, returning 0 if the first is equal to second.
 Uses void pointers to store the PMC, sadly.
@@ -358,7 +441,7 @@ Uses void pointers to store the PMC, sadly.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-int
+static int
 hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
 {
     ASSERT_ARGS(hash_compare_pmc)
@@ -376,7 +459,8 @@ hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
 
 /*
 
-=item C<size_t key_hash_int(PARROT_INTERP, const void *value, size_t seed)>
+=item C<static size_t key_hash_int(PARROT_INTERP, const void *value, size_t
+seed)>
 
 Returns a hashed value for an integer key (passed as a void pointer, sadly).
 
@@ -387,7 +471,7 @@ Returns a hashed value for an integer key (passed as a void pointer, sadly).
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-size_t
+static size_t
 key_hash_int(SHIM_INTERP, ARGIN_NULLOK(const void *value), size_t seed)
 {
     ASSERT_ARGS(key_hash_int)
@@ -396,7 +480,8 @@ key_hash_int(SHIM_INTERP, ARGIN_NULLOK(const void *value), size_t seed)
 
 /*
 
-=item C<int hash_compare_int(PARROT_INTERP, const void *a, const void *b)>
+=item C<static int hash_compare_int(PARROT_INTERP, const void *a, const void
+*b)>
 
 Compares two integers for equality, returning -1, 0, and 1 if the first is less
 than, equal to, or greater than the second, respectively.  Uses void pointers
@@ -409,7 +494,7 @@ to store the integers, sadly.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-int
+static int
 hash_compare_int(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     ASSERT_ARGS(hash_compare_int)
