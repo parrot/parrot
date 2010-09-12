@@ -42,8 +42,8 @@ more information.
 
 
 /*
- * A Continuation (and RetContinuation, ExceptionHandler) has in its
- * context a pointer to the register frame, which contains active objects.
+ * A Continuation (and an ExceptionHandler) has in its context a pointer
+ * to the register frame, which contains active objects.
  * Additionally ct->current_cont has the continuation of the caller.
  */
 
