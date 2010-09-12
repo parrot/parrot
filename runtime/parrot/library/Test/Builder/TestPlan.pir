@@ -54,6 +54,15 @@ Both classes support the following methods.
     setattribute self, 'plan', plan
 .end
 
+.sub 'get_bool' :vtable :method
+    .local pmc plan
+    plan = getattribute self, 'plan'
+
+    $I0 = isa plan, [ 'Test'; 'Builder'; 'NullPlan' ]
+    $I0 = not $I0
+    .return ($I0)
+.end
+
 .sub 'set_tests' :method
     .param int tests
 

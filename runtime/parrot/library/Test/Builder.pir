@@ -494,6 +494,9 @@ plan.  This calls C<exit>; there's little point in continuing.
 =cut
 
 .sub 'skip_all' :method
+    .param string reason  :optional
+    .param int has_reason :opt_flag
+
     .local pmc testplan
     testplan = self.'testplan'()
 
@@ -505,9 +508,14 @@ plan.  This calls C<exit>; there's little point in continuing.
     throw plan_exception
 
   SKIP_ALL:
+    $S0 = "1..0 # SKIP"
+    unless has_reason goto NO_REASON
+    $S0 .= " "
+    $S0 .= reason
+  NO_REASON: 
     .local pmc output
     output = self.'output'()
-    output.'write'( "1..0" )
+    output.'write'( $S0 )
     exit 0
 .end
 
