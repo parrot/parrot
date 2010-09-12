@@ -216,21 +216,6 @@ Read the given number of bytes from the gziphandle and return them in a string.
 
 /*
 
-=item C<METHOD is_tty()>
-
-GzipHandles are never tty's, returns false.
-
-=cut
-
-*/
-    METHOD is_tty() {
-        Parrot_warn_deprecated(INTERP,
-            "'is_tty' is deprecated, use 'isatty' instead - TT #1689");
-        RETURN(INTVAL 0);
-    }
-
-/*
-
 =back
 
 =head2 Basic Methods

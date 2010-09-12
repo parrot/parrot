@@ -216,21 +216,6 @@ stored for mocking.
 
 /*
 
-=item C<METHOD is_tty()>
-
-StringHandles are never tty's, returns false.
-
-=cut
-
-*/
-    METHOD is_tty() {
-        Parrot_warn_deprecated(INTERP,
-            "'is_tty' is deprecated, use 'isatty' instead - TT #1689");
-        RETURN(INTVAL 0);
-    }
-
-/*
-
 =item C<METHOD close()>
 
 Reset some core data for the StringHandle, but don't delete the string data, as
