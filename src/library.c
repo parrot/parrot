@@ -784,46 +784,6 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 /*
 
-=item C<char* Parrot_get_runtime_prefix(PARROT_INTERP)>
-
-Return a malloced C-string for the runtime prefix.  The calling function
-must free it.
-
-This function is deprecated, use Parrot_get_runtime_path instead.
-See TT #1191
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char*
-Parrot_get_runtime_prefix(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_get_runtime_prefix)
-    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
-
-    Parrot_warn_deprecated(interp, "Parrot_get_runtime_prefix is deprecated TT #1191");
-    if (env)
-        return env;
-    else {
-        PMC    * const config_hash =
-            VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
-
-        if (VTABLE_elements(interp, config_hash)) {
-            STRING * const key = CONST_STRING(interp, "prefix");
-            STRING * const s   = VTABLE_get_string_keyed_str(interp, config_hash, key);
-            return Parrot_str_to_cstring(interp, s);
-        }
-        else
-            return mem_sys_strdup(".");
-    }
-}
-
-/*
-
 =item C<STRING * Parrot_get_runtime_path(PARROT_INTERP)>
 
 Return a string for the runtime prefix.

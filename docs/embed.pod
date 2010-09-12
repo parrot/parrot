@@ -775,8 +775,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_runtime_path>
 
-=item C<Parrot_get_runtime_prefix>
-
 =item C<Parrot_get_strreg>
 
 =item C<Parrot_get_vtable>
