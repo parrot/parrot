@@ -320,6 +320,15 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     .const 'Sub' _clean_wininst = '_clean_wininst'
     register_step_after('clean', _clean_wininst)
   L1:
+  
+    $I0 = $P0['has_zlib']
+    if $I0 goto L2
+    .const 'Sub' _no_zlib = '_no_zlib'
+    register_step('smoke', _no_zlib)
+    register_step('sdist_gztar', _no_zlib)
+    register_step('sdist_zip', _no_zlib)
+    register_step('bdist_rpm', _no_zlib)
+  L2:
 .end
 
 =head2 Functions
@@ -4105,6 +4114,12 @@ TEMPLATE
     unlink('inno.iss', 1 :named('verbose'))
     $S0 = get_setupname('.exe', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
+.end
+
+
+.sub '_no_zlib' :anon
+    .param pmc kv :slurpy :named
+    say "This step needs a parrot built with zlib"
 .end
 
 =head2 Configuration Helpers
