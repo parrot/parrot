@@ -320,7 +320,7 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     .const 'Sub' _clean_wininst = '_clean_wininst'
     register_step_after('clean', _clean_wininst)
   L1:
-  
+
     $I0 = $P0['has_zlib']
     if $I0 goto L2
     .const 'Sub' _no_zlib = '_no_zlib'

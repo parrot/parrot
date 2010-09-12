@@ -512,7 +512,7 @@ plan.  This calls C<exit>; there's little point in continuing.
     unless has_reason goto NO_REASON
     $S0 .= " "
     $S0 .= reason
-  NO_REASON: 
+  NO_REASON:
     .local pmc output
     output = self.'output'()
     output.'write'( $S0 )
