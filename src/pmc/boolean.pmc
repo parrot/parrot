@@ -8,124 +8,195 @@ src/pmc/boolean.pmc - Boolean PMC
 
 =head1 DESCRIPTION
 
-This class implements a boolean value variable.
+This PMC implements a Boolean type with a single true/false value.
+A C<Boolean> does not morph to other types when its value is set; it simply
+changes its value.
 
-Albeit the C<Boolean PMC> is derived from the C<Integer PMC>,
-it doesn't morph to other types. Only its value is changed.
+This implementation of C<Boolean> inherits from the C<Scalar> PMC.
+Unlike the previous implementation, it does I<not> inherit
+from C<Integer>.
 
-=head2 Methods
+=head2 Functions
 
-=over 4
+=over
 
 =cut
 
 */
 
-/* HEADERIZER HFILE: none */
+/* This new Boolean PMC stores its boolean value in a private PObj flag. */
 
-pmclass Boolean extends Integer provides boolean provides scalar auto_attrs {
+#define boolean_FLAG PObj_private0_FLAG
+
+#define get_boolean_FLAG(pmc) \
+    ((PObj_get_FLAGS(pmc) & boolean_FLAG) != 0)
+
+#define set_boolean_FLAG(pmc, val) \
+     if (val) \
+         PObj_get_FLAGS(pmc) |= boolean_FLAG; \
+     else \
+         PObj_get_FLAGS(pmc) &= ~boolean_FLAG;
+
+#define flip_boolean_FLAG(pmc) \
+     PObj_get_FLAGS(pmc) ^= boolean_FLAG
+
+
+pmclass Boolean extends scalar provides boolean provides scalar manual_attrs {
 
 /*
+
+=item C<void init()>
+
+Create a new C<Boolean> with initial value C<FALSE>.
 
 =item C<void init_pmc(PMC *value)>
 
-Initialises SELF value according to the boolean value of the passed PMC.
+Create a new C<Boolean> with the given initial value interpreted
+as a Boolean.
 
 =cut
 
 */
-    VTABLE void init_pmc(PMC *value) {
-        INTVAL v = PMC_IS_NULL(value) ? (INTVAL) 0 : VTABLE_get_bool(INTERP, value);
-        SELF.set_bool(v);
+
+    /* These two init functions set the boolean flag directly. */
+
+    VTABLE void init() {
+        set_boolean_FLAG(SELF, 0);
     }
+
+    VTABLE void init_pmc(PMC *value) {
+        INTVAL v = PMC_IS_NULL(value) ? 0 : VTABLE_get_bool(INTERP, value);
+        set_boolean_FLAG(SELF, v);
+    }
+
 /*
+
+=item C<INTVAL get_bool()>
+
+Obtain the value of the C<Boolean> as an integer: 1 = C<TRUE>, 0 = C<FALSE>.
+
+=item C<INTVAL get_integer()>
+
+Same as C<get_bool()>.
+
+=item C<FLOATVAL get_number()>
+
+Obtain the value of the C<Boolean> as a float: 1.0 = C<TRUE>, 0.0 = C<FALSE>.
 
 =item C<STRING *get_string()>
 
-Return "1" or "0".
+Obtain the value of the C<Boolean> as a string: "1" = C<TRUE>, "0" = C<FALSE>.
 
 =cut
 
 */
-    VTABLE STRING *get_string() {
-        return SUPER();
+
+    VTABLE INTVAL get_bool() {
+        return get_boolean_FLAG(SELF);
     }
 
+    VTABLE INTVAL get_integer() {
+        return SELF.get_bool();
+    }
+
+    VTABLE FLOATVAL get_number() {
+        INTVAL value = SELF.get_bool();
+        return (FLOATVAL)value;
+    }
+
+    VTABLE STRING *get_string() {
+        return Parrot_str_from_int(INTERP, SELF.get_integer());
+    }
 
 /*
-
-=item C<void set_integer_native(INTVAL value)>
 
 =item C<void set_bool(INTVAL value)>
 
-=item C<void set_pmc(PMC *value)>
+Sets the value of the Boolean to the specified integer value: 0 = C<FALSE>, non-0 =
+C<TRUE>.
 
-=cut
+=item C<void set_integer_native(INTVAL value)>
 
-*/
-    VTABLE void set_integer_native(INTVAL value) {
-        SUPER((value != 0));
-    }
-
-
-    VTABLE void set_bool(INTVAL value) {
-        SELF.set_integer_native(value);
-    }
-
-/*
+Same as C<set_bool()>.
 
 =item C<void set_number_native(FLOATVAL value)>
 
-Sets the value to C<value> evaluated in a boolean context.
+Sets the value of the Boolean to the specified float value: 0.0 = C<FALSE>, non-0.0 =
+C<TRUE>.
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the Boolean to the value represented by the specified string. All values are
+considered C<TRUE> except for C<""> and C<"0>", which are considered
+C<FALSE>.
 
 =cut
 
 */
+
+    VTABLE void set_bool(INTVAL value) {
+        set_boolean_FLAG(SELF, value);
+    }
+
+    VTABLE void set_integer_native(INTVAL value) {
+        SELF.set_bool(value);
+    }
 
     VTABLE void set_number_native(FLOATVAL value) {
         SELF.set_bool(!FLOAT_IS_ZERO(value));
     }
 
-/*
-
-=item C<void set_string_native(STRING *value)>
-
-Sets the value to C<*value> evaluated in a boolean context.
-
-=cut
-
-*/
-
     VTABLE void set_string_native(STRING *value) {
         SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 
-/*
-
-=item C<PMC *neg(PMC *dest)>
-
-=item C<void i_neg()>
-
-Set C<dest> to the ''negated'' value of C<SELF>. The negative of a
-boolean value is the identical value.
-
-=cut
-
-*/
-
-    VTABLE PMC *neg(PMC *dest) {
+/**    VTABLE PMC *neg(PMC *dest) {
         dest = Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
                                        SELF.get_bool());
         return dest;
     }
 
     VTABLE void i_neg() {
+        /* Nothing to do for an in-place negate.
+    }**/
+
+    /* No POD documentation, since the reader should see Scalar. */
+
+    VTABLE void i_logical_not() {
+        flip_boolean_FLAG(SELF);
     }
+
+/*
+
+=item C<void freeze(PMC *info)>
+
+Used to archive the C<Boolean>.
+
+=item C<void thaw(PMC *info)>
+
+Used to unarchive the C<Boolean>.
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *info) {
+        SUPER(info);
+        VTABLE_push_integer(INTERP, info, SELF.get_bool());
+    }
+
+    VTABLE void thaw(PMC *info) {
+        SUPER(info);
+        SELF.set_bool(VTABLE_shift_integer(INTERP, info));
+    }
+
 }
 
 /*
 
 =back
+
+See also the C<Scalar> PMC.
 
 =cut
 
