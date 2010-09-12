@@ -22,7 +22,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(37)
+    plan(38)
 
     test_init()
     test_set_string()
@@ -134,6 +134,10 @@ end:
     .local int big
 
     bb = new ['ByteBuffer']
+    s = bb.'get_string'('ascii')
+    n = length s
+    is(s, 0, "getting from unitialized buffer gives empty string")
+
     bb = binary:"abcd"
     s = bb.'get_string'('ascii')
     n = length s

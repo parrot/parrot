@@ -21,16 +21,14 @@ individual bytes and conversions from and to parrot strings.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * build_string(PARROT_INTERP,
-    ARGIN(const unsigned char *content),
+    ARGIN_NULLOK(const unsigned char *content),
     INTVAL size,
     ARGIN_NULLOK(const STR_VTABLE *encoding))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 static INTVAL grow_to(INTVAL position);
 #define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(content))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_grow_to __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -388,7 +386,7 @@ grow_to(INTVAL position)
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-build_string(PARROT_INTERP, ARGIN(const unsigned char *content),
+build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
         INTVAL size,
         ARGIN_NULLOK(const STR_VTABLE *encoding))
 {
