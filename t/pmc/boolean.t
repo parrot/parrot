@@ -116,9 +116,9 @@ type combinations.
     set $I0, $P1
     is($I0, 1, "cloned Boolean is not a reference")
 
-    set $P1, 1
+    set $P1, 0
     set $I0, $P1
-    is($I0, 1, "cloned Boolean can change value")
+    is($I0, 0, "cloned Boolean can change value")
 .end
 
 .sub boolean_as_conditional

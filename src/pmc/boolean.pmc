@@ -150,16 +150,6 @@ C<FALSE>.
         SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 
-/**    VTABLE PMC *neg(PMC *dest) {
-        dest = Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                                       SELF.get_bool());
-        return dest;
-    }
-
-    VTABLE void i_neg() {
-        /* Nothing to do for an in-place negate.
-    }**/
-
     /* No POD documentation, since the reader should see Scalar. */
 
     VTABLE void i_logical_not() {
