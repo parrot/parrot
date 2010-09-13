@@ -24,6 +24,10 @@ from C<Integer>.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /* This new Boolean PMC stores its boolean value in a private PObj flag. */
 
 #define boolean_FLAG PObj_private0_FLAG
