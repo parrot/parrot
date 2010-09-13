@@ -55,7 +55,7 @@ sub runstep {
     if ( !$@ ) {
         my $test = $conf->cc_run();
         if ( my $has_pcre = $self->_evaluate_cc_run($conf, $test) ) {
-	    $conf->data->set( HAS_PCRE => $has_pcre);
+        $conf->data->set( HAS_PCRE => $has_pcre);
         }
     }
 
