@@ -261,8 +261,8 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
          || base_type == enum_class_String)
             type = Parrot_pmc_get_type(interp, key);
         else
-            type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key)); 
-            
+            type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key));
+
         classobj = get_pmc_proxy(interp, type);
     }
 
