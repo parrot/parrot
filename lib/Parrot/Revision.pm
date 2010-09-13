@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Revision - SVN Revision
+Parrot::Revision - Git "Revision" a.k.a SHA1
 
 =head1 SYNOPSIS
 
@@ -81,24 +81,11 @@ sub _get_revision {
 
 sub _analyze_sandbox {
     my $revision = 0;
-    # code taken from pugs/util/version_h.pl rev 14410
-    # modified because in xml output commit and entry revision
-    # are difficult to distinguish in a simplified parsing
     my $nul = File::Spec->devnull;
-    # Avoid locale troubles with svn messages
+    # Avoid locale troubles
     local $ENV{LANG}   = 'C';
     local $ENV{LC_ALL} = 'C';
-    if ( my @svn_info = qx/svn info 2>$nul/ and $? == 0 ) {
-        if ( my ($line) = grep /^Revision:/, @svn_info ) {
-            ($revision) = $line =~ /(\d+)/;
-        }
-    }
-    if( !$revision && (-d '.git') ) {
-        my $git_log = qx/git log -100 2>$nul/;
-        if(defined($git_log) && $git_log =~ /git-svn-id: \S+\@(\d+)\s/) {
-            $revision = $1;
-        }
-    }
+    chomp(my $revision = qx/git rev-parse HEAD/);
     return $revision;
 }
 
