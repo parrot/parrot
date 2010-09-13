@@ -133,7 +133,7 @@ Returns created string.
 */
 
     VTABLE STRING *get_string() {
-        STRING *buffer, *result;
+        STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* We need to build a new string because outside of StringBuilder
          * strings are immutable. */
