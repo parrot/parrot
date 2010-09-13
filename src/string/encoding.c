@@ -290,7 +290,7 @@ Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding)
 =item C<void Parrot_str_internal_register_encoding_names(PARROT_INTERP)>
 
 Helper function for initializing characterset encoding names. We can't create
-the STRING names until the default encodings and charsets are already initted,
+the STRING names until the default encodings are already initted,
 so the name generation is split into a second init stage.
 
 =cut
@@ -351,8 +351,7 @@ Parrot_register_encoding(PARROT_INTERP, ARGIN(STR_VTABLE *encoding))
 
 =item C<void Parrot_encodings_init(PARROT_INTERP)>
 
-Creates the initial charsets and encodings, and registers the initial
-charset converters.
+Creates the initial encodings.
 
 =cut
 

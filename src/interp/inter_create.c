@@ -446,7 +446,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         interp->evc_func_table_size = 0;
     }
 
-    /* strings, charsets, encodings - only once */
+    /* strings, encodings - only once */
     Parrot_str_finish(interp);
 
     PARROT_CORE_OPLIB_INIT(interp, 0);

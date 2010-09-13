@@ -303,10 +303,9 @@ Return a new Iterator for this PMC.
 
 =over 4
 
-=item C<get_string(string charset, string encoding)>
+=item C<get_string(string encoding)>
 
-Create a string with the buffer content and the charset and encoding
-specified.
+Create a string with the buffer content and the encoding specified.
 
 =cut
 
@@ -328,7 +327,7 @@ specified.
 
 =item C<get_string_as(string as)>
 
-Create a string with the buffer content and the same charset and encoding
+Create a string with the buffer content and the same encoding
 as the string argument.
 
 =cut
@@ -365,7 +364,7 @@ decrease the number of reallocations.
 =item C<static STRING * build_string(PARROT_INTERP, const unsigned char
 *content, INTVAL size, const STR_VTABLE *encoding)>
 
-Build a string fro the buffer content with the charset and encoding specified.
+Build a string from the buffer content with the encoding specified.
 
 =cut
 

@@ -349,7 +349,7 @@ Parrot_io_recv_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(STRING **s))
 AGAIN:
     if ((error = recv(io->os_handle, buf, 2048, 0)) >= 0) {
         bytesread += error;
-        /* The charset should probably be 'binary', but right now httpd.pir
+        /* The encoding should probably be 'binary', but right now httpd.pir
          * only works with 'ascii'
          */
         *s = Parrot_str_new_init(interp, buf, bytesread,

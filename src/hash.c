@@ -285,7 +285,7 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
 *search_key, const void *bucket_key)>
 
 Compare two strings. Returns 0 if they are identical. Considers differing
-charset or encoding to be distinct.
+encodings to be distinct.
 
 */
 

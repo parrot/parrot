@@ -529,8 +529,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 =item C<static STRING * clone_string_into(Interp *d, Interp *s, PMC *value)>
 
 Extracts a STRING value from PMC C<value> in interpreter C<s>. Copies that
-string into the pool of interpreter C<d> using the default encoding
-and charset.
+string into the pool of interpreter C<d> using the default encoding.
 
 =cut
 
