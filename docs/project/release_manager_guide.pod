@@ -408,7 +408,7 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
  - Sep 21, 2010 - 2.8   - gerd
  - Oct 19, 2010 - 2.9*  - gerd
- - Nov 16, 2010 - 2.10  - ??
+ - Nov 16, 2010 - 2.10  - tcurtis
  - Dec 21, 2010 - 2.11  - whiteknight
  - Jan 18, 2011 - 3.0*  - ??
  - Feb 15, 2011 - 3.1   - ??
