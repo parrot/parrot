@@ -996,7 +996,7 @@ Parrot_str_substr(PARROT_INTERP,
         true_length = (UINTVAL)(src_length - true_offset);
 
     if (true_length == src_length && !offset)
-        return src;
+        return (STRING *)src;
     else
         return STRING_substr(interp, src, true_offset, true_length);
 }

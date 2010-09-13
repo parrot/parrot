@@ -1465,7 +1465,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 
     if (hash->key_type == Hash_key_type_STRING) {
         const STRING * const s = (STRING *)key;
-        hashval                = key_hash_STRING(interp, s, hash->seed);
+        hashval                = key_hash_STRING(interp, (STRING *)s, hash->seed);
         bucket                 = hash->index[hashval & hash->mask];
 
         while (bucket) {
