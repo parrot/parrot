@@ -22,7 +22,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(38)
+    plan(37)
 
     test_init()
     test_set_string()
@@ -353,17 +353,6 @@ donearray:
     .local string s
     bb = new ['ByteBuffer']
     bb = 'something'
-    push_eh catch_charset
-    s = bb.'get_string'('***INVALID cHARsET%%%%')
-    pop_eh
-    ok(0, "get_string with invalid charset should throw")
-    goto check_encoding
-catch_charset:
-    .get_results(ex)
-    finalize ex
-    pop_eh
-    ok(1, "get_string with invalid charset throws")
-check_encoding:
     push_eh catch_encoding
     s = bb.'get_string'('ascii', '???INVALID eNCODING===')
     pop_eh

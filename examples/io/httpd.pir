@@ -142,11 +142,11 @@ NEXT:
     req = ""
 MORE:
     buf = work.'recv'()
-    # charset I0, buf
-    # charsetname S1, I0
+    # encoding I0, buf
+    # encodingname S1, I0
     # print "\nret: "
     # print ret
-    # print "\ncharset of buf: "
+    # print "\nencoding of buf: "
     # print S1
     # print "\nbuf:"
     # print buf

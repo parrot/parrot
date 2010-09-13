@@ -645,20 +645,16 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, re
     $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
     $S0 .= $S1
     pio.'close'()
-    $I1 = charset $S0
-    $S2 = charsetname $I1
-    say $S2
 
     $I1 = encoding $S0
     $S2 = encodingname $I1
     say $S2
 
-    $I1 = find_charset 'iso-8859-1'
-    trans_charset $S1, $S0, $I1
+    $I1 = find_encoding 'iso-8859-1'
+    trans_encoding $S1, $S0, $I1
     print $S1
 .end
 CODE
-utf8
 utf8
 T\xf6tsch
 OUTPUT

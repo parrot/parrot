@@ -539,29 +539,19 @@ print line
 
     \$P1.'close'()
 
-    \$I1 = charset line
-    \$S2 = charsetname \$I1
+    \$I1 = encoding line
+    \$S2 = encodingname \$I1
     if \$S2 == 'utf8' goto ok_3
     print \$S2
     print 'not '
   ok_3:
-    say 'ok 3 # unicode charset'
-
-
-    \$I1 = encoding line
-    \$S2 = encodingname \$I1
-    if \$S2 == 'utf8' goto ok_4
-    print \$S2
-    print 'not '
-  ok_4:
-    say 'ok 4 # utf8 encoding'
+    say 'ok 3 # utf8 encoding'
 
 .end
 CODE
 ok 1 - $S1 = $P1.readline() # read with utf8 encoding on
 ok 2 - $S2 = $P1.readline() # read iso-8859-1 string
-ok 3 # unicode charset
-ok 4 # utf8 encoding
+ok 3 # utf8 encoding
 OUT
 
 
