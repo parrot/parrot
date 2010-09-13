@@ -34,6 +34,7 @@ for "little endian".
 
 #include "parrot/parrot.h"
 #include "byteorder.h"
+#include "pf_items.str"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -1329,7 +1330,6 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
                   (flag_charset_word & 0x2 ? PObj_private7_FLAG : 0) ;
     encoding_nr = (flag_charset_word >> 8) & 0xFF;
 
-
     size = (size_t)PF_fetch_opcode(pf, cursor);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
@@ -1341,8 +1341,11 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                     "Invalid encoding number '%d' specified", encoding_nr);
 
-    s = Parrot_str_new_init(interp, (const char *)*cursor, size,
-            encoding, flags);
+    if (size)
+        s = Parrot_str_new_init(interp, (const char *)*cursor, size,
+                encoding, flags);
+    else
+        s = CONST_STRING(interp, "");
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",

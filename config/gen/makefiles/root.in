@@ -690,6 +690,7 @@ STR_FILES = \
     src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/packfile.str \
+    src/packfile/pf_items.str \
     src/pmc.str \
     src/pmc_freeze.str \
     src/oo.str \
@@ -1450,7 +1451,8 @@ src/packfile$(O) : src/packfile.str \
 	$(INC_DIR)/embed.h $(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h \
 	$(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h
 
-src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
+src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.str \
+	src/packfile/pf_items.c
 
 src/packout$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packout.c
 
