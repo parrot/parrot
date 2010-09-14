@@ -113,7 +113,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "empty literal encoding persistence - TT #179
     say $S0
 .end
 CODE
-(0): fixed_8
+(0): ascii
 (0): utf8
 (0): utf8
 (0): utf16
