@@ -85,7 +85,7 @@ sub _analyze_sandbox {
     # Avoid locale troubles
     local $ENV{LANG}   = 'C';
     local $ENV{LC_ALL} = 'C';
-    chomp(my $revision = qx/git rev-parse HEAD/);
+    chomp($revision = qx/git rev-parse HEAD/);
     return $revision;
 }
 
