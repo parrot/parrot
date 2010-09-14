@@ -140,11 +140,11 @@ Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
-=item Duplicated VTABLE functions [eligible in 2.10]
+=item Behavior of Parrot::Pmc2c::PMC::add_method() [eligible in 2.10]
 
-In F<src/pmc/oplib.pmc>, C<INTVAL get_integer()> is declared twice.
-
-In F<src/pmc/resizablestringarray.pmc>, C<PMC *shift_pmc()> is declared twice.
+Duplicated vtable functions currently generate only a warning; after deadline,
+they will cause a C<die> and failure to build Parrot or any HLL
+using this method.
 
 L<http://trac.parrot.org/parrot/ticket/1785>
 

@@ -116,10 +116,6 @@ pmclass OpLib auto_attrs {
         return STATICSELF.elements();
     }
 
-    VTABLE INTVAL get_integer() {
-        return STATICSELF.elements();
-    }
-
     METHOD op_family(STRING *shortname)
     {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
