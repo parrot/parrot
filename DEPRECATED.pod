@@ -161,6 +161,14 @@ L<https://trac.parrot.org/parrot/ticket/1778>
 These opcodes will be removed. The corresponding encoding opcodes should be
 used instead.
 
+=item fixed_8 encoding [eligible in 2.10]
+
+L<https://trac.parrot.org/parrot/ticket/1778>
+
+The 'fixed_8' encoding is going away. Use 'ascii' instead. If you want to test
+for a fixed_8 encoding, you have to compare the encoding to 'ascii',
+'iso-8859-1' and 'binary' separately.
+
 =item open and close opcodes will be removed [eligible in 2.7]
 
 L<https://trac.parrot.org/parrot/ticket/1697>
