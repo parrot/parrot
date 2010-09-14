@@ -89,6 +89,9 @@ LIB_WIN32:
     loadlib libpcre, 'pcre3'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
+    loadlib libpcre, 'libpcre-0' # pcre 8.10 and maybe others
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
     branch LIB_FAILED
 
 LIB_CYGWIN:
