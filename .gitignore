@@ -597,6 +597,7 @@ t/tools/pmc2c.*.c
 t/tools/pmc2c.*.dump
 t/tools/pmc2c.*.h
 t/tools/pmc2c.*.pmc
+tools/dev/mk_language_shell.pl
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
