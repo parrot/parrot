@@ -41,9 +41,9 @@ use File::Basename;
 =head2 new
 
     $mani = Parrot::Manifest->new({
-        script => $0,
-        file => $filename,
-        skip => $skipfilename,
+        script    => $0,
+        file      => $filename,
+        skip      => $skipfilename,
         gitignore => $gitignoresfilename,
     })
 
@@ -76,22 +76,13 @@ sub new {
         gitignore  => $argsref->{gitignore} ? $argsref->{gitignore} : q{.gitignore},
     );
 
-    my $status_output_ref = [qx($data{cmd} status -u --porcelain)];
+    my $lsfiles = qx($data{cmd} ls-files );
 
     # grab the versioned resources:
     my @versioned_files;
     my @dirs;
-    my @versioned_output = grep !/^[?D]/, @{$status_output_ref};
-    for my $line (@versioned_output) {
-        my @line_info = split( /\s+/, $line );
-
-        # the file is the last item in the @line_info array
-        my $filename = $line_info[-1];
-        $filename =~ s/\\/\//g;
-
-        # ignore .svn, blib directories;
-        # ignore ports/ directories, as that information does not need to be
-        # in tarball releases
+    my @versioned_output = split /\n/, $lsfiles;
+    for my $filename (@versioned_output) {
         next if $filename =~ m[/\.git|^blib|^ports];
         if ( -d $filename ) {
             push @dirs, $filename;
@@ -435,7 +426,6 @@ sub _get_ignores {
     my $self      = shift;
 
     my $gitignore = `cat .gitignore| grep -v '^#'`;
-    use Data::Dumper;
 
     my %ignores;
     my @ignore = sort grep { $_ } split( /\n/, $gitignore );
@@ -446,7 +436,7 @@ sub _get_ignores {
          $ignore =~ s/\./\\./g;
          $ignore =~ s/\*/.\*/g;
          # printf "%s:%s:%s\n", $ignore, $dirname, $basename;
-         $ignores{$ignore} = 1;
+         $ignores{$ignore} = "";
     }
 
     return \%ignores;
