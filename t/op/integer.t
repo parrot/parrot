@@ -750,15 +750,29 @@ Tests the use of Parrot integer registers.
 # minimum integer + 1. This should be true because we are assuming a
 # two's-complement machine.
 
-.loadlib 'sys_ops'
-.include 'sysinfo.pasm'
-
+.include 'iglobals.pasm'
 .sub test_negate_max_integer
-    .local int max
-    .local int min
-    max = sysinfo .SYSINFO_PARROT_INTMAX
+    .local int max, min
+
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['intvalsize']
+
+    # XXX can't use sysinfo (from sys_ops) in coretest
+    # build up 2's compliment min and max integers manually
+    max = 0x7F
+    min = 0x80
+    dec $I0
+  loop:
+    unless $I0 goto end_loop
+    min <<= 8
+    max <<= 8
+    max  |= 0xFF
+    dec $I0
+    goto loop
+  end_loop:
+
     neg max
-    min = sysinfo .SYSINFO_PARROT_INTMIN
     inc min
     is(max, min)
 .end

@@ -506,16 +506,36 @@ OK2:
     ok($I1, 'negation')
 .end
 
-.loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.sub 'get_int_minmax'
+    .local int min, max
+
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['intvalsize']
+
+    # XXX can't use sysinfo (from sys_ops) in coretest
+    # build up 2's compliment min and max integers manually
+    max = 0x7F
+    min = 0x80
+    dec $I0
+  loop:
+    unless $I0 goto end_loop
+    min <<= 8
+    max <<= 8
+    max  |= 0xFF
+    dec $I0
+    goto loop
+  end_loop:
+
+    .return (min, max)
+.end
 
 .sub negate_min_integer
     .local int max
     .local int min
     .local pmc max_1
     .local pmc neg_min
-    max = sysinfo .SYSINFO_PARROT_INTMAX
-    min = sysinfo .SYSINFO_PARROT_INTMIN
+    (min, max) = 'get_int_minmax'()
     max_1 = box max
     inc max_1
     neg_min = box min
@@ -547,8 +567,7 @@ OK2:
     .local pmc max_1
     .local pmc neg_min
     .local pmc result
-    max = sysinfo .SYSINFO_PARROT_INTMAX
-    min = sysinfo .SYSINFO_PARROT_INTMIN
+    (min, max) = 'get_int_minmax'()
     max_1 = box max
     inc max_1
     neg_min = box min
