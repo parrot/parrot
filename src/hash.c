@@ -28,12 +28,25 @@ C<< hash->buckets >> bucket store points to this region.
 
 /* the number of entries above which it's faster to hash the hashval instead of
  * looping over the used HashBuckets directly */
-#define INITIAL_SIZE  8
+
+/* hash first allocation size */
+#define INITIAL_SIZE  2
+
+/* below this hash size we use fixed_size_allocator
+ * else we use system allocator */
+#define SPLIT_POINT  16
 
 /* HEADERIZER HFILE: include/parrot/hash.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void allocate_buckets(PARROT_INTERP,
+    ARGMOD(Hash *hash),
+    ARGIN_NULLOK(const UINTVAL size))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hash);
 
 static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(1)
@@ -172,6 +185,9 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_allocate_buckets __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_expand_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -613,6 +629,9 @@ parrot_mark_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     int mark_key   = 0;
     int mark_value = 0;
 
+    if (!hash->buckets)
+        return;
+
     if (hash->entry_type == (PARROT_DATA_TYPE) enum_hash_string
     ||  hash->entry_type == (PARROT_DATA_TYPE) enum_hash_pmc)
         mark_value = 1;
@@ -740,7 +759,6 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
 Hash *
 Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
 {
@@ -885,6 +903,51 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
         });
 }
 
+/*
+
+=item C<static void allocate_buckets(PARROT_INTERP, Hash *hash, const UINTVAL
+size)>
+
+Allocate sized buckets and index storage for a hash
+
+=cut
+
+*/
+
+static void
+allocate_buckets(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(const UINTVAL size))
+{
+    ASSERT_ARGS(allocate_buckets)
+
+    UINTVAL new_size = INITIAL_SIZE;
+    HashBucket *new_buckets, *bucket;
+    size_t i;
+
+    while (size > new_size)
+        new_size <<= 1;
+
+    if (new_size > SPLIT_POINT)
+        new_buckets  = (HashBucket *) Parrot_gc_allocate_memory_chunk(
+                        interp, HASH_ALLOC_SIZE(new_size));
+    else
+        new_buckets  = (HashBucket *) Parrot_gc_allocate_fixed_size_storage(
+                        interp, HASH_ALLOC_SIZE(new_size));
+
+    memset(new_buckets, 0, HASH_ALLOC_SIZE(new_size));
+
+    hash->mask      = new_size - 1;
+    hash->buckets   = new_buckets;
+    hash->index     = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
+
+    /* add new buckets to free_list
+     * lowest bucket is top on free list and will be used first */
+
+    bucket = hash->buckets + N_BUCKETS(new_size) - 1;
+    for (i = 0; i < N_BUCKETS(new_size); ++i, --bucket) {
+        bucket->next    = hash->free_list;
+        hash->free_list = bucket;
+    }
+}
 
 /*
 
@@ -924,8 +987,6 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     HashBucket  **new_index,  **index;
     HashBucket   *new_buckets, *bucket;
 
-    HashBucket * const initial_offset = (HashBucket *)((char *)hash + sizeof (Hash));
-
     void *        new_mem;
     void * const  old_mem    = hash->buckets;
     const UINTVAL old_size   = hash->mask + 1;
@@ -945,42 +1006,37 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     */
 
     /* resize mem */
-    if (initial_offset != old_mem) {
-        /* This buffer has been reallocated at least once before. */
-        new_mem   = Parrot_gc_reallocate_memory_chunk_with_interior_pointers(
-                interp, old_mem,
-                HASH_ALLOC_SIZE(new_size),
-                HASH_ALLOC_SIZE(old_size));
+    if (new_size > SPLIT_POINT)
+        new_mem  = Parrot_gc_allocate_memory_chunk(
+                        interp, HASH_ALLOC_SIZE(new_size));
+    else
+        new_mem  = Parrot_gc_allocate_fixed_size_storage(
+                        interp, HASH_ALLOC_SIZE(new_size));
 
-        new_buckets = (HashBucket *)  new_mem;
-        new_index   = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
+    offset = (char *)new_mem - (char *)old_mem;
 
-        offset = (char *)new_mem - (char *)old_mem;
+    new_buckets = (HashBucket *)  new_mem;
+    new_index   = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
 
-        /* old index is here */
-        index  = (HashBucket **)(new_buckets + N_BUCKETS(old_size));
-        /* reallocate index */
-        mem_sys_memcopy(new_index, index, sizeof (HashBucket *) * old_size);
+    /* copy buckets and index */
+    mem_sys_memcopy(new_buckets, hash->buckets,
+            N_BUCKETS(old_size) * sizeof (HashBucket));
+    mem_sys_memcopy(new_index, hash->index, old_size * sizeof (HashBucket **));
 
-        /* clear second half of the buckets, freed by old the index */
-        memset(new_buckets + N_BUCKETS(old_size), 0,
-                sizeof (HashBucket *) * old_size);
-    }
-    else {
-        /* Allocate a new buffer. */
-        new_mem = Parrot_gc_allocate_memory_chunk_with_interior_pointers(
-                interp, HASH_ALLOC_SIZE(new_size));
+    /* free */
+    if (old_size > SPLIT_POINT)
+        Parrot_gc_free_memory_chunk(interp, old_mem);
+    else
+        Parrot_gc_free_fixed_size_storage(interp, HASH_ALLOC_SIZE(old_size), old_mem);
 
-        new_buckets = (HashBucket *)  new_mem;
-        new_index   = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
 
-        offset = (char *)new_buckets - (char *)hash->buckets;
+    /* clear second half of the buckets, freed by old the index */
+    memset(new_buckets + N_BUCKETS(old_size), 0,
+            sizeof (HashBucket *) * old_size);
 
-        mem_sys_memcopy(new_buckets, hash->buckets ,
-                N_BUCKETS(old_size) * sizeof (HashBucket));
-        mem_sys_memcopy(new_index,   hash->index,
-                sizeof (HashBucket *) * old_size);
-    }
+    /* clear second half of the index */
+    memset(new_index + (old_size), 0, sizeof (HashBucket **) * old_size);
+
 
 
     /*
@@ -1032,16 +1088,13 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
     /* add new buckets to free_list
      * lowest bucket is top on free list and will be used first */
-
     bucket = new_buckets + N_BUCKETS(old_size);
-
-    for (; bucket < new_buckets + N_BUCKETS(new_size) - 1; ++bucket) {
+    for (i = N_BUCKETS(old_size)-1 ; i > 0; --i, ++bucket) {
         bucket->next = bucket + 1;
-        bucket->key  = bucket->value = NULL;
     }
 
-    hash->free_list = new_buckets + N_BUCKETS(old_size);
     bucket->next = NULL;
+    hash->free_list = new_buckets + N_BUCKETS(old_size);
 }
 
 
@@ -1150,32 +1203,22 @@ Memory from this function must be freed.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
 Hash *
 parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type)
 {
     ASSERT_ARGS(parrot_create_hash)
-    return parrot_create_hash_sized(interp, val_type, hkey_type, INITIAL_SIZE);
-}
+    Hash * const hash = (Hash*) Parrot_gc_allocate_fixed_size_storage(interp, sizeof (Hash));
 
+    hash->entry_type = val_type;
+    hash->key_type   = hkey_type;
+    hash->seed       = interp->hash_seed;
+    hash->mask       = 0;
+    hash->entries    = 0;
+    hash->index      = NULL;
+    hash->buckets    = NULL;
+    hash->free_list  = NULL;
 
-/*
-
-=item C<static UINTVAL round_up_pow2(UINTVAL x)>
-
-Round a value up to the nearest power of 2.
-
-=cut
-
-*/
-
-PARROT_INLINE
-static UINTVAL
-round_up_pow2(UINTVAL x) {
-    UINTVAL y = 1;
-    while (y < x)
-        y <<= 1;
-    return y;
+    return hash;
 }
 
 
@@ -1194,43 +1237,14 @@ Preallocates at least C<size> buckets.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
 Hash *
 parrot_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
         UINTVAL size)
 {
     ASSERT_ARGS(parrot_create_hash_sized)
-    UINTVAL      initial_buckets = size > INITIAL_SIZE ? round_up_pow2(size) : INITIAL_SIZE;
-    HashBucket  *bp;
-    void        *alloc = Parrot_gc_allocate_memory_chunk_with_interior_pointers(
-                            interp, sizeof (Hash) + HASH_ALLOC_SIZE(initial_buckets));
-    Hash * const hash  = (Hash*)alloc;
-    size_t       i;
 
-    PARROT_ASSERT(initial_buckets % 4 == 0);
-
-    hash->entry_type = val_type;
-    hash->key_type   = hkey_type;
-    hash->seed       = interp->hash_seed;
-    hash->mask       = initial_buckets - 1;
-    hash->entries    = 0;
-
-    bp = (HashBucket *)((char *)alloc + sizeof (Hash));
-    hash->free_list = NULL;
-
-    /* fill free_list from hi addresses so that we can use
-     * buckets[i] directly in an OrderedHash, *if* nothing
-     * was deleted */
-
-    hash->buckets = bp;
-    bp += N_BUCKETS(initial_buckets);
-    hash->index = (HashBucket **)bp;
-
-    for (i = 0, --bp; i < N_BUCKETS(initial_buckets); ++i, --bp) {
-        bp->next        = hash->free_list;
-        hash->free_list = bp;
-    }
-
+    Hash *hash = parrot_create_hash(interp, val_type, hkey_type);
+    allocate_buckets(interp, hash, size);
     return hash;
 }
 
@@ -1252,10 +1266,14 @@ void
 parrot_hash_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_destroy)
-    HashBucket * const bp = (HashBucket*)((char*)hash + sizeof (Hash));
-    if (bp != hash->buckets)
-        mem_gc_free(interp, hash->buckets);
-    mem_gc_free(interp, hash);
+    if (hash->buckets){
+        if (hash->mask > SPLIT_POINT)
+            Parrot_gc_free_memory_chunk(interp, hash->buckets);
+        else
+            Parrot_gc_free_fixed_size_storage(interp,
+                HASH_ALLOC_SIZE(hash->mask+1), hash->buckets);
+    }
+    Parrot_gc_free_fixed_size_storage(interp, sizeof (Hash), hash);
 }
 
 
@@ -1460,38 +1478,44 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(parrot_hash_put)
-    HashBucket *bucket;
+    HashBucket *bucket = NULL;
     size_t      hashval;
 
-    if (hash->key_type == Hash_key_type_STRING) {
-        const STRING * const s = (STRING *)key;
-        hashval                = key_hash_STRING(interp, (STRING *)key, hash->seed);
-        bucket                 = hash->index[hashval & hash->mask];
-
-        while (bucket) {
-            const STRING *s2 = (const STRING *)bucket->key;
-            if (s == s2)
-                break;
-            /* manually inline part of string_equal  */
-            if (hashval == s2->hashval) {
-                if (s->encoding == s2->encoding) {
-                    if ((STRING_byte_length(s) == STRING_byte_length(s2))
-                    && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
-                        break;
-                } else if (STRING_equal(interp, s, s2))
-                        break;
-            }
-            bucket = bucket->next;
-        }
+    if (!hash->buckets){
+        allocate_buckets(interp, hash, INITIAL_SIZE);
+        hashval = key_hash(interp, hash, key);
     }
     else {
-        hashval = key_hash(interp, hash, key);
-        bucket  = hash->index[hashval & hash->mask];
+        if (hash->key_type == Hash_key_type_STRING) {
+            const STRING * const s = (STRING *)key;
+            hashval                = key_hash_STRING(interp, (STRING *)key, hash->seed);
+            bucket                 = hash->index[hashval & hash->mask];
 
-        while (bucket) {
-            if (hash_compare(interp, hash, key, bucket->key) == 0)
-                break;
-            bucket = bucket->next;
+            while (bucket) {
+                const STRING *s2 = (const STRING *)bucket->key;
+                if (s == s2)
+                    break;
+                /* manually inline part of string_equal  */
+                if (hashval == s2->hashval) {
+                    if (s->encoding == s2->encoding) {
+                        if ((STRING_byte_length(s) == STRING_byte_length(s2))
+                        && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
+                            break;
+                    } else if (STRING_equal(interp, s, s2))
+                            break;
+                }
+                bucket = bucket->next;
+            }
+        }
+        else {
+            hashval = key_hash(interp, hash, key);
+            bucket  = hash->index[hashval & hash->mask];
+
+            while (bucket) {
+                if (hash_compare(interp, hash, key, bucket->key) == 0)
+                    break;
+                bucket = bucket->next;
+            }
         }
     }
 
@@ -1536,17 +1560,19 @@ parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
     ASSERT_ARGS(parrot_hash_delete)
     const UINTVAL hashval = key_hash(interp, hash, key) & hash->mask;
-    HashBucket   **prev   = &hash->index[hashval];
-    if (*prev) {
-        for (; *prev; prev = &(*prev)->next) {
-            HashBucket *current = *prev;
-            if (hash_compare(interp, hash, key, current->key) == 0) {
-                *prev = current->next;
-                --hash->entries;
-                current->next    = hash->free_list;
-                current->key     = NULL;
-                hash->free_list = current;
-                return;
+    if (hash->buckets){
+        HashBucket   **prev   = &hash->index[hashval];
+        if (*prev) {
+            for (; *prev; prev = &(*prev)->next) {
+                HashBucket *current = *prev;
+                if (hash_compare(interp, hash, key, current->key) == 0) {
+                    *prev = current->next;
+                    --hash->entries;
+                    current->next    = hash->free_list;
+                    current->key     = NULL;
+                    hash->free_list = current;
+                    return;
+                }
             }
         }
     }

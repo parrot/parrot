@@ -68,6 +68,7 @@ struct _hash {
 
     /* Random seed value for seeding hash algorithms */
     size_t seed;
+
 };
 
 /* Utility macros - use them, do not reinvent the wheel */
@@ -89,26 +90,29 @@ struct _hash {
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
 {                                                                           \
     INTVAL _loc;                                                            \
-    for (_loc = (_hash)->mask; _loc >= 0; --_loc) {                         \
-        HashBucket *_bucket = (_hash)->index[_loc];                         \
-        while (_bucket) {                                                   \
-            _code                                                           \
-            _bucket = _bucket->next;                                        \
+        if ((_hash)->entries){                                              \
+            for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                 \
+                HashBucket *_bucket = (_hash)->index[_loc];                 \
+                while (_bucket) {                                           \
+                    _code                                                   \
+                    _bucket = _bucket->next;                                \
+                }                                                           \
+            }                                                               \
         }                                                                   \
-    }                                                                       \
 }
-
 
 #define parrot_hash_iterator_advance(_hash, _bucket, _loc)                  \
 {                                                                           \
-    /* Try to advance current bucket */                                     \
-    if ((_bucket))                                                          \
-        (_bucket) = (_bucket)->next;                                        \
-    while (!(_bucket)) {                                                    \
-        /* If there is no more buckets */                                   \
-        if ((_loc) == (INTVAL)(_hash)->mask+1)                              \
-            break;                                                          \
-        (_bucket) = (_hash)->index[(_loc)++];                               \
+    if ((_hash)->entries) {                                                 \
+        /* Try to advance current bucket */                                 \
+        if ((_bucket))                                                      \
+            (_bucket) = (_bucket)->next;                                    \
+        while (!(_bucket)) {                                                \
+            /* If there is no more buckets */                               \
+            if ((_loc) == (INTVAL)(_hash)->mask+1)                          \
+                break;                                                      \
+            (_bucket) = (_hash)->index[(_loc)++];                           \
+        }                                                                   \
     }                                                                       \
 }
 
@@ -335,7 +339,6 @@ void parrot_chash_destroy_values(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
 Hash * parrot_create_hash(PARROT_INTERP,
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type)
@@ -343,7 +346,6 @@ Hash * parrot_create_hash(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
 Hash * parrot_create_hash_sized(PARROT_INTERP,
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
@@ -369,7 +371,6 @@ void Parrot_hash_freeze(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
 Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
