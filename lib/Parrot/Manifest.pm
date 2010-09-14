@@ -46,7 +46,7 @@ use Carp;
         gitignore => $gitignoresfilename,
     })
 
-Creates a Parrot::Manifest object by asking C<svn status> for verbose output,
+Creates a Parrot::Manifest object by asking C<git status> for verbose output,
 and parsing the results.
 
 C<file> is the name of the file that the manifest will eventually be written
@@ -68,14 +68,14 @@ sub new {
     my %data = (
         id         => '$' . 'Id$',
         time       => scalar gmtime,
-        cmd        => 'svn',
+        cmd        => 'git',
         script     => $argsref->{script},
         file       => $argsref->{file}      ? $argsref->{file}      : q{MANIFEST},
         skip       => $argsref->{skip}      ? $argsref->{skip}      : q{MANIFEST.SKIP},
         gitignore  => $argsref->{gitignore} ? $argsref->{gitignore} : q{.gitignore},
     );
 
-    my $status_output_ref = [qx($data{cmd} status -v)];
+    my $status_output_ref = [qx($data{cmd} status -u --porcelain)];
 
     # grab the versioned resources:
     my @versioned_files;
@@ -312,7 +312,7 @@ sub _get_current_files {
 
     $print_str = $mani->prepare_manifest_skip();
 
-Gets a list of the files that SVN ignores, and returns a string that can be
+Gets a list of the files that git ignores, and returns a string that can be
 put into F<MANIFEST.SKIP>.
 
 =cut
