@@ -442,17 +442,11 @@ sub _get_ignores {
 
     for my $ignore (@ignore) {
          my ($dirname, $basename) = (dirname($ignore), basename($ignore));
+         # .gitignore has different regexen than MANIFEST
          $ignore =~ s/\./\\./g;
          $ignore =~ s/\*/.\*/g;
-         # .gitignore has different regexen than MANIFEST
-         printf "%s:%s:%s\n", $ignore, $dirname, $basename;
-         if ($ignore =~ m!/!) {
-            printf "Setting %s to %s\n", $dirname, $basename;
-            $ignores{$dirname} = $basename;
-         } else {
-            print "Setting $ignore\n";
-            $ignores{$ignore} = "";
-         }
+         # printf "%s:%s:%s\n", $ignore, $dirname, $basename;
+         $ignores{$ignore} = 1;
     }
 
     return \%ignores;
@@ -518,11 +512,8 @@ END_HEADER
 
     foreach my $file ( sort keys %ignore ) {
         my $dir = $file;
-        # $dir =~ s!\\!/!g;
-        printf "dir=$dir\n";
+        # printf "dir=$dir,file=$ignore{$file}\n";
         foreach ( $ignore{$file} ) {
-            #s/\./\\./g;
-            #s/\*/.*/g;
             $print_str .=
                 ( $dir ne '.' )
                 ? "^$dir$_\$\n^$dir$_/\n"
