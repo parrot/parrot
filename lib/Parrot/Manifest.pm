@@ -34,6 +34,7 @@ package Parrot::Manifest;
 use strict;
 use warnings;
 use Carp;
+use File::Basename;
 
 =head1 METHODS
 
@@ -91,7 +92,7 @@ sub new {
         # ignore .svn, blib directories;
         # ignore ports/ directories, as that information does not need to be
         # in tarball releases
-        next if $filename =~ m[/\.svn|^blib|^ports];
+        next if $filename =~ m[/\.git|^blib|^ports];
         if ( -d $filename ) {
             push @dirs, $filename;
         }
@@ -433,25 +434,25 @@ sub print_gitignore {
 sub _get_ignores {
     my $self      = shift;
 
-    my $svnignore = `$self->{cmd} propget svn:ignore @{ $self->{dirs} }`;
+    my $gitignore = `cat .gitignore| grep -v '^#'`;
+    use Data::Dumper;
 
-    # cope with trailing newlines in svn:ignore output
-    $svnignore =~ s/\n{3,}/\n\n/g;
     my %ignores;
-    my @ignore = split( /\n\n/, $svnignore );
-    foreach (@ignore) {
-        my @cnt = m/( - )/g;
-        if ($#cnt) {
-            my @a = split /\n(?=(?:.*?) - )/, $_;
-            foreach (@a) {
-                m/^\s*(.*?) - (.+)/sm;
-                $ignores{$1} = $2 if $2;
-            }
-        }
-        else {
-            m/^(.*) - (.+)/sm;
-            $ignores{$1} = $2 if $2;
-        }
+    my @ignore = sort grep { $_ } split( /\n/, $gitignore );
+
+    for my $ignore (@ignore) {
+         my ($dirname, $basename) = (dirname($ignore), basename($ignore));
+         $ignore =~ s/\./\\./g;
+         $ignore =~ s/\*/.\*/g;
+         # .gitignore has different regexen than MANIFEST
+         printf "%s:%s:%s\n", $ignore, $dirname, $basename;
+         if ($ignore =~ m!/!) {
+            printf "Setting %s to %s\n", $dirname, $basename;
+            $ignores{$dirname} = $basename;
+         } else {
+            print "Setting $ignore\n";
+            $ignores{$ignore} = "";
+         }
     }
 
     return \%ignores;
@@ -507,24 +508,24 @@ sub _compose_manifest_skip {
 # See docs/submissions.pod on how to recreate this file after SVN
 # has been told about new generated files.
 #
-# Ignore the SVN directories
-\\B\\.svn\\b
+# Ignore the .git directory
+\\B\\.git\\b
 
 # ports/ should not go into release tarballs
 ^ports\$
 ^ports/
 END_HEADER
 
-    foreach my $directory ( sort keys %ignore ) {
-        my $dir = $directory;
-        $dir =~ s!\\!/!g;
-        $print_str .= "# generated from svn:ignore of '$dir/'\n";
-        foreach ( sort split /\n/, $ignore{$directory} ) {
-            s/\./\\./g;
-            s/\*/.*/g;
+    foreach my $file ( sort keys %ignore ) {
+        my $dir = $file;
+        # $dir =~ s!\\!/!g;
+        printf "dir=$dir\n";
+        foreach ( $ignore{$file} ) {
+            #s/\./\\./g;
+            #s/\*/.*/g;
             $print_str .=
                 ( $dir ne '.' )
-                ? "^$dir/$_\$\n^$dir/$_/\n"
+                ? "^$dir$_\$\n^$dir$_/\n"
                 : "^$_\$\n^$_/\n";
         }
     }
