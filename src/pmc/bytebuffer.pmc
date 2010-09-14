@@ -393,7 +393,15 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
     if (encoding == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Invalid encoding");
-    return Parrot_str_new_init(interp, (const char *)content, size, encoding, 0);
+    else {
+        STRING * const result = Parrot_str_new_init(interp,
+                (const char *)content, size, encoding, 0);
+        if (!STRING_validate(interp, result))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_STRING_REPRESENTATION,
+                    "Invalid buffer content");
+        return result;
+    }
 }
 
 /*
