@@ -1698,7 +1698,8 @@ CONFIGURE_TEST_FILES = \
     t/steps/*.t
 PBC_TEST_FILES = \
     t/pmc/testlib/annotations.pbc \
-    t/pmc/testlib/number.pbc
+    t/pmc/testlib/number.pbc \
+    t/op/testlib/test_strings.pbc
 
 # pbc files used for several tests
 pbctestfiles: $(PARROT) $(PBC_TEST_FILES)
@@ -1708,6 +1709,9 @@ t/pmc/testlib/number.pbc: t/pmc/testlib/number.pasm
 
 t/pmc/testlib/annotations.pbc: t/pmc/testlib/annotations.pir
 	$(PARROT) -o t/pmc/testlib/annotations.pbc t/pmc/testlib/annotations.pir
+
+t/op/testlib/test_strings.pbc: t/op/testlib/test_strings.pir
+	$(PARROT) -o t/op/testlib/test_strings.pbc t/op/testlib/test_strings.pir
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
