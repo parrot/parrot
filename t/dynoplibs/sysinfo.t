@@ -184,8 +184,10 @@ CODE
 }
 
 pir_output_is(<<'CODE', <<OUTPUT, 'INTVAL min and max coherence');
-# assumes 2's compliment integer math
+.loadlib 'sys_ops'
+.include 'sysinfo.pasm'
 .sub 'main' :main
+    # assumes 2's compliment integer math
     .include 'test_more.pir'
     .local int min, max
     max = sysinfo .SYSINFO_PARROT_INTMAX
