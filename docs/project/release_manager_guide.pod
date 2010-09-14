@@ -411,7 +411,7 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
  - Nov 16, 2010 - 2.10  - tcurtis
  - Dec 21, 2010 - 2.11  - whiteknight
  - Jan 18, 2011 - 3.0*  - ??
- - Feb 15, 2011 - 3.1   - ??
+ - Feb 15, 2011 - 3.1   - mikehh
  - Mar 15, 2011 - 3.2   - ??
  - Apr 19, 2011 - 3.3*  - ??
  - May 17, 2011 - 3.4   - ??
