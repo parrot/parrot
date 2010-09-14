@@ -174,7 +174,7 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
                 return i;
         }
     }
-    else if (STRING_equal(interp, encodingname, fixed_8_str)) {
+    else if (Parrot_str_equal(interp, encodingname, fixed_8_str)) {
         for (i = 0; i < n; ++i) {
             if (STREQ(encodings[i]->name, "ascii"))
                 return i;
