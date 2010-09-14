@@ -40,13 +40,12 @@ present in the except string.
     .param string s
     .param string except
 
-    .local int asciicharset, utf8enc, scharset, senc
-    asciicharset = find_charset 'ascii'
-    scharset = charset s
-    if scharset == asciicharset goto encodeit
+    .local int asciienc, utf8enc, senc
+    senc = encoding s
+    asciienc = find_encoding 'ascii'
+    if senc == asciienc goto encodeit
 
     utf8enc = find_encoding 'utf8'
-    senc = encoding s
     if utf8enc == senc goto encodeit
     s = trans_encoding s, utf8enc
 
