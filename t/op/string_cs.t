@@ -87,7 +87,7 @@ hello(10): utf16
 hello(10): ucs2
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "empty literal encoding persistence - TT #1791", todo => 'TT #1791' );
+pir_output_is( <<'CODE', <<OUTPUT, "empty literal encoding persistence - TT #1791");
 .sub main
     load_bytecode 't/op/testlib/test_strings.pbc'
     $P0 = 'get_empties'()
