@@ -1341,7 +1341,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                     "Invalid encoding number '%d' specified", encoding_nr);
 
-    if (size)
+    if (size || (!STRING_IS_NULL(s) && s->encoding != CONST_STRING(interp, "")->encoding))
         s = Parrot_str_new_init(interp, (const char *)*cursor, size,
                 encoding, flags);
     else
