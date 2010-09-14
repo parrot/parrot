@@ -98,6 +98,7 @@ sub runstep {
             libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
+            ar                  => 'lib',
             ar_flags            => '',
             ar_out              => '-out:',
             slash               => '\\',
