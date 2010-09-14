@@ -58,11 +58,16 @@ Create a new C<Boolean> with initial value C<FALSE>.
 Create a new C<Boolean> with the given initial value interpreted
 as a Boolean.
 
+=item C<void init_int(INTVAL value)>
+
+Create a new C<Boolean> with the given initial value interpreted
+as a Boolean.
+
 =cut
 
 */
 
-    /* These two init functions set the boolean flag directly. */
+    /* These init functions set the boolean flag directly. */
 
     VTABLE void init() {
         set_boolean_FLAG(SELF, 0);
@@ -71,6 +76,10 @@ as a Boolean.
     VTABLE void init_pmc(PMC *value) {
         INTVAL v = PMC_IS_NULL(value) ? 0 : VTABLE_get_bool(INTERP, value);
         set_boolean_FLAG(SELF, v);
+    }
+
+    VTABLE void init_int(INTVAL value) {
+        set_boolean_FLAG(SELF, value);
     }
 
 /*
