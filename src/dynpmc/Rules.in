@@ -78,8 +78,12 @@ $(DYNEXT_DIR)/gziphandle$(LOAD_EXT): src/dynpmc/gziphandle$(O)
 
 src/dynpmc/pmc_gziphandle.h : src/dynpmc/gziphandle.c
 
-src/dynpmc/gziphandle$(O): src/dynpmc/gziphandle.c $(DYNPMC_H_FILES) \
-    src/dynpmc/pmc_gziphandle.h include/pmc/pmc_fixedintegerarray.h
+src/dynpmc/gziphandle$(O): \
+    src/dynpmc/gziphandle.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_gziphandle.h \
+    include/pmc/pmc_handle.h \
+    include/pmc/pmc_fixedintegerarray.h
 
 src/dynpmc/gziphandle.c: src/dynpmc/gziphandle.dump
 	$(PMC2CC) src/dynpmc/gziphandle.pmc
