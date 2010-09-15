@@ -18239,8 +18239,10 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_not_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
-    VTABLE_set_bool(interp, PREG(1), (!VTABLE_get_bool(interp, PREG(2))));
+    const INTVAL a = ! VTABLE_get_bool(interp, PREG(2));
+    if (PMC_IS_NULL(PREG(1)))
+        PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
+    VTABLE_set_bool(interp, PREG(1), a);
 
 return (opcode_t *)cur_opcode + 3;}
 

@@ -958,8 +958,10 @@ inline op not(invar PMC) :base_core {
 }
 
 inline op not(out PMC, invar PMC) :base_core {
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_bool(interp, $1, (!VTABLE_get_bool(interp, $2)));
+    const INTVAL a = ! VTABLE_get_bool(interp, $2);
+    if (PMC_IS_NULL($1))
+        $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
+    VTABLE_set_bool(interp, $1, a);
 }
 
 ########################################
