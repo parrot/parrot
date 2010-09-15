@@ -1,5 +1,17 @@
 # $Id$
 
+New in 2.8.0
+- Core
+  + Inlined hashing and comparison functions
+  + Hash memory allocation moved from system malloc to lazy allocated
+  + Avoided infinite catching of exceptions while dying from exception
+  + Some svn fixes
+  + Added a check for duplicate vtable entries in PMCs
+  + Added more core pmc tests
+  + Building Parrot with Perl 5.12 and gcc-4.5 / g++-4.5
+  + Eliminated cruft left over after dynops_mapping
+  + Improved charset and string encoding
+ 
 New in 2.7.0
 - Core
   + cleanups in packfile and freeze/thaw handling
