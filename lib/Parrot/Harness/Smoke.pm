@@ -50,7 +50,7 @@ C<$ENV{'USERDOMAIN'}>.
     send_archive_to_smolder( %env_data );
 
 At the current time, automated smoke reports are collected and displayed via
-the Smolder system at L<http://smolder.plusthree.com>.  Such reports require
+the Smolder system at L<http://smolder.parrot.org>.  Such reports require
 the Perl 5 F<LWP::UserAgent> module, available from CPAN.
 
 On network problem or for offline use you may send tar reports later
@@ -92,10 +92,10 @@ our @EXPORT_OK = qw(
 
 # language implementations have a different project id
 my %SMOLDER_CONFIG = (
-    server       => 'http://smolder.plusthree.com',
+    server       => 'http://smolder.parrot.org',
     username     => 'parrot-autobot',
-    password     => 'squ@wk',
-    project_id   => 8,
+    password     => 'qa_rocks',
+    project_id   => 1,
     report_file  => ['parrot_test_run.tar.gz'],
 );
 
