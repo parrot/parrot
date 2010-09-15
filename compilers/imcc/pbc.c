@@ -1306,7 +1306,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
         }
     }
 
-    if (!lex_info && (unit->outer || need_lex)) {
+    if (!lex_info && need_lex) {
         lex_info = Parrot_pmc_new_noinit(interp, lex_info_id);
         VTABLE_init_pmc(interp, lex_info, sub_pmc);
     }
