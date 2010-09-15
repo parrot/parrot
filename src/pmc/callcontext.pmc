@@ -1344,7 +1344,8 @@ return current Namespace
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_string(INTERP, hash, key);
@@ -1358,7 +1359,8 @@ return current Namespace
     }
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_string(INTERP, hash, key);
@@ -1373,7 +1375,8 @@ return current Namespace
 
 
     VTABLE STRING * get_string_keyed_str(STRING *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_string(INTERP, hash, key);
@@ -1387,7 +1390,8 @@ return current Namespace
     }
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_string(INTERP, hash, key);
@@ -1405,7 +1409,8 @@ return current Namespace
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_pmc(INTERP, hash, key);
@@ -1419,7 +1424,8 @@ return current Namespace
     }
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_pmc(INTERP, hash, key);
@@ -1433,7 +1439,8 @@ return current Namespace
     }
 
     VTABLE STRING * get_string_keyed(PMC *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_pmc(INTERP, hash, key);
@@ -1447,7 +1454,8 @@ return current Namespace
     }
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = hash_key_from_pmc(INTERP, hash, key);
@@ -1465,7 +1473,8 @@ return current Namespace
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void * const k = hash_key_from_pmc(INTERP, hash, key);
@@ -1476,7 +1485,8 @@ return current Namespace
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        Hash * const hash = get_hash(INTERP, SELF);
+        Hash *hash;
+        GETATTR_CallContext_hash(INTERP, SELF, hash);
 
         if (hash) {
             void * const k = hash_key_from_string(INTERP, hash, key);
@@ -1512,6 +1522,7 @@ Creates and returns a clone of the signature.
         PMC * const  dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL       num;
         Pcc_cell    *our_cells, *dest_cells;
+        Hash        *hash;
 
         GET_ATTR_num_positionals(INTERP, SELF, num);
         /* Copy positionals */
@@ -1526,6 +1537,8 @@ Creates and returns a clone of the signature.
         GET_ATTR_arg_flags(INTERP, SELF, arg_flags);
         GET_ATTR_return_flags(INTERP, SELF, return_flags);
 
+        GET_ATTR_hash(INTERP, SELF, hash);
+
         if (!PMC_IS_NULL(type_tuple))
             SET_ATTR_type_tuple(INTERP, dest, VTABLE_clone(INTERP, type_tuple));
 
@@ -1538,8 +1551,8 @@ Creates and returns a clone of the signature.
         if (!PMC_IS_NULL(return_flags))
             SET_ATTR_return_flags(INTERP, dest, VTABLE_clone(INTERP, return_flags));
 
-        parrot_hash_clone(INTERP, get_hash(INTERP, SELF),
-            get_hash(INTERP, dest));
+        if (hash)
+        parrot_hash_clone(INTERP, hash, get_hash(INTERP, dest));
 
         return dest;
     }
