@@ -11,13 +11,10 @@ tools/release/gen_release_info.pl - generate release info for graphs and charts
 
 =head1 DESCRIPTION
 
-This utility generates release information from subversion in csv format,
+This utility generates release information from git in csv format,
 suitable for graphs, charts, and reports.
 
 =cut
-
-
-my $repo_url = 'https://svn.parrot.org/parrot/tags';
 
 ##  create a release information data structure
 my $r = {
@@ -34,9 +31,9 @@ my $r = {
 
 ##  gather interesting release-related information from the tag
 map {
-    ##  ask subversion for info about the tag
+    ##  ask git for info about the tag
     my $tag       = $r->{$_}{tag};
-    my $commit_id = qx{ git rev-parse $tag};
+    my $commit_id = qx{ git rev-parse $tag };
     chomp $commit_id;
     my $info      = qx{ git show $commit_id --quiet --format="Author: %an%nCommit: %H%nDate: %ai" };
 
