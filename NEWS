@@ -7,10 +7,22 @@ New in 2.8.0
   + Avoided infinite catching of exceptions while dying from exception
   + Some svn fixes
   + Added a check for duplicate vtable entries in PMCs
-  + Added more core pmc tests
   + Building Parrot with Perl 5.12 and gcc-4.5 / g++-4.5
   + Eliminated cruft left over after dynops_mapping
   + Improved charset and string encoding
+  + Better organisation of programs by reposition it to "tools/build" and "tools/release"
+  + Implemented Exception clone vtable function
+  + Added experimental function Parrot_getpid and getpid method
+  + Closed a lot of tickets
+- Testing
+  + Added more core pmc tests
+  + Rearranged some tests with C coverage
+- GitMigration
+  + Set up a test site for github trac plugin at http://mksig.org/trac/
+  + Mirror Parrot on github
+  + Code of Trac plugin at github is on http://github.com/cotto/github-trac
+- Compilers
+  + Fixed problem with imcc HLL in load_bytecode difference between loading a pbc and compiling a pir
  
 New in 2.7.0
 - Core
