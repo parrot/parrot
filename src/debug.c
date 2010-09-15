@@ -3478,7 +3478,8 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<display_breakpoint>
+=item C<static void display_breakpoint(PDB_t *pdb, const PDB_breakpoint_t
+*breakpoint)>
 
 Displays a breakpoint.
 
@@ -3489,7 +3490,7 @@ Displays a breakpoint.
 static void
 display_breakpoint(ARGIN(PDB_t *pdb), ARGIN(const PDB_breakpoint_t *breakpoint))
 {
-    ASSERT_ARGS(display_breakpoint);
+    ASSERT_ARGS(display_breakpoint)
 
     /* Display the breakpoint id, PC, line number (if known),
        and disabled flag. */
