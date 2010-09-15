@@ -48,78 +48,6 @@ CODE
 ascii
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "literal encoding persistence - TT #468" );
-.include 'stdio.pasm'
-.sub main
-    # set output encoding to normalize printed strings
-    $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
-    $P1.'encoding'('utf8')
-
-    load_bytecode 't/op/testlib/test_strings.pbc'
-    $P0 = 'get_hellos'()
-    $P1 = iter $P0
-
-  loop:
-    unless $P1 goto end_loop
-    $S0 = shift $P1
-    show($S0)
-    goto loop
-  end_loop:
-.end
-
-.sub show
-    .param string s
-    print s
-    $I0 = bytelength s
-    print '('
-    print $I0
-    print "): "
-    $I0 = encoding s
-    $S0 = encodingname $I0
-    say $S0
-.end
-CODE
-hello(5): ascii
-hello(5): utf8
-hello(5): utf8
-hello(10): utf16
-hello(10): ucs2
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "empty literal encoding persistence - TT #1791");
-.sub main
-    load_bytecode 't/op/testlib/test_strings.pbc'
-    $P0 = 'get_empties'()
-    $P1 = iter $P0
-
-  loop:
-    unless $P1 goto end_loop
-    $S0 = shift $P1
-    show($S0)
-    goto loop
-  end_loop:
-.end
-
-.sub show
-    .param string s
-    print s
-    $I0 = bytelength s
-    print '('
-    print $I0
-    print "): "
-    $I0 = encoding s
-    $S0 = encodingname $I0
-    say $S0
-.end
-CODE
-(0): ascii
-(0): utf8
-(0): utf8
-(0): utf16
-(0): ucs2
-OUTPUT
-
 pasm_output_is( <<'CODE', <<OUTPUT, "find_encoding" );
     find_encoding I0, "iso-8859-1"
     print "ok 1\n"
@@ -481,7 +409,80 @@ abcdefg
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 17 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 19 ) unless $PConfig{has_icu};
+
+    pir_output_is( <<'CODE', <<OUTPUT, "literal encoding persistence - TT #468" );
+.include 'stdio.pasm'
+.sub main
+    # set output encoding to normalize printed strings
+    $P0 = getinterp
+    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1.'encoding'('utf8')
+
+    load_bytecode 't/op/testlib/test_strings.pbc'
+    $P0 = 'get_hellos'()
+    $P1 = iter $P0
+
+  loop:
+    unless $P1 goto end_loop
+    $S0 = shift $P1
+    show($S0)
+    goto loop
+  end_loop:
+.end
+
+.sub show
+    .param string s
+    print s
+    $I0 = bytelength s
+    print '('
+    print $I0
+    print "): "
+    $I0 = encoding s
+    $S0 = encodingname $I0
+    say $S0
+.end
+CODE
+hello(5): ascii
+hello(5): utf8
+hello(5): utf8
+hello(10): utf16
+hello(10): ucs2
+OUTPUT
+
+    pir_output_is( <<'CODE', <<OUTPUT, "empty literal encoding persistence - TT #1791");
+.sub main
+    load_bytecode 't/op/testlib/test_strings.pbc'
+    $P0 = 'get_empties'()
+    $P1 = iter $P0
+
+  loop:
+    unless $P1 goto end_loop
+    $S0 = shift $P1
+    show($S0)
+    goto loop
+  end_loop:
+.end
+
+.sub show
+    .param string s
+    print s
+    $I0 = bytelength s
+    print '('
+    print $I0
+    print "): "
+    $I0 = encoding s
+    $S0 = encodingname $I0
+    say $S0
+.end
+CODE
+(0): ascii
+(0): utf8
+(0): utf8
+(0): utf16
+(0): ucs2
+OUTPUT
+
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main
     set $S0, iso-8859-1:"TÖTSCH"
