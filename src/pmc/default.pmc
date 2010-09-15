@@ -1855,56 +1855,6 @@ Default fallback. Performs a multiple dispatch call for 'cmp_pmc'.
 
         return retval;
     }
-/*
-
-=item C<PMC *logical_or(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_or'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_or(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_or", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
-
-/*
-
-=item C<PMC *logical_and(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_and'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_and(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_and", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
-
-/*
-
-=item C<PMC *logical_xor(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_xor'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_xor(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_xor", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
 
 /*
 

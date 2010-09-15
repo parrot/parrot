@@ -928,7 +928,7 @@ inline op and(out INT, in INT, in INT) :base_core {
 }
 
 inline op and(invar PMC, invar PMC, invar PMC) :base_core {
-    $1 = VTABLE_logical_and(interp, $2, $3, $1);
+    $1 = VTABLE_get_bool(interp, $2) ? $3 : $2;
 }
 
 ########################################
@@ -954,11 +954,12 @@ inline op not(out INT, in INT) :base_core {
 }
 
 inline op not(invar PMC) :base_core {
-    VTABLE_i_logical_not(interp, $1);
+    VTABLE_set_bool(interp, $1, !VTABLE_get_bool(interp, $1));
 }
 
 inline op not(out PMC, invar PMC) :base_core {
-    $1 = VTABLE_logical_not(interp, $2, $1);
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
+    VTABLE_set_bool(interp, $1, (!VTABLE_get_bool(interp, $2)));
 }
 
 ########################################
@@ -976,7 +977,7 @@ inline op or(out INT, in INT, in INT) :base_core {
 }
 
 inline op or(invar PMC, invar PMC, invar PMC) :base_core {
-    $1 = VTABLE_logical_or(interp, $2, $3, $1);
+    $1 = VTABLE_get_bool(interp, $2) ? $2 : $3;
 }
 
 ########################################
@@ -995,7 +996,17 @@ inline op xor(out INT, in INT, in INT) :base_core {
 }
 
 inline op xor(invar PMC, invar PMC, invar PMC) :base_core {
-    $1 = VTABLE_logical_xor(interp, $2, $3, $1);
+    const INTVAL a = VTABLE_get_bool(interp, $2);
+    const INTVAL b = VTABLE_get_bool(interp, $3);
+    if (a && ! b)
+        $1 = $2;
+    else
+        if (b && ! a)
+            $1 = $3 ;
+        else{
+            $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
+            VTABLE_set_bool(interp, $1, 0);
+        }
 }
 
 =back

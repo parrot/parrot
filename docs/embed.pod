@@ -1141,8 +1141,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_i_floor_divide_int>
 
-=item C<Parrot_PMC_i_logical_not>
-
 =item C<Parrot_PMC_i_modulus>
 
 =item C<Parrot_PMC_i_modulus_float>
@@ -1198,14 +1196,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_i_subtract_float>
 
 =item C<Parrot_PMC_i_subtract_int>
-
-=item C<Parrot_PMC_logical_and>
-
-=item C<Parrot_PMC_logical_not>
-
-=item C<Parrot_PMC_logical_or>
-
-=item C<Parrot_PMC_logical_xor>
 
 =item C<Parrot_PMC_mark>
 

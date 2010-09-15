@@ -280,17 +280,6 @@ Fetch the string part of C<value> and concatenate it to yourself, storing the
 result in C<dest>. (Probably by calling its C<set_string> method) This is a
 string multimethod.
 
-=item C<logical_or>
-
-=item C<logical_and>
-
-Perform the given short-circuiting logical operations between your boolean
-value and the value passed in, storing the result in C<dest>.
-
-=item C<logical_not>
-
-Set yourself to be a logical negation of the value passed in.
-
 =item C<repeat>
 
 Repeat your string representation C<value> times and store the result in

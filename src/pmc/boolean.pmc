@@ -163,12 +163,6 @@ C<FALSE>.
         SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 
-    /* No POD documentation, since the reader should see Scalar. */
-
-    VTABLE void i_logical_not() {
-        flip_boolean_FLAG(SELF);
-    }
-
 /*
 
 =item C<void freeze(PMC *info)>

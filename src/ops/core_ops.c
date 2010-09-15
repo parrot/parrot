@@ -18211,7 +18211,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_and_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_and(interp, PREG(2), PREG(3), PREG(1));
+    PREG(1) = VTABLE_get_bool(interp, PREG(2)) ? PREG(3) : PREG(2);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18232,14 +18232,15 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_not_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    VTABLE_i_logical_not(interp, PREG(1));
+    VTABLE_set_bool(interp, PREG(1), !VTABLE_get_bool(interp, PREG(1)));
 
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
 Parrot_not_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_not(interp, PREG(2), PREG(1));
+    PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
+    VTABLE_set_bool(interp, PREG(1), (!VTABLE_get_bool(interp, PREG(2))));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -18267,7 +18268,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_or_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_or(interp, PREG(2), PREG(3), PREG(1));
+    PREG(1) = VTABLE_get_bool(interp, PREG(2)) ? PREG(2) : PREG(3);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18295,7 +18296,17 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_xor_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_xor(interp, PREG(2), PREG(3), PREG(1));
+    const INTVAL a = VTABLE_get_bool(interp, PREG(2));
+    const INTVAL b = VTABLE_get_bool(interp, PREG(3));
+    if (a && ! b)
+        PREG(1) = PREG(2);
+    else
+        if (b && ! a)
+            PREG(1) = PREG(3) ;
+        else{
+            PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
+            VTABLE_set_bool(interp, PREG(1), 0);
+        }
 
 return (opcode_t *)cur_opcode + 4;}
 
