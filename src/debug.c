@@ -1613,7 +1613,7 @@ list_breakpoints(ARGIN(PDB_t *pdb))
 
     if (pdb->breakpoint)
         for (breakpoint = pdb->breakpoint;
-             breakpoint; 
+             breakpoint;
              breakpoint = breakpoint->next)
             display_breakpoint(pdb, breakpoint);
 
@@ -2822,7 +2822,7 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
     /* Allocate a file block and the source buffer. */
 
     dfile = mem_gc_allocate_zeroed_typed(interp, PDB_file_t);
-    dfile->source = mem_gc_allocate_n_typed(interp, DEBUG_SOURCE_BUFFER_CHUNK, 
+    dfile->source = mem_gc_allocate_n_typed(interp, DEBUG_SOURCE_BUFFER_CHUNK,
                                                     char);
     buffer_size = DEBUG_SOURCE_BUFFER_CHUNK;
 
@@ -2856,7 +2856,7 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         if (ch == EOF) {
             dfile->source[dfile->size++] = '\n';
             Parrot_io_eprintf(pdb->debugger,
-                              "(Newline appended to last line of file)\n"); 
+                              "(Newline appended to last line of file)\n");
         }
 
         /* Allocate a line block and store information about the line.
