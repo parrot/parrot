@@ -132,6 +132,9 @@ L<https://trac.parrot.org/parrot/ticket/1628>
 These can be replaced by C<get_bool> and intval ops unless you're using them for
 things that aren't really logical ops (don't do that!).
 
+Logical vtables are removed in r49012, and logical ops on PMCs are converted to
+use C<get_bool> internally. Rakudo seems to depend on logical ops on PMCs.
+
 L<https://trac.parrot.org/parrot/ticket/1655>
 
 =item Method getpid on ParrotInterpreter [experimental]
