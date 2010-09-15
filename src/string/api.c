@@ -23,6 +23,8 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 
 */
 
+#include <stdio.h>
+
 #include "parrot/parrot.h"
 #include "private_cstring.h"
 #include "api.str"
@@ -2408,10 +2410,12 @@ Parrot_str_escape_truncate(PARROT_INTERP,
         ARGIN_NULLOK(const STRING *src), UINTVAL limit)
 {
     ASSERT_ARGS(Parrot_str_escape_truncate)
-    STRING *result, *hex;
-    UINTVAL i, len, charlen;
-    String_iter iter;
-    unsigned char *dp;
+    STRING      *result;
+    UINTVAL      i, len, charlen;
+    String_iter  iter;
+    char         hex_buf[16];
+    int          hex_len;
+    char        *dp;
 
     if (STRING_IS_NULL(src))
         return STRINGNULL;
@@ -2433,18 +2437,19 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
     /* more work TODO */
     STRING_ITER_INIT(interp, &iter);
-    dp = (unsigned char *)result->strstart;
+    dp = result->strstart;
 
     for (i = 0; len > 0; --len) {
-        UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
+        unsigned c = STRING_iter_get_and_advance(interp, src, &iter);
         if (c < 0x7f) {
             /* process ASCII chars */
             if (i >= charlen - 2) {
                 /* resize - still len codepoints to go */
                 charlen += len * 2 + 16;
+                result->bufused = i;
                 Parrot_gc_reallocate_string_storage(interp, result, charlen);
                 /* start can change */
-                dp = (unsigned char *)result->strstart;
+                dp = result->strstart;
             }
             switch (c) {
               case '\\':
@@ -2486,28 +2491,34 @@ Parrot_str_escape_truncate(PARROT_INTERP,
                 break;
             }
             if (c >= 0x20) {
-                dp[i++]         = (unsigned char)c;
-                result->bufused = result->strlen = i;
+                dp[i++] = c;
                 continue;
             }
         }
 
         /* escape by appending either \uhhhh or \x{hh...} */
-        result->bufused = result->strlen = i;
 
         if (c < 0x0100 || c >= 0x10000)
-            hex = Parrot_sprintf_c(interp, "\\x{%x}", c);
+            hex_len = snprintf(hex_buf, 15, "\\x{%x}", c);
         else
-            hex = Parrot_sprintf_c(interp, "\\u%04x", c);
+            hex_len = snprintf(hex_buf, 15, "\\u%04x", c);
 
-        result = Parrot_str_concat(interp, result, hex);
+        if (hex_len < 0)
+            hex_len = 0;
+
+        if (i + hex_len > charlen) {
+            /* resize - still len codepoints to go */
+            charlen += len * 2 + 16;
+            result->bufused = i;
+            Parrot_gc_reallocate_string_storage(interp, result, charlen);
+            /* start can change */
+            dp = result->strstart;
+        }
+
+        mem_sys_memcopy(dp + i, hex_buf, hex_len);
 
         /* adjust our insert idx */
-        i += hex->strlen;
-
-        /* and usable len */
-        charlen = Buffer_buflen(result);
-        dp      = (unsigned char *)result->strstart;
+        i += hex_len;
 
         PARROT_ASSERT(i <= charlen);
     }
