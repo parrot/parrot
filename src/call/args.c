@@ -1135,8 +1135,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ++param_index;
     }
 
-    if (named_used_list != NULL)
-        parrot_hash_destroy(interp, named_used_list);
 
     /* Double check that all named arguments were assigned to parameters. */
     if (err_check) {
@@ -1145,6 +1143,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* Early exit to avoid vtable call */
         GETATTR_CallContext_hash(interp, call_object, h);
         if (!h || !h->entries){
+            if (named_used_list != NULL)
+                parrot_hash_destroy(interp, named_used_list);
             return;
         }
 
@@ -1153,7 +1153,10 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (!PMC_IS_NULL(named_arg_list)) {
             const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
 
-            if (named_used_list==NULL)
+            if (named_used_list==NULL){
+                if (named_used_list != NULL)
+                    parrot_hash_destroy(interp, named_used_list);
+
                 return;
 
                 /* The 'return' above is a temporary hack to duplicate an old
@@ -1165,6 +1168,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     "too many named arguments: %d passed, 0 used",
                     named_arg_count);
                  */
+            }
 
             if (named_arg_count > named_count) {
                 /* At this point we know we have named arguments that weren't
@@ -1179,6 +1183,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                             named_arg_list, named_arg_index);
 
                     if (!parrot_hash_exists(interp, named_used_list, name)) {
+                        if (named_used_list != NULL)
+                            parrot_hash_destroy(interp, named_used_list);
                         Parrot_ex_throw_from_c_args(interp, NULL,
                                 EXCEPTION_INVALID_OPERATION,
                                 "too many named arguments: '%S' not used",
@@ -1188,6 +1194,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             }
         }
     }
+    if (named_used_list != NULL)
+        parrot_hash_destroy(interp, named_used_list);
 }
 
 
