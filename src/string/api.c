@@ -377,6 +377,9 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
     /* Clear live flag. It might be set on constant strings */
     PObj_live_CLEAR(d);
 
+    /* Set the string copy flag */
+    PObj_is_string_copy_SET(d);
+
     /* Now check that buffer allocated from pool and affected by compacting */
     if (is_movable && Buffer_bufstart(s)) {
         /* If so, mark it as shared */
@@ -450,16 +453,42 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     /* calc usable and total bytes */
     total_length = a->bufused + b->bufused;
 
-    dest = Parrot_str_new_noinit(interp, total_length);
-    PARROT_ASSERT(enc);
-    dest->encoding = enc;
+    if (PObj_is_growable_TESTALL(a)
+    &&  a->strstart + total_length <=
+        (char *)Buffer_bufstart(a) + Buffer_buflen(a)) {
+        /* String a is growable and there's enough space in the buffer */
+        DECL_CONST_CAST;
 
-    /* Copy A first */
-    mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
+        dest = Parrot_str_copy(interp, a);
 
-    /* Tack B on the end of A */
-    mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + a->bufused),
-            b->strstart, b->bufused);
+        /* Switch string copy flags */
+        PObj_is_string_copy_SET(PARROT_const_cast(STRING *, a));
+        PObj_is_string_copy_CLEAR(dest);
+
+        /* Append b */
+        mem_sys_memcopy(dest->strstart + dest->bufused,
+                b->strstart, b->bufused);
+
+        dest->hashval = 0;
+    }
+    else {
+        if (4 * b->bufused < a->bufused) {
+            /* Preallocate more memory if we're appending a short string to
+               a long string */
+            total_length += total_length >> 1;
+        }
+
+        dest = Parrot_str_new_noinit(interp, total_length);
+        PARROT_ASSERT(enc);
+        dest->encoding = enc;
+
+        /* Copy A first */
+        mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
+
+        /* Tack B on the end of A */
+        mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + a->bufused),
+                b->strstart, b->bufused);
+    }
 
     dest->bufused = a->bufused + b->bufused;
     dest->strlen  = a->strlen + b->strlen;

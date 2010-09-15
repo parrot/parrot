@@ -135,6 +135,8 @@ typedef enum PObj_enum {
     PObj_is_string_FLAG         = POBJ_FLAG(8),
     /* PObj is a PMC */
     PObj_is_PMC_FLAG            = POBJ_FLAG(9),
+    /* PObj is a copy of a string that doesn't own the string buffer */
+    PObj_is_string_copy_FLAG    = POBJ_FLAG(10),
     /* the PMC is a shared PMC */
     PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11), /* Same as PObj_is_shared_FLAG */
     /* PObj is otherwise shared */
@@ -246,6 +248,10 @@ typedef enum PObj_enum {
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
 #define PObj_is_string_CLEAR(o) PObj_flag_CLEAR(is_string, o)
 
+#define PObj_is_string_copy_TEST(o) PObj_flag_TEST(is_string_copy, o)
+#define PObj_is_string_copy_SET(o) PObj_flag_SET(is_string_copy, o)
+#define PObj_is_string_copy_CLEAR(o) PObj_flag_CLEAR(is_string_copy, o)
+
 #define PObj_sysmem_TEST(o) PObj_flag_TEST(sysmem, o)
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
 #define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
@@ -316,6 +322,10 @@ typedef enum PObj_enum {
 
 #define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
         (PObj_sysmem_FLAG | PObj_on_free_list_FLAG | \
+         PObj_constant_FLAG | PObj_external_FLAG)))
+
+#define PObj_is_growable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
+        (PObj_sysmem_FLAG | PObj_is_string_copy_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \
