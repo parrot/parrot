@@ -1552,7 +1552,7 @@ Creates and returns a clone of the signature.
             SET_ATTR_return_flags(INTERP, dest, VTABLE_clone(INTERP, return_flags));
 
         if (hash)
-        parrot_hash_clone(INTERP, hash, get_hash(INTERP, dest));
+            parrot_hash_clone(INTERP, hash, get_hash(INTERP, dest));
 
         return dest;
     }
