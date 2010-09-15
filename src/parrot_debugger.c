@@ -294,7 +294,7 @@ PDB_printwelcome(void)
 {
     fprintf(stderr,
         "Parrot " PARROT_VERSION " Debugger\n"
-        "\nPlease note: the debugger is currently under reconstruction\n");
+        "(Please note: the debugger is currently under reconstruction)\n");
 }
 
 /*
