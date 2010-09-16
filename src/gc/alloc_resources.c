@@ -175,6 +175,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
 =item C<static void debug_print_buf(PARROT_INTERP, const Buffer *b)>
 
 Prints a debug statement with information about the given PObj C<b>.
+
 =cut
 
 */
@@ -193,19 +194,9 @@ debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
 
 =back
 
-*/
-
-/*
-
-=back
-
 =head2 Parrot Re/Allocate Code
 
 =over 4
-
-*/
-
-/*
 
 =item C<void merge_pools(Variable_Size_Pool *dest, Variable_Size_Pool *source)>
 
