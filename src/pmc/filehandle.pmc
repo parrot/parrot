@@ -373,7 +373,10 @@ Read a line from the filehandle and return it in a string.
 
 #ifdef PARROT_HAS_READLINE
     /* 4-column indent to get c_indent.t to DTRT */
-        char * const r = readline(got_prompt ? prompt->strstart : NULL);
+        char *prompt_cstring =
+            (got_prompt ? Parrot_str_to_cstring(INTERP, prompt) : NULL);
+        char * const r = readline(prompt_cstring);
+        Parrot_str_free_cstring(prompt_cstring);
 
         if (r) {
             if (*r)
@@ -383,8 +386,11 @@ Read a line from the filehandle and return it in a string.
             free(r);
         }
 #else
-        if (got_prompt)
-            fprintf(stderr, "%s", prompt->strstart);
+        if (got_prompt) {
+            char *prompt_cstring = Parrot_str_to_cstring(INTERP, prompt);
+            fprintf(stderr, "%s", prompt_cstring);
+            Parrot_str_free_cstring(prompt_cstring);
+        }
 
         if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
             Parrot_io_setlinebuf(INTERP, SELF);
