@@ -661,17 +661,6 @@ void Parrot_gc_inf_init(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/string_gc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_str_alloc_new_block(
-     ARGMOD(Memory_Pools *mem_pools),
-    size_t size,
-    ARGMOD(Variable_Size_Pool *pool),
-    ARGIN(const char *why))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*mem_pools)
-        FUNC_MODIFIES(*pool);
-
 void Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
     ARGOUT(Buffer *buffer),
@@ -728,10 +717,6 @@ void Parrot_gc_str_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*str);
 
-#define ASSERT_ARGS_Parrot_gc_str_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools) \
-    , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(why))
 #define ASSERT_ARGS_Parrot_gc_str_allocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

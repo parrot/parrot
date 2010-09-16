@@ -67,9 +67,6 @@ static void fix_pmc_syncs(
         FUNC_MODIFIES(*dest_interp);
 
 static void free_pool(ARGFREE(Fixed_Size_Pool *pool));
-static int is_block_almost_full(ARGIN(const Memory_Block *block))
-        __attribute__nonnull__(1);
-
 static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *dest),
@@ -117,8 +114,6 @@ static int sweep_cb_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(dest_interp) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_is_block_almost_full __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(block))
 #define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
