@@ -162,6 +162,11 @@ static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms_iterate_live_strings(PARROT_INTERP,
+    string_iterator_callback callback,
+    ARGIN_NULLOK(void *data))
+        __attribute__nonnull__(1);
+
 static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -327,6 +332,8 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -455,6 +462,8 @@ Parrot_gc_ms_init(PARROT_INTERP)
     interp->gc_sys->is_blocked_sweep = gc_ms_is_blocked_GC_sweep;
 
     interp->gc_sys->get_gc_info      = gc_ms_get_gc_info;
+
+    interp->gc_sys->iterate_live_strings = gc_ms_iterate_live_strings;
 
     initialize_var_size_pools(interp, interp->mem_pools);
     initialize_fixed_size_pools(interp, interp->mem_pools);
@@ -1876,6 +1885,52 @@ gc_ms_total_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
     }
     return ret;
 }
+
+/*
+=item C<static void gc_ms_iterate_live_strings(PARROT_INTERP,
+string_iterator_callback callback, void *data)>
+
+Iterate over live string invoking callback for each of them. Used during
+compacting of string pool.
+
+=cut
+*/
+static void
+gc_ms_iterate_live_strings(PARROT_INTERP,
+        string_iterator_callback callback,
+        ARGIN_NULLOK(void *data))
+{
+    ASSERT_ARGS(gc_ms_iterate_live_strings)
+
+    Memory_Pools * const mem_pools = interp->mem_pools;
+    INTVAL j;
+
+    /* Run through all the Buffer header pools and invoke callback */
+    for (j = (INTVAL)mem_pools->num_sized - 1; j >= 0; --j) {
+        Fixed_Size_Pool  * const header_pool = mem_pools->sized_header_pools[j];
+        Fixed_Size_Arena       * cur_buffer_arena;
+        UINTVAL       object_size;
+
+        if (!header_pool)
+            continue;
+
+        object_size = header_pool->object_size;
+
+        for (cur_buffer_arena = header_pool->last_Arena;
+                cur_buffer_arena;
+                cur_buffer_arena = cur_buffer_arena->prev) {
+            Buffer *b = (Buffer *) cur_buffer_arena->start_objects;
+            UINTVAL i;
+            const size_t objects_end = cur_buffer_arena->used;
+
+            for (i = objects_end; i; --i) {
+                callback(interp, b, data);
+                b = (Buffer *)((char *)b + object_size);
+            }
+        }
+    }
+}
+
 
 /*
 

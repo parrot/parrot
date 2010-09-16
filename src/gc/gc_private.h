@@ -91,6 +91,9 @@ typedef enum _gc_skip_type_enum {
     GC_NEVER_SKIP       /* unused */
 } gc_skip_type_enum;
 
+/* Callback for live string. Use Buffer for now... */
+typedef void (*string_iterator_callback)(PARROT_INTERP, Buffer *str, void *data);
+
 typedef struct GC_Subsystem {
     /* Which GC subsystem are we using? See PARROT_GC_DEFAULT_TYPE in
      * include/parrot/settings.h for possible values */
@@ -147,6 +150,9 @@ typedef struct GC_Subsystem {
     /* Introspection. Each GC must provide this function. Even with fake data */
     /* Return by value to simplify memory management */
     size_t (*get_gc_info)(PARROT_INTERP, Interpinfo_enum);
+
+    /* Iterate over _live_ strings. Used for string pool compacting */
+    void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 
     /*Function hooks that GC systems can CHOOSE to provide if they need them
      *These will be called via the GC API functions Parrot_gc_func_name

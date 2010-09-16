@@ -34,6 +34,11 @@ Functions to manage non-PObj memory, including strings and buffers.
 
 typedef void (*compact_f) (Interp *, Memory_Pools * const, Variable_Size_Pool *);
 
+typedef struct string_callback_data {
+    Memory_Block *new_block;     /* A pointer to our working block */
+    char         *cur_spot;      /* Where we're currently copying to */
+} string_callback_data;
+
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
@@ -92,6 +97,13 @@ static void free_old_mem_blocks(
 static void free_pool(ARGFREE(Fixed_Size_Pool *pool));
 static int is_block_almost_full(ARGIN(const Memory_Block *block))
         __attribute__nonnull__(1);
+
+static void move_buffer_callback(PARROT_INTERP,
+    ARGIN(Buffer *b),
+    ARGIN(void *data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -175,6 +187,10 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_block_almost_full __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(block))
+#define ASSERT_ARGS_move_buffer_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(b) \
+    , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_move_one_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool) \
@@ -439,10 +455,11 @@ compact_pool(PARROT_INTERP,
     INTVAL        j;
     UINTVAL       total_size;
 
-    Memory_Block *new_block;     /* A pointer to our working block */
-    char         *cur_spot;      /* Where we're currently copying to */
-
     Fixed_Size_Arena *cur_buffer_arena;
+
+    /* Contains new_block and cur_spot */
+    string_callback_data cb_data;
+
 
     /* Bail if we're blocked */
     if (mem_pools->gc_sweep_block_level)
@@ -466,57 +483,53 @@ compact_pool(PARROT_INTERP,
 
     alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
-    new_block = pool->top_block;
+    cb_data.new_block = pool->top_block;
 
     /* Start at the beginning */
-    cur_spot  = new_block->start;
+    cb_data.cur_spot  = cb_data.new_block->start;
 
     /* Run through all the Buffer header pools and copy */
-    for (j = (INTVAL)mem_pools->num_sized - 1; j >= 0; --j) {
-        Fixed_Size_Pool * const header_pool = mem_pools->sized_header_pools[j];
-        UINTVAL       object_size;
-
-        if (!header_pool)
-            continue;
-
-        object_size = header_pool->object_size;
-
-        for (cur_buffer_arena = header_pool->last_Arena;
-                cur_buffer_arena;
-                cur_buffer_arena = cur_buffer_arena->prev) {
-            Buffer *b = (Buffer *) cur_buffer_arena->start_objects;
-            UINTVAL i;
-            const size_t objects_end = cur_buffer_arena->used;
-
-            for (i = objects_end; i; --i) {
-
-                if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
-                    Memory_Block *old_block = Buffer_pool(b);
-
-                    if (!is_block_almost_full(old_block))
-                        cur_spot = move_one_buffer(interp, new_block, b, cur_spot);
-                }
-
-                b = (Buffer *)((char *)b + object_size);
-            }
-        }
-    }
+    interp->gc_sys->iterate_live_strings(interp, move_buffer_callback, &cb_data);
 
     /* Okay, we're done with the copy. Set the bits in the pool struct */
     /* First, where we allocate next */
-    new_block->top = cur_spot;
+    cb_data.new_block->top = cb_data.cur_spot;
 
-    PARROT_ASSERT(new_block->size >= (size_t)new_block->top -
-            (size_t)new_block->start);
+    PARROT_ASSERT(cb_data.new_block->size
+                  >=
+                  (size_t)cb_data.new_block->top - (size_t)cb_data.new_block->start);
 
     /* How much is free. That's the total size minus the amount we used */
-    new_block->free = new_block->size - (cur_spot - new_block->start);
-    mem_pools->memory_collected +=      (cur_spot - new_block->start);
-    mem_pools->memory_used      +=      (cur_spot - new_block->start);
+    cb_data.new_block->free     = cb_data.new_block->size
+                                  - (cb_data.cur_spot - cb_data.new_block->start);
+    mem_pools->memory_collected += (cb_data.cur_spot - cb_data.new_block->start);
+    mem_pools->memory_used      += (cb_data.cur_spot - cb_data.new_block->start);
 
-    free_old_mem_blocks(mem_pools, pool, new_block, total_size);
+    free_old_mem_blocks(mem_pools, pool, cb_data.new_block, total_size);
 
     --mem_pools->gc_sweep_block_level;
+}
+
+/*
+=item C<static void move_buffer_callback(PARROT_INTERP, Buffer *b, void *data)>
+
+Callback for live STRING/Buffer for compating.
+
+=cut
+*/
+static void
+move_buffer_callback(PARROT_INTERP, ARGIN(Buffer *b), ARGIN(void *data))
+{
+    ASSERT_ARGS(move_buffer_callback)
+    string_callback_data *cb = (string_callback_data*)data;
+
+    if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
+        Memory_Block *old_block = Buffer_pool(b);
+
+        if (!is_block_almost_full(old_block))
+            cb->cur_spot = move_one_buffer(interp, cb->new_block, b, cb->cur_spot);
+    }
+
 }
 
 /*
