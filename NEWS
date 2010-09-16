@@ -17,10 +17,11 @@ New in 2.8.0
 - Testing
   + Added more core pmc tests
   + Rearranged some tests with C coverage
+  + We now have Smolder back, at http://smolder.parrot.org . Submit reports with "make smoke"
 - GitMigration
   + Set up a test site for github trac plugin at http://mksig.org/trac/
-  + Mirror Parrot on github
   + Code of Trac plugin at github is on http://github.com/cotto/github-trac
+  + Parrot is now mirrored on github at http://github.com/parrot/parrot
 - Compilers
   + Fixed problem with imcc HLL in load_bytecode difference between loading a pbc and compiling a pir
  
