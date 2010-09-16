@@ -380,7 +380,7 @@ Read a line from the filehandle and return it in a string.
                 add_history(r);
 
             string_result = Parrot_str_new(INTERP, r, 0);
-            mem_internal_free(r);
+            free(r);
         }
 #else
         if (got_prompt)
