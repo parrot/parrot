@@ -2668,23 +2668,27 @@ Parrot_str_unescape(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_str_unescape)
 
-    STRING           *result;
-    const STR_VTABLE *encoding;
+    STRING           *src, *result;
+    const STR_VTABLE *encoding, *src_encoding;
 
     /* does the encoding have a character set? */
     const char     *p        = enc_char ? strchr(enc_char, ':') : NULL;
     size_t          clength  = strlen(cstring);
-    String_iter     iter;
-    UINTVAL         offs, d;
-    Parrot_UInt4    r;
-
-    /* we are constructing const table strings here */
-    const UINTVAL   flags = PObj_constant_FLAG;
 
     if (delimiter && clength)
         --clength;
 
-    if (p) {
+    if (enc_char == NULL) {
+        encoding = Parrot_default_encoding_ptr;
+    }
+    else if (p == NULL) {
+        encoding = Parrot_find_encoding(interp, enc_char);
+
+        if (!encoding)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Can't make '%s' encoding strings", enc_char);
+    }
+    else {
         #define MAX_ENCODING_NAME_ALLOWED 63
         char   buffer[MAX_ENCODING_NAME_ALLOWED + 1];
         size_t l = p - enc_char;
@@ -2697,45 +2701,27 @@ Parrot_str_unescape(PARROT_INTERP,
             buffer[0] = '\0';
         }
 
-        result   = string_make(interp, cstring, clength, buffer, flags);
-        encoding = Parrot_ascii_encoding_ptr;
-    }
-    else {
-        result   = string_make(interp, cstring, clength, enc_char, flags);
-        encoding = result->encoding;
-    }
+        encoding = Parrot_find_encoding(interp, buffer);
 
-    STRING_ITER_INIT(interp, &iter);
+        if (!encoding) {
+            encoding = Parrot_find_encoding(interp, p + 1);
 
-    for (offs = d = 0; offs < clength; ++offs) {
-        r = (Parrot_UInt4)((unsigned char *)result->strstart)[offs];
-
-        /* There cannot be any NULs within this string.  */
-        PARROT_ASSERT(r != '\0');
-
-        if (r == '\\') {
-            ++offs;
-            r = string_unescape_one(interp, &offs, result);
-            --offs;
+            if (!encoding)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                    "Can't make '%s' encoding strings", enc_char);
         }
-
-        if (d == offs) {
-            /* we did it in place - no action */
-            ++d;
-            ++(iter.bytepos);
-            ++(iter.charpos);
-            continue;
-        }
-
-        PARROT_ASSERT(d < offs);
-        encoding->iter_set_and_advance(interp, result, &iter, r);
-        ++d;
     }
 
-    result->strlen  = d;
-    result->bufused = iter.bytepos;
+    if (encoding->max_bytes_per_codepoint == 1)
+        src_encoding = encoding;
+    else
+        src_encoding = Parrot_utf8_encoding_ptr;
 
-    return result;
+    src = Parrot_str_new_init(interp, cstring, clength, src_encoding,
+            PObj_external_FLAG);
+
+    return Parrot_str_unescape_string(interp, src, encoding,
+            PObj_constant_FLAG);
 }
 
 

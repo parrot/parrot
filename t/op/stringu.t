@@ -186,7 +186,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
@@ -194,7 +194,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
@@ -202,7 +202,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
@@ -210,7 +210,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
