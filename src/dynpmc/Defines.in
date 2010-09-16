@@ -70,7 +70,6 @@ DYNPMC_H_FILES = \
     include/parrot/stat.h \
     include/parrot/string.h \
     include/parrot/string_funcs.h \
-    include/parrot/string_primitives.h \
     include/parrot/sub.h \
     include/parrot/thread.h \
     include/parrot/vtable.h \

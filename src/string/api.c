@@ -3250,8 +3250,6 @@ Parrot_str_gc_unregister(PARROT_INTERP, ARGIN(STRING *s))
 
 =over
 
-=item F<src/string/primitives.c>
-
 =item F<include/parrot/string.h>
 
 =item F<include/parrot/string_funcs.h>

@@ -963,7 +963,6 @@ include/parrot/settings.h                                   [main]include
 include/parrot/stat.h                                       [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
-include/parrot/string_primitives.h                          [main]include
 include/parrot/sub.h                                        [main]include
 include/parrot/sysmem.h                                     [main]include
 include/parrot/thr_pthread.h                                [main]include
@@ -1432,7 +1431,6 @@ src/string/encoding/ucs2.c                                  []
 src/string/encoding/ucs4.c                                  []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
-src/string/primitives.c                                     []
 src/string/unicode.h                                        []
 src/sub.c                                                   []
 src/thread.c                                                []

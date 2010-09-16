@@ -370,7 +370,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/datatypes.h \
 	$(INC_DIR)/encoding.h \
 	$(INC_DIR)/string.h \
-	$(INC_DIR)/string_primitives.h \
 	$(INC_DIR)/hash.h \
 	$(INC_DIR)/pmc_freeze.h \
 	$(INC_DIR)/vtable.h \
@@ -506,7 +505,6 @@ INTERP_O_FILES = \
     src/scheduler$(O) \
     src/spf_render$(O) \
     src/spf_vtable$(O) \
-    src/string/primitives$(O) \
     src/sub$(O) \
     src/thread$(O) \
     src/runcore/trace$(O) \
@@ -1409,8 +1407,6 @@ src/sub$(O) : \
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
 	src/string/private_cstring.h src/string/api.c
-
-src/string/primitives$(O) : $(PARROT_H_HEADERS) src/string/primitives.c
 
 src/longopt$(O) : $(PARROT_H_HEADERS) src/longopt.c
 
