@@ -916,73 +916,22 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     if (r->type & VT_ENCODED) {
         /*
          * the lexer parses:   foo:"string"
-         * get first part as charset, rest as string
+         * get first part as encoding, rest as string
          */
-        STRING     *s;
-        const STR_VTABLE *s_encoding;
-        const STR_VTABLE *src_encoding;
         #define MAX_NAME 31
-        char charset_name[MAX_NAME + 1];
         char encoding_name[MAX_NAME + 1];
-        char * p = strchr(r->name, '"');
-        char * p2 = strchr(r->name, ':');
-        PARROT_ASSERT(p && p[-1] == ':');
-        if (p2 < p -1) {
-            /* Handle the old 'encoding:charset' format by trying
-             * encoding as well as charset */
-            strncpy(encoding_name, buf, p2 - buf);
-            encoding_name[p2-buf] = '\0';
-            strncpy(charset_name, p2 +1, p - p2 - 2);
-            charset_name[p- p2 - 2] = '\0';
-            /*fprintf(stderr, "%s:%s\n", charset_name, encoding_name);*/
-            s_encoding = Parrot_find_encoding(interp, encoding_name);
-            if (s_encoding == NULL) {
-                s_encoding = Parrot_find_encoding(interp, charset_name);
-                if (s_encoding == NULL)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_STRING_REPRESENTATION,
-                            "Unknown encoding '%s:%s'",
-                            encoding_name, charset_name);
-            }
-        }
-        else {
-            strncpy(encoding_name, buf, p - buf - 1);
-            encoding_name[p - buf - 1] = '\0';
-            charset_name[0] = '\0';
-            /*fprintf(stderr, "%s\n", encoding_name);*/
-            s_encoding = Parrot_find_encoding(interp, encoding_name);
-            if (s_encoding == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "Unknown encoding '%s'", encoding_name);
-        }
-        if (s_encoding->max_bytes_per_codepoint == 1)
-            src_encoding = s_encoding;
-        else
-            src_encoding = Parrot_utf8_encoding_ptr;
+        char * p = strchr(buf, '"');
+        size_t len;
 
-        /* past delim */
-        buf     = p + 1;
-        if (strcmp(charset_name, "unicode") == 0 && strcmp(encoding_name, "utf8") == 0) {
-            /* Special case needed for backward compatibility with utf8 literals
-             * using \xHH\xHH byte sequences */
-            s = Parrot_str_unescape(interp, buf, '"', "utf8:unicode");
-        }
-        else {
-            p       = buf;
-            p2      = strchr(buf, '"');
-            while (p2 != NULL) {
-               p  = p2;
-               p2 = strchr(p + 1, '"');
-            }
-            {
-                STRING * aux = Parrot_str_new_init(interp, buf, p - buf,
-                        src_encoding, 0);
-                s = Parrot_str_unescape_string(interp, aux,
-                        s_encoding, PObj_constant_FLAG);
-            }
-        }
-        return s;
+        PARROT_ASSERT(p && p[-1] == ':');
+
+        len = p - buf - 1;
+        if (len > MAX_NAME)
+            len = MAX_NAME;
+        memcpy(encoding_name, buf, len);
+        encoding_name[len] = '\0';
+
+        return Parrot_str_unescape(interp, p + 1, '"', encoding_name);
     }
     else if (*buf == '"') {
         buf++;
