@@ -1886,59 +1886,34 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         int                 sign      = 1;
         UINTVAL             i         = 0;
         String_iter         iter;
-        number_parse_state  state = parse_start;
+        INTVAL              count = (INTVAL)s->strlen;
+        UINTVAL             c;
 
         STRING_ITER_INIT(interp, &iter);
 
-        while (state != parse_end && iter.charpos < s->strlen) {
-            const UINTVAL c = STRING_iter_get_and_advance(interp, s, &iter);
-            /* Check for overflow */
-            if (c > 255)
+        c = count-- > 0 ? STRING_iter_get_and_advance(interp, s, &iter) : 0;
+        while (c == ' ')
+            c = count-- > 0 ? STRING_iter_get_and_advance(interp, s, &iter) : 0;
+        switch (c) {
+          case '-':
+            sign = -1;
+          case '+':
+            c = count-- > 0 ? STRING_iter_get_and_advance(interp, s, &iter) : 0;
+            break;
+          default:
+            ; /* nothing */
+        }
+        while (c) {
+            const UINTVAL nextval = c - (UINTVAL)'0';
+            if (nextval > 9)
                 break;
-
-            switch (state) {
-              case parse_start:
-                if (isdigit((unsigned char)c)) {
-                    const UINTVAL nextval = c - '0';
-                    if (i < max_safe || (i == max_safe && nextval <= last_dig))
-                        i = i * 10 + nextval;
-                    else
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_ERR_OVERFLOW,
-                            "Integer value of String '%S' too big", s);
-                    state = parse_before_dot;
-                }
-                else if (c == '-') {
-                    sign      = -1;
-                    state = parse_before_dot;
-                }
-                else if (c == '+')
-                    state = parse_before_dot;
-                else if (isspace((unsigned char)c))
-                    ; /* Do nothing */
-                else
-                    state = parse_end;
-
-                break;
-
-              case parse_before_dot:
-                if (isdigit((unsigned char)c)) {
-                    const UINTVAL nextval = c - '0';
-                    if (i < max_safe || (i == max_safe && nextval <= last_dig))
-                        i = i * 10 + nextval;
-                    else
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_ERR_OVERFLOW,
-                            "Integer value of String '%S' too big", s);
-                }
-                else
-                    state = parse_end;
-                break;
-
-              default:
-                /* Pacify compiler */
-                break;
-            }
+            if (i < max_safe || (i == max_safe && nextval <= last_dig))
+                i = i * 10 + nextval;
+            else
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_ERR_OVERFLOW,
+                    "Integer value of String '%S' too big", s);
+            c = count-- > 0 ? STRING_iter_get_and_advance(interp, s, &iter) : 0;
         }
 
         if (sign == 1 && i > (UINTVAL)PARROT_INTVAL_MAX)
