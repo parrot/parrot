@@ -1315,8 +1315,8 @@ sub:
         {
           IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5;
           if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid) {
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = mem_sys_strdup(
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->name);
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid =
+                IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
           }
         }
      sub_params
@@ -1447,9 +1447,10 @@ subid:
          }
    | SUBID '(' any_string ')'
          {
+           SymReg *r = mk_const(interp, $3, 'S');
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, $3, 'S');
-           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
+           IMCC_INFO(interp)->cur_unit->subid = r;
+           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = r;
            mem_sys_free($3);
          }
    ;

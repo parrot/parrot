@@ -105,36 +105,6 @@ Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 
 /*
 
-=item C<char * str_dup_remove_quotes(const char *old)>
-
-Duplicates a C string (minus the wrapping quotes).  Similar to strdup(),
-except it dies if it runs out of memory.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char *
-str_dup_remove_quotes(ARGIN(const char *old))
-{
-    ASSERT_ARGS(str_dup_remove_quotes)
-    const size_t oldlen = strlen(old) + 1;
-
-    /* 2 for the beginning and ending quote chars */
-    const size_t newlen = oldlen - 2;
-    char * const copy   = (char *)mem_internal_allocate(newlen);
-
-    memcpy(copy, old + 1, newlen);
-    copy[newlen - 1] = 0;
-
-    return copy;
-}
-
-/*
-
 =back
 
 =head1 SEE ALSO

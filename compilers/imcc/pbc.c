@@ -778,7 +778,7 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
         const SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if subid matches - ok */
-        if (r && (r->subid && (strcmp(r->subid, lookup) == 0)))
+        if (r && (r->subid && (strcmp(r->subid->name, lookup) == 0)))
             return s;
 
         *pc += s->size;
