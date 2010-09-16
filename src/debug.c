@@ -82,7 +82,8 @@ static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb))
 static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void display_breakpoint(ARGIN(PDB_t *pdb),
+static void display_breakpoint(
+    ARGIN(PDB_t *pdb),
     ARGIN(const PDB_breakpoint_t *breakpoint))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

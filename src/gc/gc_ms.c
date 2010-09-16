@@ -61,13 +61,6 @@ static void gc_ms_alloc_objects(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_allocate_buffer_storage(PARROT_INTERP,
-    ARGOUT(Buffer *buffer),
-    size_t size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*buffer);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
@@ -186,13 +179,6 @@ static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_reallocate_buffer_storage(PARROT_INTERP,
-    ARGMOD(Buffer *buffer),
-    size_t newsize)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*buffer);
-
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void * gc_ms_reallocate_memory_chunk(SHIM_INTERP,
@@ -205,13 +191,6 @@ static void * gc_ms_reallocate_memory_chunk_zeroed(SHIM_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize);
-
-static void gc_ms_reallocate_string_storage(PARROT_INTERP,
-    ARGMOD(STRING *str),
-    size_t newsize)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*str);
 
 static int gc_ms_sweep_cb(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
@@ -280,9 +259,6 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_gc_ms_allocate_buffer_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_gc_ms_allocate_bufferlike_header \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -345,17 +321,9 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_gc_ms_reallocate_buffer_storage \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_gc_ms_reallocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_reallocate_memory_chunk_zeroed \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_gc_ms_reallocate_string_storage \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_ms_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
@@ -435,10 +403,10 @@ Parrot_gc_ms_init(PARROT_INTERP)
     interp->gc_sys->allocate_pmc_attributes = gc_ms_allocate_pmc_attributes;
     interp->gc_sys->free_pmc_attributes     = gc_ms_free_pmc_attributes;
 
-    interp->gc_sys->allocate_string_storage = gc_ms_allocate_string_storage;
+    interp->gc_sys->allocate_string_storage   = gc_ms_allocate_string_storage;
     interp->gc_sys->reallocate_string_storage = gc_ms_reallocate_string_storage;
 
-    interp->gc_sys->allocate_buffer_storage = gc_ms_allocate_buffer_storage;
+    interp->gc_sys->allocate_buffer_storage   = gc_ms_allocate_buffer_storage;
     interp->gc_sys->reallocate_buffer_storage = gc_ms_reallocate_buffer_storage;
 
     interp->gc_sys->allocate_fixed_size_storage = gc_ms_allocate_fixed_size_storage;
@@ -465,7 +433,7 @@ Parrot_gc_ms_init(PARROT_INTERP)
 
     interp->gc_sys->iterate_live_strings = gc_ms_iterate_live_strings;
 
-    initialize_var_size_pools(interp, interp->mem_pools);
+    Parrot_gc_str_initialize(interp, &interp->mem_pools->string_gc);
     initialize_fixed_size_pools(interp, interp->mem_pools);
     Parrot_gc_initialize_fixed_size_pools(interp, interp->mem_pools,
                                           GC_NUM_INITIAL_FIXED_SIZE_POOLS);
@@ -489,7 +457,7 @@ gc_ms_finalize(PARROT_INTERP)
     Parrot_gc_destroy_header_pools(interp, interp->mem_pools);
 
     /* memory pools in resources */
-    Parrot_gc_destroy_memory_pools(interp, interp->mem_pools);
+    Parrot_gc_str_finalize(interp, &interp->mem_pools->string_gc);
 
     /* mem subsystem is dead now */
     mem_internal_free(interp->mem_pools);
@@ -606,7 +574,54 @@ void
 gc_ms_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_compact_memory_pool)
-    compact_pool(interp, interp->mem_pools, interp->mem_pools->memory_pool);
+    Parrot_gc_str_compact_pool(interp, &interp->mem_pools->string_gc);
+}
+
+/*
+
+=item C<void gc_ms_allocate_string_storage(PARROT_INTERP, STRING *str, size_t
+size)>
+
+=item C<void gc_ms_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t
+size)>
+
+=item C<void gc_ms_allocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+size)>
+
+=item C<void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+size)>
+
+Functions for allocating strings/buffers storage.
+
+=cut
+*/
+
+void
+gc_ms_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
+{
+    ASSERT_ARGS(gc_ms_allocate_string_storage)
+    Parrot_gc_str_allocate_string_storage(interp, &interp->mem_pools->string_gc, str, size);
+}
+
+void
+gc_ms_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
+{
+    ASSERT_ARGS(gc_ms_reallocate_string_storage)
+    Parrot_gc_str_reallocate_string_storage(interp, &interp->mem_pools->string_gc, str, size);
+}
+
+void
+gc_ms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+{
+    ASSERT_ARGS(gc_ms_allocate_buffer_storage)
+    Parrot_gc_str_allocate_buffer_storage(interp, &interp->mem_pools->string_gc, str, size);
+}
+
+void
+gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+{
+    ASSERT_ARGS(gc_ms_reallocate_buffer_storage)
+    Parrot_gc_str_reallocate_buffer_storage(interp, &interp->mem_pools->string_gc, str, size);
 }
 
 /*
@@ -1082,233 +1097,6 @@ gc_ms_free_attributes_from_pool(ARGMOD(PMC_Attribute_Pool *pool), ARGMOD(void *d
     pool->free_list = item;
 
     ++pool->num_free_objects;
-}
-
-/*
-
-=item C<static void gc_ms_allocate_buffer_storage(PARROT_INTERP, Buffer *buffer,
-size_t size)>
-
-Allocates a chunk of memory of at least size C<size> for the given Buffer.
-buffer is guaranteed to be properly aligned for things like C<FLOATVALS>,
-so the size may be rounded up or down to guarantee that this alignment holds.
-
-=cut
-
-*/
-
-static void
-gc_ms_allocate_buffer_storage(PARROT_INTERP,
-    ARGOUT(Buffer *buffer), size_t size)
-{
-    ASSERT_ARGS(gc_ms_allocate_buffer_storage)
-    const size_t new_size   = ALIGNED_STRING_SIZE(size);
-
-    Buffer_bufstart(buffer) = (void *)aligned_mem(buffer,
-        (char *)mem_allocate(interp,
-        interp->mem_pools, new_size, interp->mem_pools->memory_pool));
-
-    /* Save pool used to allocate into buffer header */
-    *Buffer_poolptr(buffer) = interp->mem_pools->memory_pool->top_block;
-
-    Buffer_buflen(buffer)   = new_size - sizeof (void *);
-}
-
-/*
-
-=item C<static void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Buffer
-*buffer, size_t newsize)>
-
-Reallocate the Buffer's buffer memory to the given size. The
-allocated buffer will not shrink. If the buffer was allocated with
-L<Parrot_allocate_aligned> the new buffer will also be aligned. As with
-all reallocation, the new buffer might have moved and the additional
-memory is not cleared.
-
-=cut
-
-*/
-
-static void
-gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
-    size_t newsize)
-{
-    ASSERT_ARGS(gc_ms_reallocate_buffer_storage)
-    size_t copysize;
-    char  *mem;
-    Variable_Size_Pool * const pool = interp->mem_pools->memory_pool;
-    size_t new_size, needed, old_size;
-
-    /* we don't shrink buffers */
-    if (newsize <= Buffer_buflen(buffer))
-        return;
-
-    /*
-     * same as below but barely used and tested - only 3 list related
-     * tests do use true reallocation
-     *
-     * list.c, which does _reallocate, has 2 reallocations
-     * normally, which play ping pong with buffers.
-     * The normal case is therefore always to allocate a new block
-     */
-    new_size = ALIGNED_STRING_SIZE(newsize);
-    old_size = ALIGNED_STRING_SIZE(Buffer_buflen(buffer));
-    needed   = new_size - old_size;
-
-    if ((pool->top_block->free >= needed)
-    &&  (pool->top_block->top  == (char *)Buffer_bufstart(buffer) + old_size)) {
-        pool->top_block->free -= needed;
-        pool->top_block->top  += needed;
-        interp->mem_pools->memory_used += needed;
-        Buffer_buflen(buffer)  = newsize;
-        return;
-    }
-
-    copysize = Buffer_buflen(buffer);
-
-    mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
-    mem = aligned_mem(buffer, mem);
-
-    /* We shouldn't ever have a 0 from size, but we do. If we can track down
-     * those bugs, this can be removed which would make things cheaper */
-    if (copysize)
-        memcpy(mem, Buffer_bufstart(buffer), copysize);
-
-    Buffer_bufstart(buffer) = mem;
-
-    new_size -= sizeof (void *);
-
-    Buffer_buflen(buffer) = new_size;
-
-    /* Save pool used to allocate into buffer header */
-    *Buffer_poolptr(buffer) = interp->mem_pools->memory_pool->top_block;
-}
-
-/*
-
-=item C<void gc_ms_allocate_string_storage(PARROT_INTERP, STRING *str, size_t
-size)>
-
-Allocate the STRING's buffer memory to the given size. The allocated
-buffer maybe slightly bigger than the given C<size>. This function
-sets also C<< str->strstart >> to the new buffer location, C<< str->bufused >>
-is B<not> changed.
-
-=cut
-
-*/
-
-void
-gc_ms_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
-    size_t size)
-{
-    ASSERT_ARGS(gc_ms_allocate_string_storage)
-    size_t       new_size;
-    Variable_Size_Pool *pool;
-    char        *mem;
-
-    Buffer_buflen(str)   = 0;
-    Buffer_bufstart(str) = NULL;
-
-    if (size == 0)
-        return;
-
-    pool     = PObj_constant_TEST(str)
-                ? interp->mem_pools->constant_string_pool
-                : interp->mem_pools->memory_pool;
-
-    new_size = ALIGNED_STRING_SIZE(size);
-    mem      = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
-    mem     += sizeof (void *);
-
-    Buffer_bufstart(str) = str->strstart = mem;
-    Buffer_buflen(str)   = new_size - sizeof (void *);
-
-    /* Save pool used to allocate into buffer header */
-    *Buffer_poolptr(str) = pool->top_block;
-}
-
-/*
-
-=item C<static void gc_ms_reallocate_string_storage(PARROT_INTERP, STRING *str,
-size_t newsize)>
-
-Reallocate the STRING's buffer memory to the given size. The allocated
-buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
-new buffer location, C<str-E<gt>bufused> is B<not> changed.
-
-=cut
-
-*/
-
-static void
-gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
-    size_t newsize)
-{
-    ASSERT_ARGS(gc_ms_reallocate_string_storage)
-    size_t copysize;
-    char *mem, *oldmem;
-    size_t new_size, needed, old_size;
-
-    Variable_Size_Pool * const pool =
-        PObj_constant_TEST(str)
-            ? interp->mem_pools->constant_string_pool
-            : interp->mem_pools->memory_pool;
-
-    /* if the requested size is smaller then buflen, we are done */
-    if (newsize <= Buffer_buflen(str))
-        return;
-
-    /*
-     * first check, if we can reallocate:
-     * - if the passed strings buffer is the last string in the pool and
-     * - if there is enough size, we can just move the pool's top pointer
-     */
-    new_size = ALIGNED_STRING_SIZE(newsize);
-    old_size = ALIGNED_STRING_SIZE(Buffer_buflen(str));
-    needed   = new_size - old_size;
-
-    if (pool->top_block->free >= needed
-    &&  pool->top_block->top  == (char *)Buffer_bufstart(str) + old_size) {
-        pool->top_block->free -= needed;
-        pool->top_block->top  += needed;
-        interp->mem_pools->memory_used += needed;
-        Buffer_buflen(str) = new_size - sizeof (void *);
-        return;
-    }
-
-    PARROT_ASSERT(str->bufused <= newsize);
-
-    /* only copy used memory, not total string buffer */
-    copysize = str->bufused;
-
-    mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
-    mem += sizeof (void *);
-
-    /* Update Memory_Block usage */
-    /* We must not reallocate non-movable buffers! */
-    PARROT_ASSERT(PObj_is_movable_TESTALL(str));
-
-    /* We must not reallocate shared buffers! */
-    PARROT_ASSERT(!(*Buffer_bufflagsptr(str) & Buffer_shared_FLAG));
-
-    /* Decrease usage */
-    PARROT_ASSERT(Buffer_pool(str));
-    Buffer_pool(str)->freed += old_size;
-
-    /* copy mem from strstart, *not* bufstart */
-    oldmem             = str->strstart;
-    Buffer_bufstart(str) = (void *)mem;
-    str->strstart      = mem;
-    Buffer_buflen(str)   = new_size - sizeof (void *);
-
-    /* We shouldn't ever have a 0 from size, but we do. If we can track down
-     * those bugs, this can be removed which would make things cheaper */
-    if (copysize)
-        memcpy(mem, oldmem, copysize);
-
-    /* Save pool used to allocate into buffer header */
-    *Buffer_poolptr(str) = pool->top_block;
 }
 
 /*

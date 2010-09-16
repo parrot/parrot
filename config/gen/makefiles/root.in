@@ -464,6 +464,7 @@ INTERP_O_FILES = \
     src/gc/gc_inf$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
+    src/gc/string_gc$(O) \
     src/global_setup$(O) \
     src/hash$(O) \
     src/hll$(O) \
@@ -1299,6 +1300,9 @@ src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
 
 src/gc/alloc_resources$(O) : $(PARROT_H_HEADERS) \
 	src/gc/gc_private.h src/gc/alloc_resources.c
+
+src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
+	src/gc/gc_private.h src/gc/string_gc.c
 
 src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
