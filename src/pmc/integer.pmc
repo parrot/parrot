@@ -1228,7 +1228,7 @@ is the minimum integer, a BigInt is created.
         else {
             maybe_throw_overflow_error(INTERP);
             SELF = upgrade_self_to_bignum(INTERP, SELF);
-            return VTABLE_i_neg(INTERP, SELF);
+            VTABLE_i_neg(INTERP, SELF);
         }
     }
 
