@@ -178,7 +178,7 @@ This is @lang@, a compiler for the Parrot virtual machine.
 
 For building @lang@ you need at least a C compiler, a C<make> utility,
 and Perl 5.8 or newer.  To automatically obtain and build Parrot
-you may also need a subversion (svn) client.
+you also need a git client.
 
 =head2 Building and invoking @lang@
 
