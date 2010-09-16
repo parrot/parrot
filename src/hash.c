@@ -26,9 +26,6 @@ C<< hash->buckets >> bucket store points to this region.
 
 #include "parrot/parrot.h"
 
-/* the number of entries above which it's faster to hash the hashval instead of
- * looping over the used HashBuckets directly */
-
 /* hash first allocation size */
 #define INITIAL_SIZE  2
 
