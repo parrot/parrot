@@ -1924,7 +1924,11 @@ gc_ms_iterate_live_strings(PARROT_INTERP,
             const size_t objects_end = cur_buffer_arena->used;
 
             for (i = objects_end; i; --i) {
-                callback(interp, b, data);
+                if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
+                    Memory_Block *old_block = Buffer_pool(b);
+                    if (5 * (old_block->free + old_block->freed) >= old_block->size)
+                        callback(interp, b, data);
+                }
                 b = (Buffer *)((char *)b + object_size);
             }
         }
