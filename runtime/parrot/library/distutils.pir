@@ -2061,6 +2061,11 @@ a string
 
 a hash
 
+=item smolder_credentials
+
+A string, of the form "USERNAME:PASSWORD" to be used as the credentials for
+the server. The default is "parrot-autobot:qa_rocks"
+
 =back
 
 =cut
@@ -2155,6 +2160,18 @@ a hash
     set $P0, 1
     $P0[0] = archive
     push contents, $P0
+    $S0 = 'parrot-autobot:qa_rocks'
+    $I0 = exists kv['smolder_credentials']
+    unless $I0 goto L5
+    $S0 = kv['smolder_credentials']
+  L5:
+    $P0 = split ':', $S0
+    $P1 = $P0[0]
+    push contents, "username"
+    push contents, $P1
+    $P1 = $P0[1]
+    push contents, "password"
+    push contents, $P1
     load_bytecode 'LWP/UserAgent.pir'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
