@@ -227,29 +227,6 @@ Parrot_gc_str_finalize(SHIM_INTERP, ARGMOD(String_GC *gc))
 
 /*
 
-=item C<void Parrot_gc_str_alloc_new_block( Memory_Pools *mem_pools, size_t
-size, Variable_Size_Pool *pool, const char *why)>
-
-Allocate a new string block
-
-=cut
-
-*/
-
-void
-Parrot_gc_str_alloc_new_block(
-        ARGMOD(Memory_Pools *mem_pools),
-        size_t size,
-        ARGMOD(Variable_Size_Pool *pool),
-        ARGIN(const char *why))
-{
-    ASSERT_ARGS(Parrot_gc_str_alloc_new_block)
-
-    alloc_new_block(mem_pools, size, pool, why);
-}
-
-/*
-
 =item C<void Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP, String_GC *gc,
 Buffer *buffer, size_t size)>
 
@@ -712,7 +689,7 @@ mem_allocate(PARROT_INTERP,
              * Mark the block as big block (it has just one item)
              * And don't set big blocks as the top_block.
              */
-            Parrot_gc_str_alloc_new_block(mem_pools, size, pool, "compact failed");
+            alloc_new_block(mem_pools, size, pool, "compact failed");
 
             ++mem_pools->mem_allocs_since_last_collect;
 
@@ -863,7 +840,7 @@ compact_pool(PARROT_INTERP,
         return;
     }
 
-    Parrot_gc_str_alloc_new_block(mem_pools, total_size, pool, "inside compact");
+    alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
     cb_data.new_block = pool->top_block;
 
