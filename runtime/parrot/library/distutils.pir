@@ -2160,17 +2160,13 @@ the server. The default is "parrot-autobot:qa_rocks"
     set $P0, 1
     $P0[0] = archive
     push contents, $P0
-    $S0 = 'parrot-autobot:qa_rocks'
-    $I0 = exists kv['smolder_credentials']
-    unless $I0 goto L5
-    $S0 = kv['smolder_credentials']
-  L5:
+    $S0 = get_value('smolder_credentials', "parrot-autobot:qa_rocks" :named('default'), kv :flat :named)
     $P0 = split ':', $S0
     $P1 = $P0[0]
-    push contents, "username"
+    push contents, 'username'
     push contents, $P1
     $P1 = $P0[1]
-    push contents, "password"
+    push contents, 'password'
     push contents, $P1
     load_bytecode 'LWP/UserAgent.pir'
     .local pmc ua, response
