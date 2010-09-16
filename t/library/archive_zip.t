@@ -25,8 +25,8 @@ Test the Archive/Zip library
     goto have_zlib_support
   no_zlib_support:
     .get_results($P0)
-    pop_eh
     finalize $P0
+    pop_eh
     plan(1)
     ok(1, "Test irrelevant without zlib support built-in")
     goto zlib_test_end
@@ -35,7 +35,6 @@ Test the Archive/Zip library
     test_new()
     test_pack()
   zlib_test_end:
-    exit 0
 .end
 
 .sub 'test_new'
