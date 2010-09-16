@@ -19,11 +19,23 @@ Test the Archive/Zip library
 .sub 'main' :main
     .include 'test_more.pir'
 
+    push_eh no_zlib_support
     load_bytecode 'Archive/Zip.pir'
-
+    pop_eh
+    goto have_zlib_support
+  no_zlib_support:
+    .get_results($P0)
+    pop_eh
+    finalize $P0
+    plan(1)
+    ok(1, "Test irrelevant without zlib support built-in")
+    goto zlib_test_end
+  have_zlib_support:
     plan(14)
     test_new()
     test_pack()
+  zlib_test_end:
+    exit 0
 .end
 
 .sub 'test_new'
