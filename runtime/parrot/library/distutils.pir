@@ -1222,7 +1222,7 @@ hash
 
 the key is the PMC name
 
-the value is an array of PMC pathname or a single PPC pathname
+the value is an array of PMC pathname or a single PMC pathname
 
 an array creates a PMC group
 
@@ -1458,8 +1458,7 @@ an array creates a PMC group
 .sub '_mk_path_gen_dynpmc' :anon
     .param string src
     .param string ext
-    $I0 = length src
-    $I0 -= 4
+    $I0 = rindex(src, '.')
     $S0 = substr src, 0, $I0
     $S0 .= ext
     unless ext == '.h' goto L1
