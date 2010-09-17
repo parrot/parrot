@@ -2570,6 +2570,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
             pending = 0;
             next = c;
             if (c == '\\') {
+                if (itersrc.bytepos >= srclen) break;
                 c = STRING_iter_get_and_advance(interp, src, &itersrc);
                 switch (c) {
                 /* Common one char sequences */
@@ -2583,6 +2584,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'e': next = '\x1B'; break;
                 /* Escape character */
                 case 'c':
+                    if (itersrc.bytepos >= srclen) break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     /* This assumes ascii-alike encoding */
                     if (c < 'A' || c > 'Z')
@@ -2591,6 +2593,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
+                    if (itersrc.bytepos >= srclen) break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */
@@ -2630,6 +2633,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'u':
                     /* \uhhhh 4 hex digits */
                     for (digcount = 0; digcount < 4; ++digcount) {
+                        if (itersrc.bytepos >= srclen) break;
                         c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (!isxdigit(c))
                             throw_illegal_escape(interp);
@@ -2641,6 +2645,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'U':
                     /* \Uhhhhhhhh 8 hex digits */
                     for (digcount = 0; digcount < 8; ++digcount) {
+                        if (itersrc.bytepos >= srclen) break;
                         c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (!isxdigit(c))
                             throw_illegal_escape(interp);
@@ -2654,6 +2659,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     /* \ooo 1..3 oct digits */
                     digbuf[0] = c;
                     for (digcount = 1; digcount < 3; ++digcount) {
+                        if (itersrc.bytepos >= srclen) break;
                         c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (c < '0' || c > '7')
                             break;
@@ -2661,7 +2667,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     }
                     digbuf[digcount] = '\0';
                     next = strtol(digbuf, NULL, 8);
-                    if (digcount < 3)
+                    if (itersrc.bytepos < srclen && digcount < 3)
                         pending = 1;
                     break;
                 default:
