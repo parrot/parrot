@@ -118,9 +118,10 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-Run C<./ops2c --core> (or C<make bootstrap-ops>, ignoring errors) followed by
-C<make reconfig> and C<make> to update the names of version-specific internal
-functions.
+To have parrot configured and have run C<make> with the old version number is
+condition for this step. Run C<./ops2c --core> (or C<make bootstrap-ops>,
+ignoring errors) followed by C<make reconfig> and C<make> to update the names
+of version-specific internal functions.
 
 =item g
 
