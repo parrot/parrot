@@ -286,20 +286,23 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_Float), 0);
         SELF.set_number_native(value);
     }
 
 
     VTABLE void set_bool(INTVAL value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
         SELF.set_bool(value);
     }
 
 
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_String), 0);
         SELF.set_string_native(value);
     }
 
