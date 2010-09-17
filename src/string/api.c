@@ -471,6 +471,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         mem_sys_memcopy(dest->strstart + dest->bufused,
                 b->strstart, b->bufused);
 
+        dest->encoding = enc;
         dest->hashval = 0;
     }
     else {
