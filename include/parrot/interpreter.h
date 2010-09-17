@@ -172,6 +172,8 @@ struct parrot_interp_t {
 
     struct GC_Subsystem *gc_sys;              /*functions and data specific
                                                   to current GC subsystem*/
+    UINTVAL gc_threshold;                     /* maximum percentage of memory
+                                                 wasted by GC */
 
     PMC *gc_registry;                         /* root set of registered PMCs */
 

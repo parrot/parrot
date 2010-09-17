@@ -612,6 +612,9 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
 void Parrot_gc_ms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+int Parrot_gc_ms_needed(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_gc_ms_allocate_buffer_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
@@ -642,6 +645,8 @@ void Parrot_gc_ms_init(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms.c */

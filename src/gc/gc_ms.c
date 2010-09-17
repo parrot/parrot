@@ -486,6 +486,46 @@ gc_ms_destroy_child_interp(ARGMOD(Interp *dest_interp),
     Memory_Pools * const source_arena = source_interp->mem_pools;
     Parrot_gc_merge_memory_pools(dest_interp, dest_arena, source_arena);
 }
+
+/*
+
+=item C<int Parrot_gc_ms_needed(PARROT_INTERP)>
+
+Determines whether a GC run is needed. The decision is based on the amount
+of memory used since the last GC run. This amount is compared to a static
+and a dynamic threshold. The dynamic threshold roughly limits the memory
+wasted by objects that could be freed but are not yet collected to a
+percentage of total memory that is actually needed.
+
+Increasing the dynamic threshold results in fewer GC runs and more memory
+consumption.
+
+=cut
+
+*/
+
+int
+Parrot_gc_ms_needed(PARROT_INTERP)
+{
+    const Memory_Pools * const mem_pools = interp->mem_pools;
+    size_t dynamic_threshold;
+
+    /* new_mem is the additional amount of memory used since the last GC */
+    size_t new_mem = mem_pools->memory_used
+                   - mem_pools->mem_used_last_collect;
+
+    /* Never run a GC if new_mem is below static GC_SIZE_THRESHOLD */
+    if (new_mem <= GC_SIZE_THRESHOLD)
+        return 0;
+
+    /* The dynamic threshold is a configurable percentage of the amount of
+       memory used after the last GC */
+    dynamic_threshold = (size_t)(mem_pools->mem_used_last_collect *
+                                 (0.01 * interp->gc_threshold));
+
+    return new_mem > dynamic_threshold;
+}
+
 /*
 
 =item C<static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
@@ -1345,15 +1385,12 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
         ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
-    size_t new_mem = mem_pools->memory_used
-                   - mem_pools->mem_used_last_collect;
 
     if (pool->skip == GC_ONE_SKIP)
         pool->skip = GC_NO_SKIP;
     else if (pool->skip == GC_NEVER_SKIP
          || (pool->skip == GC_NO_SKIP
-         && (new_mem > (mem_pools->mem_used_last_collect >> 2)
-         &&  new_mem >= GC_SIZE_THRESHOLD)))
+         &&  Parrot_gc_ms_needed(interp)))
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.

@@ -39,6 +39,11 @@ static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
+static int is_all_digits(ARGIN(const char *s))
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
@@ -74,6 +79,8 @@ static void usage(ARGMOD(FILE *fp))
 
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -156,6 +163,29 @@ main(int argc, const char *argv[])
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
 #define SET_DEBUG(flag)  Parrot_set_debug(interp, (flag))
 #define SET_TRACE(flag)  Parrot_set_trace(interp, (flag))
+
+/*
+
+=item C<static int is_all_digits(const char *s)>
+
+Tests all characters in a string are decimal digits.
+Returns 1 if true, 0 as soon as a non-decimal found
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int
+is_all_digits(ARGIN(const char *s))
+{
+    ASSERT_ARGS(is_all_hex_digits)
+    for (; *s; ++s)
+        if (!isdigit(*s))
+            return 0;
+    return 1;
+}
 
 /*
 
@@ -278,6 +308,7 @@ help(void)
     printf(
     "    -w --warnings\n"
     "    -G --no-gc\n"
+    "       --gc-threshold=percentage    maximum memory wasted by GC\n"
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
     "    -g --gc ms|inf set GC type\n"
@@ -367,6 +398,29 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
             }
             break;
         }
+        else if (!strncmp(arg, "--gc-threshold", 14)) {
+
+            if ((arg = strrchr(arg, '=')))
+                ++arg;
+            else
+                arg = argv[++pos];
+
+            if (is_all_digits(arg)) {
+                interp->gc_threshold = strtoul(arg, NULL, 10);
+
+                if (interp->gc_threshold > 1000) {
+                    fprintf(stderr, "error: maximum GC threshold is 1000\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                fprintf(stderr, "error: invalid GC threshold specified:"
+                        "'%s'\n", arg);
+                exit(EXIT_FAILURE);
+            }
+            ++pos;
+            arg = argv[pos];
+        }
         else if (!strncmp(arg, "--hash-seed", 11)) {
 
             if ((arg = strrchr(arg, '=')))
@@ -443,6 +497,9 @@ parseflags(PARROT_INTERP,
             break;
           case 'g':
             /* Handled in parseflags_minimal */
+            break;
+          case OPT_GC_THRESHOLD:
+            /* handled in parseflags_minimal */
             break;
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {

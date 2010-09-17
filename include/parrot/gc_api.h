@@ -33,6 +33,8 @@
 
 #define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
 
+#define GC_DYNAMIC_THRESHOLD_DEFAULT 25
+
 /* pool iteration */
 typedef enum {
     POOL_PMC    = 0x01,

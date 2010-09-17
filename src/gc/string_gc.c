@@ -662,11 +662,8 @@ mem_allocate(PARROT_INTERP,
          * TODO pass required allocation size to the GC system,
          *      so that collection can be skipped if needed
          */
-        size_t new_mem = mem_pools->memory_used -
-                         mem_pools->mem_used_last_collect;
         if (!mem_pools->gc_mark_block_level
-            && new_mem > (mem_pools->mem_used_last_collect >> 2)
-            && new_mem > GC_SIZE_THRESHOLD) {
+        &&  Parrot_gc_ms_needed(interp)) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
             if (interp->gc_sys->sys_type != INF) {
