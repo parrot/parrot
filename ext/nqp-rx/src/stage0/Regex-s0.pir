@@ -3248,7 +3248,9 @@ character list.
 
     ops.'push_pirop'('inline', negate, subtype, 'inline'=>'  # rx enumcharlist negate=%0 %1')
 
+    if zerowidth goto skip_zero_1 
     ops.'push_pirop'('ge', pos, eos, fail)
+  skip_zero_1:
     ops.'push_pirop'('sub', '$I10', pos, off)
     ops.'push_pirop'('substr', '$S10', tgt, '$I10', 1)
     ops.'push_pirop'('index', '$I11', charlist, '$S10')
