@@ -170,6 +170,26 @@ static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
+PARROT_CAN_RETURN_NULL
+static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
+    ARGIN(Hash *hash),
+    ARGIN(STRING *s),
+    INTVAL hashval)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void parrot_hash_store_value_in_bucket(PARROT_INTERP,
+    ARGMOD(Hash *hash),
+    ARGMOD_NULLOK(HashBucket *bucket),
+    INTVAL hashval,
+    ARGIN_NULLOK(void *key),
+    ARGIN_NULLOK(void *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hash)
+        FUNC_MODIFIES(*bucket);
+
 static void parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -228,6 +248,14 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_parrot_hash_get_bucket_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_parrot_hash_store_value_in_bucket \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_parrot_mark_hash_both __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -1458,6 +1486,93 @@ parrot_hash_exists(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(void *key))
 
 /*
 
+=item C<static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP, Hash
+*hash, STRING *s, INTVAL hashval)>
+
+Given a hash, a STRING key, and the hashval of the key, returns the appropriate
+bucket of the hash for the key.  This assumes buckets are already available, so
+ensure the hash has storage before calling this function.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+static HashBucket *
+parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(Hash *hash),
+        ARGIN(STRING *s), INTVAL hashval)
+{
+    ASSERT_ARGS(parrot_hash_get_bucket_string)
+    HashBucket *bucket = hash->index[hashval & hash->mask];
+
+    while (bucket) {
+        const STRING *s2 = (const STRING *)bucket->key;
+        if (s == s2)
+            break;
+
+        /* manually inline part of string_equal  */
+        if (hashval == s2->hashval) {
+            if (s->encoding == s2->encoding) {
+                if ((STRING_byte_length(s) == STRING_byte_length(s2))
+                && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
+                    break;
+            } else if (Parrot_str_equal(interp, s, s2))
+                    break;
+        }
+        bucket = bucket->next;
+    }
+
+    return bucket;
+}
+
+
+/*
+
+=item C<static void parrot_hash_store_value_in_bucket(PARROT_INTERP, Hash *hash,
+HashBucket *bucket, INTVAL hashval, void *key, void *value)>
+
+Given a hash, a bucket, the hashval of the key, the key, and its value, stores
+the value in the bucket.  The bucket can be NULL, in which case this function
+will allocate more storage as appropriate.
+
+Note that C<key> is B<not> copied.
+
+=cut
+
+*/
+
+static void
+parrot_hash_store_value_in_bucket(PARROT_INTERP, ARGMOD(Hash *hash),
+    ARGMOD_NULLOK(HashBucket *bucket), INTVAL hashval,
+    ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
+{
+    ASSERT_ARGS(parrot_hash_store_value_in_bucket)
+
+    /* If we have a bucket already, put the value in it. Otherwise, we need
+       to get a new bucket */
+    if (bucket)
+        bucket->value = value;
+    else {
+        /* Get a new bucket off the free list. If the free list is empty, we
+           expand the hash so we get more items on the free list */
+        if (!hash->free_list)
+            expand_hash(interp, hash);
+
+        bucket = hash->free_list;
+
+        /* Add the value to the new bucket, increasing the count of elements */
+        ++hash->entries;
+        hash->free_list                   = bucket->next;
+        bucket->key                       = key;
+        bucket->value                     = value;
+        bucket->next                      = hash->index[hashval & hash->mask];
+        hash->index[hashval & hash->mask] = bucket;
+    }
+}
+
+
+/*
+
 =item C<HashBucket* parrot_hash_put(PARROT_INTERP, Hash *hash, void *key, void
 *value)>
 
@@ -1484,25 +1599,9 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     }
     else {
         if (hash->key_type == Hash_key_type_STRING) {
-            const STRING * const s = (STRING *)key;
-            hashval                = key_hash_STRING(interp, (STRING *)key, hash->seed);
-            bucket                 = hash->index[hashval & hash->mask];
-
-            while (bucket) {
-                const STRING *s2 = (const STRING *)bucket->key;
-                if (s == s2)
-                    break;
-                /* manually inline part of string_equal  */
-                if (hashval == s2->hashval) {
-                    if (s->encoding == s2->encoding) {
-                        if ((STRING_byte_length(s) == STRING_byte_length(s2))
-                        && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
-                            break;
-                    } else if (Parrot_str_equal(interp, s, s2))
-                            break;
-                }
-                bucket = bucket->next;
-            }
+            STRING *s = (STRING *)key;
+            hashval = key_hash_STRING(interp, s, hash->seed);
+            bucket  = parrot_hash_get_bucket_string(interp, hash, s, hashval);
         }
         else {
             hashval = key_hash(interp, hash, key);
@@ -1516,26 +1615,8 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         }
     }
 
-    /* If we have a bucket already, put the value in it. Otherwise, we need
-       to get a new bucket */
-    if (bucket)
-        bucket->value = value;
-    else {
-        /* Get a new bucket off the free list. If the free list is empty, we
-           expand the hash so we get more items on the free list */
-        if (!hash->free_list)
-            expand_hash(interp, hash);
-
-        bucket = hash->free_list;
-
-        /* Add the value to the new bucket, increasing the count of elements */
-        ++hash->entries;
-        hash->free_list                   = bucket->next;
-        bucket->key                       = key;
-        bucket->value                     = value;
-        bucket->next                      = hash->index[hashval & hash->mask];
-        hash->index[hashval & hash->mask] = bucket;
-    }
+    parrot_hash_store_value_in_bucket(interp, hash, bucket, hashval,
+        key, value);
 
     return bucket;
 }
