@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Parrot::Config;
 
 =head1 NAME
@@ -406,6 +406,34 @@ pir_output_is( <<'CODE', <<'OUTPUT', "concat ascii, utf8" );
 CODE
 abcdefg
 abcdefg
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "concat ascii, utf8 preallocated" );
+.sub main
+    .local string s, t
+    s = repeat "abcd", 100
+    t = "efg"
+    s = s . t
+    s = s . t
+    s = s . t
+    s = s . t
+    t = utf8:"hi\xa9jk"
+    s = s . t
+    $I0 = encoding s
+    $S0 = encodingname $I0
+    print $S0
+    print "\n"
+    $I0 = length s
+    print $I0
+    print "\n"
+    s = substr s, -21
+    print s
+    print "\n"
+.end
+CODE
+utf8
+417
+abcdefgefgefgefghi\xc2\xa9jk
 OUTPUT
 
 SKIP: {
