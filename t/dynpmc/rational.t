@@ -27,16 +27,6 @@ Tests the Rational PMC.
 
     unless $S0 goto no_gmp
     plan(56)
-    goto gmp_tests
-
-  no_gmp:
-    # seems like plan(0) is not supported currently
-    plan(1)
-    ok(1,'GMP not found, skipping Rational tests')
-    .return()
-
-    # The following tests only run if GMP is installed
- gmp_tests:
     loadlib $P1, 'rational'
     test_init()
     test_version()
@@ -77,6 +67,11 @@ Tests the Rational PMC.
     test_abs()
     test_cmp()
     test_equal_tt1517()
+    .return()
+
+ no_gmp:
+    skip_all('GMP not found, skipping Rational tests')
+    .return()
 .end
 
 .sub test_neg
