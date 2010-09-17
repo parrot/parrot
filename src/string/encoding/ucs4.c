@@ -19,7 +19,6 @@ UCS-4 encoding with the help of the ICU library.
 */
 
 #include "parrot/parrot.h"
-#include "../unicode.h"
 #include "shared.h"
 
 #if !PARROT_HAS_ICU
@@ -32,7 +31,7 @@ static void no_ICU_lib(PARROT_INTERP) /* HEADERIZER SKIP */
 }
 #endif
 
-/* HEADERIZER HFILE: src/string/encoding/ucs4.h */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -150,8 +149,6 @@ static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#include "ucs4.h"
 
 #if PARROT_HAS_ICU
 #  include <unicode/ustring.h>

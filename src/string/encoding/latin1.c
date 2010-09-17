@@ -17,11 +17,10 @@ This file implements encoding functions for ISO-8859-1 strings.
 */
 
 #include "parrot/parrot.h"
-#include "latin1.h"
 #include "shared.h"
 #include "tables.h"
 
-/* HEADERIZER HFILE: src/string/encoding/latin1.h */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

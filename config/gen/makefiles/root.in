@@ -1582,32 +1582,22 @@ src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
 src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/ascii.h \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
 src/string/encoding/latin1$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/latin1.h \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
 src/string/encoding/binary$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/binary.h \
     src/string/encoding/shared.h
 src/string/encoding/utf8$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/utf8.h \
     src/string/encoding/shared.h \
     src/string/unicode.h
 src/string/encoding/utf16$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/utf16.h \
-    src/string/encoding/shared.h \
-    src/string/unicode.h
+    src/string/encoding/shared.h
 src/string/encoding/ucs2$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/ucs2.h \
-    src/string/encoding/shared.h \
-    src/string/unicode.h
+    src/string/encoding/shared.h
 src/string/encoding/ucs4$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/ucs4.h \
-    src/string/encoding/shared.h \
-    src/string/unicode.h
+    src/string/encoding/shared.h
 
 src/pbc_merge$(O) : \
     $(INC_DIR)/embed.h \

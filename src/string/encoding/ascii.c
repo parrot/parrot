@@ -17,11 +17,10 @@ This file implements encoding functions for ASCII strings.
 */
 
 #include "parrot/parrot.h"
-#include "ascii.h"
 #include "shared.h"
 #include "tables.h"
 
-/* HEADERIZER HFILE: src/string/encoding/ascii.h */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

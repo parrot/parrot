@@ -20,10 +20,9 @@ UTF-8 (L<http://www.utf-8.com/>).
 
 #include "parrot/parrot.h"
 #include "../unicode.h"
-#include "utf8.h"
 #include "shared.h"
 
-/* HEADERIZER HFILE: src/string/encoding/utf8.h */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -17,10 +17,9 @@ This file implements encoding functions for binary strings.
 */
 
 #include "parrot/parrot.h"
-#include "binary.h"
 #include "shared.h"
 
-/* HEADERIZER HFILE: src/string/encoding/binary.h */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

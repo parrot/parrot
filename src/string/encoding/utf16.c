@@ -19,10 +19,9 @@ UTF-16 encoding with the help of the ICU library.
 */
 
 #include "parrot/parrot.h"
-#include "../unicode.h"
 #include "shared.h"
 
-/* HEADERIZER HFILE: src/string/encoding/utf16.h */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -132,8 +131,6 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#include "utf16.h"
 
 #if PARROT_HAS_ICU
 #  include <unicode/utf16.h>
