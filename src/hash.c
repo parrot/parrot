@@ -799,9 +799,13 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
     if (key_type   == Hash_key_type_STRING
     &&  entry_type == enum_hash_int) {
         for (entry_index = 0; entry_index < num_entries; ++entry_index) {
-            STRING * const key = VTABLE_shift_string(interp, info);
-            const INTVAL   i   = VTABLE_shift_integer(interp, info);
-            parrot_hash_put(interp, hash, (void *)key, (void *)i);
+            STRING * const key     = VTABLE_shift_string(interp, info);
+            const INTVAL   i       = VTABLE_shift_integer(interp, info);
+            const INTVAL   hashval = key_hash_STRING(interp, key, hash->seed);
+            HashBucket    *b       = parrot_hash_get_bucket_string(interp, hash,
+                                         key, hashval);
+            parrot_hash_store_value_in_bucket(interp, hash, b, hashval,
+                                         (void *)key, (void *)i);
         }
 
         return hash;
