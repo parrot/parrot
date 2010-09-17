@@ -507,6 +507,8 @@ consumption.
 int
 Parrot_gc_ms_needed(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_ms_needed)
+
     const Memory_Pools * const mem_pools = interp->mem_pools;
     size_t dynamic_threshold;
 

@@ -180,9 +180,9 @@ PARROT_PURE_FUNCTION
 static int
 is_all_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_hex_digits)
+    ASSERT_ARGS(is_all_digits)
     for (; *s; ++s)
-        if (!isdigit(*s))
+        if (!isdigit((unsigned char)*s))
             return 0;
     return 1;
 }
