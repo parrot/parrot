@@ -1222,7 +1222,7 @@ hash
 
 the key is the PMC name
 
-the value is an array of PMC pathname or a single PMC pathname
+the value is an array of PMC/C/H pathname or a single PMC pathname
 
 an array creates a PMC group
 
@@ -1260,24 +1260,52 @@ an array creates a PMC group
     .local pmc srcs
     srcs = hash[name]
     $I0 = does srcs, 'array'
-    unless $I0 goto L5
+    unless $I0 goto L3
+    .local pmc pmcs, includes
+    pmcs = new 'ResizableStringArray'
+    includes = new 'ResizableStringArray'
     $P1 = iter srcs
-  L3:
-    unless $P1 goto L4
+  L4:
+    unless $P1 goto L5
     .local string src
     src = shift $P1
+    .local string ext
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    unless ext == '.pmc' goto L6
+    push pmcs, src
+  L6:
+    unless ext == '.h' goto L4
+    push includes, src
+    goto L4
+  L5:
+    $P1 = iter srcs
+  L7:
+    unless $P1 goto L8
+    src = shift $P1
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    if ext == '.h' goto L7
     $S0 = _mk_path_gen_dynpmc(src, obj)
-    $I0 = newer($S0, src)
-    if $I0 goto L3
+    push includes, src
+    $I0 = newer($S0, includes)
+    $S1 = pop includes
+    if $I0 goto L7
+    if ext == '.c' goto L9
     __build_dynpmc(src, cflags)
-    goto L3
-  L4:
+    goto L7
+  L9:
+    __compile_cc($S0, src, cflags)
+    $S0 = ' ' . $S0
+    ldflags .= $S0
+    goto L7
+  L8:
     $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, srcs)
     if $I0 goto L1
-    __build_dynpmc_group(srcs, name, cflags, ldflags)
+    __build_dynpmc_group(pmcs, name, cflags, ldflags)
     goto L1
-  L5:
+  L3:
     src = srcs
     $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, src)
@@ -1778,13 +1806,18 @@ the value is the POD pathname
     unless $P1 goto L4
     .local string src
     src = shift $P1
+    .local string ext
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    if ext == '.h' goto L3
+    $S0 = _mk_path_gen_dynpmc(src, obj)
+    unlink($S0, 1 :named('verbose'))
+    if ext == '.c' goto L3
     $S0 = _mk_path_gen_dynpmc(src, '.c')
     unlink($S0, 1 :named('verbose'))
     $S0 = _mk_path_gen_dynpmc(src, '.h')
     unlink($S0, 1 :named('verbose'))
     $S0 = _mk_path_gen_dynpmc(src, '.dump')
-    unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynpmc(src, obj)
     unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
