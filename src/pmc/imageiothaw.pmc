@@ -21,9 +21,9 @@ Thaws PMCs from packfile images.
 #include "parrot/imageio.h"
 
 #define BYTECODE_SHIFT_OK(interp, pmc) PARROT_ASSERT( \
-    PARROT_IMAGEIOTHAW(pmc)->curs <= \
-    PARROT_IMAGEIOTHAW(pmc)->image->strstart + \
-    Parrot_str_byte_length((interp), PARROT_IMAGEIOTHAW(pmc)->image->strstart))
+    PARROT_IMAGEIOTHAW(pmc)->curs <= (opcode_t *) \
+    (PARROT_IMAGEIOTHAW(pmc)->img->strstart + \
+    Parrot_str_byte_length((interp), PARROT_IMAGEIOTHAW(pmc)->img)))
 
 
 /* HEADERIZER HFILE: none */
