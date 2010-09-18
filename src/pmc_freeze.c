@@ -54,7 +54,7 @@ STRING*
 Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_freeze)
-    PMC * const image = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC * const image = Parrot_pmc_new(interp, enum_class_ImageIOFreeze);
     VTABLE_set_pmc(interp, image, pmc);
     return VTABLE_get_string(interp, image);
 }
@@ -83,7 +83,7 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
     STRING *image;
     DECL_CONST_CAST;
 
-    visitor  = Parrot_pmc_new(interp, enum_class_ImageIO);
+    visitor  = Parrot_pmc_new(interp, enum_class_ImageIOFreeze);
     VTABLE_set_pointer(interp, visitor,
         PARROT_const_cast(void *, (const void *)pf));
     VTABLE_set_pmc(interp, visitor, pmc);
