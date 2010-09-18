@@ -267,8 +267,10 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "The opcode '%s' needs arguments", name);
 
-    r[0]           = mk_const(interp, r[0]->name, 'P');
-    r[0]->pmc_type = enum_class_FixedIntegerArray;
+    if (r[0]->set == 'S') {
+        r[0]           = mk_const(interp, r[0]->name, 'P');
+        r[0]->pmc_type = enum_class_FixedIntegerArray;
+    }
 
     op_fullname(fullname, name, r, 1, 0);
     op = (op_info_t *)parrot_hash_get(interp, interp->op_hash, fullname);

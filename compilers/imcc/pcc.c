@@ -354,7 +354,8 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         bufpos--;
     memcpy(buf+bufpos, subf, lensubf);
 
-    regs[0] = mk_const(interp, buf, 'S');
+    regs[0] = mk_const(interp, buf, 'P');
+    regs[0]->pmc_type = enum_class_FixedIntegerArray;
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
 
     if (n >= PCC_GET_ARGS_LIMIT) {
