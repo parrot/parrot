@@ -802,9 +802,8 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
             STRING * const key     = VTABLE_shift_string(interp, info);
             const INTVAL   i       = VTABLE_shift_integer(interp, info);
             const INTVAL   hashval = key_hash_STRING(interp, key, hash->seed);
-            HashBucket    *b       = parrot_hash_get_bucket_string(interp, hash,
-                                         key, hashval);
-            parrot_hash_store_value_in_bucket(interp, hash, b, hashval,
+            /* serialized hashes assumed not to contain duplicates */
+            parrot_hash_store_value_in_bucket(interp, hash, NULL, hashval,
                                          (void *)key, (void *)i);
         }
 
