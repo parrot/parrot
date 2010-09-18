@@ -763,6 +763,9 @@ Returns the PMC value for the element at C<*key>.
 
         GET_ATTR_hash(INTERP, SELF, hash);
 
+        if (!hash->entries)
+            return PMCNULL;
+
         /* special case the most likely key type, for speed */
         if (hash->key_type != Hash_key_type_STRING)
             key = (STRING *)hash_key_from_string(INTERP, hash, key);
