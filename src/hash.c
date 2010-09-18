@@ -1398,7 +1398,6 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
 {
     ASSERT_ARGS(parrot_hash_get_bucket)
     DECL_CONST_CAST;
-    HashBucket *bucket;
 
     if (hash->entries <= 0)
         return NULL;
@@ -1407,30 +1406,12 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
         STRING * const s       = (STRING *)PARROT_const_cast(void *, key);
         const size_t   hashval = key_hash_STRING(interp, s, hash->seed);
 
-        bucket                 = hash->index[hashval & hash->mask];
-
-        while (bucket) {
-            const STRING *s2 = (const STRING *)bucket->key;
-
-            if (s == s2)
-                break;
-            /* manually inline part of string_equal  */
-            if (hashval == s2->hashval) {
-                if (s->encoding == s2->encoding){
-                    if ((STRING_byte_length(s) == STRING_byte_length(s2))
-                    && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
-                        break;
-                } else if (Parrot_str_equal(interp, s, s2))
-                        break;
-            }
-
-            bucket = bucket->next;
-        }
+        return parrot_hash_get_bucket_string(interp, hash, s, hashval);
     }
     else {
         const size_t hashval = key_hash(interp, hash,
                                     PARROT_const_cast(void *, key));
-        bucket               = hash->index[hashval & hash->mask];
+        HashBucket  *bucket  = hash->index[hashval & hash->mask];
 
         while (bucket) {
             if (hash_compare(interp, hash,
@@ -1439,9 +1420,9 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
                 break;
             bucket = bucket->next;
         }
-    }
 
-    return bucket;
+        return bucket;
+    }
 }
 
 /*
