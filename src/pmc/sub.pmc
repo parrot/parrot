@@ -743,7 +743,7 @@ Unarchives the subroutine.
         INTVAL flags;
         int    i;
 
-        SUPER(info);
+        STATICSELF.init();
 
         PMC_get_sub(INTERP, SELF, sub);
 
