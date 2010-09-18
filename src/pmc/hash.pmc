@@ -766,10 +766,6 @@ Returns the PMC value for the element at C<*key>.
         if (!hash->entries)
             return PMCNULL;
 
-        /* special case the most likely key type, for speed */
-        if (hash->key_type != Hash_key_type_STRING)
-            key = (STRING *)hash_key_from_string(INTERP, hash, key);
-
         b = parrot_hash_get_bucket(INTERP, hash, key);
 
         if (!b)
