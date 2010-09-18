@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id: imageio.pmc 49125 2010-09-18 00:48:46Z plobsing $
+$Id$
 
 =head1 NAME
 
@@ -54,11 +54,6 @@ static void INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pmc);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_INLINE
-static INTVAL INFO_HAS_DATA(ARGIN(const PMC *io))
-        __attribute__nonnull__(1);
-
 PARROT_INLINE
 static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
         __attribute__nonnull__(1)
@@ -78,8 +73,6 @@ static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
     , PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_INC_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_INFO_HAS_DATA __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_SET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(cursor))

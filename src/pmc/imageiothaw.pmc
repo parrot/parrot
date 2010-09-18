@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id: imageio.pmc 48634 2010-08-24 17:14:54Z plobsing $
+$Id$
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ Thaws PMCs from packfile images.
 #define BYTECODE_SHIFT_OK(interp, pmc) PARROT_ASSERT( \
     PARROT_IMAGEIOTHAW(pmc)->curs <= \
     PARROT_IMAGEIOTHAW(pmc)->image->strstart + \
-    Parrot_str_byte_length(interp, PARROT_IMAGEIOTHAW(pmc)->image->strstart))
+    Parrot_str_byte_length((interp), PARROT_IMAGEIOTHAW(pmc)->image->strstart))
 
 
 /* HEADERIZER HFILE: none */
@@ -98,11 +98,11 @@ Thaws the PMC contained in C<image>.
 */
 
     VTABLE void set_string_native(STRING *image) {
-	if (!PObj_external_TEST(image))
-	    Parrot_str_pin(INTERP, image);
+        if (!PObj_external_TEST(image))
+            Parrot_str_pin(INTERP, image);
 
-	PARROT_IMAGEIOTHAW(SELF)->img  = image;
-	PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)image->strstart;
+        PARROT_IMAGEIOTHAW(SELF)->img  = image;
+        PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)image->strstart;
 
         if (PObj_flag_TEST(private1, SELF)) {
             PARROT_IMAGEIOTHAW(SELF)->pf = PARROT_IMAGEIOTHAW(SELF)->pf_ct->base.pf;
@@ -117,7 +117,8 @@ Thaws the PMC contained in C<image>.
 
             PARROT_IMAGEIOTHAW(SELF)->pf->options |= PFOPT_PMC_FREEZE_ONLY;
             unpacked_length = PackFile_unpack(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf,
-                                PARROT_IMAGEIOTHAW(SELF)->curs, Parrot_str_byte_length(interp, image));
+                                PARROT_IMAGEIOTHAW(SELF)->curs,
+                                Parrot_str_byte_length(interp, image));
 
             if (unpacked_length)
                 PARROT_IMAGEIOTHAW(SELF)->curs += header_length / sizeof (opcode_t*);
@@ -125,19 +126,19 @@ Thaws the PMC contained in C<image>.
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_STRING_REPRESENTATION,
                         "PackFile header failed during unpack");
-	}
+        }
 
-	STATICSELF.shift_pmc();
-	Parrot_visit_loop_visit(INTERP, SELF);
+        STATICSELF.shift_pmc();
+        Parrot_visit_loop_visit(INTERP, SELF);
 
-	/* we're done reading the image */
-	PARROT_ASSERT(image->strstart + Parrot_str_byte_length(interp, image) ==
+        /* we're done reading the image */
+        PARROT_ASSERT(image->strstart + Parrot_str_byte_length(interp, image) ==
                     PARROT_IMAGEIOTHAW(SELF)->curs);
 
-	Parrot_visit_loop_thawfinish(INTERP, SELF);
+        Parrot_visit_loop_thawfinish(INTERP, SELF);
 
-	if (!PObj_external_TEST(image))
-	    Parrot_str_unpin(INTERP, image);
+        if (!PObj_external_TEST(image))
+            Parrot_str_unpin(INTERP, image);
     }
 
 

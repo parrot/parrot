@@ -1,3 +1,6 @@
+/* Copyright (C) 2001-2009, Parrot Foundation.
+ * $Id$
+ */
 #ifndef PARROT_IMAGEIO_H_GUARD
 #define PARROT_IMAGEIO_H_GUARD
 
@@ -21,3 +24,10 @@ enum {
 };
 
 #endif /* PARROT_IMAGEIO_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
