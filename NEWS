@@ -13,6 +13,7 @@ New in 2.8.0
   + Better organisation of programs by reposition it to "tools/build" and "tools/release"
   + Implemented Exception clone vtable function
   + Added experimental function Parrot_getpid and getpid method
+  + --gc-threshold command line argument added, which controls the % of memory wasted by the GC
   + Closed a lot of tickets
 - Testing
   + Added more core pmc tests
