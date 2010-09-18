@@ -24,10 +24,9 @@ Tests Parrot unicode string system.
 =cut
 
 pir_output_is( <<'CODE', <<OUTPUT, "angstrom" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     chr $S0, 0x212B
     print $S0
@@ -39,10 +38,9 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"\x{212b}"
     print $S0
@@ -54,10 +52,9 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{212b}"
     print $S0
@@ -69,10 +66,9 @@ aaaaaa\xe2\x84\xab
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{212b}-aaaaaa"
     print $S0
@@ -84,10 +80,9 @@ aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\u212b-aaaaaa"
     print $S0
@@ -99,10 +94,9 @@ aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
     print $S0
@@ -114,10 +108,9 @@ aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U' );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\U0001d400-aaaaaa"
     print $S0
@@ -129,10 +122,9 @@ aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "two upscales" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
     print $S0
@@ -148,10 +140,9 @@ aaaaaa\xe2\x84\xab-bbbbbb\xf0\x9d\x90\x80-cccccc
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale" );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
     print $S0
@@ -167,10 +158,9 @@ aaaaaa\xf0\x9d\x90\x80-bbbbbb\xe2\x84\xab-cccccc
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo' );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'("utf8")
     set $S0, "ok 1\cJ"
     print $S0

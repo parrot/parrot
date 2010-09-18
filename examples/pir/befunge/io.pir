@@ -40,7 +40,7 @@
     if $I0 > 0 goto _IO__INPUT_CHAR__SUBSTR
 
     $P1 = getinterp
-    $P1 = $P1.'stdhandle'(.PIO_STDIN_FILENO)
+    $P1 = $P1.'stdin_handle'()
     $S0 = $P1.'readline'()
     $S0 = chopn $S0, 1
 
@@ -73,7 +73,7 @@
     if len > 0 goto _IO__INPUT_INT__PARSE_INPUT
 
     $P1 = getinterp
-    $P1 = $P1.'stdhandle'(.PIO_STDIN_FILENO)
+    $P1 = $P1.'stdin_handle'()
     $S0 = $P1.'readline'()
     $S0 = chopn $S0, 1
     len = length $S0
