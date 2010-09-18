@@ -199,7 +199,7 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
     ASSERT_ARGS(Parrot_thaw)
 
     PMC        *result;
-    PMC * const info     = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC * const info     = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
     int         gc_block = 0;
 
     /*
@@ -251,7 +251,7 @@ Parrot_thaw_pbc(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGMOD(const opco
     ASSERT_ARGS(Parrot_thaw_pbc)
     PackFile * const pf = ct->base.pf;
     STRING *image       = PF_fetch_buf(interp, pf, cursor);
-    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
     VTABLE_set_pointer(interp, info, ct);
     VTABLE_set_string_native(interp, info, image);
     return VTABLE_get_pmc(interp, info);
