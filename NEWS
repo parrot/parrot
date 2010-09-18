@@ -18,6 +18,7 @@ New in 2.8.0
   + Added more core pmc tests
   + Rearranged some tests with C coverage
   + We now have Smolder back, at http://smolder.parrot.org . Submit reports with "make smoke"
+  + skip_all implementation in Parrot's Test::More completed
 - GitMigration
   + Set up a test site for github trac plugin at http://mksig.org/trac/
   + Code of Trac plugin at github is on http://github.com/cotto/github-trac
