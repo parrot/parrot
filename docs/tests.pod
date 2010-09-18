@@ -24,7 +24,7 @@ in the languages directory.
 =head2 Submitting smolder test results
 
 Parrot has a status page with smoke test results at
-L<http://smolder.plusthree.com/app/public_projects/details/8>.
+L<http://smolder.parrot.org/app/projects/smoke_reports/1>.
 
 You can supply new tests results by just running C<make smoke>.  It will run the
 same tests as C<make test> would, but will upload the test results to the
