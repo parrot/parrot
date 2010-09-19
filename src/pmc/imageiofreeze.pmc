@@ -42,13 +42,6 @@ PARROT_WARN_UNUSED_RESULT
 static opcode_t * GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PARROT_INLINE
-static PMC* id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_INLINE
 static void INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
         __attribute__nonnull__(1)
@@ -68,9 +61,6 @@ static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
     , PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_GET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_id_list_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_INC_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_SET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -82,6 +72,8 @@ static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
 /*
 
 =item C<static opcode_t * GET_VISIT_CURSOR(const PMC *pmc)>
+
+Get the buffer cursor. Buffer relocations are handled.
 
 =cut
 
@@ -104,6 +96,8 @@ GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
 
 =item C<static void SET_VISIT_CURSOR(PMC *pmc, const char *cursor)>
 
+Set the buffer cursor. Buffer relocations are handled.
+
 =cut
 
 */
@@ -123,6 +117,8 @@ SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
 
 =item C<static void INC_VISIT_CURSOR(PMC *pmc, UINTVAL inc)>
 
+Increment the buffer cursor. Buffer relocations are handled.
+
 =cut
 
 */
@@ -141,6 +137,8 @@ INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
 /*
 
 =item C<static void create_buffer(PARROT_INTERP, PMC *pmc, PMC *info)>
+
+Allocate the image buffer.
 
 =cut
 
@@ -209,25 +207,6 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 #ifndef DISABLE_GC_DEBUG
     Parrot_gc_compact_memory_pool(interp);
 #endif
-}
-
-/*
-
-=item C<static PMC* id_list_get(PARROT_INTERP, const PMC *io, UINTVAL id)>
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PARROT_INLINE
-static PMC*
-id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id)
-{
-    ASSERT_ARGS(id_list_get)
-
-    return VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIOFREEZE(io)->todo, id - 1);
 }
 
 pmclass ImageIOFreeze auto_attrs {
