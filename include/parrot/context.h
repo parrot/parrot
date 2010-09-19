@@ -134,14 +134,6 @@ INTVAL Parrot_pcc_get_HLL_func(SHIM_INTERP, ARGIN(PMC *ctx))
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-PARROT_CAN_RETURN_NULL
-INTVAL Parrot_pcc_get_int_constant_func(SHIM_INTERP,
-    ARGIN(PMC *ctx),
-    INTVAL idx)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_pcc_get_lex_pad_func(SHIM_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
@@ -339,9 +331,6 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_HLL_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_int_constant_func \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_lex_pad_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -452,7 +441,6 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_get_signature(i, c) (CONTEXT_STRUCT(c)->current_sig)
 #  define Parrot_pcc_set_signature(i, c, value) (CONTEXT_STRUCT(c)->current_sig = (value))
 
-#  define Parrot_pcc_get_int_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.integer)
 #  define Parrot_pcc_get_num_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.number)
 #  define Parrot_pcc_get_string_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.string)
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) (CONTEXT_STRUCT(c)->constants[(idx)].u.key)
@@ -510,7 +498,6 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_get_signature(i, c) Parrot_pcc_get_signature_func((i), (c))
 #  define Parrot_pcc_set_signature(i, c, value) Parrot_pcc_set_signature_func((i), (c), (value))
 
-#  define Parrot_pcc_get_int_constant(i, c, idx) Parrot_pcc_get_int_constant_func((i), (c), (idx))
 #  define Parrot_pcc_get_num_constant(i, c, idx) Parrot_pcc_get_num_constant_func((i), (c), (idx))
 #  define Parrot_pcc_get_string_constant(i, c, idx) Parrot_pcc_get_string_constant_func((i), (c), (idx))
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) Parrot_pcc_get_pmc_constant_func((i), (c), (idx))

@@ -655,9 +655,6 @@ Parrot_pcc_trace_flags_test_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 
 /*
 
-=item C<INTVAL Parrot_pcc_get_int_constant_func(PARROT_INTERP, PMC *ctx, INTVAL
-idx)>
-
 =item C<FLOATVAL Parrot_pcc_get_num_constant_func(PARROT_INTERP, PMC *ctx,
 INTVAL idx)>
 
@@ -672,18 +669,6 @@ Get typed constant from context.
 =cut
 
 */
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_CAN_RETURN_NULL
-INTVAL
-Parrot_pcc_get_int_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
-{
-    ASSERT_ARGS(Parrot_pcc_get_int_constant_func)
-    const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(c->constants[idx].type == 'i');
-    return c->constants[idx].u.integer;
-}
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION

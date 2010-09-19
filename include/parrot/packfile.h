@@ -170,7 +170,6 @@ typedef struct PackFile_Header {
 typedef struct PackFile_Constant {
     opcode_t type;
     union {
-        opcode_t  integer;
         FLOATVAL  number;
         STRING   *string;
         PMC      *key;
