@@ -7,7 +7,6 @@ docs/project/git_terminology.pod - Git Terminology
 This document describes terms that are used in F<docs/project/git_workflow.pod>
 and contains generally useful things to know about Git.
 
-
 =head1 INTRODUCTION
 
 Before learning any terminology, there are a few very basic things that
@@ -40,6 +39,12 @@ it operates on the index, working copy, staging area or a combination of the
 three. Also note that certain C<git> commands can operate on different areas
 when given different command-line options.
 
+=head1 HELPING YOURSELF
+
+Git comes with extensive documentation. To get the short help summary for a git
+command, do C<git cmd -h>. To see the manual for a git command, type C<git help
+cmd>, where "cmd" is the name of the command you want to look up.
+
 =head1 TERMS
 
 =head2 clone
@@ -61,6 +66,13 @@ remote is where the repo was originally cloned from and it has the name
 =head2 repo
 
 Noun. Short for repository.
+
+=head2 SHA1
+
+Secure Hash Algorithm 1. Also called a SHA1 sum or SHA1 hash. Every git commit
+is uniquely identified by a SHA1. This is roughly similar to a Subversion
+Revision, but it is not an integer and does not increase linearly, because git
+commits can have any number of parents.
 
 =head1 SEE ALSO
 
