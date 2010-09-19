@@ -4,11 +4,11 @@ docs/project/git_terminology.pod - Git Terminology
 
 =head1 DESCRIPTION
 
-This document describes terms that are used in docs/project/git_workflow.pod
+This document describes terms that are used in F<docs/project/git_workflow.pod>
 and contains generally useful things to know about Git.
 
 
-=head2 INTRODUCTION
+=head1 INTRODUCTION
 
 Before learning any terminology, there are a few very basic things that
 should be understood about Git, which will provide a foundation for
@@ -35,11 +35,36 @@ file/directory foo to the staging area. When you type C<git log> you are
 asking the index to show you a log of all commits. When you run a non-git
 command in a repo, such as C<rm foo>, you are modifying the working copy.
 
-The most important thing to learn when understanding a C<git> command is
-whether it operates on the index, working copy or staging area. Also note
-that certain C<git> commands can operate on different areas when given
-certain command-line options.
+The most important thing to learn when understanding a C<git> command is whether
+it operates on the index, working copy, staging area or a combination of the
+three. Also note that certain C<git> commands can operate on different areas
+when given different command-line options.
 
+=head1 TERMS
+
+=head2 clone
+
+Verb. The term used for copying a remote repo locally, which contains the entire
+history of the git repo being cloned.
+
+=head2 commitish
+
+Noun. A general term for a way to describe a set of commits.
+
+=head2 remote
+
+Noun. A remote is basically a URL with metadata that describes where changes are
+pushed/pulled from.  A git repo may have any number of remotes. The default
+remote is where the repo was originally cloned from and it has the name
+"origin".
+
+=head2 repo
+
+Noun. Short for repository.
+
+=head1 SEE ALSO
+
+F<docs/project/git_workflow.pod>
 
 =cut
 
