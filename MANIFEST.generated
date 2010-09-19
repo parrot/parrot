@@ -69,9 +69,10 @@ include/pmc/pmc_handle.h                         [devel]include
 include/pmc/pmc_hash.h                           [devel]include
 include/pmc/pmc_hashiterator.h                   [devel]include
 include/pmc/pmc_hashiteratorkey.h                [devel]include
-include/pmc/pmc_imageio.h                        [devel]include
+include/pmc/pmc_imageiofreeze.h                  [devel]include
 include/pmc/pmc_imageiosize.h                    [devel]include
 include/pmc/pmc_imageiostrings.h                 [devel]include
+include/pmc/pmc_imageiothaw.h                    [devel]include
 include/pmc/pmc_integer.h                        [devel]include
 include/pmc/pmc_iterator.h                       [devel]include
 include/pmc/pmc_key.h                            [devel]include
@@ -364,9 +365,10 @@ src/pmc/handle.dump                              [devel]src
 src/pmc/hash.dump                                [devel]src
 src/pmc/hashiterator.dump                        [devel]src
 src/pmc/hashiteratorkey.dump                     [devel]src
-src/pmc/imageio.dump                             [devel]src
+src/pmc/imageiofreeze.dump                       [devel]src
 src/pmc/imageiosize.dump                         [devel]src
 src/pmc/imageiostrings.dump                      [devel]src
+src/pmc/imageiothaw.dump                         [devel]src
 src/pmc/integer.dump                             [devel]src
 src/pmc/iterator.dump                            [devel]src
 src/pmc/key.dump                                 [devel]src
