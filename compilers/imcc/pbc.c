@@ -1083,20 +1083,20 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 
     /* otherwise... */
     {
-        if (!ct->str.constants) {
+        if (!ct->str.constants)
             ct->str.constants =
                 mem_gc_allocate_n_zeroed_typed(interp, 1, STRING *);
 
-            /* initialize rlookup cache */
-            ct->string_hash = parrot_create_hash(interp,
-                    enum_type_INTVAL,
-                    Hash_key_type_STRING_enc);
-        }
-        else {
+        else
             ct->str.constants =
                 mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
                     ct->str.const_count + 1, ct->str.const_count, STRING *);
-        }
+
+        /* initialize rlookup cache */
+        if (!ct->string_hash)
+            ct->string_hash = parrot_create_hash(interp,
+                    enum_type_INTVAL,
+                    Hash_key_type_STRING_enc);
 
         ct->str.constants[ct->str.const_count] = s;
 
@@ -1670,8 +1670,9 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     ASSERT_ARGS(build_key)
 
     PackFile_ConstTable *ct = interp->code->const_table;
-    SymReg *reg = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
-    PMC    *head, *tail;
+    SymReg *reg  = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
+    PMC    *head = NULL;
+    PMC    *tail = NULL;
     opcode_t regno, k;
 
     for (; reg; reg = reg->nextkey) {

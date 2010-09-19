@@ -191,7 +191,9 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
 
     for (i = 0; i < self->pmc.const_count; i++) {
         PMC *c = self->pmc.constants[i];
+        size += 1;
         if (c->vtable->base_type == enum_class_Key) {
+            size += 1;
             while (c) {
                 size += 2;
                 GETATTR_Key_next_key(interp, c, c);
