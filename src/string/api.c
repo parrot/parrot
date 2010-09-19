@@ -1010,7 +1010,7 @@ Parrot_str_substr(PARROT_INTERP,
     ASSERT_STRING_SANITY(src);
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-    if (offset == src_length || length < 1)
+    if (true_offset == src_length || length < 1)
         return CONST_STRING(interp, "");
 
     if (offset < 0)
