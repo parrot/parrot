@@ -95,6 +95,8 @@ Set pointer to underlying PackFile_ConstTable
         opcode_t i;
 
         /* Preallocate required amount of memory */
+#if 0
+        /* XXX TODO */
         VTABLE_set_integer_native(INTERP, attrs->constants, table->const_count);
         VTABLE_set_integer_native(INTERP, attrs->types, table->const_count);
 
@@ -120,6 +122,7 @@ Set pointer to underlying PackFile_ConstTable
                         "Unknown PackFile constant type: %d", val->type);
             }
         }
+#endif
     }
 
 /*
@@ -138,6 +141,8 @@ Set pointer to underlying PackFile_ConstTable
         pftable->base.type = PF_CONST_SEG;
 
         /* Copy all constanst with respect of type */
+#if 0
+        /* XXX TODO */
         pftable->const_count = VTABLE_get_integer(INTERP, attrs->constants);
         pftable->constants   = mem_gc_allocate_n_typed(INTERP,
                 pftable->const_count, PackFile_Constant);
@@ -167,6 +172,7 @@ Set pointer to underlying PackFile_ConstTable
                         "Unknown PackFile constant type: %d", value->type);
             }
         }
+#endif
 
         return pftable;
     }

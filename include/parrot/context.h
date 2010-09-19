@@ -12,7 +12,7 @@
 #include "parrot/string.h"
 #include "parrot/compiler.h"
 
-struct PackFile_Constant;
+struct PackFile_ConstTable;
 
 typedef union {
     PMC         **regs_p;
@@ -148,8 +148,7 @@ FLOATVAL Parrot_pcc_get_num_constant_func(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-struct PackFile_Constant * Parrot_pcc_get_num_constants_func(SHIM_INTERP,
-    ARGIN(PMC *ctx))
+FLOATVAL * Parrot_pcc_get_num_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -181,8 +180,7 @@ PMC* Parrot_pcc_get_pmc_constant_func(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-struct PackFile_Constant * Parrot_pcc_get_pmc_constants_func(SHIM_INTERP,
-    ARGIN(PMC *ctx))
+PMC ** Parrot_pcc_get_pmc_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -199,8 +197,7 @@ PMC* Parrot_pcc_get_signature_func(SHIM_INTERP, ARGIN(PMC *ctx))
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-struct PackFile_Constant * Parrot_pcc_get_str_constants_func(SHIM_INTERP,
-    ARGIN(PMC *ctx))
+STRING ** Parrot_pcc_get_str_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -226,8 +223,9 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void Parrot_pcc_set_constants_func(SHIM_INTERP,
     ARGIN(PMC *ctx),
-    ARGIN_NULLOK(struct PackFile_Constant *constants))
-        __attribute__nonnull__(2);
+    ARGIN(struct PackFile_ConstTable *ct))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_pcc_set_continuation_func(SHIM_INTERP,
@@ -384,7 +382,8 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
        PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(caller_ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_constants_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(ctx) \
+    , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_Parrot_pcc_set_continuation_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
@@ -432,7 +431,11 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_get_num_constants(i, c) (CONTEXT_STRUCT(c)->constants)
 #  define Parrot_pcc_get_str_constants(i, c) (CONTEXT_STRUCT(c)->constants)
 #  define Parrot_pcc_get_pmc_constants(i, c) (CONTEXT_STRUCT(c)->constants)
-#  define Parrot_pcc_set_constants(i, c, value) (CONTEXT_STRUCT(c)->constants = (value))
+#  define Parrot_pcc_set_constants(i, c, ct) do { \
+    CONTEXT_STRUCT(c)->num_constants = (ct)->num.constants; \
+    CONTEXT_STRUCT(c)->str_constants = (ct)->str.constants; \
+    CONTEXT_STRUCT(c)->pmc_constants = (ct)->pmc.constants; \
+} while (0)
 
 #  define Parrot_pcc_get_continuation(i, c) (CONTEXT_STRUCT(c)->current_cont)
 #  define Parrot_pcc_set_continuation(i, c, value) (CONTEXT_STRUCT(c)->current_cont = (value))

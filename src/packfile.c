@@ -298,6 +298,15 @@ static PackFile * PackFile_append_pbc(PARROT_INTERP,
     ARGIN_NULLOK(const char *filename))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
+    ARGIN(PackFile_ConstTable *constt),
+    ARGIN(const opcode_t **cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*header);
@@ -484,6 +493,10 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_PackFile_append_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(constt) \
+    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -736,7 +749,7 @@ run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     PMC              *retval   = PMCNULL;
 
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
-            interp->code->const_table->constants);
+            interp->code->const_table);
 
     Parrot_ext_call(interp, sub_pmc, "->P", &retval);
     interp->run_core = old_core;
@@ -855,29 +868,13 @@ static void
 mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
 {
     ASSERT_ARGS(mark_1_seg)
-    PackFile_Constant * const constants = find_constants(interp, ct);
     opcode_t i;
 
-    for (i = 0; i < ct->const_count; ++i) {
-        switch (constants[i].type) {
-          case PFC_PMC:
-          case PFC_KEY:
-          {
-            PMC * const pmc = constants[i].u.key;
-            Parrot_gc_mark_PMC_alive(interp, pmc);
-            break;
-          }
-          case PFC_STRING:
-          {
-            STRING * const string = constants[i].u.string;
-            Parrot_gc_mark_STRING_alive(interp, string);
-            break;
-           }
-          default:
-            /* Do nothing. */
-            break;
-        }
-    }
+    for (i = 0; i < ct->str.const_count; i++)
+        Parrot_gc_mark_STRING_alive(interp, ct->str.constants[i]);
+
+    for (i = 0; i < ct->pmc.const_count; i++)
+        Parrot_gc_mark_PMC_alive(interp, ct->pmc.constants[i]);
 }
 
 
@@ -983,11 +980,11 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 Parrot_Sub_attributes    *sub;
                 const opcode_t ci = ft->fixups[i].offset;
 
-                if (ci < 0 || ci >= ct->const_count)
+                if (ci < 0 || ci >= ct->pmc.const_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "Illegal fixup offset (%d) in enum_fixup_sub");
 
-                sub_pmc       = ct->constants[ci].u.key;
+                sub_pmc       = ct->pmc.constants[ci];
                 PMC_get_sub(interp, sub_pmc, sub);
                 sub->eval_pmc = eval_pmc;
 
@@ -999,8 +996,8 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
 
                     /* replace Sub PMC with computation results */
                     if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
-                        ft->fixups[i].type      = enum_fixup_none;
-                        ct->constants[ci].u.key = result;
+                        ft->fixups[i].type    = enum_fixup_none;
+                        ct->pmc.constants[ci] = result;
                     }
                 }
 
@@ -3082,7 +3079,7 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
                    debug->mappings[i].offset);
         Parrot_io_printf(interp, "        FILENAME => %Ss\n",
-                PF_CONST(debug->code, debug->mappings[i].filename).u.string);
+                PF_CONST(debug->code, str, debug->mappings[i].filename));
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -3167,9 +3164,9 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     if (debug->num_mappings) {
         prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         filename_pstr = Parrot_str_new(interp, filename, 0);
-        if (ct->constants[prev_filename_n].type == PFC_STRING &&
+        if (ct->str.constants[prev_filename_n] &&
                 Parrot_str_equal(interp, filename_pstr,
-                    ct->constants[prev_filename_n].u.string)) {
+                    ct->str.constants[prev_filename_n])) {
             return;
         }
     }
@@ -3203,15 +3200,14 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
         STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
                 Parrot_default_encoding_ptr, 0);
-        size_t count = ct->const_count;
+        size_t count = ct->str.const_count;
         size_t i;
 
         mapping->offset = offset;
 
         /* Check if there is already a constant with this filename */
         for (i= 0; i < count; ++i) {
-            if (ct->constants[i].type == PFC_STRING &&
-                    Parrot_str_equal(interp, namestr, ct->constants[i].u.string))
+            if (Parrot_str_equal(interp, namestr, ct->str.constants[i]))
                 break;
         }
         if (i < count) {
@@ -3220,14 +3216,11 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
        }
        else {
             /* Not found, create a new one */
-            PackFile_Constant             *fnconst;
-            ct->const_count   = ct->const_count + 1;
-            ct->constants = mem_gc_realloc_n_typed_zeroed(interp, ct->constants,
-                    ct->const_count, ct->const_count - 1, PackFile_Constant);
-
-            fnconst           = &ct->constants[ct->const_count - 1];
-            fnconst->type     = PFC_STRING;
-            fnconst->u.string = Parrot_str_new_init(interp, filename, strlen(filename),
+            ct->str.const_count++;
+            ct->str.constants = mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
+                    ct->str.const_count, ct->str.const_count - 1, STRING *);
+            ct->str.constants[ct->str.const_count - 1] =
+                Parrot_str_new_init(interp, filename, strlen(filename),
                     Parrot_default_encoding_ptr,
                     PObj_constant_FLAG);
         }
@@ -3268,8 +3261,8 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
        if (i + 1                          == debug->num_mappings
        || (debug->mappings[i].offset     <= pc
        &&  debug->mappings[i + 1].offset >  pc))
-            return PF_CONST(debug->code,
-                    debug->mappings[i].filename).u.string;
+            return PF_CONST(debug->code, str,
+                    debug->mappings[i].filename);
     }
 
     /* Otherwise, no mappings == no filename. */
@@ -3349,9 +3342,13 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
     }
 
     interp->code               = new_cs;
+
+#if 0
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), really
                                ? find_constants(interp, new_cs->const_table)
-                               : new_cs->const_table->constants);
+                               : new_cs->const_table);
+#endif
+    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), new_cs->const_table);
 
     if (really)
         prepare_for_run(interp);
@@ -3415,6 +3412,7 @@ need to refer to namespace pointers.
 
 */
 
+#if 0
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant *
@@ -3456,6 +3454,7 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
         return new_consts;
     }
 }
+#endif
 
 
 /*
@@ -3476,6 +3475,9 @@ Parrot_destroy_constants(PARROT_INTERP)
     UINTVAL i;
     Hash *hash;
 
+    return;
+
+#if 0
     if (!interp->thread_data)
         return;
 
@@ -3490,6 +3492,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         PackFile_Constant * const consts      = (PackFile_Constant *) _bucket->value;
         mem_gc_free(interp, consts););
     parrot_hash_destroy(interp, hash);
+#endif
 }
 
 
@@ -3905,12 +3908,17 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
     ASSERT_ARGS(PackFile_ConstTable_clear)
     opcode_t i;
 
-    if (self->constants) {
-        mem_gc_free(interp, self->constants);
-        self->constants = NULL;
-    }
+#define EMPTY_CONSTS(type) do { \
+    if (self-> type .constants) { \
+        mem_gc_free(interp, self-> type .constants); \
+        self-> type .constants   = NULL; \
+    } \
+    self-> type .const_count = 0; \
+} while (0)
 
-    self->const_count = 0;
+    EMPTY_CONSTS(num);
+    EMPTY_CONSTS(str);
+    EMPTY_CONSTS(pmc);
 
     if (self->string_hash) {
         parrot_hash_destroy(interp, self->string_hash);
@@ -3951,33 +3959,47 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
 
     PackFile_ConstTable_clear(interp, self);
 
-    self->const_count = PF_fetch_opcode(pf, &cursor);
+    self->num.const_count = PF_fetch_opcode(pf, &cursor);
+    self->str.const_count = PF_fetch_opcode(pf, &cursor);
+    self->pmc.const_count = PF_fetch_opcode(pf, &cursor);
 
-    TRACE_PRINTF(("PackFile_ConstTable_unpack: Unpacking %ld constants\n",
-                  self->const_count));
-
-    if (self->const_count == 0)
-        return cursor;
-
-    self->constants = mem_gc_allocate_n_zeroed_typed(interp, self->const_count,
-                PackFile_Constant);
-
-    if (!self->constants) {
-        Parrot_io_eprintf(interp,
-            "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
-        self->const_count = 0;
-        return NULL;
+    if (self->num.const_count) {
+        self->num.constants = mem_gc_allocate_n_zeroed_typed(interp,
+                                    self->num.const_count, FLOATVAL);
+        if (!self->num.constants)
+            goto err;
     }
 
-    for (i = 0; i < self->const_count; ++i) {
-        TRACE_PRINTF(("PackFile_ConstTable_unpack(): Unpacking constant %ld/%ld\n",
-            i, self->const_count));
-
-        cursor = PackFile_Constant_unpack(interp, self, &self->constants[i],
-                    cursor);
+    if (self->str.const_count) {
+        self->str.constants = mem_gc_allocate_n_zeroed_typed(interp,
+                                    self->str.const_count, STRING *);
+        if (!self->str.constants)
+            goto err;
     }
+
+    if (self->pmc.const_count) {
+        self->pmc.constants = mem_gc_allocate_n_zeroed_typed(interp,
+                                    self->pmc.const_count, PMC *);
+        if (!self->pmc.constants)
+            goto err;
+    }
+
+    for (i = 0; i < self->num.const_count; i++)
+        self->num.constants[i] = PF_fetch_number(pf, &cursor);
+
+    for (i = 0; i < self->str.const_count; i++)
+        self->str.constants[i] = PF_fetch_string(interp, pf, &cursor);
+
+    for (i = 0; i < self->pmc.const_count; i++)
+        self->pmc.constants[i] = PackFile_Constant_unpack_pmc(interp, self, &cursor);
 
     return cursor;
+
+  err:
+    Parrot_io_eprintf(interp,
+        "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
+    PackFile_ConstTable_clear(interp, self);
+    return NULL;
 }
 
 
@@ -4026,124 +4048,8 @@ const_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 /*
 
-=item C<size_t PackFile_Constant_pack_size(PARROT_INTERP, const
-PackFile_Constant *self, const PackFile_ConstTable *ct)>
-
-Determines the size of the buffer needed in order to pack the PackFile Constant
-into a contiguous region of memory.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-size_t
-PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self), ARGIN(const
-    PackFile_ConstTable *ct))
-{
-    ASSERT_ARGS(PackFile_Constant_pack_size)
-    PMC    *component;
-    size_t  packed_size;
-
-    switch (self->type) {
-      case PFC_NUMBER:
-        packed_size = PF_size_number();
-        break;
-
-      case PFC_STRING:
-        packed_size = PF_size_string(self->u.string);
-        break;
-
-      case PFC_KEY:
-        packed_size = 1;
-
-        for (component = self->u.key; component;){
-            packed_size += 2;
-            GETATTR_Key_next_key(interp, component, component);
-        }
-        break;
-
-      case PFC_PMC:
-        component = self->u.key; /* the pmc (Sub, ...) */
-        packed_size = PF_size_strlen(Parrot_freeze_pbc_size(interp, component, ct)) - 1;
-        break;
-
-      default:
-        Parrot_io_eprintf(NULL,
-                    "Constant_packed_size: Unrecognized type '%c'!\n",
-                    (char)self->type);
-        return 0;
-    }
-
-    /* Tack on space for the initial type field */
-    return packed_size + 1;
-}
-
-
-/*
-
-=item C<const opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
-PackFile_ConstTable *constt, PackFile_Constant *self, const opcode_t *cursor)>
-
-Unpacks a PackFile Constant from a block of memory. The format is:
-
-  opcode_t type
-  *  data
-
-Returns cursor if everything is okay, else NULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const opcode_t *
-PackFile_Constant_unpack(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
-        ARGOUT(PackFile_Constant *self), ARGIN(const opcode_t *cursor))
-{
-    ASSERT_ARGS(PackFile_Constant_unpack)
-    PackFile * const pf   = constt->base.pf;
-    const opcode_t   type = PF_fetch_opcode(pf, &cursor);
-
-    TRACE_PRINTF(("PackFile_Constant_unpack(): Type is %ld ('%c')...\n",
-                  type, (char)type));
-
-    switch (type) {
-      case PFC_NUMBER:
-        self->u.number = PF_fetch_number(pf, &cursor);
-        self->type     = PFC_NUMBER;
-        break;
-
-      case PFC_STRING:
-        self->u.string = PF_fetch_string(interp, pf, &cursor);
-        self->type     = PFC_STRING;
-        break;
-
-      case PFC_KEY:
-        cursor = PackFile_Constant_unpack_key(interp, constt, self, cursor);
-        break;
-
-      case PFC_PMC:
-        cursor = PackFile_Constant_unpack_pmc(interp, constt, self, cursor);
-        break;
-      default:
-        Parrot_io_eprintf(NULL,
-                    "Constant_unpack: Unrecognized type '%c' during unpack!\n",
-                    (char)type);
-        return NULL;
-    }
-
-    return cursor;
-}
-
-
-/*
-
-=item C<const opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
-PackFile_ConstTable *constt, PackFile_Constant *self, const opcode_t *cursor)>
+=item C<static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
+PackFile_ConstTable *constt, const opcode_t **cursor)>
 
 Unpacks a constant PMC.
 
@@ -4151,114 +4057,95 @@ Unpacks a constant PMC.
 
 */
 
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-const opcode_t *
+static PMC *
 PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
-        ARGMOD(PackFile_Constant *self), ARGIN(const opcode_t *cursor))
+        ARGIN(const opcode_t **cursor))
 {
     ASSERT_ARGS(PackFile_Constant_unpack_pmc)
-    PackFile * const pf   = constt->base.pf;
-    STRING          *_sub = CONST_STRING(interp, "Sub");
-    PMC             *pmc;
-
-    /* thawing the PMC needs the real packfile in place */
-    PackFile_ByteCode * const cs_save = interp->code;
-    interp->code                      = pf->cur_cs;
-    pmc                               = Parrot_thaw_pbc(interp, constt, &cursor);
-
-    /* place item in const_table */
-    self->type  = PFC_PMC;
-    self->u.key = pmc;
-
-    /* finally place the sub into some namespace stash
-     * XXX place this code in Sub.thaw ?  */
-    if (VTABLE_isa(interp, pmc, _sub))
-        Parrot_ns_store_sub(interp, pmc);
-
-    /* restore code */
-    interp->code = cs_save;
-
-    return cursor;
-}
-
-
-/*
-
-=item C<const opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
-PackFile_ConstTable *constt, PackFile_Constant *self, const opcode_t *cursor)>
-
-Unpacks a PackFile Constant from a block of memory. The format consists of a
-sequence of key atoms, each with the following format:
-
-  opcode_t type
-  opcode_t value
-
-Returns cursor if everything is OK, else NULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const opcode_t *
-PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
-        ARGMOD(PackFile_Constant *self), ARGIN(const opcode_t *cursor))
-{
-    ASSERT_ARGS(PackFile_Constant_unpack_key)
     PackFile * const pf         = constt->base.pf;
-    PMC             *head       = NULL;
-    PMC             *tail       = NULL;
-    INTVAL           components = (INTVAL)PF_fetch_opcode(pf, &cursor);
-    int              pmc_enum   = enum_class_Key;
+    STRING          *_sub       = CONST_STRING(interp, "Sub");
+    const opcode_t   const_type = PF_fetch_opcode(pf, cursor);
 
-    while (components-- > 0) {
-        opcode_t       type       = PF_fetch_opcode(pf, &cursor);
-        opcode_t        op;
+    switch (const_type) {
+      case PFC_KEY:
+        {
+            PMC    *head       = NULL;
+            PMC    *tail       = NULL;
+            INTVAL  components = (INTVAL)PF_fetch_opcode(pf, cursor);
 
-        if (tail) {
-            SETATTR_Key_next_key(interp, tail, Parrot_pmc_new_constant(interp, pmc_enum));
-            GETATTR_Key_next_key(interp, tail, tail);
+            while (components-- > 0) {
+                opcode_t       type       = PF_fetch_opcode(pf, cursor);
+                opcode_t        op;
+
+                if (tail) {
+                    SETATTR_Key_next_key(interp, tail, Parrot_pmc_new_constant(interp,
+                                                        enum_class_Key));
+                    GETATTR_Key_next_key(interp, tail, tail);
+                }
+                else
+                    head = tail = Parrot_pmc_new_constant(interp, enum_class_Key);
+
+                op = PF_fetch_opcode(pf, cursor);
+
+                switch (type) {
+                  case PARROT_ARG_IC:
+                    key_set_integer(interp, tail, op);
+                    break;
+                  case PARROT_ARG_NC:
+                    key_set_number(interp, tail, constt->num.constants[op]);
+                    break;
+                  case PARROT_ARG_SC:
+                    key_set_string(interp, tail, constt->str.constants[op]);
+                    break;
+                  case PARROT_ARG_I:
+                    key_set_register(interp, tail, op, KEY_integer_FLAG);
+                    break;
+                  case PARROT_ARG_N:
+                    key_set_register(interp, tail, op, KEY_number_FLAG);
+                    break;
+                  case PARROT_ARG_S:
+                    key_set_register(interp, tail, op, KEY_string_FLAG);
+                    break;
+                  case PARROT_ARG_P:
+                    key_set_register(interp, tail, op, KEY_pmc_FLAG);
+                    break;
+                  default:
+                    *cursor = NULL;
+                    return PMCNULL;
+                }
+            }
+
+            return head;
         }
-        else
-            head = tail = Parrot_pmc_new_constant(interp, pmc_enum);
 
-        op = PF_fetch_opcode(pf, &cursor);
+      case PFC_PMC:
+        {
+            PMC             *pmc;
+            /* thawing the PMC needs the real packfile in place */
+            PackFile_ByteCode * const cs_save = interp->code;
+            interp->code                      = pf->cur_cs;
+            pmc                               = Parrot_thaw_pbc(interp, constt, cursor);
 
-        switch (type) {
-          case PARROT_ARG_IC:
-            key_set_integer(interp, tail, op);
-            break;
-          case PARROT_ARG_NC:
-            key_set_number(interp, tail, constt->constants[op].u.number);
-            break;
-          case PARROT_ARG_SC:
-            key_set_string(interp, tail, constt->constants[op].u.string);
-            break;
-          case PARROT_ARG_I:
-            key_set_register(interp, tail, op, KEY_integer_FLAG);
-            break;
-          case PARROT_ARG_N:
-            key_set_register(interp, tail, op, KEY_number_FLAG);
-            break;
-          case PARROT_ARG_S:
-            key_set_register(interp, tail, op, KEY_string_FLAG);
-            break;
-          case PARROT_ARG_P:
-            key_set_register(interp, tail, op, KEY_pmc_FLAG);
-            break;
-          default:
-            return NULL;
+            /* finally place the sub into some namespace stash
+             * XXX place this code in Sub.thaw ?  */
+            if (VTABLE_isa(interp, pmc, _sub))
+                Parrot_ns_store_sub(interp, pmc);
+
+            /* restore code */
+            interp->code = cs_save;
+
+            return pmc;
         }
+
+      default:
+        Parrot_io_eprintf(NULL,
+                    "Constant_unpack: Unrecognized type '%c' during unpack!\n",
+                    (char)const_type);
+        *cursor = NULL;
+        return PMCNULL;
     }
-
-    self->type  = PFC_KEY;
-    self->u.key = head;
-
-    return cursor;
 }
 
 
@@ -4516,7 +4403,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
         const PackFile_Annotations_Key * const key = self->keys + i;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
-                PF_CONST(self->code, key->name).u.string);
+                PF_CONST(self->code, str, key->name));
         Parrot_io_printf(interp, "        TYPE => %s\n",
                 key->type == PF_ANNOTATION_KEY_TYPE_INT ? "integer" :
                 key->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
@@ -4621,12 +4508,12 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 {
     ASSERT_ARGS(PackFile_Annotations_add_entry)
     /* See if we already have this key. */
-    STRING  * const key_name = PF_CONST(self->code, key).u.string;
+    STRING  * const key_name = PF_CONST(self->code, str, key);
     opcode_t key_id   = -1;
     INTVAL   i;
 
     for (i = 0; i < self->num_keys; ++i) {
-        STRING * const test_key = PF_CONST(self->code, self->keys[i].name).u.string;
+        STRING * const test_key = PF_CONST(self->code, str, self->keys[i].name);
         if (Parrot_str_equal(interp, test_key, key_name)) {
             key_id = i;
             break;
@@ -4701,12 +4588,12 @@ make_annotation_value_pmc(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
       case PF_ANNOTATION_KEY_TYPE_NUM:
         result = Parrot_pmc_new(interp, enum_class_Float);
         VTABLE_set_number_native(interp, result,
-                    PF_CONST(self->code, value).u.number);
+                    PF_CONST(self->code, num, value));
         break;
       default:
         result = Parrot_pmc_new(interp, enum_class_String);
         VTABLE_set_string_native(interp, result,
-                    PF_CONST(self->code, value).u.string);
+                    PF_CONST(self->code, str, value));
     }
 
     return result;
@@ -4743,7 +4630,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
     if (!STRING_IS_NULL(key)) {
         for (i = 0; i < self->num_keys; ++i) {
-            STRING * const test_key = PF_CONST(self->code, self->keys[i].name).u.string;
+            STRING * const test_key = PF_CONST(self->code, str, self->keys[i].name);
             if (Parrot_str_equal(interp, test_key, key)) {
                 key_id = i;
                 break;
@@ -4782,7 +4669,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
         for (i = 0; i < self->num_keys; ++i) {
             if (have_values[i]) {
-                STRING * const key_name = PF_CONST(self->code, self->keys[i].name).u.string;
+                STRING * const key_name = PF_CONST(self->code, str, self->keys[i].name);
                 VTABLE_set_pmc_keyed_str(interp, result, key_name,
                         make_annotation_value_pmc(interp, self, self->keys[i].type,
                                 latest_values[i]));
