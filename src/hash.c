@@ -1721,8 +1721,7 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
             const size_t hashval = key_hash(interp, dest, key);
             /* hash tables has no duplicate keys */
             parrot_hash_store_value_in_bucket(interp, dest, NULL, hashval, key, valtmp);
-        }
-    );
+        });
 }
 
 /*
