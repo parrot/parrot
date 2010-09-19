@@ -79,10 +79,10 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
 {
     ASSERT_ARGS(advance_to_next)
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
-    
-    while(attrs->elements > 0){
+
+    while (attrs->elements > 0) {
         attrs->bucket = attrs->parrot_hash->buckets + attrs->pos++;
-        if (attrs->bucket->key){
+        if (attrs->bucket->key) {
             break;
         }
     }
