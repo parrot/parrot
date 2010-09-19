@@ -1678,6 +1678,15 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
 {
     ASSERT_ARGS(parrot_hash_clone_prunable)
 
+    /* dest hash has the same size as source hash */
+    if (dest->buckets){
+        if (dest->mask+1 > SPLIT_POINT)
+            Parrot_gc_free_memory_chunk(interp, dest->buckets);
+        else
+            Parrot_gc_free_fixed_size_storage(interp, HASH_ALLOC_SIZE(dest->mask+1), dest->buckets);
+    }
+    allocate_buckets(interp, dest, hash->mask);
+
     parrot_hash_iterate(hash,
         void         *valtmp;
         void * const  key = _bucket->key;
@@ -1708,8 +1717,12 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
             Parrot_ex_throw_from_c_args(interp, NULL, -1,
                     "hash corruption: type = %d\n", hash->entry_type);
         };
-        if (key)
-            parrot_hash_put(interp, dest, key, valtmp););
+        if (key) {
+            const size_t hashval = key_hash(interp, dest, key);
+            /* hash tables has no duplicate keys */
+            parrot_hash_store_value_in_bucket(interp, dest, NULL, hashval, key, valtmp);
+        }
+    );
 }
 
 /*
