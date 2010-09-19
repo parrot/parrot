@@ -90,32 +90,16 @@ struct _hash {
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
 {                                                                           \
     INTVAL _loc;                                                            \
-        if ((_hash)->entries){                                              \
-            for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                 \
-                HashBucket *_bucket = (_hash)->index[_loc];                 \
-                while (_bucket) {                                           \
-                    _code                                                   \
-                    _bucket = _bucket->next;                                \
-                }                                                           \
+    if ((_hash)->entries){                                                  \
+        for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                     \
+            HashBucket *_bucket = (_hash)->index[_loc];                     \
+            while (_bucket) {                                               \
+                _code                                                       \
+                _bucket = _bucket->next;                                    \
             }                                                               \
-        }                                                                   \
-}
-
-#define parrot_hash_iterator_advance(_hash, _bucket, _loc)                  \
-{                                                                           \
-    if ((_hash)->entries) {                                                 \
-        /* Try to advance current bucket */                                 \
-        if ((_bucket))                                                      \
-            (_bucket) = (_bucket)->next;                                    \
-        while (!(_bucket)) {                                                \
-            /* If there is no more buckets */                               \
-            if ((_loc) == (INTVAL)(_hash)->mask+1)                          \
-                break;                                                      \
-            (_bucket) = (_hash)->index[(_loc)++];                           \
         }                                                                   \
     }                                                                       \
 }
-
 
 typedef void (*value_free)(ARGFREE(void *));
 

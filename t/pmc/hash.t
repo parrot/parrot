@@ -663,9 +663,6 @@ DONE:
 # To try to ensure that the test fails reliably if there's a regression, it's
 # run 3 times with different hash keys.
 .sub clone_preserves_order
-    todo("clone preserves hash internal order")
-    .return ()
-
     .local pmc h, cloned
     .local string s1, s2
     .local int all_ok
@@ -742,10 +739,6 @@ end:
 .end
 
 .sub freeze_thaw_preserves_order
-    # is internal order important somehow?
-    todo("freeze/thaw preserves hash internal order")
-    .return ()
-
     .local pmc h, cloned
     .local string s1, s2
     .local int all_ok
