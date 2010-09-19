@@ -172,9 +172,9 @@ static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
 
 PARROT_CAN_RETURN_NULL
 static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
-    ARGIN(Hash *hash),
+    ARGIN(const Hash *hash),
     ARGIN(STRING *s),
-    INTVAL hashval)
+    UINTVAL hashval)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -1470,8 +1470,8 @@ parrot_hash_exists(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(void *key))
 
 /*
 
-=item C<static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP, Hash
-*hash, STRING *s, INTVAL hashval)>
+=item C<static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP, const
+Hash *hash, STRING *s, UINTVAL hashval)>
 
 Given a hash, a STRING key, and the hashval of the key, returns the appropriate
 bucket of the hash for the key.  This assumes buckets are already available, so
@@ -1483,8 +1483,8 @@ ensure the hash has storage before calling this function.
 
 PARROT_CAN_RETURN_NULL
 static HashBucket *
-parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(Hash *hash),
-        ARGIN(STRING *s), INTVAL hashval)
+parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(const Hash *hash),
+        ARGIN(STRING *s), UINTVAL hashval)
 {
     ASSERT_ARGS(parrot_hash_get_bucket_string)
     HashBucket *bucket = hash->index[hashval & hash->mask];
