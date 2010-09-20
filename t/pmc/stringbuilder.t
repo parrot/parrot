@@ -23,6 +23,7 @@ Tests the C<StringBuilder> PMC.
     test_create()               # 3 tests
     test_init_pmc()
     test_push_string()
+    test_push_string_resize()
     test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
@@ -107,6 +108,29 @@ Tests the C<StringBuilder> PMC.
 
     $S1 = sb
     is( $S0, $S1, "push a null string does nothing" )
+.end
+
+.sub 'test_push_string_resize'
+    # Try to cover the case of resizing a buffer while converting it to utf8
+    # Depends on internal details of StringBuffer, so it may need changes
+    # when that internals do.
+    .local pmc sb
+    sb = new ["StringBuilder"]
+    .local string s
+    .local int i, n
+    # Get the allocated capacity and almost fill it
+    n = sb
+    n -= 2
+    s = repeat iso-8859-1:"x", n
+    push sb, s
+    # push a string that needs reallocation and has incompatible encoding rep.
+    s = unicode:"yyyy"
+    push sb, s
+    # Check the expected string length. Not a rock solid check, but the
+    # purpose of this test is just code coverage, so is enough.
+    i = sb.'get_string_length'()
+    n = n + 4
+    is(i, n, 'test_push_string_resize')
 .end
 
 .sub 'test_push_pmc'
