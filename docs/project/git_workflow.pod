@@ -141,6 +141,8 @@ want tested.
 
 =back
 
+=head2 Syncing branches
+
 =head2 Merging a Branch
 
 When you're ready to merge your changes back into master, use the C<git merge>
@@ -170,6 +172,18 @@ If there was a specific language, tool, or platform that you wanted tested
 before merging but couldn't get any response from the responsible person, you
 may want to include some warning in the announcement that you weren't able to
 test that piece fully.
+
+=head2 Deleting a Branch
+
+After merging a branch, you will have a local copy of the merged branch, as well
+as a copy of the branch on your remote. To remove the local branch:
+
+  git branch -d user/foo
+
+To remove the remote branch user/foo on the remote origin :
+
+  git push origin :user/foo
+
 
 =cut
 
