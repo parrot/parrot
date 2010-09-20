@@ -79,13 +79,32 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
 {
     ASSERT_ARGS(advance_to_next)
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
-
-    while (attrs->elements > 0) {
-        attrs->bucket = attrs->parrot_hash->buckets + attrs->pos++;
-        if (attrs->bucket->key) {
-            break;
+    if (attrs->parrot_hash->key_type == Hash_key_type_int
+    ||  attrs->parrot_hash->key_type == Hash_key_type_ptr
+    ||  attrs->parrot_hash->key_type == Hash_key_type_cstring){
+        /* indexed scan */
+        if (attrs->elements){
+            if (attrs->bucket)
+                attrs->bucket = attrs->bucket->next;
+            while (!attrs->bucket) {
+                /* If there is no more buckets */
+                if (attrs->pos == attrs->total_buckets)
+                    break;
+                attrs->bucket = attrs->parrot_hash->index[attrs->pos++];
+            }
         }
     }
+    else{
+        /* linear scan */
+        if (!attrs->bucket)
+            attrs->bucket = attrs->parrot_hash->buckets;
+        while (attrs->elements > 0) {
+            attrs->bucket = attrs->parrot_hash->buckets + attrs->pos++;
+            if (attrs->bucket->key)
+                break;
+        }
+    }
+
     --attrs->elements;
     return;
 }
@@ -116,8 +135,8 @@ Defaults iteration mode to iterate from start.
         attrs->pmc_hash         = hash;
         attrs->parrot_hash      = (Hash*)VTABLE_get_pointer(INTERP, hash);
         attrs->total_buckets    = attrs->parrot_hash->mask + 1;
-        attrs->bucket           = attrs->parrot_hash->buckets;
         attrs->elements         = attrs->parrot_hash->entries;
+        attrs->bucket           = NULL;
         attrs->pos              = 0;
 
         PObj_custom_mark_SET(SELF);
@@ -163,8 +182,8 @@ Marks the hash as live.
 
         if (value == ITERATE_FROM_START) {
             /* Restart iterator */
-            attrs->bucket           = attrs->parrot_hash->buckets;
             attrs->elements         = attrs->parrot_hash->entries;
+            attrs->bucket           = NULL;
             attrs->pos              = 0;
             return;
         }
