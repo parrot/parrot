@@ -141,8 +141,22 @@ want tested.
 
 =back
 
-
 =head2 Merging a Branch
+
+When you're ready to merge your changes back into master, use the C<git merge>
+command. First, make sure you are on the master branch with C<git checkout
+master>. Now, to merge the branch user/foo into master:
+
+  git merge user/foo
+
+If the same part of the same file has been modified in master and the branch
+user/foo, you will get a conflict. If you get a conflict, then you need to edit
+each file with a conflict, fix the conflict, delete the conflict markers, C<git
+add> each conflicted file and then finally commit the result. You may find it
+useful to type C<git commit> with no commit message argument (-m), so your
+$EDITOR will be opened and a default commit message of "Merged branch user/foo
+into master" with a list of conflicted files will be present, which can be left
+alone or additional information can be added.
 
 =head2 Announcing a Merge
 
