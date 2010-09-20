@@ -59,12 +59,10 @@ static void add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         FUNC_MODIFIES(*r);
 
 static int add_const_key(PARROT_INTERP,
-    ARGIN(const opcode_t *key),
+    const opcode_t *key,
     int size,
-    ARGIN(const char *s_key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+    const char *s_key)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
@@ -82,13 +80,6 @@ add_const_pmc_sub(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_str(PARROT_INTERP, ARGIN(STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static int add_const_table(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static int add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -215,9 +206,7 @@ static void verify_signature(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_add_const_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key) \
-    , PARROT_ASSERT_ARG(s_key))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_add_const_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_add_const_pmc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -226,11 +215,6 @@ static void verify_signature(PARROT_INTERP,
 #define ASSERT_ARGS_add_const_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_add_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_add_const_table_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_add_const_table_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
