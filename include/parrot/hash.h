@@ -72,7 +72,6 @@ struct _hash {
 };
 
 /* Utility macros - use them, do not reinvent the wheel */
-#define parrot_hash_iterate parrot_hash_iterate_linear
 
 #define parrot_hash_iterate_linear(_hash, _code)                            \
 {                                                                           \
@@ -89,7 +88,7 @@ struct _hash {
 
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
 {                                                                           \
-    INTVAL _loc;                                                            \
+    UINTVAL _loc;                                                           \
     if ((_hash)->entries){                                                  \
         for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                     \
             HashBucket *_bucket = (_hash)->index[_loc];                     \
@@ -99,6 +98,14 @@ struct _hash {
             }                                                               \
         }                                                                   \
     }                                                                       \
+}
+
+#define parrot_hash_iterate(_hash, _code)                                   \
+{                                                                           \
+    if ((_hash)->key_type == Hash_key_type_int)                             \
+        parrot_hash_iterate_indexed(_hash, _code)                           \
+    else                                                                    \
+        parrot_hash_iterate_linear(_hash, _code)                            \
 }
 
 typedef void (*value_free)(ARGFREE(void *));
