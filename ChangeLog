@@ -10,6 +10,7 @@
           GH #1213, #1212, #1096
     - Documentation
     - Tests
+        + Check in pcre.t the returned error string, GH #258
     - Community
 
 2016-02-16    release 8.1.0

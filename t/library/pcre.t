@@ -112,7 +112,7 @@ OUT
 
 ## 2
     my @todo;
-    @todo = ( todo => '3..5 fail on Win32' ) if $^O =~ /MSWin32/;
+    @todo = ( todo => '4..6 fail on Win32 (maybe)' ) if $^O =~ /MSWin32/;
     pir_output_is( <<"CODE", <<'OUT', 'soup to nuts', @todo );
 
 .include 'iglobals.pasm'
@@ -149,37 +149,54 @@ NOK2:
 OK2:
     say 'ok 2'
 
-
-    .local string s
     .local string pat
-
-    s= '--a--'
-    pat= 'a'
+    pat= '(a'
+    func= get_global ['PCRE'], 'compile'
 
     .local pmc code
-    .local string error
+    .local pmc error
     .local int errptr
+     error= new ['String']
+
+    func= get_global ['PCRE'], 'compile'
+    ( code, error, errptr )= func( pat, 0 )
+
+    # expecting error like 'missing )'
+    .local int error_end
+    .local int found_paren
+    error_end = elements error
+    dec error_end
+    found_paren = error.'reverse_index'(')', error_end)
+    ne found_paren, -1, OK3
+    print 'not '
+OK3:
+    say 'ok 3'
+
+    pat= 'a'
 
     func= get_global ['PCRE'], 'compile'
     ( code, error, errptr )= func( pat, 0 )
 
     .local int is_code_defined
     is_code_defined= defined code
-    if is_code_defined goto OK3
+    if is_code_defined goto OK4
     print 'not '
-OK3:
-    say 'ok 3'
+OK4:
+    say 'ok 4'
 
     .local int ok
     .local pmc result
 
+    .local string s
+    s= '--a--'
+
     func= get_global ['PCRE'], 'match'
     ( ok, result )= func( code, s, 0, 0 )
 
-    unless ok < 0 goto OK4
+    unless ok < 0 goto OK5
     print 'not '
-OK4:
-    say 'ok 4'
+OK5:
+    say 'ok 5'
 
     .local int i
     i = 0
@@ -187,10 +204,10 @@ OK4:
 
     func = get_global ['PCRE'], 'dollar'
     match = func( s, ok, result, i )
-    if 'a' == match goto OK5
+    if 'a' == match goto OK6
     print 'not '
-OK5:
-    say 'ok 5'
+OK6:
+    say 'ok 6'
 
 .end
 CODE
@@ -199,6 +216,7 @@ ok 2
 ok 3
 ok 4
 ok 5
+ok 6
 OUT
 
 }
