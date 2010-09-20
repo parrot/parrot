@@ -133,7 +133,7 @@ Thaws the PMC contained in C<image>.
 
         /* we're done reading the image */
         PARROT_ASSERT(image->strstart + Parrot_str_byte_length(interp, image) ==
-                    PARROT_IMAGEIOTHAW(SELF)->curs);
+                    (char *)PARROT_IMAGEIOTHAW(SELF)->curs);
 
         Parrot_visit_loop_thawfinish(INTERP, SELF);
 
@@ -235,10 +235,10 @@ Retreive a float as the next item from the image.
 */
 
     VTABLE FLOATVAL shift_float() {
-        const PackFile      *pf        = PARROT_IMAGEIOTHAW(SELF)->pf;
-        opcode_t *curs                 = PARROT_IMAGEIOTHAW(SELF)->curs;
+        PackFile       *pf             = PARROT_IMAGEIOTHAW(SELF)->pf;
+        const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
         FLOATVAL        f              = PF_fetch_number(pf, &curs);
-        PARROT_IMAGEIOTHAW(SELF)->curs = curs;
+        PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)curs;
         BYTECODE_SHIFT_OK(INTERP, SELF);
         return f;
     }
@@ -277,9 +277,9 @@ Retreive a string as the next item from the image.
 
         {
             PackFile *pf                   = PARROT_IMAGEIOTHAW(SELF)->pf;
-            opcode_t *curs                 = PARROT_IMAGEIOTHAW(SELF)->curs;
+            const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
             STRING   *s                    = PF_fetch_string(INTERP, pf, &curs);
-            PARROT_IMAGEIOTHAW(SELF)->curs = curs;
+            PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)curs;
             BYTECODE_SHIFT_OK(INTERP, SELF);
             return s;
         }
