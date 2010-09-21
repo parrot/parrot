@@ -113,5 +113,6 @@ Starred release numbers indicate supported releases.
 
  coke        2.6.0 *        2010-Jul-20     "Red-rumped"
  mikehh      2.7.0          2010-Aug-17     "Australian King"
+ Gerd        2.8.0          2010-Sep-21     "Tui Parakeet"
 
 =cut
