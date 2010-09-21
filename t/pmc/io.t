@@ -631,7 +631,7 @@ OUTPUT
 
 ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 
-print $FOO "T\xc3\xb6tsch\n";
+print $FOO "T\xc3\xb6tsch \xe2\x82\xac100\n";
 close $FOO;
 
 pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, read parts" );
@@ -642,6 +642,10 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, re
     pio.'open'(temp_file, 'r')
     pio.'encoding'("utf8")
     $S0 = pio.'read'(2)
+    say $S0
+    $S1 = pio.'read'(7)
+    say $S1
+    $S0 .= $S1
     $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
     $S0 .= $S1
     pio.'close'()
@@ -650,13 +654,13 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, re
     $S2 = encodingname $I1
     say $S2
 
-    $I1 = find_encoding 'iso-8859-1'
-    trans_encoding $S1, $S0, $I1
-    print $S1
+    print $S0
 .end
 CODE
+T\xc3\xb6
+tsch \xe2\x82\xac
 utf8
-T\xf6tsch
+T\xc3\xb6tsch \xe2\x82\xac100
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - classmeth" );

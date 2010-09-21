@@ -65,31 +65,32 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
             const UINTVAL c = *u8ptr;
 
             if (UTF8_IS_START(c)) {
-                UINTVAL len2 = UTF8SKIP(u8ptr);
+                UINTVAL new_bufused = iter.bytepos + UTF8SKIP(u8ptr);
+                UINTVAL len2;
                 INTVAL  read;
 
-                if (iter.bytepos + len2 <= s->bufused)
+                if (new_bufused <= s->bufused)
                     goto ok;
 
-                /* need len - 1 more chars */
-                --len2;
-                s2 = Parrot_str_new_init(interp, NULL, len2,
-                        Parrot_utf8_encoding_ptr, 0);
-                s2->bufused  = len2;
-
-                read = Parrot_io_read_buffer(interp, filehandle, &s2);
+                /* read additional bytes to complete UTF-8 char */
+                len2        = new_bufused - s->bufused;
+                s2          = Parrot_str_new_init(interp, NULL, len2,
+                                    Parrot_binary_encoding_ptr, 0);
+                s2->bufused = len2;
+                read        = Parrot_io_read_buffer(interp, filehandle, &s2);
                 UNUSED(read);
 
-                s->strlen    = iter.charpos;
-                s            = Parrot_str_concat(interp, s, s2);
-                *buf         = s;
-                len         += len2 + 1;
+                Parrot_gc_reallocate_string_storage(interp, s, new_bufused);
+                mem_sys_memcopy(s->strstart + s->bufused, s2->strstart, len2);
+
+                s->bufused  = new_bufused;
+                len        += len2;
 
                 /* check last char */
             }
         }
 ok:
-        Parrot_utf8_encoding_ptr->iter_get_and_advance(interp, *buf, &iter);
+        STRING_iter_get_and_advance(interp, s, &iter);
     }
     s->strlen = iter.charpos;
     return len;
