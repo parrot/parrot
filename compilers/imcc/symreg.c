@@ -859,11 +859,14 @@ int_overflows(ARGIN(const SymReg *r))
     }
 
     errno = 0;
+
     if (base == 10) {
-        (void)strtol(digits, NULL, base);
+        long int unused = strtol(digits, NULL, base);
+        UNUSED(unused);
     }
     else {
-        (void)strtoul(digits + 2, NULL, base);
+        unsigned long int unused = strtoul(digits + 2, NULL, base);
+        UNUSED(unused);
     }
 
     return errno ? 1 : 0;
