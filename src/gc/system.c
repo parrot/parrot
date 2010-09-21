@@ -526,7 +526,7 @@ is_pmc_ptr(ARGIN(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_pmc_ptr)
     return contained_in_pool(mem_pools->pmc_pool, ptr)
-        && PObj_is_PMC_TEST((PObj *)ptr);
+           && PObj_is_PMC_TEST((const PObj *)ptr);
 }
 
 
