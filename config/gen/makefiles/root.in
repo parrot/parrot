@@ -2523,7 +2523,7 @@ exec : src/parrot_config$(O) $(LIBPARROT)
 src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
 	$(CC) $(CFLAGS) @optimize::src/nci_test.c@ @ccwarn::src/nci_test.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci_test.c
 
-$(LIBNCI_TEST_SO): src/nci_test$(O) $(LIBPARROT)
+$(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
     @ld_out@$@ src/nci_test$(O) $(C_LIBS)
 
