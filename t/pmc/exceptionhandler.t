@@ -23,7 +23,7 @@ Tests the ExceptionHandler PMC.
     .include 'test_more.pir'
 
     # If test exited with "bad plan" MyHandlerCan.can_handle wasn't invoked.
-    plan(18)
+    plan(19)
 
     test_bool()
     test_int()
@@ -105,7 +105,7 @@ Tests the ExceptionHandler PMC.
 
     test_handle_types_except()
 
-    goto subclass_handler
+    goto init_int
 
   typed_handler_one:
     .get_results (e)
@@ -119,6 +119,21 @@ Tests the ExceptionHandler PMC.
     c = e['resume']
     eh = 0
     c()
+
+  init_int:
+    eh = new ['ExceptionHandler'], .CONTROL_BREAK
+    set_addr eh, init_int_eh
+    push_eh eh
+    $P0 = new ['Exception']
+    $P0['type'] = .CONTROL_BREAK
+    throw $P0
+    $I0 = 0
+    goto init_int_done
+  init_int_eh:
+    pop_eh
+    $I0 = 1
+  init_int_done:
+    ok($I0, "init_int handler correctly caught exception")
 
   subclass_handler:
     .local pmc myhandler, myhandlercan
