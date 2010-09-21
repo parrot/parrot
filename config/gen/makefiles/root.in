@@ -1574,7 +1574,7 @@ src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str src/spf_render.c
 
 src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
-src/string/encoding$(O) : $(PARROT_H_HEADERS)
+src/string/encoding$(O) : $(PARROT_H_HEADERS) src/string/encoding.c
 
 src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/tables.h
