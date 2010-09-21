@@ -26194,7 +26194,7 @@ static void hop_init(PARROT_INTERP)
     HOP *hops = hop_buckets =
         mem_gc_allocate_n_zeroed_typed(interp, core_op_lib.op_count * 2, HOP );
 
-    size_t i;
+    opcode_t i;
 
     /* store full names */
     for (i = 0; i < core_op_lib.op_count; i++) {

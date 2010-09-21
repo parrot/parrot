@@ -703,11 +703,11 @@ none exists.
 static
 opcode_t
 bytecode_map_op(PARROT_INTERP, op_info_t *info) {
-    int i;
     op_lib_t          *lib     = info->lib;
     op_func_t         op_func  = OP_INFO_OPFUNC(info);
     PackFile_ByteCode *bc      = interp->code;
     PackFile_ByteCode_OpMappingEntry *om;
+    opcode_t i;
 
     for (i = 0; i < bc->op_mapping.n_libs; i++) {
         if (lib == bc->op_mapping.libs[i].lib) {
