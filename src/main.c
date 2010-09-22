@@ -398,7 +398,9 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
             }
             break;
         }
-        else if (!strncmp(arg, "--gc-threshold", 14)) {
+        /* don't overflow argv; check length first */
+        else if (argc > arg + 14
+             && !strncmp(arg, "--gc-threshold", 14)) {
 
             if ((arg = strrchr(arg, '=')))
                 ++arg;
