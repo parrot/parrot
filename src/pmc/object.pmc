@@ -355,7 +355,7 @@ of the given name walking up the inheritance tree.
 
         /* If there's a vtable override for 'get_attr_str' run that first. */
         PMC * const method = Parrot_oo_find_vtable_override(INTERP,
-                VTABLE_get_class(INTERP, SELF), get_attr);
+                obj->_class, get_attr);
 
         if (!PMC_IS_NULL(method)) {
             PMC *result = PMCNULL;
@@ -420,7 +420,7 @@ of the given name walking up the inheritance tree.
 
         /* If there's a vtable override for 'set_attr_str' run that first. */
         PMC * const method = Parrot_oo_find_vtable_override(INTERP,
-                VTABLE_get_class(INTERP, SELF), vtable_meth_name);
+                obj->_class, vtable_meth_name);
 
         if (!PMC_IS_NULL(method)) {
             Parrot_ext_call(INTERP, method, "PiSP->", SELF, name, value);
@@ -594,20 +594,7 @@ Get the class PMC representing the class that this object is an instance of.
 
 */
     VTABLE PMC *get_class() {
-        PMC    * const classobj  = PARROT_OBJECT(SELF)->_class;
-        STRING * const get_class = CONST_STRING(INTERP, "get_class");
-
-        /* If there's a vtable override for 'get_class' run that instead. */
-        PMC    * const method    = Parrot_oo_find_vtable_override(INTERP,
-                classobj, get_class);
-
-        if (!PMC_IS_NULL(method)) {
-            PMC *result;
-            Parrot_ext_call(INTERP, method, "Pi->P", SELF, &result);
-            return result;
-        }
-
-        return classobj;
+        return PARROT_OBJECT(SELF)->_class;
     }
 
 
@@ -690,10 +677,11 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        if (SUPER(classname))
+        if (SELF->vtable->whoami == classname
+        ||  Parrot_str_equal(INTERP, SELF->vtable->whoami, classname))
             return 1;
         else {
-            PMC * _class = VTABLE_get_class(INTERP, SELF);
+            PMC *_class = PARROT_OBJECT(SELF)->_class;
             return VTABLE_isa(INTERP, _class, classname);
         }
     }

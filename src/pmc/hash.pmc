@@ -141,9 +141,7 @@ Free hash structure.
 
         attr->hash = parrot_create_hash(INTERP,
                 (PARROT_DATA_TYPE)value_type,
-                Hash_key_type_STRING,
-                hash_compare_string,
-                (hash_hash_key_fn)key_hash_STRING);
+                Hash_key_type_STRING);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -233,23 +231,17 @@ NB: this method will destroy all old data!
         if (type == Hash_key_type_STRING)
             new_hash = parrot_create_hash(INTERP,
                     entry_type,
-                    Hash_key_type_STRING,
-                    hash_compare_string,
-                    (hash_hash_key_fn)key_hash_STRING);
+                    Hash_key_type_STRING);
         else if (type == Hash_key_type_int)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(INTERP,
                     entry_type,
-                    Hash_key_type_int,
-                    hash_compare_int,
-                    key_hash_int);
+                    Hash_key_type_int);
         else if (type == Hash_key_type_PMC)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(INTERP,
                     entry_type,
-                    Hash_key_type_PMC,
-                    (hash_comp_fn)hash_compare_pmc,
-                    (hash_hash_key_fn)key_hash_PMC);
+                    Hash_key_type_PMC);
         else
             /* We probably will not implement other types of keys. They are way
              * too dangerous to use from PIR */
@@ -310,9 +302,7 @@ NB: this method will destroy all old data!
           case enum_type_PMC:
             new_hash = parrot_create_hash(INTERP,
                         (PARROT_DATA_TYPE)type,
-                        old_hash ? old_hash->key_type : Hash_key_type_STRING,
-                        old_hash ? old_hash->compare  : hash_compare_string,
-                        old_hash ? old_hash->hash_val : (hash_hash_key_fn)key_hash_STRING);
+                        old_hash ? old_hash->key_type : Hash_key_type_STRING);
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -383,11 +373,12 @@ Return a representation of the hash contents.
     }
 
     VTABLE STRING *get_repr() {
-        /* TT #1231:  Use freeze in get_repr() (for hashes) */
-        PMC * const  iter = VTABLE_get_iter(INTERP, SELF);
-        STRING      *res  = CONST_STRING(INTERP, "{");
-        const INTVAL n    = VTABLE_elements(INTERP, SELF);
+        PMC * const iter = VTABLE_get_iter(INTERP, SELF);
+        PMC          *sb = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
+        const INTVAL n   = VTABLE_elements(INTERP, SELF);
         INTVAL       j;
+
+        VTABLE_push_string(INTERP, sb, CONST_STRING(INTERP, "{"));
 
         for (j = 0; j < n; ++j) {
             STRING * const key      = VTABLE_shift_string(INTERP, iter);
@@ -407,25 +398,22 @@ Return a representation of the hash contents.
             Parrot_str_free_cstring(key_str);
 
             if (all_digit) {
-                res = Parrot_str_concat(INTERP, res, key);
+                VTABLE_push_string(INTERP, sb, key);
             }
             else {
-                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "'"));
-                res = Parrot_str_concat(INTERP, res, key);
-                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "'"));
+                VTABLE_push_string(INTERP, sb, CONST_STRING(INTERP, "'"));
+                VTABLE_push_string(INTERP, sb, key);
+                VTABLE_push_string(INTERP, sb, CONST_STRING(INTERP, "'"));
             }
-
-            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ": "));
+            VTABLE_push_string(INTERP, sb, CONST_STRING(INTERP, ":"));
             val = SELF.get_pmc_keyed_str(key);
-            res = Parrot_str_concat(INTERP, res, VTABLE_get_string(INTERP, val));
+            VTABLE_push_string(INTERP, sb, VTABLE_get_string(INTERP, val));
 
             if (j < n - 1)
-                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
+                VTABLE_push_string(INTERP, sb, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "}"));
-
-        return res;
+        return VTABLE_get_string(INTERP, sb);
     }
 
 /*
@@ -628,8 +616,9 @@ Returns the floating-point value for the element at C<*key>.
         HashBucket * const b =
             parrot_hash_get_bucket(INTERP, hash, hash_key_from_string(INTERP, hash, key));
 
+        /* XXX: shouldn't we return STRINGNULL? */
         if (!b)
-            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+            return CONST_STRING(INTERP, "");
 
         return hash_value_to_string(INTERP, hash, b->value);
     }
@@ -640,7 +629,7 @@ Returns the floating-point value for the element at C<*key>.
             parrot_hash_get_bucket(INTERP, hash, hash_key_from_int(INTERP, hash, key));
 
         if (!b)
-            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+            return CONST_STRING(INTERP, "");
 
         return hash_value_to_string(INTERP, hash, b->value);
     }
@@ -661,7 +650,7 @@ Returns the string value for the element at C<*key>.
         HashBucket * const b        = parrot_hash_get_bucket(INTERP, hash, hash_key);
 
         if (!b)
-            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+            return CONST_STRING(INTERP, "");
 
         key = key_next(INTERP, key);
 
@@ -772,9 +761,8 @@ Returns the PMC value for the element at C<*key>.
 
         GET_ATTR_hash(INTERP, SELF, hash);
 
-        /* special case the most likely key type, for speed */
-        if (hash->key_type != Hash_key_type_STRING)
-            key = (STRING *)hash_key_from_string(INTERP, hash, key);
+        if (!hash->entries)
+            return PMCNULL;
 
         b = parrot_hash_get_bucket(INTERP, hash, key);
 
@@ -1198,7 +1186,6 @@ Used to archive the hash.
 */
 
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         Parrot_hash_freeze(INTERP, (Hash *)SELF.get_pointer(), info);
     }
 
@@ -1213,7 +1200,6 @@ Used to unarchive the hash.
 */
 
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SELF.set_pointer((void *)Parrot_hash_thaw(INTERP, info));
     }
 }

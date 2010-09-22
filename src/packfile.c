@@ -2778,7 +2778,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     ASSERT_ARGS(byte_code_unpack)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
-    int total_ops = 0;
+    size_t total_ops = 0;
 
     byte_code->op_count          = PF_fetch_opcode(self->pf, &cursor);
     byte_code->op_func_table     = mem_gc_allocate_n_zeroed_typed(interp,
@@ -2849,12 +2849,12 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                 opcode_t idx = PF_fetch_opcode(self->pf, &cursor);
                 opcode_t op  = PF_fetch_opcode(self->pf, &cursor);
 
-                if (0 > op || op >= entry->lib->op_count)
+                if (0 > op || (size_t)op >= entry->lib->op_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                         "opcode index out of bounds on library `%s'. Found %d, expected 0 to %d.",
                         entry->lib->name, op, entry->lib->op_count - 1);
 
-                if (0 > idx || idx >= byte_code->op_count)
+                if (0 > idx || (size_t)idx >= byte_code->op_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                         "op table index out of bounds for entry from library `%s'."
                         " Found %d, expected 0 to %d",
@@ -3202,7 +3202,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         /* Set up new entry and insert it. */
         PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
         STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+                Parrot_default_encoding_ptr, 0);
         size_t count = ct->const_count;
         size_t i;
 
@@ -3228,7 +3228,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
             fnconst           = &ct->constants[ct->const_count - 1];
             fnconst->type     = PFC_STRING;
             fnconst->u.string = Parrot_str_new_init(interp, filename, strlen(filename),
-                    PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                    Parrot_default_encoding_ptr,
                     PObj_constant_FLAG);
         }
 
@@ -3911,6 +3911,11 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
     }
 
     self->const_count = 0;
+
+    if (self->string_hash) {
+        parrot_hash_destroy(interp, self->string_hash);
+        self->string_hash = NULL;
+    }
 
     return;
 }

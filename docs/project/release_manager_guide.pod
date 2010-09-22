@@ -118,9 +118,10 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-Run C<./ops2c --core> (or C<make bootstrap-ops>, ignoring errors) followed by
-C<make reconfig> and C<make> to update the names of version-specific internal
-functions.
+To have parrot configured and have run C<make> with the old version number is
+condition for this step. Run C<./ops2c --core> (or C<make bootstrap-ops>,
+ignoring errors) followed by C<make reconfig> and C<make> to update the names
+of version-specific internal functions.
 
 =item g
 
@@ -406,11 +407,16 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Sep 21, 2010 - 2.8   - gerd
  - Oct 19, 2010 - 2.9*  - gerd
- - Nov 16, 2010 - 2.10  - ??
- - Dec 21, 2010 - 2.11  - ??
- - Jan 18, 2010 - 3.0*  - ??
+ - Nov 16, 2010 - 2.10  - tcurtis
+ - Dec 21, 2010 - 2.11  - whiteknight
+ - Jan 18, 2011 - 3.0*  - cotto
+ - Feb 15, 2011 - 3.1   - mikehh
+ - Mar 15, 2011 - 3.2   - ??
+ - Apr 19, 2011 - 3.3*  - ??
+ - May 17, 2011 - 3.4   - ??
+ - Jun 21, 2011 - 3.5   - ??
+ - Jul 19, 2011 - 3.6*  - kid51
 
 =cut
 

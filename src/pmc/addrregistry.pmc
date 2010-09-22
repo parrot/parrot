@@ -46,9 +46,7 @@ Initializes the instance.
     VTABLE void init() {
         Hash  *registry = parrot_create_hash(INTERP,
                 enum_type_int,
-                Hash_key_type_PMC,
-                hash_compare_int,
-                key_hash_int);
+                Hash_key_type_PMC_ptr);
 
         SET_ATTR_hash(INTERP, SELF, registry);
         PObj_custom_mark_destroy_SETALL(SELF);

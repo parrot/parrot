@@ -21,7 +21,7 @@ Tests the object/class subsystem.
     .include "iglobals.pasm"
     .include "interpinfo.pasm"
 
-    plan(194)
+    plan(191)
 
     get_classname_from_class()
     test_get_class()
@@ -142,15 +142,6 @@ Tests the object/class subsystem.
 
     isa $I0, $P1, "calar"
     is( $I0, 0, 'Boolean !isa calar' )
-
-    isa $I0, $P1, "Integer"
-    is( $I0, 1, 'Boolean isa Integer' )
-
-    isa $I0, $P1, "Integ"
-    is( $I0, 0, 'Boolean !isa Integ' )
-
-    isa $I0, $P1, "eger"
-    is( $I0, 0, 'Boolean !isa eger' )
 
     isa $I0, $P1, " "
     is( $I0, 0, 'Boolean !isa " "' )

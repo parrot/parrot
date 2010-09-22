@@ -128,6 +128,7 @@ Tests Parrot string registers and operations.
     split_on_empty_string()
     split_on_non_empty_string()
     test_join()
+    test_join_many()
     eq_addr_or_ne_addr()
     test_if_null_s_ic()
     test_upcase()
@@ -1496,6 +1497,21 @@ WHILE:
     push $P0, "b"
     join $S0, "--", $P0
     is( $S0, "a--b", 'join' )
+.end
+
+.sub 'test_join_many'
+    $P1 = new ['ResizablePMCArray']
+    $I0 = 0
+  loop:
+    unless $I0 < 20000 goto done
+    $P2 = new ['Integer']
+    assign $P2, $I0
+    push $P1, $P2
+    inc $I0
+    goto loop
+  done:
+    $S0 = join ' ', $P1
+    ok("Join of many temporary strings doesn't crash")
 .end
 
 # join: get_string returns a null string --------

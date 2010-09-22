@@ -665,14 +665,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'StringHandle is not a tty' );
     .local int i
     sh = new ['StringHandle']
 
-    # See TT #1689
-    i = sh.'is_tty'()
-    say i
     i = sh.'isatty'()
     say i
 .end
 CODE
-0
 0
 OUTPUT
 

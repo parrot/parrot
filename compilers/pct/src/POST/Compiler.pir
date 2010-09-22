@@ -130,9 +130,8 @@ Return generated PIR for C<node> and all of its children.
     pos = cpost['pos']
     if null pos goto done_subline
     source = cpost['source']
-    $I0 = can source, 'lineof'
-    unless $I0 goto done_subline
-    line = source.'lineof'(pos)
+    if null source goto done_subline
+    line = self.'lineof'(source, pos, 'cache'=>1)
     inc line
   done_subline:
     self.'pir'(cpost)

@@ -255,7 +255,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/interpreter.h"
 #include "parrot/datatypes.h"
 #include "parrot/encoding.h"
-#include "parrot/charset.h"
 #include "parrot/string.h"
 #include "parrot/string_primitives.h"
 #include "parrot/hash.h"

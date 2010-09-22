@@ -294,8 +294,7 @@ Create a new cursor for matching C<target>.
     parrotclass = getattribute $P0, 'parrotclass'
     cur = new parrotclass
 
-    $P0 = new ['CodeString']
-    $P0 = target
+    $P0 = box target
     setattribute cur, '$!target', $P0
 
     if has_cont goto cursor_cont
@@ -502,7 +501,8 @@ Log a debug message.
     fmt = new ['ResizablePMCArray']
     from = getattribute self, '$!from'
     orig = getattribute self, '$!target'
-    line = orig.'lineof'(from)
+    $P0 = get_hll_global ['HLL'], 'Compiler'
+    line = $P0.'lineof'(orig, from, 'cache'=>1)
 
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(2)
@@ -1074,11 +1074,23 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     .local int pos
     .local string tgt
     (cur, pos, tgt) = self.'!cursor_start'()
+    .local pmc debug
+    debug = getattribute cur, '$!debug'
+    if null debug goto debug_1
+    cur.'!cursor_debug'('START', name)
+  debug_1:
     $I0 = is_cclass cclass, tgt, pos
     unless $I0 goto fail
     inc pos
+  pass:
     cur.'!cursor_pass'(pos, name)
+    if null debug goto done
+    cur.'!cursor_debug'('PASS', name)
+    goto done
   fail:
+    if null debug goto done
+    cur.'!cursor_debug'('FAIL', name)
+  done:
     .return (cur)
 .end
 
@@ -1087,6 +1099,11 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     .local int pos
     .local string tgt
     (cur, pos, tgt) = self.'!cursor_start'()
+    .local pmc debug
+    debug = getattribute cur, '$!debug'
+    if null debug goto debug_1
+    cur.'!cursor_debug'('START', 'alpha')
+  debug_1:
     $I0 = is_cclass .CCLASS_ALPHABETIC, tgt, pos
     if $I0 goto pass
 
@@ -1098,7 +1115,13 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
   pass:
     inc pos
     cur.'!cursor_pass'(pos, 'alpha')
+    if null debug goto done
+    cur.'!cursor_debug'('PASS', 'alpha')
+    goto done
   fail:
+    if null debug goto done
+    cur.'!cursor_debug'('FAIL', 'alpha')
+  done:
     .return (cur)
 .end
 
@@ -1157,12 +1180,11 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
     message = concat "Unable to parse ", dba
     message .= ", couldn't find final "
     message .= goal
-    $P0 = getattribute self, '$!target'
-    $I0 = can $P0, 'lineof'
-    unless $I0 goto have_line
     message .= ' at line '
+    $P0 = getattribute self, '$!target'
+    $P1 = get_hll_global ['HLL'], 'Compiler'
     $I0 = self.'pos'()
-    $I0 = $P0.'lineof'($I0)
+    $I0 = $P1.'lineof'($P0, $I0)
     inc $I0
     $S0 = $I0
     message .= $S0
@@ -3226,7 +3248,9 @@ character list.
 
     ops.'push_pirop'('inline', negate, subtype, 'inline'=>'  # rx enumcharlist negate=%0 %1')
 
+    if zerowidth goto skip_zero_1 
     ops.'push_pirop'('ge', pos, eos, fail)
+  skip_zero_1:
     ops.'push_pirop'('sub', '$I10', pos, off)
     ops.'push_pirop'('substr', '$S10', tgt, '$I10', 1)
     ops.'push_pirop'('index', '$I11', charlist, '$S10')

@@ -282,6 +282,8 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
             Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                         "Couldn't dlopen(NULL): %s\n",
                         err ? err : "unknown reason");
+            /* clear the error memory */
+            (void)Parrot_dlerror();
             return NULL;
         }
     }
@@ -307,6 +309,8 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
                     Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                                 "Couldn't load '%Ss': %s\n",
                             full_name, err ? err : "unknown reason");
+                    /* clear the error memory */
+                    (void)Parrot_dlerror();
                     return NULL;
                 }
             }
@@ -372,6 +376,9 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
         Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                     "Couldn't load '%Ss': %s\n",
                     lib, err ? err : "unknown reason");
+
+        /* clear the error memory */
+        (void)Parrot_dlerror();
         return NULL;
     }
 }
@@ -477,12 +484,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     Parrot_pcc_set_namespace(interp, context,
             Parrot_get_HLL_namespace(interp, parrot_hll_id));
 
-    /*
-     * work around gcc 3.3.3 and other problem with dynpmcs
-     * something during library loading doesn't stand a GC run
-     */
-    Parrot_block_GC_mark(interp);
-
     if (lib_name) {
         STRING * const load_name       = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
@@ -517,9 +518,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     /* remember lib_pmc in iglobals */
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
 
-    /* UNLOCK */
-    Parrot_unblock_GC_mark(interp);
-
     Parrot_pop_context(interp);
 
     return lib_pmc;
@@ -531,8 +529,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 =item C<static STRING * clone_string_into(Interp *d, Interp *s, PMC *value)>
 
 Extracts a STRING value from PMC C<value> in interpreter C<s>. Copies that
-string into the pool of interpreter C<d> using the default encoding
-and charset.
+string into the pool of interpreter C<d> using the default encoding.
 
 =cut
 
@@ -548,7 +545,7 @@ clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
     char   * const  raw_str = Parrot_str_to_cstring(s, orig);
     STRING * const  ret     =
         Parrot_str_new_init(d, raw_str, strlen(raw_str),
-            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+            Parrot_default_encoding_ptr,
             PObj_constant_FLAG);
     Parrot_str_free_cstring(raw_str);
     return ret;

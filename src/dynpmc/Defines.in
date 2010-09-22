@@ -24,7 +24,6 @@ DYNPMC_H_FILES = \
     include/parrot/caches.h \
     include/parrot/call.h \
     include/parrot/cclass.h \
-    include/parrot/charset.h \
     include/parrot/compiler.h \
     include/parrot/config.h \
     include/parrot/context.h \

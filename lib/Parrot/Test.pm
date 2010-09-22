@@ -298,7 +298,6 @@ use base qw( Exporter );
 Memoize::memoize('path_to_parrot');
 
 # Tell parrot it's being tested--disables searching of installed libraries.
-# (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
 
 my $builder = Test::Builder->new();

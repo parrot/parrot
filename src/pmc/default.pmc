@@ -533,6 +533,22 @@ Returns the name of the PMC.
 
 /*
 
+=item C<void PMC *add_attribute(STRING *name, PMC *type)>
+
+Throws an exception, as you can only add an attribute to something Class-y or
+Role-y.
+
+=cut
+
+*/
+
+    VTABLE void add_attribute(STRING *name, PMC *type) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot add attribute to non-class");
+    }
+
+/*
+
 =item C<PMC *get_namespace>
 
 Return the namespace for this PMC.
@@ -781,7 +797,7 @@ Calculate hashvalue for PMC. Default behaviour stringify and use string.
 
     INTVAL hashvalue() {
         STRING *s = SELF.get_string();
-        return key_hash_STRING(INTERP, s, 0);
+        return Parrot_str_to_hashval(INTERP, s);
     }
 
 /*
@@ -1838,56 +1854,6 @@ Default fallback. Performs a multiple dispatch call for 'cmp_pmc'.
                 "cmp_pmc", "PP->P", SELF, value, &retval);
 
         return retval;
-    }
-/*
-
-=item C<PMC *logical_or(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_or'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_or(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_or", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
-
-/*
-
-=item C<PMC *logical_and(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_and'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_and(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_and", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
-
-/*
-
-=item C<PMC *logical_xor(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_xor'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_xor(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_xor", "PPP->P", SELF, value, dest, &result);
-        return result;
     }
 
 /*

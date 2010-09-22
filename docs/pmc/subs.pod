@@ -27,7 +27,6 @@ These are all of the built-in classes that are directly callable, or
     Coroutine
     Eval
   Continuation
-    RetContinuation
     ExceptionHandler
 
 By "invokable" we mean that they can be supplied as the first argument to the

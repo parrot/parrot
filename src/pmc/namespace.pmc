@@ -32,7 +32,7 @@ static void add_multi_to_namespace(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void add_nci_to_namespace(PARROT_INTERP,
+static void add_native_to_namespace(PARROT_INTERP,
     ARGIN(PMC *SELF),
     ARGIN(STRING *key),
     ARGIN_NULLOK(PMC *value))
@@ -76,7 +76,7 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF) \
     , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_add_nci_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_add_native_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF) \
     , PARROT_ASSERT_ARG(key))
@@ -235,15 +235,14 @@ PMC *value)>
 */
 
 static void
-add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
+add_native_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN_NULLOK(PMC *value))
 {
-    ASSERT_ARGS(add_nci_to_namespace)
-
-    STRING * const nci_str = CONST_STRING(interp, "NCI");
+    ASSERT_ARGS(add_native_to_namespace)
 
     if (!PMC_IS_NULL(value)
-    &&   VTABLE_isa(interp, value, nci_str)) {
+    && (value->vtable->base_type == enum_class_NativePCCMethod ||
+        value->vtable->base_type == enum_class_NCI)) {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC * const classobj = VTABLE_get_class(interp, SELF);
 
@@ -433,8 +432,8 @@ really a public API.
         if (maybe_add_sub_to_namespace(INTERP, SELF, key, value))
             return;
 
-        /* If it's an NCI method */
-        add_nci_to_namespace(INTERP, SELF, key, value);
+        /* If it's an native method */
+        add_native_to_namespace(INTERP, SELF, key, value);
 
         /* If it's a multi-sub and the first in this NS... */
         add_multi_to_namespace(INTERP, SELF, key, value);

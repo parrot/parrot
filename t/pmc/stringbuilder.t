@@ -20,8 +20,10 @@ Tests the C<StringBuilder> PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    test_create()               # 2 tests
+    test_create()               # 3 tests
+    test_init_pmc()
     test_push_string()
+    test_push_string_resize()
     test_push_pmc()             # 4 tests
     test_push_string_unicode()  # 1 test
     test_i_concatenate()        # 1 test
@@ -36,6 +38,7 @@ Tests the C<StringBuilder> PMC.
     emit_with_pos_and_named_args()
 
     test_unicode_conversion_tt1665()
+    test_encodings()
 
     done_testing()
 
@@ -53,6 +56,12 @@ Tests the C<StringBuilder> PMC.
     $S0 = sb
     is( $S0, '', '... with empty content')
 
+    .local pmc ar
+    ar = new ['FixedStringArray']
+    sb = new ['StringBuilder'], ar
+    $I0 = isnull sb
+    not $I0
+    ok( $I0, 'StringBuilder created from empty array' )
 .end
 
 .sub 'test_push_string'
@@ -69,9 +78,6 @@ Tests the C<StringBuilder> PMC.
 
     is( $S0, "foo", "... without clobbering first string")
 
-    $I0 = sb
-    is( $I0, 128, "... and capacity still 128" )
-
     $I0 = sb.'get_string_length'()
     is( $I0, 6,   "... and string length is correct")
 
@@ -83,18 +89,12 @@ Tests the C<StringBuilder> PMC.
     $S1 = sb
     is( $S0, $S1, "Push 128 chars string works")
 
-    $I0 = sb
-    is( $I0, 256, "... and capacity increased" )
-
     $S99 = repeat "x", 1000
     push sb, $S99
 
     $S0 = concat $S0, $S99
     $S1 = sb
     is( $S0, $S1, "Push 1000 chars string works")
-
-    $I0 = sb
-    is( $I0, 2048, "... and capacity increased" )
 
     $S99 = repeat "x", 12000
     push sb, $S99
@@ -103,14 +103,34 @@ Tests the C<StringBuilder> PMC.
     $S1 = sb
     is( $S0, $S1, "Push 10000 chars string works")
 
-    $I0 = sb
-    is( $I0, 16384, "... and capacity increased" )
+    null $S99
+    push sb, $S99
 
-    null $S0
-    push sb, $S0
-    $I0 = sb
-    is( $I0, 16384, "push a null string does nothing" )
+    $S1 = sb
+    is( $S0, $S1, "push a null string does nothing" )
+.end
 
+.sub 'test_push_string_resize'
+    # Try to cover the case of resizing a buffer while converting it to utf8
+    # Depends on internal details of StringBuffer, so it may need changes
+    # when that internals do.
+    .local pmc sb
+    sb = new ["StringBuilder"]
+    .local string s
+    .local int i, n
+    # Get the allocated capacity and almost fill it
+    n = sb
+    n -= 2
+    s = repeat iso-8859-1:"x", n
+    push sb, s
+    # push a string that needs reallocation and has incompatible encoding rep.
+    s = unicode:"yyyy"
+    push sb, s
+    # Check the expected string length. Not a rock solid check, but the
+    # purpose of this test is just code coverage, so is enough.
+    i = sb.'get_string_length'()
+    n = n + 4
+    is(i, n, 'test_push_string_resize')
 .end
 
 .sub 'test_push_pmc'
@@ -303,6 +323,47 @@ CODE
       $S0 = sb
 
     ok( $S0, "Pushing unicode strings doesn't kill StringBuilder")
+.end
+
+.sub 'test_init_pmc'
+    .local pmc ar
+    ar = new ['ResizableStringArray']
+
+    push ar, "foo"
+    push ar, "bar"
+
+    $S99 = repeat "x", 12
+    push ar, $S99
+    $S1 = 'foobar' . $S99
+
+    $S99 = repeat "y", 13
+    push ar, $S99
+    $S1 = $S1 . $S99
+
+    $S99 = repeat "z", 14
+    push ar, $S99
+    $S1 = $S1 . $S99
+
+    null $S0
+    push ar, $S0
+
+    .local pmc sb
+    sb  = new ["StringBuilder"], ar
+    $S0 = sb
+    is( $S0, $S1, 'init_pmc() should join all passed strings' )
+.end
+
+.sub 'test_encodings'
+    .local pmc sb
+    sb  = new ["StringBuilder"]
+
+    push sb, "foo"
+    push sb, iso-8859-1:"\x{E4}\x{F6}\x{FC}"
+    push sb, utf8:unicode:"БДЖ"
+    push sb, "bar"
+
+    $S0 = sb
+    is( $S0, utf8:unicode:"fooäöüБДЖbar", 'push strings with different encodings' )
 .end
 
 # Local Variables:

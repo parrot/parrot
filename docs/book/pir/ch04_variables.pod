@@ -966,17 +966,17 @@ world. A modern string system must also handle different encodings --
 ways to represent various charsets in memory and on disk.
 
 Every string in Parrot has an associated encoding and character set. The default
-charset is 8-bit ASCII, which is almost universally supported.  Double-quoted
-string constants can have an optional prefix specifying the string's encoding
-and charset.N<As you might suspect, single-quoted strings do not support this.>
+format is 8-bit ASCII, which is almost universally supported.  Double-quoted
+string constants can have an optional prefix specifying the string's
+format.N<As you might suspect, single-quoted strings do not support this.>
 Parrot tracks information about encoding and charset internally, and
 automatically converts strings when necessary to preserve these
-characteristics. Strings constants may have prefixes of the form C<encoding:charset:>.
+characteristics. Strings constants may have prefixes of the form C<format:>.
 
 =begin PIR_FRAGMENT
 
-  $S0 = utf8:unicode:"Hello UTF-8 Unicode World!"
-  $S1 = utf16:unicode:"Hello UTF-16 Unicode World!"
+  $S0 = utf8:"Hello UTF-8 Unicode World!"
+  $S1 = utf16:"Hello UTF-16 Unicode World!"
   $S2 = ascii:"This is 8-bit ASCII"
   $S3 = binary:"This is raw, unformatted binary data"
 
@@ -987,11 +987,10 @@ X<Latin 1 character set>
 X<UCS-2 encoding>
 X<UTF-8 encoding>
 X<UTF-16 encoding>
-Parrot supports the character sets C<ascii>, C<binary>, C<iso-8859-1>
-(Latin 1), and C<unicode> and the encodings C<fixed_8>, C<ucs2>,
-C<utf8>, and C<utf16>.
+Parrot supports the formats C<ascii>, C<binary>, C<iso-8859-1>
+(Latin 1), C<utf8>, C<utf16>, C<ucs2>, and C<ucs4>.
 
-The C<binary> charset treats the string as a buffer of raw unformatted
+The C<binary> format treats the string as a buffer of raw unformatted
 binary data. It isn't really a string per se, because binary data
 contains no readable characters. This exists to support libraries which
 manipulate binary data that doesn't easily fit into any other primitive

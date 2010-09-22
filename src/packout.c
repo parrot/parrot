@@ -273,9 +273,11 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
     GETATTR_Key_str_key(interp, key, key_str);
     GETATTR_Key_num_key(interp, key, key_num);
 
-    if (type == PFC_STRING && !PMC_IS_NULL(ct->string_hash)) {
-        if (VTABLE_exists_keyed_str(interp, ct->string_hash, key_str)) {
-            i = VTABLE_get_integer_keyed_str(interp, ct->string_hash, key_str);
+    if (type == PFC_STRING && ct->string_hash) {
+        HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash,
+                key_str);
+        if (bucket) {
+            i = (int)PTR2INTVAL(bucket->value);
             if (i < ct->const_count) /* only consider constants that have already occured */
                 return i;
         }
@@ -290,10 +292,7 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
             if (constant->type == PFC_STRING) {
                 STRING * const sc = constant->u.string;
                 if (Parrot_str_equal(interp, key_str, sc)
-                &&  Parrot_charset_number_of_str(interp, key_str)
-                ==  Parrot_charset_number_of_str(interp, sc)
-                &&  Parrot_encoding_number_of_str(interp, key_str)
-                ==  Parrot_encoding_number_of_str(interp, sc)) {
+                &&  key_str->encoding == sc->encoding) {
                     return i;
                 }
             }

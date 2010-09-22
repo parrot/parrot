@@ -1,0 +1,526 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/imageiofreeze.pmc - ImageIOFreeze PMC
+
+=head1 DESCRIPTION
+
+Freezes other PMCs.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/imageio.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void create_buffer(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *pmc),
+    ARGMOD(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
+
+PARROT_INLINE
+static void ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static opcode_t * GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
+        __attribute__nonnull__(1);
+
+PARROT_INLINE
+static void INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pmc);
+
+PARROT_INLINE
+static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
+
+#define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_ensure_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_GET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_INC_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_SET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(cursor))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static opcode_t * GET_VISIT_CURSOR(const PMC *pmc)>
+
+Get the buffer cursor. Buffer relocations are handled.
+
+=cut
+
+*/
+
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static opcode_t *
+GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
+{
+    ASSERT_ARGS(GET_VISIT_CURSOR)
+
+    char * const buf = (char *)Buffer_bufstart(PARROT_IMAGEIOFREEZE(pmc)->buffer);
+    const size_t pos = PARROT_IMAGEIOFREEZE(pmc)->pos;
+    return (opcode_t *)(buf + pos);
+}
+
+/*
+
+=item C<static void SET_VISIT_CURSOR(PMC *pmc, const char *cursor)>
+
+Set the buffer cursor. Buffer relocations are handled.
+
+=cut
+
+*/
+
+
+PARROT_INLINE
+static void
+SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
+{
+    ASSERT_ARGS(SET_VISIT_CURSOR)
+
+    const char * const bufstart  = (const char *)Buffer_bufstart(PARROT_IMAGEIOFREEZE(pmc)->buffer);
+    PARROT_IMAGEIOFREEZE(pmc)->pos = (cursor - bufstart);
+}
+
+/*
+
+=item C<static void INC_VISIT_CURSOR(PMC *pmc, UINTVAL inc)>
+
+Increment the buffer cursor. Buffer relocations are handled.
+
+=cut
+
+*/
+
+
+PARROT_INLINE
+static void
+INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
+{
+    ASSERT_ARGS(INC_VISIT_CURSOR)
+
+    PARROT_IMAGEIOFREEZE(pmc)->pos += inc;
+}
+
+
+/*
+
+=item C<static void create_buffer(PARROT_INTERP, PMC *pmc, PMC *info)>
+
+Allocate the image buffer.
+
+=cut
+
+*/
+
+static void
+create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(PMC *info))
+{
+    ASSERT_ARGS(create_buffer)
+
+    INTVAL  len;
+
+    if (!PMC_IS_NULL(pmc)) {
+        STRING * const array = CONST_STRING(interp, "array");
+        STRING * const hash  = CONST_STRING(interp, "hash");
+        INTVAL         items = 1;
+
+        if (VTABLE_does(interp, pmc, array) || VTABLE_does(interp, pmc, hash))
+            items += VTABLE_elements(interp, pmc);
+
+        len = items * FREEZE_BYTES_PER_ITEM;
+    }
+    else
+        len = FREEZE_BYTES_PER_ITEM;
+
+    PARROT_IMAGEIOFREEZE(info)->buffer =
+        Parrot_gc_new_bufferlike_header(interp, sizeof (Buffer));
+    Parrot_gc_allocate_buffer_storage_aligned(interp,
+        PARROT_IMAGEIOFREEZE(info)->buffer, len);
+    SET_VISIT_CURSOR(info,
+        (const char *)Buffer_bufstart(PARROT_IMAGEIOFREEZE(info)->buffer));
+}
+
+/*
+
+=item C<static void ensure_buffer_size(PARROT_INTERP, PMC *io, size_t len)>
+
+Checks the size of the buffer to see if it can accommodate C<len> more
+bytes. If not, expands the buffer.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static void
+ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
+{
+    ASSERT_ARGS(ensure_buffer_size)
+
+    Buffer * const buf  = PARROT_IMAGEIOFREEZE(io)->buffer;
+    const size_t used   = PARROT_IMAGEIOFREEZE(io)->pos;
+    const int need_free = Buffer_buflen(buf) - used - len;
+
+    /* grow by factor 1.5 or such */
+    if (need_free <= 16) {
+        size_t new_size = (size_t) (Buffer_buflen(buf) * 1.5);
+
+        if (new_size < Buffer_buflen(buf) - need_free + 512)
+            new_size = Buffer_buflen(buf) - need_free + 512;
+
+        Parrot_gc_reallocate_buffer_storage(interp, buf, new_size);
+        PARROT_ASSERT(Buffer_buflen(buf) - used - len >= 15);
+    }
+
+#ifndef DISABLE_GC_DEBUG
+    Parrot_gc_compact_memory_pool(interp);
+#endif
+}
+
+pmclass ImageIOFreeze auto_attrs {
+    ATTR Buffer              *buffer;      /* buffer to store the image */
+    ATTR size_t               pos;         /* current read/write buf position */
+    ATTR PMC                 *seen;        /* seen hash */
+    ATTR PMC                 *todo;        /* todo list */
+    ATTR UINTVAL              id;          /* freze ID of PMC */
+    ATTR struct PackFile     *pf;
+    ATTR PackFile_ConstTable *pf_ct;
+
+/*
+
+=back
+
+=head1 VTABLES
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC.
+
+=cut
+
+*/
+    VTABLE void init() {
+        PARROT_IMAGEIOFREEZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen,
+            parrot_new_intval_hash(INTERP));
+
+        PARROT_IMAGEIOFREEZE(SELF)->todo =
+            Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+
+        PObj_flag_CLEAR(private1, SELF);
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        PackFile_destroy(INTERP, PARROT_IMAGEIOFREEZE(SELF)->pf);
+        PARROT_IMAGEIOFREEZE(SELF)->pf = NULL;
+    }
+
+
+/*
+
+=item C<void mark()>
+
+Marks the PMC as alive.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        PObj * const buffer = (PObj *)(PARROT_IMAGEIOFREEZE(SELF)->buffer);
+        if (buffer)
+            Parrot_gc_mark_PObj_alive(INTERP, buffer);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen);
+    }
+
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the content of the image as a string.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        return Parrot_str_new_from_buffer(INTERP,
+                                          PARROT_IMAGEIOFREEZE(SELF)->buffer,
+                                          PARROT_IMAGEIOFREEZE(SELF)->pos);
+    }
+
+
+/*
+
+=item C<VTABLE PMC *get_iter()>
+
+Get the C<todo> list for this freeze/thaw for iterating over.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return PARROT_IMAGEIOFREEZE(SELF)->todo;
+    }
+
+/*
+
+=item C<VTABLE INTVAL get_integer()>
+
+Returns the flags describing the visit action.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return VISIT_FREEZE_NORMAL;
+    }
+
+
+/*
+
+=item C<VTABLE void push_integer(INTVAL v)>
+
+Pushes the integer C<v> onto the end of the image.
+
+=cut
+
+*/
+
+    VTABLE void push_integer(INTVAL v) {
+        const size_t len = PF_size_integer() * sizeof (opcode_t);
+        ensure_buffer_size(INTERP, SELF, len);
+        SET_VISIT_CURSOR(SELF,
+            (const char *)PF_store_integer(GET_VISIT_CURSOR(SELF), v));
+    }
+
+
+/*
+
+=item C<VTABLE void push_float(FLOATVAL v)>
+
+Pushes the float C<v> onto the end of the image.
+
+=cut
+
+*/
+
+    VTABLE void push_float(FLOATVAL v) {
+        const size_t len = PF_size_number() * sizeof (opcode_t);
+        ensure_buffer_size(INTERP, SELF, len);
+        SET_VISIT_CURSOR(SELF,
+            (const char *)PF_store_number(GET_VISIT_CURSOR(SELF), &v));
+    }
+
+
+/*
+
+=item C<VTABLE void push_string(STRING *v)>
+
+Pushes the string C<*v> onto the end of the image.
+
+=cut
+
+*/
+
+    VTABLE void push_string(STRING *v) {
+        if (PObj_flag_TEST(private1, SELF)) {
+            /* store a reference to constant table entry of string */
+            PMC                 * const v_pmc = key_new_string(interp, v);
+            PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
+            const int idx =
+                PackFile_ConstTable_rlookup(INTERP, table, v_pmc, PFC_STRING);
+
+            if (idx >= 0) {
+                STATICSELF.push_integer(idx);
+                return;
+            }
+
+            /* XXX handle cases where the PMC has changed after
+             * Parrot_freeze_strings was called eg: :immediate subs */
+            STATICSELF.push_integer(-1);
+
+            /* TODO
+             * should really be:
+             * PANIC(INTERP, "string not previously in constant table "
+             *               "when freezing to packfile"); */
+        }
+
+        {
+            const size_t len = PF_size_string(v) * sizeof (opcode_t);
+            ensure_buffer_size(INTERP, SELF, len);
+            SET_VISIT_CURSOR(SELF,
+                (const char *)PF_store_string(GET_VISIT_CURSOR(SELF), v));
+        }
+    }
+
+
+/*
+
+=item C<VTABLE void push_pmc(PMC *v)>
+
+Pushes a reference to pmc C<*v> onto the end of the image. If C<*v>
+hasn't been seen yet, it is also pushed onto the todo list.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *v) {
+        UINTVAL id;
+        int packid_type;
+
+        if (PMC_IS_NULL(v)) {
+            id   = 0;
+            packid_type = enum_PackID_seen;
+        }
+        else {
+            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
+                    PARROT_IMAGEIOFREEZE(SELF)->seen);
+            HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
+
+            if (b) {
+                id = (UINTVAL)b->value;
+                packid_type = enum_PackID_seen;
+            }
+            else {
+                ++PARROT_IMAGEIOFREEZE(SELF)->id; /* next id to freeze */
+                id = PARROT_IMAGEIOFREEZE(SELF)->id;
+                packid_type = enum_PackID_normal;
+            }
+        }
+
+        SELF.push_integer(PackID_new(id, packid_type));
+
+        if (packid_type == enum_PackID_normal) {
+            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
+                    PARROT_IMAGEIOFREEZE(SELF)->seen);
+
+            PARROT_ASSERT(v);
+
+            /* workaround to keep ParrotInterpreter PBC hack working */
+            if (v->vtable->base_type == enum_class_ParrotInterpreter)
+                PObj_flag_CLEAR(private1, SELF);
+
+            SELF.push_integer(
+                    PObj_is_object_TEST(v)
+                    ? (INTVAL) enum_class_Object
+                    : v->vtable->base_type);
+
+            parrot_hash_put(INTERP, hash, v, (void *)id);
+            VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
+        }
+    }
+
+
+/*
+
+=item C<void set_pointer(void *value)>
+
+Sets the constant table of this ImageIO PMC.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *value) {
+        PObj_flag_SET(private1, SELF);
+        PARROT_IMAGEIOFREEZE(SELF)->pf_ct = (PackFile_ConstTable *)value;
+    }
+
+
+    VTABLE void set_pmc(PMC *p)
+    {
+        create_buffer(INTERP, p, SELF);
+
+        if (PObj_flag_TEST(private1, SELF)) {
+            PARROT_IMAGEIOFREEZE(SELF)->pf = PARROT_IMAGEIOFREEZE(SELF)->pf_ct->base.pf;
+        }
+        else {
+            const UINTVAL header_length =
+                GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+
+            PARROT_IMAGEIOFREEZE(SELF)->pf = PackFile_new(INTERP, 0);
+            PObj_custom_destroy_SET(SELF);
+
+            ensure_buffer_size(INTERP, SELF, header_length);
+            mem_sys_memcopy(GET_VISIT_CURSOR(SELF),
+                PARROT_IMAGEIOFREEZE(SELF)->pf->header, PACKFILE_HEADER_BYTES);
+            INC_VISIT_CURSOR(SELF, header_length);
+        }
+
+        STATICSELF.push_pmc(p);
+        Parrot_visit_loop_visit(INTERP, SELF);
+    }
+}
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -165,6 +165,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->gc_sys->sys_type = parent
                                     ? parent->gc_sys->sys_type
                                     : PARROT_GC_DEFAULT_TYPE;
+    interp->gc_threshold     = GC_DYNAMIC_THRESHOLD_DEFAULT;
 
     /* Done. Return and be done with it */
     return interp;
@@ -252,14 +253,10 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     Parrot_runcore_init(interp);
 
     /* Load the core op func and info tables */
-    interp->op_lib          = PARROT_CORE_OPLIB_INIT(interp, 1);
-    interp->op_count        = interp->op_lib->op_count;
-    interp->op_func_table   = interp->op_lib->op_func_table;
-    interp->op_info_table   = interp->op_lib->op_info_table;
-    interp->all_op_libs     = NULL;
-    interp->evc_func_table  = NULL;
-    interp->save_func_table = NULL;
-    interp->code            = NULL;
+    interp->all_op_libs         = NULL;
+    interp->evc_func_table      = NULL;
+    interp->evc_func_table_size = 0;
+    interp->code                = NULL;
 
     /* create the root set registry */
     interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
@@ -446,10 +443,11 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     if (interp->evc_func_table) {
         mem_gc_free(interp, interp->evc_func_table);
-        interp->evc_func_table = NULL;
+        interp->evc_func_table      = NULL;
+        interp->evc_func_table_size = 0;
     }
 
-    /* strings, charsets, encodings - only once */
+    /* strings, encodings - only once */
     Parrot_str_finish(interp);
 
     PARROT_CORE_OPLIB_INIT(interp, 0);

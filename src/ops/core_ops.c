@@ -18211,7 +18211,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_and_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_and(interp, PREG(2), PREG(3), PREG(1));
+    PREG(1) = VTABLE_get_bool(interp, PREG(2)) ? PREG(3) : PREG(2);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18232,14 +18232,17 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_not_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    VTABLE_i_logical_not(interp, PREG(1));
+    VTABLE_set_bool(interp, PREG(1), !VTABLE_get_bool(interp, PREG(1)));
 
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
 Parrot_not_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_not(interp, PREG(2), PREG(1));
+    const INTVAL a = ! VTABLE_get_bool(interp, PREG(2));
+    if (PMC_IS_NULL(PREG(1)))
+        PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
+    VTABLE_set_bool(interp, PREG(1), a);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -18267,7 +18270,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_or_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_or(interp, PREG(2), PREG(3), PREG(1));
+    PREG(1) = VTABLE_get_bool(interp, PREG(2)) ? PREG(2) : PREG(3);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18295,7 +18298,17 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_xor_p_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = VTABLE_logical_xor(interp, PREG(2), PREG(3), PREG(1));
+    const INTVAL a = VTABLE_get_bool(interp, PREG(2));
+    const INTVAL b = VTABLE_get_bool(interp, PREG(3));
+    if (a && ! b)
+        PREG(1) = PREG(2);
+    else
+        if (b && ! a)
+            PREG(1) = PREG(3) ;
+        else{
+            PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
+            VTABLE_set_bool(interp, PREG(1), 0);
+        }
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -20453,32 +20466,14 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_addattribute_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const class_name  = string_from_literal(interp, "Class");
-    STRING * const role_name   = string_from_literal(interp, "Role");
-
-    if (VTABLE_isa(interp, PREG(1), class_name) || VTABLE_isa(interp, PREG(1), role_name))
-        VTABLE_add_attribute(interp, PREG(1), SREG(2), PMCNULL);
-    else {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION,
-            "Cannot add attribute to non-class");return (opcode_t *)handler;
-    }
+    VTABLE_add_attribute(interp, PREG(1), SREG(2), PMCNULL);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_addattribute_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const class_name  = string_from_literal(interp, "Class");
-    STRING * const role_name   = string_from_literal(interp, "Role");
-
-    if (VTABLE_isa(interp, PREG(1), class_name) || VTABLE_isa(interp, PREG(1), role_name))
-        VTABLE_add_attribute(interp, PREG(1), CONST(2).u.string, PMCNULL);
-    else {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION,
-            "Cannot add attribute to non-class");return (opcode_t *)handler;
-    }
+    VTABLE_add_attribute(interp, PREG(1), CONST(2).u.string, PMCNULL);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -22872,21 +22867,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_new_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    SREG(1) = Parrot_str_new_noinit(interp, 0);
 
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
 Parrot_new_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_new_noinit(interp, enum_stringrep_one, IREG(2));
+    SREG(1) = Parrot_str_new_noinit(interp, IREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_new_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_new_noinit(interp, enum_stringrep_one, cur_opcode[2]);
+    SREG(1) = Parrot_str_new_noinit(interp, cur_opcode[2]);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23121,35 +23116,35 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_charset_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_charset_number_of_str(interp, SREG(2));
+    IREG(1) = Parrot_encoding_number_of_str(interp, SREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_charset_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_charset_number_of_str(interp, CONST(2).u.string);
+    IREG(1) = Parrot_encoding_number_of_str(interp, CONST(2).u.string);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_charsetname_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_charset_name(interp, IREG(2));
+    SREG(1) = Parrot_encoding_name(interp, IREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_charsetname_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_charset_name(interp, cur_opcode[2]);
+    SREG(1) = Parrot_encoding_name(interp, cur_opcode[2]);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_find_charset_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    const INTVAL n = Parrot_charset_number(interp, SREG(2));
+    const INTVAL n = Parrot_encoding_number(interp, SREG(2));
     if (n < 0) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_INVALID_CHARTYPE,
@@ -23162,7 +23157,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_find_charset_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    const INTVAL n = Parrot_charset_number(interp, CONST(2).u.string);
+    const INTVAL n = Parrot_encoding_number(interp, CONST(2).u.string);
     if (n < 0) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_INVALID_CHARTYPE,
@@ -23615,7 +23610,8 @@ opcode_t *
 Parrot_err_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const char * const tmp = strerror(errno);
-    SREG(1) = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    SREG(1) = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 
 return (opcode_t *)cur_opcode + 2;}
 
@@ -23623,7 +23619,8 @@ opcode_t *
 Parrot_err_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const char * const tmp = strerror(IREG(2));
-    SREG(1) = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    SREG(1) = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -23631,7 +23628,8 @@ opcode_t *
 Parrot_err_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const char * const tmp = strerror(cur_opcode[2]);
-    SREG(1) = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    SREG(1) = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -25980,9 +25978,8 @@ Parrot_find_codepoint_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_str_free_cstring(cstr);
     IREG(1) = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    opcode_t * const dest = cur_opcode + 3;
-    Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
+        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");return (opcode_t *)dest;
 #endif
 
 return (opcode_t *)cur_opcode + 3;}
@@ -25997,9 +25994,8 @@ Parrot_find_codepoint_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_str_free_cstring(cstr);
     IREG(1) = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
 #else
-    opcode_t * const dest = cur_opcode + 3;
-    Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, cur_opcode + 3,
+        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");return (opcode_t *)dest;
 #endif
 
 return (opcode_t *)cur_opcode + 3;}
@@ -26094,7 +26090,7 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  7,    /* minor_version */
+  8,    /* minor_version */
   0,    /* patch_version */
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
@@ -26219,9 +26215,9 @@ static void hop_deinit(PARROT_INTERP)
 
     hop         = NULL;
     hop_buckets = NULL;
-}
+}PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_2_7_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_2_8_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -26250,7 +26246,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_7_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_8_0;
     dynop_register(interp, lib);
     return lib;
 }

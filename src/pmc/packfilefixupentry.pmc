@@ -42,7 +42,7 @@ Initialize PackfileFixupEntry.
         Parrot_PackfileFixupEntry_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileFixupEntry_attributes*);
 
-        attrs->name = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        attrs->name = CONST_STRING(INTERP, "");
 
         PObj_custom_mark_SET(SELF);
     }
@@ -98,8 +98,7 @@ Initialize from PackFile_FixupEntry pointer.
 
         attrs->type     = entry->type;
         attrs->name     = Parrot_str_new_init(INTERP, entry->name,
-                strlen(entry->name), PARROT_FIXED_8_ENCODING,
-                PARROT_BINARY_CHARSET, 0);
+                strlen(entry->name), Parrot_binary_encoding_ptr, 0);
         attrs->offset   = entry->offset;
     }
 

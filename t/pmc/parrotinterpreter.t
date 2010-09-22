@@ -17,13 +17,15 @@ Tests the ParrotInterpreter PMC.
 
 =cut
 
+.include 'except_types.pasm'
 
 .sub main :main
 .include 'test_more.pir'
 
-    plan(12)
+    plan(13)
     test_new()      # 1 test
     test_hll_map()  # 3 tests
+    test_hll_map_invalid()  # 1 tests
 
 # Need for testing
 .annotate 'foo', 'bar'
@@ -64,6 +66,26 @@ Tests the ParrotInterpreter PMC.
 
 # Switch back to root namespace
 .HLL 'parrot'
+
+.sub test_hll_map_invalid
+    .local pmc eh
+    .local int result
+    $P0 = get_class 'Integer'
+    $P1 = subclass $P0, 'MyInt'
+    $P2 = getinterp
+    eh = new ['ExceptionHandler']
+    set_label eh, catch
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    result = 0
+    push_eh eh
+    $P2.'hll_map'($P0, $P1)
+    goto done
+  catch:
+    finalize eh
+    result = 1
+  done:
+    is(result, 1, 'hll_map outside an HLL throws')
+.end
 
 # Test accessors to various Interp fields
 .sub 'test_inspect'

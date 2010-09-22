@@ -31,13 +31,13 @@ throughout the rest of Parrot.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void free_buffer(SHIM_INTERP,
-    SHIM(Memory_Pools *mem_pools),
-    ARGMOD(Fixed_Size_Pool *pool),
+static void free_buffer(PARROT_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
+    SHIM(Fixed_Size_Pool *pool),
     ARGMOD(Buffer *b))
-        __attribute__nonnull__(3)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
 static void free_pmc_in_pool(PARROT_INTERP,
@@ -78,7 +78,8 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools);
 
 #define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -257,9 +258,11 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
 
     PObj               *b;
     Fixed_Size_Arena   *cur_arena;
-    gc_object_fn_type   gc_object   = pool->gc_object;
     UINTVAL             total_used  = 0;
     const UINTVAL       object_size = pool->object_size;
+
+    const gc_object_fn_type       gc_object       = pool->gc_object;
+    const add_free_object_fn_type add_free_object = pool->add_free_object;
 
     /* Run through all the PObj header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
@@ -297,7 +300,7 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
                 if (gc_object)
                     gc_object(interp, mem_pools, pool, b);
 
-                pool->add_free_object(interp, mem_pools, pool, b);
+                add_free_object(interp, mem_pools, pool, b);
             }
 next:
             b = (PObj *)((char *)b + object_size);
@@ -507,7 +510,6 @@ new_pmc_pool(PARROT_INTERP)
     Fixed_Size_Pool * const pmc_pool =
         new_fixed_size_obj_pool(sizeof (PMC), num_headers);
 
-    pmc_pool->mem_pool   = NULL;
     pmc_pool->gc_object  = free_pmc_in_pool;
 
     (interp->gc_sys->init_pool)(interp, pmc_pool);
@@ -572,7 +574,6 @@ new_bufferlike_pool(PARROT_INTERP,
 
     pool->gc_object = (gc_object_fn_type)free_buffer;
 
-    pool->mem_pool  = mem_pools->memory_pool;
     (interp->gc_sys->init_pool)(interp, pool);
     return pool;
 }
@@ -601,7 +602,6 @@ new_fixed_size_obj_pool(size_t object_size, size_t objects_per_alloc)
 
     pool->last_Arena        = NULL;
     pool->free_list         = NULL;
-    pool->mem_pool          = NULL;
     pool->newfree           = NULL;
     pool->newlast           = NULL;
     pool->object_size       = object_size;
@@ -632,7 +632,6 @@ new_string_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), INTVAL constant)
     if (constant) {
         pool           = new_bufferlike_pool(interp, mem_pools, sizeof (STRING));
         pool->gc_object = NULL;
-        pool->mem_pool = mem_pools->constant_string_pool;
     }
     else
         pool = get_bufferlike_pool(interp, mem_pools, sizeof (STRING));
@@ -655,39 +654,18 @@ reuse later.
 */
 
 static void
-free_buffer(SHIM_INTERP,
-        SHIM(Memory_Pools *mem_pools),
-        ARGMOD(Fixed_Size_Pool *pool),
+free_buffer(PARROT_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool),
         ARGMOD(Buffer *b))
 {
     ASSERT_ARGS(free_buffer)
-    Variable_Size_Pool * const mem_pool = (Variable_Size_Pool *)pool->mem_pool;
 
     /* If there is no allocated buffer - bail out */
     if (!Buffer_buflen(b))
         return;
 
-    /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
-     * shouldn't happen */
-    if (mem_pool) {
-        /* Update Memory_Block usage */
-        if (PObj_is_movable_TESTALL(b)) {
-            INTVAL *buffer_flags = Buffer_bufflagsptr(b);
-
-            /* Mask low 2 bits used for flags */
-            Memory_Block * block = Buffer_pool(b);
-
-            PARROT_ASSERT(block);
-
-            /* We can have shared buffers. Don't count them (yet) */
-            if (!(*buffer_flags & Buffer_shared_FLAG)) {
-                block->freed  += ALIGNED_STRING_SIZE(Buffer_buflen(b));
-            }
-
-        }
-    }
-
-    Buffer_buflen(b) = 0;
+    Parrot_gc_str_free_buffer_storage(interp, &mem_pools->string_gc, b);
 }
 
 

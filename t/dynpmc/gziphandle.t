@@ -22,15 +22,13 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
     .local pmc config_hash, interp
-    .local int num_tests
 
-    num_tests = 10
-    plan(num_tests)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = config_hash['has_zlib']
     unless $S0 goto no_zlib
 
+    plan(10)
     $P0 = loadlib 'gziphandle'
     test_handle()
     test_stream()
@@ -39,7 +37,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .return()
 
   no_zlib:
-    skip(num_tests, 'No zlib library available')
+    skip_all('No zlib library available')
     .return()
 .end
 

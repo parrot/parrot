@@ -2087,7 +2087,7 @@ attribute.
     $S0 = files
     sourceline = concat ' (', $S0
     concat sourceline, ':'
-    $I0 = source.'lineof'(pos)
+    $I0 = self.'lineof'(source, pos)
     inc $I0
     $S0 = $I0
     concat sourceline, $S0

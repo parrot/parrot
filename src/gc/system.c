@@ -75,6 +75,7 @@ static void trace_mem_block(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_NOINLINE
 static void trace_system_stack(PARROT_INTERP,
     ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
@@ -234,12 +235,14 @@ trace_system_areas(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
 Traces the memory block starting at C<< interp->lo_var_ptr >>. This should be
 the address of a local variable which has been created on the stack early in
 the interpreter's lifecycle. We trace until the address of another local stack
-variable in this function, which should be at the "top" of the stack.
+variable in this function, which should be at the "top" of the stack. For this
+reason, this function must never be inlined.
 
 =cut
 
 */
 
+PARROT_NOINLINE
 static void
 trace_system_stack(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
 {
@@ -450,8 +453,8 @@ trace_mem_block(PARROT_INTERP,
     prefix = mask & buffer_min;
 
     for (cur_var_ptr = hi_var_ptr;
-            (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
-            cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
+        (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
+        cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
         const size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */
@@ -460,14 +463,17 @@ trace_mem_block(PARROT_INTERP,
              * guaranteed to be live pmcs/buffers, and could very well have
              * had their bufstart/vtable destroyed due to the linked list of
              * free headers... */
-            if ((pmc_min <= ptr) && (ptr < pmc_max) && is_pmc_ptr(mem_pools, (void *)ptr)) {
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
+            if ((pmc_min <= ptr)
+            &&  (ptr     < pmc_max)
+            &&   is_pmc_ptr(mem_pools, (void *)ptr)) {
+                Parrot_gc_mark_PMC_alive(interp, (PMC *)ptr);
             }
-            else if ((buffer_min <= ptr) && (ptr < buffer_max) &&
-                    is_buffer_ptr(mem_pools, (void *)ptr)) {
-                /* ...and since Parrot_gc_mark_PObj_alive doesn't care about bufstart, it
-                 * doesn't really matter if it sets a flag */
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
+            else if ((buffer_min <= ptr) && (ptr < buffer_max)
+            &&        is_buffer_ptr(mem_pools, (void *)ptr)) {
+                if (PObj_is_string_TEST((PObj *)ptr))
+                    Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
+                else
+                    PObj_live_SET((PObj *)ptr);
             }
         }
     }
@@ -519,7 +525,8 @@ static int
 is_pmc_ptr(ARGIN(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_pmc_ptr)
-        return contained_in_pool(mem_pools->pmc_pool, ptr);
+    return contained_in_pool(mem_pools->pmc_pool, ptr)
+        && PObj_is_PMC_TEST((PObj *)ptr);
 }
 
 

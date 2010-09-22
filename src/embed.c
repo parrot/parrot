@@ -25,6 +25,7 @@ This file implements the Parrot embedding interface.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
+#include "parrot/oplib/core_ops.h"
 
 #include "../compilers/imcc/imc.h"
 
@@ -427,8 +428,8 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
         program_size = 0;
     }
     else {
-        STRING * const fs = string_make(interp, fullname, strlen(fullname),
-            NULL, 0);
+        STRING * const fs = Parrot_str_new_init(interp, fullname, strlen(fullname),
+            Parrot_default_encoding_ptr, 0);
 
         /* can't read a file that doesn't exist */
         if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
@@ -658,9 +659,8 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 
     for (i = 0; i < argc; ++i) {
         /* Run through argv, adding everything to @ARGS. */
-        STRING * const arg =
-            string_make(interp, argv[i], strlen(argv[i]), "unicode",
-                PObj_external_FLAG);
+        STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
+                Parrot_utf8_encoding_ptr, PObj_external_FLAG);
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
             Parrot_io_eprintf(interp, "\t%vd: %s\n", i, argv[i]);
@@ -1078,6 +1078,7 @@ void
 Parrot_run_native(PARROT_INTERP, native_func_t func)
 {
     ASSERT_ARGS(Parrot_run_native)
+    op_lib_t *core_ops  = PARROT_GET_CORE_OPLIB(interp);
     PackFile * const pf = PackFile_new(interp, 0);
     static opcode_t program_code[2] = {
         0, /* enternative */
@@ -1085,8 +1086,8 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     };
 
     static op_func_t op_func_table[2];
-    op_func_table[0] = interp->op_func_table[ interp->op_lib->op_code(interp, "enternative", 0) ];
-    op_func_table[1] = interp->op_func_table[ interp->op_lib->op_code(interp, "end", 0) ];
+    op_func_table[0] = core_ops->op_func_table[PARROT_OP_enternative];
+    op_func_table[1] = core_ops->op_func_table[PARROT_OP_end];
 
 
     pf->cur_cs = (PackFile_ByteCode *)

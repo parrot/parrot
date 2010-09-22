@@ -103,13 +103,16 @@ sub _get_programs {
     $conf->debug("\nccflags: $ccflags\n");
 
     $linkflags = $conf->data->get('linkflags');
-    $linkflags =~ s/-libpath:\S+//g;    # TT #854: No idea why.
+    # Remove the path to the Perl library (from Win32 config).
+    # See TT #854.
+    $linkflags =~ s/-libpath:\S+//g;
     $linkflags = integrate( $linkflags, $conf->options->get('linkflags') );
     $linkflags = prompt( "And flags for your linker?", $linkflags ) if $ask;
     $conf->data->set( linkflags => $linkflags );
 
     $ldflags = $conf->data->get('ldflags');
-    $ldflags =~ s/-libpath:\S+//g;      # TT #854: No idea why.
+    # For substitution below, see comment for $linkflags above.
+    $ldflags =~ s/-libpath:\S+//g;
     $ldflags = integrate( $ldflags, $conf->options->get('ldflags') );
     $ldflags = prompt( "And your $ld flags for building shared libraries?", $ldflags )
         if $ask;

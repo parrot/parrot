@@ -54,7 +54,7 @@ STRING*
 Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_freeze)
-    PMC * const image = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC * const image = Parrot_pmc_new(interp, enum_class_ImageIOFreeze);
     VTABLE_set_pmc(interp, image, pmc);
     return VTABLE_get_string(interp, image);
 }
@@ -83,7 +83,7 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
     STRING *image;
     DECL_CONST_CAST;
 
-    visitor  = Parrot_pmc_new(interp, enum_class_ImageIO);
+    visitor  = Parrot_pmc_new(interp, enum_class_ImageIOFreeze);
     VTABLE_set_pointer(interp, visitor,
         PARROT_const_cast(void *, (const void *)pf));
     VTABLE_set_pmc(interp, visitor, pmc);
@@ -199,7 +199,7 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
     ASSERT_ARGS(Parrot_thaw)
 
     PMC        *result;
-    PMC * const info     = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC * const info     = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
     int         gc_block = 0;
 
     /*
@@ -251,7 +251,7 @@ Parrot_thaw_pbc(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGMOD(const opco
     ASSERT_ARGS(Parrot_thaw_pbc)
     PackFile * const pf = ct->base.pf;
     STRING *image       = PF_fetch_buf(interp, pf, cursor);
-    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
     VTABLE_set_pointer(interp, info, ct);
     VTABLE_set_string_native(interp, info, image);
     return VTABLE_get_pmc(interp, info);
@@ -318,15 +318,17 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
 
     PMC * const  todo   = VTABLE_get_iter(interp, info);
     const INTVAL action = VTABLE_get_integer(interp, info);
-    const INTVAL e      = VTABLE_elements(interp, todo);
     INTVAL       i;
 
     /* can't cache upper limit, visit may append items */
     for (i = 0; i < VTABLE_elements(interp, todo); ++i) {
         PMC * const current = VTABLE_get_pmc_keyed_int(interp, todo, i);
-        if (!current)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "NULL current PMC in visit_loop_todo_list");
+        if (PMC_IS_NULL(current))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_MALFORMED_PACKFILE,
+                    "NULL current PMC at %d in visit_loop_todo_list - %s",
+                    (int) i,
+                    action == VISIT_FREEZE_NORMAL ? "feeze" : "thaw");
 
         PARROT_ASSERT(current->vtable);
 

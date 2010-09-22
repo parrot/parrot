@@ -681,7 +681,7 @@ inline op iter(out PMC, invar PMC) :base_core {
 
 =item B<morph>(invar PMC, in PMC)
 
-Have $1 turn itself into a PMC of type $2.
+Have $1 turn itself into a PMC of type $2. $2 should be a Class PMC.
 
 =cut
 

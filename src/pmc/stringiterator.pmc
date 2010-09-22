@@ -156,11 +156,11 @@ Reset the Iterator. C<value> must be one of
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (value == ITERATE_FROM_START) {
             SET_ATTR_reverse(INTERP, SELF, 0);
-            STRING_ITER_SET_POSITION(INTERP, str_val, iter, 0);
+            STRING_iter_set_position(INTERP, str_val, iter, 0);
         }
         else if (value == ITERATE_FROM_END) {
             SET_ATTR_reverse(INTERP, SELF, 1);
-            STRING_ITER_SET_POSITION(INTERP, str_val, iter, str_val->strlen);
+            STRING_iter_set_position(INTERP, str_val, iter, str_val->strlen);
         }
         else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -209,7 +209,7 @@ Shift next character from C<string> as PMC.
                 "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
-        STRING_ITER_SKIP(INTERP, str_val, iter, 1);
+        STRING_iter_skip(INTERP, str_val, iter, 1);
         substr = Parrot_str_iter_substr(INTERP, str_val, &old_iter, iter);
         VTABLE_set_string_native(INTERP, ret, substr);
         return ret;
@@ -234,7 +234,7 @@ Shift next character from C<string>.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        STRING_ITER_SKIP(INTERP, str_val, iter, 1);
+        STRING_iter_skip(INTERP, str_val, iter, 1);
         return Parrot_str_iter_substr(INTERP, str_val, &old_iter, iter);
     }
 
@@ -256,7 +256,7 @@ Shift next character code from C<string>.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return STRING_ITER_GET_AND_ADVANCE(INTERP, str_val, iter);
+        return STRING_iter_get_and_advance(INTERP, str_val, iter);
     }
 
 /*
@@ -281,7 +281,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
                 "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
-        STRING_ITER_SKIP(INTERP, str_val, iter, -1);
+        STRING_iter_skip(INTERP, str_val, iter, -1);
         substr = Parrot_str_iter_substr(INTERP, str_val, iter, &old_iter);
         VTABLE_set_string_native(INTERP, ret, substr);
         return ret;
@@ -307,7 +307,7 @@ Shift "next" character from C<string> for reverse iterator.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        STRING_ITER_SKIP(INTERP, str_val, iter, -1);
+        STRING_iter_skip(INTERP, str_val, iter, -1);
         return Parrot_str_iter_substr(INTERP, str_val, iter, &old_iter);
     }
 
@@ -330,8 +330,8 @@ Shift "next" character code from C<string> for reverse iterator.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        STRING_ITER_SKIP(INTERP, str_val, iter, -1);
-        return STRING_ITER_GET(INTERP, str_val, iter, 0);
+        STRING_iter_skip(INTERP, str_val, iter, -1);
+        return STRING_iter_get(INTERP, str_val, iter, 0);
     }
 
 /*
@@ -354,7 +354,7 @@ Get integer value of current position plus idx.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return STRING_ITER_GET(INTERP, str_val, iter, idx);
+        return STRING_iter_get(INTERP, str_val, iter, idx);
     }
 
 /*
@@ -379,9 +379,9 @@ Get string value of current position plus idx.
                 "StopIteration");
 
         if (idx != 0)
-            STRING_ITER_SKIP(INTERP, str_val, &iter, idx);
+            STRING_iter_skip(INTERP, str_val, &iter, idx);
         next_iter = iter;
-        STRING_ITER_SKIP(INTERP, str_val, &next_iter, 1);
+        STRING_iter_skip(INTERP, str_val, &next_iter, 1);
 
         return Parrot_str_iter_substr(INTERP, str_val, &iter, &next_iter);
     }

@@ -89,14 +89,15 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
     UINTVAL workchar  = 0;
     UINTVAL charcount = 0;
     const UINTVAL len = Parrot_str_byte_length(interp, string);
+    const unsigned char * const buf = (unsigned char *)string->strstart;
 
     /* Well, not right now */
-    UINTVAL codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+    UINTVAL codepoint = buf[*offset];
     ++*offset;
 
     switch (codepoint) {
       case 'x':
-        codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+        codepoint = buf[*offset];
         if (codepoint >= '0' && codepoint <= '9') {
             workchar = codepoint - '0';
         }
@@ -111,7 +112,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
             ++*offset;
             workchar = 0;
             for (i = 0; i < 8 && *offset < len; ++i, ++*offset) {
-                codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+                codepoint = buf[*offset];
                 if (codepoint == '}') {
                     ++*offset;
                     return workchar;
@@ -145,7 +146,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         ++*offset;
         if (*offset < len) {
             workchar *= 16;
-            codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+            codepoint = buf[*offset];
             if (codepoint >= '0' && codepoint <= '9') {
                 workchar += codepoint - '0';
             }
@@ -165,7 +166,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         ++*offset;
         return workchar;
       case 'c':
-        codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+        codepoint = buf[*offset];
         if (codepoint >= 'A' && codepoint <= 'Z') {
             workchar = codepoint - 'A' + 1;
         }
@@ -181,7 +182,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         for (charcount = 0; charcount < 4; charcount++) {
             if (*offset < len) {
                 workchar *= 16;
-                codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+                codepoint = buf[*offset];
                 if (codepoint >= '0' && codepoint <= '9') {
                     workchar += codepoint - '0';
                 }
@@ -211,7 +212,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         for (charcount = 0; charcount < 8; charcount++) {
             if (*offset < len) {
                 workchar *= 16;
-                codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+                codepoint = buf[*offset];
                 if (codepoint >= '0' && codepoint <= '9') {
                     workchar += codepoint - '0';
                 }
@@ -247,7 +248,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         workchar = codepoint - '0';
         if (*offset < len) {
             workchar *= 8;
-            codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+            codepoint = buf[*offset];
             if (codepoint >= '0' && codepoint <= '7') {
                 workchar += codepoint - '0';
             }
@@ -261,7 +262,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         ++*offset;
         if (*offset < len) {
             workchar *= 8;
-            codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+            codepoint = buf[*offset];
             if (codepoint >= '0' && codepoint <= '7') {
                 workchar += codepoint - '0';
             }

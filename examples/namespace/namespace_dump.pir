@@ -1,12 +1,13 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
+.include "interpinfo.pasm"
+.include "iterator.pasm"
+
 #
 # dump all namespaces and the contents recursively
 #
 .sub main :main
-    .include "interpinfo.pasm"
-    .include "iterator.pasm"
     .local pmc ns
     ns = get_root_namespace
     dump(ns, 0)
@@ -14,55 +15,82 @@
 
 # dump one namespace
 .sub dump
-    .param pmc ns
-    .param int lev
-    .local pmc it
-    .local string spac
+    .param pmc    ns
+    .param int    lev
+    .local pmc    it
+    .local string indent
+
+    $I0 = lev * 4
+    indent = repeat " ", $I0
 
     it = iter ns
     it = .ITERATE_FROM_START
-    $I2 = lev * 4
-    spac = repeat " ", $I2
-lp:
-    unless it goto ex
-    $S0 = shift it
-    $P0 = it[$S0]
-    # there might be a smy with the same name as a namespace
-    $P1 = ns.'get_sym'($S0)
-    if null $P1 goto no_sym
-    eq_addr $P0, $P1, no_sym
-    print spac
-    print $S0
+
+loop:
+    unless it goto return
+
+    .local string name
+    .local pmc    entry, sym_entry
+    name      = shift it
+    entry     = it[name]
+    # there might be a sym with the same name as a namespace
+    sym_entry = ns.'get_sym'(name)
+
+    if_null sym_entry,        done_sym
+    eq_addr sym_entry, entry, done_sym
+    dump_simple(name, sym_entry, indent)
+done_sym:
+
+    $I0 = isa entry, 'MultiSub'
+    if $I0 goto handle_multi
+
+    $I0 = isa entry, 'NameSpace'
+    if $I0 goto handle_ns
+
+    dump_simple(name, entry, indent)
+    goto loop
+
+handle_multi:
+    print indent
+    print name
     print " => "
-    print $P1
-    print "\n"
-no_sym:
-    $I0 = isa $P0, 'NCI'
-    unless $I0 goto no_nci
-    $P0 = new 'String'
-    $P0 = "NCI"
-no_nci:
-    print spac
-    print $S0
-    print " => "
-    $I0 = isa $P0, 'MultiSub'
-    unless $I0 goto no_multi
-    $I1 = lev + 1
+    $I0 = lev + 1
     print " Multi [\n"
-    dump_multi($P0, $I1)
-    print spac
+    dump_multi(entry, $I0)
+    print indent
     print "]\n"
-    goto lp
-no_multi:
-    print $P0
+    goto loop
+
+handle_ns:
+    dump_simple(name, entry, indent)
+    $I0 = lev + 1
+    dump(entry, $I0)
+    goto loop
+
+return:
+.end
+
+.sub dump_simple
+    .param string name
+    .param pmc    x
+    .param string indent
+    print indent
+    print name
+    print " => "
+
+    .local string val_str
+    push_eh no_get_string
+    val_str = x
+
+got_val_str:
+    pop_eh
+    print val_str
     print "\n"
-    $I0 = isa $P0, 'NameSpace'
-    unless $I0 goto no_ns
-    $I1 = lev + 1
-    dump($P0, $I1)
-no_ns:
-    goto lp
-ex:
+    .return ()
+
+no_get_string:
+    val_str = typeof x
+    goto got_val_str
 .end
 
 # dump the types of a MultiSub

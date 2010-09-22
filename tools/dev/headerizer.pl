@@ -329,7 +329,11 @@ sub main {
 
     # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
-        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
+
+        # Skip files in the src/ops/ subdirectory.
+
+        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
+                $ofile =~ m{^src/ops};                     # ... or by makefile
 
         $ofile =~ s/\\/\//g;
 

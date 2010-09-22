@@ -345,7 +345,7 @@ is_abs_path(ARGIN(const STRING *file))
     const char * const file_name = (const char *)file->strstart;
     if (file->strlen <= 1)
         return 0;
-    PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
+    PARROT_ASSERT(STRING_max_bytes_per_codepoint(file) == 1 ||
             file->encoding == Parrot_utf8_encoding_ptr);
 
     /* XXX  ../foo, ./bar */
@@ -380,12 +380,8 @@ static void
 cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
     ASSERT_ARGS(cnv_to_win32_filesep)
-    char* cnv;
+    char *cnv = path->strstart;
 
-    PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
-        path->encoding == Parrot_utf8_encoding_ptr);
-
-    cnv = path->strstart;
     while ((cnv = strchr(cnv, path_separator)) != NULL)
         *cnv = win32_path_separator;
 }
@@ -788,46 +784,6 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 /*
 
-=item C<char* Parrot_get_runtime_prefix(PARROT_INTERP)>
-
-Return a malloced C-string for the runtime prefix.  The calling function
-must free it.
-
-This function is deprecated, use Parrot_get_runtime_path instead.
-See TT #1191
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char*
-Parrot_get_runtime_prefix(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_get_runtime_prefix)
-    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
-
-    Parrot_warn_deprecated(interp, "Parrot_get_runtime_prefix is deprecated TT #1191");
-    if (env)
-        return env;
-    else {
-        PMC    * const config_hash =
-            VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
-
-        if (VTABLE_elements(interp, config_hash)) {
-            STRING * const key = CONST_STRING(interp, "prefix");
-            STRING * const s   = VTABLE_get_string_keyed_str(interp, config_hash, key);
-            return Parrot_str_to_cstring(interp, s);
-        }
-        else
-            return mem_sys_strdup(".");
-    }
-}
-
-/*
-
 =item C<STRING * Parrot_get_runtime_path(PARROT_INTERP)>
 
 Return a string for the runtime prefix.
@@ -887,23 +843,21 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    const char *   charset = Parrot_charset_c_name(interp,
-            Parrot_charset_number_of_str(interp, in));
-    STRING * const slash1  = string_make(interp, "/", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2  = string_make(interp, "\\", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot     = string_make(interp, ".", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash1 = Parrot_str_new_init(interp, "/", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash2 = Parrot_str_new_init(interp, "\\", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const dot    = Parrot_str_new_init(interp, ".", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
 
     const INTVAL len = Parrot_str_byte_length(interp, in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
 
-    pos_sl = CHARSET_RINDEX(interp, in, slash1, len);
+    pos_sl = STRING_rindex(interp, in, slash1, len);
     if (pos_sl == -1)
-        pos_sl = CHARSET_RINDEX(interp, in, slash2, len);
-    pos_dot = CHARSET_RINDEX(interp, in, dot, len);
+        pos_sl = STRING_rindex(interp, in, slash2, len);
+    pos_dot = STRING_rindex(interp, in, dot, len);
 
     /* ignore dot in directory name */
     if (pos_dot != -1 && pos_dot < pos_sl)

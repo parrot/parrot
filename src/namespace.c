@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -131,9 +131,12 @@ internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
     ARGIN(STRING *key), int flags)
 {
     ASSERT_ARGS(internal_ns_keyed_str)
-    PMC * const ns = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
+    PMC    * const ns     = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
+    STRING * const namesp = CONST_STRING(interp, "NameSpace");
 
-    if (!PMC_IS_NULL(ns) && VTABLE_isa(interp, ns, CONST_STRING(interp, "NameSpace")))
+    if (!PMC_IS_NULL(ns)
+    && (ns->vtable->base_type == enum_class_NameSpace
+     || VTABLE_isa(interp, ns, namesp)))
         return ns;
 
     return internal_ns_maybe_create(interp, base_ns, key, flags);
@@ -200,12 +203,12 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
 {
     ASSERT_ARGS(internal_ns_keyed)
 
-    if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
+    if (PMC_IS_TYPE(pmc_key, Key))
+        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
+    else if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
         STRING * const str_key = VTABLE_get_string(interp, pmc_key);
         return internal_ns_keyed_str(interp, base_ns, str_key, flags);
     }
-    else if (PMC_IS_TYPE(pmc_key, Key))
-        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
     else {
         /* array of strings */
         STRING * const isans = CONST_STRING(interp, "NameSpace");
@@ -727,9 +730,6 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     PMC *ns;
     Parrot_Sub_attributes *sub;
 
-    /* PF structures aren't fully constructed yet */
-    Parrot_block_GC_mark(interp);
-
     /* store relative to HLL namespace */
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
@@ -762,7 +762,6 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     /* restore HLL_id */
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_id);
-    Parrot_unblock_GC_mark(interp);
 }
 
 /*

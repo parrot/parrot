@@ -71,13 +71,6 @@ not already here. This allows the usage of $P0() instead of $P0($P0).
 
 L<https://trac.parrot.org/parrot/ticket/103>
 
-=item NCI without signature ("raw" pointers) [eligible in 2.4]
-
-No equivalent functionality is promised. You shouldn't be using this. Here be
-segfaults.
-
-L<https://trac.parrot.org/parrot/ticket/1549>
-
 =item UnManagedStruct handling nested structure [eligible in 2.4]
 
 UnManagedStruct will be simplified to only support flat structures. This means
@@ -139,13 +132,10 @@ L<https://trac.parrot.org/parrot/ticket/1628>
 These can be replaced by C<get_bool> and intval ops unless you're using them for
 things that aren't really logical ops (don't do that!).
 
+Logical vtables are removed in r49012, and logical ops on PMCs are converted to
+use C<get_bool> internally. Rakudo seems to depend on logical ops on PMCs.
+
 L<https://trac.parrot.org/parrot/ticket/1655>
-
-=item Method is_tty in PMCs derived from Handle [eligible in 2.7]
-
-Use isatty instead.
-
-L<https://trac.parrot.org/parrot/ticket/1689>
 
 =item Method getpid on ParrotInterpreter [experimental]
 
@@ -153,11 +143,34 @@ Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
+=item Behavior of Parrot::Pmc2c::PMC::add_method() [eligible in 2.10]
+
+Duplicated vtable functions currently generate only a warning; after deadline,
+they will cause a C<die> and failure to build Parrot or any HLL
+using this method.
+
+L<http://trac.parrot.org/parrot/ticket/1785>
+
 =back
 
 =head1 Opcodes
 
 =over 4
+
+=item charset, charsetname, find_charset, trans_charset [eligible in 2.10]
+
+L<https://trac.parrot.org/parrot/ticket/1778>
+
+These opcodes will be removed. The corresponding encoding opcodes should be
+used instead.
+
+=item fixed_8 encoding [eligible in 2.10]
+
+L<https://trac.parrot.org/parrot/ticket/1778>
+
+The 'fixed_8' encoding is going away. Use 'ascii' instead. If you want to test
+for a fixed_8 encoding, you have to compare the encoding to 'ascii',
+'iso-8859-1' and 'binary' separately.
 
 =item open and close opcodes will be removed [eligible in 2.7]
 
@@ -382,12 +395,6 @@ This function is an experimental addition to enhance and maybe replace
 Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
-
-=item Parrot_get_runtime_prefix [eligible in 2.7]
-
-Use Parrot_get_runtime_path instead.
-
-L<https://trac.parrot.org/parrot/ticket/1191>
 
 =item Parrot_getpid [experimental]
 
