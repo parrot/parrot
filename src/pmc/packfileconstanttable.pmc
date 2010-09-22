@@ -167,18 +167,21 @@ Get the number of constants.
 */
 
     METHOD INTVAL num_count() {
-        return VTABLE_elements(INTERP,
+        INTVAL ret = VTABLE_elements(INTERP,
                 PARROT_PACKFILECONSTANTTABLE(SELF)->num_constants);
+        RETURN(INTVAL ret);
     }
 
     METHOD INTVAL str_count() {
-        return VTABLE_elements(INTERP,
+        INTVAL ret = VTABLE_elements(INTERP,
                 PARROT_PACKFILECONSTANTTABLE(SELF)->str_constants);
+        RETURN(INTVAL ret);
     }
 
     METHOD INTVAL pmc_count() {
-        return VTABLE_elements(INTERP,
+        INTVAL ret = VTABLE_elements(INTERP,
                 PARROT_PACKFILECONSTANTTABLE(SELF)->pmc_constants);
+        RETURN(INTVAL ret);
     }
 
 
