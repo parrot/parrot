@@ -928,7 +928,6 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         }
 
         Parrot_io_fprintf(interp, output, "\n");
-        break;
     }
 
     Parrot_io_fprintf(interp, output, "\n=cut\n\n");
