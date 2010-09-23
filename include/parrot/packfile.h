@@ -164,15 +164,6 @@ typedef struct PackFile_Header {
     opcode_t dir_format;
 } PackFile_Header;
 
-typedef struct PackFile_Constant {
-    opcode_t type;
-    union {
-        FLOATVAL  number;
-        STRING   *string;
-        PMC      *key;
-    } u;
-} PackFile_Constant;
-
 /*
 ** PackFile Segment:
 *    The base type of every section

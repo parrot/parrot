@@ -58,12 +58,6 @@ static void add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
-static int add_const_key(PARROT_INTERP,
-    const opcode_t *key,
-    int size,
-    const char *s_key)
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
         __attribute__nonnull__(1);
@@ -1579,58 +1573,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
         return k;
     }
-}
-
-
-/*
-
-=item C<static int add_const_key(PARROT_INTERP, const opcode_t *key, int size,
-const char *s_key)>
-
-Adds a constant key to constant_table.
-
-=cut
-
-*/
-
-static int
-add_const_key(PARROT_INTERP, const opcode_t *key, int size, const char *s_key)
-{
-    ASSERT_ARGS(add_const_key)
-    const SymReg * const r =
-        _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, s_key);
-    const opcode_t      *rc;
-    PackFile_Constant   *pfc;
-    int                  k;
-
-    if (r)
-        return r->color;
-
-#if 0
-    pfc = mem_gc_allocate_typed(interp, PackFile_Constant);
-    rc  = PackFile_Constant_unpack_key(interp,
-            interp->code->const_table, pfc, key);
-#endif
-
-    if (!rc) {
-        mem_sys_free(pfc);
-        IMCC_fatal(interp, 1,
-            "add_const_key: PackFile_Constant error\n");
-    }
-
-    k = add_const_table_pmc(interp, pfc->u.key);
-
-    store_key_const(interp, s_key, k);
-
-    IMCC_debug(interp, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
-               s_key, k, size);
-
-    IMCC_debug(interp, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
-               key[0], key[1], key[2], key[3], key[4]);
-
-    mem_sys_free(pfc);
-
-    return k;
 }
 
 
