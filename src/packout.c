@@ -368,7 +368,7 @@ PackFile_Constant_pack_key(PARROT_INTERP,
                 *cursor++ = PARROT_ARG_NC;
                 /* Argh */
                 *cursor++ = PackFile_ConstTable_rlookup_num(interp, const_table, n);
-                PARROT_ASSERT(cursor[-1] > 0);
+                PARROT_ASSERT(cursor[-1] >= 0);
             }
             break;
 
@@ -379,7 +379,7 @@ PackFile_Constant_pack_key(PARROT_INTERP,
                 *cursor++ = PARROT_ARG_SC;
                 /* Argh */
                 *cursor++ = PackFile_ConstTable_rlookup_str(interp, const_table, s);
-                PARROT_ASSERT(cursor[-1] > 0);
+                PARROT_ASSERT(cursor[-1] >= 0);
             }
             break;
 
