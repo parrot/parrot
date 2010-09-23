@@ -295,8 +295,6 @@ PackFile_find_in_const(PARROT_INTERP,
 
 Reverse lookup a constant in the constant table.
 
-TODO: use a hash to make these O(1) for strings
-
 =cut
 
 */
