@@ -419,7 +419,7 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 
             /* ANYTHING ELSE IS WRONG */
             else {
-                fprintf(stderr, "--gc-threshold needs an argument" );
+                fprintf(stderr, "--gc-threshold needs an argument");
                 exit(EXIT_FAILURE);
             }
 
