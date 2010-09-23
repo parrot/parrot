@@ -645,8 +645,12 @@ gc_ms2_finalize(PARROT_INTERP)
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
-    // Parrot_list_destroy(interp, self->objects);
-    // Parrot_list_destroy(interp, self->strings);
+    /* (replace c++ comments)
+     *
+     * Parrot_list_destroy(interp, self->objects);
+     * Parrot_list_destroy(interp, self->strings);
+     *
+     */
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
     Parrot_gc_pool_destroy(interp, self->string_allocator);
     Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
