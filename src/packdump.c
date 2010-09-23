@@ -244,27 +244,33 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               case KEY_number_FLAG:
                 {
                     size_t ct_index;
+                    FLOATVAL n;
+                    GETATTR_Key_num_key(interp, key, n);
 
                     Parrot_io_printf(interp, "        TYPE        => NUMBER\n");
-                    ct_index = PackFile_find_in_const(interp, ct, key, PFC_NUMBER);
+                    ct_index = PackFile_ConstTable_rlookup_num(interp, ct, n);
                     Parrot_io_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
                     Parrot_io_printf(interp, "        DATA        => %ld\n",
                                         ct->num.constants[ct_index]);
                     Parrot_io_printf(interp, "       },\n");
                 }
                 break;
+
               case KEY_string_FLAG:
                 {
                     size_t ct_index;
+                    STRING *s;
+                    GETATTR_Key_str_key(interp, key, s);
 
                     Parrot_io_printf(interp, "        TYPE        => STRING\n");
-                    ct_index = PackFile_find_in_const(interp, ct, key, PFC_STRING);
+                    ct_index = PackFile_ConstTable_rlookup_str(interp, ct, s);
                     Parrot_io_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
                     Parrot_io_printf(interp, "        DATA        => '%Ss'\n",
                                         ct->str.constants[ct_index]);
                     Parrot_io_printf(interp, "       },\n");
                 }
                 break;
+
               case KEY_integer_FLAG | KEY_register_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => I REGISTER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",

@@ -262,36 +262,11 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
 /*
 
-=item C<int PackFile_find_in_const(PARROT_INTERP, const PackFile_ConstTable *ct,
-PMC *key, int type)>
+=item C<int PackFile_ConstTable_rlookup_num(PARROT_INTERP, const
+PackFile_ConstTable *ct, FLOATVAL n)>
 
-This is really ugly, we don't know where our C<PARROT_ARG_SC> key
-constant is in constant table, so we have to search for it.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-int
-PackFile_find_in_const(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
-{
-    ASSERT_ARGS(PackFile_find_in_const)
-    int i = PackFile_ConstTable_rlookup(interp, ct, key, type);
-
-    if (i < 0) {
-        Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
-        Parrot_exit(interp, 1);
-    }
-
-    return i;
-}
-
-/*
-
-=item C<int PackFile_ConstTable_rlookup(PARROT_INTERP, const PackFile_ConstTable
-*ct, PMC *key, int type)>
+=item C<int PackFile_ConstTable_rlookup_str(PARROT_INTERP, const
+PackFile_ConstTable *ct, STRING *s)>
 
 Reverse lookup a constant in the constant table.
 
@@ -301,23 +276,31 @@ Reverse lookup a constant in the constant table.
 
 PARROT_EXPORT
 int
-PackFile_ConstTable_rlookup(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
+PackFile_ConstTable_rlookup_num(PARROT_INTERP,
+    ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
 {
-    ASSERT_ARGS(PackFile_ConstTable_rlookup)
-    int      i, strings;
-    FLOATVAL key_num;
-    STRING  *key_str;
-    PMC     *string_list;
+    ASSERT_ARGS(PackFile_ConstTable_rlookup_num)
+    int i;
 
-    PARROT_ASSERT(type == PFC_STRING || type == PFC_NUMBER);
+    for (i = 0; i < ct->num.const_count; i++) {
+        if (ct->num.constants[i] == n)
+            return i;
+    }
 
-    GETATTR_Key_str_key(interp, key, key_str);
-    GETATTR_Key_num_key(interp, key, key_num);
+    /* not found */
+    return -1;
+}
 
-    if (type == PFC_STRING && ct->string_hash) {
-        HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash,
-                key_str);
+PARROT_EXPORT
+int
+PackFile_ConstTable_rlookup_str(PARROT_INTERP,
+    ARGIN(const PackFile_ConstTable *ct), ARGIN(STRING *s))
+{
+    ASSERT_ARGS(PackFile_ConstTable_rlookup_str)
+    int      i;
+
+    if (ct->string_hash) {
+        HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash, s);
         if (bucket) {
             i = (int)PTR2INTVAL(bucket->value);
             return i;
@@ -325,27 +308,12 @@ PackFile_ConstTable_rlookup(PARROT_INTERP,
         return -1;
     }
 
-    switch (type) {
-      case PFC_STRING:
-        for (i = 0; i < ct->str.const_count; i++) {
-            STRING *sc = ct->str.constants[i];
-            if (Parrot_str_equal(interp, key_str, sc)
-            &&  key_str->encoding == sc->encoding) {
-                return i;
-            }
+    for (i = 0; i < ct->str.const_count; i++) {
+        STRING *sc = ct->str.constants[i];
+        if (Parrot_str_equal(interp, s, sc)
+        &&  s->encoding == sc->encoding) {
+            return i;
         }
-        break;
-
-      case PFC_NUMBER:
-        for (i = 0; i < ct->num.const_count; i++) {
-            if (ct->num.constants[i] == key_num)
-                return i;
-        }
-        break;
-
-
-      default:
-        PANIC(interp, "Universe imploded. Did you divide by zero?");
     }
 
     /* not found */
@@ -394,14 +362,25 @@ PackFile_Constant_pack_key(PARROT_INTERP,
             GETATTR_Key_int_key(interp, key, *cursor++);
             break;
           case KEY_number_FLAG:
-            *cursor++ = PARROT_ARG_NC;
-            /* Argh */
-            *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_NUMBER);
+            {
+                FLOATVAL n;
+                GETATTR_Key_num_key(interp, key, n);
+                *cursor++ = PARROT_ARG_NC;
+                /* Argh */
+                *cursor++ = PackFile_ConstTable_rlookup_num(interp, const_table, n);
+                PARROT_ASSERT(cursor[-1] > 0);
+            }
             break;
+
           case KEY_string_FLAG:
-            *cursor++ = PARROT_ARG_SC;
-            /* Argh */
-            *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_STRING);
+            {
+                STRING *s;
+                GETATTR_Key_str_key(interp, key, s);
+                *cursor++ = PARROT_ARG_SC;
+                /* Argh */
+                *cursor++ = PackFile_ConstTable_rlookup_str(interp, const_table, s);
+                PARROT_ASSERT(cursor[-1] > 0);
+            }
             break;
 
           case KEY_integer_FLAG | KEY_register_FLAG:
