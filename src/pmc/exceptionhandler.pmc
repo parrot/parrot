@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -73,7 +73,7 @@ Initializes the exception handler with one handled type.
         Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
         SELF.init();
 
-        attrs->handled_types        = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, 1);
+        attrs->handled_types = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, 1);
         VTABLE_set_integer_keyed_int(INTERP, attrs->handled_types, 0, handledtype);
     }
 
