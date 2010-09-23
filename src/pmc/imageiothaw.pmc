@@ -261,12 +261,7 @@ Retreive a string as the next item from the image.
 
             if (i >= 0) {
                 PackFile_ConstTable *table = PARROT_IMAGEIOTHAW(SELF)->pf_ct;
-
-                if (!table->constants[i].type)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_MALFORMED_PACKFILE,
-                            "Reference to constant not yet unpacked %d", i);
-                return table->constants[i].u.string;
+                return table->str.constants[i];
             }
 
             /* XXX

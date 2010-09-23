@@ -49,11 +49,14 @@ Parrot_pcc_get_context_struct_func(SHIM_INTERP, ARGIN_NULLOK(PMC *ctx))
 
 /*
 
-=item C<struct PackFile_Constant * Parrot_pcc_get_constants_func(PARROT_INTERP,
-PMC *ctx)>
+=item C<FLOATVAL * Parrot_pcc_get_num_constants_func(PARROT_INTERP, PMC *ctx)>
+
+=item C<STRING ** Parrot_pcc_get_str_constants_func(PARROT_INTERP, PMC *ctx)>
+
+=item C<PMC ** Parrot_pcc_get_pmc_constants_func(PARROT_INTERP, PMC *ctx)>
 
 =item C<void Parrot_pcc_set_constants_func(PARROT_INTERP, PMC *ctx, struct
-PackFile_Constant *constants)>
+PackFile_ConstTable *ct)>
 
 Get/set constants from context.
 
@@ -64,22 +67,44 @@ Get/set constants from context.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-struct PackFile_Constant *
-Parrot_pcc_get_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
+FLOATVAL *
+Parrot_pcc_get_num_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
 {
-    ASSERT_ARGS(Parrot_pcc_get_constants_func)
-    return CONTEXT_STRUCT(ctx)->constants;
+    ASSERT_ARGS(Parrot_pcc_get_num_constants_func)
+    return CONTEXT_STRUCT(ctx)->num_constants;
+}
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
+STRING **
+Parrot_pcc_get_str_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_get_str_constants_func)
+    return CONTEXT_STRUCT(ctx)->str_constants;
+}
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
+PMC **
+Parrot_pcc_get_pmc_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_get_pmc_constants_func)
+    return CONTEXT_STRUCT(ctx)->pmc_constants;
 }
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void
 Parrot_pcc_set_constants_func(SHIM_INTERP, ARGIN(PMC *ctx),
-        ARGIN_NULLOK(struct PackFile_Constant *constants))
+        ARGIN(struct PackFile_ConstTable *ct))
 {
     ASSERT_ARGS(Parrot_pcc_set_constants_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    c->constants = constants;
+    c->num_constants = ct->num.constants;
+    c->str_constants = ct->str.constants;
+    c->pmc_constants = ct->pmc.constants;
 }
 
 /*
@@ -678,8 +703,7 @@ Parrot_pcc_get_num_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_num_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(c->constants[idx].type == 'n');
-    return c->constants[idx].u.number;
+    return c->num_constants[idx];
 }
 
 PARROT_EXPORT
@@ -690,8 +714,7 @@ Parrot_pcc_get_string_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_string_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(c->constants[idx].type == 's');
-    return c->constants[idx].u.string;
+    return c->str_constants[idx];
 }
 
 PARROT_EXPORT
@@ -702,9 +725,7 @@ Parrot_pcc_get_pmc_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_pmc_constant_func)
     const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT((c->constants[idx].type == 'k')
-            || (c->constants[idx].type == 'p'));
-    return c->constants[idx].u.key;
+    return c->pmc_constants[idx];
 }
 
 /*

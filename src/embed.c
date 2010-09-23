@@ -730,7 +730,7 @@ set_current_sub(PARROT_INTERP)
     for (i = 0; i < ft->fixup_count; ++i) {
         if (ft->fixups[i].type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i].offset;
-            PMC    * const sub_pmc = ct->constants[ci].u.key;
+            PMC    * const sub_pmc = ct->pmc.constants[ci];
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
@@ -807,7 +807,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
         main_sub = set_current_sub(interp);
 
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table->constants);
+    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
 
     Parrot_ext_call(interp, main_sub, "P->", userargv);
 }
@@ -870,83 +870,64 @@ static void
 print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
 {
     ASSERT_ARGS(print_constant_table)
-    const INTVAL numconstants = interp->code->const_table->const_count;
+    const PackFile_ConstTable *ct = interp->code->const_table;
     INTVAL i;
 
     /* TODO: would be nice to print the name of the file as well */
     Parrot_io_fprintf(interp, output, "=head1 Constant-table\n\n");
 
-    for (i = 0; i < numconstants; ++i) {
-        const PackFile_Constant * const c = &interp->code->const_table->constants[i];
+    for (i = 0; i < ct->num.const_count; i++)
+        Parrot_io_fprintf(interp, output, "NUM_CONST(%d): %f\n", i, ct->num.constants[i]);
 
-        switch (c->type) {
-          case PFC_NUMBER:
-            Parrot_io_fprintf(interp, output, "PMC_CONST(%d): %f\n", i, c->u.number);
-            break;
-          case PFC_STRING:
-            Parrot_io_fprintf(interp, output, "PMC_CONST(%d): %S\n", i, c->u.string);
-            break;
-          case PFC_KEY:
-            Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
-            /* XXX */
-            /* Parrot_print_p(interp, c->u.key); */
-            Parrot_io_fprintf(interp, output, "(PMC constant)");
-            Parrot_io_fprintf(interp, output, "\n");
-            break;
-          case PFC_PMC:
-            {
-                Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
+    for (i = 0; i < ct->str.const_count; i++)
+        Parrot_io_fprintf(interp, output, "STR_CONST(%d): %S\n", i, ct->str.constants[i]);
 
-                switch (c->u.key->vtable->base_type) {
-                    /* each PBC file has a ParrotInterpreter, but it can't
-                     * stringify by itself */
-                  case enum_class_ParrotInterpreter:
-                    Parrot_io_fprintf(interp, output, "'ParrotInterpreter'");
-                    break;
+    for (i = 0; i < ct->pmc.const_count; i++) {
+        PMC *c = ct->pmc.constants[i];
+        Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
 
-                    /* FixedIntegerArrays used for signatures, handy to print */
-                  case enum_class_FixedIntegerArray:
-                    {
-                        const INTVAL n = VTABLE_elements(interp, c->u.key);
-                        INTVAL j;
-                        Parrot_io_fprintf(interp, output, "[");
+        switch (c->vtable->base_type) {
+            /* each PBC file has a ParrotInterpreter, but it can't
+             * stringify by itself */
+            case enum_class_ParrotInterpreter:
+                Parrot_io_fprintf(interp, output, "'ParrotInterpreter'");
+                break;
 
-                        for (j = 0; j < n; ++j) {
-                            const INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, j);
-                            Parrot_io_fprintf(interp, output, "%d", val);
-                            if (j < n - 1)
-                                Parrot_io_fprintf(interp, output, ",");
-                        }
-                        Parrot_io_fprintf(interp, output, "]");
-                        break;
+            /* FixedIntegerArrays used for signatures, handy to print */
+            case enum_class_FixedIntegerArray:
+                {
+                    const INTVAL n = VTABLE_elements(interp, c);
+                    INTVAL j;
+                    Parrot_io_fprintf(interp, output, "[");
+
+                    for (j = 0; j < n; ++j) {
+                        const INTVAL val = VTABLE_get_integer_keyed_int(interp, c, j);
+                        Parrot_io_fprintf(interp, output, "%d", val);
+                        if (j < n - 1)
+                            Parrot_io_fprintf(interp, output, ",");
                     }
-                  case enum_class_NameSpace:
-                  case enum_class_String:
-                  case enum_class_Key:
-                  case enum_class_ResizableStringArray:
-                    {
-                        /*Parrot_print_p(interp, c->u.key);*/
-                        STRING * const s = VTABLE_get_string(interp, c->u.key);
-                        if (s)
-                            Parrot_io_fprintf(interp, output, "%Ss", s);
-                        break;
-                    }
-                  case enum_class_Sub:
-                    Parrot_io_fprintf(interp, output, "%S", VTABLE_get_string(interp, c->u.key));
-                    break;
-                  default:
-                    Parrot_io_fprintf(interp, output, "(PMC constant)");
+                    Parrot_io_fprintf(interp, output, "]");
                     break;
                 }
-
-                Parrot_io_fprintf(interp, output, "\n");
+            case enum_class_NameSpace:
+            case enum_class_String:
+            case enum_class_Key:
+            case enum_class_ResizableStringArray:
+                {
+                    STRING * const s = VTABLE_get_string(interp, c);
+                    if (s)
+                        Parrot_io_fprintf(interp, output, "%Ss", s);
+                    break;
+                }
+            case enum_class_Sub:
+                Parrot_io_fprintf(interp, output, "%S", VTABLE_get_string(interp, c));
                 break;
-            }
-          default:
-            Parrot_io_fprintf(interp, output,  "wrong constant type in constant table!\n");
-            /* XXX throw an exception? Is it worth the trouble? */
-            break;
+            default:
+                Parrot_io_fprintf(interp, output, "(PMC constant)");
+                break;
         }
+
+        Parrot_io_fprintf(interp, output, "\n");
     }
 
     Parrot_io_fprintf(interp, output, "\n=cut\n\n");
@@ -1024,7 +1005,7 @@ Parrot_disassemble(PARROT_INTERP,
                 const int filename_const_offset =
                     interp->code->debugs->mappings[curr_mapping].filename;
                 Parrot_io_fprintf(interp, output, "# Current Source Filename '%Ss'\n",
-                        interp->code->const_table->constants[filename_const_offset].u.string);
+                        interp->code->const_table->str.constants[filename_const_offset]);
                 ++curr_mapping;
             }
         }
@@ -1103,7 +1084,7 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     run_native = func;
 
     if (interp->code && interp->code->const_table)
-        Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table->constants);
+        Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
 
     runops(interp, interp->resume_offset);
 }

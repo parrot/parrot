@@ -301,9 +301,6 @@ typedef enum {
 } iglobals_enum;
 /* &end_gen */
 
-#define PCONST(i) PF_CONST(interp->code, (i))
-#define PNCONST   PF_NCONST(interp->code)
-
 /* TODO - Make this a config option */
 #ifndef PARROT_CATCH_NULL
 #  ifdef S_SPLINT_S

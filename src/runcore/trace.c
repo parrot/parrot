@@ -313,7 +313,7 @@ trace_op_dump(PARROT_INTERP,
     ||  *pc == PARROT_OP_get_results_pc
     ||  *pc == PARROT_OP_get_params_pc
     ||  *pc == PARROT_OP_set_returns_pc) {
-        sig = interp->code->const_table->constants[pc[1]].u.key;
+        sig = interp->code->const_table->pmc.constants[pc[1]];
 
         if (!sig)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,

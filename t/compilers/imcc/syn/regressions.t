@@ -242,13 +242,16 @@ pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT #1009)');
 CODE
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'over long keys should not segfault (TT #641)');
+SKIP: {
+    skip("No limit on key size", 1);
+    pir_error_output_like( <<'CODE', <<'OUT', 'over long keys should not segfault (TT #641)');
 .sub main
  $P0 = new [0;0;0;0;0;0;0;0;0;0;0;0] # more than MAX_KEY_LEN.
 .end
 CODE
 /Key too long/
 OUT
+}
 
 # This test probably belongs in subflags.t
 # The test inspired by TT #744, even though it presents differently.

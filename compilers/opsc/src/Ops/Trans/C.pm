@@ -24,12 +24,12 @@ method new() {
         :k("PREG(NUM)"),
         :ki("IREG(NUM)"),
 
-        :ic("cur_opcode[NUM]"),
-        :nc("CONST(NUM).u.number"),
-        :pc("CONST(NUM).u.key"),
-        :sc("CONST(NUM).u.string"),
-        :kc("CONST(NUM).u.key"),
-        :kic("cur_opcode[NUM]")
+        :ic("ICONST(NUM)"),
+        :nc("NCONST(NUM)"),
+        :pc("PCONST(NUM)"),
+        :sc("SCONST(NUM)"),
+        :kc("PCONST(NUM)"),
+        :kic("ICONST(NUM)")
     );
 
     self;
@@ -108,14 +108,17 @@ Returns the C C<#define> macros for register access etc.
 method defines($emitter) {
     return qq|
 /* defines - Ops::Trans::C */
-#undef CONST
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) (CUR_CTX->bp.regs_i[cur_opcode[i]])
 #define NREG(i) (CUR_CTX->bp.regs_n[-1L - cur_opcode[i]])
 #define PREG(i) (CUR_CTX->bp_ps.regs_p[-1L - cur_opcode[i]])
 #define SREG(i) (CUR_CTX->bp_ps.regs_s[cur_opcode[i]])
-#define CONST(i) Parrot_pcc_get_constants(interp, interp->ctx)[cur_opcode[i]]
+#define ICONST(i) cur_opcode[i]
+#define NCONST(i) Parrot_pcc_get_num_constants(interp, interp->ctx)[cur_opcode[i]]
+#define SCONST(i) Parrot_pcc_get_str_constants(interp, interp->ctx)[cur_opcode[i]]
+#undef  PCONST
+#define PCONST(i) Parrot_pcc_get_pmc_constants(interp, interp->ctx)[cur_opcode[i]]
 
 static int get_op(PARROT_INTERP, const char * name, int full);
 |;
