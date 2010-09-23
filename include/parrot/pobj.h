@@ -153,6 +153,9 @@ typedef enum PObj_enum {
     PObj_sysmem_FLAG            = POBJ_FLAG(15),
 
 /* PObj usage FLAGs, COW & GC */
+    /* Used during tri-color mark&sweep */
+    PObj_grey_FLAG              = POBJ_FLAG(16),
+
     /* The Buffer allows COW copies, and may have some. */
     PObj_is_COWable_FLAG        = POBJ_FLAG(17),
     /* Private flag for the GC system. Set if the PObj's in use as
@@ -235,6 +238,9 @@ typedef enum PObj_enum {
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
 
+#define PObj_grey_TEST(o) gc_flag_TEST(grey, o)
+#define PObj_grey_SET(o) gc_flag_SET(grey, o)
+#define PObj_grey_CLEAR(o) gc_flag_CLEAR(grey, o)
 
 #define PObj_on_free_list_TEST(o) gc_flag_TEST(on_free_list, o)
 #define PObj_on_free_list_SET(o) gc_flag_SET(on_free_list, o)

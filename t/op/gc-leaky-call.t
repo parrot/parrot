@@ -22,18 +22,16 @@ function calls.
 .sub _main :main
     .include 'test_more.pir'
 
-    plan(3)
 
     $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
-    if $S0 == "inf" goto dont_run_hanging_tests
+    if $S0 != "ms" goto dont_run_hanging_tests
 
+    plan(3)
     test_gc_mark_sweep()
 
     goto test_end
   dont_run_hanging_tests:
-    ok(1, "#TODO - Test disabled on gc_inf")
-    ok(1, "#TODO - Test disabled on gc_inf")
-    ok(1, "#TODO - Test disabled on gc_inf")
+    skip_all("Not relevant for this GC")
   test_end:
 .end
 

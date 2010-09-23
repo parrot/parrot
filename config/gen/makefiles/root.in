@@ -410,6 +410,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
+	$(INC_DIR)/list.h \
 	include/pmc/pmc_callcontext.h
 
 # generated list of header files
@@ -462,8 +463,11 @@ INTERP_O_FILES = \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
     src/gc/gc_inf$(O) \
+    src/gc/gc_ms2$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
+    src/gc/fixed_allocator$(O) \
+    src/gc/variable_size_pool$(O) \
     src/gc/string_gc$(O) \
     src/global_setup$(O) \
     src/hash$(O) \
@@ -478,6 +482,7 @@ INTERP_O_FILES = \
     src/call/context_accessors$(O) \
     src/key$(O) \
     src/library$(O) \
+    src/list$(O) \
     src/longopt$(O) \
     src/misc$(O) \
     src/multidispatch$(O) \
@@ -919,6 +924,8 @@ src/install_config$(O) : $(PARROT_H_HEADERS) src/install_config.c
 
 src/null_config$(O) : $(PARROT_H_HEADERS) src/null_config.c
 
+src/list$(O): $(PARROT_H_HEADERS) include/pmc/pmc_callcontext.h src/list.c
+
 src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
     include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
 
@@ -1296,10 +1303,18 @@ src/gc/gc_ms$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_ms.c
 
 src/gc/gc_inf$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_inf.c
 
+src/gc/gc_ms2$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/fixed_allocator.h src/gc/gc_ms2.c
+
 src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
 
 src/gc/alloc_resources$(O) : $(PARROT_H_HEADERS) \
 	src/gc/gc_private.h src/gc/alloc_resources.c
+
+src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
+	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
+
+src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
+	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
 
 src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
 	src/gc/gc_private.h src/gc/string_gc.c

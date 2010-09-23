@@ -260,6 +260,8 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 
     PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
+    PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_CallContext);
+
     /*
      * FIXME Invoking corotine shouldn't initialise context. So just
      * check ctx->current_sub. If it's not null return from here

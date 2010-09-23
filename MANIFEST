@@ -583,6 +583,7 @@ examples/benchmarks/stress2.pasm                            [examples]
 examples/benchmarks/stress2.pl                              [examples]
 examples/benchmarks/stress2.rb                              [examples]
 examples/benchmarks/stress3.pasm                            [examples]
+examples/benchmarks/stress_integers.pir                     [examples]
 examples/benchmarks/stress_strings.pir                      [examples]
 examples/benchmarks/vpm.pir                                 [examples]
 examples/benchmarks/vpm.pl                                  [examples]
@@ -970,6 +971,7 @@ include/parrot/io_unix.h                                    [main]include
 include/parrot/io_win32.h                                   [main]include
 include/parrot/key.h                                        [main]include
 include/parrot/library.h                                    [main]include
+include/parrot/list.h                                       [main]include
 include/parrot/longopt.h                                    [main]include
 include/parrot/memory.h                                     [main]include
 include/parrot/misc.h                                       [main]include
@@ -1282,14 +1284,19 @@ src/extend.c                                                []
 src/gc/alloc_memory.c                                       []
 src/gc/alloc_resources.c                                    []
 src/gc/api.c                                                []
+src/gc/fixed_allocator.c                                    []
+src/gc/fixed_allocator.h                                    []
 src/gc/gc_inf.c                                             []
 src/gc/gc_ms.c                                              []
+src/gc/gc_ms2.c                                             []
 src/gc/gc_private.h                                         []
 src/gc/malloc.c                                             []
 src/gc/malloc_trace.c                                       []
 src/gc/mark_sweep.c                                         []
 src/gc/string_gc.c                                          []
 src/gc/system.c                                             []
+src/gc/variable_size_pool.c                                 []
+src/gc/variable_size_pool.h                                 []
 src/global_setup.c                                          []
 src/hash.c                                                  []
 src/hll.c                                                   []
@@ -1311,6 +1318,7 @@ src/io/win32.c                                              []
 src/key.c                                                   []
 src/libnci_test.def                                         []
 src/library.c                                               []
+src/list.c                                                  []
 src/longopt.c                                               []
 src/main.c                                                  []
 src/misc.c                                                  []
