@@ -546,7 +546,8 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     ASSERT_ARGS(Parrot_gc_ms2_init)
     struct MarkSweep_GC *self;
 
-    interp->gc_sys->finalize_gc_system = gc_ms2_finalize;
+    /* We have to transfer ownership of memory to parent interp in threaded parrot */
+    interp->gc_sys->finalize_gc_system = NULL; /* gc_ms2_finalize; */
 
     interp->gc_sys->do_gc_mark              = gc_ms2_mark_and_sweep;
     interp->gc_sys->compact_string_pool     = gc_ms2_compact_memory_pool;
