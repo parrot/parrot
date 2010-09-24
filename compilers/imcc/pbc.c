@@ -1656,7 +1656,21 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
         }
     }
 
-    k = add_const_table_pmc(interp, head);
+    {
+        STRING *name      = key_set_to_string(interp, head);
+        const char *cname = Parrot_str_to_cstring(interp, name);
+        SymReg * const r  = _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, cname);
+
+        if (r) {
+            k = r->color;
+        }
+        else {
+            k = add_const_table_pmc(interp, head);
+            store_key_const(interp, cname, k);
+        }
+
+        Parrot_str_free_cstring(cname);
+    }
 
     /* single 'S' keys already have their color assigned */
     if (key_reg->set == 'K')
