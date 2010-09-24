@@ -529,8 +529,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<PackFile_destroy>
 
-=item C<PackFile_find_in_const>
-
 =item C<PackFile_fixup_subs>
 
 =item C<PackFile_new>

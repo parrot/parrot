@@ -155,7 +155,7 @@ trace whole root set, including system areas.
 
 int
 Parrot_gc_trace_root(PARROT_INTERP,
-        ARGMOD(Memory_Pools *mem_pools),
+        ARGMOD_NULLOK(Memory_Pools *mem_pools),
         Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(Parrot_gc_trace_root)
@@ -170,7 +170,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     }
 
     /* We have to start somewhere; the interpreter globals is a good place */
-    if (!mem_pools->gc_mark_start) {
+    if (mem_pools && !mem_pools->gc_mark_start) {
         mem_pools->gc_mark_start
             = mem_pools->gc_mark_ptr
             = interp->iglobals;
@@ -229,8 +229,9 @@ Parrot_gc_trace_root(PARROT_INTERP,
     /* quick check to see if we have already marked all impatient PMCs. If we
        have, return 0 and exit here. This will alert other parts of the GC
        that if we are in a lazy run we can just stop it. */
-    if (mem_pools->lazy_gc
-    &&  mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
+    if (mem_pools
+        && mem_pools->lazy_gc
+        && mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
         return 0;
 
     return 1;
@@ -455,7 +456,7 @@ arenas structure, such as the number of objects allocated in it.
 */
 
 void
-Parrot_append_arena_in_pool(SHIM_INTERP,
+Parrot_append_arena_in_pool(PARROT_INTERP,
         ARGMOD(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGMOD(Fixed_Size_Arena *new_arena), size_t size)
@@ -480,8 +481,8 @@ Parrot_append_arena_in_pool(SHIM_INTERP,
         new_arena->prev->next = new_arena;
 
     pool->last_Arena = new_arena;
-    mem_pools->header_allocs_since_last_collect += size;
-    mem_pools->memory_allocated += size;
+    interp->gc_sys->stats.header_allocs_since_last_collect += size;
+    interp->gc_sys->stats.memory_allocated += size;
 }
 
 /*

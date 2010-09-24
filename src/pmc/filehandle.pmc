@@ -379,11 +379,20 @@ Read a line from the filehandle and return it in a string.
         Parrot_str_free_cstring(prompt_cstring);
 
         if (r) {
+            STRING *encoding;
+            const STR_VTABLE *enc = NULL;
+            GET_ATTR_encoding(INTERP, SELF, encoding);
             if (*r)
                 add_history(r);
-
-            string_result = Parrot_str_new(INTERP, r, 0);
+            if (!STRING_IS_NULL(encoding))
+                enc = Parrot_get_encoding(INTERP, Parrot_encoding_number(INTERP, encoding));
+            if (enc == NULL)
+                string_result = Parrot_str_new(INTERP, r, 0);
+            else
+                string_result = Parrot_str_new_init(INTERP, r, strlen(r), enc, 0);
             free(r);
+            if (enc != NULL)
+                STRING_validate(INTERP, string_result);
         }
 #else
         if (got_prompt) {

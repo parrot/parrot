@@ -967,7 +967,7 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
         const unsigned char *ucstream = *(const unsigned char **)stream;
         opcode_t o  = (pf->fetch_op)(ucstream);
         ucstream   += pf->header->wordsize;
-        *stream     = (opcode_t *)ucstream;
+        *stream     = (const opcode_t *)ucstream;
         return o;
     }
 }

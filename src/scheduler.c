@@ -859,9 +859,9 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
     static PMC * keep_context = NULL;
 
     PMC            *context;
-    PMC            *iter        = PMCNULL;
-    STRING * const  handled_str = CONST_STRING(interp, "handled");
-    STRING * const  iter_str    = CONST_STRING(interp, "handler_iter");
+    PMC            *iter             = PMCNULL;
+    STRING * const  handled_str      = CONST_STRING(interp, "handled");
+    STRING * const  handler_iter_str = CONST_STRING(interp, "handler_iter");
 
     if (already_doing) {
         Parrot_io_eprintf(interp,
@@ -886,7 +886,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
          * tasks don't (though they could). */
         if (task->vtable->base_type == enum_class_Exception
         && VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
-            iter    = VTABLE_get_attr_str(interp, task, iter_str);
+            iter    = VTABLE_get_attr_str(interp, task, handler_iter_str);
             context = (PMC *)VTABLE_get_pointer(interp, task);
         }
         else {
@@ -904,17 +904,13 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
             if (!PMC_IS_NULL(handler)) {
                 INTVAL valid_handler = 0;
-                if (handler->vtable->base_type == enum_class_Object)
-                    Parrot_pcc_invoke_method_from_c_args(interp, handler, CONST_STRING(interp, "can_handle"),
-                        "P->I", task, &valid_handler);
-                else
-                    Parrot_pcc_invoke_method_from_c_args(interp, handler, CONST_STRING(interp, "can_handle"),
+                Parrot_pcc_invoke_method_from_c_args(interp, handler, CONST_STRING(interp, "can_handle"),
                         "P->I", task, &valid_handler);
 
                 if (valid_handler) {
                     if (task->vtable->base_type == enum_class_Exception) {
                         /* Store iterator and context for a later rethrow. */
-                        VTABLE_set_attr_str(interp, task, CONST_STRING(interp, "handler_iter"), iter);
+                        VTABLE_set_attr_str(interp, task, handler_iter_str, iter);
                         VTABLE_set_pointer(interp, task, context);
                     }
                     --already_doing;

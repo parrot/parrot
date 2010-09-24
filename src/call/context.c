@@ -260,6 +260,8 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 
     PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
+    PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_CallContext);
+
     /*
      * FIXME Invoking corotine shouldn't initialise context. So just
      * check ctx->current_sub. If it's not null return from here
@@ -277,7 +279,9 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->current_sub       = PMCNULL;
 
     if (PMC_IS_NULL(pmcold)) {
-        ctx->constants         = NULL;
+        ctx->num_constants     = NULL;
+        ctx->str_constants     = NULL;
+        ctx->pmc_constants     = NULL;
         ctx->warns             = 0;
         ctx->errors            = 0;
         ctx->trace_flags       = 0;
@@ -288,7 +292,9 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     else {
         Parrot_Context *old = CONTEXT_STRUCT(pmcold);
         /* some items should better be COW copied */
-        ctx->constants         = old->constants;
+        ctx->num_constants     = old->num_constants;
+        ctx->str_constants     = old->str_constants;
+        ctx->pmc_constants     = old->pmc_constants;
         ctx->warns             = old->warns;
         ctx->errors            = old->errors;
         ctx->trace_flags       = old->trace_flags;

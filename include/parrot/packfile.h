@@ -16,9 +16,6 @@
 
 #include "parrot/parrot.h"
 
-#define PF_NCONST(pf)  ((pf)->const_table->const_count)
-#define PF_CONST(pf, i) ((pf)->const_table->constants[(i)])
-
 #define DIRECTORY_SEGMENT_NAME   Parrot_str_new_constant(interp, "DIRECTORY")
 #define FIXUP_TABLE_SEGMENT_NAME Parrot_str_new_constant(interp, "FIXUP")
 #define CONSTANT_SEGMENT_NAME    Parrot_str_new_constant(interp, "CONSTANT")
@@ -167,15 +164,6 @@ typedef struct PackFile_Header {
     opcode_t dir_format;
 } PackFile_Header;
 
-typedef struct PackFile_Constant {
-    opcode_t type;
-    union {
-        FLOATVAL  number;
-        STRING   *string;
-        PMC      *key;
-    } u;
-} PackFile_Constant;
-
 /*
 ** PackFile Segment:
 *    The base type of every section
@@ -259,10 +247,20 @@ typedef struct PackFile_FixupTable {
 
 typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
-    opcode_t                   const_count;
-    PackFile_Constant         *constants;
-    PackFile_ByteCode         *code;  /* where this segment belongs to */
-    Hash                      *string_hash; /* Hash for lookup strings and numbers */
+    struct {
+        opcode_t        const_count;
+        FLOATVAL       *constants;
+    } num;
+    struct {
+        opcode_t        const_count;
+        STRING        **constants;
+    } str;
+    struct {
+        opcode_t        const_count;
+        PMC           **constants;
+    } pmc;
+    PackFile_ByteCode  *code;  /* where this segment belongs to */
+    Hash               *string_hash; /* Hash for lookup strings and numbers */
 } PackFile_ConstTable;
 
 typedef struct PackFile_ByteCode_OpMappingEntry {
@@ -387,19 +385,6 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-opcode_t * PackFile_Constant_pack(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *const_table),
-    ARGIN(const PackFile_Constant *self),
-    ARGOUT(opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cursor);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_ConstTable_pack(PARROT_INTERP,
@@ -417,19 +402,16 @@ size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-int PackFile_ConstTable_rlookup(PARROT_INTERP,
+int PackFile_ConstTable_rlookup_num(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
-    ARGIN(PMC *key),
-    int type)
+    FLOATVAL n)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
-int PackFile_find_in_const(PARROT_INTERP,
+int PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
-    ARGIN(PMC *key),
-    int type)
+    ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -450,11 +432,6 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
-#define ASSERT_ARGS_PackFile_Constant_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(const_table) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_ConstTable_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg) \
@@ -462,14 +439,15 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 #define ASSERT_ARGS_PackFile_ConstTable_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_PackFile_ConstTable_rlookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_ConstTable_rlookup_num \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_PackFile_ConstTable_rlookup_str \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct) \
-    , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_PackFile_find_in_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ct) \
-    , PARROT_ASSERT_ARG(key))
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_PackFile_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -527,54 +505,6 @@ PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
     SHIM(STRING *name),
     NULLOK(int add))
         __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-size_t PackFile_Constant_pack_size(PARROT_INTERP,
-    ARGIN(const PackFile_Constant *self),
-    ARGIN(const PackFile_ConstTable *ct))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
-    ARGIN(PackFile_ConstTable *constt),
-    ARGOUT(PackFile_Constant *self),
-    ARGIN(const opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
-    ARGIN(PackFile_ConstTable *constt),
-    ARGMOD(PackFile_Constant *self),
-    ARGIN(const opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-const opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
-    ARGIN(PackFile_ConstTable *constt),
-    ARGMOD(PackFile_Constant *self),
-    ARGIN(const opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
 void PackFile_ConstTable_clear(PARROT_INTERP,
@@ -883,25 +813,6 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_PackFile_Constant_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(ct))
-#define ASSERT_ARGS_PackFile_Constant_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(constt) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_PackFile_Constant_unpack_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(constt) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(constt) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_ConstTable_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))

@@ -126,27 +126,16 @@ void
 Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_PObj_alive)
-    /* TODO: Have each core register a ->pobject_lives function pointer in the
-       Memory_Pools struct, and call that pointer directly instead of having a messy
-       set of #if preparser conditions. */
 
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj))
         return;
 
-    /* mark it live */
-    PObj_live_SET(obj);
-
-    /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-     * to the chained mark list. */
     if (PObj_is_PMC_TEST(obj)) {
-        PMC * const p = (PMC *)obj;
-
-        if (PObj_is_special_PMC_TEST(obj))
-            interp->gc_sys->mark_special(interp, p);
-
-        else if (PMC_metadata(p))
-            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(p));
+        interp->gc_sys->mark_pmc_header(interp, (PMC*) obj);
+    }
+    else {
+        interp->gc_sys->mark_pobj_header(interp, obj);
     }
 }
 
@@ -165,25 +154,7 @@ void
 Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_PMC_alive_fun)
-    if (!PMC_IS_NULL(obj)) {
-        PARROT_ASSERT(PObj_is_PMC_TEST(obj));
-
-        if (PObj_is_live_or_free_TESTALL(obj))
-            return;
-
-        /* mark it live */
-        PObj_live_SET(obj);
-
-        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-         * to the chained mark list. */
-        if (PObj_is_special_PMC_TEST(obj)) {
-            if (PObj_custom_mark_TEST(obj))
-                VTABLE_mark(interp, obj);
-        }
-
-        if (PMC_metadata(obj))
-            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
-    }
+    interp->gc_sys->mark_pmc_header(interp, obj);
 }
 
 /*
@@ -198,15 +169,10 @@ A type safe wrapper of Parrot_gc_mark_PObj_alive for STRING.
 
 PARROT_EXPORT
 void
-Parrot_gc_mark_STRING_alive_fun(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
+Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
-    if (!STRING_IS_NULL(obj)) {
-        PARROT_ASSERT(PObj_is_string_TEST(obj));
-
-        /* mark it live */
-        PObj_live_SET(obj);
-    }
+    interp->gc_sys->mark_pobj_header(interp, (PObj*)obj);
 }
 
 /*
@@ -238,6 +204,9 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
         break;
       case INF:
         Parrot_gc_inf_init(interp);
+        break;
+      case MS2:
+        Parrot_gc_ms2_init(interp);
         break;
       default:
         /*die horribly because of invalid GC core specified*/
@@ -974,7 +943,7 @@ Parrot_is_blocked_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_is_blocked_GC_sweep)
     if (interp->gc_sys->is_blocked_sweep)
-        return interp->gc_sys->is_blocked_mark(interp);
+        return interp->gc_sys->is_blocked_sweep(interp);
     else
         return 0;
 }
@@ -1029,6 +998,9 @@ Parrot_gc_sys_name(PARROT_INTERP)
             break;
         case INF:
             name = Parrot_str_new(interp, "inf", 3);
+            break;
+        case MS2:
+            name = Parrot_str_new(interp, "ms2", 3);
             break;
         default:
             name = Parrot_str_new(interp, "unknown", 7);

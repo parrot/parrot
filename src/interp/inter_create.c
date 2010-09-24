@@ -218,6 +218,10 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->HLL_info = NULL;
 
     Parrot_initialize_core_vtables(interp);
+
+    /* create the root set registry */
+    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+
     init_world_once(interp);
 
     /* context data */
@@ -257,9 +261,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
     interp->code                = NULL;
-
-    /* create the root set registry */
-    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
 
     /* And a dynamic environment stack */
     /* TODO: We should really consider removing this (TT #876) */

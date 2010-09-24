@@ -2344,29 +2344,30 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
           case PARROT_ARG_NC:
             {
                 /* Convert the float to a string */
-                const FLOATVAL f = interp->code->const_table->constants[op[j]].u.number;
+                const FLOATVAL f = interp->code->const_table->num.constants[op[j]];
                 Parrot_snprintf(interp, buf, sizeof (buf), FLOATVAL_FMT, f);
                 strcpy(&dest[size], buf);
                 size += strlen(buf);
             }
             break;
           case PARROT_ARG_SC:
-            dest[size++] = '"';
-            if (interp->code->const_table->constants[op[j]].u.string->strlen) {
-                char * const unescaped =
-                    Parrot_str_to_cstring(interp, interp->code->
-                           const_table->constants[op[j]].u.string);
-                char * const escaped =
-                    PDB_escape(interp, unescaped, interp->code->const_table->
-                           constants[op[j]].u.string->strlen);
-                if (escaped) {
-                    strcpy(&dest[size], escaped);
-                    size += strlen(escaped);
-                    mem_gc_free(interp, escaped);
+            {
+                const STRING *s = interp->code->const_table->str.constants[op[j]];
+                dest[size++] = '"';
+                if (s->strlen) {
+                    char * const unescaped =
+                        Parrot_str_to_cstring(interp, s);
+                    char * const escaped =
+                        PDB_escape(interp, unescaped, s->strlen);
+                    if (escaped) {
+                        strcpy(&dest[size], escaped);
+                        size += strlen(escaped);
+                        mem_gc_free(interp, escaped);
+                    }
+                    Parrot_str_free_cstring(unescaped);
                 }
-                Parrot_str_free_cstring(unescaped);
+                dest[size++] = '"';
             }
-            dest[size++] = '"';
             break;
           case PARROT_ARG_PC:
             Parrot_snprintf(interp, buf, sizeof (buf), "PMC_CONST(%d)", op[j]);
@@ -2382,7 +2383,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
             break;
           case PARROT_ARG_KC:
             {
-                PMC * k = interp->code->const_table->constants[op[j]].u.key;
+                PMC * k = interp->code->const_table->pmc.constants[op[j]];
                 dest[size - 1] = '[';
                 while (k) {
                     switch (PObj_get_FLAGS(k)) {
@@ -2486,7 +2487,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
 
     if (specialop > 0) {
         char buf[1000];
-        PMC * const sig = interp->code->const_table->constants[op[1]].u.key;
+        PMC * const sig = interp->code->const_table->pmc.constants[op[1]];
         const int n_values = VTABLE_elements(interp, sig);
         /* The flag_names strings come from Call_bits_enum_t (with which it
            should probably be colocated); they name the bits from LSB to MSB.

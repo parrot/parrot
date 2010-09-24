@@ -390,6 +390,8 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
                 interp->gc_sys->sys_type = MS;
             else if (STREQ(arg, "inf"))
                 interp->gc_sys->sys_type = INF;
+            else if (STREQ(arg, "ms2"))
+                interp->gc_sys->sys_type = MS2;
             else {
                 fprintf(stderr,
                         "main: Unrecognized GC '%s' specified."
@@ -398,12 +400,28 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
             }
             break;
         }
-        else if (!strncmp(arg, "--gc-threshold", 14)) {
 
-            if ((arg = strrchr(arg, '=')))
-                ++arg;
-            else
-                arg = argv[++pos];
+        /* arg should start with --gc-threshold *and* contain more chars */
+        else if (strncmp(arg, "--gc-threshold", 14) == 0) {
+
+            /* the next character could be '=' */
+            if (arg[14] == '=') {
+                arg++;
+            }
+
+            /* or the end of the string... */
+            else if (arg[14] == '\0'
+
+            /* and there's another argument */
+                 && pos < argc - 1) {
+                 arg = argv[++pos];
+            }
+
+            /* ANYTHING ELSE IS WRONG */
+            else {
+                fprintf(stderr, "--gc-threshold needs an argument");
+                exit(EXIT_FAILURE);
+            }
 
             if (is_all_digits(arg)) {
                 interp->gc_threshold = strtoul(arg, NULL, 10);

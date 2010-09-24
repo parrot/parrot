@@ -204,7 +204,7 @@ Pushes the string C<*v> onto the end of the image.
             /* store a reference to constant table entry of string */
             PMC *v_pmc = key_new_string(interp, v);
             PackFile_ConstTable *table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            int idx = PackFile_ConstTable_rlookup(INTERP, table, v_pmc, PFC_STRING);
+            int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
 
             if (idx >= 0) {
                 STATICSELF.push_integer(idx);

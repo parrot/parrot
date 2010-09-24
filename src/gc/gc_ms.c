@@ -16,6 +16,7 @@ This code implements the default mark and sweep garbage collector.
 
 #include "parrot/parrot.h"
 #include "gc_private.h"
+#include "parrot/list.h"
 
 #define DEBUG_FREE_LIST 0
 
@@ -43,10 +44,11 @@ static INTVAL contained_in_attr_pool(
 static int gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
-static void gc_ms_add_free_object(SHIM_INTERP,
+static void gc_ms_add_free_object(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -155,6 +157,12 @@ static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static int gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
+        __attribute__nonnull__(1);
+
+static int gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
+        __attribute__nonnull__(1);
+
 static void gc_ms_iterate_live_strings(PARROT_INTERP,
     string_iterator_callback callback,
     ARGIN_NULLOK(void *data))
@@ -162,6 +170,10 @@ static void gc_ms_iterate_live_strings(PARROT_INTERP,
 
 static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
+
+static void gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*obj);
 
 static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
@@ -252,7 +264,8 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 #define ASSERT_ARGS_gc_ms_active_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(to_add))
 #define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -308,9 +321,15 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_is_string_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -400,6 +419,11 @@ Parrot_gc_ms_init(PARROT_INTERP)
     interp->gc_sys->allocate_bufferlike_header  = gc_ms_allocate_bufferlike_header;
     interp->gc_sys->free_bufferlike_header      = gc_ms_free_bufferlike_header;
 
+    interp->gc_sys->is_pmc_ptr              = gc_ms_is_pmc_ptr;
+    interp->gc_sys->is_string_ptr           = gc_ms_is_string_ptr;
+    interp->gc_sys->mark_pmc_header         = gc_ms_mark_pmc_header;
+    interp->gc_sys->mark_pobj_header        = gc_ms_mark_pobj_header;
+
     interp->gc_sys->allocate_pmc_attributes = gc_ms_allocate_pmc_attributes;
     interp->gc_sys->free_pmc_attributes     = gc_ms_free_pmc_attributes;
 
@@ -432,6 +456,10 @@ Parrot_gc_ms_init(PARROT_INTERP)
     interp->gc_sys->get_gc_info      = gc_ms_get_gc_info;
 
     interp->gc_sys->iterate_live_strings = gc_ms_iterate_live_strings;
+
+    /* gc_private is @objects */
+    interp->gc_sys->gc_private       = Parrot_list_new(interp);
+
 
     Parrot_gc_str_initialize(interp, &interp->mem_pools->string_gc);
     initialize_fixed_size_pools(interp, interp->mem_pools);
@@ -513,8 +541,8 @@ Parrot_gc_ms_needed(PARROT_INTERP)
     size_t dynamic_threshold;
 
     /* new_mem is the additional amount of memory used since the last GC */
-    size_t new_mem = mem_pools->memory_used
-                   - mem_pools->mem_used_last_collect;
+    size_t new_mem = interp->gc_sys->stats.memory_used
+                   - interp->gc_sys->stats.mem_used_last_collect;
 
     /* Never run a GC if new_mem is below static GC_SIZE_THRESHOLD */
     if (new_mem <= GC_SIZE_THRESHOLD)
@@ -522,7 +550,7 @@ Parrot_gc_ms_needed(PARROT_INTERP)
 
     /* The dynamic threshold is a configurable percentage of the amount of
        memory used after the last GC */
-    dynamic_threshold = (size_t)(mem_pools->mem_used_last_collect *
+    dynamic_threshold = (size_t)(interp->gc_sys->stats.mem_used_last_collect *
                                  (0.01 * interp->gc_threshold));
 
     return new_mem > dynamic_threshold;
@@ -581,7 +609,7 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     }
     else {
-        ++mem_pools->gc_lazy_mark_runs;
+        ++interp->gc_sys->stats.gc_lazy_mark_runs;
 
         Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
     }
@@ -592,10 +620,12 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     pt_gc_stop_mark(interp);
 
     /* Note it */
-    ++mem_pools->gc_mark_runs;
+    ++interp->gc_sys->stats.gc_mark_runs;
+    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
+
     --mem_pools->gc_mark_block_level;
-    mem_pools->header_allocs_since_last_collect = 0;
-    mem_pools->mem_used_last_collect = mem_pools->memory_used;
+    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
+    interp->gc_sys->stats.mem_used_last_collect = interp->gc_sys->stats.memory_used;
 
     return;
 }
@@ -777,6 +807,83 @@ gc_ms_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
+=item C<void gc_ms_mark_pmc_header(PARROT_INTERP, PMC *obj)>
+
+Mark the PMC *obj as live and attach PMCs and/or buffers
+
+=cut
+
+*/
+
+void
+gc_ms_mark_pmc_header(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
+{
+    ASSERT_ARGS(gc_ms_mark_pmc_header)
+    if (!PMC_IS_NULL(obj)) {
+        PARROT_ASSERT(PObj_is_PMC_TEST(obj));
+
+        if (PObj_is_live_or_free_TESTALL(obj))
+            return;
+
+        /* mark it live */
+        PObj_live_SET(obj);
+
+        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
+         * to the chained mark list. */
+        if (PObj_is_special_PMC_TEST(obj)) {
+            if (PObj_custom_mark_TEST(obj))
+                VTABLE_mark(interp, obj);
+        }
+
+        if (PMC_metadata(obj))
+            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
+    }
+}
+
+/*
+
+=item C<static int gc_ms_is_pmc_ptr(PARROT_INTERP, void *ptr)>
+
+return True if *ptr is contained in the pool
+
+=cut
+
+*/
+
+static int
+gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
+{
+    ASSERT_ARGS(gc_ms_is_pmc_ptr)
+    return contained_in_pool(interp->mem_pools->pmc_pool, ptr);
+}
+
+/*
+
+=item C<static int gc_ms_is_string_ptr(PARROT_INTERP, void *ptr)>
+
+establish if string *ptr is owned
+
+=cut
+
+*/
+
+static int
+gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
+{
+    ASSERT_ARGS(gc_ms_is_string_ptr)
+    UINTVAL        i;
+
+    for (i = 0; i < interp->mem_pools->num_sized; ++i) {
+        if (interp->mem_pools->sized_header_pools[i]
+            &&  contained_in_pool(interp->mem_pools->sized_header_pools[i], ptr))
+            return 1;
+    }
+
+    return 0;
+}
+
+/*
+
 =item C<static STRING* gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL
 flags)>
 
@@ -819,6 +926,26 @@ gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
         PObj_flags_SETTO((PObj *)s, PObj_on_free_list_FLAG);
         pool->add_free_object(interp, interp->mem_pools, pool, s);
         ++pool->num_free_objects;
+    }
+}
+
+/*
+
+=item C<static void gc_ms_mark_pobj_header(PARROT_INTERP, PObj *obj)>
+
+mark *obj as live
+
+=cut
+
+*/
+
+static void
+gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
+{
+    ASSERT_ARGS(gc_ms_mark_pobj_header)
+    if (obj) {
+        /* mark it live */
+        PObj_live_SET(obj);
     }
 }
 
@@ -1415,7 +1542,7 @@ the PObj flags to indicate that the item is free.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP,
+gc_ms_add_free_object(PARROT_INTERP,
         ARGMOD(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGIN(void *to_add))
@@ -1431,7 +1558,7 @@ gc_ms_add_free_object(SHIM_INTERP,
 
     object->next_ptr = pool->free_list;
     pool->free_list  = object;
-    mem_pools->memory_used -= pool->object_size;
+    interp->gc_sys->stats.memory_used -= pool->object_size;
 }
 
 /*
@@ -1482,7 +1609,7 @@ gc_ms_get_free_object(PARROT_INTERP,
     }
 
     --pool->num_free_objects;
-    mem_pools->memory_used += pool->object_size;
+    interp->gc_sys->stats.memory_used += pool->object_size;
 
     return ptr;
 }
@@ -1632,12 +1759,6 @@ gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
     Memory_Pools * const mem_pools = interp->mem_pools;
     switch (which) {
-        case TOTAL_MEM_ALLOC:
-            return mem_pools->memory_allocated;
-        case GC_MARK_RUNS:
-            return mem_pools->gc_mark_runs;
-        case GC_COLLECT_RUNS:
-            return mem_pools->gc_collect_runs;
         case ACTIVE_PMCS:
             return mem_pools->pmc_pool->total_objects -
                    mem_pools->pmc_pool->num_free_objects;
@@ -1647,17 +1768,50 @@ gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
             return mem_pools->pmc_pool->total_objects;
         case TOTAL_BUFFERS:
             return gc_ms_total_sized_buffers(mem_pools);
-        case HEADER_ALLOCS_SINCE_COLLECT:
-            return mem_pools->header_allocs_since_last_collect;
-        case MEM_ALLOCS_SINCE_COLLECT:
-            return mem_pools->mem_allocs_since_last_collect;
-        case TOTAL_COPIED:
-            return mem_pools->memory_collected;
         case IMPATIENT_PMCS:
             return mem_pools->num_early_gc_PMCs;
+        default:
+            return Parrot_gc_get_info(interp, which, &interp->gc_sys->stats);
+            break;
+    }
+    return 0;
+}
+
+/*
+TODO Move it somewhere.
+*/
+
+/*
+
+=item C<size_t Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which,
+GC_Statistics *stats)>
+
+returns stats as required by enum which
+
+=cut
+
+*/
+
+size_t
+Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
+{
+    ASSERT_ARGS(Parrot_gc_get_info)
+
+    switch (which) {
+        case TOTAL_MEM_ALLOC:
+            return stats->memory_allocated;
+        case GC_MARK_RUNS:
+            return stats->gc_mark_runs;
+        case GC_COLLECT_RUNS:
+            return stats->gc_collect_runs;
+        case HEADER_ALLOCS_SINCE_COLLECT:
+            return stats->header_allocs_since_last_collect;
+        case MEM_ALLOCS_SINCE_COLLECT:
+            return stats->mem_allocs_since_last_collect;
+        case TOTAL_COPIED:
+            return stats->memory_collected;
         case GC_LAZY_MARK_RUNS:
-            return mem_pools->gc_lazy_mark_runs;
-        case EXTENDED_PMCS:
+            return stats->gc_lazy_mark_runs;
         default:
             break;
     }

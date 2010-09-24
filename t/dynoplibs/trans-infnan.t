@@ -187,38 +187,38 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
     $N0 = 'Inf'
     #$N1 = coth $N0
     #is($N1, 1, 'coth: coth Inf')
-    todo(0, 'coth Inf', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'coth Inf', 'coth not implemented for real numbers')
     $N0 = '-Inf'
     #$N1 = coth $N0
     #is($N1, -1, '... coth -Inf')
-    todo(0, 'coth -Inf', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'coth -Inf', 'coth not implemented for real numbers')
     $N0 = 'NaN'
     #$N1 = coth $N0
     #is($N1, 'NaN', '... coth NaN')
-    todo(0, 'coth NaN', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'coth NaN', 'coth not implemented for real numbers')
 .end
 
 .sub test_acot
     $N0 = 'Inf'
     #$N1 = acot $N0
     #is($N1, 'NaN', 'acot: acot Inf')
-    todo(0, 'acot Inf', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'acot Inf', 'acot not implemented for real numbers')
     $N0 = '-Inf'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot -Inf')
-    todo(0, 'acot -Inf', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'acot -Inf', 'acot not implemented for real numbers')
     $N0 = 'NaN'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot NaN')
-    todo(0, 'acot NaN', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'acot NaN', 'acot not implemented for real numbers')
     $N0 = '-2'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot -2')
-    todo(0, 'acot -2', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'acot -2', 'acot not implemented for real numbers')
     $N0 = '2'
     #$N1 = acot $N0
     #is($N1, 'NaN', '... acot 2')
-    todo(0, 'acot 2', 'cot/coth/acot not implemented for real numbers')
+    todo(0, 'acot 2', 'acot not implemented for real numbers')
 .end
 
 .sub test_sec

@@ -435,7 +435,7 @@ Invokes the subroutine.
 
         Parrot_pcc_set_sub(INTERP, context, SELF);
         Parrot_pcc_set_continuation(INTERP, context, ccont);
-        Parrot_pcc_set_constants(INTERP, context, sub->seg->const_table->constants);
+        Parrot_pcc_set_constants(INTERP, context, sub->seg->const_table);
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
@@ -873,7 +873,7 @@ The number of optional named arguments
             /* If the first instruction is a get_params... */
             if (OPCODE_IS(INTERP, sub->seg, *pc, core_ops, PARROT_OP_get_params_pc)) {
                 /* Get the signature (the next thing in the bytecode). */
-                PMC * const sig = PF_CONST(sub->seg, *(++pc)).u.key;
+                PMC * const sig = sub->seg->const_table->pmc.constants[*(++pc)];
 
                 /* Iterate over the signature and compute argument counts. */
                 const INTVAL sig_length = VTABLE_elements(INTERP, sig);

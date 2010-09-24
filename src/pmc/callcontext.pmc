@@ -526,8 +526,10 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR opcode_t *current_pc;            /* program counter of Sub invocation */
     ATTR PMC      *current_sig;           /* temporary CallContext PMC for active call */
 
-    /* deref the constants - we need it all the time */
-    ATTR struct PackFile_Constant *constants;
+    /* deref the constants - we need them all the time */
+    ATTR FLOATVAL *num_constants;
+    ATTR STRING  **str_constants;
+    ATTR PMC     **pmc_constants;
 
     ATTR INTVAL                 current_HLL;     /* see also src/hll.c */
 

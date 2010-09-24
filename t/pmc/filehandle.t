@@ -736,6 +736,9 @@ expect 0 exit status: 0
 expect 1 exit status: 1
 OUTPUT
 
+SKIP: {
+    skip 'Timely destruction is deprecated. TT#1800' => 1;
+
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
 .sub main :main
@@ -745,15 +748,23 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" )
         needs_destroy $P0
     print $P0, "a line\n"
     null $P0            # kill it
+    # Call dummy sub to cleanup CallContext
+    dummy()
     sweep 0            # a lazy GC has to close the PIO
     $P0 = new ['FileHandle']
     $P0.'open'(temp_file, 'r')
     $S0 = $P0.'read'(20)
     print $S0
 .end
+
+.sub dummy
+.end
+
 CODE
 a line
 OUTPUT
+
+}
 
 my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
 

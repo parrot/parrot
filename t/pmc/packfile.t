@@ -24,7 +24,7 @@ Tests the Packfile PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(47)
+    plan(49)
     'test_new'()
     'test_set_string_native'()
     'test_get_string'()
@@ -368,14 +368,17 @@ load_error:
     pfdir["BYTECODE_t/pmc/packfile.t"] = $P1
 
     $P2 = new 'PackfileConstantTable'
+    # float constants
     $P2[0] = 42.0
-    $P2[1] = "42"
+    # string constants
+    $P2[0] = "42"
+    # PMC constants
     $P3 = new 'Integer'
     $P3 = 42
-    $P2[2] = $P3
+    $P2[0] = $P3
     $P4 = new 'Key'
     $P4 = 42
-    $P2[3] = $P4
+    $P2[1] = $P4
     pfdir["CONSTANTS_t/pmc/packfile.t"] = $P2
 
     # Set uuid_type
@@ -385,9 +388,10 @@ load_error:
     # Pack it
     ok(1, "PackFile packed")
 
-    #$P1 = open "/tmp/1.pbc", "w"
-    #$P1.'puts'($S0)
-    #close $P1
+    # $P1 = new ['FileHandle']
+    # $P1.'open'("/tmp/1.pbc", "w")
+    # $P1.'puts'($S0)
+    # $P1.'close'()
 
     pf = new 'Packfile'
     pf = $S0
@@ -411,17 +415,23 @@ load_error:
     $P0 = _find_segment_by_type(pf, "PackfileConstantTable")
     $I0 = defined $P0
     ok($I0, "ConstantTable unpacked")
-    $I0 = elements $P0
-    is($I0, 4, "    and contains 4 elements")
+
+    $I0 = $P0.'num_count'()
+    is($I0, 1, "    and contains 1 number constants")
+    $I0 = $P0.'str_count'()
+    is($I0, 1, "    and contains 1 string constant")
+    $I0 = $P0.'pmc_count'()
+    is($I0, 2, "    and contains 2 pmc constants")
+
     $N0 = $P0[0]
-    is($N0, 42.0, "    first is number")
-    $S0 = $P0[1]
-    is($S0, "42", "    second is string")
-    $P1 = $P0[2]
+    is($N0, 42.0, "    first number")
+    $S0 = $P0[0]
+    is($S0, "42", "    first string")
+    $P1 = $P0[0]
     isa_ok($P1, "Integer")
     $I0 = $P1
     is($I0, 42, "    with proper value")
-    $P1 = $P0[3]
+    $P1 = $P0[1]
     isa_ok($P1, "Key")
 .end
 

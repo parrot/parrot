@@ -19,13 +19,14 @@ Tests the C<Key> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(9)
+    plan(12)
 
     traverse_key_chain()
     extract_int_from_string_keys()
     extract_string_from_int_keys()
     use_number_keys()
     do_not_collect_string_keys_early_rt_60128()
+    'get_repr'()
 .end
 
 .sub traverse_key_chain
@@ -173,6 +174,31 @@ code
   $P1 = subclass $P0, 'TclProc'
   $P1 = new ['ResizablePMCArray']
   set_global 'call_chain', $P1
+.end
+
+.sub 'get_repr'
+    $P0 = new ['Key']
+    $P0 = 42
+    repr_is($P0, '[ 42 ]')
+
+    $P0 = new ['Key']
+    $P0 = "xyzzy"
+    repr_is($P0, "[ 'xyzzy' ]") # nothing happens (hopefully)
+
+    $P0 = new ['Key']
+    $P0.'set_register'(1, 4) # register 1 of set 4 (S1)
+    # XXX PCC treats key arguments as special. Don't pass keys to subroutines.
+    # repr_is($P0, '[ S1 ]')
+    $S0 = get_repr $P0
+    is($S0, '[ S1 ]')
+.end
+
+.sub repr_is
+    .param pmc x
+    .param pmc repr
+    .include 'test_more.pir'
+    $S0 = get_repr x
+    is($S0, repr)
 .end
 
 # Local Variables:

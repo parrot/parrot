@@ -338,12 +338,17 @@ void
 parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 {
     ASSERT_ARGS(parrot_hash_oplib)
-    int i;
+
+    size_t i;
+
     for (i = 0; i < lib->op_count; i++) {
         op_info_t *op = &lib->op_info_table[i];
-        parrot_hash_put(interp, interp->op_hash, (void *)op->full_name, (void *)op);
+        parrot_hash_put(interp, interp->op_hash, (void *)op->full_name,
+                                                 (void *)op);
+
         if (!parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
-            parrot_hash_put(interp, interp->op_hash, (void *)op->name, (void *)op);
+            parrot_hash_put(interp, interp->op_hash, (void *)op->name,
+                                                     (void *)op);
     }
 }
 
@@ -401,7 +406,7 @@ enable_event_checking(PARROT_INTERP)
 
     /* ensure event checking table is big enough */
     if (interp->evc_func_table_size < cs->op_count) {
-        int i;
+        size_t i;
         op_lib_t *core_lib = get_core_op_lib_init(interp, interp->run_core)(interp, 1);
 
         interp->evc_func_table = interp->evc_func_table ?

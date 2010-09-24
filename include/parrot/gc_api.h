@@ -99,6 +99,7 @@ typedef enum {
 #define GC_trace_normal_FLAG   (UINTVAL)(1 << 1)   /* the same */
 #define GC_lazy_FLAG           (UINTVAL)(1 << 2)   /* timely destruction run */
 #define GC_finish_FLAG         (UINTVAL)(1 << 3)   /* on Parrot exit: mark (almost) all PMCs dead and */
+#define GC_strings_cb_FLAG     (UINTVAL)(1 << 4)   /* Invoked from String GC during mem_alloc to sweep dead strings */
                                                    /* garbage collect. */
 
 /* HEADERIZER BEGIN: src/gc/api.c */
@@ -140,8 +141,9 @@ void Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         FUNC_MODIFIES(*obj);
 
 PARROT_EXPORT
-void Parrot_gc_mark_STRING_alive_fun(SHIM_INTERP,
+void Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *obj))
+        __attribute__nonnull__(1)
         FUNC_MODIFIES(*obj);
 
 PARROT_EXPORT
@@ -343,7 +345,8 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_Parrot_gc_mark_STRING_alive_fun \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_reallocate_memory_chunk \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

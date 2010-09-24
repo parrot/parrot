@@ -17,6 +17,7 @@ Parrot.
 #define PARROT_GC_PRIVATE_H_GUARD
 
 #include "parrot/settings.h"
+#include "variable_size_pool.h"
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack. Defined in src/gc/system.c */
@@ -79,8 +80,10 @@ typedef struct GC_MS_PObj_Wrapper {
 
 
 typedef enum _gc_sys_type_enum {
-    MS,  /*mark and sweep*/
-    INF  /*infinite memory core*/
+    MS,  /* mark and sweep */
+    INF, /* infinite memory core */
+    TMS, /* tricolor mark and sweep */
+    MS2
 } gc_sys_type_enum;
 
 /* how often to skip a full GC when this pool has nothing free */
@@ -90,6 +93,38 @@ typedef enum _gc_skip_type_enum {
     GC_ALWAYS_SKIP,
     GC_NEVER_SKIP       /* unused */
 } gc_skip_type_enum;
+
+/** statistics for GC **/
+typedef struct GC_Statistics {
+    size_t  gc_mark_runs;       /* Number of times we've done a mark run */
+    size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
+    size_t  gc_collect_runs;    /* Number of times we've done a memory
+                                   compaction */
+    size_t  mem_allocs_since_last_collect;      /* The number of memory
+                                                 * allocations from the
+                                                 * system since the last
+                                                 * compaction run */
+    size_t  header_allocs_since_last_collect;   /* The size of header
+                                                 * blocks allocated from
+                                                 * the system since the last
+                                                 * GC run */
+    size_t  memory_allocated;     /* The total amount of memory allocated
+                                   * in fixed and variable size pools.
+                                   * Doesn't count memory for internal
+                                   * structures */
+    size_t  memory_used;          /* The total amount of memory used
+                                   * in fixed and variable size
+                                   * pools. Also includes memory in
+                                   * variable size pools that has been
+                                   * freed but can only be reclaimed
+                                   * by a GC run */
+    size_t  mem_used_last_collect;    /* The total amount of
+                                       * memory used after
+                                       * the last GC run */
+    UINTVAL memory_collected;     /* Total amount of memory copied
+                                     during collection */
+
+} GC_Statistics;
 
 /* Callback for live string. Use Buffer for now... */
 typedef void (*string_iterator_callback)(PARROT_INTERP, Buffer *str, void *data);
@@ -115,10 +150,15 @@ typedef struct GC_Subsystem {
     void (*free_pmc_header)(PARROT_INTERP, PMC *);
 
     STRING* (*allocate_string_header)(PARROT_INTERP, UINTVAL flags);
-    void (*free_string_header)(PARROT_INTERP, STRING*);
+    void    (*free_string_header)(PARROT_INTERP, STRING*);
 
     Buffer* (*allocate_bufferlike_header)(PARROT_INTERP, size_t size);
-    void (*free_bufferlike_header)(PARROT_INTERP, Buffer*, size_t size);
+    void    (*free_bufferlike_header)(PARROT_INTERP, Buffer*, size_t size);
+
+    int  (*is_pmc_ptr)(PARROT_INTERP, void*);
+    int  (*is_string_ptr)(PARROT_INTERP, void*);
+    void (*mark_pobj_header)(PARROT_INTERP, PObj*);
+    void (*mark_pmc_header)(PARROT_INTERP, PMC *);
 
     void* (*allocate_pmc_attributes)(PARROT_INTERP, PMC *);
     void (*free_pmc_attributes)(PARROT_INTERP, PMC *);
@@ -154,49 +194,18 @@ typedef struct GC_Subsystem {
     /* Iterate over _live_ strings. Used for string pool compacting */
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 
+    /* Statistic for GC */
+    struct GC_Statistics stats;
+
     /*Function hooks that GC systems can CHOOSE to provide if they need them
      *These will be called via the GC API functions Parrot_gc_func_name
      *e.g. read barrier && write barrier hooks can go here later ...*/
 
-    /* Holds system-specific data structures
-     * unused right now, but this is where it should go if we need them ...
-      union {
-      } gc_private;
-     */
+    /* Holds system-specific data structures */
+    void * gc_private;
 } GC_Subsystem;
 
 
-
-/* This header structure describes a block of memory that is part of a
-   variable-size pool. The allocatable memory follows the header. */
-
-typedef struct Memory_Block {
-    size_t free;                /* Remaining free space. */
-    size_t size;                /* Size of memory. */
-    struct Memory_Block *prev;  /* Pointer to previous block. */
-    struct Memory_Block *next;  /* Pointer to next block. */
-    char *start;                /* Pointer to start of memory. */
-    char *top;                  /* Pointer to free space in memory. */
-    size_t freed;               /* Amount of freed memory.
-                                   Used in compact_pool */
-} Memory_Block;
-
-/* This structure describes a variable-size memory pool. Various such pools
-   hang off the Memory_Pools root structure. */
-
-typedef struct Variable_Size_Pool {
-    Memory_Block *top_block;            /* Pointer to most recent memory block. */
-                                        /* Pool compactor, or NULL. */
-    void (*compact)(PARROT_INTERP, struct Memory_Pools *,
-                                   struct Variable_Size_Pool *);
-    size_t minimum_block_size;          /* Minimum allocation size, to
-                                           prevent fragmentation. */
-    size_t total_allocated;             /* Total bytes allocated to this pool. */
-    size_t guaranteed_reclaimable;      /* Bytes that can definitely be reclaimed. */
-    size_t possibly_reclaimable;        /* Bytes that can possibly be reclaimed
-                                           (above plus COW-freed bytes). */
-    FLOATVAL reclaim_factor;            /* Minimum percentage we will reclaim. */
-} Variable_Size_Pool;
 
 /* This header structure describes an arena: a block of memory that is part of a
    fixed-sized pool. The arena has enough memory for 'total_objects' objects
@@ -296,64 +305,18 @@ typedef struct String_GC {
                                                    compacted */
 } String_GC;
 
-/* This structure acts as the root for all the various memory pools:
-   variable-sized, fixed-size, and PMC attributes. It also contains
-   various GC-related items. It hangs off the Interp structure. */
-
 typedef struct Memory_Pools {
-    /* Pointers to pools */
-    String_GC            string_gc;             /* TEMPORARY */
-                                                /* String GC susbsytem pointer */
+    String_GC            string_gc;
 
-    Fixed_Size_Pool     *string_header_pool;    /* String header pool. */
-    Fixed_Size_Pool     *pmc_pool;              /* PMC object pool. */
-    Fixed_Size_Pool     *constant_pmc_pool;     /* And one for constant PMCs. */
-    Fixed_Size_Pool     *constant_string_header_pool; /* And a constant string
-                                                         header pool. */
+    Fixed_Size_Pool     *string_header_pool;
+    Fixed_Size_Pool     *pmc_pool;
+    Fixed_Size_Pool     *constant_pmc_pool;
+    Fixed_Size_Pool     *constant_string_header_pool;
+    Fixed_Size_Pool    **sized_header_pools;
+    size_t               num_sized;
 
-    Fixed_Size_Pool    **sized_header_pools;    /* Vector of pools for other
-                                                  fixed-size headers. */
-    size_t               num_sized;             /* Length of that vector. */
-
-    PMC_Attribute_Pool **attrib_pools;          /* Vector of pools for PMC
-                                                   attributes. */
-    size_t               num_attribs;           /* Length of that vector. */
-
-    /* statistics for GC */
-    size_t  gc_mark_runs;       /* Number of times we've done a mark run */
-    size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
-    size_t  gc_collect_runs;    /* Number of times we've done a memory
-                                   compaction */
-    size_t  mem_allocs_since_last_collect;      /* The number of memory
-                                                 * allocations from the
-                                                 * system since the last
-                                                 * compaction run */
-    size_t  header_allocs_since_last_collect;   /* The size of header
-                                                 * blocks allocated from
-                                                 * the system since the last
-                                                 * GC run */
-    size_t  memory_allocated;     /* The total amount of memory allocated
-                                   * in fixed and variable size pools.
-                                   * Doesn't count memory for internal
-                                   * structures */
-    size_t  memory_used;          /* The total amount of memory used
-                                   * in fixed and variable size
-                                   * pools. Also includes memory in
-                                   * variable size pools that has been
-                                   * freed but can only be reclaimed
-                                   * by a GC run */
-    size_t  mem_used_last_collect;    /* The total amount of
-                                       * memory used after
-                                       * the last GC run */
-    UINTVAL memory_collected;     /* Total amount of memory copied
-                                     during collection */
-    UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
-    UINTVAL num_early_PMCs_seen;  /* how many such PMCs has GC seen */
-    PMC    *gc_mark_start;        /* first PMC marked during a GC run */
-    PMC    *gc_mark_ptr;          /* last PMC marked during a GC run */
-    PMC    *gc_trace_ptr;         /* last PMC trace_children was called on */
-    int     lazy_gc;              /* flag that indicates whether we should stop
-                                     when we've seen all impatient PMCs */
+    PMC_Attribute_Pool **attrib_pools;
+    size_t               num_attribs;
 
     /* GC blocking */
     UINTVAL gc_mark_block_level;  /* How many outstanding GC block
@@ -361,19 +324,28 @@ typedef struct Memory_Pools {
     UINTVAL gc_sweep_block_level; /* How many outstanding GC block
                                      requests are there? */
 
+    PMC    *gc_mark_start;        /* first PMC marked during a GC run */
+    PMC    *gc_mark_ptr;          /* last PMC marked during a GC run */
+    PMC    *gc_trace_ptr;         /* last PMC trace_children was called on */
+    int     lazy_gc;              /* flag that indicates whether we should stop
+                                     when we've seen all impatient PMCs */
+    UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
+    UINTVAL num_early_PMCs_seen;  /* how many such PMCs has GC seen */
+
+    /* private data for the GC subsystem */
+    void *gc_private;             /* GC subsystem data */
 } Memory_Pools;
 
 
 /* HEADERIZER BEGIN: src/gc/system.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void trace_system_areas(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void trace_system_areas(PARROT_INTERP,
+    ARGIN_NULLOK(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_trace_system_areas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/system.c */
 
@@ -430,11 +402,12 @@ void Parrot_add_to_free_list(SHIM_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*arena);
 
-void Parrot_append_arena_in_pool(SHIM_INTERP,
+void Parrot_append_arena_in_pool(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Arena *new_arena),
     size_t size)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -460,10 +433,9 @@ void Parrot_gc_sweep_pool(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 int Parrot_gc_trace_root(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+    ARGMOD_NULLOK(Memory_Pools *mem_pools),
     Parrot_gc_trace_type trace)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
 #define ASSERT_ARGS_contained_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -487,7 +459,8 @@ int Parrot_gc_trace_root(PARROT_INTERP,
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(arena))
 #define ASSERT_ARGS_Parrot_append_arena_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(new_arena))
 #define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -499,8 +472,7 @@ int Parrot_gc_trace_root(PARROT_INTERP,
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/mark_sweep.c */
 
@@ -592,6 +564,10 @@ void gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+void gc_ms_mark_pmc_header(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*obj);
+
 void gc_ms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -608,6 +584,12 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+size_t Parrot_gc_get_info(PARROT_INTERP,
+    Interpinfo_enum which,
+    ARGIN(GC_Statistics *stats))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 void Parrot_gc_ms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -632,6 +614,8 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms_mark_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -644,6 +628,9 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_Parrot_gc_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(stats))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -662,6 +649,16 @@ void Parrot_gc_inf_init(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_inf.c */
 
+/* HEADERIZER BEGIN: src/gc/gc_ms2.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+void Parrot_gc_ms2_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/gc/gc_ms2.c */
 
 /* HEADERIZER BEGIN: src/gc/string_gc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
