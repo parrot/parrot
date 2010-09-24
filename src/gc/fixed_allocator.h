@@ -98,9 +98,10 @@ void Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
         FUNC_MODIFIES(*pool);
 
 PARROT_EXPORT
-void Parrot_gc_pool_free(SHIM_INTERP,
+void Parrot_gc_pool_free(PARROT_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGFREE(void *data))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -138,7 +139,8 @@ Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
 #define ASSERT_ARGS_Parrot_gc_pool_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_pool_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_pool_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))

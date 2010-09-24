@@ -102,11 +102,13 @@ typedef struct GC_Statistics {
     size_t  mem_allocs_since_last_collect;      /* The number of memory
                                                  * allocations from the
                                                  * system since the last
-                                                 * compaction run */
+                                                 * compaction run.
+                                                 * UNUSED, ALWAYS 0 */
     size_t  header_allocs_since_last_collect;   /* The size of header
                                                  * blocks allocated from
                                                  * the system since the last
-                                                 * GC run */
+                                                 * GC run.
+                                                 * UNUSED, ALWAYS 0 */
     size_t  memory_allocated;     /* The total amount of memory allocated
                                    * in fixed and variable size pools.
                                    * Doesn't count memory for internal
@@ -652,9 +654,15 @@ void Parrot_gc_inf_init(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_ms2.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_ms2_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_gc_maybe_mark_and_sweep \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

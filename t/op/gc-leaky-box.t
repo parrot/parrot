@@ -26,7 +26,7 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
 
 
     $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
-    if $S0 != "ms" goto dont_run_hanging_tests
+    if $S0 == "inf" goto dont_run_hanging_tests
 
     plan(3)
     test_gc_mark_sweep()
@@ -62,8 +62,8 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
 
     $S1 = $I3
     $S0 = "allocated " . $S1
-    $S0 .= " (which should be <= 2_000_000) bytes of memory"
-    $I4 = isle $I3, 2000000
+    $S0 .= " (which should be <= 4_000_000) bytes of memory"
+    $I4 = isle $I3, 4000000
     ok($I4,$S0)
 .end
 

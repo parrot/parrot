@@ -619,10 +619,8 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Note it */
     ++interp->gc_sys->stats.gc_mark_runs;
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
 
     --mem_pools->gc_mark_block_level;
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect = interp->gc_sys->stats.memory_used;
 
     return;

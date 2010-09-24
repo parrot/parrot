@@ -480,7 +480,6 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
         new_arena->prev->next = new_arena;
 
     pool->last_Arena = new_arena;
-    interp->gc_sys->stats.header_allocs_since_last_collect += size;
     interp->gc_sys->stats.memory_allocated += size;
 }
 
