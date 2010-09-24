@@ -53,3 +53,9 @@ See http://trac.parrot.org/parrot/ticket/1723
     setattribute nextiter, '$!value', $P0
     .return ($P0, nextiter)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
