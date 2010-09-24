@@ -8,6 +8,10 @@ src/gc/fixed_allocator.c - Implementation of allocator for small objects.
 
 =head1 DESCRIPTION
 
+C<FixedAllocator> used to allocate small chunks of fixed size memory.
+
+C<PoolAllocator> used to allocate memory of particular size.
+
 =cut
 
 */
@@ -207,6 +211,8 @@ Frees a fixed-size data item back to the Pool for later reallocation
 
 check for pool validity
 
+=back
+
 =cut
 
 */
@@ -281,6 +287,10 @@ Parrot_gc_pool_is_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *
 
 
 /*
+
+=head1 PoolAllocator helper functions
+
+=over 4
 
 =item C<static void * pool_allocate(Pool_Allocator *pool)>
 
