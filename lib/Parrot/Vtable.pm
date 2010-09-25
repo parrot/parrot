@@ -232,7 +232,7 @@ EOM
  * vtable slot names
  */
 EOM
-    my $vtable_slot_num = 9;
+    my $vtable_slot_num = 10;
     for my $entry ( @{$vtable} ) {
         my $uc_meth = uc $entry->[1];
         $macros .= <<"EOM";
