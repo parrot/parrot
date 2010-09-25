@@ -1000,11 +1000,30 @@ $get_extra_vtable
     return vt;
 }
 
+EOC
+
+    $get_extra_vtable = '';
+
+    if ($first_parent eq 'default') {
+        $get_extra_vtable .= "    vt = Parrot_default_wb_get_vtable(interp);\n";
+    }
+    else {
+        $get_extra_vtable .= "    vt = Parrot_${first_parent}_wb_get_vtable(interp);\n";
+    }
+
+    foreach my $parent_name ( @other_parents ) {
+        $get_extra_vtable .= "    Parrot_${parent_name}_wb_update_vtable(vt);\n";
+    }
+
+    $get_extra_vtable .= "    Parrot_${classname}_wb_update_vtable(vt);\n";
+
+    $cout .= <<"EOC";
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_wb_get_vtable(PARROT_INTERP) {
     VTABLE *vt;
+$get_extra_vtable
     return vt;
 }
 
