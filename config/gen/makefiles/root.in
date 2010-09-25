@@ -202,7 +202,6 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/dlopenflags.pasm \
 	runtime/parrot/include/longopt.pasm \
 	runtime/parrot/include/packfile_segments.pasm \
-	runtime/parrot/include/packfile_constants.pasm \
 	runtime/parrot/include/packfile_annotation_key_type.pasm \
 	runtime/parrot/include/stat.pasm \
 	runtime/parrot/include/stringinfo.pasm \
@@ -1206,8 +1205,6 @@ runtime/parrot/include/cclass.pasm : $(INC_DIR)/cclass.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/cclass.h $@
 
 runtime/parrot/include/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
-runtime/parrot/include/packfile_constants.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 runtime/parrot/include/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@

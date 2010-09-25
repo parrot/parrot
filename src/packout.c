@@ -26,26 +26,6 @@ This file implements various functions for creating and writing packfiles.
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 /* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static opcode_t * PackFile_Constant_pack_key(PARROT_INTERP,
-    ARGIN(PMC *self),
-    ARGIN(const PackFile_ConstTable *const_table),
-    ARGOUT(opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cursor);
-
-#define ASSERT_ARGS_PackFile_Constant_pack_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(const_table) \
-    , PARROT_ASSERT_ARG(cursor))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

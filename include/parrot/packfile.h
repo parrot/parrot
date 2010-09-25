@@ -215,17 +215,6 @@ typedef struct PackFile_Segment {
 
 typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP, PackFile_Segment *seg, void *user_data);
 
-/* &gen_from_def(packfile_constants.pasm) */
-
-/* no ascii chars use numbers: for n, s, k, p */
-#define PFC_NONE    0x0
-#define PFC_NUMBER  0x6E
-#define PFC_STRING  0x73
-#define PFC_PMC     0x70
-#define PFC_KEY     0x6B
-
-/* &end_gen */
-
 typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
     struct {
