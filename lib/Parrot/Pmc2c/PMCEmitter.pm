@@ -30,6 +30,7 @@ use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::PMC::RO ();
+use Parrot::Pmc2c::PMC::WB ();
 use Parrot::Pmc2c::PMC::ParrotClass ();
 
 sub prep_for_emit {
@@ -218,6 +219,8 @@ sub init {
 
     $self->ro( Parrot::Pmc2c::PMC::RO->new($self) )
         unless $self->abstract or $self->singleton;
+
+    $self->wb( Parrot::Pmc2c::PMC::WB->new($self) )
 }
 
 =item C<gen_includes()>
@@ -516,6 +519,7 @@ END_MULTI_LIST
 
     my %extra_vt;
     $extra_vt{ro} = $self->{ro} if $self->{ro};
+    $extra_vt{wb} = $self->{wb};
 
     $cout .= <<"EOC";
 void

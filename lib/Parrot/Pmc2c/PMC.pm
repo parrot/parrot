@@ -281,6 +281,12 @@ sub ro {
     return $self->{ro};
 }
 
+sub wb {
+    my ( $self, $value ) = @_;
+    $self->{wb} = $value if $value;
+    return $self->{wb};
+}
+
 sub flag {
     my ( $self, $name ) = @_;
     return $self->{flags}{$name};
