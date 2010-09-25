@@ -411,6 +411,7 @@ sub vtable_decl {
         NULL,       /* mro */
         NULL,       /* attribute_defs */
         NULL,       /* ro_variant_vtable */
+        NULL,       /* wb_variant_vtable */
         $methlist,
 	0           /* attr size */
     };

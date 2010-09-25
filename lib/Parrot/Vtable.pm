@@ -178,6 +178,8 @@ typedef struct _vtable {
     const char *attribute_defs; /* list of PMC attributes */
     struct _vtable *ro_variant_vtable; /* A variant of this vtable with the
                                    opposite IS_READONLY flag */
+    struct _vtable *wb_variant_vtable; /* A variant of this vtable with the
+                                   write barrier trampoline */
     /* Vtable Functions */
 
 EOF
@@ -256,6 +258,7 @@ static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
     "",   /* class */
     "",   /* mro */
     "",   /* ro_variant_vtable */
+    "",   /* wb_variant_vtable */
 
     /* Vtable Functions */
 EOM
