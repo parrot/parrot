@@ -141,9 +141,11 @@ EOH
     if ($name ne 'default') {
         $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(ARGMOD(VTABLE*));\n");
         $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(ARGMOD(VTABLE*));\n");
+        $h->emit("${export}VTABLE* Parrot_${name}_wb_update_vtable(ARGMOD(VTABLE*));\n");
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
+    $h->emit("${export}VTABLE* Parrot_${name}_wb_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro));\n");
     $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa));\n");
 
@@ -809,6 +811,33 @@ $vtable_updates
 
 EOC
 
+    # Generate WB vtable for implemented non-updating methods
+    $vtable_updates = '';
+    foreach my $name ( @{ $self->vtable->names} ) {
+        next unless exists $self->{has_method}{$name};
+        if ($self->vtable_method_does_write($name)) {
+            # If we override constantness status of vtable
+            if (!$self->vtable->attrs($name)->{write}) {
+                $vtable_updates .= "    vt->$name = Parrot_${classname}_wb_${name};\n";
+            }
+        }
+        else {
+            $vtable_updates .= "    vt->$name = Parrot_${classname}_${name};\n";
+        }
+    }
+
+    $vtable_updates .= $set_attr_size;
+
+    $cout .= <<"EOC";
+
+$export
+VTABLE *Parrot_${classname}_wb_update_vtable(ARGMOD(VTABLE *vt)) {
+$vtable_updates
+    return vt;
+}
+
+EOC
+
     $cout;
 }
 
@@ -968,6 +997,14 @@ PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_ro_get_vtable(PARROT_INTERP) {
     VTABLE *vt;
 $get_extra_vtable
+    return vt;
+}
+
+$export
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+VTABLE* Parrot_${classname}_wb_get_vtable(PARROT_INTERP) {
+    VTABLE *vt;
     return vt;
 }
 
