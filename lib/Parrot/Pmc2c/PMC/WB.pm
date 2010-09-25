@@ -31,9 +31,9 @@ use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions qw( return_statement );
 use Text::Balanced 'extract_bracketed';
 
-=item C<make_RO($type)>
+=item C<new($type)>
 
-Create a RO version of the PMC
+Create a WB version of the PMC
 
 =cut
 
@@ -45,8 +45,12 @@ sub new {
         {
             # prepend self to parent
             parents => [ $parent->name, @{ $parent->parents } ],
+            # copy flags,
+            flags      => $parent->get_flags,
             # and alias vtable
             vtable     => $parent->vtable,
+            # set pmcname
+            name       => $parent->name . "_wb",
             # set parentname
             parentname => $parent->name,
         }
@@ -66,13 +70,12 @@ sub new {
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         my $name = $vt_method->name;
 
-        # Generate RO variant only if we override method constantness
+        # Generate WB variant only if we override method constantness
         # with ":write"
         next unless $parent->{has_method}{$name}
-                    && $parent->vtable_method_does_write($name)
-                    && !$parent->vtable->attrs($name)->{write};
+                    && $parent->vtable_method_does_write($name);
 
-        my $ro_method = Parrot::Pmc2c::Method->new(
+        my $method = Parrot::Pmc2c::Method->new(
             {
                 name        => $name,
                 parent_name => $parent->name,
@@ -83,14 +86,14 @@ sub new {
             }
         );
         my $pmcname = $parent->name;
-        my $ret     = return_statement($ro_method);
+        my $ret     = return_statement($method);
         my $body    = <<EOC;
         /* Switch vtable here and redispatch to original method */
 EOC
 
         # don't return after a Parrot_ex_throw_from_c_args
-        $ro_method->body( Parrot::Pmc2c::Emitter->text($body) );
-        $self->add_method($ro_method);
+        $method->body( Parrot::Pmc2c::Emitter->text($body) );
+        $self->add_method($method);
     }
 
     return $self;

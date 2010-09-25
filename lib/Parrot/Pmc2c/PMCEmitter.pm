@@ -92,6 +92,10 @@ sub generate_c_file {
         $ro->gen_methods;
     }
 
+    my $wb = $self->wb;
+    $wb->{emitter} = $self->{emitter};
+    $wb->gen_methods;
+
     $c->emit("#include \"pmc_default.h\"\n");
 
     $c->emit( $self->update_vtable_func );
