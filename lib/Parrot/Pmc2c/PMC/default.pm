@@ -51,7 +51,7 @@ sub gen_methods {
     $ro->{emitter} = $self->{emitter};
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
-        if ($vt_method_name eq 'find_method') {
+        if ($vt_method_name eq 'find_method' && $self->name ne 'default_wb') {
             # Generate default_ro_find_method.
             $self->{emitter}->emit(<<'EOC');
 static  PMC *
