@@ -812,7 +812,7 @@ Return the POST representation of a C<PAST::Block>.
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
-    .local pmc nsentry, subid, ns, hll, multi
+    .local pmc nsentry, subid, ns, hll, multi, loadlibs
     name = node.'name'()
     pirflags = node.'pirflags'()
     blocktype = node.'blocktype'()
@@ -821,6 +821,7 @@ Return the POST representation of a C<PAST::Block>.
     ns = node.'namespace'()
     hll = node.'hll'()
     multi = node.'multi'()
+    loadlibs = node.'loadlibs'()
 
     ##  handle nsentry attribute
     $I0 = defined nsentry
@@ -846,7 +847,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  create a POST::Sub node for this block
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi, 'loadlibs'=>loadlibs)
     unless pirflags goto pirflags_done
     bpost.'pirflags'(pirflags)
   pirflags_done:
@@ -931,8 +932,9 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
+    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'")
     bpost.'push_pirop'('set_addr', $S0, ctrllabel)
+    bpost.'push_pirop'('callmethod', '"handle_types"', $S0, '.CONTROL_RETURN')
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
 
@@ -2086,7 +2088,7 @@ attribute.
     $S0 = files
     sourceline = concat ' (', $S0
     concat sourceline, ':'
-    $I0 = self.'lineof'(source, pos)
+    $I0 = source.'lineof'(pos)
     inc $I0
     $S0 = $I0
     concat sourceline, $S0
