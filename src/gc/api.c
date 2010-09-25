@@ -96,16 +96,6 @@ implementation, and malloc wrappers for various purposes. These are unused.
 
 /* HEADERIZER HFILE: include/parrot/gc_api.h */
 
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
-
-#if ! DISABLE_GC_DEBUG
-
-#endif
-
 /*
 
 =item C<void Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>
@@ -960,6 +950,24 @@ Parrot_gc_completely_unblock(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_gc_write_barrier(PARROT_INTERP, PMC *pmc)>
+
+Write barrier for PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_gc_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_gc_write_barrier)
+    interp->gc_sys->write_barrier(interp, pmc);
+}
+
+/*
+
 =item C<void Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)>
 
 Mark a PMC as needing timely destruction
@@ -1009,6 +1017,7 @@ Parrot_gc_sys_name(PARROT_INTERP)
     PARROT_ASSERT(name != NULL);
     return name;
 }
+
 
 /*
 
