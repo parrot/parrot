@@ -191,17 +191,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
 
     for (i = 0; i < self->pmc.const_count; i++) {
         PMC *c = self->pmc.constants[i];
-        size += 1;
-        if (c->vtable->base_type == enum_class_Key) {
-            size += 1;
-            while (c) {
-                size += 2;
-                GETATTR_Key_next_key(interp, c, c);
-            }
-        }
-        else {
-            size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self)) - 1;
-        }
+        size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self)) - 1;
     }
 
     return size;
@@ -247,14 +237,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
     for (i = 0; i < self->pmc.const_count; i++) {
         PMC *c = self->pmc.constants[i];
-        if (c->vtable->base_type == enum_class_Key) {
-            *cursor++ = PFC_KEY;
-             cursor   = PackFile_Constant_pack_key(interp, c, self, cursor);
-        }
-        else {
-            *cursor++ = PFC_PMC;
-             cursor   = Parrot_freeze_pbc(interp, c, self, cursor);
-        }
+        cursor   = Parrot_freeze_pbc(interp, c, self, cursor);
     }
 
     return cursor;

@@ -3548,86 +3548,21 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     ASSERT_ARGS(PackFile_Constant_unpack_pmc)
     PackFile * const pf         = constt->base.pf;
     STRING          *_sub       = CONST_STRING(interp, "Sub");
-    const opcode_t   const_type = PF_fetch_opcode(pf, cursor);
+    PMC             *pmc;
+    /* thawing the PMC needs the real packfile in place */
+    PackFile_ByteCode * const cs_save = interp->code;
+    interp->code                      = pf->cur_cs;
+    pmc                               = Parrot_thaw_pbc(interp, constt, cursor);
 
-    switch (const_type) {
-      case PFC_KEY:
-        {
-            PMC    *head       = NULL;
-            PMC    *tail       = NULL;
-            INTVAL  components = (INTVAL)PF_fetch_opcode(pf, cursor);
+    /* finally place the sub into some namespace stash
+     * XXX place this code in Sub.thaw ?  */
+    if (VTABLE_isa(interp, pmc, _sub))
+        Parrot_ns_store_sub(interp, pmc);
 
-            while (components-- > 0) {
-                opcode_t       type       = PF_fetch_opcode(pf, cursor);
-                opcode_t        op;
+    /* restore code */
+    interp->code = cs_save;
 
-                if (tail) {
-                    SETATTR_Key_next_key(interp, tail, Parrot_pmc_new_constant(interp,
-                                                        enum_class_Key));
-                    GETATTR_Key_next_key(interp, tail, tail);
-                }
-                else
-                    head = tail = Parrot_pmc_new_constant(interp, enum_class_Key);
-
-                op = PF_fetch_opcode(pf, cursor);
-
-                switch (type) {
-                  case PARROT_ARG_IC:
-                    key_set_integer(interp, tail, op);
-                    break;
-                  case PARROT_ARG_NC:
-                    key_set_number(interp, tail, constt->num.constants[op]);
-                    break;
-                  case PARROT_ARG_SC:
-                    key_set_string(interp, tail, constt->str.constants[op]);
-                    break;
-                  case PARROT_ARG_I:
-                    key_set_register(interp, tail, op, KEY_integer_FLAG);
-                    break;
-                  case PARROT_ARG_N:
-                    key_set_register(interp, tail, op, KEY_number_FLAG);
-                    break;
-                  case PARROT_ARG_S:
-                    key_set_register(interp, tail, op, KEY_string_FLAG);
-                    break;
-                  case PARROT_ARG_P:
-                    key_set_register(interp, tail, op, KEY_pmc_FLAG);
-                    break;
-                  default:
-                    *cursor = NULL;
-                    return PMCNULL;
-                }
-            }
-
-            return head;
-        }
-
-      case PFC_PMC:
-        {
-            PMC             *pmc;
-            /* thawing the PMC needs the real packfile in place */
-            PackFile_ByteCode * const cs_save = interp->code;
-            interp->code                      = pf->cur_cs;
-            pmc                               = Parrot_thaw_pbc(interp, constt, cursor);
-
-            /* finally place the sub into some namespace stash
-             * XXX place this code in Sub.thaw ?  */
-            if (VTABLE_isa(interp, pmc, _sub))
-                Parrot_ns_store_sub(interp, pmc);
-
-            /* restore code */
-            interp->code = cs_save;
-
-            return pmc;
-        }
-
-      default:
-        Parrot_io_eprintf(NULL,
-                    "Constant_unpack: Unrecognized type '%c' during unpack!\n",
-                    (char)const_type);
-        *cursor = NULL;
-        return PMCNULL;
-    }
+    return pmc;
 }
 
 
