@@ -189,12 +189,11 @@ typedef struct GC_Subsystem {
     /* Iterate over _live_ strings. Used for string pool compacting */
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 
+    /* Write barrier */
+    void (*write_barrier)(PARROT_INTERP, PMC *);
+
     /* Statistic for GC */
     struct GC_Statistics stats;
-
-    /*Function hooks that GC systems can CHOOSE to provide if they need them
-     *These will be called via the GC API functions Parrot_gc_func_name
-     *e.g. read barrier && write barrier hooks can go here later ...*/
 
     /* Holds system-specific data structures */
     void * gc_private;
