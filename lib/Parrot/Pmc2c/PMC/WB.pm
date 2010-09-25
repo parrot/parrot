@@ -75,6 +75,11 @@ sub new {
         next unless $parent->{has_method}{$name}
                     && $parent->vtable_method_does_write($name);
 
+        # Get parameters.      strip type from param
+        my $parameters = join ', ',
+                         map { s/(\s*\S+\s*\*?\s*)//; $_ }
+                         split (/,/, $vt_method->parameters);
+
         my $method = Parrot::Pmc2c::Method->new(
             {
                 name        => $name,
@@ -82,13 +87,17 @@ sub new {
                 return_type => $vt_method->return_type,
                 parameters  => $vt_method->parameters,
                 type        => Parrot::Pmc2c::Method::VTABLE,
-                pmc_unused  => 1,
             }
         );
         my $pmcname = $parent->name;
         my $ret     = return_statement($method);
-        my $body    = <<EOC;
+        my $body    = <<"EOC";
         /* Switch vtable here and redispatch to original method */
+        Parrot_gc_write_barrier(interp, _self);
+        VTABLE *t = _self->vtable->wb_variant_vtable;
+        _self->vtable->wb_variant_vtable = _self->vtable;
+        _self->vtable = t;
+        return _self->vtable->$name(interp, $parameters);
 EOC
 
         # don't return after a Parrot_ex_throw_from_c_args
