@@ -400,41 +400,6 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
 /*
 
-=item C<void PackFile_Fixup_dump(PARROT_INTERP, const PackFile_FixupTable *ft)>
-
-Dumps the fix-up table C<ft>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
-{
-    ASSERT_ARGS(PackFile_Fixup_dump)
-    opcode_t i;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        Parrot_io_printf(interp, "\t#%d\n", (int) i);
-        switch (ft->fixups[i].type) {
-          case enum_fixup_sub:
-            Parrot_io_printf(interp,
-                        "\ttype => %d offs => %8d name => '%s',\n",
-                        (int)ft->fixups[i].type,
-                        (int)ft->fixups[i].offset,
-                        ft->fixups[i].name);
-            break;
-          default:
-            Parrot_io_printf(interp, "\ttype => %d ???,\n",
-                        (int) ft->fixups[i].type);
-            break;
-        }
-    }
-}
-
-/*
-
 =back
 
 =head1 SEE ALSO

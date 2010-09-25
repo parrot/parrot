@@ -216,61 +216,6 @@ static PackFile_ConstTable * find_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile_FixupEntry * find_fixup(
-    ARGMOD(PackFile_FixupTable *ft),
-    INTVAL type,
-    ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*ft);
-
-static INTVAL find_fixup_iter(PARROT_INTERP,
-    ARGIN(PackFile_Segment *seg),
-    ARGIN(void *user_data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-static void fixup_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * fixup_new(PARROT_INTERP,
-    SHIM(PackFile *pf),
-    SHIM(STRING *name),
-    SHIM(int add))
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static opcode_t * fixup_pack(PARROT_INTERP,
-    ARGIN(PackFile_Segment *self),
-    ARGOUT(opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*cursor);
-
-static size_t fixup_packed_size(PARROT_INTERP,
-    ARGMOD(PackFile_Segment *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static const opcode_t * fixup_unpack(PARROT_INTERP,
-    ARGIN(PackFile_Segment *seg),
-    ARGIN(const opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_CANNOT_RETURN_NULL
 static PMC * make_annotation_value_pmc(PARROT_INTERP,
     ARGIN(PackFile_Annotations *self),
@@ -455,29 +400,6 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_find_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
-#define ASSERT_ARGS_find_fixup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ft) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_find_fixup_iter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(seg) \
-    , PARROT_ASSERT_ARG(user_data))
-#define ASSERT_ARGS_fixup_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_fixup_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_fixup_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_fixup_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_fixup_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(seg) \
-    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_make_annotation_value_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -638,12 +560,6 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
       case PF_BYTEC_SEG:
         if (!pf->cur_cs)
             pf->cur_cs = (PackFile_ByteCode *)seg;
-        break;
-      case PF_FIXUP_SEG:
-        if (!pf->cur_cs->fixups) {
-            pf->cur_cs->fixups       = (PackFile_FixupTable *)seg;
-            pf->cur_cs->fixups->code = pf->cur_cs;
-        }
         break;
       case PF_CONST_SEG:
         if (!pf->cur_cs->const_table) {
@@ -960,46 +876,32 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
 {
     ASSERT_ARGS(do_sub_pragmas)
-    PackFile_FixupTable * const ft = self->fixups;
     PackFile_ConstTable * const ct = self->const_table;
     opcode_t i;
 
     TRACE_PRINTF(("PackFile: do_sub_pragmas (action=%d)\n", action));
 
-    for (i = 0; i < ft->fixup_count; ++i) {
-        switch (ft->fixups[i].type) {
-            case enum_fixup_sub:
-            {
-                /* offset is an index into const_table holding the Sub PMC */
-                PMC           *sub_pmc;
-                Parrot_Sub_attributes    *sub;
-                const opcode_t ci = ft->fixups[i].offset;
+    for (i = 0; i < ct->pmc.const_count; ++i) {
+        STRING * const SUB = CONST_STRING(interp, "Sub");
+        PMC *sub_pmc = ct->pmc.constants[i];
 
-                if (ci < 0 || ci >= ct->pmc.const_count)
-                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "Illegal fixup offset (%d) in enum_fixup_sub");
+        if (VTABLE_isa(interp, sub_pmc, SUB)) {
+            Parrot_Sub_attributes *sub;
 
-                sub_pmc       = ct->pmc.constants[ci];
-                PMC_get_sub(interp, sub_pmc, sub);
-                sub->eval_pmc = eval_pmc;
+            PMC_get_sub(interp, sub_pmc, sub);
+            sub->eval_pmc = eval_pmc;
 
-                if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
-                ||   (Sub_comp_get_FLAGS(sub) & SUB_COMP_FLAG_MASK))
-                &&    sub_pragma(interp, action, sub_pmc)) {
-                    PMC * const result = do_1_sub_pragma(interp, sub_pmc,
-                                                         action);
+            if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
+            ||   (Sub_comp_get_FLAGS(sub) & SUB_COMP_FLAG_MASK))
+            &&    sub_pragma(interp, action, sub_pmc)) {
+                PMC * const result = do_1_sub_pragma(interp, sub_pmc,
+                        action);
 
-                    /* replace Sub PMC with computation results */
-                    if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
-                        ft->fixups[i].type    = enum_fixup_none;
-                        ct->pmc.constants[ci] = result;
-                    }
+                /* replace Sub PMC with computation results */
+                if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
+                    ct->pmc.constants[i] = result;
                 }
-
-                break;
             }
-            default:
-                break;
         }
     }
 }
@@ -1675,15 +1577,6 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         default_dump
     };
 
-    static const PackFile_funcs fixupf = {
-        fixup_new,
-        fixup_destroy,
-        fixup_packed_size,
-        fixup_pack,
-        fixup_unpack,
-        default_dump
-    };
-
     static const PackFile_funcs constf = {
         const_new,
         const_destroy,
@@ -1722,7 +1615,6 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
 
     PackFile_funcs_register(interp, pf, PF_DIR_SEG,         dirf);
     PackFile_funcs_register(interp, pf, PF_UNKNOWN_SEG,     defaultf);
-    PackFile_funcs_register(interp, pf, PF_FIXUP_SEG,       fixupf);
     PackFile_funcs_register(interp, pf, PF_CONST_SEG,       constf);
     PackFile_funcs_register(interp, pf, PF_BYTEC_SEG,       bytef);
     PackFile_funcs_register(interp, pf, PF_DEBUG_SEG,       debugf);
@@ -1799,7 +1691,7 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
 =item C<PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP, STRING
 *file_name, int add)>
 
-Creates the bytecode, constant, and fixup segments for C<file_name>. If C<add>
+Creates the bytecode and constant segments for C<file_name>. If C<add>
 is true, the current packfile becomes the owner of these segments by adding the
 segments to the directory.
 
@@ -1818,12 +1710,6 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add)
     PackFile_ByteCode * const cur_cs =
         (PackFile_ByteCode *)create_seg(interp, &pf->directory,
             PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
-
-    cur_cs->fixups       =
-        (PackFile_FixupTable *)create_seg(interp, &pf->directory,
-            PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME, file_name, add);
-
-    cur_cs->fixups->code = cur_cs;
 
     cur_cs->const_table  =
         (PackFile_ConstTable *)create_seg(interp, &pf->directory,
@@ -2308,27 +2194,13 @@ sort_segs(ARGMOD(PackFile_Directory *dir))
         }
     }
 
-    seg = dir->segments[1];
-
-    if (seg->type != PF_FIXUP_SEG) {
-        size_t i;
-
-        for (i = 2; i < num_segs; ++i) {
-            PackFile_Segment * const s2 = dir->segments[i];
-            if (s2->type == PF_FIXUP_SEG) {
-                dir->segments[1] = s2;
-                dir->segments[i] = seg;
-                break;
-            }
-        }
-    }
 
     /* XXX
      * Temporary? hack to put ConstantTable in front of other segments.
      * This is useful for Annotations because we ensure that constants used
      * for keys already available during unpack.
      */
-    seg = dir->segments[2];
+    seg = dir->segments[1];
 
     if (seg->type != PF_CONST_SEG) {
         size_t i;
@@ -2642,7 +2514,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     byte_code->annotations     = NULL;
     byte_code->const_table     = NULL;
     byte_code->debugs          = NULL;
-    byte_code->fixups          = NULL;
     byte_code->op_func_table   = NULL;
     byte_code->op_info_table   = NULL;
     byte_code->op_mapping.libs = NULL;
@@ -3491,395 +3362,6 @@ Parrot_destroy_constants(PARROT_INTERP)
         mem_gc_free(interp, ct););
     parrot_hash_destroy(interp, hash);
 }
-
-
-/*
-
-=back
-
-=head2 PackFile FixupTable Structure Functions
-
-=over 4
-
-=item C<void PackFile_FixupTable_clear(PARROT_INTERP, PackFile_FixupTable
-*self)>
-
-Clears a PackFile FixupTable.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_FixupTable_clear(PARROT_INTERP, ARGMOD(PackFile_FixupTable *self))
-{
-    ASSERT_ARGS(PackFile_FixupTable_clear)
-
-    if (!self) {
-        Parrot_io_eprintf(interp, "PackFile_FixupTable_clear: self == NULL!\n");
-        return;
-    }
-
-    if (self->fixup_count) {
-        opcode_t i;
-        for (i = 0; i < self->fixup_count; ++i) {
-            mem_gc_free(interp, self->fixups[i].name);
-            self->fixups[i].name = NULL;
-        }
-        mem_gc_free(interp, self->fixups);
-    }
-    self->fixups      = NULL;
-    self->fixup_count = 0;
-
-    return;
-}
-
-
-/*
-
-=item C<static void fixup_destroy(PARROT_INTERP, PackFile_Segment *self)>
-
-Calls C<PackFile_FixupTable_clear()> with C<self>.
-
-=cut
-
-*/
-
-static void
-fixup_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
-{
-    ASSERT_ARGS(fixup_destroy)
-    PackFile_FixupTable * const ft = (PackFile_FixupTable *)self;
-    PackFile_FixupTable_clear(interp, ft);
-}
-
-
-/*
-
-=item C<static size_t fixup_packed_size(PARROT_INTERP, PackFile_Segment *self)>
-
-Calculates the size, in multiples of C<opcode_t>, required to store the
-passed C<PackFile_FixupTable> in bytecode.
-
-=cut
-
-*/
-
-static size_t
-fixup_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
-{
-    ASSERT_ARGS(fixup_packed_size)
-    PackFile_FixupTable * const ft   = (PackFile_FixupTable *)self;
-    size_t                      size = 1;
-    opcode_t i;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        /* fixup_entry type */
-        ++size;
-        switch (ft->fixups[i].type) {
-          case enum_fixup_sub:
-            size += PF_size_cstring(ft->fixups[i].name);
-            ++size; /* offset */
-            break;
-          case enum_fixup_none:
-            break;
-          default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Unknown fixup type\n");
-        }
-    }
-
-    return size;
-}
-
-
-/*
-
-=item C<static opcode_t * fixup_pack(PARROT_INTERP, PackFile_Segment *self,
-opcode_t *cursor)>
-
-Packs the fixup table for a given packfile.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static opcode_t *
-fixup_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
-{
-    ASSERT_ARGS(fixup_pack)
-    PackFile_FixupTable * const ft = (PackFile_FixupTable *)self;
-    opcode_t i;
-
-    *cursor++ = ft->fixup_count;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        *cursor++ = (opcode_t) ft->fixups[i].type;
-        switch (ft->fixups[i].type) {
-          case enum_fixup_sub:
-            cursor    = PF_store_cstring(cursor, ft->fixups[i].name);
-            *cursor++ = ft->fixups[i].offset;
-            break;
-          case enum_fixup_none:
-            break;
-          default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Unknown fixup type\n");
-        }
-    }
-
-    return cursor;
-}
-
-
-/*
-
-=item C<static PackFile_Segment * fixup_new(PARROT_INTERP, PackFile *pf, STRING
-*name, int add)>
-
-Returns a new C<PackFile_FixupTable> segment.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment *
-fixup_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
-{
-    ASSERT_ARGS(fixup_new)
-    PackFile_FixupTable * const fixup = mem_gc_allocate_zeroed_typed(interp,
-            PackFile_FixupTable);
-
-    return (PackFile_Segment *) fixup;
-}
-
-
-/*
-
-=item C<static const opcode_t * fixup_unpack(PARROT_INTERP, PackFile_Segment
-*seg, const opcode_t *cursor)>
-
-Unpacks a PackFile FixupTable from a block of memory, given a cursor.
-
-Returns one (1) if everything is okay, else zero (0).
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static const opcode_t *
-fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *cursor))
-{
-    ASSERT_ARGS(fixup_unpack)
-    PackFile_FixupTable * const self = (PackFile_FixupTable *)seg;
-    PackFile                   *pf;
-    opcode_t                    i;
-
-    if (!self) {
-        Parrot_io_eprintf(interp,
-            "PackFile_FixupTable_unpack: self == NULL!\n");
-        return NULL;
-    }
-
-    PackFile_FixupTable_clear(interp, self);
-
-    pf                = self->base.pf;
-    self->fixup_count = PF_fetch_opcode(pf, &cursor);
-
-    TRACE_PRINTF(("PackFile_FixupTable_unpack(): %ld entries\n",
-        self->fixup_count));
-
-    if (self->fixup_count) {
-        self->fixups = mem_gc_allocate_n_zeroed_typed(interp,
-            self->fixup_count, PackFile_FixupEntry);
-
-        if (!self->fixups) {
-            Parrot_io_eprintf(interp,
-                    "PackFile_FixupTable_unpack: Could not allocate "
-                    "memory for array!\n");
-            self->fixup_count = 0;
-            return NULL;
-        }
-    }
-
-    for (i = 0; i < self->fixup_count; ++i) {
-        PackFile_FixupEntry * const entry = self->fixups + i;
-
-        entry->type = PF_fetch_opcode(pf, &cursor);
-
-        switch (entry->type) {
-          case enum_fixup_sub:
-            entry->name   = PF_fetch_cstring(interp, pf, &cursor);
-            entry->offset = PF_fetch_opcode(pf, &cursor);
-            TRACE_PRINTF_VAL(("PackFile_FixupTable_unpack(): type %d, "
-                    "name %s, offset %ld\n",
-                    entry->type, entry->name, entry->offset));
-            break;
-          case enum_fixup_none:
-            break;
-          default:
-            Parrot_io_eprintf(interp,
-                    "PackFile_FixupTable_unpack: Unknown fixup type %d!\n",
-                    entry->type);
-            return NULL;
-        }
-    }
-
-    return cursor;
-}
-
-
-/*
-
-=item C<void PackFile_FixupTable_new_entry(PARROT_INTERP, const char *label,
-INTVAL type, opcode_t offs)>
-
-Adds a new fix-up entry with label and type.  Creates a new PackFile FixupTable
-if none is present.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_FixupTable_new_entry(PARROT_INTERP,
-        ARGIN(const char *label), INTVAL type, opcode_t offs)
-{
-    ASSERT_ARGS(PackFile_FixupTable_new_entry)
-    PackFile_FixupTable *self = interp->code->fixups;
-    opcode_t             i;
-
-    if (!self) {
-        self = (PackFile_FixupTable *) PackFile_Segment_new_seg(
-                interp, interp->code->base.dir, PF_FIXUP_SEG,
-                FIXUP_TABLE_SEGMENT_NAME, 1);
-
-        interp->code->fixups = self;
-        self->code           = interp->code;
-    }
-
-    i = self->fixup_count++;
-    self->fixups = mem_gc_realloc_n_typed_zeroed(interp,
-            self->fixups, self->fixup_count, i, PackFile_FixupEntry);
-
-    self->fixups[i].type   = type;
-    self->fixups[i].name   = mem_sys_strdup(label);
-    self->fixups[i].offset = offs;
-}
-
-
-/*
-
-=item C<static PackFile_FixupEntry * find_fixup(PackFile_FixupTable *ft, INTVAL
-type, const char *name)>
-
-Finds the fix-up entry in a given FixupTable C<ft> for C<type> and C<name> and
-returns it.
-
-This ignores directories. For a recursive version see
-C<PackFile_find_fixup_entry()>.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile_FixupEntry *
-find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name))
-{
-    ASSERT_ARGS(find_fixup)
-    opcode_t i;
-    for (i = 0; i < ft->fixup_count; ++i) {
-        if ((INTVAL)((enum_fixup_t)ft->fixups[i].type) == type
-        &&  STREQ(ft->fixups[i].name, name)) {
-            return ft->fixups + i;
-        }
-    }
-
-    return NULL;
-}
-
-
-/*
-
-=item C<static INTVAL find_fixup_iter(PARROT_INTERP, PackFile_Segment *seg, void
-*user_data)>
-
-Internal iterator for C<PackFile_find_fixup_entry>; recurses into directories.
-
-=cut
-
-*/
-
-static INTVAL
-find_fixup_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(void *user_data))
-{
-    ASSERT_ARGS(find_fixup_iter)
-    if (seg->type == PF_DIR_SEG) {
-        if (PackFile_map_segments(interp, (PackFile_Directory *)seg,
-                    find_fixup_iter, user_data))
-            return 1;
-    }
-    else if (seg->type == PF_FIXUP_SEG) {
-        PackFile_FixupEntry ** const e  = (PackFile_FixupEntry **)user_data;
-        PackFile_FixupEntry *  const fe = (PackFile_FixupEntry *)find_fixup(
-                (PackFile_FixupTable *) seg, (*e)->type, (*e)->name);
-
-        if (fe) {
-            *e = fe;
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-
-/*
-
-=item C<PackFile_FixupEntry * PackFile_find_fixup_entry(PARROT_INTERP, INTVAL
-type, char *name)>
-
-Searches the whole PackFile recursively for a fix-up entry with the given
-C<type> and C<name>, and returns the found entry or NULL.
-
-This also recurses into directories, compared to the simplier C<find_fixup>
-which just searches one PackFile_FixupTable.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile_FixupEntry *
-PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, ARGIN(char *name))
-{
-    ASSERT_ARGS(PackFile_find_fixup_entry)
-
-    /* TODO make a hash of all fixups */
-    PackFile_Directory  * const dir = interp->code->base.dir;
-    PackFile_FixupEntry * const ep  = mem_gc_allocate_zeroed_typed(interp, PackFile_FixupEntry);
-
-    ep->type = type;
-    ep->name = name;
-
-    if (PackFile_map_segments(interp, dir, find_fixup_iter, (void *) ep))
-        return ep;
-
-    return NULL;
-}
-
 
 /*
 

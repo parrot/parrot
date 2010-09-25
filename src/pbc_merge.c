@@ -126,15 +126,6 @@ static void pbc_merge_debugs(PARROT_INTERP,
         FUNC_MODIFIES(*pf)
         FUNC_MODIFIES(*bc);
 
-static void pbc_merge_fixups(PARROT_INTERP,
-    ARGIN(pbc_merge_input **inputs),
-    int num_inputs,
-    ARGMOD(PackFile *pf))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*pf);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_loadpbc(PARROT_INTERP,
@@ -173,10 +164,6 @@ static void pbc_merge_write(PARROT_INTERP,
     , PARROT_ASSERT_ARG(inputs) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(bc))
-#define ASSERT_ARGS_pbc_merge_fixups __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_pbc_merge_loadpbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname))
@@ -477,92 +464,6 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
 /*
 
-=item C<static void pbc_merge_fixups(PARROT_INTERP, pbc_merge_input **inputs,
-int num_inputs, PackFile *pf)>
-
-This function merges the fixups tables from the input PBC files.
-
-=cut
-
-*/
-
-static void
-pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
-                 int num_inputs, ARGMOD(PackFile *pf))
-{
-    ASSERT_ARGS(pbc_merge_fixups)
-    PackFile_FixupTable  *fixup_seg;
-    PackFile_FixupEntry  *fixups = NULL;
-    opcode_t              cursor = 0;
-    int                   i;
-
-    /* Add a fixup table segment. */
-    fixup_seg = (PackFile_FixupTable*)PackFile_Segment_new_seg(
-        interp, &pf->directory, PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME, 1);
-    if (fixup_seg == NULL) {
-        Parrot_io_eprintf(interp,
-            "PBC Merge: Error creating fixup table segment.");
-        Parrot_exit(interp, 1);
-    }
-
-    /* Loop over input files. */
-    for (i = 0; i < num_inputs; ++i) {
-        /* Get the fixup segment from the input file. */
-        PackFile_FixupTable * const in_seg = inputs[i]->pf->cur_cs->fixups;
-        int j;
-
-        if (in_seg == NULL) {
-            Parrot_io_eprintf(interp,
-                "PBC Merge: Cannot locate fixup segment in %s",
-                inputs[i]->filename);
-            Parrot_exit(interp, 1);
-        }
-
-        /* Allocate space for these fixups, provided we have some. */
-        if (in_seg->fixup_count > 0) {
-            fixups = mem_gc_realloc_n_typed(interp, fixups,
-                    cursor + in_seg->fixup_count, PackFile_FixupEntry);
-        }
-
-        /* Loop over the fixups and copy them to the output PBC, correcting
-           the offsets into the bytecode. */
-        for (j = 0; j < in_seg->fixup_count; ++j) {
-            /* Get the entry and allocate space for copies. */
-            const PackFile_FixupEntry * const cur_entry = in_seg->fixups + j;
-            PackFile_FixupEntry * const copy =
-                mem_gc_allocate_typed(interp, PackFile_FixupEntry);
-            char * const name_copy = mem_gc_allocate_n_typed(interp,
-                    strlen(cur_entry->name) + 1, char);
-
-            /* Copy type and name. */
-            copy->type = cur_entry->type;
-            strcpy(name_copy, cur_entry->name);
-            copy->name = name_copy;
-
-            /* Set new offset and bytecode pointer. */
-            switch (copy->type) {
-                case enum_fixup_sub:
-                    copy->offset = cur_entry->offset + inputs[i]->pmc.const_start;
-                    break;
-                default:
-                    Parrot_io_eprintf(interp, "PBC Merge: Unknown fixup type");
-                    Parrot_exit(interp, 1);
-            }
-
-            /* Slot it into the list. */
-            fixups[cursor] = *copy;
-            ++cursor;
-        }
-    }
-
-    /* Stash merged fixup table and count. */
-    fixup_seg->fixups      = fixups;
-    fixup_seg->fixup_count = cursor;
-}
-
-
-/*
-
 =item C<static void pbc_merge_debugs(PARROT_INTERP, pbc_merge_input **inputs,
 int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
 
@@ -851,7 +752,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
     UNUSED(ct);
 
-    pbc_merge_fixups(interp, inputs, num_inputs, merged);
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */

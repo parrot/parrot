@@ -717,8 +717,8 @@ set_current_sub(PARROT_INTERP)
     PMC *new_sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
-    PackFile_FixupTable * const ft     = cur_cs->fixups;
     PackFile_ConstTable * const ct     = cur_cs->const_table;
+    STRING * const SUB = CONST_STRING(interp, "Sub");
 
     opcode_t    i;
 
@@ -727,10 +727,9 @@ set_current_sub(PARROT_INTERP)
      * entry point with the address at our resume_offset.
      */
 
-    for (i = 0; i < ft->fixup_count; ++i) {
-        if (ft->fixups[i].type == enum_fixup_sub) {
-            const opcode_t ci      = ft->fixups[i].offset;
-            PMC    * const sub_pmc = ct->pmc.constants[ci];
+    for (i = 0; i < ct->pmc.const_count; i++) {
+        PMC *sub_pmc = ct->pmc.constants[i];
+        if (VTABLE_isa(interp, sub_pmc, SUB)) {
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
