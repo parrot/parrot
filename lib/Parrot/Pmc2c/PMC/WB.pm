@@ -79,6 +79,7 @@ sub new {
         my $parameters = join ', ',
                          map { s/(\s*\S+\s*\*?\s*)//; $_ }
                          split (/,/, $vt_method->parameters);
+        $parameters = ', ' . $parameters if $parameters;
 
         my $method = Parrot::Pmc2c::Method->new(
             {
@@ -93,11 +94,11 @@ sub new {
         my $ret     = return_statement($method);
         my $body    = <<"EOC";
         /* Switch vtable here and redispatch to original method */
-        Parrot_gc_write_barrier(interp, _self);
         VTABLE *t = _self->vtable->wb_variant_vtable;
         _self->vtable->wb_variant_vtable = _self->vtable;
         _self->vtable = t;
-        return _self->vtable->$name(interp, $parameters);
+        Parrot_gc_write_barrier(interp, _self);
+        return _self->vtable->$name(interp, _self $parameters);
 EOC
 
         # don't return after a Parrot_ex_throw_from_c_args
