@@ -37,7 +37,7 @@ See http://trac.parrot.org/parrot/ticket/1723
     ($I0, next) = next.'reify'()
     if $I1 < 10000000 goto loop
     sweep 1
-    ok(1, "Marking of large list doesn't exaust C stack")
+    ok(1, "Marking of large list doesn't exhaust C stack")
     done_testing()
 .end
 
