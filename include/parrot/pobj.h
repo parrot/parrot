@@ -171,6 +171,9 @@ typedef enum PObj_enum {
     /* For debugging, report when this buffer gets moved around */
     PObj_report_FLAG            = POBJ_FLAG(22),
 
+    /* Flags used by generation GC to determine generation object belong */
+    PObj_GC_generation_0_FLAG   = POBJ_FLAG(23),
+    PObj_GC_generation_1_FLAG   = POBJ_FLAG(24),
 
 /* PMC specific FLAGs */
     /* call object finalizer */
