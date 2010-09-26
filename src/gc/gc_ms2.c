@@ -8,6 +8,20 @@ src/gc/gc_ms2.c - Non-recursive M&S
 
 =head1 DESCRIPTION
 
+Generational, non-compacting, mark and sweep GC.
+
+Objects stored in 3 different lists for each generation.
+PObj_GC_generation_0_FLAG and PObj_GC_generation_1_FLAG determine generation.
+PObj_GC_generation_2_FLAG set when Object survived first collection in particular
+generation.
+
+GC algorithm is:
+1. After C<gc_threshold> allocated memory we trigger collection of young objects.
+2. Survived objects without PObj_GC_generation_2_FLAG will set flag.
+3. -- // -- with PObj_GC_generation_2_FLAG will be moved to older generation.
+4. After ... we trigger collection of older objects with same approach.
+5. After ... we trigger collection of ancient objects.
+
 =cut
 
 */
