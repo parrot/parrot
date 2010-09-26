@@ -294,6 +294,10 @@ static void gc_ms2_unblock_GC_mark(PARROT_INTERP)
 static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms2_allocate_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -407,6 +411,9 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -594,38 +601,38 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     /* We have to transfer ownership of memory to parent interp in threaded parrot */
     interp->gc_sys->finalize_gc_system = NULL; /* gc_ms2_finalize; */
 
-    interp->gc_sys->do_gc_mark              = gc_ms2_mark_and_sweep;
-    interp->gc_sys->compact_string_pool     = gc_ms2_compact_memory_pool;
+    interp->gc_sys->do_gc_mark                  = gc_ms2_mark_and_sweep;
+    interp->gc_sys->compact_string_pool         = gc_ms2_compact_memory_pool;
 
     /*
     interp->gc_sys->mark_special                = gc_ms2_mark_special;
     */
     interp->gc_sys->pmc_needs_early_collection  = gc_ms2_pmc_needs_early_collection;
 
-    interp->gc_sys->allocate_pmc_header     = gc_ms2_allocate_pmc_header;
-    interp->gc_sys->free_pmc_header         = gc_ms2_free_pmc_header;
+    interp->gc_sys->allocate_pmc_header         = gc_ms2_allocate_pmc_header;
+    interp->gc_sys->free_pmc_header             = gc_ms2_free_pmc_header;
 
-    interp->gc_sys->allocate_string_header  = gc_ms2_allocate_string_header;
-    interp->gc_sys->free_string_header      = gc_ms2_free_string_header;
+    interp->gc_sys->allocate_string_header      = gc_ms2_allocate_string_header;
+    interp->gc_sys->free_string_header          = gc_ms2_free_string_header;
 
     interp->gc_sys->allocate_bufferlike_header  = gc_ms2_allocate_buffer_header;
     interp->gc_sys->free_bufferlike_header      = gc_ms2_free_buffer_header;
 
-    interp->gc_sys->allocate_pmc_attributes = gc_ms2_allocate_pmc_attributes;
-    interp->gc_sys->free_pmc_attributes     = gc_ms2_free_pmc_attributes;
+    interp->gc_sys->allocate_pmc_attributes     = gc_ms2_allocate_pmc_attributes;
+    interp->gc_sys->free_pmc_attributes         = gc_ms2_free_pmc_attributes;
 
-    interp->gc_sys->is_pmc_ptr              = gc_ms2_is_pmc_ptr;
-    interp->gc_sys->is_string_ptr           = gc_ms2_is_string_ptr;
-    interp->gc_sys->mark_pmc_header         = gc_ms2_mark_pmc_header;
-    interp->gc_sys->mark_pobj_header        = gc_ms2_mark_pobj_header;
+    interp->gc_sys->is_pmc_ptr                  = gc_ms2_is_pmc_ptr;
+    interp->gc_sys->is_string_ptr               = gc_ms2_is_string_ptr;
+    interp->gc_sys->mark_pmc_header             = gc_ms2_mark_pmc_header;
+    interp->gc_sys->mark_pobj_header            = gc_ms2_mark_pobj_header;
 
-    interp->gc_sys->block_mark      = gc_ms2_block_GC_mark;
-    interp->gc_sys->unblock_mark    = gc_ms2_unblock_GC_mark;
-    interp->gc_sys->is_blocked_mark = gc_ms2_is_blocked_GC_mark;
+    interp->gc_sys->block_mark                  = gc_ms2_block_GC_mark;
+    interp->gc_sys->unblock_mark                = gc_ms2_unblock_GC_mark;
+    interp->gc_sys->is_blocked_mark             = gc_ms2_is_blocked_GC_mark;
 
-    interp->gc_sys->block_sweep      = gc_ms2_block_GC_sweep;
-    interp->gc_sys->unblock_sweep    = gc_ms2_unblock_GC_sweep;
-    interp->gc_sys->is_blocked_sweep = gc_ms2_is_blocked_GC_sweep;
+    interp->gc_sys->block_sweep                 = gc_ms2_block_GC_sweep;
+    interp->gc_sys->unblock_sweep               = gc_ms2_unblock_GC_sweep;
+    interp->gc_sys->is_blocked_sweep            = gc_ms2_is_blocked_GC_sweep;
 
     interp->gc_sys->allocate_string_storage     = gc_ms2_allocate_string_storage;
     interp->gc_sys->reallocate_string_storage   = gc_ms2_reallocate_string_storage;
@@ -637,17 +644,18 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     interp->gc_sys->free_fixed_size_storage     = gc_ms2_free_fixed_size_storage;
 
     /* We don't distinguish between chunk and chunk_with_pointers */
-    interp->gc_sys->allocate_memory_chunk   = gc_ms2_allocate_memory_chunk;
-    interp->gc_sys->reallocate_memory_chunk = gc_ms2_reallocate_memory_chunk;
+    interp->gc_sys->allocate_memory_chunk       = gc_ms2_allocate_memory_chunk;
+    interp->gc_sys->reallocate_memory_chunk     = gc_ms2_reallocate_memory_chunk;
     interp->gc_sys->allocate_memory_chunk_with_interior_pointers
                 = gc_ms2_allocate_memory_chunk_zeroed;
     interp->gc_sys->reallocate_memory_chunk_with_interior_pointers
                 = gc_ms2_reallocate_memory_chunk_zeroed;
-    interp->gc_sys->free_memory_chunk       = gc_ms2_free_memory_chunk;
+    interp->gc_sys->free_memory_chunk           = gc_ms2_free_memory_chunk;
 
-    interp->gc_sys->iterate_live_strings = gc_ms2_iterate_live_strings;
+    interp->gc_sys->iterate_live_strings        = gc_ms2_iterate_live_strings;
+    interp->gc_sys->write_barrier               = gc_ms2_write_barrier;
 
-    interp->gc_sys->get_gc_info      = gc_ms2_get_gc_info;
+    interp->gc_sys->get_gc_info                 = gc_ms2_get_gc_info;
 
     if (interp->parent_interpreter && interp->parent_interpreter->gc_sys) {
         /* This is a "child" interpreter. Just reuse parent one */
@@ -1462,6 +1470,23 @@ gc_ms2_maybe_mark_and_sweep(PARROT_INTERP)
     if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold) {
         gc_ms2_mark_and_sweep(interp, 0);
     }
+}
+
+/*
+=item C<static void gc_ms2_write_barrier(PARROT_INTERP, PMC *pmc)>
+
+WriteBarrier for PMC. Add to root_objects list for mandatory next collecting.
+
+=cut
+*/
+static void
+gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(gc_ms2_write_barrier)
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header *item = Obj2LLH(pmc);
+    LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
+    LIST_APPEND(self->root_objects, item);
 }
 
 /*
