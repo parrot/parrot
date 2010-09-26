@@ -22,6 +22,10 @@ GC algorithm is:
 4. After ... we trigger collection of older objects with same approach.
 5. After ... we trigger collection of ancient objects.
 
+Objects in old generations have wb_variant_vtable as primary vtable.
+WB (WriteBarrier) vtables trigger Parrot_gc_write_barrier(self) which will add
+SELF into root_objects list.
+
 =cut
 
 */
@@ -34,18 +38,30 @@ GC algorithm is:
 
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
+/* Get generation from PObj->flags */
+#define PObj_to_generation(pobj)                    \
+    (                                               \
+        (pobj)->flags & PObj_GC_generation_0_FLAG   \
+        ? (pobj->flags) & PObj_GC_generation_1_FLAG \
+            ? 2                                     \
+            : 1                                     \
+        : 0                                         \
+    )
+
 /* Private information */
 typedef struct MarkSweep_GC {
     /* Allocator for PMC headers */
-    struct Pool_Allocator *pmc_allocator;
-    /* Currently allocate objects */
-    struct Linked_List    *objects;
+    struct Pool_Allocator  *pmc_allocator;
+
     /* During M&S gather new live objects in this list */
-    struct Linked_List    *root_objects;
+    struct Linked_List     *root_objects;
+
+    /* Currently allocate objects. 3 generations of them */
+    struct Linked_List     *objects[3];
 
     /* Allocator for strings */
-    struct Pool_Allocator *string_allocator;
-    struct Linked_List    *strings;
+    struct Pool_Allocator  *string_allocator;
+    struct Linked_List     *strings;
 
     /* Fixed-size allocator */
     struct Fixed_Allocator *fixed_size_allocator;
@@ -54,7 +70,10 @@ typedef struct MarkSweep_GC {
     struct String_GC        string_gc;
 
     /* Amount of allocated memory before trigger gc */
-    size_t gc_threshold;
+    size_t                  gc_threshold;
+
+    /* During GC phase - which generation we are collecting */
+    size_t                  current_generation;
 
     /* GC blocking */
     UINTVAL gc_mark_block_level;  /* How many outstanding GC block
@@ -627,7 +646,10 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (PMC));
-        self->objects = Parrot_list_new(interp);
+
+        self->objects[0] = Parrot_list_new(interp);
+        self->objects[1] = Parrot_list_new(interp);
+        self->objects[2] = Parrot_list_new(interp);
 
         /* Allocate list for gray objects */
         self->root_objects = Parrot_list_new(interp);
@@ -663,7 +685,9 @@ gc_ms2_finalize(PARROT_INTERP)
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
-    Parrot_list_destroy(interp, self->objects);
+    Parrot_list_destroy(interp, self->objects[0]);
+    Parrot_list_destroy(interp, self->objects[1]);
+    Parrot_list_destroy(interp, self->objects[2]);
     Parrot_list_destroy(interp, self->strings);
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
     Parrot_gc_pool_destroy(interp, self->string_allocator);
@@ -689,9 +713,10 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp,
             self->pmc_allocator);
-    LIST_APPEND(self->objects, ptr);
+    LIST_APPEND(self->objects[0], ptr);
 
     ret = LLH2Obj_typed(ptr, PMC);
+    ret->flags = 0;
 
     return ret;
 }
@@ -704,7 +729,9 @@ gc_ms2_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
     if (pmc) {
         if (PObj_on_free_list_TEST(pmc))
             return;
-        Parrot_list_remove(interp, self->objects, Obj2LLH(pmc));
+
+        Parrot_list_remove(interp, self->objects[PObj_to_generation(pmc)], Obj2LLH(pmc));
+
         PObj_on_free_list_SET(pmc);
 
         Parrot_pmc_destroy(interp, pmc);
@@ -741,8 +768,10 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     /* mark it live */
     PObj_live_SET(pmc);
 
-    LIST_REMOVE(self->objects, item);
+    LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
     LIST_APPEND(self->root_objects, item);
+    /* Move to young generation */
+    pmc->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
 
 }
 
@@ -761,7 +790,9 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_pmc_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[0])
+           || gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[1])
+           || gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[2]);
 }
 
 /*
@@ -1063,12 +1094,18 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* sweep of root_objects will repaint them white */
     /* sweep of objects will destroy dead objects leaving only "constant" */
     gc_ms2_sweep_pool(interp, self->pmc_allocator, self->root_objects, gc_ms2_sweep_pmc_cb);
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects, gc_ms2_sweep_pmc_cb);
+
+    /* TODO Depends on current collected generation */
+    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
+    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
+    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
+
     gc_ms2_sweep_pool(interp, self->string_allocator, self->strings, gc_ms2_sweep_string_cb);
 
+    /* TODO */
     /* Replace objects with root_objects. Ignoring "constant" one */
-    list = self->objects;
-    self->objects = self->root_objects;
+    list = self->objects[0];
+    self->objects[0] = self->root_objects;
 
     /* Cleanup old list */
     list->first = list->last = NULL;
