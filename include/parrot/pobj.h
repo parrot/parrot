@@ -153,26 +153,24 @@ typedef enum PObj_enum {
     PObj_sysmem_FLAG            = POBJ_FLAG(15),
 
 /* PObj usage FLAGs, COW & GC */
-    /* Used during tri-color mark&sweep */
-    PObj_grey_FLAG              = POBJ_FLAG(16),
-
     /* The Buffer allows COW copies, and may have some. */
-    PObj_is_COWable_FLAG        = POBJ_FLAG(17),
+    PObj_is_COWable_FLAG        = POBJ_FLAG(16),
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
-    b_PObj_live_FLAG            = POBJ_FLAG(18),
+    b_PObj_live_FLAG            = POBJ_FLAG(17),
     /* Mark the object as on the free list */
-    b_PObj_on_free_list_FLAG    = POBJ_FLAG(19),
+    b_PObj_on_free_list_FLAG    = POBJ_FLAG(18),
 
 /* GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
-    PObj_custom_mark_FLAG       = POBJ_FLAG(20),
+    PObj_custom_mark_FLAG       = POBJ_FLAG(19),
     /* Mark the buffer as needing GC */
-    PObj_custom_GC_FLAG         = POBJ_FLAG(21),
+    PObj_custom_GC_FLAG         = POBJ_FLAG(20),
     /* Set if the PObj has a destroy method that must be called */
-    PObj_custom_destroy_FLAG    = POBJ_FLAG(22),
+    PObj_custom_destroy_FLAG    = POBJ_FLAG(21),
     /* For debugging, report when this buffer gets moved around */
-    PObj_report_FLAG            = POBJ_FLAG(23),
+    PObj_report_FLAG            = POBJ_FLAG(22),
+
 
 /* PMC specific FLAGs */
     /* call object finalizer */
