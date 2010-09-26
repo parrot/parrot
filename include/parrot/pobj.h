@@ -164,8 +164,6 @@ typedef enum PObj_enum {
 /* GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
     PObj_custom_mark_FLAG       = POBJ_FLAG(19),
-    /* Mark the buffer as needing GC */
-    PObj_custom_GC_FLAG         = POBJ_FLAG(20),
     /* Set if the PObj has a destroy method that must be called */
     PObj_custom_destroy_FLAG    = POBJ_FLAG(21),
     /* For debugging, report when this buffer gets moved around */
@@ -238,10 +236,6 @@ typedef enum PObj_enum {
 #define PObj_report_TEST(o) PObj_flag_TEST(report, o)
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
-
-#define PObj_grey_TEST(o) gc_flag_TEST(grey, o)
-#define PObj_grey_SET(o) gc_flag_SET(grey, o)
-#define PObj_grey_CLEAR(o) gc_flag_CLEAR(grey, o)
 
 #define PObj_on_free_list_TEST(o) gc_flag_TEST(on_free_list, o)
 #define PObj_on_free_list_SET(o) gc_flag_SET(on_free_list, o)
