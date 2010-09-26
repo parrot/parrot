@@ -165,13 +165,14 @@ typedef enum PObj_enum {
     /* Set to true if the PObj has a custom mark routine */
     PObj_custom_mark_FLAG       = POBJ_FLAG(19),
     /* Set if the PObj has a destroy method that must be called */
-    PObj_custom_destroy_FLAG    = POBJ_FLAG(21),
+    PObj_custom_destroy_FLAG    = POBJ_FLAG(20),
     /* For debugging, report when this buffer gets moved around */
-    PObj_report_FLAG            = POBJ_FLAG(22),
+    PObj_report_FLAG            = POBJ_FLAG(21),
 
     /* Flags used by generation GC to determine generation object belong */
-    PObj_GC_generation_0_FLAG   = POBJ_FLAG(23),
-    PObj_GC_generation_1_FLAG   = POBJ_FLAG(24),
+    PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
+    PObj_GC_generation_1_FLAG   = POBJ_FLAG(23),
+    PObj_GC_generation_2_FLAG   = POBJ_FLAG(24),
 
 /* PMC specific FLAGs */
     /* call object finalizer */
