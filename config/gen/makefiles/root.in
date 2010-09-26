@@ -1764,7 +1764,8 @@ PBC_TEST_FILES = \
     t/pmc/testlib/annotations.pbc \
     t/pmc/testlib/number.pbc
 
-# pbc files used for several tests
+# pbc files used for several tests;
+# not needed for build, hence this target is not included in 'all'
 pbctestfiles: $(PARROT) $(PBC_TEST_FILES)
 
 t/pmc/testlib/number.pbc: t/pmc/testlib/number.pasm
