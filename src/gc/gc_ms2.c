@@ -27,7 +27,7 @@ typedef struct MarkSweep_GC {
     /* Currently allocate objects */
     struct Linked_List    *objects;
     /* During M&S gather new live objects in this list */
-    struct Linked_List    *new_objects;
+    struct Linked_List    *root_objects;
 
     /* Allocator for strings */
     struct Pool_Allocator *string_allocator;
@@ -615,6 +615,10 @@ Parrot_gc_ms2_init(PARROT_INTERP)
             sizeof (List_Item_Header) + sizeof (PMC));
         self->objects = Parrot_list_new(interp);
 
+        /* Allocate list for gray objects */
+        self->root_objects = Parrot_list_new(interp);
+
+
         self->string_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (STRING));
         self->strings = Parrot_list_new(interp);
@@ -724,7 +728,7 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     PObj_live_SET(pmc);
 
     LIST_REMOVE(self->objects, item);
-    LIST_APPEND(self->new_objects, item);
+    LIST_APPEND(self->root_objects, item);
 
 }
 
@@ -1014,21 +1018,17 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     ++self->gc_mark_block_level;
 
-    /* Allocate list for gray objects */
-    self->new_objects = Parrot_list_new(interp);
-
-    /* Trace "roots" into new_objects */
+    /* Trace "roots" */
     gc_ms2_mark_pmc_header(interp, PMCNULL);
-
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
     if (interp->pdb && interp->pdb->debugger) {
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
     }
 
-    /* new_objects are "gray" untill fully marked */
-    /* Additional gray objects will appened to new_objects list */
+    /* root_objects are "gray" untill fully marked */
+    /* Additional gray objects will appened to root_objects list */
     /* So, iterate over them in one go */
-    tmp = self->new_objects->first;
+    tmp = self->root_objects->first;
     while (tmp) {
         PMC *pmc = LLH2Obj_typed(tmp, PMC);
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
@@ -1044,18 +1044,21 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         tmp = tmp->next;
     }
 
-    /* At this point of time new_objects contains only live PMCs */
+    /* At this point of time root_objects contains only live PMCs */
     /* objects contains "dead" or "constant" PMCs */
-    /* sweep of new_objects will repaint them white */
+    /* sweep of root_objects will repaint them white */
     /* sweep of objects will destroy dead objects leaving only "constant" */
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->new_objects, gc_ms2_sweep_pmc_cb);
+    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->root_objects, gc_ms2_sweep_pmc_cb);
     gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects, gc_ms2_sweep_pmc_cb);
     gc_ms2_sweep_pool(interp, self->string_allocator, self->strings, gc_ms2_sweep_string_cb);
 
-    /* Replace objects with new_objects. Ignoring "constant" one */
+    /* Replace objects with root_objects. Ignoring "constant" one */
     list = self->objects;
-    self->objects = self->new_objects;
-    Parrot_list_destroy(interp, list);
+    self->objects = self->root_objects;
+
+    /* Cleanup old list */
+    list->first = list->last = NULL;
+    list->count = 0;
 
     interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect            = 0;
