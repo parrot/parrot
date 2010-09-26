@@ -1489,7 +1489,6 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     PDB_breakpoint_t *newbreak,
                      *oldbreak;
     PDB_line_t       *line = NULL;
-    long              bp_id;
     opcode_t         *breakpos = NULL;
 
     unsigned long ln = get_ulong(& command, 0);
@@ -1796,10 +1795,8 @@ void
 PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_delete_breakpoint)
-    PDB_t *pdb = interp->pdb;
+    PDB_t * const pdb = interp->pdb;
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
-    const PDB_line_t *line;
-    long bp_id;
 
     if (breakpoint) {
         display_breakpoint(pdb, breakpoint);
