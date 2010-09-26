@@ -39,7 +39,7 @@ typedef struct MarkSweep_GC {
     /* String GC */
     struct String_GC        string_gc;
 
-    /* Number of allocated objects before trigger gc */
+    /* Amount of allocated memory before trigger gc */
     size_t gc_threshold;
 
     /* GC blocking */
