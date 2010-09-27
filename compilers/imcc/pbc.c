@@ -1669,7 +1669,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             store_key_const(interp, cname, k);
         }
 
-        Parrot_str_free_cstring(cname);
+        Parrot_str_free_cstring((char *)cname);
     }
 
     /* single 'S' keys already have their color assigned */
