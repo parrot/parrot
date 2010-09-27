@@ -42,11 +42,18 @@ SELF into root_objects list.
 #define PObj_to_generation(pobj)                    \
     (                                               \
         (pobj)->flags & PObj_GC_generation_0_FLAG   \
-        ? (pobj->flags) & PObj_GC_generation_1_FLAG \
+        ? 1                                         \
+        : (pobj->flags) & PObj_GC_generation_1_FLAG \
             ? 2                                     \
-            : 1                                     \
-        : 0                                         \
+            : 0                                     \
     )
+
+#define generation_to_flags(gen)                    \
+    (gen) == 1                                      \
+        ? PObj_GC_generation_0_FLAG                 \
+        : (gen) == 2                                \
+            ? PObj_GC_generation_1_FLAG             \
+            : 0
 
 /* Private information */
 typedef struct MarkSweep_GC {
@@ -250,6 +257,14 @@ static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+static void gc_ms2_propagate_to_older_generation(PARROT_INTERP,
+    size_t current_gen,
+    ARGIN(Linked_List *from),
+    ARGIN(Linked_List *to))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(Buffer *str),
     size_t size)
@@ -391,6 +406,11 @@ static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms2_propagate_to_older_generation \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(from) \
+    , PARROT_ASSERT_ARG(to))
 #define ASSERT_ARGS_gc_ms2_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -847,6 +867,7 @@ gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
     ASSERT_ARGS(gc_ms2_sweep_pmc_cb)
     PMC *pmc = (PMC *)obj;
     Parrot_pmc_destroy(interp, pmc);
+    gc_ms2_free_pmc_header(interp, pmc);
 }
 
 /*
@@ -1124,7 +1145,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
     Linked_List      *list;
-    size_t            counter;
+    size_t            gen;
     UNUSED(flags);
 
     /* GC is blocked */
@@ -1148,11 +1169,11 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     if (0 && interp->gc_sys->stats.gc_mark_runs % 100 == 0)
-        self->current_generation = 2;
+        gen = self->current_generation = 2;
     else if (interp->gc_sys->stats.gc_mark_runs % 10 == 0)
-        self->current_generation = 1;
+        gen = self->current_generation = 1;
     else
-        self->current_generation = 0;
+        gen = self->current_generation = 0;
 
     /* Trace "roots" */
     gc_ms2_mark_pmc_header(interp, PMCNULL);
@@ -1177,6 +1198,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         if (PMC_metadata(pmc))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
 
+        PObj_live_SET(pmc);
+
         tmp = tmp->next;
     }
 
@@ -1186,14 +1209,18 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* sweep of objects will destroy dead objects leaving only "constant" */
     gc_ms2_sweep_pool(interp, self->pmc_allocator, self->root_objects, gc_ms2_sweep_pmc_cb);
 
-    /* TODO Depends on current collected generation */
+    /* Depends on current collected generation */
     gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
+    if (gen >= 1)
+        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
+    if (gen >= 2)
+        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
 
     gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[0], gc_ms2_sweep_string_cb);
-    gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[1], gc_ms2_sweep_string_cb);
-    gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[2], gc_ms2_sweep_string_cb);
+    if (gen >= 1)
+        gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[1], gc_ms2_sweep_string_cb);
+    if (gen >= 2)
+        gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[2], gc_ms2_sweep_string_cb);
 
     /* TODO */
     /* Replace objects with root_objects. Ignoring "constant" one */
@@ -1205,6 +1232,13 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     list->count = 0;
     self->root_objects = list;
 
+    /* TODO Handle oldest generation */
+    /* Propagate survived objects into older generation */
+    if (gen != 2) {
+        gc_ms2_propagate_to_older_generation(interp, gen, self->objects[gen], self->objects[gen+1]);
+        gc_ms2_propagate_to_older_generation(interp, gen, self->strings[gen], self->strings[gen+1]);
+    }
+
     interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect            = 0;
     self->gc_mark_block_level--;
@@ -1214,7 +1248,47 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_ms2_compact_memory_pool(interp);
 }
 
+static void
+gc_ms2_propagate_to_older_generation(PARROT_INTERP,
+        size_t current_gen,
+        ARGIN(Linked_List *from),
+        ARGIN(Linked_List *to))
+{
+    ASSERT_ARGS(gc_ms2_propagate_to_older_generation)
+    List_Item_Header *next, *tmp = from->first;
+    ++current_gen;
+    while (tmp) {
+        PObj * obj = LLH2Obj_typed(tmp, PObj);
+        next = tmp->next;
 
+        /* We can't do such a naive check for "survived" objects */
+        /* If PMC "A" survived first collection */
+        /* Then PMC "B" was added to it */
+        /* We'll move "A" into older generation */
+        /* But keep "B" in younger */
+        /* Kaboom. "B" collected prematurely on next run */
+        if (0 && obj->flags & PObj_GC_generation_2_FLAG) {
+            /* Move into older generation */
+            LIST_REMOVE(from, tmp);
+            LIST_APPEND(to, tmp);
+            obj->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
+            obj->flags |= generation_to_flags(current_gen);
+
+            if (PObj_is_PMC_TEST(obj)) {
+                PMC     *pmc = (PMC *)obj;
+                VTABLE  *t   = pmc->vtable;
+                pmc->vtable = pmc->vtable->wb_variant_vtable;
+                pmc->vtable->wb_variant_vtable = t;
+            }
+        }
+        else {
+            /* First time survival. */
+            obj->flags |= PObj_GC_generation_2_FLAG;
+        }
+
+        tmp = next;
+    }
+}
 
 /*
 =item C<static void gc_ms2_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
