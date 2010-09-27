@@ -791,15 +791,20 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(gc_ms2_mark_pmc_header)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header  *item = Obj2LLH(pmc);
+    size_t             gen  = PObj_to_generation(pmc);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
     if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
         return;
 
+    /* If object too old - skip it */
+    if (gen > self->current_generation)
+        return;
+
     /* mark it live */
     PObj_live_SET(pmc);
 
-    LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
+    LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->root_objects, item);
     /* Move to young generation */
     pmc->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
@@ -1140,9 +1145,16 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     ++self->gc_mark_block_level;
 
+    interp->gc_sys->stats.gc_mark_runs++;
     /* Which generation we are going to collect? */
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
+    if (0 && interp->gc_sys->stats.gc_mark_runs % 100 == 0)
+        self->current_generation = 2;
+    else if (interp->gc_sys->stats.gc_mark_runs % 10 == 0)
+        self->current_generation = 1;
+    else
+        self->current_generation = 0;
 
     /* Trace "roots" */
     gc_ms2_mark_pmc_header(interp, PMCNULL);
@@ -1197,7 +1209,6 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect            = 0;
-    interp->gc_sys->stats.gc_mark_runs++;
     self->gc_mark_block_level--;
     /* We swept all dead objects */
     self->num_early_gc_PMCs                      = 0;
