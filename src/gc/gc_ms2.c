@@ -237,6 +237,10 @@ static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 static void gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
         __attribute__nonnull__(1);
 
+static void gc_ms2_mark_string_header(PARROT_INTERP, ARGIN(STRING *str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_ms2_maybe_mark_and_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -378,6 +382,9 @@ static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms2_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_mark_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_ms2_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_pmc_needs_early_collection \
@@ -991,6 +998,38 @@ gc_ms2_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
+static void
+gc_ms2_mark_string_header(PARROT_INTERP, ARGIN(STRING *str))
+{
+    ASSERT_ARGS(gc_ms2_mark_string_header)
+    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header  *item = Obj2LLH(str);
+    size_t             gen  = PObj_to_generation(str);
+
+    /* If object too old - skip it */
+    if (gen > self->current_generation)
+        return;
+
+    /* Object was already marked as grey. Or live. Or dead. Skip it */
+    if (PObj_is_live_or_free_TESTALL(str))
+        return;
+
+    /* External/sysmem/whaever strings aren't managed by GC */
+    if (!PObj_is_movable_TESTALL(str))
+        return;
+
+    /* mark it live */
+    PObj_live_SET(str);
+
+    PARROT_ASSERT(Parrot_list_contains(interp, self->strings[gen], Obj2LLH(str)));
+
+    /* Move to young generation */
+    if (gen) {
+        LIST_REMOVE(self->strings[gen], item);
+        LIST_APPEND(self->strings[0], item);
+        str->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
+    }
+}
 /*
 
 =item C<static void gc_ms2_mark_pobj_header(PARROT_INTERP, PObj * obj)>
@@ -1008,8 +1047,9 @@ gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
     if (obj) {
         if (PObj_is_PMC_TEST(obj))
             gc_ms2_mark_pmc_header(interp, (PMC *)obj);
-        else
-            PObj_live_SET(obj);
+        else {
+            gc_ms2_mark_string_header(interp, (STRING *)obj);
+        }
     }
 }
 
