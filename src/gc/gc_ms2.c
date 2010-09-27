@@ -39,20 +39,18 @@ SELF into root_objects list.
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
 /* Get generation from PObj->flags */
-#define PObj_to_generation(pobj)                    \
-    (                                               \
-        (pobj)->flags & PObj_GC_generation_0_FLAG   \
-        ? 1                                         \
-        : (pobj->flags) & PObj_GC_generation_1_FLAG \
-            ? 2                                     \
-            : 0                                     \
-    )
+#define PObj_to_generation(pobj)                      \
+    ((pobj)->flags & PObj_GC_generation_0_FLAG        \
+        ? 1                                           \
+        : ((pobj)->flags) & PObj_GC_generation_1_FLAG \
+            ? 2                                       \
+            : 0)
 
-#define generation_to_flags(gen)                    \
-    (gen) == 1                                      \
-        ? PObj_GC_generation_0_FLAG                 \
-        : (gen) == 2                                \
-            ? PObj_GC_generation_1_FLAG             \
+#define generation_to_flags(gen)                      \
+    (gen) == 1                                        \
+        ? PObj_GC_generation_0_FLAG                   \
+        : (gen) == 2                                  \
+            ? PObj_GC_generation_1_FLAG               \
             : 0
 
 /* Private information */
@@ -871,9 +869,10 @@ gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
 }
 
 /*
-=item C<gc_ms2_allocate_string_header()>
 
-=item C<gc_ms2_free_string_header()>
+=item C<gc_ms2_allocate_string_header(PARROT_INTERP, STRING *str)>
+
+=item C<gc_ms2_free_string_header(PARROT_INTERP, STRING *s)>
 
 =item C<static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP, size_t
 size)>
@@ -971,16 +970,16 @@ gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 /*
 
-item C<void gc_ms_allocate_string_storage(PARROT_INTERP, STRING *str, size_t
+item C<void gc_ms2_allocate_string_storage(PARROT_INTERP, STRING *str, size_t
 size)>
 
-=item C<void gc_ms_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t
+=item C<void gc_ms2_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t
 size)>
 
-=item C<void gc_ms_allocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+=item C<void gc_ms2_allocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
 size)>
 
-=item C<void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+=item C<void gc_ms2_reallocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
 size)>
 
 Functions for allocating strings/buffers storage.
@@ -1023,6 +1022,16 @@ gc_ms2_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
     Parrot_gc_str_reallocate_buffer_storage(interp, &self->string_gc, str, size);
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
+
+/*
+
+=item C<static void gc_ms2_mark_string_header(PARROT_INTERP, STRING *str)>
+
+Mark String
+
+=cut
+
+*/
 
 static void
 gc_ms2_mark_string_header(PARROT_INTERP, ARGIN(STRING *str))
@@ -1121,6 +1130,17 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
     gc_ms2_iterate_string_list(interp, self->strings[1], callback, data);
     gc_ms2_iterate_string_list(interp, self->strings[2], callback, data);
 }
+
+/*
+
+=item C<static void gc_ms2_iterate_string_list(PARROT_INTERP, Linked_List *list,
+string_iterator_callback callback, void *data)>
+
+Iterate over string list
+
+=cut
+
+*/
 
 static void
 gc_ms2_iterate_string_list(PARROT_INTERP,
@@ -1247,6 +1267,17 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_compact_memory_pool(interp);
 }
+
+/*
+
+=item C<static void gc_ms2_propagate_to_older_generation(PARROT_INTERP, size_t
+current_gen, Linked_List *from, Linked_List *to)>
+
+Move to Older Generation
+
+=cut
+
+*/
 
 static void
 gc_ms2_propagate_to_older_generation(PARROT_INTERP,
