@@ -1153,6 +1153,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* Cleanup old list */
     list->first = list->last = NULL;
     list->count = 0;
+    self->root_objects = list;
 
     interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect            = 0;
