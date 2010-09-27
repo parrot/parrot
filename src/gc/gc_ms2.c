@@ -1026,8 +1026,6 @@ gc_ms2_mark_string_header(PARROT_INTERP, ARGIN(STRING *str))
     /* mark it live */
     PObj_live_SET(str);
 
-    PARROT_ASSERT(Parrot_list_contains(interp, self->strings[gen], Obj2LLH(str)));
-
     /* Move to young generation */
     if (gen) {
         LIST_REMOVE(self->strings[gen], item);
