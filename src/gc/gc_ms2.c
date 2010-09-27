@@ -685,7 +685,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         /* Collect every 256M allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = 256 * 1024 * 1024;
+        self->gc_threshold = 1 * 1024 * 1024;
     }
     interp->gc_sys->gc_private = self;
 
