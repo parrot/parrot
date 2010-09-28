@@ -200,7 +200,7 @@ pcf_i_tp(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1));
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 }
 static void
@@ -304,7 +304,7 @@ STRING *final_destination;
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 }
 static void
@@ -353,7 +353,7 @@ STRING *final_destination;
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_v_p(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -399,7 +399,7 @@ pcf_v_pit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_v_ptt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -423,8 +423,8 @@ pcf_v_ptt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
      (*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
     
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_v_Jtiiipt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -451,12 +451,12 @@ pcf_v_Jtiiipt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
      (*fn_pointer)(interp, t_1, t_2, t_3, t_4, PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), t_6);
     
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 
 
 
-if (t_6) Parrot_str_free_cstring(t_6);
+if (!STRING_IS_NULL(ts_6)) Parrot_str_free_cstring(t_6);
 }
 static void
 pcf_p_JttPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -486,8 +486,8 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 
 }
@@ -513,7 +513,7 @@ pcf_P_Jtpi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2), t_3);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 
 }
@@ -591,7 +591,7 @@ pcf_v_pt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
      (*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
     
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_v_Jpt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -615,7 +615,7 @@ pcf_v_Jpt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_v_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -1375,7 +1375,7 @@ pcf_i_ptii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 
 }
@@ -1431,8 +1431,8 @@ STRING *final_destination;
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 }
 static void
@@ -1459,7 +1459,7 @@ STRING *final_destination;
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -1488,9 +1488,9 @@ STRING *final_destination;
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
-if (t_3) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
 
 }
 static void
@@ -1648,8 +1648,8 @@ STRING *final_destination;
     return_data =  (char *)(*fn_pointer)(t_0, t_1);
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
-if (t_1) Parrot_str_free_cstring(t_1);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_I_JOt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -1673,7 +1673,7 @@ pcf_I_JOt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_v_JOSI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2033,8 +2033,8 @@ pcf_l_lttl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (long)(*fn_pointer)(t_0, t_1, t_2, t_3);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 }
 static void
@@ -2229,11 +2229,11 @@ pcf_i_pttttt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
-if (t_3) Parrot_str_free_cstring(t_3);
-if (t_4) Parrot_str_free_cstring(t_4);
-if (t_5) Parrot_str_free_cstring(t_5);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_4)) Parrot_str_free_cstring(t_4);
+if (!STRING_IS_NULL(ts_5)) Parrot_str_free_cstring(t_5);
 }
 static void
 pcf_c_pttt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2258,9 +2258,9 @@ pcf_c_pttt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (char)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
-if (t_3) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
 }
 static void
 pcf_p_pttttiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2294,12 +2294,12 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
-if (t_3) Parrot_str_free_cstring(t_3);
-if (t_4) Parrot_str_free_cstring(t_4);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_4)) Parrot_str_free_cstring(t_4);
 
-if (t_6) Parrot_str_free_cstring(t_6);
+if (!STRING_IS_NULL(ts_6)) Parrot_str_free_cstring(t_6);
 
 }
 static void
@@ -2323,7 +2323,7 @@ pcf_i_pt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_i_ptl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2347,7 +2347,7 @@ pcf_i_ptl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -2441,7 +2441,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_p_ptt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2470,8 +2470,8 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_i_pit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2496,7 +2496,7 @@ pcf_i_pit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_p_pp(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2547,8 +2547,8 @@ pcf_l_ttl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (long)(*fn_pointer)(t_0, t_1, t_2);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
-    if (t_0) Parrot_str_free_cstring(t_0);
-if (t_1) Parrot_str_free_cstring(t_1);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -2574,8 +2574,8 @@ pcf_l_pttl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (long)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 }
 static void
@@ -2597,7 +2597,7 @@ pcf_v_t(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(t_0);
     
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 }
 static void
 pcf_p_pttttitl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -2631,12 +2631,12 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
-if (t_3) Parrot_str_free_cstring(t_3);
-if (t_4) Parrot_str_free_cstring(t_4);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_4)) Parrot_str_free_cstring(t_4);
 
-if (t_6) Parrot_str_free_cstring(t_6);
+if (!STRING_IS_NULL(ts_6)) Parrot_str_free_cstring(t_6);
 
 }
 static void
@@ -2667,9 +2667,9 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 VTABLE_set_integer_native(interp, t_3, i_3);
 
 }
@@ -2701,7 +2701,7 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 
 VTABLE_set_integer_native(interp, t_3, i_3);
@@ -2735,7 +2735,7 @@ pcf_i_pPtiiipi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 
 
@@ -2766,7 +2766,7 @@ pcf_i_tpiibi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2, t_3, Buffer_bufstart(t_4), t_5);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 
 
@@ -2805,7 +2805,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 
 
@@ -2880,8 +2880,8 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 
 }
@@ -2916,7 +2916,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 
 
@@ -3062,7 +3062,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -3118,7 +3118,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 
 }
@@ -3147,7 +3147,7 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 }
 static void
@@ -3177,7 +3177,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -3203,7 +3203,7 @@ pcf_i_pt33(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, &i_2, &i_3);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 VTABLE_set_integer_native(interp, t_2, i_2);
 VTABLE_set_integer_native(interp, t_3, i_3);
 }
@@ -3650,7 +3650,7 @@ pcf_i_iit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_i_iiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -3676,7 +3676,7 @@ pcf_i_iiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 }
 static void
@@ -3728,7 +3728,7 @@ pcf_i_iti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(t_0, t_1, t_2);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -4261,7 +4261,7 @@ pcf_i_piit(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     
 
 
-if (t_3) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
 }
 static void
 pcf_i_piiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -4289,7 +4289,7 @@ pcf_i_piiti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     
 
 
-if (t_3) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
 
 }
 static void
@@ -4621,7 +4621,7 @@ pcf_i_pti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 }
 static void
@@ -4648,7 +4648,7 @@ pcf_i_pitl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 }
 static void
@@ -4818,7 +4818,7 @@ pcf_i_t(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 }
 static void
 pcf_i_ti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -4840,7 +4840,7 @@ pcf_i_ti(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, t_1);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 }
 static void
@@ -5106,7 +5106,7 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 }
 static void
 pcf_p_b(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -5159,7 +5159,7 @@ PMC * final_destination = PMCNULL;
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_p_i(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -5411,7 +5411,7 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 }
 static void
 pcf_p_tpp(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -5439,7 +5439,7 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 
 }
@@ -5473,13 +5473,13 @@ PMC * final_destination = PMCNULL;
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
-if (t_1) Parrot_str_free_cstring(t_1);
-if (t_2) Parrot_str_free_cstring(t_2);
-if (t_3) Parrot_str_free_cstring(t_3);
-if (t_4) Parrot_str_free_cstring(t_4);
-if (t_5) Parrot_str_free_cstring(t_5);
-if (t_6) Parrot_str_free_cstring(t_6);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_3)) Parrot_str_free_cstring(t_3);
+if (!STRING_IS_NULL(ts_4)) Parrot_str_free_cstring(t_4);
+if (!STRING_IS_NULL(ts_5)) Parrot_str_free_cstring(t_5);
+if (!STRING_IS_NULL(ts_6)) Parrot_str_free_cstring(t_6);
 }
 static void
 pcf_s_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -5642,7 +5642,7 @@ STRING *final_destination;
     return_data =  (char *)(*fn_pointer)(t_0);
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 }
 static void
 pcf_t_tl4(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -5667,7 +5667,7 @@ STRING *final_destination;
     return_data =  (char *)(*fn_pointer)(t_0, t_1, &i_2);
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 
 VTABLE_set_integer_native(interp, t_2, i_2);
 }
@@ -5693,7 +5693,7 @@ STRING *final_destination;
     return_data =  (char *)(*fn_pointer)(t_0, &i_1);
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 VTABLE_set_integer_native(interp, t_1, i_1);
 }
 static void
@@ -5857,7 +5857,7 @@ STRING *final_destination;
     return_data =  (char *)(*fn_pointer)(&t_0);
     final_destination = Parrot_str_new(interp, return_data, 0);
            ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", final_destination);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 }
 static void
 pcf_v_P(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -6069,7 +6069,7 @@ pcf_i_JOt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_i_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -6091,7 +6091,7 @@ pcf_i_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(interp, t_1);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
 pcf_i_Ji(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -6392,7 +6392,7 @@ pcf_i_ppt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
 pcf_i_pppi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -6613,7 +6613,7 @@ pcf_i_tV(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(t_0, &v_1);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
-    if (t_0) Parrot_str_free_cstring(t_0);
+    if (!STRING_IS_NULL(ts_0)) Parrot_str_free_cstring(t_0);
 VTABLE_set_pointer(interp, t_1, v_1);
 }
 static void
@@ -6640,7 +6640,7 @@ pcf_i_ptiVp(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     return_data =  (int)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, &v_3, PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4));
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 
 VTABLE_set_pointer(interp, t_3, v_3);
 
@@ -6695,7 +6695,7 @@ pcf_i_pitii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 
 
 }

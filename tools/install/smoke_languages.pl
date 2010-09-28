@@ -323,6 +323,8 @@ unlink($filename);
 
 SKIP:
 {
+delete $ENV{LUA_INIT};
+delete $ENV{LUA_PATH};
 $exe = quote(catfile($pwd, $bindir, 'parrot-lua'));
 skip("Lua", 1) unless (-d "$pwd/$langdir/lua" || -e $exe);
 chdir("$pwd/$langdir/lua");

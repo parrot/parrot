@@ -24,7 +24,7 @@ file, or invoke the compiler without a command line argument, in which case our
 compiler enters the interactive mode. Consider the first case, passing the file
 test.sq, just as we did before:
 
- $ ./installable_squeak test.sq
+ $ ./installable_squaak test.sq
 
 When invoking our compiler like this, the file test.sq is compiled and the
 generated code (bytecode) is executed immediately by Parrot. How does this work,
@@ -50,7 +50,7 @@ four default compilation phases of an HLLCompiler object:
 This is an example of using the target option set to "parse", which will print
 the parse tree of the input to stdout:
 
- $ ./installable_squeak --target=parse test.sq
+ $ ./installable_squaak --target=parse test.sq
 
 In interactive mode, giving this input:
 
@@ -235,9 +235,8 @@ whatnot, don't hesitate to leave a comment.
 
 =over 4
 
-=item 1. PIR language specification: docs/pdds/draft/PDD19_pir.pod
+=item 1. PIR language specification: docs/pdds/pdd19_pir.pod
 
 =back
 
 =cut
-

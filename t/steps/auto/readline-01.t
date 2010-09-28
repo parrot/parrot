@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  9;
+use Test::More tests => 15;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -23,19 +23,40 @@ use IO::CaptureOutput qw | capture |;
 
 my ($args, $step_list_ref) = process_options(
     {
-        argv => [ ],
+        argv => [ '--without-readline' ],
         mode => q{configure},
     }
 );
 
 my $conf = Parrot::Configure::Step::Test->new;
 $conf->include_config_results( $args );
+my $serialized = $conf->pcfreeze();
 
 my $pkg = q{auto::readline};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+
+my $ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value" );
+is($step->result(), q{not requested},
+    "Got expected result for 'without-readline'");
+is($conf->data->get('HAS_READLINE'), 0,
+    "Got expected value for HAS_READLINE");
+
+$conf->replenish($serialized);
+
+($args, $step_list_ref) = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
+
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
 
 # Mock values for OS and C-compiler
 my ($osname, $cc);

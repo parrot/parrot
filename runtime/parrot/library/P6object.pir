@@ -260,6 +260,9 @@ Deprecated; use add_parent(class, parentclass)
     .local pmc methodpmc
     methodname = shift methoditer
     methodpmc = methods[methodname]
+    # don't add NativePCCMethods
+    $I0 = isa methodpmc, 'NativePCCMethod'
+    if $I0 goto method_loop
     # don't add NCI methods (they don't work)
     $I0 = isa methodpmc, 'NCI'
     if $I0 goto method_loop

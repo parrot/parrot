@@ -36,6 +36,14 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $without_opt = $conf->options->get('without-readline');
+
+    if ($without_opt) {
+        $conf->data->set('HAS_READLINE' => 0);
+        $self->set_result('not requested');
+        return 1;
+    }
+
     my $cc     = $conf->data->get('cc');
     my $osname = $conf->data->get('osname');
 

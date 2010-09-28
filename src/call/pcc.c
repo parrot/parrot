@@ -270,8 +270,7 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 
 =item C<INTVAL Parrot_pcc_do_run_ops(PARROT_INTERP, PMC *sub_obj)>
 
-Check if current object require running ops. Used in tailcall for updating
-RetContinuation.
+Check if current object require running ops.
 
 =cut
 

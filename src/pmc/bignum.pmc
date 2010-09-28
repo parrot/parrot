@@ -148,6 +148,15 @@ value)>
 =item C<static void bignum_set_default_prec(PARROT_INTERP, PMC *self, INTVAL
 prec)>
 
+All the above functions are local to the bignum pmc and are there to provide
+interface functions to The GNU MP Bignum Library (GMP)
+
+If GMP is not available, at present these functions will throw a NYI exception.
+
+(It would be appreciated if maintainers/implementors could improve the
+ documentation here at some stage. possibly adding documentation for
+ individual functions - at least the less obvious ones.)
+
 =cut
 
 */

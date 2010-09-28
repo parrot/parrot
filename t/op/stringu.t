@@ -327,8 +327,8 @@ OUTPUT
     .local string s, t
     .local int i
     s = iso-8859-1:"T\xf6tsch"
-    i = find_charset "unicode"
-    s = trans_charset s, i
+    i = find_encoding "utf8"
+    s = trans_encoding s, i
     t = upcase s
     escape t, t
     print t

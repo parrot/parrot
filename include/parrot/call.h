@@ -303,11 +303,12 @@ void Parrot_pcc_split_signature_string(
 } while (0)
 
 #define ADD_OP_VAR_PART(interp, seg, pc, n) do { \
-    if (OPCODE_IS((interp), (seg), *(pc), PARROT_OP_set_args_pc)       \
-    ||  OPCODE_IS((interp), (seg), *(pc), PARROT_OP_get_results_pc)    \
-    ||  OPCODE_IS((interp), (seg), *(pc), PARROT_OP_get_params_pc)     \
-    ||  OPCODE_IS((interp), (seg), *(pc), PARROT_OP_set_returns_pc)) { \
-        PMC * const sig = (seg)->const_table->constants[(pc)[1]].u.key; \
+    op_lib_t *_core_ops = PARROT_GET_CORE_OPLIB(interp); \
+    if (OPCODE_IS((interp), (seg), *(pc), _core_ops, PARROT_OP_set_args_pc)       \
+    ||  OPCODE_IS((interp), (seg), *(pc), _core_ops, PARROT_OP_get_results_pc)    \
+    ||  OPCODE_IS((interp), (seg), *(pc), _core_ops, PARROT_OP_get_params_pc)     \
+    ||  OPCODE_IS((interp), (seg), *(pc), _core_ops, PARROT_OP_set_returns_pc)) { \
+        PMC * const sig = (seg)->const_table->pmc.constants[(pc)[1]]; \
         (n) += VTABLE_elements((interp), sig); \
     } \
 } while (0)
@@ -334,45 +335,54 @@ void Parrot_clear_s(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP,
-    ARGIN(PMC *ctx),
+    ARGIN(const PMC *ctx),
     UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP,
-    ARGIN(PMC *ctx),
+    ARGIN(const PMC *ctx),
     UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, ARGIN(PMC *ctx))
+Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 Regs_ps* Parrot_pcc_get_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type)
+PARROT_PURE_FUNCTION
+UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP,
+    ARGIN(const PMC *ctx),
+    int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 STRING ** Parrot_pcc_get_STRING_reg(PARROT_INTERP,
     ARGIN(PMC *ctx),
@@ -381,8 +391,9 @@ STRING ** Parrot_pcc_get_STRING_reg(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

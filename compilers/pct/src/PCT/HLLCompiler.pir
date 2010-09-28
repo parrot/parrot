@@ -26,10 +26,9 @@ running compilers from a command line.
 
 .include 'cclass.pasm'
 .include 'stdio.pasm'
+.include 'iglobals.pasm'
 
 .sub 'init' :vtable :method
-    load_bytecode 'config.pir'
-
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
@@ -56,7 +55,8 @@ running compilers from a command line.
 
     $S0  = '???'
     push_eh _handler
-    $P0  = _config()
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
     $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
   _handler:
     pop_eh
@@ -954,6 +954,70 @@ based on double-colon separators.
     $P0 = split '::', name
     .return ($P0)
 .end
+
+=item lineof(target, pos [, cache :named('cache')])
+
+Return the line number of offset C<pos> within C<target>.  The return
+value uses zero for the first line.  If C<cache> is true, then
+memoize the line offsets as a C<!lineof> property on C<target>.
+
+=cut
+
+.sub 'lineof' :method
+    .param pmc target
+    .param int pos
+    .param int cache           :optional :named('cache')
+    .local pmc linepos
+
+    # If we've previously cached C<linepos> for target, we use it.
+    unless cache goto linepos_build
+    linepos = getprop '!linepos', target
+    unless null linepos goto linepos_done
+
+    # calculate a new linepos array.
+  linepos_build:
+    linepos = new ['ResizableIntegerArray']
+    unless cache goto linepos_build_1
+    setprop target, '!linepos', linepos
+  linepos_build_1:
+    .local string s
+    .local int jpos, eos
+    s = target
+    eos = length s
+    jpos = 0
+    # Search for all of the newline markers in C<target>.  When we
+    # find one, mark the ending offset of the line in C<linepos>.
+  linepos_loop:
+    jpos = find_cclass .CCLASS_NEWLINE, s, jpos, eos
+    unless jpos < eos goto linepos_done
+    $I0 = ord s, jpos
+    inc jpos
+    push linepos, jpos
+    # Treat \r\n as a single logical newline.
+    if $I0 != 13 goto linepos_loop
+    $I0 = ord s, jpos
+    if $I0 != 10 goto linepos_loop
+    inc jpos
+    goto linepos_loop
+  linepos_done:
+
+    # We have C<linepos>, so now we search the array for the largest
+    # element that is not greater than C<pos>.  The index of that
+    # element is the line number to be returned.
+    # (Potential optimization: use a binary search.)
+    .local int line, count
+    count = elements linepos
+    line = 0
+  line_loop:
+    if line >= count goto line_done
+    $I0 = linepos[line]
+    if $I0 > pos goto line_done
+    inc line
+    goto line_loop
+  line_done:
+    .return (line)
+.end
+
 
 =item dumper(obj, name, options)
 

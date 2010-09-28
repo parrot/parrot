@@ -166,6 +166,46 @@ Initializes the exception with supplied values.
 
 /*
 
+=item C<PMC *clone()>
+
+Create a copy of the Exception.
+
+Copy only the user supplied values, not the throwing and handling
+information.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        INTVAL   id;
+        STRING   *message;
+        PMC      *payload;
+        INTVAL   severity;
+        INTVAL   type;
+        INTVAL   exit_code;
+        GET_ATTR_id(INTERP, SELF, id);
+        SET_ATTR_id(INTERP, dest, id);
+        GET_ATTR_message(INTERP, SELF, message);
+        SET_ATTR_message(INTERP, dest, message);
+        GET_ATTR_severity(INTERP, SELF, severity);
+        SET_ATTR_severity(INTERP, dest, severity);
+        GET_ATTR_type(INTERP, SELF, type);
+        SET_ATTR_type(INTERP, dest, type);
+        GET_ATTR_exit_code(INTERP, SELF, exit_code);
+        SET_ATTR_exit_code(INTERP, dest, exit_code);
+
+        GET_ATTR_payload(INTERP, SELF, payload);
+        if (!PMC_IS_NULL(payload)) {
+            payload = VTABLE_clone(INTERP, payload);
+            SET_ATTR_payload(INTERP, dest, payload);
+        }
+        return dest;
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any active exception data as live.
@@ -261,42 +301,6 @@ C<key> is "message".
 
 /*
 
-=item C<INTVAL get_integer_keyed(PMC *key)>
-
-Returns the integer value for C<*key>.
-
-=cut
-
-*/
-
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
-        STRING * const name = VTABLE_get_string(INTERP, key);
-        INTVAL  result = 0;
-
-        switch (getAttrEnum(INTERP, name)) {
-          case attr_type:
-            GET_ATTR_type(INTERP, SELF, result);
-            break;
-          case attr_severity:
-            GET_ATTR_severity(INTERP, SELF, result);
-            break;
-          case attr_exit_code:
-            GET_ATTR_exit_code(INTERP, SELF, result);
-            break;
-          case attr_handled:
-            GET_ATTR_handled(INTERP, SELF, result);
-            break;
-          default:
-            /* If unknown attribute name, throw an exception. */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
-                "No such integer attribute '%S'", name);
-        }
-
-        return result;
-    }
-
-/*
-
 =item C<INTVAL get_integer_keyed_str(STRING *key)>
 
 Returns the integer value for C<*key>.
@@ -327,6 +331,21 @@ Returns the integer value for C<*key>.
         }
 
         return result;
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        return SELF.get_integer_keyed_str(name);
     }
 
 /*
@@ -414,38 +433,6 @@ Sets the Parrot string value for C<*key>.
 
 /*
 
-=item C<void set_integer_keyed(PMC *key, INTVAL value)>
-
-Sets the integer value for C<*key>.
-
-=cut
-
-*/
-
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        STRING * const name = VTABLE_get_string(INTERP, key);
-        switch (getAttrEnum(INTERP, name)) {
-          case attr_type:
-            SET_ATTR_type(INTERP, SELF, value);
-            break;
-          case attr_severity:
-            SET_ATTR_severity(INTERP, SELF, value);
-            break;
-          case attr_exit_code:
-            SET_ATTR_exit_code(INTERP, SELF, value);
-            break;
-          case attr_handled:
-            SET_ATTR_handled(INTERP, SELF, value);
-            break;
-          default:
-            /* If unknown attribute name, throw an exception. */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
-                "No such integer attribute '%S'", name);
-        }
-    }
-
-/*
-
 =item C<void set_integer_keyed_str(STRING *key, INTVAL value) >
 
 Sets the integer value for C<*key>.
@@ -473,6 +460,21 @@ Sets the integer value for C<*key>.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such integer attribute '%S'", key);
         }
+    }
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Sets the integer value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+        STRING * const name = VTABLE_get_string(INTERP, key);
+        SELF.set_integer_keyed_str(name, value);
     }
 
 /*
@@ -588,6 +590,7 @@ Retrieve an attribute value for the exception object.
             GET_ATTR_exit_code(INTERP, SELF, exit_code);
             value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, exit_code);
             }
+            break;
           case attr_handled:
             {
             INTVAL handled;
@@ -784,6 +787,7 @@ sub, or for the point of the call a level deeper for the rest.
 */
 
     METHOD backtrace() {
+        STRING * const meth_backtrace = CONST_STRING(INTERP, "backtrace");
         PMC *result = PMCNULL;
         PMC *resume;
 
@@ -792,7 +796,8 @@ sub, or for the point of the call a level deeper for the rest.
         if (!PMC_IS_NULL(resume)) {
             /* We have a resume continuation, so we can get the address from that. */
             const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, CONST_STRING(INTERP, "backtrace"), "P->P", resume, &result);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, meth_backtrace,
+                    "P->P", resume, &result);
         }
         else {
             /* Hopefully we have a thrower set - our most epic fail fallback is
@@ -801,7 +806,8 @@ sub, or for the point of the call a level deeper for the rest.
             GET_ATTR_thrower(INTERP, SELF, cur_ctx);
             if (PMC_IS_NULL(cur_ctx))
                 cur_ctx = CURRENT_CONTEXT(INTERP);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, cur_ctx, CONST_STRING(INTERP, "backtrace"), "->P", &result);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, cur_ctx, meth_backtrace,
+                    "->P", &result);
         }
 
         RETURN(PMC *result);

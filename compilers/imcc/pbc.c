@@ -9,6 +9,8 @@
 #include "parrot/pmc_freeze.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
+#include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: compilers/imcc/pbc.h */
 
@@ -56,14 +58,6 @@ static void add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
-static int add_const_key(PARROT_INTERP,
-    ARGIN(const opcode_t *key),
-    int size,
-    ARGIN(const char *s_key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
-
 PARROT_WARN_UNUSED_RESULT
 static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
         __attribute__nonnull__(1);
@@ -80,13 +74,6 @@ add_const_pmc_sub(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_str(PARROT_INTERP, ARGIN(STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static int add_const_table(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static int add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -212,10 +199,6 @@ static void verify_signature(PARROT_INTERP,
 #define ASSERT_ARGS_add_1_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(r))
-#define ASSERT_ARGS_add_const_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key) \
-    , PARROT_ASSERT_ARG(s_key))
 #define ASSERT_ARGS_add_const_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_add_const_pmc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -224,11 +207,6 @@ static void verify_signature(PARROT_INTERP,
 #define ASSERT_ARGS_add_const_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_add_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_add_const_table_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_add_const_table_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -337,46 +315,6 @@ imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 
 /*
 
-=item C<static int add_const_table(PARROT_INTERP)>
-
-Adds an empty item to constant table, returning its position.
-
-=cut
-
-*/
-
-static int
-add_const_table(PARROT_INTERP)
-{
-    ASSERT_ARGS(add_const_table)
-    const size_t oldcount = interp->code->const_table->const_count;
-    const size_t newcount = oldcount + 1;
-
-    /* Update the constant count and reallocate */
-    if (interp->code->const_table->constants) {
-        interp->code->const_table->constants =
-            mem_gc_realloc_n_typed_zeroed(interp, interp->code->const_table->constants,
-                newcount, oldcount, PackFile_Constant);
-    }
-    else {
-        /* initialize rlookup cache */
-        interp->code->const_table->string_hash =
-            Parrot_pmc_new_init_int(interp, enum_class_Hash, enum_type_INTVAL);
-        ((Hash *)VTABLE_get_pointer(interp, interp->code->const_table->string_hash))->compare =
-            (hash_comp_fn)STRING_compare_distinct_cs_enc;
-
-        interp->code->const_table->constants =
-            mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant);
-    }
-
-    interp->code->const_table->const_count         = newcount;
-
-    return oldcount;
-}
-
-
-/*
-
 =item C<static int add_const_table_pmc(PARROT_INTERP, PMC *pmc)>
 
 Adds a PMC to the const table, returning its position.
@@ -389,37 +327,20 @@ static int
 add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(add_const_table_pmc)
-    const int newitem = add_const_table(interp);
-    PackFile_Constant * const constant = &interp->code->const_table->constants[newitem];
+    PackFile_ConstTable *ct = interp->code->const_table;
 
-    constant->type  = PFC_PMC;
-    constant->u.key = pmc;
+    if (!ct->pmc.constants)
+        ct->pmc.constants =
+            mem_gc_allocate_n_zeroed_typed(interp, 1, PMC *);
+    else
+        ct->pmc.constants =
+            mem_gc_realloc_n_typed_zeroed(interp, ct->pmc.constants,
+                ct->pmc.const_count + 1, ct->pmc.const_count, PMC *);
 
-    return newitem;
-}
 
+    ct->pmc.constants[ct->pmc.const_count++] = pmc;
 
-/*
-
-=item C<static int add_const_table_key(PARROT_INTERP, PMC *key)>
-
-Adds a key to the const table, returning its position.
-
-=cut
-
-*/
-
-static int
-add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
-{
-    ASSERT_ARGS(add_const_table_key)
-    const int newitem = add_const_table(interp);
-    PackFile_Constant * const constant = &interp->code->const_table->constants[newitem];
-
-    constant->type  = PFC_KEY;
-    constant->u.key = key;
-
-    return newitem;
+    return ct->pmc.const_count - 1;
 }
 
 
@@ -642,6 +563,7 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
     ASSERT_ARGS(get_code_size)
     Instruction *ins = unit->instructions;
     size_t       code_size;
+    op_lib_t    *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     /* run through instructions:
      * - sanity check
@@ -664,12 +586,12 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
         }
         else if (ins->opname && *ins->opname) {
             (*src_lines)++;
-            if (ins->opnum < 0)
+            if (!ins->op)
                 IMCC_fatal(interp, 1, "get_code_size: "
                         "no opnum ins#%d %d\n",
                         ins->index, ins);
 
-            if (ins->opnum == PARROT_OP_set_p_pc) {
+            if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
                 /* set_p_pc opcode */
                 IMCC_debug(interp, DEBUG_PBC_FIXUP, "PMC constant %s\n",
                         ins->symregs[1]->name);
@@ -702,13 +624,12 @@ none exists.
 
 static
 opcode_t
-bytecode_map_op(PARROT_INTERP, opcode_t op) {
-    int i;
-    op_info_t         *info    = &interp->op_info_table[op];
+bytecode_map_op(PARROT_INTERP, op_info_t *info) {
     op_lib_t          *lib     = info->lib;
-    op_func_t         op_func  = interp->op_func_table[op];
+    op_func_t         op_func  = OP_INFO_OPFUNC(info);
     PackFile_ByteCode *bc      = interp->code;
     PackFile_ByteCode_OpMappingEntry *om;
+    opcode_t i;
 
     for (i = 0; i < bc->op_mapping.n_libs; i++) {
         if (lib == bc->op_mapping.libs[i].lib) {
@@ -739,11 +660,11 @@ bytecode_map_op(PARROT_INTERP, opcode_t op) {
     /* op not yet mapped */
     bc->op_count++;
     bc->op_func_table =
-        mem_gc_realloc_n_typed_zeroed(interp, bc->op_func_table, bc->op_count, bc->op_count,
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_func_table, bc->op_count, bc->op_count - 1,
                                         op_func_t);
     bc->op_func_table[bc->op_count - 1] = op_func;
     bc->op_info_table =
-        mem_gc_realloc_n_typed_zeroed(interp, bc->op_info_table, bc->op_count, bc->op_count,
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_info_table, bc->op_count, bc->op_count - 1,
                                         op_info_t *);
     bc->op_info_table[bc->op_count - 1] = info;
 
@@ -857,6 +778,7 @@ fixup_globals(PARROT_INTERP)
     ASSERT_ARGS(fixup_globals)
     subs_t *s;
     int     jumppc = 0;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         const SymHash * const hsh = &s->fixup;
@@ -912,7 +834,7 @@ fixup_globals(PARROT_INTERP)
                     SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
-                    const int op = interp->op_lib->op_code(interp, "find_sub_not_null_p_sc", 1);
+                    op_info_t *op = &core_ops->op_info_table[PARROT_OP_find_sub_not_null_p_sc];
                     PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = bytecode_map_op(interp, op);
@@ -973,9 +895,8 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
          * get first part as charset, rest as string
          */
         STRING     *s;
-        const CHARSET *s_charset;
-        const ENCODING *s_encoding = NULL;
-        const ENCODING *src_encoding;
+        const STR_VTABLE *s_encoding;
+        const STR_VTABLE *src_encoding;
         #define MAX_NAME 31
         char charset_name[MAX_NAME + 1];
         char encoding_name[MAX_NAME + 1];
@@ -983,38 +904,38 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         char * p2 = strchr(r->name, ':');
         PARROT_ASSERT(p && p[-1] == ':');
         if (p2 < p -1) {
+            /* Handle the old 'encoding:charset' format by trying
+             * encoding as well as charset */
             strncpy(encoding_name, buf, p2 - buf);
             encoding_name[p2-buf] = '\0';
             strncpy(charset_name, p2 +1, p - p2 - 2);
             charset_name[p- p2 - 2] = '\0';
             /*fprintf(stderr, "%s:%s\n", charset_name, encoding_name);*/
-            s_charset = Parrot_find_charset(interp, charset_name);
-            if (s_charset == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "Unknown charset '%s'", charset_name);
+            s_encoding = Parrot_find_encoding(interp, encoding_name);
+            if (s_encoding == NULL) {
+                s_encoding = Parrot_find_encoding(interp, charset_name);
+                if (s_encoding == NULL)
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_STRING_REPRESENTATION,
+                            "Unknown encoding '%s:%s'",
+                            encoding_name, charset_name);
+            }
+        }
+        else {
+            strncpy(encoding_name, buf, p - buf - 1);
+            encoding_name[p - buf - 1] = '\0';
+            charset_name[0] = '\0';
+            /*fprintf(stderr, "%s\n", encoding_name);*/
             s_encoding = Parrot_find_encoding(interp, encoding_name);
             if (s_encoding == NULL)
                 Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_STRING_REPRESENTATION,
                         "Unknown encoding '%s'", encoding_name);
         }
-        else {
-            strncpy(charset_name, buf, p - buf - 1);
-            charset_name[p - buf - 1] = '\0';
-            /*fprintf(stderr, "%s\n", charset_name);*/
-            s_charset = Parrot_find_charset(interp, charset_name);
-            if (s_charset == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "Unknown charset '%s'", charset_name);
-        }
-        if (strcmp(charset_name, "unicode") == 0)
-            src_encoding = Parrot_utf8_encoding_ptr;
+        if (s_encoding->max_bytes_per_codepoint == 1)
+            src_encoding = Parrot_ascii_encoding_ptr;
         else
-            src_encoding = Parrot_fixed_8_encoding_ptr;
-        if (s_encoding == NULL)
-            s_encoding = src_encoding;
+            src_encoding = Parrot_utf8_encoding_ptr;
 
         /* past delim */
         buf     = p + 1;
@@ -1032,10 +953,10 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
             }
             {
                 STRING * aux = Parrot_str_new_init(interp, buf, p - buf,
-                        src_encoding, s_charset, 0);
+                        src_encoding, 0);
                 s = Parrot_str_unescape_string(interp, aux,
-                        s_charset, s_encoding, PObj_constant_FLAG);
-                if (!CHARSET_VALIDATE(interp, s))
+                        s_encoding, PObj_constant_FLAG);
+                if (!STRING_validate(interp, s))
                        Parrot_ex_throw_from_c_args(interp, NULL,
                                EXCEPTION_INVALID_STRING_REPRESENTATION,
                                "Malformed string");
@@ -1049,12 +970,13 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     }
     else if (*buf == '\'') {   /* TODO handle python raw strings */
         buf++;
-        return string_make(interp, buf, strlen(buf) - 1, "ascii",
-                PObj_constant_FLAG);
+        return Parrot_str_new_init(interp, buf, strlen(buf) - 1,
+                Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
 
     /* unquoted bare name - ASCII only don't unescape it */
-    return string_make(interp, buf, strlen(buf), "ascii", PObj_constant_FLAG);
+    return Parrot_str_new_init(interp, buf, strlen(buf),
+            Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
 }
 
 /*
@@ -1102,7 +1024,8 @@ IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(char *buf))
     }
     else if (*buf == '\'') {
         buf++;
-        return string_make(interp, buf, strlen(buf) - 1, "ascii", PObj_constant_FLAG);
+        return Parrot_str_new_init(interp, buf, strlen(buf) - 1,
+                Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
     else {
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "Unknown STRING format: '%s'\n", buf);
@@ -1126,9 +1049,8 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(add_const_str)
 
-    PMC *s_pmc = key_new_string(interp, s);
-    PackFile_ConstTable *table = interp->code->const_table;
-    int i = PackFile_ConstTable_rlookup(interp, table, s_pmc, PFC_STRING);
+    PackFile_ConstTable *ct = interp->code->const_table;
+    int i = PackFile_ConstTable_rlookup_str(interp, ct, s);
 
     if (i >= 0)
         return i;
@@ -1136,14 +1058,27 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 
     /* otherwise... */
     {
-        int                k        = add_const_table(interp);
-        PackFile_Constant *constant = &table->constants[k];
-        constant->type              = PFC_STRING;
-        constant->u.string          = s;
+        if (!ct->str.constants)
+            ct->str.constants =
+                mem_gc_allocate_n_zeroed_typed(interp, 1, STRING *);
 
-        VTABLE_set_integer_keyed_str(interp, table->string_hash, s, k);
+        else
+            ct->str.constants =
+                mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
+                    ct->str.const_count + 1, ct->str.const_count, STRING *);
 
-        return k;
+        /* initialize rlookup cache */
+        if (!ct->string_hash)
+            ct->string_hash = parrot_create_hash(interp,
+                    enum_type_INTVAL,
+                    Hash_key_type_STRING_enc);
+
+        ct->str.constants[ct->str.const_count] = s;
+
+        parrot_hash_put(interp, ct->string_hash, s,
+            (void *)ct->str.const_count);
+
+        return ct->str.const_count++;
     }
 }
 
@@ -1163,15 +1098,20 @@ static int
 add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 {
     ASSERT_ARGS(add_const_num)
-    const int      k = add_const_table(interp);
-    STRING * const s = Parrot_str_new(interp, buf, 0);
+    PackFile_ConstTable *ct = interp->code->const_table;
+    STRING * const s        = Parrot_str_new(interp, buf, 0);
 
-    PackFile_Constant * const constant = &interp->code->const_table->constants[k];
+    if (!ct->num.constants)
+        ct->num.constants =
+            mem_gc_allocate_n_zeroed_typed(interp, 1, FLOATVAL);
+    else
+        ct->num.constants =
+            mem_gc_realloc_n_typed_zeroed(interp, ct->num.constants,
+                ct->num.const_count + 1, ct->num.const_count, FLOATVAL);
 
-    constant->type     = PFC_NUMBER;
-    constant->u.number = Parrot_str_to_num(interp, s);
+    ct->num.constants[ct->num.const_count] = Parrot_str_to_num(interp, s);
 
-    return k;
+    return ct->num.const_count++;
 }
 
 
@@ -1211,7 +1151,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         r = pcc_sub->multi[i];
 
         if (r->set == 'S') {
-            STRING * const type_name = ct->constants[r->color].u.string;
+            STRING * const type_name = ct->str.constants[r->color];
             const INTVAL type_num    = Parrot_pmc_get_type_str(interp, type_name);
 
             if (type_num == enum_type_undef) {
@@ -1224,7 +1164,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         }
         else {
             PARROT_ASSERT(r->set == 'K');
-            sig_pmc = ct->constants[r->color].u.key;
+            sig_pmc = ct->pmc.constants[r->color];
         }
 
         VTABLE_set_pmc_keyed_int(interp, multi_sig, i, sig_pmc);
@@ -1255,10 +1195,10 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
                int need_lex)
 {
     ASSERT_ARGS(create_lexinfo)
-    PMC               *lex_info    = NULL;
-    SymHash           *hsh         = &unit->hash;
-    PackFile_Constant *constants   = interp->code->const_table->constants;
-    const INTVAL       lex_info_id = Parrot_get_ctx_HLL_type(interp,
+    PMC                 *lex_info    = NULL;
+    SymHash             *hsh         = &unit->hash;
+    PackFile_ConstTable *ct          = interp->code->const_table;
+    const INTVAL         lex_info_id = Parrot_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
     unsigned int        i;
 
@@ -1283,7 +1223,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
                     Parrot_Sub_attributes *sub;
                     PARROT_ASSERT(k >= 0);
 
-                    lex_name = constants[k].u.string;
+                    lex_name = ct->str.constants[k];
                     PARROT_ASSERT(PObj_is_string_TEST(lex_name));
 
                     PMC_get_sub(interp, sub_pmc, sub);
@@ -1305,7 +1245,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
         }
     }
 
-    if (!lex_info && (unit->outer || need_lex)) {
+    if (!lex_info && need_lex) {
         lex_info = Parrot_pmc_new_noinit(interp, lex_info_id);
         VTABLE_init_pmc(interp, lex_info, sub_pmc);
     }
@@ -1410,9 +1350,9 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     int                  i;
     int                  ns_const = -1;
+    SymReg     * const ns = unit->_namespace ? unit->_namespace->reg : NULL;
 
     if (unit->_namespace) {
-        SymReg     * const ns = unit->_namespace->reg;
 
         /* strip namespace off from front */
         static const char ns_sep[]  = "@@@";
@@ -1478,7 +1418,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     Sub_comp_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
 
     r->color  = add_const_str(interp, IMCC_string_from_reg(interp, r));
-    sub->name = ct->constants[r->color].u.string;
+    sub->name = ct->str.constants[r->color];
 
     /* If the unit has no subid, set the subid to match the name. */
     if (!unit->subid)
@@ -1495,18 +1435,21 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             IMCC_string_from_reg(interp, unit->subid));
     }
 
-    sub->subid = ct->constants[unit->subid->color].u.string;
+    sub->subid = ct->str.constants[unit->subid->color];
     ns_pmc     = NULL;
 
-    if (ns_const >= 0 && ns_const < ct->const_count) {
-        switch (ct->constants[ns_const].type) {
-          case PFC_KEY:
-            ns_pmc = ct->constants[ns_const].u.key;
+    if (ns) {
+        switch (ns->set) {
+          case 'K':
+            if (ns_const >= 0 && ns_const < ct->pmc.const_count)
+                ns_pmc = ct->pmc.constants[ns_const];
             break;
-          case PFC_STRING:
-            ns_pmc = Parrot_pmc_new_constant(interp, enum_class_String);
-            VTABLE_set_string_native(interp, ns_pmc,
-                ct->constants[ns_const].u.string);
+          case 'S':
+            if (ns_const >= 0 && ns_const < ct->str.const_count) {
+                ns_pmc = Parrot_pmc_new_constant(interp, enum_class_String);
+                VTABLE_set_string_native(interp, ns_pmc,
+                    ct->str.constants[ns_const]);
+            }
             break;
           default:
             break;
@@ -1599,11 +1542,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     /* store the sub */
     {
-        const int                   k = add_const_table(interp);
-        PackFile_Constant * const pfc = &ct->constants[k];
-
-        pfc->type     = PFC_PMC;
-        pfc->u.key    = sub_pmc;
+        const int k = add_const_table_pmc(interp, sub_pmc);
         unit->sub_pmc = sub_pmc;
 
         IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
@@ -1623,64 +1562,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                                    : Parrot_str_new(interp, "*none*", 0));
         }
 
-        /*
-         * create entry in our fixup (=symbol) table
-         * the offset is the index in the constant table of this Sub
-         */
-        PackFile_FixupTable_new_entry(interp, r->name, enum_fixup_sub, k);
-
         return k;
     }
-}
-
-
-/*
-
-=item C<static int add_const_key(PARROT_INTERP, const opcode_t *key, int size,
-const char *s_key)>
-
-Adds a constant key to constant_table.
-
-=cut
-
-*/
-
-static int
-add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const char *s_key))
-{
-    ASSERT_ARGS(add_const_key)
-    const SymReg * const r =
-        _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, s_key);
-    const opcode_t      *rc;
-    PackFile_Constant   *pfc;
-    int                  k;
-
-    if (r)
-        return r->color;
-
-    pfc = mem_gc_allocate_typed(interp, PackFile_Constant);
-    rc  = PackFile_Constant_unpack_key(interp,
-            interp->code->const_table, pfc, key);
-
-    if (!rc) {
-        mem_sys_free(pfc);
-        IMCC_fatal(interp, 1,
-            "add_const_key: PackFile_Constant error\n");
-    }
-
-    k = add_const_table_key(interp, pfc->u.key);
-
-    store_key_const(interp, s_key, k);
-
-    IMCC_debug(interp, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
-               s_key, k, size);
-
-    IMCC_debug(interp, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
-               key[0], key[1], key[2], key[3], key[4]);
-
-    mem_sys_free(pfc);
-
-    return k;
 }
 
 
@@ -1702,30 +1585,23 @@ static opcode_t
 build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 {
     ASSERT_ARGS(build_key)
-#define MAX_KEY_LEN 10
-#define MAX_KEYNAME_LEN 20
-    SymReg   *reg = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
 
-    char      s_key[MAX_KEY_LEN * MAX_KEYNAME_LEN];
-    opcode_t  key[MAX_KEY_LEN * 2 + 1];
-    opcode_t  size;
-    int       key_length = 0;     /* P0["hi;there"; S0; 2] has length 3 */
-    int       k;
+    PackFile_ConstTable *ct = interp->code->const_table;
+    SymReg *reg  = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
+    PMC    *head = NULL;
+    PMC    *tail = NULL;
+    opcode_t regno, k;
 
-    /* 0 is length */
-    opcode_t *pc = key + 1;
-
-    /* stringified key */
-    char     *s  = s_key;
-
-    *s           = 0;
-
-    for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
+    for (; reg; reg = reg->nextkey) {
         SymReg *r = reg;
 
-        if (key_length >= MAX_KEY_LEN)
-            IMCC_fatal(interp, 1, "build_key:"
-                    "Key too long, increase MAX_KEY_LEN.\n");
+        if (tail) {
+            SETATTR_Key_next_key(interp, tail, Parrot_pmc_new_constant(interp, enum_class_Key));
+            GETATTR_Key_next_key(interp, tail, tail);
+        }
+        else {
+            head = tail = Parrot_pmc_new_constant(interp, enum_class_Key);
+        }
 
         switch (r->type) {
           case VTIDENTIFIER:       /* P[S0] */
@@ -1736,20 +1612,15 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             if (r->reg)
                 r = r->reg;
 
+            /* don't emit mapped regs in key parts */
+            regno = r->color >= 0 ? r->color : -1 - r->color;
+
             if (r->set == 'I')
-                *pc++ = PARROT_ARG_I;    /* register type */
+                key_set_register(interp, tail, regno, KEY_integer_FLAG);
             else if (r->set == 'S')
-                *pc++ = PARROT_ARG_S;
+                key_set_register(interp, tail, regno, KEY_string_FLAG);
             else
                 IMCC_fatal(interp, 1, "build_key: wrong register set\n");
-
-            /* don't emit mapped regs in key parts */
-            if (r->color < 0)
-                *pc++ = -1 - r->color;
-            else
-                *pc++ = r->color;
-
-            sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
 
             IMCC_debug(interp, DEBUG_PBC_CONST,
                     " keypart reg %s %c%d\n",
@@ -1763,30 +1634,15 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             switch (r->set) {
               case 'S':                       /* P["key"] */
                 /* str constant */
-                *pc++ = PARROT_ARG_SC;
-
-                /* constant idx */
-                *pc++ = r->color;
-
-                IMCC_debug(interp, DEBUG_PBC_CONST,
-                        " keypart SC %s #%d\n",
-                        r->name, r->color);
+                key_set_string(interp, tail, ct->str.constants[r->color]);
                 break;
               case 'I':                       /* P[;42;..] */
                 /* int constant */
-                *pc++ = PARROT_ARG_IC;
-
-                /* value */
-                *pc++ = r->color = atol(r->name);
-
-                IMCC_debug(interp, DEBUG_PBC_CONST,
-                        " keypart IC %s #%d\n",
-                        r->name, r->color);
+                key_set_integer(interp, tail, atol(r->name));
                 break;
               default:
                 IMCC_fatal(interp, 1, "build_key: unknown set\n");
             }
-            sprintf(s+strlen(s), "%cc" INTVAL_FMT, r->set, r->color);
             break;
           default:
             IMCC_fatal(interp, 1, "build_key: "
@@ -1794,13 +1650,21 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
         }
     }
 
-    key[0] = key_length;
-    size   = pc - key;
+    {
+        STRING *name      = key_set_to_string(interp, head);
+        const char *cname = Parrot_str_to_cstring(interp, name);
+        SymReg * const r  = _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, cname);
 
-    /* now we have a packed key, which packfile can work on */
-    /* XXX endianess? probably no, we pack/unpack on the very
-     * same computer */
-    k      = add_const_key(interp, key, size, s_key);
+        if (r) {
+            k = r->color;
+        }
+        else {
+            k = add_const_table_pmc(interp, head);
+            store_key_const(interp, cname, k);
+        }
+
+        Parrot_str_free_cstring((char *)cname);
+    }
 
     /* single 'S' keys already have their color assigned */
     if (key_reg->set == 'K')
@@ -1882,7 +1746,7 @@ init_fixedintegerarray_from_string(PARROT_INTERP, ARGIN(PMC *p), ARGIN(STRING *s
     char   *src, *chr, *start;
     int     base;
 
-    if (s->encoding != Parrot_fixed_8_encoding_ptr)
+    if (STRING_max_bytes_per_codepoint(s) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "unhandled string encoding in FixedIntegerArray initialization");
 
@@ -2225,10 +2089,11 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
 {
     ASSERT_ARGS(verify_signature)
     PMC    *changed_sig    = NULL;
-    PMC    * const sig_arr = interp->code->const_table->constants[pc[-1]].u.key;
+    PMC    * const sig_arr = interp->code->const_table->pmc.constants[pc[-1]];
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
     int     needed         = 0;
-    int     no_consts      = (ins->opnum == PARROT_OP_get_results_pc
-                           || ins->opnum == PARROT_OP_get_params_pc);
+    int     no_consts      = (ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]
+                           || ins->op == &core_ops->op_info_table[PARROT_OP_get_params_pc]);
 
     INTVAL  i, n;
 
@@ -2304,7 +2169,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 {
     ASSERT_ARGS(e_pbc_emit)
     int        ok = 0;
-    int        op, i;
+    int        i;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
@@ -2376,7 +2242,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     &interp->initial_pf->directory;
             interp->code->annotations = (PackFile_Annotations *)
                     PackFile_Segment_new_seg(interp, dir,
-                        PF_ANNOTATIONS_SEG, name, add);
+                        PF_ANNOTATIONS_SEG, name, 1);
             interp->code->annotations->code = interp->code;
 
             /* Create initial group. */
@@ -2428,16 +2294,14 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             IMCC_INFO(interp)->debug_seg->base.data[IMCC_INFO(interp)->ins_line++] =
                 (opcode_t)ins->line;
 
-        op = (opcode_t)ins->opnum;
-
         /* Get the info for that opcode */
-        op_info = &interp->op_info_table[op];
+        op_info = ins->op;
 
         IMCC_debug(interp, DEBUG_PBC, "%d %s", IMCC_INFO(interp)->npc,
             op_info->full_name);
 
         /* Start generating the bytecode */
-        *(IMCC_INFO(interp)->pc)++ = bytecode_map_op(interp, op);
+        *(IMCC_INFO(interp)->pc)++ = bytecode_map_op(interp, op_info);
 
         for (i = 0; i < op_info->op_count-1; i++) {
             switch (op_info->types[i]) {
@@ -2489,10 +2353,10 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                 break;
             }
         }
-        if (ins->opnum == PARROT_OP_set_args_pc
-        ||  ins->opnum == PARROT_OP_get_results_pc
-        ||  ins->opnum == PARROT_OP_get_params_pc
-        ||  ins->opnum == PARROT_OP_set_returns_pc) {
+        if (ins->op == &core_ops->op_info_table[PARROT_OP_set_args_pc]
+        ||  ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]
+        ||  ins->op == &core_ops->op_info_table[PARROT_OP_get_params_pc]
+        ||  ins->op == &core_ops->op_info_table[PARROT_OP_set_returns_pc]) {
 
             /* TODO get rid of verify_signature - PIR call sigs are already
              * fixed, but PASM still needs it */

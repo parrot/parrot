@@ -402,7 +402,7 @@ D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
 N: Gerd Pokorra
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0, 2.3.0 and 2.5.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0 and 2.8.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -644,7 +644,7 @@ S: Herrnbaumgarten, Austria
 
 N: Luben Karavelov
 U: luben
-E: luben@unixsol.org
+E: karavelov@spnet.net
 
 N: Luca Barbato
 D: fix to make installable
@@ -772,6 +772,11 @@ U: nickg
 
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
+
+N: Nick Wellnhofer
+D: String iterator rewrite, GC fixes
+E: wellnhofer@aevum.de
+U: nwellnhof
 
 N: Nikolay Ananiev
 D: Win32 build fix

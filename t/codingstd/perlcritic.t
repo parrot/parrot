@@ -22,7 +22,7 @@ By default, tests all perl source files for some very specific perl coding
 violations.
 
 This test uses a standard perlcriticrc file, located in
-F<tools/utils/perlcritic.conf>
+F<tools/dev/perlcritic.conf>
 
 If you wish to run a specific policy, the easiest way to do so is to
 temporarily add a custom theme to the configuration file and then specify
@@ -62,7 +62,7 @@ GetOptions(
     'theme=s'   => \$theme
 );
 
-my $config = File::Spec->catfile( $PConfig{build_dir}, qw{tools util perlcritic.conf} );
+my $config = File::Spec->catfile( $PConfig{build_dir}, qw{tools dev perlcritic.conf} );
 
 Test::Perl::Critic->import(
     -profile => $config,

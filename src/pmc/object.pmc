@@ -85,6 +85,14 @@ static INTVAL get_attrib_index_keyed(PARROT_INTERP,
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
 
+/*
+
+=item C<static INTVAL get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)>
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
 get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
@@ -138,10 +146,18 @@ get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
     return -1;
 }
 
+/*
 
-/* This variation bypasses the cache and finds the index of a particular
- * parent's attribute in an object's attribute store and returns it. Returns -1
- * if the attribute does not exist. */
+=item C<static INTVAL get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key,
+STRING *name)>
+
+This variation bypasses the cache and finds the index of a particular
+parent's attribute in an object's attribute store and returns it.
+Returns C<-1> if the attribute does not exist.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
@@ -176,6 +192,13 @@ get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(S
     return -1;
 }
 
+/*
+
+=item C<static PMC * find_cached(PARROT_INTERP, PMC *_class, STRING *name)>
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -192,6 +215,14 @@ find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
     return VTABLE_get_pmc_keyed_str(interp, cache, name);
 }
 
+/*
+
+=item C<static void cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC
+*method)>
+
+=cut
+
+*/
 
 static void
 cache_method(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name),
@@ -324,7 +355,7 @@ of the given name walking up the inheritance tree.
 
         /* If there's a vtable override for 'get_attr_str' run that first. */
         PMC * const method = Parrot_oo_find_vtable_override(INTERP,
-                VTABLE_get_class(INTERP, SELF), get_attr);
+                obj->_class, get_attr);
 
         if (!PMC_IS_NULL(method)) {
             PMC *result = PMCNULL;
@@ -389,7 +420,7 @@ of the given name walking up the inheritance tree.
 
         /* If there's a vtable override for 'set_attr_str' run that first. */
         PMC * const method = Parrot_oo_find_vtable_override(INTERP,
-                VTABLE_get_class(INTERP, SELF), vtable_meth_name);
+                obj->_class, vtable_meth_name);
 
         if (!PMC_IS_NULL(method)) {
             Parrot_ext_call(INTERP, method, "PiSP->", SELF, name, value);
@@ -563,20 +594,7 @@ Get the class PMC representing the class that this object is an instance of.
 
 */
     VTABLE PMC *get_class() {
-        PMC    * const classobj  = PARROT_OBJECT(SELF)->_class;
-        STRING * const get_class = CONST_STRING(INTERP, "get_class");
-
-        /* If there's a vtable override for 'get_class' run that instead. */
-        PMC    * const method    = Parrot_oo_find_vtable_override(INTERP,
-                classobj, get_class);
-
-        if (!PMC_IS_NULL(method)) {
-            PMC *result;
-            Parrot_ext_call(INTERP, method, "Pi->P", SELF, &result);
-            return result;
-        }
-
-        return classobj;
+        return PARROT_OBJECT(SELF)->_class;
     }
 
 
@@ -659,10 +677,11 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        if (SUPER(classname))
+        if (SELF->vtable->whoami == classname
+        ||  Parrot_str_equal(INTERP, SELF->vtable->whoami, classname))
             return 1;
         else {
-            PMC * _class = VTABLE_get_class(INTERP, SELF);
+            PMC *_class = PARROT_OBJECT(SELF)->_class;
             return VTABLE_isa(INTERP, _class, classname);
         }
     }

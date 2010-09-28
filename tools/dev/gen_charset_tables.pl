@@ -23,7 +23,7 @@ my ($svnid) =
     '$Id$' =~
     /^\$[iI][dD]:\s(.*) \$$/;
 my $fileid      = '$' . 'Id $';
-my $charset_dir = File::Spec->catdir(qw/ src charset /);
+my $charset_dir = File::Spec->catdir(qw/ src string encoding /);
 
 my $coda = <<'EOF';
 /*
@@ -110,7 +110,7 @@ sub create_table {
 }
 
 #
-# create 'src/charset/tables.c'
+# create 'src/encoding/tables.c'
 #
 ###########################################################################
 my $c_file = File::Spec->catfile( $charset_dir, 'tables.c' );
@@ -129,7 +129,7 @@ print $coda;
 close STDOUT;
 
 #
-# create 'src/charset/tables.h'
+# create 'src/encoding/tables.h'
 #
 ###########################################################################
 my $h_file = File::Spec->catfile( $charset_dir, 'tables.h' );

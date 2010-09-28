@@ -18,12 +18,23 @@ Test the Archive/Zip library
 
 .sub 'main' :main
     .include 'test_more.pir'
+    .include 'iglobals.pasm'
+    .local pmc config_hash, interp
 
-    load_bytecode 'Archive/Zip.pir'
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    $S0 = config_hash['has_zlib']
+    unless $S0 goto no_zlib
 
     plan(14)
+    load_bytecode 'Archive/Zip.pir'
     test_new()
     test_pack()
+    .return()
+
+  no_zlib:
+    skip_all('No zlib library available')
+    .return()
 .end
 
 .sub 'test_new'

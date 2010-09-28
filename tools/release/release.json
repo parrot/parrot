@@ -1,0 +1,21 @@
+{
+    "release.version"  : "2.9.0",
+    "release.name"     : "Red-masked",
+    "release.day"      : "Tuesday",
+    "release.date"     : "19 October 2010",
+    "release.nextdate" : "16 November 2010",
+
+    "web.root"         : "http://parrot.org/",
+    "web.source"       : "download",
+    "web.openpatches"  : "openpatches.html",
+    "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
+
+    "bugday.day"       : "Saturday",
+    "bugday.date"      : "13 November 2010",
+
+    "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
+    "wiki.bugday"      : "bug_day_2010_11_13",
+
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.9.0/",
+    "subversion.root"  : "http://subversion.apache.org/"
+}

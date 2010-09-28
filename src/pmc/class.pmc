@@ -141,19 +141,10 @@ static void initialize_parents_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t key_hash_pointer(SHIM_INTERP,
-    ARGIN(const void *value),
-    size_t seed)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static int pointer_compare(SHIM_INTERP,
-    ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b));
 
 #define ASSERT_ARGS_build_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -178,56 +169,16 @@ static int pointer_compare(SHIM_INTERP,
     , PARROT_ASSERT_ARG(object) \
     , PARROT_ASSERT_ARG(all_parents) \
     , PARROT_ASSERT_ARG(init))
-#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_make_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF))
-#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
-
-
-
-=cut
-
-*/
-
-static int
-pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b))
-{
-    ASSERT_ARGS(pointer_compare)
-    return a != b;
-}
-
-/*
-
-=item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t seed)>
-
-
-
-=cut
-
-*/
-
-static size_t
-key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_pointer)
-    return ((size_t) value ^ seed);
-}
-
-/*
-
-=item C<static int cache_class_attribs(PARROT_INTERP,
-    PMC *cur_class, PMC *attrib_index, PMC *cache, int cur_index)>
-
-
+=item C<static int cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC
+*attrib_index, PMC *cache, int cur_index)>
 
 =cut
 
@@ -311,7 +262,7 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
 }
- 
+
 /*
 
 =item C<static void init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)>
@@ -485,9 +436,8 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 
 /*
 
-=item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)>
-
-
+=item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC
+*all_parents)>
 
 =cut
 
@@ -524,10 +474,8 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 
 /*
 
-=item C<static void initialize_parents_pmc(PARROT_INTERP,
-    PMC *object, PMC *all_parents, PMC *init)>
-
-
+=item C<static void initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC
+*all_parents, PMC *init)>
 
 =cut
 
@@ -697,7 +645,7 @@ arguments. The class is attached to the current HLL namespace.
                 (Parrot_Class_attributes *) PMC_data(SELF);
 
         /* Set flag for custom GC mark. */
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
 
         /* Set up the object. */
         _class->name            = CONST_STRING(INTERP, "");
@@ -714,9 +662,10 @@ arguments. The class is attached to the current HLL namespace.
 
         _class->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
         _class->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
+
         _class->isa_cache        = parrot_create_hash(INTERP,
-            enum_type_INTVAL, Hash_key_type_PMC,
-            (hash_comp_fn)pointer_compare, (hash_hash_key_fn)key_hash_pointer);
+            enum_type_INTVAL, Hash_key_type_PMC_ptr);
+
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(INTERP, _class->all_parents, SELF);
@@ -1459,10 +1408,14 @@ Returns whether the class is or inherits from C<*class>.
         if (PMC_IS_NULL(lookup))
             return 0;
 
-        if (PObj_is_class_TEST(lookup) && lookup == SELF)
-            return 1;
-
-        classobj = Parrot_oo_get_class(INTERP, lookup);
+        if (PObj_is_class_TEST(lookup)) {
+            if (lookup == SELF)
+                return 1;
+            else
+                classobj = lookup;
+        }
+        else
+            classobj = Parrot_oo_get_class(INTERP, lookup);
 
         if (PMC_IS_NULL(classobj))
             return 0;

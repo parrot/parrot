@@ -127,14 +127,14 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         return;
     }
 
-    if (!pmc->vtable || (UINTVAL)pmc->vtable == 0xdeadbeef) {
-        Parrot_io_eprintf(debugger, "<!!no vtable!!>");
-        return;
-    }
-
     if (PObj_on_free_list_TEST(pmc))
         Parrot_io_eprintf(debugger,
             "**************** PMC is on free list *****\n");
+
+    if (!pmc->vtable) {
+        Parrot_io_eprintf(debugger, "<!!no vtable!!>");
+        return;
+    }
 
     if (pmc->vtable->pmc_class == pmc) {
         STRING * const name = trace_class_name(interp, pmc);
@@ -239,7 +239,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
             break;
           case KEY_string_FLAG|KEY_register_FLAG:
             {
-            const INTVAL keynum = VTABLE_get_integer(interp, key);
+            const UINTVAL keynum = (UINTVAL)VTABLE_get_integer(interp, key);
             if (keynum < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR)) {
                 const STRING * const s = REG_STR(interp, keynum);
                 STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
@@ -313,7 +313,7 @@ trace_op_dump(PARROT_INTERP,
     ||  *pc == PARROT_OP_get_results_pc
     ||  *pc == PARROT_OP_get_params_pc
     ||  *pc == PARROT_OP_set_returns_pc) {
-        sig = interp->code->const_table->constants[pc[1]].u.key;
+        sig = interp->code->const_table->pmc.constants[pc[1]];
 
         if (!sig)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,

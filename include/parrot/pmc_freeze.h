@@ -123,12 +123,14 @@ STRING* Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING * Parrot_freeze_pbc(PARROT_INTERP,
+opcode_t * Parrot_freeze_pbc(PARROT_INTERP,
     ARGIN(PMC *pmc),
-    ARGIN(const PackFile_ConstTable *pf))
+    ARGIN(const PackFile_ConstTable *pf),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -170,11 +172,12 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC* Parrot_thaw_pbc(PARROT_INTERP,
-    ARGIN(STRING *image),
-    ARGIN(PackFile_ConstTable *pf))
+    ARGIN(PackFile_ConstTable *ct),
+    ARGMOD(const opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*cursor);
 
 void Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info))
         __attribute__nonnull__(1)
@@ -193,7 +196,8 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
 #define ASSERT_ARGS_Parrot_freeze_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(pf))
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_Parrot_freeze_pbc_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -212,8 +216,8 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
     , PARROT_ASSERT_ARG(image))
 #define ASSERT_ARGS_Parrot_thaw_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(image) \
-    , PARROT_ASSERT_ARG(pf))
+    , PARROT_ASSERT_ARG(ct) \
+    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_Parrot_visit_loop_thawfinish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))

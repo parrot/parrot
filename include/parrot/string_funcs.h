@@ -226,6 +226,31 @@ PARROT_PURE_FUNCTION
 INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
+INTVAL Parrot_str_iter_index(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGMOD(String_iter *start),
+    ARGOUT(String_iter *end),
+    ARGIN(const STRING *search))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*start)
+        FUNC_MODIFIES(*end);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_str_iter_substr(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGIN(const String_iter *l),
+    ARGIN_NULLOK(const String_iter *r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING* Parrot_str_join(PARROT_INTERP,
@@ -272,18 +297,14 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_new_init(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
-    ARGIN(const ENCODING *encoding),
-    ARGIN(const CHARSET *charset),
+    ARGIN(const STR_VTABLE *encoding),
     UINTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(4);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_str_new_noinit(PARROT_INTERP,
-    parrot_string_representation_t representation,
-    UINTVAL capacity)
+STRING * Parrot_str_new_noinit(PARROT_INTERP, UINTVAL capacity)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -301,15 +322,12 @@ void Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-const CHARSET * Parrot_str_rep_compatible(PARROT_INTERP,
+const STR_VTABLE * Parrot_str_rep_compatible(PARROT_INTERP,
     ARGIN(const STRING *a),
-    ARGIN(const STRING *b),
-    ARGOUT(const ENCODING **e))
+    ARGIN(const STRING *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*e);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -390,13 +408,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_unescape_string(PARROT_INTERP,
     ARGIN(const STRING *src),
-    ARGIN(const CHARSET *charset),
-    ARGIN(const ENCODING *encoding),
+    ARGIN(const STR_VTABLE *encoding),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
@@ -429,17 +445,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_make(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
-    ARGIN_NULLOK(const char *charset_name),
-    UINTVAL flags)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * string_make_from_charset(PARROT_INTERP,
-    ARGIN_NULLOK(const char *buffer),
-    UINTVAL len,
-    INTVAL charset_nr,
+    ARGIN_NULLOK(const char *encoding_name),
     UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -454,13 +460,6 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_OBSERVER
-const char* string_primary_encoding_for_representation(PARROT_INTERP,
-    parrot_string_representation_t representation)
-        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_MALLOC
@@ -559,6 +558,16 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_str_iter_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(start) \
+    , PARROT_ASSERT_ARG(end) \
+    , PARROT_ASSERT_ARG(search))
+#define ASSERT_ARGS_Parrot_str_iter_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(l))
 #define ASSERT_ARGS_Parrot_str_join __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ar))
@@ -573,8 +582,7 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_str_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(encoding) \
-    , PARROT_ASSERT_ARG(charset))
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_str_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_not_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -584,8 +592,7 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b) \
-    , PARROT_ASSERT_ARG(e))
+    , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_Parrot_str_repeat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -614,7 +621,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_unescape_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
-    , PARROT_ASSERT_ARG(charset) \
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_str_unpin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -628,16 +634,11 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_string_make __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_string_make_from_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_string_max_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_string_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_string_primary_encoding_for_representation \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_string_to_cstring_nullable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_str_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

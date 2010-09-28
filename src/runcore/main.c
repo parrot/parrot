@@ -36,28 +36,14 @@ The runcore API handles running the operations.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f get_dynamic_op_lib_init(SHIM_INTERP,
     ARGIN(const PMC *lib))
         __attribute__nonnull__(2);
 
-static void notify_func_table(PARROT_INTERP,
-    ARGIN(op_func_t *table),
-    int on)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lib))
-#define ASSERT_ARGS_notify_func_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(table))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -219,10 +205,6 @@ runops_int(PARROT_INTERP, size_t offset)
 {
     ASSERT_ARGS(runops_int)
 
-    /* setup event function ptrs */
-    if (!interp->save_func_table)
-        Parrot_setup_event_func_ptrs(interp);
-
     interp->resume_offset = offset;
     interp->resume_flag  |= RESUME_RESTART;
 
@@ -244,47 +226,6 @@ runops_int(PARROT_INTERP, size_t offset)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "branch_cs: illegal resume offset");
         }
-    }
-}
-
-
-/*
-
-=item C<void Parrot_setup_event_func_ptrs(PARROT_INTERP)>
-
-Setup a C<func_table> containing pointers (or addresses) of the
-C<check_event__> opcode.
-
-TODO: Free it at destroy. Handle run-core changes.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_setup_event_func_ptrs(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_setup_event_func_ptrs)
-    const size_t       n         = interp->op_count;
-    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
-    op_lib_t * const   lib       = init_func(interp, 1);
-
-    /* remember op_func_table */
-    interp->save_func_table      = lib->op_func_table;
-
-    if (!lib->op_func_table)
-        return;
-
-    /* function or CG core - prepare func_table */
-    if (!interp->evc_func_table) {
-        size_t i;
-
-        interp->evc_func_table = mem_gc_allocate_n_zeroed_typed(interp, n, op_func_t);
-
-        for (i = 0; i < n; ++i)
-            interp->evc_func_table[i] = (op_func_t)
-                D2FPTR(((void**)lib->op_func_table)[CORE_OPS_check_events__]);
     }
 }
 
@@ -322,14 +263,10 @@ Parrot_runcore_destroy(PARROT_INTERP)
     interp->cores    = NULL;
     interp->run_core = NULL;
 
-    /* dynop libs */
-    if (interp->n_libs <= 0)
-        return;
+    if (interp->all_op_libs)
+        mem_gc_free(interp, interp->all_op_libs);
 
-    mem_gc_free(interp, interp->op_info_table);
-    mem_gc_free(interp, interp->op_func_table);
-    interp->op_info_table = NULL;
-    interp->op_func_table = NULL;
+    interp->all_op_libs = NULL;
 }
 
 
@@ -354,21 +291,12 @@ void
 dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 {
     ASSERT_ARGS(dynop_register)
-    op_lib_t *lib, *core;
-    oplib_init_f init_func;
-    op_func_t *new_func_table, *new_evc_func_table;
-    op_info_t *new_info_table;
-    size_t i, n_old, n_new, n_tot;
+    op_lib_t     *lib;
+    oplib_init_f  init_func;
 
     if (n_interpreters > 1) {
-        /* This is not supported because oplibs are always shared.
-         * If we mem_sys_reallocate() the op_func_table while another
-         * interpreter is running using that exact op_func_table,
-         * this will cause problems
-         * Also, the mapping from op name to op number is global even for
-         * dynops (!). The mapping is done by get_op in core_ops.c (even for
-         * dynops) and uses a global hash as a cache and relies on modifications
-         * to the static-scoped core_op_lib data structure to see dynops.
+        /* This is not supported yet because interp->all_op_libs
+         * and interp->op_hash are shared.
          */
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "loading a new dynoplib while "
             "more than one thread is running is not supported.");
@@ -389,116 +317,38 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     /* if we are registering an op_lib variant, called from below the base
      * names of this lib and the previous one are the same */
     if (interp->n_libs >= 2
-    && (STREQ(interp->all_op_libs[interp->n_libs-2]->name, lib->name))) {
-        /* registering is handled below */
+    && (STREQ(interp->all_op_libs[interp->n_libs-2]->name, lib->name)))
         return;
-    }
 
-    /* when called from yyparse, we have to set up the evc_func_table */
-    Parrot_setup_event_func_ptrs(interp);
-
-    n_old = interp->op_count;
-    n_new = lib->op_count;
-    n_tot = n_old + n_new;
-    core  = PARROT_CORE_OPLIB_INIT(interp, 1);
-
-    PARROT_ASSERT(interp->op_count == core->op_count);
-
-    new_evc_func_table = mem_gc_realloc_n_typed_zeroed(interp,
-            interp->evc_func_table, n_tot, n_old, op_func_t);
-    if (core->flags & OP_FUNC_IS_ALLOCATED) {
-        new_func_table = mem_gc_realloc_n_typed_zeroed(interp,
-                core->op_func_table, n_tot, n_old, op_func_t);
-        new_info_table = mem_gc_realloc_n_typed_zeroed(interp,
-                core->op_info_table, n_tot, n_old, op_info_t);
-    }
-    else {
-        /* allocate new op_func and info tables */
-        new_func_table = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_func_t);
-        new_info_table = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_info_t);
-
-        /* copy old */
-        for (i = 0; i < n_old; ++i) {
-            new_func_table[i] = interp->op_func_table[i];
-            new_info_table[i] = interp->op_info_table[i];
-        }
-    }
-
-    /* add new */
-    for (i = n_old; i < n_tot; ++i) {
-        new_func_table[i] = ((op_func_t*)lib->op_func_table)[i - n_old];
-        new_info_table[i] = lib->op_info_table[i - n_old];
-
-        /*
-         * fill new ops of event checker func table
-         * if we are running a different core, entries are
-         * changed below
-         */
-        new_evc_func_table[i] = new_func_table[CORE_OPS_check_events__];
-    }
-
-    interp->evc_func_table  = new_evc_func_table;
-    interp->save_func_table = new_func_table;
-
-    /* deinit core, so that it gets rehashed */
-    (void) PARROT_CORE_OPLIB_INIT(interp, 0);
-
-    /* set table */
-    core->op_func_table = interp->op_func_table = new_func_table;
-    core->op_info_table = interp->op_info_table = new_info_table;
-    core->op_count      = interp->op_count      = n_tot;
-    core->flags         = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
-
-    /* done for plain core */
-    dynop_register_switch(interp, n_old, n_new);
-}
-
-
-
-
-/*
-
-=item C<static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t
-n_new)>
-
-Used only at the end of dynop_register.  Sums the old and new op_counts
-storing the result into the operations count field of the interpreter
-object.
-
-=cut
-
-*/
-
-static void
-dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
-{
-    ASSERT_ARGS(dynop_register_switch)
-    op_lib_t * const lib = PARROT_CORE_OPLIB_INIT(interp, 1);
-    lib->op_count        = n_old + n_new;
+    parrot_hash_oplib(interp, lib);
 }
 
 
 /*
 
-=item C<static void notify_func_table(PARROT_INTERP, op_func_t *table, int on)>
+=item C<void parrot_hash_oplib(PARROT_INTERP, op_lib_t *lib)>
 
-Tell the interpreter's running core about the new function table.
+Add the ops in C<lib> to the global name => op_info hash.
 
 =cut
 
 */
 
-static void
-notify_func_table(PARROT_INTERP, ARGIN(op_func_t *table), int on)
+void
+parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 {
-    ASSERT_ARGS(notify_func_table)
-    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
+    ASSERT_ARGS(parrot_hash_oplib)
 
-    init_func(interp, (long) table);
+    size_t i;
 
-    if (PARROT_RUNCORE_FUNC_TABLE_TEST(interp->run_core)) {
-        PARROT_ASSERT(table);
-        interp->op_func_table = table;
+    for (i = 0; i < lib->op_count; i++) {
+        op_info_t *op = &lib->op_info_table[i];
+        parrot_hash_put(interp, interp->op_hash, (void *)op->full_name,
+                                                 (void *)op);
+
+        if (!parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
+            parrot_hash_put(interp, interp->op_hash, (void *)op->name,
+                                                     (void *)op);
     }
 }
 
@@ -549,9 +399,30 @@ enable_event_checking(PARROT_INTERP)
 {
     ASSERT_ARGS(enable_event_checking)
     PackFile_ByteCode *cs = interp->code;
+
     /* only save if we're not already event checking */
     if (cs->save_func_table == NULL)
         cs->save_func_table = cs->op_func_table;
+
+    /* ensure event checking table is big enough */
+    if (interp->evc_func_table_size < cs->op_count) {
+        size_t i;
+        op_lib_t *core_lib = get_core_op_lib_init(interp, interp->run_core)(interp, 1);
+
+        interp->evc_func_table = interp->evc_func_table ?
+                                    mem_gc_realloc_n_typed_zeroed(interp,
+                                        interp->evc_func_table, cs->op_count,
+                                        interp->evc_func_table_size, op_func_t) :
+                                    mem_gc_allocate_n_zeroed_typed(interp,
+                                        cs->op_count, op_func_t);
+
+        for (i = interp->evc_func_table_size; i < cs->op_count; i++)
+            interp->evc_func_table[i] = (op_func_t)
+                D2FPTR(((void**)core_lib->op_func_table)[CORE_OPS_check_events__]);
+
+        interp->evc_func_table_size = cs->op_count;
+    }
+
     /* put evc table in place */
     cs->op_func_table   = interp->evc_func_table;
 }

@@ -134,8 +134,12 @@ end:
     .local int big
 
     bb = new ['ByteBuffer']
+    s = bb.'get_string'('ascii')
+    n = length s
+    is(s, 0, "getting from unitialized buffer gives empty string")
+
     bb = binary:"abcd"
-    s = bb.'get_string'('ascii', 'fixed_8')
+    s = bb.'get_string'('ascii')
     n = length s
     is(n, 4, "getting ascii from buffer gives correct length")
     is(s, "abcd", "getting ascii from buffer gives correct content")
@@ -161,7 +165,7 @@ isbig:
     bb[0] = 0x00
     bb[1] = 0xD1
 doit:
-    s = bb.'get_string'('unicode', 'utf16')
+    s = bb.'get_string'('utf16')
     n = length s
     is(n, 1, "getting utf16 from buffer gives correct length")
     n = ord s
@@ -297,7 +301,7 @@ setdone:
     if i < 8192 goto loopset
 
     .local string s
-    s = bb.'get_string'('unicode', 'utf16')
+    s = bb.'get_string'('utf16')
 
     # Check string size
     i = length s
@@ -345,23 +349,14 @@ donearray:
 .end
 
 .sub test_invalid
-    .local pmc bb, ex
+    .local pmc bb, eh, ex
     .local string s
+    eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_ENCODING
+    set_addr eh, catch_encoding
+    push_eh eh
     bb = new ['ByteBuffer']
     bb = 'something'
-    push_eh catch_charset
-    s = bb.'get_string'('***INVALID cHARsET%%%%', 'fixed_8')
-    pop_eh
-    ok(0, "get_string with invalid charset should throw")
-    goto check_encoding
-catch_charset:
-    .get_results(ex)
-    finalize ex
-    pop_eh
-    ok(1, "get_string with invalid charset throws")
-check_encoding:
-    push_eh catch_encoding
-    s = bb.'get_string'('ascii', '???INVALID eNCODING===')
+    s = bb.'get_string'('???INVALID eNCODING===')
     pop_eh
     ok(0, "get_string with invalid encoding should throw")
     goto check_content
@@ -372,8 +367,10 @@ catch_encoding:
     ok(1, "get_string with invalid encoding throws")
 check_content:
     bb[0] = 128 # Out of ascii range
-    push_eh catch_content
-    s = bb.'get_string'('ascii', 'fixed_8')
+    eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_STRING_REPRESENTATION
+    set_addr eh, catch_content
+    push_eh eh
+    s = bb.'get_string'('ascii')
     pop_eh
     ok(0, "get_string with invalid content should throw")
     goto end

@@ -155,7 +155,7 @@ newline or semicolon after an end keyword."
     "ParrotIO" "ParrotInterpreter" "ParrotLibrary" "ParrotObject"
     "ParrotThread" "Pointer"
     "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
-    "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
+    "ResizablePMCArray" "ResizableStringArray"
     "Role" "Scalar" "String" "Sub" "Super"
     "Timer" "UnManagedStruct" "Undef" "VtableCache"))
 

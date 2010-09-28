@@ -134,9 +134,9 @@ escape sequences are processed.
 =item "double-quoted string constants"
 
 Are delimited by double-quotes (C<">). A C<"> inside a string must be escaped
-by C<\>. The default encoding for a double-quoted string constant is 7-bit
+by C<\>. The default format for a double-quoted string constant is 7-bit
 ASCII, other character sets and encodings must be marked explicitly using a
-charset or encoding flag.
+format flag.
 
 =item <<"heredoc",  <<'heredoc'
 
@@ -190,11 +190,18 @@ OUTPUT
 
 =end PIR_FRAGMENT_TODO
 
-=item charset:"string constant"
+=item format:"string constant"
 
-Like above with a character set attached to the string. Valid character
-sets are currently: C<ascii> (the default), C<binary>, C<unicode>
-(with UTF-8 as the default encoding), and C<iso-8859-1>.
+Like above with a format attached to the string. Valid formats are
+currently: C<ascii> (the default), C<binary>, C<iso-8859-1>, C<utf8>,
+C<utf16>, C<ucs2>, and C<ucs4>.
+
+The format is attached to the string constant, and
+adopted by any string container the constant is assigned to.
+
+The standard escape sequences are honored within strings with an
+alternate format, so you can include a particular Unicode character
+as either a literal sequence of bytes, or as an escape sequence.
 
 =back
 
@@ -211,20 +218,6 @@ Inside double-quoted strings the following escape sequences are processed.
   \a, \b, \t, \n, \v, \f, \r, \e, \\, \"
 
 =over 4
-
-=item encoding:charset:"string constant"
-
-Like above with an extra encoding attached to the string. For example:
-
-  set S0, utf8:unicode:"«"
-
-The encoding and charset are attached to the string constant, and
-adopted by any string container the constant is assigned to.
-
-The standard escape sequences are honored within strings with an
-alternate encoding, so in the example above, you can include a
-particular Unicode character as either a literal sequence of bytes, or
-as an escape sequence.
 
 =item numeric constants
 

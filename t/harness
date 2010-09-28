@@ -82,6 +82,7 @@ if ($longopts->{archive}) {
             merge            => 1,
             extra_properties => \%env_data,
             extra_files      => [ 'myconfig', 'config_lib.pir' ],
+            jobs             => $ENV{TEST_JOBS} || 1,
         }
     );
     $harness->runtests(@tests);

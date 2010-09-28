@@ -75,25 +75,37 @@ sub check_operators {
             $buf = strip_pod($buf);
         }
 
-        # strip ', ", and C comments
+        # strip ', ", and C comments #'
         $buf =~ s{ (?:
-                       (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
-                     | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string
-                     | /(\*) .*? (\*)/                        # remove C comment
+                       (?: (') (?: \\\\ | \\' | [^'] )* (') ) # rm ' string #'
+                     | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # rm " string #"
+                     | /(\*) .*? (\*)/                        # rm C comment
                    )
                 }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
         my @lines = split( /\n/, $buf );
-        for my $line (@lines) {
+        $comma_space{$path} = [];
+        for (my $i=0; $i <= $#lines; $i++) {
             # after a comma there should be one space or a newline
-            if ( $line =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
-                $comma_space{$path} = undef;
+            if ( $lines[$i] =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
+                push @{ $comma_space{$path} }, $lines[$i];
             }
         }
     }
 
 ## L<PDD07/Code Formatting"there should be one space or a newline after a comma">/
-    is( join("\n", keys %comma_space), "", "there should be one space or a newline after a comma" );
+    my @comma_space_files;
+    for my $path ( sort keys %comma_space ) {
+        if (my $cnt = scalar  @{ $comma_space{$path} }) {
+            push @comma_space_files, <<"END_ERROR";
+$path [$cnt line@{[ ($cnt >1) ? 's': '' ]}] at :
+@{[ join("\n--\n", @{$comma_space{$path}}) ]}
+END_ERROR
+        }
+    }
+    is(join("\n",@comma_space_files),
+       "",
+       "there should be one space or a newline after a comma");
 }
 
 # Local Variables:

@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 36;
 
 =head1 NAME
 
@@ -1078,24 +1078,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
 CODE
 set_attr_str was called
 get_attr_str was called
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "overloading get_class vtable" );
-.sub main :main
-    .local pmc cl, o, cl2
-    cl = newclass 'MyClass'
-    o = new ['MyClass']
-    cl2 = class o
-.end
-
-.namespace ['MyClass']
-
-.sub get_class :method :vtable
-    print "get_class was called\n"
-.end
-
-CODE
-get_class was called
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object" );

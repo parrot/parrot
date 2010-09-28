@@ -19,7 +19,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(120)
+    plan(121)
 
     set_or_get_strings()
     setting_integers()
@@ -586,6 +586,11 @@ loop:
 
   $I0 = $P0.'is_integer'('+1')
   ok( $I0, '... +1' )
+
+  $S0 = 'abc123abc'
+  $S1 = substr $S0, 3, 3
+  $I0 = $P0.'is_integer'($S1)
+  ok( $I0, '... substr' )
 .end
 
 .sub instantiate_str

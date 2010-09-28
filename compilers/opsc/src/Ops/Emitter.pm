@@ -256,7 +256,7 @@ method _emit_init_func($fh) {
     my $dispatch := self.trans.init_func_disaptch;
 
     # TODO There is a bug in NQP about \{
-    $fh.print(q|
+    $fh.print((self.flags<core> ?? 'PARROT_EXPORT' !! '') ~ q|
 op_lib_t *
 | ~ self.init_func ~ q|(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
@@ -359,7 +359,8 @@ method _emit_includes($fh) {
 #include "parrot/oplib.h"
 #include "parrot/runcore_api.h"
 
-{self.sym_export} op_lib_t *{self.init_func}(PARROT_INTERP, long init);
+| ~ (self.flags<core> ?? 'PARROT_EXPORT' !! '') ~ qq|
+op_lib_t *{self.init_func}(PARROT_INTERP, long init);
 
 |);
 }
@@ -374,7 +375,7 @@ method _emit_preamble($fh) {
  * .ops files). by {self<script>}.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 |);

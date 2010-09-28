@@ -72,12 +72,14 @@ inline op err(out INT) {
 
 op err(out STR) {
     const char * const tmp = strerror(errno);
-    $1 = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    $1 = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 }
 
 op err(out STR, in INT) {
     const char * const tmp = strerror($2);
-    $1 = string_make(interp, tmp, strlen(tmp), "ascii", 0);
+    $1 = Parrot_str_new_init(interp, tmp, strlen(tmp),
+            Parrot_ascii_encoding_ptr, 0);
 }
 
 

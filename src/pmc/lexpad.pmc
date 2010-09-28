@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -97,10 +97,14 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *name) {
-        PMC *info;
+        PMC  *info;
+        Hash *hash;
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        return parrot_hash_get_bucket(INTERP,
-                (Hash *)VTABLE_get_pointer(INTERP, info), name) != 0;
+        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
+
+        return hash->entries
+            ? (parrot_hash_get_bucket(INTERP, hash, name) != 0)
+            : 0;
     }
 
     VTABLE INTVAL exists_keyed(PMC *name) {
@@ -109,23 +113,24 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *name) {
-        PMC              * info;
-        Hash             * hash;
-        PMC              * ctx;
-        HashBucket       * b;
-        INTVAL            regno;
+        PMC        *info;
+        Hash       *hash;
+        PMC        *ctx;
+        HashBucket *b;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        GET_ATTR_ctx(INTERP, SELF, ctx);
         hash = (Hash *)VTABLE_get_pointer(INTERP, info);
-        b    = parrot_hash_get_bucket(INTERP, hash, name);
+
+        if (!hash->entries)
+            return PMCNULL;
+
+        b = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
-            return NULL;
+            return PMCNULL;
 
-        regno = (INTVAL) b->value;
-
-        return CTX_REG_PMC(ctx, regno);
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        return CTX_REG_PMC(ctx, (INTVAL)b->value);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *name) {
@@ -138,10 +143,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         Hash             * hash;
         PMC              * ctx;
         HashBucket       * b;
-        INTVAL             regno;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        GET_ATTR_ctx(INTERP, SELF, ctx);
         hash = (Hash *)VTABLE_get_pointer(INTERP, info);
         b    = parrot_hash_get_bucket(INTERP, hash, name);
 
@@ -149,8 +152,8 @@ Return the LexInfo PMC, if any or a Null PMC.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", name);
 
-        regno                   = (INTVAL) b->value;
-        CTX_REG_PMC(ctx, regno) = value;
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        CTX_REG_PMC(ctx, (INTVAL)b->value) = value;
     }
 
     VTABLE void set_pmc_keyed(PMC *name, PMC *value) {

@@ -1247,25 +1247,23 @@ CODE
 /too few positional arguments: 3 passed, 4 \(or more\) expected/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
+pir_output_is( <<'CODE', <<'OUTPUT', "faux tailcall to NCI" );
 .sub main :main
     .local pmc s
     s = new 'String'
-    s = "OK 1\n"
-    $S0 = s."lower"()
-    print $S0
-    s = "OK 2\n"
-    $S1 = foo(s)
-    print $S1
+    $I0 = s."is_integer"(22)
+    say $I0
+    $I1 = foo(s)
+    say $I1
 .end
 .sub foo
     .param pmc s
-    $S0 = s."lower"()
-    .return ($S0)
+    $I0 = s."is_integer"(22)
+    .return ($I0)
 .end
 CODE
-ok 1
-ok 2
+1
+1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI - 2" );

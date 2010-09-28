@@ -665,7 +665,6 @@ void
 pt_thread_prepare_for_run(Parrot_Interp d, SHIM(Parrot_Interp s))
 {
     ASSERT_ARGS(pt_thread_prepare_for_run)
-    Parrot_setup_event_func_ptrs(d);
 }
 
 /*

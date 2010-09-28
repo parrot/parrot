@@ -64,8 +64,8 @@ ERR:
 END:
     close sock
 
-    $I1 = find_charset 'unicode'
-    json_result = trans_charset json_result, $I1
+    $I1 = find_encoding 'utf8'
+    json_result = trans_encoding json_result, $I1
 
     # Strip off http headers.
     $I0 = index json_result, "\r\n\r\n"

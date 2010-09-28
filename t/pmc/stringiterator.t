@@ -17,19 +17,32 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 =cut
 
 .include 'iterator.pasm'
+.include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
 
-    plan(24)
+    plan(30)
 
+    test_get_pmc()
     test_clone()
     test_elements()
     iterate_forward() # 11 tests
     iterate_backward() # 8 tests
     iterate_wrong() # 1 test
     iterate_out() # 1 test
+    get_keyed()
 
+.end
+
+
+.sub 'test_get_pmc'
+    .local pmc s, it, sget
+    s = new ['String']
+    s = 'foobar'
+    it = iter s
+    sget = deref it
+    is(s, sget, 'deref StringIterator gives the iterated string')
 .end
 
 .sub 'test_clone'
@@ -206,6 +219,46 @@ catch4:
 fail:
     ok(0, "Out of bounds iteration should throw")
 end:
+.end
+
+.sub get_keyed
+    .local pmc s, it, eh
+    .local string s1
+    .local int result, i1
+    result = 0
+    s = new ['String']
+    s = 'hi'
+    it = iter s
+    s1 = it[0]
+    is(s1, 'h', 'get_string_keyed_int - zero')
+    s1 = it[1]
+    is(s1, 'i', 'get_string_keyed_int - not zero')
+
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    set_label eh, catch
+    push_eh eh
+    s1 = it[2]
+    goto done
+  catch:
+    finalize eh
+    result = 1
+  done:
+    ok(result, 'get_string_keyed_int out of bounds')
+
+    result = 0
+    i1 = it[0]
+    s1 = chr i1
+    is(s1, 'h', 'get_integer_keyed_int')
+
+    set_label eh, catch2
+    i1 = it[2]
+    goto done2
+  catch2:
+    finalize eh
+    result = 1
+  done2:
+    ok(result, 'get_integer_keyed_int out of bounds')
 .end
 
 # Local Variables:

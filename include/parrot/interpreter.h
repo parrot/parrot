@@ -172,6 +172,8 @@ struct parrot_interp_t {
 
     struct GC_Subsystem *gc_sys;              /*functions and data specific
                                                   to current GC subsystem*/
+    UINTVAL gc_threshold;                     /* maximum percentage of memory
+                                                 wasted by GC */
 
     PMC *gc_registry;                         /* root set of registered PMCs */
 
@@ -182,19 +184,8 @@ struct parrot_interp_t {
 
     struct _ParrotIOData   *piodata;          /* interpreter's IO system */
 
-    op_lib_t  *op_lib;                        /* Opcode library */
-    size_t     op_count;                      /* The number of ops */
-    op_info_t *op_info_table;                 /* Opcode info table
-                                               * (name, nargs, arg types) */
-
-    op_func_t *op_func_table;                  /* opcode dispatch table
-                                                * (functions, labels, or nothing
-                                                * (e.g. switched core), which
-                                                * the interpreter is currently
-                                                * running */
-
     op_func_t *evc_func_table;                /* event check opcode dispatch */
-    op_func_t *save_func_table;               /* for restoring op_func_table */
+    size_t     evc_func_table_size;
 
     int         n_libs;                       /* count of libs below */
     op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */
@@ -216,6 +207,8 @@ struct parrot_interp_t {
     struct PackFile          *initial_pf;     /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */
+    Hash               *op_hash;              /* mapping from op names to op_info_t */
+
 
     const char *output_file;                  /* where to write output */
 
@@ -307,9 +300,6 @@ typedef enum {
     IGLOBALS_SIZE
 } iglobals_enum;
 /* &end_gen */
-
-#define PCONST(i) PF_CONST(interp->code, (i))
-#define PNCONST   PF_NCONST(interp->code)
 
 /* TODO - Make this a config option */
 #ifndef PARROT_CATCH_NULL
@@ -503,6 +493,17 @@ void Parrot_mark_method_writes(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void register_native_pcc_method_in_ns(PARROT_INTERP,
+    const int type,
+    ARGIN(void *func),
+    ARGIN(STRING *name),
+    ARGIN(STRING *signature))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
 void register_nci_method(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
@@ -512,15 +513,6 @@ void register_nci_method(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
-
-PARROT_EXPORT
-void register_raw_nci_method_in_ns(PARROT_INTERP,
-    const int type,
-    ARGIN(void *func),
-    ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
 
 #define ASSERT_ARGS_interpinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -539,15 +531,17 @@ void register_raw_nci_method_in_ns(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_register_native_pcc_method_in_ns \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(func) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_register_nci_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(func) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(proto))
-#define ASSERT_ARGS_register_raw_nci_method_in_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_misc.c */
 

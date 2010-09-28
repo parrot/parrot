@@ -132,8 +132,18 @@ static PMC* get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* Get list_item by index */
-/* XXX Can this actually return NULL or not? */
+/*
+
+=item C<static PMC* get_list_item(PARROT_INTERP, PMC *self, INTVAL idx)>
+
+Get list_item by index
+
+XXX Can this actually return NULL or not?
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
@@ -158,8 +168,19 @@ get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx)
     return list_entry;
 }
 
-/* Find first/last in cloned/thawed OrderedHash */
-/* Parameter C<pmc_hash> is Hash, not OrderedHash */
+/*
+
+=item C<static void find_bounds(PARROT_INTERP, PMC *pmc_hash, PMC **first, PMC
+**last)>
+
+Find first/last in cloned/thawed OrderedHash
+
+Parameter C<pmc_hash> is Hash, not OrderedHash
+
+=cut
+
+*/
+
 static void
 find_bounds(PARROT_INTERP, ARGIN(PMC *pmc_hash), ARGMOD(PMC **first), ARGMOD(PMC **last))
 {
@@ -182,6 +203,17 @@ find_bounds(PARROT_INTERP, ARGIN(PMC *pmc_hash), ARGMOD(PMC **first), ARGMOD(PMC
 }
 
 /* Helpers for boxing values */
+
+/*
+
+=item C<static PMC* box_string(PARROT_INTERP, STRING *str)>
+
+Helper function to box STRING
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
@@ -195,6 +227,16 @@ box_string(PARROT_INTERP, ARGIN(STRING *str))
     return ret;
 }
 
+/*
+
+=item C<static PMC* box_integer(PARROT_INTERP, INTVAL val)>
+
+Helper function to box INTVAL
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
@@ -207,6 +249,16 @@ box_integer(PARROT_INTERP, INTVAL val)
     VTABLE_set_integer_native(interp, ret, val);
     return ret;
 }
+
+/*
+
+=item C<static PMC* box_number(PARROT_INTERP, FLOATVAL val)>
+
+Helper function to box FLOATVAL
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT

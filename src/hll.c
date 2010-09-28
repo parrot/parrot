@@ -329,21 +329,26 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)
 {
     ASSERT_ARGS(Parrot_register_HLL_type)
-    PMC  *entry, *type_hash;
-    PMC  *hll_info = interp->HLL_info;
-    const INTVAL n = VTABLE_elements(interp, hll_info);
 
-    if (hll_id >= n)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
-            "no such HLL ID (%vd)", hll_id);
+    if (hll_id == Parrot_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot map without an HLL");
+    else {
+        PMC *hll_info = interp->HLL_info;
+        const INTVAL n = VTABLE_elements(interp, hll_info);
+        if (hll_id >= n)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+                "no such HLL ID (%vd)", hll_id);
+        else {
+            PMC  *type_hash;
+            PMC  *entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
+            PARROT_ASSERT(!PMC_IS_NULL(entry));
+            type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
+            PARROT_ASSERT(!PMC_IS_NULL(type_hash));
 
-    entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
-    PARROT_ASSERT(!PMC_IS_NULL(entry));
-
-    type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
-    PARROT_ASSERT(!PMC_IS_NULL(type_hash));
-
-    VTABLE_set_integer_keyed_int(interp, type_hash, core_type, hll_type);
+            VTABLE_set_integer_keyed_int(interp, type_hash, core_type, hll_type);
+        }
+    }
 }
 
 /*

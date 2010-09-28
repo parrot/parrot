@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/pmc/hash.t - Test the Hash PMC
+t/pmc/hashiterator.t - Test the HashIterator PMC
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ t/pmc/hash.t - Test the Hash PMC
 
 =head1 DESCRIPTION
 
-Tests the C<Hash> PMC. Checks key access with various types of
+Tests the C<HashIterator> PMC. Checks key access with various types of
 normal and potentially hazardous keys. Does a bit of stress testing as
 well.
 
@@ -23,12 +23,13 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(8)
+    plan(10)
 
     iter_over_empty_hash()
     iter_over_single_element()
     iter_over_single_element_with_checks()
     iter_invalid_type()
+    iter_clone()
 .end
 
 .sub 'iter_over_empty_hash'
@@ -37,6 +38,12 @@ well.
     it   = new 'HashIterator', hash
     $I0  = isfalse it
     ok($I0, "Iterator for empty Hash is empty")
+
+    # shift_pmc throws on empty Hash but shift_string doesn't.
+
+    $S0 = shift it
+    is($S0, '', 'shift string for empty hash gives empty string')
+
     .local pmc eh
     .local int i
     i = 1
@@ -51,7 +58,7 @@ well.
     finalize eh
   report:
     pop_eh
-    ok(i, 'shift for empty hash throws')
+    ok(i, 'shift pmc for empty hash throws')
 .end
 
 .sub 'iter_over_single_element'
@@ -102,6 +109,18 @@ well.
   report:
     pop_eh
     ok(i, 'setting invalid type throws')
+.end
+
+.sub iter_clone
+    .local pmc oh, it, cl
+    .local int result
+    oh = new ['Hash']
+    it = iter oh
+
+    # This chekcs the de facto behavior for code coverage purposes.
+    cl = clone it
+    result = isnull cl
+    ok(result, 'clone of HashIterator gives null')
 .end
 
 # Local Variables:

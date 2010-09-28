@@ -28,8 +28,6 @@ my @steps = qw(
     init::optimize
     inter::shlibs
     inter::libparrot
-    inter::charset
-    inter::encoding
     inter::types
     auto::ops
     auto::pmc
@@ -41,6 +39,7 @@ my @steps = qw(
     auto::isreg
     auto::jit
     auto::frames
+    auto::llvm
     auto::inline
     auto::gc
     auto::memalign

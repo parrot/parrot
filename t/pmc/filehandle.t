@@ -539,29 +539,19 @@ print line
 
     \$P1.'close'()
 
-    \$I1 = charset line
-    \$S2 = charsetname \$I1
-    if \$S2 == 'unicode' goto ok_3
+    \$I1 = encoding line
+    \$S2 = encodingname \$I1
+    if \$S2 == 'utf8' goto ok_3
     print \$S2
     print 'not '
   ok_3:
-    say 'ok 3 # unicode charset'
-
-
-    \$I1 = encoding line
-    \$S2 = encodingname \$I1
-    if \$S2 == 'utf8' goto ok_4
-    print \$S2
-    print 'not '
-  ok_4:
-    say 'ok 4 # utf8 encoding'
+    say 'ok 3 # utf8 encoding'
 
 .end
 CODE
 ok 1 - $S1 = $P1.readline() # read with utf8 encoding on
 ok 2 - $S2 = $P1.readline() # read iso-8859-1 string
-ok 3 # unicode charset
-ok 4 # utf8 encoding
+ok 3 # utf8 encoding
 OUT
 
 
@@ -746,6 +736,9 @@ expect 0 exit status: 0
 expect 1 exit status: 1
 OUTPUT
 
+SKIP: {
+    skip 'Timely destruction is deprecated. TT#1800' => 1;
+
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
 .sub main :main
@@ -755,15 +748,23 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" )
         needs_destroy $P0
     print $P0, "a line\n"
     null $P0            # kill it
+    # Call dummy sub to cleanup CallContext
+    dummy()
     sweep 0            # a lazy GC has to close the PIO
     $P0 = new ['FileHandle']
     $P0.'open'(temp_file, 'r')
     $S0 = $P0.'read'(20)
     print $S0
 .end
+
+.sub dummy
+.end
+
 CODE
 a line
 OUTPUT
+
+}
 
 my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
 

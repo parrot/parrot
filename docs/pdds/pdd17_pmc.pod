@@ -1327,40 +1327,6 @@ I<value> (0 for equal, 1 if I<self> is greater, -1 if I<value> is
 greater). The C<_num> version performs a numeric comparison, while the
 C<_string> version performs a string comparison.
 
-=item logical_or
-
-  PMC* logical_or(INTERP, PMC *self, PMC *value, PMC *dest)
-
-Performs a logical OR, returning I<self> if it is true, and I<value>
-otherwise.
-
-=item logical_and
-
-  PMC* logical_and(INTERP, PMC *self, PMC *value, PMC *dest)
-
-Performs a logical AND, returning a true value if both I<self> and
-I<value> are true, and a false value otherwise. (Currently implemented
-as: If I<self> is false, return it, since the entire expression is
-false. If I<self> is true, return value, since the truth or falsehood of
-I<value> will determine the truth or falsehood of the whole expression.)
-
-=item logical_xor
-
-  PMC* logical_xor(INTERP, PMC *self, PMC *value, PMC *dest)
-
-Performs a logical XOR, returning I<self> if it is true and I<value> is
-false, returning I<value> if it is true and I<self> is false, and
-returning a false value (PMC of the same type as I<self>, with the
-boolean value 0) if both are true or neither are true.
-
-=item logical_not
-
-  PMC* logical_not(INTERP, PMC *self, PMC *dest)
-  void i_logical_not(INTERP, PMC *self)
-
-Returns the logical negation of I<self>. The C<i_> variant performs an
-inplace negation, modifying the value of I<self>.
-
 =back
 
 =head4 String Vtable Functions

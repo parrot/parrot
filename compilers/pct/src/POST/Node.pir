@@ -194,6 +194,13 @@ Get/set the opcode type for this node.
 .end
 
 
+.sub 'loadlibs' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('loadlibs', value, has_value)
+.end
+
+
 .sub 'outer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag

@@ -112,9 +112,9 @@ sub new {
 
     $manifest_lines_ref = $mani->prepare_manifest();
 
-Prepares the manifest from the read in by the C<new()> method, and returns a
-hash of the files.  The keys of the hash are the filenames, and the values are
-strings representing the package and a list of the meta flags.
+Prepares the manifest from the data read in by the C<new()> method, and
+returns a hash of the files.  The keys of the hash are the filenames, and the
+values are strings representing the package and a list of the meta flags.
 
 =cut
 

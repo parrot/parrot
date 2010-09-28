@@ -298,19 +298,9 @@ C<PMCNULL> if not found.
 Search the namespace PMC C<namespace> for an object with name C<globalname>.
 Return the object, or NULL if not found.
 
-=item C<Parrot_PMC Parrot_find_global_s(PARROT_INTERP, Parrot_String namespace, Parrot_String name)>
-
-Find and return a global called C<name> in the namespace C<namespace>.  Returns
-C<PMCNULL> if not found.
-
 =item C<void Parrot_ns_store_global(PARROT_INTERP, PMC namespace, Parrot_String name, Parrot_PMC val)>
 
 Store the PMC C<val> into the namespace PMC C<namespace> with name C<globalname>.
-
-=item C<void Parrot_store_global_s(PARROT_INTERP, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
-
-Sets the value of a global called C<name> in the namespace C<namespace>.  Does
-nothing if the global is not found.
 
 =back
 
@@ -539,8 +529,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<PackFile_destroy>
 
-=item C<PackFile_find_in_const>
-
 =item C<PackFile_fixup_subs>
 
 =item C<PackFile_new>
@@ -568,18 +556,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_ext_call>
 
 =item C<Parrot_char_digit_value>
-
-=item C<Parrot_charset_c_name>
-
-=item C<Parrot_charset_name>
-
-=item C<Parrot_charset_number>
-
-=item C<Parrot_charset_number_of_str>
-
-=item C<Parrot_charsets_encodings_deinit>
-
-=item C<Parrot_charsets_encodings_init>
 
 =item C<Parrot_clear_debug>
 
@@ -653,8 +629,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_cx_send_message>
 
-=item C<Parrot_default_charset>
-
 =item C<Parrot_default_encoding>
 
 =item C<Parrot_del_timer_event>
@@ -701,13 +675,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ex_throw_from_op_args>
 
-=item C<Parrot_find_charset>
-
-=item C<Parrot_find_charset_converter>
-
 =item C<Parrot_find_encoding>
-
-=item C<Parrot_find_encoding_converter>
 
 =item C<Parrot_ns_find_current_namespace_global>
 
@@ -716,8 +684,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_ns_find_namespace_global>
 
 =item C<Parrot_ns_find_global_from_op>
-
-=item C<Parrot_find_global_s>
 
 =item C<Parrot_find_language>
 
@@ -748,8 +714,6 @@ The list may also be augmented if additional functionality is required.
 =item C<parrot_gc_gms_Parrot_gc_mark_PObj_alive>
 
 =item C<Parrot_gc_mark_PObj_alive>
-
-=item C<Parrot_get_charset>
 
 =item C<Parrot_get_ctx_HLL_namespace>
 
@@ -786,8 +750,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_get_root_namespace>
 
 =item C<Parrot_get_runtime_path>
-
-=item C<Parrot_get_runtime_prefix>
 
 =item C<Parrot_get_strreg>
 
@@ -931,8 +893,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_load_bytecode>
 
-=item C<Parrot_load_charset>
-
 =item C<Parrot_load_encoding>
 
 =item C<Parrot_load_language>
@@ -944,8 +904,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_locate_runtime_file_str>
 
 =item C<Parrot_make_cb>
-
-=item C<Parrot_make_default_charset>
 
 =item C<Parrot_make_default_encoding>
 
@@ -968,8 +926,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_new>
 
 =item C<Parrot_new_cb_event>
-
-=item C<Parrot_new_charset>
 
 =item C<Parrot_new_encoding>
 
@@ -1183,8 +1139,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_i_floor_divide_int>
 
-=item C<Parrot_PMC_i_logical_not>
-
 =item C<Parrot_PMC_i_modulus>
 
 =item C<Parrot_PMC_i_modulus_float>
@@ -1240,14 +1194,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_i_subtract_float>
 
 =item C<Parrot_PMC_i_subtract_int>
-
-=item C<Parrot_PMC_logical_and>
-
-=item C<Parrot_PMC_logical_not>
-
-=item C<Parrot_PMC_logical_or>
-
-=item C<Parrot_PMC_logical_xor>
 
 =item C<Parrot_PMC_mark>
 
@@ -1459,10 +1405,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_regenerate_HLL_namespaces>
 
-=item C<Parrot_register_charset>
-
-=item C<Parrot_register_charset_converter>
-
 =item C<Parrot_register_encoding>
 
 =item C<Parrot_register_HLL>
@@ -1529,21 +1471,15 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_store_global>
 
-=item C<Parrot_store_global_s>
-
 =item C<Parrot_ns_store_sub>
 
 =item C<Parrot_str_boolean>
 
 =item C<Parrot_str_byte_length>
 
-=item C<Parrot_str_change_charset>
-
 =item C<Parrot_str_change_encoding>
 
 =item C<Parrot_str_chopn>
-
-=item C<Parrot_str_chopn_inplace>
 
 =item C<Parrot_str_compare>
 
@@ -1554,8 +1490,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_str_copy>
 
 =item C<Parrot_str_downcase>
-
-=item C<Parrot_str_downcase_inplace>
 
 =item C<Parrot_str_equal>
 
@@ -1595,8 +1529,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_str_new_constant>
 
-=item C<Parrot_str_new_COW>
-
 =item C<Parrot_str_new_init>
 
 =item C<Parrot_str_new_noinit>
@@ -1609,19 +1541,11 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_str_replace>
 
-=item C<Parrot_str_resize>
-
-=item C<Parrot_str_reuse_COW>
-
-=item C<Parrot_str_set>
-
 =item C<Parrot_str_split>
 
 =item C<Parrot_str_substr>
 
 =item C<Parrot_str_titlecase>
-
-=item C<Parrot_str_titlecase_inplace>
 
 =item C<Parrot_str_to_cstring>
 
@@ -1636,10 +1560,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_str_unpin>
 
 =item C<Parrot_str_upcase>
-
-=item C<Parrot_str_upcase_inplace>
-
-=item C<Parrot_str_write_COW>
 
 =item C<Parrot_sub_new_from_c_func>
 
@@ -1681,19 +1601,13 @@ The list may also be augmented if additional functionality is required.
 
 =item C<PObj_custom_mark_SET>
 
-=item C<string_capacity>
-
 =item C<string_chr>
 
 =item C<string_make>
 
-=item C<string_make_from_charset>
-
 =item C<string_max_bytes>
 
 =item C<string_ord>
-
-=item C<string_primary_encoding_for_representation>
 
 =item C<string_rep_compatible>
 

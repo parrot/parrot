@@ -50,15 +50,6 @@ static INTVAL fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC * find_method_direct_1(PARROT_INTERP,
-    ARGIN(PMC *_class),
-    ARGIN(STRING *method_name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -81,10 +72,6 @@ static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 #define ASSERT_ARGS_fail_if_type_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_find_method_direct_1 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(_class) \
-    , PARROT_ASSERT_ARG(method_name))
 #define ASSERT_ARGS_get_pmc_proxy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_invalidate_all_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -93,6 +80,65 @@ static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+
+/*
+
+=item C<static void debug_trace_find_meth(PARROT_INTERP, const PMC *_class,
+const STRING *name, const PMC *sub)>
+
+Print some information about the search for a sub.
+
+=cut
+
+*/
+
+#ifdef NDEBUG
+#  define TRACE_FM(i, c, m, sub)
+#else
+#  define TRACE_FM(i, c, m, sub) \
+    debug_trace_find_meth((i), (c), (m), (sub))
+
+static void
+debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
+        ARGIN(const STRING *name), ARGIN_NULLOK(const PMC *sub))
+{
+    ASSERT_ARGS(debug_trace_find_meth)
+    STRING *class_name;
+    const char *result;
+    Interp *tracer;
+
+    if (!Interp_trace_TEST(interp, PARROT_TRACE_FIND_METH_FLAG))
+        return;
+
+    if (PObj_is_class_TEST(_class)) {
+        SLOTTYPE * const class_array    = PMC_data_typed(_class, SLOTTYPE *);
+        PMC      * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        class_name                      = VTABLE_get_string(interp, class_name_pmc);
+    }
+    else
+        class_name = _class->vtable->whoami;
+
+    if (sub) {
+        if (sub->vtable->base_type == enum_class_NativePCCMethod)
+            result = "NativePCCMethod";
+        else if (sub->vtable->base_type == enum_class_NCI)
+            result = "NCI";
+        else
+            result = "Sub";
+    }
+    else
+        result = "no";
+
+    tracer = (interp->pdb && interp->pdb->debugger) ?
+        interp->pdb->debugger :
+        interp;
+    Parrot_io_eprintf(tracer, "# find_method class '%Ss' method '%Ss': %s\n",
+            class_name, name, result);
+}
+
+#endif
+
 
 /*
 
@@ -870,15 +916,38 @@ PMC *
 Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
 {
     ASSERT_ARGS(Parrot_find_method_direct)
-    PMC * const found = find_method_direct_1(interp, _class, method_name);
 
-    if (!PMC_IS_NULL(found))
-        return found;
+    STRING * const class_str   = CONST_STRING(interp, "class");
+    STRING * const methods_str = CONST_STRING(interp, "methods");
+    PMC    * const mro         = _class->vtable->mro;
+    const INTVAL   n           = VTABLE_elements(interp, mro);
+    INTVAL         i;
 
+    for (i = 0; i < n; ++i) {
+        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class);
+        PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
+        PMC        *method    = PMCNULL;
+        PMC        *method_hash;
 
-    if (Parrot_str_equal(interp, method_name, CONST_STRING(interp, "__get_string")))
-        return find_method_direct_1(interp, _class, CONST_STRING(interp, "__get_repr"));
+        if (PMC_IS_NULL(class_obj))
+            method_hash = VTABLE_inspect_str(interp, ns, methods_str);
+        else
+            method_hash = VTABLE_inspect_str(interp, class_obj, methods_str);
 
+        if (!PMC_IS_NULL(method_hash))
+            method = VTABLE_get_pmc_keyed_str(interp, method_hash, method_name);
+
+        if (PMC_IS_NULL(method))
+            method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
+
+        TRACE_FM(interp, _class, method_name, method);
+
+        if (!PMC_IS_NULL(method))
+            return method;
+    }
+
+    TRACE_FM(interp, _class, method_name, NULL);
     return PMCNULL;
 }
 
@@ -908,15 +977,13 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 {
     ASSERT_ARGS(Parrot_find_method_with_cache)
 
-    UINTVAL type, bits;
-    Caches           *mc;
-    Meth_cache_entry *e;
-
-    PARROT_ASSERT(method_name != 0);
-
 #if DISABLE_METH_CACHE
     return Parrot_find_method_direct(interp, _class, method_name);
 #else
+
+    Caches           *mc;
+    Meth_cache_entry *e;
+    UINTVAL type, bits;
 
     if (! PObj_constant_TEST(method_name))
         return Parrot_find_method_direct(interp, _class, method_name);
@@ -926,31 +993,29 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
     bits = (((UINTVAL) Buffer_bufstart(method_name)) >> 2) & TBL_SIZE_MASK;
 
     if (type >= mc->mc_size) {
-        if (mc->idx) {
+        if (mc->idx)
             mc->idx = mem_gc_realloc_n_typed_zeroed(interp, mc->idx,
-                    type + 1, mc->mc_size, Meth_cache_entry**);
-        }
-        else {
-            mc->idx = mem_gc_allocate_n_zeroed_typed(interp, type + 1, Meth_cache_entry**);
-        }
+                    type + 1, mc->mc_size, Meth_cache_entry **);
+        else
+            mc->idx = mem_gc_allocate_n_zeroed_typed(interp, type + 1,
+                        Meth_cache_entry **);
+
         mc->mc_size = type + 1;
     }
 
-    if (mc->idx[type] == NULL) {
+    if (! mc->idx[type])
         mc->idx[type] = mem_gc_allocate_n_zeroed_typed(interp,
-                TBL_SIZE, Meth_cache_entry*);
-    }
+                TBL_SIZE, Meth_cache_entry *);
 
-    e   = mc->idx[type][bits];
+    e = mc->idx[type][bits];
 
-    while (e && e->strstart != Buffer_bufstart(method_name)) {
-        e   = e->next;
-    }
+    while (e && e->strstart != Buffer_bufstart(method_name))
+        e = e->next;
 
     if (!e) {
         /* when here no or no correct entry was at [bits] */
         /* Use zeroed allocation because find_method_direct can trigger GC */
-        e     = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
+        e = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
 
         mc->idx[type][bits] = e;
 
@@ -962,116 +1027,6 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
     return e->pmc;
 
 #endif
-}
-
-
-/*
-
-=item C<static void debug_trace_find_meth(PARROT_INTERP, const PMC *_class,
-const STRING *name, const PMC *sub)>
-
-Print some information about the search for a sub.
-
-=cut
-
-*/
-
-#ifdef NDEBUG
-#  define TRACE_FM(i, c, m, sub)
-#else
-#  define TRACE_FM(i, c, m, sub) \
-    debug_trace_find_meth((i), (c), (m), (sub))
-
-static void
-debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
-        ARGIN(const STRING *name), ARGIN_NULLOK(const PMC *sub))
-{
-    ASSERT_ARGS(debug_trace_find_meth)
-    STRING *class_name;
-    const char *result;
-    Interp *tracer;
-
-    if (!Interp_trace_TEST(interp, PARROT_TRACE_FIND_METH_FLAG))
-        return;
-
-    if (PObj_is_class_TEST(_class)) {
-        SLOTTYPE * const class_array    = PMC_data_typed(_class, SLOTTYPE *);
-        PMC      * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
-        class_name                      = VTABLE_get_string(interp, class_name_pmc);
-    }
-    else
-        class_name = _class->vtable->whoami;
-
-    if (sub) {
-        if (sub->vtable->base_type == enum_class_NCI)
-            result = "NCI";
-        else
-            result = "Sub";
-    }
-    else
-        result = "no";
-
-    tracer = (interp->pdb && interp->pdb->debugger) ?
-        interp->pdb->debugger :
-        interp;
-    Parrot_io_eprintf(tracer, "# find_method class '%Ss' method '%Ss': %s\n",
-            class_name, name, result);
-}
-
-#endif
-
-
-/*
-
-=item C<static PMC * find_method_direct_1(PARROT_INTERP, PMC *_class, STRING
-*method_name)>
-
-Find the method with the given name in the specified class.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC *
-find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
-                              ARGIN(STRING *method_name))
-{
-    ASSERT_ARGS(find_method_direct_1)
-    INTVAL i;
-
-    PMC * const  mro = _class->vtable->mro;
-    const INTVAL n   = VTABLE_elements(interp, mro);
-    STRING * const methods_str = CONST_STRING(interp, "methods");
-    STRING * const class_str = CONST_STRING(interp, "class");
-
-    for (i = 0; i < n; ++i) {
-        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        PMC * const ns        = VTABLE_get_namespace(interp, _class);
-        PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
-        PMC           *method = PMCNULL;
-        PMC * method_hash;
-
-        if (PMC_IS_NULL(class_obj))
-            method_hash = VTABLE_inspect_str(interp, ns, methods_str);
-        else
-            method_hash = VTABLE_inspect_str(interp, class_obj, methods_str);
-
-        if (!PMC_IS_NULL(method_hash))
-            method = VTABLE_get_pmc_keyed_str(interp, method_hash, method_name);
-
-        if (PMC_IS_NULL(method))
-            method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
-
-        TRACE_FM(interp, _class, method_name, method);
-
-        if (!PMC_IS_NULL(method))
-            return method;
-    }
-
-    TRACE_FM(interp, _class, method_name, NULL);
-    return PMCNULL;
 }
 
 

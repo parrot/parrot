@@ -8,6 +8,7 @@ t/pmc/packfileconstanttable.t - test the PackfileConstantTable PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfileconstanttable.t
 
 =head1 DESCRIPTION
@@ -25,11 +26,10 @@ Tests the PackfileConstantTable PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-.include 'packfile_constants.pasm'
-    'plan'(16)
+    'plan'(15)
 
     'test_sanity'()
-    'test_elements'()
+    'test_counts'()
     'test_get'()
     'test_set'()
     'test_get_or_create'()
@@ -55,15 +55,26 @@ load_error:
 
 
 # PackfileConstantTable.elements
-.sub 'test_elements'
+.sub 'test_counts'
     .local pmc pf, pftable
     .local int size
     push_eh load_error
     pf      = _pbc()
     pop_eh
     pftable = _get_consttable(pf)
-    size    = elements pftable
-    ok(size, "PackfileConstantTable.elements returns non-zero")
+
+    # Make sure the mark vtable is exercised and the content survives
+    sweep 1
+
+    size = pftable.'pmc_count'()
+    ok(size, "PackfileConstantTable.pmc_count returns non-zero")
+
+    size = pftable.'str_count'()
+    ok(size, "PackfileConstantTable.str_count returns non-zero")
+
+    size = pftable.'num_count'()
+    ok(size, "PackfileConstantTable.num_count returns non-zero")
+
     .return ()
 load_error:
     .get_results($P0)
@@ -73,52 +84,39 @@ load_error:
 .end
 
 
-# PackfileConstantTable.get_type and PackfileConstantTable.get_*_keyed_int
+# PackfileConstantTable.get_*_keyed_int
 .sub 'test_get'
     .local pmc pf, pftable
-    .local int size, this, type
+    .local int size, i
     push_eh load_error
     pf      = _pbc()
     pop_eh
     pftable = _get_consttable(pf)
-    size    = elements pftable
-    this    = 0
-  loop:
-    type = pftable.'get_type'(this)
-    eq type, .PFC_NONE, next
-    eq type, .PFC_NUMBER, const_num
-    eq type, .PFC_STRING, const_str
-    eq type, .PFC_PMC, const_pmc
-    eq type, .PFC_KEY, const_key
-    goto bad
-  const_num:
-    $N0 = pftable[this]
-    goto next
-  const_str:
-    $S0 = pftable[this]
-    goto next
-  const_pmc:
-    $P0 = pftable[this]
-    goto next
-  const_key:
-    $P0 = pftable[this]
-    $S0 = typeof $P0
-    eq $S0, 'Key', next
-    $S0 = concat 'constant Key with wrong type: ', $S0
-    ok(0, $S0)
-    .return()
 
-  next:
-    this = this + 1
-    ge this, size, done
-    goto loop
-    gt size, 0, done
+    size    = pftable.'num_count'()
+    i       = 0
+  num_loop:
+    $N0 = pftable[i]
+    inc i
+    if i < size goto num_loop
+
+    size    = pftable.'str_count'()
+    i       = 0
+  str_loop:
+    $S0 = pftable[i]
+    inc i
+    if i < size goto str_loop
+
+    size    = pftable.'pmc_count'()
+    i       = 0
+  pmc_loop:
+    $P0 = pftable[i]
+    inc i
+    if i < size goto pmc_loop
+
 
   done:
     ok(1, 'PackfileConstantTable.get_*_int works')
-    .return()
-  bad:
-    ok(0, 'Unknown constant type')
     .return()
 load_error:
     .get_results($P0)
@@ -134,32 +132,26 @@ load_error:
     ct = new ['PackfileConstantTable']
 
     # Initial PackfileConstantTable is empty
-    size = elements ct
+    $I0   = ct.'num_count'()
+    $I1   = ct.'str_count'()
+    $I2   = ct.'pmc_count'()
+    size  = $I0 + $I1
+    size += $I2
     is(size, 0, "Empty PackfileConstantTable created")
 
-    # Set first string
     ct[0] = "string"
-    $I0 = elements ct
+    $I0 = ct.'str_count'()
     is($I0, 1, "String element added")
 
-    ct[1] = 1.0
-    $I0 = elements ct
-    is($I0, 2, "Number elements added")
+    ct[0] = 1.0
+    $I0 = ct.'num_count'()
+    is($I0, 1, "Number elements added")
 
     $P0 = new 'Integer'
     $P0 = 42
-    ct[2] = $P0
-    $I0 = elements ct
-    is($I0, 3, "PMC elements added")
-
-    # Check types of created constants
-    $I0 = ct.'get_type'(0)
-    is($I0, .PFC_STRING, "First element is string")
-    $I0 = ct.'get_type'(1)
-    is($I0, .PFC_NUMBER, "Second element is number")
-    $I0 = ct.'get_type'(2)
-    is($I0, .PFC_PMC, "Third element is PMC")
-
+    ct[0] = $P0
+    $I0 = ct.'pmc_count'()
+    is($I0, 1, "PMC elements added")
 .end
 
 .sub 'test_get_or_create'

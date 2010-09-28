@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 27;
+use Test::More tests => 30;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -96,6 +96,13 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
 # Test --runtime-prefix
 like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 
+# TT #1797: check for warning error and mask off "did it crash?" bits
+my $output = qx{$PARROT --gc-threshold 2>&1 };
+my $exit   = $? & 127;
+like( $output, qr/--gc-threshold needs an argument/,
+                 '--gc-threshold needs argument warning' );
+is( $exit, 0, '... and should not crash' );
+
 # clean up temporary files
 unlink $first_pir_file;
 unlink $second_pir_file;
@@ -118,6 +125,14 @@ END_PIR
 
     return $filename;
 }
+
+#make sure that VERSION matches the output of --version
+open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
+my $file_version = <$version_fh>;
+chomp($file_version);
+close($version_fh);
+like( qx{$PARROT --version}, qr/.*${file_version}.*/, "VERSION matches --version" );
+
 
 # Local Variables:
 #   mode: cperl
