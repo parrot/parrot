@@ -1308,8 +1308,16 @@ gc_ms2_propagate_to_older_generation(PARROT_INTERP,
             if (PObj_is_PMC_TEST(obj)) {
                 PMC     *pmc = (PMC *)obj;
                 VTABLE  *t   = pmc->vtable;
+
+                PARROT_ASSERT(pmc->vtable);
+                PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+
                 pmc->vtable = pmc->vtable->wb_variant_vtable;
                 pmc->vtable->wb_variant_vtable = t;
+
+                PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
+                PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+
             }
         }
         else {
@@ -1640,8 +1648,18 @@ gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(gc_ms2_write_barrier)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *item = Obj2LLH(pmc);
+    size_t            gen  = PObj_to_generation(pmc);
+
+    if (PObj_is_live_or_free_TESTALL(pmc))
+        return;
+
+    if (!gen)
+        return;
+
     LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
     LIST_APPEND(self->root_objects, item);
+    pmc->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
+    PObj_live_SET(pmc);
 }
 
 /*
