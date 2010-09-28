@@ -67,13 +67,14 @@ sub new {
         }
     }
 
+    my $pmcname = $parent->name;
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         my $name = $vt_method->name;
 
-        # Generate WB variant only if we override method constantness
-        # with ":write"
-        next unless $parent->{has_method}{$name}
-                    && $parent->vtable_method_does_write($name);
+        #warn "$pmcname $name\n";
+        # Generate WB variant 
+        next unless exists $parent->{has_method}{$name};
+        #&& $parent->vtable_method_does_write($name);
 
         # Get parameters.      strip type from param
         my $parameters = join ', ',
@@ -90,13 +91,14 @@ sub new {
                 type        => Parrot::Pmc2c::Method::VTABLE,
             }
         );
-        my $pmcname = $parent->name;
         my $ret     = return_statement($method);
         my $body    = <<"EOC";
         /* Switch vtable here and redispatch to original method */
-        VTABLE *t = _self->vtable->wb_variant_vtable;
-        _self->vtable->wb_variant_vtable = _self->vtable;
-        _self->vtable = t;
+        VTABLE *t = _self->vtable;
+        PARROT_ASSERT(_self->vtable != _self->vtable->wb_variant_vtable);
+        _self->vtable = _self->vtable->wb_variant_vtable;
+        _self->vtable->wb_variant_vtable = t;
+        PARROT_ASSERT(_self->vtable != _self->vtable->wb_variant_vtable);
         Parrot_gc_write_barrier(interp, _self);
         return _self->vtable->$name(interp, _self $parameters);
 EOC
