@@ -66,10 +66,6 @@ load_error:
     .local pmc pf, pfdir
     pf = new 'Packfile'
     pfdir = pf.'get_directory'()
-    #$P0 = new 'PackfileConstantTable'
-    #$P0[0] = 42.0
-    $P0 = new 'PackfileFixupTable'
-    pfdir["FIXUP_t/pmc/packfileannotations.t"] = $P0
 
     $P1 = new 'PackfileRawSegment'
     pfdir["BYTECODE_t/pmc/packfileannotations.t"] = $P1

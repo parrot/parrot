@@ -3219,7 +3219,6 @@ Parrot_str_split(PARROT_INTERP,
 
     do {
         String_iter start, end;
-        INTVAL pos;
 
         start = iter;
         if (Parrot_str_iter_index(interp, str, &start, &end, delim) < 0)

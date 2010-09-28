@@ -1,5 +1,13 @@
 # $Id$
 
+New in 2.9.0
+- Core
+  + New default garbage collector
+- Testing
+  + "make smoke" now respects TEST_JOBS
+- GitMigration
+- Compilers
+
 New in 2.8.0
 - Core
   + Inlined hashing and comparison functions

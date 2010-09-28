@@ -97,9 +97,6 @@ Initialize PackfileDirectory from PackFile_Directory.
               case PF_DIR_SEG:
                 pmc_type = enum_class_PackfileDirectory;
                 break;
-              case PF_FIXUP_SEG:
-                pmc_type = enum_class_PackfileFixupTable;
-                break;
               case PF_CONST_SEG:
                 pmc_type = enum_class_PackfileConstantTable;
                 break;

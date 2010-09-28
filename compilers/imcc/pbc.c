@@ -1562,12 +1562,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                                    : Parrot_str_new(interp, "*none*", 0));
         }
 
-        /*
-         * create entry in our fixup (=symbol) table
-         * the offset is the index in the constant table of this Sub
-         */
-        PackFile_FixupTable_new_entry(interp, r->name, enum_fixup_sub, k);
-
         return k;
     }
 }

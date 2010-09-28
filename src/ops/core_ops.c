@@ -6,7 +6,7 @@
  * .ops files). by ops2c.nqp.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 
@@ -18244,7 +18244,7 @@ Parrot_not_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const INTVAL a = ! VTABLE_get_bool(interp, PREG(2));
     if (PMC_IS_NULL(PREG(1)))
-        PREG(1) = Parrot_pmc_new(interp, VTABLE_type(interp, PREG(2)));
+        PREG(1) = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Boolean));
     VTABLE_set_bool(interp, PREG(1), a);
 
 return (opcode_t *)cur_opcode + 3;}
@@ -26098,7 +26098,7 @@ op_lib_t core_op_lib = {
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*

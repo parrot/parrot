@@ -130,8 +130,9 @@ Return generated PIR for C<node> and all of its children.
     pos = cpost['pos']
     if null pos goto done_subline
     source = cpost['source']
-    if null source goto done_subline
-    line = self.'lineof'(source, pos, 'cache'=>1)
+    $I0 = can source, 'lineof'
+    unless $I0 goto done_subline
+    line = source.'lineof'(pos)
     inc line
   done_subline:
     self.'pir'(cpost)
@@ -362,9 +363,20 @@ the sub.
     goto subpir_done
 
   subpir_post:
-    unless hll goto subpir_ns
+    unless hll goto subpir_loadlibs
     $P0 = self.'escape'(hll)
     subpir.'append_format'("\n.HLL %0\n", $P0)
+  subpir_loadlibs:
+    $P0 = node.'loadlibs'()
+    if null $P0 goto subpir_ns
+    unless $P0 goto subpir_ns
+    $P1 = iter $P0
+  subpir_loadlibs_loop:
+    unless $P1 goto subpir_ns
+    $P2 = shift $P1
+    $P2 = self.'escape'($P2)
+    subpir.'append_format'("\n.loadlib %0\n", $P2)
+    goto subpir_loadlibs_loop
   subpir_ns:
     subpir.'append_format'("\n.namespace %0\n", nskey)
   subpir_directives:

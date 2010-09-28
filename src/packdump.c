@@ -238,14 +238,13 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               case KEY_integer_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => INTEGER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",
-                            VTABLE_get_integer(interp, key));
+                            key_integer(interp, key));
                 Parrot_io_printf(interp, "       },\n");
                 break;
               case KEY_number_FLAG:
                 {
                     size_t ct_index;
-                    FLOATVAL n;
-                    GETATTR_Key_num_key(interp, key, n);
+                    FLOATVAL n = key_number(interp, key);
 
                     Parrot_io_printf(interp, "        TYPE        => NUMBER\n");
                     ct_index = PackFile_ConstTable_rlookup_num(interp, ct, n);
@@ -259,8 +258,7 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               case KEY_string_FLAG:
                 {
                     size_t ct_index;
-                    STRING *s;
-                    GETATTR_Key_str_key(interp, key, s);
+                    STRING *s = key_string(interp, key);
 
                     Parrot_io_printf(interp, "        TYPE        => STRING\n");
                     ct_index = PackFile_ConstTable_rlookup_str(interp, ct, s);
@@ -399,41 +397,6 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
     }
 }
 
-
-/*
-
-=item C<void PackFile_Fixup_dump(PARROT_INTERP, const PackFile_FixupTable *ft)>
-
-Dumps the fix-up table C<ft>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
-{
-    ASSERT_ARGS(PackFile_Fixup_dump)
-    opcode_t i;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        Parrot_io_printf(interp, "\t#%d\n", (int) i);
-        switch (ft->fixups[i].type) {
-          case enum_fixup_sub:
-            Parrot_io_printf(interp,
-                        "\ttype => %d offs => %8d name => '%s',\n",
-                        (int)ft->fixups[i].type,
-                        (int)ft->fixups[i].offset,
-                        ft->fixups[i].name);
-            break;
-          default:
-            Parrot_io_printf(interp, "\ttype => %d ???,\n",
-                        (int) ft->fixups[i].type);
-            break;
-        }
-    }
-}
 
 /*
 

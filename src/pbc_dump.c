@@ -82,25 +82,6 @@ const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 
 /*
 
-=item C<static void fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
-
-Dump the fixup table.
-
-=cut
-
-*/
-
-static void
-fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
-{
-    Parrot_io_printf(interp, "%Ss => [\n", segp->name);
-    PackFile_Fixup_dump(interp, (const PackFile_FixupTable *)segp);
-    Parrot_io_printf(interp, "],\n");
-}
-
-
-/*
-
 =item C<static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Disassemble and dump.
@@ -432,7 +413,6 @@ main(int argc, const char **argv)
     /* install a dumper function */
     if (!terse) {
         pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
-        pf->PackFuncs[PF_FIXUP_SEG].dump = fixup_dump;
     }
 
     if (disas)

@@ -890,7 +890,6 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
     const Hash_key_type    key_type   = hash->key_type;
     const PARROT_DATA_TYPE entry_type = hash->entry_type;
     const size_t           entries    = hash->entries;
-    size_t                 i;
 
     VTABLE_push_integer(interp, info, entries);
     VTABLE_push_integer(interp, info, key_type);

@@ -26,7 +26,6 @@ Tests the PackfileConstantTable PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-.include 'packfile_constants.pasm'
     'plan'(15)
 
     'test_sanity'()

@@ -375,7 +375,7 @@ method _emit_preamble($fh) {
  * .ops files). by {self<script>}.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 |);
