@@ -311,6 +311,10 @@ static void gc_ms2_unblock_GC_mark(PARROT_INTERP)
 static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -436,6 +440,9 @@ static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_vtable_mark_propagate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms2_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -1256,6 +1263,10 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* Propagate survived objects into older generation */
     if (gen != 2) {
         gc_ms2_propagate_to_older_generation(interp, gen, self->objects[gen], self->objects[gen+1]);
+
+        while (self->root_objects->first)
+            gc_ms2_propagate_to_older_generation(interp, gen, self->root_objects, self->objects[gen+1]);
+
         gc_ms2_propagate_to_older_generation(interp, gen, self->strings[gen], self->strings[gen+1]);
     }
 
@@ -1287,46 +1298,100 @@ gc_ms2_propagate_to_older_generation(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_ms2_propagate_to_older_generation)
     List_Item_Header *next, *tmp = from->first;
+    List_Item_Header *previous_last = to->last;
+
     ++current_gen;
     while (tmp) {
         PObj * obj = LLH2Obj_typed(tmp, PObj);
         next = tmp->next;
 
-        /* We can't do such a naive check for "survived" objects */
-        /* If PMC "A" survived first collection */
-        /* Then PMC "B" was added to it */
-        /* We'll move "A" into older generation */
-        /* But keep "B" in younger */
-        /* Kaboom. "B" collected prematurely on next run */
-        if (1 || obj->flags & PObj_GC_generation_2_FLAG) {
-            /* Move into older generation */
-            LIST_REMOVE(from, tmp);
-            LIST_APPEND(to, tmp);
-            obj->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
-            obj->flags |= generation_to_flags(current_gen);
+        if (!PObj_constant_TEST(obj)) {
 
-            if (PObj_is_PMC_TEST(obj)) {
-                PMC     *pmc = (PMC *)obj;
-                VTABLE  *t   = pmc->vtable;
+            /* We can't do such a naive check for "survived" objects */
+            /* If PMC "A" survived first collection */
+            /* Then PMC "B" was added to it */
+            /* We'll move "A" into older generation */
+            /* But keep "B" in younger */
+            /* Kaboom. "B" collected prematurely on next run */
+            if (1 || obj->flags & PObj_GC_generation_2_FLAG) {
+                /* Move into older generation */
+                LIST_REMOVE(from, tmp);
+                LIST_APPEND(to, tmp);
+                obj->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG);
+                obj->flags |= generation_to_flags(current_gen);
 
-                PARROT_ASSERT(pmc->vtable);
-                PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+                if (PObj_is_PMC_TEST(obj)) {
+                    PMC     *pmc = (PMC *)obj;
+                    VTABLE  *t   = pmc->vtable;
 
-                pmc->vtable = pmc->vtable->wb_variant_vtable;
-                pmc->vtable->wb_variant_vtable = t;
+                    PARROT_ASSERT(pmc->vtable);
+                    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
 
-                PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
-                PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+                    pmc->vtable = pmc->vtable->wb_variant_vtable;
+                    pmc->vtable->wb_variant_vtable = t;
 
+                    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
+                    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+
+                }
             }
-        }
-        else {
-            /* First time survival. */
-            obj->flags |= PObj_GC_generation_2_FLAG;
+            else {
+                /* First time survival. */
+                obj->flags |= PObj_GC_generation_2_FLAG;
+            }
         }
 
         tmp = next;
     }
+
+    /* Ugly, awful, terrible hack. I'm not even trying to find excuse for doing it */
+    /* When we propagating object to older generation we have to propagate all his
+     * dependant objects. To do it I just override mark_pmc_header function with
+     * special version which copy this objects into C<root_objects>. After first
+     * pass I just propagate all gathered objects into older generation */
+    if (to->first && PObj_is_PMC_TEST(LLH2Obj_typed(to->first, PObj))) {
+        size_t count = 0;
+        interp->gc_sys->mark_pmc_header = gc_ms2_vtable_mark_propagate;
+
+        tmp = previous_last
+              ? previous_last->next
+              : to->first;
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            next = tmp->next;
+            if (PObj_custom_mark_TEST(pmc))
+                VTABLE_mark(interp, pmc);
+            ++count;
+            tmp = next;
+        }
+
+        fprintf(stderr, "count: %d\n", count);
+        interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
+    }
+
+}
+
+static void
+gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header  *item = Obj2LLH(pmc);
+    size_t             gen  = PObj_to_generation(pmc);
+
+    /* Objects from older generation will stay */
+    if (gen > self->current_generation)
+        return;
+
+    /* "Constant"... */
+    if (pmc->flags & PObj_constant_FLAG)
+        return;
+
+    if (pmc->flags & PObj_GC_generation_2_FLAG)
+        return;
+
+    LIST_REMOVE(self->objects[gen], item);
+    LIST_APPEND(self->root_objects, item);
+    pmc->flags |= PObj_GC_generation_2_FLAG;
 }
 
 /*
