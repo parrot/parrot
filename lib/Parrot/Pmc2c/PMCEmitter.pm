@@ -814,7 +814,8 @@ EOC
     # Generate WB vtable for implemented non-updating methods
     $vtable_updates = '';
     foreach my $name ( @{ $self->vtable->names} ) {
-        next unless exists $self->{has_method}{$name};
+        next unless exists $self->{has_method}{$name}
+                    && $self->vtable_method_does_write($name);
         next if $name =~ m{ ^init }xo;
         $vtable_updates .= "    vt->$name = Parrot_${classname}_wb_${name};\n";
     }
@@ -995,14 +996,8 @@ $get_extra_vtable
 
 EOC
 
-    $get_extra_vtable = '';
-
-    if ($first_parent eq 'default') {
-        $get_extra_vtable .= "    vt = Parrot_default_wb_get_vtable(interp);\n";
-    }
-    else {
-        $get_extra_vtable .= "    vt = Parrot_${first_parent}_wb_get_vtable(interp);\n";
-    }
+    $get_extra_vtable .= "    vt = Parrot_${classname}_get_vtable(interp);\n";
+    #$get_extra_vtable .= "    Parrot_${first_parent}_wb_update_vtable(interp);\n";
 
     foreach my $parent_name ( @other_parents ) {
         $get_extra_vtable .= "    Parrot_${parent_name}_wb_update_vtable(vt);\n";

@@ -150,6 +150,24 @@ $ro_vtable_decl
 
 EOC
 
+    # Generate WB vtable for implemented non-updating methods
+    my $vtable_updates = '';
+    foreach my $name ( @{ $self->vtable->names} ) {
+        next unless exists $self->{has_method}{$name}
+                    && $self->vtable_method_does_write($name);
+        next if $name =~ m{ ^init }xo;
+        $vtable_updates .= "    vt->$name = Parrot_default_wb_${name};\n";
+    }
+
+    $cout .= <<"EOC";
+
+PARROT_EXPORT
+VTABLE *Parrot_default_wb_update_vtable(ARGMOD(VTABLE *vt)) {
+$vtable_updates
+    return vt;
+}
+
+EOC
     $cout;
 }
 

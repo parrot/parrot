@@ -73,8 +73,8 @@ sub new {
 
         #warn "$pmcname $name\n";
         # Generate WB variant
-        next unless exists $parent->{has_method}{$name};
-        #&& $parent->vtable_method_does_write($name);
+        next unless exists $parent->{has_method}{$name}
+                    && $parent->vtable_method_does_write($name);
 
         # Get parameters.      strip type from param
         my $parameters = join ', ',
