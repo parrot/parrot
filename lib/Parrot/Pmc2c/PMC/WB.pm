@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 
 # $Id$
 
@@ -72,7 +72,7 @@ sub new {
         my $name = $vt_method->name;
 
         #warn "$pmcname $name\n";
-        # Generate WB variant 
+        # Generate WB variant
         next unless exists $parent->{has_method}{$name};
         #&& $parent->vtable_method_does_write($name);
 
