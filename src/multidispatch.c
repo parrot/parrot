@@ -560,6 +560,7 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
             if (PMC_IS_NULL(converted_sig))
                 return PMCNULL;
 
+            Parrot_gc_write_barrier(interp, sub_pmc);
             multi_sig = sub->multi_signature = converted_sig;
         }
 
@@ -598,6 +599,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
             GETATTR_NativePCCMethod_mmd_long_signature(interp, pmc, long_sig);
             multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+            Parrot_gc_write_barrier(interp, pmc);
             SETATTR_NativePCCMethod_mmd_multi_sig(interp, pmc, multi_sig);
         }
     }
@@ -608,6 +610,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
             GETATTR_NCI_long_signature(interp, pmc, long_sig);
             multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+            Parrot_gc_write_barrier(interp, pmc);
             SETATTR_NCI_multi_sig(interp, pmc, multi_sig);
         }
     }
@@ -979,6 +982,8 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     /* Attach a type tuple array to the sub for multi dispatch */
     PMC    *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
 
+    Parrot_gc_write_barrier(interp, sub_obj);
+
     if (sub_obj->vtable->base_type == enum_class_NativePCCMethod) {
         SETATTR_NativePCCMethod_mmd_multi_sig(interp, sub_obj, multi_sig);
     }
@@ -1027,6 +1032,8 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
     PMC    *multi_sig     = mmd_build_type_tuple_from_long_sig(interp,
                                 long_sig_str);
 
+    Parrot_gc_write_barrier(interp, sub_obj);
+
     VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig_str,
                                     F2DPTR(multi_func_ptr));
 
@@ -1071,6 +1078,8 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
 
         /* Create an NCI sub for the C function */
         PMC    *sub_obj       = Parrot_pmc_new_constant(interp, enum_class_NCI);
+
+        Parrot_gc_write_barrier(interp, sub_obj);
 
         VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig,
                                      F2DPTR(func_ptr));
