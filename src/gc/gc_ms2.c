@@ -1298,7 +1298,7 @@ gc_ms2_propagate_to_older_generation(PARROT_INTERP,
         /* We'll move "A" into older generation */
         /* But keep "B" in younger */
         /* Kaboom. "B" collected prematurely on next run */
-        if (0 && obj->flags & PObj_GC_generation_2_FLAG) {
+        if (1 || obj->flags & PObj_GC_generation_2_FLAG) {
             /* Move into older generation */
             LIST_REMOVE(from, tmp);
             LIST_APPEND(to, tmp);
