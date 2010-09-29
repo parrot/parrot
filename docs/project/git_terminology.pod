@@ -47,6 +47,13 @@ cmd>, where "cmd" is the name of the command you want to look up.
 
 =head1 TERMS
 
+=head2 branch
+
+Noun. A symbolic name referring to a commit SHA1. The master branch is just a branch
+called master, it is not special in any way except that it is the default.
+
+Verb. To create a divergent history of commits from a given commit, branch or tag.
+
 =head2 clone
 
 Verb. The term used for copying a remote repo locally, which contains the entire
@@ -55,6 +62,11 @@ history of the git repo being cloned.
 =head2 commitish
 
 Noun. A general term for a way to describe a set of commits.
+
+=head2 rebase
+
+Verb. Update the local index with changes from a remote, then replay local changes,
+in order, on top of them.
 
 =head2 remote
 
@@ -69,10 +81,14 @@ Noun. Short for repository.
 
 =head2 SHA1
 
-Secure Hash Algorithm 1. Also called a SHA1 sum or SHA1 hash. Every git commit
+Noun. Secure Hash Algorithm 1. Also called a SHA1 sum or SHA1 hash. Every git commit
 is uniquely identified by a SHA1. This is roughly similar to a Subversion
 Revision, but it is not an integer and does not increase linearly, because git
 commits can have any number of parents.
+
+=head2 topic branch
+
+Noun. Any branch that is not the master branch.
 
 =head1 SEE ALSO
 
