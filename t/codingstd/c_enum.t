@@ -9,6 +9,25 @@ use lib qw[ . lib ../lib ../../lib ];
 use Test::More tests => 1;
 use Parrot::Distribution;
 
+=head1 NAME
+
+t/codingstd/c_enum.t - checks for rules related to enums in C source
+
+=head1 SYNOPSIS
+
+    # test all files
+    % prove t/codingstd/c_enum.t
+
+    # test specific files
+    % perl t/codingstd/c_enum.t src/foo.c include/parrot/bar.h
+
+
+=head1 DESCRIPTION
+
+Checks that all C language source files use enums appropriately (eg: C89-compliant).
+
+=cut
+
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? <@ARGV> : $DIST->get_c_language_files();
 
@@ -43,3 +62,10 @@ sub check_enums {
 trailing commas in enums are not legal C89
 END_DESCRIPTION
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
