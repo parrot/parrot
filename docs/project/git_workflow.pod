@@ -64,7 +64,8 @@ To get the latest updates:
   $ git fetch
 
 This copies the index from your default remote (origin) and saves it to your
-local index. This does not effect your working copy. To sync up your working
+local index. This does not effect your working copy, so it doesn't matter
+what branch you are on when you run this command. To sync up your working
 copy, you can use C<git rebase>
 
   $ git checkout master       # Switch to the master branch
