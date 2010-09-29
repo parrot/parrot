@@ -34,7 +34,7 @@ typedef enum {
     Hash_key_type_PMC,
     Hash_key_type_ptr,
     Hash_key_type_PMC_ptr,
-    Hash_key_type_STRING_enc,
+    Hash_key_type_STRING_enc
 } Hash_key_type;
 /* &end_gen */
 
