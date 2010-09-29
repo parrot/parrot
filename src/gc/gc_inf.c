@@ -61,7 +61,7 @@ PARROT_CANNOT_RETURN_NULL
 static void * gc_inf_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
@@ -112,7 +112,7 @@ static void gc_inf_reallocate_buffer_storage(SHIM_INTERP,
         FUNC_MODIFIES(*buffer);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_inf_reallocate_memory_chunk(SHIM_INTERP,
     ARGFREE(void *from),
     size_t size);
@@ -524,7 +524,7 @@ gc_inf_allocate_memory_chunk(SHIM_INTERP, size_t size)
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_inf_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 {
@@ -540,13 +540,13 @@ gc_inf_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
@@ -555,7 +555,7 @@ gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
