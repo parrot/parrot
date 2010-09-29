@@ -23,18 +23,18 @@ To get the full version history Parrot, which is called "cloning a repository",
 you will use the C<git clone> command. This will show how to clone the repo from
 L<http://github.com> :
 
-  $ git clone git://github.com/parrot/parrot.git
+  git clone git://github.com/parrot/parrot.git
 
 If you have commit access to parrot.git, then you can use the read/write SSH
 protocol
 
-  $ git clone git@github.com:parrot/parrot.git
+  git clone git@github.com:parrot/parrot.git
 
 If you are behind a firewall that will only let you do HTTP, you can use the
 HTTP protocol, but it is much slower and inefficient, so only use it if you
 must:
 
-  $ git clone http://github.com/parrot/parrot.git
+  git clone http://github.com/parrot/parrot.git
 
 Cloning a git repo automatically makes the URL that you cloned from your
 default "remote", which is called "origin". What this means is that
@@ -46,40 +46,43 @@ when you want to pull in new changes or push changes out in the future,
 To create a branch and check it out, use the C<git checkout -b> command.
 Current convention is to create branch names of the form username/foo.
 
-  $ git checkout -b username/foo
+  git checkout -b username/foo
 
 You can also create a branch without checking it out:
 
-  $ git branch username/foo
+  git branch username/foo
 
 To checkout (or "switch to", as it is commonly referred to) the username/foo
 branch:
 
-  $ git checkout username/foo
+  git checkout username/foo
 
 =head2 Keeping updated
 
 To get the latest updates:
 
-  $ git fetch
+  git fetch
 
 This copies the index from your default remote (origin) and saves it to your
 local index. This does not effect your working copy, so it doesn't matter
 what branch you are on when you run this command. To sync up your working
 copy, you can use C<git rebase>
 
-  $ git checkout master       # Switch to the master branch
-  $ git rebase origin/master  # rebase latest fetched changes onto master
+  git checkout master       # Switch to the master branch
+  git rebase origin/master  # rebase latest fetched changes onto master
 
 This is a common action, so there is also a simpler way to do it:
 
-  $ git pull --rebase
+  git pull --rebase
 
 Whenever you don't specify a remote or branch to a git command, they default
 to the remote called "origin" and the master branch, so the previous command
 means exactly the same as:
 
-  $ git pull --rebase origin master
+  git pull --rebase origin master
+
+This is important to note when you are working with remotes other than origin,
+or other branches.
 
 =head2 How to commit
 
@@ -87,7 +90,7 @@ Let's say you modified the file foo.c and added the file bar.c and you want to c
 these changes. To add these changes to the staging area (the list of stuff 
 that will be included in your next commit) :
 
-  $ git add foo.c bar.c
+  git add foo.c bar.c
 
 The command C<git add> is not only for adding new files, just keep that in mind.
 It tells git "add the state of these files to my staging area."
@@ -97,7 +100,7 @@ system, committing code is seperate from sending your changes to a remote server
 Keep this in mind if you are used to Subversion or similar VCS's, where committing
 and sending changes are tied together.
 
-  $ git commit -m "This is an awesome and detailed commit message"
+  git commit -m "This is an awesome and detailed commit message"
 
 If you do not give the -m option to C<git commit>, it will open your $EDITOR
 and give you metadata which will help you write your commit message,
@@ -113,6 +116,29 @@ It is good practice to describe *why* something was done in the long message,
 in addition to what was done.
 
 =head2 Maintaining a Branch
+
+To update your local git index from origin:
+
+  git fetch
+
+If you are following multiple remotes, you can fetch updates from all of them with
+
+  git fetch --all
+
+Note that this command requires a recent (1.7.x.x) version of git.
+
+The command C<git fetch> only modifies the index, not your working copy or staging
+area. To update your working copy of the branch bobby/tables
+
+  git checkout bobby/tables         # make sure we are on the branch
+  git rebase origin/bobby/tables    # get the latest sql injections
+
+If you have a topic branch and want to pick up the most recent changes in master
+since the topic branch diverged, you can merge the master branch into the topic
+branch. In this case, we assume the topic branch is called parrot/beak:
+
+  git checkout parrot/beak
+  git merge master
 
 =head2 Preparing to Merge a Branch
 
@@ -185,6 +211,12 @@ To remove the remote branch user/foo on the remote origin :
 
   git push origin :user/foo
 
+This follows the general pattern of
+
+  git push origin local_branch_name:remote_branch_name
+
+When local_branch_name is empty, you are pushing "nothing" to the remote branch,
+which deletes it.
 
 =cut
 
