@@ -39,8 +39,8 @@ sub check_enums {
     my @trailing_comma;
 
     foreach my $file (@_) {
-	my $path = @ARGV ? $file : $file->path();
-	my $buf  = $DIST->slurp($path);
+        my $path = @ARGV ? $file : $file->path();
+        my $buf  = $DIST->slurp($path);
 
         # strip ', ", and C comments
         $buf =~ s{ (?:
@@ -50,12 +50,12 @@ sub check_enums {
                    )
                 }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
-	if ($buf =~ /enum \s+ (?: (\w+) \s+ )? {
-			[^}]+,
-		    \s+ } (?: \s+ (\w+) )?/x) {
-	    my $name = $1 || $2 || '(anonymous)';
-	    push @trailing_comma => "$path: $name";
-	}
+        if ($buf =~ /enum \s+ (?: (\w+) \s+ )? {
+                [^}]+,
+                \s+ } (?: \s+ (\w+) )?/x) {
+            my $name = $1 || $2 || '(anonymous)';
+            push @trailing_comma => "$path: $name";
+        }
     }
 
     is( join("\n", @trailing_comma), "", <<END_DESCRIPTION );
