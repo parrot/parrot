@@ -34,12 +34,12 @@ sub runstep {
     $conf->cc_gen('config/auto/timespec/test_c.in');
     eval { $conf->cc_build(); };
     if ($@) {
-	$conf->data->set( HAS_TIMESPEC => 0 );
-	$self->set_result('no');
+        $conf->data->set( HAS_TIMESPEC => 0 );
+        $self->set_result('no');
     }
     else {
-	$conf->data->set( HAS_TIMESPEC => 1 );
-	$self->set_result('yes');
+        $conf->data->set( HAS_TIMESPEC => 1 );
+        $self->set_result('yes');
     }
     $conf->cc_clean();
 
