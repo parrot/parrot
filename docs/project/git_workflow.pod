@@ -170,7 +170,8 @@ merge a branch.
 
 =item 1
 
-Ask people to submit test results for their language, tool, or platform. If
+Ask people to submit test results for their language, tool, or platform. They
+can submit results to Smolder by typing "make smoke" on the relevant branch. If
 you don't hear back from people, it doesn't mean they ran the tests and found
 no problems, it means they didn't bother testing the branch. If you need
 feedback on a particular language or platform, follow up with the person
@@ -216,6 +217,9 @@ You may want to push a topic branch to allow other people to help:
 
   git checkout -b user/foo_in_master
   git push origin user/foo_in_master
+
+You can now mention the problems you ran into to parrot-dev or #parrot
+and mention the branch.
 
 =head2 Announcing a Merge
 
