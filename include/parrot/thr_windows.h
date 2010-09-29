@@ -119,13 +119,12 @@ typedef HANDLE Parrot_thread;
 
 typedef void (*Cleanup_Handler)(void *);
 
-#ifndef _TIMESPEC_DEFINED
-#  define _TIMESPEC_DEFINED
+#if ! PARROT_HAS_TIMESPEC
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#endif /* _TIMESPEC_DEFINED */
+#endif /* PARROT_HAS_TIMESPEC */
 
 #endif /* PARROT_THR_WINDOWS_H_GUARD */
 
