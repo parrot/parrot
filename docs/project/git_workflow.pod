@@ -44,6 +44,10 @@ when you want to pull in new changes or push changes out in the future,
 =head2 Creating and Switching Branches
 
 To create a branch and check it out, use the C<git checkout -b> command.
+Please note that branches are first created locally, and then pushed
+to any number of remotes. A branch cannot be seen by anyone else
+until it is pushed to a remote.
+
 Current convention is to create branch names of the form username/foo.
 
   git checkout -b username/foo
@@ -57,7 +61,21 @@ branch:
 
   git checkout username/foo
 
-=head2 Keeping updated
+=head2 Pushing branches and tags
+
+If you want to push your local branch user/branch to origin:
+
+  git push origin user/branch
+
+Tags are not pushed by default. If you want to push your tags to origin:
+
+  git push origin --tags
+
+Since origin is the default remote, this is the same as
+
+  git push --tags
+
+=head2 Keeping branches updated
 
 To get the latest updates:
 
@@ -190,6 +208,14 @@ useful to type C<git commit> with no commit message argument (-m), so your
 $EDITOR will be opened and a default commit message of "Merged branch user/foo
 into master" with a list of conflicted files will be present, which can be left
 alone or additional information can be added.
+
+At this point you should run the test suite on the merged branch, and fix
+any failures if possible. If these problems cannot be resolved, then
+the results of the merge should not be pushed back to master on origin.
+You may want to push a topic branch to allow other people to help:
+
+  git checkout -b user/foo_in_master
+  git push origin user/foo_in_master
 
 =head2 Announcing a Merge
 
