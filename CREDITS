@@ -400,6 +400,10 @@ D: Miscellaneous fixes
 N: Gerard Goossen
 D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
+N: Géraud Continsouzas
+D: Perl2Pir tests conversion
+D: Miscellaneous codingstd fixes
+
 N: Gerd Pokorra
 E: pokorra@uni-siegen.de
 D: Release manager for 1.9.0, 2.3.0, 2.5.0 and 2.8.0
