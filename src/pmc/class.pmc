@@ -261,6 +261,8 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     /* Store built attribute index and invalidate cache. */
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
+
+    Parrot_gc_write_barrier(interp, self);
 }
 
 /*
