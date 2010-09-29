@@ -454,7 +454,7 @@ D: string.pmc, complex.pmc
 N: isop
 D: various Pynie patches
 
-N: James E Keenan (Jim)
+N: James E Keenan (Jim) (aka kid51)
 E: jkeenan@cpan.org
 U: jkeenan
 D: Testing of configuration and build tools
