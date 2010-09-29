@@ -400,7 +400,9 @@ D: Miscellaneous fixes
 N: Gerard Goossen
 D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
-N: Géraud Continsouzas
+N: GÃ©raud Continsouzas
+U: GeJ
+A: geraud
 D: Perl2Pir tests conversion
 D: Miscellaneous codingstd fixes
 
