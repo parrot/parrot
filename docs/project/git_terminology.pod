@@ -59,7 +59,7 @@ Verb. To create a divergent history of commits from a given commit, branch or ta
 Verb. The term used for copying a remote repo locally, which contains the entire
 history of the git repo being cloned.
 
-=head2 commitish
+=head2 commit-ish, committish
 
 Noun. A general term for a way to describe a set of commits.
 
