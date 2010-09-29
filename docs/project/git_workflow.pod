@@ -137,8 +137,11 @@ If you have a topic branch and want to pick up the most recent changes in master
 since the topic branch diverged, you can merge the master branch into the topic
 branch. In this case, we assume the topic branch is called parrot/beak:
 
-  git checkout parrot/beak
-  git merge master
+  git checkout parrot/beak          # make sure we are on the branch
+  git merge master                  # merge master into parrot/beak
+
+This same pattern can be followed for merging any branch into another
+branch.
 
 =head2 Preparing to Merge a Branch
 
@@ -168,13 +171,14 @@ want tested.
 
 =back
 
-=head2 Syncing branches
-
 =head2 Merging a Branch
 
 When you're ready to merge your changes back into master, use the C<git merge>
-command. First, make sure you are on the master branch with C<git checkout
-master>. Now, to merge the branch user/foo into master:
+command. First, make sure you are on the master branch with
+
+  git checkout master
+
+Now, to merge the branch user/foo into master:
 
   git merge user/foo
 
