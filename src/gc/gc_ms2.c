@@ -1365,7 +1365,7 @@ gc_ms2_propagate_to_older_generation(PARROT_INTERP,
             tmp = next;
         }
 
-        fprintf(stderr, "count: %d\n", count);
+        //fprintf(stderr, "count: %d\n", count);
         interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
     }
 
