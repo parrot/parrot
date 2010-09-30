@@ -814,10 +814,11 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
         if (PObj_on_free_list_TEST(s))
             return;
         Parrot_list_remove(interp, self->strings, Obj2LLH(s));
-        PObj_on_free_list_SET(s);
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer *)s);
+
+        PObj_on_free_list_SET(s);
 
         Parrot_gc_pool_free(interp, self->string_allocator, Obj2LLH(s));
 
@@ -1093,10 +1094,11 @@ gc_ms2_sweep_pool(PARROT_INTERP,
             PObj_live_CLEAR(obj);
         }
         else if (!PObj_constant_TEST(obj)) {
-            PObj_on_free_list_SET(obj);
             LIST_REMOVE(list, tmp);
 
             callback(interp, obj);
+
+            PObj_on_free_list_SET(obj);
 
             Parrot_gc_pool_free(interp, pool, tmp);
         }
