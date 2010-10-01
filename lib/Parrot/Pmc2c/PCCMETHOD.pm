@@ -429,7 +429,12 @@ END
 END
     }
     $e->emit( <<'END', __FILE__, __LINE__ + 1 );
+
+    Parrot_gc_write_barrier(interp, _self);
+
     { /* BEGIN PMETHOD BODY */
+
+
 END
 
     $e_post->emit( <<'END', __FILE__, __LINE__ + 1 );
