@@ -963,7 +963,8 @@ void
 Parrot_gc_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_write_barrier)
-    interp->gc_sys->write_barrier(interp, pmc);
+    if (interp->gc_sys->write_barrier)
+        interp->gc_sys->write_barrier(interp, pmc);
 }
 
 /*
