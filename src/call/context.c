@@ -755,6 +755,7 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
+    Parrot_gc_write_barrier(interp, ctx);
     return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_s[idx]);
 }
 
@@ -776,6 +777,7 @@ Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
+    Parrot_gc_write_barrier(interp, ctx);
     return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
 }
 
