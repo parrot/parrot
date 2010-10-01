@@ -45,6 +45,7 @@ my @steps = qw(
     auto::memalign
     auto::signal
     auto::socklen_t
+    auto::stat
     auto::neg_0
     auto::env
     auto::timespec
