@@ -1336,7 +1336,7 @@ TODO Write docu.
 */
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 {
@@ -1345,7 +1345,7 @@ gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
