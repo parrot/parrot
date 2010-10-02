@@ -123,7 +123,7 @@ const struct _data_types data_types[] = {
 };
 #endif /* INSIDE_GLOBAL_SETUP */
 
-#if defined(__NetBSD__) && defined(__alpha__)
+#ifdef PARROT_HAS_INF_NAN
 #  include <math.h>
 #  define PARROT_FLOATVAL_INF_POSITIVE	INFINITY
 #  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY
