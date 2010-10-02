@@ -160,13 +160,9 @@ static STRING *
 utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(utf16_to_encoding)
-#if PARROT_HAS_ICU
-    UErrorCode err;
-    int dest_len;
-    UChar *p;
-#endif
-    int src_len;
-    STRING *result;
+    int           src_len, dest_len;
+    Parrot_UInt2 *p;
+    STRING       *result;
 
     if (src->encoding == Parrot_utf16_encoding_ptr
     ||  src->encoding == Parrot_ucs2_encoding_ptr)
@@ -174,56 +170,58 @@ utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
          * and downcase functions assume to get an unshared buffer */
         return Parrot_str_clone(interp, src);
 
-    result = Parrot_gc_new_string_header(interp, 0);
+    result  = Parrot_gc_new_string_header(interp, 0);
+    src_len = STRING_length(src);
 
-    /*
-     * TODO adapt string creation functions
-     */
-    src_len = src->strlen;
     if (!src_len) {
         result->encoding = Parrot_ucs2_encoding_ptr;
-        result->strlen = result->bufused = 0;
         return result;
     }
-#if PARROT_HAS_ICU
-    Parrot_gc_allocate_string_storage(interp, result, sizeof (UChar) * src_len);
-    p = (UChar *)result->strstart;
 
-    if (src->encoding == Parrot_latin1_encoding_ptr ||
-            src->encoding == Parrot_ascii_encoding_ptr) {
-        for (dest_len = 0; dest_len < (int)src->strlen; ++dest_len) {
-            p[dest_len] = (UChar)((unsigned char*)src->strstart)[dest_len];
+    Parrot_gc_allocate_string_storage(interp, result, 2 * src_len);
+    p = (Parrot_UInt2 *)result->strstart;
+
+    if (STRING_max_bytes_per_codepoint(src) == 1) {
+        for (dest_len = 0; dest_len < src_len; ++dest_len) {
+            p[dest_len] = (unsigned char)src->strstart[dest_len];
         }
     }
-    else {
-        err = U_ZERO_ERROR;
-        u_strFromUTF8(p, src_len,
-                &dest_len, src->strstart, src->bufused, &err);
+    else if (src->encoding == Parrot_utf8_encoding_ptr) {
+#if PARROT_HAS_ICU
+        UErrorCode err = U_ZERO_ERROR;
+
+        u_strFromUTF8(p, src_len, &dest_len, src->strstart, src->bufused, &err);
+
         if (!U_SUCCESS(err)) {
             /*
              * have to resize - required len in UChars is in dest_len
              */
-            result->bufused = dest_len * sizeof (UChar);
-            Parrot_gc_reallocate_string_storage(interp, result,
-                                     sizeof (UChar) * dest_len);
-            p = (UChar *)result->strstart;
-            u_strFromUTF8(p, dest_len,
-                    &dest_len, src->strstart, src->bufused, &err);
+            result->bufused = 2 * dest_len;
+            Parrot_gc_reallocate_string_storage(interp, result, 2 * dest_len);
+
+            p = (Parrot_UInt2 *)result->strstart;
+            u_strFromUTF8(p, dest_len, &dest_len, src->strstart, src->bufused, &err);
             PARROT_ASSERT(U_SUCCESS(err));
         }
+#else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "no ICU lib loaded");
+#endif
     }
-    result->bufused = dest_len * sizeof (UChar);
-    result->encoding = Parrot_utf16_encoding_ptr;
-    result->strlen = src_len;
+    else {
+        UNIMPL;
+    }
+
+    result->bufused  = 2 * dest_len;
+    result->strlen   = src_len;
 
     /* downgrade if possible */
-    if (dest_len == (int)src->strlen)
+    if (dest_len == src_len)
         result->encoding = Parrot_ucs2_encoding_ptr;
+    else
+        result->encoding = Parrot_utf16_encoding_ptr;
+
     return result;
-#else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
 }
 
 /*
