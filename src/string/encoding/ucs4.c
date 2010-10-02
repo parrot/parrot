@@ -86,9 +86,7 @@ static void ucs4_iter_skip(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
 
-static UINTVAL ucs4_ord(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset)
+static UINTVAL ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -225,8 +223,7 @@ ucs4_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL ucs4_ord(PARROT_INTERP, const STRING *src, UINTVAL
-offset)>
+=item C<static UINTVAL ucs4_ord(PARROT_INTERP, const STRING *src, INTVAL idx)>
 
 Returns the codepoint in string C<src> at position C<offset>.
 
@@ -235,15 +232,24 @@ Returns the codepoint in string C<src> at position C<offset>.
 */
 
 static UINTVAL
-ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
+ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(ucs4_ord)
 #if PARROT_HAS_ICU
-    const UChar32 * const s = (const UChar32*) src->strstart;
-    UNUSED(interp);
-    return s[offset];
+    const UINTVAL  len = STRING_length(src);
+    const UChar32 *s;
+
+    if (idx < 0)
+        idx += len;
+
+    if ((UINTVAL)idx >= len)
+        encoding_ord_error(interp, src, idx);
+
+    s = (const UChar32 *)src->strstart;
+
+    return s[idx];
 #else
-    UNUSED(offset);
+    UNUSED(idx);
     UNUSED(src);
     no_ICU_lib(interp);
 #endif

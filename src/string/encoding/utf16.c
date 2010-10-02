@@ -73,7 +73,7 @@ static void utf16_iter_skip(PARROT_INTERP,
 
 static UINTVAL utf16_ord(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset)
+    INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -264,8 +264,7 @@ utf16_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL utf16_ord(PARROT_INTERP, const STRING *src, UINTVAL
-offset)>
+=item C<static UINTVAL utf16_ord(PARROT_INTERP, const STRING *src, INTVAL idx)>
 
 Returns the codepoint in string C<src> at position C<offset>.
 
@@ -274,21 +273,29 @@ Returns the codepoint in string C<src> at position C<offset>.
 */
 
 static UINTVAL
-utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
+utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(utf16_ord)
 #if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) src->strstart;
-    UINTVAL c, pos;
-    UNUSED(interp);
+    const UINTVAL len = STRING_length(src);
+    const UChar  *s;
+    UINTVAL       c, pos;
 
+    if (idx < 0)
+        idx += len;
+
+    if ((UINTVAL)idx >= len)
+        encoding_ord_error(interp, src, idx);
+
+    s   = (UChar *)src->strstart;
     pos = 0;
-    U16_FWD_N_UNSAFE(s, pos, offset);
+    U16_FWD_N_UNSAFE(s, pos, idx);
     U16_GET_UNSAFE(s, pos, c);
+
     return c;
 #else
     UNUSED(src);
-    UNUSED(offset);
+    UNUSED(idx);
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");

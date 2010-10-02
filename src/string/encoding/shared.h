@@ -85,6 +85,12 @@ INTVAL encoding_is_cclass(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+void encoding_ord_error(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    INTVAL offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 INTVAL encoding_rindex(PARROT_INTERP,
     SHIM(const STRING *src),
@@ -181,7 +187,7 @@ void fixed8_iter_skip(SHIM_INTERP,
         FUNC_MODIFIES(*iter);
 
 PARROT_WARN_UNUSED_RESULT
-UINTVAL fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
+UINTVAL fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -277,6 +283,9 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_encoding_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_encoding_ord_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_encoding_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_encoding_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -147,12 +147,12 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&
                 len == 1 &&
-                string_ord(interp, str, 0) == '0') {
+                STRING_ord(interp, str, 0) == '0') {
             str = Parrot_str_chopn(interp, str, len);
             len = 0;
         }
         /* +, space */
-        if (!len || string_ord(interp, str, 0) != '-') {
+        if (!len || STRING_ord(interp, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
                 STRING * const cs = CONST_STRING(interp, "+");
                 str = Parrot_str_concat(interp, cs, str);
@@ -197,8 +197,8 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(interp, str, 0) == '-' ||
-                    string_ord(interp, str, 0) == '+')) {
+                && (STRING_ord(interp, str, 0) == '-' ||
+                    STRING_ord(interp, str, 0) == '+')) {
                 STRING *temp = NULL;
                 STRING *ignored;
                 temp = Parrot_str_substr(interp, str, 1, len-1);
@@ -429,7 +429,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
     for (i = 0; i < pat_len; ++i) {
-        if (string_ord(interp, pat, i) == '%') {        /* % */
+        if (STRING_ord(interp, pat, i) == '%') {        /* % */
             if (len) {
                 substr = Parrot_str_substr(interp, pat, old, len);
                 /* XXX This shouldn't modify targ the pointer */
@@ -437,7 +437,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
             }
             len = 0;
             old = i;
-            if (string_ord(interp, pat, i + 1) == '%') {
+            if (STRING_ord(interp, pat, i + 1) == '%') {
                 /* skip this one, make next the first char
                  * of literal sequence, starting at old */
                 ++i;
@@ -548,7 +548,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
  */
 
                 for (++i; i < pat_len && info.phase != PHASE_DONE; ++i) {
-                    const INTVAL ch = string_ord(interp, pat, i);
+                    const INTVAL ch = STRING_ord(interp, pat, i);
 
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:

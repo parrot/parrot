@@ -40,11 +40,11 @@ If $3 is less than the negative of the length of $2, an exception is thrown.
 =cut
 
 inline op ord(out INT, in STR) :base_core {
-    $1 = string_ord(interp, $2, 0);
+    $1 = STRING_ord(interp, $2, 0);
 }
 
 inline op ord(out INT, in STR, in INT) :base_core {
-    $1 = string_ord(interp, $2, $3);
+    $1 = STRING_ord(interp, $2, $3);
 }
 
 

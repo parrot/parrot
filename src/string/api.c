@@ -756,14 +756,13 @@ Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<INTVAL Parrot_str_indexed(PARROT_INTERP, const STRING *s, UINTVAL idx)>
+=item C<INTVAL Parrot_str_indexed(PARROT_INTERP, const STRING *s, INTVAL idx)>
 
-Returns the character (or glyph, depending upon the string's encoding).  This
-abstracts the process of finding the Nth character in a (possibly Unicode or
-JIS-encoded) string, the idea being that once the encoding functions are
-fleshed out, this function can do the right thing.
+Returns the codepoint at a given index into a string. Negative indexes are
+treated as counting from the end of the string. Throws an exception if C<s>
+is null or C<idx> is out of bounds.
 
-Note that this is not range-checked.
+Identical to the STRING_ord macro.
 
 =cut
 
@@ -772,11 +771,14 @@ Note that this is not range-checked.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
+Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_str_indexed)
-    ASSERT_STRING_SANITY(s);
-    return (INTVAL)STRING_ord(interp, s, idx);
+
+    if (s == NULL)
+        s = STRINGNULL;
+
+    return STRING_ord(interp, s, idx);
 }
 
 
@@ -826,26 +828,9 @@ INTVAL
 string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 {
     ASSERT_ARGS(string_ord)
-    const UINTVAL len        = STRING_length(s);
 
-    if (idx < 0)
-        idx += len;
-
-    if ((UINTVAL)idx >= len) {
-        const char *err_msg;
-
-        if (STRING_IS_NULL(s))
-            err_msg = "Cannot get character of NULL string";
-        else if (!len)
-            err_msg = "Cannot get character of empty string";
-        else if (idx >= 0)
-            err_msg = "Cannot get character past end of string";
-        else if (idx < 0)
-            err_msg = "Cannot get character before beginning of string";
-
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
-            err_msg);
-    }
+    if (s == NULL)
+        s = STRINGNULL;
 
     return STRING_ord(interp, s, idx);
 }
@@ -2847,7 +2832,7 @@ string_increment(PARROT_INTERP, ARGIN(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "increment only for length = 1 done");
 
-    o = (UINTVAL)string_ord(interp, s, 0);
+    o = (UINTVAL)STRING_ord(interp, s, 0);
 
     if ((o >= 'A' && o < 'Z') || (o >= 'a' && o < 'z')) {
         ++o;

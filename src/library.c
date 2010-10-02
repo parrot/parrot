@@ -448,8 +448,8 @@ path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
     STRING * const path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
-    if (Parrot_str_indexed(interp, path , path->strlen - 1)
-         != Parrot_str_indexed(interp, path_separator_string, 0))
+    if (STRING_ord(interp, path, -1)
+         != STRING_ord(interp, path_separator_string, 0))
         path = Parrot_str_concat(interp, path , path_separator_string);
 
     return path;

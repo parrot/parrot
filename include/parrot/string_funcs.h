@@ -201,9 +201,7 @@ STRING * Parrot_str_from_num(PARROT_INTERP, FLOATVAL f)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_str_indexed(PARROT_INTERP,
-    ARGIN(const STRING *s),
-    UINTVAL idx)
+INTVAL Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

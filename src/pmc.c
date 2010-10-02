@@ -1004,14 +1004,14 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
         pos = idx;
         len = Parrot_str_byte_length(interp, role);
 
-        if (pos && (Parrot_str_indexed(interp, what, pos - 1) != 32)) {
+        if (pos && (STRING_ord(interp, what, pos - 1) != 32)) {
             pos += len;
             continue;
         }
 
         if (pos + len < length) {
             pos += len;
-            if (Parrot_str_indexed(interp, what, pos) != 32)
+            if (STRING_ord(interp, what, pos) != 32)
                 continue;
         }
 

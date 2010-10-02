@@ -447,7 +447,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return string_ord(INTERP, str_val, pos);
+        return STRING_ord(INTERP, str_val, pos);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
