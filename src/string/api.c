@@ -245,43 +245,48 @@ string_rep_compatible(SHIM_INTERP,
 {
     ASSERT_ARGS(string_rep_compatible)
 
-    if (a->encoding == b->encoding) {
+    PARROT_ASSERT(a->encoding && b->encoding);
+
+    if (a->encoding == b->encoding)
         return a->encoding;
-    }
 
     /* a table could possibly simplify the logic */
-    if (a->encoding == Parrot_utf8_encoding_ptr
-    &&  b->encoding == Parrot_ascii_encoding_ptr) {
-        if (a->strlen == a->bufused) {
-            return b->encoding;
-        }
-        return a->encoding;
-    }
 
-    if (b->encoding == Parrot_utf8_encoding_ptr
-    &&  a->encoding == Parrot_ascii_encoding_ptr) {
-        if (b->strlen == b->bufused) {
+    if (STRING_max_bytes_per_codepoint(a) == 1
+    &&  STRING_max_bytes_per_codepoint(b) == 1) {
+        /* Return the "largest" encoding where ascii < latin1 < binary */
+
+        if (b->encoding == Parrot_ascii_encoding_ptr)
+            return a->encoding;
+        if (a->encoding == Parrot_ascii_encoding_ptr)
+            return b->encoding;
+        if (a->encoding == Parrot_binary_encoding_ptr)
+            return a->encoding;
+        if (b->encoding == Parrot_binary_encoding_ptr)
+            return b->encoding;
+    }
+    else {
+        /* UTF-8 strings are ASCII compatible if their byte length equals
+           their codepoint length. This is a nice trick but it can cause many
+           surprises when UTF-8 strings are suddenly "downgraded" to ASCII
+           strings. */
+
+        if (a->encoding == Parrot_utf8_encoding_ptr
+        &&  b->encoding == Parrot_ascii_encoding_ptr) {
+            if (a->strlen == a->bufused) {
+                return b->encoding;
+            }
             return a->encoding;
         }
-        return b->encoding;
+
+        if (b->encoding == Parrot_utf8_encoding_ptr
+        &&  a->encoding == Parrot_ascii_encoding_ptr) {
+            if (b->strlen == b->bufused) {
+                return a->encoding;
+            }
+            return b->encoding;
+        }
     }
-
-    /* Sanity check before dereferencing the encoding pointers */
-    if (a->encoding == NULL || b->encoding == NULL)
-        return NULL;
-
-    if (STRING_max_bytes_per_codepoint(a) != 1 ||
-        STRING_max_bytes_per_codepoint(b) != 1)
-        return NULL;
-
-    if (b->encoding == Parrot_ascii_encoding_ptr)
-        return a->encoding;
-    if (a->encoding == Parrot_ascii_encoding_ptr)
-        return b->encoding;
-    if (a->encoding == Parrot_binary_encoding_ptr)
-        return a->encoding;
-    if (b->encoding == Parrot_binary_encoding_ptr)
-        return b->encoding;
 
     return NULL;
 }
