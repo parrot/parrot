@@ -9,11 +9,11 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread\b/ ) {
-        $libs .= ' -lpthread';
-    }
-    if ( $libs !~ /-lrt\b/ ) {
-        $libs .= ' -lrt';    # Needed for sched_yield.
+    # rt is needed for sched_yield.
+    for my $lib qw(socket nsl pthread rt) {
+        if ( $libs !~ /-l$lib\b/ ) {
+            $libs .= " -l$lib";
+        }
     }
     $conf->data->set( libs => $libs );
 
@@ -59,11 +59,10 @@ sub runstep {
     my $solaris_cc_shared_cb = sub {
         my ( $key, $gccversion ) = @_;
 
-        if ($gccversion) {
-            $conf->data->set( cc_shared => '-fPIC' );
-        }
-        else {
-            $conf->data->set( cc_shared => '-KPIC' );
+        if (!$gccversion) {
+            $conf->data->set( cc_shared      => '-KPIC' );
+            $conf->data->set( ld_share_flags => '-G' );
+            $conf->data->set( ld_load_flags  => '-G' );
         }
         $conf->data->set( 'has_dynamic_linking', '1' );
         $conf->data->set( 'parrot_is_shared', '1' );

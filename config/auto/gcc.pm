@@ -83,9 +83,14 @@ sub _evaluate_gcc {
     $gccversion .= ".$minor" if defined $minor;
     $self->set_result("yes, $gccversion");
 
+    $conf->data->set(
+        cc_shared      => '-fPIC',
+        ld_share_flags => '-shared -fPIC',
+        ld_load_flags  => '-shared -fPIC',
+        noinline       => '__attribute__ ((noinline))',
+    );
     $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
         if $gccversion >= 4.0 && !$conf->data->get('sym_export');
-    $conf->data->set( noinline => '__attribute__ ((noinline))' );
 
     # sneaky check for g++
     my $gpp = (index($conf->data->get('cc'), '++') > 0) ? 1 : 0;

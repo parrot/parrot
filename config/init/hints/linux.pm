@@ -33,31 +33,18 @@ sub runstep {
 
         # Intel C++ compiler has the same name as its C compiler
         $link = $cc;
-        $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
-        $cc_shared .= ' -fPIC';
 
         $ccflags = _handle_icc_ccflags($conf, $ccflags);
 
     }
     elsif ( $cc =~ /suncc/ ) {
         $link = 'sunCC';
-        if ( $ld_share_flags !~ /-KPIC/ ) {
-            $ld_share_flags = '-KPIC';
+        if ( $ld_share_flags !~ /-G/ ) {
+            $ld_share_flags = '-G';
         }
         if ( $cc_shared !~ /-KPIC/ ) {
             $cc_shared = '-KPIC';
         }
-    }
-    else {
-        if ( $ld_share_flags !~ /-fPIC/ ) {
-            $ld_share_flags .= ' -fPIC';
-        }
-        if ( $cc_shared !~ /-fPIC/ ) {
-            $cc_shared .= ' -fPIC';
-        }
-
-        # --export-dynamic, s. info gcc, ld
-        $linkflags .= ' -Wl,-E';
     }
 
     if ( $ccflags !~ /-D_GNU_SOURCE/ ) {

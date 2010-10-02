@@ -90,11 +90,6 @@ sub _get_programs {
 
     $ccflags = integrate( $conf->data->get('ccflags'),
         $conf->options->get('ccflags') );
-
-    # Remove some perl5-isms.
-    $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
-    $ccflags =~ s/-fno-strict-aliasing//g;
-    $ccflags =~ s/-fnative-struct//g;
     $ccflags = prompt( "What flags should your C compiler receive?", $ccflags )
         if $ask;
     $conf->data->set( ccflags => $ccflags );
@@ -112,25 +107,17 @@ sub _get_programs {
 
 
     $linkflags = $conf->data->get('linkflags');
-    # Remove the path to the Perl library (from Win32 config).
-    # See TT #854.
-    $linkflags =~ s/-libpath:\S+//g;
     $linkflags = integrate( $linkflags, $conf->options->get('linkflags') );
     $linkflags = prompt( "And flags for your linker?", $linkflags ) if $ask;
     $conf->data->set( linkflags => $linkflags );
 
     $ldflags = $conf->data->get('ldflags');
-    # For substitution below, see comment for $linkflags above.
-    $ldflags =~ s/-libpath:\S+//g;
     $ldflags = integrate( $ldflags, $conf->options->get('ldflags') );
     $ldflags = prompt( "And your $ld flags for building shared libraries?", $ldflags )
         if $ask;
     $conf->data->set( ldflags => $ldflags );
 
     $libs = $conf->data->get('libs');
-    $libs = join q{ },
-        grep { $conf->data->get('OSNAME_provisional') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
-        split( q{ }, $libs );
     $libs = integrate( $libs, $conf->options->get('libs') );
     $libs = prompt( "What libraries should your C compiler use?", $libs )
         if $ask;

@@ -12,9 +12,6 @@ sub runstep {
     my $version   = $conf->option_or_data('VERSION');
     my $libs = $conf->data->get('libs');
 
-    # get rid of old pthread-stuff, if any
-    $libs =~ s/(-lpthreads|-lc_r)\b\s*//g;
-
     # The following test is from FreeBSD's /usr/ports/Mk/bsd.port.mk,
     # which must be assumed to do the right thing.
 

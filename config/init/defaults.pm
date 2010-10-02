@@ -85,6 +85,8 @@ sub runstep {
     $build_dir    =~ s{ }{\\ }g;
 
     my $cc_option = $conf->options->get('cc');
+    my $cc        = $cc_option ? $cc_option : $Config{cc};
+
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
@@ -97,57 +99,57 @@ sub runstep {
 
         # Compiler -- used to turn .c files into object files.
         # (Usually cc or cl, or something like that.)
-        cc      => $cc_option ? $cc_option : $Config{cc},
+        cc      => $cc,
         # If we specify a compiler, we can't use existing ccflags.
-        ccflags => $cc_option ? ''         : $Config{ccflags},
+        ccflags => '',
         ccwarn  => '',
 
         # Flags used to indicate this object file is to be compiled
         # with position-independent code suitable for dynamic loading.
-        cc_shared => $Config{cccdlflags},    # e.g. -fpic for GNU cc.
+        cc_shared => '',    # e.g. -fpic for GNU cc.
 
         # Linker, used to link object files (plus libraries) into
         # an executable.  It is usually $cc on Unix-ish systems.
         # VMS and Win32 might use "Link".
         # Perl5's Configure doesn't distinguish linking from loading, so
         # make a reasonable guess at defaults.
-        link      => $Config{cc},
-        linkflags => $Config{ldflags},
+        link      => $cc,
+        linkflags => '',
 
         # Linker Flags to have this binary work with the shared and dynamically
         # loadable libraries we're building.  On HP-UX, for example, we need to
         # allow dynamic libraries to access the binary's symbols
-        link_dynamic => $ccdlflags,    # e.g. -Wl,-E on HP-UX
+        link_dynamic => '',    # e.g. -Wl,-E on HP-UX
 
         # ld: Tool used to build shared libraries and dynamically loadable
         # modules. Often $cc on Unix-ish systems, but apparently sometimes
         # it's ld.
-        ld      => $Config{ld},
-        ldflags => $Config{ldflags},
+        ld      => $cc,
+        ldflags => '',
 
         # Some operating systems (e.g. Darwin) distinguish between shared
         # libraries and modules that can be dynamically loaded.  Flags to tell
         # ld to build a shared library, e.g.  -shared for GNU ld.
-        ld_share_flags => $Config{lddlflags},
+        ld_share_flags => '',
 
         # Flags to tell ld to build a dynamically loadable module, e.g.
         # -shared for GNU ld.
-        ld_load_flags => $Config{lddlflags},
+        ld_load_flags => '',
 
-        libs => $Config{libs},
+        libs => '',
 
         cc_inc     => "-I./include -I./include/pmc",
         cc_debug   => '-g',
         link_debug => '',
 
-        o         => $Config{_o},       # object files extension
-        share_ext => ".$Config{so}",    # shared library extension
+        o         => '.o',       # object files extension
+        share_ext => '.so',      # shared library extension
 
         # dynamically loadable module extension
-        load_ext => ".$Config{so}",
-        a        => $Config{_a},        # library or archive extension
-        exe      => $Config{_exe},      # executable files extension
-        cc_o_out => '-o ',              # cc object output file
+        load_ext => '.so',
+        a        => '.a',        # library or archive extension
+        exe      => '',          # executable files extension
+        cc_o_out => '-o ',       # cc object output file
 
         # cc executable output file (different on Win32)
         cc_exe_out => '-o ',
@@ -170,8 +172,8 @@ sub runstep {
         blib_dir => 'blib/lib',
 
         # libparrot library names
-        libparrot_static => 'libparrot' . $Config{_a},
-        libparrot_shared => 'libparrot.' . $Config{so},
+        libparrot_static => 'libparrot.a',
+        libparrot_shared => 'libparrot.so',
 
         # does the system know about static/dynamic linking?
         has_static_linking  => 1,
@@ -196,7 +198,7 @@ sub runstep {
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
 
-        ar        => $Config{ar},
+        ar        => 'ar',
         arflags   => 'cr',
 
         # for Win32
@@ -204,7 +206,7 @@ sub runstep {
 
         # for Borland C
         ar_extra      => '',
-        ranlib        => $Config{ranlib},
+        ranlib        => ':',
         rpath         => '',
         make          => $Config{make},
         make_set_make => $Config{make_set_make},

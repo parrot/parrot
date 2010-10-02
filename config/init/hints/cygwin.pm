@@ -8,14 +8,6 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    # cygwin's perl is compiled with -lutil, which for some reason is not
-    # in the standard installation, so we get rid of it
-    my $libs = $conf->data->get('libs');
-    $libs =~ s/-lutil\b//g;
-    # same for -lm and -dl
-    $libs =~ s/-lm\b//g;
-    $libs =~ s/-ldl\b//g;
-
     my $build_dir = $conf->data->get('build_dir');
     $build_dir =~ s/ /\\ /g;
     my $bindir = $conf->data->get('bindir');
@@ -40,9 +32,6 @@ sub runstep {
         ld                  => $conf->data->get('ld') eq 'ld2'
                                ? 'gcc' # do not use old perl5 linker helper
                                : $conf->data->get('ld'), # gcc or g++
-        ld_share_flags      => '-shared',
-        ld_load_flags       => '-shared',
-        libs                => $libs,
         has_static_linking  => 0,
         has_dynamic_linking => 1,
         parrot_is_shared    => 1,

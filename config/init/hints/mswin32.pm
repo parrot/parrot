@@ -26,11 +26,25 @@ sub runstep {
     my $is_bcc   = $cc =~ m/\bbcc32(?:\.exe)?/i;
 
     $conf->data->set(
-        win32  => 1,
-        PQ     => '"',
-        make_c => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
+        win32             => 1,
+        PQ                => '"',
+        make_c            => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
         ncilib_link_extra => '-def:src/libnci_test.def',
+        clock_best        => ' ',
+        slash             => '\\',
+        exe               => '.exe',
+        share_ext         => '.dll',
+        load_ext          => '.dll',
+        libparrot_shared  => 'libparrot.dll',
     );
+
+    if (!$is_mingw) {
+        $conf->data->set(
+            a => '.lib',
+            o => '.obj',
+            libparrot_static => 'libparrot.obj',
+        );
+    }
 
     my $build_dir = $conf->data->get('build_dir');
 
@@ -43,8 +57,6 @@ sub runstep {
     if ( $bindir =~ /\s/ ) {
         $conf->data->set( bindir => Win32::GetShortPathName($bindir) );
     }
-
-    $conf->data->set( clock_best => ' ' );
 
     if ($is_msvc) {
         my $msvcversion = $conf->data->get('msvcversion');
@@ -75,10 +87,6 @@ sub runstep {
         }
 
         $conf->data->set(
-            share_ext  => '.dll',
-            load_ext   => '.dll',
-            a          => '.lib',
-            o          => '.obj',
             cc_o_out   => '-Fo',
             cc_exe_out => '-out:',
             cc_ldflags => '/link',
@@ -95,12 +103,9 @@ sub runstep {
             ld_out              => '-out:',
             ldflags             => '-nologo -nodefaultlib',
             libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
-            libparrot_static    => 'libparrot' . $conf->data->get('a'),
-            libparrot_shared    => "libparrot$share_ext",
             ar                  => 'lib',
             arflags             => '',
             ar_out              => '-out:',
-            slash               => '\\',
             ccflags             => $ccflags,
             ccwarn              => $ccwarn,
             has_dynamic_linking => 1,
@@ -131,10 +136,6 @@ sub runstep {
     }
     elsif ($is_intel) {
         $conf->data->set(
-            share_ext  => '.dll',
-            load_ext   => '.dll',
-            a          => '.lib',
-            o          => '.obj',
             cc_o_out   => '-Fo',
             cc_exe_out => '-out:',
             cc_ldflags => '/link',
@@ -151,7 +152,6 @@ sub runstep {
             ar                  => 'xilib',
             arflags             => '',
             ar_out              => '-out:',
-            slash               => '\\',
             ccflags             => $ccflags,
             ccwarn              => '',
             has_dynamic_linking => 1
@@ -170,18 +170,14 @@ sub runstep {
     }
     elsif ($is_bcc) {
         $conf->data->set(
-            o         => '.obj',
-            a         => '.lib',
-            share_ext => '.dll',
-            load_ext  => '.dll',
-            cc        => ${cc},
-            ccflags =>
+            cc         => $cc,
+            ccflags    =>
                 '-O2 -w-8066 -DWIN32 -DNO_STRICT -DNDEBUG -D_CONSOLE -w-par -w-aus -w-ccc -w-rch',
             cc_o_out   => '-o',
             cc_exe_out => '-e',
             cc_debug   => '-v',
 
-            ld             => ${cc},
+            ld             => $cc,
             ldflags        => '',
             ld_out         => '-e',
             cc_ldflags     => '',
@@ -190,66 +186,23 @@ sub runstep {
             ld_load_flags  => '-WD',
             libs           => 'import32.lib cw32.lib',
 
-            link      => ${cc},
+            link      => $cc,
             linkflags => '',
 
             ar       => 'tlib /a /P128',
             arflags  => '',
             ar_out   => '',
             ar_extra => '',
-            slash    => '\\',
             make_and => "\n\t",
         );
     }
     elsif ($is_mingw) {
-        my $make = $conf->data->get(qw(make));
-        if ( $make =~ /nmake/i ) {
-
-            # ActiveState Perl
-            $conf->data->set(
-                a       => '.a',
-                ar      => 'ar',
-                ccflags => '-DWIN32 ',
-                ld      => 'g++',
-                ldflags => '',
-                libs =>
-'-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion ',
-                link      => 'gcc',
-                linkflags => '',
-                o         => '.o',
-            );
-        }
-        elsif ( $make =~ /dmake/i ) {
-
-            # strawberry Perl
-            $conf->data->set(
-                ccflags   => '-DWIN32 ',
-                ldflags   => '',
-                linkflags => '',
-                optimize  => '',
-            );
-        }
-        elsif ( $make =~ /mingw32-make/i ) {
-            ; # Vanilla Perl
-            $conf->data->set(
-                make      => 'mingw32-make',
-                make_c    => 'mingw32-make -C',
-            );
-        }
-        else {
-            warn "unknown configuration";
-        }
-
-        if ( $conf->data->get(qw(optimize)) eq "1" ) {
-            $conf->data->set( optimize => '-O2' );
-        }
-
         $conf->data->set(
             cc                  => 'gcc',
+            ccflags             => '-DWIN32',
+            libs                => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion',
             parrot_is_shared    => 1,
             has_dynamic_linking => 1,
-            ld_load_flags       => '-shared ',
-            ld_share_flags      => '-shared ',
             libparrot_ldflags   => "\"$build_dir\\libparrot.dll\"",
             inst_libparrot_ldflags => "\"$bindir\\libparrot.dll\"",
             libparrot_linkflags   => "\"$build_dir\\libparrot.dll\"",
@@ -257,7 +210,6 @@ sub runstep {
             ncilib_link_extra   => 'src/libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
-            slash               => '\\',
         );
     }
 }
