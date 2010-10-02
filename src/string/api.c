@@ -430,14 +430,17 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     STRING           *dest;
     UINTVAL           total_length;
 
-    if (STRING_IS_NULL(a)) {
-        if (STRING_IS_NULL(b))
-            return STRINGNULL;
+    if (STRING_IS_NULL(a) && STRING_IS_NULL(b))
+        return STRINGNULL;
+
+    if (STRING_length(a) == 0) {
+        if (STRING_length(b) == 0)
+            return CONST_STRING(interp, "");
         else
             return Parrot_str_copy(interp, b);
     }
     else {
-        if (STRING_IS_NULL(b))
+        if (STRING_length(b) == 0)
             return Parrot_str_copy(interp, a);
     }
 
@@ -779,8 +782,8 @@ Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 
 /*
 
-=item C<INTVAL Parrot_str_find_index(PARROT_INTERP, const STRING *s, const
-STRING *s2, INTVAL start)>
+=item C<INTVAL Parrot_str_find_index(PARROT_INTERP, const STRING *src, const
+STRING *search, INTVAL start)>
 
 Returns the character position of the second Parrot string in the first at or
 after C<start>. The return value is a (0 based) offset in characters, not
@@ -793,36 +796,16 @@ bytes. If second string is not found in the first string, returns -1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *s),
-        ARGIN(const STRING *s2), INTVAL start)
+Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *src),
+        ARGIN(const STRING *search), INTVAL start)
 {
     ASSERT_ARGS(Parrot_str_find_index)
-    UINTVAL len;
 
-    if (start < 0)
+    if ((UINTVAL)start >= STRING_length(src)
+    ||  !STRING_length(search))
         return -1;
 
-    len = Parrot_str_length(interp, s);
-
-    if (!len)
-        return -1;
-
-    if (start >= (INTVAL)len)
-        return -1;
-
-    /* Short circuit when s is the same as s2 */
-    if (s == s2)
-        return start == 0 ? 0 : -1;
-
-    if (!Parrot_str_length(interp, s2))
-        return -1;
-    else {
-        DECL_CONST_CAST;
-        STRING *src    = PARROT_const_cast(STRING *, s);
-        STRING *search = PARROT_const_cast(STRING *, s2);
-
-        return STRING_index(interp, src, search, (UINTVAL)start);
-    }
+    return STRING_index(interp, src, search, (UINTVAL)start);
 }
 
 
@@ -843,32 +826,28 @@ INTVAL
 string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 {
     ASSERT_ARGS(string_ord)
-    UINTVAL len;
-    UINTVAL       true_index = (UINTVAL)idx;
+    const UINTVAL len        = STRING_length(s);
 
-    if (STRING_IS_NULL(s))
+    if (idx < 0)
+        idx += len;
+
+    if ((UINTVAL)idx >= len) {
+        const char *err_msg;
+
+        if (STRING_IS_NULL(s))
+            err_msg = "Cannot get character of NULL string";
+        else if (!len)
+            err_msg = "Cannot get character of empty string";
+        else if (idx >= 0)
+            err_msg = "Cannot get character past end of string";
+        else if (idx < 0)
+            err_msg = "Cannot get character before beginning of string";
+
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
-            "Cannot get character of NULL string");
-
-    len = Parrot_str_length(interp, s);
-    if (len == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
-            "Cannot get character of empty string");
-
-    if (idx < 0) {
-        if ((INTVAL)(idx + len) < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_ORD_OUT_OF_STRING,
-                "Cannot get character before beginning of string");
-
-        true_index = (UINTVAL)(len + idx);
+            err_msg);
     }
 
-    if (true_index > (len - 1))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
-            "Cannot get character past end of string");
-
-    return Parrot_str_indexed(interp, s, true_index);
+    return STRING_ord(interp, s, idx);
 }
 
 
@@ -1008,39 +987,37 @@ Parrot_str_substr(PARROT_INTERP,
         ARGIN_NULLOK(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(Parrot_str_substr)
-
-    UINTVAL       true_length;
-    UINTVAL       true_offset = (UINTVAL)offset;
-    const UINTVAL src_length  = Parrot_str_length(interp, src);
-
-    if (STRING_IS_NULL(src))
-        Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_SUBSTR_OUT_OF_STRING, "Cannot substr on a null string");
-
-    ASSERT_STRING_SANITY(src);
-
-    /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-    if (true_offset == src_length || length < 1)
-        return CONST_STRING(interp, "");
+    const UINTVAL strlen = STRING_length(src);
+    UINTVAL       maxlen;
 
     if (offset < 0)
-        true_offset = src_length + offset;
+        offset += strlen;
 
-    /* 0 based... */
-    if (src_length == 0 || true_offset > src_length - 1)
+    if ((UINTVAL)offset >= strlen || length <= 0) {
+        if (STRING_IS_NULL(src))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_SUBSTR_OUT_OF_STRING, "Cannot substr on a null string");
+
+        /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
+        if ((UINTVAL)offset == strlen || length <= 0)
+            return Parrot_str_new_noinit(interp, 0);
+
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Cannot take substr outside string");
+    }
 
-    true_length = (UINTVAL)length;
+    ASSERT_STRING_SANITY(src);
 
-    if (true_length > (src_length - true_offset))
-        true_length = (UINTVAL)(src_length - true_offset);
+    maxlen = strlen - offset;
 
-    if (true_length == src_length && !offset)
+    if ((UINTVAL)length > maxlen)
+        length = maxlen;
+
+    if (length == strlen && !offset)
         return (STRING *)src;
-    else
-        return STRING_substr(interp, src, true_offset, true_length);
+
+    return STRING_substr(interp, src, offset, length);
 }
 
 /*
@@ -1054,7 +1031,6 @@ Returns the substring between iterators C<l> and C<r>.
 
 */
 
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
@@ -1096,7 +1072,6 @@ or -1 if it wasn't found.
 
 */
 
-PARROT_EXPORT
 INTVAL
 Parrot_str_iter_index(PARROT_INTERP,
     ARGIN(const STRING *src),
@@ -1292,47 +1267,12 @@ STRING *
 Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
 {
     ASSERT_ARGS(Parrot_str_chopn)
+    INTVAL end = -n;
 
-    STRING * const chopped = Parrot_str_copy(interp, s);
-    UINTVAL new_length;
+    if (n >= 0)
+        end += STRING_length(s);
 
-    if (n < 0) {
-        new_length = -n;
-        if (new_length > chopped->strlen)
-            return chopped;
-    }
-    else {
-        if (chopped->strlen > (UINTVAL)n)
-            new_length = chopped->strlen - n;
-        else
-            new_length = 0;
-    }
-
-    chopped->hashval = 0;
-
-    if (!new_length || !chopped->strlen) {
-        chopped->bufused = chopped->strlen = 0;
-        return chopped;
-    }
-
-    if (STRING_max_bytes_per_codepoint(chopped) == 1) {
-        chopped->bufused = new_length;
-    }
-    else if (chopped->encoding == Parrot_ucs2_encoding_ptr) {
-        const UINTVAL uchar_size = chopped->bufused / chopped->strlen;
-        chopped->bufused = new_length * uchar_size;
-    }
-    else {
-        String_iter iter;
-
-        STRING_ITER_INIT(interp, &iter);
-        STRING_iter_set_position(interp, s, &iter, new_length);
-        chopped->bufused = iter.bytepos;
-    }
-
-    chopped->strlen = new_length;
-
-    return chopped;
+    return Parrot_str_substr(interp, s, 0, end);
 }
 
 
@@ -1356,11 +1296,14 @@ INTVAL
 Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_compare)
-    if (STRING_IS_NULL(s2))
-        return s1 && (s1->strlen != 0);
+    UINTVAL len1 = STRING_length(s1);
+    UINTVAL len2 = STRING_length(s2);
 
-    if (STRING_IS_NULL(s1))
-        return -(s2->strlen != 0);
+    if (len2 == 0)
+        return len1 != 0;
+
+    if (len1 == 0)
+        return -1;
 
     ASSERT_STRING_SANITY(s1);
     ASSERT_STRING_SANITY(s2);
@@ -1411,33 +1354,21 @@ INTVAL
 Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_equal)
+    UINTVAL len1 = STRING_length(s1);
+    UINTVAL len2 = STRING_length(s2);
 
-    if ((s1 == s2) || (STRING_IS_NULL(s1) && STRING_IS_NULL(s2)))
-        return 1;
-    else if (STRING_IS_NULL(s2))
-        return s1->strlen == 0;
-    else if (STRING_IS_NULL(s1))
-        return s2->strlen == 0;
-
-   /* we don't care which is bigger */
-    else if (s1->strlen != s2->strlen)
-        return 0;
-    else if ((s1->hashval != s2->hashval) && s1->hashval && s2->hashval)
+    if (len1 == 0)
+        return len2 == 0;
+    else if (len2 == 0)
         return 0;
 
-    /* s2->strlen is the same here */
-    else if (s1->strlen == 0)
+    if (s1 == s2)
         return 1;
 
-    /* COWed strings */
-    else if ((s1->strstart == s2->strstart) && (s1->bufused == s2->bufused))
-        return 1;
+    if (s1->strlen != s2->strlen
+    || (s1->hashval && s2->hashval && s1->hashval != s2->hashval))
+        return 0;
 
-    /*
-     * now,
-     * both strings are non-null
-     * both strings have same length
-     */
     return STRING_compare(interp, s1, s2) == 0;
 }
 
@@ -1800,13 +1731,13 @@ INTVAL
 Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_boolean)
-    const INTVAL len = !STRING_IS_NULL(s) ? Parrot_str_length(interp, s) : 0;
+    const INTVAL len = STRING_length(s);
 
     if (len == 0)
         return 0;
 
     if (len == 1) {
-        const UINTVAL c = Parrot_str_indexed(interp, s, 0);
+        const UINTVAL c = STRING_ord(interp, s, 0);
 
         /* relying on character literals being interpreted as ASCII--may
         not be correct on EBCDIC systems. use numeric value instead? */
