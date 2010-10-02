@@ -318,7 +318,7 @@ Tests Parrot string registers and operations.
     .local int r
     null s
     eh = new ['ExceptionHandler']
-    eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
+    eh.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
     set_addr eh, handler
     push_eh eh
     r = 1

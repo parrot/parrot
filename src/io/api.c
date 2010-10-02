@@ -364,7 +364,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             if (offset + read_length > orig_length)
                 read_length = orig_length - offset;
 
-            result = Parrot_str_substr(interp, string_orig, offset, read_length);
+            result = STRING_substr(interp, string_orig, offset, read_length);
             SETATTR_StringHandle_read_offset(interp, pmc, offset + read_length);
         }
     }
@@ -422,7 +422,7 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
         else
             read_length = newline_pos - offset + 1; /* +1 to include the newline */
 
-        result = Parrot_str_substr(interp, result, offset, read_length);
+        result = STRING_substr(interp, result, offset, read_length);
         SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
     }
     else

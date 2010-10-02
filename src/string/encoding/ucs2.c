@@ -97,15 +97,6 @@ static UINTVAL ucs2_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING * ucs2_substr(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -137,9 +128,6 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs2_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ucs2_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs2_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -242,39 +230,6 @@ ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 #endif
 }
 
-/*
-
-=item C<static STRING * ucs2_substr(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Returns the codepoints in string C<src> at position C<offset> and length
-C<count>.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-ucs2_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(ucs2_substr)
-    STRING * const return_string = Parrot_str_copy(interp, src);
-
-#if PARROT_HAS_ICU
-    return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
-    return_string->bufused  = count * sizeof (UChar);
-    return_string->strlen   = count;
-    return_string->hashval  = 0;
-    return return_string;
-#else
-    UNUSED(src);
-    UNUSED(offset);
-    UNUSED(count);
-    no_ICU_lib(interp);
-#endif
-}
 
 /*
 
@@ -471,7 +426,7 @@ static STR_VTABLE Parrot_ucs2_encoding = {
 
     ucs2_scan,
     ucs2_ord,
-    ucs2_substr,
+    fixed_substr,
 
     encoding_is_cclass,
     encoding_find_cclass,

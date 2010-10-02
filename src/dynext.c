@@ -355,7 +355,7 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), Parrot_dlopen_flags flags,
         *handle = Parrot_dlopen((char *)lib->strstart + 3, 0);
 
         if (*handle)
-            return Parrot_str_substr(interp, lib, 3, lib->strlen - 3);
+            return STRING_substr(interp, lib, 3, lib->strlen - 3);
     }
 #endif
 
@@ -363,7 +363,7 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), Parrot_dlopen_flags flags,
 #ifdef __CYGWIN__
     if (!STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
         path = Parrot_str_concat(interp, CONST_STRING(interp, "cyg"),
-            Parrot_str_substr(interp, lib, 3, lib->strlen - 3));
+            STRING_substr(interp, lib, 3, lib->strlen - 3));
 
         *handle = dlopen_string(interp, flags, path);
 
