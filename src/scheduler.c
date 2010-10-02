@@ -137,13 +137,13 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
             PMC    * const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
             STRING * const type     = VTABLE_get_string(interp, type_pmc);
 
-            if (Parrot_str_equal(interp, type, CONST_STRING(interp, "callback"))) {
+            if (STRING_equal(interp, type, CONST_STRING(interp, "callback"))) {
                 Parrot_cx_invoke_callback(interp, task);
             }
-            else if (Parrot_str_equal(interp, type, CONST_STRING(interp, "timer"))) {
+            else if (STRING_equal(interp, type, CONST_STRING(interp, "timer"))) {
                 Parrot_cx_timer_invoke(interp, task);
             }
-            else if (Parrot_str_equal(interp, type, CONST_STRING(interp, "event"))) {
+            else if (STRING_equal(interp, type, CONST_STRING(interp, "event"))) {
                 PMC * const handler = Parrot_cx_find_handler_for_task(interp, task);
                 if (!PMC_IS_NULL(handler)) {
                     PMC * const handler_sub = VTABLE_get_attr_str(interp, handler, CONST_STRING(interp, "code"));
@@ -455,7 +455,7 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         for (index = 0; index < num_tasks; ++index) {
             PMC *message = VTABLE_get_pmc_keyed_int(interp, sched_struct->messages, index);
             if (!PMC_IS_NULL(message)
-            &&   Parrot_str_equal(interp, VTABLE_get_string(interp, message),
+            &&   STRING_equal(interp, VTABLE_get_string(interp, message),
                         suspend_str)) {
                 VTABLE_delete_keyed_int(interp, sched_struct->messages, index);
                 UNLOCK(sched_struct->msg_lock);
@@ -533,9 +533,9 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
         typedef enum { Hunknown,  Hexception, Hevent } Htype;
 
         const Htype htype =
-            Parrot_str_equal(interp, handler_type, exception_str) ?
+            STRING_equal(interp, handler_type, exception_str) ?
             Hexception :
-            Parrot_str_equal(interp, handler_type, event_str) ?
+            STRING_equal(interp, handler_type, event_str) ?
                 Hevent :
                 Hunknown;
         STRING * const handler_name = (htype == Hexception) ? handler_str : (STRING *)NULL;
@@ -606,9 +606,9 @@ Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
         typedef enum { Hunknown,  Hexception, Hevent } Htype;
 
         const Htype htype =
-            (Parrot_str_equal(interp, handler_type, exception_str)) ?
+            (STRING_equal(interp, handler_type, exception_str)) ?
             Hexception :
-            (Parrot_str_equal(interp, handler_type, event_str)) ?
+            (STRING_equal(interp, handler_type, event_str)) ?
                 Hevent :
                 Hunknown;
         STRING * const handler_name = (htype == Hexception) ? handler_str : (STRING *)NULL;
@@ -1132,7 +1132,7 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #endif
         UNLOCK(sched_struct->msg_lock);
         if (!PMC_IS_NULL(message)
-         && Parrot_str_equal(interp, VTABLE_get_string(interp, message),
+         && STRING_equal(interp, VTABLE_get_string(interp, message),
                 suspend_str)) {
 #if CX_DEBUG
     fprintf(stderr, "found a suspend, suspending [interp=%p]\n", interp);

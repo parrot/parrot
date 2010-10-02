@@ -416,21 +416,21 @@ composed into this role.
         /* What should we return? */
         PMC         *found;
 
-        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "name"))) {
+        if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "name"))) {
             found = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, found, role->name);
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "namespace"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "namespace"))) {
             /* Don't clone the namespace, as it's not part of our state. */
             return role->_namespace;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "attributes"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "attributes"))) {
             found = role->attrib_metadata;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
             found = role->methods;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "roles"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "roles"))) {
             found = role->roles;
         }
         else {
@@ -541,7 +541,7 @@ Returns whether the class does the role with the given C<*rolename>.
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
 
-        if (Parrot_str_equal(INTERP, role->name, role_name))
+        if (STRING_equal(INTERP, role->name, role_name))
             return 1;
 
         count = VTABLE_elements(INTERP, role->roles);

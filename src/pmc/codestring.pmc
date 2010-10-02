@@ -128,10 +128,10 @@ A newline is automatically added to the end of the fmt.
             const INTVAL I0 = Parrot_str_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
-        else if (Parrot_str_equal(INTERP, key, comma)) {
+        else if (STRING_equal(INTERP, key, comma)) {
             repl = Parrot_str_join(INTERP, comma_space, args);
         }
-        else if (Parrot_str_equal(INTERP, key, percent)) {
+        else if (STRING_equal(INTERP, key, percent)) {
             repl = percent;
         }
         else {

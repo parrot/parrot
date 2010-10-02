@@ -501,10 +501,10 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
         FLOATVAL value;
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             GET_ATTR_re(INTERP, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             GET_ATTR_im(INTERP, SELF, value);
         }
         else
@@ -687,10 +687,10 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             SET_ATTR_re(INTERP, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             SET_ATTR_im(INTERP, SELF, value);
         }
         else

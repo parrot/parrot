@@ -674,7 +674,7 @@ Parrot_io_is_encoding(PARROT_INTERP, ARGIN(const PMC *filehandle), ARGIN(STRING 
     if (STRING_IS_NULL(handle_struct->encoding))
         return 0;
 
-    if (Parrot_str_equal(interp, value, handle_struct->encoding))
+    if (STRING_equal(interp, value, handle_struct->encoding))
         return 1;
 
     return 0;

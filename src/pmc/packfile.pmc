@@ -316,7 +316,7 @@ Fetch a string keyed value from the packfile object.  Valid keys are:
 
 */
     VTABLE STRING *get_string_keyed_str(STRING *key) {
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "uuid")))
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "uuid")))
             return PARROT_PACKFILE(SELF)->uuid;
 
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
@@ -431,7 +431,7 @@ keys are:
 */
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
-        if (!Parrot_str_compare(INTERP, key, CONST_STRING(INTERP, "uuid"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "uuid"))) {
             PARROT_PACKFILE(SELF)->uuid = value;
             return;
         }
@@ -532,23 +532,23 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
     ASSERT_ARGS(getAttrEnum)
 
     AttrEnumPackfile r;
-    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "wordsize")))
+    if (STRING_equal(interp, name, CONST_STRING(interp, "wordsize")))
         r = attr_wordsize;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "byteorder")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "byteorder")))
         r = attr_byteorder;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fptype")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "fptype")))
         r = attr_fptype;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "version_major")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "version_major")))
         r = attr_version_major;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "version_minor")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "version_minor")))
         r = attr_version_minor;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "version_patch")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "version_patch")))
         r = attr_version_patch;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "bytecode_major")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "bytecode_major")))
         r = attr_bytecode_major;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "bytecode_minor")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "bytecode_minor")))
         r = attr_bytecode_minor;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "uuid_type")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "uuid_type")))
         r = attr_uuid_type;
     else
         r = attr_NONE;

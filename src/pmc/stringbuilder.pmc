@@ -394,7 +394,7 @@ key receives the value of the hash element.
                     VTABLE_get_string_keyed_int(INTERP, args,
                         Parrot_str_to_int(INTERP, key)));
             }
-            else if (Parrot_str_equal(INTERP, key, comma)) {
+            else if (STRING_equal(INTERP, key, comma)) {
                 INTVAL num_args = VTABLE_elements(INTERP, args);
                 INTVAL pos_args;
 
@@ -405,7 +405,7 @@ key receives the value of the hash element.
                         VTABLE_get_string_keyed_int(INTERP, args, pos_args));
                 }
             }
-            else if (Parrot_str_equal(INTERP, key, percent)) {
+            else if (STRING_equal(INTERP, key, percent)) {
                 VTABLE_push_string(INTERP, stringbuilder, percent);
             }
             else {

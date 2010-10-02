@@ -287,7 +287,7 @@ C<key> is "message".
         STRING * const name = VTABLE_get_string(INTERP, key);
         STRING *message;
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
+        if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
             message = SELF.get_string();
         }
         else {
@@ -421,7 +421,7 @@ Sets the Parrot string value for C<*key>.
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
         STRING * const name = VTABLE_get_string(INTERP, key);
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
+        if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
             SELF.set_string_native(value);
         }
         else {
@@ -844,29 +844,29 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
     ASSERT_ARGS(getAttrEnum)
 
     AttrEnum r;
-    if (Parrot_str_equal(interp, name, CONST_STRING(interp, "birthtime")))
+    if (STRING_equal(interp, name, CONST_STRING(interp, "birthtime")))
         r = attr_birthtime;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "message")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "message")))
         r = attr_message;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "payload")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "payload")))
         r = attr_payload;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "resume")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "resume")))
         r = attr_resume;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "severity")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "severity")))
         r = attr_severity;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "type")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "type")))
         r = attr_type;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exit_code")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "exit_code")))
         r = attr_exit_code;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "backtrace")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "backtrace")))
         r = attr_backtrace;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "handled")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "handled")))
         r = attr_handled;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "handler_iter")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "handler_iter")))
         r = attr_handler_iter;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "handler_ctx")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "handler_ctx")))
         r = attr_handler_ctx;
-    else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "thrower")))
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "thrower")))
         r = attr_thrower;
     else
         r = attr_NONE;
