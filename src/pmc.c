@@ -996,7 +996,7 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 
     do {
         INTVAL len;
-        const INTVAL idx = Parrot_str_find_index(interp, what, role, (INTVAL)pos);
+        const INTVAL idx = STRING_index(interp, what, role, pos);
 
         if ((idx < 0) || (idx >= length))
             return 0;

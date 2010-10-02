@@ -115,7 +115,7 @@ A newline is automatically added to the end of the fmt.
 
     while (pos >= 0) {
         pos += replen;
-        pos = Parrot_str_find_index(INTERP, fmt, percent, pos);
+        pos = STRING_index(INTERP, fmt, percent, pos);
         if (pos < 0)
             break;
 
@@ -277,14 +277,14 @@ prefixed with 'unicode:'.
 
     escaped_str = Parrot_str_concat(INTERP, quote, escaped_str);
     escaped_str = Parrot_str_concat(INTERP, escaped_str, quote);
-    x_pos       = Parrot_str_find_index(INTERP, escaped_str, x, 0);
+    x_pos       = STRING_index(INTERP, escaped_str, x, 0);
 
     if (x_pos != -1) {
         is_unicode = 1;
     }
     else {
         STRING * const u = CONST_STRING(INTERP, "\\u");
-        const INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
+        const INTVAL u_pos = STRING_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }

@@ -284,11 +284,11 @@ B<index> returns "-1".
 =cut
 
 inline op index(out INT, in STR, in STR) :base_core {
-    $1 = ($2 && $3) ? Parrot_str_find_index(interp, $2, $3, 0) : -1;
+    $1 = ($2 && $3) ? STRING_index(interp, $2, $3, 0) : -1;
 }
 
 inline op index(out INT, in STR, in STR, in INT) :base_core {
-    $1 = ($2 && $3) ? Parrot_str_find_index(interp, $2, $3, $4) : -1;
+    $1 = ($2 && $3) ? STRING_index(interp, $2, $3, $4) : -1;
 }
 
 

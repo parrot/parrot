@@ -1040,7 +1040,7 @@ slurpy arguments).
                 EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
 
-        kind = Parrot_str_find_index(INTERP, types, reg, 0);
+        kind = STRING_index(INTERP, types, reg, 0);
 
         if (kind == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,

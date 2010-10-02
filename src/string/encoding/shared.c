@@ -148,7 +148,7 @@ encoding_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rh
 /*
 
 =item C<INTVAL encoding_index(PARROT_INTERP, const STRING *src, const STRING
-*search, UINTVAL offs)>
+*search, INTVAL offset)>
 
 Searches for the first instance of STRING C<search> in STRING C<src>.
 returns the position where the substring is found if it is indeed found.
@@ -161,14 +161,18 @@ ASCII.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-encoding_index(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search),
-    UINTVAL offs)
+encoding_index(PARROT_INTERP, ARGIN(const STRING *src),
+        ARGIN(const STRING *search), INTVAL offset)
 {
     ASSERT_ARGS(encoding_index)
     String_iter start, end;
 
+    if ((UINTVAL)offset >= STRING_length(src)
+    ||  !STRING_length(search))
+        return -1;
+
     STRING_ITER_INIT(interp, &start);
-    STRING_iter_set_position(interp, src, &start, offs);
+    STRING_iter_set_position(interp, src, &start, offset);
 
     return Parrot_str_iter_index(interp, src, &start, &end, search);
 }
@@ -177,7 +181,7 @@ encoding_index(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *sear
 /*
 
 =item C<INTVAL encoding_rindex(PARROT_INTERP, const STRING *src, const STRING
-*search_string, UINTVAL offset)>
+*search_string, INTVAL offset)>
 
 Finds the last index of substring C<search_string> in STRING C<src>,
 starting from C<offset>. Not implemented.
@@ -189,7 +193,7 @@ starting from C<offset>. Not implemented.
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 encoding_rindex(PARROT_INTERP, SHIM(const STRING *src),
-        SHIM(const STRING *search_string), SHIM(UINTVAL offset))
+        SHIM(const STRING *search_string), SHIM(INTVAL offset))
 {
     ASSERT_ARGS(encoding_rindex)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
@@ -725,7 +729,7 @@ fixed8_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs)
 /*
 
 =item C<INTVAL fixed8_index(PARROT_INTERP, const STRING *src, const STRING
-*search_string, UINTVAL offset)>
+*search, INTVAL offset)>
 
 Searches for the first instance of STRING C<search> in STRING C<src>.
 returns the position where the substring is found if it is indeed found.
@@ -738,26 +742,23 @@ Returns -1 otherwise.
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 fixed8_index(PARROT_INTERP, ARGIN(const STRING *src),
-        ARGIN(const STRING *search_string), UINTVAL offset)
+        ARGIN(const STRING *search), INTVAL offset)
 {
     ASSERT_ARGS(fixed8_index)
     INTVAL retval;
 
-    if (STRING_max_bytes_per_codepoint(search_string) != 1) {
-        return encoding_index(interp, src, search_string, offset);
-    }
+    if ((UINTVAL)offset >= STRING_length(src)
+    ||  !STRING_length(search))
+        return -1;
 
-    PARROT_ASSERT(STRING_max_bytes_per_codepoint(src) == 1);
-    retval = Parrot_byte_index(interp, src,
-            search_string, offset);
-    return retval;
+    return Parrot_byte_index(interp, src, search, offset);
 }
 
 
 /*
 
 =item C<INTVAL fixed8_rindex(PARROT_INTERP, const STRING *src, const STRING
-*search_string, UINTVAL offset)>
+*search_string, INTVAL offset)>
 
 Searches for the last instance of STRING C<search_string> in STRING
 C<src>. Starts searching at C<offset>.
@@ -769,7 +770,7 @@ C<src>. Starts searching at C<offset>.
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 fixed8_rindex(PARROT_INTERP, ARGIN(const STRING *src),
-        ARGIN(const STRING *search_string), UINTVAL offset)
+        ARGIN(const STRING *search_string), INTVAL offset)
 {
     ASSERT_ARGS(fixed8_rindex)
     INTVAL retval;

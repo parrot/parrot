@@ -957,10 +957,19 @@ WHILE:
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, null strings' )
 
+    .local pmc eh
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
+    set_addr eh, handler
+    push_eh eh
+    $I1 = 1
     null $S0
     null $S1
-    index $I1, $S0, $S1
-    is( $I1, "-1", 'index, null strings' )
+    index $I0, $S0, $S1
+    $I1 = 0
+  handler:
+    pop_eh
+    is( $I1, "1", "index with null string throws" )
 .end
 
 .sub index_embedded_nulls
