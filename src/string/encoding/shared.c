@@ -195,7 +195,7 @@ encoding_rindex(PARROT_INTERP, SHIM(const STRING *src),
 
 /*
 
-=item C<size_t encoding_hash(PARROT_INTERP, const STRING *src, size_t seed)>
+=item C<size_t encoding_hash(PARROT_INTERP, const STRING *src, size_t hashval)>
 
 Computes the hash of the given STRING C<src> with starting seed value C<seed>.
 
@@ -205,19 +205,22 @@ Computes the hash of the given STRING C<src> with starting seed value C<seed>.
 
 PARROT_WARN_UNUSED_RESULT
 size_t
-encoding_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
+encoding_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t hashval)
 {
     ASSERT_ARGS(encoding_hash)
+    DECL_CONST_CAST;
+    STRING * const s = PARROT_const_cast(STRING *, src);
     String_iter iter;
-    size_t      hashval = seed;
 
     STRING_ITER_INIT(interp, &iter);
 
-    while (iter.charpos < src->strlen) {
-        const UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
+    while (iter.charpos < s->strlen) {
+        const UINTVAL c = STRING_iter_get_and_advance(interp, s, &iter);
         hashval += hashval << 5;
         hashval += c;
     }
+
+    s->hashval = hashval;
 
     return hashval;
 }
@@ -772,7 +775,7 @@ fixed8_rindex(PARROT_INTERP, ARGIN(const STRING *src),
 
 /*
 
-=item C<size_t fixed8_hash(PARROT_INTERP, const STRING *s, size_t hashval)>
+=item C<size_t fixed8_hash(PARROT_INTERP, const STRING *src, size_t hashval)>
 
 Returns the hashed value of the string, given a seed in hashval.
 
@@ -782,16 +785,23 @@ Returns the hashed value of the string, given a seed in hashval.
 
 PARROT_WARN_UNUSED_RESULT
 size_t
-fixed8_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
+fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
 {
     ASSERT_ARGS(fixed8_hash)
-    const unsigned char *pos = (const unsigned char *)s->strstart;
-    UINTVAL        len = s->strlen;
+    DECL_CONST_CAST;
+    STRING * const s = PARROT_const_cast(STRING *, src);
+    const unsigned char *pos;
+    UINTVAL len;
+
+    pos = (const unsigned char *)s->strstart;
+    len = s->strlen;
 
     while (len--) {
         hashval += hashval << 5;
         hashval += *(pos++);
     }
+
+    s->hashval = hashval;
 
     return hashval;
 }

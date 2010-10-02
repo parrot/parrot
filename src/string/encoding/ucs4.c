@@ -36,10 +36,9 @@ static void no_ICU_lib(PARROT_INTERP) /* HEADERIZER SKIP */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static size_t ucs4_hash(PARROT_INTERP,
-    ARGIN(const STRING *s),
+static size_t ucs4_hash(SHIM_INTERP,
+    ARGIN(const STRING *src),
     size_t hashval)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static UINTVAL ucs4_iter_get(PARROT_INTERP,
@@ -102,8 +101,7 @@ static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_ucs4_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
@@ -386,7 +384,8 @@ ucs4_iter_set_position(PARROT_INTERP,
 
 /*
 
-=item C<static size_t ucs4_hash(PARROT_INTERP, const STRING *s, size_t hashval)>
+=item C<static size_t ucs4_hash(PARROT_INTERP, const STRING *src, size_t
+hashval)>
 
 Returns the hashed value of the string, given a seed in hashval.
 
@@ -395,17 +394,23 @@ Returns the hashed value of the string, given a seed in hashval.
 */
 
 static size_t
-ucs4_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
+ucs4_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
 {
     ASSERT_ARGS(ucs4_hash)
-    const Parrot_UInt4 *pos = (const Parrot_UInt4 *) s->strstart;
-    UINTVAL len = s->strlen;
-    UNUSED(interp);
+    DECL_CONST_CAST;
+    STRING * const s = PARROT_const_cast(STRING *, src);
+    const Parrot_UInt4 *pos;
+    UINTVAL len;
+
+    pos = (const Parrot_UInt4 *)s->strstart;
+    len = s->strlen;
 
     while (len--) {
         hashval += hashval << 5;
         hashval += *(pos++);
     }
+
+    s->hashval = hashval;
 
     return hashval;
 }

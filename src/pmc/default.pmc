@@ -797,7 +797,7 @@ Calculate hashvalue for PMC. Default behaviour stringify and use string.
 
     INTVAL hashvalue() {
         STRING *s = SELF.get_string();
-        return Parrot_str_to_hashval(INTERP, s);
+        return STRING_hash(INTERP, s, INTERP->hash_seed);
     }
 
 /*
