@@ -38,8 +38,8 @@ sub runstep {
     if (!$@) {
         my $output = eval { $conf->cc_run() };
         if (!$@ && $output =~ /OK/) {
-	    $bsd_stat = 1;
-	}
+            $bsd_stat = 1;
+        }
     }
     $conf->cc_clean();
 
@@ -48,8 +48,8 @@ sub runstep {
         $self->set_result('bsd');
     }
     else {
-	$conf->data->set( HAS_BSD_STAT_EXTN => 0 );
-	$self->set_result('posix');
+        $conf->data->set( HAS_BSD_STAT_EXTN => 0 );
+        $self->set_result('posix');
     }
 
     return 1;
