@@ -28,6 +28,7 @@ src/test_main.c
 #include "parrot/context.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/runcore_trace.h */
 
@@ -298,6 +299,7 @@ trace_op_dump(PARROT_INTERP,
     ASSERT_ARGS(trace_op_dump)
     Interp    * const debugger = debugger_or_interp(interp);
     op_info_t * const info     = interp->code->op_info_table[*pc];
+    op_lib_t  *       core_ops = PARROT_GET_CORE_OPLIB(interp);
     PMC *sig                   = PMCNULL;
     INTVAL n                   = info->op_count;
     INTVAL s                   = 1;
@@ -309,10 +311,10 @@ trace_op_dump(PARROT_INTERP,
 
 #define ARGS_COLUMN 40
 
-    if (*pc == PARROT_OP_set_args_pc
-    ||  *pc == PARROT_OP_get_results_pc
-    ||  *pc == PARROT_OP_get_params_pc
-    ||  *pc == PARROT_OP_set_returns_pc) {
+    if (OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_set_args_pc)
+    ||  OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_get_results_pc)
+    ||  OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_get_params_pc)
+    ||  OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_set_returns_pc)) {
         sig = interp->code->const_table->pmc.constants[pc[1]];
 
         if (!sig)
@@ -333,7 +335,7 @@ trace_op_dump(PARROT_INTERP,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else {
-                if (!sig)
+                if (PMC_IS_NULL(sig))
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "NULL sig PMC detected in trace_op_dump");
 
