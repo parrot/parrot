@@ -97,15 +97,6 @@ static UINTVAL ucs4_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING * ucs4_substr(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -137,9 +128,6 @@ static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ucs4_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -251,36 +239,6 @@ ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 #else
     UNUSED(idx);
     UNUSED(src);
-    no_ICU_lib(interp);
-#endif
-}
-
-
-/*
-
-=item C<static STRING * ucs4_substr(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Returns the C<count> codepoints stored at position C<offset> in string
-C<src> as a new string.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-ucs4_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(ucs4_substr)
-#if PARROT_HAS_ICU
-    return Parrot_str_new_init(interp, (char*)src->strstart + offset * sizeof (UChar32),
-                               count * sizeof (UChar32), src->encoding, 0);
-#else
-    UNUSED(src);
-    UNUSED(offset);
-    UNUSED(count);
     no_ICU_lib(interp);
 #endif
 }
@@ -471,7 +429,7 @@ static STR_VTABLE Parrot_ucs4_encoding = {
 
     ucs4_scan,
     ucs4_ord,
-    ucs4_substr,
+    fixed_substr,
 
     encoding_is_cclass,
     encoding_find_cclass,

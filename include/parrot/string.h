@@ -97,7 +97,7 @@ typedef UINTVAL  (*str_vtable_validate_t)(PARROT_INTERP, ARGIN(const STRING *src
 
 typedef UINTVAL  (*str_vtable_scan_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
-typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
+typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL count);
 
 /* character classes */
 typedef INTVAL   (*str_vtable_is_cclass_t)(PARROT_INTERP, INTVAL, ARGIN(const STRING *src), UINTVAL offset);

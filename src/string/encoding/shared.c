@@ -378,8 +378,8 @@ encoding_ord_error(PARROT_INTERP, ARGIN(const STRING *s), INTVAL offset)
 
 /*
 
-=item C<STRING * encoding_substr(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
+=item C<STRING * encoding_substr(PARROT_INTERP, const STRING *src, INTVAL
+offset, INTVAL length)>
 
 Returns the codepoints in string C<src> at position C<offset> and length
 C<count>.
@@ -390,28 +390,51 @@ C<count>.
 
 PARROT_CANNOT_RETURN_NULL
 STRING *
-encoding_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
+encoding_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(encoding_substr)
-
-    STRING * const return_string = Parrot_str_copy(interp, src);
+    const UINTVAL  strlen = STRING_length(src);
+    STRING        *return_string;
     String_iter    iter;
     UINTVAL        start;
+
+    if (offset < 0)
+        offset += strlen;
+
+    if ((UINTVAL)offset >= strlen || length <= 0) {
+        /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
+        if ((UINTVAL)offset == strlen || length <= 0)
+            return Parrot_str_new_constant(interp, "");
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_SUBSTR_OUT_OF_STRING,
+            "Cannot take substr outside string");
+    }
+
+    return_string = Parrot_str_copy(interp, src);
+
+    if (offset == 0 && (UINTVAL)length >= strlen)
+        return return_string;
 
     STRING_ITER_INIT(interp, &iter);
 
     if (offset)
         STRING_iter_set_position(interp, src, &iter, offset);
 
-    start                   = iter.bytepos;
-    return_string->strstart = (char *)return_string->strstart + start;
+    start = iter.bytepos;
+    return_string->strstart += start;
 
-    if (count)
-        STRING_iter_set_position(interp, src, &iter, offset + count);
+    if ((UINTVAL)length >= strlen - (UINTVAL)offset) {
+        return_string->bufused -= start;
+        return_string->strlen  -= offset;
+    }
+    else {
+        STRING_iter_set_position(interp, src, &iter, offset + length);
+        return_string->bufused = iter.bytepos - start;
+        return_string->strlen  = length;
+    }
 
-    return_string->bufused  = iter.bytepos - start;
-    return_string->strlen   = count;
-    return_string->hashval  = 0;
+    return_string->hashval = 0;
 
     return return_string;
 }
@@ -823,11 +846,11 @@ fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 
 /*
 
-=item C<STRING * fixed8_substr(PARROT_INTERP, const STRING *src, UINTVAL offset,
-UINTVAL count)>
+=item C<STRING * fixed_substr(PARROT_INTERP, const STRING *src, INTVAL offset,
+INTVAL length)>
 
 Returns the codepoints in string C<src> at position C<offset> and length
-C<count>.
+C<count>. Works for all fixed size encodings.
 
 =cut
 
@@ -836,16 +859,41 @@ C<count>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-fixed8_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
+fixed_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
 {
-    ASSERT_ARGS(fixed8_substr)
-    STRING * const return_string = Parrot_str_copy(interp, src);
+    ASSERT_ARGS(fixed_substr)
+    const UINTVAL  strlen = STRING_length(src);
+    STRING        *return_string;
+    UINTVAL        maxlen, bytes_per_codepoint;
 
-    return_string->encoding      = src->encoding;
-    return_string->strstart      = (char *)return_string->strstart + offset;
-    return_string->bufused       = count;
-    return_string->strlen        = count;
-    return_string->hashval       = 0;
+    if (offset < 0)
+        offset += strlen;
+
+    if ((UINTVAL)offset >= strlen || length <= 0) {
+        /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
+        if ((UINTVAL)offset == strlen || length <= 0)
+            return Parrot_str_new_constant(interp, "");
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_SUBSTR_OUT_OF_STRING,
+            "Cannot take substr outside string");
+    }
+
+    return_string = Parrot_str_copy(interp, src);
+
+    if (offset == 0 && (UINTVAL)length >= strlen)
+        return return_string;
+
+    bytes_per_codepoint = src->encoding->max_bytes_per_codepoint;
+    maxlen              = strlen - offset;
+
+    if ((UINTVAL)length > maxlen)
+        length = maxlen;
+
+    return_string->strstart += offset * bytes_per_codepoint;
+    return_string->bufused   = length * bytes_per_codepoint;
+    return_string->strlen    = length;
+    return_string->hashval   = 0;
 
     return return_string;
 }

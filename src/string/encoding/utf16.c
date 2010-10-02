@@ -86,8 +86,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * utf16_substr(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    INTVAL offset,
+    INTVAL length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -304,8 +304,8 @@ utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 
 /*
 
-=item C<static STRING * utf16_substr(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
+=item C<static STRING * utf16_substr(PARROT_INTERP, const STRING *src, INTVAL
+offset, INTVAL length)>
 
 Returns the codepoints in string C<src> at position C<offset> and length
 C<count>.
@@ -317,26 +317,55 @@ C<count>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-utf16_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
+utf16_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(utf16_substr)
 #if PARROT_HAS_ICU
-    UINTVAL pos = 0, start;
     const UChar * const s = (UChar*) src->strstart;
-    STRING * const return_string = Parrot_str_copy(interp, src);
+    const UINTVAL  strlen = STRING_length(src);
+    STRING        *return_string;
+    UINTVAL        pos = 0, start;
+
+    if (offset < 0)
+        offset += strlen;
+
+    if ((UINTVAL)offset >= strlen || length <= 0) {
+        /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
+        if ((UINTVAL)offset == strlen || length <= 0)
+            return Parrot_str_new_noinit(interp, 0);
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_SUBSTR_OUT_OF_STRING,
+            "Cannot take substr outside string");
+    }
+
+    return_string = Parrot_str_copy(interp, src);
+
+    if (offset == 0 && (UINTVAL)length >= strlen)
+        return return_string;
 
     U16_FWD_N_UNSAFE(s, pos, offset);
+
     start = pos * sizeof (UChar);
-    return_string->strstart = (char *)return_string->strstart + start;
-    U16_FWD_N_UNSAFE(s, pos, count);
-    return_string->bufused = pos * sizeof (UChar) - start;
-    return_string->strlen = count;
+    return_string->strstart += start;
+
+    if ((UINTVAL)length >= strlen - (UINTVAL)offset) {
+        return_string->bufused -= start;
+        return_string->strlen  -= offset;
+    }
+    else {
+        U16_FWD_N_UNSAFE(s, pos, length);
+        return_string->bufused = pos * sizeof (UChar) - start;
+        return_string->strlen  = length;
+    }
+
     return_string->hashval = 0;
+
     return return_string;
 #else
     UNUSED(src);
     UNUSED(offset);
-    UNUSED(count);
+    UNUSED(length);
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");

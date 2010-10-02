@@ -252,11 +252,11 @@ New $1 string returned.
 
 inline op substr(out STR, in STR, in INT) :base_core {
     const INTVAL len = Parrot_str_byte_length(interp, $2);
-    $1 = Parrot_str_substr(interp, $2, $3, len);
+    $1 = STRING_substr(interp, $2, $3, len);
 }
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
-    $1 = Parrot_str_substr(interp, $2, $3, $4);
+    $1 = STRING_substr(interp, $2, $3, $4);
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {

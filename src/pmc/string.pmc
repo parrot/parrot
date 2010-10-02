@@ -365,7 +365,7 @@ C<length>, and places it in C<dest>.
     VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
         STRING *str_val, *s2;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        s2 = Parrot_str_substr(INTERP, str_val, offset, length);
+        s2 = STRING_substr(INTERP, str_val, offset, length);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
 
@@ -382,7 +382,7 @@ C<length>, and returns it.
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, offset, length);
+        return STRING_substr(INTERP, str_val, offset, length);
     }
 
 /*
@@ -437,7 +437,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE STRING *get_string_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, pos, 1);
+        return STRING_substr(INTERP, str_val, pos, 1);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {

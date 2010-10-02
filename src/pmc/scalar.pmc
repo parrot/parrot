@@ -831,7 +831,7 @@ C<offset>.
 */
 
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        return Parrot_str_substr(INTERP, VTABLE_get_string(INTERP, SELF),
+        return STRING_substr(INTERP, VTABLE_get_string(INTERP, SELF),
                 offset, length);
     }
 

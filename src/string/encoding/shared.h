@@ -105,8 +105,8 @@ UINTVAL encoding_scan(PARROT_INTERP, ARGIN(const STRING *src))
 PARROT_CANNOT_RETURN_NULL
 STRING * encoding_substr(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    INTVAL offset,
+    INTVAL length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -207,10 +207,10 @@ UINTVAL fixed8_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * fixed8_substr(PARROT_INTERP,
+STRING * fixed_substr(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    INTVAL offset,
+    INTVAL length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -339,7 +339,7 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_fixed8_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_fixed8_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_fixed_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_unicode_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -958,7 +958,12 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
 offset, INTVAL length)>
 
 Returns substring of length C<length> from C<offset> from the specified
-Parrot string.
+Parrot string. If C<offset> is negative, it counts from the end of the
+string. Returns the empty string if C<offset> equals the length of the
+string. Throws an exception if C<src> is null or C<offset> is out of bounds.
+Truncates C<length> if it extends beyond the end of the string.
+
+Identical to the STRING_substr macro.
 
 =cut
 
@@ -972,35 +977,9 @@ Parrot_str_substr(PARROT_INTERP,
         ARGIN_NULLOK(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(Parrot_str_substr)
-    const UINTVAL strlen = STRING_length(src);
-    UINTVAL       maxlen;
 
-    if (offset < 0)
-        offset += strlen;
-
-    if ((UINTVAL)offset >= strlen || length <= 0) {
-        if (STRING_IS_NULL(src))
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_SUBSTR_OUT_OF_STRING, "Cannot substr on a null string");
-
-        /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-        if ((UINTVAL)offset == strlen || length <= 0)
-            return Parrot_str_new_noinit(interp, 0);
-
-        Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_SUBSTR_OUT_OF_STRING,
-            "Cannot take substr outside string");
-    }
-
-    ASSERT_STRING_SANITY(src);
-
-    maxlen = strlen - offset;
-
-    if ((UINTVAL)length > maxlen)
-        length = maxlen;
-
-    if (length == strlen && !offset)
-        return (STRING *)src;
+    if (src == NULL)
+        src = STRINGNULL;
 
     return STRING_substr(interp, src, offset, length);
 }
@@ -1257,7 +1236,7 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
     if (n >= 0)
         end += STRING_length(s);
 
-    return Parrot_str_substr(interp, s, 0, end);
+    return STRING_substr(interp, s, 0, end);
 }
 
 

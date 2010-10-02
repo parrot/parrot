@@ -240,7 +240,7 @@ static STR_VTABLE Parrot_binary_encoding = {
 
     fixed8_scan,
     fixed8_ord,
-    fixed8_substr,
+    fixed_substr,
 
     binary_is_cclass,
     binary_find_cclass,
