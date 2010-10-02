@@ -25,6 +25,10 @@ PARROT_DATA STR_VTABLE *Parrot_ucs4_encoding_ptr;
 
 PARROT_DATA STR_VTABLE *Parrot_default_encoding_ptr;
 
+#ifdef PARROT_IN_CORE
+STR_VTABLE *Parrot_null_encoding_ptr;
+#endif
+
 /* HEADERIZER BEGIN: src/string/encoding.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

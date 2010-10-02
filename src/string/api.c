@@ -145,7 +145,7 @@ Parrot_str_init(PARROT_INTERP)
 #if PARROT_CATCH_NULL
     /* initialize STRINGNULL, but not in the constant table */
     STRINGNULL = Parrot_str_new_init(interp, NULL, 0,
-                       Parrot_default_encoding_ptr,
+                       Parrot_null_encoding_ptr,
                        PObj_constant_FLAG);
 #endif
 
@@ -329,9 +329,14 @@ STRING*
 Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_clone)
+    size_t  alloc_size;
+    STRING *result;
 
-    const size_t alloc_size = s->bufused;
-    STRING * const result = Parrot_gc_new_string_header(interp, 0);
+    if (STRING_IS_NULL(s))
+        return STRINGNULL;
+
+    result     = Parrot_gc_new_string_header(interp, 0);
+    alloc_size = s->bufused;
 
     if (alloc_size) {
         /* Allocate new chunk of memory */
@@ -368,7 +373,10 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
     STRING *d;
-    const int is_movable = PObj_is_movable_TESTALL(s);
+    int     is_movable;
+
+    if (STRING_IS_NULL(s))
+        return STRINGNULL;
 
     d = Parrot_gc_new_string_header(interp,
         PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
@@ -381,6 +389,8 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 
     /* Set the string copy flag */
     PObj_is_string_copy_SET(d);
+
+    is_movable = PObj_is_movable_TESTALL(s);
 
     /* Now check that buffer allocated from pool and affected by compacting */
     if (is_movable && Buffer_bufstart(s)) {
@@ -1195,16 +1205,21 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     if (true_length > (src->strlen - true_offset))
         true_length = (UINTVAL)(src->strlen - true_offset);
 
-    /* may have different reps..... */
-    enc = string_rep_compatible(interp, src, rep);
-
-    if (!enc) {
-        if (src->encoding != Parrot_utf8_encoding_ptr)
-            src = Parrot_utf8_encoding_ptr->to_encoding(interp, src);
-        if (rep->encoding != Parrot_utf8_encoding_ptr)
-            rep = Parrot_utf8_encoding_ptr->to_encoding(interp, rep);
-        /* Remember selected encoding */
+    if (STRING_IS_NULL(rep)) {
         enc = src->encoding;
+    }
+    else {
+        /* may have different reps..... */
+        enc = string_rep_compatible(interp, src, rep);
+
+        if (!enc) {
+            if (src->encoding != Parrot_utf8_encoding_ptr)
+                src = Parrot_utf8_encoding_ptr->to_encoding(interp, src);
+            if (rep->encoding != Parrot_utf8_encoding_ptr)
+                rep = Parrot_utf8_encoding_ptr->to_encoding(interp, rep);
+            /* Remember selected encoding */
+            enc = src->encoding;
+        }
     }
 
     /* get byte position of the part that will be replaced */
