@@ -678,7 +678,7 @@ Returns whether the class is or inherits from C<*classname>.
 
     VTABLE INTVAL isa(STRING *classname) {
         if (SELF->vtable->whoami == classname
-        ||  Parrot_str_equal(INTERP, SELF->vtable->whoami, classname))
+        ||  STRING_equal(INTERP, SELF->vtable->whoami, classname))
             return 1;
         else {
             PMC *_class = PARROT_OBJECT(SELF)->_class;

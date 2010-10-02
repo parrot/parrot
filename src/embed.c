@@ -1118,10 +1118,10 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
         PARROT_ASSERT(interp->initial_pf);
     }
 
-    if (Parrot_str_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
+    if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
         return IMCC_compile_pir_s(interp, code, error);
 
-    if (Parrot_str_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
+    if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
         return IMCC_compile_pasm_s(interp, code, error);
 
     *error = Parrot_str_new(interp, "Invalid interpreter type", 0);

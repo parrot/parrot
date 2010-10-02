@@ -569,7 +569,7 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL 
     result->strstart        = (char *)Buffer_bufstart(result);
     result->bufused         = len;
     result->strlen          = len;
-    result->encoding      = Parrot_binary_encoding_ptr;
+    result->encoding        = Parrot_binary_encoding_ptr;
 
     Buffer_buflen(buffer)   = 0;
     Buffer_bufstart(buffer) = NULL;
@@ -1315,7 +1315,11 @@ INTVAL
 Parrot_str_not_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_not_equal)
-    return !Parrot_str_equal(interp, s1, s2);
+
+    if (s1 == NULL)
+        s1 = STRINGNULL;
+
+    return !STRING_equal(interp, s1, s2);
 }
 
 
@@ -1325,9 +1329,11 @@ Parrot_str_not_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK
 *s2)>
 
 Compares two Parrot strings, performing type and encoding conversions if
-necessary.
+necessary. The null string is considered equal to the empty string.
 
 Returns 1 if the strings are equal, and 0 otherwise.
+
+Identical to the STRING_equal macro.
 
 =cut
 
@@ -1339,22 +1345,11 @@ INTVAL
 Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_equal)
-    UINTVAL len1 = STRING_length(s1);
-    UINTVAL len2 = STRING_length(s2);
 
-    if (len1 == 0)
-        return len2 == 0;
-    else if (len2 == 0)
-        return 0;
+    if (s1 == NULL)
+        s1 = STRINGNULL;
 
-    if (s1 == s2)
-        return 1;
-
-    if (s1->strlen != s2->strlen
-    || (s1->hashval && s2->hashval && s1->hashval != s2->hashval))
-        return 0;
-
-    return STRING_compare(interp, s1, s2) == 0;
+    return STRING_equal(interp, s1, s2);
 }
 
 
@@ -2004,13 +1999,13 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     /* charpos <= 2 because for "-i" iter already advanced to next char */
     if (check_nan && (iter.charpos <= 2)) {
         STRING *t = Parrot_str_upcase(interp, s);
-        if (Parrot_str_equal(interp, t, CONST_STRING(interp, "NAN")))
+        if (STRING_equal(interp, t, CONST_STRING(interp, "NAN")))
             return PARROT_FLOATVAL_NAN_QUIET;
-        else if (Parrot_str_equal(interp, t, CONST_STRING(interp, "INF"))
-             ||  Parrot_str_equal(interp, t, CONST_STRING(interp, "INFINITY")))
+        else if (STRING_equal(interp, t, CONST_STRING(interp, "INF"))
+             ||  STRING_equal(interp, t, CONST_STRING(interp, "INFINITY")))
             return PARROT_FLOATVAL_INF_POSITIVE;
-        else if (Parrot_str_equal(interp, t, CONST_STRING(interp, "-INF"))
-             ||  Parrot_str_equal(interp, t, CONST_STRING(interp, "-INFINITY")))
+        else if (STRING_equal(interp, t, CONST_STRING(interp, "-INF"))
+             ||  STRING_equal(interp, t, CONST_STRING(interp, "-INFINITY")))
             return PARROT_FLOATVAL_INF_NEGATIVE;
     }
 

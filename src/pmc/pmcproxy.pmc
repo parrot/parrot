@@ -119,7 +119,7 @@ Initializes a PMCProxy PMC.
             PMC    *pclass = VTABLE_get_pmc_keyed_int(INTERP, INTERP->vtables[type_num]->mro, i);
             PMC    *cns    = pclass->vtable->_namespace;
             STRING *cname  = pclass->vtable->whoami;
-            if (Parrot_str_not_equal(INTERP, cname, CONST_STRING(INTERP, "scalar"))) {
+            if (!STRING_equal(INTERP, cname, CONST_STRING(INTERP, "scalar"))) {
                 PMC *pproxy = Parrot_oo_get_class(INTERP, cns);
                 VTABLE_push_pmc(INTERP, proxy_info->all_parents, pproxy);
             }
@@ -217,7 +217,7 @@ Returns whether the class is or inherits from C<*classname>.
         classname = VTABLE_get_string(INTERP, classobj);
 
         /* Check if the passed name is the same as the stored short name. */
-        if (Parrot_str_equal(INTERP, classname, _proxy->name))
+        if (STRING_equal(INTERP, classname, _proxy->name))
             return 1;
 
         /* Check if the class object is the same as self's class object */
@@ -225,7 +225,7 @@ Returns whether the class is or inherits from C<*classname>.
             return 1;
 
         /* Check if the passed name is the same as the fully qualified name. */
-        if (Parrot_str_equal(INTERP, classname, VTABLE_get_string(INTERP, SELF)))
+        if (STRING_equal(INTERP, classname, VTABLE_get_string(INTERP, SELF)))
             return 1;
 
         /* Look in the isa hash. */
@@ -265,7 +265,7 @@ Returns whether the class is or inherits from C<*classname>.
         Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
         const STRING * const pmc_proxy = CONST_STRING(INTERP, "PMCProxy");
 
-        if (Parrot_str_equal(INTERP, classname, pmc_proxy))
+        if (STRING_equal(INTERP, classname, pmc_proxy))
             return 1;
 
         if (SUPER(classname))
@@ -275,7 +275,7 @@ Returns whether the class is or inherits from C<*classname>.
         if (INTERP->vtables[_proxy->id]) {
             Hash *isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
 
-            if (!isa_hash && Parrot_str_equal(INTERP,
+            if (!isa_hash && STRING_equal(INTERP,
                      INTERP->vtables[_proxy->id]->whoami, classname)) {
                 return 1;
             }

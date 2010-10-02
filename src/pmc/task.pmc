@@ -209,27 +209,27 @@ Gets the value of an attribute for this task.
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         PMC *value;
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "id"))) {
+        if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "id"))) {
             value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                     core_struct->id);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
             value = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, value, core_struct->type);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "subtype"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "subtype"))) {
             value = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, value, core_struct->subtype);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "priority"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "priority"))) {
             value = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                     core_struct->priority);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "status"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "status"))) {
             value = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, value, core_struct->status);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
             value = Parrot_pmc_new(INTERP, enum_class_Float);
             VTABLE_set_number_native(INTERP, value, core_struct->birthtime);
         }
@@ -252,28 +252,28 @@ Sets the value of an attribute for this task.
     VTABLE void set_attr_str(STRING *name, PMC *value) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "id"))) {
+        if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "id"))) {
             core_struct->id = VTABLE_get_integer(INTERP, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
             core_struct->type = VTABLE_get_string(INTERP, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "subtype"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "subtype"))) {
             core_struct->subtype = VTABLE_get_string(INTERP, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "priority"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "priority"))) {
             core_struct->priority = VTABLE_get_integer(INTERP, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "status"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "status"))) {
             core_struct->status = VTABLE_get_string(INTERP, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
             core_struct->birthtime = VTABLE_get_number(INTERP, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "code"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "code"))) {
             core_struct->codeblock = value;
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "data"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "data"))) {
             core_struct->data = value;
         }
     }

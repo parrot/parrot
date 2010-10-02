@@ -508,9 +508,9 @@ reads entries from a directory.
         /* Add \* to the directory name and start search. */
         STRING *last_char = Parrot_str_substr(INTERP, path,
                                               Parrot_str_length(INTERP, path) - 1, 1, NULL, 0);
-        int trailing_slash = Parrot_str_equal(INTERP, last_char, string_from_literal(INTERP, "\\"))
+        int trailing_slash = STRING_equal(INTERP, last_char, string_from_literal(INTERP, "\\"))
                              ||
-                             Parrot_str_equal(INTERP, last_char, string_from_literal(INTERP, "/"));
+                             STRING_equal(INTERP, last_char, string_from_literal(INTERP, "/"));
         cpath = Parrot_str_to_cstring(INTERP, Parrot_str_concat(INTERP,
                 path, string_from_literal(INTERP, trailing_slash ? "*" : "\\*"), 0));
         hFind = FindFirstFile(cpath, &file_find_data);

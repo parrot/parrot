@@ -318,7 +318,7 @@ Get or create constant for passed value.
 
         for (i=0; i < num; ++i) {
             STRING * const str = VTABLE_get_string_keyed_int(INTERP, attrs->str_constants, i);
-            if (Parrot_str_equal(INTERP, value, str))
+            if (STRING_equal(INTERP, value, str))
                 return i;
         }
 

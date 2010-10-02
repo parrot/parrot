@@ -243,7 +243,7 @@ they match.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return (INTVAL)(Parrot_str_equal(INTERP, str_val, v));
+        return (INTVAL)(STRING_equal(INTERP, str_val, v));
     }
 
     MULTI INTVAL is_equal(PMC *value) {
@@ -286,7 +286,7 @@ Compares the string with C<value>; returns FALSE if they match.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_equal(INTERP, str_val, v);
+        return STRING_equal(INTERP, str_val, v);
     }
 
 /*

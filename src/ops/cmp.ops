@@ -78,7 +78,7 @@ inline op eq(in NUM, in NUM, inconst LABEL) :base_core {
 }
 
 op eq(in STR, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_equal(interp, $1, $2)) {
+    if (STRING_equal(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
@@ -114,7 +114,7 @@ op eq(invar PMC, in NUM, inconst LABEL) :base_core {
 }
 
 op eq(invar PMC, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_equal(interp, VTABLE_get_string(interp, $1), $2)) {
+    if (STRING_equal(interp, VTABLE_get_string(interp, $1), $2)) {
         goto OFFSET($3);
     }
 }
@@ -184,7 +184,7 @@ inline op ne(in NUM, in NUM, inconst LABEL) :base_core {
 }
 
 op ne(in STR, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_not_equal(interp, $1, $2)) {
+    if (!STRING_equal(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
@@ -214,7 +214,7 @@ op ne(invar PMC, in NUM, inconst LABEL) :base_core {
 }
 
 op ne(invar PMC, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_not_equal(interp, VTABLE_get_string(interp, $1), $2)) {
+    if (!STRING_equal(interp, VTABLE_get_string(interp, $1), $2)) {
         goto OFFSET($3);
     }
 }
@@ -857,7 +857,7 @@ inline op iseq(out INT, in NUM, in NUM) {
 }
 
 inline op iseq(out INT, in STR, in STR) {
-    $1 = (Parrot_str_equal(interp, $2, $3) ? 1 : 0);
+    $1 = STRING_equal(interp, $2, $3);
 }
 
 inline op iseq(out INT, invar PMC, invar PMC) {
@@ -888,7 +888,7 @@ inline op isne(out INT, in NUM, in NUM) {
 }
 
 inline op isne(out INT, in STR, in STR) {
-    $1 = (Parrot_str_not_equal(interp, $2, $3) ? 1 : 0);
+    $1 = !STRING_equal(interp, $2, $3);
 }
 
 inline op isne(out INT, invar PMC, invar PMC) {

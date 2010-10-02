@@ -197,9 +197,9 @@ check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), A
     ASSERT_ARGS(check_set_std_props)
 
     /*
-     * s2 in Parrot_str_equal is freed here
+     * s2 in STRING_equal is freed here
      */
-    if (Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
+    if (STRING_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         /* pmc should set/clear readonly */
         const INTVAL on = VTABLE_get_bool(interp, value);
 
@@ -286,7 +286,7 @@ check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *k
     ASSERT_ARGS(check_get_std_props)
 
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-       && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
+       && STRING_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val = Parrot_pmc_new_init_int(interp,
                 enum_class_Integer, 1);
         return ret_val;
@@ -1003,7 +1003,7 @@ true (1) is returned; otherwise, false (0) is returned.
         else {
             const Hash * const isa_hash = SELF->vtable->isa_hash;
             if (!isa_hash)
-                return Parrot_str_equal(INTERP, SELF->vtable->whoami, _class);
+                return STRING_equal(INTERP, SELF->vtable->whoami, _class);
 
             return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
         }
@@ -1020,12 +1020,12 @@ Provides introspection of a specific piece of information about the PMC.
 */
 
     VTABLE PMC *inspect_str(STRING *name) {
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "flags"))) {
+        if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "flags"))) {
             PMC *found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "mro"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "mro"))) {
             return VTABLE_clone(INTERP, SELF->vtable->mro);
         }
         else

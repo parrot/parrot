@@ -271,7 +271,7 @@ add_string_const(ARGIN(bytecode * const bc), ARGIN(char const * const str),
     while (index < count) {
         constant = bc->interp->code->const_table->constants[index];
         if (constant->type == PFC_STRING) {
-            if (Parrot_str_equal(bc->interp, constant->u.string, parrotstr)) {
+            if (STRING_equal(bc->interp, constant->u.string, parrotstr)) {
 #if DEBUGBC
                 fprintf(stderr, "found string %s at index %d\n", str, index);
 #endif
@@ -351,7 +351,7 @@ add_key_const(ARGIN(bytecode * const bc), ARGIN(PMC *key))
 
         if (constant->type == PFC_KEY) {
             STRING *s2 = key_set_to_string(bc->interp, constant->u.key);
-            if (Parrot_str_equal(bc->interp, s1, s2)) {
+            if (STRING_equal(bc->interp, s1, s2)) {
 #if DEBUGBC
                 fprintf(stderr, "found equal key (%d)\n", index);
 #endif

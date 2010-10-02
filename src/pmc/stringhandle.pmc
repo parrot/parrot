@@ -55,7 +55,7 @@ encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     if (STRING_IS_NULL(s))
         return 0;
     else
-        return Parrot_str_equal(interp, s, CONST_STRING(interp, "utf8"));
+        return STRING_equal(interp, s, CONST_STRING(interp, "utf8"));
 }
 
 pmclass StringHandle extends Handle auto_attrs {
@@ -391,15 +391,15 @@ ignored, but stored for mocking.
         GET_ATTR_flags(INTERP, SELF, flags);
 
         if (got_type) {
-            if (Parrot_str_equal(INTERP, new_type, nobuffer_string)) {
+            if (STRING_equal(INTERP, new_type, nobuffer_string)) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string)) {
+            else if (STRING_equal(INTERP, new_type, linebuffer_string)) {
                 flags |=   PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string)) {
+            else if (STRING_equal(INTERP, new_type, fullbuffer_string)) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags |=   PIO_F_BLKBUF;
             }

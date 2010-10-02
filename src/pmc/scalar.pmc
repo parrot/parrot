@@ -800,7 +800,7 @@ Returns whether the PMC has string equality with C<*value>.
 */
 
     MULTI INTVAL is_equal_string(PMC *value) {
-        return (0 != Parrot_str_equal(INTERP, VTABLE_get_string(INTERP, SELF),
+        return (0 != STRING_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }
 

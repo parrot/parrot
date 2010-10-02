@@ -422,7 +422,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
             if (!PMC_IS_NULL(child_sub->outer_sub)) {
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
-                if (Parrot_str_equal(interp, current_sub->subid,
+                if (STRING_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
                     child_sub->outer_ctx = ctx;
                 }

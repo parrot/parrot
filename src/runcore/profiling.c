@@ -169,10 +169,10 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     if (output_cstr) {
 
         STRING *profile_format_str = Parrot_str_new(interp, output_cstr, 0);
-        if (Parrot_str_equal(interp, profile_format_str, CONST_STRING(interp, "pprof"))) {
+        if (STRING_equal(interp, profile_format_str, CONST_STRING(interp, "pprof"))) {
             runcore->output_fn = record_values_ascii_pprof;
         }
-        else if (Parrot_str_equal(interp, profile_format_str, CONST_STRING(interp, "none"))) {
+        else if (STRING_equal(interp, profile_format_str, CONST_STRING(interp, "none"))) {
             runcore->output_fn = record_values_none;
         }
         else {
@@ -197,11 +197,11 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
             profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
             lc_filename               = Parrot_str_downcase(interp, runcore->profile_filename);
 
-            if (Parrot_str_equal(interp, lc_filename, CONST_STRING(interp, "stderr"))) {
+            if (STRING_equal(interp, lc_filename, CONST_STRING(interp, "stderr"))) {
                 runcore->profile_fd       = stderr;
                 runcore->profile_filename = lc_filename;
             }
-            else if (Parrot_str_equal(interp, lc_filename, CONST_STRING(interp, "stdout"))) {
+            else if (STRING_equal(interp, lc_filename, CONST_STRING(interp, "stdout"))) {
                 runcore->profile_fd       = stdout;
                 runcore->profile_filename = lc_filename;
             }

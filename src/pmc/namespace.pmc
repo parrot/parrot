@@ -182,7 +182,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
         STRING *method_name = key;
 
-        if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
+        if (STRING_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
             if (sub->vtable_index != -1 && !STRING_IS_NULL(vtable_key)) {
                 method_name = vtable_key;
             }
@@ -287,7 +287,7 @@ add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
                 STRING *method_name = key;
                 Hash   *hash;
 
-                if (Parrot_str_not_equal(interp, sub->method_name, empty_str))
+                if (!STRING_equal(interp, sub->method_name, empty_str))
                     method_name = sub->method_name;
 
                 add_to_class(interp, nsinfo, classobj, method_name, value);
@@ -731,13 +731,13 @@ Includes vtable overrides composed in from roles.
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC *found;
 
-        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
+        if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
             found = nsinfo->methods;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
             found = nsinfo->vtable;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "class"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "class"))) {
             found = nsinfo->_class;
         }
         else
