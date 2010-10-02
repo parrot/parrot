@@ -22226,42 +22226,42 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_ord_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SREG(2), 0);
+    IREG(1) = STRING_ord(interp, SREG(2), 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_ord_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SCONST(2), 0);
+    IREG(1) = STRING_ord(interp, SCONST(2), 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_ord_i_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SREG(2), IREG(3));
+    IREG(1) = STRING_ord(interp, SREG(2), IREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_ord_i_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SCONST(2), IREG(3));
+    IREG(1) = STRING_ord(interp, SCONST(2), IREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_ord_i_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SREG(2), ICONST(3));
+    IREG(1) = STRING_ord(interp, SREG(2), ICONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_ord_i_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SCONST(2), ICONST(3));
+    IREG(1) = STRING_ord(interp, SCONST(2), ICONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -26098,7 +26098,7 @@ op_lib_t core_op_lib = {
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */
+  get_op          /* op_code() */ 
 };
 
 /*

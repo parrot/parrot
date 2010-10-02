@@ -96,7 +96,7 @@ typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), siz
 typedef UINTVAL  (*str_vtable_validate_t)(PARROT_INTERP, ARGIN(const STRING *src));
 
 typedef UINTVAL  (*str_vtable_scan_t)(PARROT_INTERP, ARGIN(const STRING *src));
-typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset);
+typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
 typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
 
 /* character classes */

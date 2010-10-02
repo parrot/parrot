@@ -78,9 +78,7 @@ static void utf8_iter_skip(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
 
-static UINTVAL utf8_ord(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset)
+static UINTVAL utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -94,11 +92,11 @@ static UINTVAL utf8_scan2(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static const void * utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
+static const utf8_t * utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
+static const utf8_t * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
@@ -304,8 +302,7 @@ utf8_scan2(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL utf8_ord(PARROT_INTERP, const STRING *src, UINTVAL
-offset)>
+=item C<static UINTVAL utf8_ord(PARROT_INTERP, const STRING *src, INTVAL idx)>
 
 Returns the codepoint in string C<src> at position C<offset>.
 
@@ -314,10 +311,20 @@ Returns the codepoint in string C<src> at position C<offset>.
 */
 
 static UINTVAL
-utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
+utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(utf8_ord)
-    const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
+    const UINTVAL len = STRING_length(src);
+    const utf8_t *start;
+
+    if (idx < 0)
+        idx += len;
+
+    if ((UINTVAL)idx >= len)
+        encoding_ord_error(interp, src, idx);
+
+    start = utf8_skip_forward(src->strstart, idx);
+
     return utf8_decode(interp, start);
 }
 
@@ -407,7 +414,7 @@ utf8_encode(PARROT_INTERP, ARGIN(void *ptr), UINTVAL c)
 
 /*
 
-=item C<static const void * utf8_skip_forward(const void *ptr, UINTVAL n)>
+=item C<static const utf8_t * utf8_skip_forward(const void *ptr, UINTVAL n)>
 
 Moves C<ptr> C<n> characters forward.
 
@@ -416,7 +423,7 @@ Moves C<ptr> C<n> characters forward.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static const void *
+static const utf8_t *
 utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
 {
     ASSERT_ARGS(utf8_skip_forward)
@@ -432,7 +439,7 @@ utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
 
 /*
 
-=item C<static const void * utf8_skip_backward(const void *ptr, UINTVAL n)>
+=item C<static const utf8_t * utf8_skip_backward(const void *ptr, UINTVAL n)>
 
 Moves C<ptr> C<n> characters back.
 
@@ -444,7 +451,7 @@ XXX This function is unused.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static const void *
+static const utf8_t *
 utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
 {
     ASSERT_ARGS(utf8_skip_backward)
@@ -479,10 +486,10 @@ utf8_iter_get(PARROT_INTERP,
     const utf8_t *u8ptr = (utf8_t *)((char *)str->strstart + i->bytepos);
 
     if (offset > 0) {
-        u8ptr = (const utf8_t *)utf8_skip_forward(u8ptr, offset);
+        u8ptr = utf8_skip_forward(u8ptr, offset);
     }
     else if (offset < 0) {
-        u8ptr = (const utf8_t *)utf8_skip_backward(u8ptr, -offset);
+        u8ptr = utf8_skip_backward(u8ptr, -offset);
     }
 
     return utf8_decode(interp, u8ptr);
@@ -508,10 +515,10 @@ utf8_iter_skip(SHIM_INTERP,
     const utf8_t *u8ptr = (utf8_t *)((char *)str->strstart + i->bytepos);
 
     if (skip > 0) {
-        u8ptr = (const utf8_t *)utf8_skip_forward(u8ptr, skip);
+        u8ptr = utf8_skip_forward(u8ptr, skip);
     }
     else if (skip < 0) {
-        u8ptr = (const utf8_t *)utf8_skip_backward(u8ptr, -skip);
+        u8ptr = utf8_skip_backward(u8ptr, -skip);
     }
 
     i->charpos += skip;
@@ -629,22 +636,22 @@ utf8_iter_set_position(SHIM_INTERP,
     if (pos < i->charpos) {
         if (pos <= (i->charpos >> 1)) {
             /* go forward from start */
-            u8ptr = (const utf8_t *)utf8_skip_forward(u8ptr, pos);
+            u8ptr = utf8_skip_forward(u8ptr, pos);
         }
         else {
             /* go backward from current */
-            u8ptr = (const utf8_t *)utf8_skip_backward(u8ptr + i->bytepos, i->charpos - pos);
+            u8ptr = utf8_skip_backward(u8ptr + i->bytepos, i->charpos - pos);
         }
     }
     else {
         const UINTVAL  len = str->strlen;
         if (pos <= i->charpos + ((len - i->charpos) >> 1)) {
             /* go forward from current */
-            u8ptr = (const utf8_t *)utf8_skip_forward(u8ptr + i->bytepos, pos - i->charpos);
+            u8ptr = utf8_skip_forward(u8ptr + i->bytepos, pos - i->charpos);
         }
         else {
             /* go backward from end */
-            u8ptr = (const utf8_t *)utf8_skip_backward(u8ptr + str->bufused, len - pos);
+            u8ptr = utf8_skip_backward(u8ptr + str->bufused, len - pos);
         }
     }
 

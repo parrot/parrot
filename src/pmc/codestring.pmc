@@ -151,7 +151,8 @@ A newline is automatically added to the end of the fmt.
     VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
 
     /* Add a newline if necessary */
-    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_length(INTERP, fmt) - 1))
+    if (STRING_length(fmt) > 0
+    &&  '\n' != STRING_ord(INTERP, fmt, -1))
         VTABLE_set_string_keyed_int(INTERP, parts, 2, newline);
 
     S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
@@ -199,8 +200,8 @@ the first line is line number zero.
 
             /* treat \r\n as a single newline */
             if (jpos < eos
-            && string_ord(INTERP, str, jpos - 1)     == 13
-            && string_ord(INTERP, str, jpos)         == 10) {
+            && STRING_ord(INTERP, str, jpos - 1) == 13
+            && STRING_ord(INTERP, str, jpos)     == 10) {
                 ++jpos;
             }
             /* search for the next newline */

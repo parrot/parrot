@@ -52,7 +52,7 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(const STRING *mode_str))
     mode_len = Parrot_str_byte_length(interp, mode_str);
 
     for (i = 0; i < mode_len; ++i) {
-        const INTVAL s = Parrot_str_indexed(interp, mode_str, i);
+        const INTVAL s = STRING_ord(interp, mode_str, i);
         switch (s) {
           case 'r':
             flags |= PIO_F_READ;

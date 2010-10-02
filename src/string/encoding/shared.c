@@ -348,6 +348,36 @@ encoding_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
+=item C<void encoding_ord_error(PARROT_INTERP, const STRING *s, INTVAL offset)>
+
+Throws the right exception if STRING_ord was called with a wrong index.
+C<offset> is the wrong offset into the string C<s>.
+
+=cut
+
+*/
+
+void
+encoding_ord_error(PARROT_INTERP, ARGIN(const STRING *s), INTVAL offset)
+{
+    ASSERT_ARGS(encoding_ord_error)
+    const UINTVAL len = STRING_length(s);
+    const char   *err_msg;
+
+    if (!len)
+        err_msg = "Cannot get character of empty string";
+    else if (offset >= 0)
+        err_msg = "Cannot get character past end of string";
+    else if (offset < 0)
+        err_msg = "Cannot get character before beginning of string";
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
+        err_msg);
+}
+
+
+/*
+
 =item C<STRING * encoding_substr(PARROT_INTERP, const STRING *src, UINTVAL
 offset, UINTVAL count)>
 
@@ -766,7 +796,7 @@ fixed8_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<UINTVAL fixed8_ord(PARROT_INTERP, const STRING *src, UINTVAL offset)>
+=item C<UINTVAL fixed8_ord(PARROT_INTERP, const STRING *src, INTVAL idx)>
 
 codepoints are bytes, so delegate
 
@@ -776,20 +806,18 @@ codepoints are bytes, so delegate
 
 PARROT_WARN_UNUSED_RESULT
 UINTVAL
-fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src),
-        UINTVAL offset)
+fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(fixed8_ord)
-    const unsigned char * const buf = (unsigned char *)src->strstart;
+    const UINTVAL len = STRING_length(src);
 
-    if (offset >= src->bufused) {
-/*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
-                "fixed8_ord past the end of the buffer (%i of %i)",
-                offset, src->bufused); */
-        return 0;
-    }
+    if (idx < 0)
+        idx += len;
 
-    return buf[offset];
+    if ((UINTVAL)idx >= len)
+        encoding_ord_error(interp, src, idx);
+
+    return (unsigned char)src->strstart[idx];
 }
 
 
