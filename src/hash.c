@@ -141,34 +141,11 @@ static size_t key_hash_cstring(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static size_t key_hash_int(SHIM_INTERP,
-    ARGIN_NULLOK(const void *value),
-    size_t seed);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_PMC(PARROT_INTERP,
-    ARGIN(PMC *value),
-    SHIM(size_t seed))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_pointer(SHIM_INTERP,
-    ARGIN(const void *value),
+static size_t key_hash_STRING(PARROT_INTERP,
+    ARGIN(const STRING *s),
     size_t seed)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
+        __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
@@ -239,12 +216,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_key_hash_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_key_hash_PMC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -270,7 +241,8 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static size_t key_hash_STRING(PARROT_INTERP, STRING *s, size_t seed)>
+=item C<static size_t key_hash_STRING(PARROT_INTERP, const STRING *s, size_t
+seed)>
 
 Returns the hashed value of the key C<value>.  See also string.c.
 
@@ -283,14 +255,14 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
 static size_t
-key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
+key_hash_STRING(PARROT_INTERP, ARGIN(const STRING *s), size_t seed)
 {
     ASSERT_ARGS(key_hash_STRING)
 
     if (s->hashval)
         return s->hashval;
 
-    return Parrot_str_to_hashval(interp, s);
+    return STRING_hash(interp, s, seed);
 }
 
 
@@ -372,28 +344,6 @@ hash_compare_pointer(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(cons
 
 /*
 
-=item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t
-seed)>
-
-Returns a hashvalue for a pointer.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_pointer)
-    return ((size_t) value) ^ seed;
-}
-
-
-/*
-
 =item C<static size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t
 seed)>
 
@@ -450,26 +400,6 @@ hash_compare_cstring(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 
 /*
 
-=item C<static size_t key_hash_PMC(PARROT_INTERP, PMC *value, size_t seed)>
-
-Returns a hashed value for an PMC key (passed as a void pointer, sadly).
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_PMC(PARROT_INTERP, ARGIN(PMC *value), SHIM(size_t seed))
-{
-    ASSERT_ARGS(key_hash_PMC)
-    return VTABLE_hashvalue(interp, value);
-}
-
-/*
-
 =item C<static int hash_compare_pmc(PARROT_INTERP, PMC *a, PMC *b)>
 
 Compares two PMC for equality, returning 0 if the first is equal to second.
@@ -496,27 +426,6 @@ hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
         return 1;
 
     return !VTABLE_is_equal(interp, a, b);
-}
-
-/*
-
-=item C<static size_t key_hash_int(PARROT_INTERP, const void *value, size_t
-seed)>
-
-Returns a hashed value for an integer key (passed as a void pointer, sadly).
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_int(SHIM_INTERP, ARGIN_NULLOK(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_int)
-    return (size_t)value ^ seed;
 }
 
 /*

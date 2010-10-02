@@ -64,7 +64,9 @@ STRING * encoding_get_graphemes(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-size_t encoding_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
+size_t encoding_hash(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    size_t hashval)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -132,7 +134,7 @@ INTVAL fixed8_equal(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-size_t fixed8_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
+size_t fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -306,7 +308,7 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_fixed8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \

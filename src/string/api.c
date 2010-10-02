@@ -2219,10 +2219,12 @@ Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<size_t Parrot_str_to_hashval(PARROT_INTERP, STRING *s)>
+=item C<size_t Parrot_str_to_hashval(PARROT_INTERP, const STRING *s)>
 
 Returns the hash value for the specified Parrot string, caching it in
 C<< s->hashval >>.
+
+Identical to the STRING_hash macro.
 
 =cut
 
@@ -2231,20 +2233,14 @@ C<< s->hashval >>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
+Parrot_str_to_hashval(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_hashval)
 
-    size_t hashval = interp->hash_seed;
+    if (s == NULL)
+        s = STRINGNULL;
 
-    if (!STRING_IS_NULL(s)) {
-        if (s->strlen)
-            hashval = STRING_hash(interp, s, hashval);
-
-        s->hashval = hashval;
-    }
-
-    return hashval;
+    return STRING_hash(interp, s, interp->hash_seed);
 }
 
 
