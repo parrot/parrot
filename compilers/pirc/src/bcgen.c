@@ -1079,7 +1079,7 @@ find_outer_sub(ARGIN(bytecode * const bc), ARGIN_NULLOK(char const * const outer
     cur_name = sub->name;
 
     out_name = Parrot_str_new(interp, outername, len);
-    if (Parrot_str_compare(interp, cur_name, out_name) == 0)
+    if (STRING_equal(interp, cur_name, out_name))
         return current;
 
     return NULL;

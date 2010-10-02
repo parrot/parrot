@@ -1990,17 +1990,17 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
             n = REG_STR(interp, *(int *)condition->value);
 
         if (((condition->type & PDB_cond_gt) &&
-                (Parrot_str_compare(interp, m, n) >  0)) ||
+                (STRING_compare(interp, m, n) >  0)) ||
             ((condition->type & PDB_cond_ge) &&
-                (Parrot_str_compare(interp, m, n) >= 0)) ||
+                (STRING_compare(interp, m, n) >= 0)) ||
             ((condition->type & PDB_cond_eq) &&
-                (Parrot_str_compare(interp, m, n) == 0)) ||
+                (STRING_compare(interp, m, n) == 0)) ||
             ((condition->type & PDB_cond_ne) &&
-                (Parrot_str_compare(interp, m, n) != 0)) ||
+                (STRING_compare(interp, m, n) != 0)) ||
             ((condition->type & PDB_cond_le) &&
-                (Parrot_str_compare(interp, m, n) <= 0)) ||
+                (STRING_compare(interp, m, n) <= 0)) ||
             ((condition->type & PDB_cond_lt) &&
-                (Parrot_str_compare(interp, m, n) <  0)))
+                (STRING_compare(interp, m, n) <  0)))
                     return 1;
 
         return 0;

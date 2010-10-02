@@ -113,13 +113,17 @@ encoding_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rh
 {
     ASSERT_ARGS(encoding_compare)
     String_iter l_iter, r_iter;
-    UINTVAL min_len, l_len, r_len;
+    const UINTVAL l_len = STRING_length(lhs);
+    const UINTVAL r_len = STRING_length(rhs);
+    UINTVAL min_len;
+
+    if (r_len == 0)
+        return l_len != 0;
+    if (l_len == 0)
+        return -1;
 
     STRING_ITER_INIT(interp, &l_iter);
     STRING_ITER_INIT(interp, &r_iter);
-
-    l_len = lhs->strlen;
-    r_len = rhs->strlen;
 
     min_len = l_len > r_len ? r_len : l_len;
 
@@ -679,9 +683,16 @@ INTVAL
 fixed8_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(fixed8_compare)
-    const UINTVAL l_len = lhs->strlen;
-    const UINTVAL r_len = rhs->strlen;
-    const UINTVAL min_len = l_len > r_len ? r_len : l_len;
+    const UINTVAL l_len = STRING_length(lhs);
+    const UINTVAL r_len = STRING_length(rhs);
+    UINTVAL min_len;
+
+    if (r_len == 0)
+        return l_len != 0;
+    if (l_len == 0)
+        return -1;
+
+    min_len = l_len > r_len ? r_len : l_len;
 
     if (STRING_max_bytes_per_codepoint(rhs) == 1) {
         const int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
