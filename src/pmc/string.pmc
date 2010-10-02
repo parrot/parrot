@@ -304,7 +304,7 @@ is smaller.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_compare(INTERP, str_val, v);
+        return STRING_compare(INTERP, str_val, v);
     }
 
 /*
@@ -349,7 +349,7 @@ is smaller.
         STRING        *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_compare(INTERP, str_val, v);
+        return STRING_compare(INTERP, str_val, v);
     }
 
 /*

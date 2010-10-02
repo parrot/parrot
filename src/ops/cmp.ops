@@ -280,7 +280,7 @@ inline op lt(in NUM, in NUM, inconst LABEL) :base_core {
 }
 
 op lt(in STR, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_compare(interp, $1, $2) < 0) {
+    if (STRING_compare(interp, $1, $2) < 0) {
         goto OFFSET($3);
     }
 }
@@ -310,7 +310,7 @@ op lt(invar PMC, in NUM, inconst LABEL) :base_core {
 }
 
 op lt(invar PMC, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, $1), $2) < 0) {
+    if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) < 0) {
         goto OFFSET($3);
     }
 }
@@ -364,7 +364,7 @@ inline op le(in NUM, in NUM, inconst LABEL) :base_core {
 }
 
 op le(in STR, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_compare(interp, $1, $2) <= 0) {
+    if (STRING_compare(interp, $1, $2) <= 0) {
         goto OFFSET($3);
     }
 }
@@ -394,7 +394,7 @@ op le(invar PMC, in NUM, inconst LABEL) :base_core {
 }
 
 op le(invar PMC, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, $1), $2) <= 0) {
+    if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) <= 0) {
         goto OFFSET($3);
     }
 }
@@ -454,7 +454,7 @@ op gt(invar PMC, in NUM, inconst LABEL) :base_core {
 }
 
 op gt(invar PMC, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, $1), $2) > 0) {
+    if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) > 0) {
         goto OFFSET($3);
     }
 }
@@ -514,7 +514,7 @@ op ge(invar PMC, in NUM, inconst LABEL) :base_core {
 }
 
 op ge(invar PMC, in STR, inconst LABEL) :base_core {
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, $1), $2) >= 0) {
+    if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) >= 0) {
         goto OFFSET($3);
     }
 }
@@ -627,7 +627,7 @@ inline op cmp(out INT, in NUM, in NUM) :base_core {
 }
 
 inline op cmp(out INT, in STR, in STR) :base_core {
-    $1 = Parrot_str_compare(interp, $2, $3);
+    $1 = STRING_compare(interp, $2, $3);
 }
 
 inline op cmp(out INT, invar PMC, invar PMC) :base_core {
@@ -650,7 +650,7 @@ inline op cmp(out INT, invar PMC, in NUM) :base_core {
 
 inline op cmp(out INT, invar PMC, in STR) :base_core {
     STRING* const l = VTABLE_get_string(interp, $2);
-    $1 = Parrot_str_compare(interp, l, $3);
+    $1 = STRING_compare(interp, l, $3);
 }
 
 inline op cmp_str(out INT, invar PMC, invar PMC) :base_core {
@@ -801,7 +801,7 @@ inline op isle(out INT, in NUM, in NUM) {
 }
 
 inline op isle(out INT, in STR, in STR) {
-    $1 = Parrot_str_compare(interp, $2, $3) <= 0;
+    $1 = STRING_compare(interp, $2, $3) <= 0;
 }
 
 inline op isle(out INT, invar PMC, invar PMC) {
@@ -829,7 +829,7 @@ inline op islt(out INT, in NUM, in NUM) {
 }
 
 inline op islt(out INT, in STR, in STR) {
-    $1 = Parrot_str_compare(interp, $2, $3) < 0;
+    $1 = STRING_compare(interp, $2, $3) < 0;
 }
 
 inline op islt(out INT, invar PMC, invar PMC) {

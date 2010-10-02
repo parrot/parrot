@@ -1248,7 +1248,9 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
 Compares two strings to each other.  If s1 is less than s2, returns -1.  If the
 strings are equal, returns 0.  If s1 is greater than s2, returns 2.  This
 comparison uses the character set collation order of the strings for
-comparison.
+comparison. The null string is considered equal to the empty string.
+
+Identical to the STRING_compare macro.
 
 =cut
 
@@ -1260,17 +1262,9 @@ INTVAL
 Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_compare)
-    UINTVAL len1 = STRING_length(s1);
-    UINTVAL len2 = STRING_length(s2);
 
-    if (len2 == 0)
-        return len1 != 0;
-
-    if (len1 == 0)
-        return -1;
-
-    ASSERT_STRING_SANITY(s1);
-    ASSERT_STRING_SANITY(s2);
+    if (s1 == NULL)
+        s1 = STRINGNULL;
 
     return STRING_compare(interp, s1, s2);
 }
