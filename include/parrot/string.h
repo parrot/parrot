@@ -90,8 +90,8 @@ typedef STRING * (*str_vtable_chr_t)(PARROT_INTERP, UINTVAL codepoint);
 
 typedef INTVAL   (*str_vtable_equal_t)(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs));
 typedef INTVAL   (*str_vtable_compare_t)(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs));
-typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), UINTVAL offset);
-typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), UINTVAL offset);
+typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
+typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
 typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
 typedef UINTVAL  (*str_vtable_validate_t)(PARROT_INTERP, ARGIN(const STRING *src));
 

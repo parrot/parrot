@@ -789,7 +789,11 @@ STRING *search, INTVAL start)>
 
 Returns the character position of the second Parrot string in the first at or
 after C<start>. The return value is a (0 based) offset in characters, not
-bytes. If second string is not found in the first string, returns -1.
+bytes. If the search string is not found in the first string or it is null or
+empty, returns -1. If C<start> is out of bounds, returns -1. Throws an
+exception if C<src> is null.
+
+Identical to the STRING_index macro.
 
 =cut
 
@@ -803,11 +807,10 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *src),
 {
     ASSERT_ARGS(Parrot_str_find_index)
 
-    if ((UINTVAL)start >= STRING_length(src)
-    ||  !STRING_length(search))
-        return -1;
+    if (src == NULL)
+        src = STRINGNULL;
 
-    return STRING_index(interp, src, search, (UINTVAL)start);
+    return STRING_index(interp, src, search, start);
 }
 
 

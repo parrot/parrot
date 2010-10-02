@@ -360,7 +360,7 @@ key receives the value of the hash element.
          * for the string builder. */
         while (pos >= 0) {
             /* Find the next % */
-            percentPos = Parrot_str_find_index(INTERP, fmt, percent, pos);
+            percentPos = STRING_index(INTERP, fmt, percent, pos);
 
             if (percentPos < 0) {
                 if (pos == 0) {

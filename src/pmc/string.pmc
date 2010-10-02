@@ -507,7 +507,7 @@ Replace every occurrence of C<orig> with C<_new>.
         STRING       * s       = VTABLE_get_string(INTERP, SELF);
         INTVAL         i       = 0;
 
-        while (-1 != (i = Parrot_str_find_index(INTERP, s, orig, i))) {
+        while (-1 != (i = STRING_index(INTERP, s, orig, i))) {
             s = Parrot_str_replace(INTERP, s, i, old_len, _new);
             i += new_len;
         }

@@ -414,7 +414,7 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 
         orig_length = Parrot_str_byte_length(interp, result);
         GETATTR_StringHandle_read_offset(interp, pmc, offset);
-        newline_pos = Parrot_str_find_index(interp, result, CONST_STRING(interp, "\n"), offset);
+        newline_pos = STRING_index(interp, result, CONST_STRING(interp, "\n"), offset);
 
         /* No newline found, read the rest of the string. */
         if (newline_pos == -1)
