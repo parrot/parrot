@@ -423,6 +423,7 @@ CLASS_STR_FILES   = @TEMP_pmc_classes_str@
 ENCODING_O_FILES = \
     src/string/encoding/shared$(O) \
     src/string/encoding/tables$(O) \
+    src/string/encoding/null$(O) \
     src/string/encoding/ascii$(O) \
     src/string/encoding/latin1$(O) \
     src/string/encoding/binary$(O) \
@@ -1593,6 +1594,7 @@ src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
 src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
+src/string/encoding/null$(O) : $(PARROT_H_HEADERS)
 src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
