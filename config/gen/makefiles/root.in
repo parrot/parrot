@@ -1147,6 +1147,11 @@ $(LIBRARY_DIR)/Instrument/Event.pir: $(LIBRARY_DIR)/Instrument/Event.nqp $(NQP_R
 $(LIBRARY_DIR)/Instrument/EventLibrary.pir: $(LIBRARY_DIR)/Instrument/EventLibrary.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/Instrument/EventLibrary.nqp > $@
 
+$(LIBRARY_DIR)/Instrument/Instrument.pir: $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
+	runtime/parrot/include/call_bits.pasm $(LIBRARY_DIR)/Instrument/Base.pir \
+	$(LIBRARY_DIR)/Instrument/Probe.pir $(LIBRARY_DIR)/Instrument/Event.pir \
+	$(LIBRARY_DIR)/Instrument/EventLibrary.pir
+
 runtime/parrot/include/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
 runtime/parrot/include/interpdebug.pasm : $(INC_DIR)/interpreter.h $(H2INC)
