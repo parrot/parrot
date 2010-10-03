@@ -38,8 +38,8 @@ sub runstep {
     if (!$@) {
         my $output = eval { $conf->cc_run() };
         if (!$@ && $output =~ /OK/) {
-	    $infnan = 1;
-	}
+            $infnan = 1;
+        }
     }
     $conf->cc_clean();
 
