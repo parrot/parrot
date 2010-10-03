@@ -93,7 +93,7 @@ header file.
 
 */
 
-#ifdef PARROT_HAS_INF_NAN
+#ifndef PARROT_HAS_INF_NAN
 
 PARROT_EXPORT
 FLOATVAL
