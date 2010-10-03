@@ -57,7 +57,7 @@ PARROT_CAN_RETURN_NULL
 static void* gc_inf_allocate_fixed_size_storage(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_inf_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
