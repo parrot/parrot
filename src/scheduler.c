@@ -1009,26 +1009,29 @@ opcode_t *
 Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_schedule_sleep)
-#ifdef PARROT_HAS_THREADS
-    Parrot_cond condition;
-    Parrot_mutex lock;
-    const FLOATVAL timer_end = time + Parrot_floatval_time();
-    struct timespec time_struct;
 
     /* Tell the scheduler runloop to wake, this is a good time to process
      * pending tasks. */
     Parrot_cx_runloop_wake(interp, interp->scheduler);
 
-    /* Tell this thread to sleep for the requested time. */
-    COND_INIT(condition);
-    MUTEX_INIT(lock);
-    LOCK(lock);
-    time_struct.tv_sec = (time_t) timer_end;
-    time_struct.tv_nsec = (long)((timer_end - time_struct.tv_sec)*1000.0f) *1000L*1000L;
-    COND_TIMED_WAIT(condition, lock, &time_struct);
-    UNLOCK(lock);
-    COND_DESTROY(condition);
-    MUTEX_DESTROY(lock);
+#ifdef PARROT_HAS_THREADS
+    {
+        Parrot_cond condition;
+        Parrot_mutex lock;
+        const FLOATVAL timer_end = time + Parrot_floatval_time();
+        struct timespec time_struct;
+
+        /* Tell this thread to sleep for the requested time. */
+        COND_INIT(condition);
+        MUTEX_INIT(lock);
+        LOCK(lock);
+        time_struct.tv_sec = (time_t) timer_end;
+        time_struct.tv_nsec = (long)((timer_end - time_struct.tv_sec)*1000.0f) *1000L*1000L;
+        COND_TIMED_WAIT(condition, lock, &time_struct);
+        UNLOCK(lock);
+        COND_DESTROY(condition);
+        MUTEX_DESTROY(lock);
+    }
 #else
     /* A more primitive, platform-specific, non-threaded form of sleep. */
     if (time > 1000) {
