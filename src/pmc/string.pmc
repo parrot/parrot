@@ -478,7 +478,7 @@ Replace the string at C<key> with the chr of C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
         STRING      *str_val;
-        STRING * const c = string_chr(INTERP, (UINTVAL) value);
+        STRING * const c = Parrot_str_chr(INTERP, (UINTVAL) value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
         str_val = Parrot_str_replace(INTERP, str_val, pos, 1, c);
         SET_ATTR_str_val(INTERP, SELF, str_val);

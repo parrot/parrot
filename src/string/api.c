@@ -44,6 +44,13 @@ STRING *STRINGNULL;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static INTVAL string_max_bytes(SHIM_INTERP,
+    ARGIN(const STRING *s),
+    UINTVAL nchars)
+        __attribute__nonnull__(2);
+
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
@@ -58,6 +65,8 @@ PARROT_COLD
 static void throw_illegal_escape(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_string_max_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
@@ -676,7 +685,8 @@ string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 len, const STR_VTABLE *encoding, UINTVAL flags)>
 
 Given a buffer, its length, an encoding, a character set, and STRING flags,
-creates and returns a new string.  Don't call this directly.
+creates and returns a new string. If buffer is NULL and len >= 0, allocates
+len bytes.
 
 =cut
 
@@ -846,9 +856,38 @@ string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 
 /*
 
+=item C<STRING * Parrot_str_chr(PARROT_INTERP, UINTVAL character)>
+
+Returns a single-character Parrot string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+Parrot_str_chr(PARROT_INTERP, UINTVAL character)
+{
+    ASSERT_ARGS(Parrot_str_chr)
+
+    if (character > 0xff)
+        return Parrot_utf8_encoding_ptr->chr(interp, character);
+    else if (character > 0x7f)
+        return Parrot_latin1_encoding_ptr->chr(interp, character);
+    else
+        return Parrot_ascii_encoding_ptr->chr(interp, character);
+}
+
+
+/*
+
 =item C<STRING * string_chr(PARROT_INTERP, UINTVAL character)>
 
 Returns a single-character Parrot string.
+
+Deprecated, use Parrot_str_chr instead.
 
 =cut
 
@@ -861,13 +900,7 @@ STRING *
 string_chr(PARROT_INTERP, UINTVAL character)
 {
     ASSERT_ARGS(string_chr)
-
-    if (character > 0xff)
-        return Parrot_utf8_encoding_ptr->chr(interp, character);
-    else if (character > 0x7f)
-        return Parrot_latin1_encoding_ptr->chr(interp, character);
-    else
-        return Parrot_ascii_encoding_ptr->chr(interp, character);
+    return Parrot_str_chr(interp, character);
 }
 
 
@@ -901,7 +934,8 @@ Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<INTVAL string_max_bytes(PARROT_INTERP, const STRING *s, UINTVAL nchars)>
+=item C<static INTVAL string_max_bytes(PARROT_INTERP, const STRING *s, UINTVAL
+nchars)>
 
 Returns the number of bytes required to safely contain the specified number
 of characters in the specified Parrot string's representation.
@@ -910,10 +944,9 @@ of characters in the specified Parrot string's representation.
 
 */
 
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL
+static INTVAL
 string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
 {
     ASSERT_ARGS(string_max_bytes)
@@ -2777,43 +2810,6 @@ Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         res->hashval = 0;
         return res;
     }
-}
-
-
-/*
-
-=item C<STRING * string_increment(PARROT_INTERP, const STRING *s)>
-
-Increments the string in the Perl 5 fashion, where incrementing aa gives you bb
-and so on.  Currently single char only.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-string_increment(PARROT_INTERP, ARGIN(const STRING *s))
-{
-    ASSERT_ARGS(string_increment)
-    UINTVAL o;
-
-    if (Parrot_str_length(interp, s) != 1)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "increment only for length = 1 done");
-
-    o = (UINTVAL)STRING_ord(interp, s, 0);
-
-    if ((o >= 'A' && o < 'Z') || (o >= 'a' && o < 'z')) {
-        ++o;
-        /* TODO increment in place */
-        return string_chr(interp, o);
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "increment out of range - unimplemented");
 }
 
 
