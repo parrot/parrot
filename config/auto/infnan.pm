@@ -48,8 +48,8 @@ sub runstep {
         $self->set_result('yes');
     }
     else {
-	$conf->data->set( HAS_INF_NAN => 0 );
-	$self->set_result('no');
+        $conf->data->set( HAS_INF_NAN => 0 );
+        $self->set_result('no');
     }
 
     return 1;
