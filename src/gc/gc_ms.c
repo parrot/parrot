@@ -69,7 +69,7 @@ static Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
