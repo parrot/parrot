@@ -55,7 +55,7 @@ The character specified by codepoint integer $2 is returned in string $1.
 =cut
 
 inline op chr(out STR, in INT) :base_core {
-    STRING * const s = string_chr(interp, (UINTVAL)$2);
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)$2);
     $1 = s;
 }
 

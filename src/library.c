@@ -413,7 +413,7 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
      *      the goal is just to have for sure an invisible 0 at end
      */
 
-    STRING * const nul = string_chr(interp, '\0');
+    STRING * const nul = Parrot_str_chr(interp, '\0');
 
     path = Parrot_str_concat(interp, path, nul);
     --path->bufused;
@@ -445,12 +445,11 @@ static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
     ASSERT_ARGS(path_guarantee_trailing_separator)
-    STRING * const path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
-    if (STRING_ord(interp, path, -1)
-         != STRING_ord(interp, path_separator_string, 0))
-        path = Parrot_str_concat(interp, path , path_separator_string);
+    if (STRING_ord(interp, path, -1) != path_separator)
+        path = Parrot_str_concat(interp, path,
+                Parrot_str_chr(interp, path_separator));
 
     return path;
 }

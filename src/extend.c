@@ -511,8 +511,21 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 {
     ASSERT_ARGS(Parrot_new_string)
     Parrot_String retval;
+    const STR_VTABLE *encoding;
+
     PARROT_CALLIN_START(interp);
-    retval = string_make(interp, buffer, length, encoding_name, flags);
+
+    if (encoding_name) {
+        encoding = Parrot_find_encoding(interp, encoding_name);
+        if (!encoding)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Can't make '%s' encoding strings", encoding_name);
+    }
+    else
+        encoding = Parrot_default_encoding_ptr;
+
+    retval = Parrot_str_new_init(interp, buffer, length, encoding, flags);
+
     PARROT_CALLIN_END(interp);
     return retval;
 }

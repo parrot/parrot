@@ -22268,7 +22268,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_chr_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const s = string_chr(interp, (UINTVAL)IREG(2));
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)IREG(2));
     SREG(1) = s;
 
 return (opcode_t *)cur_opcode + 3;}
@@ -22276,7 +22276,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_chr_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const s = string_chr(interp, (UINTVAL)ICONST(2));
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)ICONST(2));
     SREG(1) = s;
 
 return (opcode_t *)cur_opcode + 3;}

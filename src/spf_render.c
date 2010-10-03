@@ -685,7 +685,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                             /* INTEGERS */
                           case 'c':
                             {
-                            STRING * const ts = string_chr(interp,
+                            STRING * const ts = Parrot_str_chr(interp,
                                  (UINTVAL)obj->getint(interp, info.type, obj));
                             targ = str_concat_w_flags(interp, targ, &info, ts, NULL);
                             }
