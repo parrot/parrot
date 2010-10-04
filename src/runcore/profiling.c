@@ -48,6 +48,26 @@ static void add_bogus_parent_runloop(
     ARGIN(Parrot_profiling_runcore_t * runcore))
         __attribute__nonnull__(1);
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static char* get_filename_cstr(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PMC* ctx_pmc),
+    ARGIN(opcode_t *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static char* get_ns_cstr(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PMC* ctx_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_CAN_RETURN_NULL
 static void * init_profiling_core(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t *runcore),
@@ -95,6 +115,15 @@ static void store_postop_time(PARROT_INTERP,
 
 #define ASSERT_ARGS_add_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
+#define ASSERT_ARGS_get_filename_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(ctx_pmc) \
+    , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_get_ns_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(ctx_pmc))
 #define ASSERT_ARGS_init_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
@@ -301,7 +330,7 @@ ARGIN(opcode_t *pc))
 
     /* argv isn't initialized until after :init (etc) subs are executed */
     if (argv && !Profiling_have_printed_cli_TEST(runcore)) {
-        store_cli(interp, runcore, &pprof_data, argv);
+        store_cli(interp, runcore, (PPROF_DATA*)&pprof_data, argv);
         Profiling_have_printed_cli_SET(runcore);
     }
 
@@ -354,42 +383,12 @@ ARGIN(opcode_t *pc))
         ||   runcore->prev_sub != preop_ctx->current_sub) {
 
             if (preop_ctx->current_sub) {
-                STRING *sub_name, *full_ns, *ns_separator, *preop_filename;
-                char   *full_ns_cstr, *filename_cstr;
-                STRING *ns_names[MAX_NS_DEPTH];
-                PMC    *ns = preop_ctx->current_namespace;
-                INTVAL  i;
+                char   *filename_cstr, *ns_cstr;
 
-                preop_filename = Parrot_Sub_get_filename_from_pc(interp,
-                        Parrot_pcc_get_sub(interp, preop_ctx_pmc), pc);
+                filename_cstr = get_filename_cstr(interp, runcore, preop_ctx_pmc, preop_pc);
+                ns_cstr       = get_ns_cstr(interp, runcore, preop_ctx_pmc);
 
-                filename_cstr = Parrot_str_to_cstring(interp, preop_filename);
-
-                /* build the namespace string */
-                full_ns      = Parrot_str_new(interp, "", 0);
-                ns_separator = Parrot_str_new(interp, ";", 1);
-
-                i = MAX_NS_DEPTH - 1;
-                for (;ns ; --i) {
-                    if (i < 0) {
-                        /* should probably warn about truncated namespace here */
-                        break;
-                    }
-                    GETATTR_NameSpace_name(interp, ns, ns_names[i]);
-                    GETATTR_NameSpace_parent(interp, ns, ns);
-                }
-
-                i += 2; /* the root namespace has an empty name, so ignore it */
-                for (;i < MAX_NS_DEPTH; ++i) {
-                    full_ns = Parrot_str_concat(interp, full_ns, ns_names[i]);
-                    full_ns = Parrot_str_concat(interp, full_ns, ns_separator);
-                }
-
-                GETATTR_Sub_name(interp, preop_ctx->current_sub, sub_name);
-                full_ns = Parrot_str_concat(interp, full_ns, sub_name);
-                full_ns_cstr = Parrot_str_to_cstring(interp, full_ns);
-
-                pprof_data[PPROF_DATA_NAMESPACE] = (PPROF_DATA) full_ns_cstr;
+                pprof_data[PPROF_DATA_NAMESPACE] = (PPROF_DATA) ns_cstr;
                 pprof_data[PPROF_DATA_FILENAME]  = (PPROF_DATA) filename_cstr;
 
                 if (Profiling_canonical_output_TEST(runcore)) {
@@ -403,7 +402,7 @@ ARGIN(opcode_t *pc))
 
                 runcore->output_fn(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
 
-                Parrot_str_free_cstring(full_ns_cstr);
+                Parrot_str_free_cstring(ns_cstr);
                 Parrot_str_free_cstring(filename_cstr);
             }
 
@@ -511,6 +510,66 @@ ARGIN(PMC* argv))
 
     Parrot_str_free_cstring(cli_cstr);
 }
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static char*
+get_ns_cstr(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+ARGIN(PMC* ctx_pmc))
+{
+
+    ASSERT_ARGS(get_ns_cstr)
+
+    STRING         *sub_name, *full_ns, *ns_separator;
+    char           *full_ns_cstr;
+    STRING         *ns_names[MAX_NS_DEPTH];
+    Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context * );
+    PMC            *ns = ctx->current_namespace;
+    INTVAL          i;
+
+    /* build the namespace string */
+    full_ns      = Parrot_str_new(interp, "", 0);
+    ns_separator = Parrot_str_new(interp, ";", 1);
+
+    i = MAX_NS_DEPTH - 1;
+    for (;ns ; --i) {
+        if (i < 0) {
+            /* should probably warn about truncated namespace here */
+            break;
+        }
+        GETATTR_NameSpace_name(interp, ns, ns_names[i]);
+        GETATTR_NameSpace_parent(interp, ns, ns);
+    }
+
+    i += 2; /* the root namespace has an empty name, so ignore it */
+    for (;i < MAX_NS_DEPTH; ++i) {
+        full_ns = Parrot_str_concat(interp, full_ns, ns_names[i]);
+        full_ns = Parrot_str_concat(interp, full_ns, ns_separator);
+    }
+
+    GETATTR_Sub_name(interp, ctx->current_sub, sub_name);
+    full_ns = Parrot_str_concat(interp, full_ns, sub_name);
+    return Parrot_str_to_cstring(interp, full_ns);
+
+}
+
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static char*
+get_filename_cstr(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
+{
+
+    ASSERT_ARGS(get_filename_cstr)
+
+    STRING *filename = Parrot_Sub_get_filename_from_pc(interp,
+            Parrot_pcc_get_sub(interp, ctx_pmc), pc);
+    char *filename_cstr = Parrot_str_to_cstring(interp, filename);
+
+    return filename_cstr;
+}
+
 
 
 /*
