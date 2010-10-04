@@ -79,6 +79,20 @@ static opcode_t * runops_profiling_core(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+static void store_cli(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA* pprof_data),
+    ARGIN(PMC* argv))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+static void store_postop_time(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_add_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_init_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -95,6 +109,14 @@ static opcode_t * runops_profiling_core(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_store_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data) \
+    , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_store_postop_time __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -272,41 +294,14 @@ ARGIN(opcode_t *pc))
     runcore->runcore_start = Parrot_hires_get_time();
 
     /* if we're in a nested runloop, */
-    if (runcore->level != 0) {
-
-        if (runcore->level >= runcore->time_size) {
-            runcore->time_size *= 2;
-            runcore->time = mem_gc_realloc_n_typed(interp,
-                    runcore->time, runcore->time_size + 1, UHUGEINTVAL);
-        }
-
-        /* store the time between DO_OP and the start of this runcore in this
-         * op's running total */
-        runcore->time[runcore->level] =
-             runcore->runcore_start - runcore->op_start;
-    }
+    if (runcore->level != 0) 
+        store_postop_time(interp, runcore);
 
     argv = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST);
 
     /* argv isn't initialized until after :init (etc) subs are executed */
     if (argv && !Profiling_have_printed_cli_TEST(runcore)) {
-
-        char   *cli_cstr;
-        STRING *space, *cli_args, *cli_exe, *cli_str;
-        PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE);
-
-        space    = CONST_STRING(interp, " ");
-        cli_args = Parrot_str_join(interp, space, argv);
-        cli_exe  = VTABLE_get_string(interp, exe_name);
-        cli_str  = Parrot_sprintf_c(interp, "%Ss %Ss", cli_exe, cli_args);
-        cli_cstr = Parrot_str_to_cstring(interp, cli_str);
-
-        /* CLI line won't reflect any options passed to the parrot binary. */
-        pprof_data[PPROF_DATA_CLI] = (PPROF_DATA) cli_cstr;
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_CLI);
-
-        Parrot_str_free_cstring(cli_cstr);
-
+        store_cli(interp, runcore, &pprof_data, argv);
         Profiling_have_printed_cli_SET(runcore);
     }
 
@@ -475,6 +470,48 @@ ARGIN(opcode_t *pc))
     runcore->runcore_finish = Parrot_hires_get_time();
     return pc;
 }
+
+static void
+store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
+{
+
+    ASSERT_ARGS(store_postop_time)
+
+    if (runcore->level >= runcore->time_size) {
+        runcore->time_size *= 2;
+        runcore->time = mem_gc_realloc_n_typed(interp,
+                runcore->time, runcore->time_size + 1, UHUGEINTVAL);
+    }
+
+    /* store the time between DO_OP and the start of this runcore in this
+     *          * op's running total */
+    runcore->time[runcore->level] = runcore->runcore_start - runcore->op_start;
+}
+
+static void
+store_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data),
+ARGIN(PMC* argv))
+{
+
+    ASSERT_ARGS(store_cli)
+
+    char   *cli_cstr;
+    STRING *space, *cli_args, *cli_exe, *cli_str;
+    PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE);
+
+    space    = CONST_STRING(interp, " ");
+    cli_args = Parrot_str_join(interp, space, argv);
+    cli_exe  = VTABLE_get_string(interp, exe_name);
+    cli_str  = Parrot_sprintf_c(interp, "%Ss %Ss", cli_exe, cli_args);
+    cli_cstr = Parrot_str_to_cstring(interp, cli_str);
+
+    /* CLI line won't reflect any options passed to the parrot binary. */
+    pprof_data[PPROF_DATA_CLI] = (PPROF_DATA) cli_cstr;
+    runcore->output_fn(runcore, pprof_data, PPROF_LINE_CLI);
+
+    Parrot_str_free_cstring(cli_cstr);
+}
+
 
 /*
 
