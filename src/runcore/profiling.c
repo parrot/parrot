@@ -133,6 +133,13 @@ static void update_ctx_info(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+static INTVAL get_line_num_from_cache(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PMC *ctx_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 #define ASSERT_ARGS_add_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_get_filename_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -177,6 +184,10 @@ static void update_ctx_info(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pprof_data) \
     , PARROT_ASSERT_ARG(ctx_pmc) \
     , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_get_line_num_from_cache __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(ctx_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -415,15 +426,7 @@ ARGIN(opcode_t *pc))
         if ((runcore->prev_ctx != preop_ctx) || runcore->prev_sub != preop_ctx->current_sub)
             update_ctx_info(interp, runcore, (PPROF_DATA *) &pprof_data, preop_ctx_pmc, preop_pc);
 
-        preop_line = hash_value_to_int(interp, runcore->line_cache,
-            parrot_hash_get(interp, runcore->line_cache, preop_ctx->current_pc));
-
-        if (preop_line == 0) {
-            preop_line = Parrot_Sub_get_line_from_pc(interp,
-                    Parrot_pcc_get_sub(interp, preop_ctx_pmc), preop_ctx->current_pc);
-            parrot_hash_put(interp, runcore->line_cache,
-                    preop_ctx->current_pc, (void *) preop_line);
-        }
+        preop_line = get_line_num_from_cache(interp, runcore, preop_ctx_pmc);
 
         if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
             record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
@@ -497,6 +500,39 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
 
 }
 
+/*
+
+=item C<static INTVAL get_line_num_from_cache(PARROT_INTERP,
+Parrot_profiling_runcore_t *runcore, PMC *ctx_pmc)>
+
+Return the line number for the current context, either by fetching from cache
+or by calculating.
+
+=cut
+
+*/
+
+static INTVAL
+get_line_num_from_cache(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+ARGIN(PMC *ctx_pmc))
+{
+
+    ASSERT_ARGS(get_line_num_from_cache)
+
+    Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
+
+    INTVAL line_num = hash_value_to_int(interp, runcore->line_cache,
+            parrot_hash_get(interp, runcore->line_cache, ctx->current_pc));
+
+    /* Parrot_Sub_get_line_from_pc eats up about 20-30% of execution time
+     * *with* this cache in place. */
+    if (line_num == 0) {
+        line_num = Parrot_Sub_get_line_from_pc(interp,
+                Parrot_pcc_get_sub(interp, ctx_pmc), ctx->current_pc);
+        parrot_hash_put(interp, runcore->line_cache, ctx->current_pc, line_num);
+    }
+    return line_num;
+}
 
 /*
 
