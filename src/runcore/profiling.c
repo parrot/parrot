@@ -76,6 +76,15 @@ static void * init_profiling_core(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+static void record_annotations(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA *pprof_data),
+    ARGIN(opcode_t *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
 static void record_values_ascii_pprof(
     ARGIN(Parrot_profiling_runcore_t * runcore),
     ARGIN(PPROF_DATA *pprof_data),
@@ -113,6 +122,17 @@ static void store_postop_time(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void update_ctx_info(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA *pprof_data),
+    ARGIN(PMC* ctx_pmc),
+    ARGIN(opcode_t *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
 #define ASSERT_ARGS_add_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_get_filename_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -127,6 +147,11 @@ static void store_postop_time(PARROT_INTERP,
 #define ASSERT_ARGS_init_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_record_annotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_record_values_ascii_pprof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore) \
@@ -146,6 +171,12 @@ static void store_postop_time(PARROT_INTERP,
 #define ASSERT_ARGS_store_postop_time __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))
+#define ASSERT_ARGS_update_ctx_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data) \
+    , PARROT_ASSERT_ARG(ctx_pmc) \
+    , PARROT_ASSERT_ARG(pc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -331,7 +362,7 @@ ARGIN(opcode_t *pc))
 
     /* argv isn't initialized until after :init (etc) subs are executed */
     if (argv && !Profiling_have_printed_cli_TEST(runcore)) {
-        store_cli(interp, runcore, (PPROF_DATA*)&pprof_data, argv);
+        store_cli(interp, runcore, (PPROF_DATA *)&pprof_data, argv);
         Profiling_have_printed_cli_SET(runcore);
     }
 
@@ -381,79 +412,27 @@ ARGIN(opcode_t *pc))
         /* Occasionally the ctx stays the same while the sub changes, possible
          * with a call to a subclass' method. */
 
-        if ((runcore->prev_ctx != preop_ctx)
-        ||   runcore->prev_sub != preop_ctx->current_sub) {
-
-            if (preop_ctx->current_sub) {
-                char   *filename_cstr, *ns_cstr;
-
-                filename_cstr = get_filename_cstr(interp, runcore, preop_ctx_pmc, preop_pc);
-                ns_cstr       = get_ns_cstr(interp, runcore, preop_ctx_pmc);
-
-                pprof_data[PPROF_DATA_NAMESPACE] = (PPROF_DATA) ns_cstr;
-                pprof_data[PPROF_DATA_FILENAME]  = (PPROF_DATA) filename_cstr;
-
-                if (Profiling_canonical_output_TEST(runcore)) {
-                    pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) 0x3;
-                    pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) 0x3;
-                }
-                else {
-                    pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) preop_ctx->current_sub;
-                    pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) preop_ctx;
-                }
-
-                runcore->output_fn(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
-
-                Parrot_str_free_cstring(ns_cstr);
-                Parrot_str_free_cstring(filename_cstr);
-            }
-
-            runcore->prev_ctx = preop_ctx;
-            runcore->prev_sub = preop_ctx->current_sub;
-        }
+        if ((runcore->prev_ctx != preop_ctx) || runcore->prev_sub != preop_ctx->current_sub)
+            update_ctx_info(interp, runcore, (PPROF_DATA *) &pprof_data, preop_ctx_pmc, preop_pc);
 
         preop_line = hash_value_to_int(interp, runcore->line_cache,
-            parrot_hash_get(interp, runcore->line_cache,
-                        preop_ctx->current_pc));
+            parrot_hash_get(interp, runcore->line_cache, preop_ctx->current_pc));
 
         if (preop_line == 0) {
             preop_line = Parrot_Sub_get_line_from_pc(interp,
-                    Parrot_pcc_get_sub(interp, preop_ctx_pmc),
-                    preop_ctx->current_pc);
-            parrot_hash_put(interp, runcore->line_cache, preop_ctx->current_pc,
-                            (void *) preop_line);
+                    Parrot_pcc_get_sub(interp, preop_ctx_pmc), preop_ctx->current_pc);
+            parrot_hash_put(interp, runcore->line_cache,
+                    preop_ctx->current_pc, (void *) preop_line);
         }
 
-        if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations) {
-            PMC * const annot = PackFile_Annotations_lookup(interp,
-                    interp->code->annotations, pc - code_start + 1, NULL);
+        if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
+            record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
 
-            if (!PMC_IS_NULL(annot)) {
-
-                PMC *iter = VTABLE_get_iter(interp, annot);
-                while (VTABLE_get_bool(interp, iter)) {
-
-                    STRING *key      = VTABLE_shift_string(interp, iter);
-                    STRING *val      = VTABLE_get_string_keyed_str(interp, annot, key);
-                    char   *key_cstr = Parrot_str_to_cstring(interp, key);
-                    char   *val_cstr = Parrot_str_to_cstring(interp, val);
-
-                    pprof_data[PPROF_DATA_ANNOTATION_NAME]  = (PPROF_DATA) key_cstr;
-                    pprof_data[PPROF_DATA_ANNOTATION_VALUE] = (PPROF_DATA) val_cstr;
-                    runcore->output_fn(runcore, pprof_data, PPROF_LINE_ANNOTATION);
-
-                    Parrot_str_free_cstring(key_cstr);
-                    Parrot_str_free_cstring(val_cstr);
-                }
-            }
-        }
-
-        if (Profiling_canonical_output_TEST(runcore)) {
+        if (Profiling_canonical_output_TEST(runcore))
             pprof_data[PPROF_DATA_TIME] = 1;
-        }
-        else {
+        else
             pprof_data[PPROF_DATA_TIME] = op_time;
-        }
+
         pprof_data[PPROF_DATA_LINE]   = preop_line;
         pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) preop_opname;
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
@@ -461,9 +440,7 @@ ARGIN(opcode_t *pc))
 
     /* make it easy to tell separate runloops apart */
     if (runcore->level == 0) {
-
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_END_OF_RUNLOOP);
-
         add_bogus_parent_runloop(runcore);
     }
 
@@ -474,10 +451,101 @@ ARGIN(opcode_t *pc))
 
 /*
 
+=item C<static void update_ctx_info(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PPROF_DATA *pprof_data, PMC* ctx_pmc, opcode_t *pc)>
+
+When the active context has changed, record information about the new context.
+
+=cut
+
+*/
+
+static void
+update_ctx_info(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+ARGIN(PPROF_DATA *pprof_data), ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
+{
+    ASSERT_ARGS(update_ctx_info)
+
+    Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
+
+    if (ctx->current_sub) {
+        char   *filename_cstr, *ns_cstr;
+
+        filename_cstr = get_filename_cstr(interp, runcore, ctx_pmc, pc);
+        ns_cstr       = get_ns_cstr(interp, runcore, ctx_pmc);
+
+        pprof_data[PPROF_DATA_NAMESPACE] = (PPROF_DATA) ns_cstr;
+        pprof_data[PPROF_DATA_FILENAME]  = (PPROF_DATA) filename_cstr;
+
+        if (Profiling_canonical_output_TEST(runcore)) {
+            pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) 0x3;
+            pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) 0x3;
+        }
+        else {
+            pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) ctx->current_sub;
+            pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) ctx;
+        }
+
+        runcore->output_fn(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
+
+        Parrot_str_free_cstring(ns_cstr);
+        Parrot_str_free_cstring(filename_cstr);
+    }
+
+    runcore->prev_ctx = ctx;
+    runcore->prev_sub = ctx->current_sub;
+
+}
+
+
+/*
+
+=item C<static void record_annotations(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PPROF_DATA *pprof_data, opcode_t *pc)>
+
+Record annotation data for the current pc, if any exist.
+
+=cut
+
+*/
+
+static void
+record_annotations(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+ARGIN(PPROF_DATA *pprof_data), ARGIN(opcode_t *pc))
+{
+
+    ASSERT_ARGS(record_annotations)
+
+    PMC * const annot = PackFile_Annotations_lookup(interp,
+            interp->code->annotations, pc - code_start + 1, NULL);
+
+    if (!PMC_IS_NULL(annot)) {
+
+        PMC *iter = VTABLE_get_iter(interp, annot);
+        while (VTABLE_get_bool(interp, iter)) {
+
+            STRING *key      = VTABLE_shift_string(interp, iter);
+            STRING *val      = VTABLE_get_string_keyed_str(interp, annot, key);
+            char   *key_cstr = Parrot_str_to_cstring(interp, key);
+            char   *val_cstr = Parrot_str_to_cstring(interp, val);
+
+            pprof_data[PPROF_DATA_ANNOTATION_NAME]  = (PPROF_DATA) key_cstr;
+            pprof_data[PPROF_DATA_ANNOTATION_VALUE] = (PPROF_DATA) val_cstr;
+            runcore->output_fn(runcore, pprof_data, PPROF_LINE_ANNOTATION);
+
+            Parrot_str_free_cstring(key_cstr);
+            Parrot_str_free_cstring(val_cstr);
+        }
+    }
+}
+
+
+/*
+
 =item C<static void store_postop_time(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore)>
 
-Store the time in the op's running total'
+Store the time in the op's running total.
 
 =cut
 
