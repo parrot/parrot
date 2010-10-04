@@ -103,7 +103,7 @@ sub _get_programs {
     $conf->debug("\nccflags: $ccflags\n");
 
     $ar = integrate( $conf->data->get('ar'), $conf->options->get('ar') );
-    $ar = promt( "What archiver do you want to use to build static libraries?", $ar ) if $ask;
+    $ar = prompt( "What archiver do you want to use to build static libraries?", $ar ) if $ask;
     $conf->data->set( ar => $ar );
 
     $arflags = integrate( $conf->data->get('arflags'), $conf->options->get('arflags') );

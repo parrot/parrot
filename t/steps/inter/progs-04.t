@@ -51,9 +51,11 @@ foreach my $p (
     qw|
         cc
         link
+        ar
         ld
         ccflags
         linkflags
+        arflags
         ldflags
         libs
     |
