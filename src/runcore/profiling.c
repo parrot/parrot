@@ -317,7 +317,7 @@ ARGIN(opcode_t *pc))
 
     PMC         *argv;
     opcode_t    *preop_pc;
-    char        *preop_opname;
+    const char  *preop_opname;
     UHUGEINTVAL  op_time;
     PPROF_DATA   pprof_data[PPROF_DATA_MAX + 1];
 
@@ -455,7 +455,7 @@ ARGIN(opcode_t *pc))
             pprof_data[PPROF_DATA_TIME] = op_time;
         }
         pprof_data[PPROF_DATA_LINE]   = preop_line;
-        pprof_data[PPROF_DATA_OPNAME] = preop_opname;
+        pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) preop_opname;
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
     }
 
