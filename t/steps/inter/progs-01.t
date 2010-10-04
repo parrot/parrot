@@ -54,6 +54,8 @@ foreach my $p (
         ld
         ccflags
         linkflags
+        ar
+        arflags
         ldflags
         libs
         cxx
