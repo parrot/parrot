@@ -75,7 +75,7 @@ sub _get_programs {
     my ($conf, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
-    my ( $cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc );
+    my ( $cc, $link, $ld, $ccflags, $linkflags, $ar, $arflags, $ldflags, $libs, $lex, $yacc );
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
@@ -101,6 +101,16 @@ sub _get_programs {
     $conf->data->set( ccflags => $ccflags );
 
     $conf->debug("\nccflags: $ccflags\n");
+
+    $ar = integrate( $conf->data->get('ar'), $conf->options->get('ar') );
+    $ar = promt( "What archiver do you want to use to build static libraries?", $ar ) if $ask;
+    $conf->data->set( ar => $ar );
+
+    $arflags = integrate( $conf->data->get('arflags'), $conf->options->get('arflags') );
+    $arflags = prompt( "What flags should your archiver receive to create static libraries?",
+                $arflags) if $ask;
+    $conf->data->set( arflags => $arflags );
+
 
     $linkflags = $conf->data->get('linkflags');
     # Remove the path to the Perl library (from Win32 config).
