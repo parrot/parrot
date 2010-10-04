@@ -324,7 +324,7 @@ ARGIN(opcode_t *pc))
     runcore->runcore_start = Parrot_hires_get_time();
 
     /* if we're in a nested runloop, */
-    if (runcore->level != 0) 
+    if (runcore->level != 0)
         store_postop_time(interp, runcore);
 
     argv = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST);
@@ -472,6 +472,17 @@ ARGIN(opcode_t *pc))
     return pc;
 }
 
+/*
+
+=item C<static void store_postop_time(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore)>
+
+Store the time in the op's running total'
+
+=cut
+
+*/
+
 static void
 store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 {
@@ -488,6 +499,17 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
      *          * op's running total */
     runcore->time[runcore->level] = runcore->runcore_start - runcore->op_start;
 }
+
+/*
+
+=item C<static void store_cli(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PPROF_DATA* pprof_data, PMC* argv)>
+
+Store the cli information
+
+=cut
+
+*/
 
 static void
 store_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data),
@@ -513,6 +535,17 @@ ARGIN(PMC* argv))
     Parrot_str_free_cstring(cli_cstr);
 }
 
+/*
+
+=item C<static char* get_ns_cstr(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PMC* ctx_pmc)>
+
+Get the namespace information
+
+=cut
+
+*/
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static char*
@@ -525,7 +558,7 @@ ARGIN(PMC* ctx_pmc))
     STRING         *sub_name, *full_ns, *ns_separator;
     char           *full_ns_cstr;
     STRING         *ns_names[MAX_NS_DEPTH];
-    Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context * );
+    Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
     PMC            *ns = ctx->current_namespace;
     INTVAL          i;
 
@@ -555,6 +588,17 @@ ARGIN(PMC* ctx_pmc))
 
 }
 
+
+/*
+
+=item C<static char* get_filename_cstr(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PMC* ctx_pmc, opcode_t *pc)>
+
+Get filename information as a c string
+
+=cut
+
+*/
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
