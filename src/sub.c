@@ -235,7 +235,7 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     current_annotation = pc - base_pc;
 
     /* assert pc is in correct segment */
-    PARROT_ASSERT( base_pc <= pc && pc <= base_pc + sub->seg->base.size );
+    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + sub->seg->base.size);
 
     for (i = op = 0; op < debug_size; ++i) {
         op_info_t * const op_info  = sub->seg->op_info_table[*base_pc];
