@@ -25,7 +25,7 @@ use IO::File ();
 use Parrot::Config;
 use Parrot::Test;
 use File::Spec::Functions;
-use File::Path qw/remove_tree/;
+use File::Path qw/rmtree/;
 
 my ($path, $exefile);
 
@@ -76,7 +76,7 @@ sub output_like {
 }
 
 END {
-    remove_tree("test_parrot_language_$$");
+    rmtree("test_parrot_language_$$");
 }
 
 # Local Variables:
