@@ -317,6 +317,7 @@ ARGIN(opcode_t *pc))
 
     PMC         *argv;
     opcode_t    *preop_pc;
+    char        *preop_opname;
     UHUGEINTVAL  op_time;
     PPROF_DATA   pprof_data[PPROF_DATA_MAX + 1];
 
@@ -353,10 +354,11 @@ ARGIN(opcode_t *pc))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        preop_ctx_pmc = CURRENT_CONTEXT(interp);
-        preop_ctx = PMC_data_typed(preop_ctx_pmc, Parrot_Context*);
+        preop_ctx_pmc         = CURRENT_CONTEXT(interp);
+        preop_ctx             = PMC_data_typed(preop_ctx_pmc, Parrot_Context*);
         preop_ctx->current_pc = pc;
         preop_pc              = pc;
+        preop_opname          = interp->code->op_info_table[*pc]->name;
 
         ++runcore->level;
         Profiling_exit_check_CLEAR(runcore);
@@ -453,7 +455,7 @@ ARGIN(opcode_t *pc))
             pprof_data[PPROF_DATA_TIME] = op_time;
         }
         pprof_data[PPROF_DATA_LINE]   = preop_line;
-        pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA)(interp->code->op_info_table)[*preop_pc]->name;
+        pprof_data[PPROF_DATA_OPNAME] = preop_opname;
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
     }
 
