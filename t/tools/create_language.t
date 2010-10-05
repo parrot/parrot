@@ -36,7 +36,21 @@ BEGIN {
         plan skip_all => "$exefile hasn't been built yet.";
         exit(0);
     }
-    plan tests => 6;
+    plan tests => 8;
+}
+
+
+{
+    local $TODO = "--help isn't helpful";
+
+    create_output_like(
+        "--help",
+        qr{Unknown option: help},
+        'create_language DTRT with --help'
+    );
+    ok(!-e '--help', 'create_language does not create a language called --help');
+
+    rmtree('--help');
 }
 
 create_output_like(
@@ -56,6 +70,7 @@ ok(-e $test_dir, "$test_dir dir exists");
 ok(-e $src_dir, "$src_dir dir exists");
 ok(-s $config, "$config exists and has nonzero size");
 
+rmtree("test_parrot_language_$$");
 
 =head1 HELPER SUBROUTINES
 
@@ -75,10 +90,6 @@ sub create_output_like {
     like( $out, $snippet, $desc );
 
     return;
-}
-
-END {
-    rmtree("test_parrot_language_$$");
 }
 
 # Local Variables:
