@@ -196,7 +196,7 @@ static INTVAL get_line_num_from_cache(PARROT_INTERP,
 
 =item C<void Parrot_runcore_profiling_init(PARROT_INTERP)>
 
-Registers the profiling runcore with Parrot.
+Register the profiling runcore with Parrot.
 
 =cut
 
@@ -343,7 +343,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 Parrot_profiling_runcore_t *runcore, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
-operations, with tracing, bounds checking, and profiling enabled.
+operations with tracing, bounds checking and profiling enabled.
 
 =cut
 
@@ -454,7 +454,7 @@ ARGIN(opcode_t *pc))
 =item C<static void record_ctx_info(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore, PPROF_DATA *pprof_data, PMC* ctx_pmc, opcode_t *pc)>
 
-When the active context has changed, record information about the new context.
+If the active context has changed, record information about the new context.
 
 =cut
 
@@ -606,7 +606,10 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 =item C<static void record_cli(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore, PPROF_DATA* pprof_data, PMC* argv)>
 
-Store the cli information
+Record information about CLI arguments passed to the program being profiled.
+Note that because of the way the parrot executable parses its options,
+arguments passed directly to C<parrot> (such as C<--gc ms2> or C<--hash-seed
+234>) will not appear here.
 
 =cut
 
@@ -641,7 +644,8 @@ ARGIN(PMC* argv))
 =item C<static char* get_ns_cstr(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore, PMC* ctx_pmc)>
 
-Get the namespace information
+Return a C string containing a human-readable representation of the namespace
+for C<ctx_pmc>.
 
 =cut
 
@@ -695,7 +699,7 @@ ARGIN(PMC* ctx_pmc))
 =item C<static char* get_filename_cstr(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore, PMC* ctx_pmc, opcode_t *pc)>
 
-Get filename information as a c string
+Return the filename for C<ctx_pmc> as a C string.
 
 =cut
 
