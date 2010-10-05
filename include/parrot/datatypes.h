@@ -15,8 +15,6 @@
 #ifndef PARROT_DATATYPES_H_GUARD
 #define PARROT_DATATYPES_H_GUARD
 
-#include "parrot/has_header.h"
-
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
     enum_type_undef,            /* illegal */
@@ -125,7 +123,7 @@ const struct _data_types data_types[] = {
 };
 #endif /* INSIDE_GLOBAL_SETUP */
 
-#ifdef PARROT_HAS_INF_NAN
+#if defined(__NetBSD__) && defined(__alpha__)
 #  include <math.h>
 #  define PARROT_FLOATVAL_INF_POSITIVE	INFINITY
 #  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY

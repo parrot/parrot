@@ -49,7 +49,6 @@ my @steps = qw(
     auto::neg_0
     auto::env
     auto::timespec
-    auto::infnan
     auto::thread
     auto::gmp
     auto::readline
