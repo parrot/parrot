@@ -403,14 +403,6 @@ ARGIN(opcode_t *pc))
         preop_opname          = interp->code->op_info_table[*pc]->name;
         preop_line_num        = get_line_num_from_cache(interp, runcore, preop_ctx_pmc);
 
-        /* Occasionally the ctx stays the same while the sub changes, e.g.
-         * with a call to a subclass' method. */
-        if ((runcore->prev_ctx != preop_ctx) || runcore->prev_sub != preop_ctx->current_sub)
-            update_ctx_info(interp, runcore, (PPROF_DATA *) &pprof_data, preop_ctx_pmc, preop_pc);
-
-        if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
-            record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
-
         ++runcore->level;
         Profiling_exit_check_CLEAR(runcore);
 
@@ -427,6 +419,14 @@ ARGIN(opcode_t *pc))
             op_time = runcore->op_finish - runcore->op_start;
 
         --runcore->level;
+
+        /* Occasionally the ctx stays the same while the sub changes, e.g.
+         * with a call to a subclass' method. */
+        if ((runcore->prev_ctx != preop_ctx) || runcore->prev_sub != preop_ctx->current_sub)
+            update_ctx_info(interp, runcore, (PPROF_DATA *) &pprof_data, preop_ctx_pmc, preop_pc);
+
+        if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
+            record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
 
         if (Profiling_canonical_output_TEST(runcore))
             pprof_data[PPROF_DATA_TIME] = 1;
