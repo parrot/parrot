@@ -44,7 +44,7 @@ Functions controlling Parrot's profiling runcore.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void add_bogus_parent_runloop(
+static void record_bogus_parent_runloop(
     ARGIN(Parrot_profiling_runcore_t * runcore))
         __attribute__nonnull__(1);
 
@@ -108,7 +108,7 @@ static opcode_t * runops_profiling_core(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void store_cli(PARROT_INTERP,
+static void record_cli(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t *runcore),
     ARGIN(PPROF_DATA* pprof_data),
     ARGIN(PMC* argv))
@@ -122,7 +122,7 @@ static void store_postop_time(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void update_ctx_info(PARROT_INTERP,
+static void record_ctx_info(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t *runcore),
     ARGIN(PPROF_DATA *pprof_data),
     ARGIN(PMC* ctx_pmc),
@@ -140,7 +140,7 @@ static INTVAL get_line_num_from_cache(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_add_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_record_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_get_filename_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -170,7 +170,7 @@ static INTVAL get_line_num_from_cache(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
-#define ASSERT_ARGS_store_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_record_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pprof_data) \
@@ -178,7 +178,7 @@ static INTVAL get_line_num_from_cache(PARROT_INTERP,
 #define ASSERT_ARGS_store_postop_time __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_update_ctx_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_record_ctx_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pprof_data) \
@@ -373,7 +373,7 @@ ARGIN(opcode_t *pc))
 
     /* argv isn't initialized until after :init (etc) subs are executed */
     if (argv && !Profiling_have_printed_cli_TEST(runcore)) {
-        store_cli(interp, runcore, (PPROF_DATA *)&pprof_data, argv);
+        record_cli(interp, runcore, (PPROF_DATA *)&pprof_data, argv);
         Profiling_have_printed_cli_SET(runcore);
     }
 
@@ -384,7 +384,7 @@ ARGIN(opcode_t *pc))
         pprof_data[PPROF_DATA_VERSION] = (PPROF_DATA) PPROF_VERSION;
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_VERSION);
 
-        add_bogus_parent_runloop(runcore);
+        record_bogus_parent_runloop(runcore);
     }
 
     while (pc) {
@@ -423,7 +423,7 @@ ARGIN(opcode_t *pc))
         /* Occasionally the ctx stays the same while the sub changes, e.g.
          * with a call to a subclass' method. */
         if ((runcore->prev_ctx != preop_ctx) || runcore->prev_sub != preop_ctx->current_sub)
-            update_ctx_info(interp, runcore, (PPROF_DATA *) &pprof_data, preop_ctx_pmc, preop_pc);
+            record_ctx_info(interp, runcore, (PPROF_DATA *) &pprof_data, preop_ctx_pmc, preop_pc);
 
         if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
             record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
@@ -441,7 +441,7 @@ ARGIN(opcode_t *pc))
     /* make it easy to tell separate runloops apart */
     if (runcore->level == 0) {
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_END_OF_RUNLOOP);
-        add_bogus_parent_runloop(runcore);
+        record_bogus_parent_runloop(runcore);
     }
 
     Profiling_exit_check_SET(runcore);
@@ -451,7 +451,7 @@ ARGIN(opcode_t *pc))
 
 /*
 
-=item C<static void update_ctx_info(PARROT_INTERP, Parrot_profiling_runcore_t
+=item C<static void record_ctx_info(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore, PPROF_DATA *pprof_data, PMC* ctx_pmc, opcode_t *pc)>
 
 When the active context has changed, record information about the new context.
@@ -461,10 +461,10 @@ When the active context has changed, record information about the new context.
 */
 
 static void
-update_ctx_info(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+record_ctx_info(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
 ARGIN(PPROF_DATA *pprof_data), ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
 {
-    ASSERT_ARGS(update_ctx_info)
+    ASSERT_ARGS(record_ctx_info)
 
     Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
 
@@ -603,7 +603,7 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 
 /*
 
-=item C<static void store_cli(PARROT_INTERP, Parrot_profiling_runcore_t
+=item C<static void record_cli(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore, PPROF_DATA* pprof_data, PMC* argv)>
 
 Store the cli information
@@ -613,11 +613,11 @@ Store the cli information
 */
 
 static void
-store_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data),
+record_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data),
 ARGIN(PMC* argv))
 {
 
-    ASSERT_ARGS(store_cli)
+    ASSERT_ARGS(record_cli)
 
     char   *cli_cstr;
     STRING *space, *cli_args, *cli_exe, *cli_str;
@@ -721,7 +721,7 @@ ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
 
 /*
 
-=item C<static void add_bogus_parent_runloop(Parrot_profiling_runcore_t *
+=item C<static void record_bogus_parent_runloop(Parrot_profiling_runcore_t *
 runcore)>
 
 Record profiling information for a bogus parent runloop.  Parrot program
@@ -735,9 +735,9 @@ runloops as children.
 */
 
 static void
-add_bogus_parent_runloop(ARGIN(Parrot_profiling_runcore_t * runcore))
+record_bogus_parent_runloop(ARGIN(Parrot_profiling_runcore_t * runcore))
 {
-    ASSERT_ARGS(add_bogus_parent_runloop)
+    ASSERT_ARGS(record_bogus_parent_runloop)
 
     PPROF_DATA pprof_data[PPROF_DATA_MAX+1];
 
