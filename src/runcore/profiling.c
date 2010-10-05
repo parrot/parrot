@@ -241,7 +241,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 {
     ASSERT_ARGS(init_profiling_core)
 
-    char *profile_filename, *output_cstr, *filename_cstr;
+    char *profile_filename_cstr, *output_cstr, *env_filename_cstr;
 
     /* initialize the runcore struct */
     runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
@@ -279,15 +279,15 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* figure out where to write the output */
-    filename_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
+    env_filename_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
 
     if (runcore->output_fn != record_values_none) {
-        if (filename_cstr) {
+        if (env_filename_cstr) {
             STRING  *lc_filename;
-            runcore->profile_filename = Parrot_str_new(interp, filename_cstr, 0);
+            runcore->profile_filename = Parrot_str_new(interp, env_filename_cstr, 0);
             /* this is a little goofy, but it means that we unconditionally free
              * profile_filename later in this function */
-            profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
+            profile_filename_cstr     = Parrot_str_to_cstring(interp, runcore->profile_filename);
             lc_filename               = Parrot_str_downcase(interp, runcore->profile_filename);
 
             if (STRING_equal(interp, lc_filename, CONST_STRING(interp, "stderr"))) {
@@ -299,21 +299,21 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
                 runcore->profile_filename = lc_filename;
             }
             else
-                runcore->profile_fd = fopen(profile_filename, "w");
+                runcore->profile_fd = fopen(profile_filename_cstr, "w");
         }
         else {
             runcore->profile_filename = Parrot_sprintf_c(interp, "parrot.pprof.%d", getpid());
-            profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
-            runcore->profile_fd       = fopen(profile_filename, "w");
+            profile_filename_cstr     = Parrot_str_to_cstring(interp, runcore->profile_filename);
+            runcore->profile_fd       = fopen(profile_filename_cstr, "w");
         }
 
         if (!runcore->profile_fd) {
-            fprintf(stderr, "unable to open %s for writing", profile_filename);
-            Parrot_str_free_cstring(profile_filename);
+            fprintf(stderr, "unable to open %s for writing", profile_filename_cstr);
+            Parrot_str_free_cstring(profile_filename_cstr);
             exit(1);
         }
 
-        Parrot_str_free_cstring(profile_filename);
+        Parrot_str_free_cstring(profile_filename_cstr);
     }
     else {
         runcore->profile_filename = CONST_STRING(interp, "none");
