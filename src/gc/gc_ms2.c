@@ -84,7 +84,7 @@ PARROT_CANNOT_RETURN_NULL
 static void * gc_ms2_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_ms2_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
@@ -211,7 +211,7 @@ static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_ms2_reallocate_memory_chunk(SHIM_INTERP,
     ARGFREE(void *from),
     size_t size);
@@ -814,10 +814,11 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
         if (PObj_on_free_list_TEST(s))
             return;
         Parrot_list_remove(interp, self->strings, Obj2LLH(s));
-        PObj_on_free_list_SET(s);
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer *)s);
+
+        PObj_on_free_list_SET(s);
 
         Parrot_gc_pool_free(interp, self->string_allocator, Obj2LLH(s));
 
@@ -1093,10 +1094,11 @@ gc_ms2_sweep_pool(PARROT_INTERP,
             PObj_live_CLEAR(obj);
         }
         else if (!PObj_constant_TEST(obj)) {
-            PObj_on_free_list_SET(obj);
             LIST_REMOVE(list, tmp);
 
             callback(interp, obj);
+
+            PObj_on_free_list_SET(obj);
 
             Parrot_gc_pool_free(interp, pool, tmp);
         }
@@ -1264,7 +1266,7 @@ gc_ms2_allocate_memory_chunk(SHIM_INTERP, size_t size)
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_ms2_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 {
@@ -1280,13 +1282,13 @@ gc_ms2_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_ms2_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
@@ -1295,7 +1297,7 @@ gc_ms2_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
