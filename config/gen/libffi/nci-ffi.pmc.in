@@ -105,7 +105,7 @@ find_matching(PARROT_INTERP, STRING* sig, size_t start, size_t sig_length,
 #define IS_OLD_TYPE(x)            (((x) == 'P') || ((x) == 'J') || ((x) == 'N') || ((x) == 'S') \
                                 || ((x) == 'O') || ((x) == '@') || ((x) == 'B') || ((x) == 'p') \
                                 || ((x) == '2') || ((x) == '3') || ((x) == '4') || ((x) == 'U') \
-                                || ((x) == 'V'))
+                                || ((x) == 'V') || ((x) == 'I'))
 
 #define IS_TYPE(x)                (((x) == 'i') || ((x) == 'v') || ((x) == 'l') || ((x) == 't') \
                                 || ((x) == 'c') || ((x) == 'b') || ((x) == 'f') || ((x) == 'd') \
@@ -1038,8 +1038,15 @@ class, the PMC arguments are shifted down.
         else {
             PMC *positional, *arg_iter;
             STRING *void_return;
-            void **values, **middle_man = NULL, **pcc_ptr, **translation_pointers = NULL, **pcc_val = NULL;
-            void *return_data;
+            void **values; 
+            void **pcc_ptr; 
+            void **translation_pointers = NULL; /* Data translation pointers, used to hold values
+                                                   that are passed by reference so we can update
+                                                   the objects after the FFI call is over */
+            void **pcc_val = NULL; /* A holder for the values passed to pcc */
+            void **middle_man = NULL; /* An array to hold various pointers so they are not lost if 
+                                          the function changes values by reference */
+            void *return_data; /* Holds return data from FFI call */
             size_t count, i, j_offset;
             char *tmp_sig;
             ffi_cif *cif, pcc_cif;
@@ -1055,7 +1062,6 @@ class, the PMC arguments are shifted down.
                 if (!cif && !func)
                     Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
-
                         "attempt to call NULL function");
             }
 
@@ -1084,8 +1090,10 @@ class, the PMC arguments are shifted down.
                 pcc_ptr[1] = &call_object;
                 pcc_ptr[2] = &tmp_sig;
 
-                pcc_val = (void**)mem_internal_allocate_n_zeroed_typed(pcc_argc, void*);
-                values = (void**)mem_internal_allocate_zeroed(values_size + sizeof(void*));
+                pcc_val = mem_internal_allocate_n_zeroed_typed(pcc_argc, void*);
+                /* Allocate enough room for the values passed to the ffi function plus add some 
+                   padding just to be sure we have enough space.  */
+                values = mem_internal_allocate_zeroed(values_size + 2 * sizeof(void*));
                 /* Middle man is used to contain  */
                 middle_man = mem_internal_allocate_n_zeroed_typed(nci_info->arity, void*);
 
@@ -1093,15 +1101,15 @@ class, the PMC arguments are shifted down.
                 for (i = 0; i < pcc_argc; i++) {
                     pcc_args[i + 3] = &ffi_type_pointer;
                     if (tmp_sig[i] == 'N') {
-                        pcc_val[i] = malloc(sizeof(FLOATVAL));
+                        pcc_val[i] = mem_internal_allocate_typed(FLOATVAL);
                         pcc_ptr[i+3] = &pcc_val[i];
                     }
                     else if (tmp_sig[i] == 'I') {
-                        pcc_val[i] = malloc(sizeof(INTVAL));
+                        pcc_val[i] = mem_internal_allocate_typed(INTVAL);
                         pcc_ptr[i+3] = &pcc_val[i];
                     }
                     else if (tmp_sig[i] == 'P' || tmp_sig[i] == 'S') {
-                        pcc_val[i] = malloc(sizeof(void*));
+                        pcc_val[i] = mem_internal_allocate_typed(void*);
                         pcc_ptr[i+3] = &pcc_val[i];
                     }
                 }
@@ -1243,7 +1251,8 @@ class, the PMC arguments are shifted down.
                     for (i = 0; i < pcc_argc; i++) {
                         mem_sys_free(pcc_val[i]);
                     }
-                    mem_sys_free(pcc_val);
+                    if (pcc_val)
+                        mem_sys_free(pcc_val);
                 }
             }
             else {
@@ -1275,22 +1284,21 @@ class, the PMC arguments are shifted down.
                         ret_object = Parrot_pcc_build_call_from_c_args(interp,
                                                                         call_object,
                                                                         s, final_destination);
-
                     }
                     break;
                   case 't':
                     {
-                    STRING *final_destination = Parrot_str_new(interp, *(char**)return_data, 0);
-                    ret_object = Parrot_pcc_build_call_from_c_args(interp,
-                                                                call_object,
-                                                                s, final_destination);
+                        STRING *final_destination = Parrot_str_new(interp, *(char**)return_data, 0);
+                        ret_object = Parrot_pcc_build_call_from_c_args(interp,
+                                                                       call_object,
+                                                                       s, final_destination);
                     }
                     break;
                   case 'f':
                     {
-                    FLOATVAL final_destination = *(float*)return_data;
+                        FLOATVAL final_destination = *(float*)return_data;
 
-                    ret_object = Parrot_pcc_build_call_from_c_args(interp, 
+                        ret_object = Parrot_pcc_build_call_from_c_args(interp, 
                                                                 call_object, 
                                                                 s, final_destination);
                     }
@@ -1379,7 +1387,7 @@ class, the PMC arguments are shifted down.
                     break;
                 }
             }
-
+        
             if (nci_info->arity > 0 && middle_man) {
                 mem_sys_free(middle_man);
             }
@@ -1498,6 +1506,4 @@ Updates by John Harrison, Summer 2010, GSoC.
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
-
 
