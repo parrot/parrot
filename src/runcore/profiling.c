@@ -345,6 +345,27 @@ Parrot_profiling_runcore_t *runcore, opcode_t *pc)>
 Runs the Parrot operations starting at C<pc> until there are no more
 operations with tracing, bounds checking and profiling enabled.
 
+Some ops, such as those which call VTABLE functions, spawn inner (a.k.a.
+"inferior" or "nested") runloops.  To properly calculate the time used by these
+ops, it's necessary to keep track of start and end of both the current op and
+the current runloop.  The time spent by an op which spawns an inner runloop
+is calculated as the time between the start of the op and the start of the
+inner runloop (between A and B below), plus the time between the end of the
+inner runloop and the end of the op (between C and D below).   The AB tracking
+is handled after DO_OP(), using the exit_check flag to ensure that the value is
+only calculated when leaving an inner runloop.  The CD tracking is handled by
+C<store_postop_time>.
+
+ ___________outer runloop_______________
+/op        op with inner runloop     op \
+----   ---------------------------- ----
+|  |   |     __inner runloop__    | |  |
+----   -    /    op    op     \   - ----
+                ----  ----
+       ^    ^   |  |  |  |    ^   ^
+       |    |   ----  ----    |   |
+       A    B                 C   D
+
 =cut
 
 */
@@ -365,7 +386,7 @@ ARGIN(opcode_t *pc))
 
     runcore->runcore_start = Parrot_hires_get_time();
 
-    /* if we're in a nested runloop, */
+    /* if we're in a inner runloop, */
     if (runcore->level != 0)
         store_postop_time(interp, runcore);
 
@@ -578,7 +599,8 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN(opcode_t *pc))
 =item C<static void store_postop_time(PARROT_INTERP, Parrot_profiling_runcore_t
 *runcore)>
 
-Store the time in the op's running total.
+Record the time spend between the end of an inner runloop and the end of an
+outer op.
 
 =cut
 
@@ -596,8 +618,6 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
                 runcore->time, runcore->time_size + 1, UHUGEINTVAL);
     }
 
-    /* store the time between DO_OP and the start of this runcore in this
-     *          * op's running total */
     runcore->time[runcore->level] = runcore->runcore_start - runcore->op_start;
 }
 
