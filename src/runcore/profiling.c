@@ -34,7 +34,6 @@ Functions controlling Parrot's profiling runcore.
 #endif
 
 #define PPROF_VERSION 2
-#define MAX_NS_DEPTH 32
 
 #define code_start interp->code->base.data
 #define code_end (interp->code->base.data + interp->code->base.size)
@@ -680,7 +679,7 @@ ARGIN(PMC* ctx_pmc))
 
     STRING         *sub_name, *full_ns, *ns_separator;
     char           *full_ns_cstr;
-    STRING         *ns_names[MAX_NS_DEPTH];
+    STRING         *tmp;
     Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
     PMC            *ns = ctx->current_namespace;
     INTVAL          i;
@@ -689,20 +688,17 @@ ARGIN(PMC* ctx_pmc))
     full_ns      = Parrot_str_new(interp, "", 0);
     ns_separator = Parrot_str_new(interp, ";", 1);
 
-    i = MAX_NS_DEPTH - 1;
-    for (;ns ; --i) {
-        if (i < 0) {
-            /* should probably warn about truncated namespace here */
-            break;
-        }
-        GETATTR_NameSpace_name(interp, ns, ns_names[i]);
-        GETATTR_NameSpace_parent(interp, ns, ns);
-    }
+    while (1) {
+        GETATTR_NameSpace_name(interp, ns, tmp);
 
-    i += 2; /* the root namespace has an empty name, so ignore it */
-    for (;i < MAX_NS_DEPTH; ++i) {
-        full_ns = Parrot_str_concat(interp, full_ns, ns_names[i]);
-        full_ns = Parrot_str_concat(interp, full_ns, ns_separator);
+        /* The root ns has the empty string as its name, so ignore it. */
+        if (Parrot_str_length(interp, tmp) == 0) 
+            break;
+
+        full_ns = Parrot_str_concat(interp, ns_separator, full_ns);
+        full_ns = Parrot_str_concat(interp, tmp, full_ns);
+
+        GETATTR_NameSpace_parent(interp, ns, ns);
     }
 
     GETATTR_Sub_name(interp, ctx->current_sub, sub_name);
