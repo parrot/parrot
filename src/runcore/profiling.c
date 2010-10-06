@@ -677,14 +677,11 @@ ARGIN(PMC* ctx_pmc))
 
     ASSERT_ARGS(get_ns_cstr)
 
-    STRING         *sub_name, *full_ns, *ns_separator;
+    STRING         *sub_name, *full_ns, *ns_separator, *tmp;
     char           *full_ns_cstr;
-    STRING         *tmp;
     Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
     PMC            *ns = ctx->current_namespace;
-    INTVAL          i;
 
-    /* build the namespace string */
     full_ns      = Parrot_str_new(interp, "", 0);
     ns_separator = Parrot_str_new(interp, ";", 1);
 
