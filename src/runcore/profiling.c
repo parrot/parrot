@@ -44,10 +44,6 @@ Functions controlling Parrot's profiling runcore.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void record_bogus_parent_runloop(
-    ARGIN(Parrot_profiling_runcore_t * runcore))
-        __attribute__nonnull__(1);
-
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static char* get_filename_cstr(PARROT_INTERP,
@@ -58,6 +54,13 @@ static char* get_filename_cstr(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
+
+static INTVAL get_line_num_from_cache(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PMC *ctx_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -85,6 +88,28 @@ static void record_annotations(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+static void record_bogus_parent_runloop(
+    ARGIN(Parrot_profiling_runcore_t * runcore))
+        __attribute__nonnull__(1);
+
+static void record_version_and_cli(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA* pprof_data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void record_ctx_info(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA *pprof_data),
+    ARGIN(PMC* ctx_pmc),
+    ARGIN(opcode_t *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
 static void record_values_ascii_pprof(
     ARGIN(Parrot_profiling_runcore_t * runcore),
     ARGIN(PPROF_DATA *pprof_data),
@@ -108,45 +133,20 @@ static opcode_t * runops_profiling_core(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void record_cli(PARROT_INTERP,
-    ARGIN(Parrot_profiling_runcore_t *runcore),
-    ARGIN(PPROF_DATA* pprof_data),
-    ARGIN(PMC* argv))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
 static void store_postop_time(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t *runcore))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void record_ctx_info(PARROT_INTERP,
-    ARGIN(Parrot_profiling_runcore_t *runcore),
-    ARGIN(PPROF_DATA *pprof_data),
-    ARGIN(PMC* ctx_pmc),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-static INTVAL get_line_num_from_cache(PARROT_INTERP,
-    ARGIN(Parrot_profiling_runcore_t *runcore),
-    ARGIN(PMC *ctx_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-#define ASSERT_ARGS_record_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_get_filename_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(ctx_pmc) \
     , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_get_line_num_from_cache __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(ctx_pmc))
 #define ASSERT_ARGS_get_ns_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
@@ -160,6 +160,18 @@ static INTVAL get_line_num_from_cache(PARROT_INTERP,
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pprof_data) \
     , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_record_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(runcore))
+#define ASSERT_ARGS_record_version_and_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data))
+#define ASSERT_ARGS_record_ctx_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data) \
+    , PARROT_ASSERT_ARG(ctx_pmc) \
+    , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_record_values_ascii_pprof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pprof_data))
@@ -170,24 +182,9 @@ static INTVAL get_line_num_from_cache(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
-#define ASSERT_ARGS_record_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
-    , PARROT_ASSERT_ARG(pprof_data) \
-    , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_store_postop_time __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_record_ctx_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
-    , PARROT_ASSERT_ARG(pprof_data) \
-    , PARROT_ASSERT_ARG(ctx_pmc) \
-    , PARROT_ASSERT_ARG(pc))
-#define ASSERT_ARGS_get_line_num_from_cache __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
-    , PARROT_ASSERT_ARG(ctx_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -390,23 +387,7 @@ ARGIN(opcode_t *pc))
     if (runcore->level != 0)
         store_postop_time(interp, runcore);
 
-    argv = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST);
-
-    /* argv isn't initialized until after :init (etc) subs are executed */
-    if (argv && !Profiling_have_printed_cli_TEST(runcore)) {
-        record_cli(interp, runcore, (PPROF_DATA *)&pprof_data, argv);
-        Profiling_have_printed_cli_SET(runcore);
-    }
-
-    if (Profiling_first_loop_TEST(runcore)) {
-
-        Profiling_first_loop_CLEAR(runcore);
-
-        pprof_data[PPROF_DATA_VERSION] = (PPROF_DATA) PPROF_VERSION;
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_VERSION);
-
-        record_bogus_parent_runloop(runcore);
-    }
+    record_version_and_cli(interp, runcore, (PPROF_DATA *)&pprof_data);
 
     while (pc) {
         Parrot_Context *preop_ctx;
@@ -623,10 +604,12 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 
 /*
 
-=item C<static void record_cli(PARROT_INTERP, Parrot_profiling_runcore_t
-*runcore, PPROF_DATA* pprof_data, PMC* argv)>
+=item C<static void record_version_and_cli(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PPROF_DATA* pprof_data)>
 
-Record information about CLI arguments passed to the program being profiled.
+Record information about CLI arguments passed to the program being profiled and
+the version of the output file format.
+
 Note that because of the way the parrot executable parses its options,
 arguments passed directly to C<parrot> (such as C<--gc ms2> or C<--hash-seed
 234>) will not appear here.
@@ -636,27 +619,41 @@ arguments passed directly to C<parrot> (such as C<--gc ms2> or C<--hash-seed
 */
 
 static void
-record_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data),
-ARGIN(PMC* argv))
+record_version_and_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data))
 {
 
-    ASSERT_ARGS(record_cli)
+    ASSERT_ARGS(record_version_and_cli)
 
     char   *cli_cstr;
     STRING *space, *cli_args, *cli_exe, *cli_str;
-    PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE);
+    PMC    *exe_name;
+    PMC    *argv = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST);
 
-    space    = CONST_STRING(interp, " ");
-    cli_args = Parrot_str_join(interp, space, argv);
-    cli_exe  = VTABLE_get_string(interp, exe_name);
-    cli_str  = Parrot_sprintf_c(interp, "%Ss %Ss", cli_exe, cli_args);
-    cli_cstr = Parrot_str_to_cstring(interp, cli_str);
+    /* argv isn't initialized until after :init (etc) subs are executed */
+    if (!PMC_IS_NULL(argv) && !Profiling_have_printed_cli_TEST(runcore)) {
 
-    /* CLI line won't reflect any options passed to the parrot binary. */
-    pprof_data[PPROF_DATA_CLI] = (PPROF_DATA) cli_cstr;
-    runcore->output_fn(runcore, pprof_data, PPROF_LINE_CLI);
+        Profiling_have_printed_cli_SET(runcore);
+        exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE);
+        space    = CONST_STRING(interp, " ");
+        cli_args = Parrot_str_join(interp, space, argv);
+        cli_exe  = VTABLE_get_string(interp, exe_name);
+        cli_str  = Parrot_sprintf_c(interp, "%Ss %Ss", cli_exe, cli_args);
+        cli_cstr = Parrot_str_to_cstring(interp, cli_str);
 
-    Parrot_str_free_cstring(cli_cstr);
+        /* CLI line won't reflect any options passed to the parrot binary. */
+        pprof_data[PPROF_DATA_CLI] = (PPROF_DATA) cli_cstr;
+        runcore->output_fn(runcore, pprof_data, PPROF_LINE_CLI);
+
+        Parrot_str_free_cstring(cli_cstr);
+    }
+
+    if (Profiling_first_loop_TEST(runcore)) {
+        Profiling_first_loop_CLEAR(runcore);
+        pprof_data[PPROF_DATA_VERSION] = (PPROF_DATA) PPROF_VERSION;
+        runcore->output_fn(runcore, pprof_data, PPROF_LINE_VERSION);
+        record_bogus_parent_runloop(runcore);
+    }
+
 }
 
 /*
