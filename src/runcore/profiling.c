@@ -604,8 +604,8 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 
 /*
 
-=item C<static void record_version_and_cli(PARROT_INTERP, Parrot_profiling_runcore_t
-*runcore, PPROF_DATA* pprof_data)>
+=item C<static void record_version_and_cli(PARROT_INTERP,
+Parrot_profiling_runcore_t *runcore, PPROF_DATA* pprof_data)>
 
 Record information about CLI arguments passed to the program being profiled and
 the version of the output file format.
@@ -619,7 +619,8 @@ arguments passed directly to C<parrot> (such as C<--gc ms2> or C<--hash-seed
 */
 
 static void
-record_version_and_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), ARGIN(PPROF_DATA* pprof_data))
+record_version_and_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+                       ARGIN(PPROF_DATA* pprof_data))
 {
 
     ASSERT_ARGS(record_version_and_cli)
