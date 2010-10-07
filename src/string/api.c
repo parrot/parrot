@@ -3214,7 +3214,7 @@ Parrot_str_from_int_base(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsign
 }
 
 /*
-  
+
 =back
 
 =head2 GC registry interface
@@ -3232,7 +3232,7 @@ being collected.
 PARROT_EXPORT
 void
 Parrot_str_gc_register(PARROT_INTERP, ARGIN(STRING *s))
-{   
+{
     ASSERT_ARGS(Parrot_str_gc_register)
     /* Better not trigger a GC run with a potentially unanchored PMC */
     Parrot_block_GC_mark(interp);
@@ -3244,7 +3244,7 @@ Parrot_str_gc_register(PARROT_INTERP, ARGIN(STRING *s))
 }
 
 /*
-  
+
 =item C<void Parrot_str_gc_unregister(PARROT_INTERP, STRING *s)>
 
 Unregisters the STRING from the interpreter's GC registry.
