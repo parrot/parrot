@@ -21,7 +21,7 @@ GC related bugs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(140)
+    plan(139)
 
     sweep_1()
     sweep_0()
