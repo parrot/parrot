@@ -91,13 +91,6 @@ static void record_bogus_parent_runloop(
     ARGIN(Parrot_profiling_runcore_t * runcore))
         __attribute__nonnull__(1);
 
-static void record_version_and_cli(PARROT_INTERP,
-    ARGIN(Parrot_profiling_runcore_t *runcore),
-    ARGIN(PPROF_DATA* pprof_data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static void record_ctx_info(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t *runcore),
     ARGIN(PPROF_DATA *pprof_data),
@@ -122,6 +115,13 @@ static void record_values_none(
     ARGIN_NULLOK(Parrot_profiling_line type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static void record_version_and_cli(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA* pprof_data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -161,10 +161,6 @@ static void store_postop_time(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_record_bogus_parent_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_record_version_and_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
-    , PARROT_ASSERT_ARG(pprof_data))
 #define ASSERT_ARGS_record_ctx_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
@@ -176,6 +172,10 @@ static void store_postop_time(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pprof_data))
 #define ASSERT_ARGS_record_values_none __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data))
+#define ASSERT_ARGS_record_version_and_cli __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pprof_data))
 #define ASSERT_ARGS_runops_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -325,7 +325,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* put profile_filename in the gc root set so it won't get collected */
-    Parrot_pmc_gc_register(interp, (PMC *) runcore->profile_filename);
+    Parrot_str_gc_register(interp, runcore->profile_filename);
 
     Profiling_first_loop_SET(runcore);
 
