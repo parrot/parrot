@@ -689,7 +689,7 @@ ARGIN(PMC* ctx_pmc))
         GETATTR_NameSpace_name(interp, ns, tmp);
 
         /* The root ns has the empty string as its name, so ignore it. */
-        if (Parrot_str_length(interp, tmp) == 0) 
+        if (Parrot_str_length(interp, tmp) == 0)
             break;
 
         full_ns = Parrot_str_concat(interp, ns_separator, full_ns);
