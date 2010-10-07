@@ -3213,6 +3213,54 @@ Parrot_str_from_int_base(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsign
     return Parrot_str_from_uint(interp, tc, (UHUGEINTVAL)num, base, is_neg);
 }
 
+/*
+  
+=back
+
+=head2 GC registry interface
+
+=over 4
+
+=item C<void Parrot_str_gc_register(PARROT_INTERP, STRING *s)>
+
+Registers the STRING from the interpreter's GC registry to prevent it from
+being collected.
+
+*/
+
+
+PARROT_EXPORT
+void
+Parrot_str_gc_register(PARROT_INTERP, ARGIN(STRING *s))
+{   
+    ASSERT_ARGS(Parrot_str_gc_register)
+    /* Better not trigger a GC run with a potentially unanchored PMC */
+    Parrot_block_GC_mark(interp);
+
+    PARROT_ASSERT(interp->gc_registry);
+
+    VTABLE_set_pmc_keyed_str(interp, interp->gc_registry, s, PMCNULL);
+    Parrot_unblock_GC_mark(interp);
+}
+
+/*
+  
+=item C<void Parrot_str_gc_unregister(PARROT_INTERP, STRING *s)>
+
+Unregisters the STRING from the interpreter's GC registry.
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_str_gc_unregister(PARROT_INTERP, ARGIN(STRING *s))
+{
+    ASSERT_ARGS(Parrot_str_gc_unregister)
+    PARROT_ASSERT(interp->gc_registry);
+
+    VTABLE_delete_keyed_str(interp, interp->gc_registry, s);
+}
+
 
 /*
 
