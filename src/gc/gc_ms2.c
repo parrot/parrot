@@ -1348,7 +1348,7 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     size_t             gen  = PObj_to_generation(pmc);
 
     /* Objects from older generation will stay */
-    if (gen >= self->current_generation)
+    if (gen > self->current_generation)
         return;
 
     /* "Constant"... */
@@ -1357,7 +1357,9 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
 
     LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->objects[self->current_generation], item);
-    pmc->flags &= ~generation_to_flags(gen);
+    pmc->flags &= ~(PObj_GC_generation_0_FLAG
+        | PObj_GC_generation_1_FLAG
+        | PObj_GC_generation_2_FLAG);
     pmc->flags |= generation_to_flags(self->current_generation);
 }
 
@@ -1380,7 +1382,9 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
 
     LIST_REMOVE(self->strings[gen], item);
     LIST_APPEND(self->strings[self->current_generation], item);
-    s->flags &= ~generation_to_flags(gen);
+    s->flags &= ~(PObj_GC_generation_0_FLAG
+        | PObj_GC_generation_1_FLAG
+        | PObj_GC_generation_2_FLAG);
     s->flags |= generation_to_flags(self->current_generation);
 }
 /*
