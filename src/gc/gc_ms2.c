@@ -597,7 +597,17 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
     Linked_List      *list;
-    size_t            gen;
+    int               i, gen;
+
+    /*
+     * Remember current postions of objects.
+     * We will use later for properly moving objects between generations.
+     */
+    List_Item_Header *old_object_tails[] = {
+                          self->objects[0]->last,
+                          self->objects[1]->last,
+                          self->objects[2]->last
+                      };
     UNUSED(flags);
 
     /* GC is blocked */
@@ -627,7 +637,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     else
         gen = self->current_generation = 0;
 
-    /* Trace "roots" */
+    /* Trace roots */
     gc_ms2_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
     if (interp->pdb && interp->pdb->debugger) {
@@ -655,53 +665,129 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         tmp = tmp->next;
     }
 
-    /* At this point of time root_objects contains only live PMCs */
-    /* objects contains "dead" or "constant" PMCs */
-    /* sweep of root_objects will repaint them white */
-    /* sweep of objects will destroy dead objects leaving only "constant" */
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->root_objects, gc_ms2_sweep_pmc_cb);
+    /*
+     * At this point of time root_objects contains live objects from different
+     * generations.
+     *
+     * Iterate over them and move into proper list. Do not repaint them white yet.
+     *
+     * Remember postions of last item in lists. We will need it to pull more
+     * objects into those generations.
+     */
+    old_object_tails[0] = self->objects[0]->last;
+    old_object_tails[1] = self->objects[1]->last;
+    old_object_tails[2] = self->objects[2]->last;
 
-    /* Depends on current collected generation */
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
-    if (gen >= 1)
-        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
-    if (gen >= 2)
-        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
-
-    gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[0], gc_ms2_sweep_string_cb);
-    if (gen >= 1)
-        gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[1], gc_ms2_sweep_string_cb);
-    if (gen >= 2)
-        gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[2], gc_ms2_sweep_string_cb);
-
-    /* Root objects can contains PMCs from older generations. Put them into proper list */
     tmp = self->root_objects->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
-        PMC              *pmc  = LLH2Obj_typed(tmp, PMC);
 
-        if (PObj_to_generation(pmc)) {
-            LIST_REMOVE(self->root_objects, tmp);
-            LIST_APPEND(self->objects[PObj_to_generation(pmc)], tmp);
-        }
+        LIST_REMOVE(self->root_objects, tmp);
+        LIST_APPEND(self->objects[PObj_to_generation(LLH2Obj_typed(tmp, PMC))], tmp);
 
         tmp = next;
     }
 
-    /* TODO Handle oldest generation */
-    /* Propagate survived objects into older generation */
-    if (gen != 2) {
-        gc_ms2_propagate_to_older_generation(interp, gen, self->objects[gen], self->objects[gen+1]);
+    /*
+     * Now. self->objects[N] contains properly marked objects.
+     * (For current or younger generations).
+     * 1. Propagate survived objects into older generation.
+     * 2. Paint them white.
+     * 3. Destroy everything else.
+     */
+    for (i = gen; gen >= 0; i--) {
+        tmp = self->objects[i]->first;
+        while (tmp) {
+            PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
+            List_Item_Header    *next = tmp->next;
 
-        while (self->root_objects->first)
-            gc_ms2_propagate_to_older_generation(interp, gen, self->root_objects, self->objects[gen+1]);
+            /* We are moving previousely remembered tail. Update it */
+            if (!next) {
+                old_object_tails[i] = tmp->prev;
+            }
 
-        gc_ms2_propagate_to_older_generation(interp, gen, self->strings[gen], self->strings[gen+1]);
+            if (PObj_live_TEST(pmc)) {
+                if (!PObj_constant_TEST(pmc)) {
+                    /* "Seal" object with write barrier */
+                    VTABLE  *t   = pmc->vtable;
+
+                    PARROT_ASSERT(pmc->vtable);
+                    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+
+                    pmc->vtable = pmc->vtable->wb_variant_vtable;
+                    pmc->vtable->wb_variant_vtable = t;
+
+                    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
+                    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+
+                    /* Move to older generation */
+                    LIST_REMOVE(self->objects[i], tmp);
+                    LIST_APPEND(self->objects[i+1], tmp);
+
+                    pmc->flags &= ~(PObj_GC_generation_0_FLAG
+                                    | PObj_GC_generation_1_FLAG
+                                    | PObj_GC_generation_2_FLAG);
+                    pmc->flags |= generation_to_flags(i+1);
+                }
+
+                /* Paint white for next cycle */
+                PObj_live_CLEAR(pmc);
+            }
+            else {
+                /* Object is dead. Bury it */
+                PObj_on_free_list_SET(pmc);
+                LIST_REMOVE(self->objects[i], tmp);
+
+                Parrot_pmc_destroy(interp, pmc);
+                gc_ms2_free_pmc_header(interp, pmc);
+
+                Parrot_gc_pool_free(interp, self->pmc_allocator, tmp);
+            }
+
+            tmp = next;
+        }
     }
 
+
+    /*
+     * Last step. old_object_tails contains pointer to previous end of generation.
+     * We have to move old-to-young referenced objects into same generation.
+     *
+     * Use special version of VTABLE_mark for it.
+     */
+    interp->gc_sys->mark_pmc_header = gc_ms2_vtable_mark_propagate;
+    interp->gc_sys->mark_str_header = gc_ms2_string_mark_propagate;
+
+    for (i = 2; i > 0; i--) {
+        /* We are "marking" this generation */
+        self->current_generation = i;
+
+        /* It can be our first move to this generation */
+        tmp = old_object_tails[i]
+              ? old_object_tails[i]
+              : self->objects[i]->first;
+
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+
+            /* mark can append more objects to this list */
+            if (PObj_custom_mark_TEST(pmc))
+                VTABLE_mark(interp, pmc);
+
+            tmp = tmp->next;
+        }
+    }
+
+
+    interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
+    interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
+
+
+    /* Update some stats */
     interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect            = 0;
     self->gc_mark_block_level--;
+
     /* We swept all dead objects */
     self->num_early_gc_PMCs                      = 0;
 
@@ -1253,99 +1339,6 @@ gc_ms2_iterate_string_list(PARROT_INTERP,
     }
 }
 
-/*
-
-=item C<static void gc_ms2_propagate_to_older_generation(PARROT_INTERP, size_t
-current_gen, Linked_List *from, Linked_List *to)>
-
-Move to Older Generation
-
-=cut
-
-*/
-
-static void
-gc_ms2_propagate_to_older_generation(PARROT_INTERP,
-        size_t current_gen,
-        ARGIN(Linked_List *from),
-        ARGIN(Linked_List *to))
-{
-    ASSERT_ARGS(gc_ms2_propagate_to_older_generation)
-    List_Item_Header *next, *tmp = from->first;
-    List_Item_Header *previous_last = to->last;
-
-    ++current_gen;
-    while (tmp) {
-        PObj * obj = LLH2Obj_typed(tmp, PObj);
-        next = tmp->next;
-
-        if (!PObj_constant_TEST(obj)) {
-
-            /* We can't do such a naive check for "survived" objects */
-            /* If PMC "A" survived first collection */
-            /* Then PMC "B" was added to it */
-            /* We'll move "A" into older generation */
-            /* But keep "B" in younger */
-            /* Kaboom. "B" collected prematurely on next run */
-            if (1 || obj->flags & PObj_GC_generation_2_FLAG) {
-                /* Move into older generation */
-                LIST_REMOVE(from, tmp);
-                LIST_APPEND(to, tmp);
-                obj->flags &= ~(PObj_GC_generation_0_FLAG | PObj_GC_generation_1_FLAG | PObj_GC_generation_2_FLAG);
-                obj->flags |= generation_to_flags(current_gen);
-
-                if (PObj_is_PMC_TEST(obj)) {
-                    PMC     *pmc = (PMC *)obj;
-                    VTABLE  *t   = pmc->vtable;
-
-                    PARROT_ASSERT(pmc->vtable);
-                    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
-
-                    pmc->vtable = pmc->vtable->wb_variant_vtable;
-                    pmc->vtable->wb_variant_vtable = t;
-
-                    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
-                    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
-
-                }
-            }
-            else {
-                /* First time survival. */
-                obj->flags |= PObj_GC_generation_2_FLAG;
-            }
-        }
-
-        tmp = next;
-    }
-
-    /* Ugly, awful, terrible hack. I'm not even trying to find excuse for doing it */
-    /* When we propagating object to older generation we have to propagate all his
-     * dependant objects. To do it I just override mark_pmc_header function with
-     * special version which copy this objects into C<root_objects>. After first
-     * pass I just propagate all gathered objects into older generation */
-    if (to->first && PObj_is_PMC_TEST(LLH2Obj_typed(to->first, PObj))) {
-        size_t count = 0;
-        interp->gc_sys->mark_pmc_header = gc_ms2_vtable_mark_propagate;
-        interp->gc_sys->mark_str_header = gc_ms2_string_mark_propagate;
-
-        tmp = previous_last
-              ? previous_last->next
-              : to->first;
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            next = tmp->next;
-            if (PObj_custom_mark_TEST(pmc))
-                VTABLE_mark(interp, pmc);
-            ++count;
-            tmp = next;
-        }
-
-        //fprintf(stderr, "count: %d\n", count);
-        interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
-        interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
-    }
-
-}
 
 static void
 gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
@@ -1362,12 +1355,10 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (pmc->flags & PObj_constant_FLAG)
         return;
 
-    if (pmc->flags & PObj_GC_generation_2_FLAG)
-        return;
-
     LIST_REMOVE(self->objects[gen], item);
-    LIST_APPEND(self->root_objects, item);
-    pmc->flags |= PObj_GC_generation_2_FLAG;
+    LIST_APPEND(self->objects[self->current_generation], item);
+    pmc->flags &= ~generation_to_flags(gen);
+    pmc->flags |= generation_to_flags(self->current_generation);
 }
 
 static void
@@ -1387,12 +1378,10 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
     if (s->flags & PObj_constant_FLAG)
         return;
 
-    if (s->flags & PObj_GC_generation_2_FLAG)
-        return;
-
     LIST_REMOVE(self->strings[gen], item);
     LIST_REMOVE(self->strings[self->current_generation], item);
-    s->flags |= generation_to_flags(self->current_generation) | PObj_GC_generation_2_FLAG;
+    s->flags &= ~generation_to_flags(gen);
+    s->flags |= generation_to_flags(self->current_generation);
 }
 /*
 =item C<static void gc_ms2_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
