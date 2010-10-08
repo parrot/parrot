@@ -239,9 +239,6 @@ static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
-        __attribute__nonnull__(1);
-
 static void gc_ms2_mark_string_header(PARROT_INTERP, ARGIN(STRING *str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -397,8 +394,6 @@ static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 #define ASSERT_ARGS_gc_ms2_mark_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_ms2_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_mark_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
@@ -656,7 +651,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     interp->gc_sys->is_pmc_ptr                  = gc_ms2_is_pmc_ptr;
     interp->gc_sys->is_string_ptr               = gc_ms2_is_string_ptr;
     interp->gc_sys->mark_pmc_header             = gc_ms2_mark_pmc_header;
-    interp->gc_sys->mark_pobj_header            = gc_ms2_mark_pobj_header;
+    interp->gc_sys->mark_str_header             = gc_ms2_mark_string_header;
 
     interp->gc_sys->block_mark                  = gc_ms2_block_GC_mark;
     interp->gc_sys->unblock_mark                = gc_ms2_unblock_GC_mark;

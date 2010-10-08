@@ -171,13 +171,13 @@ static void gc_ms_iterate_live_strings(PARROT_INTERP,
 static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-static void gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*obj);
-
 static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static void gc_ms_mark_str_header(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*obj);
 
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
@@ -329,11 +329,11 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
@@ -422,7 +422,7 @@ Parrot_gc_ms_init(PARROT_INTERP)
     interp->gc_sys->is_pmc_ptr              = gc_ms_is_pmc_ptr;
     interp->gc_sys->is_string_ptr           = gc_ms_is_string_ptr;
     interp->gc_sys->mark_pmc_header         = gc_ms_mark_pmc_header;
-    interp->gc_sys->mark_pobj_header        = gc_ms_mark_pobj_header;
+    interp->gc_sys->mark_str_header         = gc_ms_mark_str_header;
 
     interp->gc_sys->allocate_pmc_attributes = gc_ms_allocate_pmc_attributes;
     interp->gc_sys->free_pmc_attributes     = gc_ms_free_pmc_attributes;
@@ -940,9 +940,9 @@ mark *obj as live
 */
 
 static void
-gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
+gc_ms_mark_str_header(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
-    ASSERT_ARGS(gc_ms_mark_pobj_header)
+    ASSERT_ARGS(gc_ms_mark_str_header)
     if (obj) {
         /* mark it live */
         PObj_live_SET(obj);

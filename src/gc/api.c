@@ -125,7 +125,7 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         interp->gc_sys->mark_pmc_header(interp, (PMC*) obj);
     }
     else {
-        interp->gc_sys->mark_pobj_header(interp, obj);
+        interp->gc_sys->mark_str_header(interp, (STRING*) obj);
     }
 }
 
@@ -162,7 +162,8 @@ void
 Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
-    interp->gc_sys->mark_pobj_header(interp, (PObj*)obj);
+    if (obj)
+        interp->gc_sys->mark_str_header(interp, obj);
 }
 
 /*
