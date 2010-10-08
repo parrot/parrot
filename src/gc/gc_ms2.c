@@ -706,8 +706,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                 old_object_tails[i] = tmp->prev;
             }
 
-            if (PObj_live_TEST(pmc)) {
-                if (!PObj_constant_TEST(pmc)) {
+            if (!PObj_constant_TEST(pmc)) {
+                if (PObj_live_TEST(pmc)) {
                     /* "Seal" object with write barrier */
                     VTABLE  *t   = pmc->vtable;
 
@@ -725,23 +725,23 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                     LIST_APPEND(self->objects[i+1], tmp);
 
                     pmc->flags &= ~(PObj_GC_generation_0_FLAG
-                                    | PObj_GC_generation_1_FLAG
-                                    | PObj_GC_generation_2_FLAG);
+                        | PObj_GC_generation_1_FLAG
+                        | PObj_GC_generation_2_FLAG);
                     pmc->flags |= generation_to_flags(i+1);
+
+                    /* Paint white for next cycle */
+                    PObj_live_CLEAR(pmc);
                 }
+                else {
+                    /* Object is dead. Bury it */
+                    PObj_on_free_list_SET(pmc);
+                    LIST_REMOVE(self->objects[i], tmp);
 
-                /* Paint white for next cycle */
-                PObj_live_CLEAR(pmc);
-            }
-            else {
-                /* Object is dead. Bury it */
-                PObj_on_free_list_SET(pmc);
-                LIST_REMOVE(self->objects[i], tmp);
+                    Parrot_pmc_destroy(interp, pmc);
+                    gc_ms2_free_pmc_header(interp, pmc);
 
-                Parrot_pmc_destroy(interp, pmc);
-                gc_ms2_free_pmc_header(interp, pmc);
-
-                Parrot_gc_pool_free(interp, self->pmc_allocator, tmp);
+                    Parrot_gc_pool_free(interp, self->pmc_allocator, tmp);
+                }
             }
 
             tmp = next;
