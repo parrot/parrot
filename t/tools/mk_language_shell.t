@@ -36,7 +36,7 @@ BEGIN {
         plan skip_all => "$exefile hasn't been built yet.";
         exit(0);
     }
-    plan tests => 5;
+    plan tests => 7;
 }
 
 output_like(
@@ -49,11 +49,18 @@ my $lang_dir = "test_parrot_language_$$";
 my $test_dir = catfile($lang_dir, "t");
 my $src_dir = catfile($lang_dir, "src");
 my $setup = catfile($lang_dir, "setup.pir");
+my $parrot_exe = catfile($PConfig{build_dir}, $PConfig{test_prog});
 ok(-e $lang_dir, "$lang_dir dir exists");
 ok(-e $test_dir, "$test_dir dir exists");
 ok(-e $src_dir, "$src_dir dir exists");
 ok(-s $setup, "$setup exists and has nonzero size");
-
+TODO:{
+    local $TODO = "mk_language_shell.pl assumes an installed parrot";
+    my $build_status = system("cd $lang_dir; $parrot_exe setup.pir");
+    ok($? == 0, "language builds");
+    my $test_status = system("cd $lang_dir; $parrot_exe setup.pir test");
+    ok($? == 0, "language passes all tests");
+}
 
 =head1 HELPER SUBROUTINES
 
