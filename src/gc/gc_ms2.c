@@ -695,7 +695,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
      * 2. Paint them white.
      * 3. Destroy everything else.
      */
-    for (i = gen; gen >= 0; i--) {
+    for (i = gen; i >= 0; i--) {
         tmp = self->objects[i]->first;
         while (tmp) {
             PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
@@ -1379,7 +1379,7 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
         return;
 
     LIST_REMOVE(self->strings[gen], item);
-    LIST_REMOVE(self->strings[self->current_generation], item);
+    LIST_APPEND(self->strings[self->current_generation], item);
     s->flags &= ~generation_to_flags(gen);
     s->flags |= generation_to_flags(self->current_generation);
 }
