@@ -22,7 +22,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(37)
+    plan(38)
 
     test_init()
     test_set_string()
@@ -65,6 +65,14 @@ Tests C<ByteBuffer> PMC..
     n = elements bb
     is(n, 42, "size of a new buffer with initial size is correct")
 
+    push_eh handler
+    bb = new ['ByteBuffer'], -1
+handler:
+    pop_eh
+    ok(1,"Creating a negative-sized ByteBuffer throws an exception")
+    goto done
+
+  done:
 .end
 
 .sub test_set_string
