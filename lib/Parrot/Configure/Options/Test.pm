@@ -7,6 +7,7 @@ use Carp;
 use Test::Harness;
 use lib qw(lib);
 use Parrot::Configure::Step::List qw( get_steps_list );
+use Parrot::Configure::Options::Test::Prepare qw( get_steps_missing_tests );
 
 sub new {
     my ( $class, $argsref ) = @_;
@@ -107,6 +108,11 @@ sub run_build_tests {
     if ( $self->get_run('run_build_tests') ) {
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
+        my @steps_missing_tests = get_steps_missing_tests();
+        if (@steps_missing_tests) {
+            print "The following configuration steps lack corresponding tests:\n";
+            print "  $_\n" for @steps_missing_tests;
+        }
         runtests(@postconfiguration_tests) or die
             "Post-configuration and build tools tests did not complete successfully; running 'make' might be dubious.";
     }

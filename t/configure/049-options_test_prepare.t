@@ -10,9 +10,8 @@ use Cwd;
 use File::Basename qw( basename fileparse );
 use File::Path qw( mkpath );
 use File::Temp 0.13 qw| tempdir |;
-use Test::More tests => 10;
+use Test::More tests => 12;
 use lib qw( lib );
-use IO::CaptureOutput qw| capture |;
 use Parrot::Configure::Options::Test::Prepare ();
 
 my $cwd = cwd();
@@ -75,24 +74,22 @@ my $cwd = cwd();
         auto::sometest
         gen::sometest
     );
-    my $not_expected = q{gen::missing};
-    push @tests_expected, $not_expected;
-    my %tests_seen = ();
-    {
-        my ($stdout, $stderr);
-        capture (
-            sub { %tests_seen = map { $_, 1}
-                Parrot::Configure::Options::Test::Prepare::_prepare_steps_tests_list(
-                    $tdir,
-                    $steps_tests_complex_ref,
-                    \@tests_expected,
-                ) },
-            \$stdout,
-            \$stderr,
+    my @not_expected = ( q{gen::missing}, q{auto::fabulous} );
+    my @all_tests = ();
+    push @all_tests, (@tests_expected, @not_expected);
+    my ( $steps_tests_ref, $steps_lacking_tests_ref) =
+        Parrot::Configure::Options::Test::Prepare::_prepare_steps_tests_list(
+            $tdir,
+            $steps_tests_complex_ref,
+            \@all_tests,
         );
-        like($stderr, qr/No tests exist for configure step $not_expected/,
-            "Warning about step class lacking test captured");
-    }
+    is( scalar(@$steps_tests_ref), scalar(@tests_expected),
+        "Got expected number of existing steps" );
+    is( scalar(@$steps_lacking_tests_ref), scalar(@not_expected),
+        "Got expected number of missing steps" );
+    is( $steps_lacking_tests_ref->[0], $not_expected[0],
+        "Got expected missing step $not_expected[0]" );
+
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 
