@@ -3,9 +3,15 @@
 New in 2.9.0
 - Core
   + New default garbage collector
+  + Fixed coredump in ByteBuffer when given a negative size
+  + Various improvements related to experimental Minix support
 - Testing
   + "make smoke" now respects TEST_JOBS
+  + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
+    mk_language_shell.pl, create_language.pl
 - GitMigration
+  + Most developer tools have been ported to Git
+  + Majority of developer docs have been written for Git
 - Compilers
 
 New in 2.8.0
