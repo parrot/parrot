@@ -20,16 +20,20 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(11)
+    plan(15)
 
     test_init()
     test_clone()
     test_bool()
     test_close()
     test_tcp_socket()
+    test_tcp_socket6()
     test_raw_tcp_socket()
+    test_raw_tcp_socket6()
     test_udp_socket()
+    test_udp_socket6()
     test_raw_udp_socket()
+    test_raw_udp_socket6()
 
 .end
 
@@ -71,6 +75,36 @@ Tests the Socket PMC.
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     ok(sock, 'Created a TCP Socket')
+.end
+
+.sub test_tcp_socket6
+    .local pmc sock
+    sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    ok(sock, 'Created a IPv6 TCP Socket')
+.end
+
+.sub test_raw_tcp_socket6
+    .local pmc sock
+    sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
+    ok(sock, 'Created a raw IPv6 TCP Socket')
+.end
+
+.sub test_udp_socket6
+    .local pmc sock
+    sock = new 'Socket'
+
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
+    ok(sock, 'Created a IPv6 UDP Socket')
+.end
+
+.sub test_raw_udp_socket6
+    .local pmc sock
+    sock = new 'Socket'
+
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
+    ok(sock, 'Created a raw IPv6 UDP Socket')
 .end
 
 .sub test_raw_tcp_socket
