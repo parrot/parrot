@@ -19,16 +19,25 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(2)
+    plan(5)
 
     test_init()
     test_clone()
+    test_bool()
 
 .end
 
 .sub test_init
     new $P0, ['Socket']
     ok(1, 'Instantiated a Socket PMC')
+
+    $S0 = typeof $P0
+    is($S0, 'Socket', 'PMC has correct type')
+.end
+
+.sub test_bool
+    new $P0, ['Socket']
+    ok($P0, 'get_bool on Socket')
 .end
 
 .sub test_clone
@@ -37,6 +46,11 @@ Tests the Socket PMC.
 
     $P2 = clone $P1
     ok(1, 'Cloned a Socket PMC')
+
+    $S0 = typeof $P2
+    $S1 = 'Socket'
+    $I0 = iseq $S0, $S1
+    todo($I0, 'Cloned PMC has correct type TT#1820')
 
 .end
 
