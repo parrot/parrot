@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,11 +20,12 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(7)
+    plan(9)
 
     test_init()
     test_clone()
     test_bool()
+    test_close()
     test_tcp_socket()
     test_udp_socket()
 
@@ -41,6 +42,13 @@ Tests the Socket PMC.
 .sub test_bool
     new $P0, ['Socket']
     ok($P0, 'get_bool on Socket')
+.end
+
+.sub test_close
+    new $P0, ['Socket']
+    $P0.'close'()
+    ok(1, 'Closed a Socket')
+    nok($P0,'A closed Socket returns False')
 .end
 
 .sub test_clone
