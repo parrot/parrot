@@ -19,10 +19,25 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(2)
 
+    test_init()
+    test_clone()
+
+.end
+
+.sub test_init
     new $P0, ['Socket']
     ok(1, 'Instantiated a Socket PMC')
+.end
+
+.sub test_clone
+    new $P0, ['Socket']
+    $P1 = $P0."sockaddr"("localhost", 1234)
+
+    $P2 = clone $P1
+    ok(1, 'Cloned a Socket PMC')
+
 .end
 
 # Local Variables:
