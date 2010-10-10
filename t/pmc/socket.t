@@ -16,14 +16,17 @@ Tests the Socket PMC.
 
 =cut
 
+.include 'socket.pasm'
 .sub main :main
     .include 'test_more.pir'
 
-    plan(5)
+    plan(7)
 
     test_init()
     test_clone()
     test_bool()
+    test_tcp_socket()
+    test_udp_socket()
 
 .end
 
@@ -51,7 +54,21 @@ Tests the Socket PMC.
     $S1 = 'Socket'
     $I0 = iseq $S0, $S1
     todo($I0, 'Cloned PMC has correct type TT#1820')
+.end
 
+.sub test_tcp_socket
+    .local pmc sock
+    sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    ok(sock, 'Created a TCP Socket')
+.end
+
+.sub test_udp_socket
+    .local pmc sock
+    sock = new 'Socket'
+
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
+    ok(sock, 'Created a UDP Socket')
 .end
 
 # Local Variables:
