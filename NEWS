@@ -3,13 +3,14 @@
 New in 2.9.0
 - Core
   + New default garbage collector
+  + Parrot and Rakudo's build and tests can now be run under the profiling runcore.
   + Fixed coredump in ByteBuffer when given a negative size
   + Various improvements related to experimental Minix support
 - Testing
   + "make smoke" now respects TEST_JOBS
   + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
     mk_language_shell.pl, create_language.pl
-- GitMigration
+- Git Migration
   + Most developer tools have been ported to Git
   + Majority of developer docs have been written for Git
 - Compilers
