@@ -45,7 +45,7 @@ BEGIN {
         plan skip_all => "pbc_disassemble hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 4;
+    plan tests => 6;
 }
 
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
@@ -77,6 +77,20 @@ disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_s_sc\s*S.*print_s\s*S.*
     \$S0 = "Wheels within wheels"
     print \$S0
     print "\\n"
+.end
+PIR
+
+disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf8:"Hello"/ms, 'pbc_disassemble utf8 string');
+.sub main :main
+    \$S0 = utf8:"Hello"
+.end
+PIR
+
+my $utf16 = pack('S*', unpack('C*', 'Hello'));
+$utf16 =~ s/\0/\\\\0/g;
+disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf16:"$utf16"/ms, 'pbc_disassemble utf16 string');
+.sub main :main
+    \$S0 = utf16:"Hello"
 .end
 PIR
 
