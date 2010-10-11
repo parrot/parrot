@@ -1790,6 +1790,18 @@ gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
     return total_amount;
 }
 
+static int
+pobj2gen(ARGIN(PMC *pmc))
+{
+    return PObj_to_generation(pmc);
+}
+
+static int
+gen2flags(int gen)
+{
+    return generation_to_flags(gen);
+}
+
 /*
 
 =back
