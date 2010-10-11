@@ -601,6 +601,9 @@ EOC
 
     for my $k ( keys %extra_vt ) {
         my $k_flags = $self->$k->vtable_flags;
+        # HACK
+        $k_flags .= '|VTABLE_IS_WRITE_BARRIER_FLAG' if $k eq 'wb';
+
         $cout .= <<"EOC";
         {
             VTABLE                   *vt_$k;

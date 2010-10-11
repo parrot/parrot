@@ -711,14 +711,16 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                     /* "Seal" object with write barrier */
                     VTABLE  *t   = pmc->vtable;
 
-                    PARROT_ASSERT(pmc->vtable);
-                    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+                    if (!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG)) {
+                        PARROT_ASSERT(pmc->vtable);
+                        PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
 
-                    pmc->vtable = pmc->vtable->wb_variant_vtable;
-                    pmc->vtable->wb_variant_vtable = t;
+                        pmc->vtable = pmc->vtable->wb_variant_vtable;
+                        pmc->vtable->wb_variant_vtable = t;
 
-                    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
-                    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+                        PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
+                        PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+                    }
 
                     /* Move to older generation */
                     LIST_REMOVE(self->objects[i], tmp);
