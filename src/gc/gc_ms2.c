@@ -695,6 +695,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
      * 2. Paint them white.
      * 3. Destroy everything else.
      */
+
+    /* FIXME There is no generation beyond 2. We have to handle it differentely */
     for (i = gen; i >= 0; i--) {
         tmp = self->objects[i]->first;
         while (tmp) {
@@ -733,16 +735,6 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
                     /* Paint white for next cycle */
                     PObj_live_CLEAR(pmc);
-                }
-                else {
-                    /* Object is dead. Bury it */
-                    PObj_on_free_list_SET(pmc);
-                    LIST_REMOVE(self->objects[i], tmp);
-
-                    Parrot_pmc_destroy(interp, pmc);
-                    gc_ms2_free_pmc_header(interp, pmc);
-
-                    Parrot_gc_pool_free(interp, self->pmc_allocator, tmp);
                 }
             }
 
@@ -783,6 +775,13 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
     interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
+
+    /* Now. Sweep all dead objects */
+    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
+    if (gen >= 1)
+        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
+    if (gen == 2)
+        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
 
 
     /* Update some stats */
