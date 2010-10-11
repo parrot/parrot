@@ -634,6 +634,8 @@ all : \
 #IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
+    src/install_config$(O) \
+
 
 # We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
