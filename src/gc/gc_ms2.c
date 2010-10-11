@@ -773,6 +773,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     }
 
 
+
     /*
      * Last step. old_object_tails contains pointer to previous end of generation.
      * We have to move old-to-young referenced objects into same generation.
@@ -790,6 +791,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         tmp = old_object_tails[i]
               ? old_object_tails[i]
               : self->objects[i]->first;
+
+        tmp = self->objects[i]->first;
 
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
