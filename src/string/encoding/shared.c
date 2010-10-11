@@ -1221,7 +1221,7 @@ unicode_upcase(PARROT_INTERP, ARGIN(const STRING *src))
 
     /*
      * XXX troubles:
-     *   t/op/string_cs_45  upcase unicode:"\u01f0"
+     *   t/op/string_cs_45  upcase utf8:"\u01f0"
      *   this creates \u004a \u030c J+NON-SPACING HACEK
      *   the string needs resizing, *if* the src buffer is
      *   too short. *But* with icu 3.2/3.4 the src string is

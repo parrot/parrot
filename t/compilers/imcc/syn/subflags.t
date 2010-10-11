@@ -97,7 +97,7 @@ test flags on PIR subs
     ## unicode nsentry
     .const 'Sub' $P60 = 'subid3'
     isa_ok($P60, 'Sub', 'subid3 found w/.const')
-    $P0 = get_global unicode:"nsentry\u2462"
+    $P0 = get_global utf8:"nsentry\u2462"
     $I0 = issame $P60, $P0
     ok($I0, "nsentry3 found in namespace")
 
@@ -176,7 +176,7 @@ test flags on PIR subs
 .end
 
 
-.sub 'anon3' :nsentry(unicode:"nsentry\u2462") :subid('subid3')
+.sub 'anon3' :nsentry(utf8:"nsentry\u2462") :subid('subid3')
     .return ('anon3')
 .end
 

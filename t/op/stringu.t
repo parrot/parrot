@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"\x{212b}"
+    set $S0, utf8:"\x{212b}"
     print $S0
     print "\n"
     end
@@ -59,7 +59,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\x{212b}"
+    set $S0, utf8:"aaaaaa\x{212b}"
     print $S0
     print "\n"
     end
@@ -74,7 +74,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\x{212b}-aaaaaa"
+    set $S0, utf8:"aaaaaa\x{212b}-aaaaaa"
     print $S0
     print "\n"
     end
@@ -89,7 +89,7 @@ pir_output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\u212b-aaaaaa"
+    set $S0, utf8:"aaaaaa\u212b-aaaaaa"
     print $S0
     print "\n"
     end
@@ -104,7 +104,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
+    set $S0, utf8:"aaaaaa\x{1d400}-aaaaaa"
     print $S0
     print "\n"
     end
@@ -119,7 +119,7 @@ pir_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U' );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\U0001d400-aaaaaa"
+    set $S0, utf8:"aaaaaa\U0001d400-aaaaaa"
     print $S0
     print "\n"
     end
@@ -134,7 +134,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "two upscales" );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
+    set $S0, utf8:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
     print $S0
     print "\n"
     length $I0, $S0
@@ -153,7 +153,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale" );
     $P0 = getinterp
     $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
     $P1.'encoding'("utf8")
-    set $S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
+    set $S0, utf8:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
     print $S0
     print "\n"
     length $I0, $S0
@@ -225,7 +225,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
-    set S0, utf8:unicode:"«"
+    set S0, utf8:"«"
     length I0, S0
     print I0
     print "\n"
@@ -291,12 +291,12 @@ SKIP: {
     .local string str
     .local string rest
 
-    str = unicode:".xyz"
+    str = utf8:".xyz"
     rest = substr str, 1
     print rest
     print "\n"
 
-    str = unicode:".xyz"
+    str = utf8:".xyz"
     $S99 = downcase str
     rest = substr str, 1
     print rest
@@ -312,7 +312,7 @@ OUTPUT
 .sub main
     .local string str
     .local string rest
-    str = unicode:".XYZ"
+    str = utf8:".XYZ"
     $S0 = downcase str
     print $S0
     print "\n"
@@ -344,7 +344,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );
 .sub main
     .include 'cclass.pasm'
     .local string s
-    s = unicode:" \t\u207babc\n\u2000\u2009"
+    s = utf8:" \t\u207babc\n\u2000\u2009"
     $I9 = length s
     $I0 = is_cclass .CCLASS_WHITESPACE, s, 0
     print $I0
@@ -371,7 +371,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_ANY in unicode" );
 .sub main
     .include 'cclass.pasm'
     .local string s
-    s = unicode:" \t\u207babc\n\u2000\u2009"
+    s = utf8:" \t\u207babc\n\u2000\u2009"
     $I9 = length s
     $I0 = is_cclass .CCLASS_ANY, s, 0
     print $I0
@@ -403,7 +403,7 @@ SKIP: {
 .sub main
     .include 'cclass.pasm'
     .local string s
-    s = unicode:"01\u207bxyz\u0660\u17e1\u19d9"
+    s = utf8:"01\u207bxyz\u0660\u17e1\u19d9"
     $I9 = length s
     $I0 = is_cclass .CCLASS_NUMERIC, s, 0
     print $I0
@@ -425,23 +425,23 @@ CODE
 1102269
 OUTPUT
 
-    # Concatenate unicode: with iso-8859-1
+    # Concatenate utf8: with iso-8859-1
     pir_output_is(
         <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1" );
 .sub main
-    $S0 = unicode:"A"
+    $S0 = utf8:"A"
     $S1 = ascii:"B"
     $S2 = concat $S0, $S1
     print $S2
     print "\n"
 
-    $S0 = unicode:"A"
-    $S1 = unicode:"B"
+    $S0 = utf8:"A"
+    $S1 = utf8:"B"
     $S2 = concat $S0, $S1
     print $S2
     print "\n"
 
-    $S0 = unicode:"A"
+    $S0 = utf8:"A"
     $S1 = iso-8859-1:"B"
     $S2 = concat $S0, $S1
     print $S2
@@ -457,7 +457,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys");
 .sub 'main'
     .local string str0, str1
-    str0 = unicode:"\u00ab"
+    str0 = utf8:"\u00ab"
     str1 = iso-8859-1:"\xab"
 
     .local pmc hash
@@ -484,7 +484,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket" );
 .sub 'main'
     .local string str0, str1
-    str0 = unicode:"infix:\u00b1"
+    str0 = utf8:"infix:\u00b1"
     str1 = iso-8859-1:"infix:\xb1"
 
     .local pmc hash
@@ -555,7 +555,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings float mixed' );
 .sub main :main
-    $S0 = unicode:"140 r\x{e9}sum\x{e9}s"
+    $S0 = utf8:"140 r\x{e9}sum\x{e9}s"
     $N0 = $S0
     say $N0
     $I0 = find_encoding 'ucs2'
@@ -575,14 +575,14 @@ pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT #752
     $S1 = chr 0xe5
     $S2 = chr 0x263b
 
-    $S0 = unicode:"\u00e5\u263b"
+    $S0 = utf8:"\u00e5\u263b"
     $S3 = concat $S1, $S2
     if $S0 == $S3 goto equal_1
     print "not "
   equal_1:
     say "equal"
 
-    $S0 = unicode:"\u263b\u00e5"
+    $S0 = utf8:"\u263b\u00e5"
     $S3 = concat $S2, $S1
     if $S0 == $S3 goto equal_2
     print "not "
@@ -598,7 +598,7 @@ pir_output_is( <<'CODE', <<'OUT', 'join mixed encodings' );
 .sub 'main'
     new $P0, 'ResizablePMCArray'
     push $P0, ascii:"a"
-    push $P0, unicode:"\x{e1}" # a acute
+    push $P0, utf8:"\x{e1}" # a acute
     push $P0, iso-8859-1:"\x{e1}" # a acute
     join $S0, "", $P0
     $I0 = length $S0
