@@ -193,7 +193,7 @@ PackFile_Constant_dump_str(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
     Parrot_io_printf(interp, "    [ 'PFC_STRING', {\n");
     pobj_flag_dump(interp, (long)PObj_get_FLAGS(self));
-    Parrot_io_printf(interp, "        ENCODING => %ld,\n", self->encoding);
+    Parrot_io_printf(interp, "        ENCODING => %s,\n", self->encoding->name);
     Parrot_io_printf(interp, "        SIZE     => %ld,\n", self->bufused);
     Parrot_io_printf(interp, "        DATA     => \"%Ss\"\n",
             Parrot_str_escape(interp, self));

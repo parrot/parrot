@@ -2350,12 +2350,19 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
           case PARROT_ARG_SC:
             {
                 const STRING *s = interp->code->const_table->str.constants[op[j]];
+
+                if (s->encoding != Parrot_ascii_encoding_ptr) {
+                    strcpy(&dest[size], s->encoding->name);
+                    size += strlen(s->encoding->name);
+                    dest[size++] = ':';
+                }
+
                 dest[size++] = '"';
                 if (s->strlen) {
                     char * const unescaped =
                         Parrot_str_to_cstring(interp, s);
                     char * const escaped =
-                        PDB_escape(interp, unescaped, s->strlen);
+                        PDB_escape(interp, unescaped, s->bufused);
                     if (escaped) {
                         strcpy(&dest[size], escaped);
                         size += strlen(escaped);
