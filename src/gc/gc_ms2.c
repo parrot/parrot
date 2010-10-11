@@ -1349,12 +1349,18 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     List_Item_Header  *item = Obj2LLH(pmc);
     size_t             gen  = PObj_to_generation(pmc);
 
+    PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
+            || !"Attempt to mark dead object");
+
     /* Objects from older generation will stay */
-    if (gen > self->current_generation)
+    if (gen >= self->current_generation)
         return;
 
     /* "Constant"... */
     if (pmc->flags & PObj_constant_FLAG)
+        return;
+
+    if (gen == self->current_generation && pmc->flags & PObj_GC_generation_2_FLAG)
         return;
 
     LIST_REMOVE(self->objects[gen], item);
@@ -1362,7 +1368,8 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc->flags &= ~(PObj_GC_generation_0_FLAG
         | PObj_GC_generation_1_FLAG
         | PObj_GC_generation_2_FLAG);
-    pmc->flags |= generation_to_flags(self->current_generation);
+    pmc->flags |= generation_to_flags(self->current_generation)
+                  | PObj_GC_generation_2_FLAG;
 }
 
 static void
