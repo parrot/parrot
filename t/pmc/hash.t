@@ -1311,7 +1311,7 @@ postit_end:
 .sub unicode_keys_register_rt_39249
   $P1 = new ['Hash']
 
-  $S99 = unicode:"\u7777"
+  $S99 = utf8:"\u7777"
   $P1[$S99] = "ok"
   $S1 = $P1[$S99]
   is( $S1, 'ok', 'unicode key' )
@@ -1320,11 +1320,11 @@ postit_end:
 .sub unicode_keys_literal_rt_39249
   $P1 = new ['Hash']
 
-  $P1[unicode:"\u7777"] = "ok"
-  $S1 = $P1[unicode:"\u7777"]
+  $P1[utf8:"\u7777"] = "ok"
+  $S1 = $P1[utf8:"\u7777"]
   is( $S1, 'ok', 'literal unicode key' )
 
-  $S2 = unicode:"\u7777"
+  $S2 = utf8:"\u7777"
   $S1 = $P1[$S2]
   is( $S1, 'ok', 'literal unicode key lookup via var' )
 .end

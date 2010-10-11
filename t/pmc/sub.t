@@ -1157,7 +1157,7 @@ OUTPUT
 
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
    print "ok\n"
 .end
 CODE
@@ -1165,24 +1165,24 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, invocation' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    unicode:"\u7777"()
+    utf8:"\u7777"()
 .end
 CODE
 ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, dynamic' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    $P1 = find_name unicode:"\u7777"
+    $P1 = find_name utf8:"\u7777"
     $P1()
 .end
 CODE
@@ -1190,12 +1190,12 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    # unicode:"\u7777" ends up as a string nicode:"\u7777
+    # utf8:"\u7777" ends up as a string nicode:"\u7777
     # (or it did, in r12860)
     $P1 = find_name 'nicode:"\u7777'
     unless null $P1 goto bad
@@ -1208,11 +1208,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub constant' );
 .sub main :main
-    .const 'Sub' s = unicode:"\u7777"
+    .const 'Sub' s = utf8:"\u7777"
     s()
 .end
 
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
    print "ok\n"
 .end
 CODE

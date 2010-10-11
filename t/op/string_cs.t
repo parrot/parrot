@@ -473,7 +473,6 @@ SKIP: {
 CODE
 hello(5): ascii
 hello(5): utf8
-hello(5): utf8
 hello(10): utf16
 hello(10): ucs2
 OUTPUT
@@ -505,7 +504,6 @@ OUTPUT
 .end
 CODE
 (0): ascii
-(0): utf8
 (0): utf8
 (0): utf16
 (0): ucs2

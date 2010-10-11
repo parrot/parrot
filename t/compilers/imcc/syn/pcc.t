@@ -545,13 +545,13 @@ pir_output_is( <<'CODE', <<'OUT', 'Unicode allowed in method names, TT #730' );
 .sub 'main' :main
     $P0 = newclass 'Foo'
     $P1 = new $P0
-    $S0 = unicode:"foo\x{b1}"
+    $S0 = utf8:"foo\x{b1}"
     $P1.$S0(1)
-    $P1.unicode:"foo\x{b1}"(2)
+    $P1.utf8:"foo\x{b1}"(2)
 .end
 
 .namespace ['Foo']
-.sub unicode:"foo\x{b1}" :method
+.sub utf8:"foo\x{b1}" :method
     .param int count
     print 'ok '
     print count
