@@ -732,10 +732,40 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                         | PObj_GC_generation_1_FLAG
                         | PObj_GC_generation_2_FLAG);
                     pmc->flags |= generation_to_flags(i+1);
-
-                    /* Paint white for next cycle */
-                    PObj_live_CLEAR(pmc);
                 }
+            }
+
+            tmp = next;
+        }
+    }
+
+    /* Handling oldest generation. Don't move it further */
+    if (gen >= 1) {
+        tmp = self->objects[2]->first;
+        while (tmp) {
+            PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
+            List_Item_Header    *next = tmp->next;
+
+            if (PObj_live_TEST(pmc)) {
+                /* "Seal" object with write barrier */
+                VTABLE  *t   = pmc->vtable;
+
+                if (!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG)) {
+                    PARROT_ASSERT(pmc->vtable);
+                    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+
+                    pmc->vtable = pmc->vtable->wb_variant_vtable;
+                    pmc->vtable->wb_variant_vtable = t;
+
+                    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
+                    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
+                }
+
+                /* Move to older generation */
+                pmc->flags &= ~(PObj_GC_generation_0_FLAG
+                    | PObj_GC_generation_1_FLAG
+                    | PObj_GC_generation_2_FLAG);
+                pmc->flags |= generation_to_flags(2);
             }
 
             tmp = next;
