@@ -370,8 +370,16 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
     STRING *d;
     const int is_movable = PObj_is_movable_TESTALL(s);
 
+    // HACK. FIXME. It's abstraction leak here from GC.
+    // Basically if we are copying string from older generation
+    // we have to clear flags about it.
     d = Parrot_gc_new_string_header(interp,
-        PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+        PObj_get_FLAGS(s) & ~PObj_constant_FLAG
+        & ~PObj_GC_generation_0_FLAG
+        & ~PObj_GC_generation_1_FLAG
+        & ~PObj_GC_generation_2_FLAG
+        );
+
     /* This might set the constant flag again but it is the right thing
      * to do */
     STRUCT_COPY(d, s);
