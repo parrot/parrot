@@ -6,6 +6,7 @@ New in 2.9.0
   + Parrot and Rakudo's build and tests can now be run under the profiling runcore.
   + Fixed coredump in ByteBuffer when given a negative size
   + Various improvements related to experimental Minix support
+  + mk_language_shell.pl and create_language.pl no longer require an installed parrot
 - Testing
   + "make smoke" now respects TEST_JOBS
   + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
