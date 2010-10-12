@@ -781,6 +781,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
             if (PObj_custom_mark_TEST(pmc))
                 VTABLE_mark(interp, pmc);
 
+            if (PMC_metadata(pmc))
+                Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
+
             tmp = tmp->next;
         }
     }
