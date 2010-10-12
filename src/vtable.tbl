@@ -17,8 +17,8 @@ PMC* get_namespace()
 
 # XXX FIXME should this be marked as writing?
 PMC* getprop(STRING* key)
-void setprop(STRING* key, PMC* value)
-void delprop(STRING* key)
+void setprop(STRING* key, PMC* value) :write
+void delprop(STRING* key) :write
 PMC* getprops()
 
 INTVAL type()
