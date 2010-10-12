@@ -281,6 +281,10 @@ static void gc_ms2_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -421,6 +425,9 @@ static int pobj2gen(ARGIN(PMC *pmc))
 #define ASSERT_ARGS_gc_ms2_seal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms2_set_gen_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_ms2_string_mark_propagate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -716,10 +723,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                     LIST_REMOVE(self->objects[i], tmp);
                     LIST_APPEND(self->objects[i+1], tmp);
 
-                    pmc->flags &= ~(PObj_GC_generation_0_FLAG
-                        | PObj_GC_generation_1_FLAG
-                        | PObj_GC_generation_2_FLAG);
-                    pmc->flags |= generation_to_flags(i+1);
+                    gc_ms2_set_gen_flags(interp, pmc, i+1);
                 }
             }
 
@@ -1845,7 +1849,22 @@ gc_ms2_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 
 }
 
+/*
+=item C<static void gc_ms2_set_gen_flags(PARROT_INTERP, PObj *obj, int gen)>
 
+Set flags for generation.
+
+=cut
+*/
+static void
+gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
+{
+    ASSERT_ARGS(gc_ms2_set_gen_flags)
+    obj->flags &= ~(PObj_GC_generation_0_FLAG
+        | PObj_GC_generation_1_FLAG
+        | PObj_GC_generation_2_FLAG);
+    obj->flags |= generation_to_flags(gen);
+}
 
 /*
 
