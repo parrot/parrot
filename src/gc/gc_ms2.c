@@ -744,7 +744,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
             if (PObj_live_TEST(pmc)) {
                 gc_ms2_seal_object(interp, pmc);
-                gc_ms2_set_gen_flags(interp, pmc, i+1);
+                gc_ms2_set_gen_flags(interp, pmc, 2);
             }
 
             tmp = next;
@@ -1381,7 +1381,7 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc->flags &= ~(PObj_GC_generation_0_FLAG
         | PObj_GC_generation_1_FLAG
         | PObj_GC_generation_2_FLAG);
-    pmc->flags |= generation_to_flags(self->current_generation);
+    pmc->flags |= gen2flags(self->current_generation);
 
     pmc->flags |= PObj_GC_generation_2_FLAG;
 }
@@ -1408,7 +1408,7 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
     s->flags &= ~(PObj_GC_generation_0_FLAG
         | PObj_GC_generation_1_FLAG
         | PObj_GC_generation_2_FLAG);
-    s->flags |= generation_to_flags(self->current_generation);
+    s->flags |= gen2flags(self->current_generation);
 }
 /*
 =item C<static void gc_ms2_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
@@ -1867,7 +1867,7 @@ gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
     obj->flags &= ~(PObj_GC_generation_0_FLAG
         | PObj_GC_generation_1_FLAG
         | PObj_GC_generation_2_FLAG);
-    obj->flags |= generation_to_flags(gen);
+    obj->flags |= gen2flags(gen);
 }
 
 /*
