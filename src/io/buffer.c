@@ -337,9 +337,12 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         size_t got;
 
         if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-            STRING *sf = Parrot_str_new_init(interp, (char *)out_buf, len,
+            /* str_new_init can cause GC. Which will render out_buf invalid */
+            /* So, initialize string without buffer and set it manually */
+            STRING *sf = Parrot_str_new_init(interp, NULL, len,
                 Parrot_default_encoding_ptr,
                 PObj_external_FLAG);
+            sf->_bufstart = sf->strstart = s->_bufstart;
             got                 = PIO_READ(interp, filehandle, &sf);
             s->strlen           = s->bufused = current + got;
 
