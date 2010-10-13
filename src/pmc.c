@@ -260,7 +260,13 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
         /* Free the old PMC resources. */
         Parrot_pmc_destroy(interp, pmc);
 
-        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+        /* We can reuse PMC from older generation. Preserve it */
+        // FIXME It's abstraction leak. And it's really strange idea
+        // of reusing PMCs...
+        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG
+            | pmc->flags & PObj_GC_generation_0_FLAG
+            | pmc->flags & PObj_GC_generation_1_FLAG
+            | pmc->flags & PObj_GC_generation_2_FLAG);
 
         /* Set the right vtable */
         pmc->vtable = new_vtable;
