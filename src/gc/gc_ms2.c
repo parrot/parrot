@@ -657,6 +657,10 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     tmp = self->root_objects->first;
     while (tmp) {
         PMC *pmc = LLH2Obj_typed(tmp, PMC);
+
+        /* write_barrier can set this flag */
+        pmc->flags &= ~PObj_GC_generation_2_FLAG;
+
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
         if (PObj_is_special_PMC_TEST(pmc)) {
@@ -732,7 +736,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     }
 
     /* Handling oldest generation. Don't move it further */
-    if (gen >= 1) {
+    if (1 || gen >= 1) {
         tmp = self->objects[2]->first;
         while (tmp) {
             PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
@@ -740,12 +744,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
             if (PObj_live_TEST(pmc)) {
                 gc_ms2_seal_object(interp, pmc);
-
-                /* Move to older generation */
-                pmc->flags &= ~(PObj_GC_generation_0_FLAG
-                    | PObj_GC_generation_1_FLAG
-                    | PObj_GC_generation_2_FLAG);
-                pmc->flags |= generation_to_flags(2);
+                gc_ms2_set_gen_flags(interp, pmc, i+1);
             }
 
             tmp = next;
@@ -1433,6 +1432,8 @@ gc_ms2_sweep_pool(PARROT_INTERP,
         if (PObj_live_TEST(obj)) {
             /* Paint live objects white */
             PObj_live_CLEAR(obj);
+
+            obj->flags &= ~PObj_GC_generation_2_FLAG;
         }
         else if (!PObj_constant_TEST(obj)) {
             PObj_on_free_list_SET(obj);
@@ -1732,7 +1733,8 @@ gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     List_Item_Header *item = Obj2LLH(pmc);
     size_t            gen  = PObj_to_generation(pmc);
 
-    if (PObj_is_live_or_free_TESTALL(pmc))
+    /* If we are already marked this one - skip it */
+    if (pmc->flags & PObj_GC_generation_2_FLAG)
         return;
 
     if (!gen)
@@ -1740,7 +1742,7 @@ gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 
     LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
     LIST_APPEND(self->root_objects, item);
-    PObj_live_SET(pmc);
+    pmc->flags |= PObj_GC_generation_2_FLAG;
 }
 
 /*
