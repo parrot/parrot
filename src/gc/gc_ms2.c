@@ -1091,7 +1091,6 @@ gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
 {
     ASSERT_ARGS(gc_ms2_sweep_pmc_cb)
     PMC *pmc = (PMC *)obj;
-    Parrot_pmc_destroy(interp, pmc);
     gc_ms2_free_pmc_header(interp, pmc);
 }
 
