@@ -69,7 +69,6 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub test_sort
      .local pmc compares, cmp_fun
-     # TT #1317 doesnt work wit prederef of JIT
      bounds 1
      compares = new ['Integer']
      compares = 0
