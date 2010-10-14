@@ -3,15 +3,16 @@
 
 =head1 NAME
 
-config/auto/va_ptr.pm - va_list to va_ptr conversion test
+config/auto/ipv6.pm - determine ipv6 capabilities of local machine
 
 =head1 DESCRIPTION
 
-Tests which kind of PARROT_VA_TO_VAPTR to use.
+This configuration step probes the local machine to determine if it capable of
+running an ipv6 stack.
 
 =cut
 
-package auto::va_ptr;
+package auto::ipv6;
 
 use strict;
 use warnings;
@@ -24,7 +25,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Test the type of va_ptr};
+    $data{description} = q{Determine IPV6 capabilities};
     $data{result}      = q{};
     return \%data;
 }
@@ -32,23 +33,10 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $va_type;
-    $conf->cc_gen('config/auto/va_ptr/test_c.in');
-    eval { $conf->cc_build('-DVA_TYPE_STACK'); };
-
-    if ( $@ || $conf->cc_run() !~ /^ok/ ) {
-        eval { $conf->cc_build('-DVA_TYPE_REGISTER'); };
-        if ( $@ || $conf->cc_run() !~ /^ok/ ) {
-            die "Unknown va_ptr type";
-        }
-        $va_type = 'register';
-    }
-    else {
-        $va_type = 'stack';
-    }
+    $conf->cc_gen('config/auto/ipv6/test.in');
     $conf->cc_clean();
-    $self->set_result($va_type);
-    $conf->data->set( va_ptr_type => $va_type );
+    $self->set_result();
+    $conf->data->set( ipv6 => undef );
 
     return 1;
 }
