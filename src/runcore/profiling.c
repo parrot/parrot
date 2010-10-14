@@ -102,6 +102,17 @@ static void record_ctx_info(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+static void record_op(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore),
+    ARGIN(PPROF_DATA *pprof_data),
+    ARGIN(const char *op_name),
+    INTVAL op_time,
+    INTVAL line_num)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
 static void record_values_ascii_pprof(
     ARGIN(Parrot_profiling_runcore_t * runcore),
     ARGIN(PPROF_DATA *pprof_data),
@@ -167,6 +178,11 @@ static void store_postop_time(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pprof_data) \
     , PARROT_ASSERT_ARG(ctx_pmc) \
     , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_record_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore) \
+    , PARROT_ASSERT_ARG(pprof_data) \
+    , PARROT_ASSERT_ARG(op_name))
 #define ASSERT_ARGS_record_values_ascii_pprof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pprof_data))
@@ -429,14 +445,7 @@ ARGIN(opcode_t *pc))
         if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
             record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
 
-        if (Profiling_canonical_output_TEST(runcore))
-            pprof_data[PPROF_DATA_TIME] = 1;
-        else
-            pprof_data[PPROF_DATA_TIME] = op_time;
-
-        pprof_data[PPROF_DATA_LINE]   = preop_line_num;
-        pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) preop_opname;
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
+        record_op(interp, runcore, (PPROF_DATA *) &pprof_data, preop_opname, op_time, preop_line_num);
     }
 
     /* make it easy to tell separate runloops apart */
@@ -572,6 +581,38 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN(opcode_t *pc))
         }
     }
 }
+
+/*
+
+=item C<static void record_op(PARROT_INTERP, Parrot_profiling_runcore_t
+*runcore, PPROF_DATA *pprof_data, const char *op_name, INTVAL op_time, INTVAL
+line_num)>
+
+Record profiing information about the most recently-executed op.
+
+=cut
+
+*/
+
+static void
+record_op(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore),
+ARGIN(PPROF_DATA *pprof_data), ARGIN(const char *op_name), INTVAL op_time,
+INTVAL line_num)
+{
+
+    ASSERT_ARGS(record_op)
+
+    if (Profiling_canonical_output_TEST(runcore))
+        pprof_data[PPROF_DATA_TIME] = 1;
+    else
+        pprof_data[PPROF_DATA_TIME] = op_time;
+
+    pprof_data[PPROF_DATA_LINE]   = line_num;
+    pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) op_name;
+    runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
+}
+
+
 
 
 /*
