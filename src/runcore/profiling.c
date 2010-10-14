@@ -262,7 +262,6 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     runcore->prev_ctx        = NULL;
     runcore->profiling_flags = 0;
     runcore->runloop_count   = 0;
-    runcore->level           = 0;
     runcore->time_size       = 32;
     runcore->line_cache      = parrot_new_pointer_hash(interp);
     runcore->time            = mem_gc_allocate_n_typed(interp, runcore->time_size,
@@ -399,7 +398,7 @@ ARGIN(opcode_t *pc))
     runcore->runcore_start = Parrot_hires_get_time();
 
     /* if we're in a inner runloop, */
-    if (runcore->level != 0)
+    if (interp->current_runloop_level != 1)
         store_postop_time(interp, runcore);
 
     record_version_and_cli(interp, runcore, (PPROF_DATA *)&pprof_data);
@@ -420,7 +419,6 @@ ARGIN(opcode_t *pc))
         preop_opname          = interp->code->op_info_table[*pc]->name;
         preop_line_num        = get_line_num_from_cache(interp, runcore, preop_ctx_pmc);
 
-        ++runcore->level;
         Profiling_exit_check_CLEAR(runcore);
 
         runcore->op_start  = Parrot_hires_get_time();
@@ -429,13 +427,11 @@ ARGIN(opcode_t *pc))
 
         if (Profiling_exit_check_TEST(runcore)) {
             op_time  = runcore->op_finish - runcore->runcore_finish;
-            op_time += runcore->time[runcore->level];
-            runcore->time[runcore->level] = 0;
+            op_time += runcore->time[interp->current_runloop_level-1];
+            runcore->time[interp->current_runloop_level-1] = 0;
         }
         else
             op_time = runcore->op_finish - runcore->op_start;
-
-        --runcore->level;
 
         /* Occasionally the ctx stays the same while the sub changes, e.g.
          * with a call to a subclass' method. */
@@ -445,11 +441,12 @@ ARGIN(opcode_t *pc))
         if (Profiling_report_annotations_TEST(runcore) && interp->code->annotations)
             record_annotations(interp, runcore, (PPROF_DATA *) &pprof_data, pc);
 
-        record_op(interp, runcore, (PPROF_DATA *) &pprof_data, preop_opname, op_time, preop_line_num);
+        record_op(interp, runcore, (PPROF_DATA *) &pprof_data,
+                  preop_opname, op_time, preop_line_num);
     }
 
     /* make it easy to tell separate runloops apart */
-    if (runcore->level == 0) {
+    if (interp->current_runloop_level == 1) {
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_END_OF_RUNLOOP);
         record_bogus_parent_runloop(runcore);
     }
@@ -633,13 +630,13 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 
     ASSERT_ARGS(store_postop_time)
 
-    if (runcore->level >= runcore->time_size) {
+    if (interp->current_runloop_level-1 >= runcore->time_size) {
         runcore->time_size *= 2;
         runcore->time = mem_gc_realloc_n_typed(interp,
                 runcore->time, runcore->time_size + 1, UHUGEINTVAL);
     }
 
-    runcore->time[runcore->level] = runcore->runcore_start - runcore->op_start;
+    runcore->time[interp->current_runloop_level-1] = runcore->runcore_start - runcore->op_start;
 }
 
 /*
