@@ -4,70 +4,62 @@ $Id$
 
 */
 
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <stdio.h>
-#include <stdarg.h>
+#include <errno.h>
 
-#if defined VA_TYPE_REGISTER
-#  define PARROT_VA_TO_VAPTR(x) (x)
-#endif
-#if defined VA_TYPE_STACK
-#  define PARROT_VA_TO_VAPTR(x) (&(x))
-#endif
+int main(int c,char**v) {
+    int x = socket( PF_INET6, SOCK_DGRAM, 0 );
+    if ( x < 0 ) {
+        perror("Not OK - socket failed");
+        return 2;
+    }
 
-typedef struct a_t {
-    void *args;
-} arg;
+    /*
+    By now we have (a) PF_INET6 defined, and (b) in-principle kernel
+    support for v6; however we don't yet know if we have any v6
+    interfaces.
+    */
 
-static void
-test2(arg *a) {
-
-    va_list *ap = (va_list*)a->args;
-    int i;
-    double d;
-    char *s;
-
-    i = va_arg(*ap, int);
-    d = va_arg(*ap, double);
-    s = va_arg(*ap, char *);
-    if (i == 42 && d == 2.0)
-        printf("%s\n", s);
-    else
-        printf("nok\n");
-}
-
-static void
-test1(va_list ap)
-{
-    arg a;
-    a.args = PARROT_VA_TO_VAPTR(ap);
-    test2(&a);
-}
-
-/*
- * Visual C++ dies with an Internal Compiler Error when compiling the
- * following function using -O2.  Don't know why, but maybe because of this:
- * https://connect.microsoft.com/VisualStudio/feedback/details/457892/internal-compiler-error
- * Disable optimizations for this function using a pragma.
+    struct in6_addr A = IN6ADDR_LOOPBACK_INIT;  /* IN6ADDR_ANY_INIT; */
+    struct sockaddr_in6 S = { AF_INET6 };  /* family is always first field in sockaddr_* */
+    S.sin6_addr = A;
+    S.sin6_port = 32760;  /* a pseudorandom 15-bit number */
  */
-#if defined _MSC_VER
-#  pragma optimize("t", off)
-#endif
-static void
-test0(int n, ...)
-{
-    va_list ap;
-    va_start(ap, n);
-    test1(ap);
-    va_end(ap);
-}
-#if defined _MSC_VER
-#  pragma optimize("", on)
-#endif
+    /*
+    By now we have struct in6_addr, struct sockaddr_in6 and AF_INET6 and
+    IN6ADDR_LOOPBACK_INIT. But we still don't know about interfaces.
+    */
 
-int
-main(int argc, char *argv[])
-{
-    test0(3, 42, 2.0, "ok");
+    #ifdef linux  /* might not be supported elsewhere */
+    S.sin6_flowinfo = 0;
+    S.sin6_scope_id = 0;
+    #endif
+
+    /*
+    Set the SO_REUSEADDR option so as not to interfere with anyone else
+    using the port, including running this test again within the
+    re-use timeout period.
+    */
+    int reuse_address = 1;
+    if ( setsockopt(x, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0 ) {
+        perror("Not OK - setsockopt failed");
+        return 1;
+    }
+
+    if ( bind( x, (void*) &S, sizeof(S) ) < 0 && errno != EADDRINUSE ) {
+        perror("Not OK - bind failed");
+        return 1;
+    }
+
+    /*
+    By now we know we can bind to "::1", which means we truly do have
+    IPv6 support. Of course, we might not have any useful routes off
+    this host, but that wasn't the question.
+    */
+    puts("OK");
+    close(x);
     return 0;
 }
 

@@ -1,14 +1,14 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
 # $Id$
-# auto/va_ptr-01.t
+# auto/ipv6-01.t
 
 use strict;
 use warnings;
-use Test::More tests =>  5;
+use Test::More qw(no_plan); # tests =>  5;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::auto::va_ptr');
+use_ok('config::auto::ipv6');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
@@ -25,7 +25,7 @@ my ($args, $step_list_ref) = process_options(
 my $conf = Parrot::Configure::Step::Test->new;
 $conf->include_config_results( $args );
 
-my $pkg = q{auto::va_ptr};
+my $pkg = q{auto::ipv6};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
@@ -36,17 +36,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto/va_ptr-01.t - test auto::va_ptr
+auto/ipv6-01.t - test auto::ipv6
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto/va_ptr-01.t
+    % prove t/steps/auto/ipv6-01.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test auto::va_ptr.
+The tests in this file test auto::ipv6.
 
 =head1 AUTHOR
 
@@ -54,7 +54,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::auto::va_ptr, F<Configure.pl>.
+config::auto::ipv6, F<Configure.pl>.
 
 =cut
 
