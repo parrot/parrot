@@ -157,6 +157,9 @@ static void gc_ms2_block_GC_mark(PARROT_INTERP)
 static void gc_ms2_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms2_check_sanity(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_ms2_compact_memory_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -352,6 +355,8 @@ static int pobj2gen(ARGIN(PMC *pmc))
 #define ASSERT_ARGS_gc_ms2_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -808,6 +813,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     self->num_early_gc_PMCs                      = 0;
 
     gc_ms2_compact_memory_pool(interp);
+
+    gc_ms2_check_sanity(interp);
 }
 
 /*
@@ -1869,6 +1876,25 @@ gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
         | PObj_GC_generation_1_FLAG
         | PObj_GC_generation_2_FLAG);
     obj->flags |= gen2flags(gen);
+}
+
+static void
+gc_ms2_check_sanity(PARROT_INTERP)
+{
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header *tmp;
+    int gen;
+
+    for (gen=0; gen < 2; gen++) {
+        tmp = self->objects[gen];
+        while (tmp) {
+            PMC * pmc = LLH2Obj_typed(tmp, PMC);
+
+            PARROT_ASSERT(pobj2gen(pmc) == gen);
+
+            tmp = tmp->next;
+        }
+    }
 }
 
 /*
