@@ -649,6 +649,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     else
         gen = self->current_generation = 0;
 
+    gc_ms2_check_sanity(interp);
+
     /* Trace roots */
     gc_ms2_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
@@ -656,6 +658,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
     }
 
+    gc_ms2_check_sanity(interp);
     /* root_objects are "gray" untill fully marked */
     /* Additional gray objects will appened to root_objects list */
     /* So, iterate over them in one go */
@@ -681,6 +684,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         tmp = tmp->next;
     }
 
+    gc_ms2_check_sanity(interp);
     /*
      * At this point of time root_objects contains live objects from different
      * generations.
@@ -704,6 +708,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         tmp = next;
     }
 
+    gc_ms2_check_sanity(interp);
     /*
      * Now. self->objects[N] contains properly marked objects.
      * (For current or younger generations).
@@ -740,6 +745,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         }
     }
 
+    gc_ms2_check_sanity(interp);
     /* Handling oldest generation. Don't move it further */
     if (1 || gen >= 1) {
         tmp = self->objects[2]->first;
@@ -756,6 +762,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         }
     }
 
+    gc_ms2_check_sanity(interp);
 
 
     /*
@@ -796,6 +803,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
     interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
 
+    gc_ms2_check_sanity(interp);
     /* Now. Sweep all dead objects */
     gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
     if (gen >= 1)
