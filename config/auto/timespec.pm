@@ -33,7 +33,16 @@ sub runstep {
 
     $conf->cc_gen('config/auto/timespec/test_c.in');
     eval { $conf->cc_build(); };
-    if ($@) {
+    my $fail_message = $@;
+    $self->_handle_timespec($conf, $fail_message);
+    $conf->cc_clean();
+
+    return 1;
+}
+
+sub _handle_timespec {
+    my ($self, $conf, $fail_message) = @_;
+    if ($fail_message) {
         $conf->data->set( HAS_TIMESPEC => 0 );
         $self->set_result('no');
     }
@@ -41,9 +50,6 @@ sub runstep {
         $conf->data->set( HAS_TIMESPEC => 1 );
         $self->set_result('yes');
     }
-    $conf->cc_clean();
-
-    return 1;
 }
 
 1;
