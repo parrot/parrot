@@ -2295,18 +2295,18 @@ Parrot_str_reverse(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(Parrot_str_reverse)
     String_iter  iter;
-    INTVAL       c, len;
-    STRING      *reversed = Parrot_str_new(interp, "", 0);
+    INTVAL       pos;
+    PMC         *sb;
 
     STRING_ITER_INIT(interp, &iter);
-    len = Parrot_str_length(interp, src);
+    sb = Parrot_pmc_new(interp, enum_class_StringBuilder);
 
-    while (iter.charpos < len) {
-        c = STRING_iter_get_and_advance(interp, src, &iter);
-        reversed = Parrot_str_concat(interp, Parrot_str_chr(interp, c), reversed);
+    for (pos = STRING_length(src) - 1; pos >= 0; pos--) {
+        VTABLE_push_string(interp, sb, Parrot_str_chr(interp, 
+            STRING_iter_get(interp, src, &iter, pos)));
     }
 
-    return reversed;
+    return VTABLE_get_string(interp, sb);
 }
 
 /*
