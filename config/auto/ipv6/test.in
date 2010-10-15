@@ -7,13 +7,13 @@ $Id$
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
-#include <errno.h>
+#include <stdlib.h>
 
 int main(int c,char**v) {
     int x = socket( PF_INET6, SOCK_DGRAM, 0 );
     if ( x < 0 ) {
         perror("Not OK - socket failed");
-        return 2;
+        return EXIT_FAILURE;
     }
 
     /*
@@ -26,7 +26,7 @@ int main(int c,char**v) {
     struct sockaddr_in6 S = { AF_INET6 };  /* family is always first field in sockaddr_* */
     S.sin6_addr = A;
     S.sin6_port = 32760;  /* a pseudorandom 15-bit number */
- */
+
     /*
     By now we have struct in6_addr, struct sockaddr_in6 and AF_INET6 and
     IN6ADDR_LOOPBACK_INIT. But we still don't know about interfaces.
@@ -43,14 +43,14 @@ int main(int c,char**v) {
     re-use timeout period.
     */
     int reuse_address = 1;
-    if ( setsockopt(x, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0 ) {
+    if ( setsockopt(x, SOL_SOCKET, SO_REUSEADDR, &reuse_address, sizeof(reuse_address)) < 0 ) {
         perror("Not OK - setsockopt failed");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     if ( bind( x, (void*) &S, sizeof(S) ) < 0 && errno != EADDRINUSE ) {
         perror("Not OK - bind failed");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     /*
@@ -60,7 +60,7 @@ int main(int c,char**v) {
     */
     puts("OK");
     close(x);
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 /*
