@@ -761,9 +761,7 @@ Translate an ASCII string with entries from a translation table.
 
 =item reverse
 
-Reverse a string, one grapheme at a time. {{ NOTE: Currently only works for
-ASCII strings, because it reverses one C<char> at a time. }}
-
+Reverse a string, one grapheme at a time.
 
 =item is_integer
 
