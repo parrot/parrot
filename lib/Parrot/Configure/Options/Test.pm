@@ -96,7 +96,7 @@ Parrot's configuration tools will work as intended.
 TEST
         my $end =time();
         print scalar(@preconfiguration_tests),
-            " t/configure and t/step tests took ",
+            " t/configure tests took ",
             ($end - $start), " seconds.\n";
     }
     return 1;
@@ -106,6 +106,7 @@ sub run_build_tests {
     my $self = shift;
     my @postconfiguration_tests = @_;
     if ( $self->get_run('run_build_tests') ) {
+        my $start = time();
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
         my @steps_missing_tests = get_steps_missing_tests();
@@ -115,6 +116,10 @@ sub run_build_tests {
         }
         runtests(@postconfiguration_tests) or die
             "Post-configuration and build tools tests did not complete successfully; running 'make' might be dubious.";
+        my $end =time();
+        print scalar(@postconfiguration_tests),
+            " t/steps, t/postconfigure and t/pharness tests took ",
+            ($end - $start), " seconds.\n";
     }
     return 1;
 }
