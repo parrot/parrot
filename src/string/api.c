@@ -2278,6 +2278,36 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGIN(const STRING *s))
     return STRING_hash(interp, s, interp->hash_seed);
 }
 
+/*
+
+=item C<STRING * Parrot_str_reverse(PARROT_INTERP, const STRING *src)>
+
+Return the reverse of C<src>, even for non-ascii strings.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_reverse(PARROT_INTERP, ARGIN(const STRING *src))
+{
+    ASSERT_ARGS(Parrot_str_reverse)
+    String_iter  iter;
+    INTVAL       c, len;
+    STRING      *reversed = Parrot_str_new(interp, "", 0);
+
+    STRING_ITER_INIT(interp, &iter);
+    len = Parrot_str_length(interp, src);
+
+    while (iter.charpos < len) {
+        c = STRING_iter_get_and_advance(interp, src, &iter);
+        reversed = Parrot_str_concat(interp, Parrot_str_chr(interp, c), reversed);
+    }
+
+    return reversed;
+}
 
 /*
 
