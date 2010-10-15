@@ -2302,7 +2302,7 @@ Parrot_str_reverse(PARROT_INTERP, ARGIN(const STRING *src))
     sb = Parrot_pmc_new(interp, enum_class_StringBuilder);
 
     for (pos = STRING_length(src) - 1; pos >= 0; pos--) {
-        VTABLE_push_string(interp, sb, Parrot_str_chr(interp, 
+        VTABLE_push_string(interp, sb, Parrot_str_chr(interp,
             STRING_iter_get(interp, src, &iter, pos)));
     }
 
