@@ -41,8 +41,15 @@ sub runstep {
             $bsd_stat = 1;
         }
     }
+
+    $self->_handle_bsd_stat($conf, $bsd_stat);
     $conf->cc_clean();
 
+    return 1;
+}
+
+sub _handle_bsd_stat {
+    my ($self, $conf, $bsd_stat) = @_;
     if ($bsd_stat) {
         $conf->data->set( HAS_BSD_STAT_EXTN => 1 );
         $self->set_result('bsd');
@@ -51,8 +58,6 @@ sub runstep {
         $conf->data->set( HAS_BSD_STAT_EXTN => 0 );
         $self->set_result('posix');
     }
-
-    return 1;
 }
 
 1;
