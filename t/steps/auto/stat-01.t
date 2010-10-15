@@ -5,12 +5,15 @@
 
 use strict;
 use warnings;
-use Test::More tests =>   9;
+use Test::More tests =>  20;
 use lib qw( lib t/configure/testlib );
+use_ok('config::init::defaults');
+use_ok('config::inter::progs');
 use_ok('config::auto::stat');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw(
+    test_step_thru_runstep
     test_step_constructor_and_description
 );
 
@@ -23,11 +26,15 @@ my ($args, $step_list_ref) = process_options( {
 
 my $conf = Parrot::Configure->new;
 
+test_step_thru_runstep($conf, q{init::defaults}, $args);
+test_step_thru_runstep($conf, q{inter::progs},   $args);
+
 my $pkg = q{auto::stat};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+ok($step->runstep($conf), "${pkg}::runstep() returned true value");
 
 ##### _handle_bsd_stat #####
 
