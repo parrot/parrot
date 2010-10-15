@@ -1886,7 +1886,7 @@ gc_ms2_check_sanity(PARROT_INTERP)
     int gen;
 
     for (gen=0; gen < 2; gen++) {
-        tmp = self->objects[gen];
+        tmp = self->objects[gen]->first;
         while (tmp) {
             PMC * pmc = LLH2Obj_typed(tmp, PMC);
 
