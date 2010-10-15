@@ -29,6 +29,32 @@ my $pkg = q{auto::ipv6};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+my $ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value" );
+
+##### _handle_ipv6_status  #####
+
+my ($ipv6_status, $exp);
+
+$conf->data->set( HAS_IPV6 => undef );
+$ipv6_status = 1;
+$exp = 'yes';
+$step->_handle_ipv6_status($conf, $ipv6_status);
+ok( defined $conf->data->get( 'HAS_IPV6' ),
+    "HAS_IPV6 is defined" );
+ok( $conf->data->get( 'HAS_IPV6' ),
+    "HAS_IPV6 is true value" );
+is( $step->result(), $exp, "Got expected result '$exp'" );
+
+$conf->data->set( HAS_IPV6 => undef );
+$ipv6_status = 0;
+$exp = 'no';
+$step->_handle_ipv6_status($conf, $ipv6_status);
+ok( defined $conf->data->get( 'HAS_IPV6' ),
+    "HAS_IPV6 is defined" );
+ok( ! $conf->data->get( 'HAS_IPV6' ),
+    "HAS_IPV6 is false value" );
+is( $step->result(), $exp, "Got expected result '$exp'" );
 
 pass("Completed all tests in $0");
 

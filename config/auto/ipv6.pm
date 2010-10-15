@@ -33,12 +33,28 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $ipv6_status = 0;
+
     $conf->cc_gen('config/auto/ipv6/test.in');
+    eval { $conf->cc_build(); };
+    if (!$@) {
+        my $output = eval { $conf->cc_run() };
+        if (!$@ && $output =~ /OK/) {
+            $ipv6_status = 1;
+        }
+    }
     $conf->cc_clean();
-    $self->set_result();
-    $conf->data->set( ipv6 => undef );
+    $self->_handle_ipv6_status($conf, $ipv6_status);
 
     return 1;
+}
+
+sub _handle_ipv6_status {
+    my ($self, $conf, $ipv6_status) = @_;
+    $conf->data->set( HAS_IPV6 => $ipv6_status );
+    $ipv6_status
+        ? $self->set_result('yes')
+        : $self->set_result('no');
 }
 
 1;
