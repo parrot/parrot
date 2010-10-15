@@ -7,6 +7,8 @@ New in 2.9.0
   + Fixed coredump in ByteBuffer when given a negative size
   + Various improvements related to experimental Minix support
   + mk_language_shell.pl and create_language.pl no longer require an installed parrot
+  + The String PMC 'reverse' method was reinstated and is now faster
+    and supports strings of any encoding
 - Testing
   + "make smoke" now respects TEST_JOBS
   + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
