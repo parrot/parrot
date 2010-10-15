@@ -716,7 +716,8 @@ Translate ascii string C<src> with entries from C<trans_table>.
 
 =item C<void reverse(STRING *src)>
 
-Reverse the ascii STRING C<src> in place.
+Either reverse this PMC's contents or set this PMC's value to the reverse of C<src>,
+if present.
 
 =cut
 
