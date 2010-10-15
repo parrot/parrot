@@ -61,6 +61,8 @@ my %steps_tests_simple = ();
 my %steps_tests_complex = ();
 sub _find_steps_tests {
     my $steps_dir = shift;
+    %steps_tests_simple = ();
+    %steps_tests_complex = ();
     sub wanted {
         if ( $File::Find::name =~
             m<
