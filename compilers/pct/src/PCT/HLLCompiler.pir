@@ -18,7 +18,7 @@ running compilers from a command line.
     load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = new 'P6metaclass'
-    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version'
+    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version $compiler_progname'
     $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
 .end
 
@@ -154,6 +154,11 @@ Set the command-line prompt for this compiler to C<value>.
 The prompt is displayed in interactive mode at each point where
 the compiler is ready for code to be compiled and executed.
 
+=item compiler_progname([string name])
+
+Accessor for the C<compiler_progname>, which is often the filename of
+the compiler's program entry point, like C<perl6.pbc>.
+
 =cut
 
 .sub 'stages' :method
@@ -190,6 +195,12 @@ the compiler is ready for code to be compiled and executed.
     .param string value        :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('$commandline_prompt', value, has_value)
+.end
+
+.sub 'compiler_progname' :method
+    .param pmc value        :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('$compiler_progname', value, has_value)
 .end
 
 =item removestage(string stagename)
@@ -786,6 +797,7 @@ Performs option processing of command-line args
 
     .local string arg0
     arg0 = shift args
+    self.'compiler_progname'(arg0)
     .local pmc getopts
     getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
