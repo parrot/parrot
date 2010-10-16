@@ -547,7 +547,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     struct MarkSweep_GC *self;
 
     /* We have to transfer ownership of memory to parent interp in threaded parrot */
-    interp->gc_sys->finalize_gc_system = NULL; /* gc_ms2_finalize; */
+    interp->gc_sys->finalize_gc_system = gc_ms2_finalize;
 
     interp->gc_sys->do_gc_mark              = gc_ms2_mark_and_sweep;
     interp->gc_sys->compact_string_pool     = gc_ms2_compact_memory_pool;
@@ -630,26 +630,33 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     Parrot_gc_str_initialize(interp, &self->string_gc);
 }
 
+
 /*
+
 =item C<static void gc_ms2_finalize(PARROT_INTERP)>
 
 Finalize GC subsystem.
 
 =cut
+
 */
+
 static void
 gc_ms2_finalize(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_finalize)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    Parrot_gc_str_finalize(interp, &self->string_gc);
+    if (!interp->parent_interpreter) {
+        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    Parrot_list_destroy(interp, self->objects);
-    Parrot_list_destroy(interp, self->strings);
-    Parrot_gc_pool_destroy(interp, self->pmc_allocator);
-    Parrot_gc_pool_destroy(interp, self->string_allocator);
-    Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
+        Parrot_gc_str_finalize(interp, &self->string_gc);
+
+        Parrot_list_destroy(interp, self->objects);
+        Parrot_list_destroy(interp, self->strings);
+        Parrot_gc_pool_destroy(interp, self->pmc_allocator);
+        Parrot_gc_pool_destroy(interp, self->string_allocator);
+        Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
+    }
 }
 
 PARROT_MALLOC
