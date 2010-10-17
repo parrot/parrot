@@ -44,6 +44,7 @@ compilers/imcc/pbc$(O) : \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS) \
+    include/pmc/pmc_key.h \
     include/pmc/pmc_sub.h
 
 compilers/imcc/parser_util$(O) : \
