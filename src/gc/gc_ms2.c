@@ -844,6 +844,11 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
+            /* Flag this object as already processed */
+            /* Otherwise we will pull it again if it's referenced */
+            /* by some other project further in list */
+            pmc->flags |= PObj_GC_generation_2_FLAG;
+
             /* mark can append more objects to this list */
             if (PObj_custom_mark_TEST(pmc))
                 VTABLE_mark(interp, pmc);
