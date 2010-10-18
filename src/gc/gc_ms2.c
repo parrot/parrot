@@ -471,9 +471,6 @@ static int pobj2gen(ARGIN(PMC *pmc))
 
 =item C<static void gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
 
-This function would perform a GC run, if we needed to. Luckily we have
-infinite memory!
-
 This function is called from the GC API function C<Parrot_gc_mark_and_sweep>.
 
 Flags can be a combination of these values:
@@ -491,12 +488,7 @@ Flags can be a combination of these values:
 
 =item C<void Parrot_gc_ms2_init(PARROT_INTERP)>
 
-Initializes the infinite memory collector. Installs the necessary function
-pointers into the Memory_Pools structure. The two most important are the
-C<mark_and_sweep> and C<pool_init> functions. C<finalize_gc_system> function
-will be called at Parrot exit and will shut down the GC system if things
-need to be flushed/closed/deactivated/freed/etc. It can be set to NULL if no
-finalization is necessary.
+Initializes the generational collector
 
 =cut
 
@@ -659,9 +651,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     }
 
     gc_ms2_check_sanity(interp);
-    /* root_objects are "gray" untill fully marked */
-    /* Additional gray objects will appened to root_objects list */
-    /* So, iterate over them in one go */
+    /* root_objects are "gray" until fully marked */
+    /* Additional gray objects will appended to root_objects list */
+    /* Iterate over them in one go */
     tmp = self->root_objects->first;
     while (tmp) {
         PMC *pmc = LLH2Obj_typed(tmp, PMC);
@@ -686,10 +678,11 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_check_sanity(interp);
     /*
-     * At this point of time root_objects contains live objects from different
+     * At this point root_objects contains live objects from different
      * generations.
      *
-     * Iterate over them and move into proper list. Do not repaint them white yet.
+     * Iterate over them and move into proper list. Do not repaint them white
+     * yet.
      *
      * Remember postions of last item in lists. We will need it to pull more
      * objects into those generations.
@@ -717,14 +710,15 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
      * 3. Destroy everything else.
      */
 
-    /* FIXME There is no generation beyond 2. We have to handle it differentely */
+    /* FIXME There is no generation beyond 2. We have to handle it
+             differently */
     for (i = gen; i >= 0; i--) {
         tmp = self->objects[i]->first;
         while (tmp) {
             PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
             List_Item_Header    *next = tmp->next;
 
-            /* We are moving previousely remembered tail. Update it */
+            /* We are moving previously remembered tail. Update it */
             if (!next) {
                 old_object_tails[i] = tmp->prev;
             }
