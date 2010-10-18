@@ -157,6 +157,11 @@ static void gc_ms2_block_GC_mark(PARROT_INTERP)
 static void gc_ms2_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms2_bring_them_together(PARROT_INTERP,
+    ARGIN(List_Item_Header *old_object_tails[]))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_ms2_check_sanity(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -356,6 +361,9 @@ static int pobj2gen(ARGIN(PMC *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_bring_them_together __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(old_object_tails))
 #define ASSERT_ARGS_gc_ms2_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -758,7 +766,46 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_check_sanity(interp);
 
+    gc_ms2_bring_them_together(interp, old_object_tails);
 
+
+    /* Now. Sweep all dead objects */
+    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
+    if (gen >= 1)
+        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
+    if (gen == 2)
+        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
+
+
+    /* Update some stats */
+    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
+    interp->gc_sys->stats.mem_used_last_collect            = 0;
+    self->gc_mark_block_level--;
+
+    /* We swept all dead objects */
+    self->num_early_gc_PMCs                      = 0;
+
+    gc_ms2_compact_memory_pool(interp);
+
+    gc_ms2_check_sanity(interp);
+}
+
+/*
+=item C<static void gc_ms2_bring_them_together(PARROT_INTERP, List_Item_Header
+*old_object_tails[])>
+
+Bring all cross-referenced objects into same generation.
+
+TODO Give better name to this function.
+
+=cut
+*/
+static void
+gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tails[]))
+{
+    ASSERT_ARGS(gc_ms2_bring_them_together)
+    MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    int i;
     /*
      * Last step. old_object_tails contains pointer to previous end of generation.
      * We have to move old-to-young referenced objects into same generation.
@@ -769,15 +816,16 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->mark_str_header = gc_ms2_string_mark_propagate;
 
     for (i = 2; i > 0; i--) {
+        /* It can be our first move to this generation */
+        List_Item_Header *tmp = old_object_tails[i]
+                              ? old_object_tails[i]
+                              : self->objects[i]->first;
+
+        // FIXME. Something wrong with updating tails.
+        tmp = self->objects[i]->first;
+
         /* We are "marking" this generation */
         self->current_generation = i;
-
-        /* It can be our first move to this generation */
-        tmp = old_object_tails[i]
-              ? old_object_tails[i]
-              : self->objects[i]->first;
-
-        tmp = self->objects[i]->first;
 
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
@@ -796,25 +844,6 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
     interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
-
-    gc_ms2_check_sanity(interp);
-    /* Now. Sweep all dead objects */
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
-    if (gen >= 1)
-        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
-    if (gen == 2)
-        gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
-
-
-    /* Update some stats */
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
-    interp->gc_sys->stats.mem_used_last_collect            = 0;
-    self->gc_mark_block_level--;
-
-    /* We swept all dead objects */
-    self->num_early_gc_PMCs                      = 0;
-
-    gc_ms2_compact_memory_pool(interp);
 
     gc_ms2_check_sanity(interp);
 }
