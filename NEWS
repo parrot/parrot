@@ -10,6 +10,7 @@ New in 2.9.0
   + The String PMC 'reverse' method was reinstated and is now faster
     and supports strings of any encoding
   + Added API for adding STRINGs to the gc root set
+  + Speed up ord, substr, index and string comparison opcodes
 - Testing
   + "make smoke" now respects TEST_JOBS
   + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
