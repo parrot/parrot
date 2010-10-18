@@ -656,7 +656,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* Which generation we are going to collect? */
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
-    if (0 && interp->gc_sys->stats.gc_mark_runs % 100 == 0)
+    if (interp->gc_sys->stats.gc_mark_runs % 100 == 0)
         gen = self->current_generation = 2;
     else if (interp->gc_sys->stats.gc_mark_runs % 10 == 0)
         gen = self->current_generation = 1;
@@ -732,9 +732,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
      * 3. Destroy everything else.
      */
 
-    /* FIXME There is no generation beyond 2. We have to handle it
-             differently */
-    for (i = gen; i >= 0; i--) {
+    /* There is no generation beyond 2. We have to handle it differentely */
+    for (i = gen == 2 ? 1 : gen; i >= 0; i--) {
         tmp = self->objects[i]->first;
         while (tmp) {
             PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
@@ -1506,6 +1505,8 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc->flags |= gen2flags(self->current_generation);
 
     pmc->flags |= PObj_GC_generation_2_FLAG;
+
+    PObj_live_SET(pmc);
 }
 
 static void
