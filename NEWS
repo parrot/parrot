@@ -3,20 +3,28 @@
 New in 2.9.0
 - Core
   + New default garbage collector
+  + Fixing and cleaning up the profiling runcore (a.k.a. "PCore")
   + Parrot and Rakudo's build and tests can now be run under the profiling runcore.
   + Fixed coredump in ByteBuffer when given a negative size
-  + Various improvements related to experimental Minix support
   + mk_language_shell.pl and create_language.pl no longer require an installed parrot
   + The String PMC 'reverse' method was reinstated and is now faster
     and supports strings of any encoding
+  + Added API for adding STRINGs to the gc root set
 - Testing
   + "make smoke" now respects TEST_JOBS
   + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
     mk_language_shell.pl, create_language.pl
+  + Fixed "Configure.pl" about missing tests
+  + Parrot and Rakudo get access to the GCC Compile Farm
+  + Testing on Darwin/PPC
 - Git Migration
   + Most developer tools have been ported to Git
   + Majority of developer docs have been written for Git
+  + More github plug-in test cases are written
 - Compilers
+  + Changed nqp-rx build
+- Platforms
+  + Various improvements related to experimental Minix support
 
 New in 2.8.0
 - Core
