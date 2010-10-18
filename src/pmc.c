@@ -153,6 +153,7 @@ PMC *
 Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     ASSERT_ARGS(Parrot_pmc_new)
+    PARROT_ASSERT(interp->n_vtable_max > base_type);
     PARROT_ASSERT(interp->vtables[base_type]);
     {
         PMC *const classobj = interp->vtables[base_type]->pmc_class;
