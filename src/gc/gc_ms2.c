@@ -659,7 +659,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
         /* write_barrier can set this flag */
-        pmc->flags &= ~PObj_GC_generation_2_FLAG;
+        pmc->flags &= ~PObj_GC_wb_triggered_FLAG;
 
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
@@ -1442,7 +1442,8 @@ gc_ms2_sweep_pool(PARROT_INTERP,
             /* Paint live objects white */
             PObj_live_CLEAR(obj);
 
-            obj->flags &= ~PObj_GC_generation_2_FLAG;
+            obj->flags &= ~PObj_GC_generation_2_FLAG
+                          | ~PObj_GC_wb_triggered_FLAG;
         }
         else if (!PObj_constant_TEST(obj)) {
             PObj_on_free_list_SET(obj);
@@ -1743,7 +1744,7 @@ gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     size_t            gen  = PObj_to_generation(pmc);
 
     /* If we are already marked this one - skip it */
-    if (pmc->flags & PObj_GC_generation_2_FLAG)
+    if (pmc->flags & PObj_GC_wb_triggered_FLAG)
         return;
 
     if (!gen)
@@ -1751,7 +1752,7 @@ gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 
     LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
     LIST_APPEND(self->root_objects, item);
-    pmc->flags |= PObj_GC_generation_2_FLAG;
+    pmc->flags |= PObj_GC_wb_triggered_FLAG;
     PObj_live_SET(pmc);
 }
 

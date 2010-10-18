@@ -191,7 +191,10 @@ typedef enum PObj_enum {
     /* True if the PMC is a class */
     PObj_is_class_FLAG          = POBJ_FLAG(29),
     /* True if the PMC is a parrot object */
-    PObj_is_object_FLAG         = POBJ_FLAG(30)
+    PObj_is_object_FLAG         = POBJ_FLAG(30),
+
+    /* Set when write barrier triggered */
+    PObj_GC_wb_triggered_FLAG   = POBJ_FLAG(31)
 
 } PObj_flags;
 #undef POBJ_FLAG
