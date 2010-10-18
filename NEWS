@@ -15,7 +15,7 @@ New in 2.9.0
   + Added tests to Socket PMC, StringBuilder PMC, ByteBuffer PMC,
     mk_language_shell.pl, create_language.pl
   + Fixed "Configure.pl" about missing tests
-  + Parrot and Rakudo get access to the GCC Compile Farm
+  + Parrot and Rakudo Perl 6 now have access to the GCC Compile Farm
   + Testing on Darwin/PPC
 - Git Migration
   + Most developer tools have been ported to Git
