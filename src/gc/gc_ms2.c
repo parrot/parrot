@@ -894,6 +894,10 @@ static void
 gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    if (PObj_constant_TEST(pmc))
+        return;
+
     PARROT_ASSERT(pobj2gen(pmc) == self->current_generation
                   || !"Got object from wrong generation");
     if (PObj_custom_mark_TEST(pmc))
@@ -904,6 +908,10 @@ static void
 gc_ms2_string_validate(PARROT_INTERP, ARGIN(STRING *s))
 {
     MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    if (PObj_constant_TEST(s))
+        return;
+
     PARROT_ASSERT(pobj2gen(s) == self->current_generation);
 }
 
