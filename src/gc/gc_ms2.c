@@ -870,11 +870,20 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
         /* It can be our first move to this generation */
         List_Item_Header *tmp = self->objects[i]->first;
 
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            pmc->flags &= ~PObj_GC_generation_2_FLAG;
+            tmp = tmp->next;
+        }
+
         /* We are "marking" this generation */
         self->current_generation = i;
 
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
+
+            pmc->flags |= PObj_GC_generation_2_FLAG;
+
             if (PObj_custom_mark_TEST(pmc))
                 VTABLE_mark(interp, pmc);
 
@@ -900,6 +909,9 @@ gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
 
     PARROT_ASSERT(pobj2gen(pmc) == self->current_generation
                   || !"Got object from wrong generation");
+
+    pmc->flags |= PObj_GC_generation_2_FLAG;
+
     if (PObj_custom_mark_TEST(pmc))
         VTABLE_mark(interp, pmc);
 }
