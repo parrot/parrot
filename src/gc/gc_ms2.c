@@ -260,6 +260,10 @@ static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+static void gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(Buffer *str),
     size_t size)
@@ -294,6 +298,10 @@ static void gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
         __attribute__nonnull__(2);
 
 static void gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void gc_ms2_string_validate(PARROT_INTERP, ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -423,6 +431,9 @@ static int pobj2gen(ARGIN(PMC *pmc))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms2_pmc_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms2_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -442,6 +453,9 @@ static int pobj2gen(ARGIN(PMC *pmc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_ms2_string_mark_propagate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_gc_ms2_string_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_gc_ms2_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -846,6 +860,51 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
     interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
 
     gc_ms2_check_sanity(interp);
+
+
+    // DEBUG ONLY. Simple recursive check
+    interp->gc_sys->mark_pmc_header = gc_ms2_pmc_validate;
+    interp->gc_sys->mark_str_header = gc_ms2_string_validate;
+
+    for (i = 2; i > 0; i--) {
+        /* It can be our first move to this generation */
+        List_Item_Header *tmp = self->objects[i]->first;
+
+        /* We are "marking" this generation */
+        self->current_generation = i;
+
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            if (PObj_custom_mark_TEST(pmc))
+                VTABLE_mark(interp, pmc);
+
+            if (PMC_metadata(pmc))
+                Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
+
+            tmp = tmp->next;
+        }
+    }
+
+    interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
+    interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
+
+}
+
+static void
+gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PARROT_ASSERT(pobj2gen(pmc) == self->current_generation
+                  || !"Got object from wrong generation");
+    if (PObj_custom_mark_TEST(pmc))
+        VTABLE_mark(interp, pmc);
+}
+
+static void
+gc_ms2_string_validate(PARROT_INTERP, ARGIN(STRING *s))
+{
+    MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PARROT_ASSERT(pobj2gen(s) == self->current_generation);
 }
 
 /*
