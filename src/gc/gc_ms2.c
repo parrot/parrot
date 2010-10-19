@@ -1860,7 +1860,7 @@ gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     if (!gen)
         return;
 
-    LIST_REMOVE(self->objects[PObj_to_generation(pmc)], item);
+    LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->root_objects, item);
     pmc->flags |= PObj_GC_wb_triggered_FLAG;
     PObj_live_SET(pmc);
