@@ -865,7 +865,6 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
     gc_ms2_check_sanity(interp);
 
-
     // DEBUG ONLY. Simple recursive check
     interp->gc_sys->mark_pmc_header = gc_ms2_pmc_validate;
     interp->gc_sys->mark_str_header = gc_ms2_string_validate;
@@ -1494,17 +1493,14 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (pmc->flags & PObj_constant_FLAG)
         return;
 
-    if ((gen == self->current_generation) && (pmc->flags & PObj_GC_generation_2_FLAG))
-        return;
+    if (gen != self->current_generation) {
+        LIST_REMOVE(self->objects[gen], item);
+        LIST_APPEND(self->objects[self->current_generation], item);
 
-    LIST_REMOVE(self->objects[gen], item);
-    LIST_APPEND(self->objects[self->current_generation], item);
-    pmc->flags &= ~(PObj_GC_generation_0_FLAG
-        | PObj_GC_generation_1_FLAG
-        | PObj_GC_generation_2_FLAG);
-    pmc->flags |= gen2flags(self->current_generation);
-
-    pmc->flags |= PObj_GC_generation_2_FLAG;
+        pmc->flags &= ~(PObj_GC_generation_0_FLAG
+            | PObj_GC_generation_1_FLAG);
+        pmc->flags |= gen2flags(self->current_generation);
+    }
 
     PObj_live_SET(pmc);
 }
