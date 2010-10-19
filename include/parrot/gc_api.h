@@ -469,7 +469,7 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
-#if defined(NDEBUG) && defined(PARROT_IN_CORE)
+#if 0 && defined(NDEBUG) && defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_STRING_alive(interp, obj) \
           do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
 #else
