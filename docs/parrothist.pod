@@ -115,4 +115,6 @@ Starred release numbers indicate supported releases.
  mikehh      2.7.0          2010-Aug-17     "Australian King"
  Gerd        2.8.0          2010-Sep-21     "Tui Parakeet"
 
+ Gerd        2.9.0 *        2010-Oct-19     "Red-masked"
+
 =cut
