@@ -344,10 +344,12 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
         new_vtable->pmc_class         = self;
         new_vtable->whoami            = VTABLE_get_string(interp, self);
         new_vtable->mro               = _class->all_parents;
-        new_vtable->ro_variant_vtable =
-                Parrot_clone_vtable(interp, self->vtable->ro_variant_vtable);
-        new_vtable->wb_variant_vtable =
-                Parrot_clone_vtable(interp, self->vtable->wb_variant_vtable);
+        if (self->vtable->ro_variant_vtable)
+            new_vtable->ro_variant_vtable =
+                    Parrot_clone_vtable(interp, self->vtable->ro_variant_vtable);
+        if (self->vtable->wb_variant_vtable)
+            new_vtable->wb_variant_vtable =
+                    Parrot_clone_vtable(interp, self->vtable->wb_variant_vtable);
 
         /* Store the class's vtable in the global table */
         interp->vtables[type_num]     = new_vtable;
