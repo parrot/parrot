@@ -2038,8 +2038,6 @@ gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    int count = 0;
-    Pool_Allocator_Arena *arena = self->pmc_allocator->top_arena;
 
     fprintf(stderr, "%s\ngen: %d\n0: %d %d\n1: %d %d\n2: %d %d\n",
             header,
@@ -2049,21 +2047,11 @@ gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
             self->objects[2]->count, self->strings[2]->count);
 
 
-
-    while (arena) {
-        count++;
-        arena = arena->next;
-    }
-    fprintf(stderr, "PMC: %d\n", count * GC_FIXED_SIZE_POOL_SIZE);
-
-    arena = self->string_allocator->top_arena;
-    while (arena) {
-        count++;
-        arena = arena->next;
-    }
-    fprintf(stderr, "STRING: %d\n", count * GC_FIXED_SIZE_POOL_SIZE);
+    fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
+    fprintf(stderr, "STRING: %d\n", Parrot_gc_pool_allocated_size(interp, self->string_allocator));
 
     fprintf(stderr, "buffers: %d\n", self->string_gc.memory_pool->total_allocated);
+    fprintf(stderr, "const buffers: %d\n", self->string_gc.constant_string_pool->total_allocated);
 
     fprintf(stderr, "\n");
 
