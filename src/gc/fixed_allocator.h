@@ -67,6 +67,12 @@ void* Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+size_t Parrot_gc_fixed_allocator_allocated_memory(PARROT_INTERP,
+    ARGIN(Fixed_Allocator *allocator))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_gc_fixed_allocator_destroy(PARROT_INTERP,
     ARGFREE_NOTNULL(Fixed_Allocator *allocator))
         __attribute__nonnull__(1)
@@ -124,6 +130,10 @@ PARROT_MALLOC
 Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
 
 #define ASSERT_ARGS_Parrot_gc_fixed_allocator_allocate \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(allocator))
+#define ASSERT_ARGS_Parrot_gc_fixed_allocator_allocated_memory \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(allocator))

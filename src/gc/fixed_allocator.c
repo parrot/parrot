@@ -98,6 +98,11 @@ Allocate fixed size memory from Fixed_Allocator.
 
 Free fixed size memory from Fixed_Allocator.
 
+=item C<size_t Parrot_gc_fixed_allocator_allocated_memory(PARROT_INTERP,
+Fixed_Allocator *allocator)>
+
+Calculate amount of memory allocated in Fixed_Allocator.
+
 =cut
 
 */
@@ -179,6 +184,23 @@ Parrot_gc_fixed_allocator_free(PARROT_INTERP,
     PARROT_ASSERT(allocator->pools[index]);
 
     pool_free(allocator->pools[index], data);
+}
+
+PARROT_EXPORT
+size_t
+Parrot_gc_fixed_allocator_allocated_memory(PARROT_INTERP,
+        ARGIN(Fixed_Allocator *allocator))
+{
+    ASSERT_ARGS(Parrot_gc_fixed_allocator_allocated_memory)
+    size_t total = 0;
+    size_t i     = 0;
+
+    for (i = 0; i < allocator->num_pools; i++) {
+        if (allocator->pools[i])
+            total += Parrot_gc_pool_allocated_size(interp, allocator->pools[i]);
+    }
+
+    return total;
 }
 
 /*
