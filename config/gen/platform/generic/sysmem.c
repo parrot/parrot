@@ -22,6 +22,7 @@ Get system memory information.
 */
 
 #include <unistd.h>
+#include "parrot/sysmem.h"
 
 /*
 

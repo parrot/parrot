@@ -12,7 +12,7 @@
 
 #include "parrot/config.h"
 
-PARROT_EXPORT INTVAL Parrot_sysmem_amount(Parrot_Interp);
+PARROT_EXPORT size_t Parrot_sysmem_amount(Parrot_Interp);
 
 #endif /* PARROT_SYSMEM_H_GUARD */
 

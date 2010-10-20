@@ -21,6 +21,8 @@ Get system memory information.
 
 */
 
+#include "parrot/sysmem.h"
+
 /*
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
