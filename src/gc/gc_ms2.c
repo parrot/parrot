@@ -793,10 +793,17 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Now. Sweep all dead objects */
     gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_ms2_sweep_pmc_cb);
-    if (gen >= 1)
+    gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[0], gc_ms2_sweep_string_cb);
+
+    if (gen >= 1) {
         gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
-    if (gen == 2)
+        gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[1], gc_ms2_sweep_string_cb);
+    }
+
+    if (gen == 2) {
         gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
+        gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[2], gc_ms2_sweep_string_cb);
+    }
 
 
     /* Update some stats */
