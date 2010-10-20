@@ -15,6 +15,7 @@ src/gc/gc_ms2.c - Non-recursive M&S
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/list.h"
+#include "parrot/sysmem.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -632,7 +633,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         /* Collect every 256M allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = Parrot_sysmem_amount() / 8;
+        self->gc_threshold = Parrot_sysmem_amount(interp) / 8;
     }
 
     interp->gc_sys->gc_private = self;
