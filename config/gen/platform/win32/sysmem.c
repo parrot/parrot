@@ -38,14 +38,14 @@ typedef struct _MEMORYSTATUSEX {
     DWORDLONG ullTotalVirtual;
     DWORDLONG ullAvailVirtual;
     DWORDLONG ullAvailExtendedVirtual;
-} MEMORYSTATUSEX,*LPMEMORYSTATUSEX;
+} MEMORYSTATUSEX, *LPMEMORYSTATUSEX;
 
 WINBASEAPI BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
 #endif
 
 /*
 
-=item C<PMC * Parrot_sysmem_amount(PARROT_INTERP)>
+=item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
 
 Get information about available physycal memory.
 
@@ -62,7 +62,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     /* http://msdn.microsoft.com/en-us/library/aa366589(v=VS.85).aspx */
     MEMORYSTATUSEX statex;
 
-    statex.dwLength = sizeof(MEMORYSTATUSEX);
+    statex.dwLength = sizeof (MEMORYSTATUSEX);
     GlobalMemoryStatusEx(&statex);
     /* TODO Check status and bail out */
     return statex.ullAvailPhys;
