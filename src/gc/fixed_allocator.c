@@ -211,6 +211,11 @@ Frees a fixed-size data item back to the Pool for later reallocation
 
 check for pool validity
 
+=item C<size_t Parrot_gc_pool_allocated_size(PARROT_INTERP, Pool_Allocator
+*pool)>
+
+Calculate size of memory allocated by pool.
+
 =back
 
 =cut
@@ -283,6 +288,21 @@ Parrot_gc_pool_is_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *
 {
     ASSERT_ARGS(Parrot_gc_pool_is_owned)
     return pool_is_owned(pool, ptr);
+}
+
+PARROT_EXPORT
+size_t
+Parrot_gc_pool_allocated_size(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(Parrot_gc_pool_allocated_size)
+    Pool_Allocator_Arena *arena = pool->top_arena;
+    int                   count = 0;
+    while (arena) {
+        count++;
+        arena = arena->next;
+    }
+
+    return count * arena_size(pool);
 }
 
 
