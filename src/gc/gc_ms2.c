@@ -614,7 +614,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         /* Collect every 256M allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = 1 * 1024 * 1024;
+        self->gc_threshold = 16 * 1024 * 1024;
     }
     interp->gc_sys->gc_private = self;
 
@@ -628,7 +628,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
     Linked_List      *list;
-    int               i, gen;
+    int               i, gen = -1;
 
     /*
      * Remember current postions of objects.
