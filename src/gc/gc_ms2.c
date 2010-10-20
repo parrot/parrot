@@ -1582,6 +1582,10 @@ gc_ms2_sweep_pool(PARROT_INTERP,
 
             Parrot_gc_pool_free(interp, pool, tmp);
         }
+        else {
+            /* Remove "constant" objects from pool. We don't handle them */
+            LIST_REMOVE(list, tmp);
+        }
         tmp = next;
     }
 }
