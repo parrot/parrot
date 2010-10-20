@@ -25,7 +25,7 @@ Get system memory information.
 
 /*
 
-=item C<PMC * Parrot_sysmem_amount(PARROT_INTERP)>
+=item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
 
 Get information about available physycal memory.
 
