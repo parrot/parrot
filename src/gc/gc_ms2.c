@@ -2036,15 +2036,37 @@ gc_ms2_check_sanity(PARROT_INTERP)
 static void
 gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
 {
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-
 #ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "%s\ngen: %d\n0: %d %d\n1: %d %d\n2: %d %d\n\n",
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    int count = 0;
+    Pool_Allocator_Arena *arena = self->pmc_allocator->top_arena;
+
+    fprintf(stderr, "%s\ngen: %d\n0: %d %d\n1: %d %d\n2: %d %d\n",
             header,
             gen,
             self->objects[0]->count, self->strings[0]->count,
             self->objects[1]->count, self->strings[1]->count,
             self->objects[2]->count, self->strings[2]->count);
+
+
+
+    while (arena) {
+        count++;
+        arena = arena->next;
+    }
+    fprintf(stderr, "PMC: %d\n", count * GC_FIXED_SIZE_POOL_SIZE);
+
+    arena = self->string_allocator->top_arena;
+    while (arena) {
+        count++;
+        arena = arena->next;
+    }
+    fprintf(stderr, "STRING: %d\n", count * GC_FIXED_SIZE_POOL_SIZE);
+
+    fprintf(stderr, "buffers: %d\n", self->string_gc.memory_pool->total_allocated);
+
+    fprintf(stderr, "\n");
+
 #endif
 }
 
