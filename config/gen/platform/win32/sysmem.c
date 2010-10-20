@@ -21,6 +21,9 @@ Get system memory information.
 
 */
 
+#include <windows.h>
+#include <stdio.h>
+
 /*
 
 =item C<PMC * Parrot_sysmem_amount(PARROT_INTERP)>
@@ -34,8 +37,15 @@ Get information about available physycal memory.
 size_t
 Parrot_sysmem_amount(PARROT_INTERP)
 {
-    /* FIXME: Stub only. Returns 1 GB */
-    return 1 * 1024 * 1024;
+    /* Copy-pasted from example at */
+    /* http://msdn.microsoft.com/en-us/library/aa366589(v=VS.85).aspx */
+    MEMORYSTATUSEX statex;
+    bool status;
+
+    statex.dwLength = sizeof(MEMORYSTATUSEX);
+    status = GlobalMemoryStatusEx(&statex);
+    /* TODO Check status and bail out */
+    return statex.ullAvailPhys;
 }
 
 /*
