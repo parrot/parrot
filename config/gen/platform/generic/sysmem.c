@@ -24,6 +24,10 @@ Get system memory information.
 #include <unistd.h>
 #include "parrot/sysmem.h"
 
+#ifdef _SC_PAGESIZE         /* some SVR4 systems omit an underscore */
+#  define  _SC_PAGE_SIZE _SC_PAGESIZE
+#endif
+
 /*
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
