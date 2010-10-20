@@ -264,6 +264,9 @@ static void gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
+        __attribute__nonnull__(1);
+
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(Buffer *str),
     size_t size)
@@ -434,6 +437,8 @@ static int pobj2gen(ARGIN(PMC *pmc))
 #define ASSERT_ARGS_gc_ms2_pmc_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms2_print_stats __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -663,6 +668,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     else
         gen = self->current_generation = 0;
 
+    gc_ms2_print_stats(interp, "Before", gen);
+
     gc_ms2_check_sanity(interp);
 
     /* Trace roots */
@@ -779,7 +786,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_check_sanity(interp);
 
+    gc_ms2_print_stats(interp, "Bringing", gen);
     gc_ms2_bring_them_together(interp, old_object_tails);
+    gc_ms2_print_stats(interp, "Here", gen);
 
 
     /* Now. Sweep all dead objects */
@@ -801,6 +810,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_ms2_compact_memory_pool(interp);
 
     gc_ms2_check_sanity(interp);
+
+
+    gc_ms2_print_stats(interp, "After", gen);
 }
 
 /*
@@ -2008,6 +2020,21 @@ gc_ms2_check_sanity(PARROT_INTERP)
             tmp = tmp->next;
         }
     }
+}
+
+static void
+gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
+{
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "%s\ngen: %d\n0: %d %d\n1: %d %d\n2: %d %d\n\n",
+            header,
+            gen,
+            self->objects[0]->count, self->strings[0]->count,
+            self->objects[1]->count, self->strings[1]->count,
+            self->objects[2]->count, self->strings[2]->count);
+#endif
 }
 
 /*
