@@ -26,6 +26,22 @@ Get system memory information.
 #include <windows.h>
 #include <stdio.h>
 
+/* Solution copied from http://www.perlmonks.org/?node_id=749964 */
+#ifndef _MSC_VER
+typedef struct _MEMORYSTATUSEX {
+    DWORD dwLength;
+    DWORD dwMemoryLoad;
+    DWORDLONG ullTotalPhys;
+    DWORDLONG ullAvailPhys;
+    DWORDLONG ullTotalPageFile;
+    DWORDLONG ullAvailPageFile;
+    DWORDLONG ullTotalVirtual;
+    DWORDLONG ullAvailVirtual;
+    DWORDLONG ullAvailExtendedVirtual;
+} MEMORYSTATUSEX,*LPMEMORYSTATUSEX;
+
+WINBASEAPI BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
+
 /*
 
 =item C<PMC * Parrot_sysmem_amount(PARROT_INTERP)>
@@ -35,6 +51,8 @@ Get information about available physycal memory.
 =cut
 
 */
+
+
 
 size_t
 Parrot_sysmem_amount(PARROT_INTERP)
