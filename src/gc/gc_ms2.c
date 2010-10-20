@@ -1229,7 +1229,7 @@ gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
 {
     ASSERT_ARGS(gc_ms2_sweep_pmc_cb)
     PMC *pmc = (PMC *)obj;
-    gc_ms2_free_pmc_header(interp, pmc);
+    Parrot_pmc_destroy(interp, pmc);
 }
 
 /*
@@ -1575,11 +1575,10 @@ gc_ms2_sweep_pool(PARROT_INTERP,
                           | ~PObj_GC_wb_triggered_FLAG;
         }
         else if (!PObj_constant_TEST(obj)) {
-            PObj_on_free_list_SET(obj);
-            LIST_REMOVE(list, tmp);
-
             callback(interp, obj);
 
+            LIST_REMOVE(list, tmp);
+            PObj_on_free_list_SET(obj);
             Parrot_gc_pool_free(interp, pool, tmp);
         }
         else {
