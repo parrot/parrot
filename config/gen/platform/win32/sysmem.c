@@ -21,28 +21,6 @@ Get system memory information.
 
 */
 
-#define _WIN32_WINNT 0x0500
-
-#include <windows.h>
-#include <stdio.h>
-
-/* Solution copied from http://www.perlmonks.org/?node_id=749964 */
-#ifndef _MSC_VER
-typedef struct _MEMORYSTATUSEX {
-    DWORD dwLength;
-    DWORD dwMemoryLoad;
-    DWORDLONG ullTotalPhys;
-    DWORDLONG ullAvailPhys;
-    DWORDLONG ullTotalPageFile;
-    DWORDLONG ullAvailPageFile;
-    DWORDLONG ullTotalVirtual;
-    DWORDLONG ullAvailVirtual;
-    DWORDLONG ullAvailExtendedVirtual;
-} MEMORYSTATUSEX, *LPMEMORYSTATUSEX;
-
-WINBASEAPI BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
-#endif
-
 /*
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
@@ -52,8 +30,6 @@ Get information about available physycal memory.
 =cut
 
 */
-
-
 
 size_t
 Parrot_sysmem_amount(PARROT_INTERP)
