@@ -60,10 +60,9 @@ Parrot_sysmem_amount(PARROT_INTERP)
     /* Copy-pasted from example at */
     /* http://msdn.microsoft.com/en-us/library/aa366589(v=VS.85).aspx */
     MEMORYSTATUSEX statex;
-    bool status;
 
     statex.dwLength = sizeof(MEMORYSTATUSEX);
-    status = GlobalMemoryStatusEx(&statex);
+    GlobalMemoryStatusEx(&statex);
     /* TODO Check status and bail out */
     return statex.ullAvailPhys;
 }
