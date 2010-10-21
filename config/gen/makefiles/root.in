@@ -1324,7 +1324,8 @@ src/gc/gc_ms2$(O) : \
     src/gc/fixed_allocator.h \
     src/gc/gc_ms2.c \
     $(INC_DIR)/list.h \
-    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h \
+    $(INC_DIR)/sysmem.h
 
 src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1352,7 +1353,10 @@ src/gc/string_gc$(O) : \
 
 src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
-src/platform$(O) : $(PARROT_H_HEADERS) src/platform.c
+src/platform$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/platform.c \
+    $(INC_DIR)/sysmem.h
 
 #IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
 #IF(platform_asm):
