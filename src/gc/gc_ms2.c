@@ -2052,7 +2052,8 @@ gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
     fprintf(stderr, "buffers: %d\n", self->string_gc.memory_pool->total_allocated);
     fprintf(stderr, "const buffers: %d\n", self->string_gc.constant_string_pool->total_allocated);
 
-    fprintf(stderr, "attrs: %d\n", Parrot_gc_fixed_allocator_allocated_memory(interp, self->fixed_size_allocator));
+    fprintf(stderr, "attrs: %d\n", Parrot_gc_fixed_allocator_allocated_memory(interp,
+                                                                      self->fixed_size_allocator));
 
     fprintf(stderr, "\n");
 
