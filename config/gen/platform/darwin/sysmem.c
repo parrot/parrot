@@ -39,7 +39,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     int           err = 0 ;
     size_t        memsize = 0 ;
     char         *err_msg;
-    unsigned long length = sizeof(memsize) ;
+    unsigned long length = sizeof (memsize) ;
 
     int selection[2] = { CTL_HW, HW_MEMSIZE} ;
 
