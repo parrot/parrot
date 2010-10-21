@@ -924,6 +924,8 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 static void
 gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(gc_ms2_pmc_validate)
+
     MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (PObj_constant_TEST(pmc))
@@ -941,6 +943,8 @@ gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
 static void
 gc_ms2_string_validate(PARROT_INTERP, ARGIN(STRING *s))
 {
+    ASSERT_ARGS(gc_ms2_string_validate)
+
     MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (PObj_constant_TEST(s))
@@ -1497,6 +1501,8 @@ gc_ms2_iterate_string_list(PARROT_INTERP,
 static void
 gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(gc_ms2_vtable_mark_propagate)
+
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header  *item = Obj2LLH(pmc);
     size_t             gen  = PObj_to_generation(pmc);
@@ -1527,6 +1533,8 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
 static void
 gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
 {
+    ASSERT_ARGS(gc_ms2_string_mark_propagate)
+
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header  *item = Obj2LLH(s);
     size_t             gen  = PObj_to_generation(s);
@@ -1960,12 +1968,16 @@ gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
 static int
 pobj2gen(ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(pobj2gen)
+
     return PObj_to_generation(pmc);
 }
 
 static int
 gen2flags(int gen)
 {
+    ASSERT_ARGS(gen2flags)
+
     return generation_to_flags(gen);
 }
 
@@ -2016,6 +2028,8 @@ gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
 static void
 gc_ms2_check_sanity(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_ms2_check_sanity)
+
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
     int gen;
@@ -2035,6 +2049,7 @@ gc_ms2_check_sanity(PARROT_INTERP)
 static void
 gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
 {
+    ASSERT_ARGS(gc_ms2_print_stats)
 #ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
