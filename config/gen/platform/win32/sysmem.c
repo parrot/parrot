@@ -44,7 +44,7 @@ WINBASEAPI BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
 
-Get information about available physycal memory.
+Get information about available physical memory.
 
 =cut
 
