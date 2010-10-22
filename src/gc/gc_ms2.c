@@ -921,6 +921,18 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
 }
 
+/*
+
+=item C<static void gc_ms2_pmc_validate(PARROT_INTERP, PMC *pmc)>
+
+=item C<static void gc_ms2_string_validate(PARROT_INTERP, STRING *s)>
+
+Validate pmc/string objects re current generation
+
+=cut
+
+*/
+
 static void
 gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
 {
@@ -1498,6 +1510,16 @@ gc_ms2_iterate_string_list(PARROT_INTERP,
 }
 
 
+/*
+
+=item C<static void gc_ms2_vtable_mark_propagate(PARROT_INTERP, PMC *pmc)>
+
+propogate to next generation if req
+
+=cut
+
+*/
+
 static void
 gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
 {
@@ -1530,6 +1552,16 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     PObj_live_SET(pmc);
 }
 
+/*
+
+=item C<static void gc_ms2_string_mark_propagate(PARROT_INTERP, STRING *s)>
+
+propogate to next generation if req
+
+=cut
+
+*/
+
 static void
 gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
 {
@@ -1556,6 +1588,7 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
         | PObj_GC_generation_2_FLAG);
     s->flags |= gen2flags(self->current_generation);
 }
+
 /*
 =item C<static void gc_ms2_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
 Linked_List *list, sweep_cb callback)>
@@ -1564,6 +1597,7 @@ Helper function to sweep pool.
 
 =cut
 */
+
 static void
 gc_ms2_sweep_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
@@ -1965,6 +1999,18 @@ gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
     return total_amount;
 }
 
+/*
+
+=item C<static int pobj2gen(PMC *pmc)>
+
+=item C<static int gen2flags(int gen)>
+
+helper functions to check and use macro
+
+=cut
+
+*/
+
 static int
 pobj2gen(ARGIN(PMC *pmc))
 {
@@ -2025,6 +2071,16 @@ gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
     obj->flags |= gen2flags(gen);
 }
 
+/*
+
+=item C<static void gc_ms2_check_sanity(PARROT_INTERP)>
+
+sanity check
+
+=cut
+
+*/
+
 static void
 gc_ms2_check_sanity(PARROT_INTERP)
 {
@@ -2045,6 +2101,17 @@ gc_ms2_check_sanity(PARROT_INTERP)
         }
     }
 }
+
+/*
+
+=item C<static void gc_ms2_print_stats(PARROT_INTERP, const char* header, int
+gen)>
+
+debug function
+
+=cut
+
+*/
 
 static void
 gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
