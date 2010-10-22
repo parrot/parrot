@@ -342,9 +342,10 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
             STRING *sf = Parrot_str_new_init(interp, NULL, len,
                 Parrot_default_encoding_ptr,
                 PObj_external_FLAG);
-            sf->_bufstart = sf->strstart = s->_bufstart;
-            got                 = PIO_READ(interp, filehandle, &sf);
-            s->strlen           = s->bufused = current + got;
+            sf->_bufstart = s->_bufstart;
+            sf->strstart  = (char *)s->_bufstart;
+            got           = PIO_READ(interp, filehandle, &sf);
+            s->strlen     = s->bufused = current + got;
 
             Parrot_io_set_file_position(interp, filehandle,
                     (got + Parrot_io_get_file_position(interp, filehandle)));

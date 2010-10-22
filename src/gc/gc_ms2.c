@@ -759,7 +759,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                     LIST_REMOVE(self->objects[i], tmp);
                     LIST_APPEND(self->objects[i+1], tmp);
 
-                    gc_ms2_set_gen_flags(interp, pmc, i+1);
+                    gc_ms2_set_gen_flags(interp, (PObj *)pmc, i+1);
                 }
             }
 
@@ -777,7 +777,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
             if (PObj_live_TEST(pmc)) {
                 gc_ms2_seal_object(interp, pmc);
-                gc_ms2_set_gen_flags(interp, pmc, 2);
+                gc_ms2_set_gen_flags(interp, (PObj *)pmc, 2);
             }
 
             tmp = next;
@@ -962,7 +962,7 @@ gc_ms2_string_validate(PARROT_INTERP, ARGIN(STRING *s))
     if (PObj_constant_TEST(s))
         return;
 
-    PARROT_ASSERT(pobj2gen(s) == self->current_generation);
+    PARROT_ASSERT(pobj2gen((PMC *)s) == self->current_generation);
 }
 
 /*
