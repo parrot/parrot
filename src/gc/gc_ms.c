@@ -931,7 +931,7 @@ gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<static void gc_ms_mark_pobj_header(PARROT_INTERP, PObj *obj)>
+=item C<static void gc_ms_mark_str_header(PARROT_INTERP, STRING *obj)>
 
 mark *obj as live
 
