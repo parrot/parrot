@@ -874,7 +874,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
                               ? old_object_tails[i]
                               : self->objects[i]->first;
 
-        // FIXME. Something wrong with updating tails.
+        /* FIXME. Something wrong with updating tails. */
         tmp = self->objects[i]->first;
 
         /* We are "marking" this generation */
@@ -901,7 +901,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
     gc_ms2_check_sanity(interp);
 
 #if 0
-    // DEBUG ONLY. Simple recursive check
+    /* DEBUG ONLY. Simple recursive check */
     interp->gc_sys->mark_pmc_header = gc_ms2_pmc_validate;
     interp->gc_sys->mark_str_header = gc_ms2_string_validate;
 

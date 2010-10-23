@@ -196,7 +196,7 @@ check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), A
 {
     ASSERT_ARGS(check_set_std_props)
 
-    // FIXME FIXME FIXME
+    /* FIXME FIXME FIXME */
     /* We have to figure out all variants of vtables transitions */
     /* between normal, ro and wb variants */
     return 0;
