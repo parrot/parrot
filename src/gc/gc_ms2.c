@@ -862,11 +862,6 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
-            /* Flag this object as already processed */
-            /* Otherwise we will pull it again if it's referenced */
-            /* by some other project further in list */
-            pmc->flags |= PObj_GC_generation_2_FLAG;
-
             /* mark can append more objects to this list */
             if (PObj_custom_mark_TEST(pmc))
                 VTABLE_mark(interp, pmc);
@@ -884,6 +879,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
     gc_ms2_check_sanity(interp);
 
+#if 0
     // DEBUG ONLY. Simple recursive check
     interp->gc_sys->mark_pmc_header = gc_ms2_pmc_validate;
     interp->gc_sys->mark_str_header = gc_ms2_string_validate;
@@ -897,6 +893,8 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
             pmc->flags &= ~PObj_GC_generation_2_FLAG;
             tmp = tmp->next;
         }
+
+        tmp = self->objects[i]->first;
 
         /* We are "marking" this generation */
         self->current_generation = i;
@@ -918,7 +916,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
     interp->gc_sys->mark_str_header = gc_ms2_mark_string_header;
     interp->gc_sys->mark_pmc_header = gc_ms2_mark_pmc_header;
-
+#endif
 }
 
 /*
@@ -1606,9 +1604,7 @@ gc_ms2_sweep_pool(PARROT_INTERP,
         if (PObj_live_TEST(obj)) {
             /* Paint live objects white */
             PObj_live_CLEAR(obj);
-
-            obj->flags &= ~PObj_GC_generation_2_FLAG
-                          | ~PObj_GC_wb_triggered_FLAG;
+            obj->flags &= ~PObj_GC_wb_triggered_FLAG;
         }
         else if (!PObj_constant_TEST(obj)) {
             callback(interp, obj);
@@ -2060,8 +2056,7 @@ gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
 {
     ASSERT_ARGS(gc_ms2_set_gen_flags)
     obj->flags &= ~(PObj_GC_generation_0_FLAG
-        | PObj_GC_generation_1_FLAG
-        | PObj_GC_generation_2_FLAG);
+        | PObj_GC_generation_1_FLAG);
     obj->flags |= gen2flags(gen);
 }
 

@@ -267,7 +267,6 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
         PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG
             | pmc->flags & PObj_GC_generation_0_FLAG
             | pmc->flags & PObj_GC_generation_1_FLAG
-            | pmc->flags & PObj_GC_generation_2_FLAG
             | pmc->flags & PObj_GC_wb_triggered_FLAG
             | pmc->flags & b_PObj_live_FLAG);
         // HACK!!!
