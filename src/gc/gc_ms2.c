@@ -799,11 +799,32 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_ms2_sweep_pmc_cb);
         gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[1], gc_ms2_sweep_string_cb);
     }
+    else {
+        tmp = 0 && old_object_tails[1]
+             ? old_object_tails[1]
+             : self->objects[1]->first;
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            PObj_live_CLEAR(pmc);
+            tmp = tmp->next;
+        }
+    }
 
     if (gen == 2) {
         gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_ms2_sweep_pmc_cb);
         gc_ms2_sweep_pool(interp, self->string_allocator, self->strings[2], gc_ms2_sweep_string_cb);
     }
+    else {
+        tmp = 0 && old_object_tails[2]
+              ? old_object_tails[2]
+              : self->objects[2]->first;
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            PObj_live_CLEAR(pmc);
+            tmp = tmp->next;
+        }
+    }
+
 
 
     /* Update some stats */
