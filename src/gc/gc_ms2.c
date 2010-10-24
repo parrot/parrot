@@ -933,7 +933,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
     gc_ms2_check_sanity(interp);
 
-#if 0
+#if 1
     // DEBUG ONLY. Simple recursive check
     interp->gc_sys->mark_pmc_header = gc_ms2_pmc_validate;
     interp->gc_sys->mark_str_header = gc_ms2_string_validate;
@@ -1017,7 +1017,7 @@ gc_ms2_string_validate(PARROT_INTERP, ARGIN(STRING *s))
     if (PObj_constant_TEST(s))
         return;
 
-    PARROT_ASSERT(pobj2gen((PMC *)s) == self->current_generation);
+    PARROT_ASSERT(pobj2gen((PObj *)s) >= self->current_generation);
 }
 
 /*
@@ -1254,12 +1254,13 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
         return;
 
+    /* mark it live. Even if it's from older generation we can have link
+     * _from_ young object which should keep it alive */
+    PObj_live_SET(pmc);
+
     /* If object too old - skip it */
     if (gen > self->current_generation)
         return;
-
-    /* mark it live */
-    PObj_live_SET(pmc);
 
     LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->root_objects, item);
