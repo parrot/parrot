@@ -178,6 +178,14 @@ static size_t gc_ms2_count_used_string_memory(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_ms2_ensure_flags(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void gc_ms2_ensure_flags_in_list(PARROT_INTERP,
+    ARGIN(Linked_List* list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_ms2_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -384,6 +392,11 @@ static int pobj2gen(ARGIN(PMC *pmc))
     , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_count_used_string_memory \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_gc_ms2_ensure_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_ensure_flags_in_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -855,6 +868,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_check_sanity(interp);
 
+    gc_ms2_ensure_flags(interp);
 
     gc_ms2_print_stats(interp, "After", gen);
 }
@@ -875,6 +889,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
     ASSERT_ARGS(gc_ms2_bring_them_together)
     MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int i;
+
     /*
      * Last step. old_object_tails contains pointer to previous end of generation.
      * We have to move old-to-young referenced objects into same generation.
@@ -2162,6 +2177,30 @@ gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
     fprintf(stderr, "\n");
 
 #endif
+}
+
+static void
+gc_ms2_ensure_flags_in_list(PARROT_INTERP, ARGIN(Linked_List* list))
+{
+    List_Item_Header *tmp = list->first;
+    while (tmp) {
+        PObj *obj = LLH2Obj_typed(tmp, PObj);
+        PARROT_ASSERT(!(obj->flags & b_PObj_live_FLAG));
+        PARROT_ASSERT(!(obj->flags & PObj_GC_generation_2_FLAG));
+        tmp = tmp->next;
+    }
+}
+
+static void
+gc_ms2_ensure_flags(PARROT_INTERP)
+{
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    gc_ms2_ensure_flags_in_list(interp, self->objects[0]);
+    gc_ms2_ensure_flags_in_list(interp, self->objects[1]);
+    gc_ms2_ensure_flags_in_list(interp, self->objects[2]);
+    gc_ms2_ensure_flags_in_list(interp, self->strings[0]);
+    gc_ms2_ensure_flags_in_list(interp, self->strings[1]);
+    gc_ms2_ensure_flags_in_list(interp, self->strings[2]);
 }
 
 /*
