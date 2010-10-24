@@ -916,6 +916,12 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
+            /*
+             * Invariant: Objects in older generation painted black:
+             * 1. By write_barrier.
+             * 2. By trace_roots.
+             * 3. By reference from young objects.
+             */
             if (PObj_live_TEST(pmc)) {
                 pmc->flags |= PObj_GC_generation_2_FLAG;
 
