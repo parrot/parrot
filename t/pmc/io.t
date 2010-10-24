@@ -291,10 +291,28 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "turn off buffering" )
     print $P0, "Howdy World\n"
 
     $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+
+#   set buffer type
+    $P0.'buffer_type'('unbuffered')
+
+#   get buffer type
+    $S0 = $P0.'buffer_type'()
+    print $S0
+    print "\n"
+
+    $S0 = $P0.'read'(50)
+    print $S0
+
+    $P0.'close'()
     end
 .end
 CODE
 unbuffered
+unbuffered
+Howdy World
 OUTPUT
 
 file_content_is( $temp_file, <<'OUTPUT', 'unbuffered file contents' );
