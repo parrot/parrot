@@ -401,21 +401,10 @@ inline op copy(inout PMC, invar PMC) :base_mem {
         goto ADDRESS(handler);
     }
     else {
-        PMC   * const clone = VTABLE_clone(interp, $2);
         /* Preserve the metadata on the destination. */
         PMC   * const meta  = VTABLE_getprops(interp, $1);
 
-        /* avoid leaks and unreachable memory by destroying the destination PMC */
-        Parrot_pmc_destroy(interp, $1);
-
-        /* the source PMC knows how to clone itself, but we must reuse the
-         * destination header */
-        memmove($1, clone, sizeof (PMC));
-
-        /* don't let the clone's destruction destroy the destination's data */
-        PObj_custom_destroy_CLEAR(clone);
-        PMC_data(clone)        = NULL;
-        PMC_metadata(clone)    = NULL;
+        $1 = VTABLE_clone(interp, $2);
 
         /* Restore metadata. */
         if (!PMC_IS_NULL(meta)) {
