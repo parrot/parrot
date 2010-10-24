@@ -348,7 +348,7 @@ static void gc_ms2_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(2);
 
 static int gen2flags(int gen);
-static int pobj2gen(ARGIN(PMC *pmc))
+static int pobj2gen(ARGIN(PObj *pmc))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -2039,7 +2039,7 @@ gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
 
 /*
 
-=item C<static int pobj2gen(PMC *pmc)>
+=item C<static int pobj2gen(PObj *pmc)>
 
 =item C<static int gen2flags(int gen)>
 
@@ -2050,7 +2050,7 @@ helper functions to check and use macro
 */
 
 static int
-pobj2gen(ARGIN(PMC *pmc))
+pobj2gen(ARGIN(PObj *pmc))
 {
     ASSERT_ARGS(pobj2gen)
 
