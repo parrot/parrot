@@ -736,9 +736,10 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     tmp = self->root_objects->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
+        PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
         LIST_REMOVE(self->root_objects, tmp);
-        LIST_APPEND(self->objects[PObj_to_generation(LLH2Obj_typed(tmp, PMC))], tmp);
+        LIST_APPEND(self->objects[PObj_to_generation(pmc)], tmp);
 
         tmp = next;
     }
@@ -1668,6 +1669,8 @@ gc_ms2_sweep_pool(PARROT_INTERP,
             LIST_REMOVE(list, tmp);
             PObj_on_free_list_SET(obj);
             Parrot_gc_pool_free(interp, pool, tmp);
+
+            memset(tmp, 0, sizeof (List_Item_Header));
         }
         else {
             /* Remove "constant" objects from pool. We don't handle them */
