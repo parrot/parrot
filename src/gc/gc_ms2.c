@@ -1448,10 +1448,6 @@ gc_ms2_mark_string_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
     if (PObj_is_live_or_free_TESTALL(str))
         return;
 
-    /* External/sysmem/whaever strings aren't managed by GC */
-    if (!PObj_is_movable_TESTALL(str))
-        return;
-
     /* mark it live */
     PObj_live_SET(str);
 }
@@ -1590,7 +1586,7 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
     PARROT_ASSERT(item->owner == self->strings[gen]);
 
     /* Objects from older generation will stay */
-    if (gen > self->current_generation)
+    if (gen >= self->current_generation)
         return;
 
     /* "Constant"... */
