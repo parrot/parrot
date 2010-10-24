@@ -1558,7 +1558,7 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (gen != self->current_generation) {
         LIST_REMOVE(self->objects[gen], item);
         LIST_APPEND(self->objects[self->current_generation], item);
-        gc_ms2_set_gen_flags(interp, pmc, self->current_generation);
+        gc_ms2_set_gen_flags(interp, (PObj *)pmc, self->current_generation);
     }
 
     PObj_live_SET(pmc);
@@ -1595,7 +1595,7 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
 
     LIST_REMOVE(self->strings[gen], item);
     LIST_APPEND(self->strings[self->current_generation], item);
-    gc_ms2_set_gen_flags(interp, s, self->current_generation);
+    gc_ms2_set_gen_flags(interp, (PObj *)s, self->current_generation);
 }
 
 /*
