@@ -19,10 +19,11 @@ Tests the LexPad PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(8)
+    plan(9)
 
     new_test()
     test_keyed()
+    test_keyed_empty()
     test_iter()
 .end
 
@@ -61,6 +62,15 @@ eh:
     pop_eh
     ok(1, "setting a non existent .lex throws")
 end:
+.end
+
+.sub test_keyed_empty
+    .local pmc info, pad, lex
+    info = new ['LexInfo']
+    pad = new ['LexPad'], info
+    lex = pad['nosuchlex']
+    $I0 = isnull lex
+    ok($I0, 'get an item from empty lexpad gives null')
 .end
 
 .sub 'test_iter'

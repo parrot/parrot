@@ -76,12 +76,12 @@
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void * mem_sys_allocate(size_t size);
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void * mem_sys_allocate_zeroed(size_t size);
 
 PARROT_EXPORT
@@ -89,12 +89,12 @@ void mem_sys_free(ARGFREE(void *from));
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void * mem_sys_realloc(ARGFREE(void *from), size_t size);
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void * mem_sys_realloc_zeroed(
     ARGFREE(void *from),
     size_t size,

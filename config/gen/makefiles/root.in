@@ -79,7 +79,7 @@ MKPATH           = @mkpath@
 RM_F             = @rm_f@
 RM_RF            = @rm_rf@
 TOUCH            = @touch@
-AR_CR            = @ar@ @ar_flags@
+AR_CR            = @ar@ @arflags@
 RANLIB           = @ranlib@
 YACC             = @yacc@
 LEX              = @lex@
@@ -409,7 +409,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
-	$(INC_DIR)/list.h \
 	include/pmc/pmc_callcontext.h
 
 # generated list of header files
@@ -423,6 +422,7 @@ CLASS_STR_FILES   = @TEMP_pmc_classes_str@
 ENCODING_O_FILES = \
     src/string/encoding/shared$(O) \
     src/string/encoding/tables$(O) \
+    src/string/encoding/null$(O) \
     src/string/encoding/ascii$(O) \
     src/string/encoding/latin1$(O) \
     src/string/encoding/binary$(O) \
@@ -617,7 +617,7 @@ all : \
     corevm \
     docs \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
-    $(EXTRANCITHUNKS_SO) \
+#IF(has_dynamic_linking): $(EXTRANCITHUNKS_SO) \
     $(DIS) \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
@@ -630,9 +630,11 @@ all : \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(NQP_LIB_PBCS) \
+#IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
+#IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
-    $(DYNOPLIBS_TARGETS) \
-    $(LIBNCI_TEST_SO)
+    src/install_config$(O) \
+
 
 # We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
@@ -641,7 +643,7 @@ corevm : \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
-    $(DYNPMC_TARGETS) \
+#IF(has_dynamic_linking): $(DYNPMC_TARGETS) \
     $(LIBRARY_DIR)/Test/More.pbc
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
@@ -923,7 +925,10 @@ src/install_config$(O) : $(PARROT_H_HEADERS) src/install_config.c
 
 src/null_config$(O) : $(PARROT_H_HEADERS) src/null_config.c
 
-src/list$(O): $(PARROT_H_HEADERS) include/pmc/pmc_callcontext.h src/list.c
+src/list$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/list.c \
+    $(INC_DIR)/list.h
 
 src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
     include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
@@ -1294,18 +1299,45 @@ $(INC_DIR)/extend_vtable.h src/extend_vtable.c src/vtable.h : src/vtable.tbl $(B
 src/key$(O) : $(PARROT_H_HEADERS) src/key.str src/key.c \
 	include/pmc/pmc_key.h
 
-src/gc/mark_sweep$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/mark_sweep.c
+src/gc/mark_sweep$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/mark_sweep.c \
+    src/gc/variable_size_pool.h
 
-src/gc/gc_ms$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_ms.c
+src/gc/gc_ms$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/gc_ms.c \
+    src/gc/variable_size_pool.h \
+    $(INC_DIR)/list.h
 
-src/gc/gc_inf$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_inf.c
+src/gc/gc_inf$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/gc_inf.c \
+    src/gc/variable_size_pool.h
 
-src/gc/gc_ms2$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/fixed_allocator.h src/gc/gc_ms2.c
+src/gc/gc_ms2$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/fixed_allocator.h \
+    src/gc/gc_ms2.c \
+    $(INC_DIR)/list.h \
+    src/gc/variable_size_pool.h \
+    $(INC_DIR)/sysmem.h
 
-src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
+src/gc/api$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/api.c \
+    src/gc/variable_size_pool.h
 
-src/gc/alloc_resources$(O) : $(PARROT_H_HEADERS) \
-	src/gc/gc_private.h src/gc/alloc_resources.c
+src/gc/alloc_resources$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/variable_size_pool.h \
+    src/gc/gc_private.h \
+    src/gc/alloc_resources.c
 
 src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
 	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
@@ -1313,20 +1345,31 @@ src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
 
-src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
-	src/gc/gc_private.h src/gc/string_gc.c
+src/gc/string_gc$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/string_gc.c \
+    src/gc/variable_size_pool.h
 
 src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
-src/platform$(O) : $(PARROT_H_HEADERS) src/platform.c
+src/platform$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/platform.c \
+    $(INC_DIR)/sysmem.h
 
 #IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
 #IF(platform_asm):
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
-src/runcore/trace$(O) : include/pmc/pmc_sub.h src/runcore/trace.c \
-	$(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_trace.h \
-	$(PARROT_H_HEADERS)
+src/runcore/trace$(O) : \
+    include/pmc/pmc_sub.h \
+    src/runcore/trace.c \
+    $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/runcore_trace.h \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
 	$(PARROT_H_HEADERS) src/debug.c \
@@ -1444,7 +1487,8 @@ src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	compilers/imcc/symreg.h \
 	compilers/imcc/unit.h \
 	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/runcore_api.h
+	$(INC_DIR)/runcore_api.h \
+        src/gc/variable_size_pool.h
 
 src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) include/pmc/pmc_continuation.h \
@@ -1472,9 +1516,14 @@ src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
-src/main$(O) : $(INC_DIR)/imcc.h $(PARROT_H_HEADERS) \
-	$(INC_DIR)/embed.h $(INC_DIR)/runcore_api.h src/gc/gc_private.h \
-	src/main.c
+src/main$(O) : \
+    $(INC_DIR)/imcc.h \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/runcore_api.h \
+    src/gc/gc_private.h \
+    src/main.c \
+    src/gc/variable_size_pool.h
 
 src/multidispatch$(O) : \
     src/multidispatch.c \
@@ -1562,7 +1611,11 @@ src/nci/extra_thunks$(O) : \
 src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 
 ## SUFFIX OVERRIDE
-src/gc/system$(O) : $(PARROT_H_HEADERS)  src/gc/gc_private.h src/gc/system.c
+src/gc/system$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/system.c\
+    src/gc/variable_size_pool.h
 	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/gc/system.c
 
 src/gc/gc_private.h : $(INC_DIR)/settings.h
@@ -1593,6 +1646,7 @@ src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
 src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
+src/string/encoding/null$(O) : $(PARROT_H_HEADERS)
 src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h

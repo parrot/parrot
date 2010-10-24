@@ -143,14 +143,6 @@ Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
-=item Behavior of Parrot::Pmc2c::PMC::add_method() [eligible in 2.10]
-
-Duplicated vtable functions currently generate only a warning; after deadline,
-they will cause a C<die> and failure to build Parrot or any HLL
-using this method.
-
-L<http://trac.parrot.org/parrot/ticket/1785>
-
 =back
 
 =head1 Opcodes

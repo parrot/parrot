@@ -72,6 +72,8 @@ Compile Options:
    --libs=(libs)        Use the given libraries
    --link=(linker)      Use the given linker
    --linkflags=(flags)  Use the given linker flags
+   --ar=(archiver)      Use the given librarian for static libraries
+   --arflags=(flags)    Use the given flags for static libraries
    --ld=(linker)        Use the given loader for shared libraries
    --ldflags=(flags)    Use the given loader flags for shared libraries
    --lex=(lexer)        Use the given lexical analyzer generator

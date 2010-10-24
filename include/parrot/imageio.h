@@ -20,7 +20,7 @@
 
 enum {
     enum_PackID_normal     = 0,
-    enum_PackID_seen       = 1,
+    enum_PackID_seen       = 1
 };
 
 #endif /* PARROT_IMAGEIO_H_GUARD */

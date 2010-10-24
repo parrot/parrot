@@ -40,11 +40,11 @@ If $3 is less than the negative of the length of $2, an exception is thrown.
 =cut
 
 inline op ord(out INT, in STR) :base_core {
-    $1 = string_ord(interp, $2, 0);
+    $1 = STRING_ord(interp, $2, 0);
 }
 
 inline op ord(out INT, in STR, in INT) :base_core {
-    $1 = string_ord(interp, $2, $3);
+    $1 = STRING_ord(interp, $2, $3);
 }
 
 
@@ -55,7 +55,7 @@ The character specified by codepoint integer $2 is returned in string $1.
 =cut
 
 inline op chr(out STR, in INT) :base_core {
-    STRING * const s = string_chr(interp, (UINTVAL)$2);
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)$2);
     $1 = s;
 }
 
@@ -252,11 +252,11 @@ New $1 string returned.
 
 inline op substr(out STR, in STR, in INT) :base_core {
     const INTVAL len = Parrot_str_byte_length(interp, $2);
-    $1 = Parrot_str_substr(interp, $2, $3, len);
+    $1 = STRING_substr(interp, $2, $3, len);
 }
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
-    $1 = Parrot_str_substr(interp, $2, $3, $4);
+    $1 = STRING_substr(interp, $2, $3, $4);
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
@@ -284,11 +284,11 @@ B<index> returns "-1".
 =cut
 
 inline op index(out INT, in STR, in STR) :base_core {
-    $1 = ($2 && $3) ? Parrot_str_find_index(interp, $2, $3, 0) : -1;
+    $1 = ($2 && $3) ? STRING_index(interp, $2, $3, 0) : -1;
 }
 
 inline op index(out INT, in STR, in STR, in INT) :base_core {
-    $1 = ($2 && $3) ? Parrot_str_find_index(interp, $2, $3, $4) : -1;
+    $1 = ($2 && $3) ? STRING_index(interp, $2, $3, $4) : -1;
 }
 
 

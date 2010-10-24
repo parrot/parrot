@@ -1181,7 +1181,7 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
             PackFile_Segment *seg = dir->segments[i];
 
             if (seg) {
-                if (Parrot_str_equal(interp, seg->name, name))
+                if (STRING_equal(interp, seg->name, name))
                     return seg;
 
                 if (sub_dir && seg->type == PF_DIR_SEG) {
@@ -1223,7 +1223,7 @@ PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
 
     for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment * const seg = dir->segments[i];
-        if (Parrot_str_equal(interp, seg->name, name)) {
+        if (STRING_equal(interp, seg->name, name)) {
             dir->num_segments--;
 
             if (i != dir->num_segments) {
@@ -2903,7 +2903,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
 
     /* find seg e.g. CODE_DB => CODE and attach it */
     str_len     = Parrot_str_length(interp, debug->base.name);
-    code_name   = Parrot_str_substr(interp, debug->base.name, 0, str_len - 3);
+    code_name   = STRING_substr(interp, debug->base.name, 0, str_len - 3);
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp, self->dir, code_name, 0);
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
@@ -3031,7 +3031,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         filename_pstr = Parrot_str_new(interp, filename, 0);
         if (ct->str.constants[prev_filename_n] &&
-                Parrot_str_equal(interp, filename_pstr,
+                STRING_equal(interp, filename_pstr,
                     ct->str.constants[prev_filename_n])) {
             return;
         }
@@ -3073,7 +3073,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
         /* Check if there is already a constant with this filename */
         for (i= 0; i < count; ++i) {
-            if (Parrot_str_equal(interp, namestr, ct->str.constants[i]))
+            if (STRING_equal(interp, namestr, ct->str.constants[i]))
                 break;
         }
         if (i < count) {
@@ -3777,7 +3777,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
 
     /* Need to associate this segment with the applicable code segment. */
     str_len     = Parrot_str_length(interp, self->base.name);
-    code_name   = Parrot_str_substr(interp, self->base.name, 0, str_len - 4);
+    code_name   = STRING_substr(interp, self->base.name, 0, str_len - 4);
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->base.dir, code_name, 0);
 
@@ -3931,7 +3931,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
     for (i = 0; i < self->num_keys; ++i) {
         STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-        if (Parrot_str_equal(interp, test_key, key_name)) {
+        if (STRING_equal(interp, test_key, key_name)) {
             key_id = i;
             break;
         }
@@ -4048,7 +4048,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     if (!STRING_IS_NULL(key)) {
         for (i = 0; i < self->num_keys; ++i) {
             STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-            if (Parrot_str_equal(interp, test_key, key)) {
+            if (STRING_equal(interp, test_key, key)) {
                 key_id = i;
                 break;
             }
@@ -4235,7 +4235,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     /* Get the base path of the located module */
     parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
-    found_path = Parrot_str_substr(interp, found_path, 0,
+    found_path = STRING_substr(interp, found_path, 0,
             Parrot_str_length(interp, found_path)-name_length);
 
     Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "include/")),
@@ -4249,7 +4249,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     /* Check if the file found was actually a bytecode file (.pbc extension) or
      * a source file (.pir or .pasm extension. */
 
-    if (Parrot_str_equal(interp, found_ext, pbc))
+    if (STRING_equal(interp, found_ext, pbc))
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;
@@ -4330,7 +4330,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     pbc = CONST_STRING(interp, "pbc");
 
-    if (Parrot_str_equal(interp, ext, pbc))
+    if (STRING_equal(interp, ext, pbc))
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;
@@ -4348,7 +4348,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     /* Check if the file found was actually a bytecode file (.pbc
      * extension) or a source file (.pir or .pasm extension). */
 
-    if (Parrot_str_equal(interp, found_ext, pbc))
+    if (STRING_equal(interp, found_ext, pbc))
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;

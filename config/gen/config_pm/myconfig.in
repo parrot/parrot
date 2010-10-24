@@ -9,12 +9,21 @@ Summary of my parrot @VERSION@ (r@revision@) configuration:
   Compiler:
     cc='@cc@', ccflags='@ccflags@',
   Linker and Libraries:
+    link='@link@', linkflags='@linkflags@',
     ld='@ld@', ldflags='@ldflags@',
     cc_ldflags='@cc_ldflags@',
     libs='@libs@'
   Dynamic Linking:
-    share_ext='@share_ext@', ld_share_flags='@ld_share_flags@',
-    load_ext='@load_ext@', ld_load_flags='@ld_load_flags@'
+    cc_shared='@cc_shared@',
+    link_dynamic='@link_dynamic@',
+    ld_share_flags='@ld_share_flags@',
+    ld_load_flags='@ld_load_flags@'
+  Extensions:
+    o='@o@', a='@a@', exe='@exe@',
+    share_ext='@share_ext@', load_ext='@load_ext@'
+  Misc Programs:
+    ar='@ar@', ranlib='@ranlib@',
+    make='@make@', make_set_make='@make_set_make@'
   Types:
     iv=@iv@, intvalsize=@intvalsize@, intsize=@intsize@, opcode_t=@opcode_t@, opcode_t_size=@opcode_t_size@,
     ptrsize=@ptrsize@,  byteorder=@byteorder@, 

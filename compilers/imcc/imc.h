@@ -59,7 +59,7 @@ typedef struct IMC_Unit IMC_Unit;
 enum {
     IMCC_FATAL_EXCEPTION     = 1,
     IMCC_FATALY_EXCEPTION    = 2,
-    IMCC_PARSEFAIL_EXCEPTION = 3,
+    IMCC_PARSEFAIL_EXCEPTION = 3
 };
 
 #define N_ELEMENTS(x) (sizeof (x)/sizeof ((x)[0]))

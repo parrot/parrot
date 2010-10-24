@@ -37,7 +37,7 @@ struct runcore_t {
 
 typedef enum Parrot_runcore_flags {
     RUNCORE_REENTRANT_FLAG    = 1 << 0,
-    RUNCORE_FUNC_TABLE_FLAG   = 1 << 1,
+    RUNCORE_FUNC_TABLE_FLAG   = 1 << 1
 } Parrot_runcore_flags;
 
 

@@ -22,7 +22,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(37)
+    plan(38)
 
     test_init()
     test_set_string()
@@ -65,6 +65,14 @@ Tests C<ByteBuffer> PMC..
     n = elements bb
     is(n, 42, "size of a new buffer with initial size is correct")
 
+    push_eh handler
+    bb = new ['ByteBuffer'], -1
+handler:
+    pop_eh
+    ok(1,"Creating a negative-sized ByteBuffer throws an exception")
+    goto done
+
+  done:
 .end
 
 .sub test_set_string
@@ -150,7 +158,7 @@ end:
     bb = new ['ByteBuffer']
 
     # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
-    #bb = utf16:unicode:"\x{D1}"
+    #bb = utf16:"\x{D1}"
     # Can't do that, or the program can't be compiled without ICU.
     # Fill the buffer with bytes instead.
 
@@ -173,7 +181,7 @@ doit:
     bb = new ['ByteBuffer']
     bb[0] = 0xC3
     bb[1] = 0x91
-    s = bb.'get_string_as'(utf8:unicode:"")
+    s = bb.'get_string_as'(utf8:"")
     n = length s
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s

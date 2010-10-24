@@ -274,7 +274,7 @@ Returns the Parrot string representation of the array.
 
     VTABLE STRING *get_string() {
         STRING *zero, *one;
-        STRING *str   = NULL;
+        STRING *str   = STRINGNULL;
         UINTVAL i;
         UINTVAL elems = SELF.elements();
 

@@ -511,8 +511,21 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 {
     ASSERT_ARGS(Parrot_new_string)
     Parrot_String retval;
+    const STR_VTABLE *encoding;
+
     PARROT_CALLIN_START(interp);
-    retval = string_make(interp, buffer, length, encoding_name, flags);
+
+    if (encoding_name) {
+        encoding = Parrot_find_encoding(interp, encoding_name);
+        if (!encoding)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Can't make '%s' encoding strings", encoding_name);
+    }
+    else
+        encoding = Parrot_default_encoding_ptr;
+
+    retval = Parrot_str_new_init(interp, buffer, length, encoding, flags);
+
     PARROT_CALLIN_END(interp);
     return retval;
 }
@@ -577,6 +590,49 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
     ASSERT_ARGS(Parrot_unregister_pmc)
     PARROT_CALLIN_START(interp);
     Parrot_pmc_gc_unregister(interp, pmc);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void Parrot_register_string(PARROT_INTERP, Parrot_String s)>
+
+Add a reference of the string to the interpreter's GC registry. This prevents
+strings only known to extension from getting destroyed during GC runs.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_register_string(PARROT_INTERP, Parrot_String s)
+{
+    ASSERT_ARGS(Parrot_register_string)
+    PARROT_CALLIN_START(interp);
+    Parrot_str_gc_register(interp, s);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void Parrot_unregister_string(PARROT_INTERP, Parrot_String s)>
+
+Remove a reference of the string from the interpreter's GC registry. If the
+reference count reaches zero, the string will be destroyed during the next GC
+run.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
+{
+    ASSERT_ARGS(Parrot_unregister_string)
+    PARROT_CALLIN_START(interp);
+    Parrot_str_gc_unregister(interp, s);
     PARROT_CALLIN_END(interp);
 }
 

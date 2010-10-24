@@ -74,7 +74,7 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
     else {
         Parrot_io_putps(interp, Parrot_io_STDERR(interp), msg);
-        if (string_ord(interp, msg, -1) != '\n')
+        if (STRING_ord(interp, msg, -1) != '\n')
             Parrot_io_eprintf(interp, "%c", '\n');
     }
     print_pbc_location(interp);

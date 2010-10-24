@@ -17,6 +17,9 @@
 #  define __STDC_VERSION__ 0
 #endif
 
+#include "imc.h"
+#include "parser.h"
+
 }
 
 %{
@@ -33,13 +36,6 @@
  * $Id$
  *
  */
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "imc.h"
-#include "parser.h"
 
 typedef struct parser_state_t parser_state_t;
 

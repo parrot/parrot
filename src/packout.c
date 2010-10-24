@@ -273,7 +273,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
 
     for (i = 0; i < ct->str.const_count; i++) {
         STRING *sc = ct->str.constants[i];
-        if (Parrot_str_equal(interp, s, sc)
+        if (STRING_equal(interp, s, sc)
         &&  s->encoding == sc->encoding) {
             return i;
         }

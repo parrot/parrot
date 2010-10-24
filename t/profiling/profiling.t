@@ -5,10 +5,10 @@
 
 INIT {
     pir::load_bytecode('ProfTest.pbc');
+    Q:PIR{ .include "test_more.pir" };
 }
 
-
-plan(12);
+plan(13);
 
 my $pir_code :=
 '.sub main
@@ -160,6 +160,43 @@ $matcher := ProfTest::Matcher.new(
 );
 
 ok( $matcher.matches($prof), "profile shows say on the correct line");
+
+my $uncaught_c_ex := '
+.sub main :main
+    .local string s
+    s = <<"CODE"
+    .sub main
+        $P0 = new ["FixedPMCArray"], -10 #throw a C-level exception
+    .end
+CODE
+
+    .local pmc f, comp
+    comp = compreg "PIR"
+
+    .local pmc eh
+    eh = new ["ExceptionHandler"]
+    set_addr eh, handler
+    push_eh eh
+
+    f = comp(s)
+    f()
+
+    pop_eh
+    goto done
+
+  handler:
+    pop_eh
+  done:
+.end';
+
+my $uncaught_c_ex_prof := ProfTest::PIRProfile.new($uncaught_c_ex);
+
+my $uncaught_c_ex_matcher := ProfTest::Matcher.new(
+    eor(),
+);
+
+ok( $uncaught_c_ex_matcher.matches($uncaught_c_ex_prof),
+      "pir with uncaught C exception in eval'd code shows END_OF_RUNLOOP");
 
 
 my $nqp_code :=

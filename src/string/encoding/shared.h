@@ -1,9 +1,9 @@
-/* fixed_8.h
+/* shared.h
  *  Copyright (C) 2004-2007, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     This is the header for the 8-bit fixed-width encoding
+ *     This is the header for general encoding functions
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -64,7 +64,9 @@ STRING * encoding_get_graphemes(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-size_t encoding_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
+size_t encoding_hash(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    size_t hashval)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -72,7 +74,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL encoding_index(PARROT_INTERP,
     ARGIN(const STRING *src),
     ARGIN(const STRING *search),
-    UINTVAL offs)
+    INTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -85,11 +87,17 @@ INTVAL encoding_is_cclass(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+void encoding_ord_error(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    INTVAL offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 INTVAL encoding_rindex(PARROT_INTERP,
     SHIM(const STRING *src),
     SHIM(const STRING *search_string),
-    NULLOK(UINTVAL offset))
+    NULLOK(INTVAL offset))
         __attribute__nonnull__(1);
 
 UINTVAL encoding_scan(PARROT_INTERP, ARGIN(const STRING *src))
@@ -99,8 +107,8 @@ UINTVAL encoding_scan(PARROT_INTERP, ARGIN(const STRING *src))
 PARROT_CANNOT_RETURN_NULL
 STRING * encoding_substr(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    INTVAL offset,
+    INTVAL length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -126,14 +134,14 @@ INTVAL fixed8_equal(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-size_t fixed8_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
+size_t fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL fixed8_index(PARROT_INTERP,
     ARGIN(const STRING *src),
-    ARGIN(const STRING *search_string),
-    UINTVAL offset)
+    ARGIN(const STRING *search),
+    INTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -181,7 +189,7 @@ void fixed8_iter_skip(SHIM_INTERP,
         FUNC_MODIFIES(*iter);
 
 PARROT_WARN_UNUSED_RESULT
-UINTVAL fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
+UINTVAL fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -189,7 +197,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL fixed8_rindex(PARROT_INTERP,
     ARGIN(const STRING *src),
     ARGIN(const STRING *search_string),
-    UINTVAL offset)
+    INTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -201,10 +209,10 @@ UINTVAL fixed8_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * fixed8_substr(PARROT_INTERP,
+STRING * fixed_substr(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    INTVAL offset,
+    INTVAL length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -277,6 +285,9 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_encoding_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_encoding_ord_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_encoding_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_encoding_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -297,11 +308,11 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_fixed8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
-    , PARROT_ASSERT_ARG(search_string))
+    , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_fixed8_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
@@ -330,7 +341,7 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_fixed8_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_fixed8_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_fixed_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_unicode_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

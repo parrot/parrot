@@ -48,7 +48,7 @@ return memory.
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void *
 mem_sys_allocate(size_t size)
 {
@@ -57,7 +57,7 @@ mem_sys_allocate(size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
@@ -75,7 +75,7 @@ otherwise.
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void *
 mem_sys_allocate_zeroed(size_t size)
 {
@@ -84,7 +84,7 @@ mem_sys_allocate_zeroed(size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
@@ -103,7 +103,7 @@ block.
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void *
 mem_sys_realloc(ARGFREE(void *from), size_t size)
 {
@@ -119,7 +119,7 @@ mem_sys_realloc(ARGFREE(void *from), size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
@@ -139,7 +139,7 @@ allocated and zeroed instead.
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void *
 mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 {
@@ -152,7 +152,7 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
 
     if (size > old_size)

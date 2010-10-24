@@ -338,7 +338,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
             STRING *sf;
 
             s->strlen = s->bufused = current + len;
-            sf        = Parrot_str_substr(interp, s, current, len);
+            sf        = STRING_substr(interp, s, current, len);
             got       = PIO_READ(interp, filehandle, &sf);
             s->strlen = s->bufused = current + got;
 

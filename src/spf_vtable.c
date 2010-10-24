@@ -452,7 +452,7 @@ getchr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGMOD(SPRINTF_OBJ *obj))
 
     ++obj->index;
     s = VTABLE_get_string(interp, tmp);
-    return Parrot_str_substr(interp, s, 0, 1);
+    return STRING_substr(interp, s, 0, 1);
 }
 
 /*

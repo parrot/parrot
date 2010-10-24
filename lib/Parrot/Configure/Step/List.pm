@@ -45,8 +45,10 @@ my @steps = qw(
     auto::memalign
     auto::signal
     auto::socklen_t
+    auto::stat
     auto::neg_0
     auto::env
+    auto::timespec
     auto::thread
     auto::gmp
     auto::readline
@@ -60,6 +62,7 @@ my @steps = qw(
     auto::ctags
     auto::revision
     auto::icu
+    auto::ipv6
     gen::config_h
     gen::core_pmcs
     gen::opengl

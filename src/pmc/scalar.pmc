@@ -753,7 +753,7 @@ C<*value>.
 */
 
     MULTI INTVAL cmp_string(PMC *value) {
-        return Parrot_str_compare(INTERP, SELF.get_string(),
+        return STRING_compare(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value));
     }
 
@@ -800,7 +800,7 @@ Returns whether the PMC has string equality with C<*value>.
 */
 
     MULTI INTVAL is_equal_string(PMC *value) {
-        return (0 != Parrot_str_equal(INTERP, VTABLE_get_string(INTERP, SELF),
+        return (0 != STRING_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }
 
@@ -831,7 +831,7 @@ C<offset>.
 */
 
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        return Parrot_str_substr(INTERP, VTABLE_get_string(INTERP, SELF),
+        return STRING_substr(INTERP, VTABLE_get_string(INTERP, SELF),
                 offset, length);
     }
 

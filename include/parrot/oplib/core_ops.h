@@ -12,7 +12,7 @@
  * .ops files). by ops2c.nqp.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 
@@ -21,7 +21,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_2_8_0(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_2_9_1(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);

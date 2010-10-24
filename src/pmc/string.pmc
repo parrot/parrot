@@ -243,7 +243,7 @@ they match.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return (INTVAL)(Parrot_str_equal(INTERP, str_val, v));
+        return (INTVAL)(STRING_equal(INTERP, str_val, v));
     }
 
     MULTI INTVAL is_equal(PMC *value) {
@@ -286,7 +286,7 @@ Compares the string with C<value>; returns FALSE if they match.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_equal(INTERP, str_val, v);
+        return STRING_equal(INTERP, str_val, v);
     }
 
 /*
@@ -304,7 +304,7 @@ is smaller.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_compare(INTERP, str_val, v);
+        return STRING_compare(INTERP, str_val, v);
     }
 
 /*
@@ -349,7 +349,7 @@ is smaller.
         STRING        *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_compare(INTERP, str_val, v);
+        return STRING_compare(INTERP, str_val, v);
     }
 
 /*
@@ -365,7 +365,7 @@ C<length>, and places it in C<dest>.
     VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
         STRING *str_val, *s2;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        s2 = Parrot_str_substr(INTERP, str_val, offset, length);
+        s2 = STRING_substr(INTERP, str_val, offset, length);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
 
@@ -382,7 +382,7 @@ C<length>, and returns it.
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, offset, length);
+        return STRING_substr(INTERP, str_val, offset, length);
     }
 
 /*
@@ -437,7 +437,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE STRING *get_string_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, pos, 1);
+        return STRING_substr(INTERP, str_val, pos, 1);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
@@ -447,7 +447,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return string_ord(INTERP, str_val, pos);
+        return STRING_ord(INTERP, str_val, pos);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
@@ -478,7 +478,7 @@ Replace the string at C<key> with the chr of C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
         STRING      *str_val;
-        STRING * const c = string_chr(INTERP, (UINTVAL) value);
+        STRING * const c = Parrot_str_chr(INTERP, (UINTVAL) value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
         str_val = Parrot_str_replace(INTERP, str_val, pos, 1, c);
         SET_ATTR_str_val(INTERP, SELF, str_val);
@@ -507,7 +507,7 @@ Replace every occurrence of C<orig> with C<_new>.
         STRING       * s       = VTABLE_get_string(INTERP, SELF);
         INTVAL         i       = 0;
 
-        while (-1 != (i = Parrot_str_find_index(INTERP, s, orig, i))) {
+        while (-1 != (i = STRING_index(INTERP, s, orig, i))) {
             s = Parrot_str_replace(INTERP, s, i, old_len, _new);
             i += new_len;
         }
@@ -710,6 +710,28 @@ Translate ascii string C<src> with entries from C<trans_table>.
 
         dest->hashval = 0; /* hash is invalid */
         RETURN(STRING dest);
+    }
+
+/*
+
+=item C<void reverse(STRING *src)>
+
+Either reverse this PMC's contents or set this PMC's value to the reverse of C<src>,
+if present.
+
+=cut
+
+*/
+
+    METHOD reverse(STRING *src :optional, INTVAL got_src :opt_flag) {
+        STRING *s;
+        if (got_src) {
+            SET_ATTR_str_val(INTERP, SELF, Parrot_str_reverse(INTERP, src));
+        }
+        else {
+            GET_ATTR_str_val(INTERP, SELF, s);
+            SET_ATTR_str_val(INTERP, SELF, Parrot_str_reverse(INTERP, s));
+        }
     }
 
 /*

@@ -318,7 +318,7 @@ Tests Parrot string registers and operations.
     .local int r
     null s
     eh = new ['ExceptionHandler']
-    eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
+    eh.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
     set_addr eh, handler
     push_eh eh
     r = 1
@@ -650,7 +650,7 @@ WHILE:
    ord $I0,$S0
    ok( 0, 'no exception: 2-param ord, empty string register' )
  handler:
-   .exception_is( 'Cannot get character of NULL string' )
+   .exception_is( 'Invalid operation on null string' )
 .end
 
 .sub exception_three_param_ord_empty_string
@@ -666,7 +666,7 @@ WHILE:
    ord $I0,$S0,0
    ok( 0, 'no exception: 3-param ord, empty string register' )
  handler:
-   .exception_is( 'Cannot get character of NULL string' )
+   .exception_is( 'Invalid operation on null string' )
 .end
 
 .sub two_param_ord_one_character_string
@@ -875,15 +875,15 @@ WHILE:
 
     # Ascii - Non-ascii, same content
     set $S0, "hello"
-    set $S1, unicode:"hello"
+    set $S1, utf8:"hello"
     index $I1, $S0, $S1
     is( $I1, "0", 'index, 3-arg form' )
     index $I1, $S1, $S0
     is( $I1, "0", 'index, 3-arg form' )
 
     # Non-ascii, source shorter than searched
-    set $S0, unicode:"-o"
-    set $S1, unicode:"@INC"
+    set $S0, utf8:"-o"
+    set $S1, utf8:"@INC"
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, 3-arg form' )
 .end
@@ -903,7 +903,7 @@ WHILE:
 
     # Ascii - Non-ascii, same content
     set $S0, "hello"
-    set $S1, unicode:"hello"
+    set $S1, utf8:"hello"
     index $I1, $S0, $S1, 0
     is( $I1, "0", 'index, 4-arg form' )
     index $I1, $S1, $S0, 0
@@ -922,8 +922,8 @@ WHILE:
 .end
 
 .sub index_trac_1482
-    $S0 = unicode:"bubuc"
-    $S1 = unicode:"buc"
+    $S0 = utf8:"bubuc"
+    $S1 = utf8:"buc"
 
     $I0 = index $S0, $S1, 0
     is ($I0, 2, 'index, 4-arg, partial-match causes failure: TT #1482')
@@ -957,10 +957,19 @@ WHILE:
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, null strings' )
 
+    .local pmc eh
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
+    set_addr eh, handler
+    push_eh eh
+    $I1 = 1
     null $S0
     null $S1
-    index $I1, $S0, $S1
-    is( $I1, "-1", 'index, null strings' )
+    index $I0, $S0, $S1
+    $I1 = 0
+  handler:
+    pop_eh
+    is( $I1, "1", "index with null string throws" )
 .end
 
 .sub index_embedded_nulls

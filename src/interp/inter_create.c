@@ -457,6 +457,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         if (interp->thread_data)
             mem_internal_free(interp->thread_data);
 
+        /* get rid of ops */
+        if (interp->op_hash)
+            parrot_hash_destroy(interp, interp->op_hash);
+
         /* free vtables */
         parrot_free_vtables(interp);
 
@@ -489,6 +493,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             mem_internal_free(interp);
         }
     }
+
+    interp->op_hash = NULL;
 }
 
 

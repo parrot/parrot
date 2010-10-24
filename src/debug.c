@@ -1990,17 +1990,17 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
             n = REG_STR(interp, *(int *)condition->value);
 
         if (((condition->type & PDB_cond_gt) &&
-                (Parrot_str_compare(interp, m, n) >  0)) ||
+                (STRING_compare(interp, m, n) >  0)) ||
             ((condition->type & PDB_cond_ge) &&
-                (Parrot_str_compare(interp, m, n) >= 0)) ||
+                (STRING_compare(interp, m, n) >= 0)) ||
             ((condition->type & PDB_cond_eq) &&
-                (Parrot_str_compare(interp, m, n) == 0)) ||
+                (STRING_compare(interp, m, n) == 0)) ||
             ((condition->type & PDB_cond_ne) &&
-                (Parrot_str_compare(interp, m, n) != 0)) ||
+                (STRING_compare(interp, m, n) != 0)) ||
             ((condition->type & PDB_cond_le) &&
-                (Parrot_str_compare(interp, m, n) <= 0)) ||
+                (STRING_compare(interp, m, n) <= 0)) ||
             ((condition->type & PDB_cond_lt) &&
-                (Parrot_str_compare(interp, m, n) <  0)))
+                (STRING_compare(interp, m, n) <  0)))
                     return 1;
 
         return 0;
@@ -2350,12 +2350,19 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
           case PARROT_ARG_SC:
             {
                 const STRING *s = interp->code->const_table->str.constants[op[j]];
+
+                if (s->encoding != Parrot_ascii_encoding_ptr) {
+                    strcpy(&dest[size], s->encoding->name);
+                    size += strlen(s->encoding->name);
+                    dest[size++] = ':';
+                }
+
                 dest[size++] = '"';
                 if (s->strlen) {
                     char * const unescaped =
                         Parrot_str_to_cstring(interp, s);
                     char * const escaped =
-                        PDB_escape(interp, unescaped, s->strlen);
+                        PDB_escape(interp, unescaped, s->bufused);
                     if (escaped) {
                         strcpy(&dest[size], escaped);
                         size += strlen(escaped);

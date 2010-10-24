@@ -68,8 +68,8 @@ Tests for String/Utils.pbc
     test_radix_digits('[41,42]XYZ', 'x', 0, 'AB', 7, '\x[41,42]')
     test_radix_digits('[41,42]'   , 'x', 1, 'A' , 2, '\x41')
     test_radix_digits('[41,42]'   , 'x', 4, 'B',  2, '\x42')
-    test_radix_digits('2000'      , 'x', 0, unicode:"\u2000", 4, '\x2000')
-    test_radix_digits('1680'      , 'x', 0, unicode:"\u1680", 4, '\x1680')
+    test_radix_digits('2000'      , 'x', 0, utf8:"\u2000", 4, '\x2000')
+    test_radix_digits('1680'      , 'x', 0, utf8:"\u1680", 4, '\x1680')
 .end
 
 

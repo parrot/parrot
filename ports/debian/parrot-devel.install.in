@@ -8,6 +8,7 @@ usr/bin/parrot_config
 usr/bin/parrot-nqp
 usr/lib/parrot/@VERSION@/tools/*
 usr/lib/parrot/@VERSION@/languages/pct/*
+usr/lib/parrot/@VERSION@/library/distutils.pbc
 usr/lib/parrot/@VERSION@/library/HLL.pbc
 usr/lib/parrot/@VERSION@/library/Regex.pbc
 usr/lib/parrot/@VERSION@/library/P6Regex.pbc
