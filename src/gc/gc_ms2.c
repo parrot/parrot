@@ -806,6 +806,14 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
             PObj_live_CLEAR(pmc);
+            pmc->flags &= ~PObj_GC_generation_2_FLAG;
+            tmp = tmp->next;
+        }
+
+        tmp = self->strings[1]->first;
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            PObj_live_CLEAR(pmc);
             tmp = tmp->next;
         }
     }
@@ -818,6 +826,14 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         tmp = 0 && old_object_tails[2]
               ? old_object_tails[2]
               : self->objects[2]->first;
+        while (tmp) {
+            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+            PObj_live_CLEAR(pmc);
+            pmc->flags &= ~PObj_GC_generation_2_FLAG;
+            tmp = tmp->next;
+        }
+
+        tmp = self->strings[2]->first;
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
             PObj_live_CLEAR(pmc);
