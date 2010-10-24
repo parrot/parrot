@@ -911,10 +911,12 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
         /* We are "marking" this generation */
         self->current_generation = i;
 
+        /* mark can append more objects to this list */
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
-            /* mark can append more objects to this list */
+            pmc->flags |= PObj_GC_generation_2_FLAG;
+
             if (PObj_custom_mark_TEST(pmc))
                 VTABLE_mark(interp, pmc);
 
@@ -993,7 +995,10 @@ gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (PObj_constant_TEST(pmc))
         return;
 
-    PARROT_ASSERT(pobj2gen(pmc) == self->current_generation
+    if (pmc->flags & PObj_GC_generation_2_FLAG)
+        return;
+
+    PARROT_ASSERT(pobj2gen(pmc) >= self->current_generation
                   || !"Got object from wrong generation");
 
     pmc->flags |= PObj_GC_generation_2_FLAG;
@@ -1586,11 +1591,13 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (pmc->flags & PObj_constant_FLAG)
         return;
 
-    if (gen != self->current_generation) {
-        LIST_REMOVE(self->objects[gen], item);
-        LIST_APPEND(self->objects[self->current_generation], item);
-        gc_ms2_set_gen_flags(interp, (PObj *)pmc, self->current_generation);
-    }
+    /* PMC was already processed */
+    if (pmc->flags & PObj_GC_generation_2_FLAG)
+        return;
+
+    LIST_REMOVE(self->objects[gen], item);
+    LIST_APPEND(self->objects[self->current_generation], item);
+    gc_ms2_set_gen_flags(interp, pmc, self->current_generation);
 
     PObj_live_SET(pmc);
 }
@@ -1652,7 +1659,7 @@ gc_ms2_sweep_pool(PARROT_INTERP,
         if (PObj_live_TEST(obj)) {
             /* Paint live objects white */
             PObj_live_CLEAR(obj);
-            obj->flags &= ~PObj_GC_wb_triggered_FLAG;
+            obj->flags &= ~(PObj_GC_wb_triggered_FLAG | PObj_GC_generation_2_FLAG);
         }
         else if (!PObj_constant_TEST(obj)) {
             callback(interp, obj);
