@@ -1201,6 +1201,8 @@ Used to unarchive the hash.
 
     VTABLE void thaw(PMC *info) {
         SELF.set_pointer((void *)Parrot_hash_thaw(INTERP, info));
+        /* Thawed Hash was created from pmc_new_noinit */
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 }
 
