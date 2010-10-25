@@ -1077,6 +1077,8 @@ static void
 gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
     UINTVAL flags)
 {
+    ASSERT_ARGS(gc_ms2_mark_live_objects)
+
     List_Item_Header *tmp;
 
     /* Allocate list for gray objects */
