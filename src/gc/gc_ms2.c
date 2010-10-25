@@ -681,7 +681,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     else
         gen = self->current_generation = 0;
 
+#ifdef DETAIL_MEMORY_DEBUG
     gc_ms2_print_stats(interp, "Before", gen);
+#endif
 
     gc_ms2_check_sanity(interp);
 
@@ -800,9 +802,15 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_check_sanity(interp);
 
+#ifdef DETAIL_MEMORY_DEBUG
     gc_ms2_print_stats(interp, "Bringing", gen);
+#endif
+
     gc_ms2_bring_them_together(interp, old_object_tails);
+
+#ifdef DETAIL_MEMORY_DEBUG
     gc_ms2_print_stats(interp, "Here", gen);
+#endif
 
 
     /* Now. Sweep all dead objects */
@@ -871,7 +879,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_ms2_ensure_flags(interp);
 
+#ifdef DETAIL_MEMORY_DEBUG
     gc_ms2_print_stats(interp, "After", gen);
+#endif
 }
 
 /*
@@ -942,7 +952,7 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
     gc_ms2_check_sanity(interp);
 
-#if 1
+#ifndef NDEBUG
     // DEBUG ONLY. Simple recursive check
     interp->gc_sys->mark_pmc_header = gc_ms2_pmc_validate;
     interp->gc_sys->mark_str_header = gc_ms2_string_validate;
@@ -2143,7 +2153,7 @@ static void
 gc_ms2_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_check_sanity)
-
+#ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
     int gen;
@@ -2158,6 +2168,7 @@ gc_ms2_check_sanity(PARROT_INTERP)
             tmp = tmp->next;
         }
     }
+#endif
 }
 
 /*
@@ -2175,7 +2186,6 @@ static void
 gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
 {
     ASSERT_ARGS(gc_ms2_print_stats)
-#ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     fprintf(stderr, "%s\ngen: %d\n0: %d %d\n1: %d %d\n2: %d %d\n",
@@ -2197,7 +2207,6 @@ gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
 
     fprintf(stderr, "\n");
 
-#endif
 }
 
 static void
@@ -2215,6 +2224,7 @@ gc_ms2_ensure_flags_in_list(PARROT_INTERP, ARGIN(Linked_List* list))
 static void
 gc_ms2_ensure_flags(PARROT_INTERP)
 {
+#ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     gc_ms2_ensure_flags_in_list(interp, self->objects[0]);
     gc_ms2_ensure_flags_in_list(interp, self->objects[1]);
@@ -2222,6 +2232,7 @@ gc_ms2_ensure_flags(PARROT_INTERP)
     gc_ms2_ensure_flags_in_list(interp, self->strings[0]);
     gc_ms2_ensure_flags_in_list(interp, self->strings[1]);
     gc_ms2_ensure_flags_in_list(interp, self->strings[2]);
+#endif
 }
 
 /*
