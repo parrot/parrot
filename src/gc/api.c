@@ -118,8 +118,10 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
     ASSERT_ARGS(Parrot_gc_mark_PObj_alive)
 
     /* if object is live or on free list return */
-    if (PObj_is_live_or_free_TESTALL(obj))
-        return;
+    // FIXME Disable this logic. We use MARK for moving objects
+    // between generations. And they are definitely alive.
+    //if (PObj_is_live_or_free_TESTALL(obj))
+    //    return;
 
     if (PObj_is_PMC_TEST(obj)) {
         interp->gc_sys->mark_pmc_header(interp, (PMC*) obj);
