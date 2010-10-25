@@ -674,6 +674,10 @@ gc_ms2_finalize(PARROT_INTERP)
         Parrot_gc_pool_destroy(interp, self->pmc_allocator);
         Parrot_gc_pool_destroy(interp, self->string_allocator);
         Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
+
+        /* now free this GC system */
+        mem_sys_free(self);
+        interp->gc_sys->gc_private = NULL;
     }
 }
 
