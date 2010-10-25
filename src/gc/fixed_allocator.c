@@ -50,6 +50,13 @@ static void pool_free(ARGMOD(Pool_Allocator *pool), ARGFREE(void *data))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pool);
 
+static int pool_is_maybe_owned(
+    ARGMOD(Pool_Allocator *pool),
+    ARGIN(void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
 static int pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -67,6 +74,9 @@ static int pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
        PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_pool_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_pool_is_maybe_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_pool_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
@@ -231,7 +241,12 @@ Frees a fixed-size data item back to the Pool for later reallocation
 =item C<int Parrot_gc_pool_is_owned(PARROT_INTERP, Pool_Allocator *pool, void
 *ptr)>
 
-check for pool validity
+check that pointer is owned by pool.
+
+=item C<int Parrot_gc_pool_is_maybe_owned(PARROT_INTERP, Pool_Allocator *pool,
+void *ptr)>
+
+check that pointer is probably owned by pool.
 
 =item C<size_t Parrot_gc_pool_allocated_size(PARROT_INTERP, Pool_Allocator
 *pool)>
@@ -313,6 +328,15 @@ Parrot_gc_pool_is_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *
 }
 
 PARROT_EXPORT
+int
+Parrot_gc_pool_is_maybe_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *ptr))
+{
+    ASSERT_ARGS(Parrot_gc_pool_is_owned)
+    return pool_is_maybe_owned(pool, ptr);
+}
+
+
+PARROT_EXPORT
 size_t
 Parrot_gc_pool_allocated_size(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
 {
@@ -343,6 +367,8 @@ Parrot_gc_pool_allocated_size(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
 =item C<static void pool_free(Pool_Allocator *pool, void *data)>
 
 =item C<static int pool_is_owned(Pool_Allocator *pool, void *ptr)>
+
+=item C<static int pool_is_maybe_owned(Pool_Allocator *pool, void *ptr)>
 
 Static implementation of public methods.
 
@@ -415,6 +441,15 @@ pool_free(ARGMOD(Pool_Allocator *pool), ARGFREE(void *data))
     ++pool->num_free_objects;
 }
 
+static int
+pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
+{
+    ASSERT_ARGS(pool_is_owned)
+    Pool_Allocator_Arena *arena = pool->top_arena;
+    size_t                a_size;
+
+    return (ptr >= pool->lo_arena_ptr && ptr < pool->hi_arena_ptr);
+}
 
 static int
 pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
