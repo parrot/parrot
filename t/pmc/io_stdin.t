@@ -46,7 +46,7 @@ sub pir_stdin_output_is {
     # Slurp and compare the output.
     my $result = do {
         local $/;
-        open(my $in, "./parrot '$code_file' < '$input_file' |")
+        open(my $in, '-|', "./parrot '$code_file' < '$input_file'")
             or die "bug";
         <$in>;
     };
