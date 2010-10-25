@@ -493,8 +493,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             mem_internal_free(interp);
         }
     }
-
-    interp->op_hash = NULL;
 }
 
 
