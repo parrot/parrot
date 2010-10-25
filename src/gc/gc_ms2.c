@@ -2209,9 +2209,22 @@ gc_ms2_print_stats(PARROT_INTERP, const char* header, int gen)
 
 }
 
+/*
+
+=item C<static void gc_ms2_ensure_flags_in_list(PARROT_INTERP, Linked_List*
+list)>
+
+Make sure the flags are in the list
+
+=cut
+
+*/
+
 static void
 gc_ms2_ensure_flags_in_list(PARROT_INTERP, ARGIN(Linked_List* list))
 {
+    ASSERT_ARGS(gc_ms2_ensure_flags_in_list)
+
     List_Item_Header *tmp = list->first;
     while (tmp) {
         PObj *obj = LLH2Obj_typed(tmp, PObj);
@@ -2221,9 +2234,20 @@ gc_ms2_ensure_flags_in_list(PARROT_INTERP, ARGIN(Linked_List* list))
     }
 }
 
+/*
+
+=item C<static void gc_ms2_ensure_flags(PARROT_INTERP)>
+
+debug function to check for flags
+
+=cut
+
+*/
+
 static void
 gc_ms2_ensure_flags(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_ms2_ensure_flags)
 #ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     gc_ms2_ensure_flags_in_list(interp, self->objects[0]);
