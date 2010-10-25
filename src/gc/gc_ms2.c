@@ -21,6 +21,13 @@ src/gc/gc_ms2.c - Non-recursive M&S
 
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
+/* Maybe M&S. Depends on total allocated memory, memory allocated since last
+alloc, and phase of the Moon. */
+#define MAYBE_MARK_AND_SWEEP(interp, self) { \
+    if ((interp)->gc_sys->stats.mem_used_last_collect > (self)->gc_threshold) \
+        gc_ms2_mark_and_sweep((interp), 0); \
+    }
+
 /* Private information */
 typedef struct MarkSweep_GC {
     /* Allocator for PMC headers */
@@ -196,9 +203,6 @@ static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 static void gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
         __attribute__nonnull__(1);
 
-static void gc_ms2_maybe_mark_and_sweep(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP,
     ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
@@ -334,8 +338,6 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms2_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms2_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -683,9 +685,10 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   *pool = self->pmc_allocator;
     List_Item_Header *ptr;
 
-    gc_ms2_maybe_mark_and_sweep(interp);
+    MAYBE_MARK_AND_SWEEP(interp, self);
 
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
@@ -693,8 +696,7 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
-    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp,
-            self->pmc_allocator);
+    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
     LIST_APPEND(self->objects, ptr);
 
     return LLH2Obj_typed(ptr, PMC);
@@ -814,18 +816,18 @@ gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_ms2_allocate_string_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   *pool = self->string_allocator;
     List_Item_Header *ptr;
     STRING           *ret;
 
-    gc_ms2_maybe_mark_and_sweep(interp);
+    MAYBE_MARK_AND_SWEEP(interp, self);
 
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
     interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
-    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp,
-            self->string_allocator);
+    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
     LIST_APPEND(self->strings, ptr);
 
     ret = LLH2Obj_typed(ptr, STRING);
@@ -1443,31 +1445,6 @@ gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_ms2_pmc_needs_early_collection)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->num_early_gc_PMCs;
-}
-
-
-/*
-
-=item C<static void gc_ms2_maybe_mark_and_sweep(PARROT_INTERP)>
-
-Maybe M&S. Depends on total allocated memory, memory allocated since last
-alloc, and phase of the Moon.
-
-=cut
-
-*/
-
-static void
-gc_ms2_maybe_mark_and_sweep(PARROT_INTERP)
-{
-    ASSERT_ARGS(gc_ms2_maybe_mark_and_sweep)
-
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-
-    /* Collect every ~n bytes */
-    if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold) {
-        gc_ms2_mark_and_sweep(interp, 0);
-    }
 }
 
 
