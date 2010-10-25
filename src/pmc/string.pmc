@@ -653,26 +653,6 @@ Used to unarchive the string.
 
 =over 4
 
-=item C<PMC *lower()>
-
-Downcase this string
-
-=cut
-
-*/
-
-    METHOD lower() {
-        STRING *str_val;
-        STRING *s;
-
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        s = Parrot_str_downcase(INTERP, str_val);
-
-        RETURN(STRING *s);
-    }
-
-/*
-
 =item C<void trans(STRING *src, PMC *trams_table)>
 
 Translate ascii string C<src> with entries from C<trans_table>.

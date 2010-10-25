@@ -114,13 +114,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method lower on String [eligible in 2.7]
-
-Use the downcase opcode or subclass with a method name consistent with your
-HLL.
-
-L<http://trac.parrot.org/parrot/ticket/1606>
-
 =item Method unescape on String [experimental]
 
 This is a helper method for testing of Parrot_str_unescape_string.
