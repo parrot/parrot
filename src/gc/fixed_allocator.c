@@ -123,6 +123,9 @@ Parrot_gc_fixed_allocator_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Fixed_Allocator
             Parrot_gc_pool_destroy(interp, allocator->pools[i]);
         }
     }
+
+    mem_sys_free(allocator->pools);
+    mem_sys_free(allocator);
 }
 
 PARROT_EXPORT
