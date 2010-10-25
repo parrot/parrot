@@ -1019,7 +1019,7 @@ gc_ms2_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (pmc->flags & PObj_GC_generation_2_FLAG)
         return;
 
-    PARROT_ASSERT(pobj2gen(pmc) >= self->current_generation
+    PARROT_ASSERT(pobj2gen((PObj *)pmc) >= self->current_generation
                   || !"Got object from wrong generation");
 
     pmc->flags |= PObj_GC_generation_2_FLAG;
@@ -1619,7 +1619,7 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
 
     LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->objects[self->current_generation], item);
-    gc_ms2_set_gen_flags(interp, pmc, self->current_generation);
+    gc_ms2_set_gen_flags(interp, (PObj *)pmc, self->current_generation);
 
     PObj_live_SET(pmc);
 }
@@ -2163,7 +2163,7 @@ gc_ms2_check_sanity(PARROT_INTERP)
         while (tmp) {
             PMC * pmc = LLH2Obj_typed(tmp, PMC);
 
-            PARROT_ASSERT(pobj2gen(pmc) == gen);
+            PARROT_ASSERT(pobj2gen((PObj *)pmc) == gen);
 
             tmp = tmp->next;
         }
