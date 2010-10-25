@@ -34,7 +34,7 @@ sub pir_stdin_output_is {
         my $string = shift;
 
         my (undef, $file) = create_tempfile(UNLINK => 1);
-        open(my $out, ">$file") or die "bug";
+        open(my $out, '>', "$file") or die "bug";
         print $out $string;
         return $file;
     };
@@ -150,3 +150,10 @@ three
 "
 got len 0:  ""
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
