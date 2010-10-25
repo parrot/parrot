@@ -30,13 +30,13 @@ sub pir_stdin_output_is {
     my ($input_string, $code, $expected_output, $test_name) = @_;
 
     my $stuff = sub {
-	# Put the string on a file.
-	my $string = shift;
+        # Put the string on a file.
+        my $string = shift;
 
-	my (undef, $file) = create_tempfile(UNLINK => 1);
-	open(my $out, ">$file") or die "bug";
-	print $out $string;
-	return $file;
+        my (undef, $file) = create_tempfile(UNLINK => 1);
+        open(my $out, ">$file") or die "bug";
+        print $out $string;
+        return $file;
     };
 
     # Write the input and code strings.
@@ -45,10 +45,10 @@ sub pir_stdin_output_is {
 
     # Slurp and compare the output.
     my $result = do {
-	local $/;
-	open(my $in, "./parrot '$code_file' < '$input_file' |")
-	    or die "bug";
-	<$in>;
+        local $/;
+        open(my $in, "./parrot '$code_file' < '$input_file' |")
+            or die "bug";
+        <$in>;
     };
     Test::More::is($result, $expected_output, $test_name);
 }
@@ -57,25 +57,25 @@ pir_stdin_output_is(<<'INPUT', <<'CODE', <<'OUTPUT', 'simple stdin use');
 foo
 INPUT
 .sub test :main
-	.local pmc stdin
-	stdin = getstdin
-	read_str(stdin, 1)
-	read_str(stdin, 2)
-	read_str(stdin, 5)
-	read_str(stdin, 5)
+    .local pmc stdin
+    stdin = getstdin
+    read_str(stdin, 1)
+    read_str(stdin, 2)
+    read_str(stdin, 5)
+    read_str(stdin, 5)
 .end
 .sub read_str
-	.param pmc stream
-	.param int n_chars
-	.local string input_string
-	.local int len
-	input_string = stream.'read'(n_chars)
-	len = length input_string
-	print "got len "
-	print len
-	print ':  "'
-	print input_string
-	print "\"\n"
+    .param pmc stream
+    .param int n_chars
+    .local string input_string
+    .local int len
+    input_string = stream.'read'(n_chars)
+    len = length input_string
+    print "got len "
+    print len
+    print ':  "'
+    print input_string
+    print "\"\n"
 .end
 CODE
 got len 1:  "f"
@@ -91,24 +91,24 @@ two
 three
 INPUT
 .sub test :main
-	.local pmc stdin
-	stdin = getstdin
-	read_str(stdin)
-	read_str(stdin)
-	read_str(stdin)
-	read_str(stdin)
+    .local pmc stdin
+    stdin = getstdin
+    read_str(stdin)
+    read_str(stdin)
+    read_str(stdin)
+    read_str(stdin)
 .end
 .sub read_str
-	.param pmc stream
-	.local string input_string
-	.local int len
-	input_string = stream.'readline'()
-	len = length input_string
-	print "got len "
-	print len
-	print ':  "'
-	print input_string
-	print "\"\n"
+    .param pmc stream
+    .local string input_string
+    .local int len
+    input_string = stream.'readline'()
+    len = length input_string
+    print "got len "
+    print len
+    print ':  "'
+    print input_string
+    print "\"\n"
 .end
 CODE
 got len 4:  "one
@@ -126,22 +126,22 @@ two
 three
 INPUT
 .sub test :main
-	.local pmc stdin
-	stdin = getstdin
-	read_str(stdin)
-	read_str(stdin)
+    .local pmc stdin
+    stdin = getstdin
+    read_str(stdin)
+    read_str(stdin)
 .end
 .sub read_str
-	.param pmc stream
-	.local string input_string
-	.local int len
-	input_string = stream.'readall'()
-	len = length input_string
-	print "got len "
-	print len
-	print ':  "'
-	print input_string
-	print "\"\n"
+    .param pmc stream
+    .local string input_string
+    .local int len
+    input_string = stream.'readall'()
+    len = length input_string
+    print "got len "
+    print len
+    print ':  "'
+    print input_string
+    print "\"\n"
 .end
 CODE
 got len 14:  "one
