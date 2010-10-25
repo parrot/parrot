@@ -138,6 +138,13 @@ static size_t gc_ms2_count_used_string_memory(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_ms2_destroy_pmc_pool(PARROT_INTERP,
+    ARGIN(Pool_Allocator *pool),
+    ARGIN(Linked_List *list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void gc_ms2_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -195,6 +202,12 @@ static void gc_ms2_iterate_live_strings(PARROT_INTERP,
 
 static void gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
+
+static void gc_ms2_mark_live_objects(PARROT_INTERP,
+    ARGIN(MarkSweep_GC *self),
+    UINTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
@@ -300,6 +313,10 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_gc_ms2_destroy_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_free_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -334,6 +351,9 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_mark_live_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_gc_ms2_mark_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -1040,41 +1060,42 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
 }
 
 
+/*
+
+=item C<static void gc_ms2_mark_live_objects(PARROT_INTERP, MarkSweep_GC *self,
+UINTVAL flags)>
+
+Marks all live objects in the system.  If this occurs during global
+destruction, makes sure to keep around the two PMCs for which order of
+destruction matters.
+
+=cut
+
+*/
+
 static void
-gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
+    UINTVAL flags)
 {
-    ASSERT_ARGS(gc_ms2_mark_and_sweep)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
-    Linked_List      *list;
-    size_t            counter;
-
-    /* GC is blocked */
-    if (self->gc_mark_block_level)
-        return;
-
-    if (flags & GC_finish_FLAG) {
-        /* Ignore it. Will cleanup in gc_ms2_finalize */
-        return;
-    }
-
-    /* Ignore calls from String GC. We know better when to trigger GC */
-    if (flags & GC_strings_cb_FLAG) {
-        return;
-    }
-
-    ++self->gc_mark_block_level;
 
     /* Allocate list for gray objects */
     self->new_objects = Parrot_list_new(interp);
 
-    /* Trace "roots" into new_objects */
-    gc_ms2_mark_pmc_header(interp, PMCNULL);
+    /* destroy root set and constants, but watch ordered destruction */
+    if (flags & GC_finish_FLAG) {
+        PObj_live_SET(interp->gc_registry);
+        PObj_live_SET(interp->scheduler);
+    }
+    else {
+        /* Trace "roots" into new_objects */
+        gc_ms2_mark_pmc_header(interp, PMCNULL);
 
-    Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
-    if (interp->pdb && interp->pdb->debugger) {
-        Parrot_gc_trace_root(interp->pdb->debugger, NULL,
-            (Parrot_gc_trace_type)0);
+        Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
+
+        if (interp->pdb && interp->pdb->debugger)
+            Parrot_gc_trace_root(interp->pdb->debugger, NULL,
+                (Parrot_gc_trace_type)0);
     }
 
     /* new_objects are "gray" until fully marked */
@@ -1096,6 +1117,30 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
         tmp = tmp->next;
     }
+}
+
+static void
+gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+{
+    ASSERT_ARGS(gc_ms2_mark_and_sweep)
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Linked_List      *list;
+    size_t            counter;
+
+    /* GC is blocked */
+    if (self->gc_mark_block_level)
+        return;
+
+    /* Ignore calls from String GC. We know better when to trigger GC */
+    if (flags & GC_strings_cb_FLAG)
+        return;
+
+    /* avoid global destruction for child interps */
+    if (flags & GC_finish_FLAG && interp->parent_interpreter)
+        return;
+
+    ++self->gc_mark_block_level;
+    gc_ms2_mark_live_objects(interp, self, flags);
 
     /* At this point of time new_objects contains only live PMCs */
     /* objects contains "dead" or "constant" PMCs */
@@ -1104,6 +1149,12 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_ms2_sweep_pmc_pool(interp, self->pmc_allocator, self->new_objects);
     gc_ms2_sweep_pmc_pool(interp, self->pmc_allocator, self->objects);
     gc_ms2_sweep_string_pool(interp, self->string_allocator, self->strings);
+
+    /* destroy the rest */
+    if (flags & GC_finish_FLAG) {
+        gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->objects);
+        gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->new_objects);
+    }
 
     /* Replace objects with new_objects. Ignoring "constant" one */
     list          = self->objects;
@@ -1114,8 +1165,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     self->num_early_gc_PMCs                                = 0;
     interp->gc_sys->stats.mem_used_last_collect            = 0;
     interp->gc_sys->stats.header_allocs_since_last_collect = 0;
-    self->gc_mark_block_level--;
     interp->gc_sys->stats.gc_mark_runs++;
+    self->gc_mark_block_level--;
 
     gc_ms2_compact_memory_pool(interp);
 }
@@ -1123,8 +1174,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<static void gc_ms2_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
-Linked_List *list, sweep_cb callback)>
+=item C<static void gc_ms2_sweep_pmc_pool(PARROT_INTERP, Pool_Allocator *pool,
+Linked_List *list)>
 
 Helper function to sweep pool.
 
@@ -1160,6 +1211,52 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
         tmp = next;
     }
 }
+
+
+/*
+
+=item C<static void gc_ms2_destroy_pmc_pool(PARROT_INTERP, Pool_Allocator *pool,
+Linked_List *list)>
+
+Helper function to perform final destruction of root set PMCs.
+
+=cut
+
+*/
+
+static void
+gc_ms2_destroy_pmc_pool(PARROT_INTERP,
+        ARGIN(Pool_Allocator *pool),
+        ARGIN(Linked_List *list))
+{
+    ASSERT_ARGS(gc_ms2_sweep_pool)
+    List_Item_Header *tmp   = list->first;
+
+    while (tmp) {
+        PMC              *pmc  = LLH2Obj_typed(tmp, PMC);
+        List_Item_Header *next = tmp->next;
+
+        LIST_REMOVE(list, tmp);
+
+        Parrot_pmc_destroy(interp, pmc);
+        PObj_on_free_list_SET(pmc);
+
+        Parrot_gc_pool_free(interp, pool, tmp);
+
+        tmp = next;
+    }
+}
+
+/*
+
+=item C<static void gc_ms2_sweep_string_pool(PARROT_INTERP, Pool_Allocator
+*pool, Linked_List *list)>
+
+Helper function to sweep STRING pool for live STRINGs.
+
+=cut
+
+*/
 
 static void
 gc_ms2_sweep_string_pool(PARROT_INTERP,

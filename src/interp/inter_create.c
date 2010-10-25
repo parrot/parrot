@@ -386,8 +386,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
-
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroying, we get a memory leak, like for
@@ -428,6 +426,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
     }
 
+    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
+
     /* MMD cache */
     Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
 
@@ -439,6 +439,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* packfile */
     if (interp->initial_pf)
         PackFile_destroy(interp, interp->initial_pf);
+
     /* cache structure */
     destroy_object_cache(interp);
 
@@ -464,7 +465,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         /* free vtables */
         parrot_free_vtables(interp);
 
-        /* Finalyze GC */
+        /* Finalize GC */
         Parrot_gc_finalize(interp);
 
         MUTEX_DESTROY(interpreter_array_mutex);
