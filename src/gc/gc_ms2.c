@@ -234,18 +234,23 @@ static void gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms2_sweep_pool(PARROT_INTERP,
+static void gc_ms2_sweep_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list),
-    ARGIN(sweep_cb callback))
+    ARGIN(Linked_List *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 static void gc_ms2_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static void gc_ms2_sweep_string_pool(PARROT_INTERP,
+    ARGIN(Pool_Allocator *pool),
+    ARGIN(Linked_List *list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void gc_ms2_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -351,14 +356,17 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms2_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
-#define ASSERT_ARGS_gc_ms2_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_gc_ms2_sweep_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(list) \
-    , PARROT_ASSERT_ARG(callback))
+    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_sweep_string_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
+#define ASSERT_ARGS_gc_ms2_sweep_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1087,12 +1095,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* objects contains "dead" or "constant" PMCs */
     /* sweep of new_objects will repaint them white */
     /* sweep of objects will destroy dead objects leaving only "constant" */
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->new_objects,
-                            gc_ms2_sweep_pmc_cb);
-    gc_ms2_sweep_pool(interp, self->pmc_allocator, self->objects,
-                            gc_ms2_sweep_pmc_cb);
-    gc_ms2_sweep_pool(interp, self->string_allocator, self->strings,
-                            gc_ms2_sweep_string_cb);
+    gc_ms2_sweep_pmc_pool(interp, self->pmc_allocator, self->new_objects);
+    gc_ms2_sweep_pmc_pool(interp, self->pmc_allocator, self->objects);
+    gc_ms2_sweep_string_pool(interp, self->string_allocator, self->strings);
 
     /* Replace objects with new_objects. Ignoring "constant" one */
     list          = self->objects;
@@ -1122,10 +1127,9 @@ Helper function to sweep pool.
 */
 
 static void
-gc_ms2_sweep_pool(PARROT_INTERP,
+gc_ms2_sweep_pmc_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
-        ARGIN(Linked_List *list),
-        ARGIN(sweep_cb callback))
+        ARGIN(Linked_List *list))
 {
     ASSERT_ARGS(gc_ms2_sweep_pool)
     List_Item_Header *tmp = list->first;
@@ -1141,7 +1145,38 @@ gc_ms2_sweep_pool(PARROT_INTERP,
         else if (!PObj_constant_TEST(obj)) {
             LIST_REMOVE(list, tmp);
 
-            callback(interp, obj);
+            Parrot_pmc_destroy(interp, (PMC *)obj);
+            PObj_on_free_list_SET(obj);
+
+            Parrot_gc_pool_free(interp, pool, tmp);
+        }
+
+        tmp = next;
+    }
+}
+
+static void
+gc_ms2_sweep_string_pool(PARROT_INTERP,
+        ARGIN(Pool_Allocator *pool),
+        ARGIN(Linked_List *list))
+{
+    ASSERT_ARGS(gc_ms2_sweep_pool)
+    List_Item_Header *tmp = list->first;
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    while (tmp) {
+        List_Item_Header *next = tmp->next;
+        PObj             *obj  = LLH2Obj_typed(tmp, PObj);
+
+        /* Paint live objects white */
+        if (PObj_live_TEST(obj))
+            PObj_live_CLEAR(obj);
+
+        else if (!PObj_constant_TEST(obj)) {
+            Buffer *str  = (Buffer *)obj;
+            LIST_REMOVE(list, tmp);
+            if (Buffer_bufstart(str) && !PObj_external_TEST(str))
+                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, str);
 
             PObj_on_free_list_SET(obj);
 
