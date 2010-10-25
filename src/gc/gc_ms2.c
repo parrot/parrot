@@ -1723,11 +1723,14 @@ gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
     if (!obj || !item)
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, pool, item))
+    if (!Parrot_gc_pool_is_maybe_owned(interp, pool, item))
         return 0;
 
     /* black or white objects marked already. */
     if (PObj_is_live_or_free_TESTALL(obj))
+        return 0;
+
+    if (!Parrot_gc_pool_is_owned(interp, pool, item))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
