@@ -120,7 +120,7 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PObj_gc_CLEAR(pmc);
 
-    if (pmc->vtable->attr_size)
+    if (pmc->vtable->attr_size && PMC_data(pmc))
         Parrot_gc_free_pmc_attributes(interp, pmc);
     else
         PMC_data(pmc) = NULL;
