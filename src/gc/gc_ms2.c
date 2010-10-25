@@ -965,13 +965,15 @@ gc_ms2_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
-            pmc->flags |= PObj_GC_generation_2_FLAG;
+            if (PObj_live_TEST(pmc)) {
+                pmc->flags |= PObj_GC_generation_2_FLAG;
 
-            if (PObj_custom_mark_TEST(pmc))
-                VTABLE_mark(interp, pmc);
+                if (PObj_custom_mark_TEST(pmc))
+                    VTABLE_mark(interp, pmc);
 
-            if (PMC_metadata(pmc))
-                Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
+                if (PMC_metadata(pmc))
+                    Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
+            }
 
             tmp = tmp->next;
         }
