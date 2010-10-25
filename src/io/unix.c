@@ -525,8 +525,8 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
               case EINTR:
                 continue;
               default:
-                s->bufused = s->strlen = 0;
-                return bytes;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Read error: %s", strerror(errno));
             }
         }
         else {
