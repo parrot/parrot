@@ -1188,7 +1188,7 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
         ARGIN(Linked_List *list))
 {
-    ASSERT_ARGS(gc_ms2_sweep_pool)
+    ASSERT_ARGS(gc_ms2_sweep_pmc_pool)
     List_Item_Header *tmp = list->first;
 
     while (tmp) {
@@ -1229,7 +1229,7 @@ gc_ms2_destroy_pmc_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
         ARGIN(Linked_List *list))
 {
-    ASSERT_ARGS(gc_ms2_sweep_pool)
+    ASSERT_ARGS(gc_ms2_destroy_pmc_pool)
     List_Item_Header *tmp   = list->first;
 
     while (tmp) {
@@ -1263,7 +1263,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
         ARGIN(Linked_List *list))
 {
-    ASSERT_ARGS(gc_ms2_sweep_pool)
+    ASSERT_ARGS(gc_ms2_sweep_string_pool)
     List_Item_Header *tmp = list->first;
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
