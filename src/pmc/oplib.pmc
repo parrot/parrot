@@ -116,8 +116,7 @@ pmclass OpLib auto_attrs {
         return STATICSELF.elements();
     }
 
-    METHOD op_family(STRING *shortname)
-    {
+    METHOD op_family(STRING *shortname) {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
         op_lib_t  *oplib;
         op_info_t *table;
@@ -136,6 +135,25 @@ pmclass OpLib auto_attrs {
         Parrot_str_free_cstring(sname);
         RETURN(PMC *result);
     }
+
+    METHOD major_version() {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        RETURN (INTVAL oplib->major_version);
+    }
+
+    METHOD minor_version() {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        RETURN (INTVAL oplib->minor_version);
+    }
+
+    METHOD patch_version() {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        RETURN (INTVAL oplib->patch_version);
+    }
+
 }
 
 /*
