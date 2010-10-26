@@ -387,6 +387,10 @@ Get process id, experimental.
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
+=item Parrot_load_bytecode_file [experimental]
+
+Load a .pbc file into the interpreter. Experimental.
+
 =back
 
 =head1 Compiler tools
@@ -429,13 +433,13 @@ use a different detection mechanism or eliminate it altogether.
 
 L<https://trac.parrot.org/parrot/ticket/463>
 
-=item PAST::Val node generation [eligible in 1.5] 
+=item PAST::Val node generation [eligible in 1.5]
 
-The PAST::Compiler may generate the code for PAST::Val nodes 
-(i.e., constants) at the beginning of the block (Parrot sub) instead 
-of the location where they occur in the PAST tree. 
+The PAST::Compiler may generate the code for PAST::Val nodes
+(i.e., constants) at the beginning of the block (Parrot sub) instead
+of the location where they occur in the PAST tree.
 
-L<https://trac.parrot.org/parrot/ticket/868> 
+L<https://trac.parrot.org/parrot/ticket/868>
 
 =item Meta-model implementation used by PCT [eligible in 2.7]
 

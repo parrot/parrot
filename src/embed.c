@@ -591,6 +591,9 @@ again:
 
 Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
+TODO: We don't do any error or sanity checking here. The packfile pointer
+should be a valid packfile, not simply a non-null pointer
+
 =cut
 
 */
@@ -609,6 +612,29 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
     interp->code       = pf->cur_cs;
 }
 
+/*
+
+=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
+
+Load a bytecode file into the interpreter by name. Returns C<0> on failure,
+Success otherwise. Writes error information to the interpreter's error file
+stream.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
+{
+    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+
+    if (!pf)
+        return 0;
+    Parrot_pbc_load(interp, pf);
+    return 1;
+}
 
 /*
 
