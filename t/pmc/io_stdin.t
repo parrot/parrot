@@ -34,7 +34,7 @@ sub pir_stdin_output_is {
         my $string = shift;
 
         my (undef, $file) = create_tempfile(UNLINK => 1);
-        open(my $out, '>', "$file") or die "bug";
+        open(my $out, '>', $file) or die "bug";
         print $out $string;
         return $file;
     };
