@@ -628,6 +628,7 @@ PARROT_EXPORT
 int
 Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
 {
+    ASSERT_ARGS(Parrot_load_bytecode_file)
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
     if (!pf)
