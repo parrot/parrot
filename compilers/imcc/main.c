@@ -646,11 +646,9 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
     if (STATE_LOAD_PBC(interp)) {
-        PackFile * const pf = Parrot_pbc_read(interp, sourcefile, 0);
-
-        if (!pf)
+        const int loaded = Parrot_load_bytecode_file(interp, sourcefile);
+        if (!loaded)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
-        Parrot_pbc_load(interp, pf);
     }
     else
         compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
