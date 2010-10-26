@@ -2,7 +2,7 @@
 #$Id$
 # Sample creating of "Hello World" program using Packfile PMCs.
 .sub 'main'
-    .local pmc pf, pfdir, pffixup, pfbc, pfconst, oplib
+    .local pmc pf, pfdir, pfbc, pfconst, oplib
 
     # Hello World is something like
     # .sub 'hello'
@@ -26,33 +26,36 @@
     pfconst[1] = $P0
 
     # "Hello World" string
-    pfconst[2] = "Hello World"
+    pfconst[0] = "Hello World"
 
-    # "hello" is function name
-    pfconst[3] = "hello"
+    # "hello" function name
+    pfconst[1] = "hello"
 
     # "hello.pir" is our pir file which we are "compiling"
-    pfconst[4] = "hello.pir"
+    pfconst[2] = "hello.pir"
 
     # We will need Sub PMC as well but will deal with it later.
     # Add PackfileConstantTable into directory.
     pfdir["CONSTANTS_hello.pir"] = pfconst
 
     # Generate bytecode
-    pfbc = new 'PackfileRawSegment'
-    oplib = new 'OpLib'
+    pfbc = new 'PackfileBytecodeSegment'
+    .local pmc op
 
     # Here is our function
-    $I0 = oplib['say_sc']
-    pfbc[0] = $I0
-    pfbc[1] = 0x002 # constant id.
+    op = new ['ResizablePMCArray']
+    op[0] = 'say_sc'
+    op[1] = 0x000 # constant id for "Hello, world"
+    push pfbc, op
 
-    $I0 = oplib['set_returns_pc']
-    pfbc[2] = $I0
-    pfbc[3] = 0x001 # id of FIA
+    op = new ['ResizablePMCArray']
+    op[0] = 'set_returns_pc'
+    op[1] = 0x001 # id of FIA
+    push pfbc, op
 
-    $I0 = oplib['returncc']
-    pfbc[4] = $I0
+    op = new ['ResizablePMCArray']
+    op[0] = 'returncc'
+    push pfbc, op
 
     # Store bytecode
     pfdir['BYTECODE_hello.pir'] = pfbc
@@ -70,18 +73,7 @@
 
     $P1 = new 'Sub', $P0
     # and store it in PackfileConstantTable
-    pfconst[5] = $P1
-
-    # Dark magik. Create Fixup for Sub.
-    pffixup = new 'PackfileFixupTable'
-    # Add it to Directory now because adding FixupEntries require Directory
-    pfdir["FIXUP_hello.pir"] = pffixup
-
-    $P1 = new 'PackfileFixupEntry'
-    $P1 = 'hello'
-    $P1.'set_type'(1)
-    $P1 = 5 # offset
-    pffixup[0] = $P1
+    pfconst[3] = $P1
 
     # Now pack Packfile and save it
     $S0 = pf
