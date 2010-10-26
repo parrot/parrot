@@ -1,0 +1,160 @@
+/*
+Copyright (C) 2001-2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfilebytecodesegment.pmc - PackfileBytecodeSegment PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileBytecode class, providing a PMC-based interface
+for bytecode creation and manipulation.
+
+See packfile.pmc for the toplevel Packfile interface; see PDD13 for the design
+spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass PackfileBytecodeSegment auto_attrs extends PackfileSegment{
+    ATTR PMC  *ops;    /* RIA of executable opcodes */
+    ATTR PMC  *op_map; /* OpMap PMC */
+
+
+
+/*
+
+=item C<void init()>
+
+Initialize PackfileBytecodeSegment.
+
+=cut
+
+*/
+    VTABLE void init() {
+        Parrot_PackfileBytecodeSegment_attributes * attrs =
+                PMC_data_typed(SELF, Parrot_PackfileBytecodeSegment_attributes*);
+
+        attrs->op_map = Parrot_pmc_new(INTERP, enum_class_PackfileOpMap);
+        attrs->ops    = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+
+        PObj_custom_mark_SET(SELF);
+        SUPER();
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileBytecodeSegment_attributes * attrs =
+                PARROT_PACKFILESEGMENT(SELF);
+
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->op_map);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->ops);
+        SUPER();
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroy anything in this segment that need destroying.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_PackfileBytecodeSegment_attributes * attrs =
+                PARROT_PACKFILESEGMENT(SELF);
+
+        VTABLE_destroy(INTERP, attrs->op_map);
+        VTABLE_destroy(INTERP, attrs->ops);
+        SUPER();
+    }
+
+/*
+
+=item C<void load_lib()>
+
+Load a dynop library so that ops contained in that library can be used in this
+bytecode segment.
+
+=cut
+
+*/
+
+    METHOD void load_lib(STRING *lib_name) {
+        /* delegate to OpMap */
+
+    }
+
+
+/*
+
+=over 4
+
+=item Packfile Interface Methods 
+
+=back 4
+
+=item C<STRING *pack()>
+
+Serialize the segment.
+
+=cut
+
+*/
+    METHOD pack() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "PackfileBytecodeSegment.pack() not implemented yet.");
+    }
+
+
+/*
+
+=item C<void unpack(STRING *data)>
+
+Unpack a serialized segment string.
+
+=cut
+
+*/
+    METHOD unpack(STRING *data) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "PackfileBytecodeSegment.unpack() not implemented yet.");
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
