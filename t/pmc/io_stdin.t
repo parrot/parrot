@@ -35,8 +35,8 @@ sub pir_stdin_output_is {
 
         my (undef, $file) = create_tempfile(UNLINK => 1);
         open(my $out, '>', $file) or die "bug";
+        binmode $out;
         print $out $string;
-        $file =~ s/\//\\/g if $^O eq 'MSWin32';
         return $file;
     };
 
@@ -44,7 +44,7 @@ sub pir_stdin_output_is {
     my $input_file = $stuff->($input_string);
     my $code_file = $stuff->($code);
 
-    my $parrot = $^O eq 'MSWin32' ? '.\parrot.exe' : './parrot';
+    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
     # Slurp and compare the output.
     my $result = do {
         local $/;
