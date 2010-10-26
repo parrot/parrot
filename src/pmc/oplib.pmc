@@ -65,8 +65,6 @@ pmclass OpLib auto_attrs {
 
         GET_ATTR_oplib(INTERP, SELF, oplib);
         num  = oplib->_op_code(INTERP, cstr, 1);
-        if (num == -1)
-            num = oplib->_op_code(INTERP, cstr, 0);
 
         Parrot_str_free_cstring(cstr);
         return num;
