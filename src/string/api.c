@@ -2952,31 +2952,6 @@ Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<STRING* Parrot_str_change_charset(PARROT_INTERP, STRING *src, INTVAL
-charset_nr)>
-
-Converts C<src> to the given charset or encoding and returns the result as a
-new string.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-STRING*
-Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
-        INTVAL charset_nr)
-{
-    ASSERT_ARGS(Parrot_str_change_charset)
-
-    return Parrot_str_change_encoding(interp, src, charset_nr);
-}
-
-
-/*
-
 =item C<STRING* Parrot_str_change_encoding(PARROT_INTERP, STRING *src, INTVAL
 encoding_nr)>
 

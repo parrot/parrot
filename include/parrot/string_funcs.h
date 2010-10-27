@@ -65,15 +65,6 @@ UINTVAL Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING* Parrot_str_change_charset(PARROT_INTERP,
-    ARGMOD_NULLOK(STRING *src),
-    INTVAL charset_nr)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*src);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 STRING* Parrot_str_change_encoding(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *src),
     INTVAL encoding_nr)
@@ -510,8 +501,6 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_boolean __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_byte_length __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_str_change_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_change_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_chopn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
