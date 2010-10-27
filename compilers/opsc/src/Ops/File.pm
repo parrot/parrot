@@ -325,7 +325,7 @@ method _set_version() {
     self<version>       := [
         +self<version_major>,
         +self<version_minor>,
-        +self<version_match>,
+        +self<version_patch>,
     ];
 }
 
