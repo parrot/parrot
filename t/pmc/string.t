@@ -19,7 +19,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(124)
+    plan(129)
 
     set_or_get_strings()
     setting_integers()
@@ -58,6 +58,7 @@ Tests the C<String> PMC.
     exception_to_int_3()
     assign_null_string()
     access_keyed()
+    exists_keyed()
     # END_OF_TESTS
 .end
 
@@ -774,6 +775,29 @@ check:
   null_replace:
     ok(1, 'Replace on null string throws')
   done_null_replace:
+.end
+
+.sub exists_keyed
+    .local pmc s, i
+    .local int r
+    s = new['String']
+    s = ''
+    i = new['Integer']
+    i = 0
+    r = exists s[i]
+    is(r, 0, 'exists_keyed on empty String')
+    s = 'a'
+    r = exists s[i]
+    is(r, 1, 'exists_keyed within bounds')
+    i = 1
+    r = exists s[i]
+    is(r, 0, 'exists_keyed out of bounds')
+    i = -1
+    r = exists s[i]
+    is(r, 1, 'exists_keyed negative within bounds')
+    i = -2
+    r = exists s[i]
+    is(r, 0, 'exists_keyed negative out of bounds')
 .end
 
 # Local Variables:
