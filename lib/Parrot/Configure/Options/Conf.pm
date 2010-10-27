@@ -101,7 +101,7 @@ External Library Options:
 
    --without-gettext    Build parrot without gettext support
    --without-gmp        Build parrot without GMP support
-   --without-libffi     Build parrot without libffi support    
+   --without-libffi     Build parrot without libffi support
    --without-opengl     Build parrot without OpenGL support (GL/GLU/GLUT)
    --without-readline   Build parrot without readline support
    --without-pcre       Build parrot without pcre support

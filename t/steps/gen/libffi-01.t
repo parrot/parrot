@@ -24,7 +24,7 @@ use IO::CaptureOutput qw( capture );
 
 ########## regular ##########
 
-sub 
+sub
 
 pass("Completed all tests in $0");
 

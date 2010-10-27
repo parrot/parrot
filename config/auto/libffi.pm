@@ -54,7 +54,7 @@ sub runstep {
     my $libffi_options_cflags = '';
     my $libffi_options_libs = '';
     my $libffi_options_linkflags = '';
-    
+
     if ($pkgconfig_exec) {
         $libffi_options_linkflags = capture_output($pkgconfig_exec, 'libffi --libs-only-L');
         chomp $libffi_options_linkflags;
@@ -70,7 +70,7 @@ sub runstep {
         cc              => $conf->data->get('cc'),
         default         => $libffi_options_libs . ' ' . $libffi_options_cflags,
     } );
-    
+
     $conf->cc_gen('config/auto/libffi/test_c.in');
     eval { $conf->cc_build( $libffi_options_cflags, $libffi_options_libs ) };
     my $has_libffi = 0;

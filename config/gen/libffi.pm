@@ -25,7 +25,7 @@ sub _init {
     my %data;
 
     $data{description} = q{Moving approriate NCI files into place};
-    
+
     return \%data;
 }
 
@@ -39,7 +39,7 @@ sub runstep {
     else {
     }
 
-    copy_if_diff( $nci_file, "src/pmc/nci.pmc" ); 
+    copy_if_diff( $nci_file, "src/pmc/nci.pmc" );
 
     return 1;
 }

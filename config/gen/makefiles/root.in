@@ -487,6 +487,7 @@ INTERP_O_FILES = \
     src/multidispatch$(O) \
     src/namespace$(O) \
     src/nci/api$(O) \
+    src/nci/signatures$(O) \
     src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
@@ -694,6 +695,7 @@ STR_FILES = \
     src/nci/api.str \
     src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
+    src/nci/signatures.str \
     src/packfile.str \
     src/packfile/pf_items.str \
     src/pmc.str \
