@@ -738,10 +738,15 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     tmp = self->root_objects->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
-        PMC *pmc = LLH2Obj_typed(tmp, PMC);
+        PMC              *pmc = LLH2Obj_typed(tmp, PMC);
+        size_t            gen = PObj_to_generation(pmc);
 
         LIST_REMOVE(self->root_objects, tmp);
-        LIST_APPEND(self->objects[PObj_to_generation(pmc)], tmp);
+        LIST_APPEND(self->objects[gen], tmp);
+
+        /* Seal old objects back */
+        if (gen)
+            gc_ms2_seal_object(interp, pmc);
 
         tmp = next;
     }
