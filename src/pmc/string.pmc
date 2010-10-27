@@ -404,7 +404,7 @@ numbers count from the end.
         GET_ATTR_str_val(INTERP, SELF, str_val);
         n = Parrot_str_length(INTERP, str_val);
 
-        return (INTVAL)((k >= 0 && k <= n) || (k < 0 && -k <= n));
+        return (INTVAL)((k >= 0 && k < n) || (k < 0 && -k <= n));
     }
 
 /*
