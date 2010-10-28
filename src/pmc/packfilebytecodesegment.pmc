@@ -65,7 +65,8 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileBytecodeSegment_attributes * attrs = PARROT_PACKFILESEGMENT(SELF);
+        Parrot_PackfileBytecodeSegment_attributes * attrs =
+            PARROT_PACKFILEBYTECODESEGMENT(SELF);
 
         Parrot_gc_mark_PMC_alive(INTERP, attrs->op_map);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->ops);
@@ -147,7 +148,8 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
             PMC  *oplib     = VTABLE_get_pmc_keyed_str(INTERP, op_map, CONST_STRING(INTERP, "oplib"));
             PMC  *lib_ops   = VTABLE_get_pmc_keyed_str(INTERP, op_map, CONST_STRING(INTERP, "lib_ops"));
             PMC  *table_ops = VTABLE_get_pmc_keyed_str(INTERP, op_map, CONST_STRING(INTERP, "table_ops"));
-            INTVAL j, version_major, version_minor, version_patch, opmap_count;
+            PMC  *version_array;
+            INTVAL j, opmap_count;
 
             /* write lib name (PF_store_cstring) */
             lib_name_cstring = Parrot_str_to_cstring(INTERP,
@@ -156,16 +158,13 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
             mem_sys_free(lib_name_cstring);
 
             /*  major, minor, patch */
-            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version_major"),
-                    "->I", &version_major);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version_minor"),
-                    "->I", &version_minor);
-            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version_patch"),
-                    "->I", &version_patch);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version"),
+                    "->P", &version_array);
 
-            *cursor++ = version_major;
-            *cursor++ = version_minor;
-            *cursor++ = version_patch;
+            /* major version, minor version, patch version */
+            *cursor++ = VTABLE_pop_integer(INTERP, version_array);
+            *cursor++ = VTABLE_pop_integer(INTERP, version_array);
+            *cursor++ = VTABLE_pop_integer(INTERP, version_array);
 
             /* write number of mappings */
             opmap_count = map_attrs->op_count;
@@ -179,6 +178,52 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 
         }
     }
+
+
+/*
+
+=item C<void push_pmc()>
+
+Add an op and its arguments to this bytecode.  The PMC should be a
+ResizablePMCArray with the first PMC being a String containing the full name of
+an op and the remaining PMCs being Integers.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *p) {
+
+        Parrot_PackfileBytecodeSegment_attributes *attrs =
+            PMC_data_typed(SELF, Parrot_PackfileBytecodeSegment_attributes*);
+
+        STRING *op_name;
+        INTVAL  i, op_num, arr_size;
+
+        if (!VTABLE_does(INTERP, p, CONST_STRING(INTERP, "array"))) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "PMC passed to push_pmc is not array-like");
+        }
+
+        op_num = VTABLE_get_integer_keyed_str(INTERP, attrs->op_map, 
+                 VTABLE_get_string_keyed_int(INTERP, p, 0));
+
+        if (op_num == -1) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "invalid op name: '%Ss'",
+                    VTABLE_get_string_keyed_int(INTERP, p, 0));
+        }
+
+        /* add the things to attrs->ops */
+        VTABLE_push_integer(INTERP, attrs->ops, op_num);
+        arr_size = VTABLE_elements(INTERP, p);
+
+        for (i = 1; i < arr_size; i++){
+            VTABLE_push_integer(INTERP, attrs->ops,
+                    VTABLE_get_integer_keyed_int(INTERP, p, i));
+        }
+    }
+
 /*
 
 =item C<void destroy()>
