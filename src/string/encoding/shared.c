@@ -747,6 +747,9 @@ fixed8_index(PARROT_INTERP, ARGIN(const STRING *src),
     ASSERT_ARGS(fixed8_index)
     INTVAL retval;
 
+    if (STRING_max_bytes_per_codepoint(search) != 1)
+        return encoding_index(interp, src, search, offset);
+
     if ((UINTVAL)offset >= STRING_length(src)
     ||  !STRING_length(search))
         return -1;
