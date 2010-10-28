@@ -91,7 +91,7 @@ pmclass OpLib auto_attrs {
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
         op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
-        if ((UINTVAL)value >= oplib->op_count ||
+        if (value >= oplib->op_count ||
                      value <  0) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "OpLib `%s': Opcode index %d out of bounds", oplib->name, value);
@@ -119,7 +119,7 @@ pmclass OpLib auto_attrs {
         op_lib_t  *oplib;
         op_info_t *table;
         PMC *result = PMCNULL;
-        UINTVAL i;
+        INTVAL i;
 
         GET_ATTR_oplib(INTERP, SELF, oplib);
         table = oplib->op_info_table;
@@ -134,24 +134,15 @@ pmclass OpLib auto_attrs {
         RETURN(PMC *result);
     }
 
-    METHOD major_version() {
+    METHOD version() {
         op_lib_t *oplib;
+        PMC *version_array = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         GET_ATTR_oplib(INTERP, SELF, oplib);
-        RETURN (INTVAL oplib->major_version);
+        VTABLE_push_integer(INTERP, version_array, oplib->major_version);
+        VTABLE_push_integer(INTERP, version_array, oplib->minor_version);
+        VTABLE_push_integer(INTERP, version_array, oplib->patch_version);
+        RETURN (PMC *version_array);
     }
-
-    METHOD minor_version() {
-        op_lib_t *oplib;
-        GET_ATTR_oplib(INTERP, SELF, oplib);
-        RETURN (INTVAL oplib->minor_version);
-    }
-
-    METHOD patch_version() {
-        op_lib_t *oplib;
-        GET_ATTR_oplib(INTERP, SELF, oplib);
-        RETURN (INTVAL oplib->patch_version);
-    }
-
 }
 
 /*
