@@ -101,8 +101,9 @@ Initializes a PMCProxy PMC.
 
         /* Ensure that it's a valid type number. */
         if (type_num > INTERP->n_vtable_max || type_num <= 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                "Attempt to create PMC Proxy for invalid type number!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Attempt to create PMC Proxy for invalid type number!");
 
         /* Set up the object. */
         SELF.init();
