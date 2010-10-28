@@ -53,7 +53,7 @@ Create empty PackfileOpMap for a given op library.
         attrs->op_count   = 0;
 
         core_ops_pmc = Parrot_pmc_new(INTERP, enum_class_String);
-        VTABLE_set_string_native(INTERP, core_ops_pmc, CONST_STRING(INTERP, PARROT_CORE_OPLIB_NAME));
+        VTABLE_set_string_native(INTERP, core_ops_pmc, CONST_STRING(INTERP, "core_ops"));
         lib_ops      = CONST_STRING(INTERP, "lib_ops");
         table_ops    = CONST_STRING(INTERP, "table_ops");
         oplib_name   = CONST_STRING(INTERP, "oplib_name");
@@ -68,9 +68,6 @@ Create empty PackfileOpMap for a given op library.
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
         VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, table_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
-        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_str, 
-                Parrot_pmc_new_init
-                );
         VTABLE_push_pmc(INTERP, attrs->op_maps, core_ops_info);
 
         SUPER();
@@ -103,30 +100,33 @@ already in the map, a new map will be created.
         GET_ATTR_op_maps(INTERP, SELF, op_maps);
         op_map_count = VTABLE_elements(INTERP, op_maps);
         for (i = 0; i < op_map_count; i++) {
+
+            PMC *table_ops, *lib_ops;
+            STRING *table_ops_str, *lib_ops_str;
+            INTVAL op_count;
+
             PMC *op_map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
             PMC *oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
             INTVAL op_num = VTABLE_get_integer_keyed(INTERP, oplib, key);
 
-            /* we found the op */
-            if (op_num > -1) {
-                PMC *table_ops, *lib_ops;
-                STRING *table_ops_str, *lib_ops_str;
-                INTVAL op_count;
-
-                table_ops_str = CONST_STRING(INTERP, "table_ops");
-                lib_ops_str   = CONST_STRING(INTERP, "lib_ops");
-
-                table_ops = VTABLE_get_pmc_keyed_str(INTERP, op_map, table_ops_str);
-                lib_ops   = VTABLE_get_pmc_keyed_str(INTERP, op_map, lib_ops_str);
-
-                GET_ATTR_op_count(INTERP, SELF, op_count);
-
-                VTABLE_set_integer_keyed(INTERP, map_cache, key, op_count);
-                VTABLE_push_integer(INTERP, table_ops, op_count);
-                VTABLE_push_integer(INTERP, lib_ops, op_num);
-
-                return op_num;
+            if (op_num == -1) {
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Couldn't find '%Ss' op.", key_str);
             }
+
+            table_ops_str = CONST_STRING(INTERP, "table_ops");
+            lib_ops_str   = CONST_STRING(INTERP, "lib_ops");
+
+            table_ops = VTABLE_get_pmc_keyed_str(INTERP, op_map, table_ops_str);
+            lib_ops   = VTABLE_get_pmc_keyed_str(INTERP, op_map, lib_ops_str);
+
+            GET_ATTR_op_count(INTERP, SELF, op_count);
+
+            VTABLE_set_integer_keyed(INTERP, map_cache, key, op_count);
+            VTABLE_push_integer(INTERP, table_ops, op_count);
+            VTABLE_push_integer(INTERP, lib_ops, op_num);
+
+            return op_num;
         }
         return -1;
     }
@@ -239,13 +239,11 @@ Ensure that an op library is loaded and accessible to this OpMap.
 
         ops_info = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_name, lib_name_pmc);
-        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_str,
-                Parrot_pmc_new_init(INTERP, enum_class_OpLib, lib_name_pmc));
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_str, oplib);
         VTABLE_set_pmc_keyed_str(INTERP, ops_info, lib_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
         VTABLE_set_pmc_keyed_str(INTERP, ops_info, table_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
-        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_str, oplib);
         VTABLE_push_pmc(INTERP, attrs->op_maps, ops_info);
 
         RETURN (INTVAL 1);
