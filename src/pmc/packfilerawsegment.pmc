@@ -122,9 +122,9 @@ Initialize PackfileRawSegment from PackFile_Segment
         PMC * opcodes = attrs->opcodes;
         size_t i;
 
-        pfseg->type     = attrs->type;
-        pfseg->size     = VTABLE_get_integer(INTERP, opcodes);
-        pfseg->data     = mem_gc_allocate_n_typed(INTERP, pfseg->size, opcode_t);
+        pfseg->type = attrs->type;
+        pfseg->size = VTABLE_get_integer(INTERP, opcodes);
+        pfseg->data = mem_gc_allocate_n_typed(INTERP, pfseg->size, opcode_t);
 
         /* Not very efficient... */
         for (i = 0; i < pfseg->size; ++i) {
