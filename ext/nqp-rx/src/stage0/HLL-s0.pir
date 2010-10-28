@@ -122,6 +122,7 @@ and HLL::Grammar.
 # continue to build from an older Parrot until parrot's trunk
 # is working again.  When we're able to bump PARROT_REVISION,
 # this code can go away to fall back to Parrot's version (DRY).
+
 =item lineof(target, pos [, cache :named('cache')])
 
 Return the line number of offset C<pos> within C<target>.  The return
@@ -207,6 +208,8 @@ memoize the line offsets as a C<!lineof> property on C<target>.
 
 ### .include 'src/cheats/hll-grammar.pir'
 # Copyright (C) 2009, The Perl Foundation.
+
+=back
 
 =head1 TITLE
 
@@ -8980,8 +8983,6 @@ An operator precedence parser.
     .return ($P501)
 .end
 
-
-=back
 
 =head1 AUTHOR
 
