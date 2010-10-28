@@ -44,7 +44,7 @@ Create empty PackfileOpMap for a given op library.
 
     VTABLE void init() {
         PMC *core_ops_info, *core_ops_pmc;
-        STRING *oplib_name, *lib_ops, *table_ops;
+        STRING *oplib_name, *oplib_str, *lib_ops, *table_ops, *core_ops_str;
         Parrot_PackfileOpMap_attributes *attrs =
             PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
         
@@ -54,17 +54,23 @@ Create empty PackfileOpMap for a given op library.
 
         core_ops_pmc = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, core_ops_pmc, CONST_STRING(INTERP, PARROT_CORE_OPLIB_NAME));
-        lib_ops    = CONST_STRING(INTERP, "lib_ops");
-        table_ops  = CONST_STRING(INTERP, "table_ops");
-        oplib_name = CONST_STRING(INTERP, "oplib_name");
+        lib_ops      = CONST_STRING(INTERP, "lib_ops");
+        table_ops    = CONST_STRING(INTERP, "table_ops");
+        oplib_name   = CONST_STRING(INTERP, "oplib_name");
+        oplib_str    = CONST_STRING(INTERP, "oplib");
+        core_ops_str = CONST_STRING(INTERP, "core_ops");
 
         core_ops_info = Parrot_pmc_new(INTERP, enum_class_Hash);
-        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_name,
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_name, core_ops_pmc);
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_str,
                 Parrot_pmc_new_init(INTERP, enum_class_OpLib, core_ops_pmc));
         VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, lib_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
         VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, table_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_str, 
+                Parrot_pmc_new_init
+                );
         VTABLE_push_pmc(INTERP, attrs->op_maps, core_ops_info);
 
         SUPER();
@@ -130,6 +136,7 @@ already in the map, a new map will be created.
         return SELF.get_integer_keyed(pmc_key);
     }
 
+
 /*
 
 =item C<void mark()>
@@ -185,78 +192,6 @@ Get the number of filename mappings.
         return op_count;
     }
 
-
-/*
-
-=item C<void *get_pointer()>
-
-Return a pointer to a PackFile_ByteCode* built from this PMC's data.
-
-=cut
-
-*/
-
-    VTABLE void *get_pointer() {
-        INTVAL i, bc_seg_size, lib_count;
-        STRING *oplib_name = CONST_STRING(INTERP, "const_string");
-        STRING *lib_ops    = CONST_STRING(INTERP, "lib_ops");
-        Parrot_PackfileOpMap_attributes *attrs =
-            PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
-        PackFile_ByteCode *bc_seg =
-            mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode);
-        
-        bc_seg->base.type = PF_BYTEC_SEG;
-
-        /* figure out size of bytecode segment (->data) */
-        // should calculate this while building bc segment
-
-        /* op count and number of libraries */
-        bc_seg_size = 2;
-        lib_count = VTABLE_elements(INTERP, attrs->op_maps);
-        for (i = 0; i < lib_count; i++) {
-            char *lib_name_cstring;
-            PMC  *op_map = VTABLE_get_pmc_keyed_int(INTERP, attrs->op_maps, i);
-
-            /* length of lib name as a cstring, plus padding */
-            lib_name_cstring = Parrot_str_to_cstring(INTERP,
-                        VTABLE_get_string_keyed_str(INTERP, op_map, oplib_name));
-            bc_seg_size += PF_size_cstring(lib_name_cstring);
-            mem_sys_free(lib_name_cstring);
-
-            /* 3 for major, minor, patch */
-            bc_seg_size += 3;
-            
-            /* 1 for number of ops */
-            bc_seg_size += 1;
-
-            /* 2*number of ops */            
-            bc_seg_size += (2 * VTABLE_elements(INTERP,
-                        VTABLE_get_pmc_keyed_str(INTERP, op_map, lib_ops)));
-        }
-
-
-        /* allocate space for ->data */
-
-        /* write bytecode bytes to ->data */
-
-        /* write number of ops, number of libs */
-
-        /* for each lib */ 
-           
-            /* write lib name (PF_store_cstring) */
-         
-            /*  major, minor, patch */
-
-            /* write number of mappings */
-
-            /* for each mapping */
-                
-                /* write table_ops[n] */
-
-                /* write lib_ops[n] */
-
-    }
-
 /*
 
 =item C<METHOD load_lib>
@@ -270,7 +205,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
         /* check if the library has been loaded */
         PMC *op_maps, *ops_info, *oplib, *lib_name_pmc;
         INTVAL i, op_map_count;
-        STRING *oplib_name, *lib_ops, *table_ops;
+        STRING *oplib_name, *lib_ops, *table_ops, *oplib_str;
         Parrot_PackfileOpMap_attributes *attrs;
 
         oplib_name = CONST_STRING(INTERP, "oplib_name");
@@ -300,14 +235,17 @@ Ensure that an op library is loaded and accessible to this OpMap.
         
         lib_ops   = CONST_STRING(INTERP, "lib_ops");
         table_ops = CONST_STRING(INTERP, "table_ops");
+        oplib_str = CONST_STRING(INTERP, "oplib");
 
         ops_info = Parrot_pmc_new(INTERP, enum_class_Hash);
-        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_name,
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_name, lib_name_pmc);
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_str,
                 Parrot_pmc_new_init(INTERP, enum_class_OpLib, lib_name_pmc));
         VTABLE_set_pmc_keyed_str(INTERP, ops_info, lib_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
         VTABLE_set_pmc_keyed_str(INTERP, ops_info, table_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_str, oplib);
         VTABLE_push_pmc(INTERP, attrs->op_maps, ops_info);
 
         RETURN (INTVAL 1);

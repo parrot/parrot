@@ -26,6 +26,8 @@ spec.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
+#include "pmc/pmc_packfileopmap.h"
+
 pmclass PackfileBytecodeSegment auto_attrs extends PackfileSegment{
     ATTR PMC  *ops;    /* RIA of executable opcodes */
     ATTR PMC  *op_map; /* OpMap PMC */
@@ -63,14 +65,120 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileBytecodeSegment_attributes * attrs =
-                PARROT_PACKFILESEGMENT(SELF);
+        Parrot_PackfileBytecodeSegment_attributes * attrs = PARROT_PACKFILESEGMENT(SELF);
 
         Parrot_gc_mark_PMC_alive(INTERP, attrs->op_map);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->ops);
         SUPER();
     }
 
+/*
+
+=item C<void *get_pointer()>
+
+Return a pointer to a PackFile_ByteCode* built from this PMC's data.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        INTVAL i, bc_seg_size, lib_count;
+        STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
+        STRING *lib_ops    = CONST_STRING(INTERP, "lib_ops");
+        opcode_t *cursor;
+        Parrot_PackfileBytecodeSegment_attributes *attrs =
+            PMC_data_typed(SELF, Parrot_PackfileBytecodeSegment_attributes*);
+        Parrot_PackfileOpMap_attributes *map_attrs =
+            PMC_data_typed(attrs->op_map, Parrot_PackfileOpMap_attributes*);
+        PackFile_ByteCode *bc_seg =
+            mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode);
+
+
+        bc_seg_size = 0;
+
+        // TODO: calculate this while building bc segment for better efficiency
+        bc_seg_size += VTABLE_elements(INTERP, attrs->ops);
+
+
+        /* op count and number of libraries */
+        bc_seg_size += 2;
+        lib_count = VTABLE_elements(INTERP, map_attrs->op_maps);
+        for (i = 0; i < lib_count; i++) {
+            char *lib_name_cstring;
+            PMC  *op_map = VTABLE_get_pmc_keyed_int(INTERP, map_attrs->op_maps, i);
+
+            /* length of lib name as a cstring, plus padding */
+            lib_name_cstring = Parrot_str_to_cstring(INTERP,
+                        VTABLE_get_string_keyed_str(INTERP, op_map, oplib_name));
+            bc_seg_size += PF_size_cstring(lib_name_cstring);
+            mem_sys_free(lib_name_cstring);
+
+            /* 3 for major, minor, patch */
+            bc_seg_size += 3;
+
+            /* 1 for number of ops */
+            bc_seg_size += 1;
+
+            /* 2*number of ops */
+            bc_seg_size += (2 * VTABLE_elements(INTERP,
+                        VTABLE_get_pmc_keyed_str(INTERP, op_map, lib_ops)));
+        }
+
+        bc_seg->base.type = PF_BYTEC_SEG;
+        bc_seg->base.size = bc_seg_size;
+        bc_seg->base.data = (opcode_t *) mem_sys_allocate(bc_seg_size);
+        cursor = bc_seg->base.data;
+
+        /* write bytecode bytes to segment */
+        // TODO: use something more efficient than this, e.g. StringBuilder
+        for (i = 0; i < VTABLE_elements(INTERP, attrs->ops); i++) {
+            *cursor++ = VTABLE_get_integer_keyed_int(INTERP, attrs->ops, i);
+        }
+
+        /* write number of ops, number of libs */
+        *cursor++ = map_attrs->op_count;
+        *cursor++ = VTABLE_elements(INTERP, map_attrs->op_maps);
+
+        /* for each lib */
+        for (i = 0; i < VTABLE_elements(INTERP, map_attrs->op_maps); i++) {
+            char *lib_name_cstring;
+            PMC  *op_map    = VTABLE_get_pmc_keyed_int(INTERP, map_attrs->op_maps, i);
+            PMC  *oplib     = VTABLE_get_pmc_keyed_str(INTERP, op_map, CONST_STRING(INTERP, "oplib"));
+            PMC  *lib_ops   = VTABLE_get_pmc_keyed_str(INTERP, op_map, CONST_STRING(INTERP, "lib_ops"));
+            PMC  *table_ops = VTABLE_get_pmc_keyed_str(INTERP, op_map, CONST_STRING(INTERP, "table_ops"));
+            INTVAL j, version_major, version_minor, version_patch, opmap_count;
+
+            /* write lib name (PF_store_cstring) */
+            lib_name_cstring = Parrot_str_to_cstring(INTERP,
+                        VTABLE_get_string_keyed_str(INTERP, op_map, oplib_name));
+            cursor = PF_store_cstring(cursor, lib_name_cstring);
+            mem_sys_free(lib_name_cstring);
+
+            /*  major, minor, patch */
+            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version_major"),
+                    "->I", &version_major);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version_minor"),
+                    "->I", &version_minor);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, oplib, CONST_STRING(INTERP, "version_patch"),
+                    "->I", &version_patch);
+
+            *cursor++ = version_major;
+            *cursor++ = version_minor;
+            *cursor++ = version_patch;
+
+            /* write number of mappings */
+            opmap_count = map_attrs->op_count;
+            *cursor++   = opmap_count;
+
+            /* for each mapping */
+            for (j = 0; j < opmap_count; j++) {
+                *cursor++ = VTABLE_get_integer_keyed_int(INTERP, table_ops, j);
+                *cursor++ = VTABLE_get_integer_keyed_int(INTERP, lib_ops, j);
+            }
+
+        }
+    }
 /*
 
 =item C<void destroy()>
@@ -83,8 +191,7 @@ Destroy anything in this segment that need destroying.
 
     VTABLE void destroy() {
         Parrot_PackfileBytecodeSegment_attributes * attrs =
-                PARROT_PACKFILESEGMENT(SELF);
-
+            PARROT_PACKFILEBYTECODESEGMENT(SELF);
         VTABLE_destroy(INTERP, attrs->op_map);
         VTABLE_destroy(INTERP, attrs->ops);
         SUPER();
@@ -102,8 +209,10 @@ bytecode segment.
 */
 
     METHOD void load_lib(STRING *lib_name) {
-        /* delegate to OpMap */
-
+        Parrot_PackfileBytecodeSegment_attributes * attrs =
+            PARROT_PACKFILEBYTECODESEGMENT(SELF);
+        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "load_lib"),
+                "S->", lib_name);
     }
 
 
