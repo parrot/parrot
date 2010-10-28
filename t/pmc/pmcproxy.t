@@ -16,9 +16,11 @@ Tests the PMCProxy PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(45)
+    plan(46)
 
     new_tests()
     get_class_tests()
@@ -39,6 +41,20 @@ Tests the PMCProxy PMC.
 
     $I0 = isa $P0, 'Foo'
     is($I0, 0, "non-default isa on PMCProxy works")
+
+    .local pmc eh
+    eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_OPERATION
+    set_label eh, catch
+    push_eh eh
+    $I0 = 1
+    new $P0, ['PMCProxy'], -1
+    $I0 = 0
+    goto check
+  catch:
+    finalize eh
+  check:
+    pop_eh
+    is($I0, 1, 'Attempt to proxy invalid type throws appropiately')
 .end
 
 
