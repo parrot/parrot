@@ -1050,40 +1050,30 @@ WHILE:
 .end
 
 .sub index_multibyte_matching
-    skip( 3, "Pending rework of creating non-ascii literals" )
+    set $S0, iso-8859-1:"\xAB"
+    find_encoding $I0, "utf8"
+    trans_encoding $S1, $S0, $I0
+    is( $S0, $S1, 'equal' )
 
-    # set $S0, "\xAB"
-    # find_chartype $I0, "8859-1"
-    # set_chartype $S0, $I0
-    # find_encoding $I0, "singlebyte"
-    # set_encoding $S0, $I0
-    # find_encoding $I0, "utf8"
-    # find_chartype $I1, "unicode"
-    # transcode $S1, $S0, $I0, $I1
-    # is( $S0, $S1, 'equal' );
+    index $I0, $S0, $S1
+    is( $I0, "0", 'index, multibyte matching' )
 
-    # index $I0, $S0, $S1
-    # is( $I0, "0", 'index, multibyte matching' )
-
-    # index $I0, $S1, $S0
-    # is( $I0, "0", 'index, multibyte matching' )
+    index $I0, $S1, $S0
+    is( $I0, "0", 'index, multibyte matching' )
 .end
 
 .sub index_multibyte_matching_two
-    skip( 2, "Pending rework of creating non-ascii literals" )
-    # set $S0, "\xAB\xBA"
-    # set $S1, "foo\xAB\xAB\xBAbar"
-    # find_chartype $I0, "8859-1"
-    # set_chartype $S0, $I0
-    # find_encoding $I0, "singlebyte"
-    # set_encoding $S0, $I0
-    # find_chartype $I0, "unicode"
-    # find_encoding $I1, "utf8"
-    # transcode $S1, $S1, $I1, $I0
-    # index $I0, $S0, $S1
-    # is( $I0, "-1", 'index, multibyte matching 2' )
-    # index $I0, $S1, $S0
-    # is( $I0, "4", 'index, multibyte matching 2' )
+    set $S0, iso-8859-1:"\xAB\xBA"
+    set $S1, utf8:"foo\xAB\xAB\xBAbar"
+    index $I0, $S0, $S1
+    is( $I0, "-1", 'index, multibyte matching 2' )
+    index $I0, $S1, $S0
+    is( $I0, "4", 'index, multibyte matching 2' )
+
+    set $S0, iso-8859-1:"abc\x{fc}def"
+    set $S1, utf8:"\x{fc}"
+    index $I1, $S0, $S1
+    is( $I1, "3", 'index, iso-8859-1 - utf8' )
 .end
 
 .sub num_to_string
@@ -1411,15 +1401,22 @@ WHILE:
 .end
 
 .sub test_find_encoding
-    skip( 4, "Pending reimplementation of find_encoding" )
-    # find_encoding $I0, "singlebyte"
-    # is( $I0, "0", 'find_encoding' )
-    # find_encoding $I0, "utf8"
-    # is( $I0, "1", 'find_encoding' )
-    # find_encoding $I0, "utf16"
-    # is( $I0, "2", 'find_encoding' )
-    # find_encoding $I0, "utf32"
-    # is( $I0, "3", 'find_encoding' )
+    find_encoding $I0, "ascii"
+    is( $I0, "0", 'find_encoding' )
+    find_encoding $I0, "iso-8859-1"
+    is( $I0, "1", 'find_encoding' )
+    find_encoding $I0, "binary"
+    is( $I0, "2", 'find_encoding' )
+    find_encoding $I0, "utf8"
+    is( $I0, "3", 'find_encoding' )
+    find_encoding $I0, "unicode"
+    is( $I0, "3", 'find_encoding' )
+    find_encoding $I0, "utf16"
+    is( $I0, "4", 'find_encoding' )
+    find_encoding $I0, "ucs2"
+    is( $I0, "5", 'find_encoding' )
+    find_encoding $I0, "ucs4"
+    is( $I0, "6", 'find_encoding' )
 .end
 
 .sub test_assign
