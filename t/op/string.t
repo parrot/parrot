@@ -55,6 +55,7 @@ Tests Parrot string registers and operations.
     substr_offset_zero_zero_length_string()
     exception_substr_offset_one_zero_length_string()
     exception_substr_neg_offset_zero_length_string()
+    exception_substr_oob_utf8()
     zero_length_substr_zero_length_string()
     zero_length_substr_zero_length_string()
     three_arg_substr_zero_length_string()
@@ -525,6 +526,14 @@ handler:
     set $S0, ""
     push_eh handler
     substr $S1, $S0, -10, 5
+handler:
+    .exception_is( "Cannot take substr outside string" )
+.end
+
+.sub exception_substr_oob_utf8
+    set $S0, utf8:"abc\uBEEFdef"
+    push_eh handler
+    substr $S1, $S0, 8, 5
 handler:
     .exception_is( "Cannot take substr outside string" )
 .end
