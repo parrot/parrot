@@ -5,13 +5,13 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More qw(no_plan); # tests => 12;
 use Carp;
 use Cwd;
-use File::Copy;
-use File::Path qw( mkpath );
-use File::Temp qw( tempdir );
-use File::Spec;
+#use File::Copy;
+#use File::Path qw( mkpath );
+#use File::Temp qw( tempdir );
+#use File::Spec;
 use lib qw( lib );
 use_ok('config::gen::libffi');
 use Parrot::Configure::Options qw( process_options );
@@ -19,12 +19,28 @@ use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
-use Parrot::Configure::Utils qw( _slurp );
-use IO::CaptureOutput qw( capture );
+#use Parrot::Configure::Utils qw( _slurp );
+#use IO::CaptureOutput qw( capture );
 
 ########## regular ##########
 
-sub
+#sub
+
+my ($args, $step_list_ref) = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
+
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
+
+my ($pkg, $step, $result);
+$pkg = q{gen::libffi};
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
 
 pass("Completed all tests in $0");
 

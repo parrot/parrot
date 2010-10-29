@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 19;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::libffi');
@@ -13,7 +13,7 @@ use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
     test_step_constructor_and_description
-    );
+);
 
 use IO::CaptureOutput qw| capture |;
 
@@ -37,9 +37,46 @@ my $serialized = $conf->pcfreeze();
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
 
-$step->runstep($conf);
-is( $step->result(), q{yes}, "Got expected result" );
-is( $conf->data->get( 'HAS_LIBFFI' ), 1, "Got expected value for 'libffi'" );
+ok( $step->runstep($conf), 'runstep() returned true value' );
+like( $step->result(), qr/^yes|no$/, "Result was set" );
+like( $conf->data->get( 'HAS_LIBFFI' ),
+    qr/^1|0$/,
+    "Plausible value for 'HAS_LIBFFI'"
+);
+# Prepare for next tests
+$step->set_result( undef );
+$conf->data->set( HAS_LIBFFI => undef );
+
+$conf->replenish($serialized);
+
+########## --verbose ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    my $stdout;
+    my $ret = capture(
+        sub { $step->runstep($conf) },
+        \$stdout
+    );
+    ok( $ret, "runstep() returned true value" );
+    like( $step->result(), qr/^yes|no$/, "Result was set" );
+    like( $conf->data->get( 'HAS_LIBFFI' ),
+        qr/^1|0$/,
+        "Plausible value for 'HAS_LIBFFI'"
+    );
+    ok( $stdout, 'Some verbose output captured' );
+}
+# Prepare for next tests
+$step->set_result( undef );
+$conf->data->set( HAS_LIBFFI => undef );
+
+########## --without-libffi ##########
 
 ($args, $step_list_ref) = process_options( {
         argv            => [ q{--without-libffi} ],
@@ -50,7 +87,13 @@ $conf->options->set(%{$args});
 $step->runstep($conf);
 is( $step->result(), q{no}, "Got expected result" );
 is( $conf->data->get( 'HAS_LIBFFI' ), 0,
-    "'libffi' undefined as expected" );
+    "'libffi' set to false value as expected" );
+
+ok(auto::libffi::_evaluate_cc_run('libffi worked'),
+    "'_evaluate_cc_run able to return true value");
+
+ok(! auto::libffi::_evaluate_cc_run('libffi did not worked'),
+    "'_evaluate_cc_run able to return false value");
 
 pass("Completed all tests in $0");
 
