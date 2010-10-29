@@ -333,32 +333,6 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 /*
 
-=item C<UINTVAL encoding_scan(PARROT_INTERP, const STRING *src)>
-
-Returns the number of codepoints in string C<src>.
-
-=cut
-
-*/
-
-UINTVAL
-encoding_scan(PARROT_INTERP, ARGIN(const STRING *src))
-{
-    ASSERT_ARGS(encoding_scan)
-    String_iter iter;
-    /*
-     * this is used to initially calculate src->strlen,
-     * therefore we must scan the whole string
-     */
-    STRING_ITER_INIT(interp, &iter);
-    while (iter.bytepos < src->bufused)
-        STRING_iter_get_and_advance(interp, src, &iter);
-    return iter.charpos;
-}
-
-
-/*
-
 =item C<void encoding_ord_error(PARROT_INTERP, const STRING *s, INTVAL offset)>
 
 Throws the right exception if STRING_ord was called with a wrong index.
