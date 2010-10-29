@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-config/gen/libffi.pm - Libffi Files
+config/gen/libffi.pm - position libffi files
 
 =head1 DESCRIPTION
 
-Moves the appropriate nci files into place.
+Moves the appropriate NCI files into place.
 
 =cut
 
@@ -24,7 +24,7 @@ sub _init {
     my $self = shift;
     my %data;
 
-    $data{description} = q{Moving approriate NCI files into place};
+    $data{description} = q{Moving appropriate NCI files into place};
 
     return \%data;
 }
@@ -35,8 +35,6 @@ sub runstep {
     my $nci_file = 'config/gen/libffi/nci.pmc.in';
     if ( $conf->data->get("HAS_LIBFFI") ) {
          $nci_file = 'config/gen/libffi/nci-ffi.pmc.in';
-    }
-    else {
     }
 
     copy_if_diff( $nci_file, "src/pmc/nci.pmc" );
