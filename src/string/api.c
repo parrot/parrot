@@ -3256,6 +3256,8 @@ Parrot_str_from_int_base(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsign
 Registers the STRING from the interpreter's GC registry to prevent it from
 being collected.
 
+=cut
+
 */
 
 
@@ -3278,6 +3280,8 @@ Parrot_str_gc_register(PARROT_INTERP, ARGIN(STRING *s))
 =item C<void Parrot_str_gc_unregister(PARROT_INTERP, STRING *s)>
 
 Unregisters the STRING from the interpreter's GC registry.
+
+=cut
 
 */
 
