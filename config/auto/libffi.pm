@@ -76,7 +76,7 @@ sub runstep {
     my $has_libffi = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_libffi = _evaluate_cc_run($test, $verbose);
+        $has_libffi = _evaluate_cc_run($test);
     }
     $conf->cc_clean();
 
@@ -100,7 +100,7 @@ sub runstep {
 }
 
 sub _evaluate_cc_run {
-    my ($output, $verbose) = @_;
+    my ($output) = @_;
     my $has_libffi = ( $output =~ m/libffi worked/ ) ? 1 : 0;
     return $has_libffi;
 }
