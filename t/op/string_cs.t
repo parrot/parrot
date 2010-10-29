@@ -896,22 +896,47 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'compare mixed encodings' );
     $S0 = iso-8859-1:"a\xFCb 1"
     $S1 = utf8:"a\xFCb 2"
     $I0 = islt $S0, $S1
-    say $I0
+    print $I0
     $I0 = isgt $S1, $S0
-    say $I0
+    print $I0
 
     $S0 = utf8:"a\uBABEb c\uBEEFd 1"
     $S1 = ucs2:"a\uBABEb c\uBEEFd 2"
     $I0 = islt $S0, $S1
-    say $I0
+    print $I0
     $I0 = isgt $S1, $S0
-    say $I0
+    print $I0
+
+    $S0 = utf8:"a\uBABEb c\uBEEFd 1"
+    $S1 = ucs2:"a\uBABEb c\uBEEFd 11"
+    $I0 = islt $S0, $S1
+    print $I0
+    $I0 = isgt $S1, $S0
+    print $I0
+
+    $S0 = utf8:""
+    $S1 = ucs2:"a\uBABEb"
+    $I0 = islt $S0, $S1
+    print $I0
+    $I0 = isgt $S1, $S0
+    print $I0
+
+    $S0 = utf8:"a\uBABEb c\uBEEFd"
+    $S1 = ucs2:"a\uBABEb c\uBEEFd"
+    $I0 = isle $S0, $S1
+    print $I0
+    $I0 = isge $S1, $S0
+    print $I0
+
+    $S0 = utf8:""
+    $S1 = ucs2:""
+    $I0 = iseq $S0, $S1
+    print $I0
+
+    print "\n"
 .end
 CODE
-1
-1
-1
-1
+11111111111
 OUTPUT
 
 # Local Variables:
