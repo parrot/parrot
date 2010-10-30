@@ -1354,6 +1354,9 @@ gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
     if (PObj_is_live_or_free_TESTALL(obj))
         return 0;
 
+    if (PObj_constant_TEST(obj))
+        return 0;
+
     /* Pool.is_owned isn't precise enough (yet) */
     if (Parrot_list_contains(interp, list, item))
         return 1;
