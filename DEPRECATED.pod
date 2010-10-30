@@ -82,7 +82,7 @@ L<https://trac.parrot.org/parrot/ticket/1551>
 
 =item UnManagedStruct initializer structure [eligible in 2.4]
 
-The initializer structure will cease to be an array of triples. In stead, an
+The initializer structure will cease to be an array of triples. Instead, an
 array of flags (no counts or offsets), or a string representation of the same
 information may be used.
 
