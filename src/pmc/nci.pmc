@@ -163,9 +163,8 @@ build_libffi_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci))
 
 pmclass NCI auto_attrs provides invokable {
     /* NCI thunk handling attributes */
-    /* NCI thunk handling attributes */
     ATTR PMC       *signature;
-    ATTR STRING    *sig_str;              /* The signature. */
+    ATTR STRING    *sig_str;
     ATTR void      *func;                   /* Function pointer to call. */
     ATTR void      *orig_func;
     ATTR PMC       *fb_info;                /* Frame-builder info */
@@ -175,9 +174,7 @@ pmclass NCI auto_attrs provides invokable {
     /* Parrot Sub-ish attributes */
     ATTR STRING    *pcc_params_signature;
     ATTR STRING    *pcc_return_signature;
-    ATTR void      *arg_translation;
-    ATTR void      *return_translation;
-    ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
+    ATTR INTVAL     arity;
 
     /* MMD fields */
     ATTR STRING    *long_signature;         /* The full signature. */
@@ -296,9 +293,7 @@ Free all of the memory used internally to store various things, like libffi call
         if (PARROT_NCI(SELF)) {
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
             mem_sys_free(nci_info->cif);
-            mem_sys_free(nci_info->arg_translation);
             mem_sys_free(nci_info->arg_types);
-            mem_sys_free(nci_info->return_translation);
         }
     }
 
