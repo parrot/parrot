@@ -56,7 +56,7 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
         switch ((char)c) {
           case '0':    /* null ptr or such - doesn't consume a reg */
-            e = enum_nci_sig_void;
+            e = enum_nci_sig_null;
             break;
 
           case 'f':
@@ -141,6 +141,9 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
         VTABLE_push_integer(interp, sig_pmc, e);
     }
+
+    if (VTABLE_elements(interp, sig_pmc) < 1)
+        VTABLE_push_integer(interp, sig_pmc, enum_nci_sig_void);
 
     return sig_pmc;
 }
@@ -229,10 +232,10 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
     }
 
     PARROT_ASSERT(j < buf_len);
-    sig_buf[j++] = '\0';
+    sig_buf[j + 1] = '\0';
 
     *ret_sig    = Parrot_str_new(interp, sig_buf, 1);
-    *params_sig = j ?
+    *params_sig = j - 1 ?
                 Parrot_str_new(interp, &sig_buf[1], j - 1) :
                 CONST_STRING(interp, "");
 

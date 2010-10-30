@@ -54,6 +54,7 @@ build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci))
     ASSERT_ARGS(build_func)
 
     nci->signature = Parrot_nci_parse_signature(interp, nci->sig_str);
+
     Parrot_nci_sig_to_pcc(interp, nci->signature,
                             &nci->pcc_params_signature,
                             &nci->pcc_return_signature);
