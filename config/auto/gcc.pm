@@ -7,7 +7,8 @@ config/auto/gcc.pm - GNU C Compiler
 
 =head1 DESCRIPTION
 
-Determines whether the C compiler is actually C<gcc>.
+Determines whether the C compiler is actually C<gcc>.  If so, sets
+C<gccdefines*> attributes.
 
 =cut
 
@@ -33,6 +34,16 @@ sub runstep {
     my ( $self, $conf ) = @_;
     my $gnucref = _probe_for_gcc($conf);
     my $rv = $self->_evaluate_gcc($conf, $gnucref);
+
+    if (defined( $conf->data->get('gccversion') ) ) {
+        my @gccdefines = `gcc -x c -E -dM /dev/null`;
+        chomp @gccdefines;
+        foreach my $def (@gccdefines) {
+            my @data = split /\s+/, $def, 3;
+            $conf->data->set("gccdefines$data[1]" => $data[2]);
+        }
+    }
+
     return $rv;
 }
 
