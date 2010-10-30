@@ -45,6 +45,7 @@ typedef struct MarkSweep_GC {
     /* Allocator for strings */
     struct Pool_Allocator *string_allocator;
     struct Linked_List    *strings;
+    struct Linked_List    *constant_strings;
 
     /* Fixed-size allocator */
     struct Fixed_Allocator *fixed_size_allocator;
@@ -117,8 +118,7 @@ static PMC * gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING * gc_ms2_allocate_string_header(PARROT_INTERP,
-    SHIM(UINTVAL flags))
+static STRING * gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_ms2_allocate_string_storage(PARROT_INTERP,
@@ -667,7 +667,8 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         self->string_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (STRING));
-        self->strings = Parrot_list_new(interp);
+        self->strings          = Parrot_list_new(interp);
+        self->constant_strings = Parrot_list_new(interp);
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
@@ -702,6 +703,7 @@ gc_ms2_finalize(PARROT_INTERP)
         Parrot_list_destroy(interp, self->objects);
         Parrot_list_destroy(interp, self->constants);
         Parrot_list_destroy(interp, self->strings);
+        Parrot_list_destroy(interp, self->constant_strings);
         Parrot_gc_pool_destroy(interp, self->pmc_allocator);
         Parrot_gc_pool_destroy(interp, self->string_allocator);
         Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
@@ -855,7 +857,7 @@ Allocate/free string/buffer headers.
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static STRING *
-gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
+gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_allocate_string_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -871,7 +873,13 @@ gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
     ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
-    LIST_APPEND(self->strings, ptr);
+
+    if (flags & PObj_constant_FLAG) {
+        LIST_APPEND(self->constant_strings, ptr);
+    }
+    else {
+        LIST_APPEND(self->strings, ptr);
+    }
 
     ret = LLH2Obj_typed(ptr, STRING);
     memset(ret, 0, sizeof (STRING));
@@ -1176,6 +1184,8 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->new_objects);
         gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->objects);
         gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->constants);
+        gc_ms2_sweep_string_pool(interp, self->string_allocator,
+                                         self->constant_strings);
     }
 
     /* Replace objects with new_objects. Ignoring "constant" one */
@@ -1297,7 +1307,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
         if (PObj_live_TEST(obj))
             PObj_live_CLEAR(obj);
 
-        else if (!PObj_constant_TEST(obj)) {
+        else {
             Buffer *str  = (Buffer *)obj;
             LIST_REMOVE(list, tmp);
             if (Buffer_bufstart(str) && !PObj_external_TEST(str))
