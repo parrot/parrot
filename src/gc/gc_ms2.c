@@ -729,16 +729,16 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
-
-    interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
-    interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
-
     ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
+
     if (flags & PObj_constant_FLAG) {
         LIST_APPEND(self->constants, ptr);
     }
     else {
+        /* only reclaimable PMCs count toward memory limits */
         LIST_APPEND(self->objects, ptr);
+        interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
+        interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
     }
 
     return LLH2Obj_typed(ptr, PMC);
