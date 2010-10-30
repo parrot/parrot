@@ -810,13 +810,7 @@ Return the arity of the NCI (the number of arguments).
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod>.
-
-=head1 HISTORY
-
-Initial revision by sean 2002/08/04.
-
-Updates by John Harrison, Summer 2010, GSoC.
+F<docs/pdds/draft/pdd16_native_call.pod>
 
 =cut
 
