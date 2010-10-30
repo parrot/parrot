@@ -36,6 +36,9 @@ typedef struct MarkSweep_GC {
     /* Currently allocated objects */
     struct Linked_List    *objects;
 
+    /* Currently allocated constant objects */
+    struct Linked_List    *constants;
+
     /* During M&S gather new live objects in this list */
     struct Linked_List    *new_objects;
 
@@ -659,7 +662,8 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (PMC));
-        self->objects = Parrot_list_new(interp);
+        self->objects   = Parrot_list_new(interp);
+        self->constants = Parrot_list_new(interp);
 
         self->string_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (STRING));
@@ -696,6 +700,7 @@ gc_ms2_finalize(PARROT_INTERP)
         Parrot_gc_str_finalize(interp, &self->string_gc);
 
         Parrot_list_destroy(interp, self->objects);
+        Parrot_list_destroy(interp, self->constants);
         Parrot_list_destroy(interp, self->strings);
         Parrot_gc_pool_destroy(interp, self->pmc_allocator);
         Parrot_gc_pool_destroy(interp, self->string_allocator);
@@ -727,7 +732,12 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
     ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
-    LIST_APPEND(self->objects, ptr);
+    if (flags & PObj_constant_FLAG) {
+        LIST_APPEND(self->constants, ptr);
+    }
+    else {
+        LIST_APPEND(self->objects, ptr);
+    }
 
     return LLH2Obj_typed(ptr, PMC);
 }
@@ -742,7 +752,10 @@ gc_ms2_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
     if (pmc) {
         if (PObj_on_free_list_TEST(pmc))
             return;
-        Parrot_list_remove(interp, self->objects, Obj2LLH(pmc));
+        if (PObj_constant_TEST(pmc))
+            Parrot_list_remove(interp, self->constants, Obj2LLH(pmc));
+        else
+            Parrot_list_remove(interp, self->objects, Obj2LLH(pmc));
         PObj_on_free_list_SET(pmc);
 
         Parrot_pmc_destroy(interp, pmc);
@@ -780,6 +793,7 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     /* mark it live */
     PObj_live_SET(pmc);
 
+    /* there should be no constant PMCs to move here */
     LIST_REMOVE(self->objects, item);
     LIST_APPEND(self->new_objects, item);
 }
@@ -1159,8 +1173,9 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* destroy the rest */
     if (flags & GC_finish_FLAG) {
-        gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->objects);
         gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->new_objects);
+        gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->objects);
+        gc_ms2_destroy_pmc_pool(interp, self->pmc_allocator, self->constants);
     }
 
     /* Replace objects with new_objects. Ignoring "constant" one */
@@ -1206,7 +1221,7 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
         if (PObj_live_TEST(obj))
             PObj_live_CLEAR(obj);
 
-        else if (!PObj_constant_TEST(obj)) {
+        else {
             LIST_REMOVE(list, tmp);
 
             Parrot_pmc_destroy(interp, (PMC *)obj);
