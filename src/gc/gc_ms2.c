@@ -32,8 +32,10 @@ alloc, and phase of the Moon. */
 typedef struct MarkSweep_GC {
     /* Allocator for PMC headers */
     struct Pool_Allocator *pmc_allocator;
-    /* Currently allocate objects */
+
+    /* Currently allocated objects */
     struct Linked_List    *objects;
+
     /* During M&S gather new live objects in this list */
     struct Linked_List    *new_objects;
 
@@ -47,16 +49,18 @@ typedef struct MarkSweep_GC {
     /* String GC */
     struct String_GC        string_gc;
 
-    /* Number of allocated objects before trigger gc */
+    /* Number of allocated objects before triggering gc */
     size_t gc_threshold;
 
     /* GC blocking */
-    UINTVAL gc_mark_block_level;  /* How many outstanding GC block
-                                     requests are there? */
-    UINTVAL gc_sweep_block_level; /* How many outstanding GC block
-                                     requests are there? */
+    /* number of outstanding mark block requests */
+    UINTVAL gc_mark_block_level;
 
-    UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
+    /* number of outstanding sweep block requests */
+    UINTVAL gc_sweep_block_level;
+
+    /* how many PMCs want immediate destruction */
+    UINTVAL num_early_gc_PMCs;
 
 } MarkSweep_GC;
 
@@ -73,7 +77,7 @@ static void failed_allocation(unsigned int line, unsigned long size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
+static Buffer * gc_ms2_allocate_buffer_header(PARROT_INTERP,
     SHIM(size_t size))
         __attribute__nonnull__(1);
 
@@ -84,7 +88,7 @@ static void gc_ms2_allocate_buffer_storage(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
+static void * gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -97,19 +101,20 @@ static void * gc_ms2_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void* gc_ms2_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+static void * gc_ms2_allocate_pmc_attributes(PARROT_INTERP,
+    ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+static PMC * gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING* gc_ms2_allocate_string_header(PARROT_INTERP,
+static STRING * gc_ms2_allocate_string_header(PARROT_INTERP,
     SHIM(UINTVAL flags))
         __attribute__nonnull__(1);
 
@@ -439,16 +444,16 @@ gc_ms2_compact_memory_pool(PARROT_INTERP)
 
 /*
 
-=item C<static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)>
+=item C<static PMC * gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)>
 
 =item C<static void gc_ms2_free_pmc_header(PARROT_INTERP, PMC *pmc)>
 
-=item C<static STRING* gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL
+=item C<static STRING * gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL
 flags)>
 
 =item C<static void gc_ms2_free_string_header(PARROT_INTERP, STRING *s)>
 
-=item C<static void* gc_ms2_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
+=item C<static void * gc_ms2_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
 =item C<static void gc_ms2_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
@@ -464,7 +469,7 @@ size_t size)>
 =item C<static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP, Buffer *str,
 size_t size)>
 
-=item C<static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t
+=item C<static void * gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t
 size)>
 
 =item C<static void gc_ms2_free_fixed_size_storage(PARROT_INTERP, size_t size,
@@ -477,7 +482,7 @@ Functions for allocating/deallocating various objects.
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void*
+static void *
 gc_ms2_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_attributes)
@@ -510,7 +515,7 @@ gc_ms2_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 
 PARROT_CAN_RETURN_NULL
-static void*
+static void *
 gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms2_allocate_fixed_size_storage)
@@ -550,6 +555,7 @@ gets stats based on enum which
 =cut
 
 */
+
 static size_t
 gc_ms2_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 {
@@ -582,7 +588,7 @@ void
 Parrot_gc_ms2_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_ms2_init)
-    struct MarkSweep_GC *self;
+    MarkSweep_GC *self;
 
     /* We have to transfer ownership of memory to parent interp
      * in threaded parrot */
@@ -646,7 +652,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
     if (interp->parent_interpreter && interp->parent_interpreter->gc_sys) {
         /* This is a "child" interpreter. Just reuse parent one */
-        self = (MarkSweep_GC*)interp->parent_interpreter->gc_sys->gc_private;
+        self = (MarkSweep_GC *)interp->parent_interpreter->gc_sys->gc_private;
     }
     else {
         self = mem_allocate_zeroed_typed(MarkSweep_GC);
@@ -704,7 +710,7 @@ gc_ms2_finalize(PARROT_INTERP)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC*
+static PMC *
 gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
@@ -754,7 +760,7 @@ gc_ms2_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 
 =item C<static void gc_ms2_mark_pmc_header(PARROT_INTERP, PMC *pmc)>
 
-mark as grey
+Mark PMC as grey
 
 =cut
 
@@ -776,7 +782,6 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 
     LIST_REMOVE(self->objects, item);
     LIST_APPEND(self->new_objects, item);
-
 }
 
 
@@ -823,7 +828,7 @@ gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
 
 =item C<gc_ms2_free_string_header()>
 
-=item C<static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP, size_t
+=item C<static Buffer * gc_ms2_allocate_buffer_header(PARROT_INTERP, size_t
 size)>
 
 =item C<static void gc_ms2_free_buffer_header(PARROT_INTERP, Buffer *s, size_t
@@ -835,7 +840,7 @@ Allocate/free string/buffer headers.
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING*
+static STRING *
 gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_ms2_allocate_string_header)
@@ -888,7 +893,7 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer*
+static Buffer *
 gc_ms2_allocate_buffer_header(PARROT_INTERP, SHIM(size_t size))
 {
     ASSERT_ARGS(gc_ms2_allocate_buffer_header)
@@ -900,7 +905,7 @@ static void
 gc_ms2_free_buffer_header(PARROT_INTERP, ARGFREE(Buffer *s), SHIM(size_t size))
 {
     ASSERT_ARGS(gc_ms2_free_buffer_header)
-    gc_ms2_free_string_header(interp, (STRING*)s);
+    gc_ms2_free_string_header(interp, (STRING *)s);
 }
 
 
@@ -918,7 +923,7 @@ static int
 gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_string_ptr)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator,
             self->strings);
 }
@@ -1266,8 +1271,8 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
         ARGIN(Linked_List *list))
 {
     ASSERT_ARGS(gc_ms2_sweep_string_pool)
-    List_Item_Header *tmp = list->first;
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header *tmp  = list->first;
 
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -1573,7 +1578,7 @@ gc_ms2_count_used_string_memory(PARROT_INTERP, ARGIN(Linked_List *list))
     while (tmp) {
         List_Item_Header *next = tmp->next;
         PObj             *obj  = LLH2Obj_typed(tmp, PObj);
-        STRING           *str  = (STRING*)obj;
+        STRING           *str  = (STRING *)obj;
 
         /* Header size */
         total_amount += sizeof (List_Item_Header) + sizeof (STRING *);
