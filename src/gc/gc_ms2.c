@@ -869,8 +869,6 @@ gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
-    interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
-    interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
     ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
 
@@ -878,7 +876,10 @@ gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         LIST_APPEND(self->constant_strings, ptr);
     }
     else {
+        /* only reclaimable STRINGs count toward memory limits */
         LIST_APPEND(self->strings, ptr);
+        interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
+        interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
     }
 
     ret = LLH2Obj_typed(ptr, STRING);
