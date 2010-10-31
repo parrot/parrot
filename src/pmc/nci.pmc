@@ -411,13 +411,10 @@ class, the PMC arguments are shifted down.
         Parrot_NCI_attributes * const nci_info    = PARROT_NCI(SELF);
         char                         *sig_str;
         PMC                          *cont;
-        INTVAL                        return_size = sizeof (void*);
         PMC                          *ctx         = CURRENT_CONTEXT(interp);
         PMC                          *call_object = Parrot_pcc_get_signature(interp, ctx);
         void (*func)(void*,void*,void*); /* a function pointer for our function to call */
 
-        PMC *positional, *arg_iter;
-        STRING *void_return;
         void **values; 
         parrot_var_t *pcc_arg;
         void **translation_pointers = NULL; /* Data translation pointers, used to hold values
@@ -626,8 +623,7 @@ class, the PMC arguments are shifted down.
                 }
             }
 
-            if (pcc_arg)
-                mem_gc_free(interp, pcc_arg); 
+            mem_gc_free(interp, pcc_arg); 
         }
 
         /*
@@ -757,15 +753,9 @@ class, the PMC arguments are shifted down.
             }
         }
     
-        if (nci_info->arity > 0 && middle_man) {
-            mem_sys_free(middle_man);
-        }
-        if (return_data) {
-            mem_sys_free(return_data);
-        }
-        if (values) {
-            mem_sys_free(values);
-        }
+        mem_sys_free(middle_man);
+        mem_sys_free(return_data);
+        mem_sys_free(values);
 
         cont = INTERP->current_cont;
 
