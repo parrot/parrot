@@ -521,36 +521,30 @@ class, the PMC arguments are shifted down.
                     break;
                   case enum_nci_sig_string:
                     translation_pointers[i] = pcc_arg[j++].s;
-                    values[i] = &translation_pointers[i];
+                    values[i]               = &translation_pointers[i];
                     break;
                   case enum_nci_sig_cstring:
-                    if (STRING_IS_NULL(pcc_arg[j].s)) {
-                        translation_pointers[i] = (char*) NULL;
-                    }
-                    else {
-                        translation_pointers[i] = Parrot_str_to_cstring(interp, pcc_arg[j].s);
-                    }
+                    translation_pointers[i] = STRING_IS_NULL(pcc_arg[j].s) ?
+                                                (char *)NULL :
+                                                Parrot_str_to_cstring(interp, pcc_arg[j].s);
                     j++;
                     values[i] = &translation_pointers[i];
                     break;
                   case enum_nci_sig_bufref:
-                    if (STRING_IS_NULL(pcc_arg[j].s)) {
-                        translation_pointers[i] = (char*) NULL;
-                    }
-                    else {
-                        translation_pointers[i] = Parrot_str_to_cstring(interp, pcc_arg[j].s);
-                    }
+                    translation_pointers[i] = STRING_IS_NULL(pcc_arg[j].s) ?
+                                                (char *)NULL :
+                                                Parrot_str_to_cstring(interp, pcc_arg[j].s);
                     j++;
-                    middle_man[i] = &translation_pointers[i];
-                    values[i] = &middle_man[i];
+                    middle_man[i]           = &translation_pointers[i];
+                    values[i]               = &middle_man[i];
                     break;
                   case enum_nci_sig_cstringref:
                     values[i] = &Buffer_bufstart(pcc_arg[j++].s);
                     break;
                   case enum_nci_sig_char:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(char);
-                    *((char**)translation_pointers)[i] = (char)pcc_arg[j++].i;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]            = mem_internal_allocate_zeroed_typed(char);
+                    *(char *)(translation_pointers[i]) = (char)pcc_arg[j++].i;
+                    values[i]                          = translation_pointers[i];
                     break;
                   case enum_nci_sig_shortref:
                     pmc_holder       = translation_pointers[i]
@@ -562,9 +556,9 @@ class, the PMC arguments are shifted down.
                     values[i]        = &pmc_holder->ival;
                     break;
                   case enum_nci_sig_short:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(short);
-                    *((short**)translation_pointers)[i] = (short)pcc_arg[j++].i;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]             = mem_internal_allocate_zeroed_typed(short);
+                    *(short *)(translation_pointers[i]) = (short)pcc_arg[j++].i;
+                    values[i]                           = translation_pointers[i];
                     break;
                   case enum_nci_sig_intref:
                     pmc_holder       = translation_pointers[i]
@@ -576,9 +570,9 @@ class, the PMC arguments are shifted down.
                     values[i]        = &pmc_holder->ival;
                     break;
                   case enum_nci_sig_int:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(int);
-                    *((int**)translation_pointers)[i] = (int)pcc_arg[j++].i;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]           = mem_internal_allocate_zeroed_typed(int);
+                    *(int *)(translation_pointers[i]) = (int)pcc_arg[j++].i;
+                    values[i]                         = translation_pointers[i];
                     break;
                   case enum_nci_sig_longref:
                     pmc_holder       = translation_pointers[i]
@@ -590,9 +584,9 @@ class, the PMC arguments are shifted down.
                     values[i]        = &pmc_holder->ival;
                     break;
                   case enum_nci_sig_long:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(long);
-                    *((long**)translation_pointers)[i] = (long)pcc_arg[j++].i;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]            = mem_internal_allocate_zeroed_typed(long);
+                    *(long *)(translation_pointers[i]) = (long)pcc_arg[j++].i;
+                    values[i]                          = translation_pointers[i];
                     break;
                   case enum_nci_sig_ptrref:
                     pmc_holder       = translation_pointers[i]
@@ -607,28 +601,28 @@ class, the PMC arguments are shifted down.
                     break;
                   case enum_nci_sig_pmc:
                     translation_pointers[i] = pcc_arg[j++].p;
-                    values[i] = &translation_pointers[i];
+                    values[i]               = &translation_pointers[i];
                     break;
                   case enum_nci_sig_ptr:
-                    translation_pointers[i] = PMC_IS_NULL(pcc_arg[j].p) ? 
+                    translation_pointers[i] = PMC_IS_NULL(pcc_arg[j].p) ?
                                 (void *)NULL : VTABLE_get_pointer(interp, pcc_arg[j].p);
                     j++;
-                    values[i] = &translation_pointers[i];
+                    values[i]               = &translation_pointers[i];
                     break;
                   case enum_nci_sig_float:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(float);
-                    *((float**)translation_pointers)[i] = (float)pcc_arg[j++].n;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]             = mem_internal_allocate_zeroed_typed(float);
+                    *(float *)(translation_pointers[i]) = (float)pcc_arg[j++].n;
+                    values[i]                           = translation_pointers[i];
                     break;
                   case enum_nci_sig_double:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(double);
-                    *((double**)translation_pointers)[i] = (double)pcc_arg[j++].n;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]              = mem_internal_allocate_zeroed_typed(double);
+                    *(double *)(translation_pointers[i]) = (double)pcc_arg[j++].n;
+                    values[i]                            = translation_pointers[i];
                     break;
                   case enum_nci_sig_numval:
-                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(FLOATVAL);
-                    *((FLOATVAL**)translation_pointers)[i] = pcc_arg[j++].n;
-                    values[i] = translation_pointers[i];
+                    translation_pointers[i]                = mem_internal_allocate_zeroed_typed(FLOATVAL);
+                    *(FLOATVAL *)(translation_pointers[i]) = pcc_arg[j++].n;
+                    values[i]                              = translation_pointers[i];
                     break;
                 }
             }
@@ -645,56 +639,51 @@ class, the PMC arguments are shifted down.
         ffi_call(cif, FFI_FN(func), return_data, values);
 
         if (cif->rtype != &ffi_type_void) {
-            char *s;
-            PMC *ret_object;
+            char         *s;
+            PMC          *ret_object;
+            parrot_var_t  final_destination;
             s = Parrot_str_to_cstring(interp, nci_info->pcc_return_signature);
             switch (VTABLE_get_integer_keyed_int(interp, nci_info->signature, 0)) {
               case enum_nci_sig_ptr:
-                {
-                    PMC *final_destination = PMCNULL;
+                final_destination.p = PMCNULL;
 
-                    if (*(void**)return_data != NULL) {
-                        final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-                        VTABLE_set_pointer(interp, final_destination, *(void**)return_data);
-                    }
-                    ret_object = Parrot_pcc_build_call_from_c_args(interp,
-                                                                    call_object,
-                                                                    s, final_destination);
+                if (*(void **)return_data != NULL) {
+                    final_destination.p = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+                    VTABLE_set_pointer(interp, final_destination.p, *(void **)return_data);
                 }
+                ret_object = Parrot_pcc_build_call_from_c_args(interp,
+                                                                call_object,
+                                                                s, final_destination.p);
                 break;
               case enum_nci_sig_cstring:
-                {
-                    STRING *final_destination = Parrot_str_new(interp, *(char**)return_data, 0);
-                    ret_object = Parrot_pcc_build_call_from_c_args(interp,
-                                                                   call_object,
-                                                                   s, final_destination);
-                }
+                final_destination.s = Parrot_str_new(interp, *(char **)return_data, 0);
+                ret_object = Parrot_pcc_build_call_from_c_args(interp,
+                                                               call_object,
+                                                               s, final_destination.s);
                 break;
               case enum_nci_sig_float:
-                {
-                    FLOATVAL final_destination = *(float*)return_data;
+                final_destination.n = *(float *)return_data;
 
-                    ret_object = Parrot_pcc_build_call_from_c_args(interp, 
-                                                            call_object, 
-                                                            s, final_destination);
-                }
+                ret_object = Parrot_pcc_build_call_from_c_args(interp, 
+                                                        call_object, 
+                                                        s, final_destination.n);
                 break;
               default:
                 switch (s[0]) {
                   case 'N':
                     ret_object = Parrot_pcc_build_call_from_c_args(interp,
                                                            call_object,
-                                                           s, *(FLOATVAL*)return_data);
+                                                           s, *(FLOATVAL *)return_data);
                   case 'I':
                     ret_object = Parrot_pcc_build_call_from_c_args(interp,
                                                            call_object,
-                                                           s, *(INTVAL*)return_data);
+                                                           s, *(INTVAL *)return_data);
                   case 'P':
                   case 'S':
                   default:
                     ret_object = Parrot_pcc_build_call_from_c_args(interp,
                                                            call_object,
-                                                           s, *(void**)return_data);
+                                                           s, *(void **)return_data);
                 }
                 break;
             }
