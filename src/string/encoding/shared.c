@@ -1300,37 +1300,6 @@ unicode_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<UINTVAL unicode_validate(PARROT_INTERP, const STRING *src)>
-
-Returns 1 if the STRING C<src> is a valid unicode string, returns 0 otherwise.
-
-=cut
-
-*/
-
-UINTVAL
-unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
-{
-    ASSERT_ARGS(unicode_validate)
-    String_iter iter;
-    const UINTVAL length = Parrot_str_length(interp, src);
-
-    STRING_ITER_INIT(interp, &iter);
-    while (iter.charpos < length) {
-        const UINTVAL codepoint = STRING_iter_get_and_advance(interp, src, &iter);
-        /* Check for Unicode non-characters */
-        if (codepoint >= 0xfdd0
-        && (codepoint <= 0xfdef || (codepoint & 0xfffe) == 0xfffe)
-        &&  codepoint <= 0x10ffff)
-            return 0;
-    }
-
-    return 1;
-}
-
-
-/*
-
 =item C<STRING* unicode_compose(PARROT_INTERP, const STRING *src)>
 
 If Parrot is built with ICU, composes the STRING C<src>. Attempts to

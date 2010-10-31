@@ -292,10 +292,6 @@ PARROT_CANNOT_RETURN_NULL
 STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
-UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_encoding_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lhs) \
@@ -418,9 +414,6 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_unicode_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_unicode_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/encoding/shared.c */
 

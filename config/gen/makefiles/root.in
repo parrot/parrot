@@ -1660,11 +1660,14 @@ src/string/encoding/utf8$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/unicode.h
 src/string/encoding/utf16$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 src/string/encoding/ucs2$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 src/string/encoding/ucs4$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 
 src/pbc_merge$(O) : \
     $(INC_DIR)/embed.h \
