@@ -267,16 +267,15 @@ Mark any referenced strings and PMCs.
 
 */
     VTABLE void mark() {
-        if (PARROT_NCI(SELF)) {
-            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
-            Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->sig_str);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_return_signature);
-            Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
-            Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
-        }
+        Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
+        Parrot_gc_mark_PMC_alive(interp, nci_info->signature);
+        Parrot_gc_mark_STRING_alive(interp, nci_info->sig_str);
+        Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
+        Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_return_signature);
+        Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
+        Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
     }
 
 /*
@@ -475,6 +474,10 @@ class, the PMC arguments are shifted down.
                   case enum_nci_sig_interp:
                     values[i] = &interp;
                     j_offset++;
+                    break;
+                  case enum_nci_sig_string:
+                    translation_pointers[i] = *(STRING**)pcc_val[i - j_offset];
+                    values[i] = &translation_pointers[i];
                     break;
                   case enum_nci_sig_cstring:
                     if (STRING_IS_NULL(*(STRING**)pcc_val[i - j_offset])) {
