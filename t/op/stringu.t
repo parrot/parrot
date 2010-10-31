@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 use Parrot::Config;
 
 =head1 NAME
@@ -226,19 +226,6 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
     set S0, utf8:"«"
-    length I0, S0
-    print I0
-    print "\n"
-    print S0
-    print "\n"
-    end
-CODE
-1
-\xc2\xab
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
-    set S0, utf8:unicode:"\xc2\xab"
     length I0, S0
     print I0
     print "\n"
@@ -508,9 +495,6 @@ hello
 hello
 OUTPUT
 
-
-SKIP: {
-    skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
 pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings to int' );
 .sub main :main
      $S0 = "140"
@@ -555,7 +539,6 @@ CODE
 140
 140
 OUT
-}
 
 pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT #752)' );
 .sub 'main'
@@ -709,6 +692,119 @@ CODE
 0x10000
 0x1FFFD
 0x20000
+0x10FFFD
+OUT
+
+sub units_to_code {
+    my $code = '';
+
+    for my $unit (@_) {
+        my $str = pack('S*', @$unit);
+        $str =~ s/./sprintf("\\x%02X", ord($&))/egs;
+        $code .= qq{    'test_chars'(binary:"$str")\n};
+    }
+
+    return $code;
+}
+
+my $code = qq{    'test_chars'(binary:"\\x41\\x42\\x43")\n};
+$code .= units_to_code(
+    [ 0xD800 ],
+    [ 0xDFFF ],
+    [ 0xD800, 0x0041 ],
+    [ 0xD900, 0xDAFF ],
+    [ 0xDBFF, 0xD800 ],
+    [ 0xDC00, 0xD8FF ],
+    [ 0xDDFF, 0xDE00 ],
+    [ 0xDFFF, 0x0041 ],
+    [ 0xFDD0 ],
+    [ 0xFDEF ],
+    [ 0xFFFE ],
+    [ 0xFFFF ],
+    [ 0xD83F, 0xDFFF ],
+    [ 0xDBFF, 0xDFFE ],
+);
+
+pir_output_is( <<CODE, <<'OUT', 'illegal utf16 chars' );
+.sub 'main'
+$code
+.end
+
+.sub 'test_chars'
+    .param string chars
+    .local pmc eh, ex, bb
+    bb = new 'ByteBuffer'
+    bb = chars
+    eh = new 'ExceptionHandler'
+    set_addr eh, handler
+    push_eh eh
+    chars = bb.'get_string'('utf16')
+    say 'valid'
+    goto end
+  handler:
+    .local pmc ex
+    .get_results (ex)
+    \$S0 = ex['message']
+    print \$S0
+  end:
+    pop_eh
+.end
+CODE
+Unaligned end in UTF-16 string
+Unaligned end in UTF-16 string
+Malformed UTF-16 string
+Malformed UTF-16 string
+Malformed UTF-16 string
+Malformed UTF-16 string
+Malformed UTF-16 string
+Malformed UTF-16 string
+Malformed UTF-16 string
+Non-character in UTF-16 string
+Non-character in UTF-16 string
+Non-character in UTF-16 string
+Non-character in UTF-16 string
+Non-character in UTF-16 string
+Non-character in UTF-16 string
+OUT
+
+$code = units_to_code(
+    [ 0x0041 ],
+    [ 0xD7FF ],
+    [ 0xE000 ],
+    [ 0xFDCF ],
+    [ 0xFDF0 ],
+    [ 0xFFFD ],
+    [ 0xD800, 0xDC00 ],
+    [ 0xD912, 0xDE34 ],
+    [ 0xDBFF, 0xDFFD ],
+);
+
+pir_output_is( <<CODE, <<'OUT', 'valid utf16 chars' );
+.sub 'main'
+$code
+.end
+
+.sub 'test_chars'
+    .param string chars
+    .local pmc bb
+    bb = new 'ByteBuffer'
+    bb = chars
+    chars = bb.'get_string'('utf16')
+    \$I0 = ord chars
+    \$P0 = new 'FixedIntegerArray', 1
+    \$P0[0] = \$I0
+    \$S0 = sprintf '0x%X', \$P0
+    say \$S0
+.end
+CODE
+0x41
+0xD7FF
+0xE000
+0xFDCF
+0xFDF0
+0xFFFD
+0x10000
+0x54A34
 0x10FFFD
 OUT
 

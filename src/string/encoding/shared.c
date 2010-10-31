@@ -48,6 +48,70 @@ static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 /*
 
+=item C<STRING * encoding_to_encoding(PARROT_INTERP, const STRING *src, const
+STR_VTABLE *encoding, double avg_bytes)>
+
+Converts the string C<src> to encoding C<encoding>.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+encoding_to_encoding(PARROT_INTERP, ARGIN(const STRING *src),
+        ARGIN(const STR_VTABLE *encoding), double avg_bytes)
+{
+    ASSERT_ARGS(encoding_to_encoding)
+    STRING           *result;
+    String_iter       src_iter, dest_iter;
+    UINTVAL           src_len, alloc_bytes;
+    UINTVAL           max_bytes = encoding->max_bytes_per_codepoint;
+
+    if (src->encoding == encoding)
+        return Parrot_str_clone(interp, src);
+
+    src_len          = src->strlen;
+    result           = Parrot_gc_new_string_header(interp, 0);
+    result->encoding = encoding;
+    result->strlen   = src_len;
+
+    if (!src_len)
+        return result;
+
+    alloc_bytes = (UINTVAL)(src_len * avg_bytes);
+    if (alloc_bytes < max_bytes)
+        alloc_bytes = max_bytes;
+    Parrot_gc_allocate_string_storage(interp, result, alloc_bytes);
+    result->bufused = alloc_bytes;
+
+    STRING_ITER_INIT(interp, &src_iter);
+    STRING_ITER_INIT(interp, &dest_iter);
+
+    while (src_iter.charpos < src_len) {
+        const UINTVAL c      = STRING_iter_get_and_advance(interp, src, &src_iter);
+        const UINTVAL needed = dest_iter.bytepos + max_bytes;
+
+        if (needed > result->bufused) {
+            alloc_bytes  = src_len - src_iter.charpos;
+            alloc_bytes  = (UINTVAL)(alloc_bytes * avg_bytes);
+            alloc_bytes += needed;
+            Parrot_gc_reallocate_string_storage(interp, result, alloc_bytes);
+            result->bufused = alloc_bytes;
+        }
+
+        STRING_iter_set_and_advance(interp, result, &dest_iter, c);
+    }
+
+    result->bufused = dest_iter.bytepos;
+
+    return result;
+}
+
+
+/*
+
 =item C<INTVAL encoding_equal(PARROT_INTERP, const STRING *lhs, const STRING
 *rhs)>
 

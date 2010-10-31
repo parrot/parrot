@@ -1815,7 +1815,7 @@ CONFIGURE_TEST_FILES = \
     t/configure/*.t \
     t/steps/*.t
 PBC_TEST_FILES = \
-#IF(has_icu):    t/op/testlib/test_strings.pbc \
+    t/op/testlib/test_strings.pbc \
     t/pmc/testlib/annotations.pbc \
     t/pmc/testlib/number.pbc
 

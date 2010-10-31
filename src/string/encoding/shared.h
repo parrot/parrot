@@ -108,6 +108,16 @@ STRING * encoding_substr(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * encoding_to_encoding(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGIN(const STR_VTABLE *encoding),
+    double avg_bytes)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_WARN_UNUSED_RESULT
 UINTVAL encoding_validate(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
@@ -323,6 +333,10 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_encoding_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_encoding_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_encoding_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))

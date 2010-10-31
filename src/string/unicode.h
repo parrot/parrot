@@ -14,8 +14,8 @@
 #define PARROT_UNICODE_H_GUARD
 
 typedef unsigned char utf8_t;
-typedef unsigned short utf16_t;
-typedef unsigned long utf32_t;
+typedef Parrot_UInt2  utf16_t;
+typedef Parrot_Int4   utf32_t;
 
 #define UNICODE_SURROGATE_FIRST         0xD800u
 #define UNICODE_SURROGATE_LAST          0xDFFFu
