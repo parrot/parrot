@@ -395,7 +395,6 @@ static STR_VTABLE Parrot_ucs4_encoding = {
     encoding_index,
     encoding_rindex,
     ucs4_hash,
-    encoding_validate,
 
     ucs4_scan,
     ucs4_ord,

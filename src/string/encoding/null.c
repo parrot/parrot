@@ -188,7 +188,6 @@ static STR_VTABLE Parrot_null_encoding = {
     (str_vtable_index_t)null_error,
     (str_vtable_rindex_t)null_error,
     null_hash,
-    encoding_validate,
 
     null_scan,
     (str_vtable_ord_t)null_error,

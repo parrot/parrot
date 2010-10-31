@@ -357,7 +357,6 @@ static STR_VTABLE Parrot_ascii_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    encoding_validate,
 
     ascii_scan,
     fixed8_ord,

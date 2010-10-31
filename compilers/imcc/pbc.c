@@ -956,10 +956,6 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
                         src_encoding, 0);
                 s = Parrot_str_unescape_string(interp, aux,
                         s_encoding, PObj_constant_FLAG);
-                if (!STRING_validate(interp, s))
-                       Parrot_ex_throw_from_c_args(interp, NULL,
-                               EXCEPTION_INVALID_STRING_REPRESENTATION,
-                               "Malformed string");
             }
         }
         return s;

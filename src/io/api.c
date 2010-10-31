@@ -351,7 +351,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
                 result->encoding = Parrot_get_encoding(interp,
                     Parrot_encoding_number(interp, encoding_str));
 
-            STRING_validate(interp, result);
+            result->strlen = STRING_scan(interp, result);
         }
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {

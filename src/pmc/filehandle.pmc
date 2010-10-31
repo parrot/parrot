@@ -391,8 +391,6 @@ Read a line from the filehandle and return it in a string.
             else
                 string_result = Parrot_str_new_init(INTERP, r, strlen(r), enc, 0);
             free(r);
-            if (enc != NULL)
-                STRING_validate(INTERP, string_result);
         }
 #else
         if (got_prompt) {

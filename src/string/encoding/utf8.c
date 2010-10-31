@@ -598,7 +598,6 @@ static STR_VTABLE Parrot_utf8_encoding = {
     encoding_index,
     encoding_rindex,
     encoding_hash,
-    encoding_validate,
 
     utf8_scan,
     utf8_ord,

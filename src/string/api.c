@@ -2736,14 +2736,6 @@ Parrot_str_unescape(PARROT_INTERP,
     result->strlen  = d;
     result->bufused = iter.bytepos;
 
-    /* Force validating the string */
-    if (encoding != result->encoding)
-        result->strlen = STRING_scan(interp, result);
-
-    if (!STRING_validate(interp, result))
-        Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_INVALID_STRING_REPRESENTATION, "Malformed string");
-
     return result;
 }
 

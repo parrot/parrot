@@ -387,7 +387,6 @@ static STR_VTABLE Parrot_latin1_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    encoding_validate,
 
     latin1_scan,
     fixed8_ord,

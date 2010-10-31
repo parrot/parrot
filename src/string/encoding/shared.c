@@ -395,27 +395,6 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 /*
 
-=item C<UINTVAL encoding_validate(PARROT_INTERP, const STRING *src)>
-
-Verifies that the given string is valid. Returns 1 if it is valid,
-returns 0 otherwise.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-UINTVAL
-encoding_validate(PARROT_INTERP, ARGIN(const STRING *src))
-{
-    ASSERT_ARGS(encoding_validate)
-
-    return STRING_scan(interp, src) == src->strlen;
-}
-
-
-/*
-
 =item C<void encoding_ord_error(PARROT_INTERP, const STRING *s, INTVAL offset)>
 
 Throws the right exception if STRING_ord was called with a wrong index.

@@ -236,7 +236,6 @@ static STR_VTABLE Parrot_binary_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    encoding_validate,
 
     binary_scan,
     fixed8_ord,
