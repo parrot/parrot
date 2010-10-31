@@ -290,7 +290,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to 
     print "never\n"
     end
 CODE
-/lossy conversion to ascii/
+/Lossy conversion/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to binary" );
@@ -376,7 +376,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-8 to iso-8
     print "never\n"
     end
 CODE
-/lossy conversion to iso-8559-1/
+/Lossy conversion/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-8 to ascii - lossy" );
@@ -386,7 +386,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-8 to ascii
     print "never\n"
     end
 CODE
-/can't convert unicode string to ascii/
+/Lossy conversion/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "bug #34661 literal" );

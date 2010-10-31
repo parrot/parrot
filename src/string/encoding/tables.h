@@ -25,7 +25,6 @@
 #define PUNCTUATION enum_cclass_punctuation
 #define DIGIT       enum_cclass_numeric
 extern const INTVAL Parrot_iso_8859_1_typetable[256];
-extern const INTVAL Parrot_ascii_typetable[256];
 #endif /* PARROT_CHARSET_TABLES_H_GUARD */
 /*
  * Local variables:

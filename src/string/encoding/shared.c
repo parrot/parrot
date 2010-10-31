@@ -597,6 +597,71 @@ encoding_decompose(PARROT_INTERP, SHIM(const STRING *src))
 
 /*
 
+=item C<STRING * fixed8_to_encoding(PARROT_INTERP, const STRING *src, const
+STR_VTABLE *enc)>
+
+Converts STRING C<src> to a string with fixed8 encoding C<enc>.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+fixed8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src),
+        ARGIN(const STR_VTABLE *enc))
+{
+    ASSERT_ARGS(fixed8_to_encoding)
+    STRING        *dest;
+    const UINTVAL  limit = enc == Parrot_ascii_encoding_ptr ? 0x80 : 0x100;
+
+    if (STRING_max_bytes_per_codepoint(src) == 1) {
+        if (limit < 0x100) {
+            const unsigned char * const ptr = (unsigned char *)src->strstart;
+            UINTVAL i;
+
+            for (i = 0; i < src->strlen; ++i) {
+                if (ptr[i] >= limit)
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_LOSSY_CONVERSION,
+                        "Lossy conversion to single byte encoding");
+            }
+        }
+
+        dest           = Parrot_str_copy(interp, src);
+        dest->encoding = enc;
+    }
+    else {
+        String_iter    iter;
+        unsigned char *ptr;
+        const UINTVAL  len = src->strlen;
+
+        dest  = Parrot_str_new_init(interp, NULL, len, enc, 0);
+        ptr   = (unsigned char *)dest->strstart;
+
+        STRING_ITER_INIT(interp, &iter);
+
+        while (iter.charpos < len) {
+            const UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
+
+            if (c >= limit)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_LOSSY_CONVERSION,
+                    "Lossy conversion to single byte encoding");
+
+            *ptr++ = c;
+        }
+
+        dest->bufused = len;
+        dest->strlen  = len;
+    }
+
+    return dest;
+}
+
+
+/*
+
 =item C<INTVAL fixed8_equal(PARROT_INTERP, const STRING *lhs, const STRING
 *rhs)>
 
@@ -900,6 +965,98 @@ fixed_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL leng
 
 /*
 
+=item C<INTVAL fixed8_is_cclass(PARROT_INTERP, INTVAL flags, const STRING *src,
+UINTVAL offset)>
+
+Returns Boolean.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+fixed8_is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
+{
+    ASSERT_ARGS(fixed8_is_cclass)
+    const unsigned char * const ptr = (unsigned char *)src->strstart;
+    UINTVAL codepoint;
+
+    if (offset >= src->strlen) return 0;
+    codepoint = ptr[offset];
+
+    return Parrot_iso_8859_1_typetable[codepoint] & flags ? 1 : 0;
+}
+
+
+/*
+
+=item C<INTVAL fixed8_find_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*src, UINTVAL offset, UINTVAL count)>
+
+Find a character in the given character class.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+fixed8_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
+        UINTVAL offset, UINTVAL count)
+{
+    ASSERT_ARGS(fixed8_find_cclass)
+    const unsigned char * const ptr = (const unsigned char *)src->strstart;
+    UINTVAL pos;
+    UINTVAL end = offset + count;
+
+    if (end > src->strlen)
+        end = src->strlen;
+
+    for (pos = offset; pos < end; ++pos) {
+        if (Parrot_iso_8859_1_typetable[ptr[pos]] & flags)
+            return pos;
+    }
+
+    return end;
+}
+
+
+/*
+
+=item C<INTVAL fixed8_find_not_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*src, UINTVAL offset, UINTVAL count)>
+
+Returns C<INTVAL>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+fixed8_find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
+        UINTVAL offset, UINTVAL count)
+{
+    ASSERT_ARGS(fixed8_find_not_cclass)
+    const unsigned char * const ptr = (unsigned char *)src->strstart;
+    UINTVAL pos;
+    UINTVAL end = offset + count;
+
+    if (end > src->strlen)
+        end = src->strlen;
+
+    for (pos = offset; pos < end; ++pos) {
+        if ((Parrot_iso_8859_1_typetable[ptr[pos]] & flags) == 0)
+            return pos;
+    }
+
+    return end;
+}
+
+
+/*
+
 =item C<STRING* fixed8_compose(PARROT_INTERP, const STRING *src)>
 
 Can't compose ASCII strings, so performs a string copy on it and
@@ -935,7 +1092,11 @@ fixed8_iter_get(PARROT_INTERP,
     ARGIN(const STRING *str), ARGIN(const String_iter *iter), INTVAL offset)
 {
     ASSERT_ARGS(fixed8_iter_get)
-    return fixed8_ord(interp, str, iter->charpos + offset);
+    const unsigned char * const ptr = (unsigned char *)str->strstart;
+
+    PARROT_ASSERT(iter->charpos + offset < str->bufused);
+
+    return ptr[iter->charpos + offset];
 }
 
 
@@ -955,9 +1116,11 @@ fixed8_iter_skip(SHIM_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *iter), INTVAL skip)
 {
     ASSERT_ARGS(fixed8_iter_skip)
+
     iter->bytepos += skip;
     iter->charpos += skip;
-    PARROT_ASSERT(iter->bytepos <= Buffer_buflen(str));
+
+    PARROT_ASSERT(iter->bytepos <= str->bufused);
 }
 
 
@@ -977,8 +1140,13 @@ fixed8_iter_get_and_advance(PARROT_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *iter))
 {
     ASSERT_ARGS(fixed8_iter_get_and_advance)
-    const UINTVAL c = fixed8_ord(interp, str, iter->charpos++);
+    unsigned char * const ptr = (unsigned char *)str->strstart;
+    const UINTVAL         c   = ptr[iter->charpos++];
+
     iter->bytepos++;
+
+    PARROT_ASSERT(iter->bytepos <= str->bufused);
+
     return c;
 }
 
@@ -1000,9 +1168,18 @@ fixed8_iter_set_and_advance(PARROT_INTERP,
     ARGMOD(STRING *str), ARGMOD(String_iter *iter), UINTVAL c)
 {
     ASSERT_ARGS(fixed8_iter_set_and_advance)
-    unsigned char *buf = (unsigned char *)str->strstart;
-    buf[iter->charpos++] = c;
+    unsigned char * const ptr = (unsigned char *)str->strstart;
+
+    UINTVAL limit = str->encoding == Parrot_ascii_encoding_ptr ? 0x80 : 0x100;
+
+    if (c >= limit)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
+            "Lossy conversion to single byte encoding");
+
+    ptr[iter->charpos++] = c;
     iter->bytepos++;
+
+    PARROT_ASSERT(iter->bytepos <= str->bufused);
 }
 
 
@@ -1022,8 +1199,9 @@ fixed8_iter_set_position(SHIM_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *iter), UINTVAL pos)
 {
     ASSERT_ARGS(fixed8_iter_set_position)
+    PARROT_ASSERT(pos <= str->bufused);
+
     iter->bytepos = iter->charpos = pos;
-    PARROT_ASSERT(pos <= Buffer_buflen(str));
 }
 
 

@@ -40,31 +40,6 @@ static STRING* ascii_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static INTVAL ascii_find_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-static INTVAL ascii_find_not_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL ascii_is_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(const STRING *src),
-    UINTVAL offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
 PARROT_CANNOT_RETURN_NULL
 static STRING* ascii_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
@@ -104,15 +79,6 @@ static UINTVAL ascii_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_ascii_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ascii_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ascii_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ascii_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -150,46 +116,10 @@ static STRING *
 ascii_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(ascii_to_encoding)
-    STRING        *dest;
 
-    if (STRING_max_bytes_per_codepoint(src) == 1) {
-        unsigned char * const src_buf  = (unsigned char *)src->strstart;
-        UINTVAL offs;
-
-        for (offs = 0; offs < src->strlen; ++offs) {
-            UINTVAL c = src_buf[offs];
-            if (c >= 0x80)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
-                    "lossy conversion to ascii");
-        }
-
-        dest           = Parrot_str_clone(interp, src);
-        dest->encoding = Parrot_ascii_encoding_ptr;
-    }
-    else {
-        String_iter iter;
-        unsigned char *p;
-        const UINTVAL len = src->strlen;
-
-        dest = Parrot_str_new_init(interp, NULL, len,
-                Parrot_ascii_encoding_ptr, 0);
-        p    = (unsigned char *)dest->strstart;
-        STRING_ITER_INIT(interp, &iter);
-
-        while (iter.charpos < len) {
-            const UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
-            if (c >= 0x80)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
-                        "can't convert unicode string to ascii");
-            *p++ = c;
-        }
-
-        dest->bufused = len;
-        dest->strlen  = len;
-    }
-
-    return dest;
+    return fixed8_to_encoding(interp, src, Parrot_ascii_encoding_ptr);
 }
+
 
 /*
 
@@ -239,94 +169,6 @@ ascii_validate(PARROT_INTERP, ARGIN(const STRING *src))
             return 0;
     }
     return 1;
-}
-
-/*
-
-=item C<static INTVAL ascii_is_cclass(PARROT_INTERP, INTVAL flags, const STRING
-*src, UINTVAL offset)>
-
-Returns Boolean.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL
-ascii_is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
-{
-    ASSERT_ARGS(ascii_is_cclass)
-    UINTVAL codepoint;
-
-    if (offset >= src->strlen)
-        return 0;
-    codepoint = STRING_ord(interp, src, offset);
-
-    if (codepoint >= sizeof (Parrot_ascii_typetable) / sizeof (Parrot_ascii_typetable[0])) {
-        return 0;
-    }
-    return (Parrot_ascii_typetable[codepoint] & flags) ? 1 : 0;
-}
-
-/*
-
-=item C<static INTVAL ascii_find_cclass(PARROT_INTERP, INTVAL flags, const
-STRING *src, UINTVAL offset, UINTVAL count)>
-
-Find a character in the given character class.  Delegates to the find_cclass
-method of the encoding plugin.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL
-ascii_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset,
-                    UINTVAL count)
-{
-    ASSERT_ARGS(ascii_find_cclass)
-    const unsigned char *contents = (const unsigned char *)src->strstart;
-    UINTVAL pos = offset;
-    UINTVAL end = offset + count;
-
-    end = src->strlen < end ? src->strlen : end;
-    for (; pos < end; ++pos) {
-        if ((Parrot_ascii_typetable[contents[pos]] & flags) != 0) {
-            return pos;
-        }
-    }
-    return end;
-}
-
-/*
-
-=item C<static INTVAL ascii_find_not_cclass(PARROT_INTERP, INTVAL flags, const
-STRING *src, UINTVAL offset, UINTVAL count)>
-
-Returns C<INTVAL>.
-
-=cut
-
-*/
-
-static INTVAL
-ascii_find_not_cclass(PARROT_INTERP,
-                INTVAL flags, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(ascii_find_not_cclass)
-    const unsigned char *contents = (const unsigned char *)src->strstart;
-    UINTVAL pos = offset;
-    UINTVAL end = offset + count;
-
-    end = src->strlen < end ? src->strlen : end;
-    for (; pos < end; ++pos) {
-        if ((Parrot_ascii_typetable[contents[pos]] & flags) == 0) {
-            return pos;
-        }
-    }
-    return end;
 }
 
 /*
@@ -520,9 +362,9 @@ static STR_VTABLE Parrot_ascii_encoding = {
     fixed8_ord,
     fixed_substr,
 
-    ascii_is_cclass,
-    ascii_find_cclass,
-    ascii_find_not_cclass,
+    fixed8_is_cclass,
+    fixed8_find_cclass,
+    fixed8_find_not_cclass,
 
     encoding_get_graphemes,
     fixed8_compose,

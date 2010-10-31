@@ -130,6 +130,24 @@ INTVAL fixed8_equal(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
+INTVAL fixed8_find_cclass(PARROT_INTERP,
+    INTVAL flags,
+    ARGIN(const STRING *src),
+    UINTVAL offset,
+    UINTVAL count)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL fixed8_find_not_cclass(PARROT_INTERP,
+    INTVAL flags,
+    ARGIN(const STRING *src),
+    UINTVAL offset,
+    UINTVAL count)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
 size_t fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
         __attribute__nonnull__(2);
 
@@ -140,6 +158,14 @@ INTVAL fixed8_index(PARROT_INTERP,
     INTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL fixed8_is_cclass(PARROT_INTERP,
+    INTVAL flags,
+    ARGIN(const STRING *src),
+    UINTVAL offset)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 UINTVAL fixed8_iter_get(PARROT_INTERP,
@@ -202,6 +228,14 @@ PARROT_WARN_UNUSED_RESULT
 UINTVAL fixed8_scan(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+STRING * fixed8_to_encoding(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGIN(const STR_VTABLE *enc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -300,12 +334,21 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
+#define ASSERT_ARGS_fixed8_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_fixed8_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
     , PARROT_ASSERT_ARG(search))
+#define ASSERT_ARGS_fixed8_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
@@ -334,6 +377,10 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_fixed8_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_fixed8_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(enc))
 #define ASSERT_ARGS_fixed_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))

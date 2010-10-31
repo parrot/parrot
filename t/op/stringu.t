@@ -269,7 +269,7 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
     print "\n"
     end
 CODE
-/Malformed string/
+/Lossy conversion/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
