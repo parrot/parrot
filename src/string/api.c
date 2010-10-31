@@ -2988,7 +2988,7 @@ Parrot_str_change_encoding(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
     new_encoding = Parrot_get_encoding(interp, encoding_nr);
 
     if (!new_encoding)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARTYPE,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "encoding #%d not found", (int) encoding_nr);
 
     if (new_encoding == src->encoding)
