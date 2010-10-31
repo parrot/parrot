@@ -86,10 +86,6 @@ static UINTVAL utf8_scan(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL utf8_scan2(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const utf8_t * utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
@@ -132,9 +128,6 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_utf8_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_utf8_scan2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_utf8_skip_backward __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -262,41 +255,47 @@ utf8_scan(PARROT_INTERP, ARGIN(const STRING *src))
     UINTVAL characters = 0;
 
     while (u8ptr < u8end) {
-        u8ptr += UTF8SKIP(u8ptr);
+        UINTVAL c = *u8ptr;
+
+        if (UTF8_IS_START(c)) {
+            size_t len = UTF8SKIP(u8ptr);
+            size_t count;
+
+            if (u8ptr + len > u8end)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                    "Unaligned end in UTF-8 string\n");
+
+            /* Check for overlong forms */
+            if (UTF8_IS_OVERLONG(c, u8ptr[1]))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                    "Overlong form in UTF-8 string\n");
+
+            c &= UTF8_START_MASK(len);
+
+            for (count = 1; count < len; ++count) {
+                ++u8ptr;
+
+                if (!UTF8_IS_CONTINUATION(*u8ptr))
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                        "Malformed UTF-8 string\n");
+
+                c = UTF8_ACCUMULATE(c, *u8ptr);
+            }
+
+            if (UNICODE_IS_INVALID(c))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                    "Invalid character in UTF-8 string\n");
+        }
+        else if (!UNICODE_IS_INVARIANT(c)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                "Malformed UTF-8 string\n");
+        }
+
+        ++u8ptr;
         ++characters;
     }
 
-    if (u8ptr > u8end)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-            "Unaligned end in UTF-8 string\n");
-
     return characters;
-}
-
-
-/*
-
-=item C<static UINTVAL utf8_scan2(PARROT_INTERP, const STRING *src)>
-
-Returns the number of codepoints in string C<src>.
-
-=cut
-
-*/
-
-static UINTVAL
-utf8_scan2(PARROT_INTERP, ARGIN(const STRING *src))
-{
-    ASSERT_ARGS(utf8_scan2)
-    String_iter iter;
-    /*
-     * this is used to initially calculate src->strlen,
-     * therefore we must scan the whole string
-     */
-    STRING_ITER_INIT(interp, &iter);
-    while (iter.bytepos < src->bufused)
-        utf8_iter_get_and_advance(interp, src, &iter);
-    return iter.charpos;
 }
 
 
@@ -354,20 +353,8 @@ utf8_decode(PARROT_INTERP, ARGIN(const utf8_t *ptr))
         for (count = 1; count < len; ++count) {
             ++u8ptr;
 
-            if (!UTF8_IS_CONTINUATION(*u8ptr))
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                    "Malformed UTF-8 string\n");
-
             c = UTF8_ACCUMULATE(c, *u8ptr);
         }
-
-        if (UNICODE_IS_SURROGATE(c))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                "Surrogate in UTF-8 string\n");
-    }
-    else if (!UNICODE_IS_INVARIANT(c)) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-            "Malformed UTF-8 string\n");
     }
 
     return c;
@@ -396,10 +383,9 @@ utf8_encode(PARROT_INTERP, ARGIN(void *ptr), UINTVAL c)
     const utf8_t * const u8ptr = (utf8_t *)ptr;
     utf8_t              *u8end = (utf8_t *)ptr + len - 1;
 
-    if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
+    if (UNICODE_IS_INVALID(c))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
-                           "Invalid character for UTF-8 encoding\n");
-    }
+                "Invalid character for UTF-8 encoding\n");
 
     while (u8end > u8ptr) {
         *u8end-- =
@@ -443,8 +429,6 @@ utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
 
 Moves C<ptr> C<n> characters back.
 
-XXX This function is unused.
-
 =cut
 
 */
@@ -485,6 +469,8 @@ utf8_iter_get(PARROT_INTERP,
     ASSERT_ARGS(utf8_iter_get)
     const utf8_t *u8ptr = (utf8_t *)((char *)str->strstart + i->bytepos);
 
+    PARROT_ASSERT(i->charpos + offset < str->strlen);
+
     if (offset > 0) {
         u8ptr = utf8_skip_forward(u8ptr, offset);
     }
@@ -514,6 +500,10 @@ utf8_iter_skip(SHIM_INTERP,
     ASSERT_ARGS(utf8_iter_skip)
     const utf8_t *u8ptr = (utf8_t *)((char *)str->strstart + i->bytepos);
 
+    i->charpos += skip;
+
+    PARROT_ASSERT(i->charpos <= str->strlen);
+
     if (skip > 0) {
         u8ptr = utf8_skip_forward(u8ptr, skip);
     }
@@ -521,8 +511,9 @@ utf8_iter_skip(SHIM_INTERP,
         u8ptr = utf8_skip_backward(u8ptr, -skip);
     }
 
-    i->charpos += skip;
     i->bytepos = (const char *)u8ptr - (const char *)str->strstart;
+
+    PARROT_ASSERT(i->bytepos <= str->bufused);
 }
 
 
@@ -544,35 +535,13 @@ utf8_iter_get_and_advance(PARROT_INTERP,
 {
     ASSERT_ARGS(utf8_iter_get_and_advance)
     const utf8_t *u8ptr = (utf8_t *)((char *)str->strstart + i->bytepos);
-    UINTVAL c = *u8ptr;
+    UINTVAL c = utf8_decode(interp, u8ptr);
 
-    if (UTF8_IS_START(c)) {
-        UINTVAL len = UTF8SKIP(u8ptr);
+    i->charpos += 1;
+    i->bytepos += UTF8SKIP(u8ptr);
 
-        c &= UTF8_START_MASK(len);
-        i->bytepos += len;
-        for (len--; len; len--) {
-            u8ptr++;
+    PARROT_ASSERT(i->bytepos <= str->bufused);
 
-            if (!UTF8_IS_CONTINUATION(*u8ptr))
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                    "Malformed UTF-8 string\n");
-            c = UTF8_ACCUMULATE(c, *u8ptr);
-        }
-
-        if (UNICODE_IS_SURROGATE(c))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                "Surrogate in UTF-8 string\n");
-    }
-    else if (!UNICODE_IS_INVARIANT(c)) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-            "Malformed UTF-8 string\n");
-    }
-    else {
-        i->bytepos++;
-    }
-
-    i->charpos++;
     return c;
 }
 
@@ -597,10 +566,10 @@ utf8_iter_set_and_advance(PARROT_INTERP,
     unsigned char * const pos = (unsigned char *)str->strstart + i->bytepos;
     unsigned char * const new_pos = (unsigned char *)utf8_encode(interp, pos, c);
 
-    i->bytepos += (new_pos - pos);
-    /* XXX possible buffer overrun exception? */
-    PARROT_ASSERT(i->bytepos <= Buffer_buflen(str));
-    i->charpos++;
+    i->charpos += 1;
+    i->bytepos += new_pos - pos;
+
+    PARROT_ASSERT(i->bytepos <= str->bufused);
 }
 
 
@@ -628,6 +597,8 @@ utf8_iter_set_position(SHIM_INTERP,
         i->bytepos = 0;
         return;
     }
+
+    PARROT_ASSERT(pos <= str->strlen);
 
     /*
      * we know the byte offsets of three positions: start, current and end
@@ -657,6 +628,8 @@ utf8_iter_set_position(SHIM_INTERP,
 
     i->charpos = pos;
     i->bytepos = (const char *)u8ptr - (const char *)str->strstart;
+
+    PARROT_ASSERT(i->bytepos <= str->bufused);
 }
 
 
@@ -664,7 +637,7 @@ static STR_VTABLE Parrot_utf8_encoding = {
     0,
     "utf8",
     NULL,
-    4, /* Max bytes per codepoint */
+    UTF8_MAXLEN, /* Max bytes per codepoint */
 
     utf8_to_encoding,
     unicode_chr,
@@ -674,9 +647,9 @@ static STR_VTABLE Parrot_utf8_encoding = {
     encoding_index,
     encoding_rindex,
     encoding_hash,
-    unicode_validate,
+    encoding_validate,
 
-    utf8_scan2,
+    utf8_scan,
     utf8_ord,
     encoding_substr,
 
