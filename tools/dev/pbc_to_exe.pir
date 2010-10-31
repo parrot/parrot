@@ -274,7 +274,7 @@ HELP
     .param string infile
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local pmc codestring
@@ -364,7 +364,7 @@ END_OF_FUNCTION
     .param string infile
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local pmc encoding_table

@@ -45,9 +45,6 @@ static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#define UNIMPL Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, \
-    "unimpl fixed_8")
-
 
 /*
 
@@ -197,7 +194,8 @@ encoding_rindex(PARROT_INTERP, SHIM(const STRING *src),
 {
     ASSERT_ARGS(encoding_rindex)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    UNIMPL;
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Unicode rindex not implemented");
 }
 
 
@@ -328,6 +326,27 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
     return 0;
 #endif
+}
+
+
+/*
+
+=item C<UINTVAL encoding_validate(PARROT_INTERP, const STRING *src)>
+
+Verifies that the given string is valid. Returns 1 if it is valid,
+returns 0 otherwise.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+UINTVAL
+encoding_validate(PARROT_INTERP, ARGIN(const STRING *src))
+{
+    ASSERT_ARGS(encoding_validate)
+
+    return STRING_scan(interp, src) == src->strlen;
 }
 
 
@@ -591,7 +610,8 @@ encoding_decompose(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(encoding_decompose)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    UNIMPL;
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Decompose not implemented");
 }
 
 
@@ -858,26 +878,6 @@ fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
     s->hashval = hashval;
 
     return hashval;
-}
-
-
-/*
-
-=item C<UINTVAL fixed8_scan(PARROT_INTERP, const STRING *src)>
-
-Returns the number of codepoints in string C<src>. No scanning needed
-for fixed encodings.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-UINTVAL
-fixed8_scan(PARROT_INTERP, ARGIN(const STRING *src))
-{
-    ASSERT_ARGS(fixed8_scan)
-    return src->bufused;
 }
 
 
@@ -1587,7 +1587,8 @@ unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(unicode_upcase_first)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    UNIMPL;
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Unicode upcase_first not implemented");
 }
 
 
@@ -1608,7 +1609,8 @@ unicode_downcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(unicode_downcase_first)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    UNIMPL;
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Unicode downcase_first not implemented");
 }
 
 
@@ -1629,7 +1631,8 @@ unicode_titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(unicode_titlecase_first)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    UNIMPL;
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Unicode titlecase_first not implemented");
 }
 
 

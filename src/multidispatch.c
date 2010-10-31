@@ -1146,7 +1146,8 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     if (name)
         strcpy((char *)(type_ids + num_values), name);
 
-    key = Parrot_str_new(interp, (char *)type_ids, id_size);
+    key = Parrot_str_new_init(interp, (char *)type_ids, id_size,
+            Parrot_binary_encoding_ptr, 0);
     mem_gc_free(interp, type_ids);
 
     return key;
@@ -1248,7 +1249,8 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     if (name)
         strcpy((char *)(type_ids + num_types), name);
 
-    key = Parrot_str_new(interp, (char *)type_ids, id_size);
+    key = Parrot_str_new_init(interp, (char *)type_ids, id_size,
+            Parrot_binary_encoding_ptr, 0);
 
     mem_gc_free(interp, type_ids);
     return key;

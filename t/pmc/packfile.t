@@ -422,7 +422,7 @@ load_error:
     push_eh load_error
     $S0 = '_filename'()
     $P0 = new ['FileHandle']
-    $P0.'open'($S0, 'r')
+    $P0.'open'($S0, 'rb')
 
     orig = $P0.'readall'()
 

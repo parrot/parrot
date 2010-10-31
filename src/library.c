@@ -842,12 +842,9 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    STRING * const slash1 = Parrot_str_new_init(interp, "/", 1,
-            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2 = Parrot_str_new_init(interp, "\\", 1,
-            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot    = Parrot_str_new_init(interp, ".", 1,
-            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash1 = CONST_STRING(interp, "/");
+    STRING * const slash2 = CONST_STRING(interp, "\\");
+    STRING * const dot    = CONST_STRING(interp, ".");
 
     const INTVAL len = Parrot_str_byte_length(interp, in);
     STRING *stem;

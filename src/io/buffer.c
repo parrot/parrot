@@ -189,7 +189,8 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
         size_t  to_write = buffer_next - buffer_start;
-        STRING *s        = Parrot_str_new(interp, (char *)buffer_start, to_write);
+        STRING *s        = Parrot_str_new_init(interp, (char *)buffer_start,
+                to_write, Parrot_binary_encoding_ptr, 0);
         /* Flush to next layer */
         long wrote = PIO_WRITE(interp, filehandle, s);
         if (wrote == (long)to_write) {
@@ -232,7 +233,7 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
     size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
     STRING  *s    = Parrot_str_new_init(interp, buf, size,
-                        Parrot_default_encoding_ptr,
+                        Parrot_binary_encoding_ptr,
                         PObj_external_FLAG);
     size_t   got  = PIO_READ(interp, filehandle, &s);
 

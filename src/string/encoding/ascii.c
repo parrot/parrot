@@ -40,6 +40,11 @@ static STRING* ascii_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL ascii_scan(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static STRING* ascii_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
@@ -66,17 +71,15 @@ static STRING* ascii_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL ascii_validate(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_ascii_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_ascii_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_ascii_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -92,9 +95,6 @@ static UINTVAL ascii_validate(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_ascii_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -143,12 +143,12 @@ ascii_chr(PARROT_INTERP, UINTVAL codepoint)
             Parrot_ascii_encoding_ptr, 0);
 }
 
+
 /*
 
-=item C<static UINTVAL ascii_validate(PARROT_INTERP, const STRING *src)>
+=item C<static UINTVAL ascii_scan(PARROT_INTERP, const STRING *src)>
 
-Verifies that the given string is valid ASCII. Returns 1 if it is ASCII,
-returns 0 otherwise.
+Returns the number of codepoints in string C<src>.
 
 =cut
 
@@ -156,20 +156,21 @@ returns 0 otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-ascii_validate(PARROT_INTERP, ARGIN(const STRING *src))
+ascii_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
-    ASSERT_ARGS(ascii_validate)
-    String_iter iter;
-    const UINTVAL length = Parrot_str_length(interp, src);
+    ASSERT_ARGS(ascii_scan)
+    unsigned char *p = (unsigned char *)src->strstart;
+    UINTVAL i;
 
-    STRING_ITER_INIT(interp, &iter);
-    while (iter.charpos < length) {
-        const UINTVAL codepoint = STRING_iter_get_and_advance(interp, src, &iter);
-        if (codepoint >= 0x80)
-            return 0;
+    for (i = 0; i < src->bufused; ++i) {
+        if (p[i] >= 0x80)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_STRING_REPRESENTATION,
+                "Invalid character in ASCII string");
     }
-    return 1;
+
+    return src->bufused;
 }
+
 
 /*
 
@@ -356,9 +357,9 @@ static STR_VTABLE Parrot_ascii_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    ascii_validate,
+    encoding_validate,
 
-    fixed8_scan,
+    ascii_scan,
     fixed8_ord,
     fixed_substr,
 

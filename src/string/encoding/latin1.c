@@ -40,6 +40,10 @@ static STRING* latin1_downcase_first(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static UINTVAL latin1_scan(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static STRING* latin1_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
@@ -67,16 +71,15 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_latin1_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_latin1_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_latin1_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -92,9 +95,6 @@ static UINTVAL latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_latin1_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -146,27 +146,21 @@ latin1_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL latin1_validate(PARROT_INTERP, const STRING *src)>
+=item C<static UINTVAL latin1_scan(PARROT_INTERP, const STRING *src)>
 
-Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise.
+Returns the number of codepoints in string C<src>. No scanning needed
+for fixed encodings.
 
 =cut
 
 */
 
 static UINTVAL
-latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
+latin1_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
-    ASSERT_ARGS(latin1_validate)
-    INTVAL offset;
-    const INTVAL length =  Parrot_str_length(interp, src);
+    ASSERT_ARGS(latin1_scan)
 
-    for (offset = 0; offset < length; ++offset) {
-        const UINTVAL codepoint = STRING_ord(interp, src, offset);
-        if (codepoint >= 0x100)
-            return 0;
-    }
-    return 1;
+    return src->bufused;
 }
 
 
@@ -393,9 +387,9 @@ static STR_VTABLE Parrot_latin1_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    latin1_validate,
+    encoding_validate,
 
-    fixed8_scan,
+    latin1_scan,
     fixed8_ord,
     fixed_substr,
 

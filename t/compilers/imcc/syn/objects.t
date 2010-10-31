@@ -28,7 +28,7 @@
 .namespace ["Foo"]
 .namespace [ ]
 .namespace []
-.namespace [utf8:"»ö«"; ascii:"perl6"]
+.namespace [utf8:"\xbb\xf6\xab"; ascii:"perl6"]
 
 .sub test
     $I0 = 42

@@ -1646,7 +1646,8 @@ src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
 src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
-src/string/encoding/null$(O) : $(PARROT_H_HEADERS)
+src/string/encoding/null$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/shared.h
 src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h

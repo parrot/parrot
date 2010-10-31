@@ -49,12 +49,15 @@ static INTVAL binary_is_cclass(SHIM_INTERP,
     SHIM(const STRING *src),
     SHIM(UINTVAL offset));
 
+static UINTVAL binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL binary_validate(SHIM_INTERP, SHIM(const STRING *src));
 #define ASSERT_ARGS_binary_change_case __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_binary_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -62,10 +65,12 @@ static UINTVAL binary_validate(SHIM_INTERP, SHIM(const STRING *src));
 #define ASSERT_ARGS_binary_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_binary_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_binary_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_binary_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_binary_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_binary_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -121,20 +126,21 @@ binary_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL binary_validate(PARROT_INTERP, const STRING *src)>
+=item C<static UINTVAL binary_scan(PARROT_INTERP, const STRING *src)>
 
-Returns 1. All sequential data is valid binary data.
+Returns the number of codepoints in string C<src>. No scanning needed
+for fixed encodings.
 
 =cut
 
 */
 
-/* Binary's always valid */
 static UINTVAL
-binary_validate(SHIM_INTERP, SHIM(const STRING *src))
+binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
-    ASSERT_ARGS(binary_validate)
-    return 1;
+    ASSERT_ARGS(binary_scan)
+
+    return src->bufused;
 }
 
 
@@ -230,9 +236,9 @@ static STR_VTABLE Parrot_binary_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    binary_validate,
+    encoding_validate,
 
-    fixed8_scan,
+    binary_scan,
     fixed8_ord,
     fixed_substr,
 

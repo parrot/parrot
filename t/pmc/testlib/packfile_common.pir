@@ -21,7 +21,7 @@
     pf   = new ['Packfile']
     $S0  = '_filename'()
     pio  = new ['FileHandle']
-    pio.'open'($S0, 'r')
+    pio.'open'($S0, 'rb')
     $S0  = pio.'readall'()
     pio.'close'()
     pf   = $S0

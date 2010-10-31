@@ -933,7 +933,7 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
                         "Unknown encoding '%s'", encoding_name);
         }
         if (s_encoding->max_bytes_per_codepoint == 1)
-            src_encoding = Parrot_ascii_encoding_ptr;
+            src_encoding = s_encoding;
         else
             src_encoding = Parrot_utf8_encoding_ptr;
 
