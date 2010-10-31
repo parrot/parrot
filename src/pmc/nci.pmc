@@ -569,7 +569,10 @@ class, the PMC arguments are shifted down.
                     *((double**)translation_pointers)[i] = *(FLOATVAL*)pcc_val[i - j_offset];
                     values[i] = translation_pointers[i];
                     break;
-                  default:
+                  case enum_nci_sig_numval:
+                    translation_pointers[i] = mem_internal_allocate_zeroed_typed(FLOATVAL);
+                    *((FLOATVAL**)translation_pointers)[i] = *(FLOATVAL*)pcc_val[i - j_offset];
+                    values[i] = translation_pointers[i];
                     break;
                 }
             }
