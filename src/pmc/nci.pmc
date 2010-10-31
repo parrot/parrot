@@ -144,6 +144,43 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t) {
     }
 }
 
+/*
+
+=item C<void sig_to_pcc_cif(PARROT_INTERP, Parrot_NCI_attributes *nci)>
+
+generate Parrot_pcc_fill_params_from_c_args dynamic call infrastructure
+
+=cut
+
+*/
+
+static void
+sig_to_pcc_cif(PARROT_INTERP, Parrot_NCI_attributes *nci)
+{
+    INTVAL     argc  = Parrot_str_length(interp, nci->pcc_params_signature) + 3;
+    ffi_type **arg_t =  nci->pcc_arg_types = 
+                        mem_gc_allocate_n_zeroed_typed(interp, argc, ffi_type *);
+    int i;
+
+    arg_t[0] = &ffi_type_pointer; /* interp */
+    arg_t[1] = &ffi_type_pointer; /* call object */
+    arg_t[2] = &ffi_type_pointer; /* pcc signature */
+    for (i = 3; i < argc; i++)
+        arg_t[i] = &ffi_type_pointer; /* INSP pointer */
+
+    if (ffi_prep_cif(&nci->pcc_cif, FFI_DEFAULT_ABI, argc, &ffi_type_void, arg_t) !=
+        FFI_OK)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR, "invalid ffi signature");
+}
+
+/*
+
+=item C<void build_libffi_func(PARROT_INTERP, Parrot_NCI_attributes *nci)>
+
+=cut
+
+*/
+
 static void
 build_libffi_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci))
 {
@@ -159,6 +196,7 @@ build_libffi_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci))
     nci->arity       = VTABLE_elements(interp, nci->signature) - 1;
 
     sig_to_cif(interp, nci);
+    sig_to_pcc_cif(interp, nci);
 }
 
 pmclass NCI auto_attrs provides invokable {
@@ -168,13 +206,17 @@ pmclass NCI auto_attrs provides invokable {
     ATTR void      *func;                   /* Function pointer to call. */
     ATTR void      *orig_func;
     ATTR PMC       *fb_info;                /* Frame-builder info */
-    ATTR void      *cif;                    /* Function interface */
-    ATTR void      *arg_types;              /* Used for building the libffi call interface */
 
     /* Parrot Sub-ish attributes */
     ATTR STRING    *pcc_params_signature;
     ATTR STRING    *pcc_return_signature;
     ATTR INTVAL     arity;
+
+    /* LibFFI attributes */
+    ATTR void      *cif;
+    ATTR void      *arg_types;
+    ATTR ffi_cif    pcc_cif;
+    ATTR ffi_type **pcc_arg_types;
 
     /* MMD fields */
     ATTR STRING    *long_signature;         /* The full signature. */
@@ -290,9 +332,10 @@ Free all of the memory used internally to store various things, like libffi call
 
     VTABLE void destroy() {
         if (PARROT_NCI(SELF)) {
-            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-            mem_sys_free(nci_info->cif);
-            mem_sys_free(nci_info->arg_types);
+            Parrot_NCI_attributes *nci = PARROT_NCI(SELF);
+            mem_gc_free(INTERP, nci->cif);
+            mem_gc_free(INTERP, nci->arg_types);
+            mem_gc_free(INTERP, nci->pcc_arg_types);
         }
     }
 
@@ -380,8 +423,7 @@ class, the PMC arguments are shifted down.
         void *return_data; /* Holds return data from FFI call */
         size_t count, i, j_offset;
         char *tmp_sig;
-        ffi_cif *cif, pcc_cif;
-        ffi_type **pcc_args;
+        ffi_cif *cif;
 
         cif  = (ffi_cif*)nci_info->cif;
         func = (void (*)(void*, void*, void*))nci_info->func;
@@ -400,12 +442,8 @@ class, the PMC arguments are shifted down.
         if (nci_info->arity > 0) {
             size_t pcc_argc, pcc_values_offset, pcc_values_size, values_size;
             /* Function has arguments */
-            pcc_args = mem_internal_allocate_n_zeroed_typed(nci_info->arity + 4, ffi_type*);
             tmp_sig  = Parrot_str_to_cstring(interp, nci_info->pcc_params_signature);
 
-            pcc_args[0] = &ffi_type_pointer;
-            pcc_args[1] = &ffi_type_pointer;
-            pcc_args[2] = &ffi_type_pointer;
             pcc_values_size = 0;
             values_size = 0;
             pcc_argc = Parrot_str_length(interp, nci_info->pcc_params_signature);
@@ -431,7 +469,6 @@ class, the PMC arguments are shifted down.
 
             /* Add up the size of the pcc arguments */
             for (i = 0; i < pcc_argc; i++) {
-                pcc_args[i + 3] = &ffi_type_pointer;
                 if (tmp_sig[i] == 'N') {
                     pcc_val[i] = mem_internal_allocate_typed(FLOATVAL);
                     pcc_ptr[i+3] = &pcc_val[i];
@@ -446,16 +483,9 @@ class, the PMC arguments are shifted down.
                 }
             }
             
-            if (ffi_prep_cif(&pcc_cif, FFI_DEFAULT_ABI, 3 + pcc_argc,
-                             &ffi_type_void, pcc_args) != FFI_OK) {
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Bad signature generated for Parrot_pcc_fill_params_from_c_args in NCI");
-            }
-
             {
                 ffi_arg ret;
-                ffi_call(&pcc_cif, FFI_FN(Parrot_pcc_fill_params_from_c_args), &ret, pcc_ptr);
+                ffi_call(&nci_info->pcc_cif, FFI_FN(Parrot_pcc_fill_params_from_c_args), &ret, pcc_ptr);
             }
             
             Parrot_str_free_cstring(tmp_sig);
@@ -577,9 +607,6 @@ class, the PMC arguments are shifted down.
                 }
             }
 
-            if (pcc_args) {
-                mem_sys_free(pcc_args);
-            }
             if (pcc_ptr) {
                 mem_sys_free(pcc_ptr); 
             }
