@@ -175,12 +175,6 @@ typedef enum PObj_enum {
 /* PMC specific FLAGs */
     /* call object finalizer */
     PObj_need_finalize_FLAG     = POBJ_FLAG(25),
-    /* a PMC that needs special handling in GC, i.e one that has either:
-     * - metadata
-     * - data_is_PMC_array_FLAG
-     * - custom_mark_FLAG
-     */
-    b_PObj_is_special_PMC_FLAG  = POBJ_FLAG(26),
 
     /* true if this is connected by some route to a needs_early_gc object */
     PObj_high_priority_gc_FLAG  = POBJ_FLAG(27),
@@ -202,7 +196,6 @@ typedef enum PObj_enum {
 
 #  define PObj_live_FLAG              b_PObj_live_FLAG
 #  define PObj_on_free_list_FLAG      b_PObj_on_free_list_FLAG
-#  define PObj_is_special_PMC_FLAG    b_PObj_is_special_PMC_FLAG
 
 #  define gc_flag_TEST(flag, o)      PObj_flag_TEST(flag, o)
 #  define gc_flag_SET(flag, o)       PObj_flag_SET(flag, o)
@@ -261,35 +254,16 @@ typedef enum PObj_enum {
 #define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
 
 
-#define PObj_special_SET(flag, o) do { \
-    PObj_flag_SET(flag, o); \
-    gc_flag_SET(is_special_PMC, o); \
-} while (0)
-
-#define PObj_special_CLEAR(flag, o) do { \
-    PObj_flag_CLEAR(flag, o); \
-    if ((PObj_get_FLAGS(o) & \
-                (PObj_custom_destroy_FLAG | \
-                 PObj_custom_mark_FLAG | \
-                 PObj_needs_early_gc_FLAG))) \
-        gc_flag_SET(is_special_PMC, o); \
-    else \
-        gc_flag_CLEAR(is_special_PMC, o); \
-} while (0)
-
-#define PObj_is_special_PMC_TEST(o) gc_flag_TEST(is_special_PMC, o)
-#define PObj_is_special_PMC_SET(o) gc_flag_SET(is_special_PMC, o)
-
 #define PObj_needs_early_gc_TEST(o) PObj_flag_TEST(needs_early_gc, o)
-#define PObj_needs_early_gc_SET(o) PObj_special_SET(needs_early_gc, o)
-#define PObj_needs_early_gc_CLEAR(o) PObj_special_CLEAR(needs_early_gc, o)
+#define PObj_needs_early_gc_SET(o) PObj_flag_SET(needs_early_gc, o)
+#define PObj_needs_early_gc_CLEAR(o) PObj_flag_CLEAR(needs_early_gc, o)
 
 #define PObj_high_priority_gc_TEST(o)   PObj_flag_TEST(high_priority_gc, o)
-#define PObj_high_priority_gc_SET(o)     PObj_special_SET(high_priority_gc, o)
-#define PObj_high_priority_gc_CLEAR(o) PObj_special_CLEAR(high_priority_gc, o)
+#define PObj_high_priority_gc_SET(o)     PObj_flag_SET(high_priority_gc, o)
+#define PObj_high_priority_gc_CLEAR(o) PObj_flag_CLEAR(high_priority_gc, o)
 
-#define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
-#define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
+#define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
+#define PObj_custom_mark_CLEAR(o)   PObj_flag_CLEAR(custom_mark, o)
 #define PObj_custom_mark_TEST(o)   PObj_flag_TEST(custom_mark, o)
 
 #define PObj_custom_destroy_SET(o)   PObj_flag_SET(custom_destroy,   o)
