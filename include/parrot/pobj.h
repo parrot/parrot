@@ -179,8 +179,7 @@ typedef enum PObj_enum {
     PObj_need_finalize_FLAG     = POBJ_FLAG(25),
 
     /* true if this is connected by some route to a needs_early_gc object */
-    PObj_high_priority_gc_FLAG  = POBJ_FLAG(27),
-    PObj_needs_early_gc_FLAG    = (POBJ_FLAG(27) | POBJ_FLAG(28)),
+    PObj_needs_early_gc_FLAG    = POBJ_FLAG(28),
 
     /* True if the PMC is a class */
     PObj_is_class_FLAG          = POBJ_FLAG(29),
@@ -258,10 +257,6 @@ typedef enum PObj_enum {
 #define PObj_needs_early_gc_TEST(o) PObj_flag_TEST(needs_early_gc, o)
 #define PObj_needs_early_gc_SET(o) PObj_flag_SET(needs_early_gc, o)
 #define PObj_needs_early_gc_CLEAR(o) PObj_flag_CLEAR(needs_early_gc, o)
-
-#define PObj_high_priority_gc_TEST(o)   PObj_flag_TEST(high_priority_gc, o)
-#define PObj_high_priority_gc_SET(o)     PObj_flag_SET(high_priority_gc, o)
-#define PObj_high_priority_gc_CLEAR(o) PObj_flag_CLEAR(high_priority_gc, o)
 
 #define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
 #define PObj_custom_mark_CLEAR(o)   PObj_flag_CLEAR(custom_mark, o)

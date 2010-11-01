@@ -360,7 +360,7 @@ mark_special(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), ARGIN(PMC *obj))
 
     /* clearing the flag is much more expensive then testing */
     if (!PObj_needs_early_gc_TEST(obj))
-        PObj_high_priority_gc_CLEAR(obj);
+        PObj_needs_early_gc_CLEAR(obj);
 
     /* mark properties */
     Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
