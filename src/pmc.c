@@ -859,7 +859,6 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
     &&  (_class == _class->vtable->pmc_class))
         interp->vtables[type]->pmc_class = _class;
     else {
-        gc_flag_CLEAR(is_special_PMC, _class);
         PObj_is_PMC_shared_CLEAR(_class);
         interp->vtables[type]->pmc_class = _class;
     }

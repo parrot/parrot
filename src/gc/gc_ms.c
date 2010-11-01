@@ -830,10 +830,8 @@ gc_ms_mark_pmc_header(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
-        if (PObj_is_special_PMC_TEST(obj)) {
-            if (PObj_custom_mark_TEST(obj))
-                VTABLE_mark(interp, obj);
-        }
+        if (PObj_custom_mark_TEST(obj))
+            VTABLE_mark(interp, obj);
 
         if (PMC_metadata(obj))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
