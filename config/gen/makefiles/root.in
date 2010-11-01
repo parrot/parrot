@@ -489,6 +489,7 @@ INTERP_O_FILES = \
     src/nci/api$(O) \
     src/nci/signatures$(O) \
     src/nci/core_thunks$(O) \
+#IF(has_libffi):    src/nci/libffi$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile$(O) \
@@ -1554,12 +1555,26 @@ src/nci/core_thunks$(O) : src/nci/core_thunks.c \
 	$(PARROT_H_HEADERS) \
 	include/pmc/pmc_nci.h
 
+src/nci/libffi$(O) : src/nci/libffi.c \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_nci.h \
+    include/pmc/pmc_unmanagedstruct.h \
+    include/pmc/pmc_managedstruct.h \
+
 ## SUFFIX OVERRIDE
 src/nci/extra_thunks$(O) : \
     $(PARROT_H_HEADERS) \
     include/pmc/pmc_nci.h \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
+
+src/nci/libffi$(O) : src/nci/libffi.c \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_nci.h \
+    include/pmc/pmc_unmanagedstruct.h \
+    include/pmc/pmc_managedstruct.h
+
+src/nci/signatures$(O) : src/nci/signatures.c $(PARROT_H_HEADERS)
 
 src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 

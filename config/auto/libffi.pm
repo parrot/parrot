@@ -43,6 +43,7 @@ sub runstep {
 
     if ($without) {
         $conf->data->set( HAS_LIBFFI => 0 );
+        $conf->data->set( has_libffi => 0 );
         $self->set_result('no');
         return 1;
     }
@@ -82,6 +83,7 @@ sub runstep {
 
     if ($has_libffi) {
         $conf->data->set( HAS_LIBFFI => $has_libffi);
+        $conf->data->set( has_libffi => $has_libffi);
         $conf->data->add( ' ', ccflags => $libffi_options_cflags );
         $conf->data->add( ' ', libs => $libffi_options_libs );
         $conf->data->add( ' ', linkflags => $libffi_options_linkflags );
@@ -92,6 +94,7 @@ sub runstep {
     }
     else {
         $conf->data->set( HAS_LIBFFI => 0 );
+        $conf->data->set( has_libffi => 0 );
         $self->set_result('no');
         print "No libffi found." if ($verbose);
     }

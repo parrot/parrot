@@ -198,6 +198,9 @@ init_world(PARROT_INTERP)
 #if PARROT_HAS_EXTRA_NCI_THUNKS
     Parrot_nci_load_extra_thunks(interp);
 #endif
+#if PARROT_HAS_LIBFFI
+    Parrot_nci_libffi_register(interp);
+#endif
 }
 
 /*

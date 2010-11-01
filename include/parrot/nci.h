@@ -66,6 +66,17 @@ PMC * build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/nci/api.c */
 
+/* HEADERIZER BEGIN: src/nci/libffi.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+void Parrot_nci_libffi_register(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_Parrot_nci_libffi_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/nci/libffi.c */
+
 /* HEADERIZER BEGIN: src/nci/signatures.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
