@@ -492,18 +492,8 @@ class, the PMC arguments are shifted down.
         }
 
         {
-            size_t values_size = 0;
-
-            /* Add up the size of memory needed for the actual call */
-            for (i = 0; i < (size_t)nci_info->arity; i++) {
-                values_size += cif->arg_types[i]->size;
-            }
-
-            /* Allocate enough room for the values passed to the ffi function plus add some 
-               padding just to be sure we have enough space.  */
-            values = mem_internal_allocate_zeroed(values_size + 2 * sizeof(void*));
-            /* Middle man is used to contain  */
-            middle_man = mem_internal_allocate_n_zeroed_typed(nci_info->arity, void*);
+            values = mem_gc_allocate_n_zeroed_typed(interp, nci_info->arity, void *);
+            middle_man = mem_gc_allocate_n_zeroed_typed(interp, nci_info->arity, void *);
 
             /*
              *  Apply Argument Transformations
@@ -634,7 +624,7 @@ class, the PMC arguments are shifted down.
          *  This will allow for any type of datat to be returned.
          *  Including one day Structures
          */
-        return_data = mem_internal_allocate_zeroed(cif->rtype->size);
+        return_data = mem_sys_allocate(cif->rtype->size);
 
         ffi_call(cif, FFI_FN(func), return_data, values);
 
@@ -744,9 +734,9 @@ class, the PMC arguments are shifted down.
             }
         }
     
-        mem_sys_free(middle_man);
-        mem_sys_free(return_data);
-        mem_sys_free(values);
+        mem_gc_free(interp, middle_man);
+        mem_gc_free(interp, return_data);
+        mem_gc_free(interp, values);
 
         cont = INTERP->current_cont;
 
