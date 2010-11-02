@@ -95,6 +95,13 @@ sub runstep {
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
 
+    # At this point, we check for __rtems__.  If the probe returns
+    # successfully, we'll set osname => 'rtems' regardless of what we have
+    # determined so far.  We will let our setting for cpuarch stand.  This
+    # will mean that _get_platform() will be set to 'generic'.
+    my $rtems_result = _probe_for_rtems($conf);
+    $osname = 'rtems' if $rtems_result;
+
     $conf->data->set(
         cpuarch  => $cpuarch,
         osname   => $osname
@@ -132,6 +139,20 @@ sub _report_verbose {
         "platform: ", $conf->data->get('platform'), "\n",
     );
     return 1;
+}
+
+sub _probe_for_rtems {
+    my $conf = shift;
+    $conf->cc_gen("config/auto/arch/test_rtems.in");
+    eval { $conf->cc_build(); };
+    my $result = 0;
+    if (!$@) {
+        if ($conf->cc_run_capture() =~ /rtems/) {
+           $result++;
+       }
+    } 
+    $conf->cc_clean();
+    return $result;
 }
 
 1;

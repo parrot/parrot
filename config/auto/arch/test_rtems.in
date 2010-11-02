@@ -1,0 +1,28 @@
+/*
+Copyright (C) 2002-2009, Parrot Foundation.
+$Id$
+
+Determine whether we're on RTEMS (Real-Time Executive for Multiprocessor
+Systems).  See: http://www.rtems.com/.
+
+*/
+
+#include <stdlib.h>
+
+int
+main(int argc, char **argv)
+{
+#ifdef __rtems__
+    printf("__rtems__ => %s,\n", __rtems__);
+    return EXIT_SUCCESS;
+#else
+    return EXIT_FAILURE;
+#endif
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
