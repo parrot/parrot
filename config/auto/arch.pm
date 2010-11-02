@@ -101,6 +101,8 @@ sub runstep {
     );
 
     $conf->data->set( 'platform' => $self->_get_platform( $conf ) );
+    $conf->data->set( 'osvers' => $conf->data->get('osvers_provisional') )
+        unless $conf->data->get('osvers');
 
     _report_verbose( $conf );
 
