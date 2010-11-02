@@ -170,13 +170,19 @@ typedef enum PObj_enum {
     PObj_report_FLAG            = POBJ_FLAG(21),
 
     /* Flags used by generation GC to determine generation object belong */
+
     PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
     PObj_GC_generation_1_FLAG   = POBJ_FLAG(23),
     PObj_GC_generation_2_FLAG   = POBJ_FLAG(24),
 
+    /* Mark that object is referenced from older generation */
+    PObj_GC_ref_generation_0_FLAG   = POBJ_FLAG(25),
+    PObj_GC_ref_generation_1_FLAG   = POBJ_FLAG(26),
+
+
 /* PMC specific FLAGs */
     /* call object finalizer */
-    PObj_need_finalize_FLAG     = POBJ_FLAG(25),
+    PObj_need_finalize_FLAG     = POBJ_FLAG(27),
 
     /* true if this is connected by some route to a needs_early_gc object */
     PObj_needs_early_gc_FLAG    = POBJ_FLAG(28),
