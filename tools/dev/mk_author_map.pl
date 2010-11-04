@@ -1,5 +1,5 @@
-#!/usr/bin/env perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+#! perl
+# Copyright (C) 2010, Parrot Foundation.
 # $Id$
 use strict;
 use warnings;
@@ -15,3 +15,10 @@ while (<>) {
     my ($f, $v) = ($1, $2);
     $n{$f} = $v unless $n{$f};  # doesn't do the right thing for the multiline fields
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
