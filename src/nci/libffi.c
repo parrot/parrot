@@ -104,6 +104,7 @@ typedef struct {
 void
 Parrot_nci_libffi_register(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_nci_libffi_register)
     PMC *iglobals = interp->iglobals;
     PMC *nci_framebuilder_callback = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     PMC *nci_framebuilder_userdata = PMCNULL;
@@ -120,6 +121,7 @@ Parrot_nci_libffi_register(PARROT_INTERP)
 static PMC *
 build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
 {
+    ASSERT_ARGS(build_ffi_thunk)
     PMC *thunk              = Parrot_pmc_new(interp, enum_class_ManagedStruct);
     ffi_thunk_t *thunk_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
 
@@ -182,6 +184,7 @@ build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
 static ffi_type *
 nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 {
+    ASSERT_ARGS(nci_to_ffi_type)
     switch (nci_t) {
       case enum_nci_sig_void:   return &ffi_type_void;
       case enum_nci_sig_null:   return &ffi_type_pointer;
@@ -219,6 +222,7 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 static void
 call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
 {
+    ASSERT_ARGS(call_ffi_thunk)
     Parrot_NCI_attributes *nci = PARROT_NCI(nci_pmc);
     ffi_thunk_t           *thunk;
 
@@ -532,12 +536,14 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
 static void
 clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *thunk_data)
 {
+    ASSERT_ARGS(clone_ffi_thunk)
     /* XXX: TODO */
 }
 
 static void
 free_ffi_thunk(PARROT_INTERP, void *thunk_func, void *thunk_data)
 {
+    ASSERT_ARGS(free_ffi_thunk)
     ffi_thunk_t *thunk = thunk_data;
     if (thunk->arg_types)
         mem_gc_free(interp, thunk->arg_types);
