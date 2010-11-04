@@ -22,40 +22,6 @@ This file implements a native call frame (thunk) factory using libffi.
 #include "pmc/pmc_unmanagedstruct.h"
 #include "pmc/pmc_managedstruct.h"
 
-/* HEADERIZER HFILE: include/parrot/nci.h */
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
-        __attribute__nonnull__(1);
-
-static void call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
-        __attribute__nonnull__(1);
-
-static void clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *thunk_data)
-        __attribute__nonnull__(1);
-
-static void free_ffi_thunk(PARROT_INTERP,
-    void *thunk_func,
-    void *thunk_data)
-        __attribute__nonnull__(1);
-
-static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
-        __attribute__nonnull__(1);
-
-#define ASSERT_ARGS_build_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_call_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_clone_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_free_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_nci_to_ffi_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
-
 #if (INTVAL_SIZE == 4)
 #  define ffi_type_parrot_intval ffi_type_sint32
 #elif (INTVAL_SIZE == 8)
@@ -101,6 +67,45 @@ typedef struct {
     PMC      *p;
 } parrot_var_t;
 
+/* HEADERIZER HFILE: include/parrot/nci.h */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
+        __attribute__nonnull__(1);
+
+static void call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
+        __attribute__nonnull__(1);
+
+static PMC * clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
+        __attribute__nonnull__(1);
+
+static void free_ffi_thunk(PARROT_INTERP,
+    void *thunk_func,
+    void *thunk_data)
+        __attribute__nonnull__(1);
+
+static PMC * init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)
+        __attribute__nonnull__(1);
+
+static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_build_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_call_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_clone_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_free_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_init_thunk_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_nci_to_ffi_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 void
 Parrot_nci_libffi_register(PARROT_INTERP)
 {
@@ -119,22 +124,29 @@ Parrot_nci_libffi_register(PARROT_INTERP)
 }
 
 static PMC *
-build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
+init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)
 {
-    ASSERT_ARGS(build_ffi_thunk)
-    PMC *thunk              = Parrot_pmc_new(interp, enum_class_ManagedStruct);
-    ffi_thunk_t *thunk_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
-
-    /* TODO: use sig PMC in fb callback */
-    PMC         *sig        = Parrot_nci_parse_signature(interp, sig_str);
-    STRING *pcc_ret_sig, *pcc_params_sig;
-    Parrot_nci_sig_to_pcc(interp, sig, &pcc_params_sig, &pcc_ret_sig);
-
+    ASSERT_ARGS(init_thunk_pmc)
+    PMC *thunk = Parrot_pmc_new(interp, enum_class_ManagedStruct);
     SETATTR_ManagedStruct_ptr(interp, thunk, call_ffi_thunk);
     SETATTR_ManagedStruct_custom_clone_func(interp, thunk, clone_ffi_thunk);
     SETATTR_ManagedStruct_custom_clone_priv(interp, thunk, thunk_data);
     SETATTR_ManagedStruct_custom_free_func(interp, thunk, free_ffi_thunk);
     SETATTR_ManagedStruct_custom_free_priv(interp, thunk, thunk_data);
+    return thunk;
+}
+
+static PMC *
+build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
+{
+    ASSERT_ARGS(build_ffi_thunk)
+    ffi_thunk_t *thunk_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
+    PMC         *thunk      = init_thunk_pmc(interp, thunk_data);
+
+    /* TODO: use sig PMC in fb callback */
+    PMC         *sig        = Parrot_nci_parse_signature(interp, sig_str);
+    STRING *pcc_ret_sig, *pcc_params_sig;
+    Parrot_nci_sig_to_pcc(interp, sig, &pcc_params_sig, &pcc_ret_sig);
 
     /* generate Parrot_pcc_fill_params_from_c_args dynamic call infrastructure */
     {
@@ -533,11 +545,25 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
     mem_gc_free(interp, values);
 }
 
-static void
-clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *thunk_data)
+static PMC *
+clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
 {
     ASSERT_ARGS(clone_ffi_thunk)
-    /* XXX: TODO */
+    ffi_thunk_t *thunk_data = (ffi_thunk_t *)_thunk_data;
+    ffi_thunk_t *clone_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
+    PMC         *clone      = init_thunk_pmc(interp, clone_data);
+
+    memcpy(clone_data, thunk_data, sizeof (ffi_thunk_t));
+
+    clone_data->pcc_arg_types = mem_gc_allocate_n_zeroed_typed(interp,
+                                    thunk_data->pcc_cif.nargs, ffi_type *);
+    mem_copy_n_typed(clone_data->pcc_arg_types, thunk_data->pcc_arg_types,
+                        thunk_data->pcc_cif.nargs, ffi_type *);
+
+    clone_data->arg_types     = mem_gc_allocate_n_zeroed_typed(interp,
+                                    thunk_data->cif.nargs, ffi_type *);
+    mem_copy_n_typed(clone_data->arg_types, thunk_data->arg_types,
+                        thunk_data->cif.nargs, ffi_type *);
 }
 
 static void
