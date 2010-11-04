@@ -262,6 +262,13 @@ sub runstep {
 
     $conf->data->set( 'archname', $Config{archname});
 
+    $conf->data->set( has_core_nci_thunks => 1 );
+    $conf->data->set( HAS_CORE_NCI_THUNKS => 1 );
+    if ( $conf->options->get( 'without-core-nci-thunks' ) ) {
+        $conf->data->set( has_core_nci_thunks => 0 );
+        $conf->data->set( HAS_CORE_NCI_THUNKS => 0 );
+    }
+
     $conf->data->set( has_extra_nci_thunks => 1 );
     $conf->data->set( HAS_EXTRA_NCI_THUNKS => 1 );
     if ( $conf->options->get( 'without-extra-nci-thunks' ) ) {

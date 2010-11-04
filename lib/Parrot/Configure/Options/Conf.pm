@@ -93,6 +93,10 @@ Parrot Options:
    --execcapable        Use JIT to emit a native executable
    --without-threads    Build parrot without thread support
    --buildframes        Dynamically build NCI call frames
+   --without-core-nci-thunks
+                        Build parrot without core-required
+                        statically compiled NCI call frames
+                        (useful for testing dynamic frame builders)
    --without-extra-nci-thunks
                         Build parrot without unnecessary
                         statically compiled NCI call frames

@@ -488,8 +488,8 @@ INTERP_O_FILES = \
     src/namespace$(O) \
     src/nci/api$(O) \
     src/nci/signatures$(O) \
-    src/nci/core_thunks$(O) \
 #IF(has_libffi):    src/nci/libffi$(O) \
+#IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile$(O) \
@@ -694,7 +694,7 @@ STR_FILES = \
     src/multidispatch.str \
     src/namespace.str \
     src/nci/api.str \
-    src/nci/core_thunks.str \
+#IF(has_core_nci_thunks):  src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile.str \
