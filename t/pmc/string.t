@@ -19,7 +19,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(129)
+    plan(130)
 
     set_or_get_strings()
     setting_integers()
@@ -748,6 +748,13 @@ check:
 
     $P0 = s[2]
     is($P0, 'R', 'Get PMC by index')
+
+    .local pmc k
+    k = new ['Integer']
+    k = 2
+    $S0 = s[k]
+    is($S0, 'R', 'Get string keyed with PMC')
+
 
     # Set
     s = new ['String']
