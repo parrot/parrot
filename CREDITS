@@ -242,7 +242,7 @@ E: cdolan@cpan.org
 N: Chris Fields (cjfields)
 D: Rakudo patches
 
-N: Christoph Otto a.k.a. cotto
+N: Christoph Otto
 U: cotto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
@@ -460,7 +460,7 @@ D: string.pmc, complex.pmc
 N: isop
 D: various Pynie patches
 
-N: James E Keenan (Jim) (aka kid51)
+N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
 D: Testing of configuration and build tools
@@ -504,7 +504,7 @@ E: jquelin@cpan.org
 U: jquelin
 S: Lyon, France
 
-N: Jerry Gay a.k.a. particle
+N: Jerry Gay
 U: particle
 E: Jerry.Gay@gmail.com
 D: Whatever
@@ -676,7 +676,7 @@ D: Bug fix
 N: Marcus Thiesen
 D: URM language, bugfixes
 
-N: Mark Glines a.k.a. Infinoid
+N: Mark Glines
 U: infinoid
 D: Cage cleaning, random bugfixes, report bugs
 E: mark@glines.org
