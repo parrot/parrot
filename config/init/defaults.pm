@@ -59,6 +59,7 @@ sub runstep {
         ccflags
         d_socklen_t
         optimize
+        osvers
         scriptdirexp
         sig_name
         sPRIgldbl
