@@ -39,7 +39,7 @@ sub runstep {
         libparrot_shared        => "libparrot$share_ext.$version",
         libparrot_shared_alias  => "libparrot$share_ext",
         libparrot_soname        => "-Wl,-soname=libparrot$share_ext.$version",
-#        osvers                  => $osvers;
+        osvers                  => $osvers,
     );
 }
 
