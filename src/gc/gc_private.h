@@ -582,6 +582,8 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t Parrot_gc_get_info(PARROT_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
@@ -591,6 +593,8 @@ size_t Parrot_gc_get_info(PARROT_INTERP,
 void Parrot_gc_ms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int Parrot_gc_ms_needed(PARROT_INTERP)
         __attribute__nonnull__(1);
 

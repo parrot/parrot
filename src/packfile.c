@@ -58,15 +58,16 @@ static PackFile_Segment * byte_code_new(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * byte_code_pack(PARROT_INTERP,
+static opcode_t * byte_code_pack(SHIM_INTERP,
     ARGMOD(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*cursor);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t byte_code_packed_size(SHIM_INTERP,
     ARGIN(PackFile_Segment *self))
         __attribute__nonnull__(2);
@@ -306,14 +307,13 @@ static PMC* run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void segment_init(PARROT_INTERP,
+static void segment_init(
     ARGOUT(PackFile_Segment *self),
     ARGIN(PackFile *pf),
     ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*self);
 
 static void sort_segs(ARGMOD(PackFile_Directory *dir))
@@ -332,8 +332,7 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_byte_code_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_byte_code_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
+       PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_byte_code_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self))
@@ -441,8 +440,7 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
 #define ASSERT_ARGS_segment_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
+       PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_sort_segs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1648,7 +1646,7 @@ PackFile_Segment_new_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
     const PackFile_Segment_new_func_t f   = pf->PackFuncs[type].new_seg;
     PackFile_Segment * const          seg = (f)(interp, pf, name, add);
 
-    segment_init(interp, seg, pf, name);
+    segment_init(seg, pf, name);
     seg->type = type;
 
     if (add)
@@ -2340,8 +2338,8 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
 
 =over 4
 
-=item C<static void segment_init(PARROT_INTERP, PackFile_Segment *self, PackFile
-*pf, STRING *name)>
+=item C<static void segment_init(PackFile_Segment *self, PackFile *pf, STRING
+*name)>
 
 Initializes the segment C<self> with the provided PackFile and the given name.
 Note that this duplicates the given name.
@@ -2351,7 +2349,7 @@ Note that this duplicates the given name.
 */
 
 static void
-segment_init(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
+segment_init(ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
         ARGIN(STRING *name))
 {
     ASSERT_ARGS(segment_init)
@@ -2554,6 +2552,8 @@ C<PackFile_ByteCode>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t
 byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
 {
@@ -2593,16 +2593,18 @@ Stores the passed C<PackFile_ByteCode> segment in bytecode.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t *
-byte_code_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(byte_code_pack)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
-    int i, j;
+    int i;
 
     *cursor++ = byte_code->op_count;
     *cursor++ = byte_code->op_mapping.n_libs;
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
+        int j;
+
         PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
 
         /* dynoplib data */
@@ -3342,7 +3344,6 @@ void
 Parrot_destroy_constants(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_destroy_constants)
-    UINTVAL i;
     Hash *hash;
 
     return;
@@ -3356,7 +3357,6 @@ Parrot_destroy_constants(PARROT_INTERP)
         return;
 
     parrot_hash_iterate(hash,
-        PackFile_ConstTable * const table     = (PackFile_ConstTable *)_bucket->key;
         PackFile_ConstTable * const ct        = (PackFile_ConstTable *)_bucket->value;
         PackFile_ConstTable_clear(interp, ct);
         mem_gc_free(interp, ct););
@@ -3385,7 +3385,6 @@ void
 PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
 {
     ASSERT_ARGS(PackFile_ConstTable_clear)
-    opcode_t i;
 
     if (self->num.constants) {
         mem_gc_free(interp, self->num.constants);
@@ -3607,8 +3606,7 @@ void
 PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_destroy)
-    PackFile_Annotations *self = (PackFile_Annotations *)seg;
-    INTVAL                i;
+    PackFile_Annotations * const self = (PackFile_Annotations *)seg;
 
     /* Free any keys. */
     if (self->keys)
@@ -3641,6 +3639,7 @@ segment.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
 PackFile_Annotations_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *seg))
 {
