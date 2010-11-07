@@ -86,6 +86,7 @@ PARROT_CAN_RETURN_NULL
 static PMC* gc_ms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING* gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
@@ -157,9 +158,11 @@ static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
@@ -532,6 +535,8 @@ consumption.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 Parrot_gc_ms_needed(PARROT_INTERP)
 {
@@ -849,6 +854,7 @@ return True if *ptr is contained in the pool
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
@@ -866,6 +872,7 @@ establish if string *ptr is owned
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
@@ -891,6 +898,8 @@ Allocate new STRING header from pool.
 =cut
 
 */
+
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING*
 gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
@@ -901,7 +910,7 @@ gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
             ? interp->mem_pools->constant_string_header_pool
             : interp->mem_pools->string_header_pool;
 
-    STRING *s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
+    STRING * const s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
     memset(s, 0, sizeof (STRING));
     return s;
 }
@@ -1791,6 +1800,8 @@ returns stats as required by enum which
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
 Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
 {
