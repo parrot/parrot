@@ -18,6 +18,7 @@ Parrot::Headerizer::Functions - Functions used in headerizer programs
 =head1 SYNOPSIS
 
     use Parrot::Headerizer::Functions qw(
+        print_headerizer_warnings
         read_file
         write_file
     );
@@ -52,6 +53,9 @@ sub print_headerizer_warnings {
         print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
     }
 }
+
+# We can't alias this to Parrot::BuildUtil::slurp_file() because that function
+# changes DOS line endings to Unix, which we don't necessarily want here.
 
 sub read_file {
     my $filename = shift;

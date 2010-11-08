@@ -7,9 +7,10 @@ use strict;
 use warnings;
 use Test::More qw(no_plan); # tests => 60;
 use Cwd;
-use File::Basename;
-use File::Copy;
+#use File::Basename;
+#use File::Copy;
 use File::Temp qw( tempdir );
+use Tie::File;
 use lib qw( lib );
 use Parrot::Headerizer::Functions qw(
     print_headerizer_warnings
@@ -18,6 +19,28 @@ use Parrot::Headerizer::Functions qw(
 );
 use IO::CaptureOutput qw| capture |;
 
+my $cwd = cwd();
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir;
+    my $file = "filename$$";
+    my @lines_to_write = (
+        "Goodbye\n",
+        "cruel\n",
+        "world\n",
+    );
+    my $text = join( '' => @lines_to_write );
+    write_file($file, $text);
+    ok(-f $file, "File was written");
+
+    my $text_returned = read_file($file);
+    ok($text_returned, "Got non-empty string back from read_file()");
+    my @lines_read = split /\n/, $text_returned;
+    is($lines_read[0], 'Goodbye', "Got first line");
+    is($lines_read[1], 'cruel', "Got second line");
+    is($lines_read[2], 'world', "Got third line");
+}
+    
 
 pass("Completed all tests in $0");
 
