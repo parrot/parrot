@@ -1,6 +1,17 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
+use strict;
+use warnings;
+
+use Getopt::Long;
+use lib qw( lib );
+use Parrot::Config;
+use Parrot::Headerizer;
+use Parrot::Headerizer::Functions qw(
+    read_file
+    write_file
+);
 
 =head1 NAME
 
@@ -59,23 +70,157 @@ Print a list of all functions that have macro X.  For example, --macro=PARROT_EX
 
 =cut
 
-use strict;
-use warnings;
-
-use Getopt::Long;
-use lib qw( lib );
-use Parrot::Config;
-use Parrot::Headerizer;
-use Parrot::Headerizer::Functions qw(
-    read_file
-    write_file
-);
-
 my $headerizer = Parrot::Headerizer->new;
 
 main();
 
 =head1 FUNCTIONS
+
+=head2 C<main()>
+
+=cut
+
+sub main {
+    my $macro_match;
+    GetOptions(
+        'macro=s' => \$macro_match,
+    ) or exit(1);
+
+    die 'No files specified.' unless @ARGV;
+    my %ofiles;
+    ++$ofiles{$_} for @ARGV;
+    my @ofiles = sort keys %ofiles;
+    for (@ofiles) {
+        print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
+    }
+    my %sourcefiles;
+    my %sourcefiles_with_statics;
+    my %api;
+
+    # Walk the object files and find corresponding source (either .c or .pmc)
+    for my $ofile (@ofiles) {
+
+        # Skip files in the src/ops/ subdirectory.
+
+        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
+                $ofile =~ m{^src/ops};                     # ... or by makefile
+
+        $ofile =~ s/\\/\//g;
+
+        my $is_yacc = ($ofile =~ /\.y$/);
+        if ( !$is_yacc ) {
+            my $sfile = $ofile;
+            $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
+            next if -f $sfile;
+        }
+
+        my $cfile = $ofile;
+        $cfile =~ s/\Q$PConfig{o}\E$/.c/ or $is_yacc
+            or die "$cfile doesn't look like an object file";
+
+        my $pmcfile = $ofile;
+        $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
+
+        my $from_pmc = -f $pmcfile && !$is_yacc;
+
+        my $sourcefile = $from_pmc ? $pmcfile : $cfile;
+
+        my $source_code = read_file( $sourcefile );
+        die qq{can't find HEADERIZER HFILE directive in "$sourcefile"}
+            unless $source_code =~
+                m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
+
+        my $hfile = $1;
+        if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
+            die qq{"$hfile" not found (referenced from "$sourcefile")};
+        }
+
+        my @decls;
+        if ( $macro_match ) {
+            @decls = $headerizer->extract_function_declarations( $source_code );
+        }
+        else {
+            @decls = extract_function_declarations_and_update_source( $sourcefile );
+        }
+
+        for my $decl (@decls) {
+            my $components = $headerizer->function_components_from_declaration( $sourcefile, $decl );
+            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
+            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
+            if ( $macro_match ) {
+                if ( grep { $_ eq $macro_match } @{$components->{macros}} ) {
+                    push( @{ $api{$sourcefile} }, $components );
+                }
+            }
+        }
+    }    # for @cfiles
+
+    if ( $macro_match ) {
+        my $nfuncs = 0;
+        for my $cfile ( sort keys %api ) {
+            my @funcs = sort { $a->{name} cmp $b->{name} } @{$api{$cfile}};
+            print "$cfile\n";
+            for my $func ( @funcs ) {
+                print "    $func->{name}\n";
+                ++$nfuncs;
+            }
+        }
+        my $s = $nfuncs == 1 ? '' : 's';
+        print "$nfuncs $macro_match function$s\n";
+    }
+    else { # Normal headerization and updating
+        # Update all the .h files
+        for my $hfile ( sort keys %sourcefiles ) {
+            my $sourcefiles = $sourcefiles{$hfile};
+
+            my $header = read_file($hfile);
+
+            for my $cfile ( sort keys %{$sourcefiles} ) {
+                my @funcs = @{ $sourcefiles->{$cfile} };
+                @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
+
+                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
+            }
+
+            write_file( $hfile, $header );
+        }
+
+        # Update all the .c files in place
+        for my $cfile ( sort keys %sourcefiles_with_statics ) {
+            my @funcs = @{ $sourcefiles_with_statics{$cfile} };
+            @funcs = grep { $_->{is_static} } @funcs;
+
+            my $source = read_file($cfile);
+            $source = replace_headerized_declarations( $source, 'static', $cfile, @funcs );
+
+            write_file( $cfile, $source );
+        }
+        print "Headerization complete.\n";
+    }
+
+    my %warnings = %{$headerizer->{warnings}};
+    if ( keys %warnings ) {
+        my $nwarnings     = 0;
+        my $nwarningfuncs = 0;
+        my $nwarningfiles = 0;
+        for my $file ( sort keys %warnings ) {
+            ++$nwarningfiles;
+            print "$file\n";
+            my $funcs = $warnings{$file};
+            for my $func ( sort keys %{$funcs} ) {
+                ++$nwarningfuncs;
+                for my $error ( @{ $funcs->{$func} } ) {
+                    print "    $func: $error\n";
+                    ++$nwarnings;
+                }
+            }
+        }
+
+        print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
+    }
+
+    return;
+}
 
 =head2 extract_function_declaration_and_update_source( $cfile_name )
 
@@ -293,148 +438,6 @@ sub replace_headerized_declarations {
 sub api_first_then_alpha {
     return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
         || ( lc $a->{name} cmp lc $b->{name} );
-}
-
-sub main {
-    my $macro_match;
-    GetOptions(
-        'macro=s' => \$macro_match,
-    ) or exit(1);
-
-    die 'No files specified.' unless @ARGV;
-    my %ofiles;
-    ++$ofiles{$_} for @ARGV;
-    my @ofiles = sort keys %ofiles;
-    for (@ofiles) {
-        print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
-    }
-    my %sourcefiles;
-    my %sourcefiles_with_statics;
-    my %api;
-
-    # Walk the object files and find corresponding source (either .c or .pmc)
-    for my $ofile (@ofiles) {
-
-        # Skip files in the src/ops/ subdirectory.
-
-        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
-                $ofile =~ m{^src/ops};                     # ... or by makefile
-
-        $ofile =~ s/\\/\//g;
-
-        my $is_yacc = ($ofile =~ /\.y$/);
-        if ( !$is_yacc ) {
-            my $sfile = $ofile;
-            $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
-            next if -f $sfile;
-        }
-
-        my $cfile = $ofile;
-        $cfile =~ s/\Q$PConfig{o}\E$/.c/ or $is_yacc
-            or die "$cfile doesn't look like an object file";
-
-        my $pmcfile = $ofile;
-        $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
-
-        my $from_pmc = -f $pmcfile && !$is_yacc;
-
-        my $sourcefile = $from_pmc ? $pmcfile : $cfile;
-
-        my $source_code = read_file( $sourcefile );
-        die qq{can't find HEADERIZER HFILE directive in "$sourcefile"}
-            unless $source_code =~
-                m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
-
-        my $hfile = $1;
-        if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
-            die qq{"$hfile" not found (referenced from "$sourcefile")};
-        }
-
-        my @decls;
-        if ( $macro_match ) {
-            @decls = $headerizer->extract_function_declarations( $source_code );
-        }
-        else {
-            @decls = extract_function_declarations_and_update_source( $sourcefile );
-        }
-
-        for my $decl (@decls) {
-            my $components = $headerizer->function_components_from_declaration( $sourcefile, $decl );
-            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
-            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
-            if ( $macro_match ) {
-                if ( grep { $_ eq $macro_match } @{$components->{macros}} ) {
-                    push( @{ $api{$sourcefile} }, $components );
-                }
-            }
-        }
-    }    # for @cfiles
-
-    if ( $macro_match ) {
-        my $nfuncs = 0;
-        for my $cfile ( sort keys %api ) {
-            my @funcs = sort { $a->{name} cmp $b->{name} } @{$api{$cfile}};
-            print "$cfile\n";
-            for my $func ( @funcs ) {
-                print "    $func->{name}\n";
-                ++$nfuncs;
-            }
-        }
-        my $s = $nfuncs == 1 ? '' : 's';
-        print "$nfuncs $macro_match function$s\n";
-    }
-    else { # Normal headerization and updating
-        # Update all the .h files
-        for my $hfile ( sort keys %sourcefiles ) {
-            my $sourcefiles = $sourcefiles{$hfile};
-
-            my $header = read_file($hfile);
-
-            for my $cfile ( sort keys %{$sourcefiles} ) {
-                my @funcs = @{ $sourcefiles->{$cfile} };
-                @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-
-                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
-            }
-
-            write_file( $hfile, $header );
-        }
-
-        # Update all the .c files in place
-        for my $cfile ( sort keys %sourcefiles_with_statics ) {
-            my @funcs = @{ $sourcefiles_with_statics{$cfile} };
-            @funcs = grep { $_->{is_static} } @funcs;
-
-            my $source = read_file($cfile);
-            $source = replace_headerized_declarations( $source, 'static', $cfile, @funcs );
-
-            write_file( $cfile, $source );
-        }
-        print "Headerization complete.\n";
-    }
-
-    my %warnings = %{$headerizer->{warnings}};
-    if ( keys %warnings ) {
-        my $nwarnings     = 0;
-        my $nwarningfuncs = 0;
-        my $nwarningfiles = 0;
-        for my $file ( sort keys %warnings ) {
-            ++$nwarningfiles;
-            print "$file\n";
-            my $funcs = $warnings{$file};
-            for my $func ( sort keys %{$funcs} ) {
-                ++$nwarningfuncs;
-                for my $error ( @{ $funcs->{$func} } ) {
-                    print "    $func: $error\n";
-                    ++$nwarnings;
-                }
-            }
-        }
-
-        print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
-    }
-
-    return;
 }
 
 # From earlier documentation:
