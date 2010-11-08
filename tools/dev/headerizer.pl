@@ -66,6 +66,10 @@ use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
 use Parrot::Headerizer;
+use Parrot::Headerizer::Functions qw(
+    read_file
+    write_file
+);
 
 my $headerizer = Parrot::Headerizer->new;
 
@@ -256,25 +260,6 @@ sub make_function_decls {
     }
 
     return @decls;
-}
-
-sub read_file {
-    my $filename = shift;
-
-    open my $fh, '<', $filename or die "couldn't read '$filename': $!";
-    my $text = do { local $/ = undef; <$fh> };
-    close $fh;
-
-    return $text;
-}
-
-sub write_file {
-    my $filename = shift;
-    my $text     = shift;
-
-    open my $fh, '>', $filename or die "couldn't write '$filename': $!";
-    print {$fh} $text;
-    close $fh;
 }
 
 sub replace_headerized_declarations {

@@ -62,7 +62,7 @@ sub runstep {
         $flagsref->{$flag} =~ s/^\s+//;
     }
 
-    my $osvers = `/usr/sbin/sysctl -n kern.osreldate`;
+    my $osvers = `/usr/sbin/sysctl -n kern.osrelease`;
     chomp $osvers;
 
     $conf->data->set(
