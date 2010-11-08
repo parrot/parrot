@@ -5,12 +5,9 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 60;
+use Test::More tests => 15;
 use Cwd;
-#use File::Basename;
-#use File::Copy;
 use File::Temp qw( tempdir );
-use Tie::File;
 use lib qw( lib );
 use Parrot::Headerizer::Functions qw(
     print_headerizer_warnings
@@ -41,6 +38,48 @@ my $cwd = cwd();
     is($lines_read[2], 'world', "Got third line");
 }
     
+my $warnings = {
+    'file1' => {
+        'func_alpha'    => [
+            'alpha warning 1',
+            'alpha warning 2',
+            'alpha warning 3',
+        ],
+        'func_beta'      => [
+            'beta warning 1',
+            'beta warning 2',
+        ],
+    },
+    'file2' => {
+        'func_gamma'    => [
+            'gamma warning 1',
+            'gamma warning 2',
+            'gamma warning 3',
+        ],
+    },
+};
+
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { print_headerizer_warnings($warnings); },
+        \$stdout,
+        \$stderr,
+    );
+    for my $func( qw| alpha gamma | ) {
+        for (1..3) {
+            like( $stdout, qr/func_alpha: alpha warning $_/s,
+                "Got expected output" );
+        }
+    }
+    for (1..2) {
+        like( $stdout, qr/func_beta: beta warning $_/s,
+            "Got expected output" );
+    }
+    like( $stdout, qr/8 warnings in 3 funcs in 2 C files/,
+        "Got expected summary of headerizer warnings" );
+}
+
 
 pass("Completed all tests in $0");
 
