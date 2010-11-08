@@ -247,7 +247,7 @@ complete:
 .sub _Ch
     .param pmc context
 
-    .local int E, F, G, result 
+    .local int E, F, G, result
 
     E = context[4]
     F = context[5]
