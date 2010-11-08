@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
+    print_headerizer_warnings
     read_file
     write_file
 );
@@ -27,6 +28,30 @@ This package holds (non-object-oriented) functions used in
 F<tools/dev/headerizer.pl>.
 
 =cut
+
+sub print_headerizer_warnings {
+    my $warnings_ref = shift;
+    my %warnings = %{$warnings_ref};
+    if ( keys %warnings ) {
+        my $nwarnings     = 0;
+        my $nwarningfuncs = 0;
+        my $nwarningfiles = 0;
+        for my $file ( sort keys %warnings ) {
+            ++$nwarningfiles;
+            print "$file\n";
+            my $funcs = $warnings{$file};
+            for my $func ( sort keys %{$funcs} ) {
+                ++$nwarningfuncs;
+                for my $error ( @{ $funcs->{$func} } ) {
+                    print "    $func: $error\n";
+                    ++$nwarnings;
+                }
+            }
+        }
+
+        print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
+    }
+}
 
 sub read_file {
     my $filename = shift;

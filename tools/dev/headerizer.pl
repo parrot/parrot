@@ -9,6 +9,7 @@ use lib qw( lib );
 use Parrot::Config;
 use Parrot::Headerizer;
 use Parrot::Headerizer::Functions qw(
+    print_headerizer_warnings
     read_file
     write_file
 );
@@ -198,26 +199,7 @@ sub main {
         print "Headerization complete.\n";
     }
 
-    my %warnings = %{$headerizer->{warnings}};
-    if ( keys %warnings ) {
-        my $nwarnings     = 0;
-        my $nwarningfuncs = 0;
-        my $nwarningfiles = 0;
-        for my $file ( sort keys %warnings ) {
-            ++$nwarningfiles;
-            print "$file\n";
-            my $funcs = $warnings{$file};
-            for my $func ( sort keys %{$funcs} ) {
-                ++$nwarningfuncs;
-                for my $error ( @{ $funcs->{$func} } ) {
-                    print "    $func: $error\n";
-                    ++$nwarnings;
-                }
-            }
-        }
-
-        print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
-    }
+    print_headerizer_warnings($headerizer->{warnings});
 
     return;
 }
