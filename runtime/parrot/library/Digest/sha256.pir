@@ -272,7 +272,7 @@ complete:
     A = context[0]
     B = context[1]
     C = context[2]
- 
+
     # Maj(x,y,z) = ( x and y ) xor ( x and z ) xor ( y and z )
     #            = ( x and y ) or ( z and ( x or y ) )
     # here as: Maj(A,B,C) = ( A and B ) or ( C and ( A or B ) )
@@ -293,7 +293,7 @@ complete:
     .param int n
 
     .local int extension, result
-    extension = shr x, n 
+    extension = shr x, n
 
     result = 32 - n
     result = shl x, result
@@ -302,7 +302,7 @@ complete:
 
     result = bor extension, result
 
-    .return (result) 
+    .return (result)
 .end
 
 ###########################################################################
@@ -349,7 +349,7 @@ complete:
     .param int value
 
     .local int intermediate, result
-   
+
     intermediate = _rotate_right( value, 7 )
     result = _rotate_right( value, 18 )
     result = bxor intermediate, result
@@ -366,7 +366,7 @@ complete:
     .param int value
 
     .local int intermediate, result
-   
+
     intermediate = _rotate_right( value, 17 )
     result = _rotate_right( value, 19 )
     result = bxor intermediate, result
@@ -441,7 +441,7 @@ complete:
     message[tmp] = result
 
     .return (result)
-.end 
+.end
 
 ###########################################################################
 
@@ -562,7 +562,7 @@ LOOP:   if counter > 63 goto DONE
 
 NIL_TO_15:
     # part 2 from the calculation of T1
-    # change the byte-order 
+    # change the byte-order
     tmp = buffer[counter]
     tmp = _byte_order(tmp)
 
@@ -670,8 +670,8 @@ BLOCK_LOOP:
     .param int hex_num
     $P0 = new 'FixedIntegerArray'
     $P0 = 1
-    $P0[0] = hex_num 
-    $S0 = sprintf "%08lx", $P0 
+    $P0[0] = hex_num
+    $S0 = sprintf "%08lx", $P0
 
     print 'value in hex-format: '
     say $S0
