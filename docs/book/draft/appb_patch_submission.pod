@@ -33,14 +33,14 @@ committers and testers have a better idea about what it does. The body of
 your email should also include a good description about what you changed
 and why.
 
-It's important that you create your patches from a checked-out subversion
+It's important that you create your patches from the Parrot git
 repository, not from a tarball or a snapshot. This way, you can ensure
 that your diff is made against the latest version of the files. If you patch
 an old version, the problem may have already been resolved! Make sure
 the paths listed in the patch match those in the repository. There are two
 methods of creating patches that will do this for you. You can make changes
-directly in your checked-out copy of the subversion repository and
-then create diffs using the command C<svn diff>. Alternatively, you can
+directly in your clone of the git repository and
+then create diffs using the command C<git diff>. Alternatively, you can
 make a copy of the repository and then create diffs between the two
 copies with the C<diff -u> command:
 
@@ -81,7 +81,7 @@ message should clearly explain what the patch is supposed to do and
 why you're submitting it. Make a note if you're adding or deleting
 files so they won't be missed.
 
-Here is a good example of a patch submission using the subversion diff
+Here is a good example of a patch submission using the git diff
 method (an actual patch from p2). It's short, sticks to the point, and
 clearly expresses the problem and the solution. The patch filename and
 the subject of the message are both descriptive:

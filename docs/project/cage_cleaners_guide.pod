@@ -333,13 +333,6 @@ If neither, please report your findings so that everyone can decide what to do.
 
 =head1 Handy configuration tips
 
-=head2 Subversion configuration and automatic properties
-
-There is an example C<.subversion/config> file in
-F<editor/subversion_config> which is useful in automatically setting the
-appropriate Subversion properties relevant to Parrot on addition of new
-files.
-
 =head2 Displaying trailing whitespace in vim and emacs
 
 =head3 Vim

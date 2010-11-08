@@ -136,7 +136,7 @@ See:
 
 =item * L<https://trac.parrot.org/>
 
-=item * L<https://svn.parrot.org/>
+=item * L<http://github.com/parrot/parrot>
 
 =back
 
