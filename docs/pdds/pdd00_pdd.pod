@@ -94,11 +94,6 @@ A short, general description of a specific part of the Parrot design. This may
 be a particular subsystem (e.g. the garbage collector), or a more general
 topic (e.g. basic Parrot datatypes).
 
-=item Version:
-
-Document version.  Since Parrot is currently kept in a Subversion repository,
-the $$-delimited keyword "Revision" will do nicely.
-
 =item Abstract:
 
 A quick blurb explaining the purpose of the PDD.

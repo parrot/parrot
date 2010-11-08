@@ -12,18 +12,18 @@ platforms, including Windows, Debian, and Redhat. Point releases are
 available from U<http://www.parrot.org/download>.
 
 If you plan to get involved in development, you'll want to check out
-the source from the subversion repository directly. Anyone can get
+the source from the git repository directly. Anyone can get
 anonymous access to read the files and download a working copy to
 explore and test. For commit access, volunteers need a
 U<https://trac.parrot.org> username, and need to be approved by a
-Metacommitter. To download the most recent version from SVN, type this
+Metacommitter. To download the most recent version from git, type this
 command into your terminal N<This is for Linux users, on Mac or
-Windows systems, follow the instructions from your SVN client>:
+Windows systems, follow the instructions from your git client>:
 
-  svn co https://svn.parrot.org/parrot/trunk parrot
+  git clone http://github.com/parrot/parrot
 
 There's also a web interface for viewing files in the repository at
-U<http://svn.parrot.org/parrot/>. 
+the same link.
 
 The repository is large and complex, so it's worth taking a little bit
 of time to explore. The code changes constantly, but most files and
