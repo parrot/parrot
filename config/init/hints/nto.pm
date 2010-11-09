@@ -1,5 +1,4 @@
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 package init::hints::nto;
 

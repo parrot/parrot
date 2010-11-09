@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # gen/core_pmcs-01.t
 
 use strict;

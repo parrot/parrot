@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Step::List;
 use strict;
 use warnings;

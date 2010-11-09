@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -303,7 +302,6 @@ internals mailing list.
 
 Copyright (C) 2008, Parrot Foundation.
 
-# $Id$
 
 =cut
 

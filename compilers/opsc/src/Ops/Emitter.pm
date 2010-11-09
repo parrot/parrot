@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 class Ops::Emitter is Hash;
 

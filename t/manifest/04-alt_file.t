@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 # 04-alt_file.t
 
 use strict;

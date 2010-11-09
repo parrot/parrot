@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # 018-revision_to_cache.t
 
 use strict;

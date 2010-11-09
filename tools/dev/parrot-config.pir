@@ -1,5 +1,4 @@
 #!/usr/bin/env parrot
-# $Id$
 
 =head1 NAME
 

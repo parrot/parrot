@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 # XXX Better to put this into docs/ somewhere.
 

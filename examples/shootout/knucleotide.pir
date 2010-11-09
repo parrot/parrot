@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2010, Parrot Foundation.
-# $Id$
 
 .loadlib 'io_ops'
 

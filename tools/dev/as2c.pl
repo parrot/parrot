@@ -2,7 +2,6 @@
 
 # Copyright (C) 2004-2007, Parrot Foundation.
 
-# $Id$
 
 =head1 NAME
 

@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2007, Parrot Foundation.
-# $Id$
 # 03-dump_vtable.t
 
 use strict;
