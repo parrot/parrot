@@ -16748,7 +16748,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_eq_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_equal(interp, SREG(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_equal(interp, SREG(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16756,7 +16756,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_eq_sc_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_equal(interp, SCONST(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_equal(interp, SCONST(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16764,7 +16764,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_eq_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_equal(interp, SREG(1), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_equal(interp, SREG(1), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16836,7 +16836,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_eq_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_equal(interp, VTABLE_get_string(interp, PREG(1)), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_equal(interp, VTABLE_get_string(interp, PREG(1)), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16844,7 +16844,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_eq_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_equal(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_equal(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16956,7 +16956,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ne_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_not_equal(interp, SREG(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (!STRING_equal(interp, SREG(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16964,7 +16964,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ne_sc_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_not_equal(interp, SCONST(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (!STRING_equal(interp, SCONST(1), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -16972,7 +16972,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ne_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_not_equal(interp, SREG(1), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (!STRING_equal(interp, SREG(1), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17032,7 +17032,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ne_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_not_equal(interp, VTABLE_get_string(interp, PREG(1)), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (!STRING_equal(interp, VTABLE_get_string(interp, PREG(1)), SREG(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17040,7 +17040,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ne_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_not_equal(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (!STRING_equal(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2))) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17152,7 +17152,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_lt_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, SREG(1), SREG(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, SREG(1), SREG(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17160,7 +17160,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_lt_sc_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, SCONST(1), SREG(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, SCONST(1), SREG(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17168,7 +17168,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_lt_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, SREG(1), SCONST(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, SREG(1), SCONST(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17228,7 +17228,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_lt_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17236,7 +17236,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_lt_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) < 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17308,7 +17308,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_le_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, SREG(1), SREG(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, SREG(1), SREG(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17316,7 +17316,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_le_sc_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, SCONST(1), SREG(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, SCONST(1), SREG(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17324,7 +17324,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_le_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, SREG(1), SCONST(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, SREG(1), SCONST(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17384,7 +17384,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_le_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17392,7 +17392,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_le_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) <= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17468,7 +17468,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_gt_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) > 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) > 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17476,7 +17476,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_gt_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) > 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) > 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17552,7 +17552,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ge_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) >= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SREG(2)) >= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17560,7 +17560,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_ge_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    if (Parrot_str_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) >= 0) {return (opcode_t *)cur_opcode + ICONST(3);
+    if (STRING_compare(interp, VTABLE_get_string(interp, PREG(1)), SCONST(2)) >= 0) {return (opcode_t *)cur_opcode + ICONST(3);
     }
 
 return (opcode_t *)cur_opcode + 4;}
@@ -17670,21 +17670,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_cmp_i_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SREG(2), SREG(3));
+    IREG(1) = STRING_compare(interp, SREG(2), SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_cmp_i_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SCONST(2), SREG(3));
+    IREG(1) = STRING_compare(interp, SCONST(2), SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_cmp_i_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SREG(2), SCONST(3));
+    IREG(1) = STRING_compare(interp, SREG(2), SCONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -17739,7 +17739,7 @@ opcode_t *
 Parrot_cmp_i_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     STRING* const l = VTABLE_get_string(interp, PREG(2));
-    IREG(1) = Parrot_str_compare(interp, l, SREG(3));
+    IREG(1) = STRING_compare(interp, l, SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -17747,7 +17747,7 @@ opcode_t *
 Parrot_cmp_i_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     STRING* const l = VTABLE_get_string(interp, PREG(2));
-    IREG(1) = Parrot_str_compare(interp, l, SCONST(3));
+    IREG(1) = STRING_compare(interp, l, SCONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -17949,21 +17949,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_isle_i_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SREG(2), SREG(3)) <= 0;
+    IREG(1) = STRING_compare(interp, SREG(2), SREG(3)) <= 0;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_isle_i_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SCONST(2), SREG(3)) <= 0;
+    IREG(1) = STRING_compare(interp, SCONST(2), SREG(3)) <= 0;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_isle_i_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SREG(2), SCONST(3)) <= 0;
+    IREG(1) = STRING_compare(interp, SREG(2), SCONST(3)) <= 0;
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18019,21 +18019,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_islt_i_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SREG(2), SREG(3)) < 0;
+    IREG(1) = STRING_compare(interp, SREG(2), SREG(3)) < 0;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_islt_i_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SCONST(2), SREG(3)) < 0;
+    IREG(1) = STRING_compare(interp, SCONST(2), SREG(3)) < 0;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_islt_i_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = Parrot_str_compare(interp, SREG(2), SCONST(3)) < 0;
+    IREG(1) = STRING_compare(interp, SREG(2), SCONST(3)) < 0;
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18089,21 +18089,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_iseq_i_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (Parrot_str_equal(interp, SREG(2), SREG(3)) ? 1 : 0);
+    IREG(1) = STRING_equal(interp, SREG(2), SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_iseq_i_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (Parrot_str_equal(interp, SCONST(2), SREG(3)) ? 1 : 0);
+    IREG(1) = STRING_equal(interp, SCONST(2), SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_iseq_i_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (Parrot_str_equal(interp, SREG(2), SCONST(3)) ? 1 : 0);
+    IREG(1) = STRING_equal(interp, SREG(2), SCONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -18162,21 +18162,21 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_isne_i_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (Parrot_str_not_equal(interp, SREG(2), SREG(3)) ? 1 : 0);
+    IREG(1) = !STRING_equal(interp, SREG(2), SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_isne_i_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (Parrot_str_not_equal(interp, SCONST(2), SREG(3)) ? 1 : 0);
+    IREG(1) = !STRING_equal(interp, SCONST(2), SREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_isne_i_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (Parrot_str_not_equal(interp, SREG(2), SCONST(3)) ? 1 : 0);
+    IREG(1) = !STRING_equal(interp, SREG(2), SCONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -22226,49 +22226,49 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_ord_i_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SREG(2), 0);
+    IREG(1) = STRING_ord(interp, SREG(2), 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_ord_i_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SCONST(2), 0);
+    IREG(1) = STRING_ord(interp, SCONST(2), 0);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_ord_i_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SREG(2), IREG(3));
+    IREG(1) = STRING_ord(interp, SREG(2), IREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_ord_i_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SCONST(2), IREG(3));
+    IREG(1) = STRING_ord(interp, SCONST(2), IREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_ord_i_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SREG(2), ICONST(3));
+    IREG(1) = STRING_ord(interp, SREG(2), ICONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_ord_i_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = string_ord(interp, SCONST(2), ICONST(3));
+    IREG(1) = STRING_ord(interp, SCONST(2), ICONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_chr_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const s = string_chr(interp, (UINTVAL)IREG(2));
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)IREG(2));
     SREG(1) = s;
 
 return (opcode_t *)cur_opcode + 3;}
@@ -22276,7 +22276,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_chr_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    STRING * const s = string_chr(interp, (UINTVAL)ICONST(2));
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)ICONST(2));
     SREG(1) = s;
 
 return (opcode_t *)cur_opcode + 3;}
@@ -22537,7 +22537,7 @@ opcode_t *
 Parrot_substr_s_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const INTVAL len = Parrot_str_byte_length(interp, SREG(2));
-    SREG(1) = Parrot_str_substr(interp, SREG(2), IREG(3), len);
+    SREG(1) = STRING_substr(interp, SREG(2), IREG(3), len);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -22545,7 +22545,7 @@ opcode_t *
 Parrot_substr_s_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const INTVAL len = Parrot_str_byte_length(interp, SCONST(2));
-    SREG(1) = Parrot_str_substr(interp, SCONST(2), IREG(3), len);
+    SREG(1) = STRING_substr(interp, SCONST(2), IREG(3), len);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -22553,7 +22553,7 @@ opcode_t *
 Parrot_substr_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const INTVAL len = Parrot_str_byte_length(interp, SREG(2));
-    SREG(1) = Parrot_str_substr(interp, SREG(2), ICONST(3), len);
+    SREG(1) = STRING_substr(interp, SREG(2), ICONST(3), len);
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -22561,63 +22561,63 @@ opcode_t *
 Parrot_substr_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     const INTVAL len = Parrot_str_byte_length(interp, SCONST(2));
-    SREG(1) = Parrot_str_substr(interp, SCONST(2), ICONST(3), len);
+    SREG(1) = STRING_substr(interp, SCONST(2), ICONST(3), len);
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_substr_s_s_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SREG(2), IREG(3), IREG(4));
+    SREG(1) = STRING_substr(interp, SREG(2), IREG(3), IREG(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_sc_i_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SCONST(2), IREG(3), IREG(4));
+    SREG(1) = STRING_substr(interp, SCONST(2), IREG(3), IREG(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_s_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SREG(2), ICONST(3), IREG(4));
+    SREG(1) = STRING_substr(interp, SREG(2), ICONST(3), IREG(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_sc_ic_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SCONST(2), ICONST(3), IREG(4));
+    SREG(1) = STRING_substr(interp, SCONST(2), ICONST(3), IREG(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_s_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SREG(2), IREG(3), ICONST(4));
+    SREG(1) = STRING_substr(interp, SREG(2), IREG(3), ICONST(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_sc_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SCONST(2), IREG(3), ICONST(4));
+    SREG(1) = STRING_substr(interp, SCONST(2), IREG(3), ICONST(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_s_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SREG(2), ICONST(3), ICONST(4));
+    SREG(1) = STRING_substr(interp, SREG(2), ICONST(3), ICONST(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_substr_s_sc_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    SREG(1) = Parrot_str_substr(interp, SCONST(2), ICONST(3), ICONST(4));
+    SREG(1) = STRING_substr(interp, SCONST(2), ICONST(3), ICONST(4));
 
 return (opcode_t *)cur_opcode + 5;}
 
@@ -22764,84 +22764,84 @@ return (opcode_t *)cur_opcode + 6;}
 opcode_t *
 Parrot_index_i_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SREG(2) && SREG(3)) ? Parrot_str_find_index(interp, SREG(2), SREG(3), 0) : -1;
+    IREG(1) = (SREG(2) && SREG(3)) ? STRING_index(interp, SREG(2), SREG(3), 0) : -1;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_index_i_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SCONST(2) && SREG(3)) ? Parrot_str_find_index(interp, SCONST(2), SREG(3), 0) : -1;
+    IREG(1) = (SCONST(2) && SREG(3)) ? STRING_index(interp, SCONST(2), SREG(3), 0) : -1;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_index_i_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SREG(2) && SCONST(3)) ? Parrot_str_find_index(interp, SREG(2), SCONST(3), 0) : -1;
+    IREG(1) = (SREG(2) && SCONST(3)) ? STRING_index(interp, SREG(2), SCONST(3), 0) : -1;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_index_i_sc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SCONST(2) && SCONST(3)) ? Parrot_str_find_index(interp, SCONST(2), SCONST(3), 0) : -1;
+    IREG(1) = (SCONST(2) && SCONST(3)) ? STRING_index(interp, SCONST(2), SCONST(3), 0) : -1;
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_index_i_s_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SREG(2) && SREG(3)) ? Parrot_str_find_index(interp, SREG(2), SREG(3), IREG(4)) : -1;
+    IREG(1) = (SREG(2) && SREG(3)) ? STRING_index(interp, SREG(2), SREG(3), IREG(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_sc_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SCONST(2) && SREG(3)) ? Parrot_str_find_index(interp, SCONST(2), SREG(3), IREG(4)) : -1;
+    IREG(1) = (SCONST(2) && SREG(3)) ? STRING_index(interp, SCONST(2), SREG(3), IREG(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_s_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SREG(2) && SCONST(3)) ? Parrot_str_find_index(interp, SREG(2), SCONST(3), IREG(4)) : -1;
+    IREG(1) = (SREG(2) && SCONST(3)) ? STRING_index(interp, SREG(2), SCONST(3), IREG(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_sc_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SCONST(2) && SCONST(3)) ? Parrot_str_find_index(interp, SCONST(2), SCONST(3), IREG(4)) : -1;
+    IREG(1) = (SCONST(2) && SCONST(3)) ? STRING_index(interp, SCONST(2), SCONST(3), IREG(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SREG(2) && SREG(3)) ? Parrot_str_find_index(interp, SREG(2), SREG(3), ICONST(4)) : -1;
+    IREG(1) = (SREG(2) && SREG(3)) ? STRING_index(interp, SREG(2), SREG(3), ICONST(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_sc_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SCONST(2) && SREG(3)) ? Parrot_str_find_index(interp, SCONST(2), SREG(3), ICONST(4)) : -1;
+    IREG(1) = (SCONST(2) && SREG(3)) ? STRING_index(interp, SCONST(2), SREG(3), ICONST(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SREG(2) && SCONST(3)) ? Parrot_str_find_index(interp, SREG(2), SCONST(3), ICONST(4)) : -1;
+    IREG(1) = (SREG(2) && SCONST(3)) ? STRING_index(interp, SREG(2), SCONST(3), ICONST(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
 opcode_t *
 Parrot_index_i_sc_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    IREG(1) = (SCONST(2) && SCONST(3)) ? Parrot_str_find_index(interp, SCONST(2), SCONST(3), ICONST(4)) : -1;
+    IREG(1) = (SCONST(2) && SCONST(3)) ? STRING_index(interp, SCONST(2), SCONST(3), ICONST(4)) : -1;
 
 return (opcode_t *)cur_opcode + 5;}
 
@@ -26093,12 +26093,12 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  8,    /* minor_version */
-  0,    /* patch_version */
+  9,    /* minor_version */
+  1,    /* patch_version */
   1083,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */
+  get_op          /* op_code() */ 
 };
 
 /*
@@ -26220,7 +26220,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_2_8_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_2_9_1(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -26249,7 +26249,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_8_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_9_1;
     dynop_register(interp, lib);
     return lib;
 }

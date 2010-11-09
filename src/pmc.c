@@ -120,7 +120,7 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PObj_gc_CLEAR(pmc);
 
-    if (pmc->vtable->attr_size)
+    if (pmc->vtable->attr_size && PMC_data(pmc))
         Parrot_gc_free_pmc_attributes(interp, pmc);
     else
         PMC_data(pmc) = NULL;
@@ -996,7 +996,7 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 
     do {
         INTVAL len;
-        const INTVAL idx = Parrot_str_find_index(interp, what, role, (INTVAL)pos);
+        const INTVAL idx = STRING_index(interp, what, role, pos);
 
         if ((idx < 0) || (idx >= length))
             return 0;
@@ -1004,14 +1004,14 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
         pos = idx;
         len = Parrot_str_byte_length(interp, role);
 
-        if (pos && (Parrot_str_indexed(interp, what, pos - 1) != 32)) {
+        if (pos && (STRING_ord(interp, what, pos - 1) != 32)) {
             pos += len;
             continue;
         }
 
         if (pos + len < length) {
             pos += len;
-            if (Parrot_str_indexed(interp, what, pos) != 32)
+            if (STRING_ord(interp, what, pos) != 32)
                 continue;
         }
 

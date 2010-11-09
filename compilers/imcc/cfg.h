@@ -50,6 +50,7 @@ typedef struct _loop_info {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int blocks_are_connected(
     ARGIN(const Basic_block *from),
     ARGIN(const Basic_block *to))
@@ -76,6 +77,7 @@ void compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int edge_count(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
@@ -90,6 +92,7 @@ void find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int natural_preheader(
     ARGIN(const IMC_Unit *unit),
     ARGIN(const Loop_info *loop_info))

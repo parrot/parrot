@@ -69,7 +69,7 @@ static Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
@@ -86,6 +86,7 @@ PARROT_CAN_RETURN_NULL
 static PMC* gc_ms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING* gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
@@ -157,9 +158,11 @@ static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
@@ -532,12 +535,13 @@ consumption.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 Parrot_gc_ms_needed(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_ms_needed)
 
-    const Memory_Pools * const mem_pools = interp->mem_pools;
     size_t dynamic_threshold;
 
     /* new_mem is the additional amount of memory used since the last GC */
@@ -850,6 +854,7 @@ return True if *ptr is contained in the pool
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
@@ -867,6 +872,7 @@ establish if string *ptr is owned
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
@@ -892,6 +898,8 @@ Allocate new STRING header from pool.
 =cut
 
 */
+
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING*
 gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
@@ -902,7 +910,7 @@ gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
             ? interp->mem_pools->constant_string_header_pool
             : interp->mem_pools->string_header_pool;
 
-    STRING *s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
+    STRING * const s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
     memset(s, 0, sizeof (STRING));
     return s;
 }
@@ -1336,7 +1344,7 @@ TODO Write docu.
 */
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 {
@@ -1345,7 +1353,7 @@ gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
 }
@@ -1792,6 +1800,8 @@ returns stats as required by enum which
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
 Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
 {

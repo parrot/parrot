@@ -34,8 +34,11 @@ my $cwd = cwd();
             qq{$libdir/Parrot}), "Able to copy Parrot::Revision");
     require Parrot::Revision;
     no warnings 'once';
-    like($Parrot::Revision::current, qr/^\d+$/,
-        "Got numeric value for revision number");
+    TODO: {
+        local $TODO = "doesn't work at the moment - git migration";
+        like($Parrot::Revision::current, qr/^[0-9a-f]{40}$/,
+            "Got git hash for revision number");
+    };
     use warnings;
     my $cache = q{.parrot_current_rev};
     ok( ( -e $cache ), "Cache for revision number was created");

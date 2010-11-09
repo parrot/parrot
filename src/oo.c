@@ -1274,7 +1274,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                 const STRING * const check =
                     VTABLE_get_string_keyed_int(interp, exclude, i);
 
-                if (Parrot_str_equal(interp, check, method_name)) {
+                if (STRING_equal(interp, check, method_name)) {
                     excluded = 1;
                     break;
                 }

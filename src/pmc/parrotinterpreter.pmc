@@ -465,12 +465,12 @@ Introspection interface. C<key> can be:
 
         PMC *ctx;
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return INTERP->root_namespace;
 
         name  = CONST_STRING(INTERP, "outer");
 
-        if (Parrot_str_equal(INTERP, item, name)) {
+        if (STRING_equal(INTERP, item, name)) {
             outer   = item;
             nextkey = key_next(INTERP, key);
 
@@ -522,32 +522,32 @@ Introspection interface. C<key> can be:
 
         name = CONST_STRING(INTERP, "context");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return ctx;
 
         name = CONST_STRING(INTERP, "sub");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return Parrot_pcc_get_sub(INTERP, ctx);
 
         name = CONST_STRING(INTERP, "lexpad");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return Parrot_pcc_get_lex_pad(INTERP, ctx);
 
         name = CONST_STRING(INTERP, "namespace");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return Parrot_pcc_get_namespace(INTERP, ctx);
 
         name = CONST_STRING(INTERP, "continuation");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return VTABLE_clone(INTERP, Parrot_pcc_get_continuation(INTERP, ctx));
 
         name = CONST_STRING(INTERP, "annotations");
 
-        if (Parrot_str_equal(INTERP, item, name)) {
+        if (STRING_equal(INTERP, item, name)) {
             PMC        *sub_pmc = Parrot_pcc_get_sub(INTERP, ctx);
             if (ctx == CURRENT_CONTEXT(INTERP)) {
                 /* We can't know the current program counter for the currently
@@ -828,23 +828,55 @@ Map core_type to hll_type.
 
 /*
 
-=item METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional)
+=item METHOD stdin_handle(PMC *newhandle :optional)
 
-Returns the standard parrot handler associated with the interpreter.
-The valid values for fileno are listed in include/stdio.pasm
+If a PMC object is provided, the standard input handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
 
-Optionally sets the parrot handler passed as second argument
-as the specified standard handler.
-
-This method is experimental. See TT #264.
+If no PMC object is provided, the current standard input handle is returned.
 
 =cut
 
 */
 
-    METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
-        PMC * const handle = Parrot_io_stdhandle(INTERP, fileno, newhandle);
-        Parrot_warn_deprecated(INTERP, "stdhandle method is experimental");
+    METHOD stdin_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDIN_FILENO, newhandle);
+        RETURN(PMC *handle);
+    }
+
+/*
+
+=item METHOD stdout_handle(PMC *newhandle :optional)
+
+If a PMC object is provided, the standard output handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
+
+If no PMC object is provided, the current standard output handle is returned.
+
+=cut
+
+*/
+
+    METHOD stdout_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDOUT_FILENO, newhandle);
+        RETURN(PMC *handle);
+    }
+
+/*
+
+=item METHOD stderr_handle(PMC *newhandle :optional)
+
+If a PMC object is provided, the standard error handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
+
+If no PMC object is provided, the current standard error handle is returned.
+
+=cut
+
+*/
+
+    METHOD stderr_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDERR_FILENO, newhandle);
         RETURN(PMC *handle);
     }
 

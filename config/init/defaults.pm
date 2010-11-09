@@ -59,6 +59,7 @@ sub runstep {
         ccflags
         d_socklen_t
         optimize
+        osvers
         scriptdirexp
         sig_name
         sPRIgldbl
@@ -197,7 +198,7 @@ sub runstep {
         touch     => '$(PERL) -MExtUtils::Command -e touch',
 
         ar        => $Config{ar},
-        ar_flags  => 'cr',
+        arflags   => 'cr',
 
         # for Win32
         ar_out => '',

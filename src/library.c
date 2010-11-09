@@ -413,7 +413,7 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
      *      the goal is just to have for sure an invisible 0 at end
      */
 
-    STRING * const nul = string_chr(interp, '\0');
+    STRING * const nul = Parrot_str_chr(interp, '\0');
 
     path = Parrot_str_concat(interp, path, nul);
     --path->bufused;
@@ -445,12 +445,11 @@ static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
     ASSERT_ARGS(path_guarantee_trailing_separator)
-    STRING * const path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
-    if (Parrot_str_indexed(interp, path , path->strlen - 1)
-         != Parrot_str_indexed(interp, path_separator_string, 0))
-        path = Parrot_str_concat(interp, path , path_separator_string);
+    if (STRING_ord(interp, path, -1) != path_separator)
+        path = Parrot_str_concat(interp, path,
+                Parrot_str_chr(interp, path_separator));
 
     return path;
 }
@@ -573,9 +572,9 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
     if (!STRING_IS_NULL(test_path)) {
         if (Parrot_str_byte_length(interp, test_path) > 4) {
-            STRING *orig_ext = Parrot_str_substr(interp, test_path, -4, 4);
+            STRING *orig_ext = STRING_substr(interp, test_path, -4, 4);
             /* First try substituting .pbc for the .pir extension */
-            if (Parrot_str_equal(interp, orig_ext, pir_extension)) {
+            if (STRING_equal(interp, orig_ext, pir_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_concat(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
@@ -583,7 +582,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
                     return result;
             }
             /* Next try substituting .pir, then .pasm for the .pbc extension */
-            else if (Parrot_str_equal(interp, orig_ext, bytecode_extension)) {
+            else if (STRING_equal(interp, orig_ext, bytecode_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_concat(interp, without_ext, pir_extension);
                 result = try_load_path(interp, test_path);
@@ -600,8 +599,8 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
         /* Finally, try substituting .pbc for the .pasm extension. */
         if (Parrot_str_byte_length(interp, test_path) > 5) {
-            STRING * const orig_ext = Parrot_str_substr(interp, test_path, -5, 5);
-            if (Parrot_str_equal(interp, orig_ext, pasm_extension)) {
+            STRING * const orig_ext = STRING_substr(interp, test_path, -5, 5);
+            if (STRING_equal(interp, orig_ext, pasm_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 5);
                 test_path = Parrot_str_concat(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
@@ -866,24 +865,24 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     ++pos_dot;
     ++pos_sl;
     if (pos_sl && pos_dot) {
-        stem = Parrot_str_substr(interp, in, pos_sl, pos_dot - pos_sl - 1);
-        *wo_ext = Parrot_str_substr(interp, in, 0, pos_dot - 1);
-        *ext = Parrot_str_substr(interp, in, pos_dot, len - pos_dot);
+        stem = STRING_substr(interp, in, pos_sl, pos_dot - pos_sl - 1);
+        *wo_ext = STRING_substr(interp, in, 0, pos_dot - 1);
+        *ext = STRING_substr(interp, in, pos_dot, len - pos_dot);
     }
     else if (pos_dot) {
-        stem = Parrot_str_substr(interp, in, 0, pos_dot - 1);
+        stem = STRING_substr(interp, in, 0, pos_dot - 1);
         *wo_ext = stem;
-        *ext = Parrot_str_substr(interp, in, pos_dot, len - pos_dot);
+        *ext = STRING_substr(interp, in, pos_dot, len - pos_dot);
     }
     else if (pos_sl) {
-        stem = Parrot_str_substr(interp, in, pos_sl, len - pos_sl);
+        stem = STRING_substr(interp, in, pos_sl, len - pos_sl);
         *wo_ext = in;
-        *ext = NULL;
+        *ext = STRINGNULL;
     }
     else {
         stem = in;
         *wo_ext = stem;
-        *ext = NULL;
+        *ext = STRINGNULL;
     }
     return stem;
 }

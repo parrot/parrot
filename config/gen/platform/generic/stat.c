@@ -177,10 +177,20 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
         result = statbuf->st_rdev;
         break;
       case STAT_PLATFORM_BLOCKSIZE:
+#ifdef PARROT_HAS_BSD_STAT_EXTN
         result = statbuf->st_blksize;
+#else
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "STAT_PLATFORM_BLOCKSIZE not supported");
+#endif
         break;
       case STAT_PLATFORM_BLOCKS:
+#ifdef PARROT_HAS_BSD_STAT_EXTN
         result = statbuf->st_blocks;
+#else
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "STAT_PLATFORM_BLOCKS not supported");
+#endif
         break;
       default:
         break;

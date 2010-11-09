@@ -1,6 +1,6 @@
 {
-    "release.version"  : "2.9.0",
-    "release.name"     : "Red-masked",
+    "release.version"  : "2.9.1",
+    "release.name"     : "(bugfix release)",
     "release.day"      : "Tuesday",
     "release.date"     : "19 October 2010",
     "release.nextdate" : "16 November 2010",
@@ -16,6 +16,6 @@
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
     "wiki.bugday"      : "bug_day_2010_11_13",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.9.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.9.1/",
     "subversion.root"  : "http://subversion.apache.org/"
 }

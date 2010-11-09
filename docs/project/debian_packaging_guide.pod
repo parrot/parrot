@@ -38,7 +38,7 @@ directory should be named "parrot-<version>" (it will be by default).
 Copy the debian/ directory from the Parrot source tree into the fresh tarball
 extract.
 
-  cp -r <path/to/parrot/svn>/ports/debian ~/deb/parrot/parrot-<version>/.
+  cp -r <path/to/parrot/git>/ports/debian ~/deb/parrot/parrot-<version>/.
 
 Copy the original tarball into ~/deb/parrot, naming it
 "parrot_<version>.orig.tar.gz" (note the "_" in place of dash).

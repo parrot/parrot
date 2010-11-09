@@ -278,7 +278,7 @@ CODE
 
   test8:
     push_eh eh8
-    $P0 = get_global [ unicode:"Fran\x{00E7}ois" ], "baz"
+    $P0 = get_global [ utf8:"Fran\x{00E7}ois" ], "baz"
     $I0 = isnull $P0
     is($I0, 0, "Find Sub in an ISO-8859-1 NameSpace looked up by a Unicode name")
     $S0 = $P0()
@@ -291,9 +291,9 @@ CODE
 
   test9:
     push_eh eh9
-    $P0 = get_global [ unicode:"\x{20AC}uros" ], "baz"
+    $P0 = get_global [ utf8:"\x{20AC}uros" ], "baz"
     $S0 = $P0()
-    is($S0, unicode:"\x{20AC}uros", "Found sub in Unicode NameSpace")
+    is($S0, utf8:"\x{20AC}uros", "Found sub in Unicode NameSpace")
     goto end_test9
   eh9:
     ok(0, "Cannot find sub in Unicode NameSpace")
@@ -302,9 +302,9 @@ CODE
 
   test10:
     push_eh eh10
-    $P0 = get_global [ "Foo";unicode:"\x{20AC}uros" ], "baz"
+    $P0 = get_global [ "Foo";utf8:"\x{20AC}uros" ], "baz"
     $S0 = $P0()
-    is($S0, unicode:"Foo::\x{20AC}uros", "Found sub in nested Unicode NameSpace")
+    is($S0, utf8:"Foo::\x{20AC}uros", "Found sub in nested Unicode NameSpace")
     goto end_test10
   eh10:
     ok(0, "Cannot find sub in nested Unicode NameSpace")
@@ -685,15 +685,15 @@ CODE
 .end
 
 # Namesace specified in Unicode
-.namespace [ unicode:"\x{20AC}uros" ]
+.namespace [ utf8:"\x{20AC}uros" ]
 .sub 'baz'
-    .return(unicode:"\x{20AC}uros")
+    .return(utf8:"\x{20AC}uros")
 .end
 
 # Nested namespace specified in Unicode
-.namespace [ "Foo";unicode:"\x{20AC}uros" ]
+.namespace [ "Foo";utf8:"\x{20AC}uros" ]
 .sub 'baz'
-    .return(unicode:"Foo::\x{20AC}uros")
+    .return(utf8:"Foo::\x{20AC}uros")
 .end
 
 .HLL "MyHLL"

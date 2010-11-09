@@ -45,7 +45,7 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 7;
+    plan tests => 13;
 }
 
 dump_output_like( <<PIR, "pir", [qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
@@ -71,6 +71,17 @@ dump_output_like( <<PIR, "pir", qr/BYTECODE_t.*=>.*\[.*offs.*op_count.*itype.*id
     \$I0 = 42
 .end
 PIR
+
+for my $enc qw(binary iso-8859-1 utf8 utf16 ucs2 ucs4) {
+    SKIP: {
+        skip( 'no ICU lib', 1 ) if $enc eq 'utf16' && !$PConfig{has_icu};
+        dump_output_like( <<PIR, "pir", qr/ENCODING.*=>.*$enc/ms, "pbc_dump $enc encoding");
+.sub main :main
+    \$S0 = $enc:"abc"
+.end
+PIR
+    }
+}
 
 my $longcode = ".sub main :main\n";
 for (0 ... 10000) {

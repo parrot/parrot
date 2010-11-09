@@ -10,6 +10,8 @@ our @EXPORT_OK = qw(
 );
 
 our @shared_valid_options = qw{
+    ar
+    arflags
     bindir
     cage
     cc

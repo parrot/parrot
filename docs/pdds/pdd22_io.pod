@@ -863,7 +863,7 @@ network-specific opcodes.
 
 C<socket> returns a new socket object from a given address family,
 socket type, and protocol number (all integers). The socket object's
-boolean value can be tested for whether the socket was created.
+boolean value can be tested to see if the socket is open or closed.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the socket operation is
@@ -872,7 +872,7 @@ socket object.
 
 =item *
 
-C<sockaddr> returns an object representing a socket address, generated
+C<sockaddr> returns a SockAddr object representing a socket address, generated
 from a port number (integer) and an address (string).
 
 No asynchronous version.

@@ -94,9 +94,32 @@ static void
 disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     const opcode_t *pc = self->data;
+    const PackFile_ByteCode_OpMapping *map = &((const PackFile_ByteCode *)self)->op_mapping;
+    INTVAL i;
 
     Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
+
+    for (i = 0; i < map->n_libs; i++) {
+
+        INTVAL j, lib_num, table_num;
+        PackFile_ByteCode_OpMappingEntry *entry = &map->libs[i];
+        Parrot_io_printf(interp, "  map #%d => [\n", i);
+        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
+                entry->lib->name,
+                entry->lib->major_version,
+                entry->lib->minor_version,
+                entry->lib->patch_version,
+                entry->n_ops);
+
+        for (j = 0; j < map->libs[i].n_ops; j++) {
+            lib_num    = entry->lib_ops[j];
+            table_num  = entry->table_ops[j];
+            Parrot_io_printf(interp, "    %08lx => %08lx (%s)\n", table_num, lib_num,
+                    entry->lib->op_info_table[lib_num].full_name);
+        }
+        Parrot_io_printf(interp, "  ]\n");
+    }
 
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */

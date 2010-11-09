@@ -1,12 +1,32 @@
 # $Id$
 
+New in 2.10.0
+ - We are on github now! https://github.com/parrot/parrot
+
+New in 2.9.1
+ - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
+
 New in 2.9.0
 - Core
-  + New default garbage collector
+  + Parrot and Rakudo's build and tests can now be run under the profiling runcore
+  + IPv6 is now detected, laying the groundwork for future networking improvements
+  + mk_language_shell.pl and create_language.pl no longer require an installed parrot
+  + String PMC's 'reverse' method is now faster and supports all encodings
+  + improvements and simplifications in internal string processing
+  + Added API for adding STRINGs to the gc root set
+  + Speed up ord, substr, index and string comparison opcodes
 - Testing
-  + "make smoke" now respects TEST_JOBS
-- GitMigration
-- Compilers
+  + "make smoke" supports parallel testing by honoring TEST_JOBS
+  + Added tests for Socket PMC, StringBuilder PMC, ByteBuffer PMC,
+    mk_language_shell.pl, create_language.pl
+  + Fixed "Configure.pl" about missing tests
+  + Parrot and Rakudo Perl 6 now have access to the GCC Compile Farm
+  + Testing on Darwin/PPC
+- Git Migration
+  + Most developer tools have been ported to Git
+  + Majority of developer docs have been written for Git
+- Platforms
+  + Parrot can now be built on Minix
 
 New in 2.8.0
 - Core

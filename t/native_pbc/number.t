@@ -76,7 +76,7 @@ native pbcs.
 # - increase number of tests
 # - include the pbc_dump header info for reference
 # - put the file into MANIFEST
-# - add the file as binary (svn add) and commit it
+# - then add the file with "git add" and commit it
 # thanks -leo and reini
 
 On test failures please add the output of

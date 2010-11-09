@@ -48,8 +48,7 @@ F<docs/pdds/pdd16_native_call.pod>.
     $P0 = new ['FileHandle']
     $P0.'open'($S0, 'w')
     $P1 = getinterp
-    .include 'stdio.pasm'
-    $P1.'stdhandle'(.PIO_STDOUT_FILENO, $P0)
+    $P1.'stdout_handle'($P0)
 
     if targ == 'head'          goto get_targ
     if targ == 'thunks'        goto get_targ
@@ -719,8 +718,7 @@ TEMPLATE
 .sub 'read_sigs'
     .local pmc stdin, seen, sigs
     $P0 = getinterp
-    .include 'stdio.pasm'
-    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    stdin = $P0.'stdin_handle'()
     seen  = new ['Hash']
     sigs  = new ['ResizablePMCArray']
 
@@ -748,8 +746,7 @@ TEMPLATE
 Ignored signature '%s' on line %d (previously seen on line %d)
 ERROR
                 $P0 = getinterp
-                .include 'stdio.pasm'
-                $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+                $P1 = $P0.'stderr_handle'()
                 $P1.'print'($S0)
             end_dup_warn:
             goto read_loop

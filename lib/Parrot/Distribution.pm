@@ -218,7 +218,7 @@ BEGIN {
         header => { c => { file_exts => ['h'] }, },
     );
 
-    my @ignore_dirs = qw{ .svn };
+    my @ignore_dirs = qw{ .git };
 
     for my $class ( keys %file_class ) {
         for my $type ( keys %{ $file_class{$class} } ) {

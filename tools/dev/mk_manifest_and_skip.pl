@@ -10,11 +10,6 @@ use Parrot::Manifest;
 
 my $script = $0;
 
-if (-e '.git') {
-    print "Sorry, this script is not compatible with git-svn\n";
-    exit 1;
-}
-
 my $mani = Parrot::Manifest->new( { script => $script, } );
 
 my $manifest_lines_ref = $mani->prepare_manifest();
@@ -37,14 +32,13 @@ tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
 
 =head1 DESCRIPTION
 
-Recreates MANIFEST and MANIFEST.SKIP from the output of C<svn status> and the subversion properties. Run this script after SVN has been told about new or deleted files and before you commit to the repository. So far tested with svn 1.2.0, 1.4.2 and 1.6.6.
+Recreates MANIFEST and MANIFEST.SKIP from the output of C<git status>.
 
-    svn add PATH...
-    svn delete PATH...
+    git add file1 file2
+    git commit -m "commit msg"
     perl tools/dev/mk_manifest_and_skip.pl
-    svn commit -m ... [PATH...]
-
-This won't work for git-svn.
+    git commit -m "update manifest"
+    git push
 
 =head1 SEE ALSO
 

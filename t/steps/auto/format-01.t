@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -33,6 +33,7 @@ my $pkg = q{auto::format};
 $conf->add_steps($pkg);
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
+ok($step->runstep($conf), 'runstep() returned true value');
 {
     $conf->data->set( iv => 'int' );
     auto::format::_set_intvalfmt($conf);

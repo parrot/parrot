@@ -59,10 +59,6 @@ L<http://trac.parrot.org/parrot/ticket/1633>
 
 L<https://trac.parrot.org/parrot/ticket/452>
 
-=item Method stdhandle in ParrotInterpreter [experimental]
-
-L<https://trac.parrot.org/parrot/ticket/264>
-
 =item Overriding vtable invoke in PIR objects [experimental]
 
 The VTABLE invoke in object.pmc puts SELF at the start of the
@@ -82,7 +78,7 @@ L<https://trac.parrot.org/parrot/ticket/1551>
 
 =item UnManagedStruct initializer structure [eligible in 2.4]
 
-The initializer structure will cease to be an array of triples. In stead, an
+The initializer structure will cease to be an array of triples. Instead, an
 array of flags (no counts or offsets), or a string representation of the same
 information may be used.
 
@@ -114,13 +110,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method lower on String [eligible in 2.7]
-
-Use the downcase opcode or subclass with a method name consistent with your
-HLL.
-
-L<http://trac.parrot.org/parrot/ticket/1606>
-
 =item Method unescape on String [experimental]
 
 This is a helper method for testing of Parrot_str_unescape_string.
@@ -142,14 +131,6 @@ L<https://trac.parrot.org/parrot/ticket/1655>
 Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
-
-=item Behavior of Parrot::Pmc2c::PMC::add_method() [eligible in 2.10]
-
-Duplicated vtable functions currently generate only a warning; after deadline,
-they will cause a C<die> and failure to build Parrot or any HLL
-using this method.
-
-L<http://trac.parrot.org/parrot/ticket/1785>
 
 =back
 
@@ -402,6 +383,10 @@ Get process id, experimental.
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
+=item Parrot_load_bytecode_file [experimental]
+
+Load a .pbc file into the interpreter. Experimental.
+
 =back
 
 =head1 Compiler tools
@@ -444,13 +429,13 @@ use a different detection mechanism or eliminate it altogether.
 
 L<https://trac.parrot.org/parrot/ticket/463>
 
-=item PAST::Val node generation [eligible in 1.5] 
+=item PAST::Val node generation [eligible in 1.5]
 
-The PAST::Compiler may generate the code for PAST::Val nodes 
-(i.e., constants) at the beginning of the block (Parrot sub) instead 
-of the location where they occur in the PAST tree. 
+The PAST::Compiler may generate the code for PAST::Val nodes
+(i.e., constants) at the beginning of the block (Parrot sub) instead
+of the location where they occur in the PAST tree.
 
-L<https://trac.parrot.org/parrot/ticket/868> 
+L<https://trac.parrot.org/parrot/ticket/868>
 
 =item Meta-model implementation used by PCT [eligible in 2.7]
 

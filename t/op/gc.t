@@ -21,7 +21,7 @@ GC related bugs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(140)
+    plan(139)
 
     sweep_1()
     sweep_0()
@@ -38,7 +38,6 @@ GC related bugs.
     write_barrier_2()
     addr_registry_1()
     addr_registry_2_int()
-    addr_registry_2_str()
     pmc_proxy_obj_mark()
     coro_context_ret_continuation()
     # END_OF_TESTS
@@ -439,35 +438,6 @@ ok5:
     is($I0, 2, "addr_registry_2_int")
 .end
 
-
-# AddrRegistry 2
-.sub addr_registry_2_str
-    .local pmc a, b, c, reg, nil, it
-    null nil
-    reg = new 'AddrRegistry'
-    a = new 'String'
-    a = "k1"
-    b = new 'String'
-    b = "k2"
-    c = new 'String'
-    c = "k3"
-    reg[a] = nil
-    reg[b] = nil
-    reg[c] = nil
-
-    $P1 = new ['ResizablePMCArray']
-    it = iter reg
-loop:
-    unless it goto done
-    $P0 = shift it
-    $S0 = $P0
-    push $P1, $S0
-    goto loop
-done:
-    $P1.'sort'()
-    $S1 = join '', $P1
-    is($S1, 'k1k2k3')
-.end
 
 # verify pmc proxy object marking
 .sub pmc_proxy_obj_mark

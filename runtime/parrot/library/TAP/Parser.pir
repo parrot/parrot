@@ -1086,8 +1086,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     goto L5
   L2:
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Unhandled token type: ")
     $P1.'print'(type)
     $P1.'print'("\n")

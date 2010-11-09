@@ -19,14 +19,14 @@ sub runstep {
     # The following test is from FreeBSD's /usr/ports/Mk/bsd.port.mk,
     # which must be assumed to do the right thing.
 
-    my $osversion;
+    my $osvers;
     if ( -e "/sbin/sysctl" ) {
-        $osversion = `/sbin/sysctl -n kern.osreldate`;
+        $osvers = `/sbin/sysctl -n kern.osreldate`;
     }
     else {
-        $osversion = `/usr/sbin/sysctl -n kern.osreldate`;
+        $osvers = `/usr/sbin/sysctl -n kern.osreldate`;
     }
-    chomp $osversion;
+    chomp $osvers;
 
     $libs .= ' -pthread';
 
@@ -34,12 +34,12 @@ sub runstep {
         libs  => $libs,
         link  => 'g++',
         rpath => '-Wl,-R',
-
-        has_dynamic_linking    => 1,
-        parrot_is_shared       => 1,
-        libparrot_shared       => "libparrot$share_ext.$version",
-        libparrot_shared_alias => "libparrot$share_ext",
-        libparrot_soname       => "-Wl,-soname=libparrot$share_ext.$version",
+        has_dynamic_linking     => 1,
+        parrot_is_shared        => 1,
+        libparrot_shared        => "libparrot$share_ext.$version",
+        libparrot_shared_alias  => "libparrot$share_ext",
+        libparrot_soname        => "-Wl,-soname=libparrot$share_ext.$version",
+        osvers                  => $osvers,
     );
 }
 

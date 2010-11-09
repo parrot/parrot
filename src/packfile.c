@@ -58,15 +58,16 @@ static PackFile_Segment * byte_code_new(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * byte_code_pack(PARROT_INTERP,
+static opcode_t * byte_code_pack(SHIM_INTERP,
     ARGMOD(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*cursor);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t byte_code_packed_size(SHIM_INTERP,
     ARGIN(PackFile_Segment *self))
         __attribute__nonnull__(2);
@@ -306,14 +307,13 @@ static PMC* run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void segment_init(PARROT_INTERP,
+static void segment_init(
     ARGOUT(PackFile_Segment *self),
     ARGIN(PackFile *pf),
     ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*self);
 
 static void sort_segs(ARGMOD(PackFile_Directory *dir))
@@ -332,8 +332,7 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_byte_code_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_byte_code_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
+       PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_byte_code_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self))
@@ -441,8 +440,7 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
 #define ASSERT_ARGS_segment_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
+       PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_sort_segs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1181,7 +1179,7 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
             PackFile_Segment *seg = dir->segments[i];
 
             if (seg) {
-                if (Parrot_str_equal(interp, seg->name, name))
+                if (STRING_equal(interp, seg->name, name))
                     return seg;
 
                 if (sub_dir && seg->type == PF_DIR_SEG) {
@@ -1223,7 +1221,7 @@ PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
 
     for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment * const seg = dir->segments[i];
-        if (Parrot_str_equal(interp, seg->name, name)) {
+        if (STRING_equal(interp, seg->name, name)) {
             dir->num_segments--;
 
             if (i != dir->num_segments) {
@@ -1648,7 +1646,7 @@ PackFile_Segment_new_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
     const PackFile_Segment_new_func_t f   = pf->PackFuncs[type].new_seg;
     PackFile_Segment * const          seg = (f)(interp, pf, name, add);
 
-    segment_init(interp, seg, pf, name);
+    segment_init(seg, pf, name);
     seg->type = type;
 
     if (add)
@@ -2340,8 +2338,8 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
 
 =over 4
 
-=item C<static void segment_init(PARROT_INTERP, PackFile_Segment *self, PackFile
-*pf, STRING *name)>
+=item C<static void segment_init(PackFile_Segment *self, PackFile *pf, STRING
+*name)>
 
 Initializes the segment C<self> with the provided PackFile and the given name.
 Note that this duplicates the given name.
@@ -2351,7 +2349,7 @@ Note that this duplicates the given name.
 */
 
 static void
-segment_init(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
+segment_init(ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
         ARGIN(STRING *name))
 {
     ASSERT_ARGS(segment_init)
@@ -2554,6 +2552,8 @@ C<PackFile_ByteCode>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t
 byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
 {
@@ -2593,16 +2593,18 @@ Stores the passed C<PackFile_ByteCode> segment in bytecode.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t *
-byte_code_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(byte_code_pack)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
-    int i, j;
+    int i;
 
     *cursor++ = byte_code->op_count;
     *cursor++ = byte_code->op_mapping.n_libs;
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
+        int j;
+
         PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
 
         /* dynoplib data */
@@ -2903,7 +2905,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
 
     /* find seg e.g. CODE_DB => CODE and attach it */
     str_len     = Parrot_str_length(interp, debug->base.name);
-    code_name   = Parrot_str_substr(interp, debug->base.name, 0, str_len - 3);
+    code_name   = STRING_substr(interp, debug->base.name, 0, str_len - 3);
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp, self->dir, code_name, 0);
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
@@ -3031,7 +3033,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         filename_pstr = Parrot_str_new(interp, filename, 0);
         if (ct->str.constants[prev_filename_n] &&
-                Parrot_str_equal(interp, filename_pstr,
+                STRING_equal(interp, filename_pstr,
                     ct->str.constants[prev_filename_n])) {
             return;
         }
@@ -3073,7 +3075,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
         /* Check if there is already a constant with this filename */
         for (i= 0; i < count; ++i) {
-            if (Parrot_str_equal(interp, namestr, ct->str.constants[i]))
+            if (STRING_equal(interp, namestr, ct->str.constants[i]))
                 break;
         }
         if (i < count) {
@@ -3342,7 +3344,6 @@ void
 Parrot_destroy_constants(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_destroy_constants)
-    UINTVAL i;
     Hash *hash;
 
     return;
@@ -3356,7 +3357,6 @@ Parrot_destroy_constants(PARROT_INTERP)
         return;
 
     parrot_hash_iterate(hash,
-        PackFile_ConstTable * const table     = (PackFile_ConstTable *)_bucket->key;
         PackFile_ConstTable * const ct        = (PackFile_ConstTable *)_bucket->value;
         PackFile_ConstTable_clear(interp, ct);
         mem_gc_free(interp, ct););
@@ -3385,7 +3385,6 @@ void
 PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
 {
     ASSERT_ARGS(PackFile_ConstTable_clear)
-    opcode_t i;
 
     if (self->num.constants) {
         mem_gc_free(interp, self->num.constants);
@@ -3607,8 +3606,7 @@ void
 PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_destroy)
-    PackFile_Annotations *self = (PackFile_Annotations *)seg;
-    INTVAL                i;
+    PackFile_Annotations * const self = (PackFile_Annotations *)seg;
 
     /* Free any keys. */
     if (self->keys)
@@ -3641,6 +3639,7 @@ segment.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
 PackFile_Annotations_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *seg))
 {
@@ -3777,7 +3776,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
 
     /* Need to associate this segment with the applicable code segment. */
     str_len     = Parrot_str_length(interp, self->base.name);
-    code_name   = Parrot_str_substr(interp, self->base.name, 0, str_len - 4);
+    code_name   = STRING_substr(interp, self->base.name, 0, str_len - 4);
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->base.dir, code_name, 0);
 
@@ -3931,7 +3930,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
     for (i = 0; i < self->num_keys; ++i) {
         STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-        if (Parrot_str_equal(interp, test_key, key_name)) {
+        if (STRING_equal(interp, test_key, key_name)) {
             key_id = i;
             break;
         }
@@ -4048,7 +4047,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     if (!STRING_IS_NULL(key)) {
         for (i = 0; i < self->num_keys; ++i) {
             STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-            if (Parrot_str_equal(interp, test_key, key)) {
+            if (STRING_equal(interp, test_key, key)) {
                 key_id = i;
                 break;
             }
@@ -4235,7 +4234,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     /* Get the base path of the located module */
     parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
-    found_path = Parrot_str_substr(interp, found_path, 0,
+    found_path = STRING_substr(interp, found_path, 0,
             Parrot_str_length(interp, found_path)-name_length);
 
     Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "include/")),
@@ -4249,7 +4248,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     /* Check if the file found was actually a bytecode file (.pbc extension) or
      * a source file (.pir or .pasm extension. */
 
-    if (Parrot_str_equal(interp, found_ext, pbc))
+    if (STRING_equal(interp, found_ext, pbc))
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;
@@ -4330,7 +4329,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     pbc = CONST_STRING(interp, "pbc");
 
-    if (Parrot_str_equal(interp, ext, pbc))
+    if (STRING_equal(interp, ext, pbc))
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;
@@ -4348,7 +4347,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     /* Check if the file found was actually a bytecode file (.pbc
      * extension) or a source file (.pir or .pasm extension). */
 
-    if (Parrot_str_equal(interp, found_ext, pbc))
+    if (STRING_equal(interp, found_ext, pbc))
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;

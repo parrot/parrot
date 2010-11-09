@@ -1145,20 +1145,20 @@ Called multi for class
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi" );
-.sub unicode:"\u7777" :multi(string)
+.sub utf8:"\u7777" :multi(string)
   .param pmc arg
   print 'String:'
   say arg
 .end
-.sub unicode:"\u7777" :multi(int)
+.sub utf8:"\u7777" :multi(int)
   .param pmc arg
   print 'Int:'
   say arg
 .end
 
 .sub main :main
-  unicode:"\u7777"('what')
-  unicode:"\u7777"(23)
+  utf8:"\u7777"('what')
+  utf8:"\u7777"(23)
 .end
 CODE
 String:what

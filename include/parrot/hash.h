@@ -88,8 +88,8 @@ struct _hash {
 
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
 {                                                                           \
-    UINTVAL _loc;                                                           \
-    if ((_hash)->entries){                                                  \
+    if ((_hash)->entries) {                                                 \
+        UINTVAL _loc;                                                       \
         for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                     \
             HashBucket *_bucket = (_hash)->index[_loc];                     \
             while (_bucket) {                                               \

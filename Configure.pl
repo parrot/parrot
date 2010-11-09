@@ -285,6 +285,14 @@ Specify which linker to use.
 
 Use the given linker flags
 
+=item C<--ar=(archiver)>
+
+Specify which librarian to use for static libraries
+
+=item C<--arflags=(flags)>
+
+Use the given librarian flags for static libraris
+
 =item C<--ld=(linker)>
 
 Specify which loader to use for shared libraries.

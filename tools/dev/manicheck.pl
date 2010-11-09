@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 ################################################################################
 
@@ -15,7 +15,7 @@ tools/dev/manicheck.pl - Check the MANIFEST file
 =head1 DESCRIPTION
 
 Check the contents of the F<MANIFEST> file against the files present in
-this directory tree, accounting for .svn dirs. Prints out the
+this directory tree, accounting for .git dirs. Prints out the
 number of I<missing>, I<expected> and I<extra> files, and
 then any extra files are listed.
 
@@ -42,7 +42,7 @@ my @extra     = ExtUtils::Manifest::filecheck();
 # my @ignored   = ExtUtils::Manifest::skipcheck();
 
 # strip '~' backup files from the extra list
-@extra = grep !m/~$/, @extra;
+@extra = grep !m/(~|\.swp)$/, @extra;
 
 printf "Found %d distinct files among MANIFEST and directory contents.\n\n",
     scalar( keys %{$file_list} );

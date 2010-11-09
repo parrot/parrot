@@ -1,6 +1,6 @@
 =pod
 
-﻿# $Id$
+# $Id$
 
     Following in the steps of other open source projects that
     eventually take over the world, here is the partial list
@@ -16,6 +16,7 @@
         The Parrot Team
         PS: Yes, this looks remarkably like the Linux CREDITS format
         PPS: This file is encoded in UTF-8
+        PPPS: To turn this file into a author map for git-svn, see tools/dev/mk_author_map.pl
 
 ----------
 N: Aaron Sherman
@@ -241,7 +242,7 @@ E: cdolan@cpan.org
 N: Chris Fields (cjfields)
 D: Rakudo patches
 
-N: Christoph Otto a.k.a. cotto
+N: Christoph Otto
 U: cotto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
@@ -291,6 +292,8 @@ D: imcc optimizer and register allocator patches and tests
 E: cgrawls@gmail.com
 
 U: cxreg
+N: Dave Olszewski
+E: cxreg@pobox.com
 D: copyright test cleanup
 
 N: Damian Miles Knopp
@@ -402,13 +405,14 @@ D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
 N: Géraud Continsouzas
 U: GeJ
+E: geraud@gcu.info
 A: geraud
 D: Perl2Pir tests conversion
 D: Miscellaneous codingstd fixes
 
 N: Gerd Pokorra
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0, 2.3.0, 2.5.0 and 2.8.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0 and 2.9.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -456,7 +460,7 @@ D: string.pmc, complex.pmc
 N: isop
 D: various Pynie patches
 
-N: James E Keenan (Jim) (aka kid51)
+N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
 D: Testing of configuration and build tools
@@ -500,7 +504,7 @@ E: jquelin@cpan.org
 U: jquelin
 S: Lyon, France
 
-N: Jerry Gay a.k.a. particle
+N: Jerry Gay
 U: particle
 E: Jerry.Gay@gmail.com
 D: Whatever
@@ -531,7 +535,7 @@ D: coding standard tests
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
-N: Jonathan Leto
+N: Jonathan "Duke" Leto
 E: jonathan@leto.net
 W: http://leto.net
 D: Release manager for 1.7.0
@@ -672,7 +676,7 @@ D: Bug fix
 N: Marcus Thiesen
 D: URM language, bugfixes
 
-N: Mark Glines a.k.a. Infinoid
+N: Mark Glines
 U: infinoid
 D: Cage cleaning, random bugfixes, report bugs
 E: mark@glines.org
@@ -751,8 +755,7 @@ D: Patch reducing code duplication
 
 N: Mitchell N Charity
 
-N: Moritz A Lenz
-A: Moritz Lenz
+N: Moritz Lenz
 E: moritz@faui2k3.org
 U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
@@ -1084,18 +1087,3 @@ U: svn
 E: svn@perl.org
 
 =cut
-
-# This makes a "svn authors" file for git svn
-
-open my $fh, "<", $0 or die "can't open $0: $!";
-my %n;
-while (<$fh>) {
-    #warn "[$_]";
-    if (m/^\s*$/) {
-        printf "%-10s = %s <%s>\n", $n{U}, $n{N}, $n{E} if $n{U};
-        %n = ();
-    }
-    next unless m/^([NEDUSW]): (.*)/;
-    my ($f, $v) = ($1, $2);
-    $n{$f} = $v unless $n{$f};  # doesn't do the right thing for the multiline fields
-}
