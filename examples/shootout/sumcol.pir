@@ -12,8 +12,7 @@
 	.local int count, tmp, linelen
 	count  = 0
 	interp = getinterp
-        .include 'stdio.pasm'
-	stdin  = interp.'stdhandle'(.PIO_STDIN_FILENO)
+	stdin  = interp.'stdin_handle'()
 beginwhile:
 	line    = stdin.'readline'()
 	linelen = length line

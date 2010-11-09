@@ -59,10 +59,6 @@ L<http://trac.parrot.org/parrot/ticket/1633>
 
 L<https://trac.parrot.org/parrot/ticket/452>
 
-=item Method stdhandle in ParrotInterpreter [experimental]
-
-L<https://trac.parrot.org/parrot/ticket/264>
-
 =item Overriding vtable invoke in PIR objects [experimental]
 
 The VTABLE invoke in object.pmc puts SELF at the start of the

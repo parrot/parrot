@@ -89,8 +89,7 @@ iter_end:
 usage:
     $S0 = argv[0]
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'($S0)
     $P1.'print'(" [ <config-key> [ <config-key> ... ] | --dump | --help ]\n")
     exit 1

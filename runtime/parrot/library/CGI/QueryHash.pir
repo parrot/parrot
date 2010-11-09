@@ -70,8 +70,7 @@ Get parameters for POST method.
         content_length  = my_env['CONTENT_LENGTH']
         len             = content_length
         $P0             = getinterp
-        .include 'stdio.pasm'
-        in              = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+        in              = $P0.'stdin_handle'()
         query           = in.'read'(len)
         in.'close'()
         #_dumper( query, 'queryPOST:' )
