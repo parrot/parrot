@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2009, Parrot Foundation.
-$Id$
 
 figure out if the compiler supports attributes.
 see parrot/compiler.h for attribute value definitions.
