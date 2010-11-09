@@ -614,31 +614,6 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 
 /*
 
-=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
-
-Load a bytecode file into the interpreter by name. Returns C<0> on failure,
-Success otherwise. Writes error information to the interpreter's error file
-stream.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-int
-Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
-{
-    ASSERT_ARGS(Parrot_load_bytecode_file)
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
-
-    if (!pf)
-        return 0;
-    Parrot_pbc_load(interp, pf);
-    return 1;
-}
-
-/*
-
 =item C<void Parrot_pbc_fixup_loaded(PARROT_INTERP)>
 
 Fixups after pbc loading

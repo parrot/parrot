@@ -93,7 +93,10 @@ Parrot_exit(PARROT_INTERP, int status)
         node = next;
     }
 
-    exit(status);
+    if (interp->api_jmp_buf)
+        longjump(api_jmp_buf);
+    else
+        exit(status);
 }
 
 /*

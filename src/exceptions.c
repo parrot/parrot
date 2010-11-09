@@ -94,7 +94,7 @@ void
 die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(die_from_exception)
-    /* Avoid anyhting that can throw if we are already throwing from
+    /* Avoid anything that can throw if we are already throwing from
      * a previous call to this function */
     static int already_dying = 0;
 
