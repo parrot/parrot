@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # auto/revision-01.t
 
 use strict;
@@ -34,13 +34,13 @@ my $step = test_step_constructor_and_description($conf);
 
 my ($testrev, $ret);
 {
-    $testrev = 99999;
+    $testrev = 'abcdef0123456789abcdef0123456789abcdef01';
     local $Parrot::Revision::current = $testrev;
     $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
     is($conf->data->get('revision'), $testrev,
         "'revision' element was set correctly");
-    is($step->result(), qq{r$testrev}, "Expected result was set");
+    is($step->result(), qq{$testrev}, "Expected result was set");
 }
 
 {
@@ -50,15 +50,18 @@ my ($testrev, $ret);
     ok( $ret, "runstep() returned true value" );
     is($conf->data->get('revision'), $testrev,
         "'revision' element was set correctly");
-    is($step->result(), q{done}, "Expected result was set");
+    is($step->result(), qq{$testrev}, "Expected result was set");
 }
 
 {
     $testrev = q{foobar};
     local $Parrot::Revision::current = $testrev;
     eval { $ret = $step->runstep($conf); };
-    like($@, qr/Cannot use non-numeric revision number/,
-        "Got expected error message");
+    TODO: {
+        local $TODO = 'Test needs modification for git migration';
+        like($@, qr/Cannot use non-numeric revision number/,
+            "Got expected error message");
+    };
 }
 
 {
