@@ -38,7 +38,7 @@ This file implements a native call frame (thunk) factory using libffi.
 #  error "unhandled NUMVAL_SIZE value"
 #endif
 
-typedef struct {
+typedef struct ffi_thunk_t {
     ffi_cif    cif;
     ffi_type **arg_types;
 
@@ -60,7 +60,7 @@ typedef struct pmc_holder_t {
     };
 } pmc_holder_t;
 
-typedef struct {
+typedef struct  parrot_var_t {
     INTVAL    i;
     FLOATVAL  n;
     STRING   *s;
