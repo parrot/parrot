@@ -2,10 +2,6 @@
 
 Parrot::Coroutine - A pure PIR implementation of coroutines
 
-=head1 VERSION
-
- $Id$
-
 =head1 SYNOPSIS
 
     .sub onload :load

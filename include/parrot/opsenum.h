@@ -1,6 +1,4 @@
 
-/* $Id$ */
-
 #ifndef PARROT_OPSENUM_H_GUARD
 #define PARROT_OPSENUM_H_GUARD
 
