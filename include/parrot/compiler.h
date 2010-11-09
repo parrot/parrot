@@ -1,7 +1,5 @@
 /* compiler.h
  *  Copyright (C) 2007-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     defines compiler capabilities
  */

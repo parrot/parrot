@@ -1,7 +1,5 @@
 /* hash.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Hashtable implementation
  */

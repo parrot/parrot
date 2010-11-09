@@ -1,7 +1,5 @@
 /* key.h
  *  Copyright (C) 2001-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the API header for the PMC subsystem
  *  Data Structure and Algorithms:

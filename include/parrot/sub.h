@@ -1,7 +1,5 @@
 /* sub.h
  *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Data Structure and Algorithms:
  *     Subroutine, coroutine, closure and continuation structures
  *     and related routines.

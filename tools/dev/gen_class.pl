@@ -45,8 +45,6 @@ my $year = (localtime())[5] + 1900; # get current year.
 print <<"EOF";
 /* ${classname}.pmc
  *  Copyright (C) $year, Parrot Foundation.
- *  SVN Info
- *     \$Id\$
  *  Overview:
  *     These are the vtable functions for the $classname base class
  *  Data Structure and Algorithms:

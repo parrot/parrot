@@ -1,7 +1,5 @@
 /* memory.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the API header for the memory subsystem
  *  Data Structure and Algorithms:

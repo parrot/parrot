@@ -1,7 +1,5 @@
 /* parrot.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     General header file includes for the parrot interpreter
  *  Data Structure and Algorithms:
