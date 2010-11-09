@@ -12,7 +12,6 @@ our @EXPORT_OK = qw($core $debug $mangled $string);
 
 $core = q{
 /*
- * $Id$
 ** pseudo-core.ops
 */
 
@@ -144,7 +143,6 @@ as the Parrot interpreter itself.
 
  $debug = q{
 /*
- * $Id$
  * Copyright (C) 2002-2008, Parrot Foundation.
  */
 
@@ -207,7 +205,6 @@ op debug_load(inconst STR) :base_debug {
 
  $mangled = q{
 /*
- * $Id$
 ** string.ops
 */
 
@@ -265,7 +262,6 @@ as the Parrot interpreter itself.
 
 $string = q{
 /*
- * $Id$
 ** pseudo-string.ops
 */
 

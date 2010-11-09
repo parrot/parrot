@@ -8,7 +8,6 @@
  *
  * parser support functions
  *
- * $Id$
  *
  */
 

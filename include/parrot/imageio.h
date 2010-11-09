@@ -1,5 +1,4 @@
 /* Copyright (C) 2001-2009, Parrot Foundation.
- * $Id$
  */
 #ifndef PARROT_IMAGEIO_H_GUARD
 #define PARROT_IMAGEIO_H_GUARD

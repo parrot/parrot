@@ -104,7 +104,6 @@ END
 
     buf = <<"END"
 /*
- * $Id$
 ** core.ops
 */
 
