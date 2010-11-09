@@ -72,8 +72,10 @@ Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
     ASSERT_ARGS(Parrot_set_config_hash_internal)
-    parrot_config_stored      = parrot_config;
-    parrot_config_size_stored = parrot_config_size;
+    if (parrot_config_stored != NULL) {
+        parrot_config_stored      = parrot_config;
+        parrot_config_size_stored = parrot_config_size;
+    }
 }
 
 /*

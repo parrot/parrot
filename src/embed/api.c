@@ -19,26 +19,29 @@
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp
+Parrot_Interp *
 Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_api_make_interpreter)
     Parrot_set_config_hash();
-    Interp * const parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
-    Interp * const interp = allocate_interpreter(parent, flags);
+    Parrot_Interp * const parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+    Parrot_Interp * const interp = allocate_interpreter(parent, flags);
     return interp;
 }
 
 PARROT_API
 INTVAL
-Parrot_api_initialize_interpreter(ARGIN(PMC *interp_pmc))
+Parrot_api_initialize_interpreter(ARGIN(Parrot_Interp *interp), ARGIN_NULLOK(void * stacktop), ARGOUT(PMC ** interp_pmc))
 {
     ASSERT_ARGS(Parrot_api_initialize_interpreter)
-    int stacktop;
+    int alt_stacktop;
     if (PMC_IS_NULL(interp_pmc)
         return;
-    Interp * const interp = GET_RAW_INTERP(interp_pmc);
-    initialize_interpreter(interp, (void*)&stacktop);
+    if (stacktop == NULL)
+        stacktop = &alt_stacktop;
+    initialize_interpreter(interp, stacktop);
+    *interp_pmc = VTABLE_get_pmc_keyed_int(interp, iglobals, (INTVAL)IGLOBALS_INTERPRETER);
+    return (!PMC_IS_NULL(interp_pmc);
 }
 
 PARROT_API
@@ -59,12 +62,12 @@ INTVAL
 Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(Parrot_String) name)
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN(interp_pmc, interp);
     PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, name_pmc, name);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
         name_pmc);
-    EMBED_API_CALLOUT(interp_pmc, interp)
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
@@ -72,8 +75,19 @@ void
 Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
-    Interp * const interp = GET_RAW_PMC(interp_pmc);
+    EMBED_API_CALLIN(interp_pmc, interp);
     Parrot_destroy(interp);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+void
+Parrot_api_exit_interpreter(ARGIN(PMC *interp_pmc))
+{
+    ASSERT_ARGS(Parrot_api_exit_interpreter)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    Parrot_exit(interp);
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 /*
@@ -90,7 +104,7 @@ stream.
 
 PARROT_API
 INTVAL
-Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filename), ARGOUT(INTVAL *result))
+Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filename), ARGOUT(PMC *)
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp);
@@ -102,3 +116,4 @@ Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filenam
     *result = 1;
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
+

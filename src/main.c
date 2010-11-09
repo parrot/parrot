@@ -115,7 +115,8 @@ main(int argc, const char *argv[])
     int          stacktop;
     const char  *sourcefile;
     const char  *execname;
-    Interp      *interp;
+    Interp      *raw_interp;
+    PMC         *interp;
     int          status;
     int          pir_argc;
     const char **pir_argv;
@@ -128,9 +129,7 @@ main(int argc, const char *argv[])
     PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
     PARROT_TEXTDOMAIN(PACKAGE);
 
-    Parrot_set_config_hash();
-
-    interp = allocate_interpreter(NULL, PARROT_NO_FLAGS);
+    raw_interp = Parrot_api_make_interpreter(NULL, PARROT_NO_FLAGS);
 
     /* We parse the arguments, but first store away the name of the Parrot
        executable, since parsing destroys that and we want to make it
@@ -138,26 +137,29 @@ main(int argc, const char *argv[])
     execname = argv[0];
 
     /* Parse minimal subset of flags */
-    parseflags_minimal(interp, argc, argv);
+    parseflags_minimal(raw_interp, argc, argv);
 
     /* Now initialize interpreter */
-    initialize_interpreter(interp, (void*)&stacktop);
+    if (!Parrot_api_initialize_interpreter(raw_interp, (void*)&stacktop, &interp)) {
+        fprintf("PARROT VM: Could not initialize new interpreter");
+        exit(EXIT_FAILURE);
+    }
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
 
-    Parrot_set_trace(interp, trace);
-    Parrot_set_run_core(interp, (Parrot_Run_core_t) core);
-    Parrot_set_executable_name(interp, Parrot_str_new(interp, execname, 0));
+    Parrot_api_set_runcore(interp, (Parrot_Run_core_t) core, trace);
+    // TODO: Parrot_str_new -> Parrot_api_str_new
+    Parrot_api_set_executable_name(interp, Parrot_str_new(interp, execname, 0)
 
-    status = imcc_run(interp, sourcefile, argc, argv);
+    status = imcc_run(raw, interp, sourcefile, argc, argv);
 
     if (status)
         imcc_run_pbc(interp, interp->output_file, pir_argc, pir_argv);
 
     /* Clean-up after ourselves */
-    Parrot_destroy(interp);
-    Parrot_exit(interp, 0);
+    Parrot_api_destroy_interpreter(interp);
+    Parrot_api_exit_interpreter(interp, 0);
 }
 
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
