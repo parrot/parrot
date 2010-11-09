@@ -30,6 +30,7 @@ ports
 *.sto
 *.suo
 *.tmp
+*.sw?
 *.vcproj*
 .git
 .parrot_current_rev
