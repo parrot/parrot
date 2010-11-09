@@ -180,7 +180,7 @@
 
     print "bef> "
     $P0 = getinterp
-    $P0 = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    $P0 = $P0.'stdin_handle'()
     $S0 = $P0.'readline'()
     $S0 = chopn $S0, 1
     $I0 = length $S0
