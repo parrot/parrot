@@ -198,7 +198,7 @@ command. First, make sure you are on the master branch with
 
 Now, to merge the branch user/foo into master:
 
-  git merge user/foo
+  git merge --no-ff user/foo
 
 If the same part of the same file has been modified in master and the branch
 user/foo, you will get a conflict. If you get a conflict, then you need to edit
@@ -219,6 +219,17 @@ You may want to push a topic branch to allow other people to help:
 
 You can now mention the problems you ran into to parrot-dev or #parrot
 and mention the branch.
+
+Why use "--no-ff" ? This flag mean "no fast forwards". Usually fast forwards
+are good, but if there is a branch that has all the commits of master, plus
+a few more, when you merge without --no-ff, there will be no merge commit.
+Git is smart enought to "fast forward." But for the purpose of looking at
+history, Parrot would like to always have a merge commit for a merge, even
+if it *could* be fast-forwarded.
+
+This flag is only needed when merging branches into master. It is optional
+for other merge cases, but it won't hurt. If it is simpler to think about,
+you can always use "--no-ff" when merging.
 
 =head2 Announcing a Merge
 
