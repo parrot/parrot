@@ -186,7 +186,7 @@ build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
     /* generate Parrot_pcc_fill_params_from_c_args dynamic call infrastructure */
     {
         INTVAL     argc  = Parrot_str_length(interp, pcc_params_sig) + 3;
-        ffi_type **arg_t =  thunk_data->pcc_arg_types = 
+        ffi_type **arg_t =  thunk_data->pcc_arg_types =
                             mem_gc_allocate_n_zeroed_typed(interp, argc, ffi_type *);
         int        i;
 
@@ -252,7 +252,7 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
       case enum_nci_sig_intval: return &ffi_type_parrot_intval;
 
       case enum_nci_sig_string:
-      case enum_nci_sig_cstring: 
+      case enum_nci_sig_cstring:
       case enum_nci_sig_cstringref:
       case enum_nci_sig_bufref:
                                 return &ffi_type_pointer;
@@ -290,12 +290,12 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
 
     PMC *call_object = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    void **values; 
+    void **values;
     parrot_var_t *pcc_arg;
     void **translation_pointers; /* Data translation pointers, used to hold values
                                            that are passed by reference so we can update
                                            the objects after the FFI call is over */
-    void **middle_man; /* An array to hold various pointers so they are not lost if 
+    void **middle_man; /* An array to hold various pointers so they are not lost if
                           the function changes values by reference */
     void *return_data; /* Holds return data from FFI call */
     int i, j;
@@ -474,7 +474,7 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
             }
         }
 
-        mem_gc_free(interp, pcc_arg); 
+        mem_gc_free(interp, pcc_arg);
     }
 
     /*
@@ -511,8 +511,8 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
             case enum_nci_sig_float:
                 final_destination.n = *(float *)return_data;
 
-                ret_object = Parrot_pcc_build_call_from_c_args(interp, 
-                        call_object, 
+                ret_object = Parrot_pcc_build_call_from_c_args(interp,
+                        call_object,
                         s, final_destination.n);
                 break;
             default:
@@ -554,13 +554,13 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
                 }
                 break;
             case enum_nci_sig_shortref:
-                VTABLE_set_integer_native(interp, 
-                        ((pmc_holder_t*)translation_pointers[i])->p, 
+                VTABLE_set_integer_native(interp,
+                        ((pmc_holder_t*)translation_pointers[i])->p,
                         ((pmc_holder_t*)translation_pointers[i])->s);
                 mem_sys_free(translation_pointers[i]);
                 break;
             case enum_nci_sig_intref:
-                VTABLE_set_integer_native(interp, 
+                VTABLE_set_integer_native(interp,
                         ((pmc_holder_t*)translation_pointers[i])->p,
                         ((pmc_holder_t*)translation_pointers[i])->i);
                 mem_sys_free(translation_pointers[i]);
@@ -572,8 +572,8 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
                 mem_sys_free(translation_pointers[i]);
                 break;
             case enum_nci_sig_ptrref:
-                VTABLE_set_pointer(interp, 
-                        ((pmc_holder_t*)translation_pointers[i])->p, 
+                VTABLE_set_pointer(interp,
+                        ((pmc_holder_t*)translation_pointers[i])->p,
                         ((pmc_holder_t*)translation_pointers[i])->ptr);
                 mem_sys_free(translation_pointers[i]);
                 break;
