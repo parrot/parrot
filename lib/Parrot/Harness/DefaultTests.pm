@@ -95,7 +95,6 @@ our @EXPORT_OK = qw(
 @configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
 
 @developing_tests = (
-    't/distro/file_metadata.t',
     ( glob 't/codingstd/*.t' ),
 );
 
