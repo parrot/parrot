@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -610,6 +609,31 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 
     interp->initial_pf = pf;
     interp->code       = pf->cur_cs;
+}
+
+/*
+
+=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
+
+Load a bytecode file into the interpreter by name. Returns C<0> on failure,
+Success otherwise. Writes error information to the interpreter's error file
+stream.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
+{
+    ASSERT_ARGS(Parrot_load_bytecode_file)
+    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+
+    if (!pf)
+        return 0;
+    Parrot_pbc_load(interp, pf);
+    return 1;
 }
 
 /*

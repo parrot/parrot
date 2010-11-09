@@ -1,7 +1,5 @@
 /* scheduler.h
  *  Copyright (C) 2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Parrot concurrency scheduler header stuff
  *  Data Structure and Algorithms:

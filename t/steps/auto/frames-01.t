@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 # auto/frames-01.t
 
 use strict;

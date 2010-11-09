@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 .sub main :main
 	load_bytecode "PGE.pbc"

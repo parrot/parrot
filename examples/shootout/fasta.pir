@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 #
 # fasta.pir N         (N = 2500000 for shootout)
 # by Joshua Isom

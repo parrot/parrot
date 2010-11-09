@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 # auto/format-01.t
 
 use strict;

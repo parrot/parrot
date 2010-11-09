@@ -1,4 +1,3 @@
-# $Id$
 # Copyright (C) 2007-2010, Parrot Foundation.
 
 =head1 NAME

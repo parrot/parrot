@@ -1,7 +1,6 @@
 %{
 
 /*
- * $Id$
  * Copyright (C) 2007-2009, Parrot Foundation.
  */
 

@@ -1,4 +1,9 @@
-# $Id$
+
+New in 2.10.0
+ - We are on github now! https://github.com/parrot/parrot
+
+New in 2.9.1
+ - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
 
 New in 2.10.0
  - We are on github now! https://github.com/parrot/parrot

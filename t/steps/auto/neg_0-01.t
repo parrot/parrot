@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 # auto_neg_0-01.t
 
 use strict;

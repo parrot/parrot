@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 #
 # Parrot SHA-2 library; Gerd Pokorra <gp@zimt.uni-siegen.de>
 #

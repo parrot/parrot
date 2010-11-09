@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 class Ops::Emitter is Hash;
 
@@ -320,9 +319,6 @@ method _generate_guard_macro_name($filename) {
 
 method _emit_guard_prefix($fh, $filename) {
     my $guardname := self._generate_guard_macro_name($filename);
-    $fh.print('
-/* $Id' ~ '$ */
-');
     $fh.print(qq/
 #ifndef $guardname
 #define $guardname

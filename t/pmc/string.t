@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(132)
+    plan(133)
 
     set_or_get_strings()
     setting_integers()
@@ -577,9 +576,9 @@ loop:
     $P0.'reverse'('hsifyllej')
     is( $P0, 'jellyfish', "reverse string with optional arg")
 
-    $P0 = box unicode:"科ムウオ"
+    $P0 = box unicode:"Ñà¦ª"
     $P0.'reverse'()
-    is( $P0, unicode:"オウム科", 'reverse unicode string')
+    is( $P0, unicode:"ª¦àÑ", 'reverse unicode string')
 
 .end
 
@@ -779,6 +778,11 @@ check:
     $P0 = 'o'
     s[2] = $P0
     is(s, 'foo', 'Set PMC keyed')
+
+    s = ''
+    k = 0
+    s[k] = $S0
+    is(s, 'f', 'Set string keyed with PMC')
 
     push_eh null_replace
     s = new ['String']

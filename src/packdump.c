@@ -2,7 +2,6 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
-$Id$
 
 =head1 NAME
 

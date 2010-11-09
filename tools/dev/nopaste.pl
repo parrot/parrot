@@ -1,7 +1,6 @@
 #!perl
 
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 use 5.008;
 use strict;

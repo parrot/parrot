@@ -1,7 +1,5 @@
 /* atomic/gcc_pcc.h
  *  Copyright (C) 2006-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This header provides an implementation of atomic
  *     operations on PowerPC platforms with GCC-style

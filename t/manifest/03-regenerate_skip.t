@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 # 03-regenerate_skip.t
 
 use strict;

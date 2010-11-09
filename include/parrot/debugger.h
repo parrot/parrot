@@ -5,8 +5,6 @@
 /*
  * debugger.h
  *
- * SVN Info
- *    $Id$
  * Overview:
  *    Parrot debugger header files
  * History:

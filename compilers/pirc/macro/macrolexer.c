@@ -990,7 +990,6 @@ static yyconst flex_int16_t yy_rule_linenum[72] =
 #line 23 "macro.l"
 
 /*
- * $Id$
  * Copyright (C) 2007-2009, Parrot Foundation.
  */
 

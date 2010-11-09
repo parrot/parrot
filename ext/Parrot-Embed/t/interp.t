@@ -1,7 +1,6 @@
 #!perl
 
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;

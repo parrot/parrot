@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 ###############################################################################
 #
@@ -1521,7 +1520,7 @@ src/main$(O) : \
     $(INC_DIR)/imcc.h \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/embed.h \
-    $(INC_DIR/api.h \
+    $(INC_DIR)/api.h \
     $(INC_DIR)/runcore_api.h \
     src/gc/gc_private.h \
     src/main.c \
