@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 
 =head1 Committer Guide
 
@@ -65,8 +64,7 @@ C<Author Date Id Revision>.  The command being:
 Also, text files should have the following line somewhere near the beginning
 of the file (usually after the Copyright notice):
 
-  # $Id$
-
+  
 (of course for C-language files you want to wrap this in C-style comments).
 
 =head1 Ignored files

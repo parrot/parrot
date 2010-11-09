@@ -1,5 +1,4 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 # This file is used from Packfile PMCs tests
 

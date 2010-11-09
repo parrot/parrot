@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 # dev_overall.t
 
 use strict;

@@ -1,6 +1,5 @@
 # Copyright (C) 2009, Parrot Foundation.
-## $Id$
-
+#
 # Microsoft Visual C++ Makefile
 # To build this example in a parrot development environment:
 

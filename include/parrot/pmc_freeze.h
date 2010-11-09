@@ -1,7 +1,5 @@
 /* pmc_freeze.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     PMC freeze and thaw interface
  *  Data Structure and Algorithms:

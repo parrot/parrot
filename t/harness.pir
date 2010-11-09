@@ -1,6 +1,5 @@
 #!parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 .sub 'main' :main
     .param pmc argv

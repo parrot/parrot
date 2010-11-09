@@ -1,6 +1,5 @@
 #! ./parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 
 # "Comprehensive" test for creating PAST for op.

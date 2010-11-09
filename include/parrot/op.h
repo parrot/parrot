@@ -1,7 +1,5 @@
 /* op.h
  *  Copyright (C) 2001-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Header file for op functions.
  *  Data Structure and Algorithms:

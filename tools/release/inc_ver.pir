@@ -1,6 +1,5 @@
 #!/usr/bin/env parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 .sub 'main' :main
     .local string version_file_name

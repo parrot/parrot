@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2010, Parrot Foundation.
- * $Id$
  */
 
 #include "imc.h"

@@ -1,6 +1,4 @@
 
-/* $Id$ */
-
 #ifndef PARROT_OPLIB_CORE_OPS_H_GUARD
 #define PARROT_OPLIB_CORE_OPS_H_GUARD
 

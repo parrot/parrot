@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 DYNPMC_TARGETS = \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \

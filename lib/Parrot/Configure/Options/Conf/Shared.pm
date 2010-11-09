@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Options::Conf::Shared;
 
 use strict;

@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 package Parrot::Configure::Options::Reconf;
 
