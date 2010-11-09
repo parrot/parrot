@@ -106,6 +106,17 @@ static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+
+/*
+
+=item C<void Parrot_nci_libffi_register(PARROT_INTERP)>
+
+Register the LibFFI frame builder with the NCI subsystem.
+
+=cut
+
+*/
+
 void
 Parrot_nci_libffi_register(PARROT_INTERP)
 {
@@ -123,6 +134,17 @@ Parrot_nci_libffi_register(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD, nci_framebuilder_userdata);
 }
 
+
+/*
+
+=item C<static PMC * init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)>
+
+Properly encapsulate C<thunk_data> in a C<ManagedStruct>.
+
+=cut
+
+*/
+
 static PMC *
 init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)
 {
@@ -135,6 +157,19 @@ init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)
     SETATTR_ManagedStruct_custom_free_priv(interp, thunk, thunk_data);
     return thunk;
 }
+
+
+/*
+
+=item C<static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING
+*sig_str)>
+
+Build a C<ManagedStruct>-encapsulated C<ffi_thunk_t> from C<sig_str>.
+Suitable for use as C<IGLOBALS_NCI_FB_CB>.
+
+=cut
+
+*/
 
 static PMC *
 build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
@@ -189,6 +224,8 @@ build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
 
 =item C<static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)>
 
+Convert an NCI type specification into the corresponding LibFFI type.
+
 =cut
 
 */
@@ -230,6 +267,17 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
     }
 }
 
+
+/*
+
+=item C<static void call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)>
+
+Call the native function described in C<nci_pmc> using the precomputed
+thunk contained in C<self>.
+
+=cut
+
+*/
 
 static void
 call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
@@ -545,6 +593,19 @@ call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
     mem_gc_free(interp, values);
 }
 
+
+/*
+
+=item C<static PMC * clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void
+*_thunk_data)>
+
+Clone a C<ManagedStruct> containing a C<ffi_thunk_t>. Suitable to be used by
+C<ManagedStruct> as a C<custom_clone_func> callback.
+
+=cut
+
+*/
+
 static PMC *
 clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
 {
@@ -566,6 +627,19 @@ clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
                         thunk_data->cif.nargs, ffi_type *);
 }
 
+
+/*
+
+=item C<static void free_ffi_thunk(PARROT_INTERP, void *thunk_func, void
+*thunk_data)>
+
+Free an C<ffi_thunk_t>. Suitable to be used by C<ManagedStruct> as a
+C<custom_free_func> callback.
+
+=cut
+
+*/
+
 static void
 free_ffi_thunk(PARROT_INTERP, void *thunk_func, void *thunk_data)
 {
@@ -579,6 +653,14 @@ free_ffi_thunk(PARROT_INTERP, void *thunk_func, void *thunk_data)
 
     mem_gc_free(interp, thunk);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
