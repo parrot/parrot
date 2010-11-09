@@ -24,7 +24,7 @@ This file implements a native call frame (thunk) factory using libffi.
 
 #if (INTVAL_SIZE == 4)
 #  define ffi_type_parrot_intval ffi_type_sint32
-#elif (INTVAL_SIZE == 8)
+#elif(INTVAL_SIZE == 8)
 #  define ffi_type_parrot_intval ffi_type_sint64
 #else
 #  error "unhandled INTVAL_SIZE value"
@@ -32,7 +32,7 @@ This file implements a native call frame (thunk) factory using libffi.
 
 #if (NUMVAL_SIZE == 4)
 #  define ffi_type_parrot_numval ffi_type_float
-#elif (NUMVAL_SIZE == 8)
+#elif(NUMVAL_SIZE == 8)
 #  define ffi_type_parrot_numval ffi_type_double
 #else
 #  error "unhandled NUMVAL_SIZE value"
