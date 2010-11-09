@@ -82,7 +82,7 @@ sub _analyze_sandbox {
     # The last SVN revision was 49810
     # The below revision never existed, which tells old HLLs that are calling "parrot_config revision"
     # "This Parrot is too new for you"
-    return 50000;
+    return "r50000";
 }
 
 1;
