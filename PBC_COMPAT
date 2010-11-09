@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+9.1	2010.10.27	nwellnhof	remove charset ops
 9.0	2010.10.19	gerd	released 2.9.0
 8.0	2010.07.20	coke	released 2.6.0
 7.0	2010.04.20	gerd	released 2.3.0 (version # added ex post facto, as all previous version #s were published)
