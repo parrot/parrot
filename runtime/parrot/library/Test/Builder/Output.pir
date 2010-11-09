@@ -57,18 +57,16 @@ STDERR by default.
 	.local pmc output
 	.local pmc diag_output
 
-        .include 'stdio.pasm'
-
 	output = args['output']
 	unless null output goto CHECK_ERROR_OUTPUT
         $P0 = getinterp
-        output = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+        output = $P0.'stdout_handle'()
 
   CHECK_ERROR_OUTPUT:
 	diag_output = args['diag_output']
 	unless null diag_output goto SET_OUTPUT
         $P0 = getinterp
-        diag_output = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+        diag_output = $P0.'stdout_handle'()
 
   SET_OUTPUT:
 	setattribute self, "output", output

@@ -25,7 +25,6 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
 =cut
 
-.include 'stdio.pasm'
 
 .sub "main" :main
     .param pmc args
@@ -67,7 +66,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
   OUTPUT_STDOUT:
     $P0 = getinterp
-    outfh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    outfh = $P0.'stdout_handle'()
     goto OUTPUT_DONE
 
   OUTPUT_FILE:
@@ -105,7 +104,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
   USAGE:
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Usage: ")
     $P1.'print'(prog)
     $P1.'print'(" [OPTIONS] FILE\n")
@@ -118,13 +117,13 @@ OPTIONS
 
   ERR_TOO_FEW_ARGS:
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Error: too few arguments\n\n")
     goto USAGE
 
   ERR_NO_INFILE:
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Error: file not found: ")
     $P1.'print'(infile)
     $P1.'print'("\n\n")
@@ -132,7 +131,7 @@ OPTIONS
 
   ERR_NO_OUTFILE:
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Error: file not found: ")
     $P1.'print'(outfile)
     $P1.'print'("\n\n")
