@@ -631,6 +631,8 @@ clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
                                     thunk_data->cif.nargs, ffi_type *);
     mem_copy_n_typed(clone_data->arg_types, thunk_data->arg_types,
                         thunk_data->cif.nargs, ffi_type *);
+
+    return clone;
 }
 
 
