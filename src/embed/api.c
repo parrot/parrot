@@ -5,6 +5,8 @@
 #define EMBED_API_CALLIN(p, i) \
     jmp_buf _env; \
     Interp * (i) = PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p); \
+    void *_oldtop = (i)->lo_var_ptr; \
+    if (_oldtop) {} else (1)->lo_var_ptr = &oldtop \
     if (!(i)) \
         return 0; \
     if (setjmp(_env)) { \
@@ -15,6 +17,12 @@
         {
 #define EMBED_API_CALLOUT(p, i) \
         } \
+        do {\
+            if (!_oldtop) {\
+                PARROT_ASSERT((i)->lo_var_ptr == &oldtop);\
+                (i)->lo_var_ptr = NULL;\
+            }\
+        } while (0); \
         return 1; \
     }
 
