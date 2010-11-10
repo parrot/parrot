@@ -18,7 +18,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(133)
+    plan(135)
 
     set_or_get_strings()
     setting_integers()
@@ -783,6 +783,17 @@ check:
     k = 0
     s[k] = $S0
     is(s, 'f', 'Set string keyed with PMC')
+
+    k = 1
+    $I0 = ord 'g'
+    s[k] = $I0
+    is(s, 'fg', 'Set integer keyed with PMC')
+
+    k = 2
+    $P0 = new ['String']
+    $P0 = 'h'
+    s[k] = $P0
+    is(s, 'fgh', 'Set PMC keyed with PMC')
 
     push_eh null_replace
     s = new ['String']
