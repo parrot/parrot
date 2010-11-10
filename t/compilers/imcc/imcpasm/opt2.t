@@ -26,7 +26,7 @@ _main:
 OUT
 
 ##############################
-pir_2_pasm_is( <<'CODE', <<'OUT', "constant propogation and resulting dead code" );
+pir_2_pasm_is( <<'CODE', <<'OUT', "constant propagation and resulting dead code" );
 .sub _main
        set $I0, 5
 loop:

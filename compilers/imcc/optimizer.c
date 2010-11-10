@@ -256,7 +256,7 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<int optimize(PARROT_INTERP, IMC_Unit *unit)>
 
-Runs after the CFG is built and handles constant propogation.
+Runs after the CFG is built and handles constant propagation.
 
 used_once ... deletes assignments, when LHS is unused
 

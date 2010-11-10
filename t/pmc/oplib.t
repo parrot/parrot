@@ -93,7 +93,7 @@ t/pmc/oplib.t - OpLib PMC
     is($I0, 0, "got end opcode data")
 
     $I0 = elements op
-    is($I0, TESTED_OP_ELEMS, "the opcode tested has the expected lenght")
+    is($I0, TESTED_OP_ELEMS, "the opcode tested has the expected length")
 
     # Using a String PMC
     name = new ['String']

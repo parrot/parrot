@@ -46,7 +46,7 @@ inline static void *parrot_ppc_cmpset(void * volatile *ptr,
                              * http://www.kegel.com/xgcc3/ppc405erratum77.html */
                             "    stwcx. %3, 0, %1\n"    /* store new using reservation */
                             "    bne- 1b\n"     /* spin on failure of reservation; - is branch prediction hint */
-                            "    b 3f\n" "2:  stwcx. %0, 0, %1\n"       /* flush reserveration */
+                            "    b 3f\n" "2:  stwcx. %0, 0, %1\n"       /* flush reservation */
                             "3:  \n"    /* end label */
                             :   /* output */
                             "=&r"(tmp)

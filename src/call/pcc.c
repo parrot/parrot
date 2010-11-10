@@ -68,7 +68,7 @@ You must pass the address_of(&) the OUT results, of course.
 
 
 Signatures:
-  uppercase letters repesent each arg and denote its types
+  uppercase letters represent each arg and denote its types
 
   I INTVAL
   N FLOATVAL

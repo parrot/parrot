@@ -18,7 +18,7 @@ the command-line md5sum like this:
  a0f32c7d31302c1427285b1a0fcbb015  -
 
 As well as testing the MD5 library itself, it is useful for spotting
-regressisions in the parrot VM, JIT and GC
+regressions in the parrot VM, JIT and GC
 
 =cut
 

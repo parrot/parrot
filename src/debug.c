@@ -443,7 +443,7 @@ In echo mode the script commands are written to stderr before executing."
         & dbg_gcdebug,
         "toggle gcdebug mode",
 "Toggle gcdebug mode.\n\n\
-In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
+In gcdebug mode a garbage collection cycle is run before each opcode,\n\
 same as using the gcdebug core."
     },
     cmd_help = {

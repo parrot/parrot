@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-t/oo/compositon.t - test role composition
+t/oo/composition.t - test role composition
 
 =head1 SYNOPSIS
 
-    % prove t/oo/compositon.t
+    % prove t/oo/composition.t
 
 =head1 DESCRIPTION
 

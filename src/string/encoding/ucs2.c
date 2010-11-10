@@ -133,7 +133,7 @@ ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     STRING * const result =
         Parrot_utf16_encoding_ptr->to_encoding(interp, src);
 
-    /* conversion to utf16 downgrads to ucs-2 if possible - check result */
+    /* conversion to utf16 downgrades to ucs-2 if possible - check result */
     if (result->encoding == Parrot_utf16_encoding_ptr)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "can't convert string with surrogates to ucs2");

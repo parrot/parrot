@@ -733,7 +733,7 @@ aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
 
 =item C<static const char * buffer_location(PARROT_INTERP, const Buffer *b)>
 
-Recturns a constant string representing the location of the given
+Returns a constant string representing the location of the given
 Buffer C<b> in one of the PMC registers. If the PMC is not located
 in one of the PMC registers of the current context, returns the
 string C<"???">.

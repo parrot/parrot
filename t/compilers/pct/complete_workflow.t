@@ -24,7 +24,7 @@ pct/complete_workflow.t - PCT tests
 Special cases in grammars and actions should be tested here.
 
 This test script builds a parser from a grammar syntax file.
-After that acctions are added from a NQP class file.
+After that actions are added from a NQP class file.
 After that the generated compiler is tested against a sample input.
 
 =cut

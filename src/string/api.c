@@ -1066,7 +1066,7 @@ Parrot_str_iter_substr(PARROT_INTERP,
 =item C<INTVAL Parrot_str_iter_index(PARROT_INTERP, const STRING *src,
 String_iter *start, String_iter *end, const STRING *search)>
 
-Find the next occurence of STRING C<search> in STRING C<src> starting at
+Find the next occurrence of STRING C<search> in STRING C<src> starting at
 String_iter C<start>. If C<search> is found C<start> is modified to mark the
 beginning of C<search> and String_iter C<end> is set to the character after
 C<search> in C<src>.  Returns the character position where C<search> was found

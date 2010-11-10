@@ -391,7 +391,7 @@ pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
         pt_suspend_self_for_gc(interp);
 
         LOCK(*mutex);
-        /* since we unlocked the mutex something bad may have occured */
+        /* since we unlocked the mutex something bad may have occurred */
         return;
     }
 

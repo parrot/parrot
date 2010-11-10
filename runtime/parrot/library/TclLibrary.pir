@@ -130,7 +130,7 @@ Performs the initialization of Tcl bridge, namely instantiates TclLibrary class
 =item _init_tclobj
 
  - creates a helper for Tcl_Obj struct
-    # do the tcl.h adoptations
+    # do the tcl.h adaptations
 
 =cut
 
