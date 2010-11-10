@@ -576,9 +576,9 @@ loop:
     $P0.'reverse'('hsifyllej')
     is( $P0, 'jellyfish', "reverse string with optional arg")
 
-    $P0 = box unicode:"Ñà¦ª"
+    $P0 = box unicode:"科ムウオ"
     $P0.'reverse'()
-    is( $P0, unicode:"ª¦àÑ", 'reverse unicode string')
+    is( $P0, unicode:"オウム科", 'reverse unicode string')
 
 .end
 
