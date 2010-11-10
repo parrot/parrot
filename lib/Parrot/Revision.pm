@@ -14,7 +14,7 @@ Parrot::Revision - SVN Revision of Parrot
 
 Get parrot's current and configure time revision.
 
-We currently always return "r1" to tell old HLL's that this version of Parrot is too new for them.
+We currently always return "1" to tell old HLL's that this version of Parrot is too new for them.
 There is currently no way to say "we are too new for you", so we have to lie again and say we are
 too old.
 
@@ -32,7 +32,7 @@ our $current = _get_revision();
 
 sub update {
     my $prev = _get_revision();
-    my $revision = "r1";
+    my $revision = 1;
     $current = _handle_update( {
         prev        => $prev,
         revision    => $revision,
@@ -76,7 +76,7 @@ sub _get_revision {
         close $FH or die "Unable to close $cache after reading: $!";
     }
     else {
-        $revision = "r1";
+        $revision = 1;
         _print_to_cache($cache, $revision);
     }
     return $revision;
