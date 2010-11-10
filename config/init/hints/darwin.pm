@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 package init::hints::darwin;
 
@@ -62,9 +61,13 @@ sub runstep {
         $flagsref->{$flag} =~ s/^\s+//;
     }
 
+    my $osvers = `/usr/sbin/sysctl -n kern.osrelease`;
+    chomp $osvers;
+
     $conf->data->set(
         darwin              => 1,
         osx_version         => $ENV{'MACOSX_DEPLOYMENT_TARGET'},
+        osvers              => $osvers,
         ccflags             => $flagsref->{ccflags},
         ldflags             => $flagsref->{ldflags},
         ccwarn              => "-Wno-shadow",

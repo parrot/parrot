@@ -1,7 +1,6 @@
 # perl program by Thomas Klausner posted on Vienna-PM list
 #
 # Copyright (C) 2004-2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;

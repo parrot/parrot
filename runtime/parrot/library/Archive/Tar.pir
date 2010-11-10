@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -440,8 +439,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .param pmc args :slurpy
     $S0 = join '', args
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'($S0)
     $P1.'print'("\n")
 .end

@@ -1,7 +1,5 @@
 /* shared.h
  *  Copyright (C) 2004-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the header for general encoding functions
  *  Data Structure and Algorithms:

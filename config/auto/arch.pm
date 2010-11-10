@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -101,6 +100,8 @@ sub runstep {
     );
 
     $conf->data->set( 'platform' => $self->_get_platform( $conf ) );
+    $conf->data->set( 'osvers' => $conf->data->get('osvers_provisional') )
+        unless $conf->data->get('osvers');
 
     _report_verbose( $conf );
 

@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -381,9 +380,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
     $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
 
-    .include 'stdio.pasm'
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("couldn't open fpmc for reading")
     exit 1
 
@@ -452,9 +450,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
     $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
 
-    .include 'stdio.pasm'
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("couldn't open fpmc for reading\n")
     exit 1
 
@@ -596,9 +593,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" )
     $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
 
-    .include 'stdio.pasm'
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("open failed\n")
 
 ok1:

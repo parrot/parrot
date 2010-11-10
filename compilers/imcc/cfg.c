@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -494,6 +493,7 @@ Returns true or false whether the given blocks are linked.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 blocks_are_connected(ARGIN(const Basic_block *from),
                      ARGIN(const Basic_block *to))
@@ -651,11 +651,12 @@ Counts and returns the number of edges in the specified IMC_Unit.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 edge_count(ARGIN(const IMC_Unit *unit))
 {
     ASSERT_ARGS(edge_count)
-    Edge *e = unit->edge_list;
+    const Edge *e = unit->edge_list;
     int   i = 0;
     while (e) {
         i++;
@@ -1054,11 +1055,12 @@ transfers control directly to the header.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info *loop_info))
 {
     ASSERT_ARGS(natural_preheader)
-    Edge *edge;
+    const Edge *edge;
     int   preheader = -1;
 
     for (edge = unit->bb_list[loop_info->header]->pred_list;

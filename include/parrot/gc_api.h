@@ -1,7 +1,5 @@
 /* gc_api.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Handles dead object destruction of the various headers
  *  History:

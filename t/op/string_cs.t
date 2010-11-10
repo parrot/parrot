@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -461,11 +460,10 @@ abcdefgefgefgefghi\xc2\xa9jk
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "literal encoding persistence - TT #468" );
-.include 'stdio.pasm'
 .sub main
     # set output encoding to normalize printed strings
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P0.'stdout_handle'()
     $P1.'encoding'('utf8')
 
     load_bytecode 't/op/testlib/test_strings.pbc'

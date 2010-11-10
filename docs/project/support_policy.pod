@@ -1,5 +1,4 @@
 # Copyright (C) 2009, The Parrot Foundation.
-# $Id$
 
 =pod
 

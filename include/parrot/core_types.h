@@ -1,7 +1,5 @@
 /* core_types.h
  *  Copyright (C) 2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Forward declaration of the interpreter basic types
  */

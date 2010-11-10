@@ -33,7 +33,6 @@
  *
  * The tokenizer.
  *
- * $Id$
  *
  */
 

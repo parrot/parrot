@@ -1,7 +1,5 @@
 /* context.h
  *  Copyright (C) 2009-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Context
  */

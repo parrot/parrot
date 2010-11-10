@@ -2428,7 +2428,6 @@ static yyconst flex_int32_t yy_rule_can_match_eol[148] =
  *
  * The tokenizer.
  *
- * $Id$
  *
  */
 

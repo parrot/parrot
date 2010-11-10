@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -59,6 +58,7 @@ sub runstep {
         ccflags
         d_socklen_t
         optimize
+        osvers
         scriptdirexp
         sig_name
         sPRIgldbl

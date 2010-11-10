@@ -1,7 +1,5 @@
 /* call.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *  $Id$
  *  Overview:
  *  Data Structure and Algorithms:
  *     Call argument handling.

@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2007-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -82,9 +81,9 @@ foreach my $file (@files) {
 my $suggested_version=<<END_SUGGESTION;
   Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.
 To find the C<start-year>, use a command such as:
-  svn log C<filename> | grep 'lines' | tail -n 1
+  git log C<filename> | grep '^Date' | tail -n 1
 To find the C<last-year-modified>, use a command such as:
-  svn log C<filename> | grep 'lines' | head -n 1
+  git log C<filename> | grep '^Date' | head -n 1
 END_SUGGESTION
 
 # run the tests

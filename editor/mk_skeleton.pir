@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 # Generate a skeleton PIR file that adheres to parrot developer standards.
 # intended for people who hack on parrot itself, not users of parrot.

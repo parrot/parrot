@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -828,23 +827,55 @@ Map core_type to hll_type.
 
 /*
 
-=item METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional)
+=item METHOD stdin_handle(PMC *newhandle :optional)
 
-Returns the standard parrot handler associated with the interpreter.
-The valid values for fileno are listed in include/stdio.pasm
+If a PMC object is provided, the standard input handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
 
-Optionally sets the parrot handler passed as second argument
-as the specified standard handler.
-
-This method is experimental. See TT #264.
+If no PMC object is provided, the current standard input handle is returned.
 
 =cut
 
 */
 
-    METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
-        PMC * const handle = Parrot_io_stdhandle(INTERP, fileno, newhandle);
-        Parrot_warn_deprecated(INTERP, "stdhandle method is experimental");
+    METHOD stdin_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDIN_FILENO, newhandle);
+        RETURN(PMC *handle);
+    }
+
+/*
+
+=item METHOD stdout_handle(PMC *newhandle :optional)
+
+If a PMC object is provided, the standard output handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
+
+If no PMC object is provided, the current standard output handle is returned.
+
+=cut
+
+*/
+
+    METHOD stdout_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDOUT_FILENO, newhandle);
+        RETURN(PMC *handle);
+    }
+
+/*
+
+=item METHOD stderr_handle(PMC *newhandle :optional)
+
+If a PMC object is provided, the standard error handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
+
+If no PMC object is provided, the current standard error handle is returned.
+
+=cut
+
+*/
+
+    METHOD stderr_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDERR_FILENO, newhandle);
         RETURN(PMC *handle);
     }
 

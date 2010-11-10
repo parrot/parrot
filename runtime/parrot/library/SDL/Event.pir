@@ -1,5 +1,4 @@
 
-# $Id$
 
 =head1 NAME
 

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -387,12 +386,10 @@ void initialize_fixed_size_pools(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools);
 
 void mark_special(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+    SHIM(Memory_Pools *mem_pools),
     ARGIN(PMC *obj))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*mem_pools);
+        __attribute__nonnull__(3);
 
 void Parrot_add_to_free_list(SHIM_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
@@ -453,7 +450,6 @@ int Parrot_gc_trace_root(PARROT_INTERP,
     , PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_Parrot_add_to_free_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
@@ -585,6 +581,8 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t Parrot_gc_get_info(PARROT_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
@@ -594,6 +592,8 @@ size_t Parrot_gc_get_info(PARROT_INTERP,
 void Parrot_gc_ms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int Parrot_gc_ms_needed(PARROT_INTERP)
         __attribute__nonnull__(1);
 

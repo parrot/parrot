@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -46,14 +45,13 @@ for whatever the distribution's parent directory is called on your machine.
 
 =over
 
-=item C<svn>
+=item C<git>
 
-If you are working with a checked out copy of parrot then please generate
-your patch with C<svn diff>.
+If you are working with a git repository of parrot then please generate
+your patch with C<git diff>.
 
     cd parrot
-    svn status
-    svn diff > my_contribution.patch
+    git diff > my_contribution.patch
 
 =item Single C<diff>
 
@@ -75,7 +73,7 @@ recursive C<diff> on the two directories to create your patch. The C<diff>
 should be created in F<workingdir>.
 
     cd workingdir
-    diff -ur --exclude='.svn' parrot parrot.new > docs.patch
+    diff -ur --exclude='.git' parrot parrot.new > docs.patch
 
 Mac OS X users should also specify C<--exclude=.DS_Store>.
 
@@ -148,18 +146,18 @@ file(s).
 =head1 Applying Patches
 
 You may wish to apply a patch submitted by someone else before the patch is
-incorporated into SVN.
+incorporated into git
 
-For single C<diff> patches or C<svn> patches, copy the patch file to
+For single C<diff> patches or C<git> patches, copy the patch file to
 F<parrot>, and run:
 
     cd parrot
-    patch -p0 < some.patch
+    git apply some.patch
 
 For recursive C<diff> patches, copy the patch file to F<workingdir>, and run:
 
     cd workingdir
-    patch -p0 < some.patch
+    git apply some.patch
 
 In order to be on the safe side run 'make test' before actually committing
 the changes.
@@ -169,15 +167,11 @@ the changes.
 Sometimes new files will be created in the configuration and build process of
 Parrot. These files should not show up when checking the distribution with
 
-    svn status
+    git status
 
 or
 
     perl tools/dev/manicheck.pl
-
-The list of these ignore files can be set up with:
-
-    svn propedit svn:ignore <PATH>
 
 In order to keep the two different checks synchronized,
 the MANIFEST and MANIFEST.SKIP file should be regenerated with:
@@ -256,10 +250,10 @@ for the new ticket and can check on the progress of your submission there.
 This identifier should be used in all correspondence concerning the submission.
 
 Everyone on Trac sees the submission and can comment on it. A developer with
-SVN commit authority can commit it to SVN once it is clear that it is the
+git commit priveledges can commit it to git once it is clear that it is the
 right thing to do.
 
-However developers with SVN commit authority may not commit your changes
+However developers with commit priveledges may not commit your changes
 immediately if they are large or complex, as we need time for peer review.
 
 A list of active tickets can be found here:

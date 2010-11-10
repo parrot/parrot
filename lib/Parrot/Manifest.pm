@@ -1,4 +1,3 @@
-# $Id$
 # Copyright (C) 2007-2010, Parrot Foundation.
 
 =head1 NAME
@@ -34,19 +33,20 @@ package Parrot::Manifest;
 use strict;
 use warnings;
 use Carp;
+use File::Basename;
 
 =head1 METHODS
 
 =head2 new
 
     $mani = Parrot::Manifest->new({
-        script => $0,
-        file => $filename,
-        skip => $skipfilename,
+        script    => $0,
+        file      => $filename,
+        skip      => $skipfilename,
         gitignore => $gitignoresfilename,
     })
 
-Creates a Parrot::Manifest object by asking C<svn status> for verbose output,
+Creates a Parrot::Manifest object by asking C<git status> for verbose output,
 and parsing the results.
 
 C<file> is the name of the file that the manifest will eventually be written
@@ -68,30 +68,21 @@ sub new {
     my %data = (
         id         => '$' . 'Id$',
         time       => scalar gmtime,
-        cmd        => 'svn',
+        cmd        => 'git',
         script     => $argsref->{script},
         file       => $argsref->{file}      ? $argsref->{file}      : q{MANIFEST},
         skip       => $argsref->{skip}      ? $argsref->{skip}      : q{MANIFEST.SKIP},
         gitignore  => $argsref->{gitignore} ? $argsref->{gitignore} : q{.gitignore},
     );
 
-    my $status_output_ref = [qx($data{cmd} status -v)];
+    my $lsfiles = qx($data{cmd} ls-files );
 
     # grab the versioned resources:
     my @versioned_files;
     my @dirs;
-    my @versioned_output = grep !/^[?D]/, @{$status_output_ref};
-    for my $line (@versioned_output) {
-        my @line_info = split( /\s+/, $line );
-
-        # the file is the last item in the @line_info array
-        my $filename = $line_info[-1];
-        $filename =~ s/\\/\//g;
-
-        # ignore .svn, blib directories;
-        # ignore ports/ directories, as that information does not need to be
-        # in tarball releases
-        next if $filename =~ m[/\.svn|^blib|^ports];
+    my @versioned_output = split /\n/, $lsfiles;
+    for my $filename (@versioned_output) {
+        next if $filename =~ m[/\.git|^blib|^ports];
         if ( -d $filename ) {
             push @dirs, $filename;
         }
@@ -312,7 +303,7 @@ sub _get_current_files {
 
     $print_str = $mani->prepare_manifest_skip();
 
-Gets a list of the files that SVN ignores, and returns a string that can be
+Gets a list of the files that git ignores, and returns a string that can be
 put into F<MANIFEST.SKIP>.
 
 =cut
@@ -433,25 +424,18 @@ sub print_gitignore {
 sub _get_ignores {
     my $self      = shift;
 
-    my $svnignore = `$self->{cmd} propget svn:ignore @{ $self->{dirs} }`;
+    my $gitignore = `cat .gitignore| grep -v '^#'`;
 
-    # cope with trailing newlines in svn:ignore output
-    $svnignore =~ s/\n{3,}/\n\n/g;
     my %ignores;
-    my @ignore = split( /\n\n/, $svnignore );
-    foreach (@ignore) {
-        my @cnt = m/( - )/g;
-        if ($#cnt) {
-            my @a = split /\n(?=(?:.*?) - )/, $_;
-            foreach (@a) {
-                m/^\s*(.*?) - (.+)/sm;
-                $ignores{$1} = $2 if $2;
-            }
-        }
-        else {
-            m/^(.*) - (.+)/sm;
-            $ignores{$1} = $2 if $2;
-        }
+    my @ignore = sort grep { $_ } split( /\n/, $gitignore );
+
+    for my $ignore (@ignore) {
+         my ($dirname, $basename) = (dirname($ignore), basename($ignore));
+         # .gitignore has different regexen than MANIFEST
+         $ignore =~ s/\./\\./g;
+         $ignore =~ s/\*/.\*/g;
+         # printf "%s:%s:%s\n", $ignore, $dirname, $basename;
+         $ignores{$ignore} = "";
     }
 
     return \%ignores;
@@ -507,24 +491,21 @@ sub _compose_manifest_skip {
 # See docs/submissions.pod on how to recreate this file after SVN
 # has been told about new generated files.
 #
-# Ignore the SVN directories
-\\B\\.svn\\b
+# Ignore the .git directory
+\\B\\.git\\b
 
 # ports/ should not go into release tarballs
 ^ports\$
 ^ports/
 END_HEADER
 
-    foreach my $directory ( sort keys %ignore ) {
-        my $dir = $directory;
-        $dir =~ s!\\!/!g;
-        $print_str .= "# generated from svn:ignore of '$dir/'\n";
-        foreach ( sort split /\n/, $ignore{$directory} ) {
-            s/\./\\./g;
-            s/\*/.*/g;
+    foreach my $file ( sort keys %ignore ) {
+        my $dir = $file;
+        # printf "dir=$dir,file=$ignore{$file}\n";
+        foreach ( $ignore{$file} ) {
             $print_str .=
                 ( $dir ne '.' )
-                ? "^$dir/$_\$\n^$dir/$_/\n"
+                ? "^$dir$_\$\n^$dir$_/\n"
                 : "^$_\$\n^$_/\n";
         }
     }

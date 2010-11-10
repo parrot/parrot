@@ -1,7 +1,5 @@
 /* unicode.h
  *  Copyright (C) 2001-2006, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Unicode support header
  *  Data Structure and Algorithms:

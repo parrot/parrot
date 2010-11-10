@@ -1,7 +1,5 @@
 /* exceptions.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     define the internal interpreter exceptions
  *  Data Structure and Algorithms:

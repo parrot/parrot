@@ -1,6 +1,5 @@
 #!parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 .sub 'main' :main
     .param pmc argv
@@ -111,7 +110,7 @@ HELP
     .local int nb
     $I0 = opts['code-tests']
     unless $I0 goto L1
-    .const string developing_tests = 't/distro/file_metadata.t t/codingstd/*.t'
+    .const string developing_tests = 't/codingstd/*.t'
     files = glob(developing_tests)
     goto L2
   L1:

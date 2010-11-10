@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 #
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom

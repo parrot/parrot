@@ -1,6 +1,5 @@
 ;;;; pasm.el
 ;;;;
-;;;; $Id$
 ;;;;
 ;;;; this is a simple major mode for working with parrot assembler
 ;;;; (and, to a certain extent, parrot imcc) files.

@@ -1,5 +1,4 @@
 # Copyright (C) 2009, The Perl Foundation.
-# $Id$
 
 =head1 NAME
 

@@ -1,5 +1,4 @@
 // (C) 2009, Parrot Foundation
-// $Id$
 
 // Fibonacci Benchmark
 

@@ -1,9 +1,8 @@
 # Copyright (C) 2005-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
-Parrot::Revision - SVN Revision
+Parrot::Revision - SVN Revision of Parrot
 
 =head1 SYNOPSIS
 
@@ -14,6 +13,10 @@ Parrot::Revision - SVN Revision
 =head1 DESCRIPTION
 
 Get parrot's current and configure time revision.
+
+We currently always return "r1" to tell old HLL's that this version of Parrot is too new for them.
+There is currently no way to say "we are too new for you", so we have to lie again and say we are
+too old.
 
 =cut
 
@@ -29,7 +32,7 @@ our $current = _get_revision();
 
 sub update {
     my $prev = _get_revision();
-    my $revision = _analyze_sandbox();
+    my $revision = "r1";
     $current = _handle_update( {
         prev        => $prev,
         revision    => $revision,
@@ -73,31 +76,8 @@ sub _get_revision {
         close $FH or die "Unable to close $cache after reading: $!";
     }
     else {
-        $revision = _analyze_sandbox();
+        $revision = "r1";
         _print_to_cache($cache, $revision);
-    }
-    return $revision;
-}
-
-sub _analyze_sandbox {
-    my $revision = 0;
-    # code taken from pugs/util/version_h.pl rev 14410
-    # modified because in xml output commit and entry revision
-    # are difficult to distinguish in a simplified parsing
-    my $nul = File::Spec->devnull;
-    # Avoid locale troubles with svn messages
-    local $ENV{LANG}   = 'C';
-    local $ENV{LC_ALL} = 'C';
-    if ( my @svn_info = qx/svn info 2>$nul/ and $? == 0 ) {
-        if ( my ($line) = grep /^Revision:/, @svn_info ) {
-            ($revision) = $line =~ /(\d+)/;
-        }
-    }
-    if( !$revision && (-d '.git') ) {
-        my $git_log = qx/git log -100 2>$nul/;
-        if(defined($git_log) && $git_log =~ /git-svn-id: \S+\@(\d+)\s/) {
-            $revision = $1;
-        }
     }
     return $revision;
 }

@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -383,21 +382,20 @@ OUTPUT
 
 # TT #1178
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
-.include 'stdio.pasm'
 .sub main :main
     $P99 = getinterp
-    $P0  = $P99.'stdhandle'(.PIO_STDIN_FILENO)
+    $P0  = $P99.'stdin_handle'()
     $I0  = $P0.'get_fd'()
     # I0 is 0 on Unix and non-Null on stdio and win32
     print "ok 1\n"
 
-    $P1 = $P99.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P99.'stdout_handle'()
     $I1 = $P1.'get_fd'()
     if $I1, OK_2
     print "not "
 OK_2:
     say "ok 2"
-    $P2 = $P99.'stdhandle'(.PIO_STDERR_FILENO)
+    $P2 = $P99.'stderr_handle'()
     $I2 = $P2.'get_fd'()
     if $I2, OK_3
     print "not "
@@ -411,10 +409,9 @@ ok 3
 OUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P2 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P2 = $P0.'stdout_handle'()
     can $I0, $P2, "puts"
     if $I0, ok1
     print "not "
@@ -428,13 +425,12 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method - PIR' );
-.include 'stdio.pasm'
 .sub main :main
    .local string s
    s = "ok 2\n"
    .local pmc io
    $P0 = getinterp
-   io = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+   io = $P0.'stdout_handle'()
    $I0 = can io, "puts"
    if $I0 goto ok1
    print "not "
@@ -448,11 +444,9 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
-.include 'stdio.pasm'
     getinterp P0                 # invocant
-    set I0, .PIO_STDERR_FILENO   # 1st argument
-    set_args "0,0", P0, I0
-    callmethodcc P0, "stdhandle"
+    set_args "0", P0
+    callmethodcc P0, "stderr_handle"
     get_results "0", P2          # STDERR
 
     set S0, "puts"               # method

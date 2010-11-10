@@ -23,11 +23,11 @@ will typically have access to the C<make> command as part of the normal
 development tools. Windows systems can get the C<nmake> utility to perform the
 same task.
 
-=item * Subversion
+=item * Git
 
-Subversion is the source control system that is used by the Parrot project.
-You need subversion to checkout the latest version of the source code. You can
-get subversion at L<http://subversion.tigris.org>, or through one of the
+Git is the source control system that is used by the Parrot project.
+You need git to clone the latest version of the source code. You can
+get git at L<http://git-scm.com>, or through one of the
 common packaging systems.
 
 =item * bison and flex

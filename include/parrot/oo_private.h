@@ -1,7 +1,5 @@
 /* oo_private.h
  *  Copyright (C) 2007-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Structs, typedefs and macros for the Class, Object, and PMCProxy PMCs.
  *     This header file is only included by files within the OO subsystem.

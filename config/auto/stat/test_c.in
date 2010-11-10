@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 seeing if struct stat has BSD extensions
 
