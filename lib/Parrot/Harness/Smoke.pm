@@ -131,7 +131,7 @@ sub send_archive_to_smolder {
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
             report_file  => $report_file,
-            revision     => $PConfig{revision},
+            revision     => `git rev-parse HEAD`,
         ]
     );
 
