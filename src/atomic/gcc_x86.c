@@ -1,7 +1,5 @@
 /* atomic/gcc_x86.c
  *  Copyright (C) 2006-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  */
 
 #include "parrot/parrot.h"

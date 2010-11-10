@@ -1,9 +1,8 @@
 # Copyright (C) 2005-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
-Parrot::Revision - Git "Revision" a.k.a SHA1
+Parrot::Revision - SVN Revision of Parrot
 
 =head1 SYNOPSIS
 
@@ -14,6 +13,10 @@ Parrot::Revision - Git "Revision" a.k.a SHA1
 =head1 DESCRIPTION
 
 Get parrot's current and configure time revision.
+
+We currently always return "r1" to tell old HLL's that this version of Parrot is too new for them.
+There is currently no way to say "we are too new for you", so we have to lie again and say we are
+too old.
 
 =cut
 
@@ -29,7 +32,7 @@ our $current = _get_revision();
 
 sub update {
     my $prev = _get_revision();
-    my $revision = _analyze_sandbox();
+    my $revision = "r1";
     $current = _handle_update( {
         prev        => $prev,
         revision    => $revision,
@@ -73,19 +76,9 @@ sub _get_revision {
         close $FH or die "Unable to close $cache after reading: $!";
     }
     else {
-        $revision = _analyze_sandbox();
+        $revision = "r1";
         _print_to_cache($cache, $revision);
     }
-    return $revision;
-}
-
-sub _analyze_sandbox {
-    my $revision = 0;
-    my $nul = File::Spec->devnull;
-    # Avoid locale troubles
-    local $ENV{LANG}   = 'C';
-    local $ENV{LC_ALL} = 'C';
-    chomp($revision = qx/git rev-parse HEAD/);
     return $revision;
 }
 

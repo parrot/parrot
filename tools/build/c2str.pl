@@ -1,5 +1,4 @@
 #! perl
-# $Id$
 
 # Copyright (C) 2004-2008, Parrot Foundation.
 

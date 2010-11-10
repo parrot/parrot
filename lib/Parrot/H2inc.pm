@@ -1,6 +1,5 @@
 package Parrot::H2inc;
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;

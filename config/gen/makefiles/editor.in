@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2010, Parrot Foundation.
-# $Id$
 
 #IF(win32):VIM_DIR     = $(USERPROFILE)/vimfiles
 #ELSE:VIM_DIR     = $(HOME)/.vim

@@ -1,7 +1,5 @@
 /* global_setup.h
  *  Copyright (C) 2001-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Contains declarations of global data and the functions
  *      that initialize that data.

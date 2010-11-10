@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2009, Parrot Foundation.
-$Id$
 
 figure out if a 64-bit type is available
 */

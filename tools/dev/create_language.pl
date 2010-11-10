@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -474,7 +473,6 @@ END
 # vim: expandtab shiftwidth=4:
 __build/Makefile.in__
 # Copyright (C) 2006-2009, The Perl Foundation.
-# $Id$
 
 PARROT_ARGS      =
 

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2009, Parrot Foundation.
-$Id$
 
 test for cmpxchg support with gcc-style inline ASM
 */

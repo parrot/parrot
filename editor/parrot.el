@@ -1,4 +1,3 @@
-;;; $Id$
 ;;; Emacs support for working on the source code of the Parrot virtual
 ;;; machine.
 ;;

@@ -3,7 +3,6 @@
 =begin RUBY_COMMENT
 
 Copyright (C) 2001-2003, Parrot Foundation.
-$Id$
 
 =head1 NAME
 

@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2008-2009, Parrot Foundation.
  */
 #ifndef PARROT_PIR_PIRMACRO_H_GUARD

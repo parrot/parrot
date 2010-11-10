@@ -1,5 +1,4 @@
 # Copyright (C) 2002-2009, Parrot Foundation.
-# $Id$
 
 #
 # ** globals used for debug purposes:

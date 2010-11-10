@@ -9,8 +9,6 @@
 
 /* src/nci/core_thunks.c
  *  Copyright (C) 2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Native Call Interface routines. The code needed to build a
  *     parrot to C call frame is in here

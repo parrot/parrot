@@ -1,7 +1,5 @@
 /* runcore_trace.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Tracing runcore.
  *  Data Structure and Algorithms:

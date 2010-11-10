@@ -1,7 +1,5 @@
 /* longopt.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
  */

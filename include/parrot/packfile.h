@@ -4,7 +4,6 @@
 
 /* packfile.h
 *
-* $Id$
 *
 * History:
 *  Rework by Melvin; new bytecode format, make bytecode portable.

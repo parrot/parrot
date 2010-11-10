@@ -4,7 +4,6 @@
 
 /* dynext.h
 *
-* $Id$
 *
 *   Parrot dynamic extensions
 */

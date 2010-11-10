@@ -1,7 +1,5 @@
 /* namespace.h
  *  Copyright (C) 2004-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Contains accessor functions for globals
  *  Data Structure and Algorithms:

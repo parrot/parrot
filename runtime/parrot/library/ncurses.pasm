@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 .pcc_sub :load __ncurses_init:
 loadlib P1, 'libform'

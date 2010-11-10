@@ -1,5 +1,4 @@
 #! perl
-# $Id$
 # Copyright (C) 2006-2010, Parrot Foundation.
 
 use strict;

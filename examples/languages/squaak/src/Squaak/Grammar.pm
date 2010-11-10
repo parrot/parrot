@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 =begin overview
 
 This is the grammar for Squaak in Perl 6 rules.

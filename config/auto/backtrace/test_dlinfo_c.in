@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2009, Parrot Foundation.
-$Id$
 
 check that Dl_info is avaible
 */
