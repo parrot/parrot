@@ -11,8 +11,10 @@
         (i)->api_jmp_buf = NULL; \
         return 0; \
     } else { \
-        (i)->api_jmp_buf = _env;
+        (i)->api_jmp_buf = _env; \
+        {
 #define EMBED_API_CALLOUT(p, i) \
+        } \
         return 1; \
     }
 
