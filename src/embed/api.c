@@ -7,8 +7,8 @@
     Interp * (i) = PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p); \
     void *_oldtop = (i)->lo_var_ptr; \
     if (_oldtop) {} else (1)->lo_var_ptr = &oldtop \
-    if (!(i)) \
-        return 0; \
+    PARROT_ASSERT(i); \
+    PARROT_ASSERT((i)->lo_val_ptr); \
     if (setjmp(_env)) { \
         (i)->api_jmp_buf = NULL; \
         return 0; \
