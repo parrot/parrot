@@ -24,6 +24,15 @@
         return 1; \
     }
 
+#define EMBED_API_FAILURE(p, i) \
+    do { \
+        if (!_oldtop) {\
+            PARROT_ASSERT((i)->lo_var_ptr == &oldtop);\
+            (i)->lo_var_ptr = NULL;\
+        } \
+        return 0; \
+    }
+
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
@@ -80,7 +89,7 @@ Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(Parrot_String) name
 }
 
 PARROT_API
-void
+INTVAL
 Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
@@ -90,7 +99,7 @@ Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
 }
 
 PARROT_API
-void
+INTVAL
 Parrot_api_exit_interpreter(ARGIN(PMC *interp_pmc))
 {
     ASSERT_ARGS(Parrot_api_exit_interpreter)
@@ -103,9 +112,7 @@ Parrot_api_exit_interpreter(ARGIN(PMC *interp_pmc))
 
 =item C<int Parrot_api_load_bytecode_file(PARROT_INTERP, const char *filename)>
 
-Load a bytecode file into the interpreter by name. Returns C<0> on failure,
-Success otherwise. Writes error information to the interpreter's error file
-stream.
+Load a bytecode file and return a bytecode PMC.
 
 =cut
 
@@ -113,16 +120,49 @@ stream.
 
 PARROT_API
 INTVAL
-Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filename), ARGOUT(PMC *)
+Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filename), ARGOUT(PMC **pbc))
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp);
-    *result = 0;
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
-        return 1;
-    Parrot_pbc_load(interp, pf);
-    *result = 1;
+        EMBED_API_FAILURE(interp_pmc, interp);
+    *pbc = Parrot_pmc_new(interp, enum_class_PackFile);
+    VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+PARROT_API
+INTVAL
+Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mainargs))
+{
+    ASSERT_ARGS(Parrot_api_run_bytecode)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    PackFile * const pf = VTABLE_get_pointer(interp, pbc);
+    if (!pf)
+        EMBED_API_FAILURE(interp_pmc, interp);
+    Parrot_pbc_load(interp, pf);
+    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
+    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), INTVAL argc, ARGIN(char **argv), ARGOUT(PMC **args))
+{
+    ASSERT_ARGS(Parrot_api_build_argv_array)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    INTVAL i;
+
+    for (i = 0; i < argc; ++i) {
+        /* Run through argv, adding everything to the array */
+        STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
+                Parrot_utf8_encoding_ptr, PObj_external_FLAG);
+        VTABLE_push_string(interp, userargv, arg);
+    }
+    *args = userargv;
+    EMBED_API_CALLIN(interp_pmc, interp);
+}
