@@ -13,7 +13,7 @@ the Parrot roadmap (L<https://trac.parrot.org/parrot/roadmap>) and
 announce the tasks to the Parrot mailing list.  Make sure everyone knows what
 they've committed to accomplish in time for the release.
 
-Right after the release preceeding your release, it is a good idea to start
+Right after the release preceding your release, it is a good idea to start
 tracking parrot news in NEWS. A good resource are the reports
 in the weekly #parrotsketch IRC-meeting. A reliable log of these meetings
 is available in L<http://irclog.perlgeek.de/parrotsketch/>.

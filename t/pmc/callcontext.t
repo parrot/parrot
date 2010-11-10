@@ -173,10 +173,10 @@ Tests the CallContext PMC.
     ok( $I0, 'exists_keyed_str' )
 
     $I0 = exists $P0[100]
-    nok( $I0, 'exists_keyed_int -- non-existant' )
+    nok( $I0, 'exists_keyed_int -- non-existent' )
 
     $I0 = exists $P0['bar']
-    nok( $I0, 'exists_keyed_str -- non-existant' )
+    nok( $I0, 'exists_keyed_str -- non-existent' )
 .end
 
 .sub 'test_clone'

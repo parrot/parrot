@@ -774,7 +774,7 @@ set_current_sub(PARROT_INTERP)
     }
 
     /* If we didn't find anything, put a dummy PMC into current_sub.
-       The default values set by SUb.init are appropiate for the
+       The default values set by SUb.init are appropriate for the
        dummy, don't need additional settings. */
     new_sub_pmc = Parrot_pmc_new(interp, enum_class_Sub);
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), new_sub_pmc);

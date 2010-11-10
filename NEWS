@@ -751,7 +751,7 @@ New in 0.8.2
     - merged LuaClosure & LuaFunction PMC
   + Pipp
     - added support for a return value from user defined functions
-    - added incomplete implemention of 'require_once'
+    - added incomplete implementation of 'require_once'
   + Ecmascript
     - parser fixes, parses spidermonkey's top level test/shell.js
 - Deprecations
@@ -797,7 +797,7 @@ New in 0.8.1
     - added .PARROT method
   + Pipp
     - added some predefined constants
-    - added implemention of the function basename()
+    - added implementation of the function basename()
   + Cardinal (Ruby)
     - Added initial support for the classes Proc, Continuation, Queue, Dir, File, and FileStat
     - fixed various minor bugs
@@ -1287,7 +1287,7 @@ New in 0.5.3
   + NQP: add '=:=' op, tests for scalar and list contextualizers, \x escapes
 - Languages
   + APL: reimplementation with PCT
-  + Cardinal (Ruby): reimplemention with PCT
+  + Cardinal (Ruby): re-implementation with PCT
   + Ecmascript: reimplementation with PCT
   + lolcode: improved expression parsing, ifthen, IT, YARN
   + lua:

@@ -75,7 +75,7 @@ Signatures:
   S STRING *
   P PMC *
 
-  lowercase letters are adverb modifiers to the preceeding uppercase arg
+  lowercase letters are adverb modifiers to the preceding uppercase arg
   identifier
 
   f flatten

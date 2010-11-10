@@ -362,7 +362,7 @@ EOS
 =item _load_lib_with_fallbacks(string friendly_name, pmc fallback_list)
 
 This function is more generally useful than just for this module -- it
-implements the search for a particular libary that may appear under any
+implements the search for a particular library that may appear under any
 of several different filenames.  The C<fallback_list> should be a simple
 array of strings, each naming one of the possible filenames, I<without>
 the trailing shared library extension (e.g. C<.dll> or C<.so>).  The

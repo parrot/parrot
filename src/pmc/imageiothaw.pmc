@@ -206,7 +206,7 @@ Set an exterior constant table to use for cross-referencing constants.
 
 =item C<INTVAL shift_integer()>
 
-Retreive an integer as the next item from the image.
+Retrieve an integer as the next item from the image.
 
 =cut
 
@@ -227,7 +227,7 @@ Retreive an integer as the next item from the image.
 
 =item C<FLOATVAL shift_float()>
 
-Retreive a float as the next item from the image.
+Retrieve a float as the next item from the image.
 
 =cut
 
@@ -247,7 +247,7 @@ Retreive a float as the next item from the image.
 
 =item C<STRING *shift_string()>
 
-Retreive a string as the next item from the image.
+Retrieve a string as the next item from the image.
 
 =cut
 
@@ -284,7 +284,7 @@ Retreive a string as the next item from the image.
 
 =item C<PMC *shift_pmc()>
 
-Retreive a PMC as the next item from the image.
+Retrieve a PMC as the next item from the image.
 
 =cut
 

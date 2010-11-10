@@ -8335,7 +8335,7 @@
 
 	* assemble.pl: macro expansion.  Here's the test macro I was using:
 
-	# this uses I32,I31 as temporaries.  # macro must be preceeded by a
+	# this uses I32,I31 as temporaries.  # macro must be preceded by a
 	label.	testi	    macro   num,got,want    print   "Test #"
 	print	num	print	"..."	set	I32,want	set
 	I31,got 	eq	I32,I31,$ok	print	"NG\n"	branch

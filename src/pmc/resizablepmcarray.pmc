@@ -747,7 +747,7 @@ Common part for unshift operations.
 
 =item C<static void throw_pop_empty(PARROT_INTERP)>
 
-Throws with the appropiate message.
+Throws with the appropriate message.
 
 =cut
 
