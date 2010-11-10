@@ -194,13 +194,13 @@ Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), INTVAL stdin, INTVAL stdout, I
 
   if(PIO_INVALID_HANDLE != (PIOHANDLE)stdout) {
     PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)fd);
+    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stdout);
     Parrot_io_sethandle(interp,PIO_STDOUT_FILENO,pmc);
   }
 
   if(PIO_INVALID_HANDLE != (PIOHANDLE)stderr) {
     PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)fd);
+    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stderr);
     Parrot_io_sethandle(interp,PIO_STDERR_FILENO,pmc);
   }
 
