@@ -166,3 +166,43 @@ Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), INTVAL argc, ARGIN(char **a
     *args = userargv;
     EMBED_API_CALLIN(interp_pmc, interp);
 }
+
+
+/*
+
+=item C<int Parrot_api_set_stdhandles(PARROT_INTERP, INTVAL stdin, INTVAL stdout, INTVAL stderr)>
+
+Set the std file descriptors for the embedded interpreter. Any file descriptor
+passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
+
+=cut
+
+*/
+
+PARROT_API
+INTVAL
+Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), INTVAL stdin, INTVAL stdout, INTVAL stderr)
+{
+  ASSERT_ARGS(Parrot_api_set_stdhandles)
+  EMBED_API_CALLIN(interp_pmc, interp);
+
+  if(PIO_INVALID_HANDLE != (PIOHANDLE)stdin) {
+    PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
+    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stind);
+    Parrot_io_sethandle(interp,PIO_STDIN_FILENO,pmc);
+  }
+
+  if(PIO_INVALID_HANDLE != (PIOHANDLE)stdout) {
+    PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
+    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)fd);
+    Parrot_io_sethandle(interp,PIO_STDOUT_FILENO,pmc);
+  }
+
+  if(PIO_INVALID_HANDLE != (PIOHANDLE)stderr) {
+    PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
+    Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)fd);
+    Parrot_io_sethandle(interp,PIO_STDERR_FILENO,pmc);
+  }
+
+  EMBED_API_CALLOUT(interp_pmc, interp);
+}
