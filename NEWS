@@ -1,6 +1,9 @@
 
 New in 2.10.0
- - We are on github now! https://github.com/parrot/parrot
+- Core
+ + We are on github now! https://github.com/parrot/parrot
+- Platforms
+ + Fedora has a package for PL/Parrot with the name "postgresql-plparrot"
 
 New in 2.9.1
  - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
