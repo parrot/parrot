@@ -17,12 +17,10 @@
         {
 #define EMBED_API_CALLOUT(p, i) \
         } \
-        do {\
-            if (!_oldtop) {\
-                PARROT_ASSERT((i)->lo_var_ptr == &oldtop);\
-                (i)->lo_var_ptr = NULL;\
-            }\
-        } while (0); \
+        if (!_oldtop) {\
+            PARROT_ASSERT((i)->lo_var_ptr == &oldtop);\
+            (i)->lo_var_ptr = NULL;\
+        }\
         return 1; \
     }
 
