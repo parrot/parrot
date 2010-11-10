@@ -33,6 +33,13 @@
 
 #define GC_DYNAMIC_THRESHOLD_DEFAULT 25
 
+typedef enum _gc_sys_type_enum {
+    MS,  /* mark and sweep */
+    INF, /* infinite memory core */
+    TMS, /* tricolor mark and sweep */
+    MS2
+} gc_sys_type_enum;
+
 /* pool iteration */
 typedef enum {
     POOL_PMC    = 0x01,

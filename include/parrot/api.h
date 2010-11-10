@@ -12,6 +12,13 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
+typedef struct _Parrot_Init_Args {
+    void *stacktop;
+    INTVAL gc_system;
+    INTVAL gc_threshold;
+    INTVAL hash_seed;
+} Parrot_Init_Args;
+
 /* HEADERIZER BEGIN src/embed_api.c */
 
 /* HEADERIZER END src/embed_api.c */

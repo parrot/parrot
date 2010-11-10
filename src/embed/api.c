@@ -19,29 +19,30 @@
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp *
-Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags)
+INTVAL
+Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags, ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(PMC **interp))
 {
     ASSERT_ARGS(Parrot_api_make_interpreter)
-    Parrot_set_config_hash();
-    Parrot_Interp * const parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
-    Parrot_Interp * const interp = allocate_interpreter(parent, flags);
-    return interp;
-}
-
-PARROT_API
-INTVAL
-Parrot_api_initialize_interpreter(ARGIN(Parrot_Interp *interp), ARGIN_NULLOK(void * stacktop), ARGOUT(PMC ** interp_pmc))
-{
-    ASSERT_ARGS(Parrot_api_initialize_interpreter)
     int alt_stacktop;
-    if (PMC_IS_NULL(interp_pmc)
-        return;
-    if (stacktop == NULL)
-        stacktop = &alt_stacktop;
-    initialize_interpreter(interp, stacktop);
+    void *stacktop_ptr = &alt_stacktop;
+    Parrot_set_config_hash();
+    {
+        Parrot_Interp * const parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+        Parrot_Interp * const interp_raw = allocate_interpreter(parent_raw, flags);
+        if (args) {
+            if (args->stack_top)
+                stacktop_ptr = args->stacktop;
+            if (args->gc_system)
+                interp->gc_sys->sys_type = args->gc_system;
+            if (args->gc_threshold)
+                interp->gc_threshold = args->gc_threshold;
+            if (args->hash_seed)
+                interp->hash_seed = args->hash_seed;
+        }
+    }
+    initialize_interpreter(interp_raw, stacktop);
     *interp_pmc = VTABLE_get_pmc_keyed_int(interp, iglobals, (INTVAL)IGLOBALS_INTERPRETER);
-    return (!PMC_IS_NULL(interp_pmc);
+    return !PMC_IS_NULL(*interp);
 }
 
 PARROT_API
