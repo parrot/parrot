@@ -3,7 +3,7 @@ Copyright (C) 2007-2010, Parrot Foundation.
 
 =head1 NAME
 
-src/main.c - the Entry Point to Parrot Programs
+src/main.c - The PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
@@ -103,7 +103,6 @@ main(int argc, const char *argv[])
 {
     int          stacktop;
     const char  *sourcefile;
-    const char  *execname;
     PMC         *interp;
     PMC         *bytecodepmc;
     PMC         *argsarray;
@@ -123,22 +122,16 @@ main(int argc, const char *argv[])
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
-    if (!Parrot_api_make_interpreter(NULL, PARROT_NO_FLAGS, initargs, &interp)) {
+    if (!(Parrot_api_make_interpreter(NULL, PARROT_NO_FLAGS, initargs, &interp) &&
+          Parrot_api_set_executable_name(interp, argv[0])) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
         exit(EXIT_FAILURE);
     }
-
-    /* We parse the arguments, but first store away the name of the Parrot
-       executable, since parsing destroys that and we want to make it
-       available. */
-    execname = argv[0];
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
 
     Parrot_api_set_runcore(interp, (Parrot_Run_core_t) core, trace);
-    // TODO: Parrot_str_new -> Parrot_api_str_new
-    Parrot_api_set_executable_name(interp, Parrot_str_new(interp, execname, 0)
 
     if (imcc_run(raw, interp, sourcefile, argc, argv, &bytecodepmc)) {
         if (!(Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray) &&
@@ -150,7 +143,6 @@ main(int argc, const char *argv[])
 
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
-    Parrot_api_exit_interpreter(interp, 0);
 }
 
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))

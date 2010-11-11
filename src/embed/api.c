@@ -83,19 +83,17 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), Parrot_Run_core_t core, Parrot_Ui
 
 PARROT_API
 INTVAL
-Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(Parrot_String) name)
+Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(const char * name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp);
+    STRING * const name_str = Parrot_str_new(interp, name, 0);
     PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, name_pmc, name);
+    VTABLE_set_string_native(interp, name_pmc, name_str);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
         name_pmc);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
-
-/* TODO: Consider merging _destroy_interpreter and _exit_interpreter.
-         it doesn't make sense to call one without calling the other */
 
 PARROT_API
 INTVAL
@@ -104,16 +102,7 @@ Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
     EMBED_API_CALLIN(interp_pmc, interp);
     Parrot_destroy(interp);
-    EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-PARROT_API
-INTVAL
-Parrot_api_exit_interpreter(ARGIN(PMC *interp_pmc))
-{
-    ASSERT_ARGS(Parrot_api_exit_interpreter)
-    EMBED_API_CALLIN(interp_pmc, interp);
-    Parrot_exit(interp);
+    Parrot_exit(interp, 0);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
