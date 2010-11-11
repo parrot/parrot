@@ -183,6 +183,13 @@ Sweeping g1:
     g1: F1 D1:E1 C1 J1:Y2 K1:J1
     g2: *I2:Z2 *B2 *A2:B2 Y2 Z2
 
+Last step - painting older generation white. Starting from old-generation-head (Y2)
+
+    R:  
+    g0: G0:E1 H0:Z2 L0:A1 M0:L0
+    g1: F1 D1:E1 C1 J1:Y2 K1:J1
+    g2: I2:Z2 B2 A2:B2 Y2 Z2
+
 Done!
 
 =cut
