@@ -26,18 +26,23 @@ my $cwd = cwd();
     ok( chdir $tdir, "Changed to temporary directory for testing" );
     my $libdir = qq{$tdir/lib};
     ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
-    local @INC;
+
+    # Can't get it to work with this. Why do we need it?
+    #local @INC;
+
     unshift @INC, $libdir;
-    ok( (File::Path::mkpath( [ qq{$libdir/Parrot} ], 0, 0777 )), "Able to make Parrot dir");
+    ok( (File::Path::mkpath( [ qq{$libdir/Parrot/Git} ], 0, 0777 )), "Able to make Parrot dir");
+    chdir $cwd;
+
     require Parrot::Git::Describe;
     {
         no warnings 'once';
         TODO: {
         ok( (copy qq{$cwd/lib/Parrot/Git/Describe.pm},
-                qq{$libdir/Parrot}), "Able to copy Parrot::Git::Describe");
+                qq{$libdir/Parrot/Git}), "Able to copy Parrot::Git::Describe");
 
             like($Parrot::Git::Describe::current,
-                qr/^(RELEASE_|REL_)\d+\.\d+\.\d+~g[a-z0-9]+$/i,
+                qr/^(RELEASE_|REL_)\d+\_\d+\_\d+\-\d+\-g[a-z0-9]+$/i,
                 "Got a describe string",
             );
         };
