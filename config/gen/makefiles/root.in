@@ -453,7 +453,7 @@ INTERP_O_FILES = \
     src/debug$(O) \
     src/dynext$(O) \
     src/embed$(O) \
-    src/embed_api$(O) \
+    src/embed/api$(O) \
     src/string/encoding$(O) \
     src/exceptions$(O) \
     src/exit$(O) \

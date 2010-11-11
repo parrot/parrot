@@ -44,7 +44,7 @@ extern int yydebug;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void compile_to_bytecode(PARROT_INTERP,
+static PackFile * compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
     ARGIN_NULLOK(const char * const output_file),
     ARGIN(yyscan_t yyscanner))
@@ -523,7 +523,7 @@ determine_output_file_type(PARROT_INTERP, ARGIN(const char *output_file))
 
 /*
 
-=item C<static void compile_to_bytecode(PARROT_INTERP, const char * const
+=item C<static PackFile * compile_to_bytecode(PARROT_INTERP, const char * const
 sourcefile, const char * const output_file, yyscan_t yyscanner)>
 
 Compile source code into bytecode (or die trying).
@@ -588,7 +588,7 @@ compile_to_bytecode(PARROT_INTERP,
 /*
 
 =item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char
-**argv)>
+**argv, PMC **pbcpmc)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)

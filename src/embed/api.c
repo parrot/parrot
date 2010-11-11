@@ -1,6 +1,8 @@
 #include "parrot/parrot.h"
 #include "parrot/api.h"
 
+/* HEADERIZER HFILE: include/parrot/api.h */
+
 #define GET_RAW_INTERP(p) ((Parrot_ParrotInterpreter_attributes)(p)->data)->interp;
 #define EMBED_API_CALLIN(p, i) \
     jmp_buf _env; \
@@ -92,8 +94,8 @@ Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(Parrot_String) name
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
-// TODO: Consider merging _destroy_interpreter and _exit_interpreter.
-//       it doesn't make sense to call one without calling the other
+/* TODO: Consider merging _destroy_interpreter and _exit_interpreter.
+         it doesn't make sense to call one without calling the other */
 
 PARROT_API
 INTVAL
@@ -117,7 +119,8 @@ Parrot_api_exit_interpreter(ARGIN(PMC *interp_pmc))
 
 /*
 
-=item C<int Parrot_api_load_bytecode_file(PARROT_INTERP, const char *filename)>
+=item C<PARROT_API INTVAL Parrot_api_load_bytecode_file(PMC *interp_pmc, const
+char *filename, PMC **pbc)>
 
 Load a bytecode file and return a bytecode PMC.
 
@@ -230,7 +233,8 @@ Parrt_api_add_dynext_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path
 
 /*
 
-=item C<int Parrot_api_set_stdhandles(PARROT_INTERP, INTVAL stdin, INTVAL stdout, INTVAL stderr)>
+=item C<PARROT_API INTVAL Parrot_api_set_stdhandles(PMC *interp_pmc, INTVAL
+stdin, INTVAL stdout, INTVAL stderr)>
 
 Set the std file descriptors for the embedded interpreter. Any file descriptor
 passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.

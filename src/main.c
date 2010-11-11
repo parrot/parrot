@@ -40,14 +40,14 @@ static int is_all_hex_digits(ARGIN(const char *s))
 
 static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
-static const char * parseflags(PARROT_INTERP,
+static const char * parseflags(
+    PMC *interp,
     int argc,
     ARGIN(const char *argv[]),
     ARGOUT(int *pgm_argc),
     ARGOUT(const char ***pgm_argv),
     ARGMOD(Parrot_Run_core_t *core),
     ARGMOD(Parrot_trace_flags *trace))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
@@ -58,10 +58,10 @@ static const char * parseflags(PARROT_INTERP,
         FUNC_MODIFIES(*core)
         FUNC_MODIFIES(*trace);
 
-static void parseflags_minimal(PARROT_INTERP,
+static void parseflags_minimal(
+    Parrot_Init_Args *initargs,
     int argc,
     ARGIN(const char *argv[]))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static void usage(ARGMOD(FILE *fp))
@@ -76,15 +76,13 @@ static void usage(ARGMOD(FILE *fp))
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(argv) \
+       PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(pgm_argc) \
     , PARROT_ASSERT_ARG(pgm_argv) \
     , PARROT_ASSERT_ARG(core) \
     , PARROT_ASSERT_ARG(trace))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(argv))
+       PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -354,8 +352,8 @@ included in the Parrot source tree.\n\n");
 
 /*
 
-=item C<static void parseflags_minimal(PARROT_INTERP, int argc, const char
-*argv[])>
+=item C<static void parseflags_minimal(Parrot_Init_Args *initargs, int argc,
+const char *argv[])>
 
 Parse minimal subset of args required for initializing interpreter.
 
@@ -447,7 +445,7 @@ parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[
 
 /*
 
-=item C<static const char * parseflags(PARROT_INTERP, int argc, const char
+=item C<static const char * parseflags(PMC *interp, int argc, const char
 *argv[], int *pgm_argc, const char ***pgm_argv, Parrot_Run_core_t *core,
 Parrot_trace_flags *trace)>
 
