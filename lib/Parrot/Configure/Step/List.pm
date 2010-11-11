@@ -5,7 +5,7 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( get_steps_list );
 
-# EDIT HERE TO ADD NEW TESTS
+# Add new Configure.pl probes here
 my @steps = qw(
     init::manifest
     init::defaults
@@ -60,6 +60,7 @@ my @steps = qw(
     auto::pod2man
     auto::ctags
     auto::revision
+    auto::sha1
     auto::icu
     auto::ipv6
     gen::config_h
