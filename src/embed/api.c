@@ -83,7 +83,36 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), Parrot_Run_core_t core, Parrot_Ui
 
 PARROT_API
 INTVAL
-Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(const char * name))
+Parrot_api_debug_flag(ARGMOD(PMC *interp_pmc), INTVAL flags, INTVAL set)
+{
+    ASSERT_ARGS(Parrot_api_debug_flag)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    if (set)
+        interp->debug_flags |= flags;
+    else
+        interp->debug_flags &= ~flags;
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrot_api_flag(ARGMOD(PMC *interp_pmc), INTVAL flags, INTVAL set)
+{
+    ASSERT_ARGS(Parrot_api_flag)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    if (set) {
+        Interp_flags_SET(interp, flag);
+        if (flag & (PARROT_BOUNDS_FLAG | PARROT_PROFILE_FLAG))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+    }
+    else
+        Interp_flags_CLEAR(interp, flag);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrot_api_set_executable_name(ARGMOD(PMC *interp_pmc), ARGIN(const char * name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp);

@@ -145,10 +145,6 @@ main(int argc, const char *argv[])
     Parrot_api_destroy_interpreter(interp);
 }
 
-#define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
-#define SET_DEBUG(flag)  Parrot_set_debug(interp, (flag))
-#define SET_TRACE(flag)  Parrot_set_trace(interp, (flag))
-
 /*
 
 =item C<static int is_all_digits(const char *s)>
@@ -504,11 +500,10 @@ parseflags(PMC *interp,
                 *trace = PARROT_TRACE_OPS_FLAG;
             break;
           case 'D':
-            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
-                SET_DEBUG(strtoul(opt.opt_arg, NULL, 16));
-            }
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
+                Parrot_api_debug_flag(interp, strtoul(opt.opt_arg, NULL, 16), 1);
             else
-                SET_DEBUG(PARROT_MEM_STAT_DEBUG_FLAG);
+                Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
             break;
 
           case '.':  /* Give Windows Parrot hackers an opportunity to
@@ -540,10 +535,10 @@ parseflags(PMC *interp,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
 #endif
-            SET_FLAG(PARROT_GC_DEBUG_FLAG);
+            Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1);
             break;
           case OPT_DESTROY_FLAG:
-            SET_FLAG(PARROT_DESTROY_FLAG);
+            Parrot_api_flag(interp PARROT_DESTROY_FLAG, 1);
             break;
           case 'I':
             result = Parrot_api_add_include_search_path(interp, opt.opt_arg);
