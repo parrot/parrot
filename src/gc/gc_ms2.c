@@ -26,6 +26,165 @@ Objects in old generations have wb_variant_vtable as primary vtable.
 WB (WriteBarrier) vtables trigger Parrot_gc_write_barrier(self) which will add
 SELF into root_objects list.
 
+
+Pictures of GC steps.
+
+Notation 
+1. "*A1:B2" live object A in generation 1 referenced from object B in generation 2.
+2. "B0" not-live object B in generation 0 not referenced from anywhere.
+2. gn: generaraion n.
+3. R: roots.
+
+Before collect:
+
+    R:  *A1:B2 *B2 *C0 *D0:E1
+    g0: F0 G0:E1 H0:Z2 L0:A1 M0:L0 N0 P0 Q0
+    g1: E1 I1:Z2 J1:Y2 K1:J1
+    g2: Y2 Z2
+
+Consider we are collecting gen1. During VTABLE_mark we will skip all objects
+from older generations.
+
+Marking roots:
+
+    R:  *A1:B2 *B2 *C0 *D0:E1 *F0 *I1:Z2 
+    g0: G0:E1 H0:Z2 L0:A1 M0:L0 N0 P0 Q0
+    g1: E1 J1:Y2 K1:J1
+    g2: Y2 Z2
+
+During this phase we've removed objects from objects[n] and move them into root_objects.
+After this phase root_objects contains only black survived objects. Generations will
+contains mix of dead and live objects.
+
+"Shuffling-marking-and-reffing" phase.
+
+Replace C<interp->gc_sys->mark> with C<gc_ms2_magical_mark>.
+
+Recursively (until I figure out non-recursive algorithm) process root_objects
+and do next things:
+1. Decide C<next_gen> generation for current object. It can be simple
+"next-gen" or some sort of heuristic to avoid "eager" propagation.
+2. Move object into C<next_gen>.
+3. Set C<tmp_gen> to C<self->current_generation>.
+4. Set C<self->current_generation> to C<next_gen>.
+5. Invoke VTABLE_mark on object (which is magical_mark).
+6. Set C<self->current_generation> to C<tmp_gen>.
+
+"Magical mark" will do next:
+0. Return if object is live.
+1. Mark it live.
+2. Do nothing if object's generation is greater-or-equal to C<self->current_generation>.
+3. Mark object as referenced from C<self->current_generation>.
+4. Set self->current_generation = obj->generation.
+5. Invoke VTABLE_mark on it.
+6. Set self->current_generation back.
+
+After this phase we will have objects moved to proper generation with
+referenced_generation set to proper one.
+
+Pictures:
+0. Take object A1.
+1. next_gen = 2.
+2. Move object
+
+    R:  *B2 *C0 *D0:E1 *F0 *I1:Z2 
+    g0: G0:E1 H0:Z2 L0:A1 M0:L0 N0 P0 Q0
+    g1: E1 J1:Y2 K1:J1
+    g2: *A2:B2 Y2 Z2
+
+3. tmp_gen = 1
+4. self->current_generation = 2
+5. Magical mark:
+ 5a. Marking L0:A1.
+ 5b. It became *L0:A2.
+ 5c. self->current_generation = 0
+ 5d. VTABLE_mark(L0)
+   5e. Marking M0:L0.
+   5f. It became *M0:L0
+ 5h. self->current_generation = 2
+
+6. self->current_generation = 1
+
+Picture after processing A1:
+
+    R:  *B2 *C0 *D0:E1 *F0 *I1:Z2 
+    g0: G0:E1 H0:Z2 *L0:A2 *M0:L0 N0 P0 Q0
+    g1: E1 J1:Y2 K1:J1
+    g2: *A2:B2 Y2 Z2
+
+Picture after B2:
+
+    R:  *C0 *D0:E1 *F0 *I1:Z2 
+    g0: G0:E1 H0:Z2 *L0:A2 *M0:L0 N0 P0 Q0
+    g1: E1 J1:Y2 K1:J1
+    g2: *B2 *A2:B2 Y2 Z2
+
+Picture after C0:
+
+    R:  *D0:E1 *F0 *I1:Z2 
+    g0: G0:E1 H0:Z2 *L0:A2 *M0:L0 N0 P0 Q0
+    g1: *C1 E1 J1:Y2 K1:J1
+    g2: *B2 *A2:B2 Y2 Z2
+
+Picture after D0:
+
+    R:  *F0 *I1:Z2 
+    g0: G0:E1 H0:Z2 *L0:A2 *M0:L0 N0 P0 Q0
+    g1: *D1:E1 *C1 E1 J1:Y2 K1:J1
+    g2: *B2 *A2:B2 Y2 Z2
+
+Picture after F0:
+
+    R:  *I1:Z2 
+    g0: G0:E1 H0:Z2 *L0:A2 *M0:L0 N0 P0 Q0
+    g1: *F1 *D1:E1 *C1 E1 J1:Y2 K1:J1
+    g2: *B2 *A2:B2 Y2 Z2
+
+Picture after I1:
+
+    R:  
+    g0: G0:E1 H0:Z2 *L0:A2 *M0:L0 N0 P0 Q0
+    g1: *F1 *D1:E1 *C1 E1 J1:Y2 K1:J1
+    g2: *I2:Z2 *B2 *A2:B2 Y2 Z2
+
+Additional marking:
+
+Starting from old-generation-start (G0 E1 Y2) invoke same magical mark on
+current generation. NB: VTABLE_mark will not mark object, only children.
+
+In our example we will skip E1. J1:Y2 will not be marked live. K1:J1 will be
+marked live.
+
+    R:  
+    g0: G0:E1 H0:Z2 *L0:A1 *M0:L0 N0 P0 Q0
+    g1: *F1 *D1:E1 *C1 E1 J1:Y2 *K1:J1
+    g2: *I2:Z2 *B2 *A2:B2 Y2 Z2
+
+
+Sweeping dead objects.
+
+Sweep current-or-younger generations.
+0. Paint object white.
+1. If object is live - skip it.
+2. If object is referenced from old generation - skip it.
+3. Otherwise - destroy it.
+
+Sweeping g0:
+
+    R:  
+    g0: G0:E1 H0:Z2 L0:A1 M0:L0
+    g1: *F1 *D1:E1 *C1 E1 J1:Y2 *K1:J1
+    g2: *I2:Z2 *B2 *A2:B2 Y2 Z2
+
+Sweeping g1:
+
+    R:  
+    g0: G0:E1 H0:Z2 L0:A1 M0:L0
+    g1: F1 D1:E1 C1 J1:Y2 K1:J1
+    g2: *I2:Z2 *B2 *A2:B2 Y2 Z2
+
+Done!
+
 =cut
 
 */
