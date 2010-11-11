@@ -14,7 +14,7 @@
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;
-    INTVAL gc_system;
+    char * gc_system;
     INTVAL gc_threshold;
     INTVAL hash_seed;
 } Parrot_Init_Args;

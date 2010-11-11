@@ -105,6 +105,20 @@ implementation, and malloc wrappers for various purposes. These are unused.
 
 #endif
 
+PARROT_EXPORT
+INTVAL
+Parrot_gc_get_system_id(PARROT_INTERP, const char *name)
+{
+    ASSERT_ARGS(Parrot_gc_get_system_id)
+    if (STREQ(name, "MS"))
+        return MS;
+    if (STREQ(name, "MS2"))
+        return MS2;
+    if (STREQ(name, "INF"))
+        return INF;
+    return -1;
+}
+
 /*
 
 =item C<void Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>

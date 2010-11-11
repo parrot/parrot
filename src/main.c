@@ -18,16 +18,8 @@ Start Parrot
 */
 
 #include <stdio.h>
+#include "parrot/api.h"
 
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-#include "parrot/imcc.h"
-#include "parrot/longopt.h"
-#include "parrot/runcore_api.h"
-#include "pmc/pmc_callcontext.h"
-
-/* For gc_sys_type_enum */
-#include "gc/gc_private.h"
 
 /* HEADERIZER HFILE: none */
 
@@ -114,11 +106,13 @@ main(int argc, const char *argv[])
     int          stacktop;
     const char  *sourcefile;
     const char  *execname;
-    Interp      *raw_interp;
     PMC         *interp;
+    PMC         *bytecodepmc;
+    PMC         *argsarray;
     int          status;
     int          pir_argc;
     const char **pir_argv;
+    Parrot_Init_Args *initargs = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args));
 
     Parrot_Run_core_t  core  = PARROT_SLOW_CORE;
     Parrot_trace_flags trace = PARROT_NO_TRACE;
@@ -128,21 +122,18 @@ main(int argc, const char *argv[])
     PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
     PARROT_TEXTDOMAIN(PACKAGE);
 
-    raw_interp = Parrot_api_make_interpreter(NULL, PARROT_NO_FLAGS);
+    /* Parse minimal subset of flags */
+    parseflags_minimal(initargs, argc, argv);
+
+    if (!Parrot_api_make_interpreter(NULL, PARROT_NO_FLAGS, initargs, &interp)) {
+        fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+        exit(EXIT_FAILURE);
+    }
 
     /* We parse the arguments, but first store away the name of the Parrot
        executable, since parsing destroys that and we want to make it
        available. */
     execname = argv[0];
-
-    /* Parse minimal subset of flags */
-    parseflags_minimal(raw_interp, argc, argv);
-
-    /* Now initialize interpreter */
-    if (!Parrot_api_initialize_interpreter(raw_interp, (void*)&stacktop, &interp)) {
-        fprintf("PARROT VM: Could not initialize new interpreter");
-        exit(EXIT_FAILURE);
-    }
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
@@ -151,10 +142,13 @@ main(int argc, const char *argv[])
     // TODO: Parrot_str_new -> Parrot_api_str_new
     Parrot_api_set_executable_name(interp, Parrot_str_new(interp, execname, 0)
 
-    status = imcc_run(raw, interp, sourcefile, argc, argv);
-
-    if (status)
-        imcc_run_pbc(interp, interp->output_file, pir_argc, pir_argv);
+    if (imcc_run(raw, interp, sourcefile, argc, argv, &bytecodepmc)) {
+        if (!(Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray) &&
+              Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))) {
+            fprintf(stderr, "PARROT VM: Could not load or run bytecode)
+            exit(EXIT_FAILURE);
+        }
+    }
 
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
@@ -369,7 +363,7 @@ Parse minimal subset of args required for initializing interpreter.
 
 */
 static void
-parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
+parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(parseflags_minimal)
 
@@ -387,18 +381,7 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
                 exit(EXIT_FAILURE);
             }
             arg = argv[pos];
-            if (STREQ(arg, "ms"))
-                interp->gc_sys->sys_type = MS;
-            else if (STREQ(arg, "inf"))
-                interp->gc_sys->sys_type = INF;
-            else if (STREQ(arg, "ms2"))
-                interp->gc_sys->sys_type = MS2;
-            else {
-                fprintf(stderr,
-                        "main: Unrecognized GC '%s' specified."
-                        "\n\nhelp: parrot -h\n", arg);
-                exit(EXIT_FAILURE);
-            }
+            initargs->gc_system = arg;
             break;
         }
 
@@ -425,9 +408,9 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
             }
 
             if (is_all_digits(arg)) {
-                interp->gc_threshold = strtoul(arg, NULL, 10);
+                initargs->gc_threshold = strtoul(arg, NULL, 10);
 
-                if (interp->gc_threshold > 1000) {
+                if (initargs->gc_threshold > 1000) {
                     fprintf(stderr, "error: maximum GC threshold is 1000\n");
                     exit(EXIT_FAILURE);
                 }
@@ -448,7 +431,7 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
                 arg = argv[++pos];
 
             if (is_all_hex_digits(arg)) {
-                interp->hash_seed = strtoul(arg, NULL, 16);
+                initargs->hash_seed = strtoul(arg, NULL, 16);
             }
             else {
                 fprintf(stderr, "error: invalid hash seed specified:"
@@ -476,14 +459,15 @@ Parse Parrot's command line for options and set appropriate flags.
 
 PARROT_CAN_RETURN_NULL
 static const char *
-parseflags(PARROT_INTERP,
+parseflags(PMC *interp,
         int argc, ARGIN(const char *argv[]),
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(Parrot_Run_core_t *core), ARGMOD(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)
-    struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
-    int                     status;
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    int status;
+    int result = 1;
 
     if (argc == 1) {
         usage(stderr);
@@ -572,33 +556,34 @@ parseflags(PARROT_INTERP,
             SET_FLAG(PARROT_DESTROY_FLAG);
             break;
           case 'I':
-            Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
-                    PARROT_LIB_PATH_INCLUDE);
+            result = Parrot_api_add_include_search_path(interp, opt.opt_arg);
             break;
           case 'L':
-            Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
-                    PARROT_LIB_PATH_LIBRARY);
+            result = Parrot_api_add_library_search_path(interp, opt.opt_arg);
             break;
           case 'X':
-            Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
-                    PARROT_LIB_PATH_DYNEXT);
+            result = Parrot_api_add_dynext_search_path(interp, opt.opt_arg);
             break;
           case 'w':
-            /* FIXME It's not best way to set warnings... */
-            Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
+            result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG);
             break;
           case 'o':
-            interp->output_file = opt.opt_arg;
+            result = Parrot_api_set_output_file(interp, opt.opt_arg);
             break;
           case OPT_PBC_OUTPUT:
-            if (!interp->output_file)
-                interp->output_file = "-";
+            result = Parrot_api_set_output_file(interp, NULL);
+            break;
           default:
             /* languages handle their arguments later (after being initialized) */
             break;
         }
     }
 
+    if (!result) {
+        fprintf(stderr, "Parrot VM: Error parsing option %s\n", argv[opt.opt_index]);
+        usage(stderr);
+        exit(EXIT_FAILURE);
+    }
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
         usage(stderr);
@@ -607,13 +592,8 @@ parseflags(PARROT_INTERP,
 
     /* reached the end of the option list and consumed all of argv */
     if (argc == opt.opt_index) {
-        if (interp->output_file) {
-            fprintf(stderr, "Missing program name or argument for -o\n");
-        }
-        else {
-            /* We are not looking at an option, so it must be a program name */
-            fprintf(stderr, "Missing program name\n");
-        }
+        /* We are not looking at an option, so it must be a program name */
+        fprintf(stderr, "Missing program name\n");
         usage(stderr);
         exit(EXIT_FAILURE);
     }

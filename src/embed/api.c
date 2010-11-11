@@ -49,8 +49,12 @@ Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags, ARGIN_NULLO
         if (args) {
             if (args->stack_top)
                 stacktop_ptr = args->stacktop;
-            if (args->gc_system)
-                interp->gc_sys->sys_type = args->gc_system;
+            if (args->gc_system) {
+                const INTVAL sysid = Parrot_gc_get_system_id(interp, args->gc_system);
+                if (sysid == -1)
+                    EMBED_API_FAILURE(interp_pmc, interp);
+                interp->gc_sys->sys_type = sysid;
+            }
             if (args->gc_threshold)
                 interp->gc_threshold = args->gc_threshold;
             if (args->hash_seed)
@@ -87,6 +91,9 @@ Parrot_api_set_executable_name(ARGIN(PMC *interp_pmc), ARGIN(Parrot_String) name
         name_pmc);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
+
+// TODO: Consider merging _destroy_interpreter and _exit_interpreter.
+//       it doesn't make sense to call one without calling the other
 
 PARROT_API
 INTVAL
@@ -165,4 +172,58 @@ Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), INTVAL argc, ARGIN(char **a
     }
     *args = userargv;
     EMBED_API_CALLIN(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrot_api_set_warnings(ARGMOD(PMC *interp_pmc), INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_api_set_warnings)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    /* Activates the given warnings.  (Macro from warnings.h.) */
+    PARROT_WARNINGS_on(interp, (Parrot_warnclass)flags);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrot_api_set_output_file(ARGMOD(PMC *interp_pmc), ARGIN(const char * filename))
+{
+    ASSERT_ARGS(Parrot_api_set_output_file)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    if (!filename && !interp->output_file)
+        interp->output_file = "-";
+    else
+        interp->output_file = filename;
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrt_api_add_library_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
+{
+    ASSERT_ARGS(Parrot_api_add_library_search_path)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LIBRARY);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrt_api_add_include_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
+{
+    ASSERT_ARGS(Parrot_api_add_include_search_path)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_INCLUDE);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+INTVAL
+Parrt_api_add_dynext_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
+{
+    ASSERT_ARGS(Parrot_api_add_dynext_search_path)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_DYNEXT);
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
