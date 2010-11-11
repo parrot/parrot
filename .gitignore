@@ -34,6 +34,7 @@ ports
 *.vcproj*
 .git
 .parrot_current_rev
+.parrot_current_sha1
 CFLAGS
 MANIFEST.configure.generated
 Makefile
