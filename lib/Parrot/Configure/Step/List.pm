@@ -61,6 +61,7 @@ my @steps = qw(
     auto::ctags
     auto::revision
     auto::sha1
+    auto::git_describe
     auto::icu
     auto::ipv6
     gen::config_h
