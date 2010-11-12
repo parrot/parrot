@@ -32,7 +32,7 @@ sub runstep {
 
     my $sha1 = $Parrot::Git::Describe::current;
 
-    if ( defined($sha1) and $sha1 !~ /^(RELEASE_|REL_)\d+\.\d+\.\d+~g[a-z0-9]+$/i ) {
+    if ( defined($sha1) and $sha1 !~ /^(RELEASE_|REL_)\d+_\d+_\d+~g[a-z0-9]+$/i ) {
         die "Invalid git describe string (Git::Describe): $!";
     }
 
