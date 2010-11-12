@@ -39,9 +39,7 @@ sub runstep {
     ($conf, $cc) = _get_programs($conf, $ask);
 
     my $debug = _get_debug($conf, $ask);
-
-    my $debug_validity = _is_debug_setting_valid($debug);
-    return unless defined $debug_validity;
+    return unless defined $debug;
 
     $conf = _set_debug_and_warn($conf, $debug);
 
@@ -145,13 +143,13 @@ sub _get_debug {
     $debug = 'y' if $conf->options->get('debugging');
     $debug = prompt( "Do you want a debugging build of Parrot?", $debug )
         if $ask;
-    return $debug;
+    ( $debug =~ /^[yn]$/i ) ? return $debug : return;
 }
 
-sub _is_debug_setting_valid {
-    my $debug = shift;
-    ( $debug =~ /^[yn]$/i ) ? return 1 : return;
-}
+#sub _is_debug_setting_valid {
+#    my $debug = shift;
+#    ( $debug =~ /^[yn]$/i ) ? return 1 : return;
+#}
 
 sub _set_debug_and_warn {
     my ($conf, $debug) = @_;

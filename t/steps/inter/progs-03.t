@@ -44,7 +44,7 @@ my $step = test_step_constructor_and_description($conf);
 
 my @prompts;
 my $object;
-my ($stdout, $debug, $debug_validity);
+my ($stdout, $debug);
 
 foreach my $p (
     qw|
@@ -74,9 +74,10 @@ capture( sub {
     my $cc;
     ($conf, $cc) = inter::progs::_get_programs($conf, $ask);
     $debug = inter::progs::_get_debug($conf, $ask);
-    $debug_validity = inter::progs::_is_debug_setting_valid($debug);
-}, \$stdout);
-ok( defined $debug_validity, "'debug_validity' set as expected" );
+    },
+    \$stdout
+);
+ok( defined $debug, "'debug' has valid setting" );
 
 capture( sub {
     $conf = inter::progs::_set_debug_and_warn($conf, $debug);

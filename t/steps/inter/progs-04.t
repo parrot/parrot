@@ -44,7 +44,7 @@ my $step = test_step_constructor_and_description($conf);
 
 my @prompts;
 my $object;
-my ($stdout, $debug, $debug_validity);
+my ($stdout, $debug);
 
 foreach my $p (
     qw|
@@ -71,7 +71,9 @@ isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 my $rv;
 capture( sub {
     $rv = $step->runstep($conf);
-}, \$stdout);
+    },
+    \$stdout
+);
 ok( ! defined $rv, "runstep returned undef as expected" );
 
 $object = undef;
