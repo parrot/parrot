@@ -281,7 +281,7 @@ A condition expr may be:
 
   * A single key, which is true if a config key is true,
   * Equal to the platform name or the osname - case-sensitive,
-  * A C<key==value> expression, which is trun if the config key has the
+  * A C<key==value> expression, which is true if the config key has the
     expected value, or
   * A logical combination of C<|>, C<OR>, C<&>, C<AND>, C<!>, C<NOT>.
 
