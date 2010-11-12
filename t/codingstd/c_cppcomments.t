@@ -19,7 +19,7 @@ t/codingstd/c_cppcomments.t - checks for C++ style comments
     % prove t/codingstd/c_cppcomments.t
 
     # test specific files
-    % perl t/codingstd/c_cppcoments.t src/foo.t include/parrot/bar.h
+    % perl t/codingstd/c_cppcomments.t src/foo.t include/parrot/bar.h
 
 =head1 DESCRIPTION
 

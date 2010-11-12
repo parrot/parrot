@@ -282,7 +282,7 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 Takes an interpreter name and an information type as arguments.
 Returns corresponding information strings about the interpreter:
 the full pathname, executable name, or the file stem,
-(or throws an error exception, if the type is not recognised).
+(or throws an error exception, if the type is not recognized).
 Valid types are EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME,
 and RUNTIME_PREFIX.
 

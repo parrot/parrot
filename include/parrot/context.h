@@ -46,7 +46,7 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 #else /* NDEBUG */
 
-/* Manually inlined macros. Used in optimised builds */
+/* Manually inlined macros. Used in optimized builds */
 
 #  define CTX_REG_NUM(p, x) (CONTEXT_STRUCT(p)->bp.regs_n[-1L - (x)])
 #  define CTX_REG_INT(p, x) (CONTEXT_STRUCT(p)->bp.regs_i[(x)])
@@ -68,7 +68,7 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 /* Context accessors functions */
 
 /*
- * For optimised builds we provide macros which directly poke into
+ * For optimized builds we provide macros which directly poke into
  * Parrot_Context.
  */
 

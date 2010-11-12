@@ -636,7 +636,7 @@ Creates and returns a new Parrot string using C<len> bytes of string data read
 from C<buffer>.
 
 The value of C<encoding_name> specifies the string's representation.
-The currently recognised values are:
+The currently recognized values are:
 
     'iso-8859-1'
     'ascii'
