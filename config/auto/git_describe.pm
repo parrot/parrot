@@ -16,6 +16,7 @@ use strict;
 use warnings;
 
 use base qw(Parrot::Configure::Step);
+use Parrot::Configure::Data;
 
 use Parrot::Git::Describe;
 
@@ -30,16 +31,18 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $sha1 = $Parrot::Git::Describe::current;
+    my $describe = $Parrot::Git::Describe::current;
+    my $data = Parrot::Configure::Data->new;
+    $data->set( git_describe => $describe );
 
-    if ( defined($sha1) and $sha1 !~ /^(RELEASE_|REL_)\d+_\d+_\d+~g[a-z0-9]+$/i ) {
+    if ( defined($describe) and $describe !~ /^(RELEASE_|REL_)\d+_\d+_\d+~g[a-z0-9]+$/i ) {
         die "Invalid git describe string (Git::Describe): $!";
     }
 
-    $conf->data->set( sha1 => $sha1 );
+    $conf->data->set( describe => $describe );
 
-    if ( defined $sha1 ) {
-        $self->set_result("$sha1");
+    if ( defined $describe ) {
+        $self->set_result("$describe");
     }
     else {
         $self->set_result("done");
