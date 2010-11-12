@@ -79,9 +79,10 @@ capture( sub {
 );
 ok( defined $debug, "'debug' has valid setting" );
 
-capture( sub {
-    $conf = inter::progs::_set_debug_and_warn($conf, $debug);
-}, \$stdout);
+capture(
+    sub { $conf = inter::progs::_set_debug($conf, $debug); },
+    \$stdout
+);
 ok( defined $conf, "Components of runstep() tested okay" );
 
 $object = undef;

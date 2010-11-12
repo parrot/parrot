@@ -41,7 +41,7 @@ sub runstep {
     my $debug = _get_debug($conf, $ask);
     return unless defined $debug;
 
-    $conf = _set_debug_and_warn($conf, $debug);
+    $conf = _set_debug($conf, $debug);
 
     # Beware!  Inside test_compiler(), cc_build() and cc_run() both silently
     # reference the Parrot::Configure object ($conf) at its current state.
@@ -72,7 +72,8 @@ sub _get_programs {
     my ($conf, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
-    my ( $cc, $link, $ld, $ccflags, $linkflags, $ar, $arflags, $ldflags, $libs, $lex, $yacc );
+    my ( $cc, $link, $ld, $ccflags, $ccwarn, $linkflags,
+        $ar, $arflags, $ldflags, $libs, $lex, $yacc );
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
@@ -98,6 +99,9 @@ sub _get_programs {
     $conf->data->set( ccflags => $ccflags );
 
     $conf->debug("\nccflags: $ccflags\n");
+
+    $ccwarn = integrate( $conf->data->get('ccwarn'), $conf->options->get('ccwarn') );
+    $conf->data->set( ccwarn => $ccwarn );
 
     $ar = integrate( $conf->data->get('ar'), $conf->options->get('ar') );
     $ar = prompt( "What archiver do you want to use to build static libraries?", $ar ) if $ask;
@@ -146,12 +150,7 @@ sub _get_debug {
     ( $debug =~ /^[yn]$/i ) ? return $debug : return;
 }
 
-#sub _is_debug_setting_valid {
-#    my $debug = shift;
-#    ( $debug =~ /^[yn]$/i ) ? return 1 : return;
-#}
-
-sub _set_debug_and_warn {
+sub _set_debug {
     my ($conf, $debug) = @_;
     if ( $debug =~ /n/i ) {
         $conf->data->set(
@@ -160,10 +159,6 @@ sub _set_debug_and_warn {
             ld_debug   => ''
         );
     }
-
-    # This one isn't prompted for above.  I don't know why.
-    my $ccwarn = integrate( $conf->data->get('ccwarn'), $conf->options->get('ccwarn') );
-    $conf->data->set( ccwarn => $ccwarn );
     return $conf;
 }
 
