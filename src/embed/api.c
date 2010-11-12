@@ -12,18 +12,24 @@ Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags, ARGIN_NULLO
 {
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
+    Parrot_Interp * const interp_raw;
+    PMC * interp_pmc;
     void *stacktop_ptr = &alt_stacktop;
-    Parrot_set_config_hash();
+
+    //SHOULD Parrot_set_config_hash();
+    //BE     Parrot_set_config_internal_hash();    
     {
-        Parrot_Interp * const parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
-        Parrot_Interp * const interp_raw = allocate_interpreter(parent_raw, flags);
+        Parrot_Interp * const parent_raw;
+        parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+        interp_raw = allocate_interpreter(parent_raw, flags);
         if (args) {
-            if (args->stack_top)
+            if (args->stacktop)
                 stacktop_ptr = args->stacktop;
             if (args->gc_system) {
                 const INTVAL sysid = Parrot_gc_get_system_id(interp, args->gc_system);
                 if (sysid == -1)
-                    EMBED_API_FAILURE(interp_pmc, interp);
+                  //  EMBED_API_FAILURE(interp_pmc, interp);
+                  // This doesn't works without EMBED_API_CALLIN
                 interp->gc_sys->sys_type = sysid;
             }
             if (args->gc_threshold)
@@ -39,12 +45,12 @@ Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags, ARGIN_NULLO
 
 PARROT_API
 INTVAL
-Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), Parrot_Run_core_t core, Parrot_Uint trace)
+Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), Parrot_Run_core_t core, Parrot_UInt trace)
 {
     ASSERT_ARGS(Parrot_api_set_runcore)
+    EMBED_API_CALLIN(interp_pmc, interp)
     if (trace)
         core = PARROT_SLOW_CORE;
-    EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_set_trace(interp, (Parrot_trace_flags)trace);
     Parrot_set_run_core(interp, core);
     EMBED_API_CALLOUT(interp_pmc, interp)
@@ -236,23 +242,24 @@ Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), INTVAL stdin, INTVAL stdout, I
 {
   ASSERT_ARGS(Parrot_api_set_stdhandles)
   EMBED_API_CALLIN(interp_pmc, interp);
+  void *dummy;
 
   if(PIO_INVALID_HANDLE != (PIOHANDLE)stdin) {
     PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
     Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stdin);
-    Parrot_io_sethandle(interp,PIO_STDIN_FILENO,pmc);
+    dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDIN_FILENO,pmc);
   }
 
   if(PIO_INVALID_HANDLE != (PIOHANDLE)stdout) {
     PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
     Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stdout);
-    Parrot_io_sethandle(interp,PIO_STDOUT_FILENO,pmc);
+    dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDOUT_FILENO,pmc);
   }
 
   if(PIO_INVALID_HANDLE != (PIOHANDLE)stderr) {
     PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
     Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stderr);
-    Parrot_io_sethandle(interp,PIO_STDERR_FILENO,pmc);
+    dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDERR_FILENO,pmc);
   }
 
   EMBED_API_CALLOUT(interp_pmc, interp);

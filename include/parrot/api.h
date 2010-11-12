@@ -6,11 +6,14 @@
  *     them.
  */
 
-#ifdef PARROT_API_H_GUARD
+#ifndef PARROT_API_H_GUARD
 #define PARROT_API_H_GUARD
 
 #include "parrot/config.h"
 #include "parrot/core_types.h"
+#include "pmc/pmc_parrotinterpreter.h"
+
+#define PARROT_API PARROT_EXPORT
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;
@@ -93,7 +96,7 @@ PARROT_API
 INTVAL Parrot_api_set_runcore(
     ARGIN(PMC *interp_pmc),
     Parrot_Run_core_t core,
-    Parrot_Uint trace)
+    Parrot_UInt trace)
         __attribute__nonnull__(1);
 
 PARROT_API

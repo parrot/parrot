@@ -961,6 +961,7 @@ include/parrot/datatypes.h                                  [main]include
 include/parrot/debugger.h                                   [main]include
 include/parrot/dynext.h                                     [main]include
 include/parrot/embed.h                                      [main]include
+include/parrot/api.h                                        [main]include
 include/parrot/encoding.h                                   [main]include
 include/parrot/enums.h                                      [main]include
 include/parrot/exceptions.h                                 [main]include
@@ -1288,7 +1289,7 @@ src/dynpmc/rational.pmc                                     []
 src/dynpmc/rotest.pmc                                       []
 src/dynpmc/subproxy.pmc                                     []
 src/embed.c                                                 []
-src/embed_api.c                                             []
+src/embed/api.c                                             []
 src/exceptions.c                                            []
 src/exit.c                                                  []
 src/extend.c                                                []
