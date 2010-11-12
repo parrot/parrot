@@ -2614,7 +2614,7 @@ src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
 		--output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
 #
-# remove the following two lines commited in r48180 which cause this to be re-generated
+# remove the following two lines committed in r48180 which cause this to be re-generated
 # every time the all target is invoked - see TT #1719
 #
 #	$(NCI_THUNK_GEN) --core --loader-name=Parrot_nci_load_extra_thunks --no-warn-dups \

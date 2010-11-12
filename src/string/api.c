@@ -1944,7 +1944,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
             else if (c == '.') {
                 state = parse_after_dot;
                 /*
-                 * Throw gathered result. Recalulate from integer mantissa
+                 * Throw gathered result. Recalculate from integer mantissa
                  * to preserve precision.
                  */
                 if (m_is_safe)
@@ -2495,7 +2495,7 @@ const STR_VTABLE *encoding, UINTVAL flags)>
 
 EXPERIMENTAL, see TT #1628
 
-Unescapes the src string returnning a new string with the encoding specified.
+Unescapes the src string returning a new string with the encoding specified.
 
 
 =cut

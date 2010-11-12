@@ -1350,7 +1350,7 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     pf->cur_cs = NULL;
     pf_register_standard_funcs(interp, pf);
 
-    /* create the master directory, all subirs go there */
+    /* create the master directory, all sub-dirs go there */
     pf->directory.base.pf = pf;
     pf->dirp              = (PackFile_Directory *)
         PackFile_Segment_new_seg(interp, &pf->directory,
@@ -3907,7 +3907,7 @@ PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
 Adds a new bytecode annotation entry. Takes the annotations segment to add the
 entry to, the current bytecode offset (assumed to be the greatest one so far in
-the currently active group), the annotation key (as an index into the constats
+the currently active group), the annotation key (as an index into the constants
 table), the annotation value type (one of PF_ANNOTATION_KEY_TYPE_INT,
 PF_ANNOTATION_KEY_TYPE_STR or PF_ANNOTATION_KEY_TYPE_NUM) and the value. The
 value will be an integer literal in the case of type being

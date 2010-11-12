@@ -89,7 +89,7 @@
 /*
 ** Enumerated constants
 ** Changes here require update PBC_COMPAT
-** The prefered way to eliminate a value is just to stop using it without
+** The preferred way to eliminate a value is just to stop using it without
 ** renumbering others, that helps to keep backward compatibility.
 */
 

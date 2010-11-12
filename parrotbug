@@ -47,7 +47,7 @@ in parrot, and e-mail it to the parrot developers.
 
 It is *NOT* intended for:
   - sending test messages,
-  - or reporting bugs in languages targetting parrot,
+  - or reporting bugs in languages targeting parrot,
   - or reporting bugs in some library bindings for parrot,
   - or simply verifying that parrot works.
 
@@ -197,7 +197,7 @@ sub init {
         $report{severity} = $opts{severity} || "";
     };
 
-    # Test message, shortcuting recipent.
+    # Test message, shortcutting recipient.
     $report{to} = $opts{to} if $opts{to};
 
     ## 

@@ -1359,7 +1359,7 @@ postit_end:
 
     # PMC is first value type
     hash.'set_value_type'(.DATATYPE_PMC)
-    $P0 = new 'Env' # arbitary choice. Just to prevent possible casting.
+    $P0 = new 'Env' # arbitrary choice. Just to prevent possible casting.
     hash['env'] = $P0
     hash['foo'] = 42
     hash['bar'] = 21285.06
