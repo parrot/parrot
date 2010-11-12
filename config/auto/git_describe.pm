@@ -38,8 +38,6 @@ sub runstep {
         die "Invalid git describe string (Git::Describe): $!";
     }
 
-    $conf->data->set( describe => $describe );
-
     if ( defined $describe ) {
         $self->set_result("$describe");
     }
