@@ -61,7 +61,6 @@ Compile Options:
    --parrot_is_shared   Link parrot dynamically
    --disable-rpath      Link without rpath (user must set LD_LIBRARY_PATH)
    --m=32               Build 32bit executable on 64-bit architecture.
-   --profile            Turn on profiled compile (gcc only for now)
    --cage               [CAGE] compile includes many additional warnings
 
    --cc=(compiler)      Use the given compiler

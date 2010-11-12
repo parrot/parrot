@@ -250,13 +250,13 @@ sub runstep {
         PKGCONFIG_DIR => $conf->options->get('pkgconfigdir') || '',
     );
 
-    # TT #855:  Profiling options are too specific to GCC
-    if ( $conf->options->get('profile') ) {
-        $conf->data->set(
-            cc_debug => " -pg ",
-            ld_debug => " -pg ",
-        );
-    }
+#    # TT #855:  Profiling options are too specific to GCC
+#    if ( $conf->options->get('profile') ) {
+#        $conf->data->set(
+#            cc_debug => " -pg ",
+#            ld_debug => " -pg ",
+#        );
+#    }
 
     $conf->data->set( clock_best => "" );
 

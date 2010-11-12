@@ -62,7 +62,6 @@ our @shared_valid_options = qw{
     parrot_is_shared
     pkgconfigdir
     prefix
-    profile
     sbindir
     sharedstatedir
     silent
