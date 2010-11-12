@@ -10,7 +10,7 @@ Determines Parrot's "git describe" string. In a release, this field is empty.
 
 =cut
 
-package auto::sha1;
+package auto::git_describe;
 
 use strict;
 use warnings;
@@ -32,10 +32,9 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $describe = $Parrot::Git::Describe::current;
-    my $data = Parrot::Configure::Data->new;
-    $data->set( git_describe => $describe );
+    $conf->data->set( git_describe => $describe );
 
-    if ( defined($describe) and $describe !~ /^(RELEASE_|REL_)\d+_\d+_\d+~g[a-z0-9]+$/i ) {
+    if ( defined($describe) and $describe !~ /^(RELEASE_|REL_)\d+_\d+_\d+-\d+-g[a-z0-9]+$/i ) {
         die "Invalid git describe string (Git::Describe): $!";
     }
 
