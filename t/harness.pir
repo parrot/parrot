@@ -352,10 +352,10 @@ TEST
     config = $P0[.IGLOBALS_CONFIG_HASH]
     .local pmc contents
     contents = new 'ResizablePMCArray' # by couple
-    push contents, 'architecture'
+    push contents, 'Architecture'
     $S0 = config['cpuarch']
     push contents, $S0
-    push contents, 'platform'
+    push contents, 'Platform'
     $S0 = config['osname']
     push contents, $S0
     $I0 = exists env_data['revision']
