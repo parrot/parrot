@@ -221,6 +221,8 @@ CONFIGURE_GENERATED_FILES = \
     MANIFEST.configure.generated \
     .configure_trace.sto \
     .parrot_current_rev \
+    .parrot_current_sha1 \
+    .parrot_current_git_describe \
 #IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
 #IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
     runtime/parrot/include/signal.pasm \
