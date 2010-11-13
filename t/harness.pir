@@ -217,7 +217,7 @@ TEST
     .local string submitter
     submitter = _get_submitter(config, env)
     $P0['Submitter'] = submitter
-    _add_git_info($P0)
+#    _add_git_info($P0)
     .return ($P0)
 .end
 
@@ -330,21 +330,6 @@ TEST
     .return (hash)
 .end
 
-.sub '_add_git_info' :anon
-    .param pmc hash
-    $I0 = file_exists('.git')
-    unless $I0 goto L1
-    $P0 = new 'FileHandle'
-    $P0.'open'('git rev-parse HEAD', 'pr')
-    $S0 = $P0.'readline'()
-    $S0 = chomp($S0)
-    say $S0
-    $P0.'close'()
-    hash['revision'] = $S0
-  L1:
-    .return (hash)
-.end
-
 .sub 'send_archive_to_smolder' :anon
     .param pmc env_data
     .local pmc config
@@ -358,10 +343,10 @@ TEST
     push contents, 'Platform'
     $S0 = config['osname']
     push contents, $S0
-    $I0 = exists env_data['revision']
+    $I0 = file_exists('.git')
     unless $I0 goto L0
     push contents, 'revision'
-    $S0 = env_data['revision']
+    $S0 = _get_git_revision()
     push contents, $S0
   L0:
     push contents, 'tags'
@@ -390,6 +375,15 @@ TEST
     $S0 = response.'content'()
     say $S0
   L1:
+.end
+
+.sub '_get_git_revision' :anon
+    $P0 = new 'FileHandle'
+    $P0.'open'('git rev-parse HEAD', 'pr')
+    $S0 = $P0.'readline'()
+    $S0 = chomp($S0)
+    $P0.'close'()
+    .return ($S0)
 .end
 
 .sub '_get_tags' :anon
