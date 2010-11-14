@@ -32,17 +32,17 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $describe = $Parrot::Git::Describe::current;
-    $conf->data->set( git_describe => $describe );
 
     if ( defined($describe) and $describe !~ /^(RELEASE_|REL_)\d+_\d+_\d+-\d+-g[a-z0-9]+$/i ) {
         die "Invalid git describe string (Git::Describe): $!";
     }
 
+    $conf->data->set( git_describe => $describe );
     if ( defined $describe ) {
-        $self->set_result("$describe");
+        $self->set_result($describe);
     }
     else {
-        $self->set_result("done");
+        $self->set_result('done');
     }
 
     return 1;
