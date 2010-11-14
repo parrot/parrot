@@ -30,8 +30,8 @@ is a virtual machine aimed at running all dynamic languages.</p>
 <p>Parrot @release.version@ is available on <a href=\"@ftp.path@\">Parrot's FTP
 site</a>, or by <a href=\"@web.root@@web.source@\">following the download
 instructions</a>. For those who want to hack on Parrot or languages that run on top of Parrot,
-we recommend <a href=\"@repo.org_root@\">our organization page</a> on GitHub,
-or you can go directly to the official Parrot Git repo on <a href="\@repo.home@\">Github</a>
+we recommend <a href=\"@web.org_root@\">our organization page</a> on GitHub,
+or you can go directly to the official Parrot Git repo on <a href="\@web.repository@\">Github</a>
 
 To clone the the Parrot Git repo into a directory called 'parrot', use the following:
 <pre>
