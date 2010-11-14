@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2010, Parrot Foundation.
 # auto/git_describe-01.t
 
 use strict;
@@ -61,7 +61,7 @@ $conf->replenish($serialized);
 
 {
     no warnings 'once';
-    my $cur = 'REL_2004_09_07-678-ga83bd';
+    my $cur = 'REL_2004_09_07-678-ga83bdab';
     local $Parrot::Git::Describe::current = $cur;
     my $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
