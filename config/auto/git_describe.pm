@@ -23,7 +23,7 @@ use Parrot::Git::Describe;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determine Parrot's git-describe string};
+    $data{description} = q{Determine Parrot's git-describe};
     $data{result}      = q{};
     return \%data;
 }
@@ -33,11 +33,12 @@ sub runstep {
 
     my $describe = $Parrot::Git::Describe::current;
 
-    if ( defined($describe) and $describe !~ /^(RELEASE_|REL_)\d+_\d+_\d+-\d+-g[a-z0-9]+$/i ) {
-        die "Invalid git describe string (Git::Describe): $!";
+    if ( defined($describe) and $describe !~ /^REL(EASE)?_\d+_\d+_\d+-\d+-g[0-9A-Fa-f]{7}$/ ) {
+        die "Invalid git describe string (Git::Describe): $describe";
     }
 
     $conf->data->set( git_describe => $describe );
+
     if ( defined $describe ) {
         $self->set_result($describe);
     }

@@ -33,8 +33,8 @@ sub runstep {
     my $sha1 = $Parrot::SHA1::current;
     my $abbrev_sha1;
 
-    if ( defined($sha1) and $sha1 !~ /^[a-z0-9]+$/i ) {
-        die "Invalid Parrot sha1 (SHA1): $!";
+    if ( defined($sha1) and $sha1 !~ /^[0-9A-Fa-f]{40}$/ ) {
+        die "Invalid Parrot sha1 (SHA1): $sha1";
     }
 
     $abbrev_sha1 = substr($sha1, 0, 7) if defined $sha1;
