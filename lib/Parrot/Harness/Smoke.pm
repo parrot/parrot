@@ -199,6 +199,8 @@ sub collect_test_environment_data {
     push @data, ( 'Configure args' => $PConfig{configure_args} )
       if $PConfig{configure_args};
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
+    push @data, ( 'Git describe' => $PConfig{git_describe} )
+      if $PConfig{git_describe};
     return @data;
 }
 
