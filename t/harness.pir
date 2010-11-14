@@ -223,6 +223,7 @@ TEST
     git_describe = config['git_describe']
     $P0['Git describe'] = git_describe
   L2:
+    _add_git_info($P0)
     .return ($P0)
 .end
 
@@ -287,6 +288,54 @@ TEST
 .end
 
 .include 'cclass.pasm'
+
+.sub '_add_git_info' :anon
+    .param pmc hash
+    $I0 = file_exists('.git')
+    unless $I0 goto L1
+    $P0 = new 'FileHandle'
+    $P0.'open'('git branch', 'pr')
+    $S0 = $P0.'readall'()
+    $P0.'close'()
+    $I0 = length $S0
+    $I1 = index $S0, '*'
+    unless $I1 >= 0 goto L2
+    $I1 += 1
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
+    $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
+    $I3 = $I2 - $I1
+    $S1 = substr $S0, $I1, $I3
+    hash['Branch'] = $S1
+  L2:
+    $P0.'open'('git status', 'pr')
+    $P1 = new 'ResizableStringArray'
+  L3:
+    $S0 = $P0.'readline'()
+    if $S0 == '' goto L4
+    $I1 = index $S0, 'modified:'
+    unless $I1 > 0 goto L3
+    $I1 += 9
+    $S0 = chomp($S0)
+    $I0 = length $S0
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
+    $S0 = substr $S0, $I1
+    push $P1, $S0
+    goto L3
+  L4:
+    $P0.'close'()
+    $I0 = elements $P1
+    unless $I0 != 0 goto L1
+    $S0 = hash['DEVEL']
+    $S0 .= ' '
+    $S1 = $I0
+    $S0 .= $S1
+    $S0 .= ' mods'
+    hash['DEVEL'] = $S0
+    $S0 = join ' ', $P1
+    hash['Modifications'] = $S0
+  L1:
+    .return (hash)
+.end
 
 .sub 'send_archive_to_smolder' :anon
     .param pmc env_data
