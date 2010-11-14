@@ -1,22 +1,23 @@
-#define GET_RAW_INTERP(p) ((Parrot_ParrotInterpreter_attributes)(p)->data)->interp;
+
+#ifndef PARROT_EMBED_PRIVATE_H
+#define PARROT_EMBED_PRIVATE_H
+
+#include "pmc/pmc_parrotinterpreter.h"
+
+#define GET_RAW_INTERP(p) ((Parrot_ParrotInterpreter_attributes*)(p)->data)->interp;
 #define EMBED_API_CALLIN(p, i) \
-    jmp_buf _env; \
     void * _oldtop; \
     Interp * (i) = PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p); \
     _oldtop = (i)->lo_var_ptr; \
-    if (_oldtop) {} else (1)->lo_var_ptr = &oldtop \
-    PARROT_ASSERT(i); \
-    PARROT_ASSERT((i)->lo_val_ptr); \
-    if (setjmp(_env)) { \
-        (i)->api_jmp_buf = NULL; \
+    if (_oldtop) {} else (i)->lo_var_ptr = &_oldtop; \
+    if (setjmp((i)->api_jmp_buf)) { \
         return 0; \
     } else { \
-        (i)->api_jmp_buf = _env; \
         {
 #define EMBED_API_CALLOUT(p, i) \
         } \
         if (!_oldtop) {\
-            PARROT_ASSERT((i)->lo_var_ptr == &oldtop);\
+            PARROT_ASSERT((i)->lo_var_ptr == &_oldtop);\
             (i)->lo_var_ptr = NULL;\
         }\
         return 1; \
@@ -25,8 +26,11 @@
 #define EMBED_API_FAILURE(p, i) \
     do { \
         if (!_oldtop) {\
-            PARROT_ASSERT((i)->lo_var_ptr == &oldtop);\
+            PARROT_ASSERT((i)->lo_var_ptr == &_oldtop);\
             (i)->lo_var_ptr = NULL;\
         } \
         return 0; \
-    }
+    } while(0);
+
+
+#endif /* PARROT_EMBED_PRIVATE_H */

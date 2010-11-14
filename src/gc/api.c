@@ -106,17 +106,16 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #endif
 
 PARROT_EXPORT
-INTVAL
-Parrot_gc_get_system_id(PARROT_INTERP, const char *name)
+void
+Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
 {
-    ASSERT_ARGS(Parrot_gc_get_system_id)
+    //ASSERT_ARGS(Parrot_gc_set_system_type)
     if (STREQ(name, "MS"))
-        return MS;
+        interp->gc_sys->sys_type = MS;
     if (STREQ(name, "MS2"))
-        return MS2;
+        interp->gc_sys->sys_type = MS2;
     if (STREQ(name, "INF"))
-        return INF;
-    return -1;
+        interp->gc_sys->sys_type = INF;
 }
 
 /*

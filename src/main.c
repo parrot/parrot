@@ -18,6 +18,8 @@ Start Parrot
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "parrot/api.h"
 
 
@@ -161,7 +163,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_digits)
+    ASSERT_ARGS(is_all_digits);
     for (; *s; ++s)
         if (!isdigit((unsigned char)*s))
             return 0;
@@ -184,7 +186,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_hex_digits)
+    ASSERT_ARGS(is_all_hex_digits);
     for (; *s; ++s)
         if (!isxdigit(*s))
             return 0;
@@ -434,8 +436,8 @@ parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[
 /*
 
 =item C<static const char * parseflags(PMC *interp, int argc, const char
-*argv[], int *pgm_argc, const char ***pgm_argv, Parrot_Run_core_t *core,
-Parrot_trace_flags *trace)>
+*argv[], int *pgm_argc, const char ***pgm_argv, Parrot_Int *core, Parrot_Int
+*trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -448,7 +450,7 @@ static const char *
 parseflags(PMC *interp,
         int argc, ARGIN(const char *argv[]),
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
-        ARGMOD(Parrot_Run_core_t *core), ARGMOD(Parrot_trace_flags *trace))
+        ARGMOD(Parrot_Int *core), ARGMOD(Parrot_Int *trace))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;

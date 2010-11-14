@@ -1,4 +1,5 @@
 #include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "parrot/api.h"
 #include "embed_private.h"
 
@@ -6,45 +7,38 @@
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-INTVAL
-Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), INTVAL flags, ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(PMC **interp))
+Parrot_Int
+Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), Parrot_Int flags, ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(PMC **interp))
 {
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
-    Parrot_Interp * const interp_raw;
-    PMC * interp_pmc;
+    struct parrot_interp_t * interp_raw;
     void *stacktop_ptr = &alt_stacktop;
+    PMC * iglobals;
 
-    //SHOULD Parrot_set_config_hash();
-    //BE     Parrot_set_config_internal_hash();    
+    Parrot_set_config_hash();
     {
-        Parrot_Interp * const parent_raw;
-        parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+        Parrot_Interp * const parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
         interp_raw = allocate_interpreter(parent_raw, flags);
         if (args) {
             if (args->stacktop)
                 stacktop_ptr = args->stacktop;
-            if (args->gc_system) {
-                const INTVAL sysid = Parrot_gc_get_system_id(interp, args->gc_system);
-                if (sysid == -1)
-                  //  EMBED_API_FAILURE(interp_pmc, interp);
-                  // This doesn't works without EMBED_API_CALLIN
-                interp->gc_sys->sys_type = sysid;
-            }
+            if (args->gc_system)
+                Parrot_gc_set_system_type(interp_raw, args->gc_system);
             if (args->gc_threshold)
-                interp->gc_threshold = args->gc_threshold;
+                interp_raw->gc_threshold = args->gc_threshold;
             if (args->hash_seed)
-                interp->hash_seed = args->hash_seed;
+                interp_raw->hash_seed = args->hash_seed;
         }
     }
-    initialize_interpreter(interp_raw, stacktop);
-    *interp_pmc = VTABLE_get_pmc_keyed_int(interp, iglobals, (INTVAL)IGLOBALS_INTERPRETER);
+    initialize_interpreter(interp_raw, stacktop_ptr);
+    iglobals = interp_raw->iglobals;
+    *interp = VTABLE_get_pmc_keyed_int(interp, iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     return !PMC_IS_NULL(*interp);
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), Parrot_Run_core_t core, Parrot_UInt trace)
 {
     ASSERT_ARGS(Parrot_api_set_runcore)
@@ -57,8 +51,8 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), Parrot_Run_core_t core, Parrot_UI
 }
 
 PARROT_API
-INTVAL
-Parrot_api_debug_flag(ARGMOD(PMC *interp_pmc), INTVAL flags, INTVAL set)
+Parrot_Int
+Parrot_api_debug_flag(ARGMOD(PMC *interp_pmc), Parrot_Int flags, Parrot_Int set)
 {
     ASSERT_ARGS(Parrot_api_debug_flag)
     EMBED_API_CALLIN(interp_pmc, interp);
@@ -70,23 +64,23 @@ Parrot_api_debug_flag(ARGMOD(PMC *interp_pmc), INTVAL flags, INTVAL set)
 }
 
 PARROT_API
-INTVAL
-Parrot_api_flag(ARGMOD(PMC *interp_pmc), INTVAL flags, INTVAL set)
+Parrot_Int
+Parrot_api_flag(ARGMOD(PMC *interp_pmc), Parrot_Int flags, Parrot_Int set)
 {
     ASSERT_ARGS(Parrot_api_flag)
     EMBED_API_CALLIN(interp_pmc, interp);
     if (set) {
-        Interp_flags_SET(interp, flag);
-        if (flag & (PARROT_BOUNDS_FLAG | PARROT_PROFILE_FLAG))
+        Interp_flags_SET(interp, flags);
+        if (flags & (PARROT_BOUNDS_FLAG | PARROT_PROFILE_FLAG))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     }
     else
-        Interp_flags_CLEAR(interp, flag);
+        Interp_flags_CLEAR(interp, flags);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrot_api_set_executable_name(ARGMOD(PMC *interp_pmc), ARGIN(const char * name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
@@ -100,7 +94,7 @@ Parrot_api_set_executable_name(ARGMOD(PMC *interp_pmc), ARGIN(const char * name)
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
@@ -112,8 +106,8 @@ Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
 
 /*
 
-=item C<PARROT_API INTVAL Parrot_api_load_bytecode_file(PMC *interp_pmc, const
-char *filename, PMC **pbc)>
+=item C<PARROT_API Parrot_Int Parrot_api_load_bytecode_file(PMC *interp_pmc,
+const char *filename, PMC **pbc)>
 
 Load a bytecode file and return a bytecode PMC.
 
@@ -122,7 +116,7 @@ Load a bytecode file and return a bytecode PMC.
 */
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filename), ARGOUT(PMC **pbc))
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
@@ -130,13 +124,13 @@ Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filenam
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
         EMBED_API_FAILURE(interp_pmc, interp);
-    *pbc = Parrot_pmc_new(interp, enum_class_PackFile);
+    *pbc = Parrot_pmc_new(interp, enum_class_Packfile);
     VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mainargs))
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
@@ -152,13 +146,13 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
 }
 
 PARROT_API
-INTVAL
-Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), INTVAL argc, ARGIN(char **argv), ARGOUT(PMC **args))
+Parrot_Int
+Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), Parrot_Int argc, ARGIN(char **argv), ARGOUT(PMC **args))
 {
     ASSERT_ARGS(Parrot_api_build_argv_array)
     EMBED_API_CALLIN(interp_pmc, interp);
     PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-    INTVAL i;
+    Parrot_Int i;
 
     for (i = 0; i < argc; ++i) {
         /* Run through argv, adding everything to the array */
@@ -167,22 +161,22 @@ Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), INTVAL argc, ARGIN(char **a
         VTABLE_push_string(interp, userargv, arg);
     }
     *args = userargv;
-    EMBED_API_CALLIN(interp_pmc, interp);
-}
-
-PARROT_API
-INTVAL
-Parrot_api_set_warnings(ARGMOD(PMC *interp_pmc), INTVAL flags)
-{
-    ASSERT_ARGS(Parrot_api_set_warnings)
-    EMBED_API_CALLIN(interp_pmc, interp);
-    /* Activates the given warnings.  (Macro from warnings.h.) */
-    PARROT_WARNINGS_on(interp, (Parrot_warnclass)flags);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
+Parrot_api_set_warnings(ARGMOD(PMC *interp_pmc), Parrot_Int flags)
+{
+    ASSERT_ARGS(Parrot_api_set_warnings)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    /* Activates the given warnings.  (Macro from warnings.h.) */
+    PARROT_WARNINGS_on(interp, flags);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+Parrot_Int
 Parrot_api_set_output_file(ARGMOD(PMC *interp_pmc), ARGIN(const char * filename))
 {
     ASSERT_ARGS(Parrot_api_set_output_file)
@@ -195,30 +189,30 @@ Parrot_api_set_output_file(ARGMOD(PMC *interp_pmc), ARGIN(const char * filename)
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrt_api_add_library_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
 {
-    ASSERT_ARGS(Parrot_api_add_library_search_path)
+    //ASSERT_ARGS(Parrot_api_add_library_search_path)
     EMBED_API_CALLIN(interp_pmc, interp);
     Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LIBRARY);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrt_api_add_include_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
 {
-    ASSERT_ARGS(Parrot_api_add_include_search_path)
+    //ASSERT_ARGS(Parrot_api_add_include_search_path)
     EMBED_API_CALLIN(interp_pmc, interp);
     Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_INCLUDE);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
-INTVAL
+Parrot_Int
 Parrt_api_add_dynext_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
 {
-    ASSERT_ARGS(Parrot_api_add_dynext_search_path)
+    //ASSERT_ARGS(Parrot_api_add_dynext_search_path)
     EMBED_API_CALLIN(interp_pmc, interp);
     Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_DYNEXT);
     EMBED_API_CALLOUT(interp_pmc, interp);
@@ -226,8 +220,8 @@ Parrt_api_add_dynext_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path
 
 /*
 
-=item C<PARROT_API INTVAL Parrot_api_set_stdhandles(PMC *interp_pmc, INTVAL
-stdin, INTVAL stdout, INTVAL stderr)>
+=item C<PARROT_API Parrot_Int Parrot_api_set_stdhandles(PMC *interp_pmc,
+Parrot_Int stdin, Parrot_Int stdout, Parrot_Int stderr)>
 
 Set the std file descriptors for the embedded interpreter. Any file descriptor
 passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
@@ -237,8 +231,8 @@ passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
 */
 
 PARROT_API
-INTVAL
-Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), INTVAL stdin, INTVAL stdout, INTVAL stderr)
+Parrot_Int
+Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), Parrot_Int stdin, Parrot_Int stdout, Parrot_Int stderr)
 {
   ASSERT_ARGS(Parrot_api_set_stdhandles)
   EMBED_API_CALLIN(interp_pmc, interp);

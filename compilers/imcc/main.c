@@ -651,7 +651,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         pf_raw = Parrot_pbc_read(interp, sourcefile, 0);
         if (!pf_raw)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
-        Parrot_pbc_load(interp, pf);
+        Parrot_pbc_load(interp, pf_raw);
     }
     else
         pf_raw = compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
@@ -689,7 +689,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     yylex_destroy(yyscanner);
 
     if (pf_raw) {
-        PMC * const _pbcpmc = Parrot_pmc_new(interp, enum_class_PackFile);
+        PMC * const _pbcpmc = Parrot_pmc_new(interp, enum_class_Packfile);
         VTABLE_set_pointer(interp, _pbcpmc, pf_raw);
         *pbcpmc = _pbcpmc;
     }
