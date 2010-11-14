@@ -217,7 +217,12 @@ TEST
     .local string submitter
     submitter = _get_submitter(config, env)
     $P0['Submitter'] = submitter
-#    _add_git_info($P0)
+    $I0 = exists config['git_describe']
+    unless $I0 goto L2
+    .local string git_describe
+    git_describe = config['git_describe']
+    $P0['Git describe'] = git_describe
+  L2:
     .return ($P0)
 .end
 
@@ -282,53 +287,6 @@ TEST
 .end
 
 .include 'cclass.pasm'
-
-.sub '_add_subversion_info' :anon
-    .param pmc hash
-    $I0 = file_exists('.svn')
-    unless $I0 goto L1
-    $P0 = new 'FileHandle'
-    $P0.'open'('svn info', 'pr')
-    $S0 = $P0.'readall'()
-    $P0.'close'()
-    $I0 = length $S0
-    $S1 = 'trunk'
-    $I1 = index $S0, '/branches/'
-    unless $I1 >= 0 goto L2
-    $I1 += 10
-    $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
-    $I3 = $I2 - $I1
-    $S1 = substr $S0, $I1, $I3
-  L2:
-    hash['Branch'] = $S1
-    $P0.'open'('svn status', 'pr')
-    $P1 = new 'ResizableStringArray'
-  L3:
-    $S0 = $P0.'readline'()
-    if $S0 == '' goto L4
-    $I0 = index $S0, 'M'
-    unless $I0 == 0 goto L3
-    $S0 = chomp($S0)
-    $I0 = length $S0
-    $I0 = find_not_cclass .CCLASS_WHITESPACE, $S0, 2, $I0
-    $S0 = substr $S0, $I0
-    push $P1, $S0
-    goto L3
-  L4:
-    $P0.'close'()
-    $I0 = elements $P1
-    unless $I0 != 0 goto L1
-    $S0 = hash['DEVEL']
-    $S0 .= ' '
-    $S1 = $I0
-    $S0 .= $S1
-    $S0 .= ' mods'
-    hash['DEVEL'] = $S0
-    $S0 = join ' ', $P1
-    hash['Modifications'] = $S0
-  L1:
-    .return (hash)
-.end
 
 .sub 'send_archive_to_smolder' :anon
     .param pmc env_data
