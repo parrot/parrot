@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -161,15 +161,15 @@ sub collect_test_environment_data {
       $arch .= 8 * $PConfig{opcode_t_size};
     }
     my $devel = $PConfig{DEVEL};
-    # check for local-modifications if -d .svn and query to continue
-    if (-d ".svn") {
-        my $status = `svn status`;
-        @mods = grep /\S/, map { /^M +(.+)$/ and $1 } split(/\n/, $status);
+    # check for local-modifications if -d .git and query to continue
+    if (-d ".git") {
+        my $status = `git status`;
+        @mods = grep /\S/, map { /^#\s+modified:\s+(.+)$/ and $1 } split(/\n/, $status);
         if (@mods) {
             $devel .= (" ".@mods." mods");
         }
-        my $info = `svn info .`;
-        ($branch) = $info =~ m{URL: .+/parrot/(?:branches/)?(\w+)$}m;
+        my $out = `git branch`;
+        ($branch) = $out =~ m{\* (\w+)$}m;
     }
     my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
            : $ENV{'LOGNAME'} || eval { getpwuid($<) };
