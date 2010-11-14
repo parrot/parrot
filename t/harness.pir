@@ -343,10 +343,10 @@ TEST
     push contents, 'Platform'
     $S0 = config['osname']
     push contents, $S0
-    $I0 = file_exists('.git')
+    $I0 = exists config['sha1']
     unless $I0 goto L0
     push contents, 'revision'
-    $S0 = _get_git_revision()
+    $S0 = config['sha1']
     push contents, $S0
   L0:
     push contents, 'tags'
@@ -375,15 +375,6 @@ TEST
     $S0 = response.'content'()
     say $S0
   L1:
-.end
-
-.sub '_get_git_revision' :anon
-    $P0 = new 'FileHandle'
-    $P0.'open'('git rev-parse HEAD', 'pr')
-    $S0 = $P0.'readline'()
-    $S0 = chomp($S0)
-    $P0.'close'()
-    .return ($S0)
 .end
 
 .sub '_get_tags' :anon
