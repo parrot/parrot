@@ -135,10 +135,6 @@ void Parrot_gc_free_memory_chunk(PARROT_INTERP, ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL Parrot_gc_get_system_id(PARROT_INTERP, const char *name)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*obj);
@@ -168,6 +164,10 @@ void * Parrot_gc_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -348,8 +348,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_gc_get_system_id __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_mark_PMC_alive_fun __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_mark_PObj_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -363,6 +361,8 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_reallocate_memory_chunk_with_interior_pointers \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_set_system_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

@@ -12,6 +12,8 @@
 #include "parrot/compiler.h"
 #include "parrot/config.h"
 #include "parrot/core_types.h"
+#include "parrot/runcore_api.h"
+#include "parrot/gc_api.h"
 
 #define PARROT_API PARROT_EXPORT
 

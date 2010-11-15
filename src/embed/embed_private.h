@@ -7,7 +7,7 @@
 #define GET_RAW_INTERP(p) ((Parrot_ParrotInterpreter_attributes*)(p)->data)->interp;
 #define EMBED_API_CALLIN(p, i) \
     void * _oldtop; \
-    Interp * (i) = PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p); \
+    Parrot_Interp (i) = PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p); \
     _oldtop = (i)->lo_var_ptr; \
     if (_oldtop) {} else (i)->lo_var_ptr = &_oldtop; \
     if (setjmp((i)->api_jmp_buf)) { \
