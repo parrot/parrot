@@ -484,6 +484,7 @@ INTERP_O_FILES = \
     src/key$(O) \
     src/library$(O) \
     src/list$(O) \
+    src/pointer_array$(O) \
     src/longopt$(O) \
     src/misc$(O) \
     src/multidispatch$(O) \
@@ -930,6 +931,11 @@ src/list$(O) : \
     $(PARROT_H_HEADERS) \
     src/list.c \
     $(INC_DIR)/list.h
+
+src/pointer_array$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/pointer_array.c \
+    $(INC_DIR)/pointer_array.h
 
 src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
     include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
