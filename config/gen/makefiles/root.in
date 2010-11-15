@@ -1240,6 +1240,7 @@ examples-clean:
     examples/mops/mops$(O) \
     examples/mops/mops$(EXE) \
     examples/pasm/hello.pbc \
+    examples/pasm/hello.c \
     examples/pasm/hello$(O) \
     examples/pasm/hello$(EXE) \
     generated_hello.pbc

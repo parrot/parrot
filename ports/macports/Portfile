@@ -1,80 +1,62 @@
 
 PortSystem              1.0
 
-name			parrot
-version			1.1.0
-categories		lang devel
-maintainers		bfulgham coleda.com:will
-description		Open source virtual machine (for Perl6 et al.)
-long_description	\
+name                    parrot
+version                 2.6.0
+revision                1
+categories              lang devel
+maintainers             bfulgham coleda.com:will
+description             Open source virtual machine (for Perl6 et al.)
+long_description    \
         Parrot is a virtual machine designed to efficiently compile and \
         execute bytecode for dynamic languages. Parrot currently hosts a \
         variety of language implementations in various stages of completion, \
         including Tcl, Javascript, Ruby, Lua, Scheme, PHP, Python, Perl 6, \
-        and a .NET bytecode translator. This package includes the development \
-        tools required to build languages on top of parrot. 
+        and a .NET bytecode translator.
 
-platforms		darwin
-homepage		http://www.parrot.org/
-set release_type	devel ;# parrot nomenclature, not macport
-master_sites		ftp://ftp.parrot.org/pub/parrot/releases/${release_type}/${version}/
+platforms               darwin
+homepage                http://www.parrot.org/
+master_sites            ftp://ftp.parrot.org/pub/parrot/releases/stable/${version}/
 
-checksums           md5     bf31fd2313b105ba356921318efd3993 \
-                    sha1    5f18ddf92f588135a741e52618fbc456ba56cf34 \
-                    rmd160  a329c698442ec73412ac886da59f188c0ff1e080
+checksums               md5     a8e0d723797dc4ff3d6551d03814204a \
+                        sha1    e7de16241d00690bef161f9904dfbb8e68f85b2c \
+                        rmd160  9bc413f1d4e016de72ea0eaa98ae7e087bb5d9e0
 
+depends_build           bin:perl:perl5
+depends_lib             port:gmp port:icu
 
-depends_build		bin:perl:perl5
-depends_lib		port:gmp port:icu
+configure.cmd           perl Configure.pl
+configure.pre_args      --prefix=${prefix} \
+                        --mandir=${prefix}/share/man \
+                        --optimize
 
-configure.cmd		perl Configure.pl
-configure.pre_args	--prefix=${prefix}/lib/parrot
-configure.args		--optimize
+destroot.target         install
+destroot.args           DESTDIR=${destroot}
 
-destroot.target         install-dev
-
-build.type		gnu
+build.type              gnu
 build.target
 
-test.run		yes
-test.target		test
-
-destroot.destdir	 PREFIX=${destroot}${prefix}/lib/parrot
+test.run                yes
+test.target             test
 
 post-destroot {
-	set bindir	${destroot}${prefix}/bin
-	set docdir      ${destroot}${prefix}/share/doc/${name}
+    set bindir ${destroot}${prefix}/bin
+    set docdir ${destroot}${prefix}/share/doc/${name}
 
-        # It would be nice if the install linked properly, but for
-        # now, update the link information manually post install to
-        # use the install dir instead of the build dir.
- 
+    set executables {
+        ops2c parrot-nqp parrot_config parrot_nci_thunk_gen
+        pbc_dump pbc_to_exe parrot parrot-prove parrot_debugger
+        pbc_disassemble pbc_merge
+    }
+
+    foreach exe $executables {
+        # fixup the library path
         set old_path "${workpath}/parrot-${version}/blib/lib/libparrot.dylib"
-        set new_path "${prefix}/lib/parrot/lib/libparrot.${version}.dylib"
+        set new_path "${prefix}/lib/libparrot.${version}.dylib"
 
-        set executables {
-            parrot parrot_config parrot_debugger
-            pbc_disassemble pbc_merge pbc_to_exe pbc_dump
-        }
-
-        foreach exe $executables { 
-            # fixup the library path
-	    system "cd ${prefix}/lib/parrot/bin && \
-                install_name_tool -change \"$old_path\" \"$new_path\" ${exe}"
-
-            # install into the common area.
-            system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/${exe}"
-        }
-
-        set dynamic_extensions {
-           digest_group libglutcb rational dynlexpad libnci_test subproxy
-        } 
-
-        foreach lib $dynamic_extensions {
-            # fixup the library path
-	    system "cd ${prefix}/lib/parrot/lib/${version}/dynext && \
-                install_name_tool -change \"$old_path\" \"$new_path\" ${lib}.bundle"
-        }
-
-	xinstall -m 755 -d ${docdir}
+        system "cd ${bindir} && \
+            install_name_tool -change \"$old_path\" \"$new_path\" ${exe}"
+    }
+    xinstall -m 755 -d ${docdir}
 }
+
