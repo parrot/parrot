@@ -2,7 +2,7 @@
  * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
-#include <w32api.h>
+#include <windows.h>
 #if WINVER < Windows2000
 #  error Minimum requirement for Parrot on Windows is Windows 2000 - might want to check windef.h
 #endif
