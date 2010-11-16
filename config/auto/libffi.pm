@@ -1,11 +1,13 @@
-# Copyright (C) 2005-2010, Parrot Foundation.
+# Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-config/auto/libffi - Check whether libffi
+config/auto/libffi - Check whether libffi is installed
 
 =head1 DESCRIPTION
+
+Note: The program F<pkg-config> is also required.
 
 =cut
 
@@ -51,19 +53,27 @@ sub runstep {
     my $osname = $conf->data->get('osname');
     print "\n" if $verbose;
     my $pkgconfig_exec = check_progs([ @pkgconfig_variations ], $verbose);
+    unless ($pkgconfig_exec) {
+        print "Program 'pkg-config' needed for libffi\n" if $verbose;
+        $conf->data->set( HAS_LIBFFI => undef );
+        $conf->data->set( has_libffi => undef );
+        $self->set_result('lack pkg-config');
+        return 1;
+    }
+    my $rv = $self->_handle_pkgconfig_exec($conf, $pkgconfig_exec, $verbose);
+    return 1 unless $rv;
 
     my $libffi_options_cflags = '';
     my $libffi_options_libs = '';
     my $libffi_options_linkflags = '';
 
-    if ($pkgconfig_exec) {
-        $libffi_options_linkflags = capture_output($pkgconfig_exec, 'libffi --libs-only-L');
-        chomp $libffi_options_linkflags;
-        $libffi_options_libs = capture_output($pkgconfig_exec, 'libffi --libs-only-l');
-        chomp $libffi_options_libs;
-        $libffi_options_cflags = capture_output($pkgconfig_exec, 'libffi --cflags');
-        chomp $libffi_options_cflags;
-    }
+    $libffi_options_linkflags =
+        capture_output($pkgconfig_exec, 'libffi --libs-only-L');
+    chomp $libffi_options_linkflags;
+    $libffi_options_libs = capture_output($pkgconfig_exec, 'libffi --libs-only-l');
+    chomp $libffi_options_libs;
+    $libffi_options_cflags = capture_output($pkgconfig_exec, 'libffi --cflags');
+    chomp $libffi_options_cflags;
 
     my $extra_libs = $self->_select_lib( {
         conf            => $conf,
@@ -106,6 +116,20 @@ sub _evaluate_cc_run {
     my ($output) = @_;
     my $has_libffi = ( $output =~ m/libffi worked/ ) ? 1 : 0;
     return $has_libffi;
+}
+
+sub _handle_pkgconfig_exec {
+    my ($self, $conf, $pkgconfig_exec, $verbose) = @_;
+    if (! $pkgconfig_exec) {
+        print "Program 'pkg-config' needed for libffi\n" if $verbose;
+        $conf->data->set( HAS_LIBFFI => undef );
+        $conf->data->set( has_libffi => undef );
+        $self->set_result('lack pkg-config');
+        return;
+    }
+    else {
+        return 1;
+    }
 }
 
 1;
