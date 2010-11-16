@@ -1,9 +1,36 @@
-
 New in 2.10.0
 - Core
  + We are on github now! https://github.com/parrot/parrot
+ + Configure, build and test subsystems were made Git-aware
+ + New parrot_config key 'osvers' which contains
+   Operating System Version information
+ + Updated to the latest nqp-rx
+ + A proper exception is now thrown on IO read errors
+ + Garbage Collector optimizations and memory leak fixes
+ + Deprecated charset ops were removed
+ + Configure system learned to detect IPv6
+ + The mk_language_shell and create_language scripts have not yet been
+   ported to Git.
+- Documentation
+ + How To Use Git to work on Parrot
+    https://github.com/parrot/parrot/blob/master/docs/project/git_workflow.pod
+ + Git Terminology
+    https://github.com/parrot/parrot/blob/master/docs/project/git_terminology.pod
 - Platforms
- + Fedora has a package for PL/Parrot with the name "postgresql-plparrot"
+- Testing
+ + Increased coverage on: String, FixedBooleanArray, PMCProxy, LexPad
+- Community
+ + Macports portfile updated to 2.6.0
+ + A Fedora package for PL/Parrot ( postgresql-plparrot ) was created
+   This package allows you to write stored procedures for PostgreSQL in
+   PIR or Rakudo Perl 6     http://pl.parrot.org
+ + Parrot Foundation is teaming up with The Perl Foundation and taking
+   part in Google Code-In 2010. Learn about it and how to get involved here:
+
+   http://trac.parrot.org/parrot/wiki/GoogleCodeIn2010Tasks
+
+   http://leto.net/perl/2010/11/parrot-foundation-the-perl-foundation-google-code-in.html
+
 
 New in 2.9.1
  - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.

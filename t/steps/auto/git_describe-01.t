@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2010, Parrot Foundation.
 # auto/git_describe-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::git_describe');
@@ -61,7 +61,21 @@ $conf->replenish($serialized);
 
 {
     no warnings 'once';
-    my $cur = 'REL_2004_09_07-678-ga83bd';
+    my $cur = 'REL_2004_09_07-678-ga83bdab';
+    local $Parrot::Git::Describe::current = $cur;
+    my $ret = $step->runstep($conf);
+    ok( $ret, "runstep() returned true value" );
+    is($step->result(), $cur,
+        "Got expected result for valid \$Parrot::Git::Describe::current"
+    );
+    $conf->data->set( git_describe => undef ); # prepare for next test
+}
+
+$conf->replenish($serialized);
+
+{
+    no warnings 'once';
+    my $cur = 'RELEASE_2_10_0';
     local $Parrot::Git::Describe::current = $cur;
     my $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
