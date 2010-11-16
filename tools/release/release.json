@@ -17,5 +17,5 @@
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
     "wiki.bugday"      : "bug_day_2010_12_18",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/...",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.10.0/",
 }
