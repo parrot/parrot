@@ -30,10 +30,11 @@ as the index, the working copy, and the staging area. The index is the actual
 DAG, where all the history of the repo is stored. This lives in the .git
 directory of a repository. The "working copy" are the actual files on the
 filesystem. The staging area is where things that will be included in the
-next commit live. When you type C<git add foo>, you are adding the
-file/directory foo to the staging area. When you type C<git log> you are
-asking the index to show you a log of all commits. When you run a non-git
-command in a repo, such as C<rm foo>, you are modifying the working copy.
+next commit live, which happens to be inside the .git directory as well.
+When you type C<git add foo>, you are adding the file/directory foo to the
+staging area. When you type C<git log> you are asking the index to show
+you a log of all commits. When you run a non-git command in a repo, such
+as C<rm foo>, you are modifying the working copy.
 
 The most important thing to learn when understanding a C<git> command is whether
 it operates on the index, working copy, staging area or a combination of the
