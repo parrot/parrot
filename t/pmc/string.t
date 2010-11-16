@@ -18,7 +18,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(135)
+    plan(136)
 
     set_or_get_strings()
     setting_integers()
@@ -633,6 +633,9 @@ loop:
     s = "2a"
     $I0 = s.'to_int'(16)
     is( $I0, "42", '... 16' )
+    s = "2B"
+    $I0 = s.'to_int'(16)
+    is( $I0, "43", '... 16 upper' )
     s = "1001"
     $I0 = s.'to_int'(2)
     is( $I0, "9", '... 2' )
