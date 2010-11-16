@@ -1,14 +1,23 @@
 New in 2.10.0
 - Core
  + We are on github now! https://github.com/parrot/parrot
- + Configure and build subsystems were made Git-aware
+ + Configure, build and test subsystems were made Git-aware
+ + New parrot_config key 'osvers' which contains
+   Operating System Version information
+ + Updated to the latest nqp-rx
+ + A proper exception is now thrown on IO read errors
+ + Garbage Collector optimizations and memory leak fixes
+ + Configure system learned to detect IPv6
 - Documentation
  + How To Use Git to work on Parrot
     https://github.com/parrot/parrot/blob/master/docs/project/git_workflow.pod
  + Git Terminology
     https://github.com/parrot/parrot/blob/master/docs/project/git_terminology.pod
 - Platforms
+- Testing
+ + Increased coveraged on: String, FixedBooleanArray, PMCProxy, LexPad
 - Community
+ + Macports portfile updated to 2.6.0
  + A Fedora package for PL/Parrot ( postgresql-plparrot ) was created
    This package allows you to write stored procedures for PostgreSQL in
    PIR or Rakudo Perl 6
