@@ -161,6 +161,32 @@ int main(int argc, char* argv[])
     }
     printf("ok 4\n");
 
+    /* Push stuff back. Twice. */
+    pi = Parrot_pa_insert(interp, pa, &i);
+    pi = Parrot_pa_insert(interp, pa, &i);
+    pk = Parrot_pa_insert(interp, pa, &k);
+    pk = Parrot_pa_insert(interp, pa, &k);
+    POINTER_ARRAY_ITER(pa,
+        if (ptr == &i)
+            ++count;
+        else if (ptr == &j)
+            ++count;
+        else if (ptr == &k)
+            ++count;
+        else {
+            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            return EXIT_FAILURE;
+        }
+    );
+
+    printf("ok 5\n");
+
+    if (count != 11) {
+        printf("Didn't iterate all pointers %d", count);
+        return EXIT_FAILURE;
+    }
+    printf("ok 6\n");
+
 
     return EXIT_SUCCESS;
 }
@@ -169,6 +195,8 @@ ok 1
 ok 2
 ok 3
 ok 4
+ok 5
+ok 6
 OUTPUT
 
 # Local Variables:
