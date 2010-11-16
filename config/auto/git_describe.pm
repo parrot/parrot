@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-config/auto/sha1.pm - Parrot's configure "git describe" string
+config/auto/git_describe.pm - Parrot's configure "git describe" string
 
 =head1 DESCRIPTION
 
