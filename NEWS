@@ -2,8 +2,16 @@
 New in 2.10.0
 - Core
  + We are on github now! https://github.com/parrot/parrot
+ + Configure and build subsystems were made Git-aware
+- Documentation
+ + How To Use Git to work on Parrot
+    https://github.com/parrot/parrot/blob/master/docs/project/git_workflow.pod
+ + Git Terminology
+    https://github.com/parrot/parrot/blob/master/docs/project/git_terminology.pod
 - Platforms
  + Fedora has a package for PL/Parrot with the name "postgresql-plparrot"
+   This package allows you to write stored procedures for PostgreSQL in
+   PIR or Rakudo Perl 6
 
 New in 2.9.1
  - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
