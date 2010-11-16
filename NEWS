@@ -20,7 +20,7 @@ New in 2.10.0
  + Macports portfile updated to 2.6.0
  + A Fedora package for PL/Parrot ( postgresql-plparrot ) was created
    This package allows you to write stored procedures for PostgreSQL in
-   PIR or Rakudo Perl 6
+   PIR or Rakudo Perl 6     http://pl.parrot.org
  + Parrot Foundation is teaming up with The Perl Foundation and taking
    part in Google Code-In 2010. Learn about it and how to get involved here:
 
