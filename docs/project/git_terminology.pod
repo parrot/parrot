@@ -14,8 +14,9 @@ should be understood about Git, which will provide a foundation for
 understanding anything else.
 
 A Git repository is a Directed Acyclic Graph (DAG), where each node in the
-graph is a commit, with zero or more parents. The first commit of a
-repository has zero parents, others have at least one parent. If a commit has
+graph is a commit, with zero or more parents. A root commit of a
+repository has zero parents, others have at least one parent. A repository
+may have any number of root commits, but many have only one. If a commit has
 more than one parent, that means it was the result of a merge.
 
 Each commit is uniquely identified by a SHA1 sum. You may refer to any commit
