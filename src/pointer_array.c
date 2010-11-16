@@ -31,6 +31,7 @@ static void allocate_more_chunks(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array *
 Parrot_pa_new(PARROT_INTERP)
@@ -40,17 +41,19 @@ Parrot_pa_new(PARROT_INTERP)
     return res;
 }
 
+PARROT_EXPORT
 void
 Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
     /* TODO */
 }
 
-void **
+PARROT_EXPORT
+void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     Parrot_Pointer_Array_Chunk   *chunk;
-    void                        **ret;
+    void                         *ret;
 
     /* If there is no free chunks */
     if (self->current_chunk >= self->total_chunks)
@@ -78,13 +81,14 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     return ret;
 }
 
+PARROT_EXPORT
 void
-Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void **ptr))
+Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     ASSERT_ARGS(Parrot_pa_remove)
     if (self->next_free)
         *self->next_free = (void**)((UINTVAL)*self->next_free | 1);
-    self->next_free = ptr;
+    self->next_free = (void**)ptr;
 }
 
 static void
