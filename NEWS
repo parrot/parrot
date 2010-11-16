@@ -1,4 +1,3 @@
-
 New in 2.10.0
 - Core
  + We are on github now! https://github.com/parrot/parrot
@@ -9,9 +8,17 @@ New in 2.10.0
  + Git Terminology
     https://github.com/parrot/parrot/blob/master/docs/project/git_terminology.pod
 - Platforms
- + Fedora has a package for PL/Parrot with the name "postgresql-plparrot"
+- Community
+ + A Fedora package for PL/Parrot ( postgresql-plparrot ) was created
    This package allows you to write stored procedures for PostgreSQL in
    PIR or Rakudo Perl 6
+ + Parrot Foundation is teaming up with The Perl Foundation and taking
+   part in Google Code-In 2010. Learn about it and how to get involved here:
+
+   http://trac.parrot.org/parrot/wiki/GoogleCodeIn2010Tasks
+
+   http://leto.net/perl/2010/11/parrot-foundation-the-perl-foundation-google-code-in.html
+
 
 New in 2.9.1
  - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
