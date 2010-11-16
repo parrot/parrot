@@ -443,7 +443,7 @@ gc_ms2_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_compact_memory_pool)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    // FIXME Parrot_gc_str_compact_pool(interp, &self->string_gc);
+    Parrot_gc_str_compact_pool(interp, &self->string_gc);
 }
 
 
@@ -1059,15 +1059,11 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
     ASSERT_ARGS(gc_ms2_iterate_live_strings)
 
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    /*
-    List_Item_Header *tmp = self->strings->first;
 
-    while (tmp) {
-        Buffer *b = LLH2Obj_typed(tmp, Buffer);
-        callback(interp, b, data);
-        tmp = tmp->next;
-    }
-    */
+    POINTER_ARRAY_ITER(self->strings,
+        STRING *s = &((string_alloc_struct *)ptr)->str;
+        callback(interp, s, data);
+    );
 }
 
 
@@ -1177,7 +1173,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.gc_mark_runs++;
     self->gc_mark_block_level--;
 
-    // FIXME gc_ms2_compact_memory_pool(interp);
+    gc_ms2_compact_memory_pool(interp);
 }
 
 
