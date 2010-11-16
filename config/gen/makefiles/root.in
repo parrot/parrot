@@ -411,6 +411,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
+	$(INC_DIR)/list.h \
 	include/pmc/pmc_callcontext.h
 
 # generated list of header files
@@ -489,7 +490,9 @@ INTERP_O_FILES = \
     src/multidispatch$(O) \
     src/namespace$(O) \
     src/nci/api$(O) \
-    src/nci/core_thunks$(O) \
+    src/nci/signatures$(O) \
+#IF(has_libffi):    src/nci/libffi$(O) \
+#IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile$(O) \
@@ -637,7 +640,6 @@ all : \
     $(GEN_LIBRARY) \
     src/install_config$(O) \
 
-
 # We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
     $(GEN_PM_INCLUDES) \
@@ -696,8 +698,9 @@ STR_FILES = \
     src/multidispatch.str \
     src/namespace.str \
     src/nci/api.str \
-    src/nci/core_thunks.str \
+#IF(has_core_nci_thunks):  src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
+    src/nci/signatures.str \
     src/packfile.str \
     src/packfile/pf_items.str \
     src/pmc.str \
@@ -1353,6 +1356,15 @@ src/gc/string_gc$(O) : \
     src/gc/string_gc.c \
     src/gc/variable_size_pool.h
 
+src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
+	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
+
+src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
+	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
+
+src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
+	src/gc/gc_private.h src/gc/string_gc.c
+
 src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
 src/platform$(O) : \
@@ -1603,12 +1615,26 @@ src/nci/core_thunks$(O) : src/nci/core_thunks.c \
 	$(PARROT_H_HEADERS) \
 	include/pmc/pmc_nci.h
 
+src/nci/libffi$(O) : src/nci/libffi.c \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_nci.h \
+    include/pmc/pmc_unmanagedstruct.h \
+    include/pmc/pmc_managedstruct.h \
+
 ## SUFFIX OVERRIDE
 src/nci/extra_thunks$(O) : \
     $(PARROT_H_HEADERS) \
     include/pmc/pmc_nci.h \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
+
+src/nci/libffi$(O) : src/nci/libffi.c \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_nci.h \
+    include/pmc/pmc_unmanagedstruct.h \
+    include/pmc/pmc_managedstruct.h
+
+src/nci/signatures$(O) : src/nci/signatures.c $(PARROT_H_HEADERS)
 
 src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 
