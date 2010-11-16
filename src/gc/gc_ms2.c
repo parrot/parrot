@@ -13,10 +13,24 @@ src/gc/gc_ms2.c - Non-recursive M&S
 
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
-#include "parrot/list.h"
+#include "parrot/pointer_array.h"
 #include "parrot/sysmem.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
+
+typedef struct pmc_alloc_struct {
+    void *ptr;
+    PMC   pmc;   /* NB: Value! */
+} pmc_alloc_struct;
+
+typedef struct string_alloc_struct {
+    void    *ptr;
+    STRING   str;   /* NB: Value! */
+} string_alloc_struct;
+
+/* We allocate additional space in front of PObj* to store additional pointer */
+#define PMC2PAC(p) ((pmc_alloc_struct *)((char*)(p) - sizeof (void *)))
+#define STR2PAC(p) ((string_alloc_struct *)((char*)(p) - sizeof (void *)))
 
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
@@ -30,15 +44,15 @@ alloc, and phase of the Moon. */
 /* Private information */
 typedef struct MarkSweep_GC {
     /* Allocator for PMC headers */
-    struct Pool_Allocator *pmc_allocator;
+    struct Pool_Allocator          *pmc_allocator;
     /* Currently allocate objects */
-    struct Linked_List    *objects;
+    struct Parrot_Pointer_Array    *objects;
     /* During M&S gather new live objects in this list */
-    struct Linked_List    *new_objects;
+    struct Parrot_Pointer_Array    *new_objects;
 
     /* Allocator for strings */
-    struct Pool_Allocator *string_allocator;
-    struct Linked_List    *strings;
+    struct Pool_Allocator          *string_allocator;
+    struct Parrot_Pointer_Array    *strings;
 
     /* Fixed-size allocator */
     struct Fixed_Allocator *fixed_size_allocator;
@@ -128,18 +142,18 @@ static void gc_ms2_compact_memory_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static size_t gc_ms2_count_used_pmc_memory(PARROT_INTERP,
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static size_t gc_ms2_count_used_string_memory(PARROT_INTERP,
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void gc_ms2_destroy_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -185,11 +199,9 @@ static int gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 static int gc_ms2_is_ptr_owned(PARROT_INTERP,
     ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list))
+    ARGIN(Pool_Allocator *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 static int gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
@@ -252,7 +264,7 @@ static void gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
 
 static void gc_ms2_sweep_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -263,7 +275,7 @@ static void gc_ms2_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
 
 static void gc_ms2_sweep_string_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -342,8 +354,7 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_is_ptr_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(list))
+    , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_gc_ms2_is_string_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -432,7 +443,7 @@ gc_ms2_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_compact_memory_pool)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Parrot_gc_str_compact_pool(interp, &self->string_gc);
+    // FIXME Parrot_gc_str_compact_pool(interp, &self->string_gc);
 }
 
 
@@ -651,12 +662,12 @@ Parrot_gc_ms2_init(PARROT_INTERP)
         self = mem_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
-            sizeof (List_Item_Header) + sizeof (PMC));
-        self->objects = Parrot_list_new(interp);
+            sizeof (pmc_alloc_struct));
+        self->objects = Parrot_pa_new(interp);
 
         self->string_allocator = Parrot_gc_pool_new(interp,
-            sizeof (List_Item_Header) + sizeof (STRING));
-        self->strings = Parrot_list_new(interp);
+            sizeof (string_alloc_struct));
+        self->strings = Parrot_pa_new(interp);
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
@@ -688,8 +699,8 @@ gc_ms2_finalize(PARROT_INTERP)
 
         Parrot_gc_str_finalize(interp, &self->string_gc);
 
-        Parrot_list_destroy(interp, self->objects);
-        Parrot_list_destroy(interp, self->strings);
+        Parrot_pa_destroy(interp, self->objects);
+        Parrot_pa_destroy(interp, self->strings);
         Parrot_gc_pool_destroy(interp, self->pmc_allocator);
         Parrot_gc_pool_destroy(interp, self->string_allocator);
         Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
@@ -709,7 +720,7 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   *pool = self->pmc_allocator;
-    List_Item_Header *ptr;
+    pmc_alloc_struct *ptr;
 
     MAYBE_MARK_AND_SWEEP(interp, self);
 
@@ -719,10 +730,10 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
-    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
-    LIST_APPEND(self->objects, ptr);
+    ptr = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
+    ptr->ptr = Parrot_pa_insert(interp, self->objects, ptr);
 
-    return LLH2Obj_typed(ptr, PMC);
+    return &ptr->pmc;
 }
 
 
@@ -735,12 +746,12 @@ gc_ms2_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
     if (pmc) {
         if (PObj_on_free_list_TEST(pmc))
             return;
-        Parrot_list_remove(interp, self->objects, Obj2LLH(pmc));
+        Parrot_pa_remove(interp, self->objects, PMC2PAC(pmc)->ptr);
         PObj_on_free_list_SET(pmc);
 
         Parrot_pmc_destroy(interp, pmc);
 
-        Parrot_gc_pool_free(interp, self->pmc_allocator, Obj2LLH(pmc));
+        Parrot_gc_pool_free(interp, self->pmc_allocator, PMC2PAC(pmc));
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_allocated      -= sizeof (PMC);
@@ -764,7 +775,7 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_mark_pmc_header)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(pmc);
+    pmc_alloc_struct  *item = PMC2PAC(pmc);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
     if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
@@ -773,8 +784,8 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     /* mark it live */
     PObj_live_SET(pmc);
 
-    LIST_REMOVE(self->objects, item);
-    LIST_APPEND(self->new_objects, item);
+    Parrot_pa_remove(interp, self->objects, item->ptr);
+    item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
 
 }
 
@@ -794,7 +805,7 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_pmc_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator);
 }
 
 
@@ -840,7 +851,7 @@ gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     ASSERT_ARGS(gc_ms2_allocate_string_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   *pool = self->string_allocator;
-    List_Item_Header *ptr;
+    string_alloc_struct *ptr;
     STRING           *ret;
 
     MAYBE_MARK_AND_SWEEP(interp, self);
@@ -850,10 +861,10 @@ gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
-    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp, pool);
-    LIST_APPEND(self->strings, ptr);
+    ptr = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
+    ptr->ptr = Parrot_pa_insert(interp, self->strings, ptr);
 
-    ret = LLH2Obj_typed(ptr, STRING);
+    ret = &ptr->str;
     memset(ret, 0, sizeof (STRING));
     return ret;
 }
@@ -868,7 +879,7 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
     && !PObj_on_free_list_TEST(s)) {
         MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-        Parrot_list_remove(interp, self->strings, Obj2LLH(s));
+        Parrot_pa_remove(interp, self->strings, STR2PAC(s)->ptr);
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp,
@@ -876,7 +887,7 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
         PObj_on_free_list_SET(s);
 
-        Parrot_gc_pool_free(interp, self->string_allocator, Obj2LLH(s));
+        Parrot_gc_pool_free(interp, self->string_allocator, STR2PAC(s));
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_allocated      -= sizeof (STRING);
@@ -918,8 +929,7 @@ gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_string_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator,
-            self->strings);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator);
 }
 
 
@@ -1049,6 +1059,7 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
     ASSERT_ARGS(gc_ms2_iterate_live_strings)
 
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    /*
     List_Item_Header *tmp = self->strings->first;
 
     while (tmp) {
@@ -1056,6 +1067,7 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
         callback(interp, b, data);
         tmp = tmp->next;
     }
+    */
 }
 
 
@@ -1078,10 +1090,10 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
 {
     ASSERT_ARGS(gc_ms2_mark_live_objects)
 
-    List_Item_Header *tmp;
+    pmc_alloc_struct *tmp;
 
     /* Allocate list for gray objects */
-    self->new_objects = Parrot_list_new(interp);
+    self->new_objects = Parrot_pa_new(interp);
 
     /* destroy root set and constants, but watch ordered destruction */
     if (flags & GC_finish_FLAG) {
@@ -1102,22 +1114,17 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
     /* new_objects are "gray" until fully marked */
     /* Additional gray objects will append to new_objects list */
     /* So, iterate over them in one go */
-    tmp = self->new_objects->first;
+    POINTER_ARRAY_ITER(self->new_objects,
+        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
-    while (tmp) {
-        PMC *pmc = LLH2Obj_typed(tmp, PMC);
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
-        if (PObj_is_special_PMC_TEST(pmc)) {
-            if (PObj_custom_mark_TEST(pmc))
-                VTABLE_mark(interp, pmc);
-        }
+        if (PObj_custom_mark_TEST(pmc))
+            VTABLE_mark(interp, pmc);
 
         if (PMC_metadata(pmc))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
-
-        tmp = tmp->next;
-    }
+    );
 }
 
 static void
@@ -1125,7 +1132,6 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_mark_and_sweep)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Linked_List      *list;
     size_t            counter;
 
     /* GC is blocked */
@@ -1158,9 +1164,11 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     }
 
     /* Replace objects with new_objects. Ignoring "constant" one */
-    list          = self->objects;
-    self->objects = self->new_objects;
-    Parrot_list_destroy(interp, list);
+    do {
+        Parrot_Pointer_Array *tmp = self->objects;
+        self->objects = self->new_objects;
+        Parrot_pa_destroy(interp, tmp);
+    } while (0);
 
     /* We swept all dead objects */
     self->num_early_gc_PMCs                                = 0;
@@ -1169,14 +1177,14 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.gc_mark_runs++;
     self->gc_mark_block_level--;
 
-    gc_ms2_compact_memory_pool(interp);
+    // FIXME gc_ms2_compact_memory_pool(interp);
 }
 
 
 /*
 
 =item C<static void gc_ms2_sweep_pmc_pool(PARROT_INTERP, Pool_Allocator *pool,
-Linked_List *list)>
+Parrot_Pointer_Array *list)>
 
 Helper function to sweep pool.
 
@@ -1187,37 +1195,33 @@ Helper function to sweep pool.
 static void
 gc_ms2_sweep_pmc_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
-        ARGIN(Linked_List *list))
+        ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_sweep_pmc_pool)
-    List_Item_Header *tmp = list->first;
 
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PObj             *obj  = LLH2Obj_typed(tmp, PObj);
+    POINTER_ARRAY_ITER(list,
+        PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
 
         /* Paint live objects white */
-        if (PObj_live_TEST(obj))
-            PObj_live_CLEAR(obj);
+        if (PObj_live_TEST(pmc))
+            PObj_live_CLEAR(pmc);
 
-        else if (!PObj_constant_TEST(obj)) {
-            LIST_REMOVE(list, tmp);
+        else if (!PObj_constant_TEST(pmc)) {
+            Parrot_pa_remove(interp, list, ptr);
 
-            Parrot_pmc_destroy(interp, (PMC *)obj);
-            PObj_on_free_list_SET(obj);
+            Parrot_pmc_destroy(interp, pmc);
+            PObj_on_free_list_SET(pmc);
 
-            Parrot_gc_pool_free(interp, pool, tmp);
+            Parrot_gc_pool_free(interp, pool, ptr);
         }
-
-        tmp = next;
-    }
+    );
 }
 
 
 /*
 
 =item C<static void gc_ms2_destroy_pmc_pool(PARROT_INTERP, Pool_Allocator *pool,
-Linked_List *list)>
+Parrot_Pointer_Array *list)>
 
 Helper function to perform final destruction of root set PMCs.
 
@@ -1228,9 +1232,11 @@ Helper function to perform final destruction of root set PMCs.
 static void
 gc_ms2_destroy_pmc_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
-        ARGIN(Linked_List *list))
+        ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_destroy_pmc_pool)
+    // FIXME
+#if 0
     List_Item_Header *tmp   = list->first;
 
     while (tmp) {
@@ -1246,12 +1252,13 @@ gc_ms2_destroy_pmc_pool(PARROT_INTERP,
 
         tmp = next;
     }
+#endif
 }
 
 /*
 
 =item C<static void gc_ms2_sweep_string_pool(PARROT_INTERP, Pool_Allocator
-*pool, Linked_List *list)>
+*pool, Parrot_Pointer_Array *list)>
 
 Helper function to sweep STRING pool for live STRINGs.
 
@@ -1262,9 +1269,11 @@ Helper function to sweep STRING pool for live STRINGs.
 static void
 gc_ms2_sweep_string_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
-        ARGIN(Linked_List *list))
+        ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_sweep_string_pool)
+    // FIXME
+#if 0
     List_Item_Header *tmp = list->first;
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
@@ -1289,13 +1298,14 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
 
         tmp = next;
     }
+#endif
 }
 
 
 /*
 
 =item C<static int gc_ms2_is_ptr_owned(PARROT_INTERP, void *ptr, Pool_Allocator
-*pool, Linked_List *list)>
+*pool)>
 
 Helper function to check that we own PObj
 
@@ -1305,12 +1315,12 @@ Helper function to check that we own PObj
 
 static int
 gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool), ARGIN(Linked_List *list))
+    ARGIN(Pool_Allocator *pool))
 {
     ASSERT_ARGS(gc_ms2_is_ptr_owned)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *item = Obj2LLH(ptr);
     PObj             *obj  = (PObj *)ptr;
+    pmc_alloc_struct *item = PMC2PAC(ptr);
 
     if (!obj || !item)
         return 0;
@@ -1322,11 +1332,7 @@ gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
     if (PObj_is_live_or_free_TESTALL(obj))
         return 0;
 
-    /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_list_contains(interp, list, item))
-        return 1;
-
-    return 0;
+    return 1;
 }
 
 
@@ -1552,8 +1558,8 @@ gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<static size_t gc_ms2_count_used_string_memory(PARROT_INTERP, Linked_List
-*list)>
+=item C<static size_t gc_ms2_count_used_string_memory(PARROT_INTERP,
+Parrot_Pointer_Array *list)>
 
 Finds the amount of used STRING memory.
 
@@ -1562,12 +1568,14 @@ Finds the amount of used STRING memory.
 */
 
 static size_t
-gc_ms2_count_used_string_memory(PARROT_INTERP, ARGIN(Linked_List *list))
+gc_ms2_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_count_used_string_memory)
 
-    List_Item_Header *tmp          = list->first;
     size_t            total_amount = 0;
+    // FIXME
+#if 0
+    List_Item_Header *tmp          = list->first;
 
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -1580,6 +1588,7 @@ gc_ms2_count_used_string_memory(PARROT_INTERP, ARGIN(Linked_List *list))
 
         tmp = next;
     }
+#endif
 
     return total_amount;
 }
@@ -1587,8 +1596,8 @@ gc_ms2_count_used_string_memory(PARROT_INTERP, ARGIN(Linked_List *list))
 
 /*
 
-=item C<static size_t gc_ms2_count_used_pmc_memory(PARROT_INTERP, Linked_List
-*list)>
+=item C<static size_t gc_ms2_count_used_pmc_memory(PARROT_INTERP,
+Parrot_Pointer_Array *list)>
 
 Finds the amount of used PMC memory.
 
@@ -1597,12 +1606,14 @@ Finds the amount of used PMC memory.
 */
 
 static size_t
-gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
+gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_count_used_pmc_memory)
 
-    List_Item_Header *tmp          = list->first;
     size_t            total_amount = 0;
+    // FIXME
+#if 0
+    List_Item_Header *tmp          = list->first;
 
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -1614,6 +1625,7 @@ gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
 
         tmp = next;
     }
+#endif
 
     return total_amount;
 }
