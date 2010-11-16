@@ -68,7 +68,13 @@ Noun. A general term for a way to describe a set of commits.
 =head2 rebase
 
 Verb. Update the local index with changes from a remote, then replay local changes,
-in order, on top of them.
+in order, on top of them. This prevents "useless merge commits", such as:
+
+    Merge branch 'master' of github.com:parrot/parrot
+
+The C<git pull --rebase> command can be used to update your master branch from
+the remote called 'origin'. There is also a C<git rebase> command that can be
+used to rebase branches onto each other.
 
 =head2 remote
 
