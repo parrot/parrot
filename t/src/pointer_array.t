@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 {
     Interp *interp = Parrot_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
-    int i, j;
+    int i, count;
     void *pi, *pj;
 
     if (!pa) {
@@ -51,20 +51,42 @@ int main(int argc, char* argv[])
     /* Push first pointer */
     pi = Parrot_pa_insert(interp, pa, &i);
 
-    if (!pa->total_chunks == 1) {
+    if (pa->total_chunks != 1) {
         printf("Fail to allocate 1 chunk");
         return EXIT_FAILURE;
     }
     printf("ok 2\n");
 
+    if (pa->current_chunk != 0) {
+        printf("current_chunk is wrong");
+        return EXIT_FAILURE;
+    }
+    printf("ok 3\n");
 
+    /* Insert many pointers */
+    for (count = CELL_PER_CHUNK * 2; count; count--) {
+        pi = Parrot_pa_insert(interp, pa, &i);
+    }
+    if (pa->total_chunks < 2) {
+        printf("Fail to allocate more chunks");
+        return EXIT_FAILURE;
+    }
+    printf("ok 4\n");
 
+    if (pa->current_chunk != pa->total_chunks - 1) {
+        printf("current_chunk is wrong");
+        return EXIT_FAILURE;
+    }
+    printf("ok 5\n");
 
     return EXIT_SUCCESS;
 }
 CODE
 ok 1
 ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
 
 # Local Variables:
