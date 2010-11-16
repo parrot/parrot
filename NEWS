@@ -9,6 +9,8 @@ New in 2.10.0
  + Garbage Collector optimizations and memory leak fixes
  + Deprecated charset ops were removed
  + Configure system learned to detect IPv6
+ + The mk_language_shell and create_language scripts have not yet been
+   ported to Git.
 - Documentation
  + How To Use Git to work on Parrot
     https://github.com/parrot/parrot/blob/master/docs/project/git_workflow.pod
