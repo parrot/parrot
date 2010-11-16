@@ -45,7 +45,11 @@ PARROT_EXPORT
 void
 Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
-    /* TODO */
+    ASSERT_ARGS(Parrot_pa_destroy)
+    size_t i;
+    for (i = 0; i < self->total_chunks; i++)
+        mem_sys_free(self->chunks[i]);
+    mem_sys_free(self->chunks);
 }
 
 PARROT_EXPORT
