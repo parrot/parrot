@@ -187,6 +187,11 @@ int main(int argc, char* argv[])
     }
     printf("ok 6\n");
 
+    /* Final check - we should have 5 allocated cells */
+    if (pa->chunks[0]->next_free != 5)
+        printf("Wrong number of used cells: %d", pa->chunks[0]->next_free);
+
+    printf("ok 7\n");
 
     return EXIT_SUCCESS;
 }
@@ -197,6 +202,7 @@ ok 3
 ok 4
 ok 5
 ok 6
+ok 7
 OUTPUT
 
 # Local Variables:

@@ -86,11 +86,9 @@ void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     ASSERT_ARGS(Parrot_pa_remove)
-    if (self->next_free)
-        *self->next_free = (void**)((UINTVAL)*self->next_free | 1);
 
     /* Mark sell to avoid iterating over */
-    *(int*)ptr = 1;
+    *(int*)ptr = (void**)((UINTVAL)self->next_free | 1);
     self->next_free = (void**)ptr;
 }
 
