@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 {
     Interp *interp = Parrot_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
-    int i, j, k;
+    int i, j, k, count = 0;
     void *pi, *pj, *pk;
 
     /* Push first pointer */
@@ -108,12 +108,12 @@ int main(int argc, char* argv[])
     pk = Parrot_pa_insert(interp, pa, &k);
 
     POINTER_ARRAY_ITER(pa,
-        if (ptr == pi)
-            pi = NULL;
-        else if (ptr == pj)
-            pj = NULL;
-        else if (ptr == pk)
-            pk = NULL;
+        if (ptr == &i)
+            ++count;
+        else if (ptr == &j)
+            ++count;
+        else if (ptr == &k)
+            ++count;
         else {
             printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
             return EXIT_FAILURE;
@@ -122,12 +122,44 @@ int main(int argc, char* argv[])
 
     printf("ok 1\n");
 
-    if (pi == NULL)
-        printf("ok 2\n");
-    if (pj == NULL)
-        printf("ok 3\n");
-    if (pk == NULL)
-        printf("ok 4\n");
+    if (count != 3) {
+        printf("Didn't iterate all pointers %d", count);
+        return EXIT_FAILURE;
+    }
+    printf("ok 2\n");
+
+    Parrot_pa_remove(interp, pa, pi);
+    POINTER_ARRAY_ITER(pa,
+        if (ptr == &j)
+            ++count;
+        else if (ptr == &k)
+            ++count;
+        else {
+            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            return EXIT_FAILURE;
+        }
+    );
+    if (count != 5) {
+        printf("Didn't iterate all pointers %d", count);
+        return EXIT_FAILURE;
+    }
+    printf("ok 3\n");
+
+
+    Parrot_pa_remove(interp, pa, pk);
+    POINTER_ARRAY_ITER(pa,
+        if (ptr == &j)
+            ++count;
+        else {
+            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            return EXIT_FAILURE;
+        }
+    );
+    if (count != 6) {
+        printf("Didn't iterate all pointers %d", count);
+        return EXIT_FAILURE;
+    }
+    printf("ok 4\n");
 
 
     return EXIT_SUCCESS;
