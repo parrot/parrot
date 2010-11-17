@@ -484,6 +484,12 @@ L<https://trac.parrot.org/parrot/ticket/754>
 
 L<https://trac.parrot.org/parrot/ticket/852>
 
+=item pkg-config support [eligible in 3.1]
+
+Use C<parrot_config> instead.
+
+L<http://trac.parrot.org/parrot/ticket/1853>
+
 =back
 
 =head1 Experimental
