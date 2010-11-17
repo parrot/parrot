@@ -15,7 +15,7 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
 
 =cut
 
-.const int TESTS = 13
+.const int TESTS = 4
 
 .loadlib 'deprecated_ops'
 
@@ -25,26 +25,10 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     plan(TESTS)
 
     test_cleari()
-    test_exchange_i()
     test_clearn()
-    test_exchange_n()
     test_clears()
-    test_exchange_s()
     test_clearp()
 .end
-
-.sub 'test_exchange_i'
-    $I10 = 10
-    $I20 = 20
-    exchange $I10, $I20
-    is($I10, 20, 'exchange i - first operand ok')
-    is($I20, 10, 'exchange i - second operand ok')
-
-    $I30 = 30
-    exchange $I30, $I30
-    is($I30, 30, 'exchange i - reflexive')
-.end
-
 
 .sub 'test_cleari'
     $I0 = 0xdeadbee
@@ -197,17 +181,6 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     is($I0, 1, 'clearn')
 .end
 
-.sub test_exchange_n
-    set $N1, 1.234560
-    set $N2, 9.876540
-    exchange $N1, $N2
-    is( $N1, "9.87654", 'exchange n' )
-    is( $N2, "1.23456", 'exchange n' )
-    set $N3, -100.200300
-    exchange $N3, $N3
-    is( $N3, "-100.2003", 'exchange n' )
-.end
-
 .sub test_clears
     set $S0, "BOO 0"
     set $S1, "BOO 1"
@@ -281,18 +254,6 @@ Tests for ops residing in src/dynoplibs/deprecated.ops
     $I0 = 1
   result:
     is($I0, 1, 'clears')
-.end
-
-.sub test_exchange_s
-    set $S0, "String #0"
-    set $S1, "String #1"
-    exchange $S0, $S1
-    is( $S0, "String #1", 'exchange s' )
-    is( $S1, "String #0", 'exchange s' )
-
-    set $S2, "String #2"
-    exchange $S2, $S2
-    is( $S2, "String #2", 'exchange s' )
 .end
 
 .sub test_clearp
