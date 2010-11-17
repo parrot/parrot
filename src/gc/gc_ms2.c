@@ -258,20 +258,12 @@ static void gc_ms2_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_ms2_sweep_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
     ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-static void gc_ms2_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void gc_ms2_sweep_string_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
@@ -808,25 +800,6 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator);
 }
 
-
-/*
-
-=item C<static void gc_ms2_sweep_pmc_cb(PARROT_INTERP, PObj *obj)>
-
-Destroys PMC *obj.
-
-=cut
-
-*/
-
-static void
-gc_ms2_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
-{
-    ASSERT_ARGS(gc_ms2_sweep_pmc_cb)
-    Parrot_pmc_destroy(interp, (PMC *)obj);
-}
-
-
 /*
 
 =item C<gc_ms2_allocate_string_header()>
@@ -1013,29 +986,6 @@ gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
         else
             PObj_live_SET(obj);
     }
-}
-
-
-/*
-
-=item C<static void gc_ms2_sweep_string_cb(PARROT_INTERP, PObj *obj)>
-
-Destroys STRING *obj.
-
-=cut
-
-*/
-
-static void
-gc_ms2_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
-{
-    ASSERT_ARGS(gc_ms2_sweep_string_cb)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Buffer       *str  = (Buffer *)obj;
-    /* Compact string pool here.
-     * (or get rid of "shared buffers" and just free storage) */
-    if (Buffer_bufstart(str) && !PObj_external_TEST(str))
-        Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, str);
 }
 
 
