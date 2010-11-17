@@ -23,7 +23,7 @@ use Parrot::Git::Describe;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determine Parrot's git-describe};
+    $data{description} = q{Determine git-describe};
     $data{result}      = q{};
     return \%data;
 }
