@@ -223,12 +223,6 @@ Intended to replace the CodeString charname_to_ord method.
 
 L<https://trac.parrot.org/parrot/ticket/1629>
 
-=item All opcodes that modify non-argument registers. [eligible in 2.7]
-
-E.g. "cleari", etc.
-
-L<https://trac.parrot.org/parrot/ticket/1642>
-
 =item finalize [experimental]
 
 Finalize exception handler, unrolling inner runloops if needed.
