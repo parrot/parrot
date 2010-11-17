@@ -17,42 +17,6 @@ expires but have been moved out of core on another ticket.
 
 ########################################
 
-=item B<exchange>(inout INT, inout INT)
-
-=item B<exchange>(inout NUM, inout NUM)
-
-=item B<exchange>(inout PMC, inout PMC)
-
-=item B<exchange>(inout STR, inout STR)
-
-Exchange the contents of registers $1 and $2
-
-=cut
-
-op exchange(inout INT, inout INT) :deprecated {
-    const INTVAL temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
-op exchange(inout PMC, inout PMC) :deprecated {
-    PMC * const temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
-op exchange(inout NUM, inout NUM) :deprecated {
-    FLOATVAL temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
-op exchange(inout STR, inout STR) :deprecated {
-    STRING * const temp = $1;
-    $1 = $2;
-    $2 = temp;
-}
-
 =item B<setp_ind>(in INT, invar PMC)
 
 Set the PMC in register $1 to $2.
