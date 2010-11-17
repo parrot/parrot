@@ -141,16 +141,6 @@ static void gc_ms2_block_GC_sweep(PARROT_INTERP)
 static void gc_ms2_compact_memory_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static size_t gc_ms2_count_used_pmc_memory(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *list))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static size_t gc_ms2_count_used_string_memory(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *list))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_ms2_destroy_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
     ARGIN(Parrot_Pointer_Array *list))
@@ -309,13 +299,6 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms2_count_used_pmc_memory __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(list))
-#define ASSERT_ARGS_gc_ms2_count_used_string_memory \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_destroy_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool) \
@@ -377,16 +360,10 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_gc_ms2_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_ms2_sweep_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(list))
-#define ASSERT_ARGS_gc_ms2_sweep_string_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_ms2_sweep_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool) \
@@ -1495,82 +1472,6 @@ gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->num_early_gc_PMCs;
 }
-
-
-/*
-
-=item C<static size_t gc_ms2_count_used_string_memory(PARROT_INTERP,
-Parrot_Pointer_Array *list)>
-
-Finds the amount of used STRING memory.
-
-=cut
-
-*/
-
-static size_t
-gc_ms2_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
-{
-    ASSERT_ARGS(gc_ms2_count_used_string_memory)
-
-    size_t            total_amount = 0;
-    // FIXME
-#if 0
-    List_Item_Header *tmp          = list->first;
-
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PObj             *obj  = LLH2Obj_typed(tmp, PObj);
-        STRING           *str  = (STRING*)obj;
-
-        /* Header size */
-        total_amount += sizeof (List_Item_Header) + sizeof (STRING *);
-        total_amount += str->bufused;
-
-        tmp = next;
-    }
-#endif
-
-    return total_amount;
-}
-
-
-/*
-
-=item C<static size_t gc_ms2_count_used_pmc_memory(PARROT_INTERP,
-Parrot_Pointer_Array *list)>
-
-Finds the amount of used PMC memory.
-
-=cut
-
-*/
-
-static size_t
-gc_ms2_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
-{
-    ASSERT_ARGS(gc_ms2_count_used_pmc_memory)
-
-    size_t            total_amount = 0;
-    // FIXME
-#if 0
-    List_Item_Header *tmp          = list->first;
-
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PMC              *obj  = LLH2Obj_typed(tmp, PMC);
-
-        /* Header size */
-        total_amount += sizeof (List_Item_Header) + sizeof (PMC *);
-        total_amount += obj->vtable->attr_size;
-
-        tmp = next;
-    }
-#endif
-
-    return total_amount;
-}
-
 
 /*
 
