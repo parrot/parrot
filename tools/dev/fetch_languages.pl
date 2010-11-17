@@ -199,8 +199,8 @@ my @hlls = (
 
     {
         name       => 'ook',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/ook/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/ook.git'
     },
 
     {
