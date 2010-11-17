@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -218,7 +217,7 @@ BEGIN {
         header => { c => { file_exts => ['h'] }, },
     );
 
-    my @ignore_dirs = qw{ .svn };
+    my @ignore_dirs = qw{ .git };
 
     for my $class ( keys %file_class ) {
         for my $type ( keys %{ $file_class{$class} } ) {

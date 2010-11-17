@@ -1,7 +1,5 @@
 /* multidispatch.h
  *  Copyright (C) 2003-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the API header for the mmd subsystem
  *  Data Structure and Algorithms:

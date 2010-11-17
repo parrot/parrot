@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -372,64 +371,26 @@ Because the location of these files can vary from platform to platform, and
 build to build, a general method is provided to find out the necessary flags to
 use.
 
-pkg-config is a helper tool, now common on many platforms, which many packages
-have adopted to provide the necessary compiler and linker flags required to
-build against a library. parrot will install a file called F<parrot.pc> which
-can be queried using pkg-config.
+C<parrot_config> is the helper tool for determining anything related to parrot
+configuration, determining compiler and linker flags to build against parrot is
+no different.
 
-To start with, find out what version of parrot is installed by running
-pkg-config with the C<--modversion> flag. If this command fails with an error,
-skip to the end of this section.
+To start, you should find C<parrot_config> in the path or allow your user to
+provide this location for you. You can check this by running C<parrot_config> with
+C<VERSION> as the argument to determine the version of parrot you are working with.
 
-  pkg-config --modversion parrot
+To determine the necessary C compiler flags, use C<embed-cflags>:
 
-To find out the necessary C<-I> flags, use C<--cflags>:
+  parrot_config embed-cflags
 
-  pkg-config --cflags parrot
+... and to find the necessary linker flags, use C<embed-ldflags>:
 
-... and to find the necessary C<-L> and C<-l> flags, use C<--libs>:
+  parrot_config embed-ldflags
 
-  pkg-config --libs parrot
+The C<parrot_config> command can be incorporated with a compile as shown here
+performing both compiling and linking in one step.
 
-Where both compiling and linking are performed in one step, query both sets of
-flags with:
-
-  pkg-config --cflags --libs parrot
-
-The pkg-config command can be incorporated with a compile as shown here.
-
-  cc src/disassemble.c `pkg-config --cflags --libs parrot`
-
-Most applications will probably choose to run pkg-config as part of a
-configure script, so if you are using autoconf you could use a test
-such as this.
-
-  PARROT_REQUIRED_VERSION=0.4.1
-  AC_SUBST(PARROT_REQUIRED_VERSION)
-  PKG_CHECK_MODULES(PARROT, parrot >= $PARROT_REQUIRED_VERSION,
-                    [AC_DEFINE([HAVE_PARROT], 1, [define if have parrot])])
-  AC_SUBST(PARROT_LIBS)
-  AC_SUBST(PARROT_CFLAGS)
-
-If parrot has been installed system-wide, then any of the previous
-lines should have returned the relevant flags. If it is not installed
-in one of the standard places that pkg-config looks, then you will get
-an error message.
-
-  pkg-config --libs parrot
-  Package parrot was not found in the pkg-config search path.
-  Perhaps you should add the directory containing `parrot.pc'
-  to the PKG_CONFIG_PATH environment variable
-  No package 'parrot' found
-
-As stated in the error message, use an environment variable to make pkg-config
-look in more locations.
-
-  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-
-The last part of the variable will almost certainly be F<.../lib/pkgconfig>.
-Set this variable in your login scripts if you need it to be available in
-future.
+  cc src/disassemble.c `parrot_config embed-cflags` `parrot_config embed-ldflags`
 
 =head1 EXAMPLES
 
@@ -1618,7 +1579,5 @@ The list may also be augmented if additional functionality is required.
 =head1 SEE ALSO
 
 F<src/main.c> and F<t/src/*.t> for Parrot's use of the embedding system.
-
-L<http://pkgconfig.freedesktop.org/wiki/> A pkg-config page
 
 =cut

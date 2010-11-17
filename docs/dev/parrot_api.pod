@@ -1,10 +1,8 @@
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
 docs/dev/parrot_api.pod - Notes on the PARROT_EXPORT macro
-
 
 =head1 OVERVIEW
 
@@ -34,6 +32,8 @@ have C<PARROT_EXPORT> or none of them should. Some with and some without won't
 work.
 
 =back
+
+=cut
 
 # vim: expandtab shiftwidth=2 tw=70:
 

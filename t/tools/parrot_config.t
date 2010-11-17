@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -45,8 +44,8 @@ config_output_like(
 );
 
 config_output_like(
-    'non_existant_key',
-     qr/no such key: 'non_existant_key'/,
+    'non_existent_key',
+     qr/no such key: 'non_existent_key'/,
      'missing keys'
 );
 

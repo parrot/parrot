@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # 06-data_get_PConfig_Temp.t
 
 use strict;

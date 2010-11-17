@@ -1,7 +1,5 @@
 /* string_funcs.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the api header for the string subsystem
  *  Data Structure and Algorithms:

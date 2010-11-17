@@ -1,5 +1,4 @@
 /* enums.h
- * $Id$
  *  Copyright (C) 2001-2008, Parrot Foundation.
  *  Overview:
  *     enums shared by much of the stack-handling code

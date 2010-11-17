@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -117,7 +116,7 @@ well.
     oh = new ['Hash']
     it = iter oh
 
-    # This chekcs the de facto behavior for code coverage purposes.
+    # This checks the de facto behavior for code coverage purposes.
     cl = clone it
     result = isnull cl
     ok(result, 'clone of HashIterator gives null')

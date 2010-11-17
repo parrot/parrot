@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -27,11 +26,10 @@ use Parrot::Test;
 use File::Spec::Functions;
 use File::Path qw/rmtree/;
 
-my ($path, $exefile);
+my $exefile;
 
 BEGIN {
-    $path = catfile( ".", qw/tools dev create_language.pl/ );
-    $exefile = $path . $PConfig{exe};
+    $exefile = catfile( ".", qw/tools dev create_language.pl/ );
     unless ( -f $exefile ) {
         plan skip_all => "$exefile hasn't been built yet.";
         exit(0);

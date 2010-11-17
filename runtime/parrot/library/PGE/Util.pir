@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -133,8 +132,7 @@ Emits the list of messages to stderr.
     message .= "\n"
   emit_message:
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'(message)
 
     mob.'to'(pos)

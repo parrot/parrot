@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -675,12 +674,12 @@ climb back the graph of register moves operations.
 The node must have a predecessor: it is implicit because if a node has
 a node_index, it must have a predecessor because the node_index are the
 index of registers in dest_regs[] array, so by definition they have
-a corrsponding src_regs register.
+a corresponding src_regs register.
 
 Then it emits the move operation with its predecessor, or its backup
 if already used/visited.
 
-Then continues the climbing if the predecessor was not modified, anf in that
+Then continues the climbing if the predecessor was not modified, and in that
 case marks it, and set node_index as its backup.
 
   node_index  ... the index of a destination (i.e. with a pred.) register
@@ -769,7 +768,7 @@ Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
   temp_reg  ... a register number not in one of these lists
   mov       ... a register move function to be called to move one register
   mov_alt   ... a register move function to be called to move one register
-                which triese fetching from an alternate src (or NULLfunc):
+                which tries fetching from an alternate src (or NULLfunc):
 
     (void)  (mov)(interp, dest, src, info);
     moved = (mov_alt)(interp, dest, src, info);

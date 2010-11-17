@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
     # Get @ARGV as a ResizableStringArray
     get_params "0", P0

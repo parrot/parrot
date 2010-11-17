@@ -1,7 +1,6 @@
 /*
 Copyright (C) 2002-2009, Parrot Foundation.
 License:  Artistic 2.0, see README and LICENSE for details
-$Id$
 
 =head1 NAME
 

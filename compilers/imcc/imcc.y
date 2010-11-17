@@ -9,7 +9,6 @@
  *
  * Grammar of the PIR language parser.
  *
- * $Id$
  *
  */
 

@@ -1,7 +1,5 @@
 /* parrot.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     General header file includes for the parrot interpreter
  *  Data Structure and Algorithms:
@@ -149,7 +147,7 @@ typedef struct parrot_interp_t Interp;
  * some compilers don't like lvalue casts, so macroize them
  *
  * NOTE: Under no circumstances is it permitted to use this macro on types
- *       that are not effectivly guaranteed to be compatible.
+ *       that are not effectively guaranteed to be compatible.
  *       Good:  int->unsigned; long->unsigned long; struct*->struct*; char*->void*
  *       Bad:   integral->pointer;  struct*->char*
  */

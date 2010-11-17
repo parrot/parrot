@@ -4,7 +4,6 @@
 
 /* cclass.h
 *
-* $Id$
 *
 *   Parrot character classes
 */

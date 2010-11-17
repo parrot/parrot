@@ -1,5 +1,4 @@
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 
 package Make_VERSION_File;
 

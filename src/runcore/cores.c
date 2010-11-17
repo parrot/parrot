@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -27,7 +26,7 @@ requires an understanding of the Parrot runcores.
 
 Parrot has multiple runcores. Some are useful for particular maintenance
 tasks, some are only available as optimizations in certain compilers,
-some are intended for general use, and some are just interesing flights
+some are intended for general use, and some are just interesting flights
 of fancy with no practical benefits. Here we list the various runcores,
 their uses, and their benefits.
 
@@ -180,7 +179,7 @@ next opcode, which means faster throughput. Remember that whatever dispatch
 mechanism is used will be called after every single opcode, and some large
 programs may have millions of opcodes! Every single machine instruction
 that can be cut out of the dispatch mechanism could increase the execution
-speed of Parrot in a significant and noticable way. B<The dispatch mechanism
+speed of Parrot in a significant and noticeable way. B<The dispatch mechanism
 used by the various runcores is hardly the largest performance bottleneck in
 Parrot anyway, but we like to use faster cores to shave every little bit of
 speed out of the system>.

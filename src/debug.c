@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -125,6 +124,7 @@ static void no_such_register(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
@@ -443,7 +443,7 @@ In echo mode the script commands are written to stderr before executing."
         & dbg_gcdebug,
         "toggle gcdebug mode",
 "Toggle gcdebug mode.\n\n\
-In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
+In gcdebug mode a garbage collection cycle is run before each opcode,\n\
 same as using the gcdebug core."
     },
     cmd_help = {
@@ -631,6 +631,7 @@ Return a pointer to the first non-whitespace character in C<cmd>.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const char *
 skip_whitespace(ARGIN(const char *cmd))
 {

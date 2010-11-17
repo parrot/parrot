@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id$
 
 # initial work by Brad Gilbert b2gills <at> gmail <dot> com
 

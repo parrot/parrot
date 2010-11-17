@@ -16,6 +16,6 @@ then
     exit
 fi
 
-find docs -name "\.svn" -prune -type f -o -type f  > ports/debian/parrot-doc.docs
+find docs -type f -o -type f  > ports/debian/parrot-doc.docs
 
 #		End debian_docs.sh

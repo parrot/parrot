@@ -1,4 +1,3 @@
-# $Id$
 
 # One first version of this article was published on TPR 2.3
 #

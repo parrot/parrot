@@ -1,6 +1,5 @@
 #! parrot
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 # Common functions for various Packfile* PMCs tests.
 # Return test filename

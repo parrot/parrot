@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2009, Parrot Foundation.
-$Id$
 
 figure out if libc has backtrace() & backtrace_symbols()
 */

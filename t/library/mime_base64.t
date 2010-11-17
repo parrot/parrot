@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -328,10 +327,10 @@ END_JSON
 # ["Y",""],
 # ["x==",""],
 
-    .local int cnt
-    cnt = 0
+    .local int count
+    count = 0
     .local pmc test_iterator, test_case
-    .local string plain, base64, comment, comment_cnt
+    .local string plain, base64, comment, comment_count
 
     encode_decode_tests = encode_decode_tests()
     test_iterator = iter encode_decode_tests
@@ -341,14 +340,14 @@ END_JSON
         plain       = shift test_case
         base64      = shift test_case
         comment     = 'encode'
-        comment_cnt = cnt
-        concat comment, comment_cnt
+        comment_count = count
+        concat comment, comment_count
         test_encode( plain, base64, comment )
         comment     = 'decode'
-        comment_cnt = cnt
-        concat comment, comment_cnt
+        comment_count = count
+        concat comment, comment_count
         test_decode( plain, base64, comment )
-        inc cnt
+        inc count
     goto enc_dec_loop
     enc_dec_loop_end:
 
@@ -360,10 +359,10 @@ END_JSON
         base64      = shift test_case
         plain       = shift test_case
         comment     = 'decode'
-        comment_cnt = cnt
-        concat comment, comment_cnt
+        comment_count = count
+        concat comment, comment_count
         test_decode( plain, base64, comment )
-        inc cnt
+        inc count
     goto dec_loop
     dec_loop_end:
 

@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 package init::hints::linux;
 
@@ -69,15 +68,19 @@ sub runstep {
         $ccflags .= ' -D_GNU_SOURCE';
     }
 
+    my $osvers = `/sbin/sysctl -n kernel.osrelease`;
+    chomp $osvers;
+
     $conf->data->set(
-        ccflags        => $ccflags,
-        libs           => $libs,
-        ld_share_flags => $ld_share_flags,
-        ld_load_flags  => $ld_share_flags,
-        linkflags      => $linkflags,
-        link           => $link,
-        cc_shared      => $cc_shared,
-        rpath          => '-Wl,-rpath=',
+        ccflags         => $ccflags,
+        libs            => $libs,
+        ld_share_flags  => $ld_share_flags,
+        ld_load_flags   => $ld_share_flags,
+        linkflags       => $linkflags,
+        link            => $link,
+        cc_shared       => $cc_shared,
+        rpath           => '-Wl,-rpath=',
+        osvers          => $osvers,
 
         has_dynamic_linking    => 1,
         parrot_is_shared       => 1,

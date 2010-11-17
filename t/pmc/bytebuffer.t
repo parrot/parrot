@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -162,7 +161,7 @@ end:
     # Can't do that, or the program can't be compiled without ICU.
     # Fill the buffer with bytes instead.
 
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
     if big goto isbig
@@ -283,7 +282,7 @@ test_negative:
     $I0 = hasicu()
     unless $I0 goto skip_it
 
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
 

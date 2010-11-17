@@ -1,9 +1,8 @@
 This is Parrot, version 2.9.1
-------------------------------
+-----------------------------
 
 Parrot is Copyright (C) 2001-2010, Parrot Foundation.
 
-$Id$
 
 LICENSE INFORMATION
 -------------------
@@ -124,6 +123,7 @@ WEB SITES
 The following web sites have all the information you need about Parrot:
     http://www.parrot.org/
     http://trac.parrot.org/
+    http://docs.parrot.org/
 
 Have fun,
    The Parrot Team.

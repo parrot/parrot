@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -36,11 +35,11 @@ Tests the Float PMC.
     falseness_0()
     'falseness_0.000'()
     integer_addition()
-    integer_substraction()
+    integer_subtraction()
     integer_multiplication()
     integer_division()
     number_addition()
-    number_substraction()
+    number_subtraction()
     number_multiplication()
     number_division()
     increment_decrement()
@@ -240,7 +239,7 @@ Tests the Float PMC.
     is($P0, -0.999, 'Basic integer arithmetic: addition (2)', PRECISION)
 .end
 
-.sub 'integer_substraction'
+.sub 'integer_subtraction'
     $P0 = new ['Float']
 
     $P0 = 103.45
@@ -287,7 +286,7 @@ Tests the Float PMC.
     is($P0, -1.199, 'Basic numeric arithmetic: addition (2)', PRECISION)
 .end
 
-.sub 'number_substraction'
+.sub 'number_subtraction'
     $P0 = new ['Float']
 
     $P0 = 103.45

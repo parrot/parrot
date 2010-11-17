@@ -4,7 +4,6 @@
 
 /* packfile.h
 *
-* $Id$
 *
 * History:
 *  Rework by Melvin; new bytecode format, make bytecode portable.
@@ -90,7 +89,7 @@
 /*
 ** Enumerated constants
 ** Changes here require update PBC_COMPAT
-** The prefered way to eliminate a value is just to stop using it without
+** The preferred way to eliminate a value is just to stop using it without
 ** renumbering others, that helps to keep backward compatibility.
 */
 
@@ -725,6 +724,7 @@ opcode_t * PackFile_Annotations_pack(SHIM_INTERP,
         FUNC_MODIFIES(*cursor);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t PackFile_Annotations_packed_size(SHIM_INTERP,
     ARGIN(PackFile_Segment *seg))
         __attribute__nonnull__(2);

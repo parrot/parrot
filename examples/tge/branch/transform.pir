@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -106,8 +105,7 @@ specified type.
     if $I0 == 2 goto fromfile
 
     $P0 = getinterp
-    .include 'stdio.pasm'
-    filehandle = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    filehandle = $P0.'stdin_handle'()
     goto grabline
 
   fromfile:

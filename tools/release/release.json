@@ -8,7 +8,8 @@
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
     "web.openpatches"  : "openpatches.html",
-    "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
+    "web.repository"   : "https://github.com/parrot/parrot",
+    "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
     "bugday.date"      : "13 November 2010",
@@ -17,5 +18,4 @@
     "wiki.bugday"      : "bug_day_2010_11_13",
 
     "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/2.9.1/",
-    "subversion.root"  : "http://subversion.apache.org/"
 }

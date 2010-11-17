@@ -1,4 +1,3 @@
-# $Id$
 package Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace;
 
 # Copyright (C) 2007-2007, Parrot Foundation.

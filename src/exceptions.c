@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -114,7 +113,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         /* In some cases we have a fatal exception before the IO system
          * is completely initialized. Do some attempt to output the
          * message to stderr, to help diagnosing. */
-        int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
+        const int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
         already_dying = 1;
 
         /* flush interpreter output to get things printed in order */
@@ -124,7 +123,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
         if (interp->pdb) {
-            Interp * interpdeb = interp->pdb->debugger;
+            Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
                 Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
                 Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
@@ -357,7 +356,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c)
 
-    Parrot_runloop    *return_point = interp->current_runloop;
+    Parrot_runloop * const return_point = interp->current_runloop;
     opcode_t *address;
     PMC        * const handler      =
                              Parrot_cx_find_handler_local(interp, exception);
@@ -368,8 +367,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");
         STRING * const msg       = VTABLE_get_string(interp, exception);
-        int            exitcode  = VTABLE_get_integer_keyed_str(interp,
-                                        exception, exit_code);
+        const int exitcode       = VTABLE_get_integer_keyed_str(interp, exception, exit_code);
 
         Parrot_io_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",

@@ -1,4 +1,3 @@
-# $Id$
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
@@ -252,6 +251,7 @@ runtime/parrot/library/Data/Dumper/Base.pbc      [main]
 runtime/parrot/library/Data/Dumper/Default.pbc   [main]
 runtime/parrot/library/Data/Replace.pbc          [main]
 runtime/parrot/library/Digest/MD5.pbc            [main]
+runtime/parrot/library/Digest/sha256.pbc         [main]
 runtime/parrot/library/Getopt/Obj.pbc            [main]
 runtime/parrot/library/HLL.pbc                   [main]
 runtime/parrot/library/HTTP/Daemon.pbc           [main]

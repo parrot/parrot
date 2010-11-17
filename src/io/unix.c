@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -642,7 +641,7 @@ Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 =item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PMC *filehandle)>
 
-Returns the current read/write position on C<*io>'s file discriptor.
+Returns the current read/write position on C<*io>'s file descriptor.
 
 =cut
 

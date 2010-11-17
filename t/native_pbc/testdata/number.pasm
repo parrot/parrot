@@ -1,5 +1,4 @@
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
         set     N0, 1.0
         set     N1, 4.0

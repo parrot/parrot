@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 Counter Example
 

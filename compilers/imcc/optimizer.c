@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
@@ -257,7 +256,7 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<int optimize(PARROT_INTERP, IMC_Unit *unit)>
 
-Runs after the CFG is built and handles constant propogation.
+Runs after the CFG is built and handles constant propagation.
 
 used_once ... deletes assignments, when LHS is unused
 
@@ -803,7 +802,6 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 {
     ASSERT_ARGS(eval_ins)
     opcode_t eval[4], *pc;
-    int opnum;
     int i;
     op_info_t *op_info = (op_info_t *)parrot_hash_get(interp, interp->op_hash, (void *)op);
     if (!op_info || !STREQ(op_info->full_name, op))
@@ -822,7 +820,7 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
           case PARROT_ARG_S:
             eval[i + 1] = i;        /* regs used are I0, I1, I2 */
             if (ops <= 2 || i) { /* fill source regs */
-                SymReg *r_ = r[i]->type & VT_CONSTP ? r[i]->reg : r[i];
+                SymReg * const r_ = r[i]->type & VT_CONSTP ? r[i]->reg : r[i];
                 switch (r[i]->set) {
                   case 'I':
                     REG_INT(interp, i) = IMCC_int_from_reg(interp, r_);

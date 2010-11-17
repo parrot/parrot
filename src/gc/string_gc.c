@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -734,7 +733,7 @@ aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
 
 =item C<static const char * buffer_location(PARROT_INTERP, const Buffer *b)>
 
-Recturns a constant string representing the location of the given
+Returns a constant string representing the location of the given
 Buffer C<b> in one of the PMC registers. If the PMC is not located
 in one of the PMC registers of the current context, returns the
 string C<"???">.
@@ -808,10 +807,7 @@ compact_pool(PARROT_INTERP,
         ARGMOD(Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(compact_pool)
-    INTVAL        j;
     UINTVAL       total_size;
-
-    Fixed_Size_Arena *cur_buffer_arena;
 
     /* Contains new_block and cur_spot */
     string_callback_data cb_data;
@@ -982,7 +978,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
     INTVAL       *flags     = NULL;
     ptrdiff_t     offset    = 0;
-    Memory_Block *old_block = NULL;
 #if RESOURCE_DEBUG
     if (Buffer_buflen(old_buf) >= RESOURCE_DEBUG_SIZE)
         debug_print_buf(interp, old_buf);
@@ -994,7 +989,6 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
         * strstart might be in unallocated memory */
     if (PObj_is_COWable_TEST(old_buf)) {
         flags = Buffer_bufflagsptr(old_buf);
-        old_block = Buffer_pool(old_buf);
 
         if (PObj_is_string_TEST(old_buf)) {
             offset = (ptrdiff_t)((STRING *)old_buf)->strstart -

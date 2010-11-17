@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
 
 package Parrot::Pmc2c::MULTI;
 #use base 'Parrot::Pmc2c::PCCMETHOD';

@@ -1,7 +1,5 @@
 /* thread.h
  *  Copyright (C) 2001-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the api header for the thread primitives
  *  Data Structure and Algorithms:

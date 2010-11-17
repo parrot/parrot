@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -660,7 +659,7 @@ Mark any referenced strings and PMCs.
 
 =item C<void morph(PMC *type)>
 
-Morph the call signature into a return signature. (Currenly ignores
+Morph the call signature into a return signature. (Currently ignores
 the type passed in, and resets the named and positional arguments
 stored.)
 

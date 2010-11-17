@@ -214,7 +214,7 @@ our sub subst ($text, $regex, $repl, :$global?) {
 }
 
 =begin item split
-Splits C<$text> on occurences of C<$regex>
+Splits C<$text> on occurrences of C<$regex>
 =end item
 
 # our sub split ($regex, $text) {

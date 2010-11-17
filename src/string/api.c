@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -637,7 +636,7 @@ Creates and returns a new Parrot string using C<len> bytes of string data read
 from C<buffer>.
 
 The value of C<encoding_name> specifies the string's representation.
-The currently recognised values are:
+The currently recognized values are:
 
     'iso-8859-1'
     'ascii'
@@ -1067,7 +1066,7 @@ Parrot_str_iter_substr(PARROT_INTERP,
 =item C<INTVAL Parrot_str_iter_index(PARROT_INTERP, const STRING *src,
 String_iter *start, String_iter *end, const STRING *search)>
 
-Find the next occurence of STRING C<search> in STRING C<src> starting at
+Find the next occurrence of STRING C<search> in STRING C<src> starting at
 String_iter C<start>. If C<search> is found C<start> is modified to mark the
 beginning of C<search> and String_iter C<end> is set to the character after
 C<search> in C<src>.  Returns the character position where C<search> was found
@@ -1945,7 +1944,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
             else if (c == '.') {
                 state = parse_after_dot;
                 /*
-                 * Throw gathered result. Recalulate from integer mantissa
+                 * Throw gathered result. Recalculate from integer mantissa
                  * to preserve precision.
                  */
                 if (m_is_safe)
@@ -2496,7 +2495,7 @@ const STR_VTABLE *encoding, UINTVAL flags)>
 
 EXPERIMENTAL, see TT #1628
 
-Unescapes the src string returnning a new string with the encoding specified.
+Unescapes the src string returning a new string with the encoding specified.
 
 
 =cut
@@ -2947,31 +2946,6 @@ Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags,
         return -1;
 
     return STRING_find_not_cclass(interp, flags, s, offset, count);
-}
-
-
-/*
-
-=item C<STRING* Parrot_str_change_charset(PARROT_INTERP, STRING *src, INTVAL
-charset_nr)>
-
-Converts C<src> to the given charset or encoding and returns the result as a
-new string.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-STRING*
-Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
-        INTVAL charset_nr)
-{
-    ASSERT_ARGS(Parrot_str_change_charset)
-
-    return Parrot_str_change_encoding(interp, src, charset_nr);
 }
 
 

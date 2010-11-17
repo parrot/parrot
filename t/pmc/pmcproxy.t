@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -54,7 +53,7 @@ Tests the PMCProxy PMC.
     finalize eh
   check:
     pop_eh
-    is($I0, 1, 'Attempt to proxy invalid type throws appropiately')
+    is($I0, 1, 'Attempt to proxy invalid type throws appropriately')
 .end
 
 

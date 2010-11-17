@@ -1,6 +1,5 @@
 # Copyright (C) 2009, Parrot Foundation.
-## $Id$
-
+#
 # To build this example with an installed parrot:
 #
 # PATH=/parrot_install_directory/bin:$PATH

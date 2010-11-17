@@ -1,7 +1,5 @@
 /* interpreter.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     The interpreter API handles running the operations
  */
@@ -264,7 +262,7 @@ struct parrot_interp_t {
 
     struct _Thread_data *thread_data;         /* thread specific items */
 
-    UINTVAL recursion_limit;                  /* Sub call resursion limit */
+    UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure */

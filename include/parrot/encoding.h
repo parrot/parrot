@@ -1,7 +1,5 @@
 /* encoding.h
  *  Copyright (C) 2004-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the header for the generic encoding functions
  *  Data Structure and Algorithms:

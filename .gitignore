@@ -30,9 +30,12 @@ ports
 *.sto
 *.suo
 *.tmp
+*.sw?
 *.vcproj*
 .git
 .parrot_current_rev
+.parrot_current_sha1
+.parrot_current_git_describe
 CFLAGS
 MANIFEST.configure.generated
 Makefile
@@ -467,6 +470,7 @@ src/ops/*.obj
 # generated from svn:ignore of 'src/packfile/'
 src/packfile/*.o
 src/packfile/*.obj
+src/packfile/*.str
 # generated from svn:ignore of 'src/pmc/'
 src/pmc/*.c
 src/pmc/*.dump
@@ -571,6 +575,8 @@ t/op/*.pasm
 t/op/*.pbc
 t/op/*.pir
 t/op/*_pbcexe*
+# generated from svn:ignore of 't/op/testlib/'
+t/op/testlib/*.pbc
 # generated from svn:ignore of 't/perl/'
 t/perl/Parrot_Test_1.pasm
 t/perl/Parrot_Test_1.pir
@@ -580,6 +586,8 @@ t/pmc/*.pasm
 t/pmc/*.pbc
 t/pmc/*.pir
 t/pmc/*_pbcexe*
+# generated from svn:ignore of 't/pmc/testlib/'
+t/pmc/testlib/*.pbc
 # generated from svn:ignore of 't/src/'
 t/src/*_*
 # generated from svn:ignore of 't/stress/'
@@ -597,6 +605,7 @@ t/tools/pmc2c.*.c
 t/tools/pmc2c.*.dump
 t/tools/pmc2c.*.h
 t/tools/pmc2c.*.pmc
+tools/dev/mk_language_shell.pl
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

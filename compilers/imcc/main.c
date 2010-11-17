@@ -1,5 +1,4 @@
 /*
- * $Id$
  *
  * Intermediate Code Compiler for Parrot.
  *

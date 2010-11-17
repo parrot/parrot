@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 =head1 Ubuntu Packaging Guide
 
@@ -46,13 +45,13 @@ F<ports/ubuntu/changelog>, preserving chronological order.
 Copy the F<ports/debian/> directory from the Parrot source tree into the fresh
 tarball extract.
 
-  cp -r <path/to/parrot/svn>/ports/debian ~/udeb/parrot/parrot-[version]/.
+  cp -r <path/to/parrot/git>/ports/debian ~/udeb/parrot/parrot-[version]/.
 
 
 Then copy the unique Ubuntu files (F<changelog> and F<control.in>) from
 F<ports/ubuntu/> into the new F<debian/> directory.
 
-  cp <path/to/parrot/svn>/ports/ubuntu/* ~/udeb/parrot/parrot-[version]/debian/.
+  cp <path/to/parrot/git>/ports/ubuntu/* ~/udeb/parrot/parrot-[version]/debian/.
 
 =item 4.
 

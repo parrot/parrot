@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 # 008-file_based_configuration.t
 
 use strict;

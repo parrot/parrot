@@ -1,7 +1,5 @@
 /* thr_pthread.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     POSIS pthread interface
  *  Data Structure and Algorithms:
