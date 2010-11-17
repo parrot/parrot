@@ -1218,33 +1218,28 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_sweep_string_pool)
-    // FIXME
-#if 0
-    List_Item_Header *tmp = list->first;
+
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PObj             *obj  = LLH2Obj_typed(tmp, PObj);
+    POINTER_ARRAY_ITER(list,
+        STRING *obj = &(((string_alloc_struct*)ptr)->str);
+
+        PARROT_ASSERT(!PObj_on_free_list_TEST(obj));
 
         /* Paint live objects white */
         if (PObj_live_TEST(obj))
             PObj_live_CLEAR(obj);
 
         else if (!PObj_constant_TEST(obj)) {
-            Buffer *str  = (Buffer *)obj;
-            LIST_REMOVE(list, tmp);
-            if (Buffer_bufstart(str) && !PObj_external_TEST(str))
-                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, str);
+            Parrot_pa_remove(interp, list, STR2PAC(obj)->ptr);
+            if (Buffer_bufstart(obj) && !PObj_external_TEST(obj))
+                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, obj);
 
             PObj_on_free_list_SET(obj);
 
-            Parrot_gc_pool_free(interp, pool, tmp);
+            Parrot_gc_pool_free(interp, pool, ptr);
         }
-
-        tmp = next;
-    }
-#endif
+    );
 }
 
 
