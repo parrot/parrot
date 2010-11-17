@@ -1158,24 +1158,16 @@ gc_ms2_destroy_pmc_pool(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_destroy_pmc_pool)
-    // FIXME
-#if 0
-    List_Item_Header *tmp   = list->first;
 
-    while (tmp) {
-        PMC              *pmc  = LLH2Obj_typed(tmp, PMC);
-        List_Item_Header *next = tmp->next;
-
-        LIST_REMOVE(list, tmp);
+    POINTER_ARRAY_ITER(list,
+        PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+        Parrot_pa_remove(interp, list, PMC2PAC(pmc)->ptr);
 
         Parrot_pmc_destroy(interp, pmc);
         PObj_on_free_list_SET(pmc);
 
-        Parrot_gc_pool_free(interp, pool, tmp);
-
-        tmp = next;
-    }
-#endif
+        Parrot_gc_pool_free(interp, pool, ptr);
+    );
 }
 
 /*
