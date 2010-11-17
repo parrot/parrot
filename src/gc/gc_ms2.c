@@ -989,8 +989,7 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
 
     POINTER_ARRAY_ITER(self->strings,
         STRING *s = &((string_alloc_struct *)ptr)->str;
-        callback(interp, (Buffer *)s, data);
-    );
+        callback(interp, (Buffer *)s, data););
 }
 
 
@@ -1046,8 +1045,7 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
             VTABLE_mark(interp, pmc);
 
         if (PMC_metadata(pmc))
-            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
-    );
+            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 }
 
 static void
@@ -1136,8 +1134,7 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
             PObj_on_free_list_SET(pmc);
 
             Parrot_gc_pool_free(interp, pool, ptr);
-        }
-    );
+        });
 }
 
 
@@ -1166,8 +1163,7 @@ gc_ms2_destroy_pmc_pool(PARROT_INTERP,
         Parrot_pmc_destroy(interp, pmc);
         PObj_on_free_list_SET(pmc);
 
-        Parrot_gc_pool_free(interp, pool, ptr);
-    );
+        Parrot_gc_pool_free(interp, pool, ptr););
 }
 
 /*
@@ -1207,8 +1203,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
             PObj_on_free_list_SET(obj);
 
             Parrot_gc_pool_free(interp, pool, ptr);
-        }
-    );
+        });
 }
 
 
