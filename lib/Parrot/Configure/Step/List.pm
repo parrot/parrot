@@ -63,6 +63,7 @@ my @steps = qw(
     auto::sha1
     auto::git_describe
     auto::icu
+    auto::libffi
     auto::ipv6
     gen::config_h
     gen::core_pmcs

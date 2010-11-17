@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 49;
+use Test::More tests => 61;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -144,6 +144,41 @@ is($conf->data->get( 'linkflags' ), '-bundle -L/usr/local/lib64',
 
 $conf->replenish($serialized);
 
+##### with core-nci-thunks #####
+($args, $step_list_ref) = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$ret = $step->runstep($conf);
+ok( defined $ret, "runstep() returned defined value" );
+ok($conf->data->get( 'has_core_nci_thunks' ),
+    "Got expected value for has_core_nci_thunks" );
+ok($conf->data->get( 'HAS_CORE_NCI_THUNKS' ),
+    "Got expected value for HAS_CORE_NCI_THUNKS" );
+
+$conf->replenish($serialized);
+
+##### without core-nci-thunks #####
+($args, $step_list_ref) = process_options(
+    {
+        argv => [ q{--without-core-nci-thunks} ],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$ret = $step->runstep($conf);
+ok( defined $ret, "runstep() returned defined value" );
+ok(! $conf->data->get( 'has_core_nci_thunks' ),
+    "Got expected value for has_core_nci_thunks" );
+ok(! $conf->data->get( 'HAS_CORE_NCI_THUNKS' ),
+    "Got expected value for HAS_CORE_NCI_THUNKS" );
 ##### with extra-nci-thunks #####
 ($args, $step_list_ref) = process_options(
     {

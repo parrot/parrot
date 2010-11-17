@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -415,7 +415,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    record = chopn record, 1
+    record = chomp(record)
     $P1 = split "\t", record
     $I0 = elements $P1 # length of array
     .local int tab_number
@@ -515,6 +515,20 @@ tag C<all> is allowed for todo tests that should fail on any system.
     desc = concat $S0, desc
 
     .return (desc)
+.end
+
+
+.sub 'chomp'
+    .param string str
+    $I0 = index str, "\r"
+    if $I0 < 0 goto L1
+    str = substr str, 0, $I0
+  L1:
+    $I1 = index str, "\n"
+    if $I1 < 0 goto L2
+    str = substr str, 0, $I1
+  L2:
+    .return (str)
 .end
 
 

@@ -14,8 +14,9 @@ should be understood about Git, which will provide a foundation for
 understanding anything else.
 
 A Git repository is a Directed Acyclic Graph (DAG), where each node in the
-graph is a commit, with zero or more parents. The first commit of a
-repository has zero parents, others have at least one parent. If a commit has
+graph is a commit, with zero or more parents. A root commit of a
+repository has zero parents, others have at least one parent. A repository
+may have any number of root commits, but many have only one. If a commit has
 more than one parent, that means it was the result of a merge.
 
 Each commit is uniquely identified by a SHA1 sum. You may refer to any commit
@@ -29,10 +30,11 @@ as the index, the working copy, and the staging area. The index is the actual
 DAG, where all the history of the repo is stored. This lives in the .git
 directory of a repository. The "working copy" are the actual files on the
 filesystem. The staging area is where things that will be included in the
-next commit live. When you type C<git add foo>, you are adding the
-file/directory foo to the staging area. When you type C<git log> you are
-asking the index to show you a log of all commits. When you run a non-git
-command in a repo, such as C<rm foo>, you are modifying the working copy.
+next commit live, which happens to be inside the .git directory as well.
+When you type C<git add foo>, you are adding the file/directory foo to the
+staging area. When you type C<git log> you are asking the index to show
+you a log of all commits. When you run a non-git command in a repo, such
+as C<rm foo>, you are modifying the working copy.
 
 The most important thing to learn when understanding a C<git> command is whether
 it operates on the index, working copy, staging area or a combination of the
@@ -66,7 +68,13 @@ Noun. A general term for a way to describe a set of commits.
 =head2 rebase
 
 Verb. Update the local index with changes from a remote, then replay local changes,
-in order, on top of them.
+in order, on top of them. This prevents "useless merge commits", such as:
+
+    Merge branch 'master' of github.com:parrot/parrot
+
+The C<git pull --rebase> command can be used to update your master branch from
+the remote called 'origin'. There is also a C<git rebase> command that can be
+used to rebase branches onto each other.
 
 =head2 remote
 

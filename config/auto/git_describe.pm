@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-config/auto/sha1.pm - Parrot's configure "git describe" string
+config/auto/git_describe.pm - Parrot's configure "git describe" string
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ sub runstep {
 
     my $describe = $Parrot::Git::Describe::current;
 
-    if ( defined($describe) and $describe !~ /^REL(EASE)?_\d+_\d+_\d+-\d+-g[0-9A-Fa-f]{7}$/ ) {
+    if ( defined($describe) and $describe !~ /^REL(EASE)?_\d+_\d+_\d+(-\d+-g[0-9A-Fa-f]{7})?$/ ) {
         die "Invalid git describe string (Git::Describe): $describe";
     }
 

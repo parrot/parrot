@@ -943,7 +943,7 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
     PMC        *multi_sub = Parrot_ns_get_global(interp, ns, sub_name);
 
     if (PMC_IS_NULL(multi_sub)) {
-        multi_sub = Parrot_pmc_new_constant(interp, enum_class_MultiSub);
+        multi_sub = Parrot_pmc_new(interp, enum_class_MultiSub);
         Parrot_ns_set_global(interp, ns, sub_name, multi_sub);
     }
 
@@ -1069,7 +1069,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         STRING   *ns_name   = mmd_info[i].ns_name;
 
         /* Create an NCI sub for the C function */
-        PMC    *sub_obj       = Parrot_pmc_new_constant(interp, enum_class_NCI);
+        PMC    *sub_obj       = Parrot_pmc_new(interp, enum_class_NCI);
 
         VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig,
                                      F2DPTR(func_ptr));
