@@ -1153,7 +1153,7 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
             PObj_live_CLEAR(pmc);
 
         else if (!PObj_constant_TEST(pmc)) {
-            Parrot_pa_remove(interp, list, ptr);
+            Parrot_pa_remove(interp, list, PMC2PAC(pmc)->ptr);
 
             Parrot_pmc_destroy(interp, pmc);
             PObj_on_free_list_SET(pmc);
