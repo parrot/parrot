@@ -1012,7 +1012,7 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
 
     POINTER_ARRAY_ITER(self->strings,
         STRING *s = &((string_alloc_struct *)ptr)->str;
-        callback(interp, s, data);
+        callback(interp, (Buffer *)s, data);
     );
 }
 
