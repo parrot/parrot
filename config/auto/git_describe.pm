@@ -31,6 +31,8 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    return 1 unless -e '.git';
+
     my $describe = $Parrot::Git::Describe::current;
 
     if ( defined($describe) and $describe !~ /^REL(EASE)?_\d+_\d+_\d+(-\d+-g[0-9A-Fa-f]{7})?$/ ) {
