@@ -67,7 +67,7 @@ sub _print_to_cache {
 }
 
 sub _get_git_describe {
-    my $git_describe;
+    my $git_describe = 0;
     if (-f $cache) {
         open my $FH, '<', $cache
             or die "Unable to open $cache for reading: $!";
@@ -75,9 +75,11 @@ sub _get_git_describe {
         close $FH or die "Unable to close $cache after reading: $!";
     }
     else {
-        $git_describe = `git describe --tags`;
-        chomp( $git_describe );
-        _print_to_cache($cache, $git_describe);
+        if ( !$git_describe && (-d '.git') ) {
+            $git_describe = `git describe --tags`;
+            chomp( $git_describe );
+            _print_to_cache($cache, $git_describe);
+        }
     }
     return $git_describe;
 }

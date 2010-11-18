@@ -64,7 +64,7 @@ sub _print_to_cache {
 }
 
 sub _get_sha1 {
-    my $sha1;
+    my $sha1 = 0;
     if (-f $cache) {
         open my $FH, '<', $cache
             or die "Unable to open $cache for reading: $!";
@@ -72,9 +72,11 @@ sub _get_sha1 {
         close $FH or die "Unable to close $cache after reading: $!";
     }
     else {
-        $sha1 = `git rev-parse HEAD`;
-        chomp($sha1);
-        _print_to_cache($cache, $sha1);
+        if ( !$sha1 && (-d '.git') ) {
+             $sha1 = `git rev-parse HEAD`;
+             chomp($sha1);
+             _print_to_cache($cache, $sha1);
+        }
     }
     return $sha1;
 }

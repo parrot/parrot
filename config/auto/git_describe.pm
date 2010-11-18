@@ -23,13 +23,18 @@ use Parrot::Git::Describe;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determine Parrot's git-describe};
+    $data{description} = q{Determine git-describe};
     $data{result}      = q{};
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
+
+    unless (-e '.git') {
+        $self->set_result('skipped');
+        return 1;
+    }
 
     my $describe = $Parrot::Git::Describe::current;
 
