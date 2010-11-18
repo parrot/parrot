@@ -1198,7 +1198,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
         else if (!PObj_constant_TEST(obj)) {
             Parrot_pa_remove(interp, list, STR2PAC(obj)->ptr);
             if (Buffer_bufstart(obj) && !PObj_external_TEST(obj))
-                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, obj);
+                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer*)obj);
 
             PObj_on_free_list_SET(obj);
 
