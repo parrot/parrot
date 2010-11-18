@@ -140,7 +140,7 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     ASSERT_ARGS(Parrot_pa_remove)
 
     /* Mark sell to avoid iterating over */
-    *(int*)ptr = (void**)((UINTVAL)self->next_free | 1);
+    *(int*)ptr = ((UINTVAL)self->next_free) | 1;
     self->next_free = (void**)ptr;
 }
 
