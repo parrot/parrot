@@ -319,7 +319,7 @@ Tests Parrot string registers and operations.
     null s
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     r = 1
     substr s, s, 0, 0
@@ -338,7 +338,7 @@ Tests Parrot string registers and operations.
     set $I1, 6
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     r = 1
 
@@ -358,7 +358,7 @@ Tests Parrot string registers and operations.
     set $I1, 6
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_SUBSTR_OUT_OF_STRING)
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     r = 1
 
@@ -968,7 +968,7 @@ WHILE:
     .local pmc eh
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     $I1 = 1
     null $S0

@@ -114,7 +114,7 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
     i = 1
     eh = new['ExceptionHandler']
     eh = .EXCEPTION_PIO_ERROR
-    set_addr eh, catchnoname
+    set_label eh, catchnoname
     push_eh eh
     fh = new['FileHandle']
     # Open without filename
@@ -127,7 +127,7 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
     say i
 
     i = 0
-    set_addr eh, catchreopen
+    set_label eh, catchreopen
     fh.'open'('README')
     i = 1
     # Open already opened
@@ -631,7 +631,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
     fh = new ['FileHandle']
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_PIO_ERROR)
-    set_addr eh, catch1
+    set_label eh, catch1
     push_eh eh
     # Using unopened FileHandle
     fh.'readall'()
@@ -641,7 +641,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
     finalize eh
     say 'caught unopened'
   test2:
-    set_addr eh, catch2
+    set_label eh, catch2
     fh.'open'('README')
     # Using opened FileHandle with the filepath option
     fh.'readall'('README')

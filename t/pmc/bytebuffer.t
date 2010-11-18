@@ -260,7 +260,7 @@ end:
     .local pmc eh
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch_negative
+    set_label eh, catch_negative
     n = 1
     push_eh eh
     bb = -1
@@ -359,7 +359,7 @@ donearray:
     .local pmc bb, eh, ex
     .local string s
     eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_ENCODING
-    set_addr eh, catch_encoding
+    set_label eh, catch_encoding
     push_eh eh
     bb = new ['ByteBuffer']
     bb = 'something'
@@ -375,7 +375,7 @@ catch_encoding:
 check_content:
     bb[0] = 128 # Out of ascii range
     eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_STRING_REPRESENTATION
-    set_addr eh, catch_content
+    set_label eh, catch_content
     push_eh eh
     s = bb.'get_string'('ascii')
     pop_eh

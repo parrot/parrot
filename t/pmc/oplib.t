@@ -54,7 +54,7 @@ t/pmc/oplib.t - OpLib PMC
     is(i, 0, 'last opcode exists')
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh eh
     op = oplib[n]
     nok(1, 'out of bounds opcode number should throw')

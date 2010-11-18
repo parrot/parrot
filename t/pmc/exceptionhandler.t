@@ -31,13 +31,13 @@ Tests the ExceptionHandler PMC.
     eh = new ['ExceptionHandler']
     ok(1, 'Instantiated ExceptionHandler')
 
-    set_addr eh, nonfatal_handler_one
+    set_label eh, nonfatal_handler_one
     eh.'min_severity'(.EXCEPT_NORMAL)
     eh.'max_severity'(.EXCEPT_WARNING)
     push_eh eh
 
     eh2 = new ['ExceptionHandler']
-    set_addr eh2, error_handler_one
+    set_label eh2, error_handler_one
     eh2.'min_severity'(.EXCEPT_ERROR)
     eh2.'max_severity'(.EXCEPT_FATAL)
     push_eh eh2
@@ -82,12 +82,12 @@ Tests the ExceptionHandler PMC.
   more_tests:
 
     eh = new ['ExceptionHandler']
-    set_addr eh, typed_handler_one
+    set_label eh, typed_handler_one
     eh.'handle_types'(.CONTROL_OK, .CONTROL_BREAK)
     push_eh eh
 
     eh = new ['ExceptionHandler']
-    set_addr eh, typed_handler_two
+    set_label eh, typed_handler_two
     eh.'handle_types'(.EXCEPTION_SYNTAX_ERROR, .EXCEPTION_UNEXPECTED_NULL)
     push_eh eh
 
@@ -121,7 +121,7 @@ Tests the ExceptionHandler PMC.
 
   init_int:
     eh = new ['ExceptionHandler'], .CONTROL_BREAK
-    set_addr eh, init_int_eh
+    set_label eh, init_int_eh
     push_eh eh
     $P0 = new ['Exception']
     $P0['type'] = .CONTROL_BREAK
@@ -156,14 +156,14 @@ Tests the ExceptionHandler PMC.
 .sub test_bool
     $P0 = new 'ExceptionHandler'
     nok($P0,'ExceptionHandler without address is false')
-    set_addr $P0, _handler
+    set_label $P0, _handler
     ok($P0,'ExceptionHandler with address is true')
   _handler:
 .end
 
 .sub test_int
     $P0 = new 'ExceptionHandler'
-    set_addr $P0, _handler
+    set_label $P0, _handler
     push_eh $P0
     $I0 = $P0
     ok(1,'get_integer on ExceptionHandler ')
@@ -189,12 +189,12 @@ Tests the ExceptionHandler PMC.
     .param pmc myhandler
     .local pmc eh
     eh = new ['ExceptionHandler']
-    set_addr eh, subclassed_popped
+    set_label eh, subclassed_popped
     push_eh eh
 
     .local pmc myeh
     new myeh, myhandler
-    set_addr myeh, subclassed_handler
+    set_label myeh, subclassed_handler
     push_eh myeh
 
     pop_eh
@@ -213,12 +213,12 @@ Tests the ExceptionHandler PMC.
     .param pmc myhandler
     .local pmc eh
     eh = new ['ExceptionHandler']
-    set_addr eh, subclassed_failed
+    set_label eh, subclassed_failed
     push_eh eh
 
     .local pmc myeh
     new myeh, myhandler
-    set_addr myeh, subclassed_handler
+    set_label myeh, subclassed_handler
     push_eh myeh
 
     $P0 = new ['Exception']
@@ -237,12 +237,12 @@ Tests the ExceptionHandler PMC.
     .param pmc myhandler
     .local pmc eh
     eh = new ['ExceptionHandler']
-    set_addr eh, subclassed_failed
+    set_label eh, subclassed_failed
     push_eh eh
 
     .local pmc myeh
     new myeh, myhandler
-    set_addr myeh, subclassed_handler
+    set_label myeh, subclassed_handler
     push_eh myeh
 
     $P0 = new ['Exception']
@@ -279,8 +279,8 @@ Tests the ExceptionHandler PMC.
     eh = new ['ExceptionHandler']
     badeh = new ['ExceptionHandler']
     eh.'handle_types_except'(TYPEUSED)
-    set_addr eh, catch
-    set_addr badeh, badcatch
+    set_label eh, catch
+    set_label badeh, badcatch
     push_eh badeh
     push_eh eh
     ex = new ['Exception']
@@ -297,8 +297,8 @@ Tests the ExceptionHandler PMC.
     ok(i, 'type not in except is list is caught')
 
     i = 0
-    set_addr badeh, catchall
-    set_addr eh, dontcatch
+    set_label badeh, catchall
+    set_label eh, dontcatch
     ex = new ['Exception']
     ex['type'] = TYPEUSED
     throw ex

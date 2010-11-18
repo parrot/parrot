@@ -64,7 +64,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
     print "main\n"
     new P29, 'ExceptionHandler'
-    set_addr P29, _handler
+    set_label P29, _handler
     push_eh P29
     new P30, 'Exception'
     throw P30

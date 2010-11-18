@@ -126,46 +126,44 @@
      PCC_END_RETURN = 332,
      PCC_BEGIN_YIELD = 333,
      PCC_END_YIELD = 334,
-     NCI_CALL = 335,
-     METH_CALL = 336,
-     INVOCANT = 337,
-     MAIN = 338,
-     LOAD = 339,
-     INIT = 340,
-     IMMEDIATE = 341,
-     POSTCOMP = 342,
-     METHOD = 343,
-     ANON = 344,
-     OUTER = 345,
-     NEED_LEX = 346,
-     MULTI = 347,
-     VTABLE_METHOD = 348,
-     LOADLIB = 349,
-     SUB_INSTANCE_OF = 350,
-     SUBID = 351,
-     NS_ENTRY = 352,
-     UNIQUE_REG = 353,
-     LABEL = 354,
-     EMIT = 355,
-     EOM = 356,
-     IREG = 357,
-     NREG = 358,
-     SREG = 359,
-     PREG = 360,
-     IDENTIFIER = 361,
-     REG = 362,
-     MACRO = 363,
-     ENDM = 364,
-     STRINGC = 365,
-     INTC = 366,
-     FLOATC = 367,
-     USTRINGC = 368,
-     PARROT_OP = 369,
-     VAR = 370,
-     LINECOMMENT = 371,
-     FILECOMMENT = 372,
-     DOT = 373,
-     CONCAT = 374
+     INVOCANT = 335,
+     MAIN = 336,
+     LOAD = 337,
+     INIT = 338,
+     IMMEDIATE = 339,
+     POSTCOMP = 340,
+     METHOD = 341,
+     ANON = 342,
+     OUTER = 343,
+     NEED_LEX = 344,
+     MULTI = 345,
+     VTABLE_METHOD = 346,
+     LOADLIB = 347,
+     SUB_INSTANCE_OF = 348,
+     SUBID = 349,
+     NS_ENTRY = 350,
+     UNIQUE_REG = 351,
+     LABEL = 352,
+     EMIT = 353,
+     EOM = 354,
+     IREG = 355,
+     NREG = 356,
+     SREG = 357,
+     PREG = 358,
+     IDENTIFIER = 359,
+     REG = 360,
+     MACRO = 361,
+     ENDM = 362,
+     STRINGC = 363,
+     INTC = 364,
+     FLOATC = 365,
+     USTRINGC = 366,
+     PARROT_OP = 367,
+     VAR = 368,
+     LINECOMMENT = 369,
+     FILECOMMENT = 370,
+     DOT = 371,
+     CONCAT = 372
    };
 #endif
 /* Tokens.  */
@@ -246,46 +244,44 @@
 #define PCC_END_RETURN 332
 #define PCC_BEGIN_YIELD 333
 #define PCC_END_YIELD 334
-#define NCI_CALL 335
-#define METH_CALL 336
-#define INVOCANT 337
-#define MAIN 338
-#define LOAD 339
-#define INIT 340
-#define IMMEDIATE 341
-#define POSTCOMP 342
-#define METHOD 343
-#define ANON 344
-#define OUTER 345
-#define NEED_LEX 346
-#define MULTI 347
-#define VTABLE_METHOD 348
-#define LOADLIB 349
-#define SUB_INSTANCE_OF 350
-#define SUBID 351
-#define NS_ENTRY 352
-#define UNIQUE_REG 353
-#define LABEL 354
-#define EMIT 355
-#define EOM 356
-#define IREG 357
-#define NREG 358
-#define SREG 359
-#define PREG 360
-#define IDENTIFIER 361
-#define REG 362
-#define MACRO 363
-#define ENDM 364
-#define STRINGC 365
-#define INTC 366
-#define FLOATC 367
-#define USTRINGC 368
-#define PARROT_OP 369
-#define VAR 370
-#define LINECOMMENT 371
-#define FILECOMMENT 372
-#define DOT 373
-#define CONCAT 374
+#define INVOCANT 335
+#define MAIN 336
+#define LOAD 337
+#define INIT 338
+#define IMMEDIATE 339
+#define POSTCOMP 340
+#define METHOD 341
+#define ANON 342
+#define OUTER 343
+#define NEED_LEX 344
+#define MULTI 345
+#define VTABLE_METHOD 346
+#define LOADLIB 347
+#define SUB_INSTANCE_OF 348
+#define SUBID 349
+#define NS_ENTRY 350
+#define UNIQUE_REG 351
+#define LABEL 352
+#define EMIT 353
+#define EOM 354
+#define IREG 355
+#define NREG 356
+#define SREG 357
+#define PREG 358
+#define IDENTIFIER 359
+#define REG 360
+#define MACRO 361
+#define ENDM 362
+#define STRINGC 363
+#define INTC 364
+#define FLOATC 365
+#define USTRINGC 366
+#define PARROT_OP 367
+#define VAR 368
+#define LINECOMMENT 369
+#define FILECOMMENT 370
+#define DOT 371
+#define CONCAT 372
 
 
 
@@ -295,7 +291,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 986 "compilers/imcc/imcc.y"
+#line 985 "compilers/imcc/imcc.y"
 
     IdList * idlist;
     int t;
@@ -306,7 +302,7 @@ typedef union YYSTYPE
 
 
 /* Line 1685 of yacc.c  */
-#line 299 "compilers/imcc/imcparser.h"
+#line 295 "compilers/imcc/imcparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

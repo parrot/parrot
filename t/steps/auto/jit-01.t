@@ -7,7 +7,6 @@ use warnings;
 use Test::More tests =>  4;
 use Carp;
 use Cwd;
-use File::Path qw( mkpath );
 use File::Temp qw( tempdir );
 use File::Spec;
 use lib qw( lib t/configure/testlib );

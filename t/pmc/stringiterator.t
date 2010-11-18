@@ -182,14 +182,14 @@ dotest:
     push_eh eh
 
     # shift string
-    set_addr eh, catch1
+    set_label eh, catch1
     rs = shift it
     goto fail
 catch1:
     finalize eh
 
     # shift integer
-    set_addr eh, catch2
+    set_label eh, catch2
     .local int ri
     ri = shift it
     goto fail
@@ -198,7 +198,7 @@ catch2:
 
 t3:
     # pop string
-    set_addr eh, catch3
+    set_label eh, catch3
     .local int ri
     rs = pop it
     goto fail
@@ -206,7 +206,7 @@ catch3:
     finalize eh
 
     # pop integer
-    set_addr eh, catch4
+    set_label eh, catch4
     .local int ri
     ri = pop it
     goto fail
