@@ -780,7 +780,7 @@ properties aren't constructed const, so we have to mark them.
 static void
 mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
 {
-    ASSERT_ARGS(mark_1_seg)
+    ASSERT_ARGS(mark_1_ct_seg)
     opcode_t i;
 
     for (i = 0; i < ct->str.const_count; i++)
@@ -805,6 +805,7 @@ Mark gcables in bytecode header.
 static void
 mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)
 {
+    ASSERT_ARGS(mark_1_bc_seg)
     size_t i;
     for (i = 0; i < bc->n_libdeps; i++)
         Parrot_gc_mark_STRING_alive(interp, bc->libdeps[i]);
