@@ -1118,7 +1118,7 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
     ASSERT_ARGS(gc_ms2_sweep_pmc_pool)
 
     POINTER_ARRAY_ITER(list,
-        PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+        PMC *pmc = &(((pmc_alloc_struct *)ptr)->pmc);
 
         /* Paint live objects white */
         if (PObj_live_TEST(pmc))
@@ -1127,8 +1127,16 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
         else if (!PObj_constant_TEST(pmc)) {
             Parrot_pa_remove(interp, list, PMC2PAC(pmc)->ptr);
 
-            Parrot_pmc_destroy(interp, pmc);
+            /* this is manual inlining of Parrot_pmc_destroy() */
+            if (PObj_custom_destroy_TEST(pmc))
+                VTABLE_destroy(interp, pmc);
+
+            if (pmc->vtable->attr_size && PMC_data(pmc))
+                Parrot_gc_free_pmc_attributes(interp, pmc);
+            PMC_data(pmc) = NULL;
+
             PObj_on_free_list_SET(pmc);
+            PObj_gc_CLEAR(pmc);
 
             Parrot_gc_pool_free(interp, pool, ptr);
         });
