@@ -111,7 +111,7 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-ng    int          stacktop;
+    int          stacktop;
     const char  *sourcefile;
     Parrot_PMC   interp;
     Parrot_PMC   bytecodepmc;
