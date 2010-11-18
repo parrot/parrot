@@ -325,6 +325,7 @@ get_free_list_item(ARGMOD(Pool_Allocator *pool))
 
     Pool_Allocator_Free_List * const item = pool->free_list;
     pool->free_list = item->next;
+    --pool->num_free_objects;
     return item;
 }
 
@@ -341,6 +342,7 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
     if (pool->newfree >= pool->newlast)
         pool->newfree = NULL;
 
+    --pool->num_free_objects;
     return item;
 }
 
@@ -350,15 +352,12 @@ pool_allocate(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(pool_allocate)
 
-    if (pool->free_list) {
-        --pool->num_free_objects;
+    if (pool->free_list)
         return get_free_list_item(pool);
-    }
 
     if (!pool->newfree)
         allocate_new_pool_arena(pool);
 
-    --pool->num_free_objects;
     return get_newfree_list_item(pool);
 }
 
