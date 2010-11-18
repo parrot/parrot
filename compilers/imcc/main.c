@@ -585,6 +585,14 @@ compile_to_bytecode(PARROT_INTERP,
     return pf;
 }
 
+int
+imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
+        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
+{
+    Interp * interp = VTABLE_get_pointer(NULL, interp_pmc);
+    return imcc_run(interp, sourcefile, argc, argv, pbcpmc);
+}
+
 /*
 
 =item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char

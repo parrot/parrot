@@ -23,14 +23,5 @@
         return 1; \
     }
 
-#define EMBED_API_FAILURE(p, i) \
-    do { \
-        if (!_oldtop) {\
-            PARROT_ASSERT((i)->lo_var_ptr == &_oldtop);\
-            (i)->lo_var_ptr = NULL;\
-        } \
-        return 0; \
-    } while(0);
-
 
 #endif /* PARROT_EMBED_PRIVATE_H */

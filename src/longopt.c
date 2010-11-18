@@ -17,14 +17,16 @@ This is used by C<parrot>.
 
 */
 
+#include <stdio.h>
 #include "parrot/parrot.h"
+#include "parrot/longopt.h"
+
 
 /* HEADERIZER HFILE: include/parrot/longopt.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_WARN_UNUSED_RESULT
 static int longopt_get_longopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -36,7 +38,6 @@ static int longopt_get_longopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
-PARROT_WARN_UNUSED_RESULT
 static int longopt_get_shortopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
@@ -73,9 +74,6 @@ Set up the const struct declaration for cmd_options
 
 */
 
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_CONST_FUNCTION
 const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
@@ -135,10 +133,8 @@ Any other value is a valid option identifier.
 
 */
 
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 int
-longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
+longopt_get(Parrot_PMC interp_pmc, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
             ARGMOD(struct longopt_opt_info* info_buf))
 {
@@ -155,7 +151,7 @@ longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
         return 0;
 
     if (info_buf->_shortopt_pos)
-        return longopt_get_shortopt(interp, argc, argv, options, info_buf);
+        return longopt_get_shortopt(interp_pmc, argc, argv, options, info_buf);
 
     if (argv[dex][1] == '-') { /* Long option or -- */
         if (argv[dex][2] == '\0') {
@@ -163,11 +159,11 @@ longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             return 0;
         }
         else {                   /* Long option */
-            return longopt_get_longopt(interp, argc, argv, options, info_buf);
+            return longopt_get_longopt(interp_pmc, argc, argv, options, info_buf);
         }
     }
     else {                       /* Short option */
-        return longopt_get_shortopt(interp, argc, argv, options, info_buf);
+        return longopt_get_shortopt(interp_pmc, argc, argv, options, info_buf);
     }
 }
 
@@ -188,9 +184,8 @@ characters and start with C<-->.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
 static int
-longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
+longopt_get_longopt(Parrot_PMC interp, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
                     ARGMOD(struct longopt_opt_info* info_buf))
 {
@@ -222,10 +217,10 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                         info_buf->opt_arg = &argv[dex][optlen+1];
                     }
                     else {
-                        Parrot_snprintf(interp, longopt_error_buffer,
-                                        sizeof (longopt_error_buffer),
-                                        "Option %s does not expect an argument",
-                                                dptr->opt_long[sptr]);
+                        snprintf(longopt_error_buffer,
+                                 sizeof (longopt_error_buffer),
+                                 "Option %s does not expect an argument",
+                                 dptr->opt_long[sptr]);
                         info_buf->opt_error = longopt_error_buffer;
                         return -1;
                     }
@@ -237,10 +232,10 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                             ++info_buf->opt_index;
                         }
                         else {
-                            Parrot_snprintf(interp, longopt_error_buffer,
-                                            sizeof (longopt_error_buffer),
-                                           "Option %s needs an argument",
-                                                   dptr->opt_long[sptr]);
+                            snprintf(interp, longopt_error_buffer,
+                                     sizeof (longopt_error_buffer),
+                                     "Option %s needs an argument",
+                                            dptr->opt_long[sptr]);
                             info_buf->opt_error = longopt_error_buffer;
                             return -1;
                         }
@@ -261,7 +256,7 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
 
     /* Couldn't find it. */
     info_buf->opt_id = -1;
-    Parrot_snprintf(interp, longopt_error_buffer,
+    snprintf(interp, longopt_error_buffer,
              sizeof (longopt_error_buffer),
              "Option %s not known", argv[dex]);
     info_buf->opt_error = longopt_error_buffer;
@@ -286,9 +281,8 @@ characters long and start with a dash.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
 static int
-longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
+longopt_get_shortopt(Parrot_PMC interp_pmc, int argc, ARGIN(const char* argv[]),
                      ARGIN(const struct longopt_opt_decl options[]),
                      ARGMOD(struct longopt_opt_info* info_buf))
 {
@@ -317,9 +311,9 @@ longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                         ++info_buf->opt_index;
                     }
                     else {
-                        Parrot_snprintf(interp, longopt_error_buffer,
-                                        sizeof (longopt_error_buffer),
-                                        "Option -%c expects an argument", *pos);
+                        snprintf(longopt_error_buffer,
+                                 sizeof (longopt_error_buffer),
+                                 "Option -%c expects an argument", *pos);
                         info_buf->opt_error = longopt_error_buffer;
                         return -1;
                     }
@@ -355,7 +349,7 @@ longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
 
     /* Couldn't find it in the table */
     info_buf->opt_id = -1;
-    Parrot_snprintf(interp, longopt_error_buffer,
+    snprintf(interp, longopt_error_buffer,
              sizeof (longopt_error_buffer),
              "Option -%c not known", *pos);
     info_buf->opt_error = longopt_error_buffer;

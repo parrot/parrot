@@ -7,6 +7,8 @@
 #ifndef PARROT_LONGOPT_H_GUARD
 #define PARROT_LONGOPT_H_GUARD
 
+#include "parrot/api.h"
+
 /* I use a char* here because this needs to be easily statically
  * initialized, and because the interpreter is probably not running
  * yet.
@@ -49,9 +51,7 @@ struct longopt_opt_info {
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-int longopt_get(PARROT_INTERP,
+int longopt_get(Parrot_PMC interp_pmc,
     int argc,
     ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
@@ -62,9 +62,6 @@ int longopt_get(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_CONST_FUNCTION
 const struct longopt_opt_decl * Parrot_cmd_options(void);
 
 #define ASSERT_ARGS_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

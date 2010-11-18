@@ -20,7 +20,10 @@ Start Parrot
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include "parrot/longopt.h"
 #include "parrot/api.h"
+
 
 
 /* HEADERIZER HFILE: none */
@@ -28,6 +31,7 @@ Start Parrot
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void get_last_error(Parrot_PMC interp);
 static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
@@ -43,13 +47,13 @@ static int is_all_hex_digits(ARGIN(const char *s))
 static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(
-    PMC *interp,
+    Parrot_PMC interp,
     int argc,
     ARGIN(const char *argv[]),
     ARGOUT(int *pgm_argc),
     ARGOUT(const char ***pgm_argv),
-    ARGMOD(Parrot_Run_core_t *core),
-    ARGMOD(Parrot_trace_flags *trace))
+    ARGMOD(const char **core),
+    ARGMOD(Parrot_Int *trace))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
@@ -61,15 +65,18 @@ static const char * parseflags(
         FUNC_MODIFIES(*trace);
 
 static void parseflags_minimal(
-    Parrot_Init_Args *initargs,
+    ARGMOD(Parrot_Init_Args * initargs),
     int argc,
     ARGIN(const char *argv[]))
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* initargs);
 
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
+#define ASSERT_ARGS_get_last_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -84,7 +91,8 @@ static void usage(ARGMOD(FILE *fp))
     , PARROT_ASSERT_ARG(core) \
     , PARROT_ASSERT_ARG(trace))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(argv))
+       PARROT_ASSERT_ARG(initargs) \
+    , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -105,46 +113,64 @@ main(int argc, const char *argv[])
 {
     int          stacktop;
     const char  *sourcefile;
-    PMC         *interp;
-    PMC         *bytecodepmc;
-    PMC         *argsarray;
+    Parrot_PMC   interp;
+    Parrot_PMC   bytecodepmc;
+    Parrot_PMC   argsarray;
     int          status;
     int          pir_argc;
     const char **pir_argv;
-    Parrot_Init_Args *initargs = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args));
+    const char  *core = "slow";
 
-    Parrot_Run_core_t  core  = PARROT_SLOW_CORE;
-    Parrot_trace_flags trace = PARROT_NO_TRACE;
+    Parrot_Init_Args *initargs = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args), 0);
+    Parrot_Int trace = 0;
 
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
-    PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
-    PARROT_TEXTDOMAIN(PACKAGE);
+    //PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
+    //PARROT_TEXTDOMAIN(PACKAGE);
 
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
-    if (!(Parrot_api_make_interpreter(NULL, PARROT_NO_FLAGS, initargs, &interp) &&
-          Parrot_api_set_executable_name(interp, argv[0])) {
+    if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+          Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+        get_last_error(interp);
         exit(EXIT_FAILURE);
     }
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
+    if (!Parrot_api_set_runcore(interp, core, trace)) {
+        get_last_error(interp);
+        exit(EXIT_FAILURE);
+    }
 
-    Parrot_api_set_runcore(interp, (Parrot_Run_core_t) core, trace);
-
-    if (imcc_run(raw, interp, sourcefile, argc, argv, &bytecodepmc)) {
+    if (imcc_run_api(interp, sourcefile, argc, argv, &bytecodepmc)) {
         if (!(Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray) &&
               Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))) {
-            fprintf(stderr, "PARROT VM: Could not load or run bytecode)
+            fprintf(stderr, "PARROT VM: Could not load or run bytecode");
+            get_last_error(interp);
             exit(EXIT_FAILURE);
         }
     }
 
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
+    exit(EXIT_SUCCESS);
+}
+
+static void
+get_last_error(Parrot_PMC interp)
+{
+    Parrot_String *errmsg;
+    char * errmsg_raw;
+    if (Parrot_api_get_last_error(interp, &errmsg) &&
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw))
+        fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+    else
+        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
+
 }
 
 /*
@@ -342,7 +368,7 @@ included in the Parrot source tree.\n\n");
 
 /*
 
-=item C<static void parseflags_minimal(Parrot_Init_Args *initargs, int argc,
+=item C<static void parseflags_minimal(Parrot_Init_Args * initargs, int argc,
 const char *argv[])>
 
 Parse minimal subset of args required for initializing interpreter.
@@ -351,7 +377,7 @@ Parse minimal subset of args required for initializing interpreter.
 
 */
 static void
-parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[]))
+parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(parseflags_minimal)
 
@@ -360,7 +386,7 @@ parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[
     while (pos < argc) {
         const char *arg = argv[pos];
 
-        if (STREQ(arg, "--gc")) {
+        if (!strcmp(arg, "--gc")) {
             ++pos;
             if (pos == argc) {
                 fprintf(stderr,
@@ -369,12 +395,12 @@ parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[
                 exit(EXIT_FAILURE);
             }
             arg = argv[pos];
-            initargs->gc_system = arg;
+            initargs->gc_system = (char *)arg;
             break;
         }
 
         /* arg should start with --gc-threshold *and* contain more chars */
-        else if (strncmp(arg, "--gc-threshold", 14) == 0) {
+        else if (!strncmp(arg, "--gc-threshold", 14)) {
 
             /* the next character could be '=' */
             if (arg[14] == '=') {
@@ -435,8 +461,8 @@ parseflags_minimal(Parrot_Init_Args *initargs, int argc, ARGIN(const char *argv[
 
 /*
 
-=item C<static const char * parseflags(PMC *interp, int argc, const char
-*argv[], int *pgm_argc, const char ***pgm_argv, Parrot_Int *core, Parrot_Int
+=item C<static const char * parseflags(Parrot_PMC interp, int argc, const char
+*argv[], int *pgm_argc, const char ***pgm_argv, const char **core, Parrot_Int
 *trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
@@ -447,10 +473,10 @@ Parse Parrot's command line for options and set appropriate flags.
 
 PARROT_CAN_RETURN_NULL
 static const char *
-parseflags(PMC *interp,
+parseflags(Parrot_PMC interp,
         int argc, ARGIN(const char *argv[]),
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
-        ARGMOD(Parrot_Int *core), ARGMOD(Parrot_Int *trace))
+        ARGMOD(const char **core), ARGMOD(Parrot_Int *trace))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
@@ -465,26 +491,7 @@ parseflags(PMC *interp,
     while ((status = longopt_get(interp, argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
           case 'R':
-            if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
-                *core = PARROT_SLOW_CORE;
-            else if (STREQ(opt.opt_arg, "fast") || STREQ(opt.opt_arg, "function"))
-                *core = PARROT_FAST_CORE;
-            else if (STREQ(opt.opt_arg, "jit"))
-                *core = PARROT_FAST_CORE;
-            else if (STREQ(opt.opt_arg, "exec"))
-                *core = PARROT_EXEC_CORE;
-            else if (STREQ(opt.opt_arg, "trace"))
-                *core = PARROT_SLOW_CORE;
-            else if (STREQ(opt.opt_arg, "profiling"))
-                *core = PARROT_PROFILING_CORE;
-            else if (STREQ(opt.opt_arg, "gcdebug"))
-                *core = PARROT_GC_DEBUG_CORE;
-            else {
-                fprintf(stderr,
-                        "main: Unrecognized runcore '%s' specified."
-                        "\n\nhelp: parrot -h\n", opt.opt_arg);
-                exit(EXIT_FAILURE);
-            }
+            *core = opt.opt_arg;
             break;
           case 'g':
             /* Handled in parseflags_minimal */
@@ -495,17 +502,20 @@ parseflags(PMC *interp,
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                 const unsigned long _temp = strtoul(opt.opt_arg, NULL, 16);
-                const Parrot_trace_flags _temp_flag = (Parrot_trace_flags)_temp;
+                //const Parrot_trace_flags _temp_flag = (Parrot_trace_flags)_temp;
+                const Parrot_Int _temp_flag = _temp;
                 *trace = _temp_flag;
             }
             else
-                *trace = PARROT_TRACE_OPS_FLAG;
+                *trace = 0x01;
+                //*trace = PARROT_TRACE_OPS_FLAG;
             break;
           case 'D':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
                 Parrot_api_debug_flag(interp, strtoul(opt.opt_arg, NULL, 16), 1);
             else
-                Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
+                //Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
+                Parrot_api_debug_flag(interp, 0x01, 1);
             break;
 
           case '.':  /* Give Windows Parrot hackers an opportunity to
@@ -524,23 +534,31 @@ parseflags(PMC *interp,
             exit(EXIT_FAILURE);
             break;
           case OPT_RUNTIME_PREFIX:
-            Parrot_io_printf(interp, "%Ss\n",
-                    Parrot_get_runtime_path(interp));
-            exit(EXIT_SUCCESS);
+            {
+                Parrot_String runtimepath;
+                char * runtimepath_c;
+                Parrot_api_get_runtime_path(interp, &runtimepath);
+                Parrot_api_string_export_ascii(interp, runtimepath, &runtimepath_c);
+                fprintf(stdout, "%s", runtimepath_c);
+                exit(EXIT_SUCCESS);
+            }
           case 'V':
             Parrot_version();
             break;
 
           case OPT_GC_DEBUG:
 #if DISABLE_GC_DEBUG
-            Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+            //Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+            Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
 #endif
-            Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1);
+            //Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1);
+            Parrot_api_flag(interp, 0x10, 1);
             break;
           case OPT_DESTROY_FLAG:
-            Parrot_api_flag(interp PARROT_DESTROY_FLAG, 1);
+            //Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1);
+            Parrot_api_flag(interp, 0x200, 1);
             break;
           case 'I':
             result = Parrot_api_add_include_search_path(interp, opt.opt_arg);
@@ -552,7 +570,8 @@ parseflags(PMC *interp,
             result = Parrot_api_add_dynext_search_path(interp, opt.opt_arg);
             break;
           case 'w':
-            result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG);
+            //result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG);
+            result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
           case 'o':
             result = Parrot_api_set_output_file(interp, opt.opt_arg);
