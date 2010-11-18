@@ -31,6 +31,18 @@ static void allocate_more_chunks(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=over 4
+
+=item C<Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP)>
+
+allocate zeroed memory for the array
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array *
@@ -40,6 +52,16 @@ Parrot_pa_new(PARROT_INTERP)
     Parrot_Pointer_Array *res = mem_allocate_zeroed_typed(Parrot_Pointer_Array);
     return res;
 }
+
+/*
+
+=item C<void Parrot_pa_destroy(PARROT_INTERP, Parrot_Pointer_Array *self)>
+
+destroy/free allocated memory chunks
+
+=cut
+
+*/
 
 PARROT_EXPORT
 void
@@ -51,6 +73,17 @@ Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
         mem_sys_free(self->chunks[i]);
     mem_sys_free(self->chunks);
 }
+
+/*
+
+=item C<void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array *self, void
+*ptr)>
+
+insert into the array, allocating/reusing chunks as necessary
+
+=cut
+
+*/
 
 PARROT_EXPORT
 void *
@@ -87,6 +120,17 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     return ret;
 }
 
+/*
+
+=item C<void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self, void
+*ptr)>
+
+mark for removal
+
+=cut
+
+*/
+
 PARROT_EXPORT
 void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
@@ -97,6 +141,19 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     *(int*)ptr = (void**)((UINTVAL)self->next_free | 1);
     self->next_free = (void**)ptr;
 }
+
+/*
+
+=item C<static void allocate_more_chunks(PARROT_INTERP, Parrot_Pointer_Array
+*self)>
+
+allocate more chunks
+
+=back
+
+=cut
+
+*/
 
 static void
 allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
