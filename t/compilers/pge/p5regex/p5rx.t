@@ -696,7 +696,7 @@ Column 6, if present, contains a description of what is being tested.
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    test_line = chopn test_line, 1
+    test_line = chomp(test_line)
 
     $P1 = split "\t", test_line
 
@@ -728,6 +728,20 @@ Column 6, if present, contains a description of what is being tested.
      $P1 = new 'Exception'
      $P1[0] = 'invalid data format'
      throw $P1
+.end
+
+
+.sub 'chomp'
+    .param string str
+    $I0 = index str, "\r"
+    if $I0 < 0 goto L1
+    str = substr str, 0, $I0
+  L1:
+    $I1 = index str, "\n"
+    if $I1 < 0 goto L2
+    str = substr str, 0, $I1
+  L2:
+    .return (str)
 .end
 
 

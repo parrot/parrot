@@ -1,0 +1,37 @@
+/*
+Copyright (C) 2008-2010, Parrot Foundation.
+$Id$
+
+seeing if libffi is installed
+*/
+
+#include <stdio.h>
+#include <ffi.h>
+
+int main() {
+    ffi_cif cif;
+    ffi_type *args[1];
+    void *values[1];
+    char *s;
+    int rc;
+
+    /* Initialize the argument info vectors */
+    args[0] = &ffi_type_pointer;
+    values[0] = &s;
+
+    /* Initialize the cif */
+    if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 1,
+        &ffi_type_uint, args) == FFI_OK) {
+        s = "libffi worked";
+        ffi_call(&cif, FFI_FN(puts), &rc, values);
+    }
+
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

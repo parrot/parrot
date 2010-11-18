@@ -42,7 +42,7 @@ my $cwd = cwd();
                 qq{$libdir/Parrot/Git}), "Able to copy Parrot::Git::Describe");
 
             like($Parrot::Git::Describe::current,
-                qr/^(RELEASE_|REL_)\d+\_\d+\_\d+\-\d+\-g[a-z0-9]+$/i,
+                qr/^(RELEASE_|REL_)\d+\_\d+\_\d+(\-\d+\-g[a-z0-9]+)?$/i,
                 "Got a describe string",
             );
         };
