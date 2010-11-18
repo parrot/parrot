@@ -87,7 +87,7 @@ Create new Fixed_Allocator.
 
 Destroy Fixed_Allocator.
 
-=item C<void* Parrot_gc_fixed_allocator_allocate(PARROT_INTERP, Fixed_Allocator
+=item C<void * Parrot_gc_fixed_allocator_allocate(PARROT_INTERP, Fixed_Allocator
 *allocator, size_t size)>
 
 Allocate fixed size memory from Fixed_Allocator.
