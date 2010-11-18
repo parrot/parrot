@@ -975,7 +975,13 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
         IMCC_fataly(interp, EXCEPTION_LIBRARY_ERROR,
             "loadlib directive could not find library `%S'", s);
     }
-    Parrot_register_HLL_lib(interp, s);
+
+    /* store non-dynoplib library deps here, dynoplibs are treated separately for now */
+    if (!STRING_equal(interp,
+            VTABLE_get_string(interp,
+                VTABLE_getprop(interp, lib_pmc, Parrot_str_new_constant(interp, "_type"))),
+            Parrot_str_new_constant(interp, "Ops")))
+        imcc_pbc_add_libdep(interp, s);
 }
 
 /* HEADERIZER STOP */

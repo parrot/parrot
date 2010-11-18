@@ -610,6 +610,25 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
 }
 
 
+void
+imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname) {
+    PackFile_ByteCode *bc      = interp->code;
+    size_t i;
+
+    /* check if already present (avoids duplicates) */
+    for (i = 0; i < bc->n_libdeps; i++) {
+        if (STRING_equal(interp, libname, bc->libdeps[i]))
+            return;
+    }
+
+    bc->n_libdeps++;
+    bc->libdeps = mem_gc_realloc_n_typed_zeroed(interp, bc->libdeps,
+                            bc->n_libdeps, bc->n_libdeps - 1,
+                            STRING *);
+    bc->libdeps[bc->n_libdeps - 1] = libname;
+}
+
+
 /*
 
 =item C<opcode_t bytecode_map_op(PARROT_INTERP, opcode_t op)>
