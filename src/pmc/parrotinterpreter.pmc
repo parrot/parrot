@@ -765,7 +765,6 @@ Finish thawing.
 
         for (i = 0; i < m; ++i) {
             PMC * const entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
-            PMC * const lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
             PMC * const name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
             PMC * const typemap  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
             INTVAL hll_id = - 1;
@@ -774,16 +773,6 @@ Finish thawing.
                 STRING * const hll_name = VTABLE_get_string(INTERP, name_pmc);
 
                 hll_id           = Parrot_register_HLL(INTERP, hll_name);
-            }
-
-            if (!PMC_IS_NULL(lib_pmc)) {
-                STRING * const lib_name = VTABLE_get_string(INTERP, lib_pmc);
-
-                if (!STRING_IS_EMPTY(lib_name)) {
-                    PMC * const ignored = Parrot_load_lib(INTERP, lib_name, NULL);
-                    const INTVAL id     = Parrot_register_HLL_lib(INTERP, lib_name);
-                    UNUSED(id);
-                }
             }
 
             if (hll_id >= 0 && !PMC_IS_NULL(typemap)) {
