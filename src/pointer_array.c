@@ -140,7 +140,7 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     ASSERT_ARGS(Parrot_pa_remove)
 
     /* Mark sell to avoid iterating over */
-    *(int*)ptr = ((UINTVAL)self->next_free) | 1;
+    *(void **)ptr = ((UINTVAL)self->next_free) | 1;
     self->next_free = (void**)ptr;
 }
 
@@ -162,7 +162,7 @@ allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(allocate_more_chunks)
     self->current_chunk = self->total_chunks++;
-    self->chunks = mem_realloc_n_typed(self->chunks,
+    mem_realloc_n_typed(self->chunks,
             self->total_chunks,
             Parrot_Pointer_Array_Chunk*);
     self->chunks[self->current_chunk] = mem_allocate_typed(Parrot_Pointer_Array_Chunk);
