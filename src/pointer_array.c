@@ -56,6 +56,8 @@ PARROT_EXPORT
 void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
+    ASSERT_ARGS(Parrot_pa_insert)
+
     Parrot_Pointer_Array_Chunk   *chunk;
     void                         *ret;
 
