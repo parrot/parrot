@@ -133,14 +133,6 @@ X<.namespace directive>
 
 Define a namespace.
 
-=head3 .nci_call
-
-X<.nci_call directive>
-
-  .nci_call R<SUB>
-
-Create an NCI call.
-
 =head3 .param
 
 X<.param directive>

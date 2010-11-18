@@ -1011,7 +1011,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
-%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD METH_CALL INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
@@ -1576,10 +1576,6 @@ pcc_call:
            add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
          }
    | PCC_CALL var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | NCI_CALL var '\n'
          {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
          }

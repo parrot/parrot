@@ -630,13 +630,6 @@ with C<.meth_call>.
 Directive to do a method call. It calls the specified method on the object
 that was specified with the C<.invocant> directive.
 
-=item .nci_call
-
-Directive to make a call through the Native Calling Interface (NCI).
-The specified subroutine must be loaded using the <dlfunc> op that takes
-the library, function name and function signature as arguments.
-See F<docs/pdds/pdd16_native_call> for details.
-
 =item .set_return <var> [:<modifier>]*
 
 Between C<.begin_return> and C<.end_return>, specify one or
@@ -1294,24 +1287,6 @@ created.
     .end_call
 
 =end PIR_FRAGMENT
-
-=head3 NCI Call
-
-=begin PIR_FRAGMENT_TODO
-
-    load_lib $P0, "libname"
-    dlfunc $P1, $P0, "funcname", "signature"
-    # ...
-    .begin_call
-      .set_arg x
-      .set_arg y
-      .set_arg z
-      .nci_call $P1 # r = funcname(x, y, z)
-      .local int r  # optional - new result var
-      .get_result r
-    .end_call
-
-=end PIR_FRAGMENT_TODO
 
 =head3 Subroutine Call Syntactic Sugar
 
