@@ -283,18 +283,6 @@ L<https://trac.parrot.org/parrot/ticket/1103>
 
 L<https://trac.parrot.org/parrot/ticket/1622>
 
-=item .nci_call [eligible in 2.7]
-
-As of the latest PCC changes, there is nothing special about calling an NCI sub.
-
-L<https://trac.parrot.org/parrot/ticket/1623>
-
-=item .meth_call [eligible in 2.7]
-
-As of the latest PCC changes, this does nothing different from '.call'.
-
-L<https://trac.parrot.org/parrot/ticket/1624>
-
 =item :main Sub behaviour and selection. [eligible in 2.7]
 
 Currently, if no :main sub is found, the first .sub in a file is used as

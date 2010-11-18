@@ -58,7 +58,7 @@ Tests automatically generated read-only PMC support.
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_addr eh, eh_label
+    set_label eh, eh_label
 
     make_readonly(foo)
     push_eh eh
@@ -119,7 +119,7 @@ Tests automatically generated read-only PMC support.
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_addr eh, eh_label
+    set_label eh, eh_label
 
     make_readonly(foo)
     push_eh eh
@@ -146,7 +146,7 @@ Tests automatically generated read-only PMC support.
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_addr eh, eh_label
+    set_label eh, eh_label
 
     make_readonly(foo)
     push_eh eh
@@ -174,7 +174,7 @@ Tests automatically generated read-only PMC support.
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_addr eh, eh_label
+    set_label eh, eh_label
 
     foo = 3
     foo[0] = three
@@ -205,7 +205,7 @@ Tests automatically generated read-only PMC support.
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_addr eh, eh_label
+    set_label eh, eh_label
 
     fooclass = newclass 'Foo'
     addattribute fooclass, 'bar'
