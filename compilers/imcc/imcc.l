@@ -308,7 +308,6 @@ SP              [ ]
 ".begin_call"            return PCC_BEGIN;
 ".end_call"              return PCC_END;
 ".call"                  return PCC_CALL;
-".meth_call"             return METH_CALL;
 ".invocant"              return INVOCANT;
 <emit,INITIAL>".pcc_sub" return PCC_SUB;
 ".begin_return"          return PCC_BEGIN_RETURN;

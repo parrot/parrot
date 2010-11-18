@@ -116,15 +116,6 @@ X<.macro directive>
 Define a named macro with a list of parameters. The macro is called as
 .R<NAME>(R<arg1>,R<arg2>,...).  Always paired with C<.endm>.
 
-=head3 .meth_call
-
-X<.meth_call directive>
-
-  .meth_call R<SUB>
-  .meth_call R<SUB>, R<RETCONT>
-
-Create a method call.
-
 =head3 .namespace
 
 X<.namespace directive>

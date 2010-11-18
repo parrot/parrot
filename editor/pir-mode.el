@@ -228,7 +228,7 @@ newline or semicolon after an end keyword."
 (defvar pir-dotted-directives
   '(".HLL" ".arg" ".const" ".constant" ".emit" ".end" ".endm"
     ".endnamespace" ".eom" ".get_results" ".global" ".globalconst"
-    ".include" ".invocant" ".lex" ".line" ".loadlib" ".macro" ".meth_call"
+    ".include" ".invocant" ".lex" ".line" ".loadlib" ".macro"
     ".namespace" ".nci_call" ".pcc_begin" ".pcc_begin_return"
     ".pcc_begin_yield" ".pcc_call" ".pcc_end" ".pcc_end_return"
     ".pcc_end_yield" ".pcc_sub" ".result" ".return" ".sub"

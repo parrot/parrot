@@ -623,12 +623,7 @@ outside of a loop and the call is done inside a loop.
 =item .invocant
 
 Directive to specify the object for a method call. Use it in combination
-with C<.meth_call>.
-
-=item .meth_call
-
-Directive to do a method call. It calls the specified method on the object
-that was specified with the C<.invocant> directive.
+with C<.call> to call methods.
 
 =item .set_return <var> [:<modifier>]*
 
@@ -1342,7 +1337,7 @@ subroutine declaration contains "method".
 =head3 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
-C<.meth_call> which must immediately be preceded by the C<.invocant>:
+C<.call> immediately preceded by C<.invocant>:
 
 =begin PIR_FRAGMENT_TODO
 
@@ -1355,7 +1350,7 @@ C<.meth_call> which must immediately be preceded by the C<.invocant>:
    .set_arg y
    .set_arg z
    .invocant obj
-   .meth_call "method" [, $P1 ] # r = obj."method"(x, y, z)
+   .call "method" [, $P1 ] # r = obj."method"(x, y, z)
    .local int r  # optional - new result var
    .get_result r
    .end_call
