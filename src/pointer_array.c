@@ -108,3 +108,11 @@ allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
     self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
     self->chunks[self->current_chunk]->next_free = 0;
 }
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
