@@ -30,7 +30,10 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    return 1 unless -e '.git';
+    unless (-e '.git') {
+        $self->set_result('skipped');
+        return 1;
+    }
 
     my $sha1 = $Parrot::SHA1::current;
     my $abbrev_sha1;
