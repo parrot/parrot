@@ -51,9 +51,9 @@ SKIP: {
             "'git_describe' undefined as expected" );
         $conf->data->set( git_describe => undef ); # prepare for next test
     }
-    
+
     $conf->replenish($serialized);
-    
+
     {
         no warnings 'once';
         local $Parrot::Git::Describe::current = 'invalid git describe string';
@@ -63,9 +63,9 @@ SKIP: {
             "Got expected 'die' message for invalid git describe string" );
         ok( ! defined $ret, "runstep() returned undefined as expected" );
     }
-    
+
     $conf->replenish($serialized);
-    
+
     {
         no warnings 'once';
         my $cur = 'REL_2004_09_07-678-ga83bdab';
@@ -77,9 +77,9 @@ SKIP: {
         );
         $conf->data->set( git_describe => undef ); # prepare for next test
     }
-    
+
     $conf->replenish($serialized);
-    
+
     {
         no warnings 'once';
         my $cur = 'RELEASE_2_10_0';
@@ -91,7 +91,7 @@ SKIP: {
         );
         $conf->data->set( git_describe => undef ); # prepare for next test
     }
-    
+
     $conf->replenish($serialized);
 }
 
@@ -102,7 +102,7 @@ my $cwd = cwd();
 
     my $temp_libdir = File::Spec->catdir( $tdir, 'config', 'auto' );
     mkpath($temp_libdir, { mode => 0777 })
-        or croak "Unable to make path $temp_libdir"; 
+        or croak "Unable to make path $temp_libdir";
     ok( -d $temp_libdir, "temp directory $temp_libdir created" );
     my $from = qq{$cwd/config/auto/git_describe.pm};
     my $to   = qq{$temp_libdir/git_describe.pm};
@@ -114,9 +114,9 @@ my $cwd = cwd();
     my $conf = Parrot::Configure::Step::Test->new;
     $conf->include_config_results( $args );
     my $serialized = $conf->pcfreeze();
-    
+
     my $pkg = q{auto::git_describe};
-    
+
     $conf->add_steps($pkg);
     $conf->options->set( %{$args} );
     my $step = test_step_constructor_and_description($conf);

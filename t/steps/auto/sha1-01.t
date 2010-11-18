@@ -51,9 +51,9 @@ SKIP: {
             "'sha1' undefined as expected" );
         $conf->data->set( sha1 => undef ); # prepare for next test
     }
-    
+
     $conf->replenish($serialized);
-    
+
     {
         no warnings 'once';
         local $Parrot::SHA1::current = 'invalid SHA1 string';
@@ -63,9 +63,9 @@ SKIP: {
             "Got expected result for invalid SHA1 string" );
         ok( ! defined $ret, "runstep() returned undefined as expected" );
     }
-    
+
     $conf->replenish($serialized);
-    
+
     {
         no warnings 'once';
         my $cur = 'abcdefABCDEF0123456789012345678901234567';
@@ -83,7 +83,7 @@ SKIP: {
         $conf->data->set( sha1 => undef ); # prepare for next test
         $conf->data->set( abbrev_sha1 => undef ); # prepare for next test
     }
-    
+
     $conf->replenish($serialized);
 }
 
@@ -94,7 +94,7 @@ my $cwd = cwd();
 
     my $temp_libdir = File::Spec->catdir( $tdir, 'config', 'auto' );
     mkpath($temp_libdir, { mode => 0777 })
-        or croak "Unable to make path $temp_libdir"; 
+        or croak "Unable to make path $temp_libdir";
     ok( -d $temp_libdir, "temp directory $temp_libdir created" );
     my $from = qq{$cwd/config/auto/sha1.pm};
     my $to   = qq{$temp_libdir/sha1.pm};
@@ -106,9 +106,9 @@ my $cwd = cwd();
     my $conf = Parrot::Configure::Step::Test->new;
     $conf->include_config_results( $args );
     my $serialized = $conf->pcfreeze();
-    
+
     my $pkg = q{auto::sha1};
-    
+
     $conf->add_steps($pkg);
     $conf->options->set( %{$args} );
     my $step = test_step_constructor_and_description($conf);
