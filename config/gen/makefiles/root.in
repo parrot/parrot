@@ -881,9 +881,9 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
-$(MINIPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-    src/null_config$(O)
-	$(LINK) @ld_out@$@ src/main$(O) src/null_config$(O) \
+$(MINIPARROT) : src/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIBPARROT) \
+    src/null_config$(O) src/longopt$(O)
+	$(LINK) @ld_out@$@ src/main$(O) src/null_config$(O) src/longopt$(O) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 

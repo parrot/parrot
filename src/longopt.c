@@ -48,11 +48,11 @@ static int longopt_get_shortopt(
         FUNC_MODIFIES(* info_buf);
 
 #define ASSERT_ARGS_longopt_get_longopt __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-      PARROT_ASSERT_ARG(argv) \
+       PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(options) \
     , PARROT_ASSERT_ARG(info_buf))
 #define ASSERT_ARGS_longopt_get_shortopt __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-      PARROT_ASSERT_ARG(argv) \
+       PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(options) \
     , PARROT_ASSERT_ARG(info_buf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -111,8 +111,8 @@ Parrot_cmd_options(void)
 
 /*
 
-=item C<int longopt_get(int argc, const char* argv[], const
-struct longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
+=item C<int longopt_get(int argc, const char* argv[], const struct
+longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
 Gets long or short options, specified in C<options[]> (see
 F<docs/dev/longopt.dev>).
@@ -165,9 +165,8 @@ longopt_get(int argc, ARGIN(const char* argv[]),
 
 /*
 
-=item C<static int longopt_get_longopt(int argc, const char*
-argv[], const struct longopt_opt_decl options[], struct longopt_opt_info*
-info_buf)>
+=item C<static int longopt_get_longopt(int argc, const char* argv[], const
+struct longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
 Find the option identifier of a long option.
 
@@ -261,9 +260,8 @@ longopt_get_longopt(int argc, ARGIN(const char* argv[]),
 
 /*
 
-=item C<static int longopt_get_shortopt(int argc, const char*
-argv[], const struct longopt_opt_decl options[], struct longopt_opt_info*
-info_buf)>
+=item C<static int longopt_get_shortopt(int argc, const char* argv[], const
+struct longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
 Find the option identifier of the next short option.
 
