@@ -37,60 +37,63 @@ my $pkg = q{auto::git_describe};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-{
-    no warnings 'once';
-    local $Parrot::Git::Describe::current = undef;
-    my $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($step->result(), q{done},
-        "Got expected result for undefined \$Parrot::Git::Describe::current"
-    );
-    ok(! defined $conf->data->get( 'git_describe' ),
-        "'git_describe' undefined as expected" );
-    $conf->data->set( git_describe => undef ); # prepare for next test
+SKIP: {
+    skip "No .git directory when working from tarball", 9 unless (-e '.git');
+    {
+        no warnings 'once';
+        local $Parrot::Git::Describe::current = undef;
+        my $ret = $step->runstep($conf);
+        ok( $ret, "runstep() returned true value" );
+        is($step->result(), q{done},
+            "Got expected result for undefined \$Parrot::Git::Describe::current"
+        );
+        ok(! defined $conf->data->get( 'git_describe' ),
+            "'git_describe' undefined as expected" );
+        $conf->data->set( git_describe => undef ); # prepare for next test
+    }
+    
+    $conf->replenish($serialized);
+    
+    {
+        no warnings 'once';
+        local $Parrot::Git::Describe::current = 'invalid git describe string';
+        my $ret;
+        eval { $ret = $step->runstep($conf); };
+        like($@, qr/Invalid git describe string \(Git::Describe\)/,
+            "Got expected 'die' message for invalid git describe string" );
+        ok( ! defined $ret, "runstep() returned undefined as expected" );
+    }
+    
+    $conf->replenish($serialized);
+    
+    {
+        no warnings 'once';
+        my $cur = 'REL_2004_09_07-678-ga83bdab';
+        local $Parrot::Git::Describe::current = $cur;
+        my $ret = $step->runstep($conf);
+        ok( $ret, "runstep() returned true value" );
+        is($step->result(), $cur,
+            "Got expected result for valid \$Parrot::Git::Describe::current"
+        );
+        $conf->data->set( git_describe => undef ); # prepare for next test
+    }
+    
+    $conf->replenish($serialized);
+    
+    {
+        no warnings 'once';
+        my $cur = 'RELEASE_2_10_0';
+        local $Parrot::Git::Describe::current = $cur;
+        my $ret = $step->runstep($conf);
+        ok( $ret, "runstep() returned true value" );
+        is($step->result(), $cur,
+            "Got expected result for valid \$Parrot::Git::Describe::current"
+        );
+        $conf->data->set( git_describe => undef ); # prepare for next test
+    }
+    
+    $conf->replenish($serialized);
 }
-
-$conf->replenish($serialized);
-
-{
-    no warnings 'once';
-    local $Parrot::Git::Describe::current = 'invalid git describe string';
-    my $ret;
-    eval { $ret = $step->runstep($conf); };
-    like($@, qr/Invalid git describe string \(Git::Describe\)/,
-        "Got expected 'die' message for invalid git describe string" );
-    ok( ! defined $ret, "runstep() returned undefined as expected" );
-}
-
-$conf->replenish($serialized);
-
-{
-    no warnings 'once';
-    my $cur = 'REL_2004_09_07-678-ga83bdab';
-    local $Parrot::Git::Describe::current = $cur;
-    my $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($step->result(), $cur,
-        "Got expected result for valid \$Parrot::Git::Describe::current"
-    );
-    $conf->data->set( git_describe => undef ); # prepare for next test
-}
-
-$conf->replenish($serialized);
-
-{
-    no warnings 'once';
-    my $cur = 'RELEASE_2_10_0';
-    local $Parrot::Git::Describe::current = $cur;
-    my $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($step->result(), $cur,
-        "Got expected result for valid \$Parrot::Git::Describe::current"
-    );
-    $conf->data->set( git_describe => undef ); # prepare for next test
-}
-
-$conf->replenish($serialized);
 
 my $cwd = cwd();
 {

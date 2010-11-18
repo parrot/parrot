@@ -37,52 +37,55 @@ my $pkg = q{auto::sha1};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-{
-    no warnings 'once';
-    local $Parrot::SHA1::current = undef;
-    my $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($step->result(), q{done},
-        "Got expected result for undefined \$Parrot::SHA1::current"
-    );
-    ok(! defined $conf->data->get( 'sha1' ),
-        "'sha1' undefined as expected" );
-    $conf->data->set( sha1 => undef ); # prepare for next test
+SKIP: {
+    skip "No .git directory when working from tarball", 9 unless (-e '.git');
+    {
+        no warnings 'once';
+        local $Parrot::SHA1::current = undef;
+        my $ret = $step->runstep($conf);
+        ok( $ret, "runstep() returned true value" );
+        is($step->result(), q{done},
+            "Got expected result for undefined \$Parrot::SHA1::current"
+        );
+        ok(! defined $conf->data->get( 'sha1' ),
+            "'sha1' undefined as expected" );
+        $conf->data->set( sha1 => undef ); # prepare for next test
+    }
+    
+    $conf->replenish($serialized);
+    
+    {
+        no warnings 'once';
+        local $Parrot::SHA1::current = 'invalid SHA1 string';
+        my $ret;
+        eval { $ret = $step->runstep($conf); };
+        like($@, qr/Invalid Parrot sha1 \(SHA1\)/,
+            "Got expected result for invalid SHA1 string" );
+        ok( ! defined $ret, "runstep() returned undefined as expected" );
+    }
+    
+    $conf->replenish($serialized);
+    
+    {
+        no warnings 'once';
+        my $cur = 'abcdefABCDEF0123456789012345678901234567';
+        my $abbrev_cur = substr($cur,0,7);
+        local $Parrot::SHA1::current = $cur;
+        my $ret = $step->runstep($conf);
+        ok( $ret, "runstep() returned true value" );
+        is($step->result(), $abbrev_cur,
+            "Got expected result for valid \$Parrot::SHA1::current"
+        );
+        is($conf->data->get('sha1'), $cur,
+            "Got expected value for sha1" );
+        is($conf->data->get('abbrev_sha1'), $abbrev_cur,
+            "Got expected value for abbrev_sha1" );
+        $conf->data->set( sha1 => undef ); # prepare for next test
+        $conf->data->set( abbrev_sha1 => undef ); # prepare for next test
+    }
+    
+    $conf->replenish($serialized);
 }
-
-$conf->replenish($serialized);
-
-{
-    no warnings 'once';
-    local $Parrot::SHA1::current = 'invalid SHA1 string';
-    my $ret;
-    eval { $ret = $step->runstep($conf); };
-    like($@, qr/Invalid Parrot sha1 \(SHA1\)/,
-        "Got expected result for invalid SHA1 string" );
-    ok( ! defined $ret, "runstep() returned undefined as expected" );
-}
-
-$conf->replenish($serialized);
-
-{
-    no warnings 'once';
-    my $cur = 'abcdefABCDEF0123456789012345678901234567';
-    my $abbrev_cur = substr($cur,0,7);
-    local $Parrot::SHA1::current = $cur;
-    my $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($step->result(), $abbrev_cur,
-        "Got expected result for valid \$Parrot::SHA1::current"
-    );
-    is($conf->data->get('sha1'), $cur,
-        "Got expected value for sha1" );
-    is($conf->data->get('abbrev_sha1'), $abbrev_cur,
-        "Got expected value for abbrev_sha1" );
-    $conf->data->set( sha1 => undef ); # prepare for next test
-    $conf->data->set( abbrev_sha1 => undef ); # prepare for next test
-}
-
-$conf->replenish($serialized);
 
 my $cwd = cwd();
 {
