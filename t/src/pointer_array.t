@@ -31,6 +31,7 @@ plan tests => 2;
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array" );
 
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
@@ -92,6 +93,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterating)" );
 
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
