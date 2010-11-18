@@ -44,8 +44,8 @@ typedef struct Parrot_Pointer_Array {
 #define POINTER_ARRAY_ITER(_array, _code)                           \
 do {                                                                \
     size_t _i;                                                      \
-    for (_i = 0; _i < _array->total_chunks; _i++) {                 \
-        Parrot_Pointer_Array_Chunk  *chunk = _array->chunks[_i];    \
+    for (_i = 0; _i < (_array)->total_chunks; _i++) {               \
+        Parrot_Pointer_Array_Chunk  *chunk = (_array)->chunks[_i];  \
         size_t                       _j;                            \
                                                                     \
         for (_j = 0; _j < CELL_PER_CHUNK - chunk->num_free; _j++) { \
