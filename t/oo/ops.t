@@ -140,7 +140,7 @@ Tests opcodes related to the OO implementation.
 try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     addattribute $P0, 'oops'

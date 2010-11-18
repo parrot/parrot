@@ -141,7 +141,7 @@ Tests role composition in the OO implementation.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     $P2.'add_role'($P1)
@@ -171,7 +171,7 @@ Tests role composition in the OO implementation.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     $P1.'add_role'($P0)
@@ -322,7 +322,7 @@ Tests role composition in the OO implementation.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     BurninatorBoss.'add_role'(Burninator)

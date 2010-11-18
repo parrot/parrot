@@ -184,7 +184,7 @@ end:
 
     $P2 = new ['ExceptionHandler']
     $P2.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
-    set_addr $P2, null_ex_eh
+    set_label $P2, null_ex_eh
     push_eh $P2
 
     $P1 = $P0[$S0]
