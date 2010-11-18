@@ -37,7 +37,7 @@ static void allocate_more_chunks(PARROT_INTERP,
 
 =item C<Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP)>
 
-allocate zeroed memory for the array
+Allocate new Pointer_Array.
 
 =cut
 
@@ -57,7 +57,7 @@ Parrot_pa_new(PARROT_INTERP)
 
 =item C<void Parrot_pa_destroy(PARROT_INTERP, Parrot_Pointer_Array *self)>
 
-destroy/free allocated memory chunks
+Destroy Pointer_Arra and free allocated memory.
 
 =cut
 
@@ -79,7 +79,7 @@ Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 =item C<void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array *self, void
 *ptr)>
 
-insert into the array, allocating/reusing chunks as necessary
+Insert pointer into the array.
 
 =cut
 
@@ -125,7 +125,7 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 =item C<void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self, void
 *ptr)>
 
-mark for removal
+Remove pointer from array.
 
 =cut
 
