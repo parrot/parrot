@@ -99,8 +99,7 @@ main(int argc, const char *argv[])
     }
     /* init and set top of stack */
     Parrot_init_stacktop(interp, &status);
-    while ((status = longopt_get(interp,
-                    argc, argv, options, &opt)) > 0) {
+    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
           case 'h':
             option += enum_DIS_HEADER;

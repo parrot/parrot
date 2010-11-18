@@ -111,7 +111,7 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    int          stacktop;
+ng    int          stacktop;
     const char  *sourcefile;
     Parrot_PMC   interp;
     Parrot_PMC   bytecodepmc;
@@ -488,7 +488,7 @@ parseflags(Parrot_PMC interp,
         exit(EXIT_SUCCESS);
     }
 
-    while ((status = longopt_get(interp, argc, argv, Parrot_cmd_options(), &opt)) > 0) {
+    while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
           case 'R':
             *core = opt.opt_arg;

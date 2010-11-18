@@ -839,7 +839,7 @@ main(int argc, const char **argv)
     if (argc < 4) {
         help(interp);
     }
-    while ((status = longopt_get(interp, argc, argv, options, &opt)) > 0) {
+    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
             case 'o':
                 if (output_file == NULL)
