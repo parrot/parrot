@@ -73,9 +73,6 @@ typedef struct MarkSweep_GC {
 
 } MarkSweep_GC;
 
-/* Callback to destroy PMC or free string storage */
-typedef void (*sweep_cb)(PARROT_INTERP, PObj *obj);
-
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
