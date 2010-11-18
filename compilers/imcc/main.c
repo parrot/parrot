@@ -585,6 +585,7 @@ compile_to_bytecode(PARROT_INTERP,
     return pf;
 }
 
+PARROT_API
 int
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))

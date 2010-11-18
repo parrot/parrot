@@ -7,7 +7,7 @@
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_last_error(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_String ** errmsg))
+Parrot_api_get_last_error(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_String * errmsg))
 {
     EMBED_API_CALLIN(interp_pmc, interp);
     *errmsg = Parrot_str_new(interp, "Generic Error Message", 0);
@@ -21,24 +21,19 @@ Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), Parrot_Int flags, ARGIN_N
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
     Parrot_Interp interp_raw;
-    Parrot_Interp parent_raw;
     void *stacktop_ptr = &alt_stacktop;
     PMC * iglobals;
-
-    Parrot_set_config_hash();
-    {
-        const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
-        interp_raw = allocate_interpreter(parent_raw, flags);
-        if (args) {
-            if (args->stacktop)
-                stacktop_ptr = args->stacktop;
-            if (args->gc_system)
-                Parrot_gc_set_system_type(interp_raw, args->gc_system);
-            if (args->gc_threshold)
-                interp_raw->gc_threshold = args->gc_threshold;
-            if (args->hash_seed)
-                interp_raw->hash_seed = args->hash_seed;
-        }
+    const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+    interp_raw = allocate_interpreter(parent_raw, flags);
+    if (args) {
+        if (args->stacktop)
+            stacktop_ptr = args->stacktop;
+        if (args->gc_system)
+            Parrot_gc_set_system_type(interp_raw, args->gc_system);
+        if (args->gc_threshold)
+            interp_raw->gc_threshold = args->gc_threshold;
+        if (args->hash_seed)
+            interp_raw->hash_seed = args->hash_seed;
     }
     initialize_interpreter(interp_raw, stacktop_ptr);
     iglobals = interp_raw->iglobals;

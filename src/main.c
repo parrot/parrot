@@ -132,6 +132,8 @@ main(int argc, const char *argv[])
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
+    Parrot_set_config_hash();
+
     if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
@@ -547,12 +549,14 @@ parseflags(Parrot_PMC interp,
             break;
 
           case OPT_GC_DEBUG:
+          /*
 #if DISABLE_GC_DEBUG
             //Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
             Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
 #endif
+            */
             //Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1);
             Parrot_api_flag(interp, 0x10, 1);
             break;

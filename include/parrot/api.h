@@ -112,7 +112,7 @@ Parrot_Int Parrot_api_flag(
 PARROT_API
 Parrot_Int Parrot_api_get_last_error(
     ARGMOD(PMC * interp_pmc),
-    ARGOUT(Parrot_String ** errmsg))
+    ARGOUT(Parrot_String * errmsg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* interp_pmc)
@@ -285,6 +285,14 @@ Parrot_Int Parrot_api_string_import_ascii(
     , PARROT_ASSERT_ARG(out))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/strings.c */
+
+/* Forward declaration because IMCC is still part of libparrot, but we don't
+   want to include parrot/imcc.h */
+
+PARROT_API
+int
+imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(const char *sourcefile), int argc,
+        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
 
 #endif /* PARROT_API_H_GUARD */
 
