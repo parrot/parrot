@@ -615,6 +615,10 @@ imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname) {
     PackFile_ByteCode *bc      = interp->code;
     size_t i;
 
+    /* bail out early if compiling to text format */
+    if (!bc)
+        return;
+
     /* check if already present (avoids duplicates) */
     for (i = 0; i < bc->n_libdeps; i++) {
         if (STRING_equal(interp, libname, bc->libdeps[i]))
