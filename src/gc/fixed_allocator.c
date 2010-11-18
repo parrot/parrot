@@ -349,21 +349,17 @@ static void *
 pool_allocate(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(pool_allocate)
-    Pool_Allocator_Free_List *item;
 
-    if (pool->free_list)
-        item = (Pool_Allocator_Free_List *)get_free_list_item(pool);
-
-    else if (pool->newfree)
-        item = (Pool_Allocator_Free_List *)get_newfree_list_item(pool);
-
-    else {
-        allocate_new_pool_arena(pool);
-        item = (Pool_Allocator_Free_List *)get_newfree_list_item(pool);
+    if (pool->free_list) {
+        --pool->num_free_objects;
+        return get_free_list_item(pool);
     }
 
+    if (!pool->newfree)
+        allocate_new_pool_arena(pool);
+
     --pool->num_free_objects;
-    return (void *)item;
+    return get_newfree_list_item(pool);
 }
 
 static void
@@ -448,7 +444,7 @@ allocate_new_pool_arena(ARGMOD(Pool_Allocator *pool))
     if (pool->lo_arena_ptr > new_arena)
         pool->lo_arena_ptr = new_arena;
 
-    if (pool->hi_arena_ptr < (char*)new_arena + GC_FIXED_SIZE_POOL_SIZE)
+    if (pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
         pool->hi_arena_ptr = new_arena + GC_FIXED_SIZE_POOL_SIZE;
 }
 
