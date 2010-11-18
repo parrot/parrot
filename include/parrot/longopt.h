@@ -56,7 +56,7 @@ int longopt_get(
     ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
     ARGMOD(struct longopt_opt_info* info_buf))
-        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* info_buf);
