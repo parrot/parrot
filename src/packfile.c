@@ -228,7 +228,10 @@ static void make_code_pointers(ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*seg);
 
-static void mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
+static void mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)
+        __attribute__nonnull__(1);
+
+static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
@@ -403,7 +406,9 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_make_code_pointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_mark_1_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_mark_1_bc_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_PackFile_append_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
