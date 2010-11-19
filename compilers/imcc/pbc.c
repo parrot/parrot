@@ -390,16 +390,6 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         PMC        *self;
 
         cs->seg = interp->code = PF_create_default_segs(interp, name, 1);
-
-        /*
-         * create a PMC constant holding the interpreter state
-         *
-         * see also ParrotInterpreter.thaw and .thawfinish
-         * currently just HLL_info is saved/restored
-         */
-        self = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                IGLOBALS_INTERPRETER);
-        (void) add_const_table_pmc(interp, self);
     }
 
     IMCC_INFO(interp)->globals->cs = cs;
