@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 =head1 NAME
@@ -34,6 +34,17 @@ pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
 .end
 CODE
 42
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "ParrotLibrary props survive GC" );
+.sub main :main
+    loadlib $P1, 'foo_group'
+    sweep 1
+    $P2 = getprop '_type', $P1
+    say $P2
+.end
+CODE
+PMC
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" );
