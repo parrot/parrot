@@ -49,7 +49,7 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), const char * corename, Parrot_UIn
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
         Parrot_set_trace(interp, (Parrot_trace_flags)trace);
-        Parrot_set_run_cure(interp, PARROT_SLOW_CORE);
+        Parrot_set_run_core(interp, PARROT_SLOW_CORE);
     } else {
         Parrot_Run_core_t core = PARROT_SLOW_CORE;
         if (!strcmp(corename, "slow"))
@@ -146,7 +146,7 @@ Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filenam
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not load packfile");
-    *pbc = Parrot_pmc_new(interp, enum_class_Packfile);
+    *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }

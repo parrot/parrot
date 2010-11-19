@@ -509,6 +509,7 @@ INTERP_O_FILES = \
     src/vtables$(O) \
     src/warnings$(O) \
     src/packfile/pf_items$(O) \
+    src/longopt$(O) \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
 #IF(platform_asm):    src/platform_asm$(O) \

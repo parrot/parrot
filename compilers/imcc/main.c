@@ -243,6 +243,57 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
 
 /*
 
+=item C<const struct longopt_opt_decl * Parrot_cmd_options(void)>
+
+Set up the const struct declaration for cmd_options
+
+=cut
+
+*/
+
+// TODO: Weed out the options that IMCC doesn't use, and rename this function
+//       to something more imcc-ish
+const struct longopt_opt_decl *
+Parrot_cmd_options(void)
+{
+    ASSERT_ARGS(Parrot_cmd_options)
+    static const struct longopt_opt_decl cmd_options[] = {
+        { '.', '.', (OPTION_flags)0, { "--wait" } },
+        { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
+        { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
+        { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
+        { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
+        { 'I', 'I', OPTION_required_FLAG, { "--include" } },
+        { 'L', 'L', OPTION_required_FLAG, { "--library" } },
+        { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
+        { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
+        { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { '\0', OPT_GC_THRESHOLD, OPTION_required_FLAG, { "--gc-threshold" } },
+        { 'V', 'V', (OPTION_flags)0, { "--version" } },
+        { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
+        { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
+                                     { "--leak-test", "--destroy-at-end" } },
+        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
+        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
+        { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
+        { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
+        { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
+        { 'h', 'h', (OPTION_flags)0, { "--help" } },
+        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
+        { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
+        { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
+        { 't', 't', OPTION_optional_FLAG, { "--trace" } },
+        { 'v', 'v', (OPTION_flags)0, { "--verbose" } },
+        { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
+        { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
+        { 0, 0, (OPTION_flags)0, { NULL } }
+    };
+    return cmd_options;
+}
+
+/*
+
 =item C<static void do_pre_process(PARROT_INTERP, yyscan_t yyscanner)>
 
 Pre-processor step.  Turn parser's output codes into Parrot instructions.
@@ -698,7 +749,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     yylex_destroy(yyscanner);
 
     if (pf_raw) {
-        PMC * const _pbcpmc = Parrot_pmc_new(interp, enum_class_Packfile);
+        PMC * const _pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, _pbcpmc, pf_raw);
         *pbcpmc = _pbcpmc;
     }
