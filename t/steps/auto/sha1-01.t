@@ -119,7 +119,6 @@ my $cwd = cwd();
 
     chdir $cwd or croak "Could not change back dir after testing";
 }
->>>>>>> 5ac740e715f755125ae2423207657700471c2fe2:t/steps/auto/sha1-01.t
 
 pass("Completed all tests in $0");
 
