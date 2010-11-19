@@ -759,21 +759,6 @@ Finish thawing.
         UNUSED(info)
 
         PMC_args(SELF) = NULL;
-
-        /* merge new_info */
-        /* TODO compare old entries */
-
-        for (i = 0; i < m; ++i) {
-            PMC * const entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
-            PMC * const name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
-            INTVAL hll_id = - 1;
-
-            if (!PMC_IS_NULL(name_pmc)) {
-                STRING * const hll_name = VTABLE_get_string(INTERP, name_pmc);
-
-                hll_id           = Parrot_register_HLL(INTERP, hll_name);
-            }
-        }
     }
 
     METHOD run_gc() {
