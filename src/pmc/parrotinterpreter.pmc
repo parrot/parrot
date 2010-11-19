@@ -766,29 +766,12 @@ Finish thawing.
         for (i = 0; i < m; ++i) {
             PMC * const entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
             PMC * const name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
-            PMC * const typemap  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
             INTVAL hll_id = - 1;
 
             if (!PMC_IS_NULL(name_pmc)) {
                 STRING * const hll_name = VTABLE_get_string(INTERP, name_pmc);
 
                 hll_id           = Parrot_register_HLL(INTERP, hll_name);
-            }
-
-            if (hll_id >= 0 && !PMC_IS_NULL(typemap)) {
-                PMC   * const iter = VTABLE_get_iter(INTERP, typemap);
-                const INTVAL e     = VTABLE_get_integer(INTERP, typemap);
-                INTVAL i;
-
-                for (i = 0; i < e; ++i) {
-                    PMC * const key        = VTABLE_shift_pmc(INTERP, iter);
-                    const INTVAL core_type = VTABLE_get_integer(INTERP, key);
-                    const INTVAL hll_type  =
-                        VTABLE_get_integer_keyed_int(INTERP, typemap, core_type);
-
-                    Parrot_register_HLL_type(INTERP, hll_id,
-                        core_type, hll_type);
-                }
             }
         }
     }
