@@ -744,7 +744,7 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc_alloc_struct  *item = PMC2PAC(pmc);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
+    if (PObj_is_live_or_free_TESTALL(pmc))
         return;
 
     /* mark it live */
