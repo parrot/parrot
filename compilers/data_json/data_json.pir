@@ -52,6 +52,7 @@ the documentation at L<http://www.json.org/>.
 
 .sub 'compile' :method
     .param string json_string
+    .param pmc    opts :slurpy :named
 
     .local pmc parse, match
     parse = get_root_global ['parrot'; 'JSON'], 'value'
@@ -66,6 +67,14 @@ the documentation at L<http://www.json.org/>.
     pirgrammar = new ['JSON'; 'PIR']
     pirbuilder = pirgrammar.'apply'(match)
     pir = pirbuilder.'get'('result')
+
+    $I0 = exists opts['target']
+    unless $I0 goto no_targ
+        $S0 = opts['target']
+        unless $S0 == 'pir' goto not_pir
+            .return (pir)
+        not_pir:
+    no_targ:
 
     .local pmc pirc, result
     pirc = compreg 'PIR'
