@@ -157,10 +157,11 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
-      PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    Parrot_pbc_load(interp, pf);
+    if (pf->cur_cs != NULL)
+        Parrot_pbc_load(interp, pf);
     PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
     PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
