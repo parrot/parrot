@@ -60,7 +60,7 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 Create a new HLL information table entry.
 Takes an interpreter name and (optional) entry name.
 Returns a pointer to the new entry.
-Used by Parrot_register_HLL and Parrot_register_HLL_lib.
+Used by Parrot_register_HLL.
 
 =cut
 
@@ -180,56 +180,6 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     return idx;
 }
 
-/*
-
-=item C<INTVAL Parrot_register_HLL_lib(PARROT_INTERP, STRING *hll_lib)>
-
-Register an HLL library.
-Takes a pointer to a library name STRING to add. If the name has already
-been registered the list position of the library in the HLL Info list is
-returned. Otherwise, the library is added to the list and 0 is returned.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-INTVAL
-Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
-{
-    ASSERT_ARGS(Parrot_register_HLL_lib)
-    PMC   *hll_info = interp->HLL_info;
-    const INTVAL nelements = VTABLE_elements(interp, hll_info);
-    INTVAL i;
-
-    for (i = 0; i < nelements; ++i) {
-        PMC * const entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);
-        PMC * const lib_name = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_lib);
-
-        if (!PMC_IS_NULL(lib_name)) {
-            const STRING * const lib_name_str = VTABLE_get_string(interp, lib_name);
-            if (STRING_equal(interp, lib_name_str, hll_lib))
-                break;
-        }
-    }
-
-    if (i < nelements)
-        return i;
-    else {
-        PMC * const new_entry = new_hll_entry(interp, NULL);
-        PMC *name;
-
-        VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_name, PMCNULL);
-
-        /* register dynlib */
-        name    = Parrot_pmc_new_constant(interp, enum_class_String);
-
-        VTABLE_set_string_native(interp, name, hll_lib);
-        VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_lib, name);
-
-        return 0;
-    }
-}
 
 /*
 

@@ -451,10 +451,6 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
             PARROT_ASSERT(v);
 
-            /* workaround to keep ParrotInterpreter PBC hack working */
-            if (v->vtable->base_type == enum_class_ParrotInterpreter)
-                PObj_flag_CLEAR(private1, SELF);
-
             SELF.push_integer(
                     PObj_is_object_TEST(v)
                     ? (INTVAL) enum_class_Object

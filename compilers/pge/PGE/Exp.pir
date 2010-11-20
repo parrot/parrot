@@ -172,11 +172,11 @@ tree as a PIR code object that can be compiled.
           .return (mob)
       .end
       .sub '' :subid(%2)
-          .param pmc mob       :unique_reg
-          .param pmc adverbs   :unique_reg
-          .local string target :unique_reg
-          .local pmc mfrom, mpos :unique_reg
-          .local int cpos, iscont :unique_reg
+          .param pmc mob
+          .param pmc adverbs
+          .local string target
+          .local pmc mfrom, mpos
+          .local int cpos, iscont
           $P0 = get_hll_global ['PGE'], '$!MATCH'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
           $P0 = interpinfo %3
@@ -192,11 +192,11 @@ tree as a PIR code object that can be compiled.
     returnop = '.return'
     code.'emit'(<<"        CODE", name, pirflags)
       .sub %0 :method :nsentry %1
-          .param pmc adverbs      :unique_reg :slurpy :named
+          .param pmc adverbs      :slurpy :named
           .local pmc mob
-          .local string target    :unique_reg
-          .local pmc mfrom, mpos  :unique_reg
-          .local int cpos, iscont :unique_reg
+          .local string target
+          .local pmc mfrom, mpos
+          .local int cpos, iscont
           $P0 = get_hll_global ['PGE'], '$!MATCH'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(self, adverbs :flat :named)
           .local int lastpos
@@ -208,28 +208,28 @@ tree as a PIR code object that can be compiled.
     ##   generate the ustack only if we need it
     .local string expstr
     expstr = expcode
-    code.'emit'("          .local pmc cstack :unique_reg")
+    code.'emit'("          .local pmc cstack")
     code.'emit'("          cstack = root_new ['parrot';'ResizableIntegerArray']")
     $I0 = index expstr, 'ustack'
     if $I0 < 0 goto code_body_1
-    code.'emit'("          .local pmc ustack :unique_reg")
+    code.'emit'("          .local pmc ustack")
     code.'emit'("          ustack = root_new ['parrot';'ResizablePMCArray']")
   code_body_1:
     ##   generate the gpad only if we need it
     $I0 = index expstr, 'gpad'
     if $I0 < 0 goto code_body_2
-    code.'emit'("          .local pmc gpad :unique_reg")
+    code.'emit'("          .local pmc gpad")
     code.'emit'("          gpad = root_new ['parrot';'ResizablePMCArray']")
   code_body_2:
     ##   set the captscope if we need it
     $I0 = index expstr, 'captscope'
     if $I0 < 0 goto code_body_3
-    code.'emit'("          .local pmc captscope, captob :unique_reg")
+    code.'emit'("          .local pmc captscope, captob")
     code.'emit'("          captscope = mob")
   code_body_3:
 
     code.'emit'(<<"        CODE", PGE_CUT_RULE, returnop)
-          .local int pos, rep, cutmark :unique_reg
+          .local int pos, rep, cutmark
         try_match:
           if cpos > lastpos goto fail_rule
           mfrom = cpos

@@ -756,7 +756,8 @@ Unarchives the subroutine.
         sub->name           = VTABLE_shift_string(INTERP, info);
         sub->method_name    = VTABLE_shift_string(INTERP, info);
         sub->ns_entry_name  = VTABLE_shift_string(INTERP, info);
-        sub->HLL_id         = Parrot_get_HLL_id(INTERP,
+        /* lookup or create HLL */
+        sub->HLL_id         = Parrot_register_HLL(INTERP,
             VTABLE_shift_string(INTERP, info));
         sub->comp_flags     = VTABLE_shift_integer(INTERP, info);
         sub->vtable_index   = VTABLE_shift_integer(INTERP, info);

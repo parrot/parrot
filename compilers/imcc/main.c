@@ -332,7 +332,6 @@ do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
             case NEED_LEX:      printf(":lex");break;
             case METHOD:        printf(":method");break;
 
-            case UNIQUE_REG:    printf(":unique_reg");break;
             case ADV_FLAT:      printf(":flat");break;
             case ADV_SLURPY:    printf(":slurpy");break;
             case ADV_OPTIONAL:  printf(":optional");break;

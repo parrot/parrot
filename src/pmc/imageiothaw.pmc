@@ -312,10 +312,6 @@ Retrieve a PMC as the next item from the image.
                         Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                                 "Unknown PMC type to thaw %d", type);
 
-                    /* workaround to keep ParrotInterpreter PBC hack working */
-                    if (type == enum_class_ParrotInterpreter)
-                        PObj_flag_CLEAR(private1, SELF);
-
                     pmc = Parrot_pmc_new_noinit(INTERP, type);
 
                     VTABLE_set_pmc_keyed_int(INTERP, todo, id - 1, pmc);
