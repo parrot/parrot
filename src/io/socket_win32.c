@@ -300,6 +300,8 @@ AGAIN:
         bytesread += error;
         *s = Parrot_str_new_init(interp, buf, bytesread,
                 Parrot_binary_encoding_ptr, 0);
+        /* Hack to make Rakudo and UTF-8 work */
+        (*s)->encoding = Parrot_ascii_encoding_ptr;
         return bytesread;
     }
     else {
