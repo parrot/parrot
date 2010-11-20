@@ -583,6 +583,21 @@ thrown.
         }
     }
 
+/*
+
+=item C<get_user_id()>
+
+Returns the ID number of the current user. This is platform-dependent.
+
+=cut
+
+*/
+
+    METHOD get_user_id() {
+        const UINTVAL uid = Parrot_get_user_id();
+        RETURN(INTVAL uid);
+    }
+
 }
 
 /*
