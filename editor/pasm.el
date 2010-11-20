@@ -17,13 +17,13 @@
 ;;;;
 ;;;; 2) simple indentation (but it kills tabs, which i think is a good
 ;;;; thing so i'm not going to fix it (yes, it'm just justifying my
-;;;; lazyness (i just realized that this is going to create a *lot* of
+;;;; laziness (i just realized that this is going to create a *lot* of
 ;;;; whitespace diffs ... hmmm ...)))
 ;;;;
 ;;;; 3) a simple function for following branches. see the doc string
 ;;;; for pasm-follow-branch. By default this is bound to "C-c C-j".
 ;;;;
-;;;; 4) a function for passing the curent buffer to assembler.pl and
+;;;; 4) a function for passing the current buffer to assembler.pl and
 ;;;; passing the output of that to the parrot interpreter and putting
 ;;;; the output in another window. see the doc string for
 ;;;; pasm-assemble-and-run-buffer (dont't forget to set PERL5LIB). By
@@ -146,7 +146,7 @@ the beginning of a line (which doesn't have a label) we want to be
 moved forward to column 8"
   (interactive)
   (pasm-indent-line-function)
-  ;; how do we check if we're at the beginnign of a line? there must
+  ;; how do we check if we're at the beginning of a line? there must
   ;; be a function for this
   (unless (or (looking-at "[A-Za-z_][A-Za-z_0-9]*:") 
               (/= (beginning-of-line-point) (point)))
@@ -186,7 +186,7 @@ current op is branching or not we rely on the value of
   (let ((jump-to-point nil))
     ;; jump-to-point and the save-excursion are so that if we're not
     ;; on a branching op line or if the op to jump to isn't defined we
-    ;; don't move the point around unneccessarily (this would be very
+    ;; don't move the point around unnecessarily (this would be very
     ;; confusing, trust me)
     (save-excursion
       (beginning-of-line)
@@ -202,7 +202,7 @@ current op is branching or not we rely on the value of
           (search-backward-regexp "[^a-zA-Z_0-9]")
           (forward-char)
           (let ((label (buffer-substring (point) (1- (search-forward-regexp "[^a-zA-Z_0-9]")))))
-            ;; label is the name (minus the traling ':') of the label
+            ;; label is the name (minus the trailing ':') of the label
             ;; to jump to
             (beginning-of-buffer)
             (setq jump-to-point (search-forward (concat label ":")))))))

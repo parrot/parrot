@@ -28,7 +28,7 @@ keyboard handling has been removed.
 .sub main :main
     .param pmc argv
 
-    # Load OpenGL libary and a helper library for calling glutInit
+    # Load OpenGL library and a helper library for calling glutInit
     load_bytecode 'OpenGL.pbc'
     load_bytecode 'NCI/Utils.pbc'
 

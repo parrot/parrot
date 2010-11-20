@@ -37,7 +37,7 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
-ok(defined($step->result()), "A result has been defiined");
+ok(defined($step->result()), "A result has been defined");
 
 $conf->replenish($serialized);
 

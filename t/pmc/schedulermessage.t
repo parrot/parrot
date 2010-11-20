@@ -35,7 +35,7 @@ Tests the SchedulerMessage PMC.
     .local pmc eh
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh eh
     $I0 = 1
     $P1 = new ['Integer']

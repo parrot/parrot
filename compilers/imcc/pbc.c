@@ -390,16 +390,6 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         PMC        *self;
 
         cs->seg = interp->code = PF_create_default_segs(interp, name, 1);
-
-        /*
-         * create a PMC constant holding the interpreter state
-         *
-         * see also ParrotInterpreter.thaw and .thawfinish
-         * currently just HLL_info is saved/restored
-         */
-        self = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                IGLOBALS_INTERPRETER);
-        (void) add_const_table_pmc(interp, self);
     }
 
     IMCC_INFO(interp)->globals->cs = cs;
@@ -607,6 +597,29 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
     }
 
     return code_size;
+}
+
+
+void
+imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname) {
+    PackFile_ByteCode *bc      = interp->code;
+    size_t i;
+
+    /* bail out early if compiling to text format */
+    if (!bc)
+        return;
+
+    /* check if already present (avoids duplicates) */
+    for (i = 0; i < bc->n_libdeps; i++) {
+        if (STRING_equal(interp, libname, bc->libdeps[i]))
+            return;
+    }
+
+    bc->n_libdeps++;
+    bc->libdeps = mem_gc_realloc_n_typed_zeroed(interp, bc->libdeps,
+                            bc->n_libdeps, bc->n_libdeps - 1,
+                            STRING *);
+    bc->libdeps[bc->n_libdeps - 1] = libname;
 }
 
 

@@ -18,7 +18,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(133)
+    plan(136)
 
     set_or_get_strings()
     setting_integers()
@@ -576,9 +576,9 @@ loop:
     $P0.'reverse'('hsifyllej')
     is( $P0, 'jellyfish', "reverse string with optional arg")
 
-    $P0 = box unicode:"Ñà¦ª"
+    $P0 = box unicode:"科ムウオ"
     $P0.'reverse'()
-    is( $P0, unicode:"ª¦àÑ", 'reverse unicode string')
+    is( $P0, unicode:"オウム科", 'reverse unicode string')
 
 .end
 
@@ -633,6 +633,9 @@ loop:
     s = "2a"
     $I0 = s.'to_int'(16)
     is( $I0, "42", '... 16' )
+    s = "2B"
+    $I0 = s.'to_int'(16)
+    is( $I0, "43", '... 16 upper' )
     s = "1001"
     $I0 = s.'to_int'(2)
     is( $I0, "9", '... 2' )
@@ -783,6 +786,17 @@ check:
     k = 0
     s[k] = $S0
     is(s, 'f', 'Set string keyed with PMC')
+
+    k = 1
+    $I0 = ord 'g'
+    s[k] = $I0
+    is(s, 'fg', 'Set integer keyed with PMC')
+
+    k = 2
+    $P0 = new ['String']
+    $P0 = 'h'
+    s[k] = $P0
+    is(s, 'fgh', 'Set PMC keyed with PMC')
 
     push_eh null_replace
     s = new ['String']

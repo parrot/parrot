@@ -229,32 +229,13 @@ C<0x> and C<0b> denote hex and binary constants respectively.
 
 =over 4
 
-=item .local <type> <identifier> [:unique_reg]
+=item .local <type> <identifier>
 
 Define a local name I<identifier> within a subroutine with the given
 I<type>. You can define multiple identifiers of the same type by
 separating them with commas:
 
   .local int i, j
-
-The optional C<:unique_reg> modifier will force the register allocator to
-associate the identifier with a unique register for the duration of the
-subroutine. If the register allocator is thought of as an optimization
-tool for allowing fewer registers to be used in a register frame by reusing
-unused registers, then the C<:unique_reg> directive forces this
-optimization to be turned off. This can be important in a number of
-situations:
-
-=over 4
-
-=item * When a subroutine has a small fixed number of registers
-
-=item * When a named variable or named register is used throughout the entire
-subroutine
-
-=item * When a reference needs to be made to a register
-
-=back
 
 =item .lex <string constant>, <reg>
 
@@ -623,19 +604,7 @@ outside of a loop and the call is done inside a loop.
 =item .invocant
 
 Directive to specify the object for a method call. Use it in combination
-with C<.meth_call>.
-
-=item .meth_call
-
-Directive to do a method call. It calls the specified method on the object
-that was specified with the C<.invocant> directive.
-
-=item .nci_call
-
-Directive to make a call through the Native Calling Interface (NCI).
-The specified subroutine must be loaded using the <dlfunc> op that takes
-the library, function name and function signature as arguments.
-See F<docs/pdds/pdd16_native_call> for details.
+with C<.call> to call methods.
 
 =item .set_return <var> [:<modifier>]*
 
@@ -671,7 +640,7 @@ C<:optional>, and C<:opt_flag>.
 At the top of a subroutine, declare a local variable, in the manner
 of C<.local>, into which parameter(s) of the current subroutine should
 be stored. Available modifiers: C<:slurpy>, C<:named>, C<:optional>,
-C<:opt_flag> and C<:unique_reg>.
+C<:opt_flag>.
 
 =back
 
@@ -1295,24 +1264,6 @@ created.
 
 =end PIR_FRAGMENT
 
-=head3 NCI Call
-
-=begin PIR_FRAGMENT_TODO
-
-    load_lib $P0, "libname"
-    dlfunc $P1, $P0, "funcname", "signature"
-    # ...
-    .begin_call
-      .set_arg x
-      .set_arg y
-      .set_arg z
-      .nci_call $P1 # r = funcname(x, y, z)
-      .local int r  # optional - new result var
-      .get_result r
-    .end_call
-
-=end PIR_FRAGMENT_TODO
-
 =head3 Subroutine Call Syntactic Sugar
 
 Below there are three different ways to invoke the subroutine C<sub_label>.
@@ -1367,7 +1318,7 @@ subroutine declaration contains "method".
 =head3 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
-C<.meth_call> which must immediately be preceded by the C<.invocant>:
+C<.call> immediately preceded by C<.invocant>:
 
 =begin PIR_FRAGMENT_TODO
 
@@ -1380,7 +1331,7 @@ C<.meth_call> which must immediately be preceded by the C<.invocant>:
    .set_arg y
    .set_arg z
    .invocant obj
-   .meth_call "method" [, $P1 ] # r = obj."method"(x, y, z)
+   .call "method" [, $P1 ] # r = obj."method"(x, y, z)
    .local int r  # optional - new result var
    .get_result r
    .end_call

@@ -98,7 +98,7 @@ Taken from an I register
 
 =item f
 
-Paramter is a float
+Parameter is a float
 
 Taken from an N register.
 
@@ -110,7 +110,7 @@ Taken from an N register.
 
 =item t
 
-Paramter is a char *, presumably a C string
+Parameter is a char *, presumably a C string
 
 Taken from an S register
 

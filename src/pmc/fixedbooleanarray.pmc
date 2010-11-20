@@ -601,7 +601,7 @@ Used to unarchive the string.
 
 =item C<METHOD fill(INTVAL fill)>
 
-Sets all of the entires to true if fill is a true value, otherwise
+Sets all of the entries to true if fill is a true value, otherwise
 sets them all to false.
 
 =cut

@@ -254,10 +254,6 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
             parrot_hash_put(INTERP, hash, v, v);
 
-            /* workaround to keep ParrotInterpreter PBC hack working */
-            if (v->vtable->base_type == enum_class_ParrotInterpreter)
-                PObj_flag_CLEAR(private1, SELF);
-
             VTABLE_push_integer(INTERP, SELF, v->vtable->base_type);
             VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo, v);
         }

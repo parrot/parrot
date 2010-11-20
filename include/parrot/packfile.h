@@ -89,7 +89,7 @@
 /*
 ** Enumerated constants
 ** Changes here require update PBC_COMPAT
-** The prefered way to eliminate a value is just to stop using it without
+** The preferred way to eliminate a value is just to stop using it without
 ** renumbering others, that helps to keep backward compatibility.
 */
 
@@ -254,6 +254,8 @@ struct PackFile_ByteCode {
     op_func_t                    *op_func_table;   /* opcode dispatch table */
     op_func_t                    *save_func_table; /* for when we hijack op_func_table */
     op_info_t                   **op_info_table;
+    size_t                        n_libdeps;       /* number of library dependancies */
+    STRING                      **libdeps;         /* names of prerequisite libraries */
 };
 
 typedef struct PackFile_DebugFilenameMapping {

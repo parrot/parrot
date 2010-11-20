@@ -260,7 +260,7 @@ method source( $trans ) {
 =item C<get_body($trans)>
 
 Performs the various macro substitutions using the specified transform,
-correctly handling nested substitions, and repeating over the whole string
+correctly handling nested substitutions, and repeating over the whole string
 until no more substitutions can be made.
 
 C<VTABLE_> macros are enforced by converting C<<< I<< x >>->vtable->I<<

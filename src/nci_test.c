@@ -936,8 +936,8 @@ PARROT_DYNEXT_EXPORT
 void
 nci_cb_D4(cb_D4_func times_ten, void* user_data)
 {
-    int cnt;
-    for (cnt = 0; cnt < 9; ++cnt)
+    int count;
+    for (count = 0; count < 9; ++count)
     {
         (times_ten)(user_data, &int_cb_D4);
         ++int_cb_D4;

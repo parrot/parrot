@@ -186,7 +186,7 @@ CODE
     obj = new "Foo6"
     .begin_call
     .invocant obj
-    .meth_call "_meth"
+    .call "_meth"
     .end_call
 .end
 
@@ -208,7 +208,7 @@ CODE
     meth = meth . "th"  # test concat to
     .begin_call
     .invocant obj
-    .meth_call meth
+    .call meth
     .end_call
 .end
 
@@ -228,7 +228,7 @@ CODE
     .begin_call
     .set_arg "hello"
     .invocant obj
-    .meth_call "_meth"
+    .call "_meth"
     .get_result $S0
     .end_call
     is($S0, 'ok', 'explicit meth call syntax, args')
@@ -254,7 +254,7 @@ CODE
     obj = new "Foo9"
     .begin_call
     .invocant obj
-    .meth_call "_meth"
+    .call "_meth"
     .end_call
 .end
 

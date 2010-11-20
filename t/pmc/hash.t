@@ -184,7 +184,7 @@ end:
 
     $P2 = new ['ExceptionHandler']
     $P2.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
-    set_addr $P2, null_ex_eh
+    set_label $P2, null_ex_eh
     push_eh $P2
 
     $P1 = $P0[$S0]
@@ -1359,7 +1359,7 @@ postit_end:
 
     # PMC is first value type
     hash.'set_value_type'(.DATATYPE_PMC)
-    $P0 = new 'Env' # arbitary choice. Just to prevent possible casting.
+    $P0 = new 'Env' # arbitrary choice. Just to prevent possible casting.
     hash['env'] = $P0
     hash['foo'] = 42
     hash['bar'] = 21285.06

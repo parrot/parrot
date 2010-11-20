@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/op/sprintf2.t - Auxilliary tests for the sprintf opcode
+t/op/sprintf2.t - Auxiliary tests for the sprintf opcode
 
 =head1 SYNOPSIS
 

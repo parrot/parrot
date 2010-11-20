@@ -808,7 +808,7 @@ N: Ovid
 D: Rename 'pbc_to_c' to 'pbc_to_exe'
 
 N: Paco Alguacil
-D: Building on various platorms
+D: Building on various platforms
 E: paco.linux@gmail.com
 
 N: Pancake
@@ -1038,8 +1038,13 @@ U: tcurtis
 E: tyler.l.curtis@gmail.com
 E: ekiru.0@gmail.com
 D: PAST Optimization GSoC 2010
+D: Release manager for 2.10.0
 A: tylercurtis
 A: ekiru
+
+N: Tadeusz Sośnierz
+U: tadzik
+E: tadzikes@gmail.com
 
 N: Ujwal Reddy Malipeddi
 U: ujwalic

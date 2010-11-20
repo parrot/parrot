@@ -64,6 +64,13 @@ sub runstep {
     open( my $OUT, ">", $gen_pm )
         or die "Can't open $gen_pm: $!";
 
+    # add some keys convenient for embedders
+    $conf->data->add( ' ', 'embed-cflags' =>
+        '-I' . $conf->data->get('includedir') . $conf->data->get('versiondir') );
+    $conf->data->add( ' ', 'embed-ldflags' =>
+        '-L' . $conf->data->get('libdir') . ' -lparrot ' . $conf->data->get('icu_shared') .
+        ' ' . $conf->data->get('libs') );
+
     # escape spaces in current directory
     my $cwd = cwd();
     $cwd =~ s{ }{\\ }g;

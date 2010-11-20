@@ -32,7 +32,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 # Set up expected output for examples
 
 # cannot test the exact result, just adding one method somewhere
-# changes all. Also namespaces are hashes.  And we do not gurantee any specific
+# changes all. Also namespaces are hashes.  And we do not guarantee any specific
 # order of keys.  test the name of the 2 toplevel names,  parrot is using
 my %expected = (
     'namespace_dump.pir' => << 'END_EXPECTED',

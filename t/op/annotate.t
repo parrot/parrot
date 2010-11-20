@@ -93,7 +93,7 @@ Test various use cases of the annotate directive.
 
     isa_ok ($P0, 'Hash', 'annotations_p op gives back hash')
     $I0 = elements $P0
-    is ($I0, 2, 'annoations op gave hash with right number of elements')
+    is ($I0, 2, 'annotations op gave hash with right number of elements')
     $S0 = $P0['file']
     is ($S0, 'loo.py', 'annotations_p op gave back correct hash')
     $I1 = $P0['line']

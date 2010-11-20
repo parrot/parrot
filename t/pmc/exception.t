@@ -148,7 +148,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub test_attrs
     $P0 = new 'ExceptionHandler'
-    set_addr $P0, _handler
+    set_label $P0, _handler
     push_eh $P0
     throw $P0
   _handler:
@@ -220,7 +220,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     ex = new ['Exception']
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_ATTRIB_NOT_FOUND)
-    set_addr eh, catch
+    set_label eh, catch
     result = 0
     push_eh eh
     setattribute ex, 'wrong attribute', eh
@@ -296,7 +296,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub test_push_pop_eh_long
     $P0 = new ['ExceptionHandler']
-    set_addr $P0, handler
+    set_label $P0, handler
     push_eh $P0
     ok(1,'push_eh works (long)')
 
@@ -319,7 +319,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub test_throw_obj
     new $P20, ['ExceptionHandler']
-    set_addr $P20, _handler
+    set_label $P20, _handler
     push_eh $P20
     new $P30, ['Exception']
     throw $P30

@@ -308,8 +308,6 @@ SP              [ ]
 ".begin_call"            return PCC_BEGIN;
 ".end_call"              return PCC_END;
 ".call"                  return PCC_CALL;
-".nci_call"              return NCI_CALL;
-".meth_call"             return METH_CALL;
 ".invocant"              return INVOCANT;
 <emit,INITIAL>".pcc_sub" return PCC_SUB;
 ".begin_return"          return PCC_BEGIN_RETURN;
@@ -329,7 +327,6 @@ SP              [ ]
 <emit,INITIAL>":lex"       return NEED_LEX;
 <emit,INITIAL>":vtable"    return VTABLE_METHOD;
 <emit,INITIAL>":nsentry"   return NS_ENTRY;
-":unique_reg"              return UNIQUE_REG;
 ":instanceof"              return SUB_INSTANCE_OF;
 ":subid"                   return SUBID;
 

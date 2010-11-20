@@ -228,7 +228,10 @@ static void make_code_pointers(ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*seg);
 
-static void mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
+static void mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)
+        __attribute__nonnull__(1);
+
+static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
@@ -403,7 +406,9 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_make_code_pointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_mark_1_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_mark_1_bc_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_PackFile_append_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -763,7 +768,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
 
 /*
 
-=item C<static void mark_1_seg(PARROT_INTERP, PackFile_ConstTable *ct)>
+=item C<static void mark_1_ct_seg(PARROT_INTERP, PackFile_ConstTable *ct)>
 
 While the PMCs should be constant, their possible contents such as
 properties aren't constructed const, so we have to mark them.
@@ -773,9 +778,9 @@ properties aren't constructed const, so we have to mark them.
 */
 
 static void
-mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
+mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
 {
-    ASSERT_ARGS(mark_1_seg)
+    ASSERT_ARGS(mark_1_ct_seg)
     opcode_t i;
 
     for (i = 0; i < ct->str.const_count; i++)
@@ -785,6 +790,26 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         Parrot_gc_mark_PMC_alive(interp, ct->pmc.constants[i]);
 }
 
+
+/*
+
+=item C<static void mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)>
+
+Mark gcables in bytecode header.
+
+=cut
+
+*/
+
+
+static void
+mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)
+{
+    ASSERT_ARGS(mark_1_bc_seg)
+    size_t i;
+    for (i = 0; i < bc->n_libdeps; i++)
+        Parrot_gc_mark_STRING_alive(interp, bc->libdeps[i]);
+}
 
 /*
 
@@ -806,11 +831,24 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
 
     Parrot_gc_mark_STRING_alive(interp, seg->name);
 
-    if (seg->type == PF_DIR_SEG)
+    switch (seg->type) {
+      case PF_DIR_SEG:
         PackFile_map_segments(interp, (const PackFile_Directory *)seg,
                 find_const_iter, user_data);
-    else if (seg->type == PF_CONST_SEG)
-        mark_1_seg(interp, (PackFile_ConstTable *)seg);
+        break;
+
+      case PF_CONST_SEG:
+        mark_1_ct_seg(interp, (PackFile_ConstTable *)seg);
+        break;
+
+      case PF_BYTEC_SEG:
+        mark_1_bc_seg(interp, (PackFile_ByteCode *)seg);
+        break;
+
+      default:
+        break;
+    }
+
 
     return 0;
 }
@@ -1350,7 +1388,7 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     pf->cur_cs = NULL;
     pf_register_standard_funcs(interp, pf);
 
-    /* create the master directory, all subirs go there */
+    /* create the master directory, all sub-dirs go there */
     pf->directory.base.pf = pf;
     pf->dirp              = (PackFile_Directory *)
         PackFile_Segment_new_seg(interp, &pf->directory,
@@ -2505,6 +2543,9 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         mem_gc_free(interp, byte_code->op_mapping.libs);
     }
 
+    if (byte_code->libdeps)
+        mem_gc_free(interp, byte_code->libdeps);
+
     if (byte_code->annotations)
         PackFile_Annotations_destroy(interp, (PackFile_Segment *)byte_code->annotations);
 
@@ -2514,6 +2555,7 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     byte_code->op_func_table   = NULL;
     byte_code->op_info_table   = NULL;
     byte_code->op_mapping.libs = NULL;
+    byte_code->libdeps         = NULL;
 }
 
 
@@ -2561,7 +2603,10 @@ byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
     size_t size;
     int i;
 
-    size = 2; /* op_count + n_libs */
+    size = 3; /* op_count + n_libs + n_libdeps*/
+
+    for (i = 0; i < byte_code->n_libdeps; i++)
+        size += PF_size_string(byte_code->libdeps[i]);
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
         PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
@@ -2598,8 +2643,12 @@ byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cur
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
 
+    *cursor++ = byte_code->n_libdeps;
     *cursor++ = byte_code->op_count;
     *cursor++ = byte_code->op_mapping.n_libs;
+
+    for (i = 0; i < byte_code->n_libdeps; i++)
+        cursor = PF_store_string(cursor, byte_code->libdeps[i]);
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
         int j;
@@ -2644,6 +2693,10 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     int i;
     size_t total_ops = 0;
 
+    byte_code->n_libdeps         = PF_fetch_opcode(self->pf, &cursor);
+    byte_code->libdeps           = mem_gc_allocate_n_zeroed_typed(interp,
+                                        byte_code->n_libdeps, STRING *);
+
     byte_code->op_count          = PF_fetch_opcode(self->pf, &cursor);
     byte_code->op_func_table     = mem_gc_allocate_n_zeroed_typed(interp,
                                         byte_code->op_count, op_func_t);
@@ -2655,6 +2708,11 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     byte_code->op_mapping.libs   = mem_gc_allocate_n_zeroed_typed(interp,
                                     byte_code->op_mapping.n_libs,
                                     PackFile_ByteCode_OpMappingEntry);
+
+    for (i = 0; i < byte_code->n_libdeps; i++) {
+        STRING *libname = PF_fetch_string(interp, self->pf, &cursor);
+        PMC    *lib_pmc = Parrot_load_lib(interp, libname, NULL);
+    }
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
         PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
@@ -3907,7 +3965,7 @@ PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
 Adds a new bytecode annotation entry. Takes the annotations segment to add the
 entry to, the current bytecode offset (assumed to be the greatest one so far in
-the currently active group), the annotation key (as an index into the constats
+the currently active group), the annotation key (as an index into the constants
 table), the annotation value type (one of PF_ANNOTATION_KEY_TYPE_INT,
 PF_ANNOTATION_KEY_TYPE_STR or PF_ANNOTATION_KEY_TYPE_NUM) and the value. The
 value will be an integer literal in the case of type being

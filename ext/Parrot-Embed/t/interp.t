@@ -26,7 +26,7 @@ like( $except, qr/File 'no file here' not found/, '... throwing exception' );
 $result = eval { $interp->load_file($hello_pbc) };
 $except = $@;
 ok( $result, '... returning true if it could load the file' );
-is( $except, '', '... throwing no exeption if so' );
+is( $except, '', '... throwing no exception if so' );
 
 can_ok( $module, 'find_global' );
 my $global_greet = $interp->find_global('greet');

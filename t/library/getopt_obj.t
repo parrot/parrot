@@ -277,7 +277,7 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
         $S0 = $P1["foo"]
         is($S0, 1, 'double dash stop')
 
-        # Hash sets an nonexistant value to ''
+        # Hash sets an nonexistent value to ''
         $S0 = $P1["bar"]
         is($S0, '', 'double dash stop')
 

@@ -1054,7 +1054,7 @@ l1:
 
     a = a * b
     set $S0, a
-    is( $S0, '1', 'multip and reasign to subclassed Integer is 1' )
+    is( $S0, '1', 'multiply and reassign to subclassed Integer is 1' )
 .end
 
 .sub equality_of_subclassed_Integer

@@ -1,4 +1,3 @@
-
 =head1 Purpose
 
 Provide a list of deprecated and experimental items in parrot.
@@ -224,18 +223,6 @@ Intended to replace the CodeString charname_to_ord method.
 
 L<https://trac.parrot.org/parrot/ticket/1629>
 
-=item All opcodes that modify non-argument registers. [eligible in 2.7]
-
-E.g. "cleari", etc.
-
-L<https://trac.parrot.org/parrot/ticket/1642>
-
-=item exchange [eligible in 2.7]
-
-This op is too low level for Parrot in its current form.
-
-L<https://trac.parrot.org/parrot/ticket/1643>
-
 =item finalize [experimental]
 
 Finalize exception handler, unrolling inner runloops if needed.
@@ -291,22 +278,6 @@ L<https://trac.parrot.org/parrot/ticket/1091>
 =item implicit optional named parameters [eligible in 2.1]
 
 L<https://trac.parrot.org/parrot/ticket/1103>
-
-=item :unique_reg flag [eligible in 2.7]
-
-L<https://trac.parrot.org/parrot/ticket/1622>
-
-=item .nci_call [eligible in 2.7]
-
-As of the latest PCC changes, there is nothing special about calling an NCI sub.
-
-L<https://trac.parrot.org/parrot/ticket/1623>
-
-=item .meth_call [eligible in 2.7]
-
-As of the latest PCC changes, this does nothing different from '.call'.
-
-L<https://trac.parrot.org/parrot/ticket/1624>
 
 =item :main Sub behaviour and selection. [eligible in 2.7]
 
@@ -483,6 +454,12 @@ L<https://trac.parrot.org/parrot/ticket/754>
 =item OpenGL bindings and libraries [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/852>
+
+=item pkg-config support [eligible in 3.1]
+
+Use C<parrot_config> instead.
+
+L<http://trac.parrot.org/parrot/ticket/1853>
 
 =back
 

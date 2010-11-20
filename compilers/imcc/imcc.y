@@ -975,7 +975,13 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
         IMCC_fataly(interp, EXCEPTION_LIBRARY_ERROR,
             "loadlib directive could not find library `%S'", s);
     }
-    Parrot_register_HLL_lib(interp, s);
+
+    /* store non-dynoplib library deps here, dynoplibs are treated separately for now */
+    if (!STRING_equal(interp,
+            VTABLE_get_string(interp,
+                VTABLE_getprop(interp, lib_pmc, Parrot_str_new_constant(interp, "_type"))),
+            Parrot_str_new_constant(interp, "Ops")))
+        imcc_pbc_add_libdep(interp, s);
 }
 
 /* HEADERIZER STOP */
@@ -1011,17 +1017,16 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
-%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
-%token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type hll_def return_or_yield comma_or_goto opt_unique_reg
+%type <t> type hll_def return_or_yield comma_or_goto
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -1579,29 +1584,6 @@ pcc_call:
          {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
          }
-   | NCI_CALL var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | METH_CALL target '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | METH_CALL STRINGC '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
-         }
-   | METH_CALL target COMMA var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-           add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
-         }
-   | METH_CALL STRINGC COMMA var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
-           add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
-         }
-   ;
 
 
 pcc_args:
@@ -1656,7 +1638,6 @@ paramtype:
    | ADV_NAMED                  { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = VT_NAMED; mem_sys_free($3); }
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = VT_NAMED; mem_sys_free($3); }
-   | UNIQUE_REG                 { $$ = 0; }
    | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;
 
@@ -1844,19 +1825,13 @@ id_list :
    ;
 
 id_list_id :
-     IDENTIFIER opt_unique_reg
+     IDENTIFIER
          {
            IdList* const l = mem_gc_allocate_n_zeroed_typed(interp, 1, IdList);
            l->id           = $1;
            $$ = l;
          }
    ;
-
-opt_unique_reg:
-     /* empty */
-   | UNIQUE_REG
-   ;
-
 
 labeled_inst:
      assignment

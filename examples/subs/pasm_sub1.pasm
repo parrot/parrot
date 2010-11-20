@@ -24,7 +24,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 
 =cut
 
-    # Fetch a subroutine objec
+    # Fetch a subroutine object
     .const 'Sub' P0 = "_sub"
 
     # Call the sub in argument, create return continuation

@@ -8,7 +8,7 @@ src/scheduler.c - The core routines for the concurrency scheduler
 =head1 DESCRIPTION
 
 Each interpreter has a concurrency scheduler element in its core struct. The
-scheduler is responsible for receiveing, dispatching, and monitoring events,
+scheduler is responsible for receiving, dispatching, and monitoring events,
 exceptions, async I/O, and concurrent tasks (threads).
 
 =cut
@@ -64,7 +64,7 @@ Functions to interface with the concurrency scheduler.
 
 =item C<void Parrot_cx_init_scheduler(PARROT_INTERP)>
 
-Initalize the concurrency scheduler for the interpreter.
+Initialize the concurrency scheduler for the interpreter.
 
 =cut
 
