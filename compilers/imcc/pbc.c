@@ -601,7 +601,8 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
 
 
 void
-imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname) {
+imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname)
+{
     PackFile_ByteCode *bc      = interp->code;
     size_t i;
 
