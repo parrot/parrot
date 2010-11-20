@@ -147,6 +147,12 @@ struct parrot_string_t;
 INTVAL Parrot_Run_OS_Command(Interp*, struct parrot_string_t *);
 INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
 
+/*
+ * user information
+ */
+
+UINTVAL Parrot_get_user_id();
+
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 
 /*
