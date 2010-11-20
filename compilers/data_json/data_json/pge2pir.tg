@@ -54,18 +54,14 @@ transform pir (value) {
   got_true:
     pir = new 'CodeString'
     result = pir.'unique'('$P')
-    $S0 = node
-    pir.'emit'("    %0 = new 'Boolean'", result)
-    pir.'emit'('    %0 = 1', result, $S0)
+    pir.'emit'("    %0 = new 'Boolean', 1", result)
     node['ret'] = result
     .return(pir)
 
   got_false:
     pir = new 'CodeString'
     result = pir.'unique'('$P')
-    $S0 = node
-    pir.'emit'("    %0 = new 'Boolean'", result)
-    pir.'emit'('    %0 = 0', result, $S0)
+    pir.'emit'("    %0 = new 'Boolean', 0", result)
     node['ret'] = result
     .return(pir)
 
