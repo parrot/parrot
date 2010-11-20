@@ -22,6 +22,9 @@ transform pir (value) {
     .local pmc pir, result
     .local string value, type
 
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
+
     type = 'string'
     sub_node = node[type]
     unless null sub_node goto got_type
@@ -53,21 +56,24 @@ transform pir (value) {
 
   got_true:
     pir = new 'CodeString'
-    result = pir.'unique'('$P')
+    $I0 = unique()
+    result = concat "$P", $I0
     pir.'emit'("    %0 = new 'Boolean', 1", result)
     node['ret'] = result
     .return(pir)
 
   got_false:
     pir = new 'CodeString'
-    result = pir.'unique'('$P')
+    $I0 = unique()
+    result = concat "$P", $I0
     pir.'emit'("    %0 = new 'Boolean', 0", result)
     node['ret'] = result
     .return(pir)
 
   got_null:
     pir = new 'CodeString'
-    result = pir.'unique'('$P')
+    $I0 = unique()
+    result = concat "$P", $I0
     $S0 = node
     pir.'emit'('    null %0', result)
     node['ret'] = result
@@ -78,7 +84,10 @@ transform pir (object) {
     .local pmc pir
     pir = new 'CodeString'
     .local string result, child_result, key_result
-    result = pir.'unique'('$P')
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $I0 = unique()
+    result = concat "$P", $I0
     pir.'emit'("    %0 = new 'Hash'", result)
 
     .local pmc items
@@ -125,7 +134,10 @@ transform pir (array) {
     .local pmc pir
     pir = new 'CodeString'
     .local string result, child_result
-    result = pir.'unique'('$P')
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $I0 = unique()
+    result = concat "$P", $I0
     pir.'emit'("    %0 = new 'ResizablePMCArray'", result)
 
     .local pmc items
@@ -157,6 +169,8 @@ end:
 transform pir (string) {
     .local pmc pir, result, children, it, child
     .local string tmp
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
     tmp = ''
     pir = new 'CodeString'
     children = node['char']
@@ -186,7 +200,8 @@ transform pir (string) {
     goto loop
   loop_end:
 
-    result = pir.'unique'('$P')
+    $I0 = unique()
+    result = concat "$P", $I0
     $S1 = pir.'escape'(tmp)
     pir.'emit'("    %0 = new 'String'", result)
     pir.'emit'('    %0 = %1', result, $S1)
@@ -197,7 +212,10 @@ transform pir (string) {
 transform pir (number) {
     .local pmc pir, result
     pir = new 'CodeString'
-    result = pir.'unique'('$P')
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $I0 = unique()
+    result = concat "$P", $I0
     $S0 = node
     pir.'emit'("    %0 = new 'Integer'", result)
     pir.'emit'('    %0 = %1', result, $S0)

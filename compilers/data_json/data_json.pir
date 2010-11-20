@@ -90,6 +90,14 @@ the documentation at L<http://www.json.org/>.
 
 .HLL 'parrot'
 
+.sub unique_pmc_reg
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $I0 = $P0()
+    $S0 = $I0
+    $S0 = concat "$P", $S0
+    .return ($S0)
+.end
+
 .include 'compilers/data_json/data_json/grammar.pir'
 .include 'compilers/data_json/data_json/pge2pir.pir'
 

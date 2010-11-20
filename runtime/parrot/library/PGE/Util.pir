@@ -246,6 +246,26 @@ end:
    .return (result)
 .end
 
+=item unique()
+
+Returns a unique integer on every call.
+
+=back
+
+=cut
+
+.sub '_unique' :anon :immediate
+    $P0 = new ['Integer'], 0
+    .return ($P0)
+.end
+
+.sub 'unique'
+    .const 'Sub' $P0 = '_unique'
+    $I0 = $P0
+    inc $P0
+    .return ($I0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
