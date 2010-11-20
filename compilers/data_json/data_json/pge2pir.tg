@@ -63,7 +63,7 @@ transform pir (value) {
   got_false:
     pir = new 'StringBuilder'
     result = unique_pmc_reg()
-    $S0 = 'sprintf'("    %Ss = new 'Boolean', 1", result)
+    $S0 = 'sprintf'("    %Ss = new 'Boolean', 0", result)
     appendln(pir, $S0)
     node['ret'] = result
     .return(pir)
@@ -209,10 +209,9 @@ transform pir (number) {
     .local pmc pir, result
     pir = new 'StringBuilder'
     result = unique_pmc_reg()
-    $S0 = 'sprintf'("    %0 = new 'Integer'", result)
+    $S0 = 'sprintf'("    %Ss = new 'Integer'", result)
     appendln(pir, $S0)
-    # $S0 = node
-    $S0 = 'sprintf'('    %0 = %1', result, node)
+    $S0 = 'sprintf'('    %Ss = %Ss', result, node)
     appendln(pir, $S0)
     node['ret'] = result
    .return(pir)
