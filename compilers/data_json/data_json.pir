@@ -98,6 +98,20 @@ the documentation at L<http://www.json.org/>.
     .return ($S0)
 .end
 
+.sub appendln
+    .param pmc sb
+    .param string line
+    push sb, line
+    push sb, "\n"
+.end
+
+.sub 'sprintf'
+    .param string fmt
+    .param pmc args :slurpy
+    $S0 = sprintf fmt, args
+    .return ($S0)
+.end
+
 .include 'compilers/data_json/data_json/grammar.pir'
 .include 'compilers/data_json/data_json/pge2pir.pir'
 
