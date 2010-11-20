@@ -71,8 +71,6 @@ Print a list of all functions that have macro X.  For example, --macro=PARROT_EX
 
 =cut
 
-my $headerizer = Parrot::Headerizer->new;
-
 my $macro_match;
 GetOptions(
     'macro=s' => \$macro_match,
@@ -88,6 +86,8 @@ for (@ofiles) {
 my %sourcefiles;
 my %sourcefiles_with_statics;
 my %api;
+my $headerizer = Parrot::Headerizer->new;
+
 
 # Walk the object files and find corresponding source (either .c or .pmc)
 for my $ofile (@ofiles) {
