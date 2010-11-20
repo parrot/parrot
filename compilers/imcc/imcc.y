@@ -1021,13 +1021,12 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
-%token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type hll_def return_or_yield comma_or_goto opt_unique_reg
+%type <t> type hll_def return_or_yield comma_or_goto
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -1639,7 +1638,6 @@ paramtype:
    | ADV_NAMED                  { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = VT_NAMED; mem_sys_free($3); }
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = VT_NAMED; mem_sys_free($3); }
-   | UNIQUE_REG                 { $$ = 0; }
    | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;
 
@@ -1827,19 +1825,13 @@ id_list :
    ;
 
 id_list_id :
-     IDENTIFIER opt_unique_reg
+     IDENTIFIER
          {
            IdList* const l = mem_gc_allocate_n_zeroed_typed(interp, 1, IdList);
            l->id           = $1;
            $$ = l;
          }
    ;
-
-opt_unique_reg:
-     /* empty */
-   | UNIQUE_REG
-   ;
-
 
 labeled_inst:
      assignment

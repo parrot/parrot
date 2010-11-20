@@ -223,7 +223,7 @@ newline or semicolon after an end keyword."
 (defvar pir-directives
   '(":anon" ":flat" ":init" ":lex" ":subid" ":load" ":main" ":method" ":multi"
     ":named" ":opt_count" ":opt_flag" ":optional" ":outer" ":postcomp"
-    ":slurpy" ":unique_reg" ":vtable" ":wrap"))
+    ":slurpy" ":vtable" ":wrap"))
 
 (defvar pir-dotted-directives
   '(".HLL" ".arg" ".const" ".constant" ".emit" ".end" ".endm"

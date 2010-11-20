@@ -142,28 +142,27 @@
      SUB_INSTANCE_OF = 348,
      SUBID = 349,
      NS_ENTRY = 350,
-     UNIQUE_REG = 351,
-     LABEL = 352,
-     EMIT = 353,
-     EOM = 354,
-     IREG = 355,
-     NREG = 356,
-     SREG = 357,
-     PREG = 358,
-     IDENTIFIER = 359,
-     REG = 360,
-     MACRO = 361,
-     ENDM = 362,
-     STRINGC = 363,
-     INTC = 364,
-     FLOATC = 365,
-     USTRINGC = 366,
-     PARROT_OP = 367,
-     VAR = 368,
-     LINECOMMENT = 369,
-     FILECOMMENT = 370,
-     DOT = 371,
-     CONCAT = 372
+     LABEL = 351,
+     EMIT = 352,
+     EOM = 353,
+     IREG = 354,
+     NREG = 355,
+     SREG = 356,
+     PREG = 357,
+     IDENTIFIER = 358,
+     REG = 359,
+     MACRO = 360,
+     ENDM = 361,
+     STRINGC = 362,
+     INTC = 363,
+     FLOATC = 364,
+     USTRINGC = 365,
+     PARROT_OP = 366,
+     VAR = 367,
+     LINECOMMENT = 368,
+     FILECOMMENT = 369,
+     DOT = 370,
+     CONCAT = 371
    };
 #endif
 /* Tokens.  */
@@ -260,28 +259,27 @@
 #define SUB_INSTANCE_OF 348
 #define SUBID 349
 #define NS_ENTRY 350
-#define UNIQUE_REG 351
-#define LABEL 352
-#define EMIT 353
-#define EOM 354
-#define IREG 355
-#define NREG 356
-#define SREG 357
-#define PREG 358
-#define IDENTIFIER 359
-#define REG 360
-#define MACRO 361
-#define ENDM 362
-#define STRINGC 363
-#define INTC 364
-#define FLOATC 365
-#define USTRINGC 366
-#define PARROT_OP 367
-#define VAR 368
-#define LINECOMMENT 369
-#define FILECOMMENT 370
-#define DOT 371
-#define CONCAT 372
+#define LABEL 351
+#define EMIT 352
+#define EOM 353
+#define IREG 354
+#define NREG 355
+#define SREG 356
+#define PREG 357
+#define IDENTIFIER 358
+#define REG 359
+#define MACRO 360
+#define ENDM 361
+#define STRINGC 362
+#define INTC 363
+#define FLOATC 364
+#define USTRINGC 365
+#define PARROT_OP 366
+#define VAR 367
+#define LINECOMMENT 368
+#define FILECOMMENT 369
+#define DOT 370
+#define CONCAT 371
 
 
 
@@ -302,7 +300,7 @@ typedef union YYSTYPE
 
 
 /* Line 1685 of yacc.c  */
-#line 295 "compilers/imcc/imcparser.h"
+#line 293 "compilers/imcc/imcparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
