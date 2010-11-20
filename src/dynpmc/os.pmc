@@ -28,6 +28,7 @@ files and directories.
 #  include <dirent.h>
 #else
 #  include <dirent.h>
+#  include <unistd.h>
 #endif
 
 /* XXX Check if we need to deallocate strerror strings */
@@ -596,6 +597,42 @@ Returns the ID number of the current user. This is platform-dependent.
     METHOD get_user_id() {
         const UINTVAL uid = Parrot_get_user_id();
         RETURN(INTVAL uid);
+    }
+
+    METHOD can_execute(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, X_OK);
+#else
+        // TODO: Win32
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
+    }
+
+    METHOD can_read(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, R_OK);
+#else
+        // TODO: Win32
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
+    }
+
+    METHOD can_write(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, W_OK);
+#else
+        // TODO: Win32
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
     }
 
 }
