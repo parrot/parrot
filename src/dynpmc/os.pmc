@@ -603,7 +603,7 @@ Returns the ID number of the current user. This is platform-dependent.
         char * const file = Parrot_str_to_cstring(INTERP, filename);
         INTVAL can = 0;
 #ifndef WIN32
-        can = access(file, X_OK);
+        can = access(file, X_OK) + 1;
 #else
         // TODO: Win32
 #endif
@@ -615,7 +615,7 @@ Returns the ID number of the current user. This is platform-dependent.
         char * const file = Parrot_str_to_cstring(INTERP, filename);
         INTVAL can = 0;
 #ifndef WIN32
-        can = access(file, R_OK);
+        can = access(file, R_OK) + 1;
 #else
         // TODO: Win32
 #endif
@@ -627,7 +627,7 @@ Returns the ID number of the current user. This is platform-dependent.
         char * const file = Parrot_str_to_cstring(INTERP, filename);
         INTVAL can = 0;
 #ifndef WIN32
-        can = access(file, W_OK);
+        can = access(file, W_OK) + 1;
 #else
         // TODO: Win32
 #endif
