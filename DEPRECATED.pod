@@ -279,10 +279,6 @@ L<https://trac.parrot.org/parrot/ticket/1091>
 
 L<https://trac.parrot.org/parrot/ticket/1103>
 
-=item :unique_reg flag [eligible in 2.7]
-
-L<https://trac.parrot.org/parrot/ticket/1622>
-
 =item :main Sub behaviour and selection. [eligible in 2.7]
 
 Currently, if no :main sub is found, the first .sub in a file is used as
