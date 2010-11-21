@@ -186,8 +186,6 @@ string is treated as '0'.
 Split the string where the regex matches, returning an array. Optionally limit
 the number of splits.
 
-=back
-
 =cut
 
 .sub 'split'
@@ -250,8 +248,6 @@ end:
 
 Returns a unique integer on every call.
 
-=back
-
 =cut
 
 .sub '_unique' :anon :immediate
@@ -265,6 +261,38 @@ Returns a unique integer on every call.
     inc $P0
     .return ($I0)
 .end
+
+=item pir_str_escape(string)
+
+Returns a PIR string for a given string contents.
+
+NOTE: this does B<NOT> securely escape strings.
+
+=cut
+
+.sub 'pir_str_escape'
+    .param string str
+
+    $S0 = escape str
+    $S0 = concat '"', $S0
+    $S0 = concat $S0, '"'
+
+    $I0 = index $S0, "\\x"
+    $I0 = $I0 == -1
+    $I1 = index $S0, "\\u"
+    $I1 = $I1 == -1
+    $I2 = and $I0, $I1
+    if $I2 goto done_unicode
+        $S0 = concat "unicode:", $S0
+    done_unicode:
+
+    .return ($S0)
+.end
+
+=back
+
+=cut
+
 
 # Local Variables:
 #   mode: pir

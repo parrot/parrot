@@ -196,9 +196,8 @@ transform pir (string) {
     result = unique_pmc_reg()
     $S0 = 'sprintf'("    %Ss = new 'String'", result)
     appendln(pir, $S0)
-    .local pmc cs
-    cs = new 'CodeString'
-    tmp = cs.'escape'(tmp)
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+    tmp = $P0(tmp)
     $S0 = 'sprintf'('    %Ss = %Ss', result, tmp)
     appendln(pir, $S0)
     node['ret'] = result
