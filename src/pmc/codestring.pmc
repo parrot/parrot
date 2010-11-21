@@ -256,48 +256,6 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 /*
 
-=item C<escape(string str)>
-
-Returns an escaped value of C<str> suitable for including in PIR.
-If the string contains any non-ASCII characters, then it's
-prefixed with 'unicode:'.
-
-=cut
-
-*/
-
-  METHOD escape(STRING *str) {
-    STRING *escaped_str  = Parrot_str_escape(INTERP, str);
-    STRING * const quote = CONST_STRING(INTERP, "\x22");
-    STRING * const x     = CONST_STRING(INTERP, "\\x");
-    INTVAL x_pos;
-    INTVAL is_unicode = 0;
-    UNUSED(SELF);
-
-    escaped_str = Parrot_str_concat(INTERP, quote, escaped_str);
-    escaped_str = Parrot_str_concat(INTERP, escaped_str, quote);
-    x_pos       = STRING_index(INTERP, escaped_str, x, 0);
-
-    if (x_pos != -1) {
-        is_unicode = 1;
-    }
-    else {
-        STRING * const u = CONST_STRING(INTERP, "\\u");
-        const INTVAL u_pos = STRING_index(INTERP, escaped_str, u, 0);
-        if (u_pos != -1)
-            is_unicode = 1;
-    }
-
-    if (is_unicode) {
-        STRING * const unicode = CONST_STRING(INTERP, "unicode:");
-        escaped_str            = Parrot_str_concat(INTERP, unicode, escaped_str);
-    }
-
-    RETURN(STRING *escaped_str);
-  }
-
-/*
-
 =item C<charname_to_ord(string name)>
 
 Converts the Unicode character name given by C<name> to its
@@ -324,59 +282,6 @@ codepoint value.  Returns -1 if an error occurs in conversion.
 #endif
   }
 
-/*
-
-=item C<key( string name1 [, string name2, ...] )>
-
-Constructs a PIR key using the strings passed as arguments.
-For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
-
-=cut
-
-*/
-
-  METHOD key(PMC *args :slurpy) {
-    INTVAL         index;
-    const INTVAL   elements      = VTABLE_elements(INTERP, args);
-    STRING * const open_bracket  = CONST_STRING(INTERP, "[");
-    STRING * const semi          = CONST_STRING(INTERP, ";");
-    STRING * const close_bracket = CONST_STRING(INTERP, "]");
-    STRING * const s_array       = CONST_STRING(INTERP, "array");
-    STRING *       prefix        = NULL;
-    STRING *       out           = open_bracket;
-
-    for (index = 0; index < elements; ++index) {
-        PMC * const P0 = VTABLE_get_pmc_keyed_int(INTERP, args, index);
-
-        if (!PMC_IS_NULL(P0)) {
-            if (VTABLE_does(INTERP, P0, s_array)) {
-                const INTVAL elements2 = VTABLE_elements(INTERP, P0);
-                INTVAL index2;
-
-                for (index2 = 0; index2 < elements2; ++index2) {
-                    STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
-                    (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-                    if (prefix)
-                        out = Parrot_str_concat(INTERP, out, prefix);
-                    out    = Parrot_str_concat(INTERP, out, S0);
-                    prefix = semi;
-                }
-            }
-            else {
-                STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
-                (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-                if (prefix)
-                    out = Parrot_str_concat(INTERP, out, prefix);
-                out    = Parrot_str_concat(INTERP, out, S0);
-                prefix = semi;
-            }
-        }
-    }
-
-    out = Parrot_str_concat(INTERP, out, close_bracket);
-
-    RETURN(STRING *out);
-}
 
 /*
 
