@@ -18,16 +18,14 @@ Tests the CodeString class directly.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(12)
+    plan(7)
 
     create_codestring()
-    calls_to_unique()
     basic_emit()
     emit_with_pos_args()
     emit_with_percent_args()
     emit_with_named_args()
     emit_with_pos_and_named_args()
-    output_global_unique_num()
     first_char_repl_regression()
 .end
 
@@ -38,21 +36,6 @@ Tests the CodeString class directly.
     code = 'ok'
     s = code
     is(s, "ok", "code string creation succeeded")
-.end
-
-.sub calls_to_unique
-    .local pmc code
-    .local string s
-    code = new ['CodeString']
-    $P1 = code.'unique'('ok ')
-    s = $P1
-    is(s, "ok 10", "call to unique with name")
-    $P1 = code.'unique'()
-    s = $P1
-    is(s, "11", "call to unique with no params")
-    $P1 = code.'unique'('$P')
-    s = $P1
-    is(s, "$P12", "call to unique with reg name")
 .end
 
 .sub basic_emit
@@ -122,17 +105,6 @@ label_1234:
     say "H, W"
     say "alpha, beta, W"
 CODE
-.end
-
-.sub output_global_unique_num
-    .local pmc code1, code2
-    code1 = new ['CodeString']
-    code2 = new ['CodeString']
-    .local string unique1, unique2
-    unique1 = code1.'unique'()
-    unique2 = code2.'unique'('$P')
-    is(unique1, "13", "global unique #1 looks ok")
-    is(unique2, "$P14", "global unique #2 looks ok")
 .end
 
 .sub first_char_repl_regression

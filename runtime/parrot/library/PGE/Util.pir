@@ -256,10 +256,13 @@ Returns a unique integer on every call.
 .end
 
 .sub 'unique'
+    .param string fmt :optional
     .const 'Sub' $P0 = '_unique'
     $I0 = $P0
     inc $P0
-    .return ($I0)
+    $S0 = $I0
+    $S0 = concat fmt, $S0
+    .return ($S0)
 .end
 
 =item pir_str_escape(string)

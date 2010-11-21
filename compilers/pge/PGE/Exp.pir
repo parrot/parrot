@@ -122,7 +122,8 @@ tree as a PIR code object that can be compiled.
     name = adverbs['name']
     namecorou = concat name, '_corou'
     if name > '' goto have_name
-    name = code.'unique'('_regex')
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    name = $P0('_regex')
     namecorou = concat name, '_corou'
   have_name:
     .local pmc escape
@@ -466,17 +467,19 @@ tree as a PIR code object that can be compiled.
     .param pmc code
     .param string label
     .param string next
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
 
     .local pmc it, exp
     code.'emit'('        %0: # concat', label)
     $P0 = self.'list'()
     it  = iter $P0
     exp = shift it
-    $S0 = code.'unique'('R')
+    $S0 = unique('R')
   iter_loop:
     unless it goto iter_end
     $P1 = shift it
-    $S1 = code.'unique'('R')
+    $S1 = unique('R')
     exp.'pir'(code, $S0, $S1)
     exp = $P1
     $S0 = $S1
@@ -527,6 +530,9 @@ tree as a PIR code object that can be compiled.
     .param string label
     .param string next
 
+    .local pmc unique
+    unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
+
     .local pmc exp, sep
     .local string explabel, seplabel, replabel, nextlabel
     exp = self[0]
@@ -546,11 +552,11 @@ tree as a PIR code object that can be compiled.
     .local int backtrack
     backtrack = self['backtrack']
 
-    explabel = code.'unique'('R')
+    explabel = unique('R')
     nextlabel = explabel
     replabel = concat label, '_repeat'
     if null sep goto outer_quant_1
-    seplabel = code.'unique'('R')
+    seplabel = unique('R')
     nextlabel = concat label, '_sep'
   outer_quant_1:
 
@@ -577,7 +583,7 @@ tree as a PIR code object that can be compiled.
     goto end
 
   bt_none:
-    $S0 = code.'unique'()
+    $S0 = unique()
     args['c'] = $S0
     args['C'] = ''
     ##   handle 0..Inf as a special case
@@ -728,7 +734,8 @@ tree as a PIR code object that can be compiled.
 
   has_cutmark:
     .local string exp0label
-    exp0label = code.'unique'('R')
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    exp0label = $P0('R')
     code.'emit'(<<"        CODE", label, exp0label, cutmark)
         %0:  # group %2
           local_branch cstack, %1
@@ -748,7 +755,8 @@ tree as a PIR code object that can be compiled.
     .param string next
 
     .local string explabel, expnext
-    explabel = code.'unique'('R')
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    explabel = $P0('R')
     expnext = concat label, '_close'
 
     .local pmc args
@@ -984,8 +992,9 @@ tree as a PIR code object that can be compiled.
     .param string next
     .local pmc exp0, exp1
     .local string exp0label, exp1label
-    exp0label = code.'unique'('R')
-    exp1label = code.'unique'('R')
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    exp0label = $P0('R')
+    exp1label = $P0('R')
     code.'emit'(<<"        CODE", label, exp0label, exp1label)
         %0:  # alt %1, %2
           push ustack, pos
@@ -1281,8 +1290,8 @@ tree as a PIR code object that can be compiled.
     group = get_hll_global ['PGE';'Exp'], '$!group'
     cutmark = group['cutmark']
     if cutmark > 0 goto has_cutmark
-    $P1 = new 'CodeString'
-    cutmark = $P1.'unique'()
+    $P1 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    cutmark = $P1()
     group['cutmark'] = cutmark
   has_cutmark:
     self['cutmark'] = cutmark
@@ -1442,8 +1451,9 @@ tree as a PIR code object that can be compiled.
     .param string next
 
     .local string exp0label, exp1label, chk0label, chk1label
-    exp0label = code.'unique'('R')
-    exp1label = code.'unique'('R')
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    exp0label = $P0('R')
+    exp1label = $P0('R')
     chk0label = concat label, '_chk0'
     chk1label = concat label, '_chk1'
     code.'emit'(<<"        CODE", label, next, exp0label, chk0label, exp1label, chk1label)

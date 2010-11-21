@@ -184,7 +184,8 @@ the output to the correct output file.
     if namespace == '' goto ns_optable
     .local string inherit
     inherit = ns['inherit']
-    $S0 = initpir.'unique'('onload_')
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $S0 = $P0('onload_')
     initpir.'emit'(<<'        CODE', namespace, inherit, $S0)
           ## namespace %0
           .local pmc p6meta

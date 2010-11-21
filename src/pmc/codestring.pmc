@@ -163,36 +163,6 @@ A newline is automatically added to the end of the fmt.
 
 /*
 
-=item C<unique([string fmt])>
-
-Each call to C<unique> returns a unique number, or if a C<fmt>
-parameter is given it returns a unique string beginning with
-C<fmt>.  (This may eventually be generalized to allow
-uniqueness anywhere in the string.)  The function starts
-counting at 10 (so that the values 0..9 can be considered "safe").
-
-=cut
-
-*/
-
-  METHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
-    static INTVAL counter = 10;
-    STRING * const counter_as_string = Parrot_str_from_int(INTERP, counter);
-    UNUSED(SELF);
-
-    ++counter;
-
-    if (!has_fmt) {
-        RETURN(STRING *counter_as_string);
-    }
-    else {
-        STRING *result = Parrot_str_concat(INTERP, format, counter_as_string);
-        RETURN(STRING *result);
-    }
-  }
-
-/*
-
 =back
 
 =cut
