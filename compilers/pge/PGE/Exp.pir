@@ -43,6 +43,8 @@ PGE::Exp - base class for expressions
     p6meta.'new_class'('PGE::Exp::Modifier',     'parent'=>expproto)
     p6meta.'new_class'('PGE::Exp::Closure',      'parent'=>expproto)
     p6meta.'new_class'('PGE::Exp::Action',       'parent'=>expproto)
+
+    load_bytecode 'PGE/Util.pbc'
 .end
 
 
@@ -122,8 +124,10 @@ tree as a PIR code object that can be compiled.
     name = code.'unique'('_regex')
     namecorou = concat name, '_corou'
   have_name:
-    name = code.'escape'(name)
-    namecorou = code.'escape'(namecorou)
+    .local pmc escape
+    escape = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+    name      = escape(name)
+    namecorou = escape(namecorou)
 
     .local string pirflags
     pirflags = adverbs['pirflags']
@@ -132,7 +136,7 @@ tree as a PIR code object that can be compiled.
     if $I0 >= 0 goto have_subid
     $P0 = adverbs['subid']
     if null $P0 goto have_subid
-    $S0 = code.'escape'($P0)
+    $S0 = escape($P0)
     pirflags = concat pirflags, ' :subid('
     concat pirflags, $S0
     concat pirflags, ')'
@@ -384,7 +388,8 @@ tree as a PIR code object that can be compiled.
     literal = downcase literal
   ignorecase_end:
 
-    literal = code.'escape'(literal)
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+    literal = $P0(literal)
 
     code.'emit'(<<"        CODE", litlen, literal, args :named :flat)
         %L: # literal
@@ -817,19 +822,22 @@ tree as a PIR code object that can be compiled.
     .local pmc args
     args = self.'getargs'(label, next)
 
+    .local pmc escape
+    escape = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+
     .local string subarg
     subarg = ''
     $I0 = exists self['arg']
     if $I0 == 0 goto subarg_dba
     subarg = self['arg']
-    subarg = code.'escape'(subarg)
+    subarg = escape(subarg)
     subarg = concat ', ', subarg
     args['A'] = $S0
   subarg_dba:
     $I0 = exists self['dba']
     if $I0 == 0 goto subarg_end
     $S0 = self['dba']
-    $S0 = code.'escape'($S0)
+    $S0 = escape($S0)
     subarg .= ", 'dba'=>"
     subarg .= $S0
   subarg_end:
@@ -1354,9 +1362,12 @@ tree as a PIR code object that can be compiled.
     .param string label
     .param string next
 
+    .local pmc escape
+    escape = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+
     .local string charlist
     $S0 = self.'ast'()
-    charlist = code.'escape'($S0)
+    charlist = escape($S0)
 
     .local string test
     test = '<'
@@ -1478,11 +1489,15 @@ tree as a PIR code object that can be compiled.
     .param pmc code
     .param string label
     .param string next
+
+    .local pmc escape
+    escape = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+
     .local string value, lang
     value = self.'ast'()
-    lang = self['lang']
-    value = code.'escape'(value)
-    lang = code.'escape'(lang)
+    lang  = self['lang']
+    value = escape(value)
+    lang  = escape(lang)
     ##  to prevent recompiling every execution, this code makes use of
     ##  a global %!cache, keyed on the inline closure source.  There
     ##  could be a (unlikely) problem if the same source is sent to
@@ -1543,14 +1558,16 @@ tree as a PIR code object that can be compiled.
     .param pmc code
     .param string label
     .param string next
+    .local pmc escape
+    escape = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
     .local string actionname, actionkey
     code.'emit'("        %0: # action", label)
     actionname = self['actionname']
     if actionname == '' goto end
-    actionname = code.'escape'(actionname)
+    actionname = escape(actionname)
     actionkey = self['actionkey']
     if actionkey == '' goto have_actionkey
-    actionkey = code.'escape'(actionkey)
+    actionkey = escape(actionkey)
     actionkey = concat ', ', actionkey
   have_actionkey:
     code.'emit'(<<"        CODE", label, next, actionname, actionkey)
