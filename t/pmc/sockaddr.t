@@ -22,6 +22,7 @@ Test the Sockaddr PMC.
 
     test_basic()
     test_bool()
+    test_string()
 .end
 
 .sub test_basic
@@ -47,6 +48,12 @@ Test the Sockaddr PMC.
     $P0 = new 'Socket'
     $P1 = $P0."sockaddr"("localhost", 1234)
     ok($P1, 'get_bool on a SockAddr')
+.end
+
+.sub test_string
+    $P0 = new 'Socket'
+    $P1 = $P0."sockaddr"("localhost", 1234)
+    is($P1,"localhost:1234","sockaddr stringification")
 .end
 
 # Local Variables:
