@@ -97,6 +97,24 @@ one.
 
 /*
 
+=item C<INTVAL get_bool()>
+
+Returns true if the Sockaddr is defined.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+
+        return data->pointer ? 1 : 0 ;
+    }
+
+/*
+
+/*
+
 =item C<void *get_pointer()>
 
 Returns a pointer to the C<sockaddr_in> or C<sockaddr_in6>.

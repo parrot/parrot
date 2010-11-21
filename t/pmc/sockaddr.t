@@ -46,13 +46,7 @@ Test the Sockaddr PMC.
 .sub test_bool
     $P0 = new 'Socket'
     $P1 = $P0."sockaddr"("localhost", 1234)
-    push_eh handler
     ok($P1, 'get_bool on a SockAddr')
-    goto done
-handler:
-    pop_eh
-    todo(0,'get_bool on SockAddr does not work TT#1822')
-done:
 .end
 
 # Local Variables:
