@@ -126,7 +126,6 @@ like($@, qr/$ofile doesn't look like an object file/,
         "Got expected die message for file lacking HEADERIZER HFILE directive" );
 }
 
-#t/tools/dev/headerizer/testlib/none.in
 {
     my $tdir = tempdir( CLEANUP => 1 );
     my $stub = 'none';
@@ -144,6 +143,25 @@ like($@, qr/$ofile doesn't look like an object file/,
     like( $source_code, qr/This file has 'none'/, 
         "Got expected source code" );
     is( $hfile, 'none', "As expected, no header file" );
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $stub = 'missingheaderfile';
+    copy "$cwd/t/tools/dev/headerizer/testlib/$stub.in" =>
+         "$tdir/$stub.c" or croak "Unable to copy file for testing";
+    $ofile = "$tdir/$stub.o";
+    my $expected_cfile = "$tdir/$stub.c";
+    eval {
+        my ($sourcefile, $source_code, $hfile) =
+            qualify_sourcefile( {
+                ofile           => $ofile,
+                PConfig         => \%PConfig,
+                is_yacc         => 0,
+            } );
+    };
+    like($@, qr/"$stub" not found \(referenced from "$expected_cfile"\)/,
+        "Got expected error message for missing header file" );
 }
 
 pass("Completed all tests in $0");
