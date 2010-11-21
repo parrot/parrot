@@ -312,28 +312,47 @@ tree as a PIR code object that can be compiled.
     .local int iscapture, isarray
     cname = self['cname']
     iscapture = self['iscapture']
-    isarray = self['isarray']
-    captgen = new 'CodeString'
-    captsave = new 'CodeString'
-    captback = new 'CodeString'
+    isarray   = self['isarray']
+    captgen   = new 'StringBuilder'
+    captsave  = new 'StringBuilder'
+    captback  = new 'StringBuilder'
     if iscapture == 0 goto end
     if isarray != 0 goto capt_array
-    captsave.'emit'("captscope[%0] = captob", cname)
-    captback.'emit'("delete captscope[%0]", cname)
+    push captsave, 'captscope['
+        push captsave, cname
+        push captsave, "] = captob\n"
+    push captback, 'delete captscope['
+        push captback, cname
+        push captback, "]\n"
     goto end
   capt_array:
-    captsave.'emit'("$P2 = captscope[%0]\n          push $P2, captob", cname)
-    captback.'emit'("$P2 = captscope[%0]\n          $P2 = pop $P2", cname)
-    captgen.'emit'(<<"        CODE", cname, label)
-          $I0 = defined captscope[%0]
-          if $I0 goto %1_cgen
-          $P0 = root_new ['parrot';'ResizablePMCArray']
-          captscope[%0] = $P0
-          local_branch cstack, %1_cgen
-          delete captscope[%0]
-          goto fail
-        %1_cgen:
-        CODE
+    push captsave, '$P2 = captscope['
+        push captsave, cname
+        push captsave, "]\n"
+    push captsave, 'push $P2, captob'
+    push captback, '$P2 = captscope['
+        push captback, cname
+        push captback, "]\n"
+    push captback, '$P2 = pop $P2'
+    push captgen, '$I0 = defined captscope['
+        push captgen, cname
+        push captgen, "]\n"
+    push captgen, 'if $I0 goto '
+        push captgen, label
+        push captgen, "_cgen\n"
+     push captgen, "$P0 = root_new ['parrot';'ResizablePMCArray']\n"
+     push captgen, 'captscope['
+         push captgen, cname
+         push captgen, "] = $P0\n"
+     push captgen, 'local_branch cstack, '
+         push captgen, label
+         push captgen, "_cgen\n"
+     push captgen, 'delete captscope['
+         push captgen, cname
+         push captgen, "]\n"
+     push captgen, "goto fail\n"
+     push captgen, label
+         push captgen, "_cgen:\n"
   end:
     .return (captgen, captsave, captback)
 .end
