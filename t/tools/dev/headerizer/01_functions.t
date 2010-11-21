@@ -6,7 +6,9 @@
 use strict;
 use warnings;
 use Test::More qw(no_plan); # tests => 15;
+use Carp;
 use Cwd;
+use File::Copy;
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Config;
@@ -97,6 +99,53 @@ eval {
 like($@, qr/$ofile doesn't look like an object file/,
     "Got expected die message for non-object, non-yacc file" );
     
+# Testing Needs We don't really need a .o file, we just need its name.
+# However, we do need one .c file and one .pmc file.  In order to have the
+# codingstd tests skip these, we should name them .in and then copy them into
+# position with the extensions we need.  We need one file where there is no
+# HEADERIZER HFILE directive within the file.  We need a case where the
+# HEADERIZER HFILE directive contains 'none'.  We need a case where the header
+# file exists and one where it does not.
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $stub = 'lack_directive';
+    copy "$cwd/t/tools/dev/headerizer/testlib/$stub.in" =>
+         "$tdir/$stub.c" or croak "Unable to copy file for testing";
+    $ofile = "$tdir/$stub.o";
+    my $expected_cfile = "$tdir/$stub.c";
+    eval {
+        my ($sourcefile, $source_code, $hfile) =
+            qualify_sourcefile( {
+                ofile           => $ofile,
+                PConfig         => \%PConfig,
+                is_yacc         => 0,
+            } );
+    };
+    like($@, qr/can't find HEADERIZER HFILE directive in "$expected_cfile"/,
+        "Got expected die message for file lacking HEADERIZER HFILE directive" );
+}
+
+#t/tools/dev/headerizer/testlib/none.in
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $stub = 'none';
+    copy "$cwd/t/tools/dev/headerizer/testlib/$stub.in" =>
+         "$tdir/$stub.c" or croak "Unable to copy file for testing";
+    $ofile = "$tdir/$stub.o";
+    my $expected_cfile = "$tdir/$stub.c";
+    my ($sourcefile, $source_code, $hfile) =
+        qualify_sourcefile( {
+            ofile           => $ofile,
+            PConfig         => \%PConfig,
+            is_yacc         => 0,
+        } );
+    is( $sourcefile, $expected_cfile, "Got expected C source file" );
+    like( $source_code, qr/This file has 'none'/, 
+        "Got expected source code" );
+    is( $hfile, 'none', "As expected, no header file" );
+}
+
 pass("Completed all tests in $0");
 
 #sub touch_parrot {
