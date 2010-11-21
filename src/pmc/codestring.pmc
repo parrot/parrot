@@ -163,69 +163,6 @@ A newline is automatically added to the end of the fmt.
 
 /*
 
-=item lineof(INTVAL pos)
-
-Return the line number of the line at offset C<pos>.  This code assumes that
-the first line is line number zero.
-
-=cut
-
-*/
-
-  METHOD lineof(INTVAL pos) {
-    PMC    *linepos;
-    INTVAL  count;
-    INTVAL  line = 0;
-
-    GET_ATTR_linepos(INTERP, SELF, linepos);
-
-    /* build the linepos array if we haven't already done so */
-    if (!linepos || PMC_IS_NULL(linepos)) {
-        STRING *str             = NULL;
-        INTVAL  eos;
-        INTVAL  jpos;
-
-        linepos = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
-        /* get the string itself */
-        GET_ATTR_str_val(INTERP, SELF, str);
-        eos  = Parrot_str_length(INTERP, str);
-        /* find the first newline, if any */
-        jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
-                                      str, 0, eos);
-        while (jpos < eos) {
-            ++jpos;
-            /* add the start of line position */
-            VTABLE_push_integer(INTERP, linepos, jpos);
-
-            /* treat \r\n as a single newline */
-            if (jpos < eos
-            && STRING_ord(INTERP, str, jpos - 1) == 13
-            && STRING_ord(INTERP, str, jpos)     == 10) {
-                ++jpos;
-            }
-            /* search for the next newline */
-            jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
-                                          str, jpos, eos);
-        }
-        /* save the array of line positions */
-        SET_ATTR_linepos(INTERP, SELF, linepos);
-    }
-
-    /* Find the line from the array, stop at the first index that is
-     * greater than the position we're looking for.  We do a linear
-     * search for now, * perhaps a binary search would be better someday.
-     */
-    count = VTABLE_elements(INTERP, linepos);
-    while (line < count
-          && VTABLE_get_integer_keyed_int(INTERP, linepos, line) <= pos)
-        ++line;
-
-    RETURN(INTVAL line);
-  }
-
-
-/*
-
 =item C<unique([string fmt])>
 
 Each call to C<unique> returns a unique number, or if a C<fmt>
@@ -253,35 +190,6 @@ counting at 10 (so that the values 0..9 can be considered "safe").
         RETURN(STRING *result);
     }
   }
-
-/*
-
-=item C<charname_to_ord(string name)>
-
-Converts the Unicode character name given by C<name> to its
-codepoint value.  Returns -1 if an error occurs in conversion.
-
-=cut
-
-*/
-
-
-  METHOD charname_to_ord(STRING *name) {
-#if PARROT_HAS_ICU
-    UErrorCode   err       = U_ZERO_ERROR;
-    char * const cstr      = Parrot_str_to_cstring(INTERP, name);
-    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
-    Parrot_str_free_cstring(cstr);
-    if (U_SUCCESS(err)) {
-        RETURN(INTVAL codepoint);
-    }
-    RETURN(INTVAL -1);
-#else
-    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
-  }
-
 
 /*
 

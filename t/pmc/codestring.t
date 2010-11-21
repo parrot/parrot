@@ -18,7 +18,7 @@ Tests the CodeString class directly.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(30)
+    plan(12)
 
     create_codestring()
     calls_to_unique()
@@ -29,8 +29,6 @@ Tests the CodeString class directly.
     emit_with_pos_and_named_args()
     output_global_unique_num()
     first_char_repl_regression()
-    ord_from_name()
-    lineof_tests()
 .end
 
 .sub create_codestring
@@ -144,61 +142,6 @@ CODE
     code.'emit'('new', 'n'=>$P0)
     is(code, "new\n", "regression on first char repl bug looks fine")
 .end
-
-.sub 'ord_from_name'
-    .local pmc code
-    load_bytecode 'config.pbc'
-    $P0 = _config()
-    $I0 = $P0['has_icu']
-    if $I0 goto has_icu
-    skip(4, 'ICU unavailable')
-    .return ()
-
-  has_icu:
-    code = new ['CodeString']
-    $I0 = code.'charname_to_ord'('LATIN CAPITAL LETTER C')
-    is($I0, 0x0043, "LATIN CAPITAL LETTER C")
-    $I0 = code.'charname_to_ord'('MUSIC FLAT SIGN')
-    is($I0, 0x266d, "MUSIC FLAT SIGN")
-    $I0 = code.'charname_to_ord'('RECYCLING SYMBOL FOR TYPE-1 PLASTICS')
-    is($I0, 0x2673, "RECYCLING SYMBOL FOR TYPE-1 PLASTICS")
-    $I0 = code.'charname_to_ord'('no such symbol')
-    is($I0, -1, 'no such symbol')
-.end
-
-.sub 'lineof_tests'
-    $P0 = new 'CodeString'
-    $P0 = "0123\n5678\r0123\r\n678\n"
-    $I0 = $P0.'lineof'(0)
-    is($I0, 0, "lineof - beginning of string")
-    $I0 = $P0.'lineof'(1)
-    is($I0, 0, "lineof - char on first line")
-    $I0 = $P0.'lineof'(4)
-    is($I0, 0, "lineof - immediately before nl")
-    $I0 = $P0.'lineof'(5)
-    is($I0, 1, "lineof - immediately after nl")
-    $I0 = $P0.'lineof'(8)
-    is($I0, 1, "lineof - char before cr")
-    $I0 = $P0.'lineof'(9)
-    is($I0, 1, "lineof - immediately before cr")
-    $I0 = $P0.'lineof'(10)
-    is($I0, 2, "lineof - immediately after cr")
-    $I0 = $P0.'lineof'(11)
-    is($I0, 2, "lineof - char after cr")
-    $I0 = $P0.'lineof'(13)
-    is($I0, 2, "lineof - char before crnl")
-    $I0 = $P0.'lineof'(14)
-    is($I0, 2, "lineof - immediately before crnl")
-    $I0 = $P0.'lineof'(15)
-    is($I0, 3, "lineof - middle of crnl")
-    $I0 = $P0.'lineof'(16)
-    is($I0, 3, "lineof - immediately after crnl")
-    $I0 = $P0.'lineof'(19)
-    is($I0, 3, "lineof - immediately before final nl")
-    $I0 = $P0.'lineof'(20)
-    is($I0, 4, "lineof - immediately after final nl")
-.end
-
 
 # Local Variables:
 #   mode: pir
