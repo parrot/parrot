@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
+Copyright (C) 2010, Parrot Foundation.
 
 */
 
@@ -7,9 +7,12 @@ Copyright (C) 2005-2009, Parrot Foundation.
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 int main(int c,char**v) {
     int x = socket( PF_INET6, SOCK_DGRAM, 0 );
+    int errno;
+
     if ( x < 0 ) {
         perror("Not OK - socket failed");
         return EXIT_FAILURE;
