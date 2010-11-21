@@ -289,6 +289,35 @@ NOTE: this does B<NOT> securely escape strings.
     .return ($S0)
 .end
 
+
+=item pir_key_escape(args)
+
+Constructs a PIR key using the strings passed as arguments.
+For example, C<pir_key_escape('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
+
+=cut
+
+.sub 'pir_key_escape'
+    .param pmc args :slurpy
+    .local pmc retv, it
+    .local string sep
+    retv = new 'StringBuilder'
+    it   = iter args
+    push retv, '['
+    sep = ''
+  loop:
+    unless it goto end_loop
+    push retv, sep
+    $S0 = shift it
+    $S0 = 'pir_str_escape'($S0)
+    push retv, $S0
+    sep = ';'
+    goto loop
+  end_loop:
+    push retv, ']'
+    .return (retv)
+.end
+
 =back
 
 =cut

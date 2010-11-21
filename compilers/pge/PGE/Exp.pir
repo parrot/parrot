@@ -77,7 +77,8 @@ C<target> adverbs.
     grammar = adverbs['grammar']
     ns = split '::', grammar
   ns_emit:
-    $P0 = code.'key'(ns)
+    $P1 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
+    $P0 = $P1(ns :flat)
     code.'emit'('.namespace %0', $P0)
   ns_done:
 
@@ -863,7 +864,8 @@ tree as a PIR code object that can be compiled.
     $I0 -= 2
     grammar = substr subname, 0, $I0
     $P0 = split '::', grammar
-    $P0 = code.'key'($P0)
+    $P1 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
+    $P0 = $P1($P0 :flat)
     code.'emit'(<<"        CODE", grammar, rname, $P0, args :flat :named)
         %L: # grammar subrule %0::%1
           captob = captscope.'new'(captscope, 'grammar'=>'%0')
