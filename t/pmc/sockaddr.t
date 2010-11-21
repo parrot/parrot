@@ -18,7 +18,7 @@ Test the Sockaddr PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(6)
+    plan(7)
 
     test_basic()
     test_bool()
