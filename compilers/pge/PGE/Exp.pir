@@ -67,7 +67,7 @@ C<target> adverbs.
     if target == 'pge::exp' goto return_exp
 
     .local pmc code
-    code = new 'CodeString'
+    code = new 'StringBuilder'
 
     .local pmc ns
     ns = adverbs['namespace']
@@ -79,7 +79,7 @@ C<target> adverbs.
   ns_emit:
     $P1 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
     $P0 = $P1(ns :flat)
-    code.'emit'('.namespace %0', $P0)
+    code.'append_format'(".namespace %0\n", $P0)
   ns_done:
 
     $P0 = self.'root_pir'(adverbs :flat :named)
@@ -107,7 +107,7 @@ C<target> adverbs.
 
 =item C<root_pir(PMC adverbs)>
 
-Return a CodeString object containing the entire expression
+Return a StringBuilder object containing the entire expression
 tree as a PIR code object that can be compiled.
 
 =cut
@@ -116,7 +116,7 @@ tree as a PIR code object that can be compiled.
     .param pmc adverbs         :slurpy :named
 
     .local pmc code
-    code = new 'CodeString'
+    code = new 'StringBuilder'
 
     .local string name, namecorou
     name = adverbs['name']
@@ -159,7 +159,7 @@ tree as a PIR code object that can be compiled.
 
     ##   generate the PIR for the expression tree.
     .local pmc expcode
-    expcode = new 'CodeString'
+    expcode = new 'StringBuilder'
     explabel = 'R'
     exp.'pir'(expcode, explabel, 'succeed')
 
@@ -167,7 +167,7 @@ tree as a PIR code object that can be compiled.
     ##   Generate the initial PIR code for a backtracking (uncut) rule.
     .local string returnop
     returnop = '.yield'
-    code.'emit'(<<"        CODE", name, pirflags, namecorou, .INTERPINFO_CURRENT_SUB)
+    code.'append_format'(<<"        CODE", name, pirflags, namecorou, .INTERPINFO_CURRENT_SUB)
       .sub %0 :method :nsentry %1
           .param pmc adverbs   :slurpy :named
           .local pmc mob
@@ -196,7 +196,7 @@ tree as a PIR code object that can be compiled.
   code_cutrule:
     ##   Initial code for a rule that cannot be backtracked into.
     returnop = '.return'
-    code.'emit'(<<"        CODE", name, pirflags)
+    code.'append_format'(<<"        CODE", name, pirflags)
       .sub %0 :method :nsentry %1
           .param pmc adverbs      :slurpy :named
           .local pmc mob
@@ -214,27 +214,27 @@ tree as a PIR code object that can be compiled.
     ##   generate the ustack only if we need it
     .local string expstr
     expstr = expcode
-    code.'emit'("          .local pmc cstack")
-    code.'emit'("          cstack = root_new ['parrot';'ResizableIntegerArray']")
+    code.'append_format'("          .local pmc cstack\n")
+    code.'append_format'("          cstack = root_new ['parrot';'ResizableIntegerArray']\n")
     $I0 = index expstr, 'ustack'
     if $I0 < 0 goto code_body_1
-    code.'emit'("          .local pmc ustack")
-    code.'emit'("          ustack = root_new ['parrot';'ResizablePMCArray']")
+    code.'append_format'("          .local pmc ustack\n")
+    code.'append_format'("          ustack = root_new ['parrot';'ResizablePMCArray']\n")
   code_body_1:
     ##   generate the gpad only if we need it
     $I0 = index expstr, 'gpad'
     if $I0 < 0 goto code_body_2
-    code.'emit'("          .local pmc gpad")
-    code.'emit'("          gpad = root_new ['parrot';'ResizablePMCArray']")
+    code.'append_format'("          .local pmc gpad\n")
+    code.'append_format'("          gpad = root_new ['parrot';'ResizablePMCArray']\n")
   code_body_2:
     ##   set the captscope if we need it
     $I0 = index expstr, 'captscope'
     if $I0 < 0 goto code_body_3
-    code.'emit'("          .local pmc captscope, captob")
-    code.'emit'("          captscope = mob")
+    code.'append_format'("          .local pmc captscope, captob\n")
+    code.'append_format'("          captscope = mob\n")
   code_body_3:
 
-    code.'emit'(<<"        CODE", PGE_CUT_RULE, returnop)
+    code.'append_format'(<<"        CODE", PGE_CUT_RULE, returnop)
           .local int pos, rep, cutmark
         try_match:
           if cpos > lastpos goto fail_rule
@@ -261,7 +261,7 @@ tree as a PIR code object that can be compiled.
     ##   add the "fail_match" target if we need it
     $I0 = index expstr, 'fail_match'
     if $I0 < 0 goto add_expcode
-    code.'emit'(<<"        CODE", PGE_CUT_MATCH)
+    code.'append_format'(<<"        CODE", PGE_CUT_MATCH)
         fail_match:
           cutmark = %0
           goto fail_cut
@@ -270,7 +270,7 @@ tree as a PIR code object that can be compiled.
   add_expcode:
     ##   add the expression code, then close off the sub
     code .= expcode
-    code.'emit'("      .end")
+    code.'append_format'("      .end\n")
     .return (code)
 .end
 
@@ -393,7 +393,7 @@ tree as a PIR code object that can be compiled.
     $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
     literal = $P0(literal)
 
-    code.'emit'(<<"        CODE", litlen, literal, args :named :flat)
+    code.'append_format'(<<"        CODE", litlen, literal, args :named :flat)
         %L: # literal
           $I0 = pos + %0
           if $I0 > lastpos goto fail
@@ -471,7 +471,7 @@ tree as a PIR code object that can be compiled.
     unique = get_root_global ['parrot';'PGE';'Util'], 'unique'
 
     .local pmc it, exp
-    code.'emit'('        %0: # concat', label)
+    code.'append_format'("        %0: # concat\n", label)
     $P0 = self.'list'()
     it  = iter $P0
     exp = shift it
@@ -571,7 +571,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != 0 goto bt_greedy_none
     $I0 = self['max']
     if $I0 != PGE_INF goto bt_greedy_none
-    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
+    code.'append_format'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant 0..Inf greedy
         %0:
           push ustack, pos
@@ -591,7 +591,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != 0 goto bt_greedy_none
     $I0 = self['max']
     if $I0 != PGE_INF goto bt_greedy_none
-    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
+    code.'append_format'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant 0..Inf none
           local_branch cstack, %0
           if cutmark != %c goto fail
@@ -611,7 +611,7 @@ tree as a PIR code object that can be compiled.
 
   bt_greedy_none:
     ##   handle greedy or none
-    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
+    code.'append_format'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant %Q greedy/none
           push gpad, 0
           local_branch cstack, %0
@@ -646,7 +646,7 @@ tree as a PIR code object that can be compiled.
 
   bt_eager:
     ##   handle eager backtracking
-    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
+    code.'append_format'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant %Q eager
           push gpad, 0
           local_branch cstack, %0
@@ -671,7 +671,7 @@ tree as a PIR code object that can be compiled.
 
   end:
     if null sep goto sep_done
-    code.'emit'(<<"        CODE", nextlabel, explabel, seplabel)
+    code.'append_format'(<<"        CODE", nextlabel, explabel, seplabel)
         %0:
           if rep == 1 goto %1
           goto %2
@@ -736,7 +736,7 @@ tree as a PIR code object that can be compiled.
     .local string exp0label
     $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
     exp0label = $P0('R')
-    code.'emit'(<<"        CODE", label, exp0label, cutmark)
+    code.'append_format'(<<"        CODE", label, exp0label, cutmark)
         %0:  # group %2
           local_branch cstack, %1
           if cutmark != %2 goto fail
@@ -780,7 +780,7 @@ tree as a PIR code object that can be compiled.
     args['X'] = '### '
   isscope_end:
 
-    code.'emit'(<<"        CODE", captgen, captsave, captback, 'E'=>explabel, args :flat :named)
+    code.'append_format'(<<"        CODE", captgen, captsave, captback, 'E'=>explabel, args :flat :named)
         %L: # capture
           %0
           captob = captscope.'new'(captscope, 'pos'=>pos)
@@ -874,7 +874,7 @@ tree as a PIR code object that can be compiled.
     $P0 = split '::', grammar
     $P1 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
     $P0 = $P1($P0 :flat)
-    code.'emit'(<<"        CODE", grammar, rname, $P0, args :flat :named)
+    code.'append_format'(<<"        CODE", grammar, rname, $P0, args :flat :named)
         %L: # grammar subrule %0::%1
           captob = captscope.'new'(captscope, 'grammar'=>'%0')
           captob.'to'(pos)
@@ -886,7 +886,7 @@ tree as a PIR code object that can be compiled.
     ##   The subrule is of the form <rule>, which means we first look
     ##   for a method on the current match object, otherwise we do a
     ##   normal name lookup.
-    code.'emit'(<<"        CODE", subname, args :flat :named)
+    code.'append_format'(<<"        CODE", subname, args :flat :named)
         %L: # subrule %0
           captob = captscope
           $P0 = getattribute captob, '$.pos'
@@ -914,7 +914,7 @@ tree as a PIR code object that can be compiled.
     ##   We either branch directly to the next node (PGE_BACKTRACK_NONE)
     ##   or to a small subroutine below that will keep backtracking into
     ##   the subrule until it no longer produces a match.
-    code.'emit'(<<"        CODE", PGE_CUT_MATCH, $S0, captgen, captsave, captback, subarg)
+    code.'append_format'(<<"        CODE", PGE_CUT_MATCH, $S0, captgen, captsave, captback, subarg)
           $P2 = adverbs['action']
           captob = $P0(captob%5, 'action'=>$P2)
           $P1 = getattribute captob, '$.pos'
@@ -929,7 +929,7 @@ tree as a PIR code object that can be compiled.
         CODE
     if $I0 == PGE_BACKTRACK_NONE goto end
     ##   Repeatedly backtrack into the subrule until there are no matches.
-    code.'emit'(<<"        CODE", PGE_CUT_MATCH, $S0, next)
+    code.'append_format'(<<"        CODE", PGE_CUT_MATCH, $S0, next)
         %1:
           pos = $P1
           $P1 = getattribute captob, '&!corou'
@@ -956,7 +956,7 @@ tree as a PIR code object that can be compiled.
     unless $I0 goto have_test
     test = 'unless'
   have_test:
-    code.'emit'(<<"        CODE", PGE_CUT_MATCH, test, next, subarg)
+    code.'append_format'(<<"        CODE", PGE_CUT_MATCH, test, next, subarg)
           captob = $P0(captob%3)
           $P1 = getattribute captob, '$.pos'
           if $P1 <= %0 goto fail_match
@@ -995,7 +995,7 @@ tree as a PIR code object that can be compiled.
     $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
     exp0label = $P0('R')
     exp1label = $P0('R')
-    code.'emit'(<<"        CODE", label, exp0label, exp1label)
+    code.'append_format'(<<"        CODE", label, exp0label, exp1label)
         %0:  # alt %1, %2
           push ustack, pos
           local_branch cstack, %1
@@ -1040,29 +1040,29 @@ tree as a PIR code object that can be compiled.
     if token == '\B' goto anchor_word
 
   anchor_fail:
-    code.'emit'("        %0: # anchor fail %1", label, token)
-    code.'emit'("          goto fail")
+    code.'append_format'("        %0: # anchor fail %1\n", label, token)
+    code.'append_format'("          goto fail\n")
     .return ()
 
   anchor_null:
-    code.'emit'("        %0: # anchor null %1", label, token)
-    code.'emit'("          goto %0", next)
+    code.'append_format'("        %0: # anchor null %1\n", label, token)
+    code.'append_format'("          goto %0\n", next)
     .return ()
 
   anchor_bos:
-    code.'emit'("        %0: # anchor bos", label)
-    code.'emit'("          if pos == 0 goto %0", next)
-    code.'emit'("          goto fail")
+    code.'append_format'("        %0: # anchor bos\n", label)
+    code.'append_format'("          if pos == 0 goto %0\n", next)
+    code.'append_format'("          goto fail\n")
     .return ()
 
   anchor_eos:
-    code.'emit'("        %0: # anchor eos", label)
-    code.'emit'("          if pos == lastpos goto %0", next)
-    code.'emit'("          goto fail")
+    code.'append_format'("        %0: # anchor eos\n", label)
+    code.'append_format'("          if pos == lastpos goto %0\n", next)
+    code.'append_format'("          goto fail\n")
     .return ()
 
   anchor_bol:
-    code.'emit'(<<"        CODE", label, next, .CCLASS_NEWLINE)
+    code.'append_format'(<<"        CODE", label, next, .CCLASS_NEWLINE)
         %0: # anchor bol
           if pos == 0 goto %1
           if pos == lastpos goto fail
@@ -1074,7 +1074,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 
   anchor_eol:
-    code.'emit'(<<"        CODE", label, next, .CCLASS_NEWLINE)
+    code.'append_format'(<<"        CODE", label, next, .CCLASS_NEWLINE)
         %0: # anchor eol
           $I1 = is_cclass %2, target, pos
           if $I1 goto %1
@@ -1088,7 +1088,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 
   anchor_word:
-    code.'emit'(<<"        CODE", label, next, .CCLASS_WORD, test)
+    code.'append_format'(<<"        CODE", label, next, .CCLASS_WORD, test)
         %0: # anchor word
           $I0 = 0
           if pos == 0 goto %0_1
@@ -1105,7 +1105,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 
   anchor_word_left:
-    code.'emit'(<<"        CODE", label, next, .CCLASS_WORD)
+    code.'append_format'(<<"        CODE", label, next, .CCLASS_WORD)
         %0: # left word boundary
           if pos >= lastpos goto fail
           $I0 = is_cclass %2, target, pos
@@ -1119,7 +1119,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 
   anchor_word_right:
-    code.'emit'(<<"        CODE", label, next, .CCLASS_WORD)
+    code.'append_format'(<<"        CODE", label, next, .CCLASS_WORD)
         %0: # right word boundary
           if pos == 0 goto fail
           $I0 = pos - 1
@@ -1177,16 +1177,16 @@ tree as a PIR code object that can be compiled.
     .local int cclass, negate
 
     $S0 = self.'ast'()
-    code.'emit'("        %0: # cclass %1", label, $S0)
-    code.'emit'("          if pos >= lastpos goto fail")
+    code.'append_format'("        %0: # cclass %1\n", label, $S0)
+    code.'append_format'("          if pos >= lastpos goto fail\n")
     cclass = self['cclass']
     negate = self['negate']
     if cclass == .CCLASS_ANY goto end
-    code.'emit'("          $I0 = is_cclass %0, target, pos", cclass)
-    code.'emit'("          if $I0 == %0 goto fail", negate)
+    code.'append_format'("          $I0 = is_cclass %0, target, pos\n", cclass)
+    code.'append_format'("          if $I0 == %0 goto fail\n", negate)
   end:
-    code.'emit'("          inc pos")
-    code.'emit'("          goto %0", next)
+    code.'append_format'("          inc pos\n")
+    code.'append_format'("          goto %0\n", next)
     .return ()
 .end
 
@@ -1205,7 +1205,7 @@ tree as a PIR code object that can be compiled.
     backtrack = quant['backtrack']
 
     ##  output initial label
-    code.'emit'("        %L: # cclass %0 %Q", self, args :flat :named)
+    code.'append_format'("        %L: # cclass %0 %Q\n", self, args :flat :named)
 
     .local int cclass, negate
     cclass = self['cclass']
@@ -1216,16 +1216,16 @@ tree as a PIR code object that can be compiled.
     if negate == 0 goto emit_find
     negstr = ''
   emit_find:
-    code.'emit'(<<"        CODE", negstr, cclass)
+    code.'append_format'(<<"        CODE", negstr, cclass)
           $I0 = find%0_cclass %1, target, pos, lastpos
           rep = $I0 - pos
         CODE
     goto emit_pir
   emit_dot:
-    code.'emit'("          rep = lastpos - pos")
+    code.'append_format'("          rep = lastpos - pos\n")
 
   emit_pir:
-    code.'emit'(<<"        CODE", args :flat :named)
+    code.'append_format'(<<"        CODE", args :flat :named)
           %Mif rep < %m goto fail
           %Nif rep <= %n goto %L_1
           %Nrep = %n
@@ -1236,7 +1236,7 @@ tree as a PIR code object that can be compiled.
     if backtrack == PGE_BACKTRACK_EAGER goto bt_eager
 
   bt_greedy:
-    code.'emit'(<<"        CODE", args :flat :named)
+    code.'append_format'(<<"        CODE", args :flat :named)
           pos += rep
         %L_2:
           if rep <= %m goto %S
@@ -1253,11 +1253,11 @@ tree as a PIR code object that can be compiled.
     .return (1)
 
   bt_none:
-    code.'emit'("          pos += rep\n          goto %0\n", next)
+    code.'append_format'("          pos += rep\n          goto %0\n", next)
     .return (1)
 
   bt_eager:
-    code.'emit'(<<"        CODE", args :flat :named)
+    code.'append_format'(<<"        CODE", args :flat :named)
           %Mpos += %m
           %Mrep -= %m
         %L_2:
@@ -1308,7 +1308,7 @@ tree as a PIR code object that can be compiled.
     cutmark = self['cutmark']
 
     if cutmark > 0 goto group_cutmark
-    code.'emit'(<<"        CODE", label, next, cutmark)
+    code.'append_format'(<<"        CODE", label, next, cutmark)
         %0: # cut rule or match
           local_branch cstack, %1
           cutmark = %2
@@ -1317,7 +1317,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 
   group_cutmark:
-    code.'emit'(<<"        CODE", label, next, cutmark)
+    code.'append_format'(<<"        CODE", label, next, cutmark)
         %0: # cut %2
           local_branch cstack, %1
           cutmark = %2
@@ -1341,7 +1341,7 @@ tree as a PIR code object that can be compiled.
 
     .local string cname
     cname = self['cname']
-    code.'emit'(<<"        CODE", label, next, cname)
+    code.'append_format'(<<"        CODE", label, next, cname)
         %0: # scalar %2
           $P0 = mob[%2]
           $I0 = does $P0, 'array'
@@ -1393,7 +1393,7 @@ tree as a PIR code object that can be compiled.
     incpos = '###   zero width'
   zerowidth_end:
 
-    code.'emit'(<<"        CODE", label, charlist, test, incpos, next)
+    code.'append_format'(<<"        CODE", label, charlist, test, incpos, next)
         %0: # enumcharlist %1
           if pos >= lastpos goto fail
           $S0 = substr target, pos, 1
@@ -1417,7 +1417,7 @@ tree as a PIR code object that can be compiled.
     .param pmc code
     .param string label
     .param string next
-    code.'emit'(<<"        CODE", label, next, .CCLASS_NEWLINE)
+    code.'append_format'(<<"        CODE", label, next, .CCLASS_NEWLINE)
         %0: # newline
           $I0 = is_cclass %2, target, pos
           if $I0 == 0 goto fail
@@ -1456,7 +1456,7 @@ tree as a PIR code object that can be compiled.
     exp1label = $P0('R')
     chk0label = concat label, '_chk0'
     chk1label = concat label, '_chk1'
-    code.'emit'(<<"        CODE", label, next, exp0label, chk0label, exp1label, chk1label)
+    code.'append_format'(<<"        CODE", label, next, exp0label, chk0label, exp1label, chk1label)
         %0: # conj %2, %4
           push gpad, pos
           push gpad, pos
@@ -1516,7 +1516,7 @@ tree as a PIR code object that can be compiled.
     ##  two different compilers.  Also, if the sources can be lengthy
     ##  we might be well served to use a hashed representation of
     ##  the source.
-    code.'emit'(<<"        CODE", label, lang, value)
+    code.'append_format'(<<"        CODE", label, lang, value)
         %0: # closure
           $S1 = %2
           $P0 = get_hll_global ['PGE';'Match'], '%!cache'
@@ -1529,7 +1529,7 @@ tree as a PIR code object that can be compiled.
         CODE
     $I0 = self['iszerowidth']
     if $I0 goto closure_zerowidth
-    code.'emit'(<<"        CODE", next)
+    code.'append_format'(<<"        CODE", next)
           mpos = pos
           ($P0 :optional, $I0 :opt_flag) = $P1(mob)
           if $I0 == 0 goto %0
@@ -1550,7 +1550,7 @@ tree as a PIR code object that can be compiled.
     unless $I0 goto have_test
     test = 'unless'
   have_test:
-    code.'emit'(<<"        CODE", test, next)
+    code.'append_format'(<<"        CODE", test, next)
           mpos = pos
           $P0 = $P1(mob)
           %0 $P0 goto %1
@@ -1573,7 +1573,7 @@ tree as a PIR code object that can be compiled.
     .local pmc escape
     escape = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
     .local string actionname, actionkey
-    code.'emit'("        %0: # action", label)
+    code.'append_format'("        %0: # action\n", label)
     actionname = self['actionname']
     if actionname == '' goto end
     actionname = escape(actionname)
@@ -1582,7 +1582,7 @@ tree as a PIR code object that can be compiled.
     actionkey = escape(actionkey)
     actionkey = concat ', ', actionkey
   have_actionkey:
-    code.'emit'(<<"        CODE", label, next, actionname, actionkey)
+    code.'append_format'(<<"        CODE", label, next, actionname, actionkey)
           $P1 = adverbs['action']
           if null $P1 goto %1
           $I1 = can $P1, %2
