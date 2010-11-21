@@ -60,7 +60,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
     zero = 0
 
     return = new ['Continuation']
-    set_addr return, return_here
+    set_label return, return_here
     loop:
         .begin_call
             .call itr, return

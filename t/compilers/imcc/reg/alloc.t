@@ -7,7 +7,7 @@ use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 10;
 
 pir_output_is( <<'CODE', <<'OUT', "alligator" );
-# if the side-effect of set_addr/continuation isn't
+# if the side-effect of set_label/continuation isn't
 # detected this program prints "Hi\nalligator\n"
 
 .sub main :main
@@ -19,7 +19,7 @@ lab:
     dec $I0
     unless $I0 goto ex
     new $P1, 'Continuation'
-    set_addr $P1, lab
+    set_label $P1, lab
     $P2 = find_name "alligator"
     set_args "0", $P1
     invokecc $P2
