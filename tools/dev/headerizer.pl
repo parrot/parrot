@@ -12,6 +12,7 @@ use Parrot::Headerizer::Functions qw(
     print_headerizer_warnings
     read_file
     write_file
+    qualify_sourcefile
 );
 
 =head1 NAME
@@ -93,7 +94,6 @@ my $headerizer = Parrot::Headerizer->new;
 for my $ofile (@ofiles) {
 
     # Skip files in the src/ops/ subdirectory.
-
     next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
             $ofile =~ m{^src/ops};                     # ... or by makefile
 
@@ -106,26 +106,12 @@ for my $ofile (@ofiles) {
         next if -f $sfile;
     }
 
-    my $cfile = $ofile;
-    $cfile =~ s/\Q$PConfig{o}\E$/.c/ or $is_yacc
-        or die "$cfile doesn't look like an object file";
-
-    my $pmcfile = $ofile;
-    $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
-
-    my $from_pmc = -f $pmcfile && !$is_yacc;
-
-    my $sourcefile = $from_pmc ? $pmcfile : $cfile;
-
-    my $source_code = read_file( $sourcefile );
-    die qq{can't find HEADERIZER HFILE directive in "$sourcefile"}
-        unless $source_code =~
-            m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
-
-    my $hfile = $1;
-    if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
-        die qq{"$hfile" not found (referenced from "$sourcefile")};
-    }
+    my ($sourcefile, $source_code, $hfile) =
+        qualify_sourcefile( {
+            ofile           => $ofile,
+            PConfig         => \%PConfig,
+            is_yacc         => $is_yacc,
+        } );
 
     my @decls;
     if ( $macro_match ) {

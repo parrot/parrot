@@ -5,14 +5,16 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More qw(no_plan); # tests => 15;
 use Cwd;
 use File::Temp qw( tempdir );
 use lib qw( lib );
+use Parrot::Config;
 use Parrot::Headerizer::Functions qw(
     print_headerizer_warnings
     read_file
     write_file
+    qualify_sourcefile
 );
 use IO::CaptureOutput qw| capture |;
 
@@ -36,6 +38,7 @@ my $cwd = cwd();
     is($lines_read[0], 'Goodbye', "Got first line");
     is($lines_read[1], 'cruel', "Got second line");
     is($lines_read[2], 'world', "Got third line");
+    chdir $cwd or die "Unable to chdir: $!";
 }
     
 my $warnings = {
@@ -80,15 +83,28 @@ my $warnings = {
         "Got expected summary of headerizer warnings" );
 }
 
-
+my ($ofile, $is_yacc);
+my ($sourcefile, $source_code, $hfile);
+$ofile = 'foobar.xyz';
+eval {
+    my ($sourcefile, $source_code, $hfile) =
+        qualify_sourcefile( {
+            ofile           => $ofile,
+            PConfig         => \%PConfig,
+            is_yacc         => 0,
+        } );
+};
+like($@, qr/$ofile doesn't look like an object file/,
+    "Got expected die message for non-object, non-yacc file" );
+    
 pass("Completed all tests in $0");
 
-sub touch_parrot {
-    open my $FH, '>', q{parrot}
-        or die "Unable to open handle for writing: $!";
-    print $FH "\n";
-    close $FH or die "Unable to close handle after writing: $!";
-}
+#sub touch_parrot {
+#    open my $FH, '>', q{parrot}
+#        or die "Unable to open handle for writing: $!";
+#    print $FH "\n";
+#    close $FH or die "Unable to close handle after writing: $!";
+#}
 
 ################### DOCUMENTATION ###################
 
