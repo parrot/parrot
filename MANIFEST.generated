@@ -36,6 +36,7 @@ include/parrot/pbcversion.h                      [devel]include
 include/parrot/platform.h                        [main]include
 include/parrot/platform_limits.h                 [devel]include
 include/parrot/vtable.h                          [main]include
+include/pmc/pmc_addrinfo.h                       [devel]include
 include/pmc/pmc_addrregistry.h                   [devel]include
 include/pmc/pmc_arrayiterator.h                  [devel]include
 include/pmc/pmc_bigint.h                         [devel]include
@@ -334,6 +335,7 @@ src/jit_emit.h                                   []
 src/nci.c                                        []
 src/null_config.c                                []
 src/parrot_config.c                              []
+src/pmc/addrinfo.dump                            [devel]src
 src/pmc/addrregistry.dump                        [devel]src
 src/pmc/arrayiterator.dump                       [devel]src
 src/pmc/bigint.dump                              [devel]src

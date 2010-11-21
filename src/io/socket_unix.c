@@ -30,6 +30,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "pmc/pmc_socket.h"
+#include "pmc/pmc_sockaddr.h"
 
 #ifdef PIO_OS_UNIX
 
@@ -40,6 +41,17 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void get_addrinfo(PARROT_INTERP,
+    ARGIN(PMC * addrinfo),
+    ARGIN(const char *host),
+    int port,
+    int protocol,
+    int family,
+    int passive)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void get_sockaddr_in(PARROT_INTERP,
     ARGIN(PMC * sockaddr),
     ARGIN(const char* host),
@@ -48,6 +60,10 @@ static void get_sockaddr_in(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_get_addrinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(addrinfo) \
+    , PARROT_ASSERT_ARG(host))
 #define ASSERT_ARGS_get_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sockaddr) \
@@ -58,6 +74,8 @@ static void get_sockaddr_in(PARROT_INTERP,
 /*
 static void get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr),
     ARGIN(const char* host), ARGIN(int port));
+static void
+get_addrinfo(PARROT_INTERP, ARGIN(PMC * addrinfo), ARGIN(const char *host), ARGIN(int port));
 */
 
 /*
@@ -106,6 +124,111 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
     return sockaddr;
 }
 
+/*
+
+=item C<PMC * Parrot_io_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL port,
+INTVAL protocol, INTVAL family, INTVAL passive)>
+
+C<Parrot_io_getaddrinfo()> calls get_addrinfo() to convert hostnames or IP
+addresses to sockaddrs (and more) and returns an Addrinfo PMC which can be
+passed to C<Parrot_io_connect_unix()> or C<Parrot_io_bind_unix()>.
+
+=cut
+
+*/
+
+/* TODO: where to move this to? originally from src/io/socket_api.c */
+static int pio_pf[PIO_PF_MAX+1] = {
+#ifdef PF_LOCAL
+    PF_LOCAL,   /* PIO_PF_LOCAL */
+#else
+    -1,         /* PIO_PF_LOCAL */
+#endif
+#ifdef PF_UNIX
+    PF_UNIX,    /* PIO_PF_UNIX */
+#else
+    -1,         /* PIO_PF_UNIX */
+#endif
+#ifdef PF_INET
+    PF_INET,    /* PIO_PF_INET */
+#else
+    -1,         /* PIO_PF_INET */
+#endif
+#ifdef PF_INET6
+    PF_INET6,   /* PIO_PF_INET6 */
+#else
+    -1,         /* PIO_PF_INET6 */
+#endif
+};
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)
+{
+    ASSERT_ARGS(Parrot_io_getaddrinfo)
+
+    char * const s        = Parrot_str_to_cstring(interp, addr);
+    PMC  * const addrinfo = Parrot_pmc_new(interp, enum_class_Addrinfo);
+
+    /* set family: 0 means any (AF_INET or AF_INET6) for getaddrinfo, so treat
+     * it specially */
+    int fam = (family != 0 ? pio_pf[family] : 0);
+
+    get_addrinfo(interp, addrinfo, s, port, protocol, fam, passive);
+    Parrot_str_free_cstring(s);
+    return addrinfo;
+}
+
+
+/*
+
+=item C<PMC * Parrot_io_remote_address(PARROT_INTERP, PMC *sock)>
+
+C<Parrot_io_remote_address()> returns the remote address of the given sock
+PMC. It can be used to find out to which address the connection was actually
+established (in case of the remote server having multiple IPv4 and/or IPv6
+addresses.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_remote_address(PARROT_INTERP, ARGIN(PMC *sock))
+{
+    ASSERT_ARGS(Parrot_io_remote_address)
+
+    PMC * const addrinfo = VTABLE_clone(interp, PARROT_SOCKET(sock)->remote);
+
+    return addrinfo;
+}
+
+/*
+
+=item C<PMC * Parrot_io_local_address(PARROT_INTERP, PMC *sock)>
+
+C<Parrot_io_local_address()> returns the local address of the given sock
+PMC. It can be used to find out to which address the socket was actually
+bound (when binding to "localhost" without explicitly specifying an address
+family, for example).
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_local_address(PARROT_INTERP, ARGIN(PMC *sock))
+{
+    ASSERT_ARGS(Parrot_io_local_address)
+
+    PMC * const addrinfo = VTABLE_clone(interp, PARROT_SOCKET(sock)->local);
+
+    return addrinfo;
+}
+
 
 /*
 
@@ -138,73 +261,135 @@ Parrot_io_socket_unix(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto
 
 /*
 
-=item C<INTVAL Parrot_io_connect_unix(PARROT_INTERP, PMC *socket, PMC *r)>
+=item C<INTVAL Parrot_io_connect_unix(PARROT_INTERP, PMC *sock, PMC *r)>
 
-Connects C<*io>'s socket to address C<*r>.
+Takes the Addrinfo PMC C<*r> and tries to establish a connection. A new socket
+PMC will be created because the Addrinfo may contain addresses of multiple
+families (IPv4 and IPv6).
 
 =cut
 
 */
 
 INTVAL
-Parrot_io_connect_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
+Parrot_io_connect_unix(PARROT_INTERP, ARGMOD(PMC *sock), ARGIN(PMC *r))
 {
     ASSERT_ARGS(Parrot_io_connect_unix)
-    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(sock);
+    struct addrinfo *res = VTABLE_get_pointer(interp, r);
+    struct addrinfo *walk;
+    int fd = -1;
+    int i = 1;
 
     if (!r)
         return -1;
 
-    PARROT_SOCKET(socket)->remote = r;
+
+    for (walk = res; walk != NULL; walk = walk->ai_next) {
+        fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
+        if (fd < 0) {
+            /* Cannot create socket. Not necessarily an error, for example not
+             * on FreeBSD, where getaddrinfo() returns IPv6 addresses even
+             * when the libc does not offer IPv6 support and thus fails in
+             * socket(). */
+            continue;
+        }
+
+        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i)) == -1) {
+            perror("Error setting SO_REUSEADDR:");
+            continue;
+        }
+
+        /* XXX: this effectively overwrites any previously set sockets. is that alright? */
+        Parrot_io_set_os_handle(interp, sock, fd);
 
 AGAIN:
-    if ((connect(io->os_handle, (struct sockaddr *)SOCKADDR_REMOTE(socket),
-            sizeof (struct sockaddr_in))) != 0) {
-        switch (errno) {
-          case EINTR:
-            goto AGAIN;
-          case EINPROGRESS:
-            goto AGAIN;
-          case EISCONN:
-            return 0;
-          default:
-            return -1;
+        if (connect(fd, walk->ai_addr, walk->ai_addrlen) != 0) {
+            switch (errno) {
+              case EINTR:
+                goto AGAIN;
+              case EINPROGRESS:
+                goto AGAIN;
+              case EISCONN:
+                break;
+              default:
+                close(fd);
+                fd = -1;
+                continue;
+            }
         }
+
+        PARROT_SOCKET(sock)->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
+
+        VTABLE_set_pointer(interp, PARROT_SOCKET(sock)->remote, walk);
+        return 0;
     }
 
-    return 0;
+    if (fd == -1)
+        return -1;
 }
 
 /*
 
-=item C<INTVAL Parrot_io_bind_unix(PARROT_INTERP, PMC *socket, PMC *sockaddr)>
+=item C<INTVAL Parrot_io_bind_unix(PARROT_INTERP, PMC *sock, PMC *sockaddr)>
 
-Binds C<*io>'s socket to the local address and port specified by C<*l>.
+Takes the Addrinfo PMC C<*sockaddr> and creates a listening socket. A new
+socket needs to be created because C<*sockaddr> may contain addresses of
+multiple families (IPv4 and IPv6). An example is binding to "localhost"
+which resolves to ::1 and 127.0.0.1. If you are on FreeBSD and have no
+IPv6 support, the first attempt to create a socket and bind it would fail.
 
 =cut
 
 */
 
 INTVAL
-Parrot_io_bind_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
+Parrot_io_bind_unix(PARROT_INTERP, ARGMOD(PMC *sock), ARGMOD(PMC *sockaddr))
 {
     ASSERT_ARGS(Parrot_io_bind_unix)
-    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
-    struct sockaddr_in * saddr;
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(sock);
+    struct addrinfo *res = VTABLE_get_pointer(interp, sockaddr);
+    struct addrinfo *walk;
+    int fd = -1;
+    int i = 1;
 
     if (!sockaddr)
         return -1;
 
-    PARROT_SOCKET(socket)->local = sockaddr;
+    for (walk = res; walk != NULL; walk = walk->ai_next) {
+        fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
+        if (fd < 0) {
+            /* Cannot create socket. Not necessarily an error, for example not
+             * on FreeBSD, where getaddrinfo() returns IPv6 addresses even
+             * when the libc does not offer IPv6 support and thus fails in
+             * socket(). */
+            continue;
+        }
 
-    saddr = SOCKADDR_LOCAL(socket);
+        if (walk->ai_family == AF_INET6) {
+            if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &i, sizeof(i)) == -1) {
+                perror("Error setting IPV6_V6ONLY:");
+                continue;
+            }
+        }
 
-    if ((bind(io->os_handle, (struct sockaddr *) saddr,
-            sizeof (struct sockaddr_in))) == -1) {
-        return -1;
+        /* XXX: this effectively overwrites any previously set sockets. is that alright? */
+        Parrot_io_set_os_handle(interp, sock, fd);
+
+        if (bind(fd, walk->ai_addr, walk->ai_addrlen) != 0) {
+            close(fd);
+            fd = -1;
+            continue;
+        }
+
+        PARROT_SOCKET(sock)->local = Parrot_pmc_new(interp, enum_class_Sockaddr);
+
+        VTABLE_set_pointer(interp, PARROT_SOCKET(sock)->local, walk);
+        return 0;
     }
 
-    return 0;
+    if (fd == -1)
+        return -1;
 }
 
 /*
@@ -248,8 +433,9 @@ Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
     PMC * newio   = Parrot_io_new_socket_pmc(interp,
             PIO_F_SOCKET | PIO_F_READ|PIO_F_WRITE);
-    Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_in);
-    struct sockaddr_in *saddr;
+    Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_storage);
+    Parrot_Sockaddr_attributes *remotedata;
+    struct sockaddr_storage *saddr;
     int newsock;
 
     PARROT_SOCKET(newio)->local  = PARROT_SOCKET(socket)->local;
@@ -262,13 +448,22 @@ Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
         return PMCNULL;
     }
 
+    /* Set the length for the remote sockaddr PMC so that it can distinguish
+     * between sockaddr_in and sockaddr_in6 */
+    remotedata = PARROT_SOCKADDR(PARROT_SOCKET(newio)->remote);
+    remotedata->len = addrlen;
+
     PARROT_SOCKET(newio)->os_handle = newsock;
 
-    /* XXX FIXME: Need to do a getsockname and getpeername here to
-     * fill in the sockaddr_in structs for local and peer */
-
-    /* Optionally do a gethostyaddr() to resolve remote IP address.
-     * This should be based on an option set in the master socket */
+    /* Optionally do a getaddrinfo() to resolve remote IP address.
+     * This should be based on an option set in the master socket.
+     *
+     * XXX: instead of resolving here, we should use the flags for
+     * getnameinfo() in the VTABLE get_string of the Sockaddr PMC.
+     * At the moment, it uses NI_NUMERICHOST, but when called
+     * differently, it will resolve the address. The advantage is
+     * that we only resolve when someone actually accesses the
+     * name. -- Michael Stapelberg */
 
     return newio;
 }
@@ -479,6 +674,33 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
     sa->sin_port = htons(port);
 }
 
+static void
+get_addrinfo(PARROT_INTERP, ARGIN(PMC * addrinfo), ARGIN(const char *host), int port, int protocol, int family, int passive)
+{
+    ASSERT_ARGS(get_addrinfo)
+
+    struct addrinfo hints;
+    struct addrinfo *res;
+    /* We need to pass the port as a string (because you could also use a
+     * service specification from /etc/services). The highest port is 65535,
+     * so we need 5 characters + trailing null-byte. */
+    char portstr[6];
+    int ret;
+
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_protocol = protocol;
+    if (passive)
+        hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = family;
+    snprintf(portstr, sizeof(portstr), "%u", port);
+
+    if ((ret = getaddrinfo(host, portstr, &hints, &res)) != 0) {
+        fprintf(stderr, "getaddrinfo failure: %s\n", gai_strerror(ret));
+        return;
+    }
+
+    VTABLE_set_pointer(interp, addrinfo, res);
+}
 
 #endif /* PIO_OS_UNIX */
 

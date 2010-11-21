@@ -180,25 +180,42 @@ PMC * Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
         FUNC_MODIFIES(*socket);
 
 INTVAL Parrot_io_bind_unix(PARROT_INTERP,
-    ARGMOD(PMC *socket),
+    ARGMOD(PMC *sock),
     ARGMOD(PMC *sockaddr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*sock)
         FUNC_MODIFIES(*sockaddr);
 
 INTVAL Parrot_io_connect_unix(PARROT_INTERP,
-    ARGMOD(PMC *socket),
+    ARGMOD(PMC *sock),
     ARGIN(PMC *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*socket);
+        FUNC_MODIFIES(*sock);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_getaddrinfo(PARROT_INTERP,
+    ARGIN(STRING *addr),
+    INTVAL port,
+    INTVAL protocol,
+    INTVAL family,
+    INTVAL passive)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 INTVAL Parrot_io_listen_unix(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_local_address(PARROT_INTERP, ARGIN(PMC *sock))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 INTVAL Parrot_io_poll_unix(SHIM_INTERP,
     ARGMOD(PMC *socket),
@@ -216,6 +233,12 @@ INTVAL Parrot_io_recv_unix(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*socket)
         FUNC_MODIFIES(*s);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_remote_address(PARROT_INTERP, ARGIN(PMC *sock))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 INTVAL Parrot_io_send_unix(SHIM_INTERP,
     ARGMOD(PMC *socket),
@@ -246,20 +269,29 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
     , PARROT_ASSERT_ARG(socket))
 #define ASSERT_ARGS_Parrot_io_bind_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(socket) \
+    , PARROT_ASSERT_ARG(sock) \
     , PARROT_ASSERT_ARG(sockaddr))
 #define ASSERT_ARGS_Parrot_io_connect_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(socket) \
+    , PARROT_ASSERT_ARG(sock) \
     , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_Parrot_io_getaddrinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(addr))
 #define ASSERT_ARGS_Parrot_io_listen_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket))
+#define ASSERT_ARGS_Parrot_io_local_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sock))
 #define ASSERT_ARGS_Parrot_io_poll_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket))
 #define ASSERT_ARGS_Parrot_io_recv_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(socket) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_io_remote_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sock))
 #define ASSERT_ARGS_Parrot_io_send_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket) \
     , PARROT_ASSERT_ARG(s))

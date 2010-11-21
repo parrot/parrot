@@ -3,11 +3,12 @@ Copyright (C) 2008-2009, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/sockaddr.pmc - sockaddr_in holder
+src/pmc/sockaddr.pmc - sockaddr_in/sockaddr_in6 holder
 
 =head1 DESCRIPTION
 
-The Sockaddr PMC holds raw c-pointer to sockaddr_in
+The Sockaddr PMC holds a C<sockaddr_in> (IPv4) or C<sockaddr_in6> (IPv6) and
+saves its length (to distinguish C<sockaddr_in> and C<sockaddr_in6>).
 
 
 =head2 Vtable Functions
@@ -23,7 +24,7 @@ These are the vtable functions for the Sockaddr class.
 #ifdef __cplusplus
 extern "C" {
 #endif
-    struct sockaddr_in;
+    struct sockaddr_storage;
 #ifdef __cplusplus
 }
 #endif
@@ -34,12 +35,13 @@ extern "C" {
 
 pmclass Sockaddr auto_attrs {
     ATTR void   *pointer; /* The stored pointer. */
+    ATTR INTVAL len; /* Length of the contents of the sockaddr_storage */
 
 /*
 
 =item C<void init()>
 
-Initializes the pointer object.
+Initializes the PMC by allocating a C<sockaddr_storage>.
 
 =cut
 
@@ -50,7 +52,7 @@ Initializes the pointer object.
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
         pdata_struct->pointer = mem_gc_allocate_zeroed_typed(INTERP,
-                struct sockaddr_in);
+                struct sockaddr_storage);
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -77,7 +79,8 @@ Destroys the PMC and frees all allocated memory.
 
 =item C<PMC *clone()>
 
-Creates and returns a clone of the pointer.
+Creates a new Sockaddr PMC with the same contents and length as the current
+one.
 
 =cut
 
@@ -85,8 +88,10 @@ Creates and returns a clone of the pointer.
 
     VTABLE PMC *clone() {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+
         memcpy(PARROT_SOCKADDR(dest)->pointer, PARROT_SOCKADDR(SELF)->pointer,
-                sizeof (struct sockaddr_in));
+                sizeof (struct sockaddr_storage));
+        PARROT_SOCKADDR(dest)->len = PARROT_SOCKADDR(SELF)->len;
         return dest;
     }
 
@@ -94,7 +99,7 @@ Creates and returns a clone of the pointer.
 
 =item C<void *get_pointer()>
 
-Returns the pointer.
+Returns a pointer to the C<sockaddr_in> or C<sockaddr_in6>.
 
 =cut
 
@@ -107,20 +112,45 @@ Returns the pointer.
 
 /*
 
+=item C<STRING *get_string()>
+
+Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
+
+=cut
+
+*/
+    VTABLE STRING *get_string() {
+        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        if (!data->pointer)
+            return Parrot_sprintf_c(interp, "(?)");
+
+        struct sockaddr_storage *addr = data->pointer;
+        /* TODO: get hostname, not only numeric */
+        char buf[INET6_ADDRSTRLEN+1];
+        getnameinfo((struct sockaddr_storage*)data->pointer, data->len, buf,
+                sizeof(buf), NULL, 0, NI_NUMERICHOST);
+        return Parrot_str_new(interp, buf, 0);
+    }
+
+
+/*
+
 =item C<void set_pointer(void *)>
 
-Sets the pointer.
+Copies a C<sockaddr_in> or C<sockaddr_in6> from the given C<addrinfo> pointer
+(by accessing its C<ai_addr> and C<ai_addrlen> members).
 
 =cut
 
 */
 
-/*
     VTABLE void set_pointer(void *value) {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
-        return data->pointer;
+
+        struct addrinfo *walk = value;
+        memcpy(data->pointer, walk->ai_addr, walk->ai_addrlen);
+        data->len = walk->ai_addrlen;
     }
-*/
 
 }
 
