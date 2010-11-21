@@ -66,7 +66,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
     set P5, 3
     set_global "foo", P5
     new P1, ['Continuation']
-    set_addr P1, endcont
+    set_label P1, endcont
 endcont:
     get_global P4, "foo"
     print "here "
@@ -98,7 +98,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
     defined I1, P1
     print I1
     print "\n"
-    set_addr P1, cont
+    set_label P1, cont
     defined I1, P1
     print I1
     print "\n"

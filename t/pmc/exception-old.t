@@ -458,7 +458,7 @@ handle_errs:
     ## Take a continuation.
     .local pmc cont
     cont = new ['Continuation']
-    set_addr cont, over_there
+    set_label cont, over_there
     print "    returning from foo\n"
     .return (cont)
 over_there:
