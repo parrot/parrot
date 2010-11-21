@@ -121,12 +121,13 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 */
     VTABLE STRING *get_string() {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        struct sockaddr_storage *addr           = data->pointer;
+        /* TODO: get hostname, not only numeric */
+        char buf[INET6_ADDRSTRLEN+1];
+
         if (!data->pointer)
             return Parrot_sprintf_c(interp, "(?)");
 
-        struct sockaddr_storage *addr = data->pointer;
-        /* TODO: get hostname, not only numeric */
-        char buf[INET6_ADDRSTRLEN+1];
         getnameinfo((struct sockaddr_storage*)data->pointer, data->len, buf,
                 sizeof(buf), NULL, 0, NI_NUMERICHOST);
         return Parrot_str_new(interp, buf, 0);
