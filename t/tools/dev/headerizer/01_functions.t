@@ -85,6 +85,17 @@ my $warnings = {
         "Got expected summary of headerizer warnings" );
 }
 
+$warnings = {};
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { print_headerizer_warnings($warnings); },
+        \$stdout,
+        \$stderr,
+    );
+    ok(! $stdout, "No warnings, hence no warnings printed" );
+}
+
 my ($ofile, $is_yacc);
 my ($sourcefile, $source_code, $hfile);
 $ofile = 'foobar.xyz';
