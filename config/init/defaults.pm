@@ -294,12 +294,12 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            for my $cc qw(cc link ld) {
+            for my $cc (qw(cc link ld)) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }
 
             # and lib flags
-            for my $lib qw(ld_load_flags ld_share_flags ldflags linkflags) {
+            for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
                 my $item = $conf->data->get($lib);
                 ( my $ni = $item ) =~ s/lib64/lib/g;
                 $conf->data->set( $lib, $ni );
