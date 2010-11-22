@@ -96,6 +96,12 @@ $warnings = {};
     ok(! $stdout, "No warnings, hence no warnings printed" );
 }
 
+my $filename = 'foobar';
+eval {
+    read_file($filename);
+};
+like($@, qr/couldn't read '$filename'/, "Got expected error message for read_file()");
+
 my ($ofile, $is_yacc);
 my ($sourcefile, $source_code, $hfile);
 $ofile = 'foobar.xyz';
@@ -173,6 +179,70 @@ like($@, qr/$ofile doesn't look like an object file/,
     };
     like($@, qr/"$stub" not found \(referenced from "$expected_cfile"\)/,
         "Got expected error message for missing header file" );
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $stub = 'validheader';
+    copy "$cwd/t/tools/dev/headerizer/testlib/$stub.in" =>
+         "$tdir/$stub.c" or croak "Unable to copy file for testing";
+    copy "$cwd/t/tools/dev/headerizer/testlib/h$stub.in" =>
+         "$tdir/$stub.h" or croak "Unable to copy file for testing";
+    $ofile = "$tdir/$stub.o";
+    my $expected_cfile = "$tdir/$stub.c";
+    chdir $tdir;
+    my ($sourcefile, $source_code, $hfile) =
+        qualify_sourcefile( {
+            ofile           => $ofile,
+            PConfig         => \%PConfig,
+            is_yacc         => 0,
+        } );
+    chdir $cwd;
+    is( $sourcefile, $expected_cfile, "Got expected C source file" );
+    like( $source_code, qr/This file has a valid HEADERIZER HFILE/, 
+        "Got expected source code" );
+    is( $hfile, "$stub.h", "Got expected header file" );
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $stub = 'validheader';
+    copy "$cwd/t/tools/dev/headerizer/testlib/$stub.in" =>
+         "$tdir/$stub.pmc" or croak "Unable to copy file for testing";
+    copy "$cwd/t/tools/dev/headerizer/testlib/h$stub.in" =>
+         "$tdir/$stub.h" or croak "Unable to copy file for testing";
+    $ofile = "$tdir/$stub.o";
+    my $expected_cfile = "$tdir/$stub.pmc";
+    chdir $tdir;
+    my ($sourcefile, $source_code, $hfile) =
+        qualify_sourcefile( {
+            ofile           => $ofile,
+            PConfig         => \%PConfig,
+            is_yacc         => 0,
+        } );
+    chdir $cwd;
+    is( $sourcefile, $expected_cfile, "Got expected PMC file" );
+    like( $source_code, qr/This file has a valid HEADERIZER HFILE/, 
+        "Got expected source code" );
+    is( $hfile, "$stub.h", "Got expected header file" );
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $stub = 'imcc';
+    copy "$cwd/t/tools/dev/headerizer/testlib/$stub.in" =>
+         "$tdir/$stub.y" or croak "Unable to copy file for testing";
+    $ofile = "$tdir/$stub.y";
+    my $expected_cfile = $ofile;
+    my ($sourcefile, $source_code, $hfile) =
+        qualify_sourcefile( {
+            ofile           => $ofile,
+            PConfig         => \%PConfig,
+            is_yacc         => 1,
+        } );
+    is( $sourcefile, $expected_cfile, "Got expected C source file" );
+    like( $source_code, qr/HEADERIZER HFILE: none/, "Got expected source code" );
+    is( $hfile, 'none', "As expected, no header file" );
 }
 
 pass("Completed all tests in $0");
