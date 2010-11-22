@@ -217,11 +217,11 @@ TEST
     .local string submitter
     submitter = _get_submitter(config, env)
     $P0['Submitter'] = submitter
-    $I0 = exists config['git_describe']
+    $I0 = exists config['sha1']
     unless $I0 goto L2
-    .local string git_describe
-    git_describe = config['git_describe']
-    $P0['Git describe'] = git_describe
+    .local string sha1
+    sha1 = config['sha1']
+    $P0['Git sha1'] = sha1
   L2:
     _add_git_info($P0)
     .return ($P0)
@@ -350,10 +350,10 @@ TEST
     push contents, 'Platform'
     $S0 = config['osname']
     push contents, $S0
-    $I0 = exists config['sha1']
+    $I0 = exists config['git_describe']
     unless $I0 goto L0
     push contents, 'revision'
-    $S0 = config['sha1']
+    $S0 = config['git_describe']
     push contents, $S0
   L0:
     push contents, 'tags'
