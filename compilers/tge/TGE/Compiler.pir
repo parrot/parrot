@@ -236,12 +236,17 @@ err_no_rule:
     .param pmc node
     .local pmc value, infile
     .local int lineno
-    value = new 'CodeString'
+    value = new 'StringBuilder'
     infile = get_global '$!infile'
     $P2 = node[0]
     (lineno) = $P2.'line_number'()
-    value.'emit'('#line %0 %1', lineno, infile)
-    value .= $P2
+    push value, '#line '
+    $S0 = lineno
+    push value, $S0
+    push value, ' '
+    push value, infile
+    push value, "\n"
+    push value, $P2
     .return (value)
 .end
 

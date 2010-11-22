@@ -94,6 +94,15 @@ is uniquely identified by a SHA1. This is roughly similar to a Subversion
 Revision, but it is not an integer and does not increase linearly, because git
 commits can have any number of parents.
 
+=head2 tag
+
+Noun. A symbolic name for a SHA1. A tag is like a variable, which points to a specific SHA1.
+Tags can change, but usually they don't. A tag is akin to a domain name, which points to
+an IP address. Run C<git help tag> for more information.
+
+Verb. The process of giving a sha1 a symbolic name, such as giving commit 9560334cf the symbolic
+name "RELEASE_42_0_1".
+
 =head2 topic branch
 
 Noun. Any branch that is not the master branch.

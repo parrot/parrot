@@ -117,7 +117,7 @@ sub pcc_error_like {
 
 sub create {
     my %o = @_;
-    $o{$_} ||= '' for qw/args params returns results/;
+    $o{$_} ||= '' for ( qw/args params returns results/ ) ;
 
     $o{returns} =
         defined $o{returns}

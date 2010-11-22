@@ -170,7 +170,7 @@ pir_output_is( <<'CODE', <<'OUT', "coroutine iterator" );
   .local int i
   i=5
   new $P1, 'Continuation'
-  set_addr $P1, after_loop
+  set_label $P1, after_loop
 loop:
   $I2 = _addtwo($P1, i)
     print $I2

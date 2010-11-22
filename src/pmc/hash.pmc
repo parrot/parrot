@@ -93,14 +93,10 @@ get_next_hash(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 
     bucket = parrot_hash_get_bucket(interp, hash, key);
 
-    if (bucket) {
+    if (bucket)
         next_hash = (PMC *)bucket->value;
-    }
-    else {
-        /* autovivify a Hash */
-        next_hash = Parrot_pmc_new(interp, enum_class_Hash);
-        parrot_hash_put(interp, hash, key, next_hash);
-    }
+    else
+        return PMCNULL;
 
     return next_hash;
 }
@@ -505,6 +501,10 @@ Returns the integer value for the element at C<*key>.
         }
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
+            if (PMC_IS_NULL(next_hash))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Cannot autovivify nested hashes");
             VTABLE_set_integer_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -696,6 +696,10 @@ Returns the string value for the element at C<*key>.
         }
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
+            if (PMC_IS_NULL(next_hash))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Cannot autovivify nested hashes");
             VTABLE_set_string_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -835,6 +839,10 @@ Returns the PMC value for the element at C<*key>.
         }
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
+            if (PMC_IS_NULL(next_hash))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Cannot autovivify nested hashes");
             VTABLE_set_number_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -893,6 +901,10 @@ Sets C<value> as the value for C<*key>.
         }
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
+            if (PMC_IS_NULL(next_hash))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Cannot autovivify nested hashes");
             VTABLE_set_pmc_keyed(INTERP, next_hash, key, value);
         }
     }

@@ -32,7 +32,7 @@ Tests the Continuation PMC.
 
 .sub invoke_with_init
     $P0 = new ['Continuation']
-    set_addr $P0, L1
+    set_label $P0, L1
     $P0()
     ok(0, "didn't call continuation")
     goto end
@@ -55,7 +55,7 @@ end:
     chosen = shift options
 
     cc = new 'Continuation'
-    set_addr cc, recurse
+    set_label cc, recurse
     paths = get_global '!paths'
     push paths, cc
 
@@ -111,7 +111,7 @@ end:
 
     # Install top-level cc in global.
     cc = new 'Continuation'
-    set_addr cc, final_failure
+    set_label cc, final_failure
     set_global '!topcc', cc
 
     $P0 = new 'ResizableStringArray'
@@ -128,7 +128,7 @@ end:
 
     # Install top-level cc in global.
     cc = new 'Continuation'
-    set_addr cc, final_failure
+    set_label cc, final_failure
     set_global '!topcc', cc
 
     $P0 = new 'ResizableStringArray'
