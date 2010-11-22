@@ -204,12 +204,6 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item find_lex [eligible in 2.4]
-
-find_lex will not throw exception for non-existing lexicals.
-
-L<https://trac.parrot.org/parrot/ticket/1207>
-
 =item inplace string updates. [eligible in 2.4]
 
 All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
