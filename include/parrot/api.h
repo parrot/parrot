@@ -156,6 +156,11 @@ Parrot_Int Parrot_api_run_bytecode(
         FUNC_MODIFIES(*interp_pmc);
 
 PARROT_API
+Parrot_Int Parrot_api_set_configuration_hash(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC confighash);
+
+PARROT_API
 Parrot_Int Parrot_api_set_executable_name(
     ARGMOD(PMC *interp_pmc),
     ARGIN(const char * name))
@@ -230,6 +235,8 @@ Parrot_Int Parrot_api_set_warnings(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pbc) \
     , PARROT_ASSERT_ARG(mainargs))
+#define ASSERT_ARGS_Parrot_api_set_configuration_hash \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_executable_name \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
@@ -272,6 +279,16 @@ Parrot_Int Parrot_api_string_import_ascii(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* out);
 
+PARROT_API
+Parrot_Int Parrot_api_string_import_binary(
+    Parrot_PMC interp_pmc,
+    ARGIN(const unsigned char *bytes),
+    Parrot_Int length,
+    ARGOUT(Parrot_String *out))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*out);
+
 #define ASSERT_ARGS_Parrot_api_string_export_ascii \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(string) \
@@ -282,6 +299,10 @@ Parrot_Int Parrot_api_string_import_ascii(
 #define ASSERT_ARGS_Parrot_api_string_import_ascii \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(out))
+#define ASSERT_ARGS_Parrot_api_string_import_binary \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bytes) \
     , PARROT_ASSERT_ARG(out))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/strings.c */

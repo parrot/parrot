@@ -32,6 +32,7 @@ void Parrot_register_core_pmcs(PARROT_INTERP, PMC* registry);
 
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
+static PMC * parrot_config_hash_global = NULL;
 
 /* HEADERIZER HFILE: include/parrot/global_setup.h */
 
@@ -65,7 +66,6 @@ will be used in subsequently created Interpreters.
 
 */
 
-PARROT_EXPORT
 void
 Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
@@ -75,6 +75,15 @@ Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
         parrot_config_stored      = parrot_config;
         parrot_config_size_stored = parrot_config_size;
     }
+}
+
+void
+Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))
+{
+    ASSERT_ARGS(Parrot_set_config_hash_pmc)
+    parrot_config_hash_global = config;
+    if (!PMC_IS_NULL(config))
+        parrot_set_config_hash_interpreter(interp);
 }
 
 /*
@@ -94,19 +103,14 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
     ASSERT_ARGS(parrot_set_config_hash_interpreter)
     PMC *iglobals = interp->iglobals;
 
-    PMC *config_hash = NULL;
-
-    if (parrot_config_size_stored > 1) {
-        STRING * const config_string =
-            Parrot_str_new_init(interp,
-                               (const char *)parrot_config_stored, parrot_config_size_stored,
-                               Parrot_default_encoding_ptr,
-                               PObj_external_FLAG|PObj_constant_FLAG);
-
-        config_hash = Parrot_thaw(interp, config_string);
-    }
-    else {
+    PMC *config_hash = parrot_config_hash_global;
+    if (config_hash == NULL)
         config_hash = Parrot_pmc_new(interp, enum_class_Hash);
+    else {
+        /* On initialization, we probably set up an empty hash for our first
+           interpreter. We should use this branch here to insert some sane
+           defaults so that things do not go crazy if the user forgets to set
+           the config hash later */
     }
 
     VTABLE_set_pmc_keyed_int(interp, iglobals,

@@ -132,9 +132,8 @@ main(int argc, const char *argv[])
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
-    Parrot_set_config_hash();
-
     if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+          Parrot_set_config_hash(interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
         get_last_error(interp);
@@ -351,10 +350,11 @@ Set up the const struct declaration for cmd_options
 */
 
 // TODO: Weed out the options that are not used by this executable
+static
 const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
-    ASSERT_ARGS(Parrot_cmd_options)
+    //ASSERT_ARGS(Parrot_cmd_options)
     static const struct longopt_opt_decl cmd_options[] = {
         { '.', '.', (OPTION_flags)0, { "--wait" } },
         { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },

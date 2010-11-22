@@ -34,4 +34,13 @@ Parrot_api_string_import_ascii(Parrot_PMC interp_pmc, ARGIN(const char * str), A
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+PARROT_API
+Parrot_Int
+Parrot_api_string_import_binary(Parrot_PMC interp_pmc, ARGIN(const unsigned char *bytes), Parrot_Int length, ARGOUT(Parrot_String *out))
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *out = Parrot_str_new(interp, bytes, length);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
 /* TODO: wchar_t variants */

@@ -23,11 +23,6 @@ typedef enum {
     enum_DIS_HEADER    = 2
 } Parrot_disassemble_options;
 
-/* Parrot_set_config_hash exists in *_config.o (e.g install_config.o),
-   so if you make this call then you will need to link with it in
-   addition to libparrot */
-void Parrot_set_config_hash(void);
-
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD

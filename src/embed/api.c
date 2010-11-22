@@ -291,3 +291,13 @@ Parrot_api_get_runtime_path(Parrot_PMC interp_pmc, ARGOUT(Parrot_String *runtime
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+PARROT_API
+Parrot_Int
+Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    Parrot_set_config_hash_pmc(interp, confighash);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+
