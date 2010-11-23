@@ -310,6 +310,7 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 {
     EMBED_API_CALLIN(interp_pmc, interp);
     Parrot_set_config_hash_pmc(interp, confighash);
+    Parrot_lib_update_paths_from_config_hash(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

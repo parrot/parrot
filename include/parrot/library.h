@@ -80,6 +80,9 @@ STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
 void parrot_init_library_paths(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext(PARROT_INTERP,
@@ -111,6 +114,9 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_parrot_init_library_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_lib_update_paths_from_config_hash \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parrot_split_path_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
