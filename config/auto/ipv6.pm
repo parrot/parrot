@@ -37,7 +37,7 @@ sub runstep {
     $conf->cc_gen('config/auto/ipv6/test.in');
     eval { $conf->cc_build(); };
     if (!$@) {
-        my $output = eval { $conf->cc_run() };
+        my $output = eval { $conf->cc_run_capture() };
         if (!$@ && $output =~ /OK/) {
             $ipv6_status = 1;
         }

@@ -6,12 +6,13 @@ transform result (ROOT) {
 
     $S0 = tree.'get'('pir', node, 'value')
 
-    pir = new 'CodeString'
-    pir.'emit'('.sub anon :anon')
-    pir.'emit'($S0)
+    pir = new 'StringBuilder'
+    appendln(pir, '.sub anon :anon')
+    appendln(pir, $S0)
     result = node['ret']
-    pir.'emit'('    .return (%0)',result)
-    pir.'emit'('.end')
+    $S0 = 'sprintf'('     .return (%Ss)', result)
+    appendln(pir, $S0)
+    appendln(pir, '.end')
 
    .return(pir)
 }
@@ -52,38 +53,37 @@ transform pir (value) {
     .return (pir)
 
   got_true:
-    pir = new 'CodeString'
-    result = pir.'unique'('$P')
-    $S0 = node
-    pir.'emit'("    %0 = new 'Boolean'", result)
-    pir.'emit'('    %0 = 1', result, $S0)
+    pir = new 'StringBuilder'
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'("    %Ss = new 'Boolean', 1", result)
+    appendln(pir, $S0)
     node['ret'] = result
     .return(pir)
 
   got_false:
-    pir = new 'CodeString'
-    result = pir.'unique'('$P')
-    $S0 = node
-    pir.'emit'("    %0 = new 'Boolean'", result)
-    pir.'emit'('    %0 = 0', result, $S0)
+    pir = new 'StringBuilder'
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'("    %Ss = new 'Boolean', 0", result)
+    appendln(pir, $S0)
     node['ret'] = result
     .return(pir)
 
   got_null:
-    pir = new 'CodeString'
-    result = pir.'unique'('$P')
-    $S0 = node
-    pir.'emit'('    null %0', result)
+    pir = new 'StringBuilder'
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'('    null %Ss', result)
+    appendln(pir, $S0)
     node['ret'] = result
     .return(pir)
 }
 
 transform pir (object) {
     .local pmc pir
-    pir = new 'CodeString'
+    pir = new 'StringBuilder'
     .local string result, child_result, key_result
-    result = pir.'unique'('$P')
-    pir.'emit'("    %0 = new 'Hash'", result)
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'("    %Ss = new 'Hash'", result)
+    appendln(pir, $S0)
 
     .local pmc items
 
@@ -106,16 +106,17 @@ loop:
     child = shift it
     $P0 = tree.'get'('pir', child, 'value')
     $S0 = $P0
-    pir .= $S0
+    push pir, $S0
     child_result = child['ret']
 
     key   = shift key_iter
     $P0 = tree.'get'('pir', key, 'string')
     $S0 = $P0
-    pir .= $S0
+    push pir, $S0
     key_result = key['ret']
 
-    pir.'emit'('    %0[%1] = %2', result, key_result, child_result)
+    $S0 = 'sprintf'('    %Ss[%Ss] = %Ss', result, key_result, child_result)
+    appendln(pir, $S0)
 
 
     goto loop
@@ -127,10 +128,11 @@ end:
 
 transform pir (array) {
     .local pmc pir
-    pir = new 'CodeString'
+    pir = new 'StringBuilder'
     .local string result, child_result
-    result = pir.'unique'('$P')
-    pir.'emit'("    %0 = new 'ResizablePMCArray'", result)
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'("    %Ss = new 'ResizablePMCArray'", result)
+    appendln(pir, $S0)
 
     .local pmc items
 
@@ -147,10 +149,11 @@ loop:
     child = shift it
     $P0 = tree.'get'('pir', child, 'value')
     $S0 = $P0
-    pir .= $S0
+    push pir, $S0
 
     child_result = child['ret']
-    pir.'emit'('    push %0, %1', result, child_result)
+    $S0 = 'sprintf'('    push %Ss, %Ss', result, child_result)
+    appendln(pir, $S0)
     goto loop
 end:
     node['ret'] = result
@@ -162,7 +165,7 @@ transform pir (string) {
     .local pmc pir, result, children, it, child
     .local string tmp
     tmp = ''
-    pir = new 'CodeString'
+    pir = new 'StringBuilder'
     children = node['char']
     if null children goto loop_end
     it = iter children
@@ -190,21 +193,25 @@ transform pir (string) {
     goto loop
   loop_end:
 
-    result = pir.'unique'('$P')
-    $S1 = pir.'escape'(tmp)
-    pir.'emit'("    %0 = new 'String'", result)
-    pir.'emit'('    %0 = %1', result, $S1)
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'("    %Ss = new 'String'", result)
+    appendln(pir, $S0)
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+    tmp = $P0(tmp)
+    $S0 = 'sprintf'('    %Ss = %Ss', result, tmp)
+    appendln(pir, $S0)
     node['ret'] = result
    .return(pir)
 }
 
 transform pir (number) {
     .local pmc pir, result
-    pir = new 'CodeString'
-    result = pir.'unique'('$P')
-    $S0 = node
-    pir.'emit'("    %0 = new 'Integer'", result)
-    pir.'emit'('    %0 = %1', result, $S0)
+    pir = new 'StringBuilder'
+    result = unique_pmc_reg()
+    $S0 = 'sprintf'("    %Ss = new 'Integer'", result)
+    appendln(pir, $S0)
+    $S0 = 'sprintf'('    %Ss = %Ss', result, node)
+    appendln(pir, $S0)
     node['ret'] = result
    .return(pir)
 }
