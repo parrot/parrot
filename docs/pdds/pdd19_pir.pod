@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 PDD 19: Parrot Intermediate Representation (PIR)
 
@@ -134,9 +133,9 @@ escape sequences are processed.
 =item "double-quoted string constants"
 
 Are delimited by double-quotes (C<">). A C<"> inside a string must be escaped
-by C<\>. The default encoding for a double-quoted string constant is 7-bit
+by C<\>. The default format for a double-quoted string constant is 7-bit
 ASCII, other character sets and encodings must be marked explicitly using a
-charset or encoding flag.
+format flag.
 
 =item <<"heredoc",  <<'heredoc'
 
@@ -190,11 +189,18 @@ OUTPUT
 
 =end PIR_FRAGMENT_TODO
 
-=item charset:"string constant"
+=item format:"string constant"
 
-Like above with a character set attached to the string. Valid character
-sets are currently: C<ascii> (the default), C<binary>, C<unicode>
-(with UTF-8 as the default encoding), and C<iso-8859-1>.
+Like above with a format attached to the string. Valid formats are
+currently: C<ascii> (the default), C<binary>, C<iso-8859-1>, C<utf8>,
+C<utf16>, C<ucs2>, and C<ucs4>.
+
+The format is attached to the string constant, and
+adopted by any string container the constant is assigned to.
+
+The standard escape sequences are honored within strings with an
+alternate format, so you can include a particular Unicode character
+as either a literal sequence of bytes, or as an escape sequence.
 
 =back
 
@@ -212,20 +218,6 @@ Inside double-quoted strings the following escape sequences are processed.
 
 =over 4
 
-=item encoding:charset:"string constant"
-
-Like above with an extra encoding attached to the string. For example:
-
-  set S0, utf8:unicode:"«"
-
-The encoding and charset are attached to the string constant, and
-adopted by any string container the constant is assigned to.
-
-The standard escape sequences are honored within strings with an
-alternate encoding, so in the example above, you can include a
-particular Unicode character as either a literal sequence of bytes, or
-as an escape sequence.
-
 =item numeric constants
 
 Both integers (C<42>) and numbers (C<3.14159>) may appear as constants.
@@ -237,32 +229,13 @@ C<0x> and C<0b> denote hex and binary constants respectively.
 
 =over 4
 
-=item .local <type> <identifier> [:unique_reg]
+=item .local <type> <identifier>
 
 Define a local name I<identifier> within a subroutine with the given
 I<type>. You can define multiple identifiers of the same type by
 separating them with commas:
 
   .local int i, j
-
-The optional C<:unique_reg> modifier will force the register allocator to
-associate the identifier with a unique register for the duration of the
-subroutine. If the register allocator is thought of as an optimization
-tool for allowing fewer registers to be used in a register frame by reusing
-unused registers, then the C<:unique_reg> directive forces this
-optimization to be turned off. This can be important in a number of
-situations:
-
-=over 4
-
-=item * When a subroutine has a small fixed number of registers
-
-=item * When a named variable or named register is used throughout the entire
-subroutine
-
-=item * When a reference needs to be made to a register
-
-=back
 
 =item .lex <string constant>, <reg>
 
@@ -631,19 +604,7 @@ outside of a loop and the call is done inside a loop.
 =item .invocant
 
 Directive to specify the object for a method call. Use it in combination
-with C<.meth_call>.
-
-=item .meth_call
-
-Directive to do a method call. It calls the specified method on the object
-that was specified with the C<.invocant> directive.
-
-=item .nci_call
-
-Directive to make a call through the Native Calling Interface (NCI).
-The specified subroutine must be loaded using the <dlfunc> op that takes
-the library, function name and function signature as arguments.
-See F<docs/pdds/pdd16_native_call> for details.
+with C<.call> to call methods.
 
 =item .set_return <var> [:<modifier>]*
 
@@ -679,7 +640,7 @@ C<:optional>, and C<:opt_flag>.
 At the top of a subroutine, declare a local variable, in the manner
 of C<.local>, into which parameter(s) of the current subroutine should
 be stored. Available modifiers: C<:slurpy>, C<:named>, C<:optional>,
-C<:opt_flag> and C<:unique_reg>.
+C<:opt_flag>.
 
 =back
 
@@ -1303,24 +1264,6 @@ created.
 
 =end PIR_FRAGMENT
 
-=head3 NCI Call
-
-=begin PIR_FRAGMENT_TODO
-
-    load_lib $P0, "libname"
-    dlfunc $P1, $P0, "funcname", "signature"
-    # ...
-    .begin_call
-      .set_arg x
-      .set_arg y
-      .set_arg z
-      .nci_call $P1 # r = funcname(x, y, z)
-      .local int r  # optional - new result var
-      .get_result r
-    .end_call
-
-=end PIR_FRAGMENT_TODO
-
 =head3 Subroutine Call Syntactic Sugar
 
 Below there are three different ways to invoke the subroutine C<sub_label>.
@@ -1375,7 +1318,7 @@ subroutine declaration contains "method".
 =head3 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
-C<.meth_call> which must immediately be preceded by the C<.invocant>:
+C<.call> immediately preceded by C<.invocant>:
 
 =begin PIR_FRAGMENT_TODO
 
@@ -1388,7 +1331,7 @@ C<.meth_call> which must immediately be preceded by the C<.invocant>:
    .set_arg y
    .set_arg z
    .invocant obj
-   .meth_call "method" [, $P1 ] # r = obj."method"(x, y, z)
+   .call "method" [, $P1 ] # r = obj."method"(x, y, z)
    .local int r  # optional - new result var
    .get_result r
    .end_call

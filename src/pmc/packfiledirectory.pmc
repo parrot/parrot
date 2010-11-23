@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -43,7 +42,7 @@ Initialize PackfileDirectory.
 
 */
     VTABLE void init() {
-        Parrot_PackfileDirectory_attributes * attrs =
+        Parrot_PackfileDirectory_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileDirectory_attributes*);
 
         attrs->hash = Parrot_pmc_new(INTERP, enum_class_Hash);
@@ -62,7 +61,7 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileDirectory_attributes * attrs =
+        Parrot_PackfileDirectory_attributes * const attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
 
         Parrot_gc_mark_PMC_alive(INTERP, attrs->hash);
@@ -96,9 +95,6 @@ Initialize PackfileDirectory from PackFile_Directory.
             switch (pfseg->type) {
               case PF_DIR_SEG:
                 pmc_type = enum_class_PackfileDirectory;
-                break;
-              case PF_FIXUP_SEG:
-                pmc_type = enum_class_PackfileFixupTable;
                 break;
               case PF_CONST_SEG:
                 pmc_type = enum_class_PackfileConstantTable;

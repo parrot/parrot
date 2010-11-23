@@ -1,5 +1,4 @@
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -35,11 +34,10 @@ sub runstep {
 
     my $without = $conf->options->get( qw| without-pcre | );
 
-    if ($without) {
-        $conf->data->set( HAS_PCRE => 0 );
-        $self->set_result('no');
-        return 1;
-    }
+    $self->set_result('no');
+    $conf->data->set( HAS_PCRE => 0 );
+
+    return 1 if ($without);
 
     my $osname = $conf->data->get('osname');
 
@@ -53,12 +51,12 @@ sub runstep {
 
     $conf->cc_gen('config/auto/pcre/pcre_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ) };
-    my $has_pcre = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_pcre = $self->_evaluate_cc_run($conf, $test);
+        if ( my $has_pcre = $self->_evaluate_cc_run($conf, $test) ) {
+        $conf->data->set( HAS_PCRE => $has_pcre);
+        }
     }
-    $conf->data->set( HAS_PCRE => $has_pcre);
 
     return 1;
 }

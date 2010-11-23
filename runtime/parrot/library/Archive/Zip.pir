@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -15,6 +14,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 
 .loadlib 'sys_ops'
 .loadlib 'io_ops'
+.include 'iglobals.pasm'
 .include 'stat.pasm'
 .include 'tm.pasm'
 
@@ -25,6 +25,12 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .namespace ['Archive';'Zip';'Base']
 
 .sub '' :init :load :anon
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['has_zlib']
+    if $I0 goto L1
+    die "Need a parrot built with zlib"
+  L1:
     $P0 = loadlib 'gziphandle'
     $P0 = newclass ['Archive';'Zip';'Base']
     .globalconst int AZ_OK = 0
@@ -46,8 +52,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .param pmc args :slurpy
     $S0 = join '', args
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'($S0)
     $P1.'print'("\n")
 .end

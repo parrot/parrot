@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -241,7 +240,7 @@ Tests OO features related to instantiating new objects.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     $P1 = newclass $P0
@@ -461,7 +460,7 @@ Tests OO features related to instantiating new objects.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_NO_CLASS)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     $P0 = new [ 'Foo'; 'Bar'; 'Baz' ]

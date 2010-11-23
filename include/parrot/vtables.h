@@ -1,7 +1,5 @@
 /* vtables.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Vtable manipulation code. Not to be confused with vtable.h
  */

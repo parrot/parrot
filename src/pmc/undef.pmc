@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -178,7 +177,7 @@ Returns an empty string.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
             "Stringifying an Undef PMC");
 
-        return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        return CONST_STRING(INTERP, "");
     }
 
 /*
@@ -208,22 +207,6 @@ Returns 0.
 
     VTABLE INTVAL get_bool() {
         return 0;
-    }
-
-/*
-
-=item C<INTVAL logical_not()>
-
-Returns 1.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_not(PMC *dest) {
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        VTABLE_set_bool(INTERP, dest, 1);
-        return dest;
     }
 
 /*

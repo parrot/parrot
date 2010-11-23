@@ -1,13 +1,12 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 31;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -39,25 +38,6 @@ sub file_content_is {
 }
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
-
-pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
-.const string temp_file = '%s'
-.sub main :main
-    interpinfo $I0, 2    # GC mark runs
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'w')
-    needs_destroy $P0
-    print $P0, "a line\n"
-    null $P0            # kill it
-    sweep 0            # a lazy GC has to close the PIO
-    $P0 = new ['FileHandle']
-    $P0.'open'(temp_file, 'r')
-    $S0 = $P0.'read'(20)
-    print $S0
-.end
-CODE
-a line
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception" );
 .sub main :main
@@ -310,10 +290,28 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "turn off buffering" )
     print $P0, "Howdy World\n"
 
     $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+
+#   set buffer type
+    $P0.'buffer_type'('unbuffered')
+
+#   get buffer type
+    $S0 = $P0.'buffer_type'()
+    print $S0
+    print "\n"
+
+    $S0 = $P0.'read'(50)
+    print $S0
+
+    $P0.'close'()
     end
 .end
 CODE
 unbuffered
+unbuffered
+Howdy World
 OUTPUT
 
 file_content_is( $temp_file, <<'OUTPUT', 'unbuffered file contents' );
@@ -384,21 +382,20 @@ OUTPUT
 
 # TT #1178
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
-.include 'stdio.pasm'
 .sub main :main
     $P99 = getinterp
-    $P0  = $P99.'stdhandle'(.PIO_STDIN_FILENO)
+    $P0  = $P99.'stdin_handle'()
     $I0  = $P0.'get_fd'()
     # I0 is 0 on Unix and non-Null on stdio and win32
     print "ok 1\n"
 
-    $P1 = $P99.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P99.'stdout_handle'()
     $I1 = $P1.'get_fd'()
     if $I1, OK_2
     print "not "
 OK_2:
     say "ok 2"
-    $P2 = $P99.'stdhandle'(.PIO_STDERR_FILENO)
+    $P2 = $P99.'stderr_handle'()
     $I2 = $P2.'get_fd'()
     if $I2, OK_3
     print "not "
@@ -412,10 +409,9 @@ ok 3
 OUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P2 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P2 = $P0.'stdout_handle'()
     can $I0, $P2, "puts"
     if $I0, ok1
     print "not "
@@ -429,13 +425,12 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method - PIR' );
-.include 'stdio.pasm'
 .sub main :main
    .local string s
    s = "ok 2\n"
    .local pmc io
    $P0 = getinterp
-   io = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+   io = $P0.'stdout_handle'()
    $I0 = can io, "puts"
    if $I0 goto ok1
    print "not "
@@ -449,11 +444,9 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
-.include 'stdio.pasm'
     getinterp P0                 # invocant
-    set I0, .PIO_STDERR_FILENO   # 1st argument
-    set_args "0,0", P0, I0
-    callmethodcc P0, "stdhandle"
+    set_args "0", P0
+    callmethodcc P0, "stderr_handle"
     get_results "0", P2          # STDERR
 
     set S0, "puts"               # method
@@ -631,7 +624,7 @@ OUTPUT
 
 ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 
-print $FOO "T\xc3\xb6tsch\n";
+print $FOO "T\xc3\xb6tsch \xe2\x82\xac100\n";
 close $FOO;
 
 pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, read parts" );
@@ -642,25 +635,25 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, re
     pio.'open'(temp_file, 'r')
     pio.'encoding'("utf8")
     $S0 = pio.'read'(2)
+    say $S0
+    $S1 = pio.'read'(7)
+    say $S1
+    $S0 .= $S1
     $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
     $S0 .= $S1
     pio.'close'()
-    $I1 = charset $S0
-    $S2 = charsetname $I1
-    say $S2
 
     $I1 = encoding $S0
     $S2 = encodingname $I1
     say $S2
 
-    $I1 = find_charset 'iso-8859-1'
-    trans_charset $S1, $S0, $I1
-    print $S1
+    print $S0
 .end
 CODE
-unicode
+T\xc3\xb6
+tsch \xe2\x82\xac
 utf8
-T\xf6tsch
+T\xc3\xb6tsch \xe2\x82\xac100
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - classmeth" );

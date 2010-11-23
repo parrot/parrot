@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -22,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(37)
+    plan(38)
 
     test_init()
     test_set_string()
@@ -65,6 +64,14 @@ Tests C<ByteBuffer> PMC..
     n = elements bb
     is(n, 42, "size of a new buffer with initial size is correct")
 
+    push_eh handler
+    bb = new ['ByteBuffer'], -1
+handler:
+    pop_eh
+    ok(1,"Creating a negative-sized ByteBuffer throws an exception")
+    goto done
+
+  done:
 .end
 
 .sub test_set_string
@@ -134,8 +141,12 @@ end:
     .local int big
 
     bb = new ['ByteBuffer']
+    s = bb.'get_string'('ascii')
+    n = length s
+    is(s, 0, "getting from unitialized buffer gives empty string")
+
     bb = binary:"abcd"
-    s = bb.'get_string'('ascii', 'fixed_8')
+    s = bb.'get_string'('ascii')
     n = length s
     is(n, 4, "getting ascii from buffer gives correct length")
     is(s, "abcd", "getting ascii from buffer gives correct content")
@@ -146,11 +157,11 @@ end:
     bb = new ['ByteBuffer']
 
     # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
-    #bb = utf16:unicode:"\x{D1}"
+    #bb = utf16:"\x{D1}"
     # Can't do that, or the program can't be compiled without ICU.
     # Fill the buffer with bytes instead.
 
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
     if big goto isbig
@@ -161,7 +172,7 @@ isbig:
     bb[0] = 0x00
     bb[1] = 0xD1
 doit:
-    s = bb.'get_string'('unicode', 'utf16')
+    s = bb.'get_string'('utf16')
     n = length s
     is(n, 1, "getting utf16 from buffer gives correct length")
     n = ord s
@@ -169,7 +180,7 @@ doit:
     bb = new ['ByteBuffer']
     bb[0] = 0xC3
     bb[1] = 0x91
-    s = bb.'get_string_as'(utf8:unicode:"")
+    s = bb.'get_string_as'(utf8:"")
     n = length s
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s
@@ -249,7 +260,7 @@ end:
     .local pmc eh
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch_negative
+    set_label eh, catch_negative
     n = 1
     push_eh eh
     bb = -1
@@ -271,7 +282,7 @@ test_negative:
     $I0 = hasicu()
     unless $I0 goto skip_it
 
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
 
@@ -297,7 +308,7 @@ setdone:
     if i < 8192 goto loopset
 
     .local string s
-    s = bb.'get_string'('unicode', 'utf16')
+    s = bb.'get_string'('utf16')
 
     # Check string size
     i = length s
@@ -345,23 +356,14 @@ donearray:
 .end
 
 .sub test_invalid
-    .local pmc bb, ex
+    .local pmc bb, eh, ex
     .local string s
+    eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_ENCODING
+    set_label eh, catch_encoding
+    push_eh eh
     bb = new ['ByteBuffer']
     bb = 'something'
-    push_eh catch_charset
-    s = bb.'get_string'('***INVALID cHARsET%%%%', 'fixed_8')
-    pop_eh
-    ok(0, "get_string with invalid charset should throw")
-    goto check_encoding
-catch_charset:
-    .get_results(ex)
-    finalize ex
-    pop_eh
-    ok(1, "get_string with invalid charset throws")
-check_encoding:
-    push_eh catch_encoding
-    s = bb.'get_string'('ascii', '???INVALID eNCODING===')
+    s = bb.'get_string'('???INVALID eNCODING===')
     pop_eh
     ok(0, "get_string with invalid encoding should throw")
     goto check_content
@@ -372,8 +374,10 @@ catch_encoding:
     ok(1, "get_string with invalid encoding throws")
 check_content:
     bb[0] = 128 # Out of ascii range
-    push_eh catch_content
-    s = bb.'get_string'('ascii', 'fixed_8')
+    eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_STRING_REPRESENTATION
+    set_label eh, catch_content
+    push_eh eh
+    s = bb.'get_string'('ascii')
     pop_eh
     ok(0, "get_string with invalid content should throw")
     goto end

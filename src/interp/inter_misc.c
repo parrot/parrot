@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -48,13 +47,13 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 {
     ASSERT_ARGS(register_nci_method)
     PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const method_name = string_make(interp, name, strlen(name),
-        NULL, PObj_constant_FLAG|PObj_external_FLAG);
+    STRING * const method_name = Parrot_str_new_init(interp, name, strlen(name),
+        Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
 
     /* create call func */
     VTABLE_set_pointer_keyed_str(interp, method,
-            string_make(interp, proto, strlen(proto), NULL,
-                PObj_constant_FLAG|PObj_external_FLAG),
+            Parrot_str_new_init(interp, proto, strlen(proto),
+                Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG),
             func);
 
     /* insert it into namespace */
@@ -64,8 +63,8 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 
 /*
 
-=item C<void register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void
-*func, STRING *name)>
+=item C<void register_native_pcc_method_in_ns(PARROT_INTERP, const int type,
+void *func, STRING *name, STRING *signature)>
 
 Create an entry in the C<nci_method_table> for the given raw NCI method
 of PMC class C<type>.
@@ -76,14 +75,14 @@ of PMC class C<type>.
 
 PARROT_EXPORT
 void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
-        ARGIN(STRING *name))
+register_native_pcc_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
+        ARGIN(STRING *name), ARGIN(STRING *signature))
 {
-    ASSERT_ARGS(register_raw_nci_method_in_ns)
-    PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
+    ASSERT_ARGS(register_native_pcc_method_in_ns)
+    PMC * method = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
 
     /* setup call func */
-    VTABLE_set_pointer(interp, method, func);
+    VTABLE_set_pointer_keyed_str(interp, method, signature, func);
 
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
@@ -224,22 +223,8 @@ interpinfo(PARROT_INTERP, INTVAL what)
         ret = Parrot_gc_impatient_pmcs(interp);
         break;
       case CURRENT_RUNCORE:
-        {
-            STRING *name = interp->run_core->name;
-
-            if (Parrot_str_equal(interp, name, CONST_STRING(interp, "slow")))
-                return PARROT_SLOW_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fast")))
-                return PARROT_FAST_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch")))
-                return PARROT_EXEC_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
-                return PARROT_GC_DEBUG_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "debugger")))
-                return PARROT_DEBUGGER_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "profiling")))
-                return PARROT_PROFILING_CORE;
-        }
+        ret = interp->run_core->id;
+        break;
       default:        /* or a warning only? */
         ret = -1;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -297,7 +282,7 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 Takes an interpreter name and an information type as arguments.
 Returns corresponding information strings about the interpreter:
 the full pathname, executable name, or the file stem,
-(or throws an error exception, if the type is not recognised).
+(or throws an error exception, if the type is not recognized).
 Valid types are EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME,
 and RUNTIME_PREFIX.
 

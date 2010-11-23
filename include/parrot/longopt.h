@@ -1,7 +1,5 @@
 /* longopt.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
  */
@@ -46,6 +44,7 @@ struct longopt_opt_info {
 #define OPT_PBC_OUTPUT     131
 #define OPT_RUNTIME_PREFIX 132
 #define OPT_HASH_SEED      133
+#define OPT_GC_THRESHOLD   134
 
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

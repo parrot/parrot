@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2004-2007, Parrot Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_MISC_H_GUARD

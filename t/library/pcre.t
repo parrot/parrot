@@ -1,6 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -101,7 +100,8 @@ Loaded
 OUT
 
 ## 2
-    my @todo = ( todo => '3..5 fail on Win32' ) if $^O =~ /MSWin32/;
+    my @todo;
+    @todo = ( todo => '3..5 fail on Win32' ) if $^O =~ /MSWin32/;
     pir_output_is( <<"CODE", <<'OUT', 'soup to nuts', @todo );
 
 .include 'iglobals.pasm'

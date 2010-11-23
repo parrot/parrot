@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id$
 
 # initial work by Brad Gilbert b2gills <at> gmail <dot> com
 
@@ -11,7 +10,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Config;
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Parrot::Config;
 
 
@@ -182,6 +181,23 @@ SKIP:
 .end
 CODE
 }
+
+pir_output_is(<<'CODE', <<OUTPUT, 'INTVAL min and max coherence');
+.loadlib 'sys_ops'
+.include 'sysinfo.pasm'
+.sub 'main' :main
+    # assumes 2's compliment integer math
+    .include 'test_more.pir'
+    .local int min, max
+    max = sysinfo .SYSINFO_PARROT_INTMAX
+    neg max
+    min = sysinfo .SYSINFO_PARROT_INTMIN
+    inc min
+    is(max, min)
+.end
+CODE
+ok 1
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

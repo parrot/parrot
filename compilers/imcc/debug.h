@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_IMCC_DEBUG_H_GUARD

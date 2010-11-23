@@ -1,7 +1,6 @@
 /*
 Copyright (C) 2002-2009, Parrot Foundation.
 License:  Artistic 2.0, see README and LICENSE for details
-$Id$
 
 =head1 NAME
 
@@ -78,7 +77,8 @@ Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
             ? "illegal"
             : data_types[type - enum_first_type].name;
 
-    return string_make(interp, s, strlen(s), NULL, PObj_external_FLAG);
+    return Parrot_str_new_init(interp, s, strlen(s),
+            Parrot_default_encoding_ptr, PObj_external_FLAG);
 }
 
 /*

@@ -5,8 +5,6 @@
 /*
  * debugger.h
  *
- * SVN Info
- *    $Id$
  * Overview:
  *    Parrot debugger header files
  * History:
@@ -129,8 +127,9 @@ typedef struct PDB_file {
 /*  PDB_breakpoint_t
  *      List of breakpoints.
  *
- *  pc:             Where the breakpoint is
  *  id:             The identification number of this breakpoint
+ *  pc:             Where the breakpoint is
+ *  line:           The source file line number
  *  skip:           The number of times to skip this breakpoint
  *  condition:      The condition attached to the breakpoint; may be NULL
  *  prev, next:     The previous & next breakpoints in the list; may be NULL.
@@ -139,8 +138,9 @@ typedef struct PDB_file {
 typedef struct PDB_breakpoint *PDB_breakpoint_ptr;
 
 typedef struct PDB_breakpoint {
-    opcode_t                *pc;
     unsigned long           id;
+    opcode_t                *pc;
+    unsigned long           line;
     long                    skip;
     PDB_condition_t         *condition;
     PDB_breakpoint_ptr      prev;

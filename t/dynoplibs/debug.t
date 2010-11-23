@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -106,7 +105,7 @@ current instr.: 'parrot;Test1;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test1;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown lexical" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - division by 0" );
 .namespace ["Test2"]
 .sub main
     print "ok 1\n"
@@ -115,13 +114,14 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown
 .end
 .sub foo :lex
     print "ok 2\n"
-    find_lex $P0, "nosuchlex"
+    $I1 = 0
+    div $I2, $I2, 0
     print "not ok 3\n"
 .end
 CODE
 /^ok 1
 ok 2
-Lexical 'nosuchlex' not found
+Divide by zero
 current instr.: 'parrot;Test2;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test2;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT

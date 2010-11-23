@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -29,6 +28,7 @@ between blocks.
 #include <string.h>
 #include "imc.h"
 #include "optimizer.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/cfg.h */
 
@@ -276,7 +276,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
         ins->index   = ++i;
         ins->bbindex = unit->n_basic_blocks - 1;
 
-        if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
+        if (!ins->op && (ins->type & ITPCCSUB)) {
             if (first) {
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interp, unit, ins);
@@ -347,9 +347,10 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 {
     ASSERT_ARGS(bb_check_set_addr)
     const Instruction *ins;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if ((ins->opnum == PARROT_OP_set_addr_p_ic)
+        if ((ins->op == &core_ops->op_info_table[PARROT_OP_set_addr_p_ic])
         &&   STREQ(label->name, ins->symregs[1]->name)) {
             IMCC_debug(interp, DEBUG_CFG, "set_addr %s\n",
                     ins->symregs[1]->name);
@@ -463,7 +464,7 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(interp, unit, from, unit->bb_list[r->first_ins->bbindex]);
     else {
-        IMCC_debug(interp, DEBUG_CFG, "register branch %I ", from->end);
+        IMCC_debug(interp, DEBUG_CFG, "register branch %d ", from->end);
         for (ins = from->end; ins; ins = ins->prev) {
             if ((ins->type & ITBRANCH)
             &&   STREQ(ins->opname, "set_addr")
@@ -492,6 +493,7 @@ Returns true or false whether the given blocks are linked.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 blocks_are_connected(ARGIN(const Basic_block *from),
                      ARGIN(const Basic_block *to))
@@ -649,11 +651,12 @@ Counts and returns the number of edges in the specified IMC_Unit.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 edge_count(ARGIN(const IMC_Unit *unit))
 {
     ASSERT_ARGS(edge_count)
-    Edge *e = unit->edge_list;
+    const Edge *e = unit->edge_list;
     int   i = 0;
     while (e) {
         i++;
@@ -1052,11 +1055,12 @@ transfers control directly to the header.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info *loop_info))
 {
     ASSERT_ARGS(natural_preheader)
-    Edge *edge;
+    const Edge *edge;
     int   preheader = -1;
 
     for (edge = unit->bb_list[loop_info->header]->pred_list;

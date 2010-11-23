@@ -1,5 +1,4 @@
 1 rem Copyright (C) 2009, Parrot Foundation.
-2 rem $Id$
 3 rem
 10 rem +----------------------------------------------------------------------+
 20 rem + perl6.bas                                                             +

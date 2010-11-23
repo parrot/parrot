@@ -1,7 +1,6 @@
 package Parrot::Pmc2c::PMC::Object;
 
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 use base 'Parrot::Pmc2c::PMC';
 use strict;
@@ -70,7 +69,7 @@ EOC
 EOC
         $method_body_text .= "            $pcc_result_decl\n" if $pcc_result_decl ne '';
         $method_body_text .= <<"EOC";
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi$pcc_sig", _self$pcc_args);
+            Parrot_ext_call(interp, meth, "Pi$pcc_sig", _self$pcc_args);
             $pcc_return_stmt
         }
 EOC

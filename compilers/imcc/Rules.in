@@ -10,6 +10,8 @@ compilers/imcc/pcc$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
 
 compilers/imcc/instructions$(O) : \
@@ -24,6 +26,8 @@ compilers/imcc/instructions$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
 
 compilers/imcc/pbc$(O) : \
@@ -37,7 +41,10 @@ compilers/imcc/pbc$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS) \
+    include/pmc/pmc_key.h \
     include/pmc/pmc_sub.h
 
 compilers/imcc/parser_util$(O) : \
@@ -83,6 +90,8 @@ compilers/imcc/cfg$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
 
 compilers/imcc/debug$(O) : \
@@ -163,6 +172,8 @@ compilers/imcc/optimizer$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
 	$(CC) $(CFLAGS) @optimize::compilers/imcc/optimizer.c@ @ccwarn::compilers/imcc/optimizer.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/optimizer.c
 

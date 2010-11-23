@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -193,7 +192,7 @@ Sets the value of the string to that of the specified C<string>.
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
             char * const copy = Parrot_str_to_cstring(INTERP, value);
             value             = Parrot_str_new_init(INTERP, copy, strlen(copy),
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                Parrot_default_encoding_ptr,
                 PObj_constant_FLAG);
             Parrot_str_free_cstring(copy);
         }
@@ -243,7 +242,7 @@ they match.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return (INTVAL)(Parrot_str_equal(INTERP, str_val, v));
+        return (INTVAL)(STRING_equal(INTERP, str_val, v));
     }
 
     MULTI INTVAL is_equal(PMC *value) {
@@ -286,7 +285,7 @@ Compares the string with C<value>; returns FALSE if they match.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_equal(INTERP, str_val, v);
+        return STRING_equal(INTERP, str_val, v);
     }
 
 /*
@@ -304,7 +303,7 @@ is smaller.
         STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_compare(INTERP, str_val, v);
+        return STRING_compare(INTERP, str_val, v);
     }
 
 /*
@@ -349,7 +348,7 @@ is smaller.
         STRING        *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_compare(INTERP, str_val, v);
+        return STRING_compare(INTERP, str_val, v);
     }
 
 /*
@@ -365,7 +364,7 @@ C<length>, and places it in C<dest>.
     VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
         STRING *str_val, *s2;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        s2 = Parrot_str_substr(INTERP, str_val, offset, length);
+        s2 = STRING_substr(INTERP, str_val, offset, length);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
 
@@ -382,7 +381,7 @@ C<length>, and returns it.
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, offset, length);
+        return STRING_substr(INTERP, str_val, offset, length);
     }
 
 /*
@@ -404,7 +403,7 @@ numbers count from the end.
         GET_ATTR_str_val(INTERP, SELF, str_val);
         n = Parrot_str_length(INTERP, str_val);
 
-        return (INTVAL)((k >= 0 && k <= n) || (k < 0 && -k <= n));
+        return (INTVAL)((k >= 0 && k < n) || (k < 0 && -k <= n));
     }
 
 /*
@@ -437,7 +436,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE STRING *get_string_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, pos, 1);
+        return STRING_substr(INTERP, str_val, pos, 1);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
@@ -447,7 +446,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return string_ord(INTERP, str_val, pos);
+        return STRING_ord(INTERP, str_val, pos);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
@@ -478,7 +477,7 @@ Replace the string at C<key> with the chr of C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
         STRING      *str_val;
-        STRING * const c = string_chr(INTERP, (UINTVAL) value);
+        STRING * const c = Parrot_str_chr(INTERP, (UINTVAL) value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
         str_val = Parrot_str_replace(INTERP, str_val, pos, 1, c);
         SET_ATTR_str_val(INTERP, SELF, str_val);
@@ -507,7 +506,7 @@ Replace every occurrence of C<orig> with C<_new>.
         STRING       * s       = VTABLE_get_string(INTERP, SELF);
         INTVAL         i       = 0;
 
-        while (-1 != (i = Parrot_str_find_index(INTERP, s, orig, i))) {
+        while (-1 != (i = STRING_index(INTERP, s, orig, i))) {
             s = Parrot_str_replace(INTERP, s, i, old_len, _new);
             i += new_len;
         }
@@ -653,26 +652,6 @@ Used to unarchive the string.
 
 =over 4
 
-=item C<PMC *lower()>
-
-Downcase this string
-
-=cut
-
-*/
-
-    METHOD lower() {
-        STRING *str_val;
-        STRING *s;
-
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        s = Parrot_str_downcase(INTERP, str_val);
-
-        RETURN(STRING *s);
-    }
-
-/*
-
 =item C<void trans(STRING *src, PMC *trams_table)>
 
 Translate ascii string C<src> with entries from C<trans_table>.
@@ -692,7 +671,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
         if (!len)
             RETURN(STRING src);
 
-        if (src->charset != Parrot_ascii_charset_ptr)
+        if (src->encoding != Parrot_ascii_encoding_ptr)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
@@ -714,6 +693,28 @@ Translate ascii string C<src> with entries from C<trans_table>.
 
 /*
 
+=item C<void reverse(STRING *src)>
+
+Either reverse this PMC's contents or set this PMC's value to the reverse of C<src>,
+if present.
+
+=cut
+
+*/
+
+    METHOD reverse(STRING *src :optional, INTVAL got_src :opt_flag) {
+        STRING *s;
+        if (got_src) {
+            SET_ATTR_str_val(INTERP, SELF, Parrot_str_reverse(INTERP, src));
+        }
+        else {
+            GET_ATTR_str_val(INTERP, SELF, s);
+            SET_ATTR_str_val(INTERP, SELF, Parrot_str_reverse(INTERP, s));
+        }
+    }
+
+/*
+
 =item C<INTEGER is_integer(STRING *src)>
 
 Checks if the ascii STRING C<str> is just an integer.
@@ -724,18 +725,18 @@ Checks if the ascii STRING C<str> is just an integer.
 
     METHOD is_integer(STRING *src) {
         INTVAL         i;
-        unsigned char *p;
+        char          *p;
         const INTVAL   len = Parrot_str_length(INTERP, src);
 
         if (!len)
             RETURN(INTVAL 0);
 
-        if (src->charset != Parrot_ascii_charset_ptr)
+        if (STRING_max_bytes_per_codepoint(src) != 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
-                "Can't is_integer non-ascii");
+                "Can't is_integer non fixed_8");
 
         i = 0;
-        p = (unsigned char *)Buffer_bufstart(src);
+        p = src->strstart;
 
         if (p[i] == '-' || p[i] == '+' ||
             (p[i] >= '0' && p[i] <= '9')) {
@@ -794,7 +795,7 @@ Find last occurrence of C<substring>, but not after the C<start> position.
         if (!Parrot_str_length(INTERP, substring))
             RETURN(INTVAL res);
 
-        res = CHARSET_RINDEX(INTERP, src, substring, (UINTVAL)start);
+        res = STRING_rindex(INTERP, src, substring, (UINTVAL)start);
         RETURN(INTVAL res);
     }
 
@@ -808,15 +809,13 @@ EXPERIMENTAL, for testing only. See TT #1628
 
 */
 
-    METHOD unescape(STRING *charsetname, STRING *encodingname)
+    METHOD unescape(STRING *encodingname)
     {
-        const CHARSET *charset = Parrot_get_charset(INTERP,
-            Parrot_charset_number(INTERP, charsetname));
-        const ENCODING *encoding = Parrot_get_encoding(INTERP,
+        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
             Parrot_encoding_number(INTERP, encodingname));
         STRING * const src = VTABLE_get_string(INTERP, SELF);
         STRING * const dest = Parrot_str_unescape_string(INTERP, src,
-                charset, encoding, 0);
+                encoding, 0);
         RETURN(STRING *dest);
     }
 

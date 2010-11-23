@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -312,7 +311,8 @@ sub _handle_icushared {
         else {
             # on MacOS X there's sometimes an errornous \c at the end of the
             # output line. Remove it.
-            $icushared =~ s/\s\\c$//;
+            # see TT #1722
+            $icushared =~ s/\s\\c\s/ /g;
         }
     }
 

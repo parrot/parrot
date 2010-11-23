@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2003-2010, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -48,6 +47,13 @@ void *mem_realloc_executable(void *, size_t, size_t);
 #  define mem_free_executable(a, b) mem_internal_free(a)
 #  define mem_realloc_executable(a, b, c) mem_internal_realloc((a), (c))
 #endif
+
+
+/*
+** Process ID
+*/
+
+UINTVAL Parrot_getpid(void);
 
 /*
 ** Time

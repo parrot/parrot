@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 /*
@@ -200,10 +199,10 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
         if (bb) {
             Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
-                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
+                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
-                     ins->flags, (ins->type & ~ITEXT), ins->opnum,
-                     ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
+                     ins->flags, ins->type, OP_INFO_OPNUM(ins->op),
+                     ins->opsize, pc);
         }
         else {
              fprintf(stderr, "\t");

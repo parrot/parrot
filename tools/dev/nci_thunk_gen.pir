@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -48,8 +47,7 @@ F<docs/pdds/pdd16_native_call.pod>.
     $P0 = new ['FileHandle']
     $P0.'open'($S0, 'w')
     $P1 = getinterp
-    .include 'stdio.pasm'
-    $P1.'stdhandle'(.PIO_STDOUT_FILENO, $P0)
+    $P1.'stdout_handle'($P0)
 
     if targ == 'head'          goto get_targ
     if targ == 'thunks'        goto get_targ
@@ -325,8 +323,6 @@ USAGE
 
 /* %s
  *  Copyright (C) 2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Native Call Interface routines. The code needed to build a
  *     parrot to C call frame is in here
@@ -712,8 +708,7 @@ TEMPLATE
 .sub 'read_sigs'
     .local pmc stdin, seen, sigs
     $P0 = getinterp
-    .include 'stdio.pasm'
-    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    stdin = $P0.'stdin_handle'()
     seen  = new ['Hash']
     sigs  = new ['ResizablePMCArray']
 
@@ -741,8 +736,7 @@ TEMPLATE
 Ignored signature '%s' on line %d (previously seen on line %d)
 ERROR
                 $P0 = getinterp
-                .include 'stdio.pasm'
-                $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+                $P1 = $P0.'stderr_handle'()
                 $P1.'print'($S0)
             end_dup_warn:
             goto read_loop
@@ -860,7 +854,7 @@ ERROR
            "temp_tmpl": "char *t_%i; STRING *ts_%i",
            "fill_params_tmpl": ", &ts_%i",
            "preamble_tmpl": "t_%i = STRING_IS_NULL(ts_%i) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_%i);",
-           "postamble_tmpl": "if (t_%i) Parrot_str_free_cstring(t_%i);" },
+           "postamble_tmpl": "if (!STRING_IS_NULL(ts_%i)) Parrot_str_free_cstring(t_%i);" },
     "v": { "as_proto": "void",
            "return_type": "void *",
            "sig_char": "v",
@@ -889,7 +883,7 @@ ERROR
            "temp_tmpl": "char *t_%i; STRING *ts_%i",
            "preamble_tmpl": "t_%i = STRING_IS_NULL(ts_%i) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_%i);",
            "call_param_tmpl": "&t_%i",
-           "postamble_tmpl": "if (t_%i) Parrot_str_free_cstring(t_%i);" },
+           "postamble_tmpl": "if (!STRING_IS_NULL(ts_%i)) Parrot_str_free_cstring(t_%i);" },
     "2": { "as_proto": "short *",
            "sig_char": "P",
            "return_type": "short",

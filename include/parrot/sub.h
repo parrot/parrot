@@ -1,7 +1,5 @@
 /* sub.h
  *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Data Structure and Algorithms:
  *     Subroutine, coroutine, closure and continuation structures
  *     and related routines.
@@ -106,7 +104,7 @@ typedef enum {
 #define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
 /*
- * a flag to signal a Sub that a new RetContinuation should be created
+ * a flag to signal a Sub that a new Continuation should be created
  */
 
 #define NEED_CONTINUATION ((PMC *)1)

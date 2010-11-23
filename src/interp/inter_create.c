@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -165,6 +164,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->gc_sys->sys_type = parent
                                     ? parent->gc_sys->sys_type
                                     : PARROT_GC_DEFAULT_TYPE;
+    interp->gc_threshold     = GC_DYNAMIC_THRESHOLD_DEFAULT;
 
     /* Done. Return and be done with it */
     return interp;
@@ -217,6 +217,10 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->HLL_info = NULL;
 
     Parrot_initialize_core_vtables(interp);
+
+    /* create the root set registry */
+    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+
     init_world_once(interp);
 
     /* context data */
@@ -252,17 +256,10 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     Parrot_runcore_init(interp);
 
     /* Load the core op func and info tables */
-    interp->op_lib          = PARROT_CORE_OPLIB_INIT(interp, 1);
-    interp->op_count        = interp->op_lib->op_count;
-    interp->op_func_table   = interp->op_lib->op_func_table;
-    interp->op_info_table   = interp->op_lib->op_info_table;
-    interp->all_op_libs     = NULL;
-    interp->evc_func_table  = NULL;
-    interp->save_func_table = NULL;
-    interp->code            = NULL;
-
-    /* create the root set registry */
-    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+    interp->all_op_libs         = NULL;
+    interp->evc_func_table      = NULL;
+    interp->evc_func_table_size = 0;
+    interp->code                = NULL;
 
     /* And a dynamic environment stack */
     /* TODO: We should really consider removing this (TT #876) */
@@ -388,8 +385,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
-
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroying, we get a memory leak, like for
@@ -430,6 +425,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
     }
 
+    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
+
     /* MMD cache */
     Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
 
@@ -441,15 +438,17 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* packfile */
     if (interp->initial_pf)
         PackFile_destroy(interp, interp->initial_pf);
+
     /* cache structure */
     destroy_object_cache(interp);
 
     if (interp->evc_func_table) {
         mem_gc_free(interp, interp->evc_func_table);
-        interp->evc_func_table = NULL;
+        interp->evc_func_table      = NULL;
+        interp->evc_func_table_size = 0;
     }
 
-    /* strings, charsets, encodings - only once */
+    /* strings, encodings - only once */
     Parrot_str_finish(interp);
 
     PARROT_CORE_OPLIB_INIT(interp, 0);
@@ -458,10 +457,14 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         if (interp->thread_data)
             mem_internal_free(interp->thread_data);
 
+        /* get rid of ops */
+        if (interp->op_hash)
+            parrot_hash_destroy(interp, interp->op_hash);
+
         /* free vtables */
         parrot_free_vtables(interp);
 
-        /* Finalyze GC */
+        /* Finalize GC */
         Parrot_gc_finalize(interp);
 
         MUTEX_DESTROY(interpreter_array_mutex);

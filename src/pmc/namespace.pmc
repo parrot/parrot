@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2005-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -32,7 +31,7 @@ static void add_multi_to_namespace(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void add_nci_to_namespace(PARROT_INTERP,
+static void add_native_to_namespace(PARROT_INTERP,
     ARGIN(PMC *SELF),
     ARGIN(STRING *key),
     ARGIN_NULLOK(PMC *value))
@@ -76,7 +75,7 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF) \
     , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_add_nci_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_add_native_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF) \
     , PARROT_ASSERT_ARG(key))
@@ -97,6 +96,15 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
     , PARROT_ASSERT_ARG(value))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+
+=item C<static void add_to_class(PARROT_INTERP, Parrot_NameSpace_attributes
+*nsinfo, PMC *classobj, STRING *key, PMC *value)>
+
+=cut
+
+*/
 
 static void
 add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
@@ -119,6 +127,15 @@ add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
         VTABLE_set_pmc_keyed_str(interp, nsinfo->methods, key, value);
     }
 }
+
+/*
+
+=item C<static int ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING
+*key, PMC *value)>
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -164,7 +181,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
         STRING *method_name = key;
 
-        if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
+        if (STRING_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
             if (sub->vtable_index != -1 && !STRING_IS_NULL(vtable_key)) {
                 method_name = vtable_key;
             }
@@ -180,6 +197,15 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
 
     return stored;
 }
+
+/*
+
+=item C<static int maybe_add_sub_to_namespace(PARROT_INTERP, PMC *SELF, STRING
+*key, PMC *value)>
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -198,16 +224,24 @@ maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
     return 0;
 }
 
+/*
+
+=item C<static void add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key,
+PMC *value)>
+
+=cut
+
+*/
+
 static void
-add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
+add_native_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN_NULLOK(PMC *value))
 {
-    ASSERT_ARGS(add_nci_to_namespace)
-
-    STRING * const nci_str = CONST_STRING(interp, "NCI");
+    ASSERT_ARGS(add_native_to_namespace)
 
     if (!PMC_IS_NULL(value)
-    &&   VTABLE_isa(interp, value, nci_str)) {
+    && (value->vtable->base_type == enum_class_NativePCCMethod ||
+        value->vtable->base_type == enum_class_NCI)) {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC * const classobj = VTABLE_get_class(interp, SELF);
 
@@ -215,6 +249,15 @@ add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         add_to_class(interp, nsinfo, classobj, key, value);
     }
 }
+
+/*
+
+=item C<static void add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING
+*key, PMC *value)>
+
+=cut
+
+*/
 
 static void
 add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
@@ -243,7 +286,7 @@ add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
                 STRING *method_name = key;
                 Hash   *hash;
 
-                if (Parrot_str_not_equal(interp, sub->method_name, empty_str))
+                if (!STRING_equal(interp, sub->method_name, empty_str))
                     method_name = sub->method_name;
 
                 add_to_class(interp, nsinfo, classobj, method_name, value);
@@ -382,17 +425,19 @@ really a public API.
                               :value->vtable->base_type == enum_class_NameSpace;
 
         /* don't need this everywhere yet */
-        PMC * const old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC *old;
 
         /* If it's a sub... */
         if (maybe_add_sub_to_namespace(INTERP, SELF, key, value))
             return;
 
-        /* If it's an NCI method */
-        add_nci_to_namespace(INTERP, SELF, key, value);
+        /* If it's an native method */
+        add_native_to_namespace(INTERP, SELF, key, value);
 
         /* If it's a multi-sub and the first in this NS... */
         add_multi_to_namespace(INTERP, SELF, key, value);
+
+        old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!old)
             SUPER(key, value);
@@ -685,13 +730,13 @@ Includes vtable overrides composed in from roles.
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC *found;
 
-        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
+        if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
             found = nsinfo->methods;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
             found = nsinfo->vtable;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "class"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "class"))) {
             found = nsinfo->_class;
         }
         else

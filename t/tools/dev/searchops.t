@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -86,7 +85,7 @@ my $opsdir = q{t/tools/dev/searchops};
         \$stderr,
     );
     unlike($stdout, qr/n_concat\(foobar/,
-        "Badly formtted entry excluded from display, as expected");
+        "Badly formatted entry excluded from display, as expected");
     is($total_identified, 8, "Got expected total number of ops for $pattern");
 }
 
@@ -108,7 +107,7 @@ my $opsdir = q{t/tools/dev/searchops};
         \$stderr,
     );
     unlike($stdout, qr/NAME/,
-        "Badly formtted entry excluded from display, as expected");
+        "Badly formatted entry excluded from display, as expected");
     is($total_identified, 2, "Got expected total number of ops for $pattern");
 }
 

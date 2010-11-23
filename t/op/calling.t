@@ -1,13 +1,12 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 98;
+use Parrot::Test tests => 99;
 
 =head1 NAME
 
@@ -1247,25 +1246,23 @@ CODE
 /too few positional arguments: 3 passed, 4 \(or more\) expected/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
+pir_output_is( <<'CODE', <<'OUTPUT', "faux tailcall to NCI" );
 .sub main :main
     .local pmc s
     s = new 'String'
-    s = "OK 1\n"
-    $S0 = s."lower"()
-    print $S0
-    s = "OK 2\n"
-    $S1 = foo(s)
-    print $S1
+    $I0 = s."is_integer"(22)
+    say $I0
+    $I1 = foo(s)
+    say $I1
 .end
 .sub foo
     .param pmc s
-    $S0 = s."lower"()
-    .return ($S0)
+    $I0 = s."is_integer"(22)
+    .return ($I0)
 .end
 CODE
-ok 1
-ok 2
+1
+1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI - 2" );
@@ -1587,7 +1584,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via explicit continuation" );
     result = "not ok 2\n"
     .local pmc cont
     cont = new 'Continuation'
-    set_addr cont, cont_dest
+    set_label cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
 cont_dest:
@@ -1614,7 +1611,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall explicit continuation, no args" )
     result = "not ok 2\n"
     .local pmc cont
     cont = new 'Continuation'
-    set_addr cont, cont_dest
+    set_label cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
 cont_dest:
@@ -1643,7 +1640,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
         .lex "MAIN-CONT", $P41
         $I42 = 10
         $P41 = new 'Continuation'
-        set_addr $P41, L2
+        set_label $P41, L2
         goto L3
 L2:
         get_results '0', $P45
@@ -2552,6 +2549,48 @@ main
 foo
 bar
 done
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "handling of slurpy after optional, TT #1733" );
+
+# Lua calling convention scheme
+
+# f() has 2 known parameters
+.sub 'f'
+    .param pmc p1 :optional
+    .param int has_p1 :opt_flag
+    .param pmc p2 :optional
+    .param int has_p2 :opt_flag
+    .param pmc extra :slurpy
+    unless has_p1 goto L1
+    say p1
+    unless has_p2 goto L1
+    say p2
+    $P0 = iter extra
+  L2:
+    unless $P0 goto L1
+    $P1 = shift $P0
+    say $P1
+    goto L2
+  L1:
+.end
+
+.sub 'main' :main
+    $P1 = box "p1"
+    $P2 = box "p2"
+    $P3 = box "p3"
+    f($P1, $P2, $P3)
+    f($P1, $P2)
+    f($P1)
+.end
+
+CODE
+p1
+p2
+p3
+p1
+p2
+p1
 OUTPUT
 
 # Local Variables:

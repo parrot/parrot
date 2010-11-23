@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 .sub main :main
 	load_bytecode "PGE.pbc"
@@ -62,8 +61,7 @@
 	# Read in the file
 beginwhile:
         $P0      = getinterp
-        .include 'stdio.pasm'
-        $P1      = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+        $P1      = $P0.'stdin_handle'()
         chunk    = $P1.'read'(65535)
         chunklen = length chunk
 	unless chunklen goto endwhile

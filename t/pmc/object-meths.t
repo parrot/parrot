@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -414,25 +413,45 @@ back in main
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "find_method" );
-    newclass P3, "Foo"
-    new P2, ['Foo']
+pir_output_is( <<'CODE', <<'OUTPUT', "find_method" );
+.sub main :main
+    $P3 = newclass "Foo"
+    $P2 = new $P3
 
-    set S0, "meth"
-    find_method P0, P2, S0
-    print "main\n"
-    callmethodcc P2, P0
-    print "back\n"
+    $P0 = find_method $P2, 'meth'
+    say 'main'
+    $P2.$P0()
+    say 'back'
+    $I0 = defined $P0
+    say $I0
     end
+.end
 
 .namespace ["Foo"]
-.pcc_sub :method meth:
-    print "in meth\n"
-    returncc
+.sub meth :method
+    say 'in meth'
+.end
 CODE
 main
 in meth
 back
+1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'find_method builtin PMC class' );
+.sub main :main
+  $P0 = new [ 'String' ]
+  $P0 = 'AbC'
+
+  $P1 = find_method $P0, 'reverse'
+  $P2 = $P0.$P1()
+  say $P2
+  $I0 = defined $P1
+  say $I0
+.end
+CODE
+CbA
+1
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
@@ -1078,24 +1097,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
 CODE
 set_attr_str was called
 get_attr_str was called
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "overloading get_class vtable" );
-.sub main :main
-    .local pmc cl, o, cl2
-    cl = newclass 'MyClass'
-    o = new ['MyClass']
-    cl2 = class o
-.end
-
-.namespace ['MyClass']
-
-.sub get_class :method :vtable
-    print "get_class was called\n"
-.end
-
-CODE
-get_class was called
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object" );

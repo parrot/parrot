@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2004-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -345,7 +344,7 @@ is_abs_path(ARGIN(const STRING *file))
     const char * const file_name = (const char *)file->strstart;
     if (file->strlen <= 1)
         return 0;
-    PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
+    PARROT_ASSERT(STRING_max_bytes_per_codepoint(file) == 1 ||
             file->encoding == Parrot_utf8_encoding_ptr);
 
     /* XXX  ../foo, ./bar */
@@ -380,12 +379,8 @@ static void
 cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
     ASSERT_ARGS(cnv_to_win32_filesep)
-    char* cnv;
+    char *cnv = path->strstart;
 
-    PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
-        path->encoding == Parrot_utf8_encoding_ptr);
-
-    cnv = path->strstart;
     while ((cnv = strchr(cnv, path_separator)) != NULL)
         *cnv = win32_path_separator;
 }
@@ -417,7 +412,7 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
      *      the goal is just to have for sure an invisible 0 at end
      */
 
-    STRING * const nul = string_chr(interp, '\0');
+    STRING * const nul = Parrot_str_chr(interp, '\0');
 
     path = Parrot_str_concat(interp, path, nul);
     --path->bufused;
@@ -449,12 +444,11 @@ static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
     ASSERT_ARGS(path_guarantee_trailing_separator)
-    STRING * const path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
-    if (Parrot_str_indexed(interp, path , path->strlen - 1)
-         != Parrot_str_indexed(interp, path_separator_string, 0))
-        path = Parrot_str_concat(interp, path , path_separator_string);
+    if (STRING_ord(interp, path, -1) != path_separator)
+        path = Parrot_str_concat(interp, path,
+                Parrot_str_chr(interp, path_separator));
 
     return path;
 }
@@ -577,9 +571,9 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
     if (!STRING_IS_NULL(test_path)) {
         if (Parrot_str_byte_length(interp, test_path) > 4) {
-            STRING *orig_ext = Parrot_str_substr(interp, test_path, -4, 4);
+            STRING *orig_ext = STRING_substr(interp, test_path, -4, 4);
             /* First try substituting .pbc for the .pir extension */
-            if (Parrot_str_equal(interp, orig_ext, pir_extension)) {
+            if (STRING_equal(interp, orig_ext, pir_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_concat(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
@@ -587,7 +581,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
                     return result;
             }
             /* Next try substituting .pir, then .pasm for the .pbc extension */
-            else if (Parrot_str_equal(interp, orig_ext, bytecode_extension)) {
+            else if (STRING_equal(interp, orig_ext, bytecode_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_concat(interp, without_ext, pir_extension);
                 result = try_load_path(interp, test_path);
@@ -604,8 +598,8 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
         /* Finally, try substituting .pbc for the .pasm extension. */
         if (Parrot_str_byte_length(interp, test_path) > 5) {
-            STRING * const orig_ext = Parrot_str_substr(interp, test_path, -5, 5);
-            if (Parrot_str_equal(interp, orig_ext, pasm_extension)) {
+            STRING * const orig_ext = STRING_substr(interp, test_path, -5, 5);
+            if (STRING_equal(interp, orig_ext, pasm_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 5);
                 test_path = Parrot_str_concat(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
@@ -788,46 +782,6 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 /*
 
-=item C<char* Parrot_get_runtime_prefix(PARROT_INTERP)>
-
-Return a malloced C-string for the runtime prefix.  The calling function
-must free it.
-
-This function is deprecated, use Parrot_get_runtime_path instead.
-See TT #1191
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char*
-Parrot_get_runtime_prefix(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_get_runtime_prefix)
-    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
-
-    Parrot_warn_deprecated(interp, "Parrot_get_runtime_prefix is deprecated TT #1191");
-    if (env)
-        return env;
-    else {
-        PMC    * const config_hash =
-            VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
-
-        if (VTABLE_elements(interp, config_hash)) {
-            STRING * const key = CONST_STRING(interp, "prefix");
-            STRING * const s   = VTABLE_get_string_keyed_str(interp, config_hash, key);
-            return Parrot_str_to_cstring(interp, s);
-        }
-        else
-            return mem_sys_strdup(".");
-    }
-}
-
-/*
-
 =item C<STRING * Parrot_get_runtime_path(PARROT_INTERP)>
 
 Return a string for the runtime prefix.
@@ -887,23 +841,21 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    const char *   charset = Parrot_charset_c_name(interp,
-            Parrot_charset_number_of_str(interp, in));
-    STRING * const slash1  = string_make(interp, "/", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2  = string_make(interp, "\\", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot     = string_make(interp, ".", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash1 = Parrot_str_new_init(interp, "/", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash2 = Parrot_str_new_init(interp, "\\", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const dot    = Parrot_str_new_init(interp, ".", 1,
+            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
 
     const INTVAL len = Parrot_str_byte_length(interp, in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
 
-    pos_sl = CHARSET_RINDEX(interp, in, slash1, len);
+    pos_sl = STRING_rindex(interp, in, slash1, len);
     if (pos_sl == -1)
-        pos_sl = CHARSET_RINDEX(interp, in, slash2, len);
-    pos_dot = CHARSET_RINDEX(interp, in, dot, len);
+        pos_sl = STRING_rindex(interp, in, slash2, len);
+    pos_dot = STRING_rindex(interp, in, dot, len);
 
     /* ignore dot in directory name */
     if (pos_dot != -1 && pos_dot < pos_sl)
@@ -912,24 +864,24 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     ++pos_dot;
     ++pos_sl;
     if (pos_sl && pos_dot) {
-        stem = Parrot_str_substr(interp, in, pos_sl, pos_dot - pos_sl - 1);
-        *wo_ext = Parrot_str_substr(interp, in, 0, pos_dot - 1);
-        *ext = Parrot_str_substr(interp, in, pos_dot, len - pos_dot);
+        stem = STRING_substr(interp, in, pos_sl, pos_dot - pos_sl - 1);
+        *wo_ext = STRING_substr(interp, in, 0, pos_dot - 1);
+        *ext = STRING_substr(interp, in, pos_dot, len - pos_dot);
     }
     else if (pos_dot) {
-        stem = Parrot_str_substr(interp, in, 0, pos_dot - 1);
+        stem = STRING_substr(interp, in, 0, pos_dot - 1);
         *wo_ext = stem;
-        *ext = Parrot_str_substr(interp, in, pos_dot, len - pos_dot);
+        *ext = STRING_substr(interp, in, pos_dot, len - pos_dot);
     }
     else if (pos_sl) {
-        stem = Parrot_str_substr(interp, in, pos_sl, len - pos_sl);
+        stem = STRING_substr(interp, in, pos_sl, len - pos_sl);
         *wo_ext = in;
-        *ext = NULL;
+        *ext = STRINGNULL;
     }
     else {
         stem = in;
         *wo_ext = stem;
-        *ext = NULL;
+        *ext = STRINGNULL;
     }
     return stem;
 }

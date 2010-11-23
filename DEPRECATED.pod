@@ -1,5 +1,3 @@
-# $Id$
-
 =head1 Purpose
 
 Provide a list of deprecated and experimental items in parrot.
@@ -59,10 +57,6 @@ L<http://trac.parrot.org/parrot/ticket/1633>
 
 L<https://trac.parrot.org/parrot/ticket/452>
 
-=item Method stdhandle in ParrotInterpreter [experimental]
-
-L<https://trac.parrot.org/parrot/ticket/264>
-
 =item Overriding vtable invoke in PIR objects [experimental]
 
 The VTABLE invoke in object.pmc puts SELF at the start of the
@@ -70,13 +64,6 @@ signature call arguments when there is no current object and is
 not already here. This allows the usage of $P0() instead of $P0($P0).
 
 L<https://trac.parrot.org/parrot/ticket/103>
-
-=item NCI without signature ("raw" pointers) [eligible in 2.4]
-
-No equivalent functionality is promised. You shouldn't be using this. Here be
-segfaults.
-
-L<https://trac.parrot.org/parrot/ticket/1549>
 
 =item UnManagedStruct handling nested structure [eligible in 2.4]
 
@@ -89,7 +76,7 @@ L<https://trac.parrot.org/parrot/ticket/1551>
 
 =item UnManagedStruct initializer structure [eligible in 2.4]
 
-The initializer structure will cease to be an array of triples. In stead, an
+The initializer structure will cease to be an array of triples. Instead, an
 array of flags (no counts or offsets), or a string representation of the same
 information may be used.
 
@@ -121,13 +108,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method lower on String [eligible in 2.7]
-
-Use the downcase opcode or subclass with a method name consistent with your
-HLL.
-
-L<http://trac.parrot.org/parrot/ticket/1606>
-
 =item Method unescape on String [experimental]
 
 This is a helper method for testing of Parrot_str_unescape_string.
@@ -139,19 +119,37 @@ L<https://trac.parrot.org/parrot/ticket/1628>
 These can be replaced by C<get_bool> and intval ops unless you're using them for
 things that aren't really logical ops (don't do that!).
 
+Logical vtables are removed in r49012, and logical ops on PMCs are converted to
+use C<get_bool> internally. Rakudo seems to depend on logical ops on PMCs.
+
 L<https://trac.parrot.org/parrot/ticket/1655>
 
-=item Method is_tty in PMCs derived from Handle [eligible in 2.7]
+=item Method getpid on ParrotInterpreter [experimental]
 
-Use isatty instead.
+Used to test the experimental function Parrot_getpid
 
-L<https://trac.parrot.org/parrot/ticket/1689>
+L<https://trac.parrot.org/parrot/ticket/1564>
 
 =back
 
 =head1 Opcodes
 
 =over 4
+
+=item charset, charsetname, find_charset, trans_charset [eligible in 2.10]
+
+L<https://trac.parrot.org/parrot/ticket/1778>
+
+These opcodes will be removed. The corresponding encoding opcodes should be
+used instead.
+
+=item fixed_8 encoding [eligible in 2.10]
+
+L<https://trac.parrot.org/parrot/ticket/1778>
+
+The 'fixed_8' encoding is going away. Use 'ascii' instead. If you want to test
+for a fixed_8 encoding, you have to compare the encoding to 'ascii',
+'iso-8859-1' and 'binary' separately.
 
 =item open and close opcodes will be removed [eligible in 2.7]
 
@@ -225,18 +223,6 @@ Intended to replace the CodeString charname_to_ord method.
 
 L<https://trac.parrot.org/parrot/ticket/1629>
 
-=item All opcodes that modify non-argument registers. [eligible in 2.7]
-
-E.g. "cleari", etc.
-
-L<https://trac.parrot.org/parrot/ticket/1642>
-
-=item exchange [eligible in 2.7]
-
-This op is too low level for Parrot in its current form.
-
-L<https://trac.parrot.org/parrot/ticket/1643>
-
 =item finalize [experimental]
 
 Finalize exception handler, unrolling inner runloops if needed.
@@ -248,6 +234,10 @@ L<https://trac.parrot.org/parrot/ticket/1635>
 These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
+
+=item errorson, errorsoff operations [eligible in 2.10]
+
+The C<.PARROT_ERRORS_GLOBAL_FLAG> flag will be eliminated. It is not used by Parrot.
 
 =back
 
@@ -289,21 +279,26 @@ L<https://trac.parrot.org/parrot/ticket/1091>
 
 L<https://trac.parrot.org/parrot/ticket/1103>
 
-=item :unique_reg flag [eligible in 2.7]
+=item :main Sub behaviour and selection. [eligible in 2.7]
 
-L<https://trac.parrot.org/parrot/ticket/1622>
+Currently, if no :main sub is found, the first .sub in a file is used as
+main. Also, arguments are passed to the main sub regardless of the .param
+declarations in that sub.
 
-=item .nci_call [eligible in 2.7]
+After this change, if no sub is marked with :main, an exception will be
+raised. Multiple :main declarations will be still be allowed, and all but the
+first will be ignored.
 
-As of the latest PCC changes, there is nothing special about calling an NCI sub.
+This change will also force all subs, including :main, to have their
+arguments checked - to allow an arbitrary number of arguments, have
+this be the only .param declaration in the sub.
 
-L<https://trac.parrot.org/parrot/ticket/1623>
+ .param pmc args :slurpy
 
-=item .meth_call [eligible in 2.7]
 
-As of the latest PCC changes, this does nothing different from '.call'.
-
-L<https://trac.parrot.org/parrot/ticket/1624>
+L<https://trac.parrot.org/parrot/ticket/1033>
+L<https://trac.parrot.org/parrot/ticket/1704>
+L<https://trac.parrot.org/parrot/ticket/1705>
 
 =back
 
@@ -322,12 +317,6 @@ All C API functions that aren't currently named according to the
 functions will be kept in the ticket at:
 
 L<https://trac.parrot.org/parrot/ticket/443>
-
-=item C<Parrot_find_global_s> and C<Parrot_store_global_s>
-
-This function is not used or tested anywhere.
-
-http://trac.parrot.org/parrot/ticket/1660
 
 =item PMC Attributes Allocation Functions [experimental]
 
@@ -358,11 +347,15 @@ Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
 
-=item Parrot_get_runtime_prefix [eligible in 2.7]
+=item Parrot_getpid [experimental]
 
-Use Parrot_get_runtime_path instead.
+Get process id, experimental.
 
-L<https://trac.parrot.org/parrot/ticket/1191>
+L<https://trac.parrot.org/parrot/ticket/1564>
+
+=item Parrot_load_bytecode_file [experimental]
+
+Load a .pbc file into the interpreter. Experimental.
 
 =back
 
@@ -414,6 +407,15 @@ of the location where they occur in the PAST tree.
 
 L<https://trac.parrot.org/parrot/ticket/868>
 
+=item Meta-model implementation used by PCT [eligible in 2.7]
+
+PCT is set to switch to a new meta-model implementation for its classes
+and objects. This will most likely only affect those who rely on the
+interface of what is returned from .HOW, or rely on PCT objects exhibiting
+various other peculiarities of the P6object implementation. (Even when that
+is the case, the HOW API will not be changing too drastically, so for most
+PCT users there should be little to no upheavel.)
+
 =back
 
 =head1 Parrot library
@@ -437,7 +439,7 @@ L<http://trac.parrot.org/parrot/ticket/1337>
 
 L<https://trac.parrot.org/parrot/ticket/1598>
 
-=item LWP, HTTP::Message & URI [experimental]
+=item LWP, HTTP::Message, URI & URI::Escape [experimental]
 
 L<http://trac.parrot.org/parrot/ticket/1637>
 
@@ -452,6 +454,12 @@ L<https://trac.parrot.org/parrot/ticket/754>
 =item OpenGL bindings and libraries [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/852>
+
+=item pkg-config support [eligible in 3.1]
+
+Use C<parrot_config> instead.
+
+L<http://trac.parrot.org/parrot/ticket/1853>
 
 =back
 

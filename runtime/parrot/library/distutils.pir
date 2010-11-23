@@ -1,5 +1,4 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -193,11 +192,14 @@ L<http://github.com/Whiteknight/parrot-linear-algebra/blob/master/setup.pir>
 
 L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
-L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
+L<http://github.com/bacek/pir/blob/master/setup.pir>
+
+L<http://github.com/kthakore/parrotSDL/blob/master/setup.pir>
+
+L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 
 =cut
 
-.loadlib 'io_ops' # workaround TT #1663
 .loadlib 'sys_ops'
 
 .sub '__onload' :load :init :anon
@@ -317,6 +319,15 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     .const 'Sub' _clean_wininst = '_clean_wininst'
     register_step_after('clean', _clean_wininst)
   L1:
+
+    $I0 = $P0['has_zlib']
+    if $I0 goto L2
+    .const 'Sub' _no_zlib = '_no_zlib'
+    register_step('smoke', _no_zlib)
+    register_step('sdist_gztar', _no_zlib)
+    register_step('sdist_zip', _no_zlib)
+    register_step('bdist_rpm', _no_zlib)
+  L2:
 .end
 
 =head2 Functions
@@ -1210,7 +1221,7 @@ hash
 
 the key is the PMC name
 
-the value is an array of PMC pathname or a single PPC pathname
+the value is an array of PMC/C/H pathname or a single PMC pathname
 
 an array creates a PMC group
 
@@ -1248,24 +1259,52 @@ an array creates a PMC group
     .local pmc srcs
     srcs = hash[name]
     $I0 = does srcs, 'array'
-    unless $I0 goto L5
+    unless $I0 goto L3
+    .local pmc pmcs, includes
+    pmcs = new 'ResizableStringArray'
+    includes = new 'ResizableStringArray'
     $P1 = iter srcs
-  L3:
-    unless $P1 goto L4
+  L4:
+    unless $P1 goto L5
     .local string src
     src = shift $P1
+    .local string ext
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    unless ext == '.pmc' goto L6
+    push pmcs, src
+  L6:
+    unless ext == '.h' goto L4
+    push includes, src
+    goto L4
+  L5:
+    $P1 = iter srcs
+  L7:
+    unless $P1 goto L8
+    src = shift $P1
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    if ext == '.h' goto L7
     $S0 = _mk_path_gen_dynpmc(src, obj)
-    $I0 = newer($S0, src)
-    if $I0 goto L3
+    push includes, src
+    $I0 = newer($S0, includes)
+    $S1 = pop includes
+    if $I0 goto L7
+    if ext == '.c' goto L9
     __build_dynpmc(src, cflags)
-    goto L3
-  L4:
+    goto L7
+  L9:
+    __compile_cc($S0, src, cflags)
+    $S0 = ' ' . $S0
+    ldflags .= $S0
+    goto L7
+  L8:
     $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, srcs)
     if $I0 goto L1
-    __build_dynpmc_group(srcs, name, cflags, ldflags)
+    __build_dynpmc_group(pmcs, name, cflags, ldflags)
     goto L1
-  L5:
+  L3:
     src = srcs
     $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, src)
@@ -1446,8 +1485,7 @@ an array creates a PMC group
 .sub '_mk_path_gen_dynpmc' :anon
     .param string src
     .param string ext
-    $I0 = length src
-    $I0 -= 4
+    $I0 = rindex(src, '.')
     $S0 = substr src, 0, $I0
     $S0 .= ext
     unless ext == '.h' goto L1
@@ -1767,13 +1805,18 @@ the value is the POD pathname
     unless $P1 goto L4
     .local string src
     src = shift $P1
+    .local string ext
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    if ext == '.h' goto L3
+    $S0 = _mk_path_gen_dynpmc(src, obj)
+    unlink($S0, 1 :named('verbose'))
+    if ext == '.c' goto L3
     $S0 = _mk_path_gen_dynpmc(src, '.c')
     unlink($S0, 1 :named('verbose'))
     $S0 = _mk_path_gen_dynpmc(src, '.h')
     unlink($S0, 1 :named('verbose'))
     $S0 = _mk_path_gen_dynpmc(src, '.dump')
-    unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynpmc(src, obj)
     unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
@@ -2049,6 +2092,11 @@ a string
 
 a hash
 
+=item smolder_credentials
+
+A string, of the form "USERNAME:PASSWORD" to be used as the credentials for
+the server. The default is "parrot-autobot:qa_rocks"
+
 =back
 
 =cut
@@ -2124,7 +2172,7 @@ a hash
     $S0 = config['osname']
     push contents, $S0
     push contents, 'revision'
-    $S0 = config['revision']
+    $S0 = config['git_describe']
     push contents, $S0
     $I0 = exists kv['smolder_tags']
     unless $I0 goto L2
@@ -2143,6 +2191,14 @@ a hash
     set $P0, 1
     $P0[0] = archive
     push contents, $P0
+    $S0 = get_value('smolder_credentials', "parrot-autobot:qa_rocks" :named('default'), kv :flat :named)
+    $P0 = split ':', $S0
+    $P1 = $P0[0]
+    push contents, 'username'
+    push contents, $P1
+    $P1 = $P0[1]
+    push contents, 'password'
+    push contents, $P1
     load_bytecode 'LWP/UserAgent.pir'
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
@@ -2330,11 +2386,11 @@ array of pathname or a single pathname
     if $I0 goto L1
     $S0 = array
     $S3 = $S0
-    $S2 = $S1 . $S3
     $I0 = index $S0, "build/"
     unless $I0 == 0 goto L0
     $S3 = substr $S0, 6
   L0:
+    $S2 = $S1 . $S3
     files[$S2] = $S0
     goto L2
   L1:
@@ -4102,6 +4158,12 @@ TEMPLATE
     unlink('inno.iss', 1 :named('verbose'))
     $S0 = get_setupname('.exe', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
+.end
+
+
+.sub '_no_zlib' :anon
+    .param pmc kv :slurpy :named
+    say "This step needs a parrot built with zlib"
 .end
 
 =head2 Configuration Helpers

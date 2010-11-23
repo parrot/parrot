@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -55,7 +54,7 @@ encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     if (STRING_IS_NULL(s))
         return 0;
     else
-        return Parrot_str_equal(interp, s, CONST_STRING(interp, "utf8"));
+        return STRING_equal(interp, s, CONST_STRING(interp, "utf8"));
 }
 
 pmclass StringHandle extends Handle auto_attrs {
@@ -193,9 +192,10 @@ stored for mocking.
 
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (encoding_is_utf8(INTERP, encoding))
-                new_string = string_make(INTERP, "", 0, "unicode", 0);
+                new_string = Parrot_str_new_init(INTERP, "", 0,
+                        Parrot_utf8_encoding_ptr, 0);
             else
-                new_string = Parrot_str_new(INTERP, "", 0);
+                new_string = CONST_STRING(INTERP, "");
 
             SET_ATTR_stringhandle(INTERP, SELF, new_string);
         }
@@ -203,28 +203,14 @@ stored for mocking.
         /* Set a default mode of read-only. */
         GET_ATTR_mode(INTERP, SELF, open_mode);
         if (STRING_IS_NULL(open_mode)) {
-            open_mode = Parrot_str_new_constant(INTERP, "r");
+            open_mode = CONST_STRING(INTERP, "r");
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
-        SELF = Parrot_io_open(INTERP, SELF, filename, open_mode);
+        flags = Parrot_io_parse_open_flags(INTERP, open_mode);
+        SET_ATTR_flags(INTERP, SELF, flags);
 
         RETURN(PMC *SELF);
-    }
-
-/*
-
-=item C<METHOD is_tty()>
-
-StringHandles are never tty's, returns false.
-
-=cut
-
-*/
-    METHOD is_tty() {
-        Parrot_warn_deprecated(INTERP,
-            "'is_tty' is deprecated, use 'isatty' instead - TT #1689");
-        RETURN(INTVAL 0);
     }
 
 /*
@@ -254,7 +240,10 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
-        const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
+        STRING *stringhandle;
+        INTVAL status;
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+        status = STRING_IS_NULL(stringhandle);
         RETURN(INTVAL status);
     }
 
@@ -309,9 +298,10 @@ StringHandle object that isn't opened yet, returns an empty string.
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (encoding_is_utf8(INTERP, encoding))
-                string_result = string_make(INTERP, "", 0, "unicode", 0);
+                string_result = Parrot_str_new_init(INTERP, "", 0,
+                        Parrot_utf8_encoding_ptr, 0);
             else
-                string_result = Parrot_str_new_constant(INTERP, "");
+                string_result = CONST_STRING(INTERP, "");
         }
 
         RETURN(STRING *string_result);
@@ -400,15 +390,15 @@ ignored, but stored for mocking.
         GET_ATTR_flags(INTERP, SELF, flags);
 
         if (got_type) {
-            if (Parrot_str_equal(INTERP, new_type, nobuffer_string)) {
+            if (STRING_equal(INTERP, new_type, nobuffer_string)) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string)) {
+            else if (STRING_equal(INTERP, new_type, linebuffer_string)) {
                 flags |=   PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string)) {
+            else if (STRING_equal(INTERP, new_type, fullbuffer_string)) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags |=   PIO_F_BLKBUF;
             }

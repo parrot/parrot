@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -298,7 +297,6 @@ use base qw( Exporter );
 Memoize::memoize('path_to_parrot');
 
 # Tell parrot it's being tested--disables searching of installed libraries.
-# (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
 
 my $builder = Test::Builder->new();
@@ -402,10 +400,14 @@ sub write_code_to_file {
     return;
 }
 
+{
+    no warnings 'once';
 # We can inherit from other modules, so we do so.
 *plan = \&Test::More::plan;
 *skip = \&Test::More::skip;
 *slurp_file = \&Parrot::BuildUtil::slurp_file;
+
+}
 
 sub convert_line_endings {
     my ($text) = @_;
@@ -494,7 +496,7 @@ sub generate_languages_functions {
             }
 
             # The generated files are left in the t/* directories.
-            # Let 'make clean' and 'svn:ignore' take care of them.
+            # Let 'make clean' and '.gitignore' take care of them.
 
             return;
         };
@@ -634,10 +636,10 @@ sub _run_test_file {
         $run_exec = 1;
         my $pbc_f = per_test( '.pbc', $test_no );
         my $o_f = per_test( '_pbcexe' . $PConfig{o}, $test_no );
-        my $exe_f =
-            per_test( '_pbcexe' . $PConfig{exe}, $test_no )
-            ;    # Make cleanup and svn:ignore more simple
-        my $exec_f = per_test( '_pbcexe', $test_no );    # Make cleanup and svn:ignore more simple
+
+        # make cleanup and .gitignore more simple
+        my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no );
+        my $exec_f = per_test( '_pbcexe', $test_no );
         $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
 
         run_command(

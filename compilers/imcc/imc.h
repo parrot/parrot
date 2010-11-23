@@ -1,9 +1,6 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
-
-/* $Id$ */
 
 #ifndef PARROT_IMCC_IMC_H_GUARD
 #define PARROT_IMCC_IMC_H_GUARD
@@ -59,7 +56,7 @@ typedef struct IMC_Unit IMC_Unit;
 enum {
     IMCC_FATAL_EXCEPTION     = 1,
     IMCC_FATALY_EXCEPTION    = 2,
-    IMCC_PARSEFAIL_EXCEPTION = 3,
+    IMCC_PARSEFAIL_EXCEPTION = 3
 };
 
 #define N_ELEMENTS(x) (sizeof (x)/sizeof ((x)[0]))
@@ -196,8 +193,8 @@ void * imcc_compile_file(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
 
-PARROT_WARN_UNUSED_RESULT
-int check_op(PARROT_INTERP,
+void check_op(PARROT_INTERP,
+    ARGOUT(op_info_t **op_info),
     ARGOUT(char *fullname),
     ARGIN(const char *name),
     ARGIN(SymReg * const * r),
@@ -207,6 +204,8 @@ int check_op(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*op_info)
         FUNC_MODIFIES(*fullname);
 
 PARROT_WARN_UNUSED_RESULT
@@ -316,27 +315,13 @@ void op_fullname(
 void register_compilers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-int try_find_op(PARROT_INTERP,
-    ARGMOD(IMC_Unit *unit),
-    ARGIN(const char *name),
-    ARGMOD(SymReg **r),
-    int n,
-    int keyvec,
-    int emit)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(*r);
-
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(error_message))
 #define ASSERT_ARGS_check_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(op_info) \
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
@@ -386,11 +371,6 @@ int try_find_op(PARROT_INTERP,
     , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_register_compilers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_try_find_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit) \
-    , PARROT_ASSERT_ARG(name) \
-    , PARROT_ASSERT_ARG(r))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
@@ -562,7 +542,6 @@ typedef struct _imc_info_t {
     SymHash               ghash;
     jmp_buf               jump_buf;        /* The jump for error  handling */
     int                   IMCC_DEBUG;
-    int                   allocated;
     int                   cnr;
     int                   debug;
     int                   dont_optimize;

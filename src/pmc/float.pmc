@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -77,7 +76,8 @@ Returns the value of the number.
 
 =item C<INTVAL get_integer()>
 
-Returns an integer representation of the number (by casting).
+Returns an integer representation of the number by truncating
+(rounding toward zero).
 
 =cut
 
@@ -138,12 +138,14 @@ Returns a Parrot string representation of the number.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer), 0);
         SELF.set_integer_native(value);
     }
 
     VTABLE void set_bool(INTVAL value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
         SELF.set_bool(value);
     }
 
@@ -174,7 +176,8 @@ Note that this method morphs the number into a C<String>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_String), 0);
         SELF.set_string_native(value);
     }
 
@@ -391,6 +394,10 @@ Used to unarchive the number.
 
 =item C<METHOD PMC *cosh()>
 
+=item C<METHOD PMC *cot()>
+
+=item C<METHOD PMC *csc()>
+
 =item C<METHOD PMC *exp()>
 
 =item C<METHOD PMC *ln()>
@@ -425,13 +432,6 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
         RETURN(PMC *d);
     }
 
-    METHOD cos() {
-        PMC * const d  = Parrot_pmc_new(INTERP,
-                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
-        SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
-        RETURN(PMC *d);
-    }
-
     METHOD asec() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(1.0 / SELF.get_number()));
@@ -456,9 +456,28 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
         RETURN(PMC *d);
     }
 
+    METHOD cos() {
+        PMC * const d  = Parrot_pmc_new(INTERP,
+                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+        SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
     METHOD cosh() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, cosh(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+    METHOD cot() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / tan(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+    METHOD csc() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / sin(SELF.get_number()));
         RETURN(PMC *d);
     }
 

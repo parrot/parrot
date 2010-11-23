@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2003-2010, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -29,6 +28,7 @@ PCC Implementation by Leopold Toetsch
 #include <string.h>
 #include "imc.h"
 #include "parser.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
@@ -353,7 +353,8 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         bufpos--;
     memcpy(buf+bufpos, subf, lensubf);
 
-    regs[0] = mk_const(interp, buf, 'S');
+    regs[0] = mk_const(interp, buf, 'P');
+    regs[0]->pmc_type = enum_class_FixedIntegerArray;
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
 
     if (n >= PCC_GET_ARGS_LIMIT) {
@@ -471,7 +472,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
             tmp = INS(interp, unit, "returncc", NULL, regs, 0, 0, 0);
         }
 
-        IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
+        IMCC_debug(interp, DEBUG_IMC, "add sub ret - %d\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
 }
@@ -675,6 +676,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     SymReg *regs[2];
     Instruction *get_params, *tmp_ins, *unused_ins;
     char *buf;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     if (!(unit->instructions->type & ITLABEL))
         return 0;
@@ -696,7 +698,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 
     get_params = unit->instructions->next;
 
-    if (get_params->opnum != PARROT_OP_get_params_pc)
+    if (get_params->op != &core_ops->op_info_table[PARROT_OP_get_params_pc])
         return 0;
 
     buf = (char *)malloc(strlen(this_sub->name) + 3);
@@ -749,7 +751,13 @@ insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
         ins     = insINS(interp, unit, ins, "tailcall", regs, 1);
     }
 
+    /* don't leak this sub SymReg; it gets detached here */
+    if (regs[0]->pcc_sub)
+        free_pcc_sub(regs[0]->pcc_sub);
+
+    /* this register is always the symbol "self", global to this IMC_Unit */
     regs[0]->pcc_sub  = sub->pcc_sub;
+
     sub->pcc_sub      = NULL;
     ins->type        |= ITPCCSUB;
 }

@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -260,7 +259,7 @@ pir_output_is( <<'CODE', <<'OUT', 'puts' );
 
     # puts to SH not opened
     result = 0
-    set_addr eh, handle1
+    set_label eh, handle1
     sh.'puts'('something')
     result = 1
     goto done1
@@ -271,7 +270,7 @@ done1:
 
     # puts to SH opened for reading
     result = 0
-    set_addr eh, handle2
+    set_label eh, handle2
     sh.'open'('mockname', 'r')
     sh.'puts'('something')
     result = 1
@@ -665,14 +664,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'StringHandle is not a tty' );
     .local int i
     sh = new ['StringHandle']
 
-    # See TT #1689
-    i = sh.'is_tty'()
-    say i
     i = sh.'isatty'()
     say i
 .end
 CODE
-0
 0
 OUTPUT
 

@@ -1,0 +1,46 @@
+# Copyright (C) 2010, Parrot Foundation.
+
+=head1 NAME
+
+opsc - An opcode compiler for Parrot
+
+=head1 DESCRIPTION
+
+Ops-to-C is a compiler to generate opcode definition files in C from
+Parrot's opcode definition language.
+
+=head1 SYNOPSIS
+
+ opsc [-options] <file>
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c, --core
+
+Generate C code for core ops (for use only in building the Parrot VM)
+
+=item -d, --dynamic
+
+Generate C code for dynamic ops in a single file.
+
+=item -q, --quiet
+
+Only report error messages, other messages are silent.
+
+=item -h, --help
+
+Print usage information.
+
+=item -n, --no-lines
+
+Do not print #line directives in generated C code.
+
+=item -g, --debug
+
+Perform all processing but do not write to any files.
+
+=back
+
+=cut

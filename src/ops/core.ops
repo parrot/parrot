@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** core.ops
 */
 
@@ -933,24 +932,25 @@ inline op gc_debug(in INT) {
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
-The valid constants for each return value are:
+The valid constants for each return value are (excluding the the .INTERPINFO_
+prefix):
 
 =over 4
 
 =item B<interpinfo>(out INT, in INT)
 
-.TOTAL_MEM_ALLOC, .GC_MARK_RUNS, .GC_COLLECT_RUNS, .ACTIVE_PMCS, .ACTIVE_BUFFERS,
-.TOTAL_PMCS, .TOTAL_BUFFERS, .HEADER_ALLOCS_SINCE_COLLECT,
-.MEM_ALLOCS_SINCE_COLLECT, .TOTAL_COPIED, .IMPATIENT_PMCS, .GC_LAZY_MARK_RUNS,
-.EXTENDED_PMCS, .RUNCORE
+TOTAL_MEM_ALLOC, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS, ACTIVE_BUFFERS,
+TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
+MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
+EXTENDED_PMCS, CURRENT_RUNCORE
 
 =item B<interpinfo>(out PMC, in INT)
 
-.CURRENT_SUB, .CURRENT_CONT, .CURRENT_OBJECT, .CURRENT_LEXPAD
+CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
 =item B<interpinfo>(out STR, in INT)
 
-.EXECUTABLE_FULLNAME, .EXECUTABLE_BASENAME, .RUNTIME_PREFIX
+EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX
 
 =back
 
@@ -1009,19 +1009,22 @@ access these from PASM, include F<errors.pasm>.  The current categories are:
 
 =item .PARROT_ERRORS_GLOBALS_FLAG
 
-Throw an exception if global doesn't exist.  Default: on.
+Throw an exception if a global doesn't exist. This
+flag is not used by Parrot and is deprecated.
 
 =item .PARROT_ERRORS_OVERFLOW_FLAG
 
-Throw math overflow instead of promoting to BigInt.  Default: off.
+When performing arithmetic on Integer PMCs, throw a math overflow exception
+instead of promoting to BigInt. This flag does not pertain to native integers,
+which are never promoted. Default: off.
 
 =item .PARROT_ERRORS_PARAM_COUNT_FLAG
 
-Throw exception on argument <-> param count mismatch.  Default: off.
+Throw an exception on an argument versus parameter count mismatch. Default: on.
 
 =item .PARROT_ERRORS_RESULT_COUNT_FLAG
 
-Throw exception on return <-> result count mismatch.  Default: off.
+Throw an exception on a return versus result count mismatch. Default: off.
 
 =item .PARROT_ERRORS_ALL_FLAG
 

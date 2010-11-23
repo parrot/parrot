@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -59,6 +58,9 @@ sub check_macro_args {
             # it's referenced in the definition.
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
+
+                    # skip args that are code blocks
+                    next if $arg eq '_code';
 
                     # eliminate any properly formed usage of the macro arg
                     $definition =~ s/\Q($arg)//g;

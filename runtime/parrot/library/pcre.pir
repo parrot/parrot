@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -87,6 +86,9 @@ LIB_WIN32:
     if loaded goto LIB_LOADED
     # But maybe you have GnuWin32 pcre3.dll?
     loadlib libpcre, 'pcre3'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+    loadlib libpcre, 'libpcre-0' # pcre 8.10 and maybe others
     loaded = defined libpcre
     if loaded goto LIB_LOADED
     branch LIB_FAILED

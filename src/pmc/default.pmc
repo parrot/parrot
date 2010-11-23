@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -197,9 +196,9 @@ check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), A
     ASSERT_ARGS(check_set_std_props)
 
     /*
-     * s2 in Parrot_str_equal is freed here
+     * s2 in STRING_equal is freed here
      */
-    if (Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
+    if (STRING_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         /* pmc should set/clear readonly */
         const INTVAL on = VTABLE_get_bool(interp, value);
 
@@ -286,7 +285,7 @@ check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *k
     ASSERT_ARGS(check_get_std_props)
 
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-       && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
+       && STRING_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val = Parrot_pmc_new_init_int(interp,
                 enum_class_Integer, 1);
         return ret_val;
@@ -356,6 +355,23 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "init_pmc() not implemented in class '%Ss'",
                 caller(INTERP, SELF));
+    }
+
+/*
+
+=item C<void init_int(INTVAL initvalue)>
+
+Calls C<init()> and C<set_integer_native(initvalue)>.
+Default implementation to allow more usages of init_int without having to
+implement it everywhere.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL initvalue) {
+        SELF.init();
+        SELF.set_integer_native(initvalue);
     }
 
 /*
@@ -513,6 +529,22 @@ Returns the name of the PMC.
         return SELF->vtable->whoami;
     }
 
+
+/*
+
+=item C<void PMC *add_attribute(STRING *name, PMC *type)>
+
+Throws an exception, as you can only add an attribute to something Class-y or
+Role-y.
+
+=cut
+
+*/
+
+    VTABLE void add_attribute(STRING *name, PMC *type) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot add attribute to non-class");
+    }
 
 /*
 
@@ -762,9 +794,9 @@ Calculate hashvalue for PMC. Default behaviour stringify and use string.
 
 */
 
-    INTVAL hashvalue() {
+    VTABLE INTVAL hashvalue() {
         STRING *s = SELF.get_string();
-        return key_hash_STRING(INTERP, s, 0);
+        return STRING_hash(INTERP, s, INTERP->hash_seed);
     }
 
 /*
@@ -970,7 +1002,7 @@ true (1) is returned; otherwise, false (0) is returned.
         else {
             const Hash * const isa_hash = SELF->vtable->isa_hash;
             if (!isa_hash)
-                return Parrot_str_equal(INTERP, SELF->vtable->whoami, _class);
+                return STRING_equal(INTERP, SELF->vtable->whoami, _class);
 
             return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
         }
@@ -987,12 +1019,12 @@ Provides introspection of a specific piece of information about the PMC.
 */
 
     VTABLE PMC *inspect_str(STRING *name) {
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "flags"))) {
+        if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "flags"))) {
             PMC *found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "mro"))) {
+        else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "mro"))) {
             return VTABLE_clone(INTERP, SELF->vtable->mro);
         }
         else
@@ -1821,56 +1853,6 @@ Default fallback. Performs a multiple dispatch call for 'cmp_pmc'.
                 "cmp_pmc", "PP->P", SELF, value, &retval);
 
         return retval;
-    }
-/*
-
-=item C<PMC *logical_or(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_or'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_or(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_or", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
-
-/*
-
-=item C<PMC *logical_and(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_and'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_and(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_and", "PPP->P", SELF, value, dest, &result);
-        return result;
-    }
-
-/*
-
-=item C<PMC *logical_xor(PMC *value, PMC *dest)>
-
-Default fallback. Performs a multiple dispatch call for 'logical_xor'.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_xor(PMC *value, PMC *dest) {
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                "logical_xor", "PPP->P", SELF, value, dest, &result);
-        return result;
     }
 
 /*

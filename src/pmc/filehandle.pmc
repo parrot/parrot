@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -373,18 +372,33 @@ Read a line from the filehandle and return it in a string.
 
 #ifdef PARROT_HAS_READLINE
     /* 4-column indent to get c_indent.t to DTRT */
-        char * const r = readline(got_prompt ? prompt->strstart : NULL);
+        char *prompt_cstring =
+            (got_prompt ? Parrot_str_to_cstring(INTERP, prompt) : NULL);
+        char * const r = readline(prompt_cstring);
+        Parrot_str_free_cstring(prompt_cstring);
 
         if (r) {
+            STRING *encoding;
+            const STR_VTABLE *enc = NULL;
+            GET_ATTR_encoding(INTERP, SELF, encoding);
             if (*r)
                 add_history(r);
-
-            string_result = Parrot_str_new(INTERP, r, 0);
-            mem_internal_free(r);
+            if (!STRING_IS_NULL(encoding))
+                enc = Parrot_get_encoding(INTERP, Parrot_encoding_number(INTERP, encoding));
+            if (enc == NULL)
+                string_result = Parrot_str_new(INTERP, r, 0);
+            else
+                string_result = Parrot_str_new_init(INTERP, r, strlen(r), enc, 0);
+            free(r);
+            if (enc != NULL)
+                STRING_validate(INTERP, string_result);
         }
 #else
-        if (got_prompt)
-            fprintf(stderr, "%s", prompt->strstart);
+        if (got_prompt) {
+            char *prompt_cstring = Parrot_str_to_cstring(INTERP, prompt);
+            fprintf(stderr, "%s", prompt_cstring);
+            Parrot_str_free_cstring(prompt_cstring);
+        }
 
         if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
             Parrot_io_setlinebuf(INTERP, SELF);
@@ -463,6 +477,8 @@ filehandle when finished.
             Parrot_io_close(INTERP, filehandle);
         }
         else {
+            PMC *sb;
+
             /* slurp open file */
             if (Parrot_io_is_closed_filehandle(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
@@ -472,12 +488,15 @@ filehandle when finished.
             if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
                 Parrot_io_setlinebuf(INTERP, SELF);
 
-            result = STRINGNULL;
+            sb = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
+                    4096);
+
             do {
                 STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
-                result = STRING_IS_NULL(result) ? part :
-                        Parrot_str_concat(INTERP, result, part);
+                VTABLE_push_string(interp, sb, part);
             } while (!Parrot_io_eof(INTERP, SELF));
+
+            result = VTABLE_get_string(interp, sb);
         }
 
         RETURN(STRING *result);
@@ -564,11 +583,11 @@ Full buffering, bytes are sent when the buffer is full.
         INTVAL flags;
 
         if (got_type) {
-            if (Parrot_str_equal(INTERP, new_type, nobuffer_string))
+            if (STRING_equal(INTERP, new_type, nobuffer_string))
                 Parrot_io_setbuf(INTERP, SELF, PIOCTL_NONBUF);
-            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string))
+            else if (STRING_equal(INTERP, new_type, linebuffer_string))
                 Parrot_io_setlinebuf(INTERP, SELF);
-            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string))
+            else if (STRING_equal(INTERP, new_type, fullbuffer_string))
                 Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
         }
 

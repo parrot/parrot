@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -20,7 +19,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .namespace ['HTTP';'Date']
 
-.loadlib 'io_ops' # XXX avoids segfaults for some reason (see TT #1663)
 .loadlib 'sys_ops'
 .include 'tm.pasm'
 

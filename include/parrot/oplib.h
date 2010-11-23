@@ -1,7 +1,5 @@
 /* oplib.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Header file for op libraries.
  *  Data Structure and Algorithms:
@@ -24,15 +22,15 @@
 typedef struct op_lib_t {
     const char *name;
     const char *suffix;
-    int      core_type;
-    int      flags;
-    int      major_version;
-    int      minor_version;
-    int      patch_version;
-    size_t      op_count;
-    op_info_t * op_info_table;
-    op_func_t * op_func_table;
-    int (*op_code)(PARROT_INTERP, const char * name, int full);
+    int         core_type;
+    int         flags;
+    int         major_version;
+    int         minor_version;
+    int         patch_version;
+    opcode_t    op_count;
+    op_info_t  *op_info_table;
+    op_func_t  *op_func_table;
+    int (*_op_code)(PARROT_INTERP, const char * name, int full);
 } op_lib_t;
 
 typedef enum {

@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 class Ops::Compiler::Actions is HLL::Actions;
 

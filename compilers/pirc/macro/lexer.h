@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2007-2009, Parrot Foundation.
  */
 #ifndef PARROT_PIR_LEXER_H_GUARD

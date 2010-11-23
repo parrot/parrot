@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -113,7 +112,7 @@ collection.
 =item C<gcdebug>
 
 Toggle garbage collection debugging mode.  In gcdebug mode a garbage collection
-cycle is run before each opcocde, which is the same as using the gcdebug core.
+cycle is run before each opcode, which is the same as using the gcdebug core.
 
 =item C<quit> or C<q>
 
@@ -136,6 +135,8 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 */
 
+#define PARROT_IN_EXTENSION
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -152,7 +153,7 @@ static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 
 =item C<int main(int argc, const char *argv[])>
 
-Reads the PIR, PASM or PBC file from argv[1], loads it, and then calls
+Reads the PIR, PASM, or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
 
 =cut
@@ -229,7 +230,7 @@ main(int argc, const char *argv[])
         const char source []= ".sub aux :main\nexit 0\n.end\n";
         Parrot_compile_string(interp, compiler, source, &errstr);
 
-        if (!Parrot_str_is_null(interp, errstr))
+        if (!STRING_IS_NULL(errstr))
             Parrot_io_eprintf(interp, "%Ss\n", errstr);
     }
 
@@ -247,11 +248,12 @@ main(int argc, const char *argv[])
     Parrot_exit(interp, 0);
 }
 
+
 /*
 
 =item C<static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[])>
 
-Run the code, catching exceptions if they are left unhandled.
+Runs the code, catching exceptions if they are left unhandled.
 
 =cut
 
@@ -275,6 +277,7 @@ PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
     free_runloop_jump_point(interp);
 }
 
+
 /*
 
 =item C<static void PDB_printwelcome(void)>
@@ -290,7 +293,7 @@ PDB_printwelcome(void)
 {
     fprintf(stderr,
         "Parrot " PARROT_VERSION " Debugger\n"
-        "\nPlease note: the debugger is currently under reconstruction\n");
+        "(Please note: the debugger is currently under reconstruction)\n");
 }
 
 /*
@@ -331,11 +334,7 @@ it bang now, try listing the source before loading or disassembling it.
 
 =item * Print the interpreter info.
 
-=item * Make the user interface better (add comands
-history/completion).
-
-=item * Some other things I don't remember now because it's late.
-
+=item * Make the user interface better (add command history/completion).
 
 =back
 

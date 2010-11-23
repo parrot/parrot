@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -18,18 +17,16 @@ running compilers from a command line.
     load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = new 'P6metaclass'
-    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version'
+    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version $compiler_progname'
     $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
 .end
 
 .namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
-.include 'stdio.pasm'
+.include 'iglobals.pasm'
 
 .sub 'init' :vtable :method
-    load_bytecode 'config.pir'
-
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
@@ -56,7 +53,8 @@ running compilers from a command line.
 
     $S0  = '???'
     push_eh _handler
-    $P0  = _config()
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
     $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
   _handler:
     pop_eh
@@ -154,6 +152,11 @@ Set the command-line prompt for this compiler to C<value>.
 The prompt is displayed in interactive mode at each point where
 the compiler is ready for code to be compiled and executed.
 
+=item compiler_progname([string name])
+
+Accessor for the C<compiler_progname>, which is often the filename of
+the compiler's program entry point, like C<perl6.pbc>.
+
 =cut
 
 .sub 'stages' :method
@@ -190,6 +193,12 @@ the compiler is ready for code to be compiled and executed.
     .param string value        :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('$commandline_prompt', value, has_value)
+.end
+
+.sub 'compiler_progname' :method
+    .param pmc value        :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('$compiler_progname', value, has_value)
 .end
 
 =item removestage(string stagename)
@@ -331,11 +340,14 @@ when the stage corresponding to target has been reached.
     $N1 = time
     $N2 = $N1 - $N0
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Stage '")
     $P1.'print'(stagename)
     $P1.'print'("': ")
-    $P1.'print'($N2)
+    $P2 = new ['ResizablePMCArray']
+    push $P2, $N2
+    $S0 = sprintf "%.3f", $P2
+    $P1.'print'($S0)
     $P1.'print'(" sec\n")
     if target == stagename goto have_result
     goto stagestats_loop
@@ -366,15 +378,6 @@ to any options and return the resulting parse tree.
   tcode_loop:
     unless tcode_it goto transcode_done
     tcode = shift tcode_it
-    push_eh tcode_enc
-    $I0 = find_charset tcode
-    $S0 = source
-    $S0 = trans_charset $S0, $I0
-    assign source, $S0
-    pop_eh
-    goto transcode_done
-  tcode_enc:
-    pop_eh
     push_eh tcode_fail
     $I0 = find_encoding tcode
     $S0 = source
@@ -615,13 +618,13 @@ specifies the encoding to use for the input (e.g., "utf8").
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
     $P1 = getinterp
-    $P2 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $P2 = $P1.'stderr_handle'()
     $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
     $P0 = getinterp
-    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    stdin = $P0.'stdin_handle'()
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -783,6 +786,7 @@ Performs option processing of command-line args
 
     .local string arg0
     arg0 = shift args
+    self.'compiler_progname'(arg0)
     .local pmc getopts
     getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
@@ -891,7 +895,7 @@ Generic method for compilers invoked from a shell command line.
     .local string output
     .local pmc ofh
     $P0 = getinterp
-    ofh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    ofh = $P0.'stdout_handle'()
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
@@ -921,7 +925,7 @@ Generic method for compilers invoked from a shell command line.
     .get_results ($P0)
     pop_eh
     $P1 = getinterp
-    $P1 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P1.'stderr_handle'()
     $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto do_exit
     $S0 = self.'backtrace'($P0)
@@ -951,6 +955,70 @@ based on double-colon separators.
     $P0 = split '::', name
     .return ($P0)
 .end
+
+=item lineof(target, pos [, cache :named('cache')])
+
+Return the line number of offset C<pos> within C<target>.  The return
+value uses zero for the first line.  If C<cache> is true, then
+memoize the line offsets as a C<!lineof> property on C<target>.
+
+=cut
+
+.sub 'lineof' :method
+    .param pmc target
+    .param int pos
+    .param int cache           :optional :named('cache')
+    .local pmc linepos
+
+    # If we've previously cached C<linepos> for target, we use it.
+    unless cache goto linepos_build
+    linepos = getprop '!linepos', target
+    unless null linepos goto linepos_done
+
+    # calculate a new linepos array.
+  linepos_build:
+    linepos = new ['ResizableIntegerArray']
+    unless cache goto linepos_build_1
+    setprop target, '!linepos', linepos
+  linepos_build_1:
+    .local string s
+    .local int jpos, eos
+    s = target
+    eos = length s
+    jpos = 0
+    # Search for all of the newline markers in C<target>.  When we
+    # find one, mark the ending offset of the line in C<linepos>.
+  linepos_loop:
+    jpos = find_cclass .CCLASS_NEWLINE, s, jpos, eos
+    unless jpos < eos goto linepos_done
+    $I0 = ord s, jpos
+    inc jpos
+    push linepos, jpos
+    # Treat \r\n as a single logical newline.
+    if $I0 != 13 goto linepos_loop
+    $I0 = ord s, jpos
+    if $I0 != 10 goto linepos_loop
+    inc jpos
+    goto linepos_loop
+  linepos_done:
+
+    # We have C<linepos>, so now we search the array for the largest
+    # element that is not greater than C<pos>.  The index of that
+    # element is the line number to be returned.
+    # (Potential optimization: use a binary search.)
+    .local int line, count
+    count = elements linepos
+    line = 0
+  line_loop:
+    if line >= count goto line_done
+    $I0 = linepos[line]
+    if $I0 > pos goto line_done
+    inc line
+    goto line_loop
+  line_done:
+    .return (line)
+.end
+
 
 =item dumper(obj, name, options)
 

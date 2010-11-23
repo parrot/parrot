@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -476,6 +475,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = _format_request(method, fullpath, request_headers)
     sock.'send'($S0)
 
+    .local pmc response
+    response = new ['HTTP';'Response']
     .local string content
     content = request.'content'()
     unless content goto L11
@@ -486,13 +487,18 @@ see http://search.cpan.org/~gaas/libwww-perl/
     unless $I0 < content_length goto L11
     $S0 = substr content, $I0, 8192
     $I1 = sock.'send'($S0)
+    if $I1 >= 0 goto L13
+    $P0 = box RC_INTERNAL_SERVER_ERROR
+    setattribute response, 'code', $P0
+    $P0 = box "I/O error"
+    setattribute response, 'message', $P0
+    .return (response)
+  L13:
     $I0 += $I1
     $N0 = $I0 / content_length
     goto L12
   L11:
 
-    .local pmc response
-    response = new ['HTTP';'Response']
     .local pmc buf
     buf = new 'StringBuilder'
     .local int header_length

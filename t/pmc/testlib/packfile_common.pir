@@ -1,6 +1,5 @@
 #! parrot
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 # Common functions for various Packfile* PMCs tests.
 # Return test filename
@@ -9,7 +8,7 @@
 
 .sub '_filename'
     .local string filename
-    filename = 't/native_pbc/number.pbc'
+    filename = 't/pmc/testlib/number.pbc'
     .return (filename)
 .end
 
@@ -63,13 +62,6 @@
   done:
     .return ()
 .end
-
-.sub '_get_fixup_table'
-    .param pmc pf
-
-    .tailcall '_find_segment_by_type'(pf, "PackfileFixupTable")
-.end
-
 
 # Report no ok for loading packfile failures
 .sub report_load_error

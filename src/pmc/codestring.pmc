@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -115,11 +114,11 @@ A newline is automatically added to the end of the fmt.
 
     while (pos >= 0) {
         pos += replen;
-        pos = Parrot_str_find_index(INTERP, fmt, percent, pos);
+        pos = STRING_index(INTERP, fmt, percent, pos);
         if (pos < 0)
             break;
 
-        key = Parrot_str_substr(INTERP, fmt, pos+1, 1);
+        key = STRING_substr(INTERP, fmt, pos+1, 1);
 
         if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
             repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
@@ -128,10 +127,10 @@ A newline is automatically added to the end of the fmt.
             const INTVAL I0 = Parrot_str_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
-        else if (Parrot_str_equal(INTERP, key, comma)) {
+        else if (STRING_equal(INTERP, key, comma)) {
             repl = Parrot_str_join(INTERP, comma_space, args);
         }
-        else if (Parrot_str_equal(INTERP, key, percent)) {
+        else if (STRING_equal(INTERP, key, percent)) {
             repl = percent;
         }
         else {
@@ -151,7 +150,8 @@ A newline is automatically added to the end of the fmt.
     VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
 
     /* Add a newline if necessary */
-    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_length(INTERP, fmt) - 1))
+    if (STRING_length(fmt) > 0
+    &&  '\n' != STRING_ord(INTERP, fmt, -1))
         VTABLE_set_string_keyed_int(INTERP, parts, 2, newline);
 
     S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
@@ -199,8 +199,8 @@ the first line is line number zero.
 
             /* treat \r\n as a single newline */
             if (jpos < eos
-            && string_ord(INTERP, str, jpos - 1)     == 13
-            && string_ord(INTERP, str, jpos)         == 10) {
+            && STRING_ord(INTERP, str, jpos - 1) == 13
+            && STRING_ord(INTERP, str, jpos)     == 10) {
                 ++jpos;
             }
             /* search for the next newline */
@@ -276,14 +276,14 @@ prefixed with 'unicode:'.
 
     escaped_str = Parrot_str_concat(INTERP, quote, escaped_str);
     escaped_str = Parrot_str_concat(INTERP, escaped_str, quote);
-    x_pos       = Parrot_str_find_index(INTERP, escaped_str, x, 0);
+    x_pos       = STRING_index(INTERP, escaped_str, x, 0);
 
     if (x_pos != -1) {
         is_unicode = 1;
     }
     else {
         STRING * const u = CONST_STRING(INTERP, "\\u");
-        const INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
+        const INTVAL u_pos = STRING_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }

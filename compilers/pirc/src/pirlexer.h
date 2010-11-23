@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2010, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_PIR_PIRLEXER_H_GUARD

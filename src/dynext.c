@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -51,14 +50,16 @@ static void * dlopen_string(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
-    ARGMOD_NULLOK(STRING *lib),
+    ARGMOD(STRING *lib),
     Parrot_dlopen_flags flags,
     ARGOUT(void **handle),
     ARGIN(STRING *wo_ext),
-    ARGIN_NULLOK(STRING *ext))
+    ARGIN(STRING *ext))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
         FUNC_MODIFIES(*lib)
         FUNC_MODIFIES(*handle);
 
@@ -77,10 +78,11 @@ static PMC * make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     ARGIN(void *handle),
-    ARGIN_NULLOK(STRING *lib_name),
+    ARGIN(STRING *lib_name),
     ARGIN(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void set_cstring_prop(PARROT_INTERP,
@@ -97,11 +99,12 @@ static void store_lib_pmc(PARROT_INTERP,
     ARGIN(PMC *lib_pmc),
     ARGIN(STRING *path),
     ARGIN(STRING *type),
-    ARGIN_NULLOK(STRING *lib_name))
+    ARGIN(STRING *lib_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 #define ASSERT_ARGS_clone_string_into __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(d) \
@@ -112,8 +115,10 @@ static void store_lib_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_get_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lib) \
     , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(wo_ext))
+    , PARROT_ASSERT_ARG(wo_ext) \
+    , PARROT_ASSERT_ARG(ext))
 #define ASSERT_ARGS_is_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -123,6 +128,7 @@ static void store_lib_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_run_init_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(lib_name) \
     , PARROT_ASSERT_ARG(wo_ext))
 #define ASSERT_ARGS_set_cstring_prop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -133,7 +139,8 @@ static void store_lib_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lib_pmc) \
     , PARROT_ASSERT_ARG(path) \
-    , PARROT_ASSERT_ARG(type))
+    , PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(lib_name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -145,8 +152,7 @@ static void store_lib_pmc(PARROT_INTERP,
 =item C<static void set_cstring_prop(PARROT_INTERP, PMC *lib_pmc, const char
 *what, STRING *name)>
 
-Set a property C<name> with value C<what> on the C<ParrotLibrary>
-C<lib_pmc>.
+Sets a property C<name> with value C<what> on the C<ParrotLibrary> C<lib_pmc>.
 
 =cut
 
@@ -164,12 +170,13 @@ set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
     VTABLE_setprop(interp, lib_pmc, key, prop);
 }
 
+
 /*
 
 =item C<static void store_lib_pmc(PARROT_INTERP, PMC *lib_pmc, STRING *path,
 STRING *type, STRING *lib_name)>
 
-Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
+Stores a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
 =cut
 
@@ -177,7 +184,7 @@ Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
 static void
 store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
-        ARGIN(STRING *type), ARGIN_NULLOK(STRING *lib_name))
+        ARGIN(STRING *type), ARGIN(STRING *lib_name))
 {
     ASSERT_ARGS(store_lib_pmc)
     PMC * const iglobals = interp->iglobals;
@@ -188,18 +195,19 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
     set_cstring_prop(interp, lib_pmc, "_filename", path);
     set_cstring_prop(interp, lib_pmc, "_type", type);
 
-    if (lib_name)
+    if (!STRING_IS_NULL(lib_name))
         set_cstring_prop(interp, lib_pmc, "_lib_name", lib_name);
 
     VTABLE_set_pmc_keyed_str(interp, dyn_libs, path, lib_pmc);
 }
 
+
 /*
 
 =item C<static PMC* is_loaded(PARROT_INTERP, STRING *path)>
 
-Check if a C<ParrotLibrary> PMC with the filename path exists.
-If it does, return it. Otherwise, return NULL.
+Returns a C<ParrotLibrary> PMC with the given filename path, if it exists.
+Otherwise returns PMCNULL.
 
 =cut
 
@@ -214,17 +222,16 @@ is_loaded(PARROT_INTERP, ARGIN(STRING *path))
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
-    if (!VTABLE_exists_keyed_str(interp, dyn_libs, path))
-        return PMCNULL;
     return VTABLE_get_pmc_keyed_str(interp, dyn_libs, path);
 }
+
 
 /*
 
 =item C<static void * dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags,
 STRING *path)>
 
-Call Parrot_dlopen with the Parrot String argument converted to C string.  The
+Calls C<Parrot_dlopen> with the path argument converted to a C string.  The
 flags argument will be converted into native form and used if applicable.
 
 =cut
@@ -244,12 +251,13 @@ dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags, ARGIN(STRING *path))
     return handle;
 }
 
+
 /*
 
 =item C<static STRING * get_path(PARROT_INTERP, STRING *lib, Parrot_dlopen_flags
 flags, void **handle, STRING *wo_ext, STRING *ext)>
 
-Return path and handle of a dynamic lib, setting lib_name to just the filestem
+Returns path and handle of a dynamic lib, setting lib_name to just the filestem
 (i.e. without path or extension) as a freshly-allocated C string.
 
 =cut
@@ -259,99 +267,102 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
-get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
-        ARGOUT(void **handle), ARGIN(STRING *wo_ext),
-        ARGIN_NULLOK(STRING *ext))
+get_path(PARROT_INTERP, ARGMOD(STRING *lib), Parrot_dlopen_flags flags,
+        ARGOUT(void **handle), ARGIN(STRING *wo_ext), ARGIN(STRING *ext))
 {
     ASSERT_ARGS(get_path)
-    STRING *path, *full_name;
-    const char *err = NULL;    /* buffer returned from Parrot_dlerror */
-
-    PMC * const iglobals = interp->iglobals;
+    PMC * const iglobals  = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
                                                      IGLOBALS_LIB_PATHS);
     PMC * const share_ext = VTABLE_get_pmc_keyed_int(interp, lib_paths,
                                                      PARROT_LIB_DYN_EXTS);
 
-    if (lib == NULL) {
+    STRING *path, *full_name;
+
+    if (STRING_IS_NULL(lib)) {
         *handle = Parrot_dlopen((char *)NULL, flags);
-        if (*handle) {
+        if (*handle)
             return CONST_STRING(interp, "");
+        else {
+            const char *err = Parrot_dlerror();
+            Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
+                        "Couldn't dlopen(NULL): %s\n",
+                        err ? err : "unknown reason");
+            /* clear the error memory */
+            (void)Parrot_dlerror();
+            return STRINGNULL;
         }
-        err = Parrot_dlerror();
-        Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
-                    "Couldn't dlopen(NULL): %s\n",
-                    err ? err : "unknown reason");
-        return NULL;
     }
 
-    /*
-     * first, try to add an extension to the file if it has none.
-     */
-    if (! ext) {
+    /* first, try to add an extension to the file if it has none */
+    if (STRING_IS_NULL(ext)) {
         const INTVAL n = VTABLE_elements(interp, share_ext);
-        INTVAL i;
+        INTVAL       i;
 
         for (i = 0; i < n; ++i) {
-            ext = VTABLE_get_string_keyed_int(interp, share_ext, i);
+            ext       = VTABLE_get_string_keyed_int(interp, share_ext, i);
             full_name = Parrot_str_concat(interp, wo_ext, ext);
-            path = Parrot_locate_runtime_file_str(interp, full_name,
-                    PARROT_RUNTIME_FT_DYNEXT);
-            if (path) {
+            path      = Parrot_locate_runtime_file_str(interp, full_name,
+                            PARROT_RUNTIME_FT_DYNEXT);
+
+            if (!STRING_IS_NULL(path)) {
                 *handle = dlopen_string(interp, flags, path);
-                if (*handle) {
+
+                if (*handle)
                     return path;
+                else {
+                    const char *err = Parrot_dlerror();
+                    Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
+                                "Couldn't load '%Ss': %s\n",
+                            full_name, err ? err : "unknown reason");
+                    /* clear the error memory */
+                    (void)Parrot_dlerror();
+                    return STRINGNULL;
                 }
-                err = Parrot_dlerror();
-                Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
-                            "Couldn't load '%Ss': %s\n",
-                        full_name, err ? err : "unknown reason");
-                return NULL;
             }
 
-            /*
-             * File with extension and prefix was not found,
-             * so try file.extension w/o prefix
-             */
+            /* File not found with extension and prefix; try file.extension */
             *handle = dlopen_string(interp, flags, full_name);
-            if (*handle) {
+            if (*handle)
                 return full_name;
-            }
         }
     }
+
     /*
      * finally, try the given file name as is. We still use
      * Parrot_locate_runtime_file so that (a) relative pathnames are searched in
      * the standard locations, and (b) the angle of the slashes are adjusted as
      * required for non-Unix systems.
      */
+
     full_name = Parrot_locate_runtime_file_str(interp, lib,
-            PARROT_RUNTIME_FT_DYNEXT);
-    if (full_name) {
+                    PARROT_RUNTIME_FT_DYNEXT);
+
+    if (!STRING_IS_NULL(full_name)) {
         *handle = dlopen_string(interp, flags, full_name);
-        if (*handle) {
+
+        if (*handle)
             return full_name;
-        }
     }
+
     /*
      * and on windows strip a leading "lib"
      * [shouldn't this happen in Parrot_locate_runtime_file instead?]
      */
 #ifdef WIN32
-    if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
+    if (STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
         *handle = Parrot_dlopen((char *)lib->strstart + 3, 0);
-        if (*handle) {
-            path = Parrot_str_substr(interp, lib, 3, lib->strlen - 3);
-            return path;
-        }
+
+        if (*handle)
+            return STRING_substr(interp, lib, 3, lib->strlen - 3);
     }
 #endif
 
     /* And on cygwin replace a leading "lib" by "cyg". */
 #ifdef __CYGWIN__
-    if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
+    if (!STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
         path = Parrot_str_concat(interp, CONST_STRING(interp, "cyg"),
-            Parrot_str_substr(interp, lib, 3, lib->strlen - 3));
+            STRING_substr(interp, lib, 3, lib->strlen - 3));
 
         *handle = dlopen_string(interp, flags, path);
 
@@ -360,19 +371,24 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
     }
 #endif
 
-    /* And after-finally,  let the OS use his own search */
-    if (!STRING_IS_EMPTY(lib)) {
+    if (!STRING_length(lib)) {
         *handle = dlopen_string(interp, flags, lib);
         if (*handle)
             return lib;
     }
+    /* And after-finally,  let the OS use his own search */
+    {
+        const char *err = Parrot_dlerror();
+        Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
+                    "Couldn't load '%Ss': %s\n",
+                    lib, err ? err : "unknown reason");
 
-    err = Parrot_dlerror();
-    Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
-                "Couldn't load '%Ss': %s\n",
-                lib, err ? err : "unknown reason");
-    return NULL;
+        /* clear the error memory */
+        (void)Parrot_dlerror();
+        return STRINGNULL;
+    }
 }
+
 
 /*
 
@@ -411,12 +427,13 @@ Parrot_init_lib(PARROT_INTERP,
     return lib_pmc;
 }
 
+
 /*
 
 =item C<void * Parrot_dlsym_str(PARROT_INTERP, void *handle, STRING *symbol)>
 
-Same as Parrot_dlsym but takes the symbol name from a Parrot String instead
-of a C string.
+Loads a symbol named C<symbol> from the shared library represented by
+C<handle>.
 
 =cut
 
@@ -430,25 +447,26 @@ Parrot_dlsym_str(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_dlsym_str)
 
-    void *ptr;
     if (STRING_IS_NULL(symbol))
-        ptr = NULL;
+        return NULL;
+
     else {
         char *const symbol_cs = Parrot_str_to_cstring(interp, symbol);
-        ptr = Parrot_dlsym(handle, symbol_cs);
+        void       *ptr       = Parrot_dlsym(handle, symbol_cs);
         Parrot_str_free_cstring(symbol_cs);
+        return ptr;
     }
-    return ptr;
 }
+
 
 /*
 
 =item C<static PMC * run_init_lib(PARROT_INTERP, void *handle, STRING *lib_name,
 STRING *wo_ext)>
 
-Loads and Initializes a new library and returns a ParrotLibrary PMC.
-Takes the name of a library C<libname>, that is loaded with handle C<handle>.
-Calls the necessary initialization routines, if any.
+Loads and initializes a new library and returns a ParrotLibrary PMC.  Takes the
+name of a library C<lib_name>, that is loaded with handle C<handle>.  Calls the
+necessary initialization routines, if any.
 
 =cut
 
@@ -457,7 +475,7 @@ Calls the necessary initialization routines, if any.
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 run_init_lib(PARROT_INTERP, ARGIN(void *handle),
-        ARGIN_NULLOK(STRING *lib_name), ARGIN(STRING *wo_ext))
+        ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
     ASSERT_ARGS(run_init_lib)
     STRING *type;
@@ -472,13 +490,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     Parrot_pcc_set_namespace(interp, context,
             Parrot_get_HLL_namespace(interp, parrot_hll_id));
 
-    /*
-     * work around gcc 3.3.3 and other problem with dynpmcs
-     * something during library loading doesn't stand a GC run
-     */
-    Parrot_block_GC_mark(interp);
-
-    if (lib_name) {
+    if (!STRING_IS_NULL(lib_name)) {
         STRING * const load_name       = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
         STRING * const init_func_name  = Parrot_sprintf_c(interp,
@@ -512,21 +524,18 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     /* remember lib_pmc in iglobals */
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
 
-    /* UNLOCK */
-    Parrot_unblock_GC_mark(interp);
-
     Parrot_pop_context(interp);
 
     return lib_pmc;
 }
+
 
 /*
 
 =item C<static STRING * clone_string_into(Interp *d, Interp *s, PMC *value)>
 
 Extracts a STRING value from PMC C<value> in interpreter C<s>. Copies that
-string into the pool of interpreter C<d> using the default encoding
-and charset.
+string into the pool of interpreter C<d> using the default encoding.
 
 =cut
 
@@ -538,15 +547,16 @@ static STRING *
 clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     ASSERT_ARGS(clone_string_into)
-    STRING * const  orig   = VTABLE_get_string(s, value);
-    char   * const raw_str = Parrot_str_to_cstring(s, orig);
-    STRING * const   ret   =
+    STRING * const  orig    = VTABLE_get_string(s, value);
+    char   * const  raw_str = Parrot_str_to_cstring(s, orig);
+    STRING * const  ret     =
         Parrot_str_new_init(d, raw_str, strlen(raw_str),
-            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+            Parrot_default_encoding_ptr,
             PObj_constant_FLAG);
     Parrot_str_free_cstring(raw_str);
     return ret;
 }
+
 
 /*
 
@@ -569,6 +579,7 @@ make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 
     return ret;
 }
+
 
 /*
 
@@ -601,14 +612,15 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
     STRING * const type =
         VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, type_str));
 
-    if (Parrot_str_equal(s, type, ops)) {
+    if (STRING_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.
          * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
          */
-        PMC * const new_lib_pmc = Parrot_pmc_new_constant(d, enum_class_ParrotLibrary);
+         PMC * const new_lib_pmc = Parrot_pmc_new_constant(d,
+                                        enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
         VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), make_string_pmc(d, wo_ext));
@@ -619,11 +631,13 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
         if (d->n_libs != s->n_libs) {
             INTVAL i;
             if (d->all_op_libs)
-                d->all_op_libs = (op_lib_t **)mem_internal_realloc(d->all_op_libs,
-                    sizeof (op_lib_t *) * s->n_libs);
+                d->all_op_libs
+                    = (op_lib_t **)mem_internal_realloc(d->all_op_libs,
+                        sizeof (op_lib_t *) * s->n_libs);
             else
-                d->all_op_libs = (op_lib_t **)mem_internal_allocate(sizeof (op_lib_t *) *
-                    s->n_libs);
+                d->all_op_libs
+                    = (op_lib_t **)mem_internal_allocate(sizeof (op_lib_t *) *
+                        s->n_libs);
             for (i = d->n_libs; i < s->n_libs; ++i)
                 d->all_op_libs[i] = s->all_op_libs[i];
             d->n_libs = s->n_libs;
@@ -631,10 +645,10 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
 
         return new_lib_pmc;
     }
-    else {
-        return run_init_lib(d, handle, lib_name, wo_ext);
-    }
+
+    return run_init_lib(d, handle, lib_name, wo_ext);
 }
+
 
 /*
 
@@ -682,36 +696,35 @@ Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *para
      *
      * LOCK()
      */
-    if (lib) {
+    if (!STRING_IS_NULL(lib))
         lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);
-    }
     else {
         wo_ext   = CONST_STRING(interp, "");
-        lib_name = NULL;
-        ext      = NULL;
+        lib_name = STRINGNULL;
+        ext      = STRINGNULL;
     }
 
     lib_pmc = is_loaded(interp, wo_ext);
-    if (!PMC_IS_NULL(lib_pmc)) {
-        /* UNLOCK() */
-        return lib_pmc;
-    }
 
-    if (!PMC_IS_NULL(parameters)) {
+    /* UNLOCK() */
+    if (!PMC_IS_NULL(lib_pmc))
+        return lib_pmc;
+
+    if (!PMC_IS_NULL(parameters))
         flags = VTABLE_get_integer(interp, parameters);
-    }
 
     path = get_path(interp, lib, (Parrot_dlopen_flags)flags, &handle, wo_ext, ext);
-    if (!path || !handle) {
-        /*
-         * XXX Parrot_ex_throw_from_c_args? return PMCNULL?
-         * PMC Undef seems convenient, because it can be queried with get_bool()
-         */
+
+    /*
+     * XXX Parrot_ex_throw_from_c_args? return PMCNULL?
+     * PMC Undef seems convenient, because it can be queried with get_bool()
+     */
+    if (!path || !handle)
         return Parrot_pmc_new(interp, enum_class_Undef);
-    }
 
     return run_init_lib(interp, handle, lib_name, wo_ext);
 }
+
 
 /*
 

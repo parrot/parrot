@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -20,7 +19,7 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(34)
+    plan(36)
     check_libgmp_good()
 
     set_and_get()
@@ -28,9 +27,11 @@ Tests the BigInt PMC.
     subtraction()
     multiplication()
     division()
-    division_by_zero()
     negation()
+    division_by_zero()
+    negate_min_integer()
     absolute_value()
+    absolute_min_integer()
     overflow_coercion()
     interface()
     boolean()
@@ -75,12 +76,12 @@ Config2:
 
 NoLibGMP:
     diag( 'No BigInt Lib configured' )
-    skip(34)
+    skip(36)
     exit 0
 
 OldLibGMP:
     diag( 'Buggy GMP version [', $S3, '] with huge digit multiply - please upgrade' )
-    skip(34)
+    skip(36)
     exit 0
 
 ret:
@@ -504,6 +505,43 @@ OK2:
     ok($I1, 'negation')
 .end
 
+.sub 'get_int_minmax'
+    .local int min, max
+
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['intvalsize']
+
+    # XXX can't use sysinfo (from sys_ops) in coretest
+    # build up 2's compliment min and max integers manually
+    max = 0x7F
+    min = 0x80
+    dec $I0
+  loop:
+    unless $I0 goto end_loop
+    min <<= 8
+    max <<= 8
+    max  |= 0xFF
+    dec $I0
+    goto loop
+  end_loop:
+
+    .return (min, max)
+.end
+
+.sub negate_min_integer
+    .local int max
+    .local int min
+    .local pmc max_1
+    .local pmc neg_min
+    (min, max) = 'get_int_minmax'()
+    max_1 = box max
+    inc max_1
+    neg_min = box min
+    neg neg_min                         # Use 1-operand form of neg.
+    is(neg_min, max_1, 'negate minimum native integer')
+.end
+
 .sub absolute_value
     $P0 = new ['BigInt']
     $P0 = '-1230000000000000000000'
@@ -520,6 +558,20 @@ OK2:
     abs $P0
     $S0 = $P0
     is($S0,'1230000000000000000000','... and in-place works too')
+.end
+
+.sub absolute_min_integer
+    .local int max
+    .local int min
+    .local pmc max_1
+    .local pmc neg_min
+    .local pmc result
+    (min, max) = 'get_int_minmax'()
+    max_1 = box max
+    inc max_1
+    neg_min = box min
+    result = abs neg_min                # Use 2-operand form of abs.
+    is(result, max_1, 'absolute minimum native integer')
 .end
 
 .sub overflow_coercion
@@ -745,7 +797,7 @@ k24:
     ne $S0, $S6, k25
     inc $I1
 k25:
-    todo( $I1, 'integer negation of MinInt converts MaxInt+1 to BigInt', 'TT #1616')
+    ok($I1, 'integer negation of MinInt converts to BigInt')
 
     $I1 = 0
     $P0 = new ['Integer']
@@ -760,7 +812,7 @@ k26:
     ne $S0, $S6, k27
     inc $I1
 k27:
-    todo( $I1, 'integer absolute-value of MinInt converts MaxInt+1 to BigInt', 'TT #1616')
+    ok($I1, 'integer abs(MinInt) converts to BigInt')
 
     $P0 = new ['Integer']
     $P0 = $I3

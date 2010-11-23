@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -19,6 +18,7 @@ These are the vtable functions for the Sub (subroutine) base class
 */
 
 #include "parrot/oplib/ops.h"
+#include "parrot/oplib/core_ops.h"
 #include "sub.str"
 
 /* HEADERIZER HFILE: none */
@@ -32,6 +32,14 @@ static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+
+=item C<static void print_sub_name(PARROT_INTERP, PMC *sub)>
+
+=cut
+
+*/
 
 static void
 print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
@@ -426,7 +434,7 @@ Invokes the subroutine.
 
         Parrot_pcc_set_sub(INTERP, context, SELF);
         Parrot_pcc_set_continuation(INTERP, context, ccont);
-        Parrot_pcc_set_constants(INTERP, context, sub->seg->const_table->constants);
+        Parrot_pcc_set_constants(INTERP, context, sub->seg->const_table);
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
@@ -734,7 +742,7 @@ Unarchives the subroutine.
         INTVAL flags;
         int    i;
 
-        SUPER(info);
+        STATICSELF.init();
 
         PMC_get_sub(INTERP, SELF, sub);
 
@@ -748,7 +756,8 @@ Unarchives the subroutine.
         sub->name           = VTABLE_shift_string(INTERP, info);
         sub->method_name    = VTABLE_shift_string(INTERP, info);
         sub->ns_entry_name  = VTABLE_shift_string(INTERP, info);
-        sub->HLL_id         = Parrot_get_HLL_id(INTERP,
+        /* lookup or create HLL */
+        sub->HLL_id         = Parrot_register_HLL(INTERP,
             VTABLE_shift_string(INTERP, info));
         sub->comp_flags     = VTABLE_shift_integer(INTERP, info);
         sub->vtable_index   = VTABLE_shift_integer(INTERP, info);
@@ -855,15 +864,16 @@ The number of optional named arguments
         if (!sub->arg_info) {
             /* Get pointer into the bytecode where this sub starts. */
             const opcode_t *pc = sub->seg->base.data + sub->start_offs;
+            op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(INTERP);
 
             /* Allocate structure to store argument information in. */
             sub->arg_info = mem_gc_allocate_zeroed_typed(INTERP,
                     Parrot_sub_arginfo);
 
             /* If the first instruction is a get_params... */
-            if (*pc == PARROT_OP_get_params_pc) {
+            if (OPCODE_IS(INTERP, sub->seg, *pc, core_ops, PARROT_OP_get_params_pc)) {
                 /* Get the signature (the next thing in the bytecode). */
-                PMC * const sig = PF_CONST(sub->seg, *(++pc))->u.key;
+                PMC * const sig = sub->seg->const_table->pmc.constants[*(++pc)];
 
                 /* Iterate over the signature and compute argument counts. */
                 const INTVAL sig_length = VTABLE_elements(INTERP, sig);
@@ -898,22 +908,22 @@ The number of optional named arguments
         }
 
         /* Return the requested argument information */
-        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_required"))) {
+        if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "pos_required"))) {
             count_found = (INTVAL)sub->arg_info->pos_required;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_optional"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "pos_optional"))) {
             count_found = (INTVAL)sub->arg_info->pos_optional;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_slurpy"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "pos_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->pos_slurpy;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_required"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "named_required"))) {
             count_found = (INTVAL)sub->arg_info->named_required;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_optional"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "named_optional"))) {
             count_found = (INTVAL)sub->arg_info->named_optional;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_slurpy"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "named_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->named_slurpy;
         }
         else
@@ -1030,7 +1040,7 @@ slurpy arguments).
                 EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
 
-        kind = Parrot_str_find_index(INTERP, types, reg, 0);
+        kind = STRING_index(INTERP, types, reg, 0);
 
         if (kind == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -1144,7 +1154,10 @@ slurpy arguments).
 
 (Experimental) Returns Sub flags.
 
+=back
+
 =cut
+
 */
     METHOD comp_flags() {
         Parrot_Sub_attributes  *sub;

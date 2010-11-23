@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -83,22 +82,22 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     ehandler.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh ehandler
 
-    set_addr ehandler, handlep
+    set_label ehandler, handlep
     $P0 = shift it
     goto fail
 handlep:
     finalize ehandler
-    set_addr ehandler, handlei
+    set_label ehandler, handlei
     $I0 = shift it
     goto fail
 handlei:
     finalize ehandler
-    set_addr ehandler, handlen
+    set_label ehandler, handlen
     $N0 = shift it
     goto fail
 handlen:
     finalize ehandler
-    set_addr ehandler, handles
+    set_label ehandler, handles
     $S0 = shift it
     goto fail
 handles:
@@ -135,22 +134,22 @@ handles:
     ehandler.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh ehandler
 
-    set_addr ehandler, handlep
+    set_label ehandler, handlep
     $P0 = pop it
     goto fail
 handlep:
     finalize ehandler
-    set_addr ehandler, handlei
+    set_label ehandler, handlei
     $I0 = pop it
     goto fail
 handlei:
     finalize ehandler
-    set_addr ehandler, handlen
+    set_label ehandler, handlen
     $N0 = pop it
     goto fail
 handlen:
     finalize ehandler
-    set_addr ehandler, handles
+    set_label ehandler, handles
     $S0 = pop it
     goto fail
 handles:

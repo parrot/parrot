@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -66,7 +65,7 @@ Create a copy of the socket handle.
         data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
         data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
 
-        return SELF;
+        return copy;
     }
 
 /*

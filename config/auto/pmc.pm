@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -36,9 +35,12 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my @pmc = sort_pmcs( @{ $self->{srcpmc} } );
-
-    my $pmc_list = join( ' ', grep { defined $_ } @pmc );
+    # $pmc_list is a string holding a space-delimited list of currently active
+    # PMCs, sorted (largely) on the basis of src/pmc/pmc.num.
+    # (By 'current', we take into account the fact that there are PMCs listed
+    # in src/pmc/pmc.num that no longer exist but whose index numbers are
+    # never deleted.)
+    my $pmc_list = get_sorted_pmc_str( @{ $self->{srcpmc} } );
 
     # names of class files for src/pmc/Makefile
     ( my $TEMP_pmc_o   = $pmc_list ) =~ s/\.pmc/\$(O)/g;
@@ -216,23 +218,20 @@ sub pmc_parents {
     return @parents;
 }
 
+# Internal sub get_pmc_order parses src/pmc/pmc.num.  The hash it builds
+# includes both active and deactivated PMCs.
 sub get_pmc_order {
     open my $IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
     my %order;
     while (<$IN>) {
-        next if /^#/;
-
-        if (/(\w+\.\w+)\s+(\d+)/) {
-            $order{$1} = $2;
-        }
+        next unless (/^(\w+\.\w+)\s+(\d+)$/);
+        $order{$1} = $2;
     }
-
     close $IN;
-
     return \%order;
 }
 
-sub sort_pmcs {
+sub get_sorted_pmc_str {
     my @pmcs      = @_;
     my $pmc_order = get_pmc_order();
     my $n         = keys %$pmc_order;
@@ -247,7 +246,41 @@ sub sort_pmcs {
         }
     }
 
-    return @sorted_pmcs;
+    # With the test for definedness below, we account for PMCs which have been
+    # deactivated but whose index numbers remain in src/pmc/pmc.num.
+    my $active_pmcs = [ grep { defined $_ } @sorted_pmcs ];
+
+    # At this point we check to see whether any active_pmcs are missing from
+    # the MANIFEST.  We warn about any such missing PMCs but (for the time
+    # being at least) we proceed to compose $pmc_str.
+    my $seen_manifest = pmcs_in_manifest();
+    check_pmcs_against_manifest( $active_pmcs, $seen_manifest );
+    return join(' ' => @{ $active_pmcs });
+}
+
+sub pmcs_in_manifest {
+    my $manifest = shift || 'MANIFEST';
+    my %seen_manifest = ();
+    open my $MAN, '<', $manifest
+        or die "Unable to open MANIFEST: $!";
+    while (my $f = <$MAN>) {
+        chomp $f;
+        if ($f =~ m{^src/pmc/(.*\.pmc)}) {
+            my $pmc = $1;
+            $seen_manifest{$pmc}++;
+        }
+    }
+    close $MAN or die "Unable to close MANIFEST: $!";
+    return \%seen_manifest;
+}
+
+sub check_pmcs_against_manifest {
+    my ($active_pmcs, $seen_manifest) = @_;
+    my @missing_from_manifest = grep { ! exists $seen_manifest->{$_} }
+        @{ $active_pmcs };
+    if (@missing_from_manifest) {
+        warn "PMCs found in /src/pmc not found in MANIFEST: @missing_from_manifest";
+    }
 }
 
 sub contains_pccmethod {

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -28,6 +27,7 @@ src/test_main.c
 #include "parrot/context.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/runcore_trace.h */
 
@@ -127,14 +127,14 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         return;
     }
 
-    if (!pmc->vtable || (UINTVAL)pmc->vtable == 0xdeadbeef) {
-        Parrot_io_eprintf(debugger, "<!!no vtable!!>");
-        return;
-    }
-
     if (PObj_on_free_list_TEST(pmc))
         Parrot_io_eprintf(debugger,
             "**************** PMC is on free list *****\n");
+
+    if (!pmc->vtable) {
+        Parrot_io_eprintf(debugger, "<!!no vtable!!>");
+        return;
+    }
 
     if (pmc->vtable->pmc_class == pmc) {
         STRING * const name = trace_class_name(interp, pmc);
@@ -239,7 +239,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
             break;
           case KEY_string_FLAG|KEY_register_FLAG:
             {
-            const INTVAL keynum = VTABLE_get_integer(interp, key);
+            const UINTVAL keynum = (UINTVAL)VTABLE_get_integer(interp, key);
             if (keynum < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR)) {
                 const STRING * const s = REG_STR(interp, keynum);
                 STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
@@ -297,7 +297,8 @@ trace_op_dump(PARROT_INTERP,
 {
     ASSERT_ARGS(trace_op_dump)
     Interp    * const debugger = debugger_or_interp(interp);
-    op_info_t * const info     = &interp->op_info_table[*pc];
+    op_info_t * const info     = interp->code->op_info_table[*pc];
+    op_lib_t  *       core_ops = PARROT_GET_CORE_OPLIB(interp);
     PMC *sig                   = PMCNULL;
     INTVAL n                   = info->op_count;
     INTVAL s                   = 1;
@@ -309,11 +310,11 @@ trace_op_dump(PARROT_INTERP,
 
 #define ARGS_COLUMN 40
 
-    if (*pc == PARROT_OP_set_args_pc
-    ||  *pc == PARROT_OP_get_results_pc
-    ||  *pc == PARROT_OP_get_params_pc
-    ||  *pc == PARROT_OP_set_returns_pc) {
-        sig = interp->code->const_table->constants[pc[1]]->u.key;
+    if (OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_set_args_pc)
+    ||  OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_get_results_pc)
+    ||  OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_get_params_pc)
+    ||  OPCODE_IS(interp, interp->code, *pc, core_ops, PARROT_OP_set_returns_pc)) {
+        sig = interp->code->const_table->pmc.constants[pc[1]];
 
         if (!sig)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -333,7 +334,7 @@ trace_op_dump(PARROT_INTERP,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else {
-                if (!sig)
+                if (PMC_IS_NULL(sig))
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "NULL sig PMC detected in trace_op_dump");
 

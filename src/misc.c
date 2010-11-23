@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -87,8 +86,8 @@ STRING *
 Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 {
     ASSERT_ARGS(Parrot_vsprintf_c)
-    STRING * const realpat = string_make(interp, pat, strlen(pat),
-                                  NULL, PObj_external_FLAG);
+    STRING * const realpat = Parrot_str_new_init(interp, pat, strlen(pat),
+            Parrot_default_encoding_ptr, PObj_external_FLAG);
 
     STRING * const ret = Parrot_vsprintf_s(interp, realpat, args);
 

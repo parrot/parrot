@@ -6,7 +6,7 @@ Z<CHP-4>
 
 Parrot is able to natively compile and execute code in two low-level
 languages, PASM and PIR. These two languages, which are very similar to
-one another, are very close to the machine and analagous to assembly
+one another, are very close to the machine and analogous to assembly
 languages from hardware processors and other virtual machines. While they
 do expose the power of the PVM in a very direct way, PASM and PIR are not
 designed to be used for writing large or maintainable programs. For these
@@ -183,7 +183,7 @@ Syntax Tree, or PAST.>
 =back
 
 PCT's workflow is customizable, but simple.  The compiler passes the source
-code of the HLL into the grammar engine.  The grammer engine parses this code
+code of the HLL into the grammar engine.  The grammar engine parses this code
 and returns a X<PGE;Match Object> special Match object which represents a
 parsed version of the code.  The compiler then passes this match object to the
 action methods, which convert it in stages into PAST.  The compiler finally

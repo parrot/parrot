@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 class Ops::Emitter is Hash;
 
@@ -217,6 +216,9 @@ method _emit_source_preamble($fh) {
 
 {self.trans.defines(self)}
 
+/* XXX should be static, but C++ doesn't want to play ball */
+extern op_lib_t {self.bs}op_lib;
+
 |);
 
     $fh.print(self.ops_file.preamble);
@@ -230,9 +232,10 @@ method _emit_op_lib_descriptor($fh) {
 ** op lib descriptor:
 */
 
-static op_lib_t | ~ self.bs ~ q|op_lib = {| ~ qq|
-  "{self.base}",               /* name */
-  "{self.suffix}",             /* suffix */
+/* XXX should be static, but C++ doesn't want to play ball */
+op_lib_t | ~ self.bs ~ q|op_lib = {| ~ qq|
+  "{self.base}_ops",                /* name */
+  "{self.suffix}",                  /* suffix */
   $core_type,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   {self.ops_file.version_major},    /* major_version */
@@ -252,7 +255,7 @@ method _emit_init_func($fh) {
     my $dispatch := self.trans.init_func_disaptch;
 
     # TODO There is a bug in NQP about \{
-    $fh.print(q|
+    $fh.print((self.flags<core> ?? 'PARROT_EXPORT' !! '') ~ q|
 op_lib_t *
 | ~ self.init_func ~ q|(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
@@ -316,9 +319,6 @@ method _generate_guard_macro_name($filename) {
 
 method _emit_guard_prefix($fh, $filename) {
     my $guardname := self._generate_guard_macro_name($filename);
-    $fh.print('
-/* $Id' ~ '$ */
-');
     $fh.print(qq/
 #ifndef $guardname
 #define $guardname
@@ -355,7 +355,8 @@ method _emit_includes($fh) {
 #include "parrot/oplib.h"
 #include "parrot/runcore_api.h"
 
-{self.sym_export} op_lib_t *{self.init_func}(PARROT_INTERP, long init);
+| ~ (self.flags<core> ?? 'PARROT_EXPORT' !! '') ~ qq|
+op_lib_t *{self.init_func}(PARROT_INTERP, long init);
 
 |);
 }
@@ -370,7 +371,7 @@ method _emit_preamble($fh) {
  * .ops files). by {self<script>}.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 |);

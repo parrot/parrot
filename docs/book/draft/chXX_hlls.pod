@@ -106,7 +106,7 @@ Here's a more verbose example of this:
     .sub 'hello'
        say 'hello world!'
     .end
-  
+
     .sub 'goodbye'
        say 'goodbye world!'
     .end
@@ -126,20 +126,18 @@ Here's an example of a Read-Eval-Print-Loop (REPL) in PIR:
 
 =begin PIR
 
-  .include 'stdio.pasm'
-
   .sub main
     $P0 = getinterp
-    $P0 = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    $P0 = $P0.'stdin_handle'()
     $P1 = compreg 'PIR'
-    
+
     loop_top:
       $S0 = $P0.'readline'()
       $S0 = ".sub '' :anon\n" . $S0
       $S0 = $S0 . "\n.end\n"
       $P2 = $P1($S0)
       $P2()
-      
+
       goto loop_top
   .end
 

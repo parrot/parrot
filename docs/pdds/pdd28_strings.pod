@@ -1,5 +1,4 @@
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id$
 
 =head1 PDD 28: Strings
 
@@ -266,7 +265,6 @@ Parrot's internal strings (C<STRING>s) have the following structure:
 	UINTVAL     strlen;
 	UINTVAL     hashval;
 	const struct _encoding *encoding;
-	const struct _charset  *charset;
 };
 
 The fields are:
@@ -302,22 +300,13 @@ used as a hash key.
 
 =item encoding
 
-How the data is encoded (e.g. fixed 8-bit characters, UTF-8, or UTF-32).  Note
-that this specifies encoding only -- it's valid to encode  EBCDIC characters
-with the UTF-8 algorithm. Silly, but valid.
+What sort of string data is in the buffer, for example ASCII, ISO-8859-1,
+UTF-8 or UTF-16.
 
 The encoding structure specifies the encoding (by index number and by name,
 for ease of lookup), the maximum number of bytes that a single character will
 occupy in that encoding, as well as functions for manipulating strings with
 that encoding.
-
-=item charset
-
-What sort of string data is in the buffer, for example ASCII, EBCDIC, or
-Unicode.
-
-The charset structure specifies the character set (by index number and by
-name) and provides functions for transcoding to and from that character set.
 
 =back
 
@@ -352,32 +341,9 @@ the addition of the NFG string format. Many string functions that are part of
 Parrot's external API will be renamed for the standard "Parrot_*" naming
 conventions.
 
-=head4 Parrot_str_set (was string_set)
-
-Set one string to a copy of the value of another string.
-
-=head4 Parrot_str_new_COW (was Parrot_make_COW_reference)
-
-Create a new copy-on-write string. Creating a new string header, clone the
-struct members of the original string, and point to the same string buffer as
-the original string.
-
-=head4 Parrot_str_reuse_COW (was Parrot_reuse_COW_reference)
-
-Create a new copy-on-write string. Clone the struct members of the original
-string into a passed in string header, and point the reused string header to
-the same string buffer as the original string.
-
-=head4 Parrot_str_write_COW (was Parrot_unmake_COW)
-
-If the specified Parrot string is copy-on-write, copy the string's contents
-to a new string buffer and clear the copy-on-write flag.
-
 =head4 Parrot_str_concat (was string_concat)
 
-Concatenate two strings. Takes three arguments: two strings, and one integer
-value of flags. If both string arguments are null, return a new string created
-according to the integer flags.
+Concatenate two strings. Takes two strings as arguments.
 
 =head4 Parrot_str_new (was string_from_cstring)
 
@@ -397,11 +363,10 @@ Returns a new empty string with the default encoding and character set.
 
 Returns a new string of the requested encoding, character set, and
 normalization form, initializing the string value to the value passed in.  The
-five arguments are a C string (C<char *>), an integer length of the string
-argument in bytes, and struct pointers for encoding, character set, and
-normalization form structs. If the C string (C<char *>) value is not passed,
-returns an empty string. If the encoding, character set, or normalization form
-are passed as null values, default values are used.
+three arguments are a C string (C<char *>), an integer length of the string
+argument in bytes, and a struct pointer for the encoding struct. If the C
+string (C<char *>) value is not passed, returns an empty string. If the
+encoding is passed as null value, a default value is used.
 
 {{ NOTE: the crippled version of this function, C<string_make>, used to accept
 a string name for the character set. This behavior is no longer supported, but
@@ -413,13 +378,6 @@ character set structs. }}
 Creates and returns a new Parrot constant string. Takes one C string (a C<char
 *>) as an argument, the value of the constant string. The length of the C
 string is calculated internally.
-
-=head4 Parrot_str_resize (was string_grow)
-
-Resize the string buffer of the given string adding the number of bytes passed
-in the integer argument. If the argument is negative, remove the given number
-of bytes. Throws an exception if shrinking the string buffer size will
-truncate the string (if C<strlen> will be longer than C<buflen>).
 
 =head4 Parrot_str_length (was string_compute_strlen)
 
@@ -443,6 +401,10 @@ C<strlen> member of the C<STRING> struct directly.
 Returns the character at the specified index (the Nth character from the start
 of the string). Combining characters are counted separately. Variable-width
 encodings will lookahead to capture full character values.
+
+=head4 Parrot_str_chr (was string_chr)
+
+Returns a single character string from a codepoint.
 
 =head4 Parrot_str_grapheme_indexed
 
@@ -505,11 +467,6 @@ substring starts and how long it is.
 Chop the requested number of characters off the end of a string without
 modifying the original string.
 
-=head4 Parrot_str_chopn_inplace (was string_chopn_inplace).
-
-Chop the requested number of characters off the end of a string, modifying the
-original string.
-
 =head4 Parrot_str_grapheme_chopn
 
 Chop the requested number of graphemes off the end of a string without
@@ -545,6 +502,10 @@ replacement for the old function.}}
 Compare two strings using NFG normalization, return 1 if they are equal, 0 if
 they are not equal.
 
+=head4 Parrot_str_split
+
+Splits the string C<str> at the delimiter C<delim>.
+
 =head3 Internal String Functions
 
 The following functions are used internally and are not part of the public
@@ -560,6 +521,10 @@ collection.
 Terminate and clean up Parrot's string subsystem, including string allocation
 and garbage collection.
 
+=head3 Deprecated String Functions
+
+The following string functions are slated to be deprecated.
+
 =head4 string_max_bytes
 
 Calculate the number of bytes needed to hold a given number of characters in a
@@ -567,10 +532,6 @@ particular encoding, multiplying the maximum possible width of a character in
 the encoding by the number of characters requested.
 
 {{NOTE: pretty primitive and not very useful. May be deprecated.}}
-
-=head3 Deprecated String Functions
-
-The following string functions are slated to be deprecated.
 
 =head4 string_primary_encoding_for_representation
 
@@ -596,8 +557,7 @@ Replaced by C<Parrot_str_indexed>.
 
 =head4 string_chr
 
-This is handled just fine by C<Parrot_str_new>, we don't need a special
-version for a single character.
+Replaced by C<Parrot_str_chr>.
 
 =head4 make_writable
 
@@ -617,10 +577,6 @@ strings, and not terribly useful even there.
 =head4 Parrot_str_cstring
 
 Unsafe, and behavior handled by Parrot_str_to_cstring.
-
-=head4 Parrot_str_split
-
-Splits the string C<str> at the delimiter C<delim>.
 
 =head4 Parrot_str_free (was string_free)
 
@@ -804,9 +760,7 @@ Translate an ASCII string with entries from a translation table.
 
 =item reverse
 
-Reverse a string, one grapheme at a time. {{ NOTE: Currently only works for
-ASCII strings, because it reverses one C<char> at a time. }}
-
+Reverse a string, one grapheme at a time.
 
 =item is_integer
 

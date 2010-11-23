@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -131,9 +130,12 @@ internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
     ARGIN(STRING *key), int flags)
 {
     ASSERT_ARGS(internal_ns_keyed_str)
-    PMC * const ns = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
+    PMC    * const ns     = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
+    STRING * const namesp = CONST_STRING(interp, "NameSpace");
 
-    if (!PMC_IS_NULL(ns) && VTABLE_isa(interp, ns, CONST_STRING(interp, "NameSpace")))
+    if (!PMC_IS_NULL(ns)
+    && (ns->vtable->base_type == enum_class_NameSpace
+     || VTABLE_isa(interp, ns, namesp)))
         return ns;
 
     return internal_ns_maybe_create(interp, base_ns, key, flags);
@@ -200,12 +202,12 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
 {
     ASSERT_ARGS(internal_ns_keyed)
 
-    if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
+    if (PMC_IS_TYPE(pmc_key, Key))
+        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
+    else if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
         STRING * const str_key = VTABLE_get_string(interp, pmc_key);
         return internal_ns_keyed_str(interp, base_ns, str_key, flags);
     }
-    else if (PMC_IS_TYPE(pmc_key, Key))
-        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
     else {
         /* array of strings */
         STRING * const isans = CONST_STRING(interp, "NameSpace");
@@ -607,35 +609,6 @@ Parrot_ns_find_current_namespace_global(PARROT_INTERP, ARGIN_NULLOK(STRING *glob
 
 /*
 
-=item C<PMC * Parrot_find_global_s(PARROT_INTERP, STRING *str_key, STRING
-*globalname)>
-
-Search the namespace designated by C<str_key>, or the HLL root if
-C<str_key> is NULL, for an object with name C<globalname>.  Return the
-object, or NULL if not found.
-
-TT #1222 - For now this function prefers non-namespaces, it will eventually
-entirely use the untyped interface.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
-        ARGIN_NULLOK(STRING *globalname))
-{
-    ASSERT_ARGS(Parrot_find_global_s)
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns = Parrot_ns_get_namespace_keyed_str(interp, hll_ns, str_key);
-    return Parrot_ns_find_namespace_global(interp, ns, globalname);
-}
-
-/*
-
 =item C<void Parrot_ns_store_global(PARROT_INTERP, PMC *ns, STRING *globalname,
 PMC *val)>
 
@@ -658,33 +631,6 @@ Parrot_ns_store_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
     VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
-
-/*
-
-=item C<void Parrot_store_global_s(PARROT_INTERP, STRING *str_key, STRING
-*globalname, PMC *val)>
-
-Store the PMC C<val> into the namespace designated by C<str_key>, or
-the HLL root if C<str_key> is NULL, with the name C<globalname>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
-        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
-{
-    ASSERT_ARGS(Parrot_store_global_s)
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC * const ns = Parrot_ns_make_namespace_keyed_str(interp, hll_ns, str_key);
-    Parrot_ns_store_global(interp, ns, globalname, val);
-
-    /* TT #1225 - method cache invalidation should be a namespace function */
-    Parrot_invalidate_method_cache(interp, str_key);
-}
-
 
 /*
 
@@ -783,9 +729,6 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     PMC *ns;
     Parrot_Sub_attributes *sub;
 
-    /* PF structures aren't fully constructed yet */
-    Parrot_block_GC_mark(interp);
-
     /* store relative to HLL namespace */
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
@@ -818,7 +761,6 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     /* restore HLL_id */
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_id);
-    Parrot_unblock_GC_mark(interp);
 }
 
 /*

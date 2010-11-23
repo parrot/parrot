@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -68,20 +67,6 @@ Sort this array, optionally using the provided cmp_func
 
 =over 4
 
-=item C<void init()>
-
-Initializes the array.
-
-=cut
-
-*/
-
-    VTABLE void init() {
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
-
-/*
-
 =item C<void init_int(INTVAL size)>
 
 Initializes the array.
@@ -96,8 +81,6 @@ Initializes the array.
                     _("FixedPMCArray: Cannot set array size to a negative number (%d)"), size);
 
         SELF.set_integer_native(size);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -406,6 +389,7 @@ array.
         for (i = 0; i < size; ++i)
             data[i] = PMCNULL;
 
+        PObj_custom_mark_destroy_SETALL(SELF);
         PMC_array(SELF) = data;
     }
 
@@ -745,13 +729,13 @@ Used to unarchive the array.
     }
 
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
+        /* Thawed array was created from pmc_new_noinit */
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*

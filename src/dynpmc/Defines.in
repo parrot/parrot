@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 DYNPMC_TARGETS = \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
@@ -24,7 +23,6 @@ DYNPMC_H_FILES = \
     include/parrot/caches.h \
     include/parrot/call.h \
     include/parrot/cclass.h \
-    include/parrot/charset.h \
     include/parrot/compiler.h \
     include/parrot/config.h \
     include/parrot/context.h \

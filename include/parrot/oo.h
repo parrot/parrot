@@ -1,7 +1,5 @@
 /* objects.h
  *  Copyright (C) 2007-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Parrot class and object header stuff
  *  Data Structure and Algorithms:

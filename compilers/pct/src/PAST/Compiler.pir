@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -81,7 +80,11 @@ any value type.
     piropsig['find_codepoint']   = 'Is'
     piropsig['find_dynamic_lex'] = 'Ps'
     piropsig['find_name']  = 'Ps'
+    piropsig['getinterp']  = 'P'
     piropsig['getprop']    = 'P~P'
+    piropsig['getstderr']  = 'P'
+    piropsig['getstdin']   = 'P'
+    piropsig['getstdout']  = 'P'
     piropsig['index']      = 'Issi'
     piropsig['isa']        = 'IP~'
     piropsig['isfalse']    = 'IP'
@@ -92,9 +95,11 @@ any value type.
     piropsig['length']     = 'Is'
     piropsig['load_bytecode'] = 'vs'
     piropsig['load_language'] = 'vs'
+    piropsig['loadlib']    = 'P~'
     piropsig['mod']        = 'PP+'
     piropsig['mul']        = 'PP+'
     piropsig['neg']        = 'PP'
+    piropsig['new']        = 'P~'
     piropsig['newclosure'] = 'PP'
     piropsig['not']        = 'PP'
     piropsig['ord']        = 'Isi'
@@ -117,7 +122,9 @@ any value type.
     piropsig['split']      = 'Pss'
     piropsig['sub']        = 'PP+'
     piropsig['substr']     = 'Ssii'
+    piropsig['titlecase']  = 'Ss'
     piropsig['trace']      = 'vi'
+    piropsig['typeof']     = 'SP'
     piropsig['unshift']    = '0P*'
     piropsig['upcase']     = 'Ss'
     set_global '%piropsig', piropsig
@@ -804,7 +811,7 @@ Return the POST representation of a C<PAST::Block>.
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
-    .local pmc nsentry, subid, ns, hll, multi
+    .local pmc nsentry, subid, ns, hll, multi, loadlibs
     name = node.'name'()
     pirflags = node.'pirflags'()
     blocktype = node.'blocktype'()
@@ -813,6 +820,7 @@ Return the POST representation of a C<PAST::Block>.
     ns = node.'namespace'()
     hll = node.'hll'()
     multi = node.'multi'()
+    loadlibs = node.'loadlibs'()
 
     ##  handle nsentry attribute
     $I0 = defined nsentry
@@ -838,7 +846,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  create a POST::Sub node for this block
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi, 'loadlibs'=>loadlibs)
     unless pirflags goto pirflags_done
     bpost.'pirflags'(pirflags)
   pirflags_done:
@@ -923,9 +931,8 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'")
+    bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
     bpost.'push_pirop'('set_addr', $S0, ctrllabel)
-    bpost.'push_pirop'('callmethod', '"handle_types"', $S0, '.CONTROL_RETURN')
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
 
@@ -2079,7 +2086,7 @@ attribute.
     $S0 = files
     sourceline = concat ' (', $S0
     concat sourceline, ':'
-    $I0 = source.'lineof'(pos)
+    $I0 = self.'lineof'(source, pos)
     inc $I0
     $S0 = $I0
     concat sourceline, $S0
@@ -2383,11 +2390,19 @@ attribute.
     name = node.'name'()
     name = self.'escape'(name)
 
+    # We have three cases here.
+    #   0 children = use self
+    #   1 child    = object to look up on
+    #   2 children = object to look up on + class handle
+    # In the last case, we need to generate a different form of the op that
+    # has the extra argument.
     .local pmc call_on
+    $I0 = elements node
+    if $I0 == 0 goto use_self
     call_on = node[0]
-    if null call_on goto use_self
     call_on = self.'as_post'(call_on, 'rtype'=>'P')
     ops.'push'(call_on)
+    if $I0 == 2 goto have_class_handle
     goto invocant_done
   use_self:
     call_on = box 'self'
@@ -2404,6 +2419,25 @@ attribute.
 
   attribute_bind:
     ops.'push_pirop'('setattribute', call_on, name, bindpost)
+    ops.'result'(bindpost)
+    .return (ops)
+
+  have_class_handle:
+    .local pmc handle
+    handle = node[1]
+    handle = self.'as_post'(handle, 'rtype'=>'P')
+    ops.'push'(handle)
+
+    if bindpost goto attribute_bind_handle
+
+    .local pmc fetchop, storeop
+    $P0 = get_hll_global ['POST'], 'Op'
+    fetchop = $P0.'new'(ops, call_on, handle, name, 'pirop'=>'getattribute')
+    storeop = $P0.'new'(call_on, handle, name, ops, 'pirop'=>'setattribute')
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
+
+  attribute_bind_handle:
+    ops.'push_pirop'('setattribute', call_on, handle, name, bindpost)
     ops.'result'(bindpost)
     .return (ops)
 .end

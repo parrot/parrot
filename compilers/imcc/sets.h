@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -33,6 +32,7 @@ Set* set_copy(PARROT_INTERP, ARGIN(const Set *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_PURE_FUNCTION
 int set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

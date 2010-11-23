@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -58,9 +57,53 @@ static void Parrot_pcc_add_invocant(PARROT_INTERP,
 =item C<void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, PMC *sub_obj,
 const char *sig, ...)>
 
-Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
-to invoke is passed as an argument rather than looked up by name. The signature
-string and call arguments are converted to a CallSignature PMC.
+C<pmc> is the invocant.
+
+C<sub_obj> is the sub to invoke.
+
+C<sig> is the signature.
+
+Variable args contains the IN arguments followed by the OUT results variables.
+You must pass the address_of(&) the OUT results, of course.
+
+
+Signatures:
+  uppercase letters represent each arg and denote its types
+
+  I INTVAL
+  N FLOATVAL
+  S STRING *
+  P PMC *
+
+  lowercase letters are adverb modifiers to the preceding uppercase arg
+  identifier
+
+  f flatten
+  n named
+  s slurpy
+  o optional
+  p opt flag
+  l lookahead parameter (next positional, or next named if no positionals)
+  i invocant
+
+  -> is the separator between args and results, similar to type theory
+  notation.
+
+  Named args require two arg slots. The first is the name, the second the arg.
+
+Example signature:
+
+  "SnIPf->INPs"
+
+  The args to the method invocation are
+    a named INTVAL:  SnI
+    a flattened PMC:  Pf
+
+  The results of the method invocation are
+    a INTVAL: I
+    a FLOATVAL: N
+    a slurpy PMC: Ps
+
 
 =cut
 
@@ -90,90 +133,6 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
-}
-
-
-/*
-
-=item C<void Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name,
-const char *signature, ...)>
-
-DEPRECATED. See TT #443. Use Parrot_pcc_invoke_method_from_c_args instead.
-
-C<pmc> is the invocant.
-
-C<method_name> is the same C<method_name> used in the C<find_method>
-VTABLE call
-
-C<signature> is a C string describing the Parrot calling conventions for
-Parrot_PCCINVOKE.  ... variable args contains the IN arguments followed
-by the OUT results variables.  You must pass the address_of(&) the OUT
-results, of course.
-
-Signatures:
-  uppercase letters repesent each arg and denote its types
-
-  I INTVAL
-  N FLOATVAL
-  S STRING *
-  P PMC *
-
-  lowercase letters are adverb modifiers to the preceeding uppercase arg
-  identifier
-
-  f flatten
-  n named
-  s slurpy
-  o optional
-  p opt flag
-  l lookahead parameter (next positional, or next named if no positionals)
-  i invocant
-
-  -> is the separator between args and results, similar to type theory
-  notation.
-
-  Named args require two arg slots. The first is the name, the second the arg.
-
-Example signature:
-
-  "SnIPf->INPs"
-
-  The args to the method invocation are
-    a named INTVAL:  SnI
-    a flattened PMC:  Pf
-
-  The results of the method invocation are
-    a INTVAL: I
-    a FLOATVAL: N
-    a slurpy PMC: Ps
-
-invokes a PMC method
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
-        ARGIN(const char *signature), ...)
-{
-    ASSERT_ARGS(Parrot_PCCINVOKE)
-    PMC *sig_obj;
-    PMC *sub_obj;
-    va_list args;
-    va_start(args, signature);
-    sig_obj = Parrot_pcc_build_sig_object_from_varargs(interp, pmc, signature, args);
-    va_end(args);
-
-    /* Find the subroutine object as a named method on pmc */
-    sub_obj = VTABLE_find_method(interp, pmc, method_name);
-    if (PMC_IS_NULL(sub_obj))
-         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
-             "Method '%Ss' not found", method_name);
-
-    /* Invoke the subroutine object with the given CallSignature object */
-    Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
 }
 
 
@@ -310,8 +269,7 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 
 =item C<INTVAL Parrot_pcc_do_run_ops(PARROT_INTERP, PMC *sub_obj)>
 
-Check if current object require running ops. Used in tailcall for updating
-RetContinuation.
+Check if current object require running ops.
 
 =cut
 
@@ -329,9 +287,8 @@ Parrot_pcc_do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 =item C<void Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, PMC *sub_obj, PMC
 *call_object)>
 
-Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
-to invoke is passed as an argument rather than looked up by name, and the
-signature string and call arguments are passed in a CallSignature PMC.
+Follows the same conventions as C<Parrot_pcc_invoke_method_from_c_args>, but
+the signature string and call arguments are passed in a CallSignature PMC.
 
 =cut
 
@@ -351,7 +308,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     Parrot_pcc_set_signature(interp, ctx, call_object);
     Parrot_pcc_set_continuation(interp, ctx, ret_cont);
-    interp->current_cont         = NEED_CONTINUATION;
+    interp->current_cont                    = NEED_CONTINUATION;
     PARROT_CONTINUATION(ret_cont)->from_ctx = ctx;
 
     /* Invoke the function */

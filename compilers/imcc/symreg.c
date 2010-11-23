@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2010, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -298,7 +297,7 @@ SymReg *
 mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_symreg)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
 
     /* Check for the condition that fires up a segfault in TT #162 */
     PARROT_ASSERT(unit != NULL);
@@ -393,7 +392,7 @@ SymReg *
 mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 {
     ASSERT_ARGS(mk_pcc_sub)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
     SymReg   * const r    = _mk_symreg(interp, &unit->hash, name, proto);
 
     r->type    = VT_PCC_SUB;
@@ -407,7 +406,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 
 =item C<void add_namespace(PARROT_INTERP, IMC_Unit *unit)>
 
-Add the current namespace to a sub declaration.
+Add the current namespace (and HLL id) to a sub declaration.
 
 =cut
 
@@ -418,6 +417,8 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(add_namespace)
     SymReg * const ns = IMCC_INFO(interp)->cur_namespace;
+
+    unit->hll_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
 
     if (!ns)
         return;
@@ -632,7 +633,7 @@ _mk_fullname(PARROT_INTERP, ARGIN_NULLOK(const Namespace *ns), ARGIN(const char 
 
 /*
 
-=item C<SymReg * mk_ident(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_ident(PARROT_INTERP, const char *name, int t, INTVAL type)>
 
 Makes a new identifier.
 
@@ -643,18 +644,17 @@ Makes a new identifier.
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 SymReg *
-mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
+mk_ident(PARROT_INTERP, ARGIN(const char *name), int t, INTVAL type)
 {
     ASSERT_ARGS(mk_ident)
     char   * const fullname = _mk_fullname(interp, IMCC_INFO(interp)->namespace_stack, name);
-    SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->last_unit->hash), name);
-    if (r && r->set != t)
+    SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->cur_unit->hash), name);
+    if (r && (r->set != t || r->type != type))
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                 "syntax error, duplicated IDENTIFIER '%s'\n", fullname);
 
     r = mk_symreg(interp, fullname, t);
-    r->type = VTIDENTIFIER;
-
+    r->type = type;
 
     if (IMCC_INFO(interp)->namespace_stack) {
         Identifier * const ident = mem_gc_allocate_zeroed_typed(interp, Identifier);
@@ -766,16 +766,17 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
                     "global PMC constant not allowed");
 
         r = _mk_symreg(interp, &IMCC_INFO(interp)->ghash, name, t);
+
+        r->type = VT_CONSTP;
     }
     else {
-        r = mk_ident(interp, name, t);
+        r = mk_ident(interp, name, t, VT_CONSTP);
 
         if (t == 'P')
             return mk_pmc_const_2(interp, IMCC_INFO(interp)->cur_unit, r, val);
     }
 
-    r->type = VT_CONSTP;
-    r->reg  = val;
+    r->reg = val;
 
     return r;
 }
@@ -857,11 +858,14 @@ int_overflows(ARGIN(const SymReg *r))
     }
 
     errno = 0;
+
     if (base == 10) {
-        (void)strtol(digits, NULL, base);
+        long int unused = strtol(digits, NULL, base);
+        UNUSED(unused);
     }
     else {
-        (void)strtoul(digits + 2, NULL, base);
+        unsigned long int unused = strtoul(digits + 2, NULL, base);
+        UNUSED(unused);
     }
 
     return errno ? 1 : 0;
@@ -1075,7 +1079,7 @@ SymReg *
 mk_local_label(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_local_label)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
     return _mk_address(interp, &unit->hash, name, U_add_uniq_label);
 }
 
@@ -1096,7 +1100,7 @@ SymReg *
 mk_label_address(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_label_address)
-    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
     return _mk_address(interp, &unit->hash, name, U_add_once);
 }
 
@@ -1254,6 +1258,30 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
 
 /*
 
+=item C<void free_pcc_sub(pcc_sub_t *sub)>
+
+Frees all memory of the given pcc_sub_t.
+
+=cut
+
+*/
+
+void
+free_pcc_sub(ARGMOD(pcc_sub_t *sub))
+{
+    ASSERT_ARGS(free_pcc_sub)
+
+    mem_sys_free(sub->multi);
+    mem_sys_free(sub->args);
+    mem_sys_free(sub->arg_flags);
+    mem_sys_free(sub->ret);
+    mem_sys_free(sub->ret_flags);
+    mem_sys_free(sub);
+}
+
+
+/*
+
 =item C<void free_sym(SymReg *r)>
 
 Frees all memory of the specified SymReg.  If it has a pcc_sub_t entry, frees
@@ -1269,14 +1297,8 @@ free_sym(ARGMOD(SymReg *r))
     ASSERT_ARGS(free_sym)
     pcc_sub_t * const sub = r->pcc_sub;
 
-    if (sub) {
-        mem_sys_free(sub->multi);
-        mem_sys_free(sub->args);
-        mem_sys_free(sub->arg_flags);
-        mem_sys_free(sub->ret);
-        mem_sys_free(sub->ret_flags);
-        mem_sys_free(sub);
-    }
+    if (sub)
+        free_pcc_sub(sub);
 
     if (r->set == 'K') {
         SymReg *key     = r->nextkey;

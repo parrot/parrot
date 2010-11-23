@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -25,7 +24,7 @@ pct/complete_workflow.t - PCT tests
 Special cases in grammars and actions should be tested here.
 
 This test script builds a parser from a grammar syntax file.
-After that acctions are added from a NQP class file.
+After that actions are added from a NQP class file.
 After that the generated compiler is tested against a sample input.
 
 =cut
@@ -306,6 +305,7 @@ sub test_pct
     # Do not assume that . is in $PATH
     # places to look for things
     my $BUILD_DIR     = $PConfig{build_dir};
+    my $BD_CHARSET    = $BUILD_DIR =~ /[^[:ascii:]]/ ? "binary:" : q{};
     my $TEST_DIR      = "$BUILD_DIR/t/compilers/pct";
     my $PARROT        = "$BUILD_DIR/parrot$PConfig{exe}";
     my $PGE_LIBRARY   = "$BUILD_DIR/runtime/parrot/library/PGE";
@@ -334,7 +334,7 @@ sub test_pct
     .local pmc args
     args = new 'ResizableStringArray'
     push args, "test_program"
-    push args, "$TEST_DIR/complete_workflow_sample_input.txt"
+    push args, $BD_CHARSET"$TEST_DIR/complete_workflow_sample_input.txt"
 
     \$P0 = new ['PCT'; 'HLLCompiler']
     \$P0.'language'('TestGrammar')

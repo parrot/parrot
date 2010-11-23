@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -23,6 +22,7 @@ I<What are these global variables?>
 
 #define INSIDE_GLOBAL_SETUP
 #include "parrot/parrot.h"
+#include "parrot/oplib/core_ops.h"
 #include "global_setup.str"
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
@@ -98,7 +98,7 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
         STRING * const config_string =
             Parrot_str_new_init(interp,
                                (const char *)parrot_config_stored, parrot_config_size_stored,
-                               PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                               Parrot_default_encoding_ptr,
                                PObj_external_FLAG|PObj_constant_FLAG);
 
         config_hash = Parrot_thaw(interp, config_string);
@@ -193,9 +193,14 @@ init_world(PARROT_INTERP)
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS, pmc);
+#if PARROT_HAS_CORE_NCI_THUNKS
     Parrot_nci_load_core_thunks(interp);
+#endif
 #if PARROT_HAS_EXTRA_NCI_THUNKS
     Parrot_nci_load_extra_thunks(interp);
+#endif
+#if PARROT_HAS_LIBFFI
+    Parrot_nci_libffi_register(interp);
 #endif
 }
 
@@ -216,6 +221,17 @@ parrot_global_setup_2(PARROT_INTERP)
     PMC *classname_hash;
 
     create_initial_context(interp);
+
+    /* initialize the ops hash */
+    if (interp->parent_interpreter) {
+        interp->op_hash = interp->parent_interpreter->op_hash;
+    }
+    else {
+        op_lib_t  *core_ops = PARROT_CORE_OPLIB_INIT(interp, 1);
+        interp->op_hash     = parrot_create_hash_sized(interp, enum_type_ptr,
+                                    Hash_key_type_cstring, core_ops->op_count);
+        parrot_hash_oplib(interp, core_ops);
+    }
 
     /* create the namespace root stash */
     interp->root_namespace = Parrot_pmc_new(interp, enum_class_NameSpace);

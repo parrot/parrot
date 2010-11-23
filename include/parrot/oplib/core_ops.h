@@ -1,6 +1,4 @@
 
-/* $Id$ */
-
 #ifndef PARROT_OPLIB_CORE_OPS_H_GUARD
 #define PARROT_OPLIB_CORE_OPS_H_GUARD
 
@@ -12,7 +10,7 @@
  * .ops files). by ops2c.nqp.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 
@@ -20,7 +18,8 @@
 #include "parrot/oplib.h"
 #include "parrot/runcore_api.h"
 
- op_lib_t *Parrot_DynOp_core_2_5_0(PARROT_INTERP, long init);
+PARROT_EXPORT
+op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -903,16 +902,6 @@
  opcode_t * Parrot_split_p_sc_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_split_p_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_split_p_sc_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_charset_i_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_charset_i_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_charsetname_s_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_charsetname_s_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_find_charset_i_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_find_charset_i_sc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_trans_charset_s_s_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_trans_charset_s_sc_i(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_trans_charset_s_s_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_trans_charset_s_sc_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_encoding_i_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_encoding_i_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_encodingname_s_i(opcode_t *, PARROT_INTERP);

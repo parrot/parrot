@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -141,19 +140,10 @@ static void initialize_parents_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t key_hash_pointer(SHIM_INTERP,
-    ARGIN(const void *value),
-    size_t seed)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static int pointer_compare(SHIM_INTERP,
-    ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b));
 
 #define ASSERT_ARGS_build_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -178,29 +168,20 @@ static int pointer_compare(SHIM_INTERP,
     , PARROT_ASSERT_ARG(object) \
     , PARROT_ASSERT_ARG(all_parents) \
     , PARROT_ASSERT_ARG(init))
-#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_make_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF))
-#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-static int
-pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b))
-{
-    ASSERT_ARGS(pointer_compare)
-    return a != b;
-}
+/*
 
-static size_t
-key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_pointer)
-    return ((size_t) value ^ seed);
-}
+=item C<static int cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC
+*attrib_index, PMC *cache, int cur_index)>
+
+=cut
+
+*/
 
 static int
 cache_class_attribs(PARROT_INTERP,
@@ -241,8 +222,17 @@ cache_class_attribs(PARROT_INTERP,
     return cur_index;
 }
 
-/* This function builds the attribute index (table to map class name and
- * attribute name to an index) for the current class. */
+/*
+
+=item C<static void build_attrib_index(PARROT_INTERP, PMC *self)>
+
+This function builds the attribute index (table to map class name and
+attribute name to an index) for the current class.
+
+=cut
+
+*/
+
 static void
 build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
 {
@@ -272,7 +262,16 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     _class->attrib_cache = cache;
 }
 
-/* Takes a hash and initializes the class based on it. */
+/*
+
+=item C<static void init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)>
+
+Takes a hash and initializes the class based on it.
+
+=cut
+
+*/
+
 static void
 init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 {
@@ -434,6 +433,15 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
     Parrot_oo_extract_methods_from_namespace(interp, self, _class->_namespace);
 }
 
+/*
+
+=item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC
+*all_parents)>
+
+=cut
+
+*/
+
 static void
 initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 {
@@ -458,10 +466,19 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 
         if (!PMC_IS_NULL(meth)) {
             /* preserve current_object */
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->", object);
+            Parrot_ext_call(interp, meth, "Pi->", object);
         }
     }
 }
+
+/*
+
+=item C<static void initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC
+*all_parents, PMC *init)>
+
+=cut
+
+*/
 
 static void
 initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
@@ -487,15 +504,23 @@ initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
         meth = Parrot_oo_find_vtable_override_for_class(interp, parent, name);
 
         if (!PMC_IS_NULL(meth))
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth,
-                    "PiP->", object, init);
+            Parrot_ext_call(interp, meth, "PiP->", object, init);
     }
 }
 
-/* This function makes and caches the name of this class, returning the string
- * directly.  VTABLE_isa() uses the name without copying it, for efficiency
- * reasons, as it does not modify the STRING.  VTABLE_get_string() makes a copy
- * of the STRING, so its callers are free to modify it. */
+/*
+
+=item C<static STRING * make_class_name(PARROT_INTERP, PMC *SELF)>
+
+This function makes and caches the name of this class, returning the string
+directly.  C<VTABLE_isa()> uses the name without copying it, for efficiency
+reasons, as it does not modify the STRING.  C<VTABLE_get_string()> makes a
+copy of the STRING, so its callers are free to modify it.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
@@ -526,11 +551,19 @@ make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
     return _class->name;
 }
 
-/* calculates the C3 method resolution order for this class. C3 is the
- * name of an algorithm used to calculate the method resolution order
- * (MRO) to use in a system with multiple inheritance. For more information
- * see the documentation associated with C<Parrot_ComputeMRO_C3>.
- */
+/*
+
+=item C<static void calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)>
+
+Calculates the C3 method resolution order for this class. C3 is the name of an
+algorithm used to calculate the method resolution order (MRO) to use in a
+system with multiple inheritance. For more information see the documentation
+associated with C<Parrot_ComputeMRO_C3>.
+
+=cut
+
+*/
+
 static void
 calculate_mro(PARROT_INTERP, ARGIN(PMC *SELF), INTVAL num_parents)
 {
@@ -611,7 +644,7 @@ arguments. The class is attached to the current HLL namespace.
                 (Parrot_Class_attributes *) PMC_data(SELF);
 
         /* Set flag for custom GC mark. */
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
 
         /* Set up the object. */
         _class->name            = CONST_STRING(INTERP, "");
@@ -628,9 +661,10 @@ arguments. The class is attached to the current HLL namespace.
 
         _class->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
         _class->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
+
         _class->isa_cache        = parrot_create_hash(INTERP,
-            enum_type_INTVAL, Hash_key_type_PMC,
-            (hash_comp_fn)pointer_compare, (hash_hash_key_fn)key_hash_pointer);
+            enum_type_INTVAL, Hash_key_type_PMC_ptr);
+
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(INTERP, _class->all_parents, SELF);
@@ -1077,39 +1111,39 @@ Array of Class PMCs representing the direct parents of this class.
         /* What should we return? */
         PMC *found;
 
-        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "attributes"))) {
+        if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "attributes"))) {
             found = _class->attrib_metadata;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "parents"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "parents"))) {
             found = _class->parents;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "name"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "name"))) {
             found = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, found, _class->name);
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "id"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "id"))) {
             found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, _class->id);
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "namespace"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "namespace"))) {
             /* Should not clone this. */
             return _class->_namespace;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "attrib_index"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "attrib_index"))) {
             found = _class->attrib_index;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "methods"))) {
             found = _class->methods;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "vtable_overrides"))) {
             found = _class->vtable_overrides;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "all_parents"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "all_parents"))) {
             found = _class->all_parents;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "roles"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "roles"))) {
             found = _class->roles;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "flags"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "flags"))) {
             found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                 (INTVAL)PObj_get_FLAGS(SELF));
         }
@@ -1373,10 +1407,14 @@ Returns whether the class is or inherits from C<*class>.
         if (PMC_IS_NULL(lookup))
             return 0;
 
-        if (PObj_is_class_TEST(lookup) && lookup == SELF)
-            return 1;
-
-        classobj = Parrot_oo_get_class(INTERP, lookup);
+        if (PObj_is_class_TEST(lookup)) {
+            if (lookup == SELF)
+                return 1;
+            else
+                classobj = lookup;
+        }
+        else
+            classobj = Parrot_oo_get_class(INTERP, lookup);
 
         if (PMC_IS_NULL(classobj))
             return 0;
@@ -1440,7 +1478,7 @@ Returns whether the class is or inherits from C<*classname>.
         PMC *want_class;
 
         /* hard-code this one exception right away */
-        if (Parrot_str_equal(INTERP, classname, CONST_STRING(INTERP, "Class")))
+        if (STRING_equal(INTERP, classname, CONST_STRING(INTERP, "Class")))
             return 1;
 
         want_class = Parrot_oo_get_class_str(INTERP, classname);

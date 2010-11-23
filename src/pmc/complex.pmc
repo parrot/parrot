@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2004-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -13,14 +12,12 @@ string parsing/generating and basic mathematical operations.
 
 =head2 Functions
 
+Equations used are sometimes listed.  At times, multiple equations are given,
+but those starting with => are the ones used
+
 =over 4
 
 =cut
-    ASSERT_ARGS()
-
-
-Equations used are sometimes listed.  At times, multiple equations are given,
-but those starting with => are the ones used
 
 */
 
@@ -76,6 +73,12 @@ C<a+bi> with optional spaces around C<+> and before C<i>. You can also
 use C<j> instead of C<i>.
 
 =cut
+
+We have a conflict among our coding standards here.  Our 100-character line
+limit meant that the following function declaration had to be split over two
+lines.  However, that leads to t/codingstd/pmc_docs.t reporting that this
+function lacks documentation -- reporting due to differences in whitespacing
+between '=item' and function declaration.
 
 */
 
@@ -238,6 +241,14 @@ complex_parse_string(PARROT_INTERP,
     Parrot_str_free_cstring(str);
 }
 
+/*
+
+=item C<static void int_check_divide_zero(PARROT_INTERP, INTVAL value)>
+
+=cut
+
+*/
+
 static void
 int_check_divide_zero(PARROT_INTERP, INTVAL value)
 {
@@ -248,6 +259,14 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
             "Divide by zero");
 }
 
+/*
+
+=item C<static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)>
+
+=cut
+
+*/
+
 static void
 float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
 {
@@ -257,6 +276,14 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
+
+/*
+
+=item C<static void complex_check_divide_zero(PARROT_INTERP, PMC *value)>
+
+=cut
+
+*/
 
 static void
 complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
@@ -273,7 +300,7 @@ complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
 }
 
 
-pmclass Complex auto_attrs {
+pmclass Complex provides complex provides scalar auto_attrs {
 
     ATTR FLOATVAL re; /* real part */
     ATTR FLOATVAL im; /* imaginary part */
@@ -473,10 +500,10 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
         FLOATVAL value;
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             GET_ATTR_re(INTERP, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             GET_ATTR_im(INTERP, SELF, value);
         }
         else
@@ -659,10 +686,10 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             SET_ATTR_re(INTERP, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             SET_ATTR_im(INTERP, SELF, value);
         }
         else

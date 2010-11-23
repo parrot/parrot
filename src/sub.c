@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -23,6 +22,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "sub.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_continuation.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 
@@ -182,7 +182,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
         if (!debug)
             return 0;
         for (i = n = 0; n < sub->seg->base.size; ++i) {
-            op_info_t * const op_info = &interp->op_info_table[*pc];
+            op_info_t * const op_info = sub->seg->op_info_table[*pc];
             opcode_t var_args = 0;
 
             if (i >= debug->base.size)
@@ -233,8 +233,11 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     base_pc            = sub->seg->base.data;
     current_annotation = pc - base_pc;
 
+    /* assert pc is in correct segment */
+    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + sub->seg->base.size);
+
     for (i = op = 0; op < debug_size; ++i) {
-        op_info_t * const op_info  = &interp->op_info_table[*base_pc];
+        op_info_t * const op_info  = sub->seg->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 
         if (i >= debug_size)
@@ -421,7 +424,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
             if (!PMC_IS_NULL(child_sub->outer_sub)) {
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
-                if (Parrot_str_equal(interp, current_sub->subid,
+                if (STRING_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
                     child_sub->outer_ctx = ctx;
                 }

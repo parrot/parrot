@@ -1,15 +1,19 @@
-This is Parrot, version 2.5.0
-------------------------------
+This is Parrot, version 2.10.1
+-----------------------------
 
 Parrot is Copyright (C) 2001-2010, Parrot Foundation.
 
-$Id$
 
 LICENSE INFORMATION
 -------------------
 
 This code is distributed under the terms of the Artistic License 2.0.
 For more details, see the full text of the license in the file LICENSE.
+
+OVERVIEW
+--------
+Parrot is a virtual machine designed to efficiently compile and execute
+bytecode for dynamic languages.
 
 PREREQUISITES
 -------------
@@ -119,6 +123,7 @@ WEB SITES
 The following web sites have all the information you need about Parrot:
     http://www.parrot.org/
     http://trac.parrot.org/
+    http://docs.parrot.org/
 
 Have fun,
    The Parrot Team.

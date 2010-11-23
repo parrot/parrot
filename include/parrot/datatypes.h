@@ -2,8 +2,6 @@
  * datatypes.h
  *  Copyright (C) 2002-2008, Parrot Foundation.
  *  License:  Artistic 2.0, see README and LICENSE for details
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Parrot and native data types enums and type names.
  *

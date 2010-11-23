@@ -9,7 +9,6 @@
  *
  * Grammar of the PIR language parser.
  *
- * $Id$
  *
  */
 
@@ -206,21 +205,6 @@ static Instruction * MK_I(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static Instruction* mk_pmc_const(PARROT_INTERP,
-    ARGMOD(IMC_Unit *unit),
-    ARGIN(const char *type),
-    ARGMOD(SymReg *left),
-    ARGIN(const char *constant))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(*left);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 static Instruction* mk_pmc_const_named(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
@@ -323,12 +307,6 @@ static void set_lexical(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(fmt))
-#define ASSERT_ARGS_mk_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit) \
-    , PARROT_ASSERT_ARG(type) \
-    , PARROT_ASSERT_ARG(left) \
-    , PARROT_ASSERT_ARG(constant))
 #define ASSERT_ARGS_mk_pmc_const_named __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit) \
@@ -418,70 +396,6 @@ MK_I(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), int n, ...)
     va_end(ap);
     return INS(interp, unit, opname, fmt, r, n,
                IMCC_INFO(interp)->keyvec, 1);
-}
-
-/*
-
-=item C<static Instruction* mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, const
-char *type, SymReg *left, const char *constant)>
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static Instruction*
-mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
-        ARGMOD(SymReg *left), ARGIN(const char *constant))
-{
-    ASSERT_ARGS(mk_pmc_const)
-    const int type_enum = atoi(type);
-    const int ascii = (*constant == '\'' || *constant == '"');
-    SymReg *rhs;
-    SymReg *r[3];
-    char   *name;
-
-    if (left->type == VTADDRESS) {      /* IDENTIFIER */
-        if (IMCC_INFO(interp)->state->pasm_file) {
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                        "Ident as PMC constant",
-                        " %s\n", left->name);
-        }
-        left->type = VTIDENTIFIER;
-        left->set = 'P';
-    }
-    r[0] = left;
-    if (ascii) {
-        /* strip delimiters */
-        name                   = mem_sys_strdup(constant + 1);
-        name[strlen(name) - 1] = 0;
-    }
-    else {
-        name = mem_sys_strdup(constant);
-    }
-
-    switch (type_enum) {
-      case enum_class_Sub:
-      case enum_class_Coroutine:
-        rhs = mk_const(interp, name, 'p');
-
-        if (!ascii)
-            rhs->type |= VT_ENCODED;
-
-        rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
-        break;
-      default:
-        rhs = mk_const(interp, name, 'P');
-        break;
-    }
-
-    r[1]          = rhs;
-    rhs->pmc_type = type_enum;
-
-    mem_sys_free(name);
-
-    return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
 }
 
 /*
@@ -1061,7 +975,13 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
         IMCC_fataly(interp, EXCEPTION_LIBRARY_ERROR,
             "loadlib directive could not find library `%S'", s);
     }
-    Parrot_register_HLL_lib(interp, s);
+
+    /* store non-dynoplib library deps here, dynoplibs are treated separately for now */
+    if (!STRING_equal(interp,
+            VTABLE_get_string(interp,
+                VTABLE_getprop(interp, lib_pmc, Parrot_str_new_constant(interp, "_type"))),
+            Parrot_str_new_constant(interp, "Ops")))
+        imcc_pbc_add_libdep(interp, s);
 }
 
 /* HEADERIZER STOP */
@@ -1097,17 +1017,16 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
-%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
-%token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type hll_def return_or_yield comma_or_goto opt_unique_reg
+%type <t> type hll_def return_or_yield comma_or_goto
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -1251,14 +1170,7 @@ constdef:
    ;
 
 pmc_const:
-     CONST { IMCC_INFO(interp)->is_def = 1; } INTC var_or_i '=' any_string
-         {
-           $$ = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6);
-           mem_sys_free($6);
-           IMCC_INFO(interp)->is_def = 0;
-         }
-
-     | CONST { IMCC_INFO(interp)->is_def = 1; } STRINGC var_or_i '=' any_string
+     CONST { IMCC_INFO(interp)->is_def = 1; } STRINGC var_or_i '=' any_string
          {
            $$ = mk_pmc_const_named(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6);
            mem_sys_free($3);
@@ -1447,7 +1359,7 @@ sub_param_type_def:
            }
            if ($3 & VT_NAMED && !($3 & VT_FLAT) && !IMCC_INFO(interp)->adv_named_id)
                adv_named_set(interp, $2);
-           $$ = mk_ident(interp, $2, $1);
+           $$ = mk_ident(interp, $2, $1, VTIDENTIFIER);
            $$->type |= $3;
            mem_sys_free($2);
           }
@@ -1672,29 +1584,6 @@ pcc_call:
          {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
          }
-   | NCI_CALL var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | METH_CALL target '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | METH_CALL STRINGC '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
-         }
-   | METH_CALL target COMMA var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-           add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
-         }
-   | METH_CALL STRINGC COMMA var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
-           add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
-         }
-   ;
 
 
 pcc_args:
@@ -1730,7 +1619,7 @@ pcc_result:
          {
            IdList * const l = $4;
            SymReg *ignored;
-           ignored = mk_ident(interp, l->id, $3);
+           ignored = mk_ident(interp, l->id, $3, VTIDENTIFIER);
            UNUSED(ignored);
            IMCC_INFO(interp)->is_def = 0;
            $$ = 0;
@@ -1749,7 +1638,6 @@ paramtype:
    | ADV_NAMED                  { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = VT_NAMED; mem_sys_free($3); }
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = VT_NAMED; mem_sys_free($3); }
-   | UNIQUE_REG                 { $$ = 0; }
    | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;
 
@@ -1937,19 +1825,13 @@ id_list :
    ;
 
 id_list_id :
-     IDENTIFIER opt_unique_reg
+     IDENTIFIER
          {
            IdList* const l = mem_gc_allocate_n_zeroed_typed(interp, 1, IdList);
            l->id           = $1;
            $$ = l;
          }
    ;
-
-opt_unique_reg:
-     /* empty */
-   | UNIQUE_REG
-   ;
-
 
 labeled_inst:
      assignment
@@ -1959,7 +1841,7 @@ labeled_inst:
            IdList *l = $4;
            while (l) {
                IdList *l1;
-               mk_ident(interp, l->id, $3);
+               mk_ident(interp, l->id, $3, VTIDENTIFIER);
                l1 = l;
                l  = l->next;
                mem_sys_free(l1->id);
@@ -2269,9 +2151,8 @@ argtype:
    | ADV_NAMED                 { $$ = VT_NAMED;    }
    | ADV_CALL_SIG              { $$ = VT_CALL_SIG; }
 
-   /* don't free $3 here; adv_named_set uses the pointer directly */
-   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
-   | ADV_NAMED '(' STRINGC  ')' { adv_named_set(interp, $3);   $$ = 0; }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); mem_sys_free($3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC  ')' { adv_named_set(interp, $3);   mem_sys_free($3); $$ = 0; }
    ;
 
 result:

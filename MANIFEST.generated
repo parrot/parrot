@@ -1,12 +1,11 @@
-# $Id$
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.2.5.0.dylib                   [main]lib
+blib/lib/libparrot.2.10.1.dylib                  [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.2.5.0                      [main]lib
+blib/lib/libparrot.so.2.10.1                     [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -69,9 +68,10 @@ include/pmc/pmc_handle.h                         [devel]include
 include/pmc/pmc_hash.h                           [devel]include
 include/pmc/pmc_hashiterator.h                   [devel]include
 include/pmc/pmc_hashiteratorkey.h                [devel]include
-include/pmc/pmc_imageio.h                        [devel]include
+include/pmc/pmc_imageiofreeze.h                  [devel]include
 include/pmc/pmc_imageiosize.h                    [devel]include
 include/pmc/pmc_imageiostrings.h                 [devel]include
+include/pmc/pmc_imageiothaw.h                    [devel]include
 include/pmc/pmc_integer.h                        [devel]include
 include/pmc/pmc_iterator.h                       [devel]include
 include/pmc/pmc_key.h                            [devel]include
@@ -80,6 +80,7 @@ include/pmc/pmc_lexpad.h                         [devel]include
 include/pmc/pmc_managedstruct.h                  [devel]include
 include/pmc/pmc_multisub.h                       [devel]include
 include/pmc/pmc_namespace.h                      [devel]include
+include/pmc/pmc_nativepccmethod.h                [devel]include
 include/pmc/pmc_nci.h                            [devel]include
 include/pmc/pmc_null.h                           [devel]include
 include/pmc/pmc_object.h                         [devel]include
@@ -250,6 +251,7 @@ runtime/parrot/library/Data/Dumper/Base.pbc      [main]
 runtime/parrot/library/Data/Dumper/Default.pbc   [main]
 runtime/parrot/library/Data/Replace.pbc          [main]
 runtime/parrot/library/Digest/MD5.pbc            [main]
+runtime/parrot/library/Digest/sha256.pbc         [main]
 runtime/parrot/library/Getopt/Obj.pbc            [main]
 runtime/parrot/library/HLL.pbc                   [main]
 runtime/parrot/library/HTTP/Daemon.pbc           [main]
@@ -378,9 +380,10 @@ src/pmc/handle.dump                              [devel]src
 src/pmc/hash.dump                                [devel]src
 src/pmc/hashiterator.dump                        [devel]src
 src/pmc/hashiteratorkey.dump                     [devel]src
-src/pmc/imageio.dump                             [devel]src
+src/pmc/imageiofreeze.dump                       [devel]src
 src/pmc/imageiosize.dump                         [devel]src
 src/pmc/imageiostrings.dump                      [devel]src
+src/pmc/imageiothaw.dump                         [devel]src
 src/pmc/integer.dump                             [devel]src
 src/pmc/iterator.dump                            [devel]src
 src/pmc/key.dump                                 [devel]src
@@ -389,6 +392,7 @@ src/pmc/lexpad.dump                              [devel]src
 src/pmc/managedstruct.dump                       [devel]src
 src/pmc/multisub.dump                            [devel]src
 src/pmc/namespace.dump                           [devel]src
+src/pmc/nativepccmethod.dump                     [devel]src
 src/pmc/nci.dump                                 [devel]src
 src/pmc/null.dump                                [devel]src
 src/pmc/object.dump                              [devel]src
@@ -434,4 +438,5 @@ src/pmc/undef.dump                               [devel]src
 src/pmc/unmanagedstruct.dump                     [devel]src
 src/string_private_cstring.h                     []
 tools/build/dynpmc.pl                            []
+tools/dev/mk_language_shell.pl                   [devel]
 vtable.dump                                      [devel]src

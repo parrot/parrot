@@ -1,5 +1,4 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -30,7 +29,7 @@ For a more complex and well-behaved example, try F<shapes.pir>.
 .sub main :main
     .param pmc argv
 
-    # Load OpenGL libary and a helper library for calling glutInit
+    # Load OpenGL library and a helper library for calling glutInit
     load_bytecode 'OpenGL.pbc'
     load_bytecode 'NCI/Utils.pbc'
 

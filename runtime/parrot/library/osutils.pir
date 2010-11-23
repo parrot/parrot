@@ -1,5 +1,4 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -849,6 +848,29 @@ osutils - Parrot OS Utilities
     directories = substr path, 0, $I0
   L4:
     .return (volume, directories, file)
+.end
+
+=item rindex
+
+=cut
+
+.sub 'rindex'
+    .param string str
+    .param string sstr
+    .param int pos              :optional
+    .param int has_pos          :opt_flag
+    if has_pos goto L1
+    pos = 0
+  L1:
+    $I0 = index str, sstr, pos
+    unless $I0 < 0 goto L2
+    .return ($I0)
+  L2:
+    $I1 = $I0
+    inc $I0
+    $I0 = index str, sstr, $I0
+    unless $I0 < 0 goto L2
+    .return ($I1)
 .end
 
 =back

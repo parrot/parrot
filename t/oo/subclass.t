@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -516,7 +515,7 @@ Tests OO features related to subclassing.
 try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     # attempt to add duplicate parent
@@ -541,7 +540,7 @@ finally:
 try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     # attempt to create inheritance loop
@@ -566,7 +565,7 @@ finally:
 try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     # attempt to create inheritance loop
@@ -591,7 +590,7 @@ finally:
 try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     # attempt to create inheritance loop

@@ -1,7 +1,5 @@
 /* runcore_api.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Functions and macros to dispatch opcodes.
  */
@@ -15,7 +13,7 @@ typedef struct runcore_t Parrot_runcore_t;
 #include "parrot/parrot.h"
 #include "parrot/op.h"
 
-#  define DO_OP(PC, INTERP) ((PC) = (((INTERP)->op_func_table)[*(PC)])((PC), (INTERP)))
+#  define DO_OP(PC, INTERP) ((PC) = (((INTERP)->code->op_func_table)[*(PC)])((PC), (INTERP)))
 
 typedef opcode_t * (*runcore_runops_fn_type) (PARROT_INTERP, ARGIN(Parrot_runcore_t *), ARGIN(opcode_t *pc));
 typedef       void (*runcore_destroy_fn_type)(PARROT_INTERP, ARGIN(Parrot_runcore_t *));
@@ -37,7 +35,7 @@ struct runcore_t {
 
 typedef enum Parrot_runcore_flags {
     RUNCORE_REENTRANT_FLAG    = 1 << 0,
-    RUNCORE_FUNC_TABLE_FLAG   = 1 << 1,
+    RUNCORE_FUNC_TABLE_FLAG   = 1 << 1
 } Parrot_runcore_flags;
 
 
@@ -78,13 +76,14 @@ void Parrot_runcore_switch(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void Parrot_runcore_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_runcore_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void Parrot_setup_event_func_ptrs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void prepare_for_run(PARROT_INTERP)
@@ -106,11 +105,12 @@ void runops_int(PARROT_INTERP, size_t offset)
 #define ASSERT_ARGS_Parrot_runcore_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_parrot_hash_oplib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lib))
 #define ASSERT_ARGS_Parrot_runcore_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_setup_event_func_ptrs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_prepare_for_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

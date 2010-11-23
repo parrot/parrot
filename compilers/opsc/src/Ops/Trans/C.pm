@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 class Ops::Trans::C is Ops::Trans;
 
@@ -24,12 +23,12 @@ method new() {
         :k("PREG(NUM)"),
         :ki("IREG(NUM)"),
 
-        :ic("cur_opcode[NUM]"),
-        :nc("CONST(NUM)->u.number"),
-        :pc("CONST(NUM)->u.key"),
-        :sc("CONST(NUM)->u.string"),
-        :kc("CONST(NUM)->u.key"),
-        :kic("cur_opcode[NUM]")
+        :ic("ICONST(NUM)"),
+        :nc("NCONST(NUM)"),
+        :pc("PCONST(NUM)"),
+        :sc("SCONST(NUM)"),
+        :kc("PCONST(NUM)"),
+        :kic("ICONST(NUM)")
     );
 
     self;
@@ -108,14 +107,17 @@ Returns the C C<#define> macros for register access etc.
 method defines($emitter) {
     return qq|
 /* defines - Ops::Trans::C */
-#undef CONST
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) (CUR_CTX->bp.regs_i[cur_opcode[i]])
 #define NREG(i) (CUR_CTX->bp.regs_n[-1L - cur_opcode[i]])
 #define PREG(i) (CUR_CTX->bp_ps.regs_p[-1L - cur_opcode[i]])
 #define SREG(i) (CUR_CTX->bp_ps.regs_s[cur_opcode[i]])
-#define CONST(i) Parrot_pcc_get_constants(interp, interp->ctx)[cur_opcode[i]]
+#define ICONST(i) cur_opcode[i]
+#define NCONST(i) Parrot_pcc_get_num_constants(interp, interp->ctx)[cur_opcode[i]]
+#define SCONST(i) Parrot_pcc_get_str_constants(interp, interp->ctx)[cur_opcode[i]]
+#undef  PCONST
+#define PCONST(i) Parrot_pcc_get_pmc_constants(interp, interp->ctx)[cur_opcode[i]]
 
 static int get_op(PARROT_INTERP, const char * name, int full);
 |;
@@ -180,6 +182,7 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
 |);
 
     my $index := 0;
+    my $op_lib_ref := '&' ~ $emitter.bs() ~ 'op_lib';
 
     for $emitter.ops_file.ops -> $op {
         my $type := sprintf( "PARROT_%s_OP", uc($op.type ?? 'INLINE' !! 'FUNCTION') );
@@ -218,7 +221,8 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
     $arg_count,
     $arg_types,
     $arg_dirs,
-    $labels
+    $labels,
+    $op_lib_ref
   | ~ '},
 ',
             );
@@ -278,11 +282,13 @@ typedef struct hop {
     op_info_t * info;
     struct hop *next;
 } HOP;
+
+static HOP *hop_buckets;
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
 static size_t hash_str(const char *str);
-static void store_op(PARROT_INTERP, op_info_t *info, int full);
+static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, const char *name);
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -314,60 +320,65 @@ size_t hash_str(ARGIN(const char *str))
     return key;
 }
 
-static void store_op(PARROT_INTERP, op_info_t *info, int full)
-{
-    HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
-    const size_t hidx =
-        hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
 
-    p->info   = info;
-    p->next   = hop[hidx];
-    hop[hidx] = p;
+static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, const char *name)
+{
+    const size_t hidx = hash_str(name) % OP_HASH_SIZE;
+
+    p->info           = info;
+    p->next           = hop[hidx];
+    hop[hidx]         = p;
 }
 
-static int get_op(PARROT_INTERP, const char * name, int full)
+static int get_op(PARROT_INTERP, const char *name, int full)
 {
-    const HOP * p;
+    const HOP   *p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
+
     if (!hop) {
         hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE,HOP *);
         hop_init(interp);
     }
+
     for (p = hop[hidx]; p; p = p->next) {
-        if(STREQ(name, full ? p->info->full_name : p->info->name))
+        if (STREQ(name, full ? p->info->full_name : p->info->name))
             return p->info - [[BS]]op_lib.op_info_table;
     }
+
     return -1;
 }
 
+
 static void hop_init(PARROT_INTERP)
 {
-    size_t i;
     op_info_t * const info = [[BS]]op_lib.op_info_table;
+
+    /* allocate the storage all in one chunk
+     * yes, this is profligate, but we can tighten it later */
+    HOP *hops = hop_buckets =
+        mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
+
+    opcode_t i;
+
     /* store full names */
-    for (i = 0; i < [[BS]]op_lib.op_count; i++)
-        store_op(interp, info + i, 1);
-    /* plus one short name */
-    for (i = 0; i < [[BS]]op_lib.op_count; i++)
-        if (get_op(interp, info[i].name, 0) == -1)
-            store_op(interp, info + i, 0);
+    for (i = 0; i < [[BS]]op_lib.op_count; i++) {
+        store_op(interp, info + i, hops++, info[i].full_name);
+
+        /* plus one short name */
+        if (i && info[i - 1].name != info[i].name)
+            store_op(interp, info + i, hops++, info[i].name);
+    }
 }
 
 static void hop_deinit(PARROT_INTERP)
 {
-    if (hop) {
-        size_t i;
-        for (i = 0; i < OP_HASH_SIZE; i++) {
-            HOP *p = hop[i];
-            while (p) {
-                HOP * const next = p->next;
-                mem_gc_free(interp, p);
-                p = next;
-            }
-        }
+    if (hop)
         mem_sys_free(hop);
-        hop = NULL;
-    }
+    if (hop_buckets)
+        mem_gc_free(interp, hop_buckets);
+
+    hop         = NULL;
+    hop_buckets = NULL;
 }|;
 
     $fh.print(subst($res, /'[[' BS ']]'/, $emitter.bs, :global));

@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -139,8 +138,8 @@ EOH
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
-    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, PMC* mro);\n");
-    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, Hash* isa);\n");
+    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro));\n");
+    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa));\n");
 
 
     $self->gen_attributes;
@@ -569,10 +568,10 @@ EOC
     if ( $self->is_dynamic ) {
         $cout .= <<"EOC";
         vt->base_type    = entry;
-        vt->whoami       = string_make(interp, "$classname", @{[length($classname)]},
-                                       "ascii", PObj_constant_FLAG|PObj_external_FLAG);
+        vt->whoami       = Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
+                                       Parrot_ascii_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
         vt->provides_str = Parrot_str_concat(interp, vt->provides_str,
-            string_make(interp, "$provides", @{[length($provides)]}, "ascii",
+            Parrot_str_new_init(interp, "$provides", @{[length($provides)]}, Parrot_ascii_encoding_ptr,
             PObj_constant_FLAG|PObj_external_FLAG));
 
 EOC
@@ -656,11 +655,18 @@ EOC
         next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
 
         #these differ for METHODs
-        my $method_name = $method->name;
-        my $symbol_name = $method->symbol;
+        my $method_name     = $method->name;
+        my $symbol_name     = $method->symbol;
+        my ($pcc_signature) = $method->pcc_signature;
 
         $cout .= <<"EOC";
-        register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
+        {
+            STRING *method_name = CONST_STRING_GEN(interp, "$symbol_name");
+            STRING *signature   = CONST_STRING_GEN(interp, "$pcc_signature");
+            register_native_pcc_method_in_ns(interp, entry,
+                F2DPTR(Parrot_${classname}_${method_name}),
+                method_name, signature);
+        }
 EOC
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
@@ -822,13 +828,14 @@ sub get_mro_func {
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* Parrot_${classname}_get_mro(PARROT_INTERP, PMC* mro) {
+PMC* Parrot_${classname}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro)) {
     if (PMC_IS_NULL(mro)) {
         mro = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     }
 $get_mro
     VTABLE_unshift_string(interp, mro,
-        string_make(interp, "$classname", @{[length($classname)]}, NULL, 0));
+        Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
+            Parrot_default_encoding_ptr, 0));
     return mro;
 }
 
@@ -863,7 +870,7 @@ sub get_isa_func {
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Hash* Parrot_${classname}_get_isa(PARROT_INTERP, Hash* isa) {
+Hash* Parrot_${classname}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa)) {
 EOC
 
     if ($get_isa ne '') {

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -465,12 +464,12 @@ Introspection interface. C<key> can be:
 
         PMC *ctx;
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return INTERP->root_namespace;
 
         name  = CONST_STRING(INTERP, "outer");
 
-        if (Parrot_str_equal(INTERP, item, name)) {
+        if (STRING_equal(INTERP, item, name)) {
             outer   = item;
             nextkey = key_next(INTERP, key);
 
@@ -522,32 +521,32 @@ Introspection interface. C<key> can be:
 
         name = CONST_STRING(INTERP, "context");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return ctx;
 
         name = CONST_STRING(INTERP, "sub");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return Parrot_pcc_get_sub(INTERP, ctx);
 
         name = CONST_STRING(INTERP, "lexpad");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return Parrot_pcc_get_lex_pad(INTERP, ctx);
 
         name = CONST_STRING(INTERP, "namespace");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return Parrot_pcc_get_namespace(INTERP, ctx);
 
         name = CONST_STRING(INTERP, "continuation");
 
-        if (Parrot_str_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, name))
             return VTABLE_clone(INTERP, Parrot_pcc_get_continuation(INTERP, ctx));
 
         name = CONST_STRING(INTERP, "annotations");
 
-        if (Parrot_str_equal(INTERP, item, name)) {
+        if (STRING_equal(INTERP, item, name)) {
             PMC        *sub_pmc = Parrot_pcc_get_sub(INTERP, ctx);
             if (ctx == CURRENT_CONTEXT(INTERP)) {
                 /* We can't know the current program counter for the currently
@@ -709,100 +708,9 @@ Finish thawing.
 
 */
 
-    VTABLE void visit(PMC *info) {
-        /*
-         * the information frozen here is part of all PBCs
-         * we probably need to freeze all dynamic extensible
-         * mappings (or at least the dynamic part)
-         * e.g.
-         *    charsets   idx - name
-         *    encodings  idx - name
-         *    pmc types  idx - name
-         *    dynamic oplibs    opcode nr - opname
-         *
-         * The machine thawing this info still needs to load
-         * these extensions, but the order of loading could be
-         * relaxed.
-         *
-         * creating all these info as standard PMCs would vastly
-         * simplify this process
-         *
-         * thaw would then need a merge operation:
-         *  - compare existing for sanity
-         *  - extend new
-         */
-
-        /*  HLL_info */
-        if (VTABLE_get_integer(INTERP, info) == VISIT_THAW_NORMAL ||
-            VTABLE_get_integer(INTERP, info) == VISIT_THAW_CONSTANTS) {
-            VISIT_PMC(INTERP, info, PMC_args(SELF));
-        }
-        else
-            VISIT_PMC(INTERP, info, INTERP->HLL_info);
-
-    }
-
-    VTABLE void thaw(PMC *info) {
-        if (!PMC_data(SELF)) {
-            Parrot_ParrotInterpreter_attributes * const attrs =
-                mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
-            PMC_data(SELF) = attrs;
-            PObj_custom_destroy_SET(SELF);
-        }
-
-        PMC_interp(SELF) = INTERP;
-    }
-
-    VTABLE void thawfinish(PMC *info) {
-        PMC * const new_info = PMC_args(SELF);
-        const INTVAL  m      = VTABLE_elements(INTERP, new_info);
-        INTVAL  i;
-        UNUSED(info)
-
-        PMC_args(SELF) = NULL;
-
-        /* merge new_info */
-        /* TODO compare old entries */
-
-        for (i = 0; i < m; ++i) {
-            PMC * const entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
-            PMC * const lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
-            PMC * const name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
-            PMC * const typemap  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
-            INTVAL hll_id = - 1;
-
-            if (!PMC_IS_NULL(name_pmc)) {
-                STRING * const hll_name = VTABLE_get_string(INTERP, name_pmc);
-
-                hll_id           = Parrot_register_HLL(INTERP, hll_name);
-            }
-
-            if (!PMC_IS_NULL(lib_pmc)) {
-                STRING * const lib_name = VTABLE_get_string(INTERP, lib_pmc);
-
-                if (!STRING_IS_EMPTY(lib_name)) {
-                    PMC * const ignored = Parrot_load_lib(INTERP, lib_name, NULL);
-                    const INTVAL id     = Parrot_register_HLL_lib(INTERP, lib_name);
-                    UNUSED(id);
-                }
-            }
-
-            if (hll_id >= 0 && !PMC_IS_NULL(typemap)) {
-                PMC   * const iter = VTABLE_get_iter(INTERP, typemap);
-                const INTVAL e     = VTABLE_get_integer(INTERP, typemap);
-                INTVAL i;
-
-                for (i = 0; i < e; ++i) {
-                    PMC * const key        = VTABLE_shift_pmc(INTERP, iter);
-                    const INTVAL core_type = VTABLE_get_integer(INTERP, key);
-                    const INTVAL hll_type  =
-                        VTABLE_get_integer_keyed_int(INTERP, typemap, core_type);
-
-                    Parrot_register_HLL_type(INTERP, hll_id,
-                        core_type, hll_type);
-                }
-            }
-        }
+    VTABLE void freeze(PMC *info) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                "Attempt to freeze interpreter");
     }
 
     METHOD run_gc() {
@@ -828,26 +736,75 @@ Map core_type to hll_type.
 
 /*
 
-=item METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional)
+=item METHOD stdin_handle(PMC *newhandle :optional)
 
-Returns the standard parrot handler associated with the interpreter.
-The valid values for fileno are listed in include/stdio.pasm
+If a PMC object is provided, the standard input handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
 
-Optionally sets the parrot handler passed as second argument
-as the specified standard handler.
-
-This method is experimental. See TT #264.
+If no PMC object is provided, the current standard input handle is returned.
 
 =cut
 
 */
 
-    METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
-        PMC * const handle = Parrot_io_stdhandle(INTERP, fileno, newhandle);
-        Parrot_warn_deprecated(INTERP, "stdhandle method is experimental");
+    METHOD stdin_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDIN_FILENO, newhandle);
         RETURN(PMC *handle);
     }
 
+/*
+
+=item METHOD stdout_handle(PMC *newhandle :optional)
+
+If a PMC object is provided, the standard output handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
+
+If no PMC object is provided, the current standard output handle is returned.
+
+=cut
+
+*/
+
+    METHOD stdout_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDOUT_FILENO, newhandle);
+        RETURN(PMC *handle);
+    }
+
+/*
+
+=item METHOD stderr_handle(PMC *newhandle :optional)
+
+If a PMC object is provided, the standard error handle for this interpreter
+is set to that PMC, and the new PMC handle is returned.
+
+If no PMC object is provided, the current standard error handle is returned.
+
+=cut
+
+*/
+
+    METHOD stderr_handle(PMC *newhandle :optional) {
+        PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDERR_FILENO, newhandle);
+        RETURN(PMC *handle);
+    }
+
+/*
+
+=item METHOD getpid()
+
+Returns the pid of the current process, 0 in platforms that doesn't
+support it.
+
+This method is experimental. See TT #1564.
+
+=cut
+
+*/
+
+    METHOD getpid() {
+        INTVAL id = Parrot_getpid();
+        RETURN(INTVAL id);
+    }
 
 }
 

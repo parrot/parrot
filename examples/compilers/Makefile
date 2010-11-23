@@ -1,4 +1,3 @@
-# $Id$
 
 # Generate shared libs, which will be used as loadable compilers
 

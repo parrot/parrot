@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -86,6 +85,7 @@ sub _evaluate_gcc {
 
     $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
         if $gccversion >= 4.0 && !$conf->data->get('sym_export');
+    $conf->data->set( noinline => '__attribute__ ((noinline))' );
 
     # sneaky check for g++
     my $gpp = (index($conf->data->get('cc'), '++') > 0) ? 1 : 0;

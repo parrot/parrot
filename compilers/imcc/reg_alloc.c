@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2003-2009, Parrot Foundation.
 */
 
@@ -166,8 +165,6 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
     if (!(IMCC_INFO(interp)->optimizer_level &
                 (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
         goto done;
-
-    IMCC_INFO(interp)->allocated = 0;
 
     if (unit->instructions->symreg_count)
       function = unit->instructions->symregs[0]->name;

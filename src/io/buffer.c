@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -232,7 +231,7 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
     size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
     STRING  *s    = Parrot_str_new_init(interp, buf, size,
-                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                        Parrot_default_encoding_ptr,
                         PObj_external_FLAG);
     size_t   got  = PIO_READ(interp, filehandle, &s);
 
@@ -272,7 +271,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGMOD(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_buffer)
-    unsigned char *out_buf, *buffer_start, *buffer_next, *buffer_end;
+    unsigned char *buffer_start, *buffer_next, *buffer_end;
     STRING        *s;
     size_t         len;
     size_t         current      = 0;
@@ -293,18 +292,17 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         return Parrot_io_readline_buffer(interp, filehandle, buf);
 
     if (*buf == NULL)
-        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, 2048);
+        *buf = Parrot_str_new_noinit(interp, 2048);
 
     s       = *buf;
     len     = s->bufused;
-    out_buf = (unsigned char *)s->strstart;
 
     /* read Data from buffer */
     if (buffer_flags & PIO_BF_READBUF) {
         const size_t avail = buffer_end - buffer_next;
         current            = avail < len ? avail : len;
 
-        memcpy(out_buf, buffer_next, current);
+        memcpy(s->strstart, buffer_next, current);
         buffer_next += current;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
         Parrot_io_set_file_position(interp, filehandle, (current +
@@ -327,7 +325,6 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         }
         else {
             /* more data needed */
-            out_buf += current;
             len -= current;
         }
     }
@@ -337,11 +334,13 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         size_t got;
 
         if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-            STRING *sf = Parrot_str_new_init(interp, (char *)out_buf, len,
-                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
-                PObj_external_FLAG);
-            got                 = PIO_READ(interp, filehandle, &sf);
-            s->strlen           = s->bufused = current + got;
+            STRING *sf  = Parrot_str_new_noinit(interp, len);
+
+            sf->bufused = len;
+            got         = PIO_READ(interp, filehandle, &sf);
+            s->strlen   = s->bufused = current + got;
+
+            memcpy(s->strstart + current, sf->strstart, got);
 
             Parrot_io_set_file_position(interp, filehandle,
                     (got + Parrot_io_get_file_position(interp, filehandle)));
@@ -357,7 +356,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
-    memcpy(out_buf, buffer_next, len);
+    memcpy(s->strstart + current, buffer_next, len);
     s->strlen    = s->bufused = current + len;
     buffer_next += len;
 
@@ -470,8 +469,10 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
     /* fill empty buffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {
-        if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
+        if (Parrot_io_fill_readbuf(interp, filehandle) == 0) {
+            s->bufused = 0;
             return 0;
+        }
     }
 
     /* Retrieve filled buffer */

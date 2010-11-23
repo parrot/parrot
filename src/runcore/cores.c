@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -27,7 +26,7 @@ requires an understanding of the Parrot runcores.
 
 Parrot has multiple runcores. Some are useful for particular maintenance
 tasks, some are only available as optimizations in certain compilers,
-some are intended for general use, and some are just interesing flights
+some are intended for general use, and some are just interesting flights
 of fancy with no practical benefits. Here we list the various runcores,
 their uses, and their benefits.
 
@@ -180,7 +179,7 @@ next opcode, which means faster throughput. Remember that whatever dispatch
 mechanism is used will be called after every single opcode, and some large
 programs may have millions of opcodes! Every single machine instruction
 that can be cut out of the dispatch mechanism could increase the execution
-speed of Parrot in a significant and noticable way. B<The dispatch mechanism
+speed of Parrot in a significant and noticeable way. B<The dispatch mechanism
 used by the various runcores is hardly the largest performance bottleneck in
 Parrot anyway, but we like to use faster cores to shave every little bit of
 speed out of the system>.
@@ -675,7 +674,7 @@ runops_gc_debug_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
 
-        Parrot_gc_mark_and_sweep(interp, GC_TRACE_FULL);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
 
         DO_OP(pc, interp);
@@ -717,7 +716,7 @@ runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
                     "attempt to access code outside of current code segment");
 
         if (interp->pdb->state & PDB_GCDEBUG)
-            Parrot_gc_mark_and_sweep(interp, 0);
+            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
         if (interp->pdb->state & PDB_TRACING) {
             trace_op(interp,

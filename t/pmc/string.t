@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(120)
+    plan(136)
 
     set_or_get_strings()
     setting_integers()
@@ -45,6 +44,7 @@ Tests the C<String> PMC.
     test_string_replace()
     set_i0__p0__string_to_int()
     test_string_trans()
+    reverse_string()
     is_integer__check_integer()
     instantiate_str()
     get_string_returns_cow_string()
@@ -57,6 +57,7 @@ Tests the C<String> PMC.
     exception_to_int_3()
     assign_null_string()
     access_keyed()
+    exists_keyed()
     # END_OF_TESTS
 .end
 
@@ -566,6 +567,21 @@ loop:
     .return(tr_array)
 .end
 
+.sub reverse_string
+    $P0 = box 'torrap'
+    $P0.'reverse'()
+    is( $P0, "parrot", 'reverse string' )
+
+    $P0 = box 'x'
+    $P0.'reverse'('hsifyllej')
+    is( $P0, 'jellyfish', "reverse string with optional arg")
+
+    $P0 = box unicode:"科ムウオ"
+    $P0.'reverse'()
+    is( $P0, unicode:"オウム科", 'reverse unicode string')
+
+.end
+
 .sub is_integer__check_integer
   $P0 = new ['String']
 
@@ -586,6 +602,11 @@ loop:
 
   $I0 = $P0.'is_integer'('+1')
   ok( $I0, '... +1' )
+
+  $S0 = 'abc123abc'
+  $S1 = substr $S0, 3, 3
+  $I0 = $P0.'is_integer'($S1)
+  ok( $I0, '... substr' )
 .end
 
 .sub instantiate_str
@@ -612,6 +633,9 @@ loop:
     s = "2a"
     $I0 = s.'to_int'(16)
     is( $I0, "42", '... 16' )
+    s = "2B"
+    $I0 = s.'to_int'(16)
+    is( $I0, "43", '... 16 upper' )
     s = "1001"
     $I0 = s.'to_int'(2)
     is( $I0, "9", '... 2' )
@@ -727,6 +751,20 @@ check:
     $P0 = s[2]
     is($P0, 'R', 'Get PMC by index')
 
+    .local pmc k
+    k = new ['Integer']
+    k = 2
+    $S0 = s[k]
+    is($S0, 'R', 'Get string keyed with PMC')
+
+    $I0 = s[k]
+    $I1 = ord 'R'
+    is($I0, $I1, 'Get integer keyed with PMC')
+
+    $P0 = s[k]
+    $S0 = $P0
+    is($S0, 'R', 'Get PMC keyed with PMC')
+
     # Set
     s = new ['String']
     s = ''
@@ -744,6 +782,22 @@ check:
     s[2] = $P0
     is(s, 'foo', 'Set PMC keyed')
 
+    s = ''
+    k = 0
+    s[k] = $S0
+    is(s, 'f', 'Set string keyed with PMC')
+
+    k = 1
+    $I0 = ord 'g'
+    s[k] = $I0
+    is(s, 'fg', 'Set integer keyed with PMC')
+
+    k = 2
+    $P0 = new ['String']
+    $P0 = 'h'
+    s[k] = $P0
+    is(s, 'fgh', 'Set PMC keyed with PMC')
+
     push_eh null_replace
     s = new ['String']
     s[0] = 'f'
@@ -753,6 +807,29 @@ check:
   null_replace:
     ok(1, 'Replace on null string throws')
   done_null_replace:
+.end
+
+.sub exists_keyed
+    .local pmc s, i
+    .local int r
+    s = new['String']
+    s = ''
+    i = new['Integer']
+    i = 0
+    r = exists s[i]
+    is(r, 0, 'exists_keyed on empty String')
+    s = 'a'
+    r = exists s[i]
+    is(r, 1, 'exists_keyed within bounds')
+    i = 1
+    r = exists s[i]
+    is(r, 0, 'exists_keyed out of bounds')
+    i = -1
+    r = exists s[i]
+    is(r, 1, 'exists_keyed negative within bounds')
+    i = -2
+    r = exists s[i]
+    is(r, 0, 'exists_keyed negative out of bounds')
 .end
 
 # Local Variables:

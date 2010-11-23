@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -16,7 +15,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 150
+.const int TESTS = 153
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -30,6 +29,7 @@ Tests the use of Parrot integer registers.
     test_sub()
     test_mul()
     test_div()
+    test_fdiv()
     test_mod()
     mod_negative_zero_rest()
     test_eq()
@@ -47,6 +47,7 @@ Tests the use of Parrot integer registers.
     test_sub_i_i()
     test_set_n()
     test_neg()
+    test_negate_max_integer()
     test_mul_i_i()
     test_null()
     test_div_i_i_by_zero()
@@ -274,6 +275,18 @@ Tests the use of Parrot integer registers.
 
     $I1 = 120 / 12
     is($I1, 10, 'div_i_ic_ic')
+.end
+
+.sub 'test_fdiv'
+    $I0 = 9
+    $I1 = -4
+    fdiv $I0, $I1
+    is($I0, -3, 'fdiv_i_i with negative divisor')
+
+    $I0 = 9
+    $I1 = -4
+    $I2 = fdiv $I0, $I1
+    is($I2, -3, 'fdiv_i_i_i with negative divisor')
 .end
 
 .sub 'test_mod'
@@ -730,6 +743,37 @@ Tests the use of Parrot integer registers.
     neg $I0
 
     is($I0, -3, 'neg_i')
+.end
+
+# Test to ensure that the negative of the maximum integer is equal to the
+# minimum integer + 1. This should be true because we are assuming a
+# two's-complement machine.
+
+.include 'iglobals.pasm'
+.sub test_negate_max_integer
+    .local int max, min
+
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['intvalsize']
+
+    # XXX can't use sysinfo (from sys_ops) in coretest
+    # build up 2's compliment min and max integers manually
+    max = 0x7F
+    min = 0x80
+    dec $I0
+  loop:
+    unless $I0 goto end_loop
+    min <<= 8
+    max <<= 8
+    max  |= 0xFF
+    dec $I0
+    goto loop
+  end_loop:
+
+    neg max
+    inc min
+    is(max, min)
 .end
 
 .sub 'test_mul_i_i'

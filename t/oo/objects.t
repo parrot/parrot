@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -21,7 +20,7 @@ Tests the object/class subsystem.
     .include "iglobals.pasm"
     .include "interpinfo.pasm"
 
-    plan(194)
+    plan(191)
 
     get_classname_from_class()
     test_get_class()
@@ -142,15 +141,6 @@ Tests the object/class subsystem.
 
     isa $I0, $P1, "calar"
     is( $I0, 0, 'Boolean !isa calar' )
-
-    isa $I0, $P1, "Integer"
-    is( $I0, 1, 'Boolean isa Integer' )
-
-    isa $I0, $P1, "Integ"
-    is( $I0, 0, 'Boolean !isa Integ' )
-
-    isa $I0, $P1, "eger"
-    is( $I0, 0, 'Boolean !isa eger' )
 
     isa $I0, $P1, " "
     is( $I0, 0, 'Boolean !isa " "' )
@@ -1064,7 +1054,7 @@ l1:
 
     a = a * b
     set $S0, a
-    is( $S0, '1', 'multip and reasign to subclassed Integer is 1' )
+    is( $S0, '1', 'multiply and reassign to subclassed Integer is 1' )
 .end
 
 .sub equality_of_subclassed_Integer

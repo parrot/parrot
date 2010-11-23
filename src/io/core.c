@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -80,7 +79,7 @@ Parrot_io_init(PARROT_INTERP)
 
 =item C<void Parrot_io_finish(PARROT_INTERP)>
 
-Closes the interpreter's IO resourses.  Called during its interpreter
+Closes the interpreter's IO resources.  Called during its interpreter
 destruction.
 
 =cut

@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -154,6 +153,7 @@ elements.
 
 */
 
+PARROT_PURE_FUNCTION
 int
 set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {

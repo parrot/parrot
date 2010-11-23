@@ -1,0 +1,270 @@
+# Copyright (C) 2008-2010, Parrot Foundation.
+
+=head1 NAME
+
+docs/project/git_workflow.pod - How to use Git to work on Parrot
+
+=head1 DESCRIPTION
+
+To minimize the disruption of feature development on language and tool
+developers, all major changes to Parrot core take place in a branch. Ideally,
+branches are short-lived, and contain the smallest set of changes possible.
+It is also good practice to have "atomic" commits, in the sense that each
+commit does one thing, so that it makes it easier to accept/revert some
+things while keeping others. Git provides many powerful tools in the
+maintainence of branches. This document aims to provide everything a Parrot
+developer needs to know about Git to successfully create a branch, work on
+it, keep it in sync with changes on master and finally merge the branch.
+
+=head2 Cloning the Git Repository
+
+To get the full version history Parrot, which is called "cloning a repository",
+you will use the C<git clone> command. This will show how to clone the repo from
+L<http://github.com> :
+
+  git clone git://github.com/parrot/parrot.git
+
+If you have commit access to parrot.git, then you can use the read/write SSH
+protocol
+
+  git clone git@github.com:parrot/parrot.git
+
+If you are behind a firewall that will only let you do HTTP, you can use the
+HTTP protocol, but it is much slower and inefficient, so only use it if you
+must:
+
+  git clone http://github.com/parrot/parrot.git
+
+Cloning a git repo automatically makes the URL that you cloned from your
+default "remote", which is called "origin". What this means is that
+when you want to pull in new changes or push changes out in the future,
+"origin" is what will be used by default.
+
+=head2 Creating and Switching Branches
+
+To create a branch and check it out, use the C<git checkout -b> command.
+Please note that branches are first created locally, and then pushed
+to any number of remotes. A branch cannot be seen by anyone else
+until it is pushed to a remote.
+
+Current convention is to create branch names of the form username/foo.
+
+  git checkout -b username/foo
+
+You can also create a branch without checking it out:
+
+  git branch username/foo
+
+To checkout (or "switch to", as it is commonly referred to) the username/foo
+branch:
+
+  git checkout username/foo
+
+=head2 Pushing branches and tags
+
+If you want to push your local branch user/branch to origin:
+
+  git push origin user/branch
+
+Tags are not pushed by default. If you want to push your tags to origin:
+
+  git push origin --tags
+
+Since origin is the default remote, this is the same as
+
+  git push --tags
+
+=head2 Keeping branches updated
+
+To get the latest updates:
+
+  git fetch
+
+This copies the index from your default remote (origin) and saves it to your
+local index. This does not effect your working copy, so it doesn't matter
+what branch you are on when you run this command. To sync up your working
+copy, you can use C<git rebase>
+
+  git checkout master       # Switch to the master branch
+  git rebase origin/master  # rebase latest fetched changes onto master
+
+This is a common action, so there is also a simpler way to do it:
+
+  git pull --rebase
+
+Whenever you don't specify a remote or branch to a git command, they default
+to the remote called "origin" and the master branch, so the previous command
+means exactly the same as:
+
+  git pull --rebase origin master
+
+This is important to note when you are working with remotes other than origin,
+or other branches.
+
+=head2 How to commit
+
+Let's say you modified the file foo.c and added the file bar.c and you want to commit
+these changes. To add these changes to the staging area (the list of stuff 
+that will be included in your next commit) :
+
+  git add foo.c bar.c
+
+The command C<git add> is not only for adding new files, just keep that in mind.
+It tells git "add the state of these files to my staging area."
+
+Now for actually creating your commit! Since Git is a distributed version control
+system, committing code is seperate from sending your changes to a remote server.
+Keep this in mind if you are used to Subversion or similar VCS's, where committing
+and sending changes are tied together.
+
+  git commit -m "This is an awesome and detailed commit message"
+
+If you do not give the -m option to C<git commit>, it will open your $EDITOR
+and give you metadata which will help you write your commit message,
+such as which files changed and if conflicts happened. Only lines that do
+not begin with a # will be in your commit message.
+
+Commit messages consist of a one line "short message" and an optional long
+message that can be as long as you like. There must be an empty line between
+the short message and the long message. It is often a good practice to keep the
+first line of a commit message relatively short, around 50 characters. This
+allows for tools to succinctly display one-line commit messages with metadata.
+It is good practice to describe *why* something was done in the long message,
+in addition to what was done.
+
+=head2 Maintaining a Branch
+
+To update your local git index from origin:
+
+  git fetch
+
+If you are following multiple remotes, you can fetch updates from all of them with
+
+  git fetch --all
+
+Note that this command requires a recent (1.7.x.x) version of git.
+
+The command C<git fetch> only modifies the index, not your working copy or staging
+area. To update your working copy of the branch bobby/tables
+
+  git checkout bobby/tables         # make sure we are on the branch
+  git rebase origin/bobby/tables    # get the latest sql injections
+
+If you have a topic branch and want to pick up the most recent changes in master
+since the topic branch diverged, you can merge the master branch into the topic
+branch. In this case, we assume the topic branch is called parrot/beak:
+
+  git checkout parrot/beak          # make sure we are on the branch
+  git merge master                  # merge master into parrot/beak
+
+This same pattern can be followed for merging any branch into another
+branch.
+
+=head2 Preparing to Merge a Branch
+
+Post to parrot-dev@lists.parrot.org letting people know that you're about to
+merge a branch.
+
+=over
+
+=item 1
+
+Ask people to submit test results for their language, tool, or platform. They
+can submit results to Smolder by typing "make smoke" on the relevant branch. If
+you don't hear back from people, it doesn't mean they ran the tests and found
+no problems, it means they didn't bother testing the branch. If you need
+feedback on a particular language or platform, follow up with the person
+responsible until you hear an explicit "Yes, it's working" answer.
+
+=item 2
+
+Let people know what tests you ran, so they can determine if you didn't run
+the tests for their language or tool (or, didn't run I<all> the tests for
+their language or tool if they have some unusual testing configuration).
+
+=item 3
+
+Mention any significant feature changes in the branch that you particularly
+want tested.
+
+=back
+
+=head2 Merging a Branch
+
+When you're ready to merge your changes back into master, use the C<git merge>
+command. First, make sure you are on the master branch with
+
+  git checkout master
+
+Now, to merge the branch user/foo into master:
+
+  git merge --no-ff user/foo
+
+If the same part of the same file has been modified in master and the branch
+user/foo, you will get a conflict. If you get a conflict, then you need to edit
+each file with a conflict, fix the conflict, delete the conflict markers, C<git
+add> each conflicted file and then finally commit the result. You may find it
+useful to type C<git commit> with no commit message argument (-m), so your
+$EDITOR will be opened and a default commit message of "Merged branch user/foo
+into master" with a list of conflicted files will be present, which can be left
+alone or additional information can be added.
+
+At this point you should run the test suite on the merged branch, and fix
+any failures if possible. If these problems cannot be resolved, then
+the results of the merge should not be pushed back to master on origin.
+You may want to push a topic branch to allow other people to help:
+
+  git checkout -b user/foo_in_master
+  git push origin user/foo_in_master
+
+You can now mention the problems you ran into to parrot-dev or #parrot
+and mention the branch.
+
+Why use "--no-ff" ? This flag mean "no fast forwards". Usually fast forwards
+are good, but if there is a branch that has all the commits of master, plus
+a few more, when you merge without --no-ff, there will be no merge commit.
+Git is smart enought to "fast forward." But for the purpose of looking at
+history, Parrot would like to always have a merge commit for a merge, even
+if it *could* be fast-forwarded.
+
+This flag is only needed when merging branches into master. It is optional
+for other merge cases, but it won't hurt. If it is simpler to think about,
+you can always use "--no-ff" when merging.
+
+=head2 Announcing a Merge
+
+Send a message to parrot-dev@lists.parrot.org letting people know that your
+branch has been merged. Include a detailed list of changes made in the branch
+(you may want to keep this list as you work). Particularly note any added,
+removed, or changed opcodes, changes to PIR syntax or conventions, and changes
+in the C interface.
+
+If there was a specific language, tool, or platform that you wanted tested
+before merging but couldn't get any response from the responsible person, you
+may want to include some warning in the announcement that you weren't able to
+test that piece fully.
+
+=head2 Deleting a Branch
+
+After merging a branch, you will have a local copy of the merged branch, as well
+as a copy of the branch on your remote. To remove the local branch:
+
+  git branch -d user/foo
+
+To remove the remote branch user/foo on the remote origin :
+
+  git push origin :user/foo
+
+This follows the general pattern of
+
+  git push origin local_branch_name:remote_branch_name
+
+When local_branch_name is empty, you are pushing "nothing" to the remote branch,
+which deletes it.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

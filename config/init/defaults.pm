@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -59,6 +58,7 @@ sub runstep {
         ccflags
         d_socklen_t
         optimize
+        osvers
         scriptdirexp
         sig_name
         sPRIgldbl
@@ -80,13 +80,17 @@ sub runstep {
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
+    # escape spaces in build directory
+    my $build_dir =  abs_path($FindBin::Bin);
+    $build_dir    =~ s{ }{\\ }g;
+
     my $cc_option = $conf->options->get('cc');
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
-        build_dir => abs_path($FindBin::Bin),
+        build_dir => $build_dir,
         configured_from_file =>
             $conf->options->get('configured_from_file') || '',
         configuration_steps => ( join q{ } => $conf->get_list_of_steps() ),
@@ -193,7 +197,7 @@ sub runstep {
         touch     => '$(PERL) -MExtUtils::Command -e touch',
 
         ar        => $Config{ar},
-        ar_flags  => 'cr',
+        arflags   => 'cr',
 
         # for Win32
         ar_out => '',
@@ -257,6 +261,13 @@ sub runstep {
     $conf->data->set( clock_best => "" );
 
     $conf->data->set( 'archname', $Config{archname});
+
+    $conf->data->set( has_core_nci_thunks => 1 );
+    $conf->data->set( HAS_CORE_NCI_THUNKS => 1 );
+    if ( $conf->options->get( 'without-core-nci-thunks' ) ) {
+        $conf->data->set( has_core_nci_thunks => 0 );
+        $conf->data->set( HAS_CORE_NCI_THUNKS => 0 );
+    }
 
     $conf->data->set( has_extra_nci_thunks => 1 );
     $conf->data->set( HAS_EXTRA_NCI_THUNKS => 1 );

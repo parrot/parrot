@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -297,25 +296,6 @@ Removes and returns an item from the start of the array.
 
         value = SELF.get_string_keyed_int(0);
         SELF.delete_keyed_int(0);
-        return value;
-    }
-
-/*
-
-=item C<PMC *shift_pmc()>
-
-Removes and returns the first element in the array.
-
-=cut
-
-*/
-
-    VTABLE PMC *shift_pmc() {
-        STRING * const strval = SELF.shift_string();
-        PMC    * const value  = Parrot_pmc_new(INTERP, enum_class_String);
-
-        VTABLE_set_string_native(INTERP, value, strval);
-
         return value;
     }
 

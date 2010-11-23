@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -59,6 +58,7 @@ efficiency on reading non-native PBCs.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
+#include "parrot/oplib/core_ops.h"
 
 /*
 
@@ -81,25 +81,6 @@ const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 
 /*
 
-=item C<static void fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
-
-Dump the fixup table.
-
-=cut
-
-*/
-
-static void
-fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
-{
-    Parrot_io_printf(interp, "%Ss => [\n", segp->name);
-    PackFile_Fixup_dump(interp, (const PackFile_FixupTable *)segp);
-    Parrot_io_printf(interp, "],\n");
-}
-
-
-/*
-
 =item C<static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Disassemble and dump.
@@ -112,13 +93,36 @@ static void
 disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     const opcode_t *pc = self->data;
+    const PackFile_ByteCode_OpMapping *map = &((const PackFile_ByteCode *)self)->op_mapping;
+    INTVAL i;
 
     Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
 
+    for (i = 0; i < map->n_libs; i++) {
+
+        INTVAL j, lib_num, table_num;
+        PackFile_ByteCode_OpMappingEntry *entry = &map->libs[i];
+        Parrot_io_printf(interp, "  map #%d => [\n", i);
+        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
+                entry->lib->name,
+                entry->lib->major_version,
+                entry->lib->minor_version,
+                entry->lib->patch_version,
+                entry->n_ops);
+
+        for (j = 0; j < map->libs[i].n_ops; j++) {
+            lib_num    = entry->lib_ops[j];
+            table_num  = entry->table_ops[j];
+            Parrot_io_printf(interp, "    %08lx => %08lx (%s)\n", table_num, lib_num,
+                    entry->lib->op_info_table[lib_num].full_name);
+        }
+        Parrot_io_printf(interp, "  ]\n");
+    }
+
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */
-        size_t n = (size_t)interp->op_info_table[*pc].op_count;
+        size_t n = (size_t)interp->code->op_info_table[*pc]->op_count;
         size_t i;
 
         /* trace_op_dump(interp, self->pf->src, pc); */
@@ -131,7 +135,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
                 Parrot_io_printf(interp, "         ");
 
         Parrot_io_printf(interp, "%s\n",
-                interp->op_info_table[*pc].full_name);
+                interp->code->op_info_table[*pc]->full_name);
 
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
@@ -159,16 +163,16 @@ nums_dump(PARROT_INTERP, const PackFile_Segment *self)
     const PackFile_Segment *debug      = PackFile_find_segment(interp,
                                             self->dir, debug_name, 1);
 
-    const opcode_t  * pc            = self->data;
-    const opcode_t  * debug_ops     = debug->data;
-    const op_info_t * const op_info = interp->op_info_table;
+    opcode_t   * pc            = self->data;
+    opcode_t   * debug_ops     = debug->data;
+    op_info_t ** const op_info = interp->code->op_info_table;
 
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */
-        size_t n = (size_t)op_info[*pc].op_count;
+        size_t n = (size_t)op_info[*pc]->op_count;
 
         Parrot_io_printf(interp, " %04x:  %s\n",
-            *(debug_ops++), op_info[*pc].full_name);
+            *(debug_ops++), op_info[*pc]->full_name);
 
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
@@ -431,7 +435,6 @@ main(int argc, const char **argv)
     /* install a dumper function */
     if (!terse) {
         pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
-        pf->PackFuncs[PF_FIXUP_SEG].dump = fixup_dump;
     }
 
     if (disas)

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2005-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -32,7 +31,10 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass AddrRegistry extends Hash provides hash auto_attrs {
+pmclass AddrRegistry provides hash auto_attrs {
+ATTR Hash *pmc_registry;
+ATTR Hash *str_registry;
+
 /*
 
 =item C<void init()>
@@ -44,16 +46,68 @@ Initializes the instance.
 */
 
     VTABLE void init() {
-        Hash  *registry = parrot_create_hash(INTERP,
+        Hash  *pmc_registry = parrot_create_hash(INTERP,
                 enum_type_int,
-                Hash_key_type_PMC,
-                int_compare,
-                key_hash_int);
+                Hash_key_type_PMC_ptr);
 
-        SET_ATTR_hash(INTERP, SELF, registry);
+        Hash  *str_registry = parrot_create_hash(INTERP,
+                enum_type_int,
+                Hash_key_type_STRING);
+
+        SET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
+        SET_ATTR_str_registry(INTERP, SELF, str_registry);
         PObj_custom_mark_destroy_SETALL(SELF);
 
     }
+
+/*
+
+=item C<void mark()>
+
+Mark any PMCs and STRINGs in this registry.
+
+=cut
+
+*/
+
+
+    VTABLE void mark() {
+        Hash *str_registry, *pmc_registry;
+
+        GET_ATTR_str_registry(INTERP, SELF, str_registry);
+        GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
+
+        parrot_mark_hash(interp, pmc_registry);
+        parrot_mark_hash(interp, str_registry);
+
+    }
+
+
+/*
+
+=item C<void destroy()>
+
+Destroy this PMC.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Hash *str_registry, *pmc_registry;
+
+        GET_ATTR_str_registry(INTERP, SELF, str_registry);
+        GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
+
+        parrot_hash_destroy(interp, pmc_registry);
+        parrot_hash_destroy(interp, str_registry);
+
+        SET_ATTR_str_registry(INTERP, SELF, NULL);
+        SET_ATTR_pmc_registry(INTERP, SELF, NULL);
+
+    }
+
+
 
 /*
 
@@ -77,7 +131,7 @@ Returns true if the hash size is not zero.
         Hash       *hash;
         const void *value;
 
-        GET_ATTR_hash(INTERP, SELF, hash);
+        GET_ATTR_pmc_registry(INTERP, SELF, hash);
         value = parrot_hash_get(INTERP, hash, key);
 
         if (value)
@@ -87,19 +141,23 @@ Returns true if the hash size is not zero.
     }
 
     VTABLE INTVAL elements() {
-        const Hash *hash;
+        const Hash *pmc_registry, *str_registry;
 
-        GET_ATTR_hash(INTERP, SELF, hash);
+        GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
+        GET_ATTR_str_registry(INTERP, SELF, str_registry);
 
-        return parrot_hash_size(INTERP, hash);
+        return parrot_hash_size(INTERP, pmc_registry) +
+               parrot_hash_size(INTERP, str_registry);
     }
 
     VTABLE INTVAL get_bool() {
-        const Hash *hash;
+        const Hash *pmc_registry, *str_registry;
 
-        GET_ATTR_hash(INTERP, SELF, hash);
+        GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
+        GET_ATTR_str_registry(INTERP, SELF, str_registry);
 
-        return parrot_hash_size(INTERP, hash) != 0;
+        return (parrot_hash_size(INTERP, pmc_registry) +
+                parrot_hash_size(INTERP, str_registry)) != 0;
     }
 /*
 
@@ -113,6 +171,8 @@ create it. The C<value> is always ignored.
 Set the given value.
 
 =item C<void delete_keyed(PMC *key)>
+
+=item C<void delete_keyed_str(STRING *key)>
 
 Decrement the reference count of C<key>. If the reference count
 reaches 0, delete the entry.
@@ -128,7 +188,23 @@ reaches 0, delete the entry.
         Hash       *hash;
         UNUSED(value);
 
-        GET_ATTR_hash(INTERP, SELF, hash);
+        GET_ATTR_pmc_registry(INTERP, SELF, hash);
+
+        oldval = parrot_hash_get(INTERP, hash, key);
+
+        if (oldval)
+            newval += (long)oldval;
+
+        parrot_hash_put(INTERP, hash, key, (void *)newval);
+    }
+
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        const void *oldval;
+        long        newval = 1;
+        Hash       *hash;
+        UNUSED(value);
+
+        GET_ATTR_str_registry(INTERP, SELF, hash);
 
         oldval = parrot_hash_get(INTERP, hash, key);
 
@@ -140,7 +216,7 @@ reaches 0, delete the entry.
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         Hash *hash;
-        GET_ATTR_hash(INTERP, SELF, hash);
+        GET_ATTR_pmc_registry(INTERP, SELF, hash);
         parrot_hash_put(INTERP, hash, key, (void *)value);
     }
 
@@ -148,7 +224,26 @@ reaches 0, delete the entry.
         Hash       *hash;
         void       *value;
 
-        GET_ATTR_hash(INTERP, SELF, hash);
+        GET_ATTR_pmc_registry(INTERP, SELF, hash);
+        value = parrot_hash_get(INTERP, hash, key);
+
+        /* these casts look bad, but they avoid type punning warnings with -O */
+        if (value) {
+            long val = (long)value;
+            if (val == 1L)
+                parrot_hash_delete(INTERP, hash, key);
+            else {
+                value = (void *)(--val);
+                parrot_hash_put(INTERP, hash, key, value);
+            }
+        }
+    }
+
+    VTABLE void delete_keyed_str(STRING *key) {
+        Hash       *hash;
+        void       *value;
+
+        GET_ATTR_str_registry(INTERP, SELF, hash);
         value = parrot_hash_get(INTERP, hash, key);
 
         /* these casts look bad, but they avoid type punning warnings with -O */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -88,20 +87,6 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs resizing */
-
-
-/*
-=item C<void init()>
-
-Initializes the array.
-
-=cut
-
-*/
-
-    VTABLE void init() {
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
 
 /*
 
@@ -762,7 +747,7 @@ Common part for unshift operations.
 
 =item C<static void throw_pop_empty(PARROT_INTERP)>
 
-Throws with the appropiate message.
+Throws with the appropriate message.
 
 =cut
 

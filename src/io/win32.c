@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -457,7 +456,7 @@ Parrot_io_read_win32(PARROT_INTERP,
                     (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
     else {
-        /* FIXME : An error occured */
+        /* FIXME : An error occurred */
             Parrot_io_set_flags(interp, filehandle,
                     (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
