@@ -148,8 +148,12 @@ main(int argc, const char *argv[])
     }
 
     if (imcc_run_api(interp, sourcefile, argc, argv, &bytecodepmc)) {
-        if (!(Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray) &&
-              Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))) {
+        if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray)) {
+            fprintf(stderr, "PARROT VM: Could not load or run bytecode");
+            get_last_error(interp);
+            exit(EXIT_FAILURE);
+        }
+        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray)) {
             fprintf(stderr, "PARROT VM: Could not load or run bytecode");
             get_last_error(interp);
             exit(EXIT_FAILURE);
@@ -164,7 +168,7 @@ main(int argc, const char *argv[])
 static void
 get_last_error(Parrot_PMC interp)
 {
-    Parrot_String *errmsg;
+    Parrot_String errmsg;
     char * errmsg_raw;
     if (Parrot_api_get_last_error(interp, &errmsg) &&
         Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw))

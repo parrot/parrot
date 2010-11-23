@@ -157,6 +157,8 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
+    PMC * main_sub = NULL;
+
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
@@ -165,6 +167,17 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
     PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
     PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+
+    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
+
+    if (!main_sub)
+        main_sub = set_current_sub(interp);
+
+    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
+    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
+
+    Parrot_ext_call(interp, main_sub, "P->", mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
