@@ -844,8 +844,8 @@ help :
 	@echo "  reconfig:          'clean' and redo configuration."
 	@echo ""
 	@echo "Fetch from source repository:"
-	@echo "  update:            svn update."
-	@echo "  status:            svn status."
+	@echo "  update:            git pull."
+	@echo "  status:            git status."
 	@echo "  patch:             Create a patch to attach to https://trac.parrot.org/"
 	@echo ""
 	@echo "Development:"
@@ -2338,18 +2338,18 @@ pmcrenumber :
 
 ###############################################################################
 #
-# SVN Targets:
+# GIT Targets:
 #
 ###############################################################################
 
 update :
-	svn -q update
+	git pull --rebase
 
 status :
-	svn -q status
+	git status
 
 patch :
-	svn diff
+	git diff
 
 LINTABLE_CFILES = `echo src/main$(O) $(O_FILES) src/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
@@ -2673,7 +2673,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir qw ( $(COVER_DIRS) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
@@ -2813,7 +2813,7 @@ tags-emacs: tags.emacs.dummy
 	$(RM_F) TAGS
 	@ctags@ -e \
 	--links=no --totals \
-	-R --exclude=blib --exclude=.svn  \
+	-R --exclude=blib --exclude=.git  \
 	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.
@@ -2833,7 +2833,7 @@ tags-vi: tags.vi.dummy
 	$(RM_F) tags
 	@ctags@ \
 	--links=no --totals \
-	-R --exclude=blib --exclude=.svn  \
+	-R --exclude=blib --exclude=.git  \
 	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.

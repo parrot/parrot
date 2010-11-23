@@ -66,7 +66,7 @@ sub replace {
     $self->add_fragment($replacement);
     $self->emit( $post, $self->filename, $self->{bline} + count_newlines($all) );
 
-    for my $x qw( data bline eline ) {
+    for my $x (qw( data bline eline )) {
         delete $self->{$x};
     }
     return 1;
@@ -102,7 +102,7 @@ sub annotate {
 
     my $output = $self->{output};
 
-    for my $x qw( output current_line current_file ) {
+    for my $x (qw( output current_line current_file )) {
         delete $self->{$x};
     }
 

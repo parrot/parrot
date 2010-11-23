@@ -49,10 +49,6 @@ L<https://trac.parrot.org/parrot/ticket/1580>
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
-=item CodeString [eligible in 2.7]
-
-L<http://trac.parrot.org/parrot/ticket/1633>
-
 =item multiple dispatch within core PMCs [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/452>
@@ -203,12 +199,6 @@ L<https://trac.parrot.org/parrot/ticket/1548>
 These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
-
-=item find_lex [eligible in 2.4]
-
-find_lex will not throw exception for non-existing lexicals.
-
-L<https://trac.parrot.org/parrot/ticket/1207>
 
 =item inplace string updates. [eligible in 2.4]
 

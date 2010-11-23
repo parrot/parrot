@@ -131,7 +131,7 @@ sub send_archive_to_smolder {
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
             report_file  => $report_file,
-            revision     => $PConfig{sha1},
+            revision     => $PConfig{git_describe},
         ]
     );
 
@@ -199,8 +199,8 @@ sub collect_test_environment_data {
     push @data, ( 'Configure args' => $PConfig{configure_args} )
       if $PConfig{configure_args};
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
-    push @data, ( 'Git describe' => $PConfig{git_describe} )
-      if $PConfig{git_describe};
+    push @data, ( 'Git sha1' => $PConfig{sha1} )
+      if $PConfig{sha1};
     return @data;
 }
 
