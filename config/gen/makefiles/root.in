@@ -454,6 +454,7 @@ INTERP_O_FILES = \
     src/embed$(O) \
     src/embed/api$(O) \
     src/embed/strings$(O) \
+    src/embed/pmc$(O) \
     src/string/encoding$(O) \
     src/exceptions$(O) \
     src/exit$(O) \
@@ -1591,10 +1592,13 @@ src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
 		include/pmc/pmc_sub.h
 
 src/embed/api$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
-		src/embed/api.c
+		src/embed/api.c src/embed/embed_private.h
 
 src/embed/strings$(O) :  $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
-		src/embed/strings.c
+		src/embed/strings.c src/embed/embed_private.h
+
+src/embed/pmc$(O) :  $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
+		src/embed/strings.c src/embed/embed_private.h
 
 src/dataypes$(O) : $(GENERAL_H_FILES) src/dataypes.c
 

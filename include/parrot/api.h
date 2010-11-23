@@ -307,6 +307,45 @@ Parrot_Int Parrot_api_string_import_binary(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/strings.c */
 
+/* HEADERIZER BEGIN: src/embed/pmc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_deserialize(
+    Parrot_PMC interp_pmc,
+    Parrot_String fpmc,
+    ARGOUT(Parrot_PMC * pmc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* pmc);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_deserialize_bytes(
+    Parrot_PMC interp_pmc,
+    ARGIN(const unsigned char * const fpmc),
+    Parrot_Int length,
+    ARGOUT(Parrot_PMC * pmc))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* pmc);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_null(
+    Parrot_PMC interp_pmc,
+    ARGMOD(Parrot_PMC *pmctonull))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmctonull);
+
+#define ASSERT_ARGS_Parrot_api_pmc_deserialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_api_pmc_deserialize_bytes \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(fpmc) \
+    , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmctonull))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/embed/pmc.c */
+
 /* Forward declaration because IMCC is still part of libparrot, but we don't
    want to include parrot/imcc.h */
 
