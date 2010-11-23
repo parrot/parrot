@@ -18,12 +18,6 @@
     # We need some constants
     # Interpreter.
     pfconst = new 'PackfileConstantTable'
-    $P0 = getinterp
-    pfconst[0] = $P0
-
-    # Empty FIA for handling returns from "hello"
-    $P0 = new 'FixedIntegerArray'
-    pfconst[1] = $P0
 
     # "Hello World" string
     pfconst[0] = "Hello World"
@@ -33,6 +27,10 @@
 
     # "hello.pir" is our pir file which we are "compiling"
     pfconst[2] = "hello.pir"
+
+    # Empty FIA for handling returns from "hello"
+    $P0 = new 'FixedIntegerArray'
+    pfconst[0] = $P0
 
     # We will need Sub PMC as well but will deal with it later.
     # Add PackfileConstantTable into directory.
@@ -73,7 +71,7 @@
 
     $P1 = new 'Sub', $P0
     # and store it in PackfileConstantTable
-    pfconst[3] = $P1
+    pfconst[1] = $P1
 
     # Now pack Packfile and save it
     $S0 = pf
