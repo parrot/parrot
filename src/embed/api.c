@@ -201,6 +201,20 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
 
 PARROT_API
 Parrot_Int
+Parrot_api_disassemble_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(const char * const outfile), Parrot_Int opts)
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
+    if (pf->cur_cs != NULL)
+        Parrot_pbc_load(interp, pf);
+    Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+Parrot_Int
 Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), Parrot_Int argc, ARGIN(char **argv), ARGOUT(PMC **args))
 {
     ASSERT_ARGS(Parrot_api_build_argv_array)

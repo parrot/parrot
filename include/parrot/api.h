@@ -16,9 +16,6 @@
 
 
 #define PARROT_API PARROT_EXPORT
-#define GET_INIT_STRUCT(i) do {\
-        (i) = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args), 0); \
-    } while(0)
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
  * rvalue lets us put ASSERT_ARGS() at the top of the list of local variables.
@@ -54,6 +51,12 @@ typedef struct _Parrot_Init_Args {
     Parrot_Int gc_threshold;
     Parrot_Int hash_seed;
 } Parrot_Init_Args;
+
+#define GET_INIT_STRUCT(i) do {\
+        void * __stacktop = NULL; \
+        (i) = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args), 0); \
+        (i)->stacktop = &__stacktop; \
+    } while(0)
 
 /* HEADERIZER BEGIN: src/embed/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -105,6 +108,17 @@ Parrot_Int Parrot_api_debug_flag(
 PARROT_API
 Parrot_Int Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
         __attribute__nonnull__(1);
+
+PARROT_API
+Parrot_Int Parrot_api_disassemble_bytecode(
+    ARGMOD(PMC *interp_pmc),
+    ARGIN(PMC *pbc),
+    ARGIN(const char * const outfile),
+    Parrot_Int opts)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*interp_pmc);
 
 PARROT_API
 Parrot_Int Parrot_api_flag(
@@ -235,6 +249,11 @@ Parrot_Int Parrot_api_set_warnings(
 #define ASSERT_ARGS_Parrot_api_destroy_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc))
+#define ASSERT_ARGS_Parrot_api_disassemble_bytecode \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(pbc) \
+    , PARROT_ASSERT_ARG(outfile))
 #define ASSERT_ARGS_Parrot_api_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc))
 #define ASSERT_ARGS_Parrot_api_get_last_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

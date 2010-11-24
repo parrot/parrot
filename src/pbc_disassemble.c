@@ -25,13 +25,12 @@ Without non-option arguments it reads the pbc from STDIN.
 
 */
 
-#include <parrot/parrot.h>
-#include "parrot/embed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "parrot/api.h"
 
-static void do_dis(Parrot_Interp, const char *, int);
+static void get_last_error(Parrot_PMC interp);
 
 /*
 
@@ -85,20 +84,23 @@ command-line and disassembles it.
 int
 main(int argc, const char *argv[])
 {
-    Parrot_PackFile pf;
-    Parrot_Interp interp;
+    Parrot_PMC interp;
+    Parrot_PMC pbc;
     const char *outfile = NULL;
     int option = 0;
     int debug = PFOPT_UTILS;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
+    Parrot_Init_Args *initargs;
+    GET_INIT_STRUCT(initargs);
 
-    interp = Parrot_new(NULL);
-    if (!interp) {
-        return 1;
+    if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+          Parrot_api_set_executable_name(interp, argv[0]))) {
+        fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+        get_last_error(interp);
+        exit(EXIT_FAILURE);
     }
-    /* init and set top of stack */
-    Parrot_init_stacktop(interp, &status);
+
     while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
           case 'h':
@@ -127,36 +129,31 @@ main(int argc, const char *argv[])
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug);
+    // What to do about this debug flag?
+    //pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug);
 
-    if (!pf) {
-        printf("Can't read PBC\n");
-        return 1;
+    if (!(Parrot_api_load_bytecode_file(interp, argc ? *argv : "-", &pbc) &&
+          Parrot_api_disassemble_bytecode(interp, pbc, outfile, option) &&
+          Parrot_api_destroy_interpreter(interp))) {
+        fprintf(stderr, "Error during disassembly\n");
+        get_last_error(interp);
+        exit(EXIT_FAILURE);
     }
-
-    Parrot_pbc_load(interp, pf);
-
-    do_dis(interp, outfile, option);
-
-    Parrot_exit(interp, 0);
+    exit(EXIT_SUCCESS);
 }
 
-/*
-
-=item C<static void do_dis(PARROT_INTERP, const char *outfile, int options)>
-
-Do the disassembling.
-
-C<option> is currently used to pass debugging flags to the packfile reader.
-
-=cut
-
-*/
-
 static void
-do_dis(PARROT_INTERP, const char *outfile, int options)
+get_last_error(Parrot_PMC interp)
 {
-    Parrot_disassemble(interp, outfile, (Parrot_disassemble_options) options);
+    Parrot_String errmsg;
+    char * errmsg_raw;
+    if (Parrot_api_get_last_error(interp, &errmsg) &&
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)) {
+        fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+        Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
+    }
+    else
+        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
 }
 
 /*
