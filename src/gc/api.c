@@ -25,51 +25,44 @@ components.
 =item F<src/gc/api.c>
 
 This is the main API file which provides access to functions which are used by
-the rest of Parrot core. In the long term, only the functions provided in this
-file should be visible to files outside the src/gc/ directory. Because this
-represents a public-facing API, the functions in this file are not related by
-theme.
+the rest of Parrot core.  Only the functions provided in this file should be
+visible to files outside the src/gc/ directory.  Because this represents a
+public-facing API, the functions in this file are not related by theme.
 
 =item F<src/gc/alloc_memory.c>
 
 This file provides a number of functions and macros for allocating memory from
-the OS. These are typically wrapper functions with error-handling capabilities
-over malloc, calloc, or realloc.
-
-=item F<src/gc/alloc_register.c>
-
-This file implements the custom management and interface logic for
-Parrot_Context structures. The functions in this file are publicly available
-and are used throughout Parrot core for interacting with contexts and registers
+the OS. These are typically wrapper functions around malloc, calloc and realloc
+with additional error-handling code.
 
 =item F<src/gc/alloc_resources.c>
 
 This file implements handling logic for strings and arbitrary-sized memory
-buffers. String storage is managed by special Variable_Size_Pool structures, and use
-a separate compacting garbage collector to keep track of them.
-
-=item F<src/gc/incremental_ms.c>
-
-=item F<src/gc/generational_ms.c>
+buffers.  String storage is managed by special Variable_Size_Pool structures.
+A separate compacting garbage collector is used to keep track of them.
 
 =item F<src/gc/gc_ms.c>
 
+=item F<src/gc/gc_ms2.c>
+
+=item F<src/gc/gc_inf.c>
+
 These files are the individual GC cores which implement the primary tracing
 and sweeping logic. gc_ms.c is the mark & sweep collector core which is used in
-Parrot by default. generational_ms.c is an experimental and incomplete
-generational core.  incremental_ms.c is an experimental and incomplete
-incremental collector core.
+Parrot by default. gc_ms2.c implements a generational mark & sweep allocator.
+gc_inf.c implements an "infinite" allocator which never frees any memory.  The
+infinite allocator is not recommended except for debugging.
 
 =item F<src/gc/mark_sweep.c>
 
-This file implements some routines that are commonly needed by the various GC
-cores and provide an abstraction layer that a GC core can use to interact with
-some of the architecture of Parrot.
+This file implements some generic utility functions that are commonly needed by
+various GC cores and provide an abstraction layer that a GC core can use to
+interact with some of the architecture of Parrot.
 
 =item F<src/gc/system.c>
 
-This file implements logic for tracing processor registers and the system stack.
-Here there be dragons.
+This file implements low-level logic for tracing processor registers and the
+system stack.  Here be dragons.
 
 =item F<src/gc/malloc.c>
 
