@@ -9,11 +9,15 @@ src/pmc/mappedbytearray.pmc - Mapped byte array
 
 A memory mapped file or shared memory segment accesible as array of bytes.
 
+Bare minimal functionality available, only for posix platforms
+(tested on linux).
+
 =cut
 
 */
 
 #include "parrot/parrot.h"
+#include "../src/io/io_private.h"
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #    include <sys/mman.h>
@@ -38,6 +42,7 @@ static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
 
 pmclass MappedByteArray auto_attrs {
     ATTR unsigned char *buffer;
+    ATTR UINTVAL size;
 
 /*
 
@@ -47,7 +52,17 @@ pmclass MappedByteArray auto_attrs {
 
 =item C<init>
 
+Invalid init without args for a now.
+
 =item C<init_pmc>
+
+The argument must be a String PMC with a file name. Maps the whole file.
+
+Other options still not available.
+
+=item C<destroy>
+
+Free all resources used.
 
 =cut
 
@@ -58,18 +73,93 @@ pmclass MappedByteArray auto_attrs {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "testing");
         #else
-	unavailable(INTERP, "MappedByteArray");
-	#endif
+        unavailable(INTERP, "MappedByteArray");
+        #endif
     }
 
     VTABLE void init_pmc(PMC * init) {
         #ifdef ENABLED
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "testing");
+        if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
+            off_t length;
+            void *mapping;
+            STRING *name = VTABLE_get_string(INTERP, init);
+            char * name_str = Parrot_str_to_cstring(INTERP, name);
+            int handle = open(name_str, O_RDONLY);
+            Parrot_str_free_cstring(name_str);
+            if (handle == -1)
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "cannot open file '%Ss'", name);
+            length = lseek(handle, 0, SEEK_END);
+            mapping = mmap(0, length, PROT_READ, MAP_PRIVATE, handle, 0);
+            close(handle);
+            if (mapping == NULL || mapping == (void *)-1)
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "cannot mmap file '%Ss': %s", name, strerror(errno));
+            PObj_custom_destroy_SET(SELF);
+            SET_ATTR_size(INTERP, SELF, length);
+            SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
+        }
+        else {
+            unavailable(INTERP, "*feature unknown or not implemented yet*");
+        }
         #else
-	unavailable(INTERP, "MappedByteArray");
-	#endif
+        unavailable(INTERP, "MappedByteArray");
+        #endif
     }
+
+    VTABLE void destroy() {
+        #ifdef ENABLED
+        unsigned char *buffer;
+        UINTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        if (size > 0) {
+            munmap(buffer, size);
+        }
+        #endif
+    }
+
+/*
+
+=item C<elements>
+
+Return the size of the mapped area.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        UINTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+    }
+
+
+/*
+
+=item C<get_integer_keyed_int>
+
+Get a byte.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
+        UINTVAL size;
+        unsigned char *buffer;
+        GET_ATTR_size(INTERP, SELF, size);
+        if (size <= 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "not mapped");
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        return buffer[pos];
+    }
+
 
 /*
 
