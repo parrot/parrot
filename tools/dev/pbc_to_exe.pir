@@ -30,7 +30,7 @@ Compile bytecode to executable.
     .local string cfile
     .local string objfile
     .local string exefile
-    .local int    runcore
+    .local string runcore
     .local int    install
 
     (infile, cfile, objfile, exefile, runcore, install) = 'handle_args'(argv)
@@ -71,9 +71,9 @@ HEADER
 
     print outfh, codestring
 
-    print outfh, '#define RUNCORE '
+    print outfh, '#define RUNCORE "'
     print outfh, runcore
-    print outfh, "\n"
+    print outfh, "\"\n"
 
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
@@ -237,7 +237,7 @@ HELP
         end_installable:
     end_outfile:
 
-    .local int runcore_code
+    .local string runcore_code
     unless runcore == 'slow' goto end_slow_core
         runcore_code = 'slow'
         goto done_runcore
