@@ -470,7 +470,7 @@ static void gc_ms2_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
+static void gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -635,7 +635,7 @@ static int pobj2gen(ARGIN(PObj *pmc))
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms2_set_gen_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms2_string_mark_propagate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -944,7 +944,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
                     LIST_REMOVE(self->objects[i], tmp);
                     LIST_APPEND(self->objects[i+1], tmp);
 
-                    gc_ms2_set_gen_flags(interp, (PObj *)pmc, i+1);
+                    gc_ms2_set_gen_flags(interp, pmc, i+1);
                 }
             }
 
@@ -962,7 +962,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
             if (PObj_live_TEST(pmc)) {
                 gc_ms2_seal_object(interp, pmc);
-                gc_ms2_set_gen_flags(interp, (PObj *)pmc, 2);
+                gc_ms2_set_gen_flags(interp, pmc, 2);
             }
 
             tmp = next;
@@ -1788,7 +1788,7 @@ gc_ms2_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
 
     LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->objects[self->current_generation], item);
-    gc_ms2_set_gen_flags(interp, (PObj *)pmc, self->current_generation);
+    gc_ms2_set_gen_flags(interp, pmc, self->current_generation);
 
     PObj_live_SET(pmc);
 }
@@ -1824,7 +1824,7 @@ gc_ms2_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
 
     LIST_REMOVE(self->strings[gen], item);
     LIST_APPEND(self->strings[self->current_generation], item);
-    gc_ms2_set_gen_flags(interp, (PObj *)s, self->current_generation);
+    gc_ms2_set_gen_flags(interp, (PMC *)s, self->current_generation);
 }
 
 /*
@@ -2296,19 +2296,19 @@ gc_ms2_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 }
 
 /*
-=item C<static void gc_ms2_set_gen_flags(PARROT_INTERP, PObj *obj, int gen)>
+=item C<static void gc_ms2_set_gen_flags(PARROT_INTERP, PMC *pmc, int gen)>
 
 Set flags for generation.
 
 =cut
 */
 static void
-gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PObj *obj), int gen)
+gc_ms2_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
 {
     ASSERT_ARGS(gc_ms2_set_gen_flags)
-    obj->flags &= ~(PObj_GC_generation_0_FLAG
+    pmc->flags &= ~(PObj_GC_generation_0_FLAG
         | PObj_GC_generation_1_FLAG);
-    obj->flags |= gen2flags(gen);
+    pmc->flags |= gen2flags(gen);
 }
 
 /*
