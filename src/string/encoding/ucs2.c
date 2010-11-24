@@ -193,7 +193,7 @@ ucs2_scan(PARROT_INTERP, ARGIN(const STRING *src))
     UINTVAL               i;
 
     if (src->bufused & 1)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
             "Unaligned end in UCS-2 string\n");
 
     for (i = 0; i < len; ++i) {

@@ -265,7 +265,7 @@ utf16_scan(PARROT_INTERP, ARGIN(const STRING *src))
         }
 
         if (UNICODE_IS_NON_CHARACTER(c))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
                 "Non-character in UTF-16 string\n");
 
         ++len;
