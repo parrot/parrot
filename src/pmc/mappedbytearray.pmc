@@ -15,13 +15,29 @@ A memory mapped file or shared memory segment accesible as array of bytes.
 
 #include "parrot/parrot.h"
 
+#ifdef PARROT_HAS_HEADER_SYSMMAN
+#    include <sys/mman.h>
+#    define ENABLED
+#endif
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_unavailable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(msg))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 
 pmclass MappedByteArray auto_attrs {
-    ATTR usigned char *buffer;
+    ATTR unsigned char *buffer;
 
 /*
 
@@ -38,13 +54,21 @@ pmclass MappedByteArray auto_attrs {
 */
 
     VTABLE void init() {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+        #ifdef ENABLED
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "testing");
+        #else
+	unavailable(INTERP, "MappedByteArray");
+	#endif
     }
 
     VTABLE void init_pmc(PMC * init) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+        #ifdef ENABLED
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "testing");
+        #else
+	unavailable(INTERP, "MappedByteArray");
+	#endif
     }
 
 /*
@@ -56,6 +80,36 @@ pmclass MappedByteArray auto_attrs {
 */
 
 } /* pmclass end */
+
+/*
+
+=head2 Helper functions
+
+=over 4
+
+=item unavailable()
+
+Throws appropiately for functionality not available in the current platform.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+unavailable(PARROT_INTERP, ARGIN(const char *msg))
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "%s not implemented in this platform", msg);
+}
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
