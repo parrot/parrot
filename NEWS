@@ -1,6 +1,9 @@
 New in 2.11.0
 - Core
  + Just In Time native call frame generation using LibFFI
+- Languages
+  + PIRC
+    - left the nest and is currently at https://github.com/plobsing/parrot-pirc/
 
 New in 2.10.0
 - Core
