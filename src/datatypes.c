@@ -26,7 +26,8 @@ F<include/parrot/datatypes.h>.
 
 /*
 
-=item C<INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP, const STRING *type_name)>
+=item C<INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP, const STRING
+*type_name)>
 
 Return datatype C<enum> for C<STRING*> type_name.
 

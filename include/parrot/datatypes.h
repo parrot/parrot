@@ -156,7 +156,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_dt_get_datatype_name(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_dt_divide_floatval_by_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_dt_divide_floatval_by_zero \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_dt_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type_name))
