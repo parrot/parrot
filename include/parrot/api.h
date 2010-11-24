@@ -9,11 +9,16 @@
 #ifndef PARROT_API_H_GUARD
 #define PARROT_API_H_GUARD
 
+#include <stdlib.h>
 #include "parrot/compiler.h"
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
+
 #define PARROT_API PARROT_EXPORT
+#define GET_INIT_STRUCT(i) do {\
+        (i) = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args), 0); \
+    } while(0)
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
  * rvalue lets us put ASSERT_ARGS() at the top of the list of local variables.
@@ -126,6 +131,18 @@ Parrot_Int Parrot_api_get_runtime_path(
         FUNC_MODIFIES(*runtime);
 
 PARROT_API
+Parrot_Int Parrot_api_load_bytecode_bytes(
+    ARGMOD(PMC *interp_pmc),
+    ARGIN(const unsigned char * const pbc),
+    Parrot_Int bytecode_size,
+    ARGOUT(PMC **pbcpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*interp_pmc)
+        FUNC_MODIFIES(*pbcpmc);
+
+PARROT_API
 Parrot_Int Parrot_api_load_bytecode_file(
     ARGMOD(PMC *interp_pmc),
     ARGIN(const char *filename),
@@ -225,6 +242,11 @@ Parrot_Int Parrot_api_set_warnings(
     , PARROT_ASSERT_ARG(errmsg))
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runtime))
+#define ASSERT_ARGS_Parrot_api_load_bytecode_bytes \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(pbc) \
+    , PARROT_ASSERT_ARG(pbcpmc))
 #define ASSERT_ARGS_Parrot_api_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(filename) \

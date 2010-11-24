@@ -120,10 +120,10 @@ main(int argc, const char *argv[])
     int          pir_argc;
     const char **pir_argv;
     const char  *core = "slow";
-
-    Parrot_Init_Args *initargs = (Parrot_Init_Args*)calloc(sizeof(Parrot_Init_Args), 0);
+    Parrot_Init_Args *initargs;
     Parrot_Int trace = 0;
 
+    GET_INIT_STRUCT(initargs);
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
     //PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
@@ -171,11 +171,12 @@ get_last_error(Parrot_PMC interp)
     Parrot_String errmsg;
     char * errmsg_raw;
     if (Parrot_api_get_last_error(interp, &errmsg) &&
-        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw))
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)) {
         fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+        Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
+    }
     else
         fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
-
 }
 
 /*

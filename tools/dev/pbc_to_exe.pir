@@ -60,9 +60,13 @@ Compile bytecode to executable.
     outfh.'open'(cfile, 'w')
     unless outfh goto err_outfh
     print outfh, <<'HEADER'
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/api.h"
 const void * get_program_code(void);
+int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+static void get_last_error(Parrot_PMC interp);
+    #define TRACE 0
 HEADER
 
     print outfh, codestring
@@ -74,43 +78,54 @@ HEADER
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
         {
-            PackFile     *pf;
-            Parrot_Interp interp;
+            PMC * interp;
+            PMC * pbc;
+            PMC * argsarray;
             const unsigned char *program_code_addr;
+            Parrot_Init_Args *initargs;
+            GET_INIT_STRUCT(initargs);
 
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)
-                return 1;
+                exit(EXIT_FAILURE);
 
-            Parrot_set_config_hash();
+            if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+                  Parrot_set_config_hash(interp) &&
+                  Parrot_api_set_executable_name(interp, argv[0]) &&
+                  Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
+                fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+                get_last_error(interp);
+                exit(EXIT_FAILURE);
+            }
 
-            interp = Parrot_new( NULL );
-            if (!interp)
-                return 1;
+            //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
-            Parrot_init_stacktop(interp, &interp);
-            Parrot_set_executable_name(interp,
-                Parrot_str_new(interp, argv[0], 0));
-            Parrot_set_run_core(interp, (Parrot_Run_core_t)RUNCORE);
-            Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
+            if (!(Parrot_api_load_bytecode_bytes(interp, program_code, sizeof(program_code), &pbc) &&
+                  Parrot_api_build_argv_array(interp, argc, argv, &argsarray) &&
+                  Parrot_api_run_bytecode(interp, pbc, argsarray))) {
+                fprintf(stderr, "PARROT VM: Execution failed");
+                get_last_error(interp);
+                exit(EXIT_FAILURE);
+            }
 
-            pf = PackFile_new(interp, 0);
-            if (!pf)
-                return 1;
-
-            if (!PackFile_unpack(interp, pf,
-                    (const opcode_t *)program_code_addr, bytecode_size))
-                return 1;
-
-            do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-
-            Parrot_pbc_load(interp, pf);
-
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-            Parrot_runcode(interp, argc, argv);
-            Parrot_destroy(interp);
-            Parrot_exit(interp, 0);
+            Parrot_api_destroy_interpreter(interp);
+            exit(EXIT_SUCCESS);
         }
+
+        static void
+        get_last_error(Parrot_PMC interp)
+        {
+            Parrot_String errmsg;
+            char * errmsg_raw;
+            if (Parrot_api_get_last_error(interp, &errmsg) &&
+                Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)) {
+                fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+                Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
+            }
+            else
+                fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
+        }
+
 MAIN
 
 
@@ -224,15 +239,15 @@ HELP
 
     .local int runcore_code
     unless runcore == 'slow' goto end_slow_core
-        runcore_code = .PARROT_SLOW_CORE
+        runcore_code = 'slow'
         goto done_runcore
     end_slow_core:
     unless runcore == 'fast' goto end_fast_core
-        runcore_code = .PARROT_FAST_CORE
+        runcore_code = 'fast'
         goto done_runcore
     end_fast_core:
     unless runcore == '' goto end_unspecified_core
-        runcore_code = .PARROT_FAST_CORE
+        runcore_code = 'fast'
         goto done_runcore
     end_unspecified_core:
         # invalid runcore name

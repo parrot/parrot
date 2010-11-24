@@ -146,9 +146,27 @@ Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filenam
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not load packfile");
+    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_load_bytecode_bytes(ARGMOD(PMC *interp_pmc), ARGIN(const unsigned char * const pbc), Parrot_Int bytecode_size, ARGOUT(PMC **pbcpmc))
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    PackFile * const pf = PackFile_new(interp, 0);
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not create packfile");
+
+    if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "could not unpack packfile");
+    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+    *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    VTABLE_set_pointer(interp, *pbcpmc, pf);
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 PARROT_API
