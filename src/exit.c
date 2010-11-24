@@ -9,8 +9,8 @@ src/exit.c - Exit Handling
 
 Parrot's version of C<exit()>, C<on_exit()>, and friends.
 
-C<Parrot_on_exit()> allows you register exit handlers which will be
-called by C<Parrot_exit()> when the interpreter exits.
+C<Parrot_x_on_exit()> allows you register exit handlers which will be
+called by C<Parrot_x_exit()> when the interpreter exits.
 
 =head2 Functions
 
@@ -27,7 +27,7 @@ called by C<Parrot_exit()> when the interpreter exits.
 
 /*
 
-=item C<void Parrot_on_exit(PARROT_INTERP, exit_handler_f function, void *arg)>
+=item C<void Parrot_x_on_exit(PARROT_INTERP, exit_handler_f function, void *arg)>
 
 Register the specified function to be called on exit.
 
@@ -37,9 +37,9 @@ Register the specified function to be called on exit.
 
 PARROT_EXPORT
 void
-Parrot_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(void *arg))
+Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(void *arg))
 {
-    ASSERT_ARGS(Parrot_on_exit)
+    ASSERT_ARGS(Parrot_x_on_exit)
 
     handler_node_t * const new_node = mem_internal_allocate_typed(handler_node_t);
 
@@ -51,7 +51,7 @@ Parrot_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(void 
 
 /*
 
-=item C<void Parrot_exit(PARROT_INTERP, int status)>
+=item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
 Exit, calling any registered exit handlers.
 
@@ -63,9 +63,9 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_exit(PARROT_INTERP, int status)
+Parrot_x_exit(PARROT_INTERP, int status)
 {
-    ASSERT_ARGS(Parrot_exit)
+    ASSERT_ARGS(Parrot_x_exit)
     /* call all the exit handlers */
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry
