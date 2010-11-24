@@ -100,7 +100,7 @@ HEADER
 
             //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
-            if (!(Parrot_api_load_bytecode_bytes(interp, program_code, sizeof(program_code), &pbc) &&
+            if (!(Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc) &&
                   Parrot_api_build_argv_array(interp, argc, argv, &argsarray) &&
                   Parrot_api_run_bytecode(interp, pbc, argsarray))) {
                 fprintf(stderr, "PARROT VM: Execution failed");
