@@ -5,7 +5,7 @@ New in 2.11.0
  + All public functions in src/datatypes.c have been renamed to Parrot_dt_*
 - Languages
   + PIRC
-    - left the nest and is currently at https://github.com/plobsing/parrot-pirc/
+    - left the nest and is currently at https://github.com/parrot/pirc/
 
 New in 2.10.0
 - Core
