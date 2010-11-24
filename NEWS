@@ -1,6 +1,7 @@
 New in 2.11.0
 - Core
  + Just In Time native call frame generation using LibFFI
+ + PIR op find_codepoint is no longer experimental, it is now supported
 
 New in 2.10.0
 - Core
