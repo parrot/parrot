@@ -2,6 +2,7 @@ New in 2.11.0
 - Core
  + Just In Time native call frame generation using LibFFI
  + PIR op find_codepoint is no longer experimental, it is now supported
+ + All public functions in src/datatypes.c have been renamed to Parrot_dt_*
 - Languages
   + PIRC
     - left the nest and is currently at https://github.com/plobsing/parrot-pirc/
