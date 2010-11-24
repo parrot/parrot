@@ -19,7 +19,7 @@ Parrot process id functions.
 
 =item C<UINTVAL Parrot_getpid(void)>
 
-Parrot wrapper around standard library C<getpid()> function, returning an UINTVAL.
+Get current process system-wide unique ID, returning an UINTVAL.
 
 =cut
 
@@ -28,8 +28,8 @@ Parrot wrapper around standard library C<getpid()> function, returning an UINTVA
 UINTVAL
 Parrot_getpid(void)
 {
-    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_getpid unuseful in this platform");
-    return 0;
+    DWORD pid = GetCurrentProcessId();
+    return (UINTVAL)pid;
 }
 
 

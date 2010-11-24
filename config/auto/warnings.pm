@@ -100,7 +100,6 @@ sub _init {
 
     my @gcc_or_gpp = qw(
         -falign-functions=16
-        -fvisibility=hidden
         -funit-at-a-time
         -maccumulate-outgoing-args
         -W
@@ -292,6 +291,13 @@ sub runstep {
         return 1;
     }
 
+    if (
+        ( $compiler eq 'gcc' or $compiler eq 'g++' ) and
+        ( $conf->data->get('gccversion') >= 4.0    )
+    ) {
+        push @{$self->{'warnings'}{$compiler}{'basic'}},
+            '-fvisibility=hidden';
+    };
     # standard warnings.
     my @warnings = grep {$self->valid_warning($conf, $_)}
         @{$self->{'warnings'}{$compiler}{'basic'}};
