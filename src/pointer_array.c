@@ -86,6 +86,7 @@ Insert pointer into the array.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
