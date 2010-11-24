@@ -79,7 +79,6 @@
 /pbc_to_exe
 /pbc_to_exe.*
 /perl6
-/pirc
 /tags
 /temp.file
 /test
@@ -126,19 +125,6 @@
 /compilers/pge/PGE.pbc
 # generated from svn:ignore of 'compilers/pge/PGE/'
 /compilers/pge/PGE/builtins_gen.pir
-# generated from svn:ignore of 'compilers/pirc/'
-/compilers/pirc/*.o
-/compilers/pirc/*.obj
-/compilers/pirc/*.pbd
-/compilers/pirc/pirc
-/compilers/pirc/pirc.exe
-# generated from svn:ignore of 'compilers/pirc/t/'
-/compilers/pirc/t/basic_?.pir
-/compilers/pirc/t/basic_??.pir
-/compilers/pirc/t/heredoc_?.pir
-/compilers/pirc/t/macro_?.pir
-/compilers/pirc/t/stmts_?.pir
-/compilers/pirc/t/subflags_?.pir
 # generated from svn:ignore of 'compilers/tge/'
 /compilers/tge/tgc.pbc
 # generated from svn:ignore of 'compilers/tge/TGE/'
