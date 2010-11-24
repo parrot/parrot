@@ -1266,7 +1266,8 @@ unicode_chr(PARROT_INTERP, UINTVAL codepoint)
     STRING * const dest = Parrot_str_new_init(interp, NULL, 4,
         Parrot_utf8_encoding_ptr, 0);
 
-    dest->strlen = 1;
+    dest->bufused = 4;
+    dest->strlen  = 1;
 
     STRING_ITER_INIT(interp, &iter);
     STRING_iter_set_and_advance(interp, dest, &iter, codepoint);
