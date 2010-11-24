@@ -36,11 +36,9 @@ static void PackFile_Constant_dump_pmc(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void PackFile_Constant_dump_str(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct),
     ARGIN(const STRING *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void pobj_flag_dump(PARROT_INTERP, long flags)
         __attribute__nonnull__(1);
@@ -51,7 +49,6 @@ static void pobj_flag_dump(PARROT_INTERP, long flags)
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Constant_dump_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ct) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_pobj_flag_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -84,7 +81,7 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 
     for (i = 0; i < self->str.const_count; i++) {
         Parrot_io_printf(interp, "    # %x:\n", (long)i);
-        PackFile_Constant_dump_str(interp, self, self->str.constants[i]);
+        PackFile_Constant_dump_str(interp, self->str.constants[i]);
     }
 
     for (i = 0; i < self->pmc.const_count; i++) {
@@ -175,8 +172,8 @@ pobj_flag_dump(PARROT_INTERP, long flags)
 
 /*
 
-=item C<static void PackFile_Constant_dump_str(PARROT_INTERP, const
-PackFile_ConstTable *ct, const STRING *self)>
+=item C<static void PackFile_Constant_dump_str(PARROT_INTERP, const STRING
+*self)>
 
 Print the representation of a string constant.
 
@@ -185,8 +182,7 @@ Print the representation of a string constant.
 */
 
 static void
-PackFile_Constant_dump_str(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
-                            ARGIN(const STRING *self))
+PackFile_Constant_dump_str(PARROT_INTERP, ARGIN(const STRING *self))
 {
     ASSERT_ARGS(PackFile_Constant_dump_str)
 
