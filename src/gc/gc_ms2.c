@@ -1856,10 +1856,10 @@ gc_ms2_sweep_pool(PARROT_INTERP,
             callback(interp, obj);
 
             LIST_REMOVE(list, tmp);
+            memset(tmp, 0, sizeof (List_Item_Header));
+
             PObj_on_free_list_SET(obj);
             Parrot_gc_pool_free(interp, pool, tmp);
-
-            memset(tmp, 0, sizeof (List_Item_Header));
         }
         else {
             /* Remove "constant" objects from pool. We don't handle them */
