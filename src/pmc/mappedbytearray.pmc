@@ -1,0 +1,65 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/mappedbytearray.pmc - Mapped byte array
+
+=head1 DESCRIPTION
+
+A memory mapped file or shared memory segment accesible as array of bytes.
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+
+pmclass MappedByteArray auto_attrs {
+    ATTR usigned char *buffer;
+
+/*
+
+=head2 Vtable Functions
+
+=over 4
+
+=item C<init>
+
+=item C<init_pmc>
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "testing");
+    }
+
+    VTABLE void init_pmc(PMC * init) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "testing");
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+} /* pmclass end */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
