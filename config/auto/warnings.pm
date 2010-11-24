@@ -294,7 +294,7 @@ sub runstep {
     if (
         ( $compiler eq 'gcc' or $compiler eq 'g++' ) and
         ( $conf->data->get('gccversion') >= 4.0    )
-    ) { 
+    ) {
         push @{$self->{'warnings'}{$compiler}{'basic'}},
             '-fvisibility=hidden';
     };
