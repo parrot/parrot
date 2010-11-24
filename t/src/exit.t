@@ -17,7 +17,7 @@ t/src/exit.t - Exiting
 
 =head1 DESCRIPTION
 
-Tests C<Parrot_exit()> and C<Parrot_on_exit()> functions.
+Tests C<Parrot_exit()> and C<Parrot_x_on_exit()> functions.
 
 =cut
 
@@ -53,9 +53,9 @@ main(int argc, char* argv[])
     if (!interp) {
         return 1;
     }
-    Parrot_on_exit(interp, ex1, 0);
-    Parrot_on_exit(interp, ex2, 0);
-    Parrot_on_exit(interp, ex3, 0);
+    Parrot_x_on_exit(interp, ex1, 0);
+    Parrot_x_on_exit(interp, ex2, 0);
+    Parrot_x_on_exit(interp, ex3, 0);
     Parrot_exit(interp, 0);
     exit(0);
 }
