@@ -349,6 +349,7 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
 {
+    ASSERT_ARGS(utf16_decode)
     UINTVAL c = *p;
 
     if (UNICODE_IS_HIGH_SURROGATE(c))
