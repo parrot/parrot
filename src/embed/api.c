@@ -157,7 +157,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_load_bytecode_bytes(ARGMOD(PMC *interp_pmc), ARGIN(const unsigned char * const pbc), Parrot_Int bytecode_size, ARGOUT(PMC **pbcpmc))
 {
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = PackFile_new(interp, 0);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not create packfile");
