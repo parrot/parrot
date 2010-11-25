@@ -92,6 +92,8 @@ Parrot_exit(PARROT_INTERP, int status)
         node = next;
     }
 
+    interp->exit_handler_list = NULL;
+
     if (interp->api_jmp_buf)
         longjmp(interp->api_jmp_buf, status);
     else
