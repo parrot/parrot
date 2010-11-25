@@ -109,8 +109,6 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
 
     VTABLE_set_pmc_keyed_int(interp, iglobals,
                              (INTVAL) IGLOBALS_CONFIG_HASH, config_hash);
-    if (VTABLE_elements(interp, config_hash))
-        Parrot_lib_update_paths_from_config_hash(interp);
 }
 
 /*
