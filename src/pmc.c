@@ -712,7 +712,7 @@ Parrot_pmc_get_new_vtable_index(PARROT_INTERP)
 
     /* Have we overflowed the table? */
     if (type_id >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
+        Parrot_vtbl_realloc_vtables(interp);
 
     return type_id;
 }

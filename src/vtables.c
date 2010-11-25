@@ -27,7 +27,7 @@ extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass);
 
 /*
 
-=item C<VTABLE * Parrot_new_vtable(PARROT_INTERP)>
+=item C<VTABLE * Parrot_vtbl_new_vtable(PARROT_INTERP)>
 
 Creates and returns a pointer to the new C<VTABLE>.
 
@@ -39,15 +39,16 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
-Parrot_new_vtable(SHIM_INTERP)
+Parrot_vtbl_new_vtable(SHIM_INTERP)
 {
-    ASSERT_ARGS(Parrot_new_vtable)
+    ASSERT_ARGS(Parrot_vtbl_new_vtable)
     return mem_internal_allocate_zeroed_typed(VTABLE);
 }
 
 /*
 
-=item C<VTABLE * Parrot_clone_vtable(PARROT_INTERP, const VTABLE *base_vtable)>
+=item C<VTABLE * Parrot_vtbl_clone_vtable(PARROT_INTERP, const VTABLE
+*base_vtable)>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
@@ -59,9 +60,9 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
-Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
+Parrot_vtbl_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 {
-    ASSERT_ARGS(Parrot_clone_vtable)
+    ASSERT_ARGS(Parrot_vtbl_clone_vtable)
     VTABLE * const new_vtable = mem_internal_allocate_typed(VTABLE);
 
     STRUCT_COPY(new_vtable, base_vtable);
@@ -80,7 +81,7 @@ Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 
 /*
 
-=item C<void Parrot_destroy_vtable(PARROT_INTERP, VTABLE *vtable)>
+=item C<void Parrot_vtbl_destroy_vtable(PARROT_INTERP, VTABLE *vtable)>
 
 Destroys C<*vtable>.
 
@@ -90,9 +91,9 @@ Destroys C<*vtable>.
 
 PARROT_EXPORT
 void
-Parrot_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
+Parrot_vtbl_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
 {
-    ASSERT_ARGS(Parrot_destroy_vtable)
+    ASSERT_ARGS(Parrot_vtbl_destroy_vtable)
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
 
@@ -121,7 +122,7 @@ Parrot_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
 
 /*
 
-=item C<void parrot_alloc_vtables(PARROT_INTERP)>
+=item C<void Parrot_vtbl_alloc_vtables(PARROT_INTERP)>
 
 Allocate memory for the vtables for all known classes (PMC types).
 
@@ -130,9 +131,9 @@ Allocate memory for the vtables for all known classes (PMC types).
 */
 
 void
-parrot_alloc_vtables(PARROT_INTERP)
+Parrot_vtbl_alloc_vtables(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_alloc_vtables)
+    ASSERT_ARGS(Parrot_vtbl_alloc_vtables)
     interp->vtables          = mem_internal_allocate_n_zeroed_typed(PARROT_MAX_CLASSES, VTABLE *);
     interp->n_vtable_max     = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES - 1;
@@ -140,7 +141,7 @@ parrot_alloc_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_realloc_vtables(PARROT_INTERP)>
+=item C<void Parrot_vtbl_realloc_vtables(PARROT_INTERP)>
 
 Reallocate memory for vtables, increasing the number of vtables by 16.
 
@@ -149,9 +150,9 @@ Reallocate memory for vtables, increasing the number of vtables by 16.
 */
 
 void
-parrot_realloc_vtables(PARROT_INTERP)
+Parrot_vtbl_realloc_vtables(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_realloc_vtables)
+    ASSERT_ARGS(Parrot_vtbl_realloc_vtables)
     /* 16 bigger seems reasonable, though it's only a pointer
        table and we could get bigger without blowing much memory
        */
@@ -167,10 +168,10 @@ parrot_realloc_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_free_vtables(PARROT_INTERP)>
+=item C<void Parrot_vtbl_free_vtables(PARROT_INTERP)>
 
 Free memory allocated for the vtables. Each vtable is destroyed
-through its destructor Parrot_destroy_vtable, after which the list
+through its destructor Parrot_vtbl_destroy_vtable, after which the list
 of pointers to these vtables is freed.
 
 =cut
@@ -178,20 +179,20 @@ of pointers to these vtables is freed.
 */
 
 void
-parrot_free_vtables(PARROT_INTERP)
+Parrot_vtbl_free_vtables(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_free_vtables)
+    ASSERT_ARGS(Parrot_vtbl_free_vtables)
     int i;
 
     for (i = 0; i < interp->n_vtable_max; ++i)
-        Parrot_destroy_vtable(interp, interp->vtables[i]);
+        Parrot_vtbl_destroy_vtable(interp, interp->vtables[i]);
 
     mem_internal_free(interp->vtables);
 }
 
 /*
 
-=item C<void mark_vtables(PARROT_INTERP)>
+=item C<void Parrot_vtbl_mark_vtables(PARROT_INTERP)>
 
 Mark all vtables as being alive for the garbage collector.
 
@@ -200,9 +201,9 @@ Mark all vtables as being alive for the garbage collector.
 */
 
 void
-mark_vtables(PARROT_INTERP)
+Parrot_vtbl_mark_vtables(PARROT_INTERP)
 {
-    ASSERT_ARGS(mark_vtables)
+    ASSERT_ARGS(Parrot_vtbl_mark_vtables)
     INTVAL i;
 
     for (i = 1; i < interp->n_vtable_max; ++i) {
@@ -222,7 +223,7 @@ mark_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_initialize_core_vtables(PARROT_INTERP)>
+=item C<void Parrot_vtbl_initialize_core_vtables(PARROT_INTERP)>
 
 Initialize vtables for the core PMCs.
 
@@ -232,12 +233,12 @@ Initialize vtables for the core PMCs.
 
 PARROT_EXPORT
 void
-Parrot_initialize_core_vtables(PARROT_INTERP)
+Parrot_vtbl_initialize_core_vtables(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_initialize_core_vtables)
+    ASSERT_ARGS(Parrot_vtbl_initialize_core_vtables)
 
     if (! interp->vtables) {
-        parrot_alloc_vtables(interp);
+        Parrot_vtbl_alloc_vtables(interp);
         Parrot_initialize_core_pmcs(interp, 0);
     }
 }

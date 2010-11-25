@@ -94,7 +94,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         d->n_vtable_max = s->n_vtable_max;
 
         if (d->n_vtable_max > d->n_vtable_alloced)
-            parrot_realloc_vtables(d);
+            Parrot_vtbl_realloc_vtables(d);
 
         last_remove = s->n_vtable_max;
 

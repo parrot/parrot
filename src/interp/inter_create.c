@@ -216,7 +216,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* initialize classes - this needs mmd func table */
     interp->HLL_info = NULL;
 
-    Parrot_initialize_core_vtables(interp);
+    Parrot_vtbl_initialize_core_vtables(interp);
 
     /* create the root set registry */
     interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
@@ -462,7 +462,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             parrot_hash_destroy(interp, interp->op_hash);
 
         /* free vtables */
-        parrot_free_vtables(interp);
+        Parrot_vtbl_free_vtables(interp);
 
         /* Finalize GC */
         Parrot_gc_finalize(interp);
@@ -485,7 +485,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
                 interp->thread_data = NULL;
             }
 
-            parrot_free_vtables(interp);
+            Parrot_vtbl_free_vtables(interp);
 
             /* Finalyze GC */
             Parrot_gc_finalize(interp);
