@@ -103,11 +103,11 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     const INTVAL   severity    = already_dying ? EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
-
+    interp->final_error = message;
     if (already_dying) {
-        fflush(stderr);
-        fprintf(stderr, "\n***FATAL ERROR: "
-                "Exception thrown while dying from previous unhandled Exception\n");
+        //fflush(stderr);
+        //fprintf(stderr, "\n***FATAL ERROR: Exception thrown while dying from previous unhandled Exception\n");
+        Parrot_exit(interp, EXCEPT_fatal);
     }
     else {
         /* In some cases we have a fatal exception before the IO system
@@ -172,6 +172,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
      * only main should run the destroy functions - exit handler chain
      * is freed during Parrot_exit
      */
+    interp->final_error = message;
     Parrot_exit(interp, exit_status);
 }
 

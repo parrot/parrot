@@ -10,7 +10,8 @@ Parrot_Int
 Parrot_api_get_last_error(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_String * errmsg))
 {
     EMBED_API_CALLIN(interp_pmc, interp);
-    *errmsg = Parrot_str_new(interp, "Generic Error Message", 0);
+    *errmsg = interp->final_error;
+    interp->final_error = NULL;
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

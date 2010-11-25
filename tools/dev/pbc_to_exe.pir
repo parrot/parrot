@@ -100,9 +100,17 @@ HEADER
 
             //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
-            if (!(Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc) &&
-                  Parrot_api_build_argv_array(interp, argc, argv, &argsarray) &&
-                  Parrot_api_run_bytecode(interp, pbc, argsarray))) {
+            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
+                fprintf(stderr, "PARROT VM: Could not load bytecode");
+                get_last_error(interp);
+                exit(EXIT_FAILURE);
+            }
+            if (!Parrot_api_build_argv_array(interp, argc, argv, &argsarray)) {
+                fprintf(stderr, "PARROT VM: Could not build args array");
+                get_last_error(interp);
+                exit(EXIT_FAILURE);
+            }
+            if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
                 fprintf(stderr, "PARROT VM: Execution failed");
                 get_last_error(interp);
                 exit(EXIT_FAILURE);
