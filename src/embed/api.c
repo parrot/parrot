@@ -204,7 +204,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_disassemble_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(const char * const outfile), Parrot_Int opts)
 {
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
@@ -332,7 +332,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_get_runtime_path(Parrot_PMC interp_pmc, ARGOUT(Parrot_String *runtime))
 {
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN(interp_pmc, interp)
     *runtime = Parrot_get_runtime_path(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -341,7 +341,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 {
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_set_config_hash_pmc(interp, confighash);
     Parrot_lib_update_paths_from_config_hash(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
