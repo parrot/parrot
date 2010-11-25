@@ -177,11 +177,15 @@ When all is well, then commit your changes:
 
  $ git diff
  $ git add file1 file2 ...
- $ git commit -m "awesome and informative commit message"
+ $ git commit -a -m "awesome and informative commit message"
 
-Note the SHA1 from this commit. You will need it later in step 7.
+If you want you can note the SHA1 from this commit.
 
- $ git revparse master > SHA1_TO_REMEMBER
+ $ git rev-parse master > SHA1_TO_REMEMBER
+
+Update repository on github.
+
+ $ git push
 
 =item 4.
 
@@ -212,7 +216,6 @@ Verify that the version is correct and doesn't contain the suffix C<devel>:
 =item 7.
 
 Tag the release as "RELEASE_a_b_c", where a.b.c is the version number.
-Specify the revision number generated in step 3, above.
 
  $ git tag RELEASE_a_b_c
  $ git push --tags
