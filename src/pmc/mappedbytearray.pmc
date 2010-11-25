@@ -31,62 +31,37 @@ Bare minimal functionality available, only for posix platforms
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CAN_RETURN_NULL
+static void * mapfromfilehandle(
+    PIOHANDLE handle,
+    unsigned long size,
+    int flag);
+
+PARROT_CAN_RETURN_NULL
+static void * mapfromfilename(PARROT_INTERP,
+    ARGIN(STRING *name),
+    ARGMOD(unsigned long *size),
+    int flag)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*size);
+
 PARROT_DOES_NOT_RETURN
 static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_mapfromfilehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_mapfromfilename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(size))
 #define ASSERT_ARGS_unavailable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(msg))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-PARROT_CAN_RETURN_NULL
-static void *
-mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
-{
-    int prot = 0;
-    if (flag & CAN_READ) prot |= PROT_READ;
-    if (flag & CAN_WRITE) prot |= PROT_WRITE;
-    return mmap(0, size, prot, MAP_SHARED, handle, 0);
-}
-
-PARROT_CAN_RETURN_NULL
-static void *
-mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), unsigned long *size, int flag)
-{
-    int handle;
-    void *mapping;
-    {
-        char * name_str = Parrot_str_to_cstring(interp, name);
-        int openmode = 0;
-        switch (flag & (CAN_READ | CAN_WRITE)) {
-          case CAN_READ:
-            openmode = O_RDONLY;
-            break;
-          case CAN_READ | CAN_WRITE:
-          case CAN_WRITE:
-            openmode = O_RDWR;
-            break;
-          default:
-            /* Should never happen, invalid modes must be caught before
-             * calling this function.
-             */
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
-        }
-        handle = open(name_str, openmode);
-        Parrot_str_free_cstring(name_str);
-    }
-    if (handle == -1)
-        Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_OPERATION, "cannot open file '%Ss'", name);
-    if (*size == 0)
-        *size = lseek(handle, 0, SEEK_END);
-    mapping = mapfromfilehandle(handle, *size, flag);
-    return mapping;
-}
 
 pmclass MappedByteArray auto_attrs {
     ATTR unsigned char *buffer;
@@ -98,13 +73,13 @@ pmclass MappedByteArray auto_attrs {
 
 =over 4
 
-=item C<init_pmc>
+=item C<init_pmc(PMC *init)>
 
 The argument must be a String PMC with a file name. Maps the whole file.
 
 Other options still not available.
 
-=item C<destroy>
+=item C<destroy()>
 
 Free all resources used.
 
@@ -148,7 +123,7 @@ Free all resources used.
 
 /*
 
-=item C<elements>
+=item C<elements()>
 
 Return the size of the mapped area.
 
@@ -165,9 +140,13 @@ Return the size of the mapped area.
 
 /*
 
-=item C<get_integer_keyed_int>
+=item C<get_integer_keyed_int(INTVAL pos)>
 
-Get a byte.
+Get the byte at pos.
+
+=item C<set_integer_keyed_int(INTVAL pos, INTVAL value)>
+
+Set the byte at pos to value.
 
 =cut
 
@@ -210,12 +189,41 @@ Get a byte.
 
 =back
 
+=head2 Methods
+
+=over 4
+
+=item C<supported()>
+
+Return 0 if file mapping is not supported, non zero otherwise.
+
+=cut
+
+*/
+
+    METHOD supported()
+    {
+        #ifdef ENABLED
+        RETURN(INTVAL 1);
+        #else
+        RETURN(INTVAL 0);
+	#endif
+    }
+
+/*
+
+=item C<open(STRING *filename, STRING *mode :optional)>
+
+Map a file by its name. The mode argument can be "r", "w" or "rw",
+"r" is assumed if omitted.
+
 =cut
 
 */
 
     METHOD open(STRING *filename, STRING *mode :optional)
     {
+        #ifdef ENABLED
         unsigned long length = 0;
         int flag = 0;
         void *mapping;
@@ -247,6 +255,7 @@ Get a byte.
         PObj_custom_destroy_SET(SELF);
         SET_ATTR_size(INTERP, SELF, length);
         SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
+	#endif
         RETURN(void);
     }
 
@@ -254,13 +263,25 @@ Get a byte.
 
 /*
 
+=back
+
 =head2 Helper functions
 
 =over 4
 
-=item unavailable()
+=item C<static void unavailable(PARROT_INTERP, const char *msg)>
 
 Throws appropiately for functionality not available in the current platform.
+
+=item C<static void * mapfromfilehandle(PIOHANDLE handle, unsigned long size,
+int flag)>
+
+Maps a file by its OS handle.
+
+=item C<static void * mapfromfilename(PARROT_INTERP, STRING *name, unsigned long
+*size, int flag)>
+
+Maps a file by its filename, throw if the file can't be opened.
 
 =cut
 
@@ -272,6 +293,62 @@ unavailable(PARROT_INTERP, ARGIN(const char *msg))
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "%s not implemented in this platform", msg);
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
+{
+    #ifdef ENABLED
+    int prot = 0;
+    if (flag & CAN_READ) prot |= PROT_READ;
+    if (flag & CAN_WRITE) prot |= PROT_WRITE;
+    return mmap(0, size, prot, MAP_SHARED, handle, 0);
+    #else
+    return (void *)-1;
+    #endif
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size), int flag)
+{
+    void *mapping;
+    #ifdef ENABLED
+    int handle;
+    {
+        char * name_str = Parrot_str_to_cstring(interp, name);
+        int openmode = 0;
+        switch (flag & (CAN_READ | CAN_WRITE)) {
+          case CAN_READ:
+            openmode = O_RDONLY;
+            break;
+          case CAN_READ | CAN_WRITE:
+          case CAN_WRITE:
+            openmode = O_RDWR;
+            break;
+          default:
+            /* Should never happen, invalid modes must be caught before
+             * calling this function.
+             */
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
+        }
+        handle = open(name_str, openmode);
+        Parrot_str_free_cstring(name_str);
+    }
+    if (handle == -1)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "cannot open file '%Ss'", name);
+    if (*size == 0)
+        *size = lseek(handle, 0, SEEK_END);
+    mapping = mapfromfilehandle(handle, *size, flag);
+
+    #else
+    mapping = (void *)-1;
+    #endif
+
+    return mapping;
 }
 
 /*
