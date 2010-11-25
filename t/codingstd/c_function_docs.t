@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config qw(%PConfig);
 use Parrot::Distribution;
-use Parrot::Headerizer;
+use Parrot::Headerizer::Object;
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ declared.
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my $headerizer = Parrot::Headerizer->new;
+my $headerizer = Parrot::Headerizer::Object->new;
 
 # can not handle .ops or .pmc files yet
 my @files = grep {/\.(c|h)$/ } @ARGV ? @ARGV :

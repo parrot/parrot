@@ -6,10 +6,12 @@ use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
-    print_headerizer_warnings
+    process_argv
     read_file
     write_file
     qualify_sourcefile
+    asserts_from_args
+    api_first_then_alpha
 );
 
 =head1 NAME
@@ -23,6 +25,8 @@ Parrot::Headerizer::Functions - Functions used in headerizer programs
         read_file
         write_file
         qualify_sourcefile
+        asserts_from_args
+        api_first_then_alpha
     );
 
 =head1 DESCRIPTION
@@ -32,15 +36,23 @@ F<tools/dev/headerizer.pl>.
 
 =head1 SUBROUTINES
 
-=head2 C<print_headerizer_warnings()>
+=head2 C<process_argv>
 
 =over 4
 
 =item * Purpose
 
+Validate list of object files provided as arguments.
+
 =item * Arguments
 
+    @ofiles = process_argv(@ARGV);
+
+List of files specified on the command-line.
+
 =item * Return Value
+
+Validated list of object files.
 
 =item * Comment
 
@@ -48,29 +60,18 @@ F<tools/dev/headerizer.pl>.
 
 =cut
 
-sub print_headerizer_warnings {
-    my $warnings_ref = shift;
-    my %warnings = %{$warnings_ref};
-    if ( keys %warnings ) {
-        my $nwarnings     = 0;
-        my $nwarningfuncs = 0;
-        my $nwarningfiles = 0;
-        for my $file ( sort keys %warnings ) {
-            ++$nwarningfiles;
-            print "$file\n";
-            my $funcs = $warnings{$file};
-            for my $func ( sort keys %{$funcs} ) {
-                ++$nwarningfuncs;
-                for my $error ( @{ $funcs->{$func} } ) {
-                    print "    $func: $error\n";
-                    ++$nwarnings;
-                }
-            }
-        }
-
-        print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
+sub process_argv {
+    my @argv = @_;
+    die 'No files specified.' unless @argv;
+    my %ofiles;
+    ++$ofiles{$_} for @argv;
+    my @ofiles = sort keys %ofiles;
+    for (@ofiles) {
+        print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
     }
+    return @ofiles;
 }
+
 
 =head2 C<read_file()>
 
@@ -218,6 +219,39 @@ sub qualify_sourcefile {
     return ($sourcefile, $source_code, $hfile);
 }
 
+sub asserts_from_args {
+    my @args = @_;
+    my @asserts;
+
+    for my $arg (@args) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+)\)} ) {
+            my $var = $2;
+            if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
+                # argument is a function pointer
+                $var = $1;
+            }
+            else {
+                # try to isolate the variable's name;
+                # strip off everything before the final space or asterisk.
+                $var =~ s{.+[* ]([^* ]+)$}{$1};
+                # strip off a trailing "[]", if any.
+                $var =~ s{\[\]$}{};
+            }
+            push( @asserts, "PARROT_ASSERT_ARG($var)" );
+        }
+        if( $arg eq 'PARROT_INTERP' ) {
+            push( @asserts, "PARROT_ASSERT_ARG(interp)" );
+        }
+    }
+
+    return (@asserts);
+}
+
+
+sub api_first_then_alpha {
+    return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
+        || ( lc $a->{name} cmp lc $b->{name} );
+}
 1;
 
 # Local Variables:

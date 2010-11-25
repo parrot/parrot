@@ -13,6 +13,7 @@ use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Config;
 use Parrot::Headerizer::Functions qw(
+    process_argv
     print_headerizer_warnings
     read_file
     write_file
@@ -21,6 +22,32 @@ use Parrot::Headerizer::Functions qw(
 use IO::CaptureOutput qw| capture |;
 
 my $cwd = cwd();
+
+my @ofiles;
+eval {
+    @ofiles = process_argv();
+};
+like($@, qr/No files specified/,
+    "Got expected error message for no files specified");
+
+@ofiles = qw( alpha.o beta.o gamma.o alpha.o );
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { @ofiles = process_argv(@ofiles); },
+        \$stdout,
+        \$stderr,
+    );
+    is(@ofiles, 3, "Got expected number of ofiles");
+    like( $stdout,
+        qr/alpha\.o is specified more than once/s,
+        "Got expected message for an argument supplied more than once"
+    );
+}
+
+@ofiles = qw( alpha.o beta.o gamma.o );
+is(@ofiles, 3, "Got expected number of ofiles");
+
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir;

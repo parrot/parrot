@@ -9,11 +9,11 @@ use Test::More qw(no_plan); # tests => 15;
 #use Cwd;
 #use File::Temp qw( tempdir );
 use lib qw( lib );
-use Parrot::Headerizer;
+use Parrot::Headerizer::Object;
 #use IO::CaptureOutput qw| capture |;
 
-my $self = Parrot::Headerizer->new();
-isa_ok( $self, 'Parrot::Headerizer' );
+my $self = Parrot::Headerizer::Object->new();
+isa_ok( $self, 'Parrot::Headerizer::Object' );
 ok( $self->valid_macro( 'PARROT_EXPORT' ),
     "valid_macro() confirmed validity of macro" );
 ok(! $self->valid_macro( 'PARROT_FOOBAR' ),
@@ -36,7 +36,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-02_methods.t - Test functions in Parrot::Headerizer.
+02_methods.t - Test functions in Parrot::Headerizer::Object.
 
 =head1 SYNOPSIS
 
