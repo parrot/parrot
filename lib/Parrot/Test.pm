@@ -704,8 +704,6 @@ sub _generate_test_functions {
     my $path_to_parrot = path_to_parrot();
     my $parrot         = File::Spec->join( File::Spec->curdir(),
                             'parrot' . $PConfig{exe} );
-    my $pirc           = File::Spec->join( File::Spec->curdir(),
-                            qw( compilers pirc ), "pirc$PConfig{exe}" );
 
     ##### 1: Parrot test map #####
     my %parrot_test_map = map {
@@ -788,11 +786,6 @@ sub _generate_test_functions {
         pir_2_pasm_isnt    => 'isnt_eq',
         pir_2_pasm_like    => 'like',
         pir_2_pasm_unlike  => 'unlike',
-
-        pirc_2_pasm_is     => 'is_eq',
-        pirc_2_pasm_isnt   => 'isnt_eq',
-        pirc_2_pasm_like   => 'like',
-        pirc_2_pasm_unlike => 'unlike',
     );
 
     foreach my $func ( keys %pir_2_pasm_test_map ) {
@@ -830,8 +823,6 @@ sub _generate_test_functions {
                 $args   .= " $opt --output=$out_f";
                 $args    =~ s/--run-exec//;
                 $cmd       = qq{$parrot $args "$code_f"};
-            } elsif ($func =~ /^pirc_/) {
-                $cmd       = qq{$pirc -b -x "$code_f"};
             }
 
             write_code_to_file( $code, $code_f );

@@ -49,10 +49,6 @@ L<https://trac.parrot.org/parrot/ticket/1580>
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
-=item CodeString [eligible in 2.7]
-
-L<http://trac.parrot.org/parrot/ticket/1633>
-
 =item multiple dispatch within core PMCs [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/452>
@@ -204,24 +200,12 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item find_lex [eligible in 2.4]
-
-find_lex will not throw exception for non-existing lexicals.
-
-L<https://trac.parrot.org/parrot/ticket/1207>
-
 =item inplace string updates. [eligible in 2.4]
 
 All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
 Part of COW removal.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
-
-=item find_codepoint [experimental]
-
-Intended to replace the CodeString charname_to_ord method.
-
-L<https://trac.parrot.org/parrot/ticket/1629>
 
 =item finalize [experimental]
 
@@ -356,6 +340,13 @@ L<https://trac.parrot.org/parrot/ticket/1564>
 =item Parrot_load_bytecode_file [experimental]
 
 Load a .pbc file into the interpreter. Experimental.
+
+=item GC timely destruction [eligible in 3.1]
+
+All PIR ops and internal semantics related to timely destruction of PMCs
+is deprecated.
+
+L<http://trac.parrot.org/parrot/ticket/1800>
 
 =back
 

@@ -138,7 +138,6 @@ Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
 
     /* We always align size to 4/8 bytes. */
     const size_t index = (size - 1) / sizeof (void *);
-    void   *ret;
     PARROT_ASSERT(size);
 
     if (index < allocator->num_pools) {

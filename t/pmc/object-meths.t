@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 
 =head1 NAME
 
@@ -413,25 +413,45 @@ back in main
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "find_method" );
-    newclass P3, "Foo"
-    new P2, ['Foo']
+pir_output_is( <<'CODE', <<'OUTPUT', "find_method" );
+.sub main :main
+    $P3 = newclass "Foo"
+    $P2 = new $P3
 
-    set S0, "meth"
-    find_method P0, P2, S0
-    print "main\n"
-    callmethodcc P2, P0
-    print "back\n"
+    $P0 = find_method $P2, 'meth'
+    say 'main'
+    $P2.$P0()
+    say 'back'
+    $I0 = defined $P0
+    say $I0
     end
+.end
 
 .namespace ["Foo"]
-.pcc_sub :method meth:
-    print "in meth\n"
-    returncc
+.sub meth :method
+    say 'in meth'
+.end
 CODE
 main
 in meth
 back
+1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'find_method builtin PMC class' );
+.sub main :main
+  $P0 = new [ 'String' ]
+  $P0 = 'AbC'
+
+  $P1 = find_method $P0, 'reverse'
+  $P2 = $P0.$P1()
+  say $P2
+  $I0 = defined $P1
+  say $I0
+.end
+CODE
+CbA
+1
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );

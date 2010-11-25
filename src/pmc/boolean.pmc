@@ -73,7 +73,7 @@ as a Boolean.
     }
 
     VTABLE void init_pmc(PMC *value) {
-        INTVAL v = PMC_IS_NULL(value) ? 0 : VTABLE_get_bool(INTERP, value);
+        const INTVAL v = PMC_IS_NULL(value) ? 0 : VTABLE_get_bool(INTERP, value);
         set_boolean_FLAG(SELF, v);
     }
 
@@ -112,7 +112,7 @@ Obtain the value of the C<Boolean> as a string: "1" = C<TRUE>, "0" = C<FALSE>.
     }
 
     VTABLE FLOATVAL get_number() {
-        INTVAL value = SELF.get_bool();
+        const INTVAL value = SELF.get_bool();
         return (FLOATVAL)value;
     }
 

@@ -726,12 +726,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         {
             STRING *s1, *s2;
             if (type_sig < 0)
-                s1 = Parrot_get_datatype_name(interp, type_sig);
+                s1 = Parrot_dt_get_datatype_name(interp, type_sig);
             else
                 s1 = interp->vtables[type_sig]->whoami;
 
             if (type_call < 0)
-                s2 = Parrot_get_datatype_name(interp, type_call);
+                s2 = Parrot_dt_get_datatype_name(interp, type_call);
             else
                 s2 = interp->vtables[type_call]->whoami;
 

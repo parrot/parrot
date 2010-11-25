@@ -127,9 +127,9 @@ const struct _data_types data_types[] = {
 #  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY
 #  define PARROT_FLOATVAL_NAN_QUIET	NAN
 #else
-#  define PARROT_FLOATVAL_INF_POSITIVE  floatval_divide_by_zero(interp, 1.0)
-#  define PARROT_FLOATVAL_INF_NEGATIVE  floatval_divide_by_zero(interp, -1.0)
-#  define PARROT_FLOATVAL_NAN_QUIET     floatval_divide_by_zero(interp, 0.0)
+#  define PARROT_FLOATVAL_INF_POSITIVE  Parrot_dt_divide_floatval_by_zero(interp, 1.0)
+#  define PARROT_FLOATVAL_INF_NEGATIVE  Parrot_dt_divide_floatval_by_zero(interp, -1.0)
+#  define PARROT_FLOATVAL_NAN_QUIET     Parrot_dt_divide_floatval_by_zero(interp, 0.0)
 #endif
 
 #define PARROT_CSTRING_INF_POSITIVE    "Inf"
@@ -141,11 +141,11 @@ const struct _data_types data_types[] = {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-FLOATVAL floatval_divide_by_zero(SHIM_INTERP, FLOATVAL num);
+FLOATVAL Parrot_dt_divide_floatval_by_zero(SHIM_INTERP, FLOATVAL num);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_get_datatype_enum(PARROT_INTERP,
+INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP,
     ARGIN(const STRING *type_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -153,14 +153,15 @@ INTVAL Parrot_get_datatype_enum(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
+STRING * Parrot_dt_get_datatype_name(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_floatval_divide_by_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_dt_divide_floatval_by_zero \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_dt_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type_name))
-#define ASSERT_ARGS_Parrot_get_datatype_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_dt_get_datatype_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/datatypes.c */

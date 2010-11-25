@@ -228,8 +228,10 @@ static void make_code_pointers(ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*seg);
 
-static void mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)
-        __attribute__nonnull__(1);
+static void mark_1_bc_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*bc);
 
 static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
@@ -407,7 +409,8 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_make_code_pointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_mark_1_bc_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
@@ -803,7 +806,7 @@ Mark gcables in bytecode header.
 
 
 static void
-mark_1_bc_seg(PARROT_INTERP, PackFile_ByteCode *bc)
+mark_1_bc_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(mark_1_bc_seg)
     size_t i;

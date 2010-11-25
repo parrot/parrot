@@ -955,6 +955,8 @@ op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
  opcode_t * Parrot_escape_s_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_compose_s_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_compose_s_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_codepoint_i_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_codepoint_i_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_spawnw_i_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_spawnw_i_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_spawnw_i_p(opcode_t *, PARROT_INTERP);
@@ -1090,8 +1092,6 @@ op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
  opcode_t * Parrot_root_new_p_pc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_pc_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_find_codepoint_i_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_find_codepoint_i_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_finalize_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_finalize_pc(opcode_t *, PARROT_INTERP);
 
