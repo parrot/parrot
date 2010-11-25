@@ -267,7 +267,7 @@ struct parrot_interp_t {
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */
-    jmp_buf api_jmp_buf;                      /* jmp point out of Parrot */
+    Parrot_jump_buff *api_jmp_buf;            /* jmp point out of Parrot */
     STRING * final_error;                     /* string to hold the final error message */
 };
 
