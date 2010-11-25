@@ -6,11 +6,9 @@
 use strict;
 use warnings;
 use Test::More qw(no_plan); # tests => 15;
-#use Cwd;
-#use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Headerizer::Object;
-#use IO::CaptureOutput qw| capture |;
+use IO::CaptureOutput qw| capture |;
 
 my $self = Parrot::Headerizer::Object->new();
 isa_ok( $self, 'Parrot::Headerizer::Object' );
@@ -22,15 +20,60 @@ my @valid_macros = $self->valid_macros;
 ok( @valid_macros,
     "Headerizer object contains list of valid macros" );
 
+my $warnings = {
+    'file1' => {
+        'func_alpha'    => [
+            'alpha warning 1',
+            'alpha warning 2',
+            'alpha warning 3',
+        ],
+        'func_beta'      => [
+            'beta warning 1',
+            'beta warning 2',
+        ],
+    },
+    'file2' => {
+        'func_gamma'    => [
+            'gamma warning 1',
+            'gamma warning 2',
+            'gamma warning 3',
+        ],
+    },
+};
+$self->{warnings} = $warnings;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $self->print_warnings(); },
+        \$stdout,
+        \$stderr,
+    );
+    for my $func( qw| alpha gamma | ) {
+        for (1..3) {
+            like( $stdout, qr/func_alpha: alpha warning $_/s,
+                "Got expected output" );
+        }
+    }
+    for (1..2) {
+        like( $stdout, qr/func_beta: beta warning $_/s,
+            "Got expected output" );
+    }
+    like( $stdout, qr/8 warnings in 3 funcs in 2 C files/,
+        "Got expected summary of headerizer warnings" );
+}
+
+$self->{warnings} = {};
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $self->print_warnings(); },
+        \$stdout,
+        \$stderr,
+    );
+    ok(! $stdout, "No warnings, hence no warnings printed" );
+}
 
 pass("Completed all tests in $0");
-
-#sub touch_parrot {
-#    open my $FH, '>', q{parrot}
-#        or die "Unable to open handle for writing: $!";
-#    print $FH "\n";
-#    close $FH or die "Unable to close handle after writing: $!";
-#}
 
 ################### DOCUMENTATION ###################
 

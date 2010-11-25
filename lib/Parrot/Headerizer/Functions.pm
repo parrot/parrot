@@ -250,7 +250,7 @@ sub asserts_from_args {
 
 sub api_first_then_alpha {
     return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
-        || ( lc $a->{name} cmp lc $b->{name} );
+        || ( lc ($a->{name} || '') cmp lc ($b->{name} || '') );
 }
 1;
 

@@ -5,6 +5,7 @@
 
 use strict;
 use warnings;
+#use Data::Dumper;
 use Test::More qw(no_plan); # tests => 15;
 use Carp;
 use Cwd;
@@ -14,10 +15,11 @@ use lib qw( lib );
 use Parrot::Config;
 use Parrot::Headerizer::Functions qw(
     process_argv
-    print_headerizer_warnings
     read_file
     write_file
     qualify_sourcefile
+    asserts_from_args
+    api_first_then_alpha
 );
 use IO::CaptureOutput qw| capture |;
 
@@ -70,59 +72,6 @@ is(@ofiles, 3, "Got expected number of ofiles");
     chdir $cwd or die "Unable to chdir: $!";
 }
     
-my $warnings = {
-    'file1' => {
-        'func_alpha'    => [
-            'alpha warning 1',
-            'alpha warning 2',
-            'alpha warning 3',
-        ],
-        'func_beta'      => [
-            'beta warning 1',
-            'beta warning 2',
-        ],
-    },
-    'file2' => {
-        'func_gamma'    => [
-            'gamma warning 1',
-            'gamma warning 2',
-            'gamma warning 3',
-        ],
-    },
-};
-
-{
-    my ($stdout, $stderr);
-    capture(
-        sub { print_headerizer_warnings($warnings); },
-        \$stdout,
-        \$stderr,
-    );
-    for my $func( qw| alpha gamma | ) {
-        for (1..3) {
-            like( $stdout, qr/func_alpha: alpha warning $_/s,
-                "Got expected output" );
-        }
-    }
-    for (1..2) {
-        like( $stdout, qr/func_beta: beta warning $_/s,
-            "Got expected output" );
-    }
-    like( $stdout, qr/8 warnings in 3 funcs in 2 C files/,
-        "Got expected summary of headerizer warnings" );
-}
-
-$warnings = {};
-{
-    my ($stdout, $stderr);
-    capture(
-        sub { print_headerizer_warnings($warnings); },
-        \$stdout,
-        \$stderr,
-    );
-    ok(! $stdout, "No warnings, hence no warnings printed" );
-}
-
 my $filename = 'foobar';
 eval {
     read_file($filename);
@@ -272,14 +221,30 @@ like($@, qr/$ofile doesn't look like an object file/,
     is( $hfile, 'none', "As expected, no header file" );
 }
 
-pass("Completed all tests in $0");
+my (@args, %asserts);
+@args = (
+    'SHIM_INTERP',
+    'ARGIN(Linked_List *list)',
+    'ARGIN(List_Item_Header *item)',
+);
+%asserts = map { $_ => 1 } asserts_from_args( @args );
+is( keys %asserts, 2, "Got expected number of asserts" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(list)'}, "Got expected assert" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 
-#sub touch_parrot {
-#    open my $FH, '>', q{parrot}
-#        or die "Unable to open handle for writing: $!";
-#    print $FH "\n";
-#    close $FH or die "Unable to close handle after writing: $!";
-#}
+@args = (
+    'PARROT_INTERP',
+    'ARGIN(Linked_List *list)',
+    'ARGIN(List_Item_Header *item)',
+    'SHIM_INTERP',
+);
+%asserts = map { $_ => 1 } asserts_from_args( @args );
+is( keys %asserts, 3, "Got expected number of asserts" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(list)'}, "Got expected assert" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
+
+pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 

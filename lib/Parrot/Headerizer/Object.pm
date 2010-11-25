@@ -26,6 +26,7 @@ of C-language files.
 
 use strict;
 use warnings;
+use Data::Dumper;$Data::Dumper::Indent=1;
 use Scalar::Util qw( reftype );
 use lib qw( lib );
 use Parrot::Config;
@@ -513,6 +514,36 @@ sub print_final_message {
     }
 }
 
+sub replace_headerized_declarations {
+    my $self = shift;
+    my $source_code = shift;
+    my $sourcefile  = shift;
+    my $hfile       = shift;
+    my @funcs       = @_;
+
+    # Allow a way to not headerize statics
+    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$sourcefile\s*\*/} ) {
+        return $source_code;
+    }
+
+    @funcs = sort api_first_then_alpha @funcs;
+print STDERR "Inside replace_headerized_declarations\n";
+print STDERR Dumper \@funcs;
+    my @function_decls = $self->make_function_decls(@funcs);
+
+    my $function_decls = join( "\n", @function_decls );
+    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $sourcefile \*/\n};
+    my $ENDMARKER      = qr{/\* HEADERIZER END: $sourcefile \*/\n?};
+    my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
+
+    $source_code =~
+        s{($STARTMARKER)(?:.*?)($ENDMARKER)}
+         {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
+        or die "Need begin/end HEADERIZER markers for $sourcefile in $hfile\n";
+
+    return $source_code;
+}
+
 sub make_function_decls {
     my $self = shift;
     my @funcs = @_;
@@ -580,6 +611,7 @@ sub make_function_decls {
     foreach my $func (@funcs) {
         my @args    = @{ $func->{args} };
         my @asserts = asserts_from_args( @args );
+print STDERR Dumper [ \@args, \@asserts ];
 
         my $assert = "#define ASSERT_ARGS_" . $func->{name};
         if(length($func->{name}) > 29) {
@@ -637,35 +669,6 @@ sub attrs_from_args {
     }
 
     return (@attrs,@mods);
-}
-
-sub replace_headerized_declarations {
-    my $self = shift;
-    my $source_code = shift;
-    my $sourcefile  = shift;
-    my $hfile       = shift;
-    my @funcs       = @_;
-
-    # Allow a way to not headerize statics
-    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$sourcefile\s*\*/} ) {
-        return $source_code;
-    }
-
-    @funcs = sort api_first_then_alpha @funcs;
-
-    my @function_decls = $self->make_function_decls(@funcs);
-
-    my $function_decls = join( "\n", @function_decls );
-    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $sourcefile \*/\n};
-    my $ENDMARKER      = qr{/\* HEADERIZER END: $sourcefile \*/\n?};
-    my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
-
-    $source_code =~
-        s{($STARTMARKER)(?:.*?)($ENDMARKER)}
-         {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
-        or die "Need begin/end HEADERIZER markers for $sourcefile in $hfile\n";
-
-    return $source_code;
 }
 
 =head2 C<print_headerizer_warnings()>
