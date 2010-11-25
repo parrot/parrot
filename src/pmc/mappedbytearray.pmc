@@ -19,6 +19,9 @@ Bare minimal functionality available, only for posix platforms
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
+#define CAN_READ  1
+#define CAN_WRITE 2
+
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #    include <sys/mman.h>
 #    define ENABLED
@@ -43,11 +46,10 @@ PARROT_CAN_RETURN_NULL
 static void *
 mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
 {
-    void *mapping = mmap(0, size,
-            flag ? PROT_WRITE : PROT_READ,
-            MAP_SHARED,
-            handle, 0);
-    return mapping;
+    int prot = 0;
+    if (flag & CAN_READ) prot |= PROT_READ;
+    if (flag & CAN_WRITE) prot |= PROT_WRITE;
+    return mmap(0, size, prot, MAP_SHARED, handle, 0);
 }
 
 PARROT_CAN_RETURN_NULL
@@ -58,7 +60,23 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), unsigned long *size, int fla
     void *mapping;
     {
         char * name_str = Parrot_str_to_cstring(interp, name);
-        handle = open(name_str, flag ? O_RDWR : O_RDONLY);
+        int openmode = 0;
+        switch (flag & (CAN_READ | CAN_WRITE)) {
+          case CAN_READ:
+            openmode = O_RDONLY;
+            break;
+          case CAN_READ | CAN_WRITE:
+          case CAN_WRITE:
+            openmode = O_RDWR;
+            break;
+          default:
+            /* Should never happen, invalid modes must be caught before
+             * calling this function.
+             */
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
+        }
+        handle = open(name_str, openmode);
         Parrot_str_free_cstring(name_str);
     }
     if (handle == -1)
@@ -98,27 +116,12 @@ Free all resources used.
         #ifdef ENABLED
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
-/*
-            void *mapping;
-*/
             STRING *name = VTABLE_get_string(INTERP, init);
-/*
-            char * name_str = Parrot_str_to_cstring(INTERP, name);
-            int handle = open(name_str, O_RDONLY);
-            Parrot_str_free_cstring(name_str);
-            if (handle == -1)
+            void *mapping = mapfromfilename(interp, name, &length, CAN_READ);
+            if (mapping == 0 || mapping == (void *)-1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "cannot open file '%Ss'", name);
-            length = lseek(handle, 0, SEEK_END);
-            mapping = mapfromfilehandle(handle, length);
-            close(handle);
-            if (mapping == NULL || mapping == (void *)-1)
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "cannot mmap file '%Ss': %s", name, strerror(errno));
-*/
-            void *mapping = mapfromfilename(interp, name, &length, 0);
+                        "mmap failed: %s", strerror(errno));
             PObj_custom_destroy_SET(SELF);
             SET_ATTR_size(INTERP, SELF, length);
             SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
@@ -171,7 +174,7 @@ Get a byte.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
-        UINTVAL size;
+        INTVAL size;
         unsigned char *buffer;
         GET_ATTR_size(INTERP, SELF, size);
         if (size <= 0)
@@ -187,7 +190,7 @@ Get a byte.
     }
 
     VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
-        UINTVAL size;
+        INTVAL size;
         unsigned char *buffer;
         GET_ATTR_size(INTERP, SELF, size);
         if (size <= 0)
@@ -211,10 +214,36 @@ Get a byte.
 
 */
 
-    METHOD open(STRING *filename, INTVAL flag :optional)
+    METHOD open(STRING *filename, STRING *mode :optional)
     {
         unsigned long length = 0;
-        void *mapping = mapfromfilename(interp, filename, &length, flag);
+        int flag = 0;
+        void *mapping;
+        if (STRING_IS_NULL(mode))
+            flag = CAN_READ;
+        else {
+            INTVAL len = Parrot_str_length(INTERP, mode);
+            INTVAL i;
+            for (i = 0; i < len; ++i) {
+                switch (STRING_ord(INTERP, mode, i)) {
+                  case 'r':
+                    flag |= CAN_READ;
+                    break;
+                  case 'w':
+                    flag |= CAN_WRITE;
+                    break;
+                  default:
+                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "invalid open mapped mode");
+                }
+            }
+        }
+        mapping = mapfromfilename(interp, filename, &length, flag);
+        if (mapping == 0 || mapping == (void *)-1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "mmap failed: %s", strerror(errno));
         PObj_custom_destroy_SET(SELF);
         SET_ATTR_size(INTERP, SELF, length);
         SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
