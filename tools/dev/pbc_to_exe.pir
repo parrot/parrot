@@ -106,7 +106,7 @@ HEADER
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
             Parrot_runcode(interp, argc, argv);
             Parrot_destroy(interp);
-            Parrot_exit(interp, 0);
+            Parrot_x_exit(interp, 0);
         }
 MAIN
 

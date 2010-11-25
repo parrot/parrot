@@ -754,13 +754,13 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_exit cycles' );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_x_exit cycles' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-/* this is Parrot_exit without the exit()
+/* this is Parrot_x_exit without the exit()
  * it will call Parrot_really_destroy() as an exit handler
  */
 void interp_cleanup(Parrot_Interp, int);

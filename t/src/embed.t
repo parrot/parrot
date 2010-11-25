@@ -484,7 +484,7 @@ main(int margc, const char *margv[])
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, (char **)argv);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 CODE
@@ -574,7 +574,7 @@ main(int margc, const char *margv[])
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, (char **) argv);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 CODE
@@ -665,7 +665,7 @@ main(int margc, const char *margv[])
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 CODE
@@ -755,7 +755,7 @@ main(int margc, const char *margv[])
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 CODE
@@ -844,7 +844,7 @@ main(int margc, const char *margv[])
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 CODE

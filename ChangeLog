@@ -232,7 +232,7 @@
 	well as keys; the corresponding namespace PMC methods are gone.
 
 2006.07.21    leo
-	* Parrot_exit, Parrot_on_exit take now an Interp * argument
+	* Parrot_x_exit, Parrot_x_on_exit take now an Interp * argument
 
 2006.07.25    chip
 	* add experimental op find_type_i_p
