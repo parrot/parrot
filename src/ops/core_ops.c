@@ -16033,42 +16033,42 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_loadlib_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_load_lib(interp, SREG(2), NULL);
+    PREG(1) = Parrot_dyn_load_lib(interp, SREG(2), NULL);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_loadlib_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_load_lib(interp, SCONST(2), NULL);
+    PREG(1) = Parrot_dyn_load_lib(interp, SCONST(2), NULL);
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_loadlib_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_load_lib(interp, SREG(2), PREG(3));
+    PREG(1) = Parrot_dyn_load_lib(interp, SREG(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_loadlib_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_load_lib(interp, SCONST(2), PREG(3));
+    PREG(1) = Parrot_dyn_load_lib(interp, SCONST(2), PREG(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_loadlib_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_load_lib(interp, SREG(2), PCONST(3));
+    PREG(1) = Parrot_dyn_load_lib(interp, SREG(2), PCONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
 opcode_t *
 Parrot_loadlib_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_load_lib(interp, SCONST(2), PCONST(3));
+    PREG(1) = Parrot_dyn_load_lib(interp, SCONST(2), PCONST(3));
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -16085,7 +16085,7 @@ Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym_str(interp, dl_handle, SREG(3));
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
@@ -16114,7 +16114,7 @@ Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym_str(interp, dl_handle, SCONST(3));
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
@@ -16143,7 +16143,7 @@ Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym_str(interp, dl_handle, SREG(3));
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
@@ -16172,7 +16172,7 @@ Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    ptr = Parrot_dlsym_str(interp, dl_handle, SCONST(3));
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
@@ -16200,7 +16200,7 @@ Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    p = Parrot_dlsym_str(interp, dl_handle, SREG(3));
+    p = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
@@ -16229,7 +16229,7 @@ Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
-    p = Parrot_dlsym_str(interp, dl_handle, SCONST(3));
+    p = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();

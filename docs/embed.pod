@@ -850,7 +850,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_load_language>
 
-=item C<Parrot_load_lib>
+=item C<Parrot_dyn_load_lib>
 
 =item C<Parrot_locate_runtime_file>
 

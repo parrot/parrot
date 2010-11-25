@@ -126,7 +126,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         for (i = 0; i < n; ++i) {
             STRING * const key     = VTABLE_shift_string(s, lib_iter);
             PMC    * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
-            PMC    * const ignored = Parrot_clone_lib_into(d, s, lib_pmc);
+            PMC    * const ignored = Parrot_dyn_clone_lib_into(d, s, lib_pmc);
             UNUSED(ignored);
         }
     }
