@@ -38,7 +38,7 @@ segments from the input PBC files.
 #define PARROT_IN_EXTENSION
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include "parrot/longopt.h"
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"

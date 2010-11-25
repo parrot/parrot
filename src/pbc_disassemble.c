@@ -29,6 +29,14 @@ Without non-option arguments it reads the pbc from STDIN.
 #include <stdlib.h>
 #include <ctype.h>
 #include "parrot/api.h"
+#include "parrot/longopt.h"
+
+#define PFOPT_UTILS 1
+
+typedef enum {
+    enum_DIS_BARE      = 1,
+    enum_DIS_HEADER    = 2
+} Parrot_disassemble_options;
 
 static void get_last_error(Parrot_PMC interp);
 

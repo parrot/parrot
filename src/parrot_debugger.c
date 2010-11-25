@@ -142,7 +142,6 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include <string.h>
 #include <ctype.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
