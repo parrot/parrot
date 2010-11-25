@@ -140,7 +140,7 @@ subsystem, the exceptions system, or the concurrency scheduler.
 X<compiler developer role>
 
 Compiler developers develop and maintain one or more Parrot front-end
-compilers such as IMCC, PIRC, PGE and TGE.
+compilers such as IMCC, PGE and TGE.
 
 =item High-Level Language Developer
 

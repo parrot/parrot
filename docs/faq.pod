@@ -24,7 +24,7 @@ could run both Perl and Python, it seemed like a perfect fit.
 =head2 Is Parrot the same as Perl 6?
 
 No. Perl 6 is just one of the languages that will run on Parrot. For
-information about Perl 6 on Parrot (a.k.a Rakudo), see L<languages/perl6/>.
+information about Perl 6 on Parrot (a.k.a Rakudo), see L<http://rakudo.org/>.
 
 =head2 Can I use Parrot today?
 

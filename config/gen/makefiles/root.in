@@ -125,7 +125,6 @@ HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
 include src/dynpmc/Defines.mak
 include src/dynoplibs/Defines.mak
 include compilers/imcc/Defines.mak
-include compilers/pirc/Defines.mak
 include compilers/tge/Defines.mak
 include compilers/pge/Defines.mak
 include compilers/pct/Defines.mak
@@ -537,7 +536,6 @@ PBC_MERGE           = .@slash@pbc_merge$(EXE)
 PDB                 = .@slash@parrot_debugger$(EXE)
 PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
-PIRC                = .@slash@pirc$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PROVE               = .@slash@parrot-prove$(EXE)
@@ -814,8 +812,8 @@ help :
 	@echo "  reconfig:          'clean' and redo configuration."
 	@echo ""
 	@echo "Fetch from source repository:"
-	@echo "  update:            svn update."
-	@echo "  status:            svn status."
+	@echo "  update:            git pull."
+	@echo "  status:            git status."
 	@echo "  patch:             Create a patch to attach to https://trac.parrot.org/"
 	@echo ""
 	@echo "Development:"
@@ -2025,7 +2023,7 @@ clean : \
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_RF) runtime/parrot/languages/data_json
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
-	$(RM_F) $(PIRC_CLEANUPS) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
+	$(RM_F) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
 	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
 	$(RM_F) $(NQPRX_CLEANUPS)  $(OPSC_CLEANUPS)
@@ -2195,18 +2193,18 @@ pmcrenumber :
 
 ###############################################################################
 #
-# SVN Targets:
+# GIT Targets:
 #
 ###############################################################################
 
 update :
-	svn -q update
+	git pull --rebase
 
 status :
-	svn -q status
+	git status
 
 patch :
-	svn diff
+	git diff
 
 LINTABLE_CFILES = `echo src/main$(O) $(O_FILES) src/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
@@ -2530,7 +2528,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir qw ( $(COVER_DIRS) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
@@ -2670,7 +2668,7 @@ tags-emacs: tags.emacs.dummy
 	$(RM_F) TAGS
 	@ctags@ -e \
 	--links=no --totals \
-	-R --exclude=blib --exclude=.svn  \
+	-R --exclude=blib --exclude=.git  \
 	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.
@@ -2690,7 +2688,7 @@ tags-vi: tags.vi.dummy
 	$(RM_F) tags
 	@ctags@ \
 	--links=no --totals \
-	-R --exclude=blib --exclude=.svn  \
+	-R --exclude=blib --exclude=.git  \
 	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.
@@ -2723,7 +2721,6 @@ HEADERIZER_O_FILES = \
     src/main$(O) \
     src/packdump$(O) \
     src/pbc_merge$(O) \
-    $(PIRC_O_FILES)
 
 headerizer : src/core_pmcs.c
 	$(HEADERIZER) $(HEADERIZER_O_FILES) compilers/imcc/imcc.y
@@ -2741,7 +2738,6 @@ include src/dynpmc/Rules.mak
 include src/dynoplibs/Rules.mak
 include runtime/parrot/library/Rules.mak
 include compilers/imcc/Rules.mak
-include compilers/pirc/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
 include compilers/opsc/Rules.mak

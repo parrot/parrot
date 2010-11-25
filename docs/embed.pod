@@ -672,9 +672,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_ctx_HLL_type>
 
-=item C<Parrot_get_datatype_enum>
+=item C<Parrot_dt_get_datatype_enum>
 
-=item C<Parrot_get_datatype_name>
+=item C<Parrot_dt_get_datatype_name>
 
 =item C<Parrot_get_encoding>
 
