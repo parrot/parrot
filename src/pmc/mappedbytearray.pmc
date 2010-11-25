@@ -39,6 +39,36 @@ static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+PARROT_CAN_RETURN_NULL
+static void *
+mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
+{
+    void *mapping = mmap(0, size,
+            flag ? PROT_WRITE : PROT_READ,
+            MAP_SHARED,
+            handle, 0);
+    return mapping;
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), unsigned long *size, int flag)
+{
+    int handle;
+    void *mapping;
+    {
+        char * name_str = Parrot_str_to_cstring(interp, name);
+        handle = open(name_str, flag ? O_RDWR : O_RDONLY);
+        Parrot_str_free_cstring(name_str);
+    }
+    if (handle == -1)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "cannot open file '%Ss'", name);
+    if (*size == 0)
+        *size = lseek(handle, 0, SEEK_END);
+    mapping = mapfromfilehandle(handle, *size, flag);
+    return mapping;
+}
 
 pmclass MappedByteArray auto_attrs {
     ATTR unsigned char *buffer;
@@ -49,10 +79,6 @@ pmclass MappedByteArray auto_attrs {
 =head2 Vtable Functions
 
 =over 4
-
-=item C<init>
-
-Invalid init without args for a now.
 
 =item C<init_pmc>
 
@@ -68,21 +94,15 @@ Free all resources used.
 
 */
 
-    VTABLE void init() {
-        #ifdef ENABLED
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "testing");
-        #else
-        unavailable(INTERP, "MappedByteArray");
-        #endif
-    }
-
     VTABLE void init_pmc(PMC * init) {
         #ifdef ENABLED
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
-            off_t length;
+            unsigned long length = 0;
+/*
             void *mapping;
+*/
             STRING *name = VTABLE_get_string(INTERP, init);
+/*
             char * name_str = Parrot_str_to_cstring(INTERP, name);
             int handle = open(name_str, O_RDONLY);
             Parrot_str_free_cstring(name_str);
@@ -91,12 +111,14 @@ Free all resources used.
                         EXCEPTION_INVALID_OPERATION,
                         "cannot open file '%Ss'", name);
             length = lseek(handle, 0, SEEK_END);
-            mapping = mmap(0, length, PROT_READ, MAP_PRIVATE, handle, 0);
+            mapping = mapfromfilehandle(handle, length);
             close(handle);
             if (mapping == NULL || mapping == (void *)-1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "cannot mmap file '%Ss': %s", name, strerror(errno));
+*/
+            void *mapping = mapfromfilename(interp, name, &length, 0);
             PObj_custom_destroy_SET(SELF);
             SET_ATTR_size(INTERP, SELF, length);
             SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
@@ -156,8 +178,28 @@ Get a byte.
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "not mapped");
+        if (pos < 0 || pos >= size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of mapped");
         GET_ATTR_buffer(INTERP, SELF, buffer);
         return buffer[pos];
+    }
+
+    VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
+        UINTVAL size;
+        unsigned char *buffer;
+        GET_ATTR_size(INTERP, SELF, size);
+        if (size <= 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "not mapped");
+        if (pos < 0 || pos >= size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of mapped");
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        buffer[pos] = value;
     }
 
 
@@ -168,6 +210,16 @@ Get a byte.
 =cut
 
 */
+
+    METHOD open(STRING *filename, INTVAL flag :optional)
+    {
+        unsigned long length = 0;
+        void *mapping = mapfromfilename(interp, filename, &length, flag);
+        PObj_custom_destroy_SET(SELF);
+        SET_ATTR_size(INTERP, SELF, length);
+        SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
+        RETURN(void);
+    }
 
 } /* pmclass end */
 
