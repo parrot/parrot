@@ -366,7 +366,7 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         clear_sym_hash(&IMCC_INFO(interp)->globals->cs->key_consts);
     else {
         /* register cleanup code */
-        Parrot_on_exit(interp, imcc_globals_destroy, NULL);
+        Parrot_x_on_exit(interp, imcc_globals_destroy, NULL);
     }
 
     /* free previous cached key constants if any */

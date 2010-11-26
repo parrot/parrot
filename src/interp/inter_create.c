@@ -299,7 +299,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
      * Threaded interpreters are destructed when the thread ends
      */
     if (!Interp_flags_TEST(interp, PARROT_IS_THREAD))
-        Parrot_on_exit(interp, Parrot_really_destroy, NULL);
+        Parrot_x_on_exit(interp, Parrot_really_destroy, NULL);
 #endif
 
     return interp;

@@ -184,16 +184,16 @@ See <Parrot_really_destroy()>.
 Destroys an interpreter, regardless of the environment.  The exit code is
 currently unused.
 
-=item C<void Parrot_exit(PARROT_INTERP, int status)>
+=item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
 Destroys the interpreter and exits with an exit code of C<status>.  Before
 exiting, the function calls all registered exit handlers in LIFO order.
 C<Parrot_really_destroy()> is usually called as the last exit handler.
 
-=item C<void Parrot_on_exit(PARROT_INTERP,
+=item C<void Parrot_x_on_exit(PARROT_INTERP,
                             void (*handler)(Parrot_Interp, int, void *), void *arg)>
 
-Registers an exit handler to be called from C<Parrot_exit()> in LIFO order.
+Registers an exit handler to be called from C<Parrot_x_exit()> in LIFO order.
 The handler function should accept as arguments an interpreter, an integer
 exit code, and an argument (which can be NULL).
 
@@ -612,7 +612,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ex_build_exception>
 
-=item C<Parrot_exit>
+=item C<Parrot_x_exit>
 
 =item C<Parrot_ex_mark_unhandled>
 
@@ -892,7 +892,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_get_name>
 
-=item C<Parrot_on_exit>
+=item C<Parrot_x_on_exit>
 
 =item C<Parrot_oo_get_class>
 

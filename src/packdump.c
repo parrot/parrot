@@ -291,7 +291,7 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               default:
                 Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                Parrot_exit(interp, 1);
+                Parrot_x_exit(interp, 1);
             }
             GETATTR_Key_next_key(interp, key, key);
         }
