@@ -506,9 +506,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_block_GC_sweep>
 
-=item C<Parrot_byte_index>
+=item C<Parrot_util_byte_index>
 
-=item C<Parrot_byte_rindex>
+=item C<Parrot_util_byte_rindex>
 
 =item C<Parrot_callback_C>
 
@@ -646,7 +646,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_find_named_item>
 
-=item C<Parrot_float_rand>
+=item C<Parrot_util_float_rand>
 
 =item C<Parrot_fprintf>
 
@@ -718,7 +718,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_init_stacktop>
 
-=item C<Parrot_int_rand>
+=item C<Parrot_util_int_rand>
 
 =item C<Parrot_invalidate_method_cache>
 
@@ -1354,7 +1354,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_push_mark>
 
-=item C<Parrot_range_rand>
+=item C<Parrot_util_range_rand>
 
 =item C<Parrot_regenerate_HLL_namespaces>
 
@@ -1364,7 +1364,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_register_HLL_type>
 
-=item C<Parrot_register_move>
+=item C<Parrot_util_register_move>
 
 =item C<Parrot_register_pmc>
 
@@ -1418,7 +1418,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_sprintf_s>
 
-=item C<Parrot_srand>
+=item C<Parrot_util_srand>
 
 =item C<Parrot_ns_store_global>
 
@@ -1524,7 +1524,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_thaw_constants>
 
-=item C<Parrot_uint_rand>
+=item C<Parrot_util_uint_rand>
 
 =item C<Parrot_unblock_GC_mark>
 

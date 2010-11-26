@@ -631,7 +631,7 @@ Sort the array and return self.
                 qsort(int_array, n, sizeof (INTVAL),
                         (int (*)(const void *, const void*))auxcmpfunc);
             else
-                Parrot_quicksort(INTERP, (void**)int_array, n, cmp_func);
+                Parrot_util_quicksort(INTERP, (void**)int_array, n, cmp_func);
         }
         RETURN(PMC *SELF);
     }

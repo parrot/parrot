@@ -113,14 +113,14 @@ op decodetime(out PMC, in INT) {
     struct tm tm;
     const time_t t = (time_t) $2;
     Parrot_gmtime_r(&t, &tm);
-    $1 = Parrot_tm_to_array(interp, &tm);
+    $1 = Parrot_util_tm_to_array(interp, &tm);
 }
 
 op decodelocaltime(out PMC, in INT) {
     struct tm tm;
     const time_t t = (time_t) $2;
     Parrot_localtime_r(&t, &tm);
-    $1 = Parrot_tm_to_array(interp, &tm);
+    $1 = Parrot_util_tm_to_array(interp, &tm);
 }
 
 ########################################
