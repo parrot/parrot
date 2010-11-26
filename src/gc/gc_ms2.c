@@ -10,15 +10,15 @@ src/gc/gc_ms2.c - Non-recursive M&S
 
 Generational, non-compacting, mark and sweep GC.
 
-Objects stored in 3 different lists for each generation.
-PObj_GC_generation_0_FLAG and PObj_GC_generation_1_FLAG determine generation.
-PObj_GC_generation_2_FLAG set when Object survived first collection in particular
-generation.
+Objects are stored in 3 different lists; one for each generation.
+PObj_GC_generation_0_FLAG and PObj_GC_generation_1_FLAG determine which
+generation an object is in.  PObj_GC_generation_2_FLAG is set when an object
+has survived first collection in a particular generation.
 
 GC algorithm is:
-1. After C<gc_threshold> allocated memory we trigger collection of young objects.
-2. Survived objects without PObj_GC_generation_2_FLAG will set flag.
-3. -- // -- with PObj_GC_generation_2_FLAG will be moved to older generation.
+1. After C<gc_threshold> allocates memory, we trigger the collection of any young objects.
+2. Objects which have survived without PObj_GC_generation_2_FLAG set will have that flag set.
+3. Objects which have survived and have PObj_GC_generation_2_FLAG set will be moved to the next oldest generation.
 4. After ... we trigger collection of older objects with same approach.
 5. After ... we trigger collection of ancient objects.
 
@@ -30,53 +30,53 @@ SELF into root_objects list.
 Pictures of GC steps.
 
 Notation 
-1. "*A1:B2" live object A in generation 1 referenced from object B in generation 2.
-2. "B0" not-live object B in generation 0 not referenced from anywhere.
-2. gn: generaraion n.
-3. R: roots.
+1. "*A1:B2" is a live object A in generation 1 referenced by an object B in generation 2.
+2. "B0" is a non-live object B in generation 0 not referenced by anything.
+2. gn: generation n.
+3. R: root set.
 
-Before collect:
+Before collection:
 
     R:  *A1:B2 *B2 *C0 *D0:E1
     g0: F0 G0:E1 H0:Z2 L0:A1 M0:L0 N0 P0 Q0
     g1: E1 I1:Z2 J1:Y2 K1:J1
     g2: Y2 Z2
 
-Consider we are collecting gen1. During VTABLE_mark we will skip all objects
-from older generations.
+Consider collecting generation 1.  During VTABLE_mark we will skip all objects from the
+older generations.
 
-Marking roots:
+After marking the root set:
 
     R:  *A1:B2 *B2 *C0 *D0:E1 *F0 *I1:Z2 
     g0: G0:E1 H0:Z2 L0:A1 M0:L0 N0 P0 Q0
     g1: E1 J1:Y2 K1:J1
     g2: Y2 Z2
 
-During this phase we've removed objects from objects[n] and move them into root_objects.
-After this phase root_objects contains only black survived objects. Generations will
-contains mix of dead and live objects.
+During this phase we move objects from objects[n] into root_objects.
+Afterward, root_objects will contain only black surviving objects.  The three
+generations will contain a mix of dead and live objects.
 
 "Shuffling-marking-and-reffing" phase.
 
-Replace C<interp->gc_sys->mark> with C<gc_ms2_magical_mark>.
+Replace C«interp->gc_sys->mark» with C<gc_ms2_magical_mark>.
 
-Recursively (until I figure out non-recursive algorithm) process root_objects
-and do next things:
-1. Decide C<next_gen> generation for current object. It can be simple
-"next-gen" or some sort of heuristic to avoid "eager" propagation.
-2. Move object into C<next_gen>.
-3. Set C<tmp_gen> to C<self->current_generation>.
-4. Set C<self->current_generation> to C<next_gen>.
-5. Invoke VTABLE_mark on object (which is magical_mark).
-6. Set C<self->current_generation> to C<tmp_gen>.
+Recursively (until I figure out a non-recursive algorithm) process root_objects
+and do the following:
+1. Decide which generation (C<next_gen>) the current object will be assigned
+to. It can be a fixed algorithm or a heuristic to avoid "eager" propagation.
+2. Move the object into C<next_gen>.
+3. Set C<tmp_gen> to C«self->current_generation».
+4. Set C«self->current_generation» to C<next_gen>.
+5. Invoke VTABLE_mark on the object (which is magical_mark).
+6. Set C«self->current_generation» to C<tmp_gen>.
 
 "Magical mark" will do next:
 0. Return if object is live.
 1. Mark it live.
-2. Do nothing if object's generation is greater-or-equal to C<self->current_generation>.
-3. Mark object as referenced from C<self->current_generation>.
-4. Set self->current_generation = obj->generation.
-5. Invoke VTABLE_mark on it.
+2. Do nothing if object's generation is greater than or equal to C«self->current_generation».
+3. Mark object as referenced from C«self->current_generation».
+4. Set self->current_generation to obj->generation.
+5. Invoke VTABLE_mark on the object.
 6. Set self->current_generation back.
 
 After this phase we will have objects moved to proper generation with
