@@ -87,6 +87,28 @@ Not documented yet.
 
 =head2 Type signatures
 
+What is a type signature? It is a string which represents the calling and
+return conventions of a function. It is a very succinct representation of the
+answer to the question "How do I call this function and what does it
+return?".
+
+All type signatures follow the form of:
+
+    Foo->Bar
+
+where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. Here is
+an example of a few type signatures and what they mean:
+
+   P->S     In: PMC                 Out: String
+   PiP->S   In: PMC (method call)   Out: String
+   NN->N    In: Two Numerics        Out: Numeric
+   I->I     In: Integer             Out: Integer
+   I->N     In: Integer             Out: Numeric
+   Pi->     In: none (method call)  Out: none
+   ->I      In: none                Out: Integer
+
+TODO: Multiple return values? Spaces? Is "->" valid ?
+
 There are four main datatypes that can be used in Parrot Type Signatures:
 
     I <=> Parrot_Int
