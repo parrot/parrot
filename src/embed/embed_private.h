@@ -25,13 +25,14 @@
         return !exit_code;                                         \
     } else {                                                       \
         {
-#define EMBED_API_CALLOUT(p, i) \
-        } \
-        if (!_oldtop) {\
-            PARROT_ASSERT((i)->lo_var_ptr == &_oldtop);\
-            (i)->lo_var_ptr = NULL;\
-        }\
-        return 1; \
+#define EMBED_API_CALLOUT(p, i)                                    \
+        }                                                          \
+        (i)->api_jmp_buf = NULL;                                   \
+        if (!_oldtop) {                                            \
+            PARROT_ASSERT((i)->lo_var_ptr == &_oldtop);            \
+            (i)->lo_var_ptr = NULL;                                \
+        }                                                          \
+        return 1;                                                  \
     }
 
 #endif /* PARROT_EMBED_PRIVATE_H */
