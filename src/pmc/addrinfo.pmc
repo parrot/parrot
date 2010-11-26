@@ -86,8 +86,10 @@ Creates and returns a clone of the pointer.
 
     VTABLE PMC *clone() {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(PARROT_ADDRINFO(dest)->pointer, PARROT_ADDRINFO(SELF)->pointer,
-                sizeof (struct sockaddr_storage));
+        if (PARROT_ADDRINFO(SELF)->pointer)
+            memcpy(PARROT_ADDRINFO(dest)->pointer,
+                   PARROT_ADDRINFO(SELF)->pointer,
+                   sizeof (struct sockaddr_storage));
         return dest;
     }
 
