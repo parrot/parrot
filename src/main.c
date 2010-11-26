@@ -169,14 +169,14 @@ static void
 get_last_error(Parrot_PMC interp)
 {
     Parrot_String errmsg;
-    char * errmsg_raw = "This is a test";
+    char * errmsg_raw = NULL;
     if (Parrot_api_get_last_error(interp, &errmsg) &&
         Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)
         ) {
         fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
         Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
     }
-    else
+    else if (errmsg_raw != NULL)
         fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
 }
 
