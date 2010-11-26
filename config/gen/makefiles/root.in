@@ -1795,16 +1795,16 @@ RUNCORE_TEST_FILES = \
     --runcore-tests
 SRC_TEST_FILES = \
     t/src/*.t
-TOOLS_TEST_FILES = \
-    t/tools/*.t
+TOOLS_TEST_DIR = t/tools
+TOOLS_TEST_FILES = $(TOOLS_TEST_DIR)/tools/*.t
 LIBRARY_TEST_FILES = @library_tests@
-PMC2CUTILS_DIR = t/tools/pmc2cutils
+PMC2CUTILS_DIR = $(TOOLS_TEST_DIR)/pmc2cutils
 HARNESS_DIR = t/pharness
 BUILDTOOLS_TEST_FILES = \
     $(PMC2CUTILS_DIR)/*.t \
     $(HARNESS_DIR)/*.t
 MANIFEST_DIR = t/manifest
-INSTALL_TOOLS_DIR = t/tools/install
+INSTALL_TOOLS_DIR = $(TOOLS_TEST_DIR)/install
 MANIFEST_TEST_FILES = \
     $(MANIFEST_DIR)/*.t \
     $(INSTALL_TOOLS_DIR)/*.t
@@ -1817,6 +1817,7 @@ PBC_TEST_FILES = \
 #IF(has_icu):    t/op/testlib/test_strings.pbc \
     t/pmc/testlib/annotations.pbc \
     t/pmc/testlib/number.pbc
+HEADERIZER_TEST_FILES = $(TOOLS_TEST_DIR)/dev/headerizer/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -1879,7 +1880,8 @@ fulltest :
 	benchmark_tests \
 	manifest_tests \
 	examples_tests \
-	distro_tests
+	distro_tests \
+	headerizer_tests
 
 # bounds checking, slow core
 testb : test_prep
@@ -1964,6 +1966,10 @@ distro_tests : test_prep
 # configure tests
 configure_tests :
 	$(PERL) t/harness $(CONFIGURE_TEST_FILES)
+
+# headerizer tests
+headerizer_tests : test_prep
+	$(PERL) t/harness $(HEADERIZER_TEST_FILES)
 
 # library tests - tests run by make test but not by make fulltest or make cover
 library_tests : test_prep
