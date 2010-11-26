@@ -160,17 +160,22 @@ for readable, two for writeable, and four for exceptions.
 
 /*
 
-=item C<sockaddr(STRING * address, INTVAL port)>
+=item C<sockaddr(STRING * address, INTVAL port, INTVAL family :optional)>
 
 C<sockaddr> returns an object representing a socket address, generated
-from a port number (integer) and an address (string).
+from a port number (integer) , address (string) and an optional address
+family (integer). If no address family is given, it defaults to IPv4.
 
 =cut
 
 */
 
-    METHOD sockaddr(STRING * address, INTVAL port) {
-        PMC * res = Parrot_io_sockaddr_in(INTERP, address, port);
+    METHOD sockaddr(STRING * address, INTVAL port, INTVAL family :optional) {
+        PMC * res;
+        if (!family)
+            family = AF_INET;
+
+        res = Parrot_io_sockaddr_in(INTERP, address, port, family);
         RETURN(PMC * res);
     }
 

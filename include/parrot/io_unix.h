@@ -250,7 +250,10 @@ INTVAL Parrot_io_send_unix(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
+PMC * Parrot_io_sockaddr_in(PARROT_INTERP,
+    ARGIN(STRING *addr),
+    INTVAL port,
+    INTVAL family)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

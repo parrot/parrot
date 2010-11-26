@@ -55,7 +55,8 @@ static void get_addrinfo(PARROT_INTERP,
 static void get_sockaddr_in(PARROT_INTERP,
     ARGIN(PMC * sockaddr),
     ARGIN(const char* host),
-    int port)
+    int port,
+    const int family)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -91,7 +92,8 @@ Very minimal stubs for now, maybe someone will run with these.
 
 =over 4
 
-=item C<PMC * Parrot_io_sockaddr_in(PARROT_INTERP, STRING *addr, INTVAL port)>
+=item C<PMC * Parrot_io_sockaddr_in(PARROT_INTERP, STRING *addr, INTVAL port,
+INTVAL family)>
 
 C<Parrot_io_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
@@ -112,14 +114,14 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
+Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL family)
 {
     ASSERT_ARGS(Parrot_io_sockaddr_in)
 
     char * const s        = Parrot_str_to_cstring(interp, addr);
     PMC  * const sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
 
-    get_sockaddr_in(interp, sockaddr, s, port);
+    get_sockaddr_in(interp, sockaddr, s, port, family);
     Parrot_str_free_cstring(s);
     return sockaddr;
 }
@@ -630,10 +632,10 @@ AGAIN:
 /*
 
 =item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr, const char*
-host, int port)>
+host, int port, const int family)>
 
 Get a new C<sockaddr_in> structure for the given PMC to connect to the
-specified host and port.
+specified host, port and address family.
 
 =cut
 
@@ -641,11 +643,9 @@ specified host and port.
 
 static void
 get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
-            int port)
+            int port, const int family)
 {
     ASSERT_ARGS(get_sockaddr_in)
-    /* Hard coded to IPv4 for now */
-    const int family = AF_INET;
 
     struct sockaddr_in * const sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
 #  ifdef PARROT_DEF_INET_ATON
