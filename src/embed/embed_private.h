@@ -15,7 +15,7 @@
         (i)->lo_var_ptr = &_oldtop;                                \
         (i)->final_error = NULL;                                   \
         (i)->api_jmp_buf = &env;                                   \
-    if (exit_code = setjmp(env)) {                                 \
+    if ((exit_code = setjmp(env))) {                               \
         /* exit code is incremented in 1 since                     \
          * longjmp can't return 0                                  \
          * exit_code = 1 -> normal exit                            \

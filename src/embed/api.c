@@ -179,6 +179,7 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
     PMC * main_sub = NULL;
 
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
@@ -196,6 +197,7 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
 
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, mainargs);
     Parrot_ext_call(interp, main_sub, "P->", mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
