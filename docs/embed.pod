@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -69,11 +69,15 @@ line.
 
 =item C<Parrot_Int>
 
+Parrot's integer numeric type.
+
 =item C<Parrot_Float>
+
+Parrot's floating point numeric type.
 
 =item C<Parrot_UInt>
 
-Parrot's numeric types.
+Parrot's unsigned integer numeric type.
 
 =back
 
@@ -83,7 +87,16 @@ Not documented yet.
 
 =head2 Type signatures
 
-    TODO: Write about signature strings
+There are four main datatypes that can be used in Parrot Type Signatures:
+
+    I <=> Parrot_Int
+    N <=> Parrot_Float (Numeric)
+    S <=> Parrot_String
+    P <=> Parrot_PMC
+
+There is also the C<Pi> datatype, which may only appear at the beginning of a
+type signature. It stands for "PMC invocant" and basically means SELF. C<Pi>
+will only be used if calling a method on an object.
 
 =head2 Interpreter initialization and destruction
 
