@@ -18,11 +18,22 @@ Tests the Addrinfo PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(2)
+    test_new()
+    test_clone()
+.end
 
+.sub test_new
     $P0 = new ['Addrinfo']
     isa_ok($P0, 'Addrinfo')
 .end
+
+.sub test_clone
+    $P0 = new ['Addrinfo']
+    $P2 = clone $P0
+    isa_ok($P2, 'Addrinfo')
+.end
+
 
 # Local Variables:
 #   mode: pir
