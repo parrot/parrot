@@ -56,7 +56,7 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    sockaddr = sock."sockaddr"("::1",80)
+    sockaddr = sock."sockaddr"("::1",80, .PIO_PF_INET6)
     ok(sockaddr,"A TCP ipv6 sockaddr was set")
 .end
 
@@ -65,7 +65,7 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
-    sockaddr = sock."sockaddr"("::1",80)
+    sockaddr = sock."sockaddr"("::1",80,.PIO_PF_INET6)
     ok(sockaddr,"A raw TCP ipv6 sockaddr was set")
 .end
 
@@ -74,7 +74,7 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
-    sockaddr = sock."sockaddr"("::1",80)
+    sockaddr = sock."sockaddr"("::1",80,.PIO_PF_INET6)
     ok(sockaddr,"A UDP ipv6 sockaddr was set")
 .end
 
@@ -83,7 +83,7 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
-    sockaddr = sock."sockaddr"("::1",80)
+    sockaddr = sock."sockaddr"("::1",80,.PIO_PF_INET6)
     ok(sockaddr,"A raw UDP ipv6 sockaddr was set")
 .end
 
