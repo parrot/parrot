@@ -24,7 +24,7 @@ IPv6-related tests for the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(4)
+    plan(8)
 
     check_for_ipv6()
 
@@ -56,8 +56,11 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    sockaddr = sock."sockaddr"("localhost",80, .PIO_PF_INET6)
+    isa_ok(sockaddr,'Sockaddr',"A TCP ipv6 sockaddr to localhost was set")
+
     sockaddr = sock."sockaddr"("::1",80, .PIO_PF_INET6)
-    ok(sockaddr,"A TCP ipv6 sockaddr was set")
+    isa_ok(sockaddr,'Sockaddr',"A TCP ipv6 sockaddr to ::1 was set")
 .end
 
 .sub test_raw_tcp_socket6
@@ -65,8 +68,10 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
+    sockaddr = sock."sockaddr"("localhost",80,.PIO_PF_INET6)
+    isa_ok(sockaddr,'Sockaddr',"A raw TCP ipv6 sockaddr to localhost was set:")
     sockaddr = sock."sockaddr"("::1",80,.PIO_PF_INET6)
-    ok(sockaddr,"A raw TCP ipv6 sockaddr was set")
+    isa_ok(sockaddr,'Sockaddr',"A raw TCP ipv6 sockaddr to ::1 was set:")
 .end
 
 .sub test_udp_socket6
@@ -74,8 +79,11 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
+    sockaddr = sock."sockaddr"("localhost",80,.PIO_PF_INET6)
+    isa_ok(sockaddr,'Sockaddr', "A UDP ipv6 sockaddr to localhost was set:")
+
     sockaddr = sock."sockaddr"("::1",80,.PIO_PF_INET6)
-    ok(sockaddr,"A UDP ipv6 sockaddr was set")
+    isa_ok(sockaddr,'Sockaddr', "A UDP ipv6 sockaddr to ::1 was set:")
 .end
 
 .sub test_raw_udp_socket6
@@ -83,8 +91,10 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
 
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
+    sockaddr = sock."sockaddr"("localhost",80,.PIO_PF_INET6)
+    isa_ok(sockaddr,'Sockaddr', "A raw UDP ipv6 sockaddr to localhost was set: ")
     sockaddr = sock."sockaddr"("::1",80,.PIO_PF_INET6)
-    ok(sockaddr,"A raw UDP ipv6 sockaddr was set")
+    isa_ok(sockaddr,'Sockaddr', "A raw UDP ipv6 sockaddr to ::1 was set: ")
 .end
 
 

@@ -648,6 +648,10 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
     ASSERT_ARGS(get_sockaddr_in)
 
     struct sockaddr_in * const sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
+
+    /* FIXME ::1, which is localhost in IPv6, does not seem to be 
+        handled properly by the following code
+    */
 #  ifdef PARROT_DEF_INET_ATON
     if (inet_aton(host, &sa->sin_addr) != 0) {
 #  else
