@@ -54,12 +54,12 @@ L<http://en.wikipedia.org/wiki/List_of_parrots>.
 The day of the release has come.
 Make sure you have the most recent version of the master branch:
 
- $ git checkout master && git pull --rebase
+    git checkout master && git pull --rebase
 
 Also be sure you do not have any local commits that have not yet
 been pushed out and tested thoroughly. You can check for this with
 
- $ git log ..origin/master
+    git log ..origin/master
 
 If there is no output from that command, then your local master
 and the master on origin are in sync.
@@ -161,10 +161,10 @@ Parrot with various primitive size options.
 
 Make sure everything works:
 
- $ make realclean
- $ perl Configure.pl --test ...
- $ make world docs html 2>&1 | tee make_world_docs_html.log
- $ make fulltest        2>&1 | tee make_fulltest.log
+    make realclean
+    perl Configure.pl --test ...
+    make world docs html 2>&1 | tee make_world_docs_html.log
+    make fulltest        2>&1 | tee make_fulltest.log
 
 Note that running "make fulltest" takes a while and that separate
 harnesses are being run.
@@ -175,19 +175,34 @@ harnesses are being run.
 
 When all is well, then commit your changes:
 
- $ git diff
- $ git add file1 file2 ...
- $ git commit -m "awesome and informative commit message"
+    git diff
+    git add file1 file2 ...
+    git commit -m "awesome and informative commit message"
 
-Note the SHA1 from this commit. You will need it later in step 7.
+Instead of adding files individually, you can also tell C<git commit> that
+you want all modified and deleted files to be in your next commit via the C<-a>
+flag:
 
- $ git revparse master > SHA1_TO_REMEMBER
+    git commit -a -m "awesome and informative commit message"
+
+Be carefult with C<git commit -a>, it could add files that you do not mean
+to include. Verify that the contents of your most recent commit look sane with:
+
+    git show
+
+If you want you can note the SHA1 from this commit.
+
+    git rev-parse master > SHA1_TO_REMEMBER
+
+Update repository on github.
+
+    git push origin master
 
 =item 4.
 
 Prepare the release tarball.
 
- $ make release VERSION=a.b.c
+    make release VERSION=a.b.c
 
 where a.b.c is the version number. This will create the tarball named
 F<parrot-a.b.c.tar.gz>. This will automatically avoid including C<DEVELOPING>
@@ -201,43 +216,42 @@ Untar F<parrot-a.b.c.tar.gz> into another area.
 
 Make sure everything works:
 
- $ perl Configure.pl
- $ make world docs html 2>&1 | tee make_world_docs_html.log
- $ make fulltest        2>&1 | tee make_fulltest.log
+    perl Configure.pl
+    make world docs html 2>&1 | tee make_world_docs_html.log
+    make fulltest        2>&1 | tee make_fulltest.log
 
 Verify that the version is correct and doesn't contain the suffix C<devel>:
 
- $ ./parrot -V
+    ./parrot -V
 
 =item 7.
 
 Tag the release as "RELEASE_a_b_c", where a.b.c is the version number.
-Specify the revision number generated in step 3, above.
 
- $ git tag RELEASE_a_b_c
- $ git push --tags
+    git tag RELEASE_a_b_c
+    git push --tags
 
 =item 8.
 
 SSH to ftp-osl.osuosl.org. (If you don't have the necessary login information,
 get it from one of the previous release managers.)
 
- $ ssh -l <USERNAME> ftp-osl.osuosl.org
+    ssh -l <USERNAME> ftp-osl.osuosl.org
 
 If the release is a monthly development release, create a new directory under
 F<~/ftp/releases/devel>.
 
- $ mkdir ~/ftp/releases/devel/a.b.c
+ mkdir ~/ftp/releases/devel/a.b.c
 
 If the release is in the supported series (L<Appendix 1 - Upcoming releases>)
 create the new directory in F<~/ftp/releases/supported> instead.
 
- $ mkdir ~/ftp/releases/supported/a.b.c
+ mkdir ~/ftp/releases/supported/a.b.c
 
 Copy the different compressed tarballs and the according checksum files from
 your machine into the new directory.
 
- $ scp parrot-a.b.c.tar.gz parrot-a.b.c.tar.bz2 \
+ scp parrot-a.b.c.tar.gz parrot-a.b.c.tar.bz2 \
        parrot-a.b.c.tar.gz.sha256 parrot-a.b.c.tar.bz2.sha256 \
    <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
 
@@ -256,8 +270,8 @@ only take a few minutes for the mirrors to sync.
 Compose the release announcement.  Use F<tools/release/crow.pir> to make
 this part easier.  You can specify the format of your announcements like so:
 
-  $ ./parrot tools/release/crow.pir --type=text
-  $ ./parrot tools/release/crow.pir --type=html
+  ./parrot tools/release/crow.pir --type=text
+  ./parrot tools/release/crow.pir --type=html
 
 Take the screen output and paste it into the application you need.  HTML
 works well for use Perl and PerlMonks, and text for the rest.  It is not a
