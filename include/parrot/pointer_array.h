@@ -21,7 +21,7 @@ Lower bit in cell masked to indicate pointer-to-free-cell.
 
 /* Calculate size of chunk data     "header"  */
 #define CHUNK_SIZE 4096
-#define CELL_PER_CHUNK ((CHUNK_SIZE - 2 * sizeof(size_t) / sizeof (void *)))
+#define CELL_PER_CHUNK ((CHUNK_SIZE - 2 * sizeof(size_t)) / sizeof (void *))
 
 typedef struct Parrot_Pointer_Array_Chunk {
     size_t   num_free;
