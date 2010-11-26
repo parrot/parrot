@@ -10,7 +10,15 @@ use lib qw( lib );
 use Parrot::Headerizer::Object;
 use IO::CaptureOutput qw| capture |;
 
-my $self = Parrot::Headerizer::Object->new();
+my $self;
+eval { $self = Parrot::Headerizer::Object->new([]); };
+like($@, qr/Argument to Parrot::Headerizer::Object must be hashref/,
+    "Got expected error message for bad argument to constructor" );
+
+$self = Parrot::Headerizer::Object->new({ macro_match => 1});
+isa_ok( $self, 'Parrot::Headerizer::Object' );
+
+$self = Parrot::Headerizer::Object->new();
 isa_ok( $self, 'Parrot::Headerizer::Object' );
 ok( $self->valid_macro( 'PARROT_EXPORT' ),
     "valid_macro() confirmed validity of macro" );
@@ -19,6 +27,31 @@ ok(! $self->valid_macro( 'PARROT_FOOBAR' ),
 my @valid_macros = $self->valid_macros;
 ok( @valid_macros,
     "Headerizer object contains list of valid macros" );
+ok(! defined $self->{macro_match}, "macro_match undefined" );
+
+my $msg = 'message';
+$self->{message} = $msg;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $self->print_final_message(); },
+        \$stdout,
+        \$stderr,
+    );
+    like($stdout, qr/$msg/s, "Got expected final message");
+}
+$msg = '';
+$self->{message} = $msg;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $self->print_final_message(); },
+        \$stdout,
+        \$stderr,
+    );
+    chomp($stdout);
+    ok(! $stdout, "No final message");
+}
 
 my $warnings = {
     'file1' => {
@@ -71,6 +104,24 @@ $self->{warnings} = {};
         \$stderr,
     );
     ok(! $stdout, "No warnings, hence no warnings printed" );
+}
+my ($file, $func, @error);
+$file = 'file 4';
+$func = 'func_delta';
+$error[0] = 'delta warning 4';
+$self->squawk($file, $func, $error[0]);
+$error[1] = 'delta warning 5';
+$self->squawk($file, $func, $error[1]);
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $self->print_warnings(); },
+        \$stdout,
+        \$stderr,
+    );
+    for (0..1) {
+        like($stdout, qr/$error[$_]/s, "Got expected squawk message");
+    }
 }
 
 pass("Completed all tests in $0");

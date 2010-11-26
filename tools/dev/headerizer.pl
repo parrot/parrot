@@ -10,7 +10,6 @@ use Parrot::Headerizer::Object;
 use Parrot::Headerizer::Functions qw(
     process_argv
 );
-#    print_headerizer_warnings
 
 =head1 NAME
 

@@ -26,7 +26,6 @@ of C-language files.
 
 use strict;
 use warnings;
-use Data::Dumper;$Data::Dumper::Indent=1;
 use Scalar::Util qw( reftype );
 use lib qw( lib );
 use Parrot::Config;
@@ -35,7 +34,6 @@ use Parrot::Headerizer::Functions qw(
     write_file
     qualify_sourcefile
     asserts_from_args
-    api_first_then_alpha
 );
 
 =item C<new()>
@@ -83,35 +81,57 @@ sub new {
     return bless $args, $class;
 }
 
-=item C<valid_macro()>
-
-    $headerizer->valid_macro( $macro )
-
-Returns a boolean saying whether I<$macro> is a valid C<PARROT_XXX> macro.
-
-=cut
-
-sub valid_macro {
+sub get_sources {
     my $self = shift;
-    my $macro = shift;
-
-    return exists $self->{valid_macros}{$macro};
-}
-
-=item C<valid_macros()>
-
-    $headerizer->valid_macros()
-
-Returns a list of all the valid C<PARROT_XXX> macros.
-
-=cut
-
-sub valid_macros {
-    my $self = shift;
-
-    my @macros = sort keys %{$self->{valid_macros}};
-
-    return @macros;
+    my @ofiles = @_;
+    my %sourcefiles;
+    my %sourcefiles_with_statics;
+    my %api;
+    # Walk the object files and find corresponding source (either .c or .pmc)
+    for my $ofile (@ofiles) {
+    
+        # Skip files in the src/ops/ subdirectory.
+        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
+                $ofile =~ m{^src/ops};                     # ... or by makefile
+    
+        $ofile =~ s/\\/\//g;
+    
+        my $is_yacc = ($ofile =~ /\.y$/);
+        if ( !$is_yacc ) {
+            my $sfile = $ofile;
+            $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
+            next if -f $sfile;
+        }
+    
+        my ($sourcefile, $source_code, $hfile) =
+            qualify_sourcefile( {
+                ofile           => $ofile,
+                PConfig         => \%PConfig,
+                is_yacc         => $is_yacc,
+            } );
+    
+        my @decls;
+        if ( $self->{macro_match} ) {
+            @decls = $self->extract_function_declarations( $source_code );
+        }
+        else {
+            @decls = $self->extract_function_declarations_and_update_source( $sourcefile );
+        }
+    
+        for my $decl (@decls) {
+            my $components = $self->function_components_from_declaration( $sourcefile, $decl );
+            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
+            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
+            if ( $self->{macro_match} ) {
+                if ( grep { $_ eq $self->{macro_match} } @{$components->{macros}} ) {
+                    push( @{ $api{$sourcefile} }, $components );
+                }
+            }
+        }
+    }    # for @cfiles
+    $self->{sourcefiles} = \%sourcefiles;
+    $self->{sourcefiles_with_statics} = \%sourcefiles_with_statics;
+    $self->{api} = \%api;
 }
 
 =item C<extract_function_declarations()>
@@ -184,6 +204,39 @@ sub extract_function_declarations {
     chomp @funcs;
 
     return @funcs;
+}
+
+=head2 extract_function_declaration_and_update_source( $cfile_name )
+
+Extract all the function declarations from the C file specified by
+I<$cfile_name>, and update the comment blocks within.
+
+=cut
+
+sub extract_function_declarations_and_update_source {
+    my $self = shift;
+    my $cfile_name = shift;
+
+    open( my $fhin, '<', $cfile_name ) or die "Can't open $cfile_name: $!";
+    my $text = join( '', <$fhin> );
+    close $fhin;
+
+    my @func_declarations = $self->extract_function_declarations( $text );
+    for my $decl ( @func_declarations ) {
+        my $specs = $self->function_components_from_declaration( $cfile_name, $decl );
+        my $name = $specs->{name};
+
+        my $heading = $self->generate_documentation_signature($decl);
+
+        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or do {
+            warn "$cfile_name: $name has no POD\n" unless $name =~ /^yy/; # lexer funcs don't have to have POD
+        }
+    }
+    open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
+    print {$fhout} $text;
+    close $fhout;
+
+    return @func_declarations;
 }
 
 =item C<function_components_from_declaration($file, $proto)>
@@ -351,6 +404,37 @@ sub generate_documentation_signature {
     return $split_decl;
 }
 
+=item C<valid_macro()>
+
+    $headerizer->valid_macro( $macro )
+
+Returns a boolean saying whether I<$macro> is a valid C<PARROT_XXX> macro.
+
+=cut
+
+sub valid_macro {
+    my $self = shift;
+    my $macro = shift;
+
+    return exists $self->{valid_macros}{$macro};
+}
+
+=item C<valid_macros()>
+
+    $headerizer->valid_macros()
+
+Returns a list of all the valid C<PARROT_XXX> macros.
+
+=cut
+
+sub valid_macros {
+    my $self = shift;
+
+    my @macros = sort keys %{$self->{valid_macros}};
+
+    return @macros;
+}
+
 =item C<squawk($file, $func, $error)>
 
 Headerizer-specific ways of complaining if something went wrong.
@@ -370,92 +454,6 @@ sub squawk {
     push( @{ $self->{warnings}{$file}{$func} }, $error );
 
     return;
-}
-
-sub get_sources {
-    my $self = shift;
-    my @ofiles = @_;
-    my %sourcefiles;
-    my %sourcefiles_with_statics;
-    my %api;
-    # Walk the object files and find corresponding source (either .c or .pmc)
-    for my $ofile (@ofiles) {
-    
-        # Skip files in the src/ops/ subdirectory.
-        next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
-                $ofile =~ m{^src/ops};                     # ... or by makefile
-    
-        $ofile =~ s/\\/\//g;
-    
-        my $is_yacc = ($ofile =~ /\.y$/);
-        if ( !$is_yacc ) {
-            my $sfile = $ofile;
-            $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
-            next if -f $sfile;
-        }
-    
-        my ($sourcefile, $source_code, $hfile) =
-            qualify_sourcefile( {
-                ofile           => $ofile,
-                PConfig         => \%PConfig,
-                is_yacc         => $is_yacc,
-            } );
-    
-        my @decls;
-        if ( $self->{macro_match} ) {
-            @decls = $self->extract_function_declarations( $source_code );
-        }
-        else {
-            @decls = $self->extract_function_declarations_and_update_source( $sourcefile );
-        }
-    
-        for my $decl (@decls) {
-            my $components = $self->function_components_from_declaration( $sourcefile, $decl );
-            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
-            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
-            if ( $self->{macro_match} ) {
-                if ( grep { $_ eq $self->{macro_match} } @{$components->{macros}} ) {
-                    push( @{ $api{$sourcefile} }, $components );
-                }
-            }
-        }
-    }    # for @cfiles
-    $self->{sourcefiles} = \%sourcefiles;
-    $self->{sourcefiles_with_statics} = \%sourcefiles_with_statics;
-    $self->{api} = \%api;
-}
-
-=head2 extract_function_declaration_and_update_source( $cfile_name )
-
-Extract all the function declarations from the C file specified by
-I<$cfile_name>, and update the comment blocks within.
-
-=cut
-
-sub extract_function_declarations_and_update_source {
-    my $self = shift;
-    my $cfile_name = shift;
-
-    open( my $fhin, '<', $cfile_name ) or die "Can't open $cfile_name: $!";
-    my $text = join( '', <$fhin> );
-    close $fhin;
-
-    my @func_declarations = $self->extract_function_declarations( $text );
-    for my $decl ( @func_declarations ) {
-        my $specs = $self->function_components_from_declaration( $cfile_name, $decl );
-        my $name = $specs->{name};
-
-        my $heading = $self->generate_documentation_signature($decl);
-
-        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or do {
-            warn "$cfile_name: $name has no POD\n" unless $name =~ /^yy/; # lexer funcs don't have to have POD
-        }
-    }
-    open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
-    print {$fhout} $text;
-    close $fhout;
-
-    return @func_declarations;
 }
 
 sub process_sources {
@@ -486,7 +484,6 @@ sub process_sources {
             for my $cfile ( sort keys %{$sourcefiles} ) {
                 my @funcs = @{ $sourcefiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-    
                 $header = $self->replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
             }
     
@@ -507,13 +504,6 @@ sub process_sources {
     }
 }
 
-sub print_final_message {
-    my $self = shift;
-    if ($self->{message} ne '') {
-        print "$self->{message}\n";
-    }
-}
-
 sub replace_headerized_declarations {
     my $self = shift;
     my $source_code = shift;
@@ -526,9 +516,10 @@ sub replace_headerized_declarations {
         return $source_code;
     }
 
-    @funcs = sort api_first_then_alpha @funcs;
-print STDERR "Inside replace_headerized_declarations\n";
-print STDERR Dumper \@funcs;
+    @funcs = sort {
+        ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
+        || ( ( lc($a->{name}) || '') cmp ( lc($b->{name}) || '') )
+    } @funcs;
     my @function_decls = $self->make_function_decls(@funcs);
 
     my $function_decls = join( "\n", @function_decls );
@@ -611,7 +602,6 @@ sub make_function_decls {
     foreach my $func (@funcs) {
         my @args    = @{ $func->{args} };
         my @asserts = asserts_from_args( @args );
-print STDERR Dumper [ \@args, \@asserts ];
 
         my $assert = "#define ASSERT_ARGS_" . $func->{name};
         if(length($func->{name}) > 29) {
@@ -669,6 +659,13 @@ sub attrs_from_args {
     }
 
     return (@attrs,@mods);
+}
+
+sub print_final_message {
+    my $self = shift;
+    if ($self->{message} ne '') {
+        print "$self->{message}\n";
+    }
 }
 
 =head2 C<print_headerizer_warnings()>

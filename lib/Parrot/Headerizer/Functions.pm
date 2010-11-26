@@ -11,7 +11,6 @@ our @EXPORT_OK = qw(
     write_file
     qualify_sourcefile
     asserts_from_args
-    api_first_then_alpha
 );
 
 =head1 NAME
@@ -26,7 +25,6 @@ Parrot::Headerizer::Functions - Functions used in headerizer programs
         write_file
         qualify_sourcefile
         asserts_from_args
-        api_first_then_alpha
     );
 
 =head1 DESCRIPTION
@@ -228,6 +226,7 @@ sub asserts_from_args {
             my $var = $2;
             if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
                 # argument is a function pointer
+                # Is this branch ever reached?
                 $var = $1;
             }
             else {
@@ -247,11 +246,6 @@ sub asserts_from_args {
     return (@asserts);
 }
 
-
-sub api_first_then_alpha {
-    return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
-        || ( lc ($a->{name} || '') cmp lc ($b->{name} || '') );
-}
 1;
 
 # Local Variables:

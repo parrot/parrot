@@ -5,8 +5,7 @@
 
 use strict;
 use warnings;
-#use Data::Dumper;
-use Test::More qw(no_plan); # tests => 15;
+use Test::More tests => 38;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -19,8 +18,8 @@ use Parrot::Headerizer::Functions qw(
     write_file
     qualify_sourcefile
     asserts_from_args
-    api_first_then_alpha
 );
+
 use IO::CaptureOutput qw| capture |;
 
 my $cwd = cwd();
@@ -243,6 +242,20 @@ is( keys %asserts, 3, "Got expected number of asserts" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(list)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
+
+@args = (
+    'ARGFREE_NOTNULL(( _abcDEF123 )())',
+    'PARROT_INTERP',
+    'ARGIN(Linked_List *list)',
+    'ARGIN(List_Item_Header *item)',
+    'SHIM_INTERP',
+);
+%asserts = map { $_ => 1 } asserts_from_args( @args );
+is( keys %asserts, 4, "Got expected number of asserts" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(list)'}, "Got expected assert" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
+ok( exists $asserts{'PARROT_ASSERT_ARG(_abcDEF123)'}, "Got expected assert" );
 
 pass("Completed all tests in $0");
 
