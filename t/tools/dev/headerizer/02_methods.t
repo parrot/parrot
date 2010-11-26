@@ -5,6 +5,12 @@
 
 use strict;
 use warnings;
+use Carp;
+use Cwd;
+use File::Copy;
+use File::Path qw( mkpath );
+use File::Spec;
+use File::Temp qw( tempdir );
 use Test::More qw(no_plan); # tests => 15;
 use lib qw( lib );
 use Parrot::Headerizer::Object;
@@ -124,7 +130,102 @@ $self->squawk($file, $func, $error[1]);
     }
 }
 
+my $cwd = cwd();
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    my $srcopsdir = File::Spec->catpath( $tdir, 'src', 'ops' );
+    mkpath( $srcopsdir, 0, 0777 );
+    my $srcopso   = File::Spec->catfile( $srcopsdir, 'ops.o' );
+    touchfile($srcopso);
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srcopso);
+    ok( ! keys %{$self->{sourcefiles}},
+        "Skipped file in src/ops/ -> no sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "Skipped file in src/ops/ -> no sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "Skipped file in src/ops/ -> no api" );
+
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco   = File::Spec->catfile( $srcdir, 'other.o' );
+    touchfile($srco);
+    my $srcs   = File::Spec->catfile( $srcdir, 'other.s' );
+    touchfile($srcs);
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( ! keys %{$self->{sourcefiles}},
+        "Skipped file in src/ -> no sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "Skipped file in src/ -> no sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "Skipped file in src/ -> no api" );
+
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco      = File::Spec->catfile( $srcdir, 'list.o' );
+    touchfile($srco);
+    my $srcc      = File::Spec->catfile( $srcdir, 'list.c' );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
+        or croak "Unable to copy";
+    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
+    mkpath( $incdir, 0, 0777 );
+    my $inch      = File::Spec->catfile( $incdir, 'list.h' );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
+        or croak "Unable to copy";
+
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( keys %{$self->{sourcefiles}},
+        "sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "no sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "no api" );
+
+    $self->process_sources();
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_final_message; },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/Headerization complete/,
+            "Got expected final message" );
+    }
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
+
 pass("Completed all tests in $0");
+
+sub touchfile {
+    my $filename = shift;
+    open my $IN, '>', $filename or croak "Unable to open for writing";
+    print $IN "\n";
+    close $IN or croak "Unable to close after writing";
+    return 1;
+}
 
 ################### DOCUMENTATION ###################
 

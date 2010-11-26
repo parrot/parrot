@@ -115,13 +115,17 @@ sub get_sources {
             @decls = $self->extract_function_declarations( $source_code );
         }
         else {
-            @decls = $self->extract_function_declarations_and_update_source( $sourcefile );
+            @decls =
+            $self->extract_function_declarations_and_update_source( $sourcefile );
         }
     
         for my $decl (@decls) {
-            my $components = $self->function_components_from_declaration( $sourcefile, $decl );
-            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
-            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
+            my $components =
+                $self->function_components_from_declaration( $sourcefile, $decl );
+            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components )
+                unless $hfile eq 'none';
+            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components )
+                if $components->{is_static};
             if ( $self->{macro_match} ) {
                 if ( grep { $_ eq $self->{macro_match} } @{$components->{macros}} ) {
                     push( @{ $api{$sourcefile} }, $components );
