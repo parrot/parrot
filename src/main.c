@@ -170,8 +170,8 @@ get_last_error(Parrot_PMC interp)
 {
     Parrot_String errmsg;
     char * errmsg_raw = "This is a test";
-    if (Parrot_api_get_last_error(interp, &errmsg)
-        //Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)
+    if (Parrot_api_get_last_error(interp, &errmsg) &&
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)
         ) {
         fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
         Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
