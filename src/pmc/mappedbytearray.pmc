@@ -23,8 +23,8 @@ Bare minimal functionality available, only for posix platforms
 #define CAN_WRITE 2
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
-#    include <sys/mman.h>
-#    define ENABLED
+#  include <sys/mman.h>
+#  define ENABLED
 #endif
 
 /* HEADERIZER HFILE: none */
@@ -357,6 +357,8 @@ PARROT_DOES_NOT_RETURN
 static void
 unavailable(PARROT_INTERP, ARGIN(const char *msg))
 {
+    ASSERT_ARGS(unavailable)
+
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "%s not implemented in this platform", msg);
 }
@@ -365,6 +367,8 @@ PARROT_CAN_RETURN_NULL
 static void *
 mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
 {
+    ASSERT_ARGS(mapfromfilehandle)
+
     #ifdef ENABLED
     int prot = 0;
     if (flag & CAN_READ) prot |= PROT_READ;
@@ -379,6 +383,8 @@ PARROT_CAN_RETURN_NULL
 static void *
 mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size), int flag)
 {
+    ASSERT_ARGS(mapfromfilename)
+
     void *mapping;
     #ifdef ENABLED
     int handle;
