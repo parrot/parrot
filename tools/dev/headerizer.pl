@@ -62,7 +62,14 @@ Tells the headerizer where the declarations for the functions should go
 
 =item C<--macro=X>
 
-Print a list of all functions that have macro X.  For example, --macro=PARROT_EXPORT.
+Print a list of all functions that have macro C<X>.  Example:
+
+    $> perl tools/dev/headerizer.pl --macro=PARROT_CAN_RETURN_NULL src/list.o
+
+    src/list.c
+        Parrot_list_pop
+        Parrot_list_remove
+    2 PARROT_CAN_RETURN_NULL functions
 
 =back
 
