@@ -73,6 +73,10 @@ pmclass MappedByteArray auto_attrs {
 
 =over 4
 
+=item C<init()>
+
+Initialize without doing any mapping.
+
 =item C<init_pmc(PMC *init)>
 
 The argument must be a String PMC with a file name. Maps the whole file.
@@ -87,8 +91,15 @@ Free all resources used.
 
 */
 
+    VTABLE void init() {
+        #ifdef ENABLED
+        PObj_custom_destroy_SET(SELF);
+        #endif
+    }
+
     VTABLE void init_pmc(PMC * init) {
         #ifdef ENABLED
+        PObj_custom_destroy_SET(SELF);
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
             STRING *name = VTABLE_get_string(INTERP, init);
@@ -123,6 +134,27 @@ Free all resources used.
 
 /*
 
+=item C<get_bool()>
+
+Return true if active, false otherwise.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        #ifdef ENABLED
+        unsigned char *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        return buffer != NULL;
+        #else
+        return 0;
+        #endif
+    }
+
+
+/*
+
 =item C<elements()>
 
 Return the size of the mapped area.
@@ -132,9 +164,13 @@ Return the size of the mapped area.
 */
 
     VTABLE INTVAL elements() {
+        #ifdef ENABLED
         UINTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
+        #else
+        return 0;
+        #endif
     }
 
 
@@ -207,7 +243,7 @@ Return 0 if file mapping is not supported, non zero otherwise.
         RETURN(INTVAL 1);
         #else
         RETURN(INTVAL 0);
-	#endif
+        #endif
     }
 
 /*
@@ -252,11 +288,41 @@ Map a file by its name. The mode argument can be "r", "w" or "rw",
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "mmap failed: %s", strerror(errno));
-        PObj_custom_destroy_SET(SELF);
         SET_ATTR_size(INTERP, SELF, length);
         SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
-	#endif
+        #endif
         RETURN(void);
+    }
+
+/*
+
+=item C<close()>
+
+Close the mapping. Return 0 if the mapping was opened aand the unmap operation
+does not fail, non zero otherwise.
+
+=cut
+
+*/
+
+    METHOD close()
+    {
+        INTVAL result = 1;
+        #ifdef ENABLED
+        unsigned char *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        if (buffer) {
+            INTVAL size;
+            GET_ATTR_size(INTERP, SELF, size);
+            result = munmap(buffer, size);
+            if (result == 0) {
+                buffer = NULL;
+                SET_ATTR_buffer(INTERP, SELF, buffer);
+                SET_ATTR_size(INTERP, SELF, 0);
+            }
+        }
+        #endif
+        RETURN(INTVAL result);
     }
 
 } /* pmclass end */
