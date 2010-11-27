@@ -1248,11 +1248,11 @@ the callback function.
 =cut
 
 inline op loadlib(out PMC, in STR) {
-    $1 = Parrot_load_lib(interp, $2, NULL);
+    $1 = Parrot_dyn_load_lib(interp, $2, NULL);
 }
 
 inline op loadlib(out PMC, in STR, in PMC) {
-    $1 = Parrot_load_lib(interp, $2, $3);
+    $1 = Parrot_dyn_load_lib(interp, $2, $3);
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
@@ -1266,7 +1266,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
     }
 
-    ptr = Parrot_dlsym_str(interp, dl_handle, $3);
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
@@ -1291,7 +1291,7 @@ op dlvar(out PMC, invar PMC, in STR) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
     }
 
-    p = Parrot_dlsym_str(interp, dl_handle, $3);
+    p = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();

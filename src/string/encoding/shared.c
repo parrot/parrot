@@ -855,7 +855,7 @@ fixed8_index(PARROT_INTERP, ARGIN(const STRING *src),
     ||  !STRING_length(search))
         return -1;
 
-    return Parrot_byte_index(interp, src, search, offset);
+    return Parrot_util_byte_index(interp, src, search, offset);
 }
 
 
@@ -884,7 +884,7 @@ fixed8_rindex(PARROT_INTERP, ARGIN(const STRING *src),
             "Cross-charset rindex not supported");
 
     PARROT_ASSERT(STRING_max_bytes_per_codepoint(src) == 1);
-    retval = Parrot_byte_rindex(interp, src, search_string, offset);
+    retval = Parrot_util_byte_rindex(interp, src, search_string, offset);
     return retval;
 }
 

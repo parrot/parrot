@@ -2714,7 +2714,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
 
     for (i = 0; i < byte_code->n_libdeps; i++) {
         STRING *libname = PF_fetch_string(interp, self->pf, &cursor);
-        PMC    *lib_pmc = Parrot_load_lib(interp, libname, NULL);
+        PMC    *lib_pmc = Parrot_dyn_load_lib(interp, libname, NULL);
     }
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
@@ -2734,7 +2734,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                 entry->lib = PARROT_CORE_OPLIB_INIT(interp, 1);
             }
             else {
-                PMC *lib_pmc = Parrot_load_lib(interp,
+                PMC *lib_pmc = Parrot_dyn_load_lib(interp,
                                                 Parrot_str_new(interp, lib_name, 0),
                                                 NULL);
                 typedef op_lib_t *(*oplib_init_t)(PARROT_INTERP, long init);

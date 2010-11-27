@@ -523,7 +523,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), d));
+                Parrot_util_floatval_mod(SELF.get_number(), d));
         return dest;
     }
 
@@ -535,7 +535,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), (FLOATVAL)value));
+                Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
         return dest;
     }
 
@@ -547,7 +547,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), value));
+                Parrot_util_floatval_mod(SELF.get_number(), value));
         return dest;
     }
 
@@ -559,7 +559,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), d));
+                Parrot_util_floatval_mod(SELF.get_number(), d));
     }
 
     VTABLE void i_modulus_int(INTVAL value) {
@@ -568,7 +568,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), (FLOATVAL)value));
+                Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
     }
 
     VTABLE void i_modulus_float(FLOATVAL value) {
@@ -577,7 +577,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), value));
+                Parrot_util_floatval_mod(SELF.get_number(), value));
     }
 
 /*

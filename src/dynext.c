@@ -392,7 +392,7 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), Parrot_dlopen_flags flags,
 
 /*
 
-=item C<PMC * Parrot_init_lib(PARROT_INTERP, dynext_load_func load_func,
+=item C<PMC * Parrot_dyn_init_lib(PARROT_INTERP, dynext_load_func load_func,
 dynext_init_func init_func)>
 
 Initializes a new library. First, calls C<load_func> to load the library
@@ -406,11 +406,11 @@ ParrotLibrary PMC object that represents the initialized library.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_init_lib(PARROT_INTERP,
+Parrot_dyn_init_lib(PARROT_INTERP,
         NULLOK(dynext_load_func load_func),
         NULLOK(dynext_init_func init_func))
 {
-    ASSERT_ARGS(Parrot_init_lib)
+    ASSERT_ARGS(Parrot_dyn_init_lib)
     PMC *lib_pmc = NULL;
 
     if (load_func)
@@ -430,7 +430,8 @@ Parrot_init_lib(PARROT_INTERP,
 
 /*
 
-=item C<void * Parrot_dlsym_str(PARROT_INTERP, void *handle, STRING *symbol)>
+=item C<void * Parrot_dyn_dlsym_str(PARROT_INTERP, void *handle, STRING
+*symbol)>
 
 Loads a symbol named C<symbol> from the shared library represented by
 C<handle>.
@@ -442,10 +443,10 @@ C<handle>.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void *
-Parrot_dlsym_str(PARROT_INTERP,
+Parrot_dyn_dlsym_str(PARROT_INTERP,
         ARGIN_NULLOK(void *handle), ARGIN_NULLOK(STRING *symbol))
 {
-    ASSERT_ARGS(Parrot_dlsym_str)
+    ASSERT_ARGS(Parrot_dyn_dlsym_str)
 
     if (STRING_IS_NULL(symbol))
         return NULL;
@@ -497,11 +498,11 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
                                         "Parrot_lib_%Ss_init", lib_name);
 
         /* get load_func */
-        void * dlsymfunc = Parrot_dlsym_str(interp, handle, load_name);
+        void * dlsymfunc = Parrot_dyn_dlsym_str(interp, handle, load_name);
         load_func = (PMC * (*)(PARROT_INTERP)) D2FPTR(dlsymfunc);
 
         /* get init_func */
-        dlsymfunc = Parrot_dlsym_str(interp, handle, init_func_name);
+        dlsymfunc = Parrot_dyn_dlsym_str(interp, handle, init_func_name);
         init_func = (void (*)(PARROT_INTERP, PMC *)) D2FPTR(dlsymfunc);
     }
     else {
@@ -509,7 +510,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         init_func = NULL;
     }
 
-    lib_pmc = Parrot_init_lib(interp, load_func, init_func);
+    lib_pmc = Parrot_dyn_init_lib(interp, load_func, init_func);
     VTABLE_set_pointer(interp, lib_pmc, handle);
 
     if (!load_func)
@@ -583,7 +584,7 @@ make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 
 /*
 
-=item C<PMC * Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)>
+=item C<PMC * Parrot_dyn_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)>
 
 Clones a ParrotLibrary PMC C<lib_pmc> from interpreter C<s> into interpreter
 C<d>.
@@ -596,9 +597,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
+Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
 {
-    ASSERT_ARGS(Parrot_clone_lib_into)
+    ASSERT_ARGS(Parrot_dyn_clone_lib_into)
     STRING * const filename = CONST_STRING(s, "_filename");
     STRING * const libname  = CONST_STRING(s, "_lib_name");
     STRING * const type_str = CONST_STRING(s, "_type");
@@ -652,7 +653,7 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
 
 /*
 
-=item C<PMC * Parrot_load_lib(PARROT_INTERP, STRING *lib, PMC *parameters)>
+=item C<PMC * Parrot_dyn_load_lib(PARROT_INTERP, STRING *lib, PMC *parameters)>
 
 Dynamic library loader.
 
@@ -681,9 +682,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *parameters))
+Parrot_dyn_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *parameters))
 {
-    ASSERT_ARGS(Parrot_load_lib)
+    ASSERT_ARGS(Parrot_dyn_load_lib)
     void   *handle;
     PMC    *lib_pmc;
     STRING *path;

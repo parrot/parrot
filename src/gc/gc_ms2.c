@@ -186,9 +186,11 @@ static int gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 static int gc_ms2_is_ptr_owned(PARROT_INTERP,
     ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool))
+    ARGIN(Pool_Allocator *pool),
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static int gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
@@ -326,7 +328,8 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_is_ptr_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool))
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_is_string_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -771,7 +774,7 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_pmc_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects);
 }
 
 /*
@@ -876,7 +879,7 @@ gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_string_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator, self->strings);
 }
 
 
@@ -1215,7 +1218,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
 /*
 
 =item C<static int gc_ms2_is_ptr_owned(PARROT_INTERP, void *ptr, Pool_Allocator
-*pool)>
+*pool, Parrot_Pointer_Array *list)>
 
 Helper function to check that we own PObj
 
@@ -1224,8 +1227,10 @@ Helper function to check that we own PObj
 */
 
 static int
-gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool))
+gc_ms2_is_ptr_owned(PARROT_INTERP,
+        ARGIN_NULLOK(void *ptr),
+        ARGIN(Pool_Allocator *pool),
+        ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_is_ptr_owned)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -1242,7 +1247,8 @@ gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
     if (PObj_is_live_or_free_TESTALL(obj))
         return 0;
 
-    return 1;
+    /* Pool.is_owned isn't precise enough (yet) */
+    return Parrot_pa_is_owned(interp, list, item, item->ptr);
 }
 
 

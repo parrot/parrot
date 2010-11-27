@@ -101,7 +101,7 @@ FILE." followed by a backtrace.
 If this exception is not handled, it results in Parrot returning an error
 indication and the stringification of I<MESSAGE> to its embedding environment.
 When running standalone, this means writing the stringification of I<MESSAGE>
-to standard error and executing the standard Parrot function C<Parrot_exit>,
+to standard error and executing the standard Parrot function C<Parrot_x_exit>,
 to shut down the interpreter cleanly.
 
 =item B<exit [ I<EXITCODE> ]>

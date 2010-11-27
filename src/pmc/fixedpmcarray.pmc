@@ -54,7 +54,7 @@ Sort this array, optionally using the provided cmp_func
                 Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
-                Parrot_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
+                Parrot_util_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
         }
         RETURN(PMC *SELF);
     }

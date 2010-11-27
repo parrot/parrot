@@ -35,23 +35,23 @@ my $step = test_step_constructor_and_description($conf);
 my ($testrev, $ret);
 {
     $testrev = 99999;
-    local $TODO = "broke";
     local $Parrot::Revision::current = $testrev;
     $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
     is($conf->data->get('revision'), $testrev,
         "'revision' element was set correctly");
+    local $TODO = "broke";
     is($step->result(), qq{r$testrev}, "Expected result was set");
 }
 
 {
     $testrev = 0;
     local $Parrot::Revision::current = $testrev;
-    local $TODO = "broke";
     $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
     is($conf->data->get('revision'), $testrev,
         "'revision' element was set correctly");
+    local $TODO = "broke";
     is($step->result(), q{done}, "Expected result was set");
 }
 
