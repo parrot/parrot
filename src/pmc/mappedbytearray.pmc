@@ -25,6 +25,11 @@ Bare minimal functionality available, only for posix platforms
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #  include <sys/mman.h>
 #  define ENABLED
+#else
+#  ifdef __MINGW32__
+#    define ENABLED
+#    define MAPW32
+#  endif
 #endif
 
 /* HEADERIZER HFILE: none */
@@ -111,12 +116,16 @@ Free all resources used.
         PObj_custom_destroy_SET(SELF);
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
+            void *mapping = NULL;
             STRING *name = VTABLE_get_string(INTERP, init);
-            void *mapping = mapfromfilename(interp, name, &length, CAN_READ);
+            #ifdef MAPW32
+            #else
+            mapping = mapfromfilename(interp, name, &length, CAN_READ);
             if (mapping == 0 || mapping == (void *)-1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "mmap failed: %s", strerror(errno));
+            #endif
             PObj_custom_destroy_SET(SELF);
             SET_ATTR_size(INTERP, SELF, length);
             SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
@@ -136,7 +145,11 @@ Free all resources used.
         GET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_buffer(INTERP, SELF, buffer);
         if (size > 0) {
+            #ifdef MAPW32
+            UnmapViewOfFile(buffer);
+            #else
             munmap(buffer, size);
+            #endif
         }
         #endif
     }
@@ -323,7 +336,11 @@ does not fail, non zero otherwise.
         if (buffer) {
             INTVAL size;
             GET_ATTR_size(INTERP, SELF, size);
+            #ifdef MAPW32
+            result = ! UnmapViewOfFile(buffer);
+            #else
             result = munmap(buffer, size);
+            #endif
             if (result == 0) {
                 buffer = NULL;
                 SET_ATTR_buffer(INTERP, SELF, buffer);
@@ -408,13 +425,31 @@ mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
     ASSERT_ARGS(mapfromfilehandle)
 
     #ifdef ENABLED
+    void *mapping = (void *)-1;
+    #ifdef MAPW32
+    HANDLE hmapping;
+    DWORD prot, access;
+    if (flag & CAN_WRITE) {
+        prot = PAGE_READWRITE;
+        access = FILE_MAP_WRITE;
+    }
+    else {
+        prot = PAGE_READONLY;
+        access = FILE_MAP_READ;
+    }
+    hmapping = CreateFileMapping(handle, NULL, prot, 0, size, NULL);
+    if (hmapping != NULL) {
+        mapping = MapViewOfFile(hmapping, access, 0, 0, size);
+        CloseHandle(hmapping);
+    }
+    #else
     int prot = 0;
     if (flag & CAN_READ) prot |= PROT_READ;
     if (flag & CAN_WRITE) prot |= PROT_WRITE;
-    return mmap(0, size, prot, MAP_SHARED, handle, 0);
-    #else
-    return (void *)-1;
+    mapping = mmap(0, size, prot, MAP_SHARED, handle, 0);
     #endif
+    #endif
+    return mapping;
 }
 
 PARROT_CAN_RETURN_NULL
@@ -423,39 +458,67 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
 {
     ASSERT_ARGS(mapfromfilename)
 
-    void *mapping;
+    void *mapping = (void *)-1;
     #ifdef ENABLED
-    int handle;
+    PIOHANDLE handle;
+    #ifdef MAPW32
+    DWORD openmode = 0;
+    switch (flag & (CAN_READ | CAN_WRITE)) {
+      case CAN_READ:
+        openmode = GENERIC_READ;
+        break;
+      case CAN_READ | CAN_WRITE:
+      case CAN_WRITE:
+        openmode = GENERIC_READ | GENERIC_WRITE;
+        break;
+      default:
+        /* Should never happen, invalid modes must be caught before
+         * calling this function.
+         */
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
+    }
     {
         char * name_str = Parrot_str_to_cstring(interp, name);
-        int openmode = 0;
-        switch (flag & (CAN_READ | CAN_WRITE)) {
-          case CAN_READ:
-            openmode = O_RDONLY;
-            break;
-          case CAN_READ | CAN_WRITE:
-          case CAN_WRITE:
-            openmode = O_RDWR;
-            break;
-          default:
-            /* Should never happen, invalid modes must be caught before
-             * calling this function.
-             */
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
-        }
+        handle = CreateFile(name_str, openmode, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        Parrot_str_free_cstring(name_str);
+    }
+    #else
+    int openmode = 0;
+    switch (flag & (CAN_READ | CAN_WRITE)) {
+      case CAN_READ:
+        openmode = O_RDONLY;
+        break;
+      case CAN_READ | CAN_WRITE:
+      case CAN_WRITE:
+        openmode = O_RDWR;
+        break;
+      default:
+        /* Should never happen, invalid modes must be caught before
+         * calling this function.
+         */
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
+    }
+    {
+        char * name_str = Parrot_str_to_cstring(interp, name);
         handle = open(name_str, openmode);
         Parrot_str_free_cstring(name_str);
     }
-    if (handle == -1)
+    #endif
+    if (handle == PIO_INVALID_HANDLE)
         Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION, "cannot open file '%Ss'", name);
-    if (*size == 0)
+    if (*size == 0) {
+        #ifdef MAPW32
+        *size = (unsigned long)GetFileSize(handle, NULL);
+        #else
         *size = lseek(handle, 0, SEEK_END);
+        #endif
+    }
     mapping = mapfromfilehandle(handle, *size, flag);
 
-    #else
-    mapping = (void *)-1;
     #endif
 
     return mapping;
