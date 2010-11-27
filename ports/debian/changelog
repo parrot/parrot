@@ -1,3 +1,9 @@
+parrot (2.9.1-1) unstable; urgency=low
+  * New upstream release (Closes: #601704)
+  * Fix script-not-executable lintian warning
+
+ -- Allison Randal <allison@parrot.org>  Sat, 27 Nov 2010 12:05:09 -0800
+
 parrot (2.6.0-1) unstable; urgency=low
   * New upstream release
   * debian/parrot-devel.install.in:
