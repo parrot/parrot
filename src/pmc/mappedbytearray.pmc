@@ -31,6 +31,13 @@ Bare minimal functionality available, only for posix platforms
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+static STRING * build_string(PARROT_INTERP,
+    ARGIN_NULLOK(const unsigned char *content),
+    INTVAL size,
+    ARGIN_NULLOK(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1);
+
 PARROT_CAN_RETURN_NULL
 static void * mapfromfilehandle(
     PIOHANDLE handle,
@@ -52,6 +59,8 @@ static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_mapfromfilehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mapfromfilename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -325,6 +334,35 @@ does not fail, non zero otherwise.
         RETURN(INTVAL result);
     }
 
+/*
+
+=item C<get_string(INTVAL pos, INTVAL bytelength, STRING *encodingname)>
+
+Get a string from the buffer content with the specified encoding.
+
+=cut
+
+*/
+
+    METHOD get_string(INTVAL pos, INTVAL bytelength, STRING *encodingname)
+    {
+        #ifdef ENABLED
+        STRING *result;
+        unsigned char *buffer;
+        INTVAL size;
+        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
+            Parrot_encoding_number(INTERP, encodingname));
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        GET_ATTR_size(INTERP, SELF, size);
+        if (pos < 0 || bytelength < 0 || size < 0 || pos + bytelength > size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of mapped");
+        result = build_string(INTERP, buffer + pos, bytelength, encoding);
+        RETURN(STRING *result);
+        #endif
+    }
+
 } /* pmclass end */
 
 /*
@@ -421,6 +459,38 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
     #endif
 
     return mapping;
+}
+
+/*
+
+=item C<static STRING * build_string(PARROT_INTERP, const unsigned char
+*content, INTVAL size, const STR_VTABLE *encoding)>
+
+Build a string from the buffer content with the encoding specified.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
+        INTVAL size,
+        ARGIN_NULLOK(const STR_VTABLE *encoding))
+{
+    ASSERT_ARGS(build_string)
+    if (encoding == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                "Invalid encoding");
+    else {
+        STRING * const result = Parrot_str_new_init(interp,
+                (const char *)content, size, encoding, 0);
+        if (!STRING_validate(interp, result))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_STRING_REPRESENTATION,
+                    "Invalid buffer content");
+        return result;
+    }
 }
 
 /*
