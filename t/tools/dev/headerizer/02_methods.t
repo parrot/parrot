@@ -217,6 +217,58 @@ my $cwd = cwd();
     chdir $cwd or croak "Unable to chdir back after testing";
 }
 
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco      = File::Spec->catfile( $srcdir, 'list.o' );
+    touchfile($srco);
+    my $srcc      = File::Spec->catfile( $srcdir, 'list.c' );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
+        or croak "Unable to copy";
+    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
+    mkpath( $incdir, 0, 0777 );
+    my $inch      = File::Spec->catfile( $incdir, 'list.h' );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
+        or croak "Unable to copy";
+
+    my $macro = 'PARROT_CAN_RETURN_NULL';
+    $self = Parrot::Headerizer::Object->new( {
+        macro_match => $macro,
+    } );
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( keys %{$self->{sourcefiles}},
+        "sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "no sourcefiles_with_statics" );
+    ok( keys %{$self->{api}},
+        "api" );
+
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->process_sources(); },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/src\/list\.c\s+Parrot_list_pop\s+Parrot_list_remove/s,
+            "Got expected list of functions matching requested macro" );
+    }
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_final_message; },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/2 $macro functions/s,
+            "Got expected final message" );
+    }
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
 pass("Completed all tests in $0");
 
 sub touchfile {
