@@ -4,8 +4,8 @@ New in 2.11.0
  + PIR op find_codepoint is no longer experimental, it is now supported
  + Several public functions in libparrot have been brought up to standard naming conventions.
 - Languages
-  + PIRC
-    - left the nest and is currently at https://github.com/parrot/pirc/
+ + PIRC
+   - left the nest and is currently at https://github.com/parrot/pirc/
 
 New in 2.10.0
 - Core
