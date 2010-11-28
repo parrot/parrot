@@ -258,7 +258,7 @@ test_negative:
     .local pmc bb
     .local int i, big, pos, b0, b1, c
 
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
 
