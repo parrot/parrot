@@ -187,7 +187,7 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
 
 #  endif /* __hpux */
 
-        trace_mem_block(interp, base,
+        trace_mem_block(interp, mem_pools, base,
                 (size_t)current_regstore_top);
 
 #else /* !__ia64__ */

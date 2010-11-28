@@ -753,8 +753,10 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     /* mark it live */
     PObj_live_SET(pmc);
 
-    Parrot_pa_remove(interp, self->objects, item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
+    if (!PObj_constant_TEST(pmc)) {
+        Parrot_pa_remove(interp, self->objects, item->ptr);
+        item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
+    }
 
 }
 
