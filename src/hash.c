@@ -1814,18 +1814,18 @@ hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key))
         {
             /* Extract real value from Key (and box it if nessary) */
             if (key->vtable->base_type == enum_class_Key)
-                switch (key_type(interp, key)) {
+                switch (Parrot_key_type(interp, key)) {
                   case KEY_integer_FLAG:
-                    key = get_integer_pmc(interp, key_integer(interp, key));
+                    key = get_integer_pmc(interp, Parrot_key_integer(interp, key));
                     break;
                   case KEY_string_FLAG:
-                    key = get_string_pmc(interp, key_string(interp, key));
+                    key = get_string_pmc(interp, Parrot_key_string(interp, key));
                     break;
                   case KEY_number_FLAG:
-                    key = get_number_pmc(interp, key_number(interp, key));
+                    key = get_number_pmc(interp, Parrot_key_number(interp, key));
                     break;
                   case KEY_pmc_FLAG:
-                    key = key_pmc(interp, key);
+                    key = Parrot_key_pmc(interp, key);
                     break;
                   default:
                     /* It's impossible if Keys are same (and they are not) */

@@ -376,7 +376,7 @@ Main set function.
         PMC *list_entry = VTABLE_get_pmc_keyed(INTERP, attrs->hash, key);
         if (!PMC_IS_NULL(list_entry)) {
             /* We have old entry. Just update value */
-            PMC * const nextkey = key_next(INTERP, key);
+            PMC * const nextkey = Parrot_key_next(INTERP, key);
             if (nextkey) {
                 /* XXX old_value is unused.  Should we be storing this at all? */
                 PMC * const old_value = VTABLE_get_pmc_keyed_int(INTERP, list_entry,

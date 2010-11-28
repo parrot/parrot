@@ -105,7 +105,7 @@ void Parrot_pa_remove(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(ptr))
-#define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_C = (\
+#define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
