@@ -720,7 +720,7 @@ Parrot_dyn_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *
      * XXX Parrot_ex_throw_from_c_args? return PMCNULL?
      * PMC Undef seems convenient, because it can be queried with get_bool()
      */
-    if (!path || !handle)
+    if (STRING_IS_NULL(path) || !handle)
         return Parrot_pmc_new(interp, enum_class_Undef);
 
     return run_init_lib(interp, handle, lib_name, wo_ext);
