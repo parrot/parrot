@@ -171,12 +171,12 @@ show_last_error_and_exit(Parrot_PMC interp)
         exit(EXIT_FAILURE);
     }
     
-    if (errmsg) {
-        char * errmsg_raw;
-        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw);
-        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
-        Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
-    }
+    /* if (errmsg) { */
+    /*     char * errmsg_raw; */
+    /*     Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw); */
+    /*     fprintf(stderr, "PARROT VM: %s\n", errmsg_raw); */
+    /*     Parrot_api_string_free_exported_ascii(interp, errmsg_raw); */
+    /* } */
     exit(exit_code);
 }
 
